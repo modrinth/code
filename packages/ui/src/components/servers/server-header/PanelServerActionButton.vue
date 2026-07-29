@@ -21,6 +21,8 @@
 					:actions="stopSplitActions"
 					:primary-disabled="!canTakeAction"
 					:dropdown-disabled="!canKill"
+					:primary-tooltip="busyTooltip"
+					:dropdown-tooltip="busyTooltip"
 				>
 					<template #kill_server>
 						<SlashIcon class="h-5 w-5" />
@@ -37,6 +39,7 @@
 					:primary-disabled="true"
 					:dropdown-disabled="!canKill"
 					:primary-muted="true"
+					:dropdown-tooltip="busyTooltip"
 				>
 					<template #kill_server>
 						<SlashIcon class="h-5 w-5" />

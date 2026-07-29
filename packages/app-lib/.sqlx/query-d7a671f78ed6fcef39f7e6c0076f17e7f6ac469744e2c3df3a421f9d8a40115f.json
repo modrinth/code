@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instance_content_sets\n\t\tSET loader_version = ?, modified = ?\n\t\tWHERE id = (\n\t\t\tSELECT applied_content_set_id\n\t\t\tFROM instances\n\t\t\tWHERE id = ?\n\t\t)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "d7a671f78ed6fcef39f7e6c0076f17e7f6ac469744e2c3df3a421f9d8a40115f"
+}

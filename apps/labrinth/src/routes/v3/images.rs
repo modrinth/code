@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use super::threads::is_authorized_thread;
 use crate::auth::checks::{is_team_member_project, is_team_member_version};
 use crate::auth::get_user_from_headers;
@@ -8,7 +6,6 @@ use crate::database::PgPool;
 use crate::database::models::{
     project_item, report_item, thread_item, version_item,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
@@ -16,11 +13,12 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_limited_from_payload;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("image", web::post().to(images_add));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(images_add);
 }
 
 #[derive(Serialize, Deserialize)]
@@ -38,10 +36,24 @@ pub struct ImageUpload {
     pub report_id: Option<ReportId>,
 }
 
+#[utoipa::path(
+	tag = "images",
+	params(
+		("ext" = String, Query),
+		("context" = String, Query),
+		("project_id" = Option<String>, Query),
+		("version_id" = Option<VersionId>, Query),
+		("thread_message_id" = Option<ThreadMessageId>, Query),
+		("report_id" = Option<ReportId>, Query)
+	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
+	responses((status = OK))
+)]
+#[post("/image")]
 pub async fn images_add(
     req: HttpRequest,
     web::Query(data): web::Query<ImageUpload>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -191,7 +203,7 @@ pub async fn images_add(
         &data.ext,
         None,
         None,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 

@@ -41,6 +41,16 @@ export const Default: Story = {
 	},
 }
 
+export const SharedWithOwner: Story = {
+	args: {
+		...baseMedalServer,
+		name: 'Medal Co-op Server',
+		owner: {
+			username: 'Prospector',
+		},
+	},
+}
+
 export const ConfiguringNewServer: Story = {
 	args: {
 		...baseMedalServer,

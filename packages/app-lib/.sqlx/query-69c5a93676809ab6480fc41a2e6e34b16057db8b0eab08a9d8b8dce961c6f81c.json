@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT texture_key FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? ORDER BY display_order ASC, rowid ASC",
+  "describe": {
+    "columns": [
+      {
+        "name": "texture_key",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "69c5a93676809ab6480fc41a2e6e34b16057db8b0eab08a9d8b8dce961c6f81c"
+}

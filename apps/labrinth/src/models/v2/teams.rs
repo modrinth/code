@@ -8,7 +8,7 @@ use crate::models::{
 };
 
 /// A member of a team
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct LegacyTeamMember {
     pub role: String,
     // is_owner removed, and role hardcoded to Owner if true,

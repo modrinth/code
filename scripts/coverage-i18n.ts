@@ -1,18 +1,18 @@
-import { parse as parseVue } from '@vue/compiler-sfc'
+import type { TSESTree } from '@typescript-eslint/typescript-estree'
+import { AST_NODE_TYPES, parse as parseTs } from '@typescript-eslint/typescript-estree'
 import {
-	parse as parseTemplate,
 	NodeTypes,
+	parse as parseTemplate,
+	type AttributeNode,
+	type ElementNode,
 	type RootNode,
 	type TemplateChildNode,
-	type ElementNode,
-	type AttributeNode,
 	type TextNode,
 } from '@vue/compiler-dom'
-import { parse as parseTs, AST_NODE_TYPES } from '@typescript-eslint/typescript-estree'
-import type { TSESTree } from '@typescript-eslint/typescript-estree'
+import { parse as parseVue } from '@vue/compiler-sfc'
 import chalk from 'chalk'
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 
 interface FileResult {
 	path: string
@@ -77,7 +77,13 @@ const TRANSLATABLE_ATTRS = new Set([
 ])
 
 // i18n symbols that indicate i18n usage
-const I18N_SYMBOLS = ['useVIntl', 'defineMessage', 'defineMessages', 'IntlFormatted', 'useI18n'] as const
+const I18N_SYMBOLS = [
+	'useVIntl',
+	'defineMessage',
+	'defineMessages',
+	'IntlFormatted',
+	'useI18n',
+] as const
 const I18N_CALL_PATTERNS = ['formatMessage', '$t'] as const
 
 function findVueFiles(dir: string): string[] {
@@ -88,7 +94,11 @@ function findVueFiles(dir: string): string[] {
 		for (const entry of entries) {
 			const fullPath = path.join(currentDir, entry.name)
 			if (entry.isDirectory()) {
-				if (!entry.name.startsWith('.') && entry.name !== 'node_modules' && entry.name !== 'legal') {
+				if (
+					!entry.name.startsWith('.') &&
+					entry.name !== 'node_modules' &&
+					entry.name !== 'legal'
+				) {
 					walk(fullPath)
 				}
 			} else if (entry.isFile() && entry.name.endsWith('.vue')) {
@@ -207,8 +217,13 @@ function countI18nCallsInExpression(expression: string): number {
 				}
 			}
 			// Also handle this.formatMessage() or intl.formatMessage()
-			if (callee.type === AST_NODE_TYPES.MemberExpression && callee.property.type === AST_NODE_TYPES.Identifier) {
-				if (I18N_CALL_PATTERNS.includes(callee.property.name as (typeof I18N_CALL_PATTERNS)[number])) {
+			if (
+				callee.type === AST_NODE_TYPES.MemberExpression &&
+				callee.property.type === AST_NODE_TYPES.Identifier
+			) {
+				if (
+					I18N_CALL_PATTERNS.includes(callee.property.name as (typeof I18N_CALL_PATTERNS)[number])
+				) {
 					count++
 				}
 			}
@@ -553,11 +568,7 @@ function main() {
 	const rootDir = path.resolve(__dirname, '..')
 
 	// Directories to scan for Vue files
-	const scanDirs = [
-		'apps/frontend/src',
-		'apps/app-frontend/src',
-		'packages/ui/src',
-	]
+	const scanDirs = ['apps/frontend/src', 'apps/app-frontend/src', 'packages/ui/src']
 
 	if (!jsonOutput) {
 		console.log()

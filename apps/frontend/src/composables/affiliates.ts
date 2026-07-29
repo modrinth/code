@@ -1,8 +1,9 @@
 export const useAffiliates = () => {
+	const config = useRuntimeConfig()
 	const affiliateCookie = useCookie('mrs_afl', {
 		maxAge: 60 * 60 * 24 * 7, // 7 days
 		sameSite: 'lax',
-		secure: true,
+		secure: config.public.cookieSecure,
 		httpOnly: false,
 		path: '/',
 	})

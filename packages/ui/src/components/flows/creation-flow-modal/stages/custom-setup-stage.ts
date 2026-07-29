@@ -46,12 +46,14 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 				icon: PlusIcon,
 				iconPosition: 'before' as const,
 				color: 'brand' as const,
-				disabled,
+				disabled: disabled || ctx.finishDisabled.value,
 				loading: ctx.loading.value,
+				tooltip: ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined,
 				onClick: () => ctx.finish(),
 			}
 		}
 
+		const finishDisabled = !goesToNextStage && ctx.finishDisabled.value
 		return {
 			label: ctx.formatMessage(
 				goesToNextStage ? commonMessages.continueButton : creationFlowMessages.finishButton,
@@ -59,7 +61,8 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			icon: goesToNextStage ? RightArrowIcon : null,
 			iconPosition: 'after' as const,
 			color: goesToNextStage ? undefined : ('brand' as const),
-			disabled,
+			disabled: disabled || finishDisabled,
+			tooltip: finishDisabled ? ctx.finishDisabledTooltip.value : undefined,
 			onClick: () => {
 				if (goesToNextStage) {
 					ctx.modal.value?.nextStage()

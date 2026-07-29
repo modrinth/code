@@ -10,15 +10,16 @@ use crate::{
 };
 
 use super::super::{
-    ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
-    condense_country, none_if_empty, none_if_zero_version_id,
+    COUNTRY_PLAYTIME_PRIVACY_FLOOR_SECONDS, ClickhouseFilterParam,
+    QueryClickhouseContext, add_to_time_slice, apply_country_privacy,
+    none_if_empty, none_if_zero_version_id, normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
 const TIME_RANGE_START: &str = "{time_range_start: UInt64}";
 const TIME_RANGE_END: &str = "{time_range_end: UInt64}";
 const TIME_SLICES: &str = "{time_slices: UInt64}";
-const PROJECT_IDS: &str = "{project_ids: Array(UInt64)}";
+const PROJECT_IDS: &str = "project_ids";
 
 /// Fields for [`super::ReturnMetrics::project_playtime`].
 #[derive(
@@ -79,6 +80,7 @@ pub struct ProjectPlaytime {
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct PlaytimeRow {
     bucket: u64,
+    source_project_id: DBProjectId,
     project_id: DBProjectId,
     parent_version_id: DBVersionId,
     version_id: DBVersionId,
@@ -94,15 +96,23 @@ const PLAYTIME: &str = {
     const USE_LOADER: &str = "{use_loader: Bool}";
     const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
     const USE_COUNTRY: &str = "{use_country: Bool}";
-    const PARENT_VERSION_IDS: &str = "{parent_version_ids: Array(UInt64)}";
-    const FILTER_VERSION_ID: &str = "{filter_version_id: Array(UInt64)}";
-    const FILTER_LOADER: &str = "{filter_loader: Array(String)}";
-    const FILTER_GAME_VERSION: &str = "{filter_game_version: Array(String)}";
-    const FILTER_COUNTRY: &str = "{filter_country: Array(String)}";
+    const PARENT_VERSION_IDS: &str = "parent_version_ids";
+    const FILTER_VERSION_ID: &str = "filter_version_id";
+    const FILTER_LOADER: &str = "filter_loader";
+    const FILTER_GAME_VERSION: &str = "filter_game_version";
+    const FILTER_COUNTRY: &str = "filter_country";
 
     formatcp!(
-        "SELECT
+        "WITH
+            ? AS {PROJECT_IDS},
+            ? AS {PARENT_VERSION_IDS},
+            ? AS {FILTER_VERSION_ID},
+            ? AS {FILTER_LOADER},
+            ? AS {FILTER_GAME_VERSION},
+            ? AS {FILTER_COUNTRY}
+        SELECT
             bucket,
+            source_project_id,
             if({USE_PROJECT_ID}, source_project_id, 0) AS project_id,
             parent_version_id,
             version_id,
@@ -122,7 +132,8 @@ const PLAYTIME: &str = {
                 seconds
             FROM playtime
             WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                recorded >= {TIME_RANGE_START}
+                AND recorded < {TIME_RANGE_END}
                 AND playtime.project_id IN {PROJECT_IDS}
                 AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
                 AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})
@@ -142,14 +153,15 @@ const PLAYTIME: &str = {
                 seconds
             FROM playtime
             WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                recorded >= {TIME_RANGE_START}
+                AND recorded < {TIME_RANGE_END}
                 AND parent IN {PARENT_VERSION_IDS}
                 AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
                 AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})
                 AND (empty({FILTER_GAME_VERSION}) OR playtime.game_version IN {FILTER_GAME_VERSION})
                 AND (empty({FILTER_COUNTRY}) OR playtime.country IN {FILTER_COUNTRY})
         )
-        GROUP BY bucket, project_id, parent_version_id, version_id, loader, game_version, country"
+        GROUP BY bucket, source_project_id, project_id, parent_version_id, version_id, loader, game_version, country"
     )
 };
 
@@ -172,10 +184,22 @@ pub(crate) async fn fetch(
     let uses = |field| metrics.bucket_by.contains(&field);
     let use_columns = &[
         ("use_project_id", uses(F::ProjectId)),
-        ("use_version_id", uses(F::VersionId)),
-        ("use_loader", uses(F::Loader)),
-        ("use_game_version", uses(F::GameVersion)),
-        ("use_country", uses(F::Country)),
+        (
+            "use_version_id",
+            uses(F::VersionId) || !metrics.filter_by.version_id.is_empty(),
+        ),
+        (
+            "use_loader",
+            uses(F::Loader) || !metrics.filter_by.loader.is_empty(),
+        ),
+        (
+            "use_game_version",
+            uses(F::GameVersion) || !metrics.filter_by.game_version.is_empty(),
+        ),
+        (
+            "use_country",
+            uses(F::Country) || !metrics.filter_by.country.is_empty(),
+        ),
     ];
     let uses_column = |name| {
         use_columns
@@ -189,28 +213,16 @@ pub(crate) async fn fetch(
         .param("time_range_start", cx.req.time_range.start.timestamp())
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len())
-        .param("project_ids", cx.project_ids)
-        .param("parent_version_ids", cx.parent_version_ids);
+        .bind(cx.project_ids)
+        .bind(cx.parent_version_ids);
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
     }
     for filter_param in [
-        ClickhouseFilterParam::VersionId(
-            "filter_version_id",
-            &metrics.filter_by.version_id,
-        ),
-        ClickhouseFilterParam::String(
-            "filter_loader",
-            &metrics.filter_by.loader,
-        ),
-        ClickhouseFilterParam::String(
-            "filter_game_version",
-            &metrics.filter_by.game_version,
-        ),
-        ClickhouseFilterParam::String(
-            "filter_country",
-            &metrics.filter_by.country,
-        ),
+        ClickhouseFilterParam::VersionId(&metrics.filter_by.version_id),
+        ClickhouseFilterParam::String(&metrics.filter_by.loader),
+        ClickhouseFilterParam::String(&metrics.filter_by.game_version),
+        ClickhouseFilterParam::String(&metrics.filter_by.country),
     ] {
         query = filter_param.bind(query);
     }
@@ -228,11 +240,25 @@ pub(crate) async fn fetch(
             } else {
                 row.project_id
             };
+        let source_project_id = if row.source_project_id.0 == 0 {
+            parent_version_projects
+                .get(&row.parent_version_id)
+                .copied()
+                .unwrap_or(row.source_project_id)
+        } else {
+            row.source_project_id
+        };
         let key = PlaytimeBucket {
             bucket: row.bucket,
             project_id,
             version_id: uses_column("use_version_id").then_some(row.version_id),
-            loader: uses_column("use_loader").then(|| row.loader.clone()),
+            loader: uses_column("use_loader").then(|| {
+                normalize_loader_for_project(
+                    row.loader.clone(),
+                    source_project_id,
+                    cx.project_loaders,
+                )
+            }),
             game_version: uses_column("use_game_version")
                 .then(|| row.game_version.clone()),
             country: uses_column("use_country").then(|| row.country.clone()),
@@ -241,7 +267,32 @@ pub(crate) async fn fetch(
         *buckets.entry(key).or_default() += row.seconds;
     }
 
-    for (key, seconds) in buckets {
+    let mut output_buckets = HashMap::<PlaytimeBucket, u64>::new();
+    for (mut key, seconds) in buckets {
+        if !apply_country_privacy(
+            &mut key.country,
+            !metrics.filter_by.country.is_empty(),
+            seconds,
+            COUNTRY_PLAYTIME_PRIVACY_FLOOR_SECONDS,
+        ) {
+            continue;
+        }
+        if !uses(F::VersionId) {
+            key.version_id = None;
+        }
+        if !uses(F::Loader) {
+            key.loader = None;
+        }
+        if !uses(F::GameVersion) {
+            key.game_version = None;
+        }
+        if !uses(F::Country) {
+            key.country = None;
+        }
+        *output_buckets.entry(key).or_default() += seconds;
+    }
+
+    for (key, seconds) in output_buckets {
         add_to_time_slice(
             cx.time_slices,
             key.bucket as usize,
@@ -253,9 +304,7 @@ pub(crate) async fn fetch(
                         .and_then(none_if_zero_version_id),
                     loader: key.loader.and_then(none_if_empty),
                     game_version: key.game_version.and_then(none_if_empty),
-                    country: key
-                        .country
-                        .map(|country| condense_country(country, seconds)),
+                    country: key.country,
                     seconds,
                 }),
             }),

@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { DeepReadonly, Ref } from 'vue'
+import type { DeepReadonly, Ref, ShallowRef } from 'vue'
 
 import { createContext } from '.'
 
@@ -17,9 +17,12 @@ export interface ProjectPageContext {
 	// Lazy version loading (client-side only)
 	versions: Ref<Labrinth.Versions.v2.Version[] | null>
 	versionsLoading: Ref<boolean>
+	versionsLoaded: Ref<boolean>
 	// Lazy dependencies loading (client-side only)
 	dependencies: Ref<Labrinth.Projects.v2.DependencyInfo | null>
 	dependenciesLoading: Ref<boolean>
+
+	thread: ShallowRef<Labrinth.Threads.v3.Thread | null | undefined>
 
 	cdnDownloadReason: DeepReadonly<Ref<CdnDownloadReason>>
 

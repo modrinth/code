@@ -4,13 +4,14 @@ use serde::Serialize;
 use std::io::Cursor;
 use tauri::Runtime;
 use tauri_plugin_dialog::DialogExt;
-use theseus::profile::get_full_path;
+use theseus::instance::get_full_path;
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("files")
         .invoke_handler(tauri::generate_handler![
             file_extract_zip,
             file_save_as,
+            file_read_dragged_file,
         ])
         .build()
 }
@@ -22,13 +23,26 @@ pub struct ExtractDryRunResult {
 }
 
 #[tauri::command]
+pub async fn file_read_dragged_file(path: String) -> Result<Vec<u8>> {
+    let metadata = tokio::fs::metadata(&path).await?;
+    if !metadata.is_file() {
+        return Err(theseus::Error::from(theseus::ErrorKind::OtherError(
+            "Dropped path is not a file".to_string(),
+        ))
+        .into());
+    }
+
+    Ok(tokio::fs::read(path).await?)
+}
+
+#[tauri::command]
 pub async fn file_extract_zip(
-    instance_path: &str,
+    instance_id: &str,
     file_path: &str,
     override_conflicts: bool,
     dry_run: bool,
 ) -> Result<Option<ExtractDryRunResult>> {
-    let base = get_full_path(instance_path).await?;
+    let base = get_full_path(instance_id).await?;
     let zip_path = base.join(file_path);
     let canonical_zip = tokio::fs::canonicalize(&zip_path).await?;
     let canonical_base = tokio::fs::canonicalize(&base).await?;
@@ -132,10 +146,10 @@ pub async fn file_extract_zip(
 #[tauri::command]
 pub async fn file_save_as<R: Runtime>(
     app: tauri::AppHandle<R>,
-    instance_path: &str,
+    instance_id: &str,
     file_path: &str,
 ) -> Result<()> {
-    let base = get_full_path(instance_path).await?;
+    let base = get_full_path(instance_id).await?;
     let source = base.join(file_path);
     let file_name = source
         .file_name()

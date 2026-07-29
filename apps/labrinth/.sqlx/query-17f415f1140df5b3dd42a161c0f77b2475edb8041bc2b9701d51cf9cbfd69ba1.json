@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tselect\n\t\t\tf.url,\n\t\t\tf.version_id as \"version_id: DBVersionId\",\n\t\t\tv.mod_id as \"project_id: DBProjectId\"\n\t\tfrom files f\n\t\tinner join versions v on v.id = f.version_id\n\t\twhere f.id = $1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "17f415f1140df5b3dd42a161c0f77b2475edb8041bc2b9701d51cf9cbfd69ba1"
+}

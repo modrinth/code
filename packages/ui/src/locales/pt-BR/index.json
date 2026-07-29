@@ -1,9 +1,12 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Você não tem permissão."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Criar link de afiliado"
   },
   "affiliate.create.header": {
-    "defaultMessage": "Criando novo código de afiliado"
+    "defaultMessage": "Criando código de afiliado"
   },
   "affiliate.create.title.description": {
     "defaultMessage": "Dar a seu link afiliado um nome para que saiba de onde as pessoas estão vindo!"
@@ -47,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "Novo"
   },
+  "badge.release": {
+    "defaultMessage": "Estável"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
@@ -65,17 +71,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Não foi possível carregar os detalhes da assinatura."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 dias"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/mês"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/trimestre"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/ano"
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 dias} monthly {/mes} quarterly {/trimestre} yearly {/ano} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Sua próxima cobrança será em <charge-date>{date}</charge-date>."
@@ -99,13 +96,13 @@
     "defaultMessage": "Filtrar resultados..."
   },
   "browse.no-results": {
-    "defaultMessage": "Sem resultados encontrados para sua consulta!"
+    "defaultMessage": "Sem resultados encontrados para sua busca!"
   },
   "browse.offline": {
     "defaultMessage": "Você está offline. Conecte a internet para navegar no Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {sombreadores} plugin {plugins} datapack {pacotes de dados} server {servidores} other {projetos}}..."
+    "defaultMessage": "Buscar {projectType}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Selecione projetos"
@@ -120,13 +117,13 @@
     "defaultMessage": "Você selecionou {count, plural, one {# projeto para instalação. Instale-o agora ou volte sem instalá-lo} other {# projetos para instalação. Instale-os agora ou volte sem instalá-los}}."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
-    "defaultMessage": "Selecione projetos não instalados"
+    "defaultMessage": "Projetos ainda não instalados"
   },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "Descartar"
   },
   "browse.selected-projects-leave-modal.header": {
-    "defaultMessage": "Projetos selecionados ainda não instalados"
+    "defaultMessage": "Projetos ainda não instalados"
   },
   "browse.view-prefix": {
     "defaultMessage": "Ver:"
@@ -204,7 +201,7 @@
     "defaultMessage": "Seguir"
   },
   "button.hide-snapshots": {
-    "defaultMessage": "Esconder snapshots"
+    "defaultMessage": "Ocultar snapshots"
   },
   "button.install": {
     "defaultMessage": "Instalar"
@@ -224,8 +221,11 @@
   "button.open-folder": {
     "defaultMessage": "Abrir pasta"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Abrir no navegador"
+  },
   "button.open-in-folder": {
-    "defaultMessage": "Abrir na pasta"
+    "defaultMessage": "Abrir pasta"
   },
   "button.open-in-modrinth": {
     "defaultMessage": "Abrir no Modrinth"
@@ -234,7 +234,7 @@
     "defaultMessage": "Jogar"
   },
   "button.refresh": {
-    "defaultMessage": "Recarregar"
+    "defaultMessage": "Atualizar"
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Reinstalar pacote de mods"
@@ -261,10 +261,10 @@
     "defaultMessage": "Redefinir"
   },
   "button.reset-server": {
-    "defaultMessage": "Reiniciar servidor"
+    "defaultMessage": "Redefinir servidor"
   },
   "button.retry": {
-    "defaultMessage": "Retentar"
+    "defaultMessage": "Tentar novamente"
   },
   "button.save": {
     "defaultMessage": "Salvar"
@@ -279,19 +279,22 @@
     "defaultMessage": "Exibir todas as versões"
   },
   "button.show-file": {
-    "defaultMessage": "Mostrar arquivo"
+    "defaultMessage": "Exibir arquivo"
   },
   "button.sign-in": {
     "defaultMessage": "Iniciar sessão"
   },
   "button.sign-out": {
-    "defaultMessage": "Sair"
+    "defaultMessage": "Encerrar sessão"
   },
   "button.sign-up": {
-    "defaultMessage": "Entrar"
+    "defaultMessage": "Criar conta"
   },
   "button.stop": {
     "defaultMessage": "Parar"
+  },
+  "button.switch-to-version": {
+    "defaultMessage": "Trocar para versão"
   },
   "button.switch-version": {
     "defaultMessage": "Trocar versão"
@@ -306,7 +309,7 @@
     "defaultMessage": "Atualizar"
   },
   "button.upload-image": {
-    "defaultMessage": "Inserir imagem"
+    "defaultMessage": "Enviar imagem"
   },
   "changelog.justNow": {
     "defaultMessage": "Agora pouco"
@@ -315,13 +318,34 @@
     "defaultMessage": "App"
   },
   "changelog.product.hosting": {
-    "defaultMessage": "Hosting"
+    "defaultMessage": "Hospedagem"
   },
   "changelog.product.web": {
     "defaultMessage": "Plataforma"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Esta coleção está vazia."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Carregando projetos..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Nenhum projeto corresponde à sua busca."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# projeto} other {# projetos}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Buscar projetos"
+  },
   "collections.label.private": {
     "defaultMessage": "Privado"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "conteúdo"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, =0 {Nenhum item} one {# item} other {# itens}}"
   },
   "content.card.select-project": {
     "defaultMessage": "Selecionar {project}"
@@ -348,10 +372,13 @@
     "defaultMessage": "Aviso de exclusão"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Excluir {count} {itemType}{count, plural, one {} other {s}}"
+    "defaultMessage": "Excluir {count, number} {itemType}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Excluir {itemType}{count, plural, one {} other {s}}"
+    "defaultMessage": "Excluir {itemType}"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Desativar {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {O retrocesso de versão} other {A atualização}} pode causar problemas de compatibilidade. Mods ou conteúdo que você adicionou além do pacote de mods serão mantidos, mas podem não ser compatíveis com a nova versão."
@@ -377,8 +404,53 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Desvincular"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Este conteúdo é necessário para outro conteúdo"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {projeto afetado} other {projetos afetados}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Alguns projetos selecionados são instalados como dependências. Excluí-los talvez quebre seu {context} ou interrompa o conteúdo dependente de carregar devidamente."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instância"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "servidor"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Excluir mesmo assim"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Excluir {count, number} {itemType} mesmo assim"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Excluindo"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Desativar dependências após excluir"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "O conteúdo dependente talvez falhe ao carregar ou se desative automaticamente"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Seu {context} talvez feche, não inicie ou se comporte inesperadamente"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Alerta de dependência"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} está instalado como uma dependência. Excluí-lo talvez quebre seu {context} ou interrompa o conteúdo dependente de carregar devidamente."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "O que acontece?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} adicionado"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Arquivos de configuração alterados"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Adicionado (dependência)"
@@ -386,14 +458,68 @@
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Desativado"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Removido (desativado)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Atualizado"
+  },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Não instalar"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Adicionado"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Removido"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Atualizado"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# arquivo} other {# arquivos}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Versão do jogo"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Instalar mesmo assim"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Loader"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Pacote de mods vinculado"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Unlinked modpack"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Pacote de mods atualizado"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Nenhuma alteração de conteúdo"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removido"
   },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} removido (desativado)"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Um arquivo só é revisado se for publicado no Modrinth, independente do formato de arquivo (incluindo .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Alguns conteúdos do seu servidor não puderam ser analisados e podem ser afetados por esta alteração."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Esta atualização contém arquivos não publicados no Modrinth. Recomendamos fortemente a instalar apenas arquivos de fontes que você confia."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Aviso de arquivos desconhecidos"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Desconhecido"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} atualizado"
@@ -428,20 +554,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instância"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Segure Shift ao clicar para pular a confirmação."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "Recomendamos criar uma cópia de segurança antes de prosseguir, assim você poderá restaurar {type, select, server {seu mundo} other {sua instância}} caso algo dê errado."
+    "defaultMessage": "Recomendamos criar uma cópia de segurança antes de prosseguir, assim você poderá restaurar seu {type} caso algo dê errado."
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "O conteúdo do seu pacote de mods agora pode ser encontrado aqui!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Conteúdo do pacote de mods movido"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Não mostrar novamente"
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Conteúdo adicional"
@@ -474,10 +597,10 @@
     "defaultMessage": "Nenhum conteúdo encontrado."
   },
   "content.page-layout.please-wait": {
-    "defaultMessage": "Por favor, aguarde"
+    "defaultMessage": "Aguarde"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Buscar {count} {contentType}..."
+    "defaultMessage": "Buscar {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nomes dos arquivos"
@@ -521,11 +644,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Excluindo {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "Excluindo {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "Excluindo {contentType}..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "Desativando {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "Desativando {count, number} {contentType}"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "Desativando {contentType}..."
@@ -533,20 +662,26 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "Ativando {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "Ativando {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "Ativando {contentType}..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "Atualizando {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "Atualizando {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Atualizando {contentType}..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} selecionado(s)"
+    "defaultMessage": "{count, number} {contentType} {count, plural, one {selecionado} other {selecionados}}"
   },
   "content.selection-bar.selected-count-simple": {
-    "defaultMessage": "{count, number} selecionado(s)"
+    "defaultMessage": "{count, number} {count, plural, one {selecionado} other {selecionados}}"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Criar instância"
@@ -576,7 +711,7 @@
     "defaultMessage": "Procurar número da build..."
   },
   "creation-flow.modal.custom-setup.content-loader.label": {
-    "defaultMessage": "Carregador de conteúdo"
+    "defaultMessage": "Loader de conteúdo"
   },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Selecionar versão de jogo"
@@ -591,16 +726,16 @@
     "defaultMessage": "Selecionar ícone"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
-    "defaultMessage": "Recente"
+    "defaultMessage": "Última"
   },
   "creation-flow.modal.custom-setup.loader-version-type.other": {
-    "defaultMessage": "Outro"
+    "defaultMessage": "Outra"
   },
   "creation-flow.modal.custom-setup.loader-version-type.stable": {
     "defaultMessage": "Estável"
   },
   "creation-flow.modal.custom-setup.loader-version.label": {
-    "defaultMessage": "Versão do carregador"
+    "defaultMessage": "Versão do loader"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
     "defaultMessage": "Selecionar versão do loader"
@@ -621,7 +756,7 @@
     "defaultMessage": "Sem versões disponíveis"
   },
   "creation-flow.modal.final-config.additional-settings.title": {
-    "defaultMessage": "Configurações extras"
+    "defaultMessage": "Configurações adicionais"
   },
   "creation-flow.modal.final-config.backup.before-reset-server.name": {
     "defaultMessage": "Antes do servidor reiniciar"
@@ -765,10 +900,10 @@
     "defaultMessage": "Buscar pacotes de mods"
   },
   "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Uma instância é uma configuração do Minecraft com um carregador, versão e mods específicos."
+    "defaultMessage": "Uma instância é uma configuração do Minecraft com um loader, versão e mods específicos."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
-    "defaultMessage": "Comece do zero, escolhendo um carregador e uma versão do jogo."
+    "defaultMessage": "Comece do zero, escolhendo um loader e uma versão do jogo."
   },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Configuração personalizada"
@@ -818,6 +953,273 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Configurar servidor"
   },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "Adicionar {count, plural, one {# arquivo} other {# arquivos}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Selecione os arquivos que devem ser movidos para este grupo."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "Não existem arquivos em outros grupos que possam ser movidos para cá."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Não foi possível carregar os arquivos"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "Nenhum arquivo corresponde à sua busca."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Buscar arquivos..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {# Arquivo selecionado} other {# Arquivos selecionados}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Adicionar arquivos a este grupo"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Adicionar arquivos..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Não foi possível adicionar arquivos"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "Conteúdo não permitido"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Aprovado"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Prova rejeitada"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Concluído"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "Sem permissão"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Não permitido"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Pendente"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Informação rejeitada"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Outro"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "Adicionar atribuição"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Todos os direitos reservados/Sem licença"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Link para a licença"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "Nome da licença, preferencialmente um identificador SPDX"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Por favor, selecione uma licença."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "O link deve ser uma URL válida."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "ex.: MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(opcional)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Licença"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "Link para a obra"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "link-para-a-licença"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "link-para-a-obra"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Este parece ser um link do Modrinth. Se este conteúdo estiver disponível no Modrinth, é provável que seu pacote tenha sido exportado incorretamente. Se você o baixou de outro site, tente baixar a versão do Modrinth; às vezes, os arquivos não são idênticos."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Notas"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Escreva algo aqui..."
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "Captura de tela de comprovação {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Remover imagem"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "Imagens de comprovação"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "Arraste e solte para enviar ou clique para selecionar uma imagem"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Caso seja constatado que você mentiu ou manipulou as imagens enviadas, seu projeto e sua conta poderão ser encerrados."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "A equipe da Modrinth poderá verificar os comprovantes apresentados"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Salvar atribuição"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Selecione uma licença..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "Motivo da permissão"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Por favor, inclua um link para sua licença. Caso não possua uma, selecione \"Todos os direitos reservados/Sem licença\""
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Por favor, forneça uma explicação ou envie pelo menos uma imagem como prova."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Por favor, forneça um link."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Por favor, forneça uma nota ou faça o envio de pelo menos uma imagem como prova."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Por favor, faça o envio de uma imagem nos formatos PNG, JPEG, GIF, WebP ou BMP."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Por favor, envie pelo menos uma imagem como prova."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Uma breve explicação ou imagens de comprovação são necessárias."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Explicação"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Grupo de atribuição {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {# arquivo} other {# arquivos}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Arquivos incluídos:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Incluído em {count, plural, one {# versão} other {# versões}}:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "Última atualização em {date} por {user}"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Desconhecido"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Licença:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Link da obra:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Motivo"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Não foi possível salvar a revisão de moderação"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Esses arquivos não são usados ​​atualmente por nenhuma versão."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Notas:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Nenhuma"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Projeto original"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Captura de tela de comprovação {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Imagens de comprovação:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Atribuído automaticamente"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Já vimos este arquivo antes e preparamos uma atribuição para você. Se algo parecer errado, entre em contato com o Suporte do Modrinth através da Central de Ajuda"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Licença"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "A licença deste trabalho permite que você a redistribua em seu pacote de mods."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Envie os documentos de suporte relacionados a esta licença."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Meu projeto"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Trabalho original criado por você."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Faça o envio de arquivos que ajudem a comprovar que você criou este trabalho."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Sem permissão"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Já vimos esse arquivo antes e sua licença normalmente não permite a redistribuição."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "Você não tem permissão para usar este trabalho."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Permissão especial"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "Você obteve permissão especial para redistribuir este trabalho em seu pacote de mods."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Excluir grupo"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Isso excluirá permanentemente este grupo de atribuição e todos os arquivos dentro dele. Esta ação não pode ser desfeita."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Excluir {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Não foi possível excluir o grupo"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Segure Shift ao clicar para pular a confirmação."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Remover do grupo"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Não foi possível dividir o arquivo"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} e mais {count}"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Moderador"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Não"
   },
@@ -842,6 +1244,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Sobrescrever"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Vai sobrescrever <file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Mais de 100 arquivos serão sobrescritos se você prosseguir com a extração; aqui estão alguns deles."
   },
@@ -851,17 +1256,14 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} sobrescrito"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Sobrescrito"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Os arquivos serão sobrescritos"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "Criar {type, select, directory {pasta} other {arquivo}}"
+    "defaultMessage": "Criar {type}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "Criar {type, select, directory {uma pasta} other {um arquivo}}"
+    "defaultMessage": "Criar um {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "ex.: minha-pasta"
@@ -875,8 +1277,11 @@
   "files.delete-modal.header": {
     "defaultMessage": "Excluir arquivo"
   },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Esta pasta e todo o seu conteúdo serão excluídos permanentemente. Esta ação não pode ser desfeita.} other {Este arquivo será excluído permanentemente. Esta ação não pode ser desfeita.}}"
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "Este arquivo será excluído permanentemente. Esta ação não pode ser desfeita."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "Esta pasta e todo seu conteúdo será excluído permanentemente. Esta ação não pode ser desfeita."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Não foi possível carregar o conteúdo do arquivo."
@@ -965,6 +1370,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Diminuir zoom"
   },
+  "files.item-type.file": {
+    "defaultMessage": "arquivo"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "arquivos"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "pasta"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "pastas"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "As operações de arquivo estão desativadas enquanto a operação está em andamento."
   },
@@ -1005,7 +1422,7 @@
     "defaultMessage": "ex.: /minha-pasta"
   },
   "files.move-modal.header": {
-    "defaultMessage": "Mover {type, select, directory {pasta} other {arquivo}}"
+    "defaultMessage": "Mover {type}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Voltar para a página inicial"
@@ -1076,6 +1493,9 @@
   "files.row.item-count": {
     "defaultMessage": "{count, plural, =0 {Nenhum item} one {# item} other {# itens}}"
   },
+  "files.row.parent-folder": {
+    "defaultMessage": "Pasta parente"
+  },
   "files.table-header.created": {
     "defaultMessage": "Criado"
   },
@@ -1128,7 +1548,7 @@
     "defaultMessage": " - {count} restantes"
   },
   "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Solte {type, select, undefined {arquivos} other {{type}s}} aqui para enviar"
+    "defaultMessage": "Arraste {type} aqui para adicionar"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "O nome deve conter apenas caracteres alfanuméricos, hífens, sublinhados ou espaços."
@@ -1374,7 +1794,7 @@
     "defaultMessage": "Falha ao desvincular o pacote de mods"
   },
   "hosting.loader.loader-version": {
-    "defaultMessage": "{loader, select, null {Carregador} other {{loader}}} versão"
+    "defaultMessage": "{loader, select, null {Loader} other {{loader}}} versão"
   },
   "hosting.loader.repair-started-text": {
     "defaultMessage": "A instalação do seu servidor foi reparada."
@@ -1482,7 +1902,7 @@
     "defaultMessage": "Auto corrigir"
   },
   "installation-settings.incompatible-content.change-loader-button": {
-    "defaultMessage": "Alterar carregador"
+    "defaultMessage": "Alterar loader"
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Desativar conflitos"
@@ -1503,7 +1923,13 @@
     "defaultMessage": "Alterar carregadores é destrutivo"
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "Vinculado ao {projectType, select, server {projeto de servidor} other {pacote de mods}}"
+    "defaultMessage": "Vinculado a {projectType}"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "pacote de mods"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "projeto de servidor"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Versão do {loader}"
@@ -1512,7 +1938,7 @@
     "defaultMessage": "Você precisará redefinir seu servidor para trocar o carregador."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Reinstalar o pacote de mods redefine o conteúdo {type, select, server {do servidor} other {da instancia}} para seu estado original, removendo quaisquer mods ou conteúdo que você tenha adicionado."
+    "defaultMessage": "Reinstalar o pacote de mods redefine o conteúdo do {type} para seu estado original, removendo quaisquer mods ou conteúdo que você tenha adicionado."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Reinstalar pacote de mods"
@@ -1541,11 +1967,23 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Buscar versão do jogo..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "instância"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "instância"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "servidor"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "servidor"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Desvincular"
   },
   "installation-settings.unlink.description": {
-    "defaultMessage": "Desvincular desconecta permanentemente {type, select, server {este servidor} other {esta instância}} do {projectType, select, server {projeto de servidor} other {pacote de mods}}, permitindo que você altere o carregador e a versão do Minecraft, mas você não receberá atualizações futuras."
+    "defaultMessage": "Desvincular desconecta permanentemente este {type} do {projectType}, permitindo que você altere o carregador e a versão do Minecraft, mas você não receberá atualizações futuras."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Verificando..."
@@ -1562,14 +2000,23 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstalar pacote de mods"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Reparar reinstala o carregador e as dependências do Minecraft sem excluir seu conteúdo. Isso pode resolver problemas se seu {type, select, server {servidor não estiver iniciando corretamente} other {jogo não estiver iniciando devido a erros relacionados ao launcher}}."
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "Reparar reinstala o carregador e as dependências do Minecraft sem excluir seu conteúdo. Isso pode resolver problemas se seu jogo não estiver iniciando devido a erros relacionados ao launcher."
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "Reparar reinstala o carregador e as dependências do Minecraft sem excluir seu conteúdo. Isso pode resolver problemas caso seu servidor não esteja iniciando corretamente."
   },
   "instance.confirm-repair.header": {
-    "defaultMessage": "Reparar {type, select, server {servidor} other {instância}}"
+    "defaultMessage": "Reparar {type}"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "instância"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparar"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "servidor"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modo Aventura"
@@ -1597,6 +2044,9 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Instalar projeto"
+  },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "Esta instância usa um carregador ou versão do jogo diferente daquela suportada por este projeto."
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Instalar"
@@ -1637,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nenhum conteúdo encontrado"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Externo"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Este arquivo não está publicado no Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Conteúdo do pacote de mods"
   },
@@ -1645,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Nenhum projeto corresponde com sua busca."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Abrir no Slicer"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Busque {count, number} {count, plural, one {projeto} other {projetos}}"
@@ -1670,6 +2129,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Ocultar incompatíveis"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "Esta versão não está marcada como compatível com esta instância. As dependências não serão instaladas automaticamente."
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "Selecione a versão"
+  },
   "instances.updater-modal.incompatible-update.description": {
     "defaultMessage": "{version} não está marcado como compatível com esta instalação. Pode não iniciar ou apresentar comportamento inesperado."
   },
@@ -1678,6 +2143,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "Atualizar mesmo assim"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Instalar mesmo assim"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Carregando registro de alterações..."
@@ -1698,7 +2166,7 @@
     "defaultMessage": "Selecione a versão para ver seu registro de alteração"
   },
   "instances.updater-modal.show-incompatible": {
-    "defaultMessage": "Ver incompatibilidade"
+    "defaultMessage": "Exibir incompatíveis"
   },
   "instances.updater-modal.switch-to": {
     "defaultMessage": "Trocar para {version}"
@@ -1758,7 +2226,7 @@
     "defaultMessage": "Painel de controle"
   },
   "label.delete": {
-    "defaultMessage": "Apagar"
+    "defaultMessage": "Excluir"
   },
   "label.delete-failed": {
     "defaultMessage": "Falha ao excluir"
@@ -1803,7 +2271,7 @@
     "defaultMessage": "Versão do jogo"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Esconder conteúdo instalado"
+    "defaultMessage": "Ocultar conteúdo já instalado"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Esconder conteúdo selecionado"
@@ -1906,6 +2374,9 @@
   },
   "label.server": {
     "defaultMessage": "Servidor"
+  },
+  "label.server-only": {
+    "defaultMessage": "Apenas servidor"
   },
   "label.servers": {
     "defaultMessage": "Servidores"
@@ -2322,22 +2793,22 @@
     "defaultMessage": "American Express"
   },
   "payment-method.card_display": {
-    "defaultMessage": "{card_brand} com final {last_four}"
+    "defaultMessage": "{card_brand} terminado em {last_four}"
   },
   "payment-method.cashapp": {
-    "defaultMessage": "Aplicativo de pagamento"
+    "defaultMessage": "Cash App"
   },
   "payment-method.charity": {
-    "defaultMessage": "Caridade"
+    "defaultMessage": "Instituição de caridade"
   },
   "payment-method.charity-plural": {
-    "defaultMessage": "Caridades"
+    "defaultMessage": "Instituições de caridade"
   },
   "payment-method.diners": {
     "defaultMessage": "Diners Club"
   },
   "payment-method.discover": {
-    "defaultMessage": "Descubrir"
+    "defaultMessage": "Discover"
   },
   "payment-method.eftpos": {
     "defaultMessage": "EFTPOS"
@@ -2346,19 +2817,19 @@
     "defaultMessage": "Vale-presente"
   },
   "payment-method.gift-card-plural": {
-    "defaultMessage": "Vale-presentes"
+    "defaultMessage": "Vales-presente"
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
   "payment-method.paypal_international": {
-    "defaultMessage": "PayPal Internacional"
+    "defaultMessage": "PayPal (internacional)"
   },
   "payment-method.unionpay": {
     "defaultMessage": "UnionPay"
@@ -2378,6 +2849,9 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.label.badges": {
+    "defaultMessage": "Emblemas"
+  },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Publicado {date}"
   },
@@ -2393,8 +2867,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Cliente ou servidor"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Servidor dedicado"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Servidor"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Um jogador"
   },
   "project-type.all": {
     "defaultMessage": "Todos"
@@ -2497,6 +2977,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "Plataformas"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, one {Plataforma} other {Plataformas}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibilidade"
@@ -2666,11 +3149,17 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, plural, =0 {Nenhum seguidor} one {{count} seguidor} other {{count} seguidores}}"
   },
+  "project.license.error": {
+    "defaultMessage": "Não foi possível obter o texto da licença."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Carregando texto da licença..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Licença"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, plural, =0 {Ninguém online} other {{count} online}}"
-  },
-  "project.online-player-count.tooltip": {
-    "defaultMessage": "{count, plural, =0 {Nenhum jogador} one {{count} jogador} other {{count} jogadores}} online"
   },
   "project.recent-plays": {
     "defaultMessage": "{countPlural, plural, =0 {Nenhuma entrada recente} one {{count} entrada recente} other {{count} entradas recentes}}"
@@ -3071,6 +3560,12 @@
   "project.settings.view.title": {
     "defaultMessage": "Ver"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {download} other {downloads}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {seguidor} other {seguidores}}"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3079,6 +3574,21 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Alternar filtro para {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "Retido"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "Versão retida devido à falta de permissões"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Resolver"
   },
   "project.visibility.archived": {
     "defaultMessage": "Arquivado"
@@ -3109,6 +3619,18 @@
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Não listado pela equipe"
+  },
+  "report.item-type.content": {
+    "defaultMessage": "conteúdo"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "projeto"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "usuário"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "versão"
   },
   "s.bg": {
     "defaultMessage": "Tarefa em segundo plano em execução\t"
@@ -3142,6 +3664,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Mostrar mais"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Avançado"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Excluir pacotes de dados"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Excluir mods"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Excluir plugins"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ambiente"
@@ -3200,8 +3734,557 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Jogo padrão"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Cópias de segurança"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Conteúdo e pacote de mods"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Arquivos e SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Energia e console"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Servidor"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Configurações e tempo de execução"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Usuários e convites"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Ações"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "Buscar ações..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "Conteúdo adicionado"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Conteúdo excluído"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "Conteúdo desativado"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "Conteúdo ativado"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Conteúdo atualizado"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Conteúdo enviado"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Cópia de segurança criada"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Cópia de segurança excluída"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Cópia de segurança renomeada"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "Cópia de segurança restaurada"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "Nome do servidor alterado"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "Subdomínio do servidor alterado"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "Console limpo"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "Executou o comando no console"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "Arquivo excluído"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "Arquivo editado"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "Arquivo renomeado"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "Arquivo enviado"
+  },
+  "servers.access-page.activity-log-filter.action.game-version-edited": {
+    "defaultMessage": "Versão do Minecraft alterada"
+  },
+  "servers.access-page.activity-log-filter.action.java-runtime-modified": {
+    "defaultMessage": "Ambiente de execução do Java alterado"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "Versão do Java alterada"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "Versão do carregador alterada"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "Pacote de mods alterado"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Pacote de mods desvinculado"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "Alocação de porta adicionada"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "Alocação de porta removida"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "Servidor criado"
+  },
+  "servers.access-page.activity-log-filter.action.server-killed": {
+    "defaultMessage": "Encerramento forçado do servidor"
+  },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "Plano alterado"
+  },
+  "servers.access-page.activity-log-filter.action.server-properties-modified": {
+    "defaultMessage": "Propriedades do servidor modificadas"
+  },
+  "servers.access-page.activity-log-filter.action.server-reallocated": {
+    "defaultMessage": "Servidor realocado"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "Servidor reparado"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "Reiniciar servidor"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "Servidor reiniciado"
+  },
+  "servers.access-page.activity-log-filter.action.server-started": {
+    "defaultMessage": "Servidor iniciado"
+  },
+  "servers.access-page.activity-log-filter.action.server-stopped": {
+    "defaultMessage": "Servidor parado"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-login": {
+    "defaultMessage": "Login efetuado via SFTP"
+  },
+  "servers.access-page.activity-log-filter.action.startup-command-modified": {
+    "defaultMessage": "Comando de inicialização alterado"
+  },
+  "servers.access-page.activity-log-filter.action.user-invite-revoked": {
+    "defaultMessage": "Convite de usuário revogado\n    \t\t\t\t\t\t"
+  },
+  "servers.access-page.activity-log-filter.action.user-invited": {
+    "defaultMessage": "Usuário convidado"
+  },
+  "servers.access-page.activity-log-filter.action.user-permission-modified": {
+    "defaultMessage": "Permissões de usuário alteradas"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "Acesso revogado"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "Adicionar filtro"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "Limpar filtros"
+  },
+  "servers.access-page.activity-log-filter.empty-options": {
+    "defaultMessage": "Sem opções disponíveis."
+  },
+  "servers.access-page.activity-log-filter.empty-search": {
+    "defaultMessage": "Nenhuma opção encontrada."
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Instâncias"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Servidor"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "Suporte"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Usuário"
+  },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "Registro de atividades"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "Adicionar usuário"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "Não foi possível enviar o pedido de amizade"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "Convite revogado para {target}."
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "Convite revogado"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "Não foi possível enviar o convite"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "Enviar outro convite para {target}."
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Convite reenviado"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "Convidado {target} como {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Convite enviado"
+  },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "Atualize a página para tentar novamente."
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Não foi possível carregar o acesso"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Acesso revogado para {target}."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Acesso revogado"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Não foi possível remover o acesso"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "Não foi possível atualizar o cargo"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Tudo"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "Função: {role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "Gerencie o conteúdo da instância, arquivos, cópias de segurança e outras configurações."
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Dono"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "Acesso completo, incluindo pagamentos, membros e ações destrutivas."
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Limitado"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Iniciar, parar e visualizar o servidor sem fazer alterações."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Buscar {count} {count, plural, one {usuário} other {usuários}}..."
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Dono"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Limitado"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "Revogar convite"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Revogar acesso"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "Reenviar convite"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "Reenviar em {seconds}"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Ações"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "Entrou"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Cargo"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Usuário"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "Nenhum usuário corresponde aos seus filtros."
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "Ações para {username}"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "Pendente"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Tarefa em segundo plano em execução\t"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Suporte"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Ações"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Tempo"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Usuário"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "Instância"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Instâncias de servidor são ambientes isolados com seu próprio conteúdo instalado e arquivos de mundo."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Em breve!"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "Nenhuma atividade corresponde aos seus filtros."
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "Faça uma ação no seu servidor e você a verá aqui!"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "Adicionou o conteúdo <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "Alterou o conteúdo <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "Excluiu o conteúdo <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "Conteúdo excluído"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "Desativou o conteúdo <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "Ativou o conteúdo <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Atualizou o conteúdo <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "Enviou <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "Alterou a cópia de segurança <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "Alterou a cópia de segurança"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "Alterou a cópia de segurança <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "Cópia de segurança criada"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "Excluiu a cópia de segurança <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "Cópia de segurança excluída"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "Renomeou a cópia de segurança <from></from> para <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "Cópia de segurança renomeada"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "Restaurou a cópia de segurança <backup></backup>"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "Cópia de segurança restaurada"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "Alterou a configuração do servidor"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "Console limpo"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "Executou o comando <command></command> no console"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "Alterou o arquivo <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "Excluiu o arquivo <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Editou o arquivo <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "Renomeou <from></from> para <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "Enviou o arquivo <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Alterou a versão do Minecraft para <version></version>"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Alterou o ambiente de execução do Java para <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Alterou a versão do Java para <java-version></java-version>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Alterou o carregador para <loader></loader> <version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Alterou o carregador para <loader></loader>"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "Alterou a versão do carregador para <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "Versão do carregador limpa"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Pacote de mods alterado"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Pacote de mods alterado para <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "Alterou a versão do pacote de mods para <version></version>"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Pacote de mods desvinculado"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Desvinculou o pacote de mods <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Desvinculou a versão do pacote de mods <version></version>"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "Adicionou a alocação de porta <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Removeu a alocação de porta <port></port>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "Servidor criado"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "Encerramento do servidor forçado"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "Alterou os metadados do servidor"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "Alterou o nome do servidor para <name></name>"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "Alterou o plano para <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, one {# CPU} other {# CPUs}}"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "novo plano"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} GB de RAM"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB de RAM"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB de armazenamento"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB de armazenamento"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Modificou as propriedades do servidor <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Modificou as propriedades do servidor"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Servidor realocado"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Servidor reparado"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Reiniciar servidor"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Servidor reiniciado"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Servidor iniciado"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Servidor parado"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Alterou o subdomínio do servidor para <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "Login efetuado via SFTP"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "Alterou o comando de inicialização para <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Evento desconhecido"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Atividade do servidor registrada"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "Convite revogado para <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "<target-user></target-user> convidado(a)"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "Convidado(a) <target-user></target-user> com <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "Alterou as permissões para <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Alterou as permissões de <target-user></target-user> para <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "Acesso revogado para <target-user></target-user>"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Servidor"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Cópia de segurança {backupName} foi cancelada."
@@ -3323,6 +4406,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Agendamento de cópia de segurança"
   },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Suporte"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Cópia de segurança manual"
   },
@@ -3359,6 +4448,57 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "Sincronização de conteúdo em andamento"
   },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Envie também um pedido de amizade"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "Este usuário já foi convidado"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "Adicionar usuário"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "Convidar"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "Veja a lista completa de permissões para cada cargo <link>aqui</link>."
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "Gerencie o conteúdo da instância, arquivos, cópias de segurança e outras configurações."
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "Selecionar cargo"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Limitado"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Iniciar, parar e visualizar o servidor sem fazer alterações."
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Não use o nome de usuário deles no Minecraft."
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Nome de usuário do Modrinth"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "Nenhum usuário correspondente encontrado."
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Insira o nome de usuário do Modrinth"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "Buscando..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "A instalação falhou"
   },
@@ -3378,7 +4518,7 @@
     "defaultMessage": "Um erro inesperado ocorreu durante a instalação"
   },
   "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Esta versão do Minecraft ou do carregador ainda não é suportada pela Modrinth Hosting."
+    "defaultMessage": "Esta versão do Minecraft ou do carregador ainda não é suportada pelo Modrinth Hosting."
   },
   "servers.installing-banner.phase.installing-addons": {
     "defaultMessage": "Instalando complementos..."
@@ -3411,7 +4551,7 @@
     "defaultMessage": "Já possui um servidor?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Saiba mais sobre a Modrinth Hosting"
+    "defaultMessage": "Saiba mais sobre o Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -3438,7 +4578,7 @@
     "defaultMessage": "Jogue com amigos"
   },
   "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Iniciar sessão"
+    "defaultMessage": "Inicie a sessão"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Configure seu servidor exatamente como um mundo de um jogador."
@@ -3465,16 +4605,16 @@
     "defaultMessage": "Novo"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Seus arquivos serão mantidos por mais {daysRemaining, plural, one {{daysRemaining} dia} other {{daysRemaining} dias}}. Entre em contato com o suporte para baixar os arquivos antes que sejam excluídos. "
+    "defaultMessage": "Seus arquivos serão mantidos por <days-remaining>mais {daysRemaining} {daysRemaining, plural, one {dia} other {dias}}</days-remaining>. Entre em contato com o suporte para baixar os arquivos antes que sejam excluídos."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Seus arquivos serão preservados por 30 dias após o cancelamento."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Seu servidor foi suspenso por ação da moderação. "
+    "defaultMessage": "Seu servidor foi suspenso por ação da moderação."
   },
   "servers.listing.notice.pending-change": {
-    "defaultMessage": "Seu servidor {verb} para o plano {planSize} em <date>{formattedDate}</date>. "
+    "defaultMessage": "Seu servidor irá {verb, select, downgrade {rebaixar} other {atualizar}} para o plano {planSize} em <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Aguarde enquanto configuramos seu servidor. Isso pode levar até 10 minutos."
@@ -3483,7 +4623,7 @@
     "defaultMessage": "Sua assinatura foi cancelada."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Sua assinatura foi cancelada em <date>{formattedDate}</date>. "
+    "defaultMessage": "Sua assinatura foi cancelada em <date>{formattedDate}</date>."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Sua assinatura foi cancelada devido a falha no pagamento."
@@ -3498,10 +4638,16 @@
     "defaultMessage": "Sua assinatura será cancelada em <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Seu servidor foi suspenso. Entre em contato com o Suporte da Modrinth para obter mais informações."
+    "defaultMessage": "Seu servidor foi suspenso. Entre em contato com o Suporte do Modrinth para obter mais informações."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "O hardware do seu servidor está sendo atualizado e estará online novamente em breve."
+  },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "Propriedade de {username}"
   },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "Reassinar"
@@ -3525,7 +4671,7 @@
     "defaultMessage": "Envio em andamento"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Contate o suporte da Modrinth"
+    "defaultMessage": "Contate o suporte do Modrinth"
   },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Nossos sistemas alertam automaticamente nossa equipe quando há algum problema. Já estamos trabalhando para restabelecê-los."
@@ -3540,7 +4686,7 @@
     "defaultMessage": "Se você adquiriu recentemente um servidor Modrinth Hosting, ele está atualmente em uma fila e aparecerá aqui assim que estiver pronto. <warning>Não tente adquirir um novo servidor.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Caso necessite de suporte personalizado em relação ao status do seu servidor, entre em contato com o Suporte da Modrinth."
+    "defaultMessage": "Caso necessite de suporte personalizado em relação ao status do seu servidor, entre em contato com o Suporte do Modrinth."
   },
   "servers.manage.error.title": {
     "defaultMessage": "Não foi possível carregar os servidores"
@@ -3551,8 +4697,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "Novo servidor"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "Nenhum dos servidores que você possui corresponde à sua busca."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "Nenhum servidor encontrado."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "Nenhum servidor compartilhado corresponde à sua busca."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "As informações de pagamento ainda estão sendo carregadas. Abriremos o processo de finalização da compra assim que estiver pronto."
@@ -3596,6 +4748,12 @@
   "servers.manage.settings-hint.title": {
     "defaultMessage": "As configurações do seu servidor foram movidas"
   },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "Servidor compartilhado"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "Seus servidores"
+  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {dia} other {dias}} <hours-count>{hours}</hours-count> {hours, plural, one {hora} other {horas}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuto} other {minutos}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {segundo} other {segundos}} restante..."
   },
@@ -3606,13 +4764,19 @@
     "defaultMessage": "Seu período de teste do servidor Medal terminou e seu servidor foi suspenso. Faça uma atualização para continuar usando o servidor."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Seu servidor foi suspenso. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte da Modrinth para obter mais informações."
+    "defaultMessage": "Seu servidor foi suspenso. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte do Modrinth para obter mais informações."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Seu servidor foi suspenso: {reason}. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte da Modrinth para obter mais informações."
+    "defaultMessage": "Seu servidor foi suspenso: {reason}. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte do Modrinth para obter mais informações."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "O hardware do seu servidor está sendo atualizado e estará online novamente em breve."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "Propriedade de {username}"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Ícone do servidor"
@@ -3665,6 +4829,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Método de pagamento"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "cobrado {interval, select, monthly {mensalmente} quarterly {trimestralmente} yearly {anualmente} other {{interval}}}"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Disponível na América do Norte, Europa e Sudeste Asiático."
   },
@@ -3713,6 +4880,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Revisar"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Austrália"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Europa Central"
   },
@@ -3735,13 +4905,61 @@
     "defaultMessage": "Onde deseja que seu servidor esteja localizado?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Região não listada? <link>Deixe-nos saber onde gostaria de ver o próximo Modrinth Hosting!</link>"
+    "defaultMessage": "Sua região não está listada? <link>Informe-nos onde você gostaria de ver o Modrinth Hosting em seguida!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Europa Ocidental"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "Adicionado {time}"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "Revogar convite"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "Eles não serão adicionados a este servidor"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "Você pode enviar outro convite para eles mais tardem"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "Revogar convite"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "Se você revogar este convite, {username} precisará de um novo convite antes de poder entrar neste servidor."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "Revogar acesso"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "Convidado {time}"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "Convite pendente"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "Revogar acesso"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "Eles perderão imediatamente o acesso ao painel do servidor e não poderão mais editar o conteúdo"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "Eles ainda poderão entrar e jogar no servidor, a menos que você faça alterações separadas"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "Data de adição desconhecida"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "Se você revogar um usuário do seu servidor, precisará convidá-lo novamente para restaurar o acesso."
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "O que acontece?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Ocorreu um erro inesperado durante a instalação. Por favor, tente novamente mais tarde."
@@ -3849,7 +5067,7 @@
     "defaultMessage": "Tema"
   },
   "settings.feature-flags.title": {
-    "defaultMessage": "Sinalização de recursos"
+    "defaultMessage": "Recursos experimentais"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Idiomas padrão"
@@ -3884,11 +5102,83 @@
   "settings.pats.title": {
     "defaultMessage": "Token de acesso pessoal"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Perfil público"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessões"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Adicionar"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Adicionado"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Este usuário já foi convidado."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Cancelar"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Editar link de convite."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Editar link de convite"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Data de expiração"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Seus amigos - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Convidar"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Seu link de convite expira em {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Ou use um link de convite"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "O link de convite foi copiado para a sua área de transferência."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Link copiado"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Não foi possível copiar o link"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Usos máximos"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Nenhum amigo encontrado."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Nenhum usuário correspondente encontrado."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Solicitação enviada"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} precisa aceitar seu pedido de amizade primeiro"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Salvar"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Insira o nome de usuário do Modrinth"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Buscando..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Falha ao atualizar o link de convite"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -4313,6 +5603,93 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Aplicar"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Limpar"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Intervalo fixo personalizado..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Diminuir o período"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "Nenhum intervalo de datas selecionado."
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "Data final"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Aumentar o período"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select, hours {{amount, plural, one {Na última hora} other {Nas últimas {amount} horas}}} days {{amount, plural, one {No último dia} other {Nos últimos # dias}}} weeks {{amount, plural, one {Na última semana} other {Nas últimas # semanas}}} months {{amount, plural, one {No último mês} other {Nos últimos # meses}}} other {Nos últimos dias}}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "No último"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Todo o período"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Últimos 14 dias"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Últimos 180 dias"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Últimos 30 dias"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Últimos 7 dias"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Últimos 90 dias"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Hoje"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "Acumulado no ano"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Ontem"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Selecione o período"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Selecionado"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Selecionando"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "Data inicial"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Quantidade de períodos"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Unidade do período"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "dias"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "horas"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "meses"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "semanas"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Você tem alterações não salvas."
   },
@@ -4336,6 +5713,224 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Dispensar tudo"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Não instalar"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Não exibir este aviso novamente"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Confirmar instalação"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Instalar mesmo assim"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Malware é frequentemente distribuído através de arquivos de mods ao serem compartilhados por plataformas como Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " não foi publicado no Modrinth. Recomendamos fortemente a instalar arquivos de fontes que você confia."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Aviso de arquivo desconhecido"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " contém arquivos não publicados no Modrinth. Recomendamos fortemente a instalar apenas arquivos de fontes que você confia."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Aviso de arquivos desconhecidos"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Um arquivo só é revisado se for publicado no Modrinth, independente do formato de arquivo (incluindo .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Arquivos não reconhecidos"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Este usuário está presente desde a versão alfa do Modrinth, que terminou em novembro de 2020."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Testador Alfa"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Este usuário está presente desde a versão beta do Modrinth, que terminou em fevereiro de 2022."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Clique aqui para ler sobre o lançamento do Modrinth Beta."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Testador Beta"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Os projetos deste usuário alcançaram coletivamente {download_sum} downloads."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} Downloads"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de pacotes de dados no Modrinth antes de seu lançamento em janeiro de 2023."
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "Adotante inicial dos pacotes de dados"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de pacote de mods no Modrinth antes de os lançarmos em maio de 2022."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "Adotante inicial dos pacotes de mods"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de plugins no Modrinth antes de os lançarmos em agosto de 2022."
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "Adotante inicial dos plugins"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de pacote de recursos no Modrinth antes de os lançarmos em agosto de 2022."
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "Adotante inicial dos pacotes de recursos"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de servidores no Modrinth antes de os lançarmos em março de 2026."
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "Adotante inicial dos servidores"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de sombreadores no Modrinth antes de seu lançamento em janeiro de 2023."
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "Adotante inicial dos sombreadores"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "Este usuário participou de um teste alfa fechado do Modrinth Hosting antes do lançamento da versão beta do Modrinth Hosting em novembro de 2024."
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "Testador Alfa do Modrinth Hosting"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "Este usuário trabalha para o Modrinth como Moderador de Conteúdo."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Os moderadores de conteúdo do Modrinth revisam projetos, lidam com denúncias e ajudam a manter o Modrinth seguro."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "Moderador de Conteúdo"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Este usuário está indo além para apoiar o Modrinth e os criadores da plataforma."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Clique aqui para saber mais sobre como se tornar membro."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Membro Modrinth+"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Este usuário participou de pelo menos uma das campanhas de arrecadação do Modrinth para a comunidade LGBTQIA+."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "Clique aqui para conhecer nossa mais recente campanha de arrecadação de fundos para o Orgulho LGBTQIA+."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Apoiador da campanha de arrecadação do Orgulho LGBTQIA+"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Este usuário trabalha para o Modrinth."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Equipe do Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Nome"
+  },
+  "version.content.version": {
+    "defaultMessage": "Versão"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "Dev jar"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadoc jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "Pacote de recursos opcional"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Primário"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Pacote de recursos necessário"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "Arquivo de assinatura"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "Jar fonte"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Outro"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Mudanças"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Compatibilidade"
+  },
+  "version.section.content": {
+    "defaultMessage": "Conteúdo"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Buscar conteúdo..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Qualquer versão compatível"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Qualquer versão"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Versão indisponível"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "Esta versão pode ter sido excluída ou está sendo revisada pelos moderadores."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "A versão solicitada pode ter sido excluída ou está sendo analisada pelos moderadores."
+  },
+  "version.section.files": {
+    "defaultMessage": "Arquivos"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Conteúdo incluído"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Incompatibilidades conhecidas"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "Nenhum registro de alterações fornecido."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Sem carregador de mods"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Dependências opcionais"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Conteúdo necessário"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Recursos suplementares"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Arquivo"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Tamanho"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Tipo"
   }
 }
-

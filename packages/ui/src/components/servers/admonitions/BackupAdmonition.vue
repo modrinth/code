@@ -32,6 +32,8 @@ defineProps<{
 	item: BackupAdmonitionEntry
 	dismissible: boolean
 	cancelling: boolean
+	canManageBackups?: boolean
+	permissionDeniedMessage?: string
 }>()
 
 defineEmits<{
@@ -278,12 +280,24 @@ function getDescription(item: BackupAdmonitionEntry): string {
 		</div>
 		<template #top-right-actions>
 			<ButtonStyled v-if="canCancel(item)" type="outlined" color="blue">
-				<button class="!border" type="button" :disabled="cancelling" @click="$emit('cancel')">
+				<button
+					v-tooltip="canManageBackups === false ? permissionDeniedMessage : undefined"
+					class="!border"
+					type="button"
+					:disabled="cancelling || canManageBackups === false"
+					@click="$emit('cancel')"
+				>
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled v-if="canRetry(item)" color="red" type="outlined">
-				<button class="!border" type="button" @click="$emit('retry')">
+				<button
+					v-tooltip="canManageBackups === false ? permissionDeniedMessage : undefined"
+					class="!border"
+					type="button"
+					:disabled="canManageBackups === false"
+					@click="$emit('retry')"
+				>
 					<RotateCounterClockwiseIcon class="size-5" />
 					{{ formatMessage(commonMessages.retryButton) }}
 				</button>

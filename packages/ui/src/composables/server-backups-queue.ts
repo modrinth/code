@@ -23,7 +23,7 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 		enabled: computed(() => !!worldId.value),
 		refetchInterval: (q) => {
 			const data = q.state.data as Archon.BackupsQueue.v1.BackupsQueueResponse | undefined
-			return data?.active_operations?.length ? 3000 : false
+			return data?.active_operations?.length ? 30_000 : false
 		},
 	})
 

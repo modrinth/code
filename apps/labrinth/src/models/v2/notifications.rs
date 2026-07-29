@@ -1,3 +1,5 @@
+#![allow(clippy::large_stack_arrays)]
+
 use crate::models::ids::{ThreadMessageId, VersionId};
 use crate::models::v3::billing::PriceDuration;
 use crate::models::{
@@ -11,8 +13,9 @@ use crate::models::{
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct LegacyNotification {
     pub id: NotificationId,
     pub user_id: UserId,
@@ -29,14 +32,14 @@ pub struct LegacyNotification {
     pub actions: Vec<LegacyNotificationAction>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct LegacyNotificationAction {
     pub title: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route
     pub action_route: (String, String),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyNotificationBody {
     TaxNotification {
@@ -65,6 +68,18 @@ pub enum LegacyNotificationBody {
         invited_by: UserId,
         team_id: TeamId,
         role: String,
+    },
+    ServerInvite {
+        server_id: Uuid,
+        server_name: String,
+        invited_by: UserId,
+        role: String,
+    },
+    SharedInstanceInvite {
+        shared_instance_id: String,
+        shared_instance_name: String,
+        shared_instance_icon: Option<String>,
+        invited_by: UserId,
     },
     StatusChange {
         project_id: ProjectId,
@@ -146,6 +161,7 @@ pub enum LegacyNotificationBody {
         amount: u64,
         date_available: DateTime<Utc>,
     },
+    DiscordRoleCreatorClub,
     Custom {
         key: String,
         title: String,
@@ -165,6 +181,12 @@ impl LegacyNotification {
             }
             NotificationBody::OrganizationInvite { .. } => {
                 Some("organization_invite".to_string())
+            }
+            NotificationBody::ServerInvite { .. } => {
+                Some("server_invite".to_string())
+            }
+            NotificationBody::SharedInstanceInvite { .. } => {
+                Some("shared_instance_invite".to_string())
             }
             NotificationBody::StatusChange { .. } => {
                 Some("status_change".to_string())
@@ -232,6 +254,9 @@ impl LegacyNotification {
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
+            NotificationBody::DiscordRoleCreatorClub => {
+                Some("discord_role_creator_club".to_string())
+            }
             NotificationBody::Custom { .. } => Some("custom".to_string()),
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
@@ -268,6 +293,28 @@ impl LegacyNotification {
                 invited_by,
                 team_id,
                 role,
+            },
+            NotificationBody::ServerInvite {
+                server_id,
+                server_name,
+                invited_by,
+                role,
+            } => LegacyNotificationBody::ServerInvite {
+                server_id,
+                server_name,
+                invited_by,
+                role,
+            },
+            NotificationBody::SharedInstanceInvite {
+                shared_instance_id,
+                shared_instance_name,
+                shared_instance_icon,
+                invited_by,
+            } => LegacyNotificationBody::SharedInstanceInvite {
+                shared_instance_id,
+                shared_instance_name,
+                shared_instance_icon,
+                invited_by,
             },
             NotificationBody::StatusChange {
                 project_id,
@@ -329,6 +376,9 @@ impl LegacyNotification {
                 amount,
                 date_available,
             },
+            NotificationBody::DiscordRoleCreatorClub => {
+                LegacyNotificationBody::DiscordRoleCreatorClub
+            }
             NotificationBody::LegacyMarkdown {
                 notification_type,
                 name,

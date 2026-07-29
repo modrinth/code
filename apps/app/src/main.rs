@@ -38,7 +38,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir().join("icons"), true)?;
     app.fs_scope()
-        .allow_directory(state.directories.profiles_dir(), true)?;
+        .allow_directory(state.directories.instances_dir(), true)?;
 
     Ok(())
 }
@@ -152,7 +152,7 @@ fn main() {
     builder = builder
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             if let Some(payload) = args.get(1) {
-                tracing::info!("Handling deep link from arg {payload}");
+                tracing::info!("Handling command-line deep link");
                 let payload = payload.clone();
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
@@ -197,7 +197,7 @@ fn main() {
                             .unwrap_or(request);
 
                     tauri::async_runtime::spawn(async move {
-                        tracing::info!("Handling deep link {actual_request}");
+                        tracing::info!("Handling macOS deep link");
 
                         let mut payload = mtx_copy_copy.lock().await;
                         if payload.is_none() {
@@ -213,7 +213,7 @@ fn main() {
             #[cfg(not(target_os = "macos"))]
             app.listen("deep-link://new-url", |url| {
                 let payload = url.payload().to_owned();
-                tracing::info!("Handling deep link {payload}");
+                tracing::info!("Handling deep link");
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
                 ));
@@ -233,16 +233,18 @@ fn main() {
         .plugin(api::auth::init())
         .plugin(api::mr_auth::init())
         .plugin(api::import::init())
+        .plugin(api::install::init())
+        .plugin(api::instance::init())
         .plugin(api::logs::init())
         .plugin(api::jre::init())
         .plugin(api::metadata::init())
         .plugin(api::minecraft_skins::init())
-        .plugin(api::pack::init())
         .plugin(api::process::init())
-        .plugin(api::profile::init())
-        .plugin(api::profile_create::init())
+        .plugin(api::reports::init())
         .plugin(api::settings::init())
+        .plugin(api::shortcuts::init())
         .plugin(api::tags::init())
+        .plugin(api::users::init())
         .plugin(api::utils::init())
         .plugin(api::cache::init())
         .plugin(api::files::init())
@@ -270,10 +272,20 @@ fn main() {
         Ok(app) => {
             app.run(|app, event| {
                 #[cfg(not(any(feature = "updater", target_os = "macos")))]
-                drop((app, event));
+                let _ = app;
+
+                if matches!(&event, tauri::RunEvent::ExitRequested { .. })
+                    && let Err(error) = tauri::async_runtime::block_on(
+                        theseus::minecraft_skins::flush_pending_skin_change(),
+                    )
+                {
+                    tracing::warn!(
+                        "Failed to flush pending Minecraft skin change before exit: {error}"
+                    );
+                }
 
                 #[cfg(feature = "updater")]
-                if matches!(event, tauri::RunEvent::Exit) {
+                if matches!(&event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
                     let should_restart = State::get_if_initialized()
                         .map(|s| {
@@ -297,6 +309,11 @@ fn main() {
                         }
 
                         set_changelog_toast(Some(update.version.clone()));
+                        let update = if should_restart {
+                            (**update).clone()
+                        } else {
+                            (**update).clone().restart_after_install(false)
+                        };
                         match update.install(data) {
                             Ok(()) => {
                                 if should_restart {

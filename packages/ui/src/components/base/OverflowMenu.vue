@@ -14,7 +14,7 @@
 				<div
 					v-if="isDivider(option)"
 					:key="`divider-${index}`"
-					class="h-px mx-3 my-2 bg-surface-5"
+					class="h-px mx-[0.625rem] my-2 bg-surface-5"
 				></div>
 				<Button
 					v-else
@@ -144,9 +144,6 @@ defineExpose({ open, close })
 	--text-color: var(--color-base);
 	--background-color: transparent;
 	justify-content: flex-start;
-
-	&:not(:last-child) {
-		margin-bottom: var(--gap-xs);
-	}
+	padding: 0.55rem 0.625rem;
 }
 </style>

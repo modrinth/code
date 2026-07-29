@@ -24,7 +24,8 @@ export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
 export type GeneratorSettingsMode = 'default' | 'flat' | 'custom'
-export type LoaderManifestResolver = (loader: string) => Promise<LauncherMeta.Manifest.v0.Manifest>
+export type LoaderManifest = LauncherMeta.Manifest.v0.Manifest
+export type LoaderManifestResolver = (loader: string) => Promise<LoaderManifest>
 export interface LoaderVersionEntry {
 	id: string
 	stable: boolean
@@ -160,7 +161,7 @@ export interface CreationFlowContextValue {
 	hideLoaderChips: ComputedRef<boolean>
 	hideLoaderVersion: ComputedRef<boolean>
 	showSnapshots: Ref<boolean>
-	loaderVersionsCache: Ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>
+	loaderVersionsCache: Ref<Record<string, LoaderManifest>>
 	paperSupportedVersions: Ref<Set<string> | null>
 	purpurSupportedVersions: Ref<Set<string> | null>
 
@@ -186,6 +187,8 @@ export interface CreationFlowContextValue {
 
 	// Loading state (set when finish() is called, cleared on reset)
 	loading: Ref<boolean>
+	finishDisabled: ComputedRef<boolean>
+	finishDisabledTooltip: ComputedRef<string | undefined>
 
 	// Backup state (set by InlineBackupCreator in reset-server flow)
 	isBackingUp: Ref<boolean>
@@ -232,6 +235,8 @@ export interface CreationFlowOptions {
 	searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest?: LoaderManifestResolver
+	finishDisabled?: ComputedRef<boolean>
+	finishDisabledTooltip?: ComputedRef<string | undefined>
 }
 
 export function createCreationFlowContext(
@@ -257,6 +262,8 @@ export function createCreationFlowContext(
 	const searchModpacks = options.searchModpacks!
 	const getProjectVersions = options.getProjectVersions!
 	const getLoaderManifest = options.getLoaderManifest ?? null
+	const finishDisabled = options.finishDisabled ?? computed(() => false)
+	const finishDisabledTooltip = options.finishDisabledTooltip ?? computed(() => undefined)
 
 	const setupType = ref<SetupType | null>(null)
 	const isImportMode = ref(false)
@@ -289,9 +296,7 @@ export function createCreationFlowContext(
 	const loaderVersionType = ref<LoaderVersionType>('stable')
 	const selectedLoaderVersion = ref<string | null>(null)
 	const showSnapshots = ref(false)
-	const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>(
-		{},
-	)
+	const loaderVersionsCache = ref<Record<string, LoaderManifest>>({})
 	const paperSupportedVersions = ref<Set<string> | null>(null)
 	const purpurSupportedVersions = ref<Set<string> | null>(null)
 
@@ -358,11 +363,11 @@ export function createCreationFlowContext(
 					(await client.launchermeta.manifest_v0.getManifest(apiLoader)),
 				staleTime: Infinity,
 			})
-			loaderVersionsCache.value[apiLoader] = data.gameVersions
+			loaderVersionsCache.value[apiLoader] = data
 			debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
 		} catch (error) {
 			debug('fetchLoaderManifest: failed', apiLoader, error)
-			loaderVersionsCache.value[apiLoader] = []
+			loaderVersionsCache.value[apiLoader] = { gameVersions: [] }
 		}
 	}
 
@@ -502,6 +507,8 @@ export function createCreationFlowContext(
 	}
 
 	function finish() {
+		if (finishDisabled.value) return
+
 		debug('finish() called, state:', {
 			setupType: setupType.value,
 			selectedLoader: selectedLoader.value,
@@ -585,6 +592,8 @@ export function createCreationFlowContext(
 		importSearchQuery,
 		hardReset,
 		loading,
+		finishDisabled,
+		finishDisabledTooltip,
 		isBackingUp,
 		cancelBackup,
 		modal,

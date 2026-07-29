@@ -4,11 +4,14 @@ on:
   push:
     branches: ['main']
     paths:
-      - '.github/workflows/i18n.push.yml'
+      - '.github/workflows/i18n-push.yml'
       - 'apps/*/src/locales/en-US/**'
       - 'apps/*/locales/en-US/**'
       - 'packages/*/src/locales/en-US/**'
       - 'packages/*/locales/en-US/**'
+      - 'scripts/i18n-icu-contract.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
       - 'crowdin.yml'
   workflow_dispatch:
 
@@ -53,9 +56,21 @@ jobs:
           CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
 
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref }}
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Query branch name
         id: branch-name
@@ -68,7 +83,7 @@ jobs:
           echo "safe_branch_name=$SAFE_BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Upload translations to Crowdin
-        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2.16.2
+        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2.17.0
         with:
           upload_sources: true
           upload_translations: false
@@ -76,6 +91,12 @@ jobs:
           push_translations: false
           create_pull_request: false
           crowdin_branch_name: '[${{ github.repository_owner }}.${{ github.event.repository.name }}] ${{ steps.branch-name.outputs.safe_branch_name }}'
+        env:
+          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Clear stale ICU translations in Crowdin
+        run: pnpm scripts i18n-icu-contract clear-crowdin-changed --base-ref HEAD^ --crowdin-branch "[${{ github.repository_owner }}.${{ github.event.repository.name }}] ${{ steps.branch-name.outputs.safe_branch_name }}"
         env:
           CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

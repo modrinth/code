@@ -5,6 +5,8 @@ import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowM
 import { createContext } from '#ui/providers/create-context'
 
 import type {
+	BulkOperationStatus,
+	ContentActionWarning,
 	ContentCardTableItem,
 	ContentItem,
 	ContentModpackCardCategory,
@@ -25,6 +27,14 @@ export interface ContentModpackData {
 	disabledText?: string
 }
 
+export interface ContentDependencyWarning {
+	items: ContentItem[]
+	dependents: Array<{
+		item: ContentItem
+		dependencies: ContentItem[]
+	}>
+}
+
 export interface ContentManagerContext {
 	// Data
 	items: Ref<ContentItem[]> | ComputedRef<ContentItem[]>
@@ -38,6 +48,7 @@ export interface ContentManagerContext {
 	// Guards
 	isBusy: Ref<boolean> | ComputedRef<boolean>
 	busyMessage?: Ref<string | null> | ComputedRef<string | null>
+	skipNonEssentialWarnings?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContentTooltip?: string
 
@@ -55,10 +66,18 @@ export interface ContentManagerContext {
 	bulkDeleteItems?: (items: ContentItem[]) => Promise<void>
 	bulkEnableItems?: (items: ContentItem[]) => Promise<void>
 	bulkDisableItems?: (items: ContentItem[]) => Promise<void>
+	canDeleteItem?: (item: ContentItem) => boolean
+	canToggleItem?: (item: ContentItem) => boolean
+	getDeleteWarning?: (items: ContentItem[]) => ContentActionWarning | null
+	getDisableWarning?: (items: ContentItem[]) => ContentActionWarning | null
+	getDeleteDependencyWarning?: (
+		items: ContentItem[],
+	) => ContentDependencyWarning | null | Promise<ContentDependencyWarning | null>
 
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void
+	bulkUpdateAll?: (onProgress?: (status: BulkOperationStatus) => void) => Promise<void>
 	bulkUpdateItem?: (item: ContentItem) => Promise<void>
 	bulkUpdateItems?: (items: ContentItem[]) => Promise<void>
 
@@ -85,10 +104,6 @@ export interface ContentManagerContext {
 
 	// Deletion context (controls modal variant)
 	deletionContext?: 'instance' | 'server'
-
-	// One-time content hint (optional — shows tooltip on modpack content button)
-	showContentHint?: Ref<boolean>
-	dismissContentHint?: () => void
 
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem

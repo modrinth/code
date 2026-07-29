@@ -1,12 +1,13 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
+use crate::database::models::SharedInstanceId;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
-use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::ImageId;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
@@ -16,25 +17,28 @@ use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::error::Context;
+use crate::util::http::HTTP_CLIENT;
 use crate::util::img;
 use crate::util::routes::read_typed_from_payload;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
-use ariadne::ids::base62_impl::parse_base62;
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::Utc;
 use serde::Deserialize;
 use validator::Validate;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("report", web::post().to(report_create));
-    cfg.route("report", web::get().to(reports));
-    cfg.route("reports", web::get().to(reports_get));
-    cfg.route("report/{id}", web::get().to(report_get));
-    cfg.route("report/{id}", web::patch().to(report_edit));
-    cfg.route("report/{id}", web::delete().to(report_delete));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(report_create_route)
+        .service(reports_route)
+        .service(reports_get_route)
+        .service(report_get_route)
+        .service(report_edit_route)
+        .service(report_delete_route);
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct CreateReport {
     pub report_type: String,
     pub item_id: String,
@@ -44,6 +48,22 @@ pub struct CreateReport {
     #[validate(length(max = 10))]
     #[serde(default)]
     pub uploaded_images: Vec<ImageId>,
+}
+
+#[utoipa::path(
+	tag = "reports",
+	request_body = CreateReport,
+	responses((status = OK))
+)]
+#[post("/report")]
+pub async fn report_create_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    body: web::Payload,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    report_create(req, pool, body, redis, session_queue).await
 }
 
 pub async fn report_create(
@@ -87,6 +107,8 @@ pub async fn report_create(
         project_id: None,
         version_id: None,
         user_id: None,
+        shared_instance_id: None,
+        shared_instance_version_id: None,
         body: new_report.body.clone(),
         reporter: current_user.id.into(),
         created: Utc::now(),
@@ -152,6 +174,64 @@ pub async fn report_create(
             }
 
             report.user_id = Some(user_id.into())
+        }
+        ItemType::SharedInstance => {
+            // parsing
+            let (instance_part, version_part) = new_report
+                .item_id
+                .split_once('/')
+                .ok_or_else(|| {
+                    ApiError::InvalidInput(
+                        "Shared instance reports must format the item ID as `instance_id/version_id`"
+                            .to_string(),
+                    )
+                })?;
+
+            let shared_instance_id =
+                SharedInstanceId(parse_base62(instance_part)? as i64);
+            let shared_instance_version_id: i32 =
+                version_part.parse().map_err(|_| {
+                    ApiError::InvalidInput(format!(
+                        "Shared instance version is not a number: {version_part}"
+                    ))
+                })?;
+
+            // validation
+            let url = format!(
+                "{}/v1/instances/{}",
+                ENV.SHARED_INSTANCES_URL,
+                to_base62(shared_instance_id.0 as u64)
+            );
+            let instance_response = HTTP_CLIENT
+                .get(&url)
+                .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
+                .send()
+                .await
+                .wrap_internal_err(
+                    "failed to reach the shared instance service (instance lookup)",
+                )?;
+
+            if !instance_response.status().is_success() {
+                return Err(ApiError::InvalidInput(format!(
+                    "Shared instance could not be found: {instance_part}"
+                )));
+            }
+
+            let version_response = HTTP_CLIENT
+                .get(format!("{url}/versions/{version_part}"))
+                .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
+                .send()
+                .await
+                .wrap_internal_err("failed to reach the shared instance service (version lookup)")?;
+
+            if !version_response.status().is_success() {
+                return Err(ApiError::InvalidInput(format!(
+                    "Shared instance version could not be found: {instance_part}/{version_part}"
+                )));
+            }
+
+            report.shared_instance_id = Some(shared_instance_id);
+            report.shared_instance_version_id = Some(shared_instance_version_id)
         }
         ItemType::Unknown => {
             return Err(ApiError::InvalidInput(format!(
@@ -220,8 +300,12 @@ pub async fn report_create(
     Ok(HttpResponse::Ok().json(Report {
         id: id.into(),
         report_type: new_report.report_type.clone(),
-        item_id: new_report.item_id.clone(),
+        item_id: match report.shared_instance_id {
+            Some(shared_instance_id) => to_base62(shared_instance_id.0 as u64),
+            None => new_report.item_id.clone(),
+        },
         item_type: new_report.item_type.clone(),
+        shared_instance_version_id: report.shared_instance_version_id,
         reporter: current_user.id,
         body: new_report.body.clone(),
         created: Utc::now(),
@@ -236,15 +320,32 @@ pub struct ReportsRequestOptions {
     pub count: u16,
     #[serde(default)]
     pub offset: u32,
-    #[serde(default = "default_all")]
+    #[serde(default)]
     pub all: bool,
 }
 
 fn default_count() -> u16 {
     100
 }
-fn default_all() -> bool {
-    true
+
+#[utoipa::path(
+	tag = "reports",
+	params(
+		("count" = Option<u16>, Query),
+		("offset" = Option<u32>, Query),
+		("all" = Option<bool>, Query)
+	),
+	responses((status = OK))
+)]
+#[get("/report")]
+pub async fn reports_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    request_opts: web::Query<ReportsRequestOptions>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    reports(req, pool, redis, request_opts, session_queue).await
 }
 
 pub async fn reports(
@@ -322,6 +423,22 @@ pub struct ReportIds {
     pub ids: String,
 }
 
+#[utoipa::path(
+	tag = "reports",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
+#[get("/reports")]
+pub async fn reports_get_route(
+    req: HttpRequest,
+    ids: web::Query<ReportIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    reports_get(req, ids, pool, redis, session_queue).await
+}
+
 pub async fn reports_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ReportIds>,
@@ -361,6 +478,18 @@ pub async fn reports_get(
     Ok(HttpResponse::Ok().json(all_reports))
 }
 
+#[utoipa::path(tag = "reports", responses((status = OK)))]
+#[get("/report/{id}")]
+pub async fn report_get_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    report_get(req, pool, redis, info, session_queue).await
+}
+
 pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -395,11 +524,24 @@ pub async fn report_get(
     }
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditReport {
     #[validate(length(max = 65536))]
     pub body: Option<String>,
     pub closed: Option<bool>,
+}
+
+#[utoipa::path(tag = "reports", responses((status = NO_CONTENT)))]
+#[patch("/report/{id}")]
+pub async fn report_edit_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
+    session_queue: web::Data<AuthQueue>,
+    edit_report: web::Json<EditReport>,
+) -> Result<HttpResponse, ApiError> {
+    report_edit(req, pool, redis, info, session_queue, edit_report).await
 }
 
 pub async fn report_edit(
@@ -509,6 +651,18 @@ pub async fn report_edit(
     } else {
         Err(ApiError::NotFound)
     }
+}
+
+#[utoipa::path(tag = "reports", responses((status = NO_CONTENT)))]
+#[delete("/report/{id}")]
+pub async fn report_delete_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    report_delete(req, pool, info, redis, session_queue).await
 }
 
 pub async fn report_delete(

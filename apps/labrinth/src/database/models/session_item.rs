@@ -1,17 +1,18 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
-const SESSIONS_NAMESPACE: &str = "sessions";
-const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids";
-const SESSIONS_USERS_NAMESPACE: &str = "sessions_users";
+const SESSIONS_NAMESPACE: &str = "sessions:v3";
+const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids:v3";
+const SESSIONS_USERS_NAMESPACE: &str = "sessions_users:v3";
 
 pub struct SessionBuilder {
     pub session: String,
@@ -207,7 +208,7 @@ impl DBSession {
                     })
                     .await?;
 
-                Ok(db_sessions)
+                Ok::<_, DatabaseError>(db_sessions)
             }).await?;
 
         Ok(val)
@@ -223,13 +224,9 @@ impl DBSession {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
-            let res = redis
-                .get_deserialized_from_json::<Vec<i64>>(
-                    SESSIONS_USERS_NAMESPACE,
-                    &user_id.0.to_string(),
-                )
-                .await?;
+            let res = redis.get_deserialized::<Vec<i64>>(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res.into_iter().map(DBSessionId).collect());
@@ -252,15 +249,9 @@ impl DBSession {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
-        redis
-            .set_serialized_to_json(
-                SESSIONS_USERS_NAMESPACE,
-                user_id.0,
-                &db_sessions,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &db_sessions, None).await?;
 
         Ok(db_sessions)
     }
@@ -279,20 +270,23 @@ impl DBSession {
             return Ok(());
         }
 
-        redis
-            .delete_many(clear_sessions.into_iter().flat_map(
-                |(id, session, user_id)| {
-                    [
-                        (SESSIONS_NAMESPACE, id.map(|i| i.0.to_string())),
-                        (SESSIONS_IDS_NAMESPACE, session),
-                        (
-                            SESSIONS_USERS_NAMESPACE,
-                            user_id.map(|i| i.0.to_string()),
-                        ),
-                    ]
-                },
-            ))
-            .await?;
+        let keys = clear_sessions
+            .into_iter()
+            .flat_map(|(id, session, user_id)| {
+                [
+                    id.map(|id| redis.key().entity(SESSIONS_NAMESPACE, id.0)),
+                    session.map(|session| {
+                        redis.key().entity(SESSIONS_IDS_NAMESPACE, session)
+                    }),
+                    user_id.map(|user_id| {
+                        redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0)
+                    }),
+                ]
+                .into_iter()
+                .flatten()
+            })
+            .collect::<Vec<_>>();
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 
@@ -310,5 +304,23 @@ impl DBSession {
         .await?;
 
         Ok(Some(()))
+    }
+
+    pub async fn remove_all_for_user(
+        user_id: DBUserId,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<Vec<(DBSessionId, String)>, sqlx::Error> {
+        let sessions = sqlx::query!(
+            "
+            DELETE FROM sessions WHERE user_id = $1 RETURNING id, session
+            ",
+            user_id.0
+        )
+        .fetch(&mut *transaction)
+        .map_ok(|x| (DBSessionId(x.id), x.session))
+        .try_collect()
+        .await?;
+
+        Ok(sessions)
     }
 }

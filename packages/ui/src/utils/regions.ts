@@ -43,4 +43,11 @@ export const regionOverrides = {
 		}),
 		flag: 'https://flagcdn.com/sg.svg',
 	},
+	'au-syd': {
+		name: defineMessage({
+			id: 'servers.region.australia',
+			defaultMessage: 'Australia',
+		}),
+		flag: 'https://flagcdn.com/au.svg',
+	},
 } satisfies Record<string, { name?: MessageDescriptor; flag?: string }>

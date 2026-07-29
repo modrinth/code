@@ -38,7 +38,8 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			icon: DownloadIcon,
 			iconPosition: 'before' as const,
 			color: 'brand' as const,
-			disabled: count === 0,
+			disabled: count === 0 || ctx.finishDisabled.value,
+			tooltip: ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined,
 			onClick: () => ctx.finish(),
 		}
 	},

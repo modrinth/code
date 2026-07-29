@@ -2,6 +2,7 @@ import mitt from 'mitt'
 
 import { AbstractWebSocketClient, type WebSocketConnection } from '../core/abstract-websocket'
 import type { Archon } from '../modules/archon/types'
+import { getNodeWebSocketUrl } from '../utils/node-url'
 
 type WSEventMap = {
 	[K in Archon.Websocket.v0.WSEvent as `${string}:${K['event']}`]: K
@@ -19,7 +20,7 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 
 		return new Promise((resolve, reject) => {
 			try {
-				const ws = new WebSocket(`wss://${auth.url}`)
+				const ws = new WebSocket(getNodeWebSocketUrl(auth.url))
 
 				const connection: WebSocketConnection = {
 					serverId,

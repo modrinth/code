@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COUNT(*) AS \"total!\"\n        FROM delphi_global_detail_verdicts dgdv\n        WHERE (\n            $1::text IS NULL\n            OR dgdv.detail_key ILIKE '%' || $1 || '%'\n        )\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "c9d5796b2c98dedd9f2f237a1a2cf7a059a49387c0c564b730733bda7358f7fe"
+}

@@ -2,6 +2,8 @@ import { AbstractModule } from '../../../core/abstract-module'
 import type { UploadHandle } from '../../../types/upload'
 import type { Labrinth } from '../types'
 
+const VERSION_UPLOAD_TIMEOUT_MS = 30 * 60 * 1000
+
 export class LabrinthVersionsV3Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'labrinth_versions_v3'
@@ -199,7 +201,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			api: 'labrinth',
 			version: 3,
 			formData,
-			timeout: 60 * 5 * 1000,
+			timeout: VERSION_UPLOAD_TIMEOUT_MS,
 		})
 	}
 
@@ -284,7 +286,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			api: 'labrinth',
 			version: 2,
 			formData,
-			timeout: 60 * 5 * 1000,
+			timeout: VERSION_UPLOAD_TIMEOUT_MS,
 		})
 	}
 }

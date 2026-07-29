@@ -1,12 +1,9 @@
-use std::sync::Arc;
-
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ThreadId, ThreadMessageId};
@@ -18,20 +15,16 @@ use crate::models::threads::{MessageBody, Thread, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use futures::TryStreamExt;
 use serde::Deserialize;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("thread")
-            .route("{id}", web::get().to(thread_get))
-            .route("{id}", web::post().to(thread_send_message)),
-    );
-    cfg.service(
-        web::scope("message").route("{id}", web::delete().to(message_delete)),
-    );
-    cfg.route("threads", web::get().to(threads_get));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(thread_get_route)
+        .service(thread_send_message_route)
+        .service(message_delete_route)
+        .service(threads_get_route);
 }
 
 pub async fn is_authorized_thread(
@@ -269,6 +262,18 @@ pub async fn filter_authorized_threads(
     Ok(final_threads)
 }
 
+#[utoipa::path(tag = "threads", responses((status = OK, body = Thread)))]
+#[get("/thread/{id}")]
+pub async fn thread_get_route(
+    req: HttpRequest,
+    info: web::Path<(ThreadId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    thread_get(req, info, pool, redis, session_queue).await
+}
+
 pub async fn thread_get(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
@@ -326,6 +331,22 @@ pub struct ThreadIds {
     pub ids: String,
 }
 
+#[utoipa::path(
+	tag = "threads",
+	params(("ids" = String, Query)),
+	responses((status = OK, body = Vec<Thread>))
+)]
+#[get("/threads")]
+pub async fn threads_get_route(
+    req: HttpRequest,
+    ids: web::Query<ThreadIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    threads_get(req, ids, pool, redis, session_queue).await
+}
+
 pub async fn threads_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ThreadIds>,
@@ -358,9 +379,23 @@ pub async fn threads_get(
     Ok(HttpResponse::Ok().json(threads))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct NewThreadMessage {
     pub body: MessageBody,
+}
+
+#[utoipa::path(tag = "threads", responses((status = NO_CONTENT)))]
+#[post("/thread/{id}")]
+pub async fn thread_send_message_route(
+    req: HttpRequest,
+    info: web::Path<(ThreadId,)>,
+    pool: web::Data<PgPool>,
+    new_message: web::Json<NewThreadMessage>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    thread_send_message(req, info, pool, new_message, redis, session_queue)
+        .await
 }
 
 pub async fn thread_send_message(
@@ -593,13 +628,26 @@ pub async fn thread_send_message_internal(
     }
 }
 
+#[utoipa::path(tag = "threads", responses((status = NO_CONTENT)))]
+#[delete("/message/{id}")]
+pub async fn message_delete_route(
+    req: HttpRequest,
+    info: web::Path<(ThreadMessageId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    file_host: web::Data<dyn FileHost>,
+) -> Result<HttpResponse, ApiError> {
+    message_delete(req, info, pool, redis, session_queue, file_host).await
+}
+
 pub async fn message_delete(
     req: HttpRequest,
     info: web::Path<(ThreadMessageId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,

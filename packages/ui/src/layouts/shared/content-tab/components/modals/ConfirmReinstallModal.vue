@@ -43,12 +43,14 @@ import { ref } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('ConfirmReinstallModal')
 
 const messages = defineMessages({
 	header: {
@@ -84,12 +86,27 @@ const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 
 function show() {
+	debug('show: called', {
+		hasModalRef: !!modal.value,
+		hasBackupCreatorRef: !!backupCreator.value,
+		buttonsDisabled: buttonsDisabled.value,
+	})
 	modal.value?.show()
+	debug('show: returned from modal.show', {
+		hasModalRef: !!modal.value,
+		hasBackupCreatorRef: !!backupCreator.value,
+		buttonsDisabled: buttonsDisabled.value,
+	})
 }
 
 function confirm() {
+	debug('confirm: called', {
+		hasModalRef: !!modal.value,
+		buttonsDisabled: buttonsDisabled.value,
+	})
 	modal.value?.hide()
 	emit('reinstall')
+	debug('confirm: emitted reinstall')
 }
 
 defineExpose({

@@ -36,7 +36,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 </template>
 <style scoped>
 .ui-normal-page {
-	@apply grid gap-6 mx-auto py-4;
+	@apply grid gap-x-6 gap-y-4 mx-auto py-4;
 	width: min(calc(100% - 2rem), calc(80rem - 3rem));
 
 	grid-template:
@@ -52,7 +52,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 			'header header'
 			'sidebar content'
 			'sidebar dummy'
-			/ 20rem 1fr;
+			/ 300px 1fr;
 	}
 
 	.ui-normal-page--sidebar-right {
@@ -60,7 +60,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 			'header header'
 			'content sidebar'
 			'dummy sidebar'
-			/ 1fr 20rem;
+			/ 1fr 300px;
 	}
 }
 

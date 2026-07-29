@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE install_jobs\n\t\tSET instance_id = ?, state = ?, modified = ?\n\t\tWHERE id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "15b4f72d367d329690f5daddafbdf0e51a285e35404053d62492e8df5fc7132f"
+}

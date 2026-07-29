@@ -3,17 +3,21 @@
 		<span class="text-lg font-semibold text-contrast">Icon</span>
 		<div class="group relative w-fit">
 			<OverflowMenu
-				v-tooltip="'Edit icon'"
+				v-tooltip="editIconTooltip"
 				class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
-				:disabled="isIconActionLoading"
+				:disabled="isIconActionDisabled"
 				:options="[
 					{
 						id: 'upload',
 						action: () => triggerFileInput(),
+						disabled: !props.canEdit,
+						tooltip: !props.canEdit ? editIconTooltip : undefined,
 					},
 					{
 						id: 'sync',
 						action: () => resetIcon(),
+						disabled: !props.canEdit,
+						tooltip: !props.canEdit ? editIconTooltip : undefined,
 					},
 				]"
 			>
@@ -47,19 +51,39 @@ import { computed, ref } from 'vue'
 
 import { OverflowMenu, ServerIcon } from '#ui/components'
 import { useServerImage } from '#ui/composables'
+import { useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
+
+const props = withDefaults(
+	defineProps<{
+		canEdit?: boolean
+		permissionDeniedMessage?: string
+	}>(),
+	{
+		canEdit: true,
+		permissionDeniedMessage: undefined,
+	},
+)
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const { serverId, server } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 const isUploadingIcon = ref(false)
 const isSyncingIcon = ref(false)
 const isIconActionLoading = computed(() => isUploadingIcon.value || isSyncingIcon.value)
+const isIconActionDisabled = computed(() => isIconActionLoading.value || !props.canEdit)
+const editIconTooltip = computed(() =>
+	props.canEdit
+		? 'Edit icon'
+		: (props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction)),
+)
 
 const {
 	image: displayIcon,
@@ -84,7 +108,7 @@ function isNotFound(error: unknown): boolean {
 }
 
 const uploadFile = async (e: Event) => {
-	if (isIconActionLoading.value) return
+	if (isIconActionDisabled.value) return
 
 	const file = (e.target as HTMLInputElement).files?.[0]
 	if (!file) {
@@ -194,7 +218,7 @@ const uploadFile = async (e: Event) => {
 }
 
 const resetIcon = async () => {
-	if (isIconActionLoading.value) return
+	if (isIconActionDisabled.value) return
 	isSyncingIcon.value = true
 
 	try {
@@ -234,7 +258,7 @@ const resetIcon = async () => {
 }
 
 const triggerFileInput = () => {
-	if (isIconActionLoading.value) return
+	if (isIconActionDisabled.value) return
 
 	const input = document.createElement('input')
 	input.type = 'file'

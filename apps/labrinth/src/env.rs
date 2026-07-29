@@ -5,6 +5,11 @@ use eyre::{Context, eyre};
 use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 
+use xredis::{
+    CacheLockingStrategy, ReadReplicaStrategy, RedisConnectionType,
+    RedisTopology,
+};
+
 macro_rules! vars {
     (
         $(
@@ -38,7 +43,7 @@ macro_rules! vars {
                     )]
                     let $field: Option<$ty> = {
                         let mut default = None::<$ty>;
-                        $( default = Some({ $default }.into()); )?
+                        $( default = Some(<$ty>::from({ $default })); )?
 
                         match parse_value::<$ty>(stringify!($field), default) {
                             Ok(value) => Some(value),
@@ -127,9 +132,54 @@ vars! {
     LABRINTH_ADMIN_KEY: String = "";
     LABRINTH_MEDAL_KEY: String = "";
     LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "";
+    LABRINTH_SUBSCRIPTIONS_KEY: String = "";
     RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
+
+    // Redis
+    REDIS_TOPOLOGY: RedisTopology = RedisTopology::Standalone;
+    REDIS_CONNECTION_TYPE: RedisConnectionType = RedisConnectionType::Pooled;
+    REDIS_CACHE_LOCKING_STRATEGY: CacheLockingStrategy = CacheLockingStrategy::Local;
+    // URL(s) for Redis. Use comma-separated values for multiple URLs in Cluster topology.
     REDIS_URL: String = "redis://localhost";
+
+    // Configures the waiting timeout for Redis connection *pools*.
+    // This doesn't affect the bulk of Redis work in Multiplexed connection type.
+    REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
+
+    // Minimum and maximum number of connections when Redis is in Standalone topology.
+    REDIS_MAX_CONNECTIONS: u32 = 2048u32;
+    REDIS_MIN_CONNECTIONS: usize = 0usize;
+
+    REDIS_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
+    REDIS_ACTUAL_EXPIRY: i64 = 60 * 30;
+    REDIS_VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
+    REDIS_VERSION_ACTUAL_EXPIRY: i64 = 60 * 30;
+
+    // Minimum and maximum number of connections when Redis is in Cluster topology, Pooled connection type.
+    REDIS_CLUSTER_MAX_CONNECTIONS: u32 = 16u32;
+    REDIS_CLUSTER_MIN_CONNECTIONS: usize = 0usize;
+
+    // The maximum number of connections of the Redis blocking pool. There's a blocking pool regardless of topology
+    // and main connection type.
+    REDIS_BLOCKING_MAX_CONNECTIONS: u32 = 256u32;
+
+    // The encoding format used for Redis cache values.
+    REDIS_ENCODING_FORMAT: xredis::EncodingFormat = xredis::EncodingFormat::Json;
+    // The level of LZ4 compression used for Redis cache values. A value of 0 disables compression (supports 1-12)
+    REDIS_COMPRESSION_LEVEL: i32 = 0i32;
+    // The compression algorithm used for Redis cache values. Currently only LZ4 is supported.
+    REDIS_COMPRESSION_ALGORITHM: xredis::Codec = xredis::Codec::Lz4;
+    // The minimum number of bytes required to trigger compression for Redis cache values.
+    REDIS_COMPRESSION_THRESHOLD_BYTES: usize = 1024usize;
+    // The minimum savings ratio required to trigger compression for Redis cache values. If the savings ratio is lower than this,
+    // the compressed payload is discarded and the original payload is stored as-is.
+    REDIS_COMPRESSION_MIN_SAVINGS_RATIO: f64 = 12.5f64;
+
+    REDIS_READ_REPLICA_STRATEGY: ReadReplicaStrategy = ReadReplicaStrategy::Primary;
+
+    KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
+    KAFKA_CLIENT_ID: String = "labrinth";
     BIND_ADDR: String = "";
     SELF_ADDR: String = "";
 
@@ -158,12 +208,39 @@ vars! {
     // search
     SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
     SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
+    SEARCH_INCREMENTAL_INDEX_BATCH_DELAY_SECONDS: u64 = 5u64;
+    SEARCH_INCREMENTAL_INDEX_BATCH_MAX_SIZE: usize = 1000usize;
     TYPESENSE_URL: String = "http://localhost:8108";
     TYPESENSE_API_KEY: String = "modrinth";
     TYPESENSE_INDEX_PREFIX: String = "labrinth";
+    TYPESENSE_IMPORT_BATCH_SIZE: usize = 5000usize;
+    TYPESENSE_DELETE_BATCH_SIZE: usize = 10_000usize;
+    TYPESENSE_USE_CACHE: bool = true;
+    SEARCH_TYPESENSE_DEFAULT_QUERY_BY: StringCsv = StringCsv(vec![
+        "name".into(),
+        "indexed_name".into(),
+        "slug".into(),
+        "author".into(),
+        "indexed_author".into(),
+        "summary".into(),
+    ]);
+    SEARCH_TYPESENSE_DEFAULT_QUERY_BY_WEIGHTS: Json<Vec<u8>> =
+        Json(vec![15, 15, 10, 3, 3, 1]);
+    SEARCH_TYPESENSE_DEFAULT_PREFIX: Json<Vec<bool>> =
+        Json(vec![true, true, true, true, true, true]);
+    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_EXACT_MATCH: bool = true;
+    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_NUM_MATCHING_FIELDS: bool = false;
+    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_TOKEN_POSITIONS: bool = true;
+    SEARCH_TYPESENSE_DEFAULT_DROP_TOKENS_THRESHOLD: usize = 0usize;
+    SEARCH_TYPESENSE_DEFAULT_TEXT_MATCH_TYPE: crate::search::backend::typesense::TextMatchType =
+        crate::search::backend::typesense::TextMatchType::MaxWeight;
+    SEARCH_TYPESENSE_DEFAULT_BUCKETING: Json<crate::search::backend::typesense::Bucketing> =
+        Json(crate::search::backend::typesense::Bucketing::Buckets(5));
+    SEARCH_TYPESENSE_DEFAULT_MAX_CANDIDATES: usize = 24usize;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;
+    FILE_SCAN_CONCURRENCY: i64 = 8i64;
 
     // s3
     S3_PUBLIC_BUCKET_NAME: String = "";
@@ -189,6 +266,8 @@ vars! {
     GITLAB_CLIENT_SECRET: String = "none";
     DISCORD_CLIENT_ID: String = "none";
     DISCORD_CLIENT_SECRET: String = "none";
+    DISCORD_COMMUNITY_BOT_HANDOFF_URL: String = "http://localhost:3000/modrinth/handoff";
+    DISCORD_COMMUNITY_LINK_SECRET: String = "";
     MICROSOFT_CLIENT_ID: String = "none";
     MICROSOFT_CLIENT_SECRET: String = "none";
     GOOGLE_CLIENT_ID: String = "none";
@@ -230,6 +309,11 @@ vars! {
     SENDY_LIST_ID: String = "none";
     SENDY_API_KEY: String = "none";
 
+    NEVERBOUNCE_API_KEY: String = "";
+    NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
+
+    EMAIL_DOMAIN_BLACKLIST: StringCsv = StringCsv(vec![]);
+
     CLICKHOUSE_REPLICATED: bool = false;
     CLICKHOUSE_URL: String = "http://localhost:8123";
     CLICKHOUSE_USER: String = "default";
@@ -253,6 +337,9 @@ vars! {
     BREX_API_KEY: String = "none";
 
     DELPHI_URL: String = "";
+
+    SHARED_INSTANCES_URL: String = "";
+    SHARED_INSTANCES_KEY: String = "";
 
     AVALARA_1099_API_URL: String = "https://www.track1099.com/api";
     AVALARA_1099_API_KEY: String = "none";
@@ -281,10 +368,6 @@ vars! {
     READONLY_DATABASE_MIN_CONNECTIONS: u32 = 0u32;
     READONLY_DATABASE_MAX_CONNECTIONS: u32 = 1u32;
 
-    REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
-    REDIS_MAX_CONNECTIONS: u32 = 10000u32;
-    REDIS_MIN_CONNECTIONS: usize = 0usize;
-
     SEARCH_OPERATION_TIMEOUT: u64 = 300000u64;
 
     SMTP_REPLY_TO_NAME: String = "";
@@ -295,6 +378,10 @@ vars! {
     DELPHI_SLACK_WEBHOOK: String = "";
 
     TREMENDOUS_CAMPAIGN_ID: String = "none";
+    TILTIFY_CLIENT_ID: String = "";
+    TILTIFY_CLIENT_SECRET: String = "";
+    TILTIFY_PRIDE_26_CAMPAIGN_ID: String = "";
+    TILTIFY_WEBHOOK_SIGNING_KEY: String = "";
 
     // server pinging
     SERVER_PING_MAX_CONCURRENT: usize = 16usize;
@@ -302,4 +389,6 @@ vars! {
     SERVER_PING_MIN_INTERVAL_SEC: u64 = 30u64 * 60;
     SERVER_PING_TIMEOUT_MS: u64 = 3u64 * 1000;
     SERVER_PING_MAX_FAIL_COUNT: u64 = 3u64;
+
+    WEBAUTHN_RP_NAME: String = "Modrinth";
 }

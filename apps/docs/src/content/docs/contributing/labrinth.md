@@ -97,7 +97,7 @@ If you're prepared to contribute by submitting a pull request, ensure you have m
 
 - `cargo fmt --all` has been run.
 - `cargo clippy --all-targets` has been run.
-- `cargo sqlx prepare` has been run.
+- `cargo sqlx prepare -- --tests` has been run.
 
 > Note: If you encounter issues with `sqlx` saying 'no queries found' after running `cargo sqlx prepare`, you may need to ensure the installed version of `sqlx-cli` matches the current version of `sqlx` used [in labrinth](https://github.com/modrinth/labrinth/blob/master/Cargo.toml).
 

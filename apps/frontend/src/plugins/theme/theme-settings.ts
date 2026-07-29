@@ -8,10 +8,11 @@ interface ThemeSettings {
 export function useThemeSettings(getDefaultTheme?: () => Theme) {
 	getDefaultTheme ??= () => 'dark'
 
+	const config = useRuntimeConfig()
 	const $settings = useCookie<ThemeSettings>('color-mode', {
 		maxAge: 60 * 60 * 24 * 365 * 10,
 		sameSite: 'lax',
-		secure: true,
+		secure: config.public.cookieSecure,
 		httpOnly: false,
 		path: '/',
 	})

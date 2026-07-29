@@ -3,7 +3,7 @@
 		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
 		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
-		:class="{ 'drop-shadow-xl': mode === 'navigation' }"
+		:class="{ 'drop-shadow-xl border border-solid border-surface-4': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
 			<RouterLink
@@ -300,8 +300,6 @@ watch(
 watch(
 	() => props.links,
 	async () => {
-		sliderReady.value = false
-		transitionsEnabled.value = false
 		await nextTick()
 		updateActiveTab()
 	},

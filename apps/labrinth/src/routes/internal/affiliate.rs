@@ -1,13 +1,11 @@
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use crate::env::ENV;
 use crate::{
     auth::get_user_from_headers,
-    database::{
-        models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
-        redis::RedisPool,
-    },
+    database::models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
     models::{
         analytics::AffiliateCodeClick, ids::AffiliateCodeId, pats::Scopes,
         users::Badges, v3::affiliate_code::AffiliateCode,
@@ -25,7 +23,7 @@ use url::Url;
 
 use crate::routes::ApiError;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ingest_click)
         .service(get_all)
         .service(create)
@@ -40,9 +38,14 @@ pub struct IngestClick {
     pub affiliate_code_id: AffiliateCodeId,
 }
 
-#[utoipa::path]
+/// Ingest an affiliate click.  
+#[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[post("/ingest-click")]
-async fn ingest_click(
+pub async fn ingest_click(
     req: HttpRequest,
     web::Json(ingest_click): web::Json<IngestClick>,
     pool: web::Data<PgPool>,
@@ -136,11 +139,14 @@ async fn ingest_click(
     Ok(())
 }
 
+/// List affiliate codes.  
 #[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
     responses((status = OK, body = inline(Vec<AffiliateCode>)))
 )]
 #[get("")]
-async fn get_all(
+pub async fn get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -187,11 +193,14 @@ pub struct CreateRequest {
     pub source_name: String,
 }
 
+/// Create an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[put("")]
-async fn create(
+pub async fn create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -263,11 +272,14 @@ async fn create(
     Ok(web::Json(AffiliateCode::from(code, is_admin)))
 }
 
+/// Get an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[get("/{id}")]
-async fn get(
+pub async fn get(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -302,9 +314,14 @@ async fn get(
     }
 }
 
-#[utoipa::path]
+/// Delete an affiliate code.  
+#[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
-async fn delete(
+pub async fn delete(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -350,9 +367,14 @@ pub struct PatchRequest {
     pub source_name: String,
 }
 
-#[utoipa::path]
+/// Update an affiliate code.  
+#[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}")]
-async fn patch(
+pub async fn patch(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,

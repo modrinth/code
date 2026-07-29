@@ -1,5 +1,6 @@
-import type { Loaders } from '@modrinth/utils'
 import type Stripe from 'stripe'
+
+import type { ServerLoader } from './loaders'
 
 export type ServerBillingInterval = 'monthly' | 'yearly' | 'quarterly'
 
@@ -82,7 +83,7 @@ export type CreatePaymentIntentRequest = PaymentRequestType & {
 		affiliate_code?: string
 		source:
 			| {
-					loader: Loaders
+					loader: ServerLoader
 					game_version?: string
 					loader_version?: string
 			  }

@@ -70,7 +70,7 @@ CSS custom properties are defined in `packages/assets/styles/variables.scss` wit
 
 ## Storybook
 
-When modifying a component in `src/components/`, you must also update its corresponding Storybook story in `src/stories/` to reflect the changes. If a story file doesn't exist yet, create one. Stories should cover the component's key states and variants.
+When modifying a component in `src/components/`, you must also update its corresponding Storybook story in `src/stories/` to reflect the changes. If a story file doesn't exist yet, create one. Stories should cover the component's key states and variants - do not make or modify a storybook unless the user asks for it or skip if it's incredibly obvious one should not be needed (e.g minor changes or styling changes DO NOT need a storybook edit)
 
 ## Dependency Injection
 

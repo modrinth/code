@@ -2,6 +2,7 @@ use actix_web::{HttpRequest, delete, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 use crate::{
     auth::get_user_from_headers,
@@ -10,7 +11,6 @@ use crate::{
         models::{
             DBAnalyticsEvent, DBAnalyticsEventId, generate_analytics_event_id,
         },
-        redis::RedisPool,
     },
     models::{
         ids::AnalyticsEventId,
@@ -22,7 +22,7 @@ use crate::{
     util::error::Context,
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(analytics_events_get)
         .service(analytics_event_create)
         .service(analytics_event_edit)
@@ -37,8 +37,11 @@ pub struct AnalyticsEventUpsert {
     pub ends: DateTime<Utc>,
 }
 
-/// Fetches all analytics events.
-#[utoipa::path(responses((status = OK, body = Vec<AnalyticsEvent>)))]
+/// List analytics events.  
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = OK, body = Vec<AnalyticsEvent>))
+)]
 #[get("")]
 pub async fn analytics_events_get(
     pool: web::Data<PgPool>,
@@ -54,8 +57,11 @@ pub async fn analytics_events_get(
     Ok(web::Json(events))
 }
 
-/// Creates an analytics event.
-#[utoipa::path(responses((status = OK, body = AnalyticsEvent)))]
+/// Create an analytics event.  
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent))
+)]
 #[post("")]
 pub async fn analytics_event_create(
     req: HttpRequest,
@@ -110,8 +116,11 @@ pub async fn analytics_event_create(
     Ok(web::Json(event.into()))
 }
 
-/// Edits an analytics event.
-#[utoipa::path(responses((status = OK, body = AnalyticsEvent)))]
+/// Update an analytics event.  
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent))
+)]
 #[patch("/{id}")]
 pub async fn analytics_event_edit(
     req: HttpRequest,
@@ -158,8 +167,11 @@ pub async fn analytics_event_edit(
     Ok(web::Json(event.into()))
 }
 
-/// Deletes an analytics event.
-#[utoipa::path(responses((status = NO_CONTENT)))]
+/// Delete an analytics event.  
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
 pub async fn analytics_event_delete(
     req: HttpRequest,

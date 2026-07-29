@@ -4,7 +4,7 @@ use chrono::{DateTime, TimeZone, Utc};
 
 #[derive(Default)]
 pub struct JoinLogEntry {
-    pub profile_path: String,
+    pub instance_id: String,
     pub host: String,
     pub port: u16,
     pub join_time: DateTime<Utc>,
@@ -16,18 +16,21 @@ impl JoinLogEntry {
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let join_time = self.join_time.timestamp();
+        let instance_id = self.instance_id.as_str();
+        let host = self.host.as_str();
+        let port = i64::from(self.port);
 
         sqlx::query!(
             "
-            INSERT INTO join_log (profile_path, host, port, join_time)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT (profile_path, host, port) DO UPDATE SET
-                join_time = $4
-            ",
-            self.profile_path,
-            self.host,
-            self.port,
-            join_time
+			INSERT INTO join_log (instance_id, host, port, join_time)
+			VALUES (?, ?, ?, ?)
+			ON CONFLICT (instance_id, host, port) DO UPDATE SET
+				join_time = excluded.join_time
+			",
+            instance_id,
+            host,
+            port,
+            join_time,
         )
         .execute(exec)
         .await?;
@@ -37,26 +40,26 @@ impl JoinLogEntry {
 }
 
 pub async fn get_joins(
-    instance: &str,
+    instance_id: &str,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<HashMap<(String, u16), DateTime<Utc>>> {
     let joins = sqlx::query!(
         "
-        SELECT profile_path, host, port, join_time
-        FROM join_log
-        WHERE profile_path = $1
-        ",
-        instance
+		SELECT host, port, join_time
+		FROM join_log
+		WHERE instance_id = ?
+		",
+        instance_id,
     )
     .fetch_all(exec)
     .await?;
 
     Ok(joins
         .into_iter()
-        .map(|x| {
+        .map(|row| {
             (
-                (x.host, x.port as u16),
-                Utc.timestamp_opt(x.join_time, 0)
+                (row.host, row.port as u16),
+                Utc.timestamp_opt(row.join_time, 0)
                     .single()
                     .unwrap_or_else(Utc::now),
             )

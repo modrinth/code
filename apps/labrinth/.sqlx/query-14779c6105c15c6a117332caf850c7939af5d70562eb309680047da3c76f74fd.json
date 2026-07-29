@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tDELETE FROM project_attribution_files\n\t\tWHERE group_id = ANY($1)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "14779c6105c15c6a117332caf850c7939af5d70562eb309680047da3c76f74fd"
+}

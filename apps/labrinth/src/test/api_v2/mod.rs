@@ -7,7 +7,6 @@ use crate::env::ENV;
 use actix_web::{App, dev::ServiceResponse, test};
 use async_trait::async_trait;
 use std::rc::Rc;
-use utoipa_actix_web::AppExt;
 
 pub mod project;
 pub mod request_data;
@@ -25,12 +24,13 @@ pub struct ApiV2 {
 impl ApiBuildable for ApiV2 {
     async fn build(labrinth_config: LabrinthConfig) -> Self {
         let app = App::new()
-            .into_utoipa_app()
             .configure(|cfg| {
-                crate::utoipa_app_config(cfg, labrinth_config.clone())
+                crate::app_data_config(cfg, labrinth_config.clone())
             })
-            .into_app()
-            .configure(|cfg| crate::app_config(cfg, labrinth_config.clone()));
+            .configure(|cfg| {
+                crate::app_routes_config(cfg, labrinth_config.clone())
+            })
+            .configure(crate::app_fallback_config);
         let test_app: Rc<dyn LocalService> =
             Rc::new(test::init_service(app).await);
 

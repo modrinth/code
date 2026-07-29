@@ -3,9 +3,9 @@ import { LRUCache } from 'lru-cache'
 import { injectI18n } from '../providers/i18n'
 import { LOCALES } from './i18n.ts'
 
-const formatterCache = new LRUCache<string, Intl.RelativeTimeFormat>({ max: 5 })
+const formatterCache = new LRUCache<string, Intl.RelativeTimeFormat>({ max: 15 })
 
-export function useRelativeTime() {
+export function useRelativeTime(options?: Intl.RelativeTimeFormatOptions) {
 	const { locale } = injectI18n()
 
 	return (value: Date | number | string | null | undefined) => {
@@ -29,7 +29,7 @@ export function useRelativeTime() {
 		const months = Math.round(diff / 2629746000)
 		const years = Math.round(diff / 31556952000)
 
-		const rtf = getFormatter(locale.value)
+		const rtf = getFormatter(locale.value, options)
 
 		if (Math.abs(seconds) < 60) {
 			return rtf.format(seconds, 'second')
@@ -49,15 +49,22 @@ export function useRelativeTime() {
 	}
 }
 
-function getFormatter(locale: string): Intl.RelativeTimeFormat {
-	let formatter = formatterCache.get(locale)
+function getFormatter(
+	locale: string,
+	options?: Intl.RelativeTimeFormatOptions,
+): Intl.RelativeTimeFormat {
+	const localeDefinition = LOCALES.find((loc) => loc.code === locale)
+	const numeric = options?.numeric ?? localeDefinition?.numeric ?? 'auto'
+	const style = options?.style ?? 'long'
+	const cacheKey = `${locale}:${numeric}:${style}`
+	let formatter = formatterCache.get(cacheKey)
 	if (!formatter) {
-		const localeDefinition = LOCALES.find((loc) => loc.code === locale)
 		formatter = new Intl.RelativeTimeFormat(locale, {
-			numeric: localeDefinition?.numeric || 'auto',
-			style: 'long',
+			...options,
+			numeric,
+			style,
 		})
-		formatterCache.set(locale, formatter)
+		formatterCache.set(cacheKey, formatter)
 	}
 	return formatter
 }

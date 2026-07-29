@@ -1,7 +1,4 @@
-use std::sync::Arc;
-
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{ThreadId, ThreadMessageId};
 use crate::models::threads::{MessageBody, Thread};
@@ -10,24 +7,29 @@ use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::Deserialize;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/thread")
+        web::scope("/thread")
             .service(thread_get)
             .service(thread_send_message),
     );
-    cfg.service(utoipa_actix_web::scope("/message").service(message_delete));
+    cfg.service(web::scope("/message").service(message_delete));
     cfg.service(threads_get);
 }
 
-/// Get a thread by ID.
+/// Get a thread by ID.  
 #[utoipa::path(
+	context_path = "/thread",
+	tag = "threads",
     get,
     operation_id = "getThread",
-    params(("id" = ThreadId, Path, description = "The ID of the thread")),
+    params(
+        ("id" = ThreadId, Path, description = "The ID of the thread")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Thread),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -53,13 +55,16 @@ pub struct ThreadIds {
     pub ids: String,
 }
 
-/// Get multiple threads by ID.
+/// Get multiple threads by ID.  
 #[utoipa::path(
+	tag = "threads",
     get,
     operation_id = "getThreads",
-    params(("ids" = String, Query, description = "The JSON array of thread IDs")),
+    params(
+        ("ids" = String, Query, description = "The JSON array of thread IDs")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyThread>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -103,11 +108,15 @@ pub struct NewThreadMessage {
     pub body: MessageBody,
 }
 
-/// Send a message to a thread.
+/// Send a message to a thread.  
 #[utoipa::path(
+	context_path = "/thread",
+	tag = "threads",
     post,
     operation_id = "sendThreadMessage",
-    params(("id" = ThreadId, Path, description = "The ID of the thread")),
+    params(
+        ("id" = ThreadId, Path, description = "The ID of the thread")
+    ),
     request_body = NewThreadMessage,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -144,11 +153,15 @@ pub async fn thread_send_message(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a thread message by ID.
+/// Delete a thread message by ID.  
 #[utoipa::path(
+	context_path = "/message",
+	tag = "threads",
     delete,
     operation_id = "deleteThreadMessage",
-    params(("id" = ThreadMessageId, Path, description = "The ID of the message")),
+    params(
+        ("id" = ThreadMessageId, Path, description = "The ID of the message")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -169,7 +182,7 @@ pub async fn message_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::threads::message_delete(

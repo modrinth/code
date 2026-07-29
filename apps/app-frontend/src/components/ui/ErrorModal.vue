@@ -16,7 +16,7 @@ import { ChatIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
-import { install } from '@/helpers/profile.js'
+import { install_existing_instance } from '@/helpers/install'
 import { cancel_directory_change } from '@/helpers/settings.ts'
 import { handleSevereError } from '@/store/error.js'
 
@@ -52,10 +52,6 @@ defineExpose({
 			if (errorVal.message.includes('because the target machine actively refused it')) {
 				metadata.value.hostsFile = true
 			}
-		} else if (errorVal.message && errorVal.message.includes('User is not logged in')) {
-			title.value = 'Sign in to Minecraft'
-			errorType.value = 'minecraft_sign_in'
-			supportLink.value = 'https://support.modrinth.com'
 		} else if (errorVal.message && errorVal.message.includes('Move directory error:')) {
 			title.value = 'Could not change app directory'
 			errorType.value = 'directory_move'
@@ -72,7 +68,7 @@ defineExpose({
 			title.value = 'No loader selected'
 			errorType.value = 'no_loader_version'
 			supportLink.value = 'https://support.modrinth.com'
-			metadata.value.profilePath = context.profilePath
+			metadata.value.instanceId = context.instanceId
 		} else if (source === 'state_init') {
 			title.value = 'Error initializing Modrinth App'
 			errorType.value = 'state_init'
@@ -125,7 +121,7 @@ const loadingRepair = ref(false)
 async function repairInstance() {
 	loadingRepair.value = true
 	try {
-		await install(metadata.value.profilePath, false)
+		await install_existing_instance(metadata.value.instanceId, false)
 		errorModal.value.hide()
 	} catch (err) {
 		handleSevereError(err)
@@ -243,20 +239,6 @@ async function copyToClipboard(text) {
 						</button>
 					</div>
 				</template>
-				<div v-else-if="errorType === 'minecraft_sign_in'">
-					<p>
-						To play this instance, you must sign in through Microsoft below. If you don't have a
-						Minecraft account, you can purchase the game on the
-						<a href="https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc"
-							>Minecraft website</a
-						>.
-					</p>
-					<div class="cta-button">
-						<button class="btn btn-primary" :disabled="loadingMinecraft" @click="loginMinecraft">
-							<LogInIcon /> Sign in to Minecraft
-						</button>
-					</div>
-				</div>
 				<template v-else-if="errorType === 'state_init'">
 					<p>
 						Modrinth App failed to load correctly. This may be because of a corrupted file, or

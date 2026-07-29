@@ -50,6 +50,16 @@ export const Default: Story = {
 	},
 }
 
+export const SharedWithOwner: Story = {
+	args: {
+		...baseServer,
+		name: 'Cobbletown',
+		owner: {
+			username: 'Prospector',
+		},
+	},
+}
+
 export const ConfiguringNewServer: Story = {
 	args: {
 		...baseServer,

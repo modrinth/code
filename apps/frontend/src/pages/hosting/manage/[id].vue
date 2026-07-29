@@ -11,6 +11,7 @@
 		:auth-user="authUser"
 		:navigate-to-billing="() => router.push('/settings/billing')"
 		:navigate-to-servers="() => router.push('/hosting/manage')"
+		constrain-width
 		:browse-modpacks="
 			({ serverId: sid, worldId: wid, from }) => {
 				navigateTo({

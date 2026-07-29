@@ -40,4 +40,3 @@ These composables are deprecated and should not be used in new code:
 
 - **`useAsyncData`** - we use tanstack, not nuxt's built in async data utility.
 - **`useBaseFetch`** (`src/composables/fetch.js`) — legacy Labrinth fetch wrapper. Use `client.labrinth.*` modules instead.
-- **`useServersFetch`** (`src/composables/servers/servers-fetch.ts`) — legacy Archon fetch wrapper with manual retry/circuit-breaker. Use `client.archon.*` modules instead — refer to the `packages/api-client/CLAUDE.md` for more information.

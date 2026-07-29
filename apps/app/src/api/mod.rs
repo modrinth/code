@@ -4,17 +4,19 @@ use thiserror::Error;
 
 pub mod auth;
 pub mod import;
+pub mod install;
+pub mod instance;
 pub mod jre;
 pub mod logs;
 pub mod metadata;
 pub mod minecraft_skins;
 pub mod mr_auth;
-pub mod pack;
 pub mod process;
-pub mod profile;
-pub mod profile_create;
+pub mod reports;
 pub mod settings;
+pub mod shortcuts;
 pub mod tags;
+pub mod users;
 pub mod utils;
 
 pub mod ads;
@@ -85,9 +87,31 @@ macro_rules! impl_serialize {
                     TheseusSerializableError::Theseus(theseus_error) => {
                         $crate::error::display_tracing_error(theseus_error);
 
-                        let mut state = serializer.serialize_struct("Theseus", 2)?;
+                        let unavailable_reason = match theseus_error.raw.as_ref() {
+                            theseus::ErrorKind::SharedInstanceUnavailable(reason) => Some(reason),
+                            _ => None,
+                        };
+                        let code = match theseus_error.raw.as_ref() {
+                            theseus::ErrorKind::SharedInstanceUnavailable(_) => {
+                                Some("shared_instance_unavailable")
+                            }
+                            theseus::ErrorKind::SharedInstancesApiError(_) => {
+                                Some("shared_instances_api_error")
+                            }
+                            _ => None,
+                        };
+                        let mut state = serializer.serialize_struct(
+                            "Theseus",
+                            2 + usize::from(code.is_some()) + usize::from(unavailable_reason.is_some()),
+                        )?;
                         state.serialize_field("field_name", "Theseus")?;
                         state.serialize_field("message", &theseus_error.to_string())?;
+                        if let Some(code) = code {
+                            state.serialize_field("code", code)?;
+                        }
+                        if let Some(reason) = unavailable_reason {
+                            state.serialize_field("reason", reason)?;
+                        }
                         state.end()
                     }
                     $(

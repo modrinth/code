@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT *\n\t\tFROM instance_files\n\t\tWHERE instance_id = ? AND relative_path = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "relative_path",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "enabled",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "sha1",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "size",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "missing",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "added_at",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified_at",
+        "ordinal": 9,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3a6a810f35329133faf35bec48d55230904ec66d400171e94e9d36af24c458f3"
+}

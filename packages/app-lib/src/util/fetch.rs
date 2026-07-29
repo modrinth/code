@@ -1,22 +1,28 @@
 //! Functions for fetching information from the Internet
 use super::io::{self, IOError};
-use crate::ErrorKind;
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
+use eyre::{Context, eyre};
+use governor::clock::{Clock, DefaultClock};
+use governor::{DefaultDirectRateLimiter, Quota, RateLimiter};
 use parking_lot::Mutex;
 use rand::Rng;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::collections::VecDeque;
-use std::ffi::OsStr;
-use std::path::{Path, PathBuf};
-use std::sync::LazyLock;
-use std::time::{self};
+use std::collections::{HashMap, VecDeque};
+use std::future::Future;
+use std::num::NonZeroU32;
+use std::path::Path;
+use std::pin::Pin;
+use std::sync::{Arc, LazyLock};
+use std::time::{self, Duration, Instant, SystemTime};
 use tokio::sync::Semaphore;
-use tokio::{fs::File, io::AsyncWriteExt};
+use tokio::{fs::File, io::AsyncReadExt, io::AsyncWriteExt};
+use tracing::{debug, info};
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
 
@@ -35,6 +41,7 @@ pub struct DownloadMeta {
     pub reason: DownloadReason,
     pub game_version: String,
     pub loader: String,
+    pub dependent_on: Option<String>,
 }
 
 impl DownloadMeta {
@@ -49,20 +56,48 @@ pub struct IoSemaphore(pub Semaphore);
 pub struct FetchSemaphore(pub Semaphore);
 
 struct FetchFence {
-    inner: Mutex<FenceInner>,
+    inner: Mutex<HashMap<&'static str, FenceInner>>,
 }
 
 impl FetchFence {
-    pub fn is_blocked(&self) -> bool {
-        self.inner.lock().is_blocked()
+    pub fn is_blocked(&self, key: &'static str) -> bool {
+        self.inner
+            .lock()
+            .entry(key)
+            .or_insert_with(FenceInner::new)
+            .is_blocked()
     }
 
-    pub fn record_ok(&self) {
-        self.inner.lock().record_ok()
+    pub fn record_ok(&self, key: &'static str) {
+        self.inner
+            .lock()
+            .entry(key)
+            .or_insert_with(FenceInner::new)
+            .record_ok()
     }
 
-    pub fn record_fail(&self) {
-        self.inner.lock().record_fail()
+    pub fn record_fail(&self, key: &'static str) {
+        self.inner
+            .lock()
+            .entry(key)
+            .or_insert_with(FenceInner::new)
+            .record_fail()
+    }
+
+    pub fn latest_block_minutes(&self) -> u32 {
+        let now = Utc::now();
+
+        self.inner
+            .lock()
+            .values()
+            .filter_map(|fence| fence.block_until)
+            .filter(|until| *until > now)
+            .max()
+            .map(|until| {
+                let seconds = until.signed_duration_since(now).num_seconds();
+                (seconds.max(0) as u32).div_ceil(60).max(1)
+            })
+            .unwrap_or(1)
     }
 }
 
@@ -153,11 +188,152 @@ impl FenceInner {
 
 static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
     LazyLock::new(|| FetchFence {
-        inner: Mutex::new(FenceInner::new()),
+        inner: Mutex::new(HashMap::new()),
     });
+
+const API_RETRY_AFTER_FALLBACK: Duration = Duration::from_secs(60);
+
+// This means the unit recovery time will be:
+// replenish one unit time in seconds = (60 / (units recovered per minute))
+// smooth recovery time = replenish one unit time in seconds * API_RATE_LIMIT_RECOVERY_SIZE.
+//
+// At 20 it means (60 / 120) * 20 = 10 seconds.
+const API_RATE_LIMIT_RECOVERY_SIZE: u32 = 20;
+
+/// Implements request-rate-limit handling as well as a local rate limiter of 120 RPM + 50 burst.
+struct ApiRateLimit {
+    block_until: Mutex<Option<Instant>>,
+    check_lock: Mutex<()>,
+    local: Arc<DefaultDirectRateLimiter>,
+    recovery_padding: Duration,
+}
+
+impl ApiRateLimit {
+    fn new() -> Self {
+        let quota = Quota::per_minute(NonZeroU32::new(120).unwrap())
+            .allow_burst(NonZeroU32::new(50).unwrap());
+        let recovery_size =
+            API_RATE_LIMIT_RECOVERY_SIZE.min(quota.burst_size().get());
+
+        Self {
+            block_until: Mutex::new(None),
+            check_lock: Mutex::new(()),
+            local: Arc::new(RateLimiter::direct(quota)),
+            recovery_padding: quota
+                .replenish_interval()
+                .saturating_mul(recovery_size.saturating_sub(1)),
+        }
+    }
+
+    fn check(&self) -> crate::Result<()> {
+        let _check_guard = self.check_lock.lock();
+        self.ensure_not_blocked()?;
+
+        if let Err(not_until) = self.local.check() {
+            // Adds hysteresis to the rate limiting system, ensuring recovery happens
+            // for longer but for more units, avoiding the "flapping" effect when running
+            // out of units.
+
+            let retry_after = not_until
+                .wait_time_from(DefaultClock::default().now())
+                .saturating_add(self.recovery_padding);
+            info!(
+                ?retry_after,
+                "Hit builtin rate limiter; waiting for recovery"
+            );
+            self.block_for(retry_after);
+
+            let retry_in_seconds = self
+                .retry_in_seconds()
+                .unwrap_or_else(|| duration_seconds_ceil(retry_after));
+
+            return Err(ErrorKind::Ratelimited { retry_in_seconds }.into());
+        }
+
+        self.ensure_not_blocked()
+    }
+
+    fn handle_response(
+        &self,
+        response: &reqwest::Response,
+    ) -> Option<ErrorKind> {
+        if response.status() != reqwest::StatusCode::TOO_MANY_REQUESTS {
+            return None;
+        }
+
+        debug!("Received 429 response; blocking");
+
+        let retry_after = response
+            .headers()
+            .get(reqwest::header::RETRY_AFTER)
+            .and_then(|value| value.to_str().ok())
+            .and_then(|value| parse_retry_after(value, SystemTime::now()))
+            .unwrap_or(API_RETRY_AFTER_FALLBACK);
+
+        self.block_for(retry_after);
+
+        Some(ErrorKind::Ratelimited {
+            retry_in_seconds: self.retry_in_seconds().unwrap_or(0),
+        })
+    }
+
+    fn ensure_not_blocked(&self) -> crate::Result<()> {
+        if let Some(retry_in_seconds) = self.retry_in_seconds() {
+            debug!("Hit builtin rate limiter; blocking");
+            return Err(ErrorKind::Ratelimited { retry_in_seconds }.into());
+        }
+
+        Ok(())
+    }
+
+    fn block_for(&self, duration: Duration) {
+        let Some(block_until) = Instant::now().checked_add(duration) else {
+            return;
+        };
+        let mut current_block = self.block_until.lock();
+
+        if current_block.is_none_or(|current| current < block_until) {
+            *current_block = Some(block_until);
+        }
+    }
+
+    fn retry_in_seconds(&self) -> Option<u64> {
+        let mut block_until = self.block_until.lock();
+        let remaining = (*block_until)?.checked_duration_since(Instant::now());
+
+        if let Some(remaining) = remaining
+            && !remaining.is_zero()
+        {
+            return Some(duration_seconds_ceil(remaining));
+        }
+
+        *block_until = None;
+        None
+    }
+}
+
+static GLOBAL_API_RATE_LIMIT: LazyLock<ApiRateLimit> =
+    LazyLock::new(ApiRateLimit::new);
+
+fn parse_retry_after(value: &str, now: SystemTime) -> Option<Duration> {
+    if let Ok(seconds) = value.parse::<u64>() {
+        return Some(Duration::from_secs(seconds));
+    }
+
+    let retry_at = httpdate::parse_http_date(value).ok()?;
+    Some(retry_at.duration_since(now).unwrap_or(Duration::ZERO))
+}
+
+fn duration_seconds_ceil(duration: Duration) -> u64 {
+    duration
+        .as_secs()
+        .saturating_add(u64::from(duration.subsec_nanos() > 0))
+}
 
 fn reqwest_client_builder() -> reqwest::ClientBuilder {
     reqwest::Client::builder()
+        .connect_timeout(time::Duration::from_secs(15))
+        .read_timeout(time::Duration::from_secs(30))
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
         .user_agent(crate::launcher_user_agent())
 }
@@ -178,11 +354,19 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
 
 const FETCH_ATTEMPTS: usize = 2;
 
+pub type FetchProgressFn<'a> = dyn FnMut(
+        u64,
+        u64,
+    ) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
+    + Send
+    + 'a;
+
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
@@ -194,6 +378,7 @@ pub async fn fetch(
         None,
         download_meta,
         None,
+        uri_path,
         semaphore,
         exec,
     )
@@ -205,6 +390,7 @@ pub async fn fetch_with_client(
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     client: &reqwest::Client,
@@ -217,9 +403,39 @@ pub async fn fetch_with_client(
         None,
         download_meta,
         None,
+        uri_path,
         semaphore,
         exec,
         client,
+    )
+    .await
+}
+
+#[tracing::instrument(skip(semaphore, progress))]
+pub async fn fetch_with_client_progress(
+    url: &str,
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        Method::GET,
+        url,
+        sha1,
+        None,
+        None,
+        None,
+        download_meta,
+        None,
+        uri_path,
+        semaphore,
+        exec,
+        client,
+        progress,
     )
     .await
 }
@@ -230,6 +446,7 @@ pub async fn fetch_json<T>(
     url: &str,
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
+    uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<T>
@@ -237,7 +454,8 @@ where
     T: DeserializeOwned,
 {
     let result = fetch_advanced(
-        method, url, sha1, json_body, None, None, None, semaphore, exec,
+        method, url, sha1, json_body, None, None, None, uri_path, semaphore,
+        exec,
     )
     .await?;
     let value = serde_json::from_slice(&result)?;
@@ -256,6 +474,7 @@ pub async fn fetch_advanced(
     header: Option<(&str, &str)>,
     download_meta: Option<&DownloadMeta>,
     loading_bar: Option<(&LoadingBarId, f64)>,
+    uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
@@ -267,9 +486,72 @@ pub async fn fetch_advanced(
         header,
         download_meta,
         loading_bar,
+        uri_path,
         semaphore,
         exec,
         &INSECURE_REQWEST_CLIENT,
+    )
+    .await
+}
+
+#[tracing::instrument(skip(body, semaphore))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_bytes(
+    method: Method,
+    url: &str,
+    body: Bytes,
+    header: Option<(&str, &str)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        None,
+        None,
+        Some(body),
+        header,
+        None,
+        None,
+        uri_path,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+        None,
+    )
+    .await
+}
+
+#[tracing::instrument(skip(json_body, semaphore, progress))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_with_progress(
+    method: Method,
+    url: &str,
+    sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    header: Option<(&str, &str)>,
+    download_meta: Option<&DownloadMeta>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        sha1,
+        json_body,
+        None,
+        header,
+        download_meta,
+        loading_bar,
+        uri_path,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+        progress,
     )
     .await
 }
@@ -285,14 +567,53 @@ pub async fn fetch_advanced_with_client(
     header: Option<(&str, &str)>,
     download_meta: Option<&DownloadMeta>,
     loading_bar: Option<(&LoadingBarId, f64)>,
+    uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     client: &reqwest::Client,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        sha1,
+        json_body,
+        None,
+        header,
+        download_meta,
+        loading_bar,
+        uri_path,
+        semaphore,
+        exec,
+        client,
+        None,
+    )
+    .await
+}
+
+#[tracing::instrument(skip(
+    json_body, bytes_body, semaphore, client, progress
+))]
+#[allow(clippy::too_many_arguments)]
+async fn fetch_advanced_with_client_and_progress(
+    method: Method,
+    url: &str,
+    sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    bytes_body: Option<Bytes>,
+    header: Option<(&str, &str)>,
+    download_meta: Option<&DownloadMeta>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
 
     let is_api_url = url.starts_with(env!("MODRINTH_API_URL"))
         || url.starts_with(env!("MODRINTH_API_URL_V3"));
+    let fence_key = if is_api_url { uri_path } else { None };
 
     let creds = if header
         .as_ref()
@@ -308,14 +629,25 @@ pub async fn fetch_advanced_with_client(
         .map(|m| (DOWNLOAD_META_HEADER.to_string(), m.to_header_value()));
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-        if is_api_url && GLOBAL_FETCH_FENCE.is_blocked() {
-            return Err(ErrorKind::ApiIsDownError.into());
+        if is_api_url {
+            GLOBAL_API_RATE_LIMIT.check()?;
+        }
+
+        if let Some(fence_key) = fence_key
+            && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
+        {
+            return Err(ErrorKind::ApiIsDownError(
+                GLOBAL_FETCH_FENCE.latest_block_minutes(),
+            )
+            .into());
         }
 
         let mut req = client.request(method.clone(), url);
 
         if let Some(body) = json_body.clone() {
             req = req.json(&body);
+        } else if let Some(body) = bytes_body.clone() {
+            req = req.body(body);
         }
 
         if let Some(header) = header {
@@ -327,16 +659,23 @@ pub async fn fetch_advanced_with_client(
         }
 
         if let Some((name, value)) = &download_meta_header {
-            tracing::info!("Sending download analytics: {value}");
+            tracing::debug!("Sending download analytics: {value}");
             req = req.header(name.as_str(), value.as_str());
         }
 
         let result = req.send().await;
         match result {
             Ok(resp) => {
+                if is_api_url
+                    && let Some(error) =
+                        GLOBAL_API_RATE_LIMIT.handle_response(&resp)
+                {
+                    return Err(error.into());
+                }
+
                 if resp.status().is_server_error() {
-                    if is_api_url {
-                        GLOBAL_FETCH_FENCE.record_fail();
+                    if let Some(fence_key) = fence_key {
+                        GLOBAL_FETCH_FENCE.record_fail(fence_key);
                     }
 
                     if attempt <= FETCH_ATTEMPTS {
@@ -347,38 +686,67 @@ pub async fn fetch_advanced_with_client(
                 if resp.status().is_client_error()
                     || resp.status().is_server_error()
                 {
+                    let status = resp.status();
                     let backup_error = resp.error_for_status_ref().unwrap_err();
-                    if let Ok(error) = resp.json().await {
+                    if let Ok(mut error) = resp.json::<LabrinthError>().await {
+                        error.status = Some(status.as_u16());
+                        error.method = Some(method.as_str().to_string());
+                        error.url = Some(url.to_string());
+                        error.route = uri_path.map(str::to_string);
                         return Err(ErrorKind::LabrinthError(error).into());
                     }
                     return Err(backup_error.into());
                 }
 
-                let bytes = if let Some((bar, total)) = &loading_bar {
+                let bytes: eyre::Result<Bytes> = if loading_bar.is_some()
+                    || progress.is_some()
+                {
                     let length = resp.content_length();
                     if let Some(total_size) = length {
                         use futures::StreamExt;
                         let mut stream = resp.bytes_stream();
-                        let mut bytes = Vec::new();
-                        while let Some(item) = stream.next().await {
-                            let chunk = item.or(Err(ErrorKind::NoValueFor(
-                                "fetch bytes".to_string(),
-                            )))?;
-                            bytes.append(&mut chunk.to_vec());
-                            emit_loading(
-                                bar,
-                                (chunk.len() as f64 / total_size as f64)
-                                    * total,
-                                None,
-                            )?;
-                        }
 
-                        Ok(bytes::Bytes::from(bytes))
+                        async {
+                            let mut bytes = Vec::new();
+                            let mut downloaded = 0_u64;
+
+                            while let Some(item) = stream.next().await {
+                                let chunk = item.wrap_err_with(|| {
+                                    eyre!(
+                                        "failed to read response body from {url}"
+                                    )
+                                })?;
+
+                                downloaded += chunk.len() as u64;
+                                bytes.extend_from_slice(&chunk);
+
+                                if let Some((bar, total)) = &loading_bar {
+                                    emit_loading(
+                                        bar,
+                                        (chunk.len() as f64
+                                            / total_size as f64)
+                                            * total,
+                                        None,
+                                    )?;
+                                }
+
+                                if let Some(progress) = progress.as_mut() {
+                                    progress(downloaded, total_size).await?;
+                                }
+                            }
+
+                            Ok(Bytes::from(bytes))
+                        }
+                        .await
                     } else {
-                        resp.bytes().await
+                        resp.bytes().await.wrap_err_with(|| {
+                            eyre!("failed to read response body from {url}")
+                        })
                     }
                 } else {
-                    resp.bytes().await
+                    resp.bytes().await.wrap_err_with(|| {
+                        eyre!("failed to read response body from {url}")
+                    })
                 };
 
                 if let Ok(bytes) = bytes {
@@ -399,8 +767,8 @@ pub async fn fetch_advanced_with_client(
 
                     tracing::trace!("Done downloading URL {url}");
 
-                    if is_api_url {
-                        GLOBAL_FETCH_FENCE.record_ok();
+                    if let Some(fence_key) = fence_key {
+                        GLOBAL_FETCH_FENCE.record_ok(fence_key);
                     }
 
                     return Ok(bytes);
@@ -426,6 +794,7 @@ pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<Bytes> {
@@ -440,9 +809,47 @@ pub async fn fetch_mirrors(
             mirror,
             sha1,
             download_meta,
+            uri_path,
             semaphore,
             exec,
             &REQWEST_CLIENT,
+        )
+        .await;
+
+        if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
+            return result;
+        }
+    }
+
+    unreachable!()
+}
+
+#[tracing::instrument(skip(semaphore, progress))]
+pub async fn fetch_mirrors_with_progress(
+    mirrors: &[&str],
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<Bytes> {
+    if mirrors.is_empty() {
+        return Err(
+            ErrorKind::InputError("No mirrors provided!".to_string()).into()
+        );
+    }
+
+    for (index, mirror) in mirrors.iter().enumerate() {
+        let result = fetch_with_client_progress(
+            mirror,
+            sha1,
+            download_meta,
+            uri_path,
+            semaphore,
+            exec,
+            &REQWEST_CLIENT,
+            progress.as_deref_mut(),
         )
         .await;
 
@@ -536,28 +943,6 @@ pub async fn copy(
     Ok(())
 }
 
-// Writes a icon to the cache and returns the absolute path of the icon within the cache directory
-#[tracing::instrument(skip(bytes, semaphore))]
-pub async fn write_cached_icon(
-    icon_path: &str,
-    cache_dir: &Path,
-    bytes: Bytes,
-    semaphore: &IoSemaphore,
-) -> crate::Result<PathBuf> {
-    let extension = Path::new(&icon_path).extension().and_then(OsStr::to_str);
-    let hash = sha1_async(bytes.clone()).await?;
-    let path = cache_dir.join("icons").join(if let Some(ext) = extension {
-        format!("{hash}.{ext}")
-    } else {
-        hash
-    });
-
-    write(&path, &bytes, semaphore).await?;
-
-    let path = io::canonicalize(path)?;
-    Ok(path)
-}
-
 pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     let hash = tokio::task::spawn_blocking(move || {
         sha1_smol::Sha1::from(bytes).hexdigest()
@@ -565,6 +950,34 @@ pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     .await?;
 
     Ok(hash)
+}
+
+pub async fn sha1_file_async(
+    path: impl AsRef<Path>,
+) -> crate::Result<(u64, String)> {
+    let path = path.as_ref();
+    // Local files can be multi-gigabyte .mrpacks, so hash them without materializing bytes.
+    let mut file = File::open(path)
+        .await
+        .map_err(|e| IOError::with_path(e, path))?;
+    let mut hasher = sha1_smol::Sha1::new();
+    let mut size = 0;
+    let mut buffer = vec![0; 262144];
+
+    loop {
+        let bytes_read = file
+            .read(&mut buffer)
+            .await
+            .map_err(|e| IOError::with_path(e, path))?;
+        if bytes_read == 0 {
+            break;
+        }
+
+        hasher.update(&buffer[..bytes_read]);
+        size += bytes_read as u64;
+    }
+
+    Ok((size, hasher.digest().to_string()))
 }
 
 #[cfg(test)]
@@ -589,6 +1002,42 @@ mod tests {
 
         fence.record_fail();
         assert!(fence.is_blocked());
+    }
+
+    #[test]
+    fn test_fetch_fence_keys_are_independent() {
+        let fence = FetchFence {
+            inner: Mutex::new(HashMap::new()),
+        };
+
+        for _ in 0..FenceInner::FAILURE_THRESHOLD {
+            fence.record_fail("/v3/version_file/:sha1/update");
+        }
+
+        assert!(fence.is_blocked("/v3/version_file/:sha1/update"));
+        assert!(!fence.is_blocked("/v3/project/:id"));
+    }
+
+    #[test]
+    fn test_fetch_fence_latest_block_minutes() {
+        let fence = FetchFence {
+            inner: Mutex::new(HashMap::new()),
+        };
+
+        {
+            let mut inner = fence.inner.lock();
+            inner.insert("/expired", FenceInner::new());
+            inner.get_mut("/expired").unwrap().block_until =
+                Some(Utc::now() - TimeDelta::minutes(1));
+            inner.insert("/short", FenceInner::new());
+            inner.get_mut("/short").unwrap().block_until =
+                Some(Utc::now() + TimeDelta::seconds(61));
+            inner.insert("/long", FenceInner::new());
+            inner.get_mut("/long").unwrap().block_until =
+                Some(Utc::now() + TimeDelta::seconds(140));
+        }
+
+        assert_eq!(fence.latest_block_minutes(), 3);
     }
 
     #[test]

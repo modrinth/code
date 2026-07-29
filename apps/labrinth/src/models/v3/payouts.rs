@@ -234,7 +234,7 @@ impl PayoutStatus {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct PayoutMethod {
     pub id: String,
     #[serde(rename = "type")]
@@ -252,7 +252,7 @@ pub struct PayoutMethod {
     pub exchange_rate: Option<Decimal>,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct PayoutMethodFee {
     #[serde(with = "rust_decimal::serde::float")]
     pub percentage: Decimal,
@@ -274,6 +274,17 @@ impl PayoutMethodFee {
 #[derive(Clone)]
 pub struct PayoutDecimal(pub Decimal);
 
+impl utoipa::PartialSchema for PayoutDecimal {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::ObjectBuilder::new()
+            .schema_type(utoipa::openapi::schema::Type::Number)
+            .build()
+            .into()
+    }
+}
+
+impl utoipa::ToSchema for PayoutDecimal {}
+
 impl Serialize for PayoutDecimal {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -293,7 +304,7 @@ impl<'de> Deserialize<'de> for PayoutDecimal {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PayoutInterval {
     Standard {

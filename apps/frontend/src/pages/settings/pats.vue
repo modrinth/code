@@ -62,7 +62,13 @@
 					<label for="pat-expires">
 						<span class="font-semibold">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 					</label>
-					<DatePicker id="pat-expires" v-model="expires" show-today wrapper-class="w-full" />
+					<DatePicker
+						id="pat-expires"
+						v-model="expires"
+						:min-date="minimumPatExpiry"
+						show-today
+						wrapper-class="w-full"
+					/>
 				</div>
 
 				<div class="ml-auto mt-4 flex gap-2">
@@ -73,13 +79,13 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-if="editPatId !== null" color="brand">
-						<button :disabled="loading || !name || !expires" @click="editPat">
+						<button :disabled="loading || !name || !isExpiryInFuture" @click="editPat">
 							<SaveIcon />
 							{{ formatMessage(commonMessages.saveChangesButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-else color="brand">
-						<button :disabled="loading || !name || !expires" @click="createPat">
+						<button :disabled="loading || !name || !isExpiryInFuture" @click="createPat">
 							<PlusIcon />
 							{{ formatMessage(createModalMessages.action) }}
 						</button>
@@ -123,8 +129,8 @@
 					<strong>{{ pat.name }}</strong>
 				</div>
 				<div>
-					<template v-if="pat.access_token">
-						<CopyCode :text="pat.access_token" />
+					<template v-if="createdPatTokens[pat.id] || pat.access_token">
+						<CopyCode :text="createdPatTokens[pat.id] || pat.access_token" />
 					</template>
 					<template v-else>
 						<span v-tooltip="pat.last_used ? formatDateTime(pat.last_used) : null">
@@ -331,12 +337,17 @@ useHead({
 const data = useNuxtApp()
 const { scopesToLabels } = useScopes()
 const patModal = ref()
+const minimumPatExpiry = data.$dayjs().add(1, 'day').format('YYYY-MM-DD')
 
 const editPatId = ref(null)
 
 const name = ref(null)
 const scopesVal = ref(BigInt(0))
 const expires = ref(null)
+const createdPatTokens = ref({})
+const isExpiryInFuture = computed(
+	() => expires.value && data.$dayjs(expires.value).isAfter(data.$dayjs(), 'day'),
+)
 
 const deletePatIndex = ref(null)
 
@@ -415,6 +426,9 @@ async function createPat() {
 			scopes: Number(scopesVal.value),
 			expires: data.$dayjs(expires.value).toISOString(),
 		})
+		if (res.access_token) {
+			createdPatTokens.value[res.id] = res.access_token
+		}
 		queryClient.setQueryData(['pat'], (old) => [...(old || []), res])
 		patModal.value.hide()
 	} catch (err) {
@@ -468,7 +482,6 @@ async function removePat(id) {
 </script>
 <style lang="scss" scoped>
 .scope-items :deep(.checkbox-outer) {
-	white-space: nowrap !important;
 	justify-content: flex-start !important;
 }
 

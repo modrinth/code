@@ -4,117 +4,206 @@ import {
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
+	injectFilePicker,
 	injectNotificationManager,
 	InstallationSettingsLayout,
-	provideAppBackup,
 	provideInstallationSettings,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 
+import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
+import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
-import { get_loader_versions } from '@/helpers/metadata'
 import {
-	duplicate,
+	install_existing_instance,
+	install_pack_to_existing_instance,
+	wait_for_install_job,
+} from '@/helpers/install'
+import {
 	edit,
 	get_linked_modpack_info,
-	install,
-	list,
+	unlink_shared_instance,
 	update_managed_modrinth_version,
 	update_repair_modrinth,
-} from '@/helpers/profile'
+} from '@/helpers/instance'
+import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectInstanceSettings } from '@/providers/instance-settings'
+import { useTheming } from '@/store/state'
 
 import type { Manifest } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
+const filePicker = injectFilePicker()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
+const debug = useDebugLogger('AppInstallationSettings')
+const themeStore = useTheming()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
+const managedContentPolicy = useManagedContentPolicy(instance)
+const skipNonEssentialWarnings = computed(() =>
+	themeStore.getFeatureFlag('skip_non_essential_warnings'),
+)
 
-const [
-	fabric_versions,
-	forge_versions,
-	quilt_versions,
-	neoforge_versions,
-	all_game_versions,
-	loaders,
-] = await Promise.all([
-	get_loader_versions('fabric')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_loader_versions('forge')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_loader_versions('quilt')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_loader_versions('neo')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_game_versions()
-		.then((gameVersions: GameVersionTag[]) => shallowRef(gameVersions))
-		.catch(handleError),
-	get_loaders()
-		.then((value: PlatformTag[]) =>
-			value
-				.filter(
-					(item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla',
-				)
-				.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
-		)
-		.then((loader: PlatformTag[]) => ref(loader))
-		.catch(handleError),
-])
-
-const { data: modpackInfo } = useQuery({
-	queryKey: computed(() => ['linkedModpackInfo', instance.value.path]),
-	queryFn: () => get_linked_modpack_info(instance.value.path, 'must_revalidate'),
-	enabled: computed(() => !!instance.value.linked_data?.project_id && !offline),
+debug('metadata load: start', {
+	instanceId: instance.value.id,
+	loader: instance.value.loader,
+	gameVersion: instance.value.game_version,
+	installStage: instance.value.install_stage,
 })
+
+function getSupportedModpackLoaders() {
+	return get_loaders().then((value: PlatformTag[]) =>
+		value
+			.filter((item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla')
+			.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
+	)
+}
+
+const fabricVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'fabric'],
+	queryFn: () => get_loader_versions('fabric') as Promise<Manifest>,
+})
+const forgeVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'forge'],
+	queryFn: () => get_loader_versions('forge') as Promise<Manifest>,
+})
+const quiltVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'quilt'],
+	queryFn: () => get_loader_versions('quilt') as Promise<Manifest>,
+})
+const neoforgeVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'neo'],
+	queryFn: () => get_loader_versions('neo') as Promise<Manifest>,
+})
+const gameVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'game-versions'],
+	queryFn: () => get_game_versions() as Promise<GameVersionTag[]>,
+})
+const loadersQuery = useQuery({
+	queryKey: ['instance-settings', 'loaders', 'modpack'],
+	queryFn: getSupportedModpackLoaders,
+})
+
+const metadataLoading = computed(() =>
+	[
+		fabricVersionsQuery,
+		forgeVersionsQuery,
+		quiltVersionsQuery,
+		neoforgeVersionsQuery,
+		gameVersionsQuery,
+		loadersQuery,
+	].some((query) => query.isLoading.value),
+)
+
+debug('metadata queries configured', {
+	instanceId: instance.value.id,
+	loader: instance.value.loader,
+	gameVersion: instance.value.game_version,
+})
+
+const isModrinthLinkedModpack = computed(
+	() =>
+		instance.value.link?.type === 'modrinth_modpack' ||
+		instance.value.link?.type === 'server_project_modpack' ||
+		(instance.value.link?.type === 'shared_instance' &&
+			!!instance.value.link.modpack_project_id &&
+			!!instance.value.link.modpack_version_id),
+)
+const isImportedModpack = computed(() => instance.value.link?.type === 'imported_modpack')
+const isSharedInstanceManagedModpack = managedContentPolicy.isManagedModpack
+const canUnlinkSharedInstance = managedContentPolicy.canUnlink
+
+const modpackInfoQuery = useQuery({
+	queryKey: computed(() => ['linkedModpackInfo', instance.value.id]),
+	queryFn: () => get_linked_modpack_info(instance.value.id, 'must_revalidate'),
+	enabled: computed(() => isModrinthLinkedModpack.value && !offline),
+})
+const modpackInfo = modpackInfoQuery.data
 
 const repairing = ref(false)
 const reinstalling = ref(false)
+const unlinkingSharedInstance = ref(false)
+const installationSettingsBusy = computed(
+	() =>
+		instance.value.quarantined ||
+		instance.value.install_stage !== 'installed' ||
+		repairing.value ||
+		reinstalling.value ||
+		unlinkingSharedInstance.value ||
+		!!offline,
+)
+const installationSettingsBusyMessage = computed(() =>
+	instance.value.quarantined ? formatMessage(messages.locked) : null,
+)
+
+async function unlinkSharedInstance() {
+	unlinkingSharedInstance.value = true
+	try {
+		await unlink_shared_instance(instance.value.id)
+		await queryClient.invalidateQueries({ queryKey: ['sharedInstanceUsers', instance.value.id] })
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
+		onUnlinked()
+	} catch (error) {
+		handleError(error)
+	} finally {
+		unlinkingSharedInstance.value = false
+	}
+}
 
 const messages = defineMessages({
 	loaderVersion: {
 		id: 'instance.settings.tabs.installation.loader-version',
 		defaultMessage: '{loader} version',
 	},
-})
-
-function getManifest(loader: string) {
-	const map: Record<string, typeof fabric_versions> = {
-		fabric: fabric_versions,
-		forge: forge_versions,
-		quilt: quilt_versions,
-		neoforge: neoforge_versions,
-	}
-	return map[loader]
-}
-
-provideAppBackup({
-	async createBackup() {
-		const allProfiles = await list()
-		const prefix = `${instance.value.name} - Backup #`
-		const existingNums = allProfiles
-			.filter((p) => p.name.startsWith(prefix))
-			.map((p) => parseInt(p.name.slice(prefix.length), 10))
-			.filter((n) => !isNaN(n))
-		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const newPath = await duplicate(instance.value.path)
-		await edit(newPath, { name: `${prefix}${nextNum}` })
+	locked: {
+		id: 'instance.settings.tabs.installation.locked',
+		defaultMessage: 'Installation settings are unavailable while this instance is locked.',
 	},
 })
 
+function getManifest(loader: string) {
+	const map: Record<string, Manifest | undefined> = {
+		fabric: fabricVersionsQuery.data.value,
+		forge: forgeVersionsQuery.data.value,
+		quilt: quiltVersionsQuery.data.value,
+		neoforge: neoforgeVersionsQuery.data.value,
+	}
+	const manifest = map[loader]
+	debug('getManifest:', {
+		loader,
+		hasManifest: !!manifest,
+		gameVersions: manifest?.gameVersions?.length ?? 0,
+	})
+	return manifest
+}
+
+async function installLocalModpackFromPicker() {
+	const picked = await filePicker.pickModpackFile({ readFile: false })
+	if (!picked?.path) return false
+
+	const job = await install_pack_to_existing_instance(instance.value.id, {
+		type: 'fromFile',
+		path: picked.path,
+	}).catch(handleError)
+	if (!job) return false
+
+	const completed = await wait_for_install_job(job.job_id).catch(handleError)
+	return !!completed
+}
+
+provideInstanceBackup(instance)
+
 provideInstallationSettings({
 	closeSettings: closeModal,
-	loading: ref(false),
+	loading: computed(() => metadataLoading.value || modpackInfoQuery.isLoading.value),
 	installationInfo: computed(() => {
 		const rows = [
 			{
@@ -136,15 +225,24 @@ provideInstallationSettings({
 		}
 		return rows
 	}),
-	isLinked: computed(() => !!instance.value.linked_data?.locked),
-	isBusy: computed(
+	isLinked: computed(
 		() =>
-			instance.value.install_stage !== 'installed' ||
-			repairing.value ||
-			reinstalling.value ||
-			!!offline,
+			isModrinthLinkedModpack.value ||
+			isImportedModpack.value ||
+			isSharedInstanceManagedModpack.value,
 	),
+	isBusy: installationSettingsBusy,
+	busyMessage: installationSettingsBusyMessage,
+	skipNonEssentialWarnings,
 	modpack: computed(() => {
+		if (isImportedModpack.value && instance.value.link?.type === 'imported_modpack') {
+			return {
+				iconUrl: instance.value.icon_path,
+				title: instance.value.link.name ?? instance.value.name,
+				versionNumber: instance.value.link.version_number ?? undefined,
+				filename: instance.value.link.filename ?? undefined,
+			}
+		}
 		if (!modpackInfo.value) return null
 		return {
 			iconUrl: modpackInfo.value.project.icon_url,
@@ -156,114 +254,212 @@ provideInstallationSettings({
 	currentPlatform: computed(() => instance.value.loader),
 	currentGameVersion: computed(() => instance.value.game_version),
 	currentLoaderVersion: computed(() => instance.value.loader_version ?? ''),
-	availablePlatforms: loaders?.value?.map((x) => x.name) ?? [],
+	availablePlatforms: computed(() => loadersQuery.data.value?.map((x) => x.name) ?? []),
 
 	resolveGameVersions(loader, showSnapshots) {
-		const versions = all_game_versions?.value ?? []
+		const versions = gameVersionsQuery.data.value ?? []
 		const filtered = versions.filter((item) => {
 			if (loader === 'vanilla') return true
 			const manifest = getManifest(loader)
-			return !!manifest?.value?.gameVersions?.some((x) => item.version === x.id)
+			return !!manifest?.gameVersions?.some((x) => item.version === x.id)
 		})
-		return (showSnapshots ? filtered : filtered.filter((x) => x.version_type === 'release')).map(
-			(x) => ({ value: x.version, label: x.version }),
-		)
+		const result = (
+			showSnapshots ? filtered : filtered.filter((x) => x.version_type === 'release')
+		).map((x) => ({ value: x.version, label: x.version }))
+		debug('resolveGameVersions:', {
+			loader,
+			showSnapshots,
+			totalVersions: versions.length,
+			filteredVersions: filtered.length,
+			resultVersions: result.length,
+		})
+		return result
 	},
 
 	resolveLoaderVersions(loader, gameVersion) {
-		if (loader === 'vanilla' || !gameVersion) return []
-		const manifest = getManifest(loader)
-		if (!manifest?.value) return []
-		if (loader === 'fabric' || loader === 'quilt') {
-			return manifest.value.gameVersions[0]?.loaders ?? []
+		if (loader === 'vanilla' || !gameVersion) {
+			debug('resolveLoaderVersions: skipped', { loader, gameVersion })
+			return []
 		}
-		return manifest.value.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
+		const manifest = getManifest(loader)
+		if (!manifest) {
+			debug('resolveLoaderVersions: no manifest', { loader, gameVersion })
+			return []
+		}
+		const entry = manifest.gameVersions?.find((item) => item.id === gameVersion)
+		if (entry?.versionGroup) {
+			const result =
+				manifest.versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
+			debug('resolveLoaderVersions: version group result', {
+				loader,
+				gameVersion,
+				versionGroup: entry.versionGroup,
+				count: result.length,
+			})
+			return result
+		}
+		const placeholder = manifest.gameVersions?.find((item) => item.id === '${modrinth.gameVersion}')
+		if (placeholder) {
+			const result = manifest.gameVersions?.some((item) => item.id === gameVersion)
+				? placeholder.loaders
+				: []
+			debug('resolveLoaderVersions: placeholder result', {
+				loader,
+				gameVersion,
+				count: result.length,
+			})
+			return result
+		}
+		const result = entry?.loaders ?? []
+		debug('resolveLoaderVersions: result', { loader, gameVersion, count: result.length })
+		return result
 	},
 
 	resolveHasSnapshots(loader) {
-		const versions = all_game_versions?.value ?? []
-		if (loader === 'vanilla') return versions.some((x) => x.version_type !== 'release')
+		const versions = gameVersionsQuery.data.value ?? []
+		if (loader === 'vanilla') {
+			const result = versions.some((x) => x.version_type !== 'release')
+			debug('resolveHasSnapshots: vanilla', { loader, result })
+			return result
+		}
 		const manifest = getManifest(loader)
 		const supported = versions.filter(
-			(item) => !!manifest?.value?.gameVersions?.some((x) => item.version === x.id),
+			(item) => !!manifest?.gameVersions?.some((x) => item.version === x.id),
 		)
-		return supported.some((x) => x.version_type !== 'release')
+		const result = supported.some((x) => x.version_type !== 'release')
+		debug('resolveHasSnapshots:', {
+			loader,
+			totalVersions: versions.length,
+			supportedVersions: supported.length,
+			result,
+		})
+		return result
 	},
 
 	async save(platform, gameVersion, loaderVersionId) {
-		const editProfile: Record<string, string | undefined> = {
+		debug('save: called', {
+			instanceId: instance.value.id,
+			platform,
+			gameVersion,
+			loaderVersionId,
+		})
+		const editInstancePatch: Record<string, string | undefined> = {
 			loader: platform,
 			game_version: gameVersion,
 		}
 		if (platform !== 'vanilla' && loaderVersionId) {
-			editProfile.loader_version = loaderVersionId
+			editInstancePatch.loader_version = loaderVersionId
 		}
-		await edit(instance.value.path, editProfile).catch(handleError)
+		await edit(instance.value.id, editInstancePatch).catch(handleError)
+		debug('save: edit complete', { editInstancePatch })
 	},
 
 	afterSave: async () => {
-		await install(instance.value.path, false).catch(handleError)
+		debug('afterSave: installing', { instanceId: instance.value.id })
+		await install_existing_instance(instance.value.id, false).catch(handleError)
 		trackEvent('InstanceRepair', {
 			loader: instance.value.loader,
 			game_version: instance.value.game_version,
 		})
+		debug('afterSave: done')
 	},
 
 	async repair() {
+		debug('repair: called', { instanceId: instance.value.id })
 		repairing.value = true
-		await install(instance.value.path, true).catch(handleError)
+		await install_existing_instance(instance.value.id, true).catch(handleError)
 		repairing.value = false
 		trackEvent('InstanceRepair', {
 			loader: instance.value.loader,
 			game_version: instance.value.game_version,
 		})
+		debug('repair: done')
 	},
 
 	async reinstallModpack() {
+		debug('reinstallModpack: called', { instanceId: instance.value.id })
 		reinstalling.value = true
-		await update_repair_modrinth(instance.value.path).catch(handleError)
-		reinstalling.value = false
-		trackEvent('InstanceRepair', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-		})
+		let shouldTrack = false
+		try {
+			if (isImportedModpack.value) {
+				shouldTrack = await installLocalModpackFromPicker()
+			} else {
+				await update_repair_modrinth(instance.value.id).catch(handleError)
+				shouldTrack = true
+			}
+		} finally {
+			reinstalling.value = false
+		}
+		if (shouldTrack) {
+			trackEvent('InstanceRepair', {
+				loader: instance.value.loader,
+				game_version: instance.value.game_version,
+			})
+		}
+		debug('reinstallModpack: done')
+	},
+
+	async swapModpack() {
+		debug('swapModpack: called', { instanceId: instance.value.id })
+		reinstalling.value = true
+		try {
+			const installed = await installLocalModpackFromPicker()
+			if (installed) {
+				trackEvent('InstanceRepair', {
+					loader: instance.value.loader,
+					game_version: instance.value.game_version,
+				})
+			}
+		} finally {
+			reinstalling.value = false
+		}
+		debug('swapModpack: done')
 	},
 
 	async unlinkModpack() {
-		await edit(instance.value.path, {
-			linked_data: null as unknown as undefined,
+		debug('unlinkModpack: called', { instanceId: instance.value.id })
+		await edit(instance.value.id, {
+			link: null as unknown as undefined,
 		})
 		await queryClient.invalidateQueries({
-			queryKey: ['linkedModpackInfo', instance.value.path],
+			queryKey: ['linkedModpackInfo', instance.value.id],
 		})
 		onUnlinked()
+		debug('unlinkModpack: done')
 	},
 
 	getCachedModpackVersions: () => null,
 	async fetchModpackVersions() {
-		const versions = await get_project_versions(instance.value.linked_data!.project_id!).catch(
-			handleError,
-		)
+		debug('fetchModpackVersions: called', {
+			projectId: instance.value.link?.project_id,
+		})
+		const versions = await get_project_versions(instance.value.link!.project_id!).catch(handleError)
+		debug('fetchModpackVersions: done', { count: versions?.length ?? 0 })
 		return (versions ?? []) as Labrinth.Versions.v2.Version[]
 	},
 
 	async getVersionChangelog(versionId: string) {
+		debug('getVersionChangelog: called', { versionId })
 		return (await get_version(versionId, 'must_revalidate').catch(
 			() => null,
 		)) as Labrinth.Versions.v2.Version | null
 	},
 
 	async onModpackVersionConfirm(version) {
-		await update_managed_modrinth_version(instance.value.path, version.id)
-		await queryClient.invalidateQueries({
-			queryKey: ['linkedModpackInfo', instance.value.path],
+		debug('onModpackVersionConfirm: called', {
+			versionId: version.id,
+			instanceId: instance.value.id,
 		})
+		await update_managed_modrinth_version(instance.value.id, version.id)
+		await queryClient.invalidateQueries({
+			queryKey: ['linkedModpackInfo', instance.value.id],
+		})
+		debug('onModpackVersionConfirm: done')
 	},
 
 	updaterModalProps: computed(() => ({
 		isApp: true,
-		currentVersionId:
-			modpackInfo.value?.update_version_id ?? instance.value.linked_data?.version_id ?? '',
+		currentVersionId: modpackInfo.value?.update_version_id ?? instance.value.link?.version_id ?? '',
 		projectIconUrl: modpackInfo.value?.project?.icon_url,
 		projectName: modpackInfo.value?.project?.title ?? 'Modpack',
 		currentGameVersion: instance.value.game_version,
@@ -272,12 +468,29 @@ provideInstallationSettings({
 
 	isServer: false,
 	isApp: true,
-	showModpackVersionActions: !isMinecraftServer.value,
+	showModpackVersionActions: computed(
+		() =>
+			isModrinthLinkedModpack.value &&
+			!isMinecraftServer.value &&
+			!isSharedInstanceManagedModpack.value,
+	),
+	isLocalFile: isImportedModpack,
+	isManagedModpack: isSharedInstanceManagedModpack,
+	managedModpackWarning: managedContentPolicy.managedModpackWarning,
 	repairing,
 	reinstalling,
 })
 </script>
 
 <template>
-	<InstallationSettingsLayout />
+	<InstallationSettingsLayout>
+		<template #extra>
+			<SharedInstanceInstallationSettingsControls
+				:can-unlink="canUnlinkSharedInstance"
+				:busy="installationSettingsBusy"
+				:unlinking="unlinkingSharedInstance"
+				:unlink="unlinkSharedInstance"
+			/>
+		</template>
+	</InstallationSettingsLayout>
 </template>

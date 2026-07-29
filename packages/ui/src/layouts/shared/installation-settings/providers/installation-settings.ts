@@ -16,6 +16,8 @@ export interface InstallationSettingsContext {
 	installationInfo: ComputedRef<InstallationInfoRow[]>
 	isLinked: ComputedRef<boolean>
 	isBusy: Ref<boolean> | ComputedRef<boolean>
+	busyMessage?: Ref<string | null> | ComputedRef<string | null>
+	skipNonEssentialWarnings?: Ref<boolean> | ComputedRef<boolean>
 
 	modpack: Ref<InstallationModpackData | null> | ComputedRef<InstallationModpackData | null>
 
@@ -23,7 +25,7 @@ export interface InstallationSettingsContext {
 	currentGameVersion: ComputedRef<string>
 	currentLoaderVersion: ComputedRef<string>
 
-	availablePlatforms: string[]
+	availablePlatforms: string[] | ComputedRef<string[]>
 
 	resolveGameVersions: (loader: string, showSnapshots: boolean) => GameVersionOption[]
 	resolveLoaderVersions: (loader: string, gameVersion: string) => LoaderVersionEntry[]
@@ -35,6 +37,7 @@ export interface InstallationSettingsContext {
 	save: (platform: string, gameVersion: string, loaderVersionId: string | null) => Promise<void>
 	repair: () => Promise<void>
 	reinstallModpack: () => Promise<void>
+	swapModpack?: () => Promise<void>
 	unlinkModpack: () => Promise<void>
 
 	getCachedModpackVersions: () => Labrinth.Versions.v2.Version[] | null
@@ -59,6 +62,14 @@ export interface InstallationSettingsContext {
 
 	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
 	isLocalFile?: boolean | ComputedRef<boolean>
+
+	/** True when an external source controls the linked modpack. */
+	isManagedModpack?: boolean | ComputedRef<boolean>
+	managedModpackWarning?: ComputedRef<{
+		admonitionHeader: string
+		changeVersionBody: string
+		unlinkBody: string
+	}>
 
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>

@@ -2,6 +2,7 @@
 	<div class="joined-buttons">
 		<ButtonStyled :color="color" :size="size">
 			<button
+				v-tooltip="primaryTooltip"
 				:class="{ 'joined-buttons__primary--muted': primaryMuted }"
 				:disabled="primaryDisabledResolved"
 				@click="handlePrimaryAction"
@@ -15,6 +16,7 @@
 				class="btn-dropdown-animation !w-10"
 				:options="dropdownOptions"
 				:disabled="dropdownDisabledResolved"
+				:tooltip="dropdownTooltip"
 			>
 				<DropdownIcon />
 				<template v-for="action in dropdownActions" :key="action.id" #[action.id]>
@@ -31,7 +33,8 @@ import { DropdownIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
-import { ButtonStyled, OverflowMenu } from '../index'
+import ButtonStyled from './ButtonStyled.vue'
+import OverflowMenu from './OverflowMenu.vue'
 
 // TODO: This should be moved to a shared types file.
 type Colors = 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
@@ -53,6 +56,8 @@ interface Props {
 	primaryDisabled?: boolean
 	dropdownDisabled?: boolean
 	primaryMuted?: boolean
+	primaryTooltip?: string
+	dropdownTooltip?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -62,6 +67,8 @@ const props = withDefaults(defineProps<Props>(), {
 	primaryDisabled: undefined,
 	dropdownDisabled: undefined,
 	primaryMuted: false,
+	primaryTooltip: undefined,
+	dropdownTooltip: undefined,
 })
 
 const primaryDisabledResolved = computed(() => props.primaryDisabled ?? props.disabled)

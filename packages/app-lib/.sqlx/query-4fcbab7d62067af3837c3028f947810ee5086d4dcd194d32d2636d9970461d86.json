@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT *\n\t\tFROM instance_content_set_remote_refs\n\t\tWHERE content_set_id = ?\n\t\tORDER BY ref_type ASC\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "content_set_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "ref_type",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "ref_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4fcbab7d62067af3837c3028f947810ee5086d4dcd194d32d2636d9970461d86"
+}

@@ -5,6 +5,10 @@
 	<div class="pointer-events-none absolute inset-0 z-[-1]">
 		<div id="absolute-background-teleport" class="relative"></div>
 	</div>
+	<div
+		class="pride-backdrop pointer-events-none absolute inset-0 z-[-1]"
+		:class="{ shown: showPrideBackdrop }"
+	></div>
 	<div class="pointer-events-none absolute inset-0 z-50">
 		<div
 			class="over-the-top-random-animation"
@@ -249,7 +253,7 @@
 							/>
 							<CompassIcon v-else aria-hidden="true" />
 							<span class="hidden md:contents">{{
-								formatMessage(navMenuMessages.discoverContent)
+								formatMessage(commonMessages.discoverContentLabel)
 							}}</span>
 							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
 							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
@@ -383,6 +387,12 @@
 								action: (event) => $refs.modal_batch_credit.show(event),
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'analytics-events',
+								color: 'primary',
+								link: '/admin/analytics/events',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -417,6 +427,9 @@
 						<template #servers-nodes>
 							<ServerIcon aria-hidden="true" /> Credit server nodes
 						</template>
+						<template #analytics-events>
+							<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
+						</template>
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">
@@ -430,20 +443,23 @@
 						:options="[
 							{
 								id: 'new-project',
-								action: (event) => $refs.modal_creation.show(event),
+								action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
 							},
 							{
 								id: 'new-server-project',
-								action: (event) => $refs.modal_creation.show(event, { type: 'server' }),
+								action: (event) =>
+									requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
 							},
 							{
 								id: 'new-collection',
-								action: (event) => $refs.modal_collection_creation.show(event),
+								action: (event) =>
+									requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
 							},
 							{ divider: true },
 							{
 								id: 'new-organization',
-								action: (event) => $refs.modal_organization_creation.show(event),
+								action: (event) =>
+									requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 							},
 						]"
 					>
@@ -467,7 +483,7 @@
 				<OverflowMenu
 					v-if="auth.user"
 					:dropdown-id="`${basePopoutId}-user`"
-					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 pr-1"
 					:options="userMenuOptions"
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
@@ -764,6 +780,7 @@ import {
 	createHostingIntercomIdentityKey,
 	defineMessages,
 	injectModrinthClient,
+	injectNotificationManager,
 	injectPageContext,
 	OverflowMenu,
 	providePageContext,
@@ -790,15 +807,18 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { errors as generatedStateErrors } from '~/generated/state.json'
+import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const generatedState = useGeneratedState()
 
 const country = useUserCountry()
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 
 const auth = await useAuth()
 const user = await useUser()
@@ -857,12 +877,51 @@ const showTinMismatchBanner = computed(() => {
 	return !!auth.value.user && status === 'tin-mismatch'
 })
 
+const PRIDE_COLLECTION_ID = 'M4c3ITvd'
+const PRIDE_ARTICLE_SLUGS = ['pride-campaign-2025', 'pride-campaign-2026', 'proud-of-you-2026']
+const PRIDE_CACHE_TIME = 1000 * 60 * 60 * 24
+
+const { data: prideCollection } = useQuery({
+	queryKey: computed(() => ['collection', PRIDE_COLLECTION_ID]),
+	queryFn: () => client.labrinth.collections.get(PRIDE_COLLECTION_ID),
+	staleTime: PRIDE_CACHE_TIME,
+	gcTime: PRIDE_CACHE_TIME,
+})
+
+const prideProjectIds = computed(() => new Set(prideCollection.value?.projects ?? []))
+
+const currentProjectId = ref()
+provideCurrentProjectId(currentProjectId)
+
+const showPrideBackdrop = computed(() => {
+	if (PRIDE_ARTICLE_SLUGS.includes(route.params.slug)) {
+		return true
+	}
+	if (route.params.collection === PRIDE_COLLECTION_ID) {
+		return true
+	}
+	return !!currentProjectId.value && prideProjectIds.value.has(currentProjectId.value)
+})
+
 const basePopoutId = useId()
 
 async function fetchIntercomToken() {
 	return $fetch('/api/intercom/messenger-jwt', {
 		query: hostingIntercomServerId.value ? { server_id: hostingIntercomServerId.value } : {},
 	})
+}
+
+function requireVerifiedEmail(action) {
+	if (!auth.value.user?.email_verified) {
+		addNotification({
+			title: formatMessage(messages.emailVerificationRequired),
+			text: formatMessage(messages.verifyEmailBeforePublishing),
+			type: 'error',
+		})
+		return
+	}
+
+	action()
 }
 
 const navMenuMessages = defineMessages({
@@ -873,10 +932,6 @@ const navMenuMessages = defineMessages({
 	search: {
 		id: 'layout.nav.search',
 		defaultMessage: 'Search',
-	},
-	discoverContent: {
-		id: 'layout.nav.discover-content',
-		defaultMessage: 'Discover content',
 	},
 	discover: {
 		id: 'layout.nav.discover',
@@ -921,6 +976,14 @@ const messages = defineMessages({
 		id: 'layout.action.publish',
 		defaultMessage: 'Publish',
 	},
+	emailVerificationRequired: {
+		id: 'layout.publish.email-verification-required.title',
+		defaultMessage: 'Email verification required',
+	},
+	verifyEmailBeforePublishing: {
+		id: 'layout.publish.email-verification-required.description',
+		defaultMessage: 'You must verify your email before publishing on Modrinth.',
+	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
 		defaultMessage: 'Project review',
@@ -952,6 +1015,10 @@ const messages = defineMessages({
 	manageAffiliates: {
 		id: 'layout.action.manage-affiliates',
 		defaultMessage: 'Manage affiliate links',
+	},
+	analyticsEvents: {
+		id: 'layout.action.analytics-events',
+		defaultMessage: 'Analytics events',
 	},
 	newProject: {
 		id: 'layout.action.new-project',
@@ -1096,7 +1163,7 @@ const userMenuOptions = computed(() => {
 			id: 'plus',
 			link: '/plus',
 			color: 'purple',
-			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(user.badges, 1 << 0),
+			shown: !flags.value.hidePlusPromoInUserMenu && !hasActiveMidas(user),
 		},
 		{
 			id: 'servers',
@@ -1256,6 +1323,10 @@ async function logoutUser() {
 }
 
 function runAnalytics() {
+	if (import.meta.dev) {
+		return
+	}
+
 	const config = useRuntimeConfig()
 	const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
 
@@ -1386,7 +1457,11 @@ const { cycle: changeTheme } = useTheme()
 
 		&-mobile {
 			.account-container {
+				opacity: 0;
 				padding-bottom: 0;
+				pointer-events: none;
+				transition: opacity 0.15s ease-in-out;
+				visibility: hidden;
 
 				.account-button {
 					padding: var(--spacing-card-md);
@@ -1409,6 +1484,12 @@ const { cycle: changeTheme } = useTheme()
 			&.expanded {
 				transform: translateY(0);
 				box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
+
+				.account-container {
+					opacity: 1;
+					pointer-events: auto;
+					visibility: visible;
+				}
 			}
 		}
 	}
@@ -1666,5 +1747,22 @@ const { cycle: changeTheme } = useTheme()
 	100% {
 		transform: translateY(0);
 	}
+}
+
+.pride-backdrop {
+	background-image: linear-gradient(to right, #c20732, #f57203, #ffd632, #21ca8b, #2f9ff2, #e420fc);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0) 80%);
+	height: 30rem;
+	opacity: 0;
+	transition: opacity 1s ease;
+}
+
+.pride-backdrop.shown {
+	opacity: 0.08;
+}
+
+.light-mode .pride-backdrop.shown,
+.light .pride-backdrop.shown {
+	opacity: 0.15;
 }
 </style>

@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT texture_key, variant AS 'variant: MinecraftSkinVariant', cape_id AS 'cape_id: Hyphenated', display_order FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "texture_key",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "variant: MinecraftSkinVariant",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "cape_id: Hyphenated",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "display_order",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "a1217622558d50ee18e7ba0d85e991032037aaccfeca64dc076f0dcc826c108a"
+}

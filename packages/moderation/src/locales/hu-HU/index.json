@@ -12,13 +12,19 @@
     "defaultMessage": "Adj hozzá egy ikont"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Add hozzá az IP címet és portot, amit a Java Edition játékosok használhatnak, hogy fellépjenek a szerveredre."
+    "defaultMessage": "Adj hozzá egy IP címet és portot hogy a Java Edition játékosok tudjanak csatlakozni a szerveredre."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Adj hozzá egy Java Címet"
+    "defaultMessage": "Adj hozzá egy Java címet"
+  },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Adjon meg az egyéni licenszének érvényes URL-címét és nevét, illetve SPDX-azonosítóját."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Add meg a license információit"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Adj meg minden releváns, a Modrinthon kívüli linket, például egy weboldalt, boltot vagy Discord-meghívót."
+    "defaultMessage": "Adj hozzá bármilyen releváns linket ami a Modrinthon kívűl található, például a weboldalad, webshopod vagy egy discord meghívó."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Az összes elérhető nyelvi beállítást kiválasztottad. Kérlek, csak azokat a nyelveket sorold fel, amelyeket a szerver valóban támogat."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Válassza ki a megfelelő nyelveket"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Mind a {totalAvailableTags} elérhető címkét kiválasztottad. A címkék célja az, hogy segítsék a felhasználókat a megfelelő projektek megtalálásában. Kérjük, csak a projekthez releváns címkéket válaszd ki."
@@ -66,7 +78,7 @@
     "defaultMessage": "Látogasd meg a Képek fület"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "A {type, select, mod {mod} plugin {bővítmény} other {projekt}} licensze megköveteli, hogy a forráskód elérhető legyen. Kérlek, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licensz használatát."
+    "defaultMessage": "A te {type} típusod egy licencet használ amelyhez szükséges a forráskód elérhetőségének megadása. Kérlek adj meg mindegyik verzióhoz a forráskódot, vagy válassz másik licence típust."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
@@ -75,7 +87,7 @@
     "defaultMessage": "Úgy tűnik, hogy néhány külső hivatkozásod megegyezik. Minden hivatkozást csak egyszer szabad megadni, és a megfelelő hivatkozástípussal kell ellátni."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Azonos hivatkozások"
+    "defaultMessage": "Töröld az azonos linkeket"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "A leírásnak elegendő mennyiségű egyszerű szöveget vagy képhelyettesítő szöveget kell tartalmaznia, hogy a képernyőolvasókat használók vagy lassú internetkapcsolattal rendelkezők számára is hozzáférhető legyen."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Győződj meg arról, hogy rendelkezésre áll-e az a bizonyíték, amely igazolja, hogy jogosult vagy a modcsomagodban szereplő bármely külső tartalom terjesztésére."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Külső jogosultságok ellenőrzése"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Válaszd ki, hogy a szervered mely verziókat támogatja, válassz egy modcsomagot, vagy tölts fel sajátot."
   },
@@ -159,7 +177,7 @@
     "defaultMessage": "Nyelv kiválasztása"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Válaszd ki, milyen licensz alatt terjeszted {type, select, mod {a mododat} modpack {a modcsomagodat} resourcepack {a forráscsomagodat} shader {a shaderedet} plugin {a bővítményedet} datapack {az adatcsomagodat} other {a projektedet}}."
+    "defaultMessage": "Válaszd ki a licencet ami a te {type} -od alapján megfelelő."
   },
   "nags.select-license.title": {
     "defaultMessage": "Válassz egy licenszet"
@@ -181,6 +199,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Jogosultságok kezelése"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Látogasd meg a címke beállításokat"
@@ -212,8 +233,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Tisztítsd meg a nevet"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "{languageCount} nyelvet választottál ki. Kérlek csak azokat a nyelveket válaszd ki, amelyeket a szerver aktívan támogat."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Válassza ki a megfelelő nyelveket"
+  },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural,one {# tag} other {# tags}} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy szervered biztosan megjelenjen a releváns keresési eredmények között."
+    "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy szervered biztosan megjelenjen a releváns keresési eredmények között."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
@@ -225,7 +252,10 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Legalább egy kép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérlek válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
+    "defaultMessage": "Legalább egy kép megadása szükséged a te {type}-od alapján."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "forráscsomag, kivéve a hang illetve a fordításos csomagok. Ha ez leírja a csomagod akkor válaszd ki a megfelelő címkét"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy képet"

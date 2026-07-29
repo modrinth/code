@@ -1,0 +1,930 @@
+{
+	"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+	"server": {
+		"id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+		"name": "CaffeineMC Fabric SMP",
+		"subdomain": "caffeine-smp"
+	},
+	"worlds": [
+		{
+			"id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"name": "Overworld"
+		},
+		{
+			"id": "ba1a5666-96fc-4de5-9b91-977dd7b58d09",
+			"name": "Creative testing"
+		}
+	],
+	"backups": [
+		{
+			"id": "142f5ee6-a239-4824-bc69-5db0e9564c24",
+			"physical_id": "restic:4f3d5df7/142f5ee6-a239-4824-bc69-5db0e9564c24",
+			"name": "Pre-1.21.1 upgrade",
+			"created_at": "2026-05-20T11:40:00Z",
+			"automated": false,
+			"status": "done",
+			"interrupted": false,
+			"ongoing": false,
+			"locked": false
+		},
+		{
+			"id": "2f9c9471-baba-45ff-a2c1-23c9962095ec",
+			"physical_id": "restic:4f3d5df7/2f9c9471-baba-45ff-a2c1-23c9962095ec",
+			"name": "Before Nether reset",
+			"created_at": "2026-05-20T13:55:00Z",
+			"automated": false,
+			"status": "done",
+			"interrupted": false,
+			"ongoing": false,
+			"locked": false
+		},
+		{
+			"id": "6f2ef8ef-3329-4c77-bb06-8a1b6b1db0f0",
+			"physical_id": "restic:4f3d5df7/6f2ef8ef-3329-4c77-bb06-8a1b6b1db0f0",
+			"name": "Rollback after datapack test",
+			"created_at": "2026-05-20T14:15:00Z",
+			"automated": false,
+			"status": "done",
+			"interrupted": false,
+			"ongoing": false,
+			"locked": true
+		}
+	],
+	"next_offset": null,
+	"data": [
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "server_created"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:00:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "changed_server_name",
+				"metadata": {
+					"name": "CaffeineMC Fabric SMP"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:05:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "changed_server_subdomain",
+				"metadata": {
+					"subdomain": "caffeine-smp"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:10:00Z"
+		},
+		{
+			"actor": {
+				"type": "support",
+				"user_id": "JZA4dW8o"
+			},
+			"action": {
+				"action": "server_reallocated"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:15:00Z"
+		},
+		{
+			"actor": {
+				"type": "support",
+				"user_id": "JZA4dW8o"
+			},
+			"action": {
+				"action": "server_plan_changed",
+				"metadata": {
+					"new_specs": {
+						"cpu": 4,
+						"memory_mb": 8192,
+						"storage_mb": 40960,
+						"swap_mb": 1024
+					}
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:20:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "user_invited",
+				"metadata": {
+					"user_id": "JZA4dW8o",
+					"permissions": "BASE_READ | POWER_ACTIONS"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:25:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "user_invite_revoked",
+				"metadata": {
+					"user_id": "DzLrfrbK"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:30:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "user_permission_modified",
+				"metadata": {
+					"user_id": "JZA4dW8o",
+					"permissions": "BASE_READ | FILES_WRITE | SETUP | BACKUPS"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:35:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "user_removed",
+				"metadata": {
+					"user_id": "DzLrfrbK"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T09:40:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_added",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "AANobbMI",
+							"version_id": "u1OEbNKx"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T09:45:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_added",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "P7dR8mSH",
+							"version_id": "Lwt6YYHL"
+						},
+						{
+							"addon_id": "gvQqBUqZ",
+							"version_id": "XQJtuOTA"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T09:50:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_uploaded",
+				"metadata": {
+					"file_names": ["sodium-fabric-0.6.13+mc1.21.1.jar"]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T09:55:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_uploaded",
+				"metadata": {
+					"file_names": ["fabric-api-0.116.12+1.21.1.jar", "lithium-fabric-0.15.3+mc1.21.1.jar"]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:00:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_disabled",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "YL57xq9U",
+							"version_id": "zsoi0dso"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:05:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_disabled",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "AANobbMI",
+							"version_id": "u1OEbNKx"
+						},
+						{
+							"addon_id": "YL57xq9U",
+							"version_id": "zsoi0dso"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:10:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_enabled",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "YL57xq9U",
+							"version_id": "zsoi0dso"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:15:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_enabled",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "AANobbMI",
+							"version_id": "u1OEbNKx"
+						},
+						{
+							"addon_id": "YL57xq9U",
+							"version_id": "zsoi0dso"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:20:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_deleted",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "YL57xq9U",
+							"version_id": "zsoi0dso"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:25:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_deleted",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "AANobbMI",
+							"version_id": "u1OEbNKx"
+						},
+						{
+							"addon_id": "P7dR8mSH",
+							"version_id": "Lwt6YYHL"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:30:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_updated",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "AANobbMI",
+							"version_id": "u1OEbNKx"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:35:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_updated",
+				"metadata": {
+					"addons": [
+						{
+							"addon_id": "P7dR8mSH",
+							"version_id": "Lwt6YYHL"
+						},
+						{
+							"addon_id": "gvQqBUqZ",
+							"version_id": "XQJtuOTA"
+						}
+					]
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:40:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "uk2lIMmm"
+			},
+			"action": {
+				"action": "modpack_changed",
+				"metadata": {
+					"spec": {
+						"platform": "modrinth",
+						"project_id": "BYN9yKrV",
+						"version_id": "w0KHzZ43",
+						"mrpack_sha1": "6b277e2f6e3a9a1acef3342bd154ade25031ad70"
+					}
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:45:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "uk2lIMmm"
+			},
+			"action": {
+				"action": "modpack_unlinked",
+				"metadata": {
+					"spec": {
+						"platform": "modrinth",
+						"project_id": "BYN9yKrV",
+						"version_id": "w0KHzZ43",
+						"mrpack_sha1": "6b277e2f6e3a9a1acef3342bd154ade25031ad70"
+					}
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:50:00Z"
+		},
+		{
+			"actor": {
+				"type": "support",
+				"user_id": "JZA4dW8o"
+			},
+			"action": {
+				"action": "server_repaired"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:55:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "server_reset"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "ba1a5666-96fc-4de5-9b91-977dd7b58d09",
+			"timestamp": "2026-05-20T11:00:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "server_started"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T11:05:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "server_stopped"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T11:10:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "server_restarted"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T11:15:00Z"
+		},
+		{
+			"actor": {
+				"type": "support",
+				"user_id": "JZA4dW8o"
+			},
+			"action": {
+				"action": "server_killed"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T11:20:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "port_allocation_added",
+				"metadata": {
+					"port": 25565
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:25:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "port_allocation_removed",
+				"metadata": {
+					"port": 24454
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:30:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "loader_version_edited",
+				"metadata": {
+					"new_loader": "fabric",
+					"new_version": "0.16.14"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:35:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "game_version_edited",
+				"metadata": {
+					"new_version": "1.21.1"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:40:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "server_properties_modified",
+				"metadata": {
+					"properties": {
+						"difficulty": "hard"
+					}
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:45:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "server_properties_modified",
+				"metadata": {
+					"properties": {
+						"max-players": "20",
+						"simulation-distance": "8",
+						"view-distance": "10"
+					}
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:50:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "file_uploaded",
+				"metadata": {
+					"path": "/mods/lithium-fabric-0.15.3+mc1.21.1.jar"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:55:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "file_deleted",
+				"metadata": {
+					"path": "/mods/old-performance-patch.jar"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:00:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "file_renamed",
+				"metadata": {
+					"from": "/world/datapacks/trial-test.zip",
+					"to": "/world/datapacks/trial-test.zip.disabled"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:05:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "file_edited",
+				"metadata": {
+					"path": "/server.properties"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:10:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "sftp_login"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T12:15:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "console_command_executed",
+				"metadata": {
+					"command": "say Maintenance in 5 minutes"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:20:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "console_cleared"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:25:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "backup_created",
+				"metadata": {
+					"id": "142f5ee6-a239-4824-bc69-5db0e9564c24"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:30:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "backup_renamed",
+				"metadata": {
+					"id": "2f9c9471-baba-45ff-a2c1-23c9962095ec",
+					"from": "Before Nether test",
+					"to": "Before Nether reset"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:35:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "backup_restored",
+				"metadata": {
+					"id": "6f2ef8ef-3329-4c77-bb06-8a1b6b1db0f0"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:40:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "backup_deleted",
+				"metadata": {
+					"id": "0dd0eb1e-f0e0-46d1-b32f-5245e18bf563"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "ba1a5666-96fc-4de5-9b91-977dd7b58d09",
+			"timestamp": "2026-05-20T12:45:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "startup_command_modified",
+				"metadata": {
+					"command": "java -Xms4G -Xmx8G -jar fabric-server-launch.jar nogui"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:50:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "java_runtime_modified",
+				"metadata": {
+					"vendor": "temurin"
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T12:55:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "java_version_modified",
+				"metadata": {
+					"version": 21
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T13:00:00Z"
+		}
+	],
+	"users": {
+		"TEZXhE2U": {
+			"username": "jellysquid3",
+			"avatar_url": "https://cdn.modrinth.com/user/TEZXhE2U/f4705a5f2388c65029ae2e59f1434b3e6e4de23a.png"
+		},
+		"JZA4dW8o": {
+			"username": "modmuss50",
+			"avatar_url": "https://avatars2.githubusercontent.com/u/4324090?v=4"
+		},
+		"DzLrfrbK": {
+			"username": "IMS",
+			"avatar_url": "https://avatars3.githubusercontent.com/u/31803019?v=4"
+		},
+		"uk2lIMmm": {
+			"username": "devin",
+			"avatar_url": "https://cdn.modrinth.com/user/uk2lIMmm/9ceb45272fef68343dcbc01696eb1c6856acb701.png"
+		}
+	},
+	"addons": {
+		"AANobbMI": {
+			"title": "Sodium",
+			"slug": "sodium",
+			"icon_url": "https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp",
+			"version": null
+		},
+		"P7dR8mSH": {
+			"title": "Fabric API",
+			"slug": "fabric-api",
+			"icon_url": "https://cdn.modrinth.com/data/P7dR8mSH/icon.png",
+			"version": null
+		},
+		"YL57xq9U": {
+			"title": "Iris Shaders",
+			"slug": "iris",
+			"icon_url": "https://cdn.modrinth.com/data/YL57xq9U/18d0e7f076d3d6ed5bedd472b853909aac5da202_96.webp",
+			"version": null
+		},
+		"gvQqBUqZ": {
+			"title": "Lithium",
+			"slug": "lithium",
+			"icon_url": "https://cdn.modrinth.com/data/gvQqBUqZ/bcc8686c13af0143adf4285d741256af824f70b7_96.webp",
+			"version": null
+		},
+		"BYN9yKrV": {
+			"title": "Adrenaline",
+			"slug": "adrenaline",
+			"icon_url": "https://cdn.modrinth.com/data/BYN9yKrV/98f14519960b17418d5ba5ebfdc46c85154ad87b_96.webp",
+			"version": null
+		}
+	},
+	"versions": {
+		"u1OEbNKx": {
+			"name": "Sodium 0.6.13 for Fabric 1.21.1",
+			"version_number": "mc1.21.1-0.6.13-fabric"
+		},
+		"Lwt6YYHL": {
+			"name": "[1.21.1] Fabric API 0.116.12+1.21.1",
+			"version_number": "0.116.12+1.21.1"
+		},
+		"zsoi0dso": {
+			"name": "Iris 1.8.8 for Fabric 1.21.1",
+			"version_number": "1.8.8+1.21.1-fabric"
+		},
+		"XQJtuOTA": {
+			"name": "Lithium 0.15.3 for Fabric",
+			"version_number": "mc1.21.1-0.15.3-fabric"
+		},
+		"w0KHzZ43": {
+			"name": "26.1.4+mc1.21.1.fabric",
+			"version_number": "26.1.4+mc1.21.1.fabric"
+		}
+	}
+}

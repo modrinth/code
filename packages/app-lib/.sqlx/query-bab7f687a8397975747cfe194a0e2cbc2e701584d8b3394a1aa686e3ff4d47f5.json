@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT COALESCE(MAX(display_order) + 1, 0) AS 'display_order!: i64' FROM custom_minecraft_skins WHERE minecraft_user_uuid = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "display_order!: i64",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "bab7f687a8397975747cfe194a0e2cbc2e701584d8b3394a1aa686e3ff4d47f5"
+}

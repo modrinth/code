@@ -3,7 +3,7 @@ import type { Component } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 export interface BrowseSearchResponse {
-	projectHits: (Labrinth.Search.v2.ResultSearchProject & {
+	projectHits: (Labrinth.Search.v3.ResultSearchProject & {
 		installed?: boolean
 		installing?: boolean
 	})[]
@@ -36,6 +36,7 @@ export interface BrowseInstallContext {
 	onBack?: () => boolean | void | Promise<boolean | void>
 	selectedProjects?: BrowseSelectedProject[]
 	isInstallingSelected?: boolean
+	skipNonEssentialWarnings?: boolean
 	installProgress?: {
 		completed: number
 		total: number

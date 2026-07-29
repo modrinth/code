@@ -64,6 +64,255 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  redis-cluster-0:
+    profiles:
+      - clustered-redis
+    image: redis:alpine
+    container_name: labrinth-redis-cluster-0
+    restart: on-failure
+    networks:
+      - redis-cluster-mesh
+    ports:
+      - '127.0.0.1:7000:7000'
+    command:
+      [
+        'redis-server',
+        '--port',
+        '7000',
+        '--cluster-enabled',
+        'yes',
+        '--cluster-config-file',
+        'nodes.conf',
+        '--cluster-node-timeout',
+        '5000',
+        '--appendonly',
+        'no',
+        '--save',
+        '',
+      ]
+    tmpfs:
+      - /data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '7000', 'PING']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  redis-cluster-1:
+    profiles:
+      - clustered-redis
+    image: redis:alpine
+    container_name: labrinth-redis-cluster-1
+    restart: on-failure
+    networks:
+      - redis-cluster-mesh
+    ports:
+      - '127.0.0.1:7001:7001'
+    command:
+      [
+        'redis-server',
+        '--port',
+        '7001',
+        '--cluster-enabled',
+        'yes',
+        '--cluster-config-file',
+        'nodes.conf',
+        '--cluster-node-timeout',
+        '5000',
+        '--appendonly',
+        'no',
+        '--save',
+        '',
+      ]
+    tmpfs:
+      - /data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '7001', 'PING']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  redis-cluster-2:
+    profiles:
+      - clustered-redis
+    image: redis:alpine
+    container_name: labrinth-redis-cluster-2
+    restart: on-failure
+    networks:
+      - redis-cluster-mesh
+    ports:
+      - '127.0.0.1:7002:7002'
+    command:
+      [
+        'redis-server',
+        '--port',
+        '7002',
+        '--cluster-enabled',
+        'yes',
+        '--cluster-config-file',
+        'nodes.conf',
+        '--cluster-node-timeout',
+        '5000',
+        '--appendonly',
+        'no',
+        '--save',
+        '',
+      ]
+    tmpfs:
+      - /data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '7002', 'PING']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  redis-cluster-3:
+    profiles:
+      - clustered-redis
+    image: redis:alpine
+    container_name: labrinth-redis-cluster-3
+    restart: on-failure
+    networks:
+      - redis-cluster-mesh
+    ports:
+      - '127.0.0.1:7003:7003'
+    command:
+      [
+        'redis-server',
+        '--port',
+        '7003',
+        '--cluster-enabled',
+        'yes',
+        '--cluster-config-file',
+        'nodes.conf',
+        '--cluster-node-timeout',
+        '5000',
+        '--appendonly',
+        'no',
+        '--save',
+        '',
+      ]
+    tmpfs:
+      - /data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '7003', 'PING']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  redis-cluster-4:
+    profiles:
+      - clustered-redis
+    image: redis:alpine
+    container_name: labrinth-redis-cluster-4
+    restart: on-failure
+    networks:
+      - redis-cluster-mesh
+    ports:
+      - '127.0.0.1:7004:7004'
+    command:
+      [
+        'redis-server',
+        '--port',
+        '7004',
+        '--cluster-enabled',
+        'yes',
+        '--cluster-config-file',
+        'nodes.conf',
+        '--cluster-node-timeout',
+        '5000',
+        '--appendonly',
+        'no',
+        '--save',
+        '',
+      ]
+    tmpfs:
+      - /data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '7004', 'PING']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  redis-cluster-5:
+    profiles:
+      - clustered-redis
+    image: redis:alpine
+    container_name: labrinth-redis-cluster-5
+    restart: on-failure
+    networks:
+      - redis-cluster-mesh
+    ports:
+      - '127.0.0.1:7005:7005'
+    command:
+      [
+        'redis-server',
+        '--port',
+        '7005',
+        '--cluster-enabled',
+        'yes',
+        '--cluster-config-file',
+        'nodes.conf',
+        '--cluster-node-timeout',
+        '5000',
+        '--appendonly',
+        'no',
+        '--save',
+        '',
+      ]
+    tmpfs:
+      - /data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '7005', 'PING']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  redis-cluster-creator:
+    profiles:
+      - clustered-redis
+    image: redis:alpine
+    container_name: labrinth-redis-cluster-creator
+    networks:
+      - redis-cluster-mesh
+    depends_on:
+      redis-cluster-0:
+        condition: service_healthy
+      redis-cluster-1:
+        condition: service_healthy
+      redis-cluster-2:
+        condition: service_healthy
+      redis-cluster-3:
+        condition: service_healthy
+      redis-cluster-4:
+        condition: service_healthy
+      redis-cluster-5:
+        condition: service_healthy
+    entrypoint: ['sh', '-c']
+    command:
+      - |
+        cluster_info="$$(redis-cli -h redis-cluster-0 -p 7000 cluster info 2>/dev/null || true)"
+        case "$$cluster_info" in
+          *"cluster_state:ok"*) exit 0 ;;
+        esac
+        exec redis-cli --cluster create \
+          redis-cluster-0:7000 \
+          redis-cluster-1:7001 \
+          redis-cluster-2:7002 \
+          redis-cluster-3:7003 \
+          redis-cluster-4:7004 \
+          redis-cluster-5:7005 \
+          --cluster-replicas 1 \
+          --cluster-yes
+  redis-insight:
+    profiles:
+      - clustered-redis
+    image: redis/redisinsight:latest
+    container_name: labrinth-redis-insight
+    restart: on-failure
+    networks:
+      - redis-cluster-mesh
+    depends_on:
+      redis-cluster-creator:
+        condition: service_completed_successfully
+    ports:
+      - '127.0.0.1:5540:5540'
+    volumes:
+      - redis-insight-data:/data
   clickhouse:
     image: clickhouse/clickhouse-server
     container_name: labrinth-clickhouse
@@ -106,6 +355,34 @@ services:
       # Gotenberg must send a message on a webhook to our backend,
       # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
+  redpanda:
+    image: redpandadata/redpanda:v26.1.10
+    container_name: labrinth-redpanda
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+    ports:
+      - '127.0.0.1:18081:18081'
+      - '127.0.0.1:18082:18082'
+      - '127.0.0.1:19092:19092'
+      - '127.0.0.1:19644:9644'
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+    healthcheck:
+      test: ['CMD', 'rpk', 'cluster', 'info', '-X', 'brokers=localhost:9092']
+      interval: 10s
+      timeout: 15s
+      retries: 10
   labrinth:
     profiles:
       - with-labrinth
@@ -130,6 +407,8 @@ services:
       elasticsearch2:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      redpanda:
         condition: service_healthy
       clickhouse:
         condition: service_healthy
@@ -204,7 +483,7 @@ services:
 networks:
   meilisearch-mesh:
     driver: bridge
-  elasticsearch-mesh:
+  redis-cluster-mesh:
     driver: bridge
 volumes:
   typesense-data:
@@ -216,4 +495,6 @@ volumes:
   elasticsearch-certs:
   db-data:
   redis-data:
+  redis-insight-data:
+  redpanda-data:
   labrinth-cdn-data:

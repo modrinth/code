@@ -1,6 +1,6 @@
 /**
  * All theseus API calls return serialized values (both return values and errors);
- * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
+ * So, for example, addDefaultInstance creates a blank instance object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
 import { invoke } from '@tauri-apps/api/core'
@@ -37,7 +37,7 @@ export type AppSettings = {
 
 	theme: ColorTheme
 	locale: string
-	default_page: 'home' | 'library'
+	default_page: 'Home' | 'Library'
 	collapsed_navigation: boolean
 	hide_nametag_skins_page: boolean
 	advanced_rendering: boolean

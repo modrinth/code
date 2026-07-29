@@ -150,7 +150,10 @@ async function refreshValues() {
 		if (equippedSkin.value) {
 			try {
 				const headUrl = await getPlayerHeadUrl(equippedSkin.value)
-				headUrlCache.value.set(equippedSkin.value.texture_key, headUrl)
+				headUrlCache.value = new Map(headUrlCache.value).set(
+					equippedSkin.value.texture_key,
+					headUrl,
+				)
 			} catch (error) {
 				console.warn('Failed to get head render for equipped skin:', error)
 			}
@@ -160,12 +163,24 @@ async function refreshValues() {
 	}
 }
 
+async function setEquippedSkin(skin: Skin) {
+	equippedSkin.value = skin
+
+	try {
+		const headUrl = await getPlayerHeadUrl(skin)
+		headUrlCache.value = new Map(headUrlCache.value).set(skin.texture_key, headUrl)
+	} catch (error) {
+		console.warn('Failed to get head render for equipped skin:', error)
+	}
+}
+
 function setLoginDisabled(value: boolean) {
 	loginDisabled.value = value
 }
 
 defineExpose({
 	refreshValues,
+	setEquippedSkin,
 	setLoginDisabled,
 	loginDisabled,
 })

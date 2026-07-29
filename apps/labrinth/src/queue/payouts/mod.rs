@@ -1,6 +1,5 @@
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::payouts::{
@@ -31,6 +30,7 @@ use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
+use xredis::RedisPool;
 
 mod affiliate;
 pub mod flow;
@@ -481,8 +481,7 @@ impl PayoutsQueue {
         Ok(options.options)
     }
 
-    pub async fn get_brex_balance() -> Result<Option<AccountBalance>, ApiError>
-    {
+    pub async fn get_brex_balance() -> eyre::Result<AccountBalance> {
         #[derive(Deserialize)]
         struct BrexBalance {
             pub amount: i64,
@@ -505,11 +504,13 @@ impl PayoutsQueue {
             .get(format!("{}accounts/cash", ENV.BREX_API_URL))
             .bearer_auth(&ENV.BREX_API_KEY)
             .send()
-            .await?
+            .await
+            .wrap_request_err("sending `accounts/cash` request")?
             .json::<BrexResponse>()
-            .await?;
+            .await
+            .wrap_request_err("reading `accounts/cash` request")?;
 
-        Ok(Some(AccountBalance {
+        Ok(AccountBalance {
             available: Decimal::from(
                 res.items
                     .iter()
@@ -524,11 +525,10 @@ impl PayoutsQueue {
                     })
                     .sum::<i64>(),
             ) / Decimal::from(100),
-        }))
+        })
     }
 
-    pub async fn get_paypal_balance() -> Result<Option<AccountBalance>, ApiError>
-    {
+    pub async fn get_paypal_balance() -> eyre::Result<AccountBalance> {
         let api_username = &ENV.PAYPAL_NVP_USERNAME;
         let api_password = &ENV.PAYPAL_NVP_PASSWORD;
         let api_signature = &ENV.PAYPAL_NVP_SIGNATURE;
@@ -544,36 +544,39 @@ impl PayoutsQueue {
         let endpoint = "https://api-3t.paypal.com/nvp";
 
         let client = reqwest::Client::new();
-        let response = client.post(endpoint).form(&params).send().await?;
+        let response = client
+            .post(endpoint)
+            .form(&params)
+            .send()
+            .await
+            .wrap_err("requesting `nvp` endpoint")?;
 
-        let text = response.text().await?;
+        let text = response
+            .text()
+            .await
+            .wrap_err("reading response text from `nvp`")?;
         let body = urlencoding::decode(&text).unwrap_or_default();
 
         let mut key_value_map = HashMap::new();
 
         for pair in body.split('&') {
-            let mut iter = pair.splitn(2, '=');
-            if let (Some(key), Some(value)) = (iter.next(), iter.next()) {
+            if let Some((key, value)) = pair.split_once('=') {
                 key_value_map.insert(key.to_string(), value.to_string());
             }
         }
 
-        if let Some(amount) = key_value_map
-            .get("L_AMT0")
-            .and_then(|x| Decimal::from_str_exact(x).ok())
-        {
-            Ok(Some(AccountBalance {
-                available: amount,
-                pending: Decimal::ZERO,
-            }))
-        } else {
-            Ok(None)
-        }
+        let amount =
+            key_value_map.get("L_AMT0").wrap_err("missing `L_AMT0`")?;
+        let amount = Decimal::from_str_exact(amount)
+            .wrap_err("cannot parse `L_AMT0` as decimal")?;
+
+        Ok(AccountBalance {
+            available: amount,
+            pending: Decimal::ZERO,
+        })
     }
 
-    pub async fn get_tremendous_balance(
-        &self,
-    ) -> Result<Option<AccountBalance>, ApiError> {
+    pub async fn get_tremendous_balance(&self) -> eyre::Result<AccountBalance> {
         #[derive(Deserialize)]
         struct FundingSourceMeta {
             available_cents: Option<u64>,
@@ -597,18 +600,23 @@ impl PayoutsQueue {
                 "funding_sources",
                 None,
             )
-            .await?;
+            .await
+            .wrap_err("fetching funding sources")?;
 
-        Ok(val
+        let funding_source = val
             .funding_sources
             .into_iter()
             .find(|x| x.method == "balance")
-            .map(|x| AccountBalance {
-                available: Decimal::from(x.meta.available_cents.unwrap_or(0))
-                    / Decimal::from(100),
-                pending: Decimal::from(x.meta.pending_cents.unwrap_or(0))
-                    / Decimal::from(100),
-            }))
+            .wrap_err("no balance funding source")?;
+
+        Ok(AccountBalance {
+            available: Decimal::from(
+                funding_source.meta.available_cents.unwrap_or(0),
+            ) / Decimal::from(100),
+            pending: Decimal::from(
+                funding_source.meta.pending_cents.unwrap_or(0),
+            ) / Decimal::from(100),
+        })
     }
 }
 
@@ -1257,7 +1265,7 @@ pub async fn index_payouts_notifications(
 pub async fn insert_bank_balances_and_webhook(
     payouts: &PayoutsQueue,
     pool: &PgPool,
-) -> Result<(), ApiError> {
+) -> eyre::Result<()> {
     let mut transaction = pool.begin().await?;
 
     let paypal_result = PayoutsQueue::get_paypal_balance().await;
@@ -1273,30 +1281,30 @@ pub async fn insert_bank_balances_and_webhook(
     let now = Utc::now();
     let today = now.date_naive().and_time(NaiveTime::MIN).and_utc();
 
-    let mut add_balance = |account_type: &str, balance: &AccountBalance| {
-        insert_account_types.push(account_type.to_string());
-        insert_amounts.push(balance.available);
-        insert_pending.push(false);
-        insert_recorded.push(today);
+    let mut add_balance =
+        |account_type: &str,
+         balance: Result<&AccountBalance, &eyre::Report>| match balance
+        {
+            Ok(balance) => {
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.available);
+                insert_pending.push(false);
+                insert_recorded.push(today);
 
-        insert_account_types.push(account_type.to_string());
-        insert_amounts.push(balance.pending);
-        insert_pending.push(true);
-        insert_recorded.push(today);
-    };
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.pending);
+                insert_pending.push(true);
+                insert_recorded.push(today);
+            }
+            Err(err) => {
+                warn!("Failed to check balance for '{account_type}': {err:?}");
+            }
+        };
 
-    if let Ok(Some(ref paypal)) = paypal_result {
-        add_balance("paypal", paypal);
-    }
-    if let Ok(Some(ref brex)) = brex_result {
-        add_balance("brex", brex);
-    }
-    if let Ok(Some(ref tremendous)) = tremendous_result {
-        add_balance("tremendous", tremendous);
-    }
-    if let Ok(Some(ref mural)) = mural_result {
-        add_balance("mural", mural);
-    }
+    add_balance("paypal", paypal_result.as_ref());
+    add_balance("brex", brex_result.as_ref());
+    add_balance("tremendous", tremendous_result.as_ref());
+    add_balance("mural", mural_result.as_ref());
 
     let inserted = sqlx::query_scalar!(
         r#"
@@ -1320,25 +1328,29 @@ pub async fn insert_bank_balances_and_webhook(
             ENV.PAYPAL_BALANCE_ALERT_THRESHOLD,
             paypal_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking PayPal balance")?;
         check_balance_with_webhook(
             "brex",
             ENV.BREX_BALANCE_ALERT_THRESHOLD,
             brex_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Brex balance")?;
         check_balance_with_webhook(
             "tremendous",
             ENV.TREMENDOUS_BALANCE_ALERT_THRESHOLD,
             tremendous_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Tremendous balance")?;
         check_balance_with_webhook(
             "mural",
             ENV.MURAL_BALANCE_ALERT_THRESHOLD,
             mural_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Mural balance")?;
     }
 
     transaction.commit().await?;
@@ -1349,13 +1361,13 @@ pub async fn insert_bank_balances_and_webhook(
 async fn check_balance_with_webhook(
     source: &str,
     threshold: u64,
-    result: Result<Option<AccountBalance>, ApiError>,
-) -> Result<Option<AccountBalance>, ApiError> {
+    result: eyre::Result<AccountBalance>,
+) -> eyre::Result<()> {
     let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
     let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
     match &result {
-        Ok(Some(account_balance)) => {
+        Ok(account_balance) => {
             if let Some(threshold) = maybe_threshold
                 && let Some(available) =
                     account_balance.available.trunc().to_u64()
@@ -1372,26 +1384,28 @@ async fn check_balance_with_webhook(
                 .await?;
             }
         }
-
         Err(error) => {
-            error!(%error, "Failure getting balance for payout source '{source}'");
+            // use compact single-line error repr here
+            error!(
+                error = format!("{error:#?}"),
+                "Failure getting balance for payout source '{source}'"
+            );
 
             if maybe_threshold.is_some() {
+                // use expanded multi-line error repr here
                 send_slack_payout_source_alert_webhook(
                     PayoutSourceAlertType::CheckFailure {
                         source: source.to_owned(),
-                        display_error: error.to_string(),
+                        display_error: format!("{error:?}"),
                     },
                     payout_alert_webhook,
                 )
                 .await?;
             }
         }
-
-        _ => {}
     }
 
-    Ok(result.ok().flatten())
+    Ok(())
 }
 
 #[cfg(test)]

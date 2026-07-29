@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Nincsen hozzá jogosultságod."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Társulati link létrehozása"
   },
@@ -54,7 +57,7 @@
     "defaultMessage": "{sharedCpus} Megosztott CPU-k"
   },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "Ön újra elő fog fizetni  <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
+    "defaultMessage": "Ön újra elő fog fizetni <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Újrafeliratkozás sikertelen, nem sikerült betölteni az előfizetés adatait."
@@ -64,18 +67,6 @@
   },
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nem sikerült betölteni az előfizetés adatait."
-  },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 nap"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/hónap"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/negyedév"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/év"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Következő befizetés: <charge-date>{date}</charge-date> napon."
@@ -104,9 +95,6 @@
   "browse.offline": {
     "defaultMessage": "Jelenleg nincs internetkapcsolatod. Csatlakozz az internethez, hogy böngészhess a Modrinthon!"
   },
-  "browse.search.placeholder": {
-    "defaultMessage": "{projectType, select, mod {Modok} modpack {Modcsomagok} resourcepack {Forráscsomagok} shader {Shaderek} plugin {Bővítmények} datapack {Adatcsomagok} server {Szerverek} other {Projektek}} keresése..."
-  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Kiválasztott projektek"
   },
@@ -117,7 +105,7 @@
     "defaultMessage": "{count} projekt kiválasztva"
   },
   "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "{count} projektet választottál ki telepítésre. Telepítsd őket most, vagy lépj vissza telepítés nélkül."
+    "defaultMessage": "{count} projektet választottál ki letöltésre. Töltsd le őket most, vagy lépj vissza letöltés nélkül."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "A kiválasztott projektek nincsenek telepítve"
@@ -135,13 +123,13 @@
     "defaultMessage": "Elfogadás"
   },
   "button.add-server-to-instance": {
-    "defaultMessage": "Szerver hozzáadása a profilhoz"
+    "defaultMessage": "Szerver hozzáadása a játékpéldányhoz"
   },
   "button.affiliate-links": {
     "defaultMessage": "Társulati linkek"
   },
   "button.analytics": {
-    "defaultMessage": "Statisztikák"
+    "defaultMessage": "Statisztika"
   },
   "button.back": {
     "defaultMessage": "Vissza"
@@ -237,10 +225,7 @@
     "defaultMessage": "Újratöltés"
   },
   "button.reinstall-modpack": {
-    "defaultMessage": "Modpack újratelepítése"
-  },
-  "button.remove": {
-    "defaultMessage": "Eltávolítás"
+    "defaultMessage": "Modcsomag újratelepítése"
   },
   "button.remove-image": {
     "defaultMessage": "Kép törlése"
@@ -291,7 +276,7 @@
     "defaultMessage": "Regisztráció"
   },
   "button.stop": {
-    "defaultMessage": "Megállítás"
+    "defaultMessage": "Leállítás"
   },
   "button.switch-version": {
     "defaultMessage": "Verzió váltása"
@@ -320,8 +305,17 @@
   "changelog.product.web": {
     "defaultMessage": "Platform"
   },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count} projekt"
+  },
   "collections.label.private": {
     "defaultMessage": "Privát"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "tartalom"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "elem"
   },
   "content.card.select-project": {
     "defaultMessage": "{project} kiválasztása"
@@ -348,10 +342,7 @@
     "defaultMessage": "Törlési figyelmeztetés"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "{count} {itemType} törlése"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Projekt{count, plural, one {} other {ek}} törlése"
+    "defaultMessage": "{count, number} {itemType} törlése"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {A verzió visszaváltása} other {A frissítés}} kompatibilitási problémákat okozhat. A modcsomaghoz hozzáadott modok vagy tartalmak megmaradnak, de előfordulhat, hogy nem lesznek kompatibilisek az új verzióval."
@@ -377,6 +368,48 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Leválasztás"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Erre a tartalomra más tartalmaknak szükségük van"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "Érintett {count, plural, one {projekt} other {projektek}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Néhány kijelölt projekt függőségként van telepítve. Ha törlöd őket, a {context} hibásan működhet, vagy a tőlük függő tartalmak nem fognak megfelelően betöltődni."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "játékpéldány"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "szerver"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Törlés ennek ellenére"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "{count, number} {itemType} törlése ennek ellenére"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Törlendő"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "A függő projektek letiltása a törlés után"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "A függő tartalmak nem biztos, hogy betöltődnek, vagy automatikusan letiltják magukat"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "A {context} összeomolhat, nem indulhat el, vagy szokatlanul viselkedhet"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Függőségi figyelmeztetés"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "A(z) {project} függőségként van telepítve. Ha törlöd, a {context} hibásan működhet, vagy a függő tartalmak nem fognak megfelelően betöltődni."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Mi fog történni?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hozzáadva"
   },
@@ -387,16 +420,40 @@
     "defaultMessage": "Letiltva"
   },
   "content.diff-modal.diff-type.updated": {
-    "defaultMessage": "Frissítve"
+    "defaultMessage": "Frissítve:"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count} fájl"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} eltávolítva"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Egy fájlt csak akkor vizsgálnak meg, ha azt a Modrinthon közzétették, függetlenül a fájlformátumtól (beleértve a .mrpack formátumot is)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "A szerverén található egyes tartalmakat nem sikerült elemezni, ezért előfordulhat, hogy ez a változás hatással lesz rájuk."
   },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Ez a frissítés olyan fájlokat tartalmaz, amelyek nem szerepelnek a Modrinthon. Határozottan javasoljuk, hogy kizárólag olyan forrásokból származó fájlokat telepíts, amelyekben megbízol."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Ismeretlen fájlok"
+  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
+  },
+  "content.filter.disabled": {
+    "defaultMessage": "Letiltott"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Engedélyezett"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Frissítések"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Figyelmeztetések"
   },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Biztonsági mentés létrehozása..."
@@ -416,20 +473,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "játékpéldány"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "Javasoljuk a biztonsági mentés készítését a továbbhaladás előtt, hogy ha valami nem működne, vissza tudd állítani a {type, select, server {világot} other {profilt}}."
+    "defaultMessage": "Javasoljuk, hogy a továbbhaladás előtt készíts biztonsági mentést, hogy ha valami nem működne, visszaállíthasd a {type}odat."
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "A modpacked tartalma itt tallható!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modpack tartalma eltávolítva"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Ne mutasd többször"
+  "content.inline-backup.world-label": {
+    "defaultMessage": "világ"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "További tartalom"
@@ -444,7 +498,7 @@
     "defaultMessage": "Böngéssz vagy tölts fel projekteket a kezdéshez"
   },
   "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "További tartalom hozzáadása ehhez a modpackhez"
+    "defaultMessage": "További tartalom hozzáadása ehhez a modcsomaghoz"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Nincs tartalom telepítve"
@@ -465,7 +519,7 @@
     "defaultMessage": "Kérjük, várjon"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Keresés {count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {tartalom}} között..."
+    "defaultMessage": "Keresés {count, number} {contentType} között..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Fájlnevek"
@@ -509,35 +563,32 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "{progress}/{total} {contentType} törlése..."
   },
-  "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "{contentType, select, mod {Mod} mods {Modok} plugin {Bővítmény} plugins {Bővítmények} datapack {Adatcsomag} datapacks {Adatcsomagok} project {Projekt} projects {Projektek} other {Tartalom}} törlése..."
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "{count, number} {contentType} törlése..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "{progress}/{total} {contentType} letiltása..."
   },
-  "content.selection-bar.bulk.disabling-waiting": {
-    "defaultMessage": "{contentType} letiltása..."
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "{count, number} {contentType} letiltása..."
   },
-  "content.selection-bar.bulk.enabling": {
-    "defaultMessage": "{progress}/{total} {contentType} engedélyezése..."
-  },
-  "content.selection-bar.bulk.enabling-waiting": {
-    "defaultMessage": "{contentType} engedélyezése..."
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "{count, number} {contentType} engedélyezése..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "{progress}/{total} {contentType} frisstése..."
   },
-  "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "{contentType} frissítése..."
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "{count, number} {contentType} frissítése..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {tartalom}} kiválasztva"
+    "defaultMessage": "{count, number} {contentType} kiválasztva"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} kiválasztva"
   },
   "creation-flow.button.create-instance": {
-    "defaultMessage": "Profil létrehozása"
+    "defaultMessage": "Játékpéldány létrehozása"
   },
   "creation-flow.button.create-world": {
     "defaultMessage": "Világ létrehozása"
@@ -549,7 +600,7 @@
     "defaultMessage": "Importálás"
   },
   "creation-flow.button.import-instances": {
-    "defaultMessage": "{count} profil importálása"
+    "defaultMessage": "{count} játékpéldány importálása"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Szerver beállítása"
@@ -603,7 +654,7 @@
     "defaultMessage": "Név"
   },
   "creation-flow.modal.custom-setup.name.placeholder": {
-    "defaultMessage": "Add meg a profil nevét"
+    "defaultMessage": "Add meg a játékpéldány nevét"
   },
   "creation-flow.modal.custom-setup.options.no-versions-available": {
     "defaultMessage": "Nincsenek elérhető verziók"
@@ -708,22 +759,22 @@
     "defaultMessage": "Egyéni ({pathName})"
   },
   "creation-flow.modal.import-instance.launcher-instances.title": {
-    "defaultMessage": "Indítóprofilok"
+    "defaultMessage": "Más indítók játékpéldányai"
   },
   "creation-flow.modal.import-instance.launcher-path.placeholder": {
     "defaultMessage": "Elérési útvonal az indítóhoz..."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.text": {
-    "defaultMessage": "Nem találtak importálható profilokat a megadott útvonalon."
+    "defaultMessage": "Nem találtunk importálható játékpéldányokat a megadott útvonalon."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.title": {
-    "defaultMessage": "Nem található profil"
+    "defaultMessage": "Nem található játékpéldány"
   },
   "creation-flow.modal.import-instance.search.placeholder": {
-    "defaultMessage": "Profilnév keresése"
+    "defaultMessage": "Játékpéldánynév keresése..."
   },
   "creation-flow.modal.import-instance.selection.clear-all": {
-    "defaultMessage": "Minden törlése"
+    "defaultMessage": "Összes törlése"
   },
   "creation-flow.modal.modpack.action.browse": {
     "defaultMessage": "Modcsomagok böngészése"
@@ -741,7 +792,7 @@
     "defaultMessage": "Modcsomag keresése"
   },
   "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "A profil egy külön Minecraft-környezet adott modbetöltővel, verzióval és modokkal."
+    "defaultMessage": "A játékpéldány egy külön Minecraft-környezet egy adott modbetöltővel, verzióval és modokkal."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Kezdés alapoktól: válassz betöltőt és játékverziót."
@@ -750,10 +801,10 @@
     "defaultMessage": "Egyedi beállítás"
   },
   "creation-flow.modal.setup-type.option.import-instance.description": {
-    "defaultMessage": "Importálj egy profilt a Prismből, CurseForge-ból, vagy hasonló forrásból."
+    "defaultMessage": "Importálj egy játékpéldányt a Prismből, CurseForge-ból, vagy hasonló forrásból."
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
-    "defaultMessage": "Profil importálása"
+    "defaultMessage": "Játékpéldány importálása"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
     "defaultMessage": "Böngéssz modcsomagokat a Modrinthon, vagy tölts be egyet fájlból."
@@ -771,7 +822,7 @@
     "defaultMessage": "Telepítés típusa"
   },
   "creation-flow.modal.setup-type.title.instance": {
-    "defaultMessage": "Profil típusa"
+    "defaultMessage": "Játékpéldány típusa"
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Világ típusa"
@@ -780,19 +831,109 @@
     "defaultMessage": "Modcsomag kiválasztása"
   },
   "creation-flow.title.create-instance": {
-    "defaultMessage": "Profil létrehozása"
+    "defaultMessage": "Játékpéldány létrehozása"
   },
   "creation-flow.title.create-world": {
     "defaultMessage": "Világ létrehozása"
   },
   "creation-flow.title.import-instance": {
-    "defaultMessage": "Profil importálása"
+    "defaultMessage": "Játékpéldány importálása"
   },
   "creation-flow.title.reset-server": {
     "defaultMessage": "Szerver visszaállítása"
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Szerver beállítása"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, one {Fájl hozzáadása} other {Fájlok hozzáadása}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Jelöld ki azokat a fájlokat, amelyeket ebbe a csoportba szeretnél áthelyezni."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "Más csoportokban nincsenek olyan fájlok, amelyeket ide lehetne áthelyezni."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "A fájlok betöltése nem sikerült"
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Fájlok keresése..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count} fájl van kiválasztva"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Fájlok hozzáadása..."
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "Nincs engedély"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Nem megengedett"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Egyéb"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Hivatkozás a lincenszhez"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "A licensz neve, lehetőleg egy SPDX-azonosító"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Kérlek válassz egy licenszt"
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "A hivatkozásnak érvényes URL-címnek kell lennie."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "pl. MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(opcionális)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Licensz"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "hivatkozas-a-licenszhez"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Jegyzetek"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Írj valamit ide..."
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Válassz egy licenszt..."
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count} fájl"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Ismeretlen"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Licensz:"
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Jegyzetek:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Nincs"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Eredeti projekt"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Licensz"
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Az én projektem"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Moderátor"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Nem"
@@ -809,11 +950,14 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} fájl felülírva"
   },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "A fájlok felül lesznek írva"
+  },
   "files.create-modal.create-button": {
-    "defaultMessage": "{type, select, directory {Mappa} other {Fájl}} létrehozása"
+    "defaultMessage": "{type} Létrehozása"
   },
   "files.create-modal.header": {
-    "defaultMessage": "{type, select, directory {Mappa} other {Fájl}} létrehozása"
+    "defaultMessage": "{type} Létrehozása"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "pl. saját-mappa"
@@ -827,8 +971,11 @@
   "files.delete-modal.header": {
     "defaultMessage": "Fájl törlése"
   },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Ez a mappa és annak teljes tartalma véglegesen törlődik. A műveletet nem lehet visszavonni.} other {Ez a fájl véglegesen törlődik. A műveletet nem lehet visszavonni.}}"
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "Ez a fájl véglegesen törölve lesz. Ez a művelet visszavonhatatlan."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "Ez a mappa és az összes tartalma véglegesen törölve lesz. Ez a művelet visszavonhatatlan."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "A fájl tartalmát nem sikerült betölteni."
@@ -905,6 +1052,9 @@
   "files.image_viewer.load_failed": {
     "defaultMessage": "Nem sikerült a fájlt betölteni."
   },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Zoom visszaállítása"
+  },
   "files.image_viewer.viewed_image_alt": {
     "defaultMessage": "Megnézett kép"
   },
@@ -913,6 +1063,18 @@
   },
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Kicsinyítés"
+  },
+  "files.item-type.file": {
+    "defaultMessage": "fájl"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "fájlok"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "mappa"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "mappák"
   },
   "files.layout.empty-folder-title": {
     "defaultMessage": "Ez a mappa üres "
@@ -936,13 +1098,16 @@
     "defaultMessage": "pl. /saját-mappa"
   },
   "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Mappa áthelyezése} other {Fájl áthelyezése}}"
+    "defaultMessage": "{type} Mozgatása"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Vissza a kezdőlapra"
   },
   "files.navbar.create-new": {
     "defaultMessage": "Létrehozás…"
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "Fájl navigáció"
   },
   "files.navbar.find-in-file": {
     "defaultMessage": "Keresés a fájlban"
@@ -970,6 +1135,9 @@
   },
   "files.navbar.upload-from-zip": {
     "defaultMessage": "Feltöltés .zip fájlból"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Feltöltés .zip URL-ből"
   },
   "files.operations.current-file": {
     "defaultMessage": "Jelenlegi fájl: {file}"
@@ -1037,11 +1205,11 @@
   "files.upload-dropdown.file-uploads": {
     "defaultMessage": "{fileType} feltöltések"
   },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "A feltöltött fájl típusa nem megfelelő"
+  },
   "files.upload-dropdown.unexpected-error": {
     "defaultMessage": "Váratlan hiba történt."
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Húzd ide a {type, select, undefined {fájlokat} other {{type} fájlokat}} a feltöltéshez"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "A név kizárólag betűket, számokat, kötőjeleket, aláhúzásokat vagy szóközöket tartalmazhat."
@@ -1239,7 +1407,7 @@
     "defaultMessage": "A tartalom engedélyezése nem sikerült"
   },
   "hosting.content.failed-to-bulk-update": {
-    "defaultMessage": "Tartalom frissítése sikertelen"
+    "defaultMessage": "A tartalom frissítése sikertelen"
   },
   "hosting.content.failed-to-install": {
     "defaultMessage": "A tartalom telepítése nem sikerült"
@@ -1314,7 +1482,7 @@
     "defaultMessage": "Ikon kiválasztása"
   },
   "input.search-version.placeholder": {
-    "defaultMessage": "Verzió keresése"
+    "defaultMessage": "Verzió keresése..."
   },
   "input.search.placeholder": {
     "defaultMessage": "Keresés..."
@@ -1342,6 +1510,9 @@
   },
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Megerősítés"
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "A(z) {gameVersion} verzióra történő átállás a szervereden a következő tartalmakat módosítja."
   },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Tartalomváltozások áttekintése"
@@ -1374,7 +1545,13 @@
     "defaultMessage": "A betöltő módosításakor az összes telepített tartalom letiltásra kerül. Javasoljuk ehelyett a szerver alaphelyzetbe állítását."
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "Összekapcsolt {projectType, select, server {szerverprojekt} other {modcsomag}}"
+    "defaultMessage": "Összekapcsolt {projectType}"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "modcsomag"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "szerverprojekt"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} verzió"
@@ -1383,19 +1560,22 @@
     "defaultMessage": "A betöltő megváltoztatásához vissza kell állítanod a szervert."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added."
+    "defaultMessage": "A modcsomag újratelepítése visszaállítja a {type} tartalmát az eredeti állapotába, és eltávolítja az általad hozzáadott összes modot és tartalmat."
   },
   "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Modpack újratelepítése"
+    "defaultMessage": "Modcsomag újratelepítése"
   },
   "installation-settings.reinstalling-modpack": {
-    "defaultMessage": "Modpack újratelepítése folyamatban"
+    "defaultMessage": "Modcsomag újratelepítése..."
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Eltávolítva (inkompatibilis)"
   },
   "installation-settings.repair.instance-description": {
     "defaultMessage": "Újratelepíti a Minecraft függőségeit, és ellenőrzi, hogy nincsenek-e sérült fájlok. Ez megoldhatja azokat a problémákat, ha a játék az indítóval kapcsolatos hibák miatt nem indul el."
   },
   "installation-settings.repair.instance-title": {
-    "defaultMessage": "Profil javítása"
+    "defaultMessage": "Játékpéldány javítása"
   },
   "installation-settings.repair.server-description": {
     "defaultMessage": "Újratelepíti a betöltőt és a Minecraft függőségeit anélkül, hogy törölné a tartalmaidat. Ez megoldhatja a problémákat, ha a szervered nem indul el megfelelően."
@@ -1407,13 +1587,25 @@
     "defaultMessage": "Mentés..."
   },
   "installation-settings.search-game-version": {
-    "defaultMessage": "Játékverzió keresése"
+    "defaultMessage": "Játékverzió keresése..."
+  },
+  "installation-settings.type.instance": {
+    "defaultMessage": "játékpéldány"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "játékpéldány"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "szerver"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "szerver"
   },
   "installation-settings.unlink": {
     "defaultMessage": "Leválasztás"
   },
   "installation-settings.unlink.description": {
-    "defaultMessage": "A leválasztás véglegesen leválasztja ezt a {type, select, server {szervert} other {profilt}} a {projectType, select, server {szerver} other {modcsomag}} projektjéről, lehetővé téve a betöltő és a Minecraft verziójának módosítását, de a jövőbeni frissítéseket nem kapod meg."
+    "defaultMessage": "A leválasztás véglegesen leválasztja ezt a {type}t a {projectType}projektről, így lehetőséged nyílik a betöltő és a Minecraft verziójának megváltoztatására, de a jövőbeli frissítéseket nem fogod megkapni."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Ellenőrzés…"
@@ -1430,14 +1622,23 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Modcsomag újratelepítése"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "A javítás során a rendszer újratelepíti a betöltőt és a Minecraft függőségeit anélkül, hogy törölné a tartalmaidat. Ez megoldhatja a problémákat, ha a {type, select, server {szerver nem indul el megfelelően} other {a játék nem indul el a betöltővel kapcsolatos hibák miatt}}."
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "A javítás során a betöltő és a Minecraft függőségei újratelepülnek anélkül, hogy a tartalmaid törlődnének. Ez megoldhatja azokat a problémákat, amelyek miatt a játék nem indul el az indítóval kapcsolatos hibák miatt."
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "A javítás során a betöltő és a Minecraft függőségei újratelepülnek anélkül, hogy a tartalmaid törlődnének. Ez megoldhatja a problémákat, ha a szervered nem indul el megfelelően."
   },
   "instance.confirm-repair.header": {
-    "defaultMessage": "{type, select, server {Szerver} other {Profil}} javítása"
+    "defaultMessage": "{type} javítása"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "Játékpéldány"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Javítás"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "Szerver"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Kaland mód"
@@ -1455,16 +1656,19 @@
     "defaultMessage": "Ismeretlen játékmód"
   },
   "instances.content-install.compatible-count": {
-    "defaultMessage": "{count} kompatiblis profil"
+    "defaultMessage": "{count} kompatiblis játékpéldány"
   },
   "instances.content-install.existing-tab": {
-    "defaultMessage": "Meglévő profil"
+    "defaultMessage": "Meglévő játékpéldány"
   },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Játékverzió kiválasztása"
   },
   "instances.content-install.header": {
     "defaultMessage": "Projekt letöltése"
+  },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "Ez a játékpéldány olyan betöltőt vagy játékverziót használ, amelyet ez a projekt nem támogat."
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Letöltés"
@@ -1500,7 +1704,7 @@
     "defaultMessage": "Ikon feltöltése"
   },
   "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ez a modack nem tartalmaz további tartalmat."
+    "defaultMessage": "Ez a modcsomag nem tartalmaz további tartalmakat."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nincsen tartalom"
@@ -1538,6 +1742,24 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Inkompatibilisek elrejtése"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "Ez a verzió nem szerepel az adott példánnyal kompatibilis verziók között. A függőségek nem kerülnek automatikusan telepítésre."
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "Verzió kiválasztása"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "A(z) {version} verzió nem szerepel a telepítéssel kompatibilis programok között. Előfordulhat, hogy nem indul el, vagy nem a várt módon működik."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Frissíted az inkompatibilis verzióra?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Frissítés mindenképpen"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Letöltés mindenképpen"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Változásnapló betöltése..."
   },
@@ -1566,7 +1788,7 @@
     "defaultMessage": "Frissítés a(z) {version} verzióra"
   },
   "instances.updater-modal.warning-app": {
-    "defaultMessage": "A frissítés meghibásodást okozhat a profilban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
+    "defaultMessage": "A frissítés meghibásodást okozhat a játékpéldányban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
   },
   "instances.updater-modal.warning-web": {
     "defaultMessage": "A frissítés meghibásodást okozhat a világban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
@@ -1660,9 +1882,6 @@
   },
   "label.game-version": {
     "defaultMessage": "Játékverzió"
-  },
-  "label.hide-installed-content": {
-    "defaultMessage": "A már telepített tartalmak elrejtése"
   },
   "label.hide-selected-content": {
     "defaultMessage": "A kijelölt tartalom elrejtése"
@@ -2147,6 +2366,9 @@
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Sikertelen"
   },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "A személyzet által nem feltüntetve"
+  },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kód másolása a vágólapra"
   },
@@ -2184,7 +2406,7 @@
     "defaultMessage": "Jótékonyság"
   },
   "payment-method.charity-plural": {
-    "defaultMessage": "Jótékonyság"
+    "defaultMessage": "Jótékonysági szervezetek"
   },
   "payment-method.diners": {
     "defaultMessage": "Diners Club"
@@ -2230,6 +2452,9 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.label.badges": {
+    "defaultMessage": "Jelvények"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Közzététel: {date}"
@@ -2350,6 +2575,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "Platformok"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, one {Platform} other {Platformok}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "Kompatibilitás"
@@ -2900,6 +3128,12 @@
   "project.settings.view.title": {
     "defaultMessage": "Megtekintés"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "letöltés"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count} követő"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -2907,7 +3141,7 @@
     "defaultMessage": "B"
   },
   "project.versions.channel.release.symbol": {
-    "defaultMessage": "R"
+    "defaultMessage": "K"
   },
   "project.visibility.archived": {
     "defaultMessage": "Archiválva"
@@ -2938,6 +3172,18 @@
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "A személyzet által nem feltüntetve"
+  },
+  "report.item-type.content": {
+    "defaultMessage": "tartalom"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "projekt"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "felhasználó"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "verzió"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Szűrő zárolva"
@@ -3026,6 +3272,324 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Biztonsági Mentések"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Tartalom és modpack"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Fájlok és SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Erőforrás és konzol"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Szerver"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Beállítások és runtime"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Felhasználók és meghívók"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Műveletek"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "Műveletek keresése..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "Hozzáadott tartalom"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Törölt tartalom"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "Letiltott tartalom"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "Engedélyezett tartalom"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Frissített tartalom"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Feltöltött tartalom"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Biztonsági mentés létrehozva"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Biztonsági mentés töröltve"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Biztonsági mentés átnevezve"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "Biztonsági mentés visszaállítva"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "Szerver nevét megváltoztatta"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "Szerrver subdomain-ét megváltoztatta"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "Törölte a konzolt"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "Konzol parancs futtatása"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "Fájl törlése"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "Szerkesztett fájl"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Leválasztott modcsomag"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "Újraindított szerver"
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Játékpéldányok"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Szerver"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Felhasználó"
+  },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "Tevénykenység napló"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "Felhasználó hozzáadása"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "Barátkérelem nem küldhető"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "Törölte a meghívót {target} felhasználótól."
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "Meghívó törölve"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "Meghívó nem küldhető"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "Még egy meghívó küldése {target} felhasználónak."
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Meghívó újraküldve"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "{target} meghíva mint {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Meghívó küldve"
+  },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "Töltsd újra az oldalt hogy újra probáld."
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Hozzáférés betöltése nem sikerült"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Törölte a hozzáférést {target} felhasználótól."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Hozzáférés törölve"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Hozzáférés nem törölhető"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "Rang nem frissíthető"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Összes"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "Rang: {role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "Szerkesztő"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "A játékpéldány tartalmának, fájljainak, biztonsági mentéseinek és egyéb beállításainak kezelése."
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Tulajdonos"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "Teljes hozzáférés bele tartozik a számlázás, tagok, és veszélyes műveletek is."
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Limitált"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Indítás, leállítás, és szerver megtekintése módosítások mentése nélkül."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Keresés {count} felhasználó között..."
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "Szerkesztő"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Tulajdonos"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Limitált"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "Meghívó törlése"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Hozzáférés törlése"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "Meghívó újraküldése"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "Újra küldhető {seconds} másodperce múlva"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Műveletek"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "Csatlakozott"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Rang"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Felhasználó"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "A szűrőfeltételeknek megfelelő felhasználó nem található."
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "Műveletek {username} felhasználónak"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "Függőben"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Support"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Műveletek"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Idő"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Felhasználó"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "Játékpéldány"
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Hamarosan érkezik!"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Frissített tartalom <content></content>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Szerkesztett fájl: <file></file>"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Leválasztott modcsomag"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Leválasztott modcsomag <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Leválasztott modcsomag-verzió <version></version>"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB RAM"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB tárhely"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB tárhely"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Módosította szerver tulajdonságokat <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Módosította szerver tulajdonságokat"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Átkonfigurált szerver"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Szerver javítás"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Szerver visszaállítása"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Újraindította a szervert"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Szerver indítása"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Szerver leállítáSA"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Megváltoztatta a szerver subdomain-jét erre <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "Bejentkezett SFTP-vel"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "Megváltoztatta a indítási parancsot erre <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Ismeretlen esemény"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Rögzített szerveraktivitás"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "Törölte a meghívót <target-user></target-user> felhasználótól"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "Meghívta <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "Meghívta <target-user></target-user> ezzek kell <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "Megváltoztatta a jogosultságokat <target-user></target-user> hoz/hez"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Megváltoztatta a jogosultságokat <target-user></target-user> nak/nek erre <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "Törölte a hozzáférést <target-user></target-user> tól/től"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Szerver"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "A(z) {backupName} biztonsági mentés megszakítva."
   },
@@ -3035,14 +3599,26 @@
   "servers.backups.admonition.backup-completed.description": {
     "defaultMessage": "A(z) {backupName} biztonsági mentés sikeresen befejeződött."
   },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "Biztonsági mentés befejezve"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Hiba történt a(z) {backupName} létrehozása közben. Kérjük, próbálja meg újra, vagy ha a probléma továbbra is fennáll, vegye fel a kapcsolatot az ügyfélszolgálattal."
   },
   "servers.backups.admonition.backup-failed.title": {
     "defaultMessage": "A biztonsági mentés sikertelen volt"
   },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "A(z) {backupName} felkerült a sorba, és hamarosan elindul."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Biztonsági mentés várólistán"
+  },
   "servers.backups.admonition.creating-backup.title": {
     "defaultMessage": "Biztonsági mentés készítése"
+  },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "{count, plural, one {Tömeges műveletek 1 kiválasztott biztonsági mentéshez} other {Tömeges műveletek # kiválasztott biztonsági mentéshez}}"
   },
   "servers.backups.bulk-bar.deleting": {
     "defaultMessage": "{total} biztonsági mentés törlése..."
@@ -3083,6 +3659,15 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatikus"
   },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Biztonsági mentés ütemezés"
+  },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Támogatás"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuális biztonsági mentés"
   },
@@ -3106,6 +3691,75 @@
   },
   "servers.backups.toolbar.select-all": {
     "defaultMessage": "Összes kijelölése"
+  },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Biztonsági mentés létrehozás folyamatban van"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Biztonsági mentés visszaálltás folyamatban van"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "A szerver települ"
+  },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Barátkérelem küldése is"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "Ez a felhasználó már meg lett hívva"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "Felhasználó hozzáadása"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "Meghívás"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "Az egyes rangokhoz tartozó jogosultságok teljes listáját <link>itt</link> tekintheti meg."
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "Szerkesztő"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "A játékpéldány tartalmának, fájljainak, biztonsági mentéseinek és egyéb beállításainak kezelése."
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "Rang kiválasztása"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Limitált"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Indítás, leállítás, és szerver megtekintése módosítások mentése nélkül."
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Ne használd a Minecraft felhasználó nevűket."
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Modrinth felhasználónév"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "Nem található a keresésnek megfelelő felhasználó."
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Modrinth felhasználónév megadása"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "Keresés..."
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "A telepítés nem sikerült"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Egy internal hiba történt a telepítés közben. Kérlek probáld újra."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Ez a modcsomag-verzió nem tartalmaz letölthető fájlt. Lehet, hogy hibásan lett összeállítva."
   },
   "servers.installing-banner.phase.installing-addons": {
     "defaultMessage": "Kiegészítők telepítése..."
@@ -3152,9 +3806,6 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Még nincsenek szerverek"
   },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Válaszd ki a kedvenc modjaidat, a többit bízd ránk!"
-  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Modok telepítése egy kattintással"
   },
@@ -3191,14 +3842,8 @@
   "servers.listing.new-label": {
     "defaultMessage": "Új"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "A fájljaid még <days-remaining>{daysRemaining} napig</days-remaining> lesznek megőrizve. Vedd fel a kapcsolatot az ügyfélszolgálattal, hogy letölthesd őket, mielőtt törlésre kerülnek."
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "A fájlok a lemondást követően 30 napig megmaradnak."
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "A szerveredet moderációs intézkedés keretében felfüggesztették."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Kérlek, várj, amíg beállítjuk a szervered. Ez akár 10 percig is eltarthat."
@@ -3206,11 +3851,11 @@
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Az előfizetésedet töröltük."
   },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Előfizetésed <date>{formattedDate}</date>-én töröltük."
-  },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Előfizetésed fizetési hiba miatt töröltük."
+  },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
   },
   "servers.listing.server-icon-alt": {
     "defaultMessage": "Szerverikon"
@@ -3267,7 +3912,7 @@
     "defaultMessage": "Modrinth Hosting"
   },
   "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mostantól itt találhatók!"
+    "defaultMessage": "Mostantól itt található!"
   },
   "servers.manage.settings-hint.dismiss": {
     "defaultMessage": "Ne mutasd újra"
@@ -3289,6 +3934,9 @@
   },
   "servers.medal-listing.notice.suspended-with-reason": {
     "defaultMessage": "A szerveredet felfüggesztettük: {reason}. Kérlek, frissítsd a számlázási adataidat, vagy további információkért vedd fel a kapcsolatot a Modrinth ügyfélszolgálatával."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Szerverikon"
@@ -3409,6 +4057,9 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Nyugat-Európa"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "A telepítés során váratlan hiba történt. Kérlek, próbáld újra később."
@@ -3548,11 +4199,74 @@
   "settings.pats.title": {
     "defaultMessage": "Személyes hozzáférési tokenek"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Nyilvános profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Munkamenetek"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Hozzáadás"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Hozzáadva"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Ez a felhasználó már meg lett hívva."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Mégse"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Meghívólink szerkesztése."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Meghívólink szerkesztése"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Lejárati dátum"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "A barátaid – {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Meghívás"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "A meghívólink lejár {duration}on belül."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Vagy használj egy meghívólinket"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "A meghívólink a vágólapra lett másolva."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Link kimásolva"
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Nem található a keresésnek megfelelő felhasználó."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Kérelem elküldve"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} felhasználónak először el kell fogadnia a barátkérelmet"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Mentés"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Modrinth felhasználónév megadása"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Keresés..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "A meghívólink frissítése sikertelen"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -3959,6 +4673,87 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Alkalmaz"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Törlés"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": " Egyéni, rögzített dátumtartomány..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": " Az időtartam csökkentése"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": " Nincs kiválasztva dátumtartomány."
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": " Az időtartam növelése"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "Az elmúlt {amount} {unit, select,\nhours {órában}\ndays {napban}\nweeks {hétben}\nmonths {hónapban}\nother {napban}\n}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "Az elmúlt"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Teljes időszak"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Az elmúlt 14 nap"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Az elmúlt 180 nap"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Az elmúlt 30 nap"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Az elmúlt 7 nap"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Az elmúlt 90 nap"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Ma"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": " Az év eleje óta"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Tegnap"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Időkeret kiválasztása"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Kiválasztva"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Kiválasztás"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Az időkeret összege"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Az időkeret egysége"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "napban"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "órában"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "hónapban"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "hétben"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Vannak nem mentett módosítások."
   },
@@ -3968,8 +4763,115 @@
   "ui.confirm-leave-modal.header": {
     "defaultMessage": "Vannak nem mentett módosításaid"
   },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Oldal elhagyása"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Maradás az oldalon"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Elhagyod az oldalt?"
+  },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count} figyelmeztetés"
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Ismeretlen fájlok"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Ez a felhasználó már a Modrinth Alpha óta aktív, amely 2020 novemberében ért véget."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Alfa-tesztelő"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Ez a felhasználó már a Modrinth Beta óta aktív, amely 2022 februárjában ért véget."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Kattints ide, hogy elolvasd a Modrinth Beta elindításáról szóló hírt."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Béta-tesztelő"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Ennek a felhasználónak a projektjei összesen {download_sum} letöltést értek el."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} letöltés"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "Ez a felhasználó segített nekünk az adatcsomag-projektek tesztelésében a Modrinthon, mielőtt azokat 2023 januárjában elindítottuk."
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "Az adatcsomagok korai tesztelője"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "Ez a felhasználó segített nekünk a modcsomag-projektek tesztelésében a Modrinthon, mielőtt azokat 2022 májusában elindítottuk."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "A modcsomagok korai tesztelője"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "Ez a felhasználó segített nekünk a bővítményprojektek tesztelésében a Modrinthon, mielőtt azokat 2022 augusztusában elindítottuk."
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "A bővítmények korai tesztelője"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "Ez a felhasználó segített nekünk a forráscsomag-projektek tesztelésében a Modrinthon, mielőtt azokat 2022 augusztusában elindítottuk."
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "A forráscsomagok korai tesztelője"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "Ez a felhasználó segített nekünk a szerverprojektek tesztelésében a Modrinthon, mielőtt azokat 2026 márciusában elindítottuk."
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "A szerverek korai tesztelője"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "Ez a felhasználó segített nekünk a shaderprojektek tesztelésében a Modrinthon, mielőtt azokat 2023 januárjában elindítottuk."
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "A shaderek korai tesztelője"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "Ez a felhasználó részt vett a Modrinth Hosting zárt alfa-tesztjén, mielőtt 2024 novemberében elindítottuk a Modrinth Hosting bétaverzióját."
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "Modrinth Hosting alfa-tesztelő"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "Ez a felhasználó a Modrinthnál tartalommoderátorként dolgozik."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "A Modrinth tartalommoderátorai áttekintik a projekteket, feldolgozzák a bejelentéseket, és hozzájárulnak a Modrinth biztonságának fenntartásához."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "Tartalommoderátor"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Ez a felhasználó minden tőle telhetőt megtesz, hogy támogassa a Modrinthot és a platformon tevékenykedő alkotókat."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Kattints ide, ha többet szeretnél megtudni arról, hogy hogyan válhatsz taggá."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Modrinth+ tag"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Ez a felhasználó részt vett a Modrinth’s Pride legalább egy, az LGBTQ+ közösség javára szervezett adománygyűjtő akciójában."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "Kattints ide, hogy megtekintsd legújabb Pride-jótékonysági akciónkat."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "A Pride jótékonysági akció támogatója"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Ez a felhasználó a Modrinthnál dolgozik."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "A Modrinth-csapat"
   }
 }
-

@@ -10,7 +10,7 @@ import {
 	get_content_items,
 	get_linked_modpack_info,
 	type LinkedModpackInfo,
-} from '@/helpers/profile'
+} from '@/helpers/instance'
 import { get_categories } from '@/helpers/tags.js'
 import type { CacheBehaviour } from '@/helpers/types'
 

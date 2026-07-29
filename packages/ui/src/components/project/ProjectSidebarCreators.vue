@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+		<h2 class="text-lg font-semibold m-0">{{ formatMessage(messages.title) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold">
 			<template v-if="organization">
 				<AutoLink
@@ -10,10 +10,10 @@
 				>
 					<Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
 					<div class="flex flex-col flex-nowrap justify-center">
-						<span class="group-hover:underline">
+						<span class="group-hover:underline font-medium">
 							{{ organization.name }}
 						</span>
-						<span class="text-secondary text-sm font-medium flex items-center gap-1"
+						<span class="text-sm font-normal text-secondary flex items-center gap-1"
 							><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
 						>
 					</div>
@@ -25,7 +25,7 @@
 				:key="`member-${member.id}`"
 				class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
 				:to="userLink(member.user.username)"
-				:target="linkTarget ?? null"
+				:target="resolveLinkTarget(userLinkTarget)"
 			>
 				<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
 				<div class="flex flex-col">
@@ -36,9 +36,9 @@
 							v-tooltip="formatMessage(messages.owner)"
 							class="text-brand-orange"
 						/>
-						<ExternalIcon v-if="linkTarget === '_blank'" />
+						<ExternalIcon v-if="resolveLinkTarget(userLinkTarget) === '_blank'" />
 					</span>
-					<span class="text-secondary text-sm font-medium">{{ member.role }}</span>
+					<span class="text-sm font-normal text-secondary">{{ member.role }}</span>
 				</div>
 			</AutoLink>
 		</div>
@@ -79,7 +79,12 @@ const props = defineProps<{
 	orgLink: (slug: string) => string
 	userLink: (username: string) => string
 	linkTarget?: string
+	userLinkTarget?: string | null
 }>()
+
+function resolveLinkTarget(target: string | null | undefined): string | null {
+	return target === undefined ? (props.linkTarget ?? null) : target
+}
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
 // The rest of the members should be sorted by role, then by name

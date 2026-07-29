@@ -448,6 +448,7 @@ import {
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	IntlFormatted,
 	ProjectCard,
 	StyledInput,
@@ -464,6 +465,7 @@ import { homePageNotifs, homePageProjects, homePageSearch } from '~/generated/st
 const formatRelativeTime = useRelativeTime()
 
 const { formatMessage } = useVIntl()
+const { labrinth } = injectModrinthClient()
 
 const searchQuery = ref('leave')
 const sortType = ref('relevance')
@@ -473,8 +475,8 @@ const PROJECT_COUNT = 100000
 
 const auth = await useAuth()
 
-const newProjects = homePageProjects?.slice(0, 40)
-const val = Math.ceil(newProjects?.length / 3)
+const newProjects = homePageProjects?.slice(0, 40) ?? []
+const val = Math.ceil(newProjects.length / 3)
 const rows = ref(
 	newProjects.length > 0
 		? [
@@ -489,11 +491,25 @@ const notifications = ref(homePageNotifs?.hits ?? [])
 const searchProjects = ref(homePageSearch?.hits ?? [])
 
 async function updateSearchProjects() {
-	const res = await useBaseFetch(
-		`search?limit=3&query=${searchQuery.value}&index=${sortType.value}`,
-	)
+	searchProjects.value = await getSearchProjects()
+}
 
-	searchProjects.value = res?.hits ?? []
+async function getSearchProjects() {
+	try {
+		const res = await labrinth.projects_v2.search({
+			limit: 3,
+			query: searchQuery.value,
+			index: sortType.value,
+		})
+
+		return res?.hits ?? []
+	} catch {
+		return []
+	}
+}
+
+if (searchProjects.value.length === 0) {
+	searchProjects.value = await getSearchProjects()
 }
 
 const messages = defineMessages({

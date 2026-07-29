@@ -28,7 +28,13 @@
 		</div>
 		<template v-if="contentError" #top-right-actions>
 			<ButtonStyled color="red" type="outlined">
-				<button class="!border" type="button" @click="emit('retry')">
+				<button
+					v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
+					class="!border"
+					type="button"
+					:disabled="retryDisabled"
+					@click="emit('retry')"
+				>
 					<RotateCounterClockwiseIcon class="size-5" />
 					{{ formatMessage(commonMessages.retryButton) }}
 				</button>
@@ -62,6 +68,8 @@ const props = defineProps<{
 	fallbackPhase?: SyncProgress['phase'] | null
 	contentError?: ContentError | null
 	dismissible?: boolean
+	retryDisabled?: boolean
+	retryDisabledTooltip?: string
 }>()
 
 const emit = defineEmits<{

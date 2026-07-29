@@ -14,7 +14,7 @@ import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleSevereError } from '@/store/error.js'
 
-import { type MinecraftAuthError, minecraftAuthErrors } from './minecraft-auth-errors'
+import { findMinecraftAuthError, type MinecraftAuthError } from './minecraft-auth-errors'
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const rawError = ref<string>('')
@@ -26,7 +26,7 @@ const loadingSignIn = ref(false)
 function show(errorVal: { message?: string }) {
 	rawError.value = errorVal?.message ?? String(errorVal)
 
-	matchedError.value = minecraftAuthErrors.find((e) => rawError.value.includes(e.errorCode)) ?? null
+	matchedError.value = findMinecraftAuthError(rawError.value)
 
 	debugCollapsed.value = true
 	hide_ads_window()

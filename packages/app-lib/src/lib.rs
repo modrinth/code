@@ -13,6 +13,7 @@ mod util;
 mod api;
 mod error;
 mod event;
+pub mod install;
 mod launcher;
 mod logger;
 mod state;

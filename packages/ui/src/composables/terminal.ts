@@ -198,7 +198,12 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 			const mod = e.ctrlKey || e.metaKey
 			if (!mod) return true
 			const key = e.key.toLowerCase()
-			if (key === 'c' || key === 'insert' || key === 'a') {
+			if (key === 'a') {
+				e.preventDefault()
+				term.selectAll()
+				return false
+			}
+			if (key === 'c' || key === 'insert') {
 				return false
 			}
 			return true

@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { PlusIcon } from '@modrinth/assets'
+import { LibraryIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, NavTabs } from '@modrinth/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
-import { profile_listener } from '@/helpers/events.js'
-import { list } from '@/helpers/profile.js'
-import { useBreadcrumbs } from '@/store/breadcrumbs.js'
+import { instance_listener } from '@/helpers/events.js'
+import { list } from '@/helpers/instance'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 const { handleError } = injectNotificationManager()
 const showCreationModal = inject('showCreationModal')
 const route = useRoute()
-const breadcrumbs = useBreadcrumbs()
 
-breadcrumbs.setRootContext({ name: 'Library', link: route.path })
+useRootBreadcrumb({
+	slot: 'root',
+	id: 'library',
+	label: 'Library',
+	to: '/library',
+	visual: { type: 'icon', component: LibraryIcon },
+})
 
 const instances = shallowRef(await list().catch(handleError))
 
@@ -26,27 +31,35 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const unlistenProfile = await profile_listener(async () => {
+const unlistenInstance = await instance_listener(async () => {
 	instances.value = await list().catch(handleError)
 })
 onUnmounted(() => {
-	unlistenProfile()
+	unlistenInstance()
 })
 </script>
 
 <template>
 	<div class="p-6 flex flex-col gap-3">
 		<h1 class="m-0 text-2xl hidden">Library</h1>
-		<NavTabs
-			:links="[
-				{ label: 'All instances', href: `/library` },
-				{ label: 'Modpacks', href: `/library/modpacks` },
-				{ label: 'Servers', href: `/library/servers` },
-				{ label: 'Custom', href: `/library/custom` },
-				{ label: 'Shared with me', href: `/library/shared`, shown: false },
-				{ label: 'Saved', href: `/library/saved`, shown: false },
-			]"
-		/>
+		<div class="flex items-center justify-between gap-3">
+			<NavTabs
+				:links="[
+					{ label: 'All instances', href: `/library` },
+					{ label: 'Modpacks', href: `/library/modpacks` },
+					{ label: 'Servers', href: `/library/servers` },
+					{ label: 'Custom', href: `/library/custom` },
+					{ label: 'Shared with me', href: `/library/shared`, shown: false },
+					{ label: 'Saved', href: `/library/saved`, shown: false },
+				]"
+			/>
+			<ButtonStyled color="brand">
+				<button :disabled="offline" @click="showCreationModal?.()">
+					<PlusIcon />
+					New instance
+				</button>
+			</ButtonStyled>
+		</div>
 		<template v-if="instances && instances.length > 0">
 			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
 		</template>

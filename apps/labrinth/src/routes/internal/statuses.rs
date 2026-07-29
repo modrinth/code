@@ -2,7 +2,8 @@ use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
-use crate::database::redis::RedisPool;
+use crate::database::models::notification_item::DBNotification;
+use crate::models::notifications::{Notification, NotificationBody};
 use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
@@ -26,14 +27,14 @@ use chrono::Utc;
 use either::Either;
 use futures_util::future::select;
 use futures_util::{StreamExt, TryStreamExt};
-use redis::AsyncCommands;
 use serde::Deserialize;
 use std::pin::pin;
 use std::sync::atomic::Ordering;
 use tokio::sync::oneshot::error::TryRecvError;
 use tokio::time::{Duration, sleep};
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ws_init);
 }
 
@@ -42,7 +43,13 @@ struct LauncherHeartbeatInit {
     code: String,
 }
 
-#[get("launcher_socket")]
+// TODO: Move launcher-specific tunnel traffic to a proper launcher websocket endpoint.
+/// Start launcher socket.  
+#[utoipa::path(
+	tag = "statuses",
+	responses((status = 101))
+)]
+#[get("/launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -126,6 +133,28 @@ pub async fn ws_init(
             },
         )?)
         .await;
+
+    let unread_launcher_invites =
+        DBNotification::get_many_user_exposed_on_site(
+            user_id.into(),
+            &**pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .filter(|notification| {
+            !notification.read
+                && matches!(
+                    &notification.body,
+                    NotificationBody::ServerInvite { .. }
+                        | NotificationBody::SharedInstanceInvite { .. }
+                )
+        })
+        .map(Notification::from);
+
+    for notification in unread_launcher_invites {
+        let _ = session.text(serde_json::to_string(&notification)?).await;
+    }
 
     let db = db.clone();
     let socket_id = db.next_socket_id.fetch_add(1, Ordering::Relaxed);
@@ -363,13 +392,10 @@ pub async fn broadcast_friends_message(
     redis: &RedisPool,
     message: RedisFriendsMessage,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    let _: () = redis
-        .pool
-        .get()
-        .await?
+    redis
         .publish(FRIENDS_CHANNEL_NAME, message)
-        .await?;
-    Ok(())
+        .await
+        .map_err(Into::into)
 }
 
 pub async fn broadcast_to_local_friends(
@@ -442,6 +468,25 @@ pub async fn send_message_to_user(
         for socket_id in socket_ids.iter() {
             if let Some(socket) = db.sockets.get(&socket_id) {
                 send_message(&socket, message).await?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+pub async fn send_notification_to_user(
+    db: &ActiveSockets,
+    user: UserId,
+    notification: &Notification,
+) -> Result<(), crate::database::models::DatabaseError> {
+    let message = serde_json::to_string(notification)?;
+
+    if let Some(socket_ids) = db.sockets_by_user_id.get(&user) {
+        for socket_id in socket_ids.iter() {
+            if let Some(socket) = db.sockets.get(&socket_id) {
+                let mut socket = socket.socket.clone();
+                let _ = socket.text(message.clone()).await;
             }
         }
     }

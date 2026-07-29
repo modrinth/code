@@ -12,7 +12,10 @@
 			</div>
 		</Teleport>
 
-		<InstallationSettingsLayout ref="installationSettingsLayout" @reset-server="setupModal?.show()">
+		<InstallationSettingsLayout
+			ref="installationSettingsLayout"
+			@reset-server="showResetServerModal"
+		>
 			<template #extra>
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
@@ -20,7 +23,12 @@
 					}}</span>
 					<div>
 						<ButtonStyled color="red">
-							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
+							<button
+								v-tooltip="resetServerDisabledTooltip"
+								class="!shadow-none"
+								:disabled="resetServerDisabled"
+								@click="showResetServerModal"
+							>
 								<RotateCounterClockwiseIcon class="size-5" />
 								{{ formatMessage(commonMessages.resetServerButton) }}
 							</button>
@@ -53,9 +61,10 @@
 			<div>
 				<ButtonStyled color="red">
 					<button
+						v-tooltip="supportResetToOnboardingTooltip"
 						class="!shadow-none"
-						:disabled="!worldId || isResettingToOnboarding"
-						@click="resetToOnboardingModal?.show()"
+						:disabled="supportResetToOnboardingDisabled"
+						@click="showResetToOnboardingModal"
 					>
 						<RotateCounterClockwiseIcon class="size-5" />
 						{{ formatMessage(messages.resetToOnboardingButton) }}
@@ -88,6 +97,7 @@ import {
 	UploadProgressModal,
 	useDebugLogger,
 	useModrinthServersConsole,
+	useServerPermissions,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -105,6 +115,7 @@ const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
 const filePicker = injectFilePicker()
 const modrinthServersConsole = useModrinthServersConsole()
+const { canSetup, canResetServer, permissionDeniedMessage } = useServerPermissions()
 
 const uploadProgressModal =
 	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
@@ -204,8 +215,23 @@ const isInstalling = computed(() => {
 	)
 	return val
 })
+const setupActionDisabled = computed(() => !canSetup.value || isInstalling.value)
+const setupActionDisabledMessage = computed(() => {
+	if (!canSetup.value) return permissionDeniedMessage.value
+	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : null
+})
+const resetServerDisabled = computed(() => !canResetServer.value || isInstalling.value)
+const resetServerDisabledTooltip = computed(() => {
+	if (!canResetServer.value) return permissionDeniedMessage.value
+	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
+})
 const installationSettingsLayout = ref<InstanceType<typeof InstallationSettingsLayout>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
+
+function showResetServerModal() {
+	if (resetServerDisabled.value) return
+	setupModal.value?.show()
+}
 
 async function invalidateServerState() {
 	debug('invalidateServerState: starting')
@@ -245,6 +271,17 @@ const editingPlatform = ref(server.value?.loader?.toLowerCase() ?? 'vanilla')
 const editingGameVersion = ref(server.value?.mc_version ?? '')
 const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
 const isResettingToOnboarding = ref(false)
+const supportResetToOnboardingDisabled = computed(
+	() => !worldId.value || isResettingToOnboarding.value || !canResetServer.value,
+)
+const supportResetToOnboardingTooltip = computed(() =>
+	!canResetServer.value ? permissionDeniedMessage.value : undefined,
+)
+
+function showResetToOnboardingModal() {
+	if (supportResetToOnboardingDisabled.value) return
+	resetToOnboardingModal.value?.show()
+}
 
 const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
@@ -339,18 +376,39 @@ function getLoaderVersionsForGameVersion(
 	}
 
 	const manifest = manifestQuery.data.value?.gameVersions
+	const versionGroups = manifestQuery.data.value?.versionGroups
 	if (!manifest) return []
 
 	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
 	if (placeholder) return placeholder.loaders
 
 	const entry = manifest.find((x) => x.id === gameVersion)
+	if (entry?.versionGroup) {
+		return versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
+	}
+
 	return entry?.loaders ?? []
 }
 
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	if (loader === 'neoforge') return 'neo_forge'
 	return loader as Archon.Content.v1.Modloader
+}
+
+async function uploadLocalModpackWithSoftOverride() {
+	const picked = await filePicker.pickModpackFile()
+	if (!picked?.file) return false
+
+	const handle = client.kyros.content_v1.uploadModpackFile(
+		worldId.value!,
+		picked.file,
+		{ known: {} },
+		{ softOverride: true },
+	)
+	await uploadProgressModal.value!.track(handle)
+	emit('reinstall')
+	await invalidateServerState()
+	return true
 }
 
 provideInstallationSettings({
@@ -396,7 +454,8 @@ provideInstallationSettings({
 		debug('isLinked:', val, 'modpack:', modpackProjectId.value)
 		return val
 	}),
-	isBusy: isInstalling,
+	isBusy: setupActionDisabled,
+	busyMessage: setupActionDisabledMessage,
 	modpack: computed(() => {
 		if (!modpack.value) return null
 		const isLocal = modpack.value.spec.platform === 'local_file'
@@ -451,7 +510,7 @@ provideInstallationSettings({
 					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 					if (!hasPlaceholder) {
 						const supportedVersions = new Set(
-							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
+							manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
 						)
 						return versions
 							.filter((v) => supportedVersions.has(v.version))
@@ -493,12 +552,15 @@ provideInstallationSettings({
 		if (hasPlaceholder) {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
 		}
-		const supportedVersions = new Set(manifest.filter((x) => x.loaders.length > 0).map((x) => x.id))
+		const supportedVersions = new Set(
+			manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
+		)
 		const supported = tags.gameVersions.value.filter((v) => supportedVersions.has(v.version))
 		return supported.some((v) => v.version_type !== 'release')
 	},
 
 	async save(platform, gameVersion, loaderVersionId) {
+		if (setupActionDisabled.value) return
 		debug('save: called with', { platform, gameVersion, loaderVersionId })
 		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
 		const platformChanged = platform !== currentPlatform
@@ -548,6 +610,7 @@ provideInstallationSettings({
 	},
 
 	async repair() {
+		if (setupActionDisabled.value) return
 		debug('repair: called')
 		try {
 			await client.archon.content_v1.repair(serverId, worldId.value!)
@@ -568,21 +631,12 @@ provideInstallationSettings({
 	},
 
 	async reinstallModpack() {
+		if (setupActionDisabled.value) return
 		if (!modpack.value) return
 		if (modpack.value.spec.platform === 'local_file') {
 			debug('reinstallModpack: local file, opening file picker')
-			const picked = await filePicker.pickModpackFile()
-			if (!picked) return
 			try {
-				const handle = client.kyros.content_v1.uploadModpackFile(
-					worldId.value!,
-					picked.file,
-					{ known: {} },
-					{ softOverride: true },
-				)
-				await uploadProgressModal.value!.track(handle)
-				emit('reinstall')
-				invalidateServerState()
+				await uploadLocalModpackWithSoftOverride()
 			} catch (err) {
 				emit('reinstall-failed')
 				addNotification({
@@ -623,7 +677,23 @@ provideInstallationSettings({
 		}
 	},
 
+	async swapModpack() {
+		if (setupActionDisabled.value) return
+		if (modpack.value?.spec.platform !== 'local_file') return
+		debug('swapModpack: local file, opening file picker')
+		try {
+			await uploadLocalModpackWithSoftOverride()
+		} catch (err) {
+			emit('reinstall-failed')
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
+			})
+		}
+	},
+
 	async unlinkModpack() {
+		if (setupActionDisabled.value) return
 		debug('unlinkModpack: called')
 		const previousData = addonsQuery.data.value
 		if (previousData) {
@@ -695,6 +765,7 @@ provideInstallationSettings({
 	},
 
 	async onModpackVersionConfirm(version) {
+		if (setupActionDisabled.value) return
 		if (!modpackProjectId.value) return
 		debug('onModpackVersionConfirm: called, version:', version.id)
 		debug('onModpackVersionConfirm: emitting reinstall before API call')
@@ -741,6 +812,7 @@ provideInstallationSettings({
 	hideLoaderVersion: false,
 
 	async disableAllContent() {
+		if (setupActionDisabled.value) return
 		debug('disableAllContent: fetching all addons')
 		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
 		const items = (addons.addons ?? [])
@@ -754,6 +826,7 @@ provideInstallationSettings({
 	},
 
 	async disableIncompatibleContent(targetGameVersion) {
+		if (setupActionDisabled.value) return
 		debug('disableIncompatibleContent: fetching addons')
 		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
 		const activeAddons = (addons.addons ?? []).filter((a) => !a.disabled)
@@ -785,6 +858,7 @@ provideInstallationSettings({
 	},
 
 	async saveWithoutAutoFix(platform, gameVersion, loaderVersionId) {
+		if (setupActionDisabled.value) return
 		debug('saveWithoutAutoFix: called with', { platform, gameVersion, loaderVersionId })
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -816,6 +890,7 @@ provideInstallationSettings({
 	},
 
 	async previewSave(_platform, gameVersion, _loaderVersionId, signal) {
+		if (setupActionDisabled.value) return null
 		const result = await client.archon.content_v1.getUpdateGameVersionPreview(
 			serverId,
 			worldId.value!,
@@ -855,6 +930,7 @@ watch(
 )
 
 function onReinstall(event?: unknown) {
+	if (resetServerDisabled.value) return
 	installationSettingsLayout.value?.cancelEditing()
 	modrinthServersConsole.clear()
 	queryClient.removeQueries({ queryKey: ['servers', 'ws-state', serverId] })
@@ -863,6 +939,7 @@ function onReinstall(event?: unknown) {
 }
 
 function onBrowseModpacks() {
+	if (resetServerDisabled.value) return
 	debug('onBrowseModpacks: navigating to modpack discovery')
 	serverSettings.browseModpacks({
 		serverId,
@@ -872,7 +949,7 @@ function onBrowseModpacks() {
 }
 
 async function confirmResetToOnboarding() {
-	if (!worldId.value) return
+	if (supportResetToOnboardingDisabled.value || !worldId.value) return
 
 	try {
 		isResettingToOnboarding.value = true

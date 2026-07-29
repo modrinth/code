@@ -22,6 +22,7 @@ node_modules
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/i18n-ally-custom-framework.yml
 
 # IDE - IntelliJ
 .idea/*

@@ -3,7 +3,7 @@ use tauri::Runtime;
 use tauri_plugin_opener::OpenerExt;
 use theseus::{
     handler,
-    prelude::{CommandPayload, DirectoryInfo},
+    prelude::{CommandPayload, DirectoryInfo, app_db_backup_dir},
 };
 
 use crate::api::{Result, TheseusSerializableError};
@@ -21,6 +21,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             highlight_in_folder,
             open_path,
             show_launcher_logs_folder,
+            show_app_db_backups_folder,
             progress_bars_list,
             get_opening_command
         ])
@@ -119,6 +120,16 @@ pub async fn show_launcher_logs_folder<R: Runtime>(app: tauri::AppHandle<R>) {
     }
 }
 
+#[tauri::command]
+pub async fn show_app_db_backups_folder<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<()> {
+    let path = app_db_backup_dir()?;
+    tokio::fs::create_dir_all(&path).await?;
+    open_path(app, path).await;
+    Ok(())
+}
+
 // Get opening command
 // For example, if a user clicks on an .mrpack to open the app.
 // This should be called once and only when the app is done booting up and ready to receive a command
@@ -129,11 +140,18 @@ pub async fn get_opening_command(
     state: tauri::State<'_, crate::macos::deep_link::InitialPayload>,
 ) -> Result<Option<CommandPayload>> {
     let payload = state.payload.lock().await;
+    let cmd_arg = std::env::args_os()
+        .nth(1)
+        .map(|path| path.to_string_lossy().to_string());
 
     return if let Some(payload) = payload.as_ref() {
         tracing::info!("opening command {payload}");
 
         Ok(Some(handler::parse_command(payload).await?))
+    } else if let Some(cmd_arg) = cmd_arg {
+        tracing::info!("opening command {cmd_arg:?}");
+
+        Ok(Some(handler::parse_command(&cmd_arg).await?))
     } else {
         Ok(None)
     };

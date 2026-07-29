@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tselect\n\t\t\t\t\tid,\n\t\t\t\t\ttitle,\n\t\t\t\t\tstatus,\n\t\t\t\t\tlink,\n\t\t\t\t\texceptions,\n\t\t\t\t\tproof,\n\t\t\t\t\tflame_project_id,\n\t\t\t\t\tinserted_at,\n\t\t\t\t\tinserted_by,\n\t\t\t\t\tupdated_at,\n\t\t\t\t\tupdated_by\n\t\t\t\tfrom moderation_external_licenses\n\t\t\t\twhere id = ANY($1)\n\t\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "link",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "exceptions",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "proof",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "flame_project_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "inserted_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "inserted_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "944286604bdef4ee40f79af358d1b68cc93bfd2067619d9cc1d03013f73e5424"
+}

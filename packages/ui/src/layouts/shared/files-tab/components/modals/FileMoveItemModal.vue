@@ -1,7 +1,11 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header, { type: item?.type })"
+		:header="
+			formatMessage(messages.header, {
+				type: formatFileItemType(formatMessage, item?.type),
+			})
+		"
 		max-width="500px"
 	>
 		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
@@ -50,7 +54,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatFileItemType } from '#ui/utils/common-messages'
 
 import type { FileItem } from '../../types'
 
@@ -59,7 +63,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	header: {
 		id: 'files.move-modal.header',
-		defaultMessage: '{type, select, directory {Move folder} other {Move file}}',
+		defaultMessage: 'Move {type}',
 	},
 	currentLocation: {
 		id: 'files.move-modal.current-location',

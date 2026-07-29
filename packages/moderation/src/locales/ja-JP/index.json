@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Javaアドレスを追加する"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "カスタムライセンスを有効にするためには、有効なURLとライセンス名またはSPDX識別子を追加する必要があります。"
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "ライセンス詳細を追加"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Modrinth以外の関連リンク (ウェブサイト、ストア、Discord招待など) を追加してください。"
   },
@@ -29,17 +35,23 @@
   "nags.add-links.title": {
     "defaultMessage": "外部リンクを追加する"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "すべての利用可能な言語オプションを選択しました。サーバーが実際にサポートしている言語のみを一覧表示してください。"
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "正確な言語を選択してください"
+  },
   "nags.all-tags-selected.description": {
     "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}のすべてを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "プロジェクトと関係のあるタグを選択する"
+    "defaultMessage": "適切なタグを選択する"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "説明文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい説明文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "さらに説明を追加する"
+    "defaultMessage": "説明を展開する"
   },
   "nags.edit-description.title": {
     "defaultMessage": "説明を編集する"
@@ -66,16 +78,16 @@
     "defaultMessage": "ギャラリーのページを閲覧する"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "この{type, select, mod {Mod} plugin {プラグイン} other {プロジェクト}}はソースコードの公開が必要なライセンスを使用しています。ソースコードへのリンクを追加するか、バージョン毎にソースファイルを添付してください。もしくは他のライセンスへの変更を検討してください。"
+    "defaultMessage": "このライセンス{type}はソースコードの公開が必要です。ソースコードへのリンクを追加するか、バージョン毎にソースファイルを添付してください。もしくは他のライセンスへの変更を検討してください。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ソースコードのリンクの追加"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "まったく同じ外部リンクが複数あるようです。各リンクは適切なリンク形式で一度だけ入力してください。"
+    "defaultMessage": "まったく同じ外部リンクが複数あります。各リンクは適切な形式で１つだけ入力してください。"
   },
   "nags.identical-links.title": {
-    "defaultMessage": "リンクの重複"
+    "defaultMessage": "リンクの重複を整理"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "視覚障害のある方やインターネット回線速度の遅い方への配慮のため、十分で分かりやすい説明または画像の代替テキストが必要です。"
@@ -87,7 +99,7 @@
     "defaultMessage": "ライセンスのURLが無効です。"
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "ライセンスのURL は {domain} を指していますが、これはライセンス情報には適切ではありません。ライセンスのURL は、ソーシャルメディアやゲームプラットフォームなどではなく、直接ライセンスのファイルにリンクする必要があります。"
+    "defaultMessage": "ライセンスのURLは {domain} を指していますが、これはライセンス情報には適切ではありません。ライセンスのURLは、ソーシャルメディアやゲームプラットフォームなどではなく、直接ライセンスのファイルにリンクする必要があります。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "ライセンスのURLの形式が間違っています。ライセンスの本文にアクセスできる有効なURLを追加してください。"
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Modpack に外部コンテンツを配布する許可を持っていることを証明する資料を必ず提供してください。"
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "外部権限を確認する"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "サーバーがサポートするバージョンのModpackを選択するか、または独自のModpackをアップロードしてください。"
   },
@@ -159,13 +177,13 @@
     "defaultMessage": "言語を選択"
   },
   "nags.select-license.description": {
-    "defaultMessage": "この{type, select, mod {Mod} modpack {Modパック} resourcepack {リソースパック} shader {シェーダー} plugin {プラグイン} datapack {データパック} other {プロジェクト}}に適用させるライセンスを選択してください。"
+    "defaultMessage": "{type} が配布されるライセンスを選択してください。"
   },
   "nags.select-license.title": {
     "defaultMessage": "ライセンスを選択"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "プロジェクトに適切に適用されるタグを選択し、適切なユーザーがプロジェクトを見つけるのを助けてあげてください。"
+    "defaultMessage": "プロジェクトに適切なタグを選択することで、適切なユーザーがプロジェクトを見つけやすくなります。"
   },
   "nags.select-tags.title": {
     "defaultMessage": "タグ選択"
@@ -174,13 +192,16 @@
     "defaultMessage": "サーバー設定を表示する"
   },
   "nags.settings.description.title": {
-    "defaultMessage": "訪問設定の表示"
+    "defaultMessage": "説明の設定を表示"
   },
   "nags.settings.license.title": {
     "defaultMessage": "ライセンス設定を表示"
   },
   "nags.settings.links.title": {
     "defaultMessage": "リンクの設定を表示"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "権限ダッシュボードを見る"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "タグの設定を表示"
@@ -192,10 +213,10 @@
     "defaultMessage": "プロジェクトの名前と要約は同じにできません。情報豊富で魅力的な要約を作成することが重要です。"
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "要約を独自のものにしましょう！"
+    "defaultMessage": "要約を独自のものにしましょう"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "要約には、フォーマット、改行、特殊文字、またはリンクを含めないでください。要約はプレーンテキストのみ表示されるためです。"
+    "defaultMessage": "要約には、プレーンテキストのみが表示されるため、フォーマット、改行、特殊文字、またはリンクを含めないでください。"
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "要約を整理"
@@ -207,13 +228,19 @@
     "defaultMessage": "要約を展開"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "プロジェクトの名前はシンプルで覚えやすくすることで、検索しやすくなります。バージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
+    "defaultMessage": "プロジェクトの名前を簡潔にすることで、検索しやすくなります。バージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "{languageCount, plural, one {# language} other {# languages}}を選択しました。サーバーが実際にサポートしている言語のみを一覧表示してください。"
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "適切な言語を選択する"
+  },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural, one {# tag} other {# tags}} を選択しました。サーバーが関連する検索結果に表示されるように、{maxTagCount} 以下に減らしてください。"
+    "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。サーバーが関連する検索結果に表示されるように、{maxTagCount}個以下に減らしてください。"
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "適切なタグを選択する"
@@ -225,13 +252,16 @@
     "defaultMessage": "正確なタグを選択"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "{type, select, resourcepack {リソースパック(但し、オーディオパックやローカリゼーションパックを除く。もしこれらに該当する場合は、適切なタグを選択してください。)} shader {シェーダー} other {プロジェクト}}の内容を紹介するには、少なくとも1枚のギャラリー画像が必要です。"
+    "defaultMessage": "{type}の内容を展示するには、少なくとも１枚の画像が必要です。"
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "音声パックや翻訳パックを除くリソースパックに該当する場合は、適切なタグを選択してください"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "ギャラリー画像をアップロード"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "プロジェクトを審査に提出するためには、少なくても1つのバージョンが必要です。"
+    "defaultMessage": "プロジェクトを審査に提出するためには、少なくとも1つのバージョンが必要です。"
   },
   "nags.upload-version.title": {
     "defaultMessage": "バージョンをアップロード"

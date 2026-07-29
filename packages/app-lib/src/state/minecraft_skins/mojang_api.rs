@@ -10,7 +10,10 @@ use super::MinecraftSkinVariant;
 use crate::{
     ErrorKind,
     data::Credentials,
-    state::{MinecraftProfile, PROFILE_CACHE, ProfileCacheEntry},
+    state::{
+        MINECRAFT_SERVICES_USER_AGENT, MinecraftProfile, PROFILE_CACHE,
+        ProfileCacheEntry,
+    },
     util::fetch::INSECURE_REQWEST_CLIENT,
 };
 
@@ -24,12 +27,13 @@ impl MinecraftCapeOperation {
     ) -> crate::Result<()> {
         update_profile_cache_from_response(
             INSECURE_REQWEST_CLIENT
-                .put("https://api.minecraftservices.com/minecraft/profile/capes/active")
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Accept", "application/json")
-                .bearer_auth(&credentials.access_token)
-                .json(&json!({
-                    "capeId": cape_id.hyphenated(),
+				.put("https://api.minecraftservices.com/minecraft/profile/capes/active")
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Accept", "application/json")
+				.header("User-Agent", MINECRAFT_SERVICES_USER_AGENT)
+				.bearer_auth(&credentials.access_token)
+				.json(&json!({
+					"capeId": cape_id.hyphenated(),
                 }))
                 .send()
                 .await
@@ -42,12 +46,13 @@ impl MinecraftCapeOperation {
 
     pub async fn unequip_any(credentials: &Credentials) -> crate::Result<()> {
         update_profile_cache_from_response(
-            INSECURE_REQWEST_CLIENT
-                .delete("https://api.minecraftservices.com/minecraft/profile/capes/active")
-                .header("Accept", "application/json")
-                .bearer_auth(&credentials.access_token)
-                .send()
-                .await
+			INSECURE_REQWEST_CLIENT
+				.delete("https://api.minecraftservices.com/minecraft/profile/capes/active")
+				.header("Accept", "application/json")
+				.header("User-Agent", MINECRAFT_SERVICES_USER_AGENT)
+				.bearer_auth(&credentials.access_token)
+				.send()
+				.await
                 .and_then(|response| response.error_for_status())?
         )
         .await;
@@ -64,7 +69,7 @@ impl MinecraftSkinOperation {
         credentials: &Credentials,
         texture: TextureStream,
         variant: MinecraftSkinVariant,
-    ) -> crate::Result<()>
+    ) -> crate::Result<Option<Arc<MinecraftProfile>>>
     where
         TextureStream: TryStream + Send + 'static,
         TextureStream::Error: Into<Box<dyn Error + Send + Sync>>,
@@ -91,12 +96,13 @@ impl MinecraftSkinOperation {
                     .file_name("skin.png"),
             );
 
-        update_profile_cache_from_response(
+        let profile = update_profile_cache_from_response(
             INSECURE_REQWEST_CLIENT
                 .post(
                     "https://api.minecraftservices.com/minecraft/profile/skins",
                 )
                 .header("Accept", "application/json")
+                .header("User-Agent", MINECRAFT_SERVICES_USER_AGENT)
                 .bearer_auth(&credentials.access_token)
                 .multipart(form)
                 .send()
@@ -105,17 +111,18 @@ impl MinecraftSkinOperation {
         )
         .await;
 
-        Ok(())
+        Ok(profile)
     }
 
     pub async fn unequip_any(credentials: &Credentials) -> crate::Result<()> {
         update_profile_cache_from_response(
-            INSECURE_REQWEST_CLIENT
-                .delete("https://api.minecraftservices.com/minecraft/profile/skins/active")
-                .header("Accept", "application/json")
-                .bearer_auth(&credentials.access_token)
-                .send()
-                .await
+			INSECURE_REQWEST_CLIENT
+				.delete("https://api.minecraftservices.com/minecraft/profile/skins/active")
+				.header("Accept", "application/json")
+				.header("User-Agent", MINECRAFT_SERVICES_USER_AGENT)
+				.bearer_auth(&credentials.access_token)
+				.send()
+				.await
                 .and_then(|response| response.error_for_status())?
         )
         .await;
@@ -124,19 +131,24 @@ impl MinecraftSkinOperation {
     }
 }
 
-async fn update_profile_cache_from_response(response: reqwest::Response) {
+async fn update_profile_cache_from_response(
+    response: reqwest::Response,
+) -> Option<Arc<MinecraftProfile>> {
     let Some(mut profile) = response.json::<MinecraftProfile>().await.ok()
     else {
         tracing::warn!(
             "Failed to parse player profile from skin or cape operation response, not updating profile cache"
         );
-        return;
+        return None;
     };
 
     profile.fetch_time = Some(Instant::now());
+    let profile = Arc::new(profile);
 
     PROFILE_CACHE
         .lock()
         .await
-        .insert(profile.id, ProfileCacheEntry::Hit(Arc::new(profile)));
+        .insert(profile.id, ProfileCacheEntry::Hit(Arc::clone(&profile)));
+
+    Some(profile)
 }

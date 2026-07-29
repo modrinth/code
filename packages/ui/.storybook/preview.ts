@@ -6,6 +6,7 @@ import '../../assets/styles/defaults.scss'
 // ---
 // app-frontend css imports
 import '../../../apps/app-frontend/src/assets/stylesheets/global.scss'
+import './preview.scss'
 
 import type { Labrinth } from '@modrinth/api-client'
 import { GenericModrinthClient } from '@modrinth/api-client'
@@ -42,7 +43,7 @@ import {
 
 // Load locale messages from the UI package's locales
 // @ts-ignore
-const localeModules = import.meta.glob('../src/locales/*/index.json', {
+const localeModules = import.meta.glob('../src/locales/en-US/index.json', {
 	eager: true,
 }) as Record<string, { default: CrowdinMessages }>
 

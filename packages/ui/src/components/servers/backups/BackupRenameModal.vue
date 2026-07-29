@@ -29,7 +29,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
-					<button :disabled="renameMutation.isPending.value || nameExists" @click="renameBackup">
+					<button
+						v-tooltip="renameDisabledTooltip"
+						:disabled="renameDisabled"
+						@click="renameBackup"
+					>
 						<template v-if="renameMutation.isPending.value">
 							<SpinnerIcon class="animate-spin" />
 							Renaming...
@@ -51,23 +55,35 @@ import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
+import { useVIntl } from '../../../composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '../../../providers'
+import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
-const props = defineProps<{
-	backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
-}>()
+const props = withDefaults(
+	defineProps<{
+		backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
+		canRename?: boolean
+		permissionDeniedMessage?: string
+	}>(),
+	{
+		backups: undefined,
+		canRename: true,
+		permissionDeniedMessage: undefined,
+	},
+)
 
 const backupsQueryKey = ['backups', 'queue', ctx.serverId]
 
@@ -99,6 +115,14 @@ const nameExists = computed(() => {
 		(backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
 	)
 })
+const renameDisabled = computed(
+	() => renameMutation.isPending.value || nameExists.value || !props.canRename,
+)
+const renameDisabledTooltip = computed(() =>
+	props.canRename
+		? undefined
+		: (props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction)),
+)
 
 const backupNumber = computed(
 	() => (props.backups?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
@@ -124,6 +148,7 @@ function hide() {
 }
 
 const renameBackup = () => {
+	if (!props.canRename) return
 	if (!currentBackup.value) {
 		addNotification({
 			type: 'error',

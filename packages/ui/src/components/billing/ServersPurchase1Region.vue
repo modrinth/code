@@ -182,6 +182,11 @@ const messages = defineMessages({
 		id: 'servers.region.custom.prompt-ram-only',
 		defaultMessage: `RAM`,
 	},
+	billedInterval: {
+		id: 'servers.purchase.step.plan.billed',
+		defaultMessage:
+			'billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}',
+	},
 })
 
 async function updateStock() {
@@ -299,7 +304,9 @@ onMounted(() => {
 				<p v-if="selectedPrice" class="mt-2 mb-0">
 					<span class="text-contrast text-lg font-bold"
 						>{{ formatPrice(selectedPrice, currency, true) }} / month</span
-					><span v-if="interval !== 'monthly'">, billed {{ interval }}</span>
+					><span v-if="interval !== 'monthly'"
+						>, {{ formatMessage(messages.billedInterval, { interval }) }}</span
+					>
 				</p>
 				<div class="bg-bg rounded-xl p-4 mt-2 text-secondary h-14">
 					<div v-if="checkingCustomStock" class="flex gap-2 items-center">

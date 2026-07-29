@@ -9,7 +9,6 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { useMagicKeys } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -30,6 +29,7 @@ import type {
 	ContentCardProject,
 	ContentCardVersion,
 	ContentOwner,
+	ContentSource,
 } from '../types'
 
 const { formatMessage } = useVIntl()
@@ -47,6 +47,7 @@ interface Props {
 	version?: ContentCardVersion
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
+	source?: ContentSource
 	enabled?: boolean
 	installing?: boolean
 	hasUpdate?: boolean
@@ -55,9 +56,13 @@ interface Props {
 	hideSwitchVersion?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
+	disabledTooltip?: string | null
+	toggleDisabled?: boolean
+	toggleDisabledTooltip?: string | null
 	showCheckbox?: boolean
 	hideDelete?: boolean
 	hideActions?: boolean
+	inline?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -65,6 +70,7 @@ const props = withDefaults(defineProps<Props>(), {
 	version: undefined,
 	versionLink: undefined,
 	owner: undefined,
+	source: undefined,
 	enabled: undefined,
 	installing: false,
 	hasUpdate: false,
@@ -73,15 +79,20 @@ const props = withDefaults(defineProps<Props>(), {
 	hideSwitchVersion: false,
 	overflowOptions: undefined,
 	disabled: false,
+	disabledTooltip: undefined,
+	toggleDisabled: false,
+	toggleDisabledTooltip: undefined,
 	showCheckbox: false,
 	hideDelete: false,
 	hideActions: false,
+	inline: false,
 })
 
 const selected = defineModel<boolean>('selected')
 
 const emit = defineEmits<{
 	'update:enabled': [value: boolean]
+	select: [value: boolean, event?: MouseEvent]
 	delete: [event: MouseEvent]
 	update: []
 	switchVersion: []
@@ -98,6 +109,7 @@ const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
+const isToggleDisabled = computed(() => isDisabled.value || props.toggleDisabled)
 
 const clientWarningMessage = computed(() => {
 	switch (props.clientWarning) {
@@ -117,8 +129,10 @@ const deleteHovered = ref(false)
 <template>
 	<div
 		role="row"
-		class="flex h-[74px] items-center justify-between gap-4 px-3"
+		class="flex items-center justify-between"
 		:class="{
+			'h-[74px] gap-4 px-3': !inline,
+			'gap-3': inline,
 			'opacity-50 grayscale': disabled && !installing,
 			'opacity-50': installing,
 		}"
@@ -134,7 +148,7 @@ const deleteHovered = ref(false)
 				:model-value="selected ?? false"
 				:aria-label="formatMessage(messages.selectProject, { project: project.title })"
 				class="shrink-0"
-				@update:model-value="selected = $event"
+				@update:model-value="(value, event) => emit('select', value, event)"
 			/>
 
 			<div
@@ -143,7 +157,7 @@ const deleteHovered = ref(false)
 			>
 				<div
 					v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined"
-					class="relative shrink-0"
+					class="relative flex shrink-0 items-center"
 				>
 					<Avatar
 						:src="project.icon_url"
@@ -173,19 +187,44 @@ const deleteHovered = ref(false)
 						>
 							{{ project.title }}
 						</AutoLink>
-						<Tooltip v-if="isClientOnly">
-							<TriangleAlertIcon class="size-4 shrink-0 text-orange" />
-							<template #popper>
-								<div class="max-w-[18rem] text-sm">
-									{{ formatMessage(clientWarningMessage) }}
-								</div>
-							</template>
-						</Tooltip>
+						<slot name="title-badges" />
+						<span
+							v-if="isClientOnly"
+							v-tooltip="formatMessage(clientWarningMessage)"
+							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
+							tabindex="0"
+						>
+							<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
+						</span>
 					</div>
 
 					<div class="flex min-w-0 items-center gap-1">
+						<template v-if="source">
+							<AutoLink
+								:target="
+									typeof source.link === 'string' && source.link.startsWith('http')
+										? '_blank'
+										: undefined
+								"
+								:to="source.link"
+								class="flex min-w-0 items-center gap-1 !decoration-secondary"
+								:class="{ 'hover:underline': source.link }"
+							>
+								<Avatar
+									:src="source.project.icon_url"
+									:alt="source.project.title"
+									:tint-by="source.project.id"
+									size="1.25rem"
+									no-shadow
+									class="shrink-0 rounded-md"
+								/>
+								<span class="truncate text-sm leading-5 text-secondary">
+									{{ source.project.title }}
+								</span>
+							</AutoLink>
+						</template>
 						<AutoLink
-							v-if="owner"
+							v-else-if="owner"
 							:target="
 								typeof owner.link === 'string' && owner.link.startsWith('http')
 									? '_blank'
@@ -283,7 +322,11 @@ const deleteHovered = ref(false)
 					hover-color-fill="background"
 				>
 					<button
-						v-tooltip="formatMessage(commonMessages.updateAvailableLabel)"
+						v-tooltip="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.updateAvailableLabel)
+						"
 						:disabled="isDisabled"
 						@click="emit('update')"
 					>
@@ -296,7 +339,11 @@ const deleteHovered = ref(false)
 					type="transparent"
 				>
 					<button
-						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
+						v-tooltip="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.switchVersionButton)
+						"
 						:disabled="isDisabled"
 						@click="emit('switchVersion')"
 					>
@@ -307,8 +354,13 @@ const deleteHovered = ref(false)
 
 			<Toggle
 				v-if="enabled !== undefined"
+				v-tooltip="
+					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
+						? (toggleDisabledTooltip ?? disabledTooltip)
+						: undefined
+				"
 				:model-value="enabled"
-				:disabled="isDisabled"
+				:disabled="isToggleDisabled"
 				:aria-label="project.title"
 				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
@@ -317,11 +369,13 @@ const deleteHovered = ref(false)
 			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
 				<button
 					v-tooltip="
-						formatMessage(
-							shiftHeld && deleteHovered
-								? commonMessages.deleteImmediatelyLabel
-								: commonMessages.deleteLabel,
-						)
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(
+									shiftHeld && deleteHovered
+										? commonMessages.deleteImmediatelyLabel
+										: commonMessages.deleteLabel,
+								)
 					"
 					:disabled="isDisabled"
 					@click="emit('delete', $event)"

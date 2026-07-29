@@ -2,17 +2,18 @@
 	<ContentDiffModal
 		ref="diffModal"
 		:header="formatMessage(messages.updateToPlay)"
-		:admonition-header="formatMessage(messages.updateRequired)"
 		:description="
 			instance ? formatMessage(messages.updateRequiredDescription, { name: instance.name }) : ''
 		"
 		:diffs="normalizedDiffs"
+		:version-date="versionDate"
+		:show-external-warnings="showExternalWarnings"
+		:external-warning-description="formatMessage(messages.externalWarningDescription)"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
-		:show-report-button="true"
+		:removed-label="formatMessage(messages.removed)"
 		@confirm="handleUpdate"
 		@cancel="handleDecline"
-		@report="handleReport"
 	/>
 </template>
 
@@ -26,12 +27,12 @@ import {
 	defineMessages,
 	useVIntl,
 } from '@modrinth/ui'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
-import { update_managed_modrinth_version } from '@/helpers/profile'
+import { wait_for_install_job } from '@/helpers/install'
+import { update_managed_modrinth_version } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { injectServerInstall } from '@/providers/server-install'
 
@@ -76,6 +77,15 @@ const { formatMessage } = useVIntl()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
+const { showExternalWarnings } = defineProps<{
+	showExternalWarnings?: boolean
+}>()
+
+const emit = defineEmits<{
+	cancel: []
+	complete: []
+}>()
+
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
 const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
@@ -83,14 +93,21 @@ const diffs = ref<DependencyDiff[]>([])
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Version | null>(null)
 
-const normalizedDiffs = computed<ContentDiffItem[]>(() =>
-	diffs.value.map((diff) => ({
+const normalizedDiffs = computed<ContentDiffItem[]>(() => {
+	return diffs.value.map((diff) => ({
 		type: diff.type,
+		external: Boolean(diff.fileName && !diff.project),
 		projectName: diff.project?.title,
 		fileName: diff.fileName,
 		currentVersionName: diff.currentVersion?.version_number,
 		newVersionName: diff.newVersion?.version_number,
-	})),
+	}))
+})
+
+const versionDate = computed(() =>
+	modpackVersion.value?.date_published
+		? dayjs(modpackVersion.value.date_published).format('MMMM D, YYYY')
+		: undefined,
 )
 
 async function computeDependencyDiffs(
@@ -189,6 +206,10 @@ async function computeDependencyDiffs(
 			}
 		})
 		.sort((a, b) => {
+			const aExternal = Boolean(a.fileName && !a.project)
+			const bExternal = Boolean(b.fileName && !b.project)
+			if (aExternal !== bExternal) return aExternal ? -1 : 1
+
 			const typeOrder = { added: 0, updated: 1, removed: 2 }
 			const typeCompare = typeOrder[a.type] - typeOrder[b.type]
 			if (typeCompare !== 0) return typeCompare
@@ -202,15 +223,15 @@ async function computeDependencyDiffs(
 }
 
 async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
-	if (!inst.linked_data) return null
-	if (!modpackVersionId.value || !inst.linked_data.version_id) return null
+	if (!inst.link) return null
+	if (!modpackVersionId.value || !inst.link.version_id) return null
 
 	try {
-		// For server projects, linked_data.project_id is the server project but
-		// linked_data.version_id references a content modpack version from a different project.
-		// Detect this by comparing the version's project_id with linked_data.project_id.
+		// For server projects, link.project_id is the server project but
+		// link.version_id references a content modpack version from a different project.
+		// Detect this by comparing the version's project_id with link.project_id.
 		modpackVersion.value = await get_version(modpackVersionId.value, 'bypass')
-		const instanceModpackVersion = await get_version(inst.linked_data.version_id, 'bypass')
+		const instanceModpackVersion = await get_version(inst.link.version_id, 'bypass')
 
 		// Compute dependency diffs between current and latest version
 		if (instanceModpackVersion && modpackVersion.value) {
@@ -226,42 +247,25 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 	return null
 }
 
-watch(
-	() => instance.value,
-	async (newInstance) => {
-		if (!newInstance) return
-		const result = await checkUpdateAvailable(newInstance)
-		diffs.value = result || []
-	},
-	{ immediate: true, deep: true },
-)
-
 async function handleUpdate() {
-	hide()
-	const serverProjectId = instance.value?.linked_data?.project_id
+	const serverProjectId = instance.value?.link?.project_id
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
 		if (modpackVersionId.value && instance.value) {
-			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
+			const job = await update_managed_modrinth_version(instance.value.id, modpackVersionId.value)
+			await wait_for_install_job(job.job_id)
 			await onUpdateComplete.value()
 		}
 	} catch (error) {
 		console.error('Error updating instance:', error)
 	} finally {
 		if (serverProjectId) stopInstallingServer(serverProjectId)
-	}
-}
-
-function handleReport() {
-	if (instance.value?.linked_data?.project_id) {
-		openUrl(
-			`https://modrinth.com/report?item=project&itemID=${instance.value.linked_data.project_id}`,
-		)
+		emit('complete')
 	}
 }
 
 function handleDecline() {
-	hide()
+	emit('cancel')
 }
 
 function show(
@@ -272,8 +276,15 @@ function show(
 ) {
 	instance.value = instanceVal
 	modpackVersionId.value = modpackVersionIdVal
+	modpackVersion.value = null
+	diffs.value = []
 	onUpdateComplete.value = callback
 	diffModal.value?.show(e)
+	void checkUpdateAvailable(instanceVal).then((result) => {
+		if (instance.value?.id === instanceVal.id && modpackVersionId.value === modpackVersionIdVal) {
+			diffs.value = result || []
+		}
+	})
 }
 
 function hide() {
@@ -285,23 +296,25 @@ const messages = defineMessages({
 		id: 'app.modal.update-to-play.header',
 		defaultMessage: 'Update to play',
 	},
-	updateRequired: {
-		id: 'app.modal.update-to-play.update-required',
-		defaultMessage: 'Update required',
-	},
 	updateRequiredDescription: {
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
-			'An update is required to play {name}. Please update to the latest version to launch the game.',
+			'An update is required to play {name}. Please update to latest version to launch the game.',
+	},
+	removed: {
+		id: 'app.modal.update-to-play.removed',
+		defaultMessage: 'Removed',
+	},
+	externalWarningDescription: {
+		id: 'app.modal.update-to-play.server-modpack-unknown-files-description',
+		defaultMessage:
+			'This server modpack update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust.',
 	},
 })
 
 const hasUpdate = computed(() => {
-	if (!instance.value?.linked_data) return false
-	return (
-		modpackVersionId.value != null &&
-		modpackVersionId.value !== instance.value.linked_data.version_id
-	)
+	if (!instance.value?.link) return false
+	return modpackVersionId.value != null && modpackVersionId.value !== instance.value.link.version_id
 })
 
 defineExpose({ show, hide, hasUpdate })

@@ -7,30 +7,37 @@
 //!   requests, you have to zip together M arrays of N elements
 //!   - this makes it inconvenient to have separate endpoints
 
-mod facets;
+use xredis::RedisPool;
+
+pub mod facets;
 mod metrics;
-mod old;
+pub mod old;
 
-use std::{collections::HashMap, num::NonZeroU64};
+use std::{
+    collections::{HashMap, HashSet},
+    num::NonZeroU64,
+};
 
-use crate::database::PgPool;
+use crate::database::{PgPool, models::DBUserId};
 use actix_web::{HttpRequest, post, web};
+use ariadne::ids::UserId;
 use chrono::{DateTime, TimeDelta, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::{
-        AuthenticationError, checks::filter_visible_version_ids,
+        AuthenticationError,
+        checks::{filter_visible_project_ids, filter_visible_version_ids},
         get_user_from_headers,
     },
     database::{
         self, DBProject,
+        models::version_item::VersionQueryResult,
         models::{
             DBAffiliateCode, DBAffiliateCodeId, DBProjectId, DBUser, DBVersion,
             DBVersionId,
         },
-        redis::RedisPool,
     },
     models::{
         ids::{AffiliateCodeId, ProjectId, VersionId},
@@ -38,16 +45,17 @@ use crate::{
         projects::ProjectStatus,
         teams::ProjectPermissions,
         threads::MessageBody,
-        v3::analytics::DownloadReason,
+        v3::{analytics::DownloadReason, projects::Project, users::User},
     },
     queue::session::AuthQueue,
     routes::ApiError,
 };
 
+#[cfg(test)]
 pub(crate) use metrics::normalize_download_source;
 pub use metrics::*;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(fetch_analytics);
     cfg.configure(facets::config);
     cfg.configure(old::config);
@@ -108,6 +116,10 @@ pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
 /// Maximum number of [`TimeSlice`]s in a [`GetResponse`], controlled by
 /// [`TimeRange::resolution`].
 pub const MAX_TIME_SLICES: usize = 1024;
+pub(crate) const UNKNOWN_LOADER: &str = "unknown";
+pub(crate) const UNKNOWN_COUNTRY: &str = "XX";
+pub(crate) const COUNTRY_PRIVACY_FLOOR: u64 = 50;
+pub(crate) const COUNTRY_PLAYTIME_PRIVACY_FLOOR_SECONDS: u64 = 4 * 60 * 60;
 
 // response
 
@@ -118,6 +130,12 @@ pub struct GetResponse {
     /// time interval of metrics collection. The number of slices is determined
     /// by [`GetRequest::time_range`].
     pub metrics: Vec<TimeSlice>,
+    /// Project metadata for projects referenced in the response metrics.
+    #[serde(default)]
+    pub projects: HashMap<ProjectId, Project>,
+    /// User metadata for users referenced in the response metrics.
+    #[serde(default)]
+    pub users: HashMap<UserId, User>,
     /// List of events associated with projects that were requested.
     pub project_events: Vec<ProjectAnalyticsEvent>,
 }
@@ -155,8 +173,10 @@ pub enum ProjectAnalyticsEventKind {
 
 // logic
 
-/// Fetches analytics data for the authorized user's projects.
+/// Fetch analytics data.  
 #[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
     responses((status = OK, body = inline(GetResponse))),
 )]
 #[post("")]
@@ -277,7 +297,7 @@ pub async fn fetch_analytics(
         .filter(|version| {
             visible_version_ids.contains(&version.inner.id)
                 && version.inner.date_published >= req.time_range.start
-                && version.inner.date_published <= req.time_range.end
+                && version.inner.date_published < req.time_range.end
         })
         .map(|version| ProjectAnalyticsEvent {
             project_id: version.inner.project_id.into(),
@@ -305,14 +325,18 @@ pub async fn fetch_analytics(
             .into_iter()
             .map(|code| code.id)
             .collect::<Vec<_>>();
+    let project_loaders = project_loader_map(&parent_version_data);
 
     let mut query_clickhouse_cx = QueryClickhouseContext {
         clickhouse: &clickhouse,
+        pool: &pool,
+        redis: &redis,
         req: &req,
         time_slices: &mut time_slices,
         project_ids: &project_ids,
         parent_version_ids: &parent_version_ids,
         affiliate_code_ids: &affiliate_code_ids,
+        project_loaders: &project_loaders,
     };
 
     if let Some(metrics) = &req.return_metrics.project_views {
@@ -338,10 +362,29 @@ pub async fn fetch_analytics(
             .await?;
     }
 
-    if req.return_metrics.project_revenue.is_some() {
+    if let Some(metrics) = &req.return_metrics.project_revenue {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
+
+        let user_id_bucket_project_ids = sqlx::query!(
+            "
+            SELECT m.id
+            FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id
+            WHERE
+                m.id = ANY($1)
+                AND tm.user_id = $2
+                AND tm.accepted
+            ",
+            &project_id_values,
+            DBUserId::from(user.id).0,
+        )
+        .fetch_all(&**pool)
+        .await?
+        .into_iter()
+        .map(|row| row.id)
+        .collect::<Vec<_>>();
 
         metrics::fetch_project_revenue(
             &pool,
@@ -349,6 +392,9 @@ pub async fn fetch_analytics(
             &req,
             num_time_slices,
             &project_id_values,
+            &user_id_bucket_project_ids,
+            user.role.is_mod(),
+            metrics,
         )
         .await?;
     }
@@ -381,8 +427,14 @@ pub async fn fetch_analytics(
         .await?;
     }
 
+    let projects =
+        fetch_response_projects(&mut time_slices, &user, &pool, &redis).await?;
+    let users = fetch_response_users(&time_slices, &pool, &redis).await?;
+
     Ok(web::Json(GetResponse {
         metrics: time_slices,
+        projects,
+        users,
         project_events,
     }))
 }
@@ -395,12 +447,178 @@ pub(crate) fn none_if_zero_version_id(v: DBVersionId) -> Option<VersionId> {
     if v.0 == 0 { None } else { Some(v.into()) }
 }
 
-pub(crate) fn condense_country(country: String, count: u64) -> String {
-    // Every country under '50' (view or downloads) should be condensed into 'XX'
-    if count < 50 {
-        "XX".to_string()
+pub(crate) fn apply_country_privacy(
+    country: &mut Option<String>,
+    country_filter_applied: bool,
+    count: u64,
+    floor: u64,
+) -> bool {
+    if count >= floor {
+        return true;
+    }
+
+    if country_filter_applied {
+        return false;
+    }
+
+    if country.is_some() {
+        *country = Some(UNKNOWN_COUNTRY.to_string());
+    }
+
+    true
+}
+
+pub(crate) fn project_loader_map(
+    versions: &[VersionQueryResult],
+) -> HashMap<DBProjectId, HashSet<String>> {
+    let mut loaders = HashMap::<DBProjectId, HashSet<String>>::new();
+
+    for version in versions {
+        loaders
+            .entry(version.inner.project_id)
+            .or_default()
+            .extend(version.loaders.iter().cloned());
+    }
+
+    loaders
+}
+
+pub(crate) fn normalize_loader_for_project(
+    loader: String,
+    project_id: DBProjectId,
+    project_loaders: &HashMap<DBProjectId, HashSet<String>>,
+) -> String {
+    if loader.is_empty() {
+        return loader;
+    }
+
+    let loader_is_valid = project_loaders
+        .get(&project_id)
+        .is_some_and(|loaders| loaders.contains(&loader));
+
+    if loader_is_valid {
+        loader
     } else {
-        country
+        UNKNOWN_LOADER.to_string()
+    }
+}
+
+async fn fetch_response_projects(
+    time_slices: &mut [TimeSlice],
+    user: &crate::models::users::User,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<HashMap<ProjectId, Project>, ApiError> {
+    let mut project_ids = HashSet::<DBProjectId>::new();
+
+    for time_slice in &*time_slices {
+        for data in &time_slice.0 {
+            let AnalyticsData::Project(project) = data else {
+                continue;
+            };
+
+            let source_project_id = DBProjectId::from(project.source_project);
+            if source_project_id.0 != 0 {
+                project_ids.insert(source_project_id);
+            }
+            if let ProjectMetrics::Downloads(downloads) = &project.metrics
+                && let Some(dependent_project_id) =
+                    downloads.dependent_project_id
+            {
+                project_ids.insert(dependent_project_id.into());
+            }
+        }
+    }
+
+    let project_ids = project_ids.into_iter().collect::<Vec<_>>();
+    let projects = DBProject::get_many_ids(&project_ids, pool, redis).await?;
+    let visible_project_ids = filter_visible_project_ids(
+        projects.iter().map(|project| &project.inner).collect(),
+        &Some(user.clone()),
+        pool,
+        false,
+    )
+    .await?
+    .into_iter()
+    .collect::<HashSet<_>>();
+
+    filter_response_project_ids(time_slices, &visible_project_ids);
+
+    Ok(projects
+        .into_iter()
+        .filter(|project| visible_project_ids.contains(&project.inner.id))
+        .map(|project| {
+            let project_id = project.inner.id.into();
+            (project_id, Project::from(project))
+        })
+        .collect())
+}
+
+async fn fetch_response_users(
+    time_slices: &[TimeSlice],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<HashMap<UserId, User>, ApiError> {
+    let mut user_ids = HashSet::<DBUserId>::new();
+
+    for time_slice in time_slices {
+        for data in &time_slice.0 {
+            let AnalyticsData::Project(project) = data else {
+                continue;
+            };
+
+            if let ProjectMetrics::Revenue(revenue) = &project.metrics
+                && let Some(user_id) = revenue.user_id
+            {
+                user_ids.insert(user_id.into());
+            }
+        }
+    }
+
+    let user_ids = user_ids.into_iter().collect::<Vec<_>>();
+    if user_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    let users = DBUser::get_many_ids(&user_ids, pool, redis).await?;
+
+    Ok(users
+        .into_iter()
+        .map(|user| {
+            let user_id = UserId::from(user.id);
+            (user_id, User::from(user))
+        })
+        .collect())
+}
+
+fn filter_response_project_ids(
+    time_slices: &mut [TimeSlice],
+    visible_project_ids: &HashSet<DBProjectId>,
+) {
+    for time_slice in time_slices {
+        time_slice.0.retain_mut(|data| {
+            let AnalyticsData::Project(project) = data else {
+                return true;
+            };
+
+            let source_project_id = DBProjectId::from(project.source_project);
+            if source_project_id.0 != 0
+                && !visible_project_ids.contains(&source_project_id)
+            {
+                return false;
+            }
+
+            if let ProjectMetrics::Downloads(downloads) = &mut project.metrics
+                && let Some(dependent_project_id) =
+                    downloads.dependent_project_id
+                && !visible_project_ids
+                    .contains(&DBProjectId::from(dependent_project_id))
+            {
+                downloads.dependent_project_id = None;
+            }
+
+            true
+        });
     }
 }
 
@@ -423,7 +641,8 @@ async fn fetch_project_status_change_events(
         WHERE
             t.mod_id = ANY($1)
             AND tm.body->>'type' = 'status_change'
-            AND tm.created BETWEEN $2 AND $3
+            AND tm.created >= $2
+            AND tm.created < $3
         "#,
         &project_id_values,
         time_range.start,
@@ -457,11 +676,14 @@ async fn fetch_project_status_change_events(
 
 pub(crate) struct QueryClickhouseContext<'a> {
     pub(crate) clickhouse: &'a clickhouse::Client,
+    pub(crate) pool: &'a PgPool,
+    pub(crate) redis: &'a RedisPool,
     pub(crate) req: &'a GetRequest,
     pub(crate) time_slices: &'a mut [TimeSlice],
     pub(crate) project_ids: &'a [DBProjectId],
     pub(crate) parent_version_ids: &'a [DBVersionId],
     pub(crate) affiliate_code_ids: &'a [DBAffiliateCodeId],
+    pub(crate) project_loaders: &'a HashMap<DBProjectId, HashSet<String>>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -472,11 +694,11 @@ pub(crate) struct ClickhouseQueryParams {
 }
 
 pub(crate) enum ClickhouseFilterParam<'a> {
-    String(&'static str, &'a [String]),
+    String(&'a [String]),
     Bool(&'static str, &'a [bool]),
-    VersionId(&'static str, &'a [VersionId]),
-    AffiliateCodeId(&'static str, &'a [AffiliateCodeId]),
-    DownloadReason(&'static str, &'a [DownloadReason]),
+    VersionId(&'a [VersionId]),
+    AffiliateCodeId(&'a [AffiliateCodeId]),
+    DownloadReason(&'a [DownloadReason]),
 }
 
 impl ClickhouseFilterParam<'_> {
@@ -485,7 +707,7 @@ impl ClickhouseFilterParam<'_> {
         query: clickhouse::query::Query,
     ) -> clickhouse::query::Query {
         match self {
-            Self::String(name, values) => query.param(name, values),
+            Self::String(values) => query.bind(values),
             Self::Bool(name, values) => {
                 let value = match values {
                     [false] => 0,
@@ -494,36 +716,30 @@ impl ClickhouseFilterParam<'_> {
                 };
                 query.param(name, value)
             }
-            Self::VersionId(name, values) => {
+            Self::VersionId(values) => {
                 let values = values
                     .iter()
                     .map(|id| DBVersionId::from(*id))
                     .collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
-            Self::AffiliateCodeId(name, values) => {
+            Self::AffiliateCodeId(values) => {
                 let values = values
                     .iter()
                     .map(|id| DBAffiliateCodeId::from(*id))
                     .collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
-            Self::DownloadReason(name, values) => {
+            Self::DownloadReason(values) => {
                 let values =
                     values.iter().map(ToString::to_string).collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
         }
     }
 }
 
 impl ClickhouseQueryParams {
-    pub(crate) const PROJECT_IDS: Self = Self {
-        project_ids: true,
-        parent_version_ids: false,
-        affiliate_code_ids: false,
-    };
-
     pub(crate) const fn empty() -> Self {
         Self {
             project_ids: false,
@@ -568,13 +784,13 @@ where
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len());
     if params.project_ids {
-        query = query.param("project_ids", cx.project_ids);
+        query = query.bind(cx.project_ids);
     }
     if params.parent_version_ids {
-        query = query.param("parent_version_ids", cx.parent_version_ids);
+        query = query.bind(cx.parent_version_ids);
     }
     if params.affiliate_code_ids {
-        query = query.param("affiliate_code_ids", cx.affiliate_code_ids);
+        query = query.bind(cx.affiliate_code_ids);
     }
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
@@ -600,6 +816,9 @@ pub(crate) fn add_to_time_slice(
     bucket: usize,
     data: AnalyticsData,
 ) -> Result<(), ApiError> {
+    // Bucketed analytics queries must filter time ranges as `[start, end)`.
+    // `widthBucket` returns `num_time_slices + 1` for values at or after
+    // `end`, which is outside the response slice array.
     // row.recorded <  time_range_start => bucket = 0
     // row.recorded >= time_range_end   => bucket = num_time_slices
     //   (note: this is out of range of `time_slices`!)
@@ -747,6 +966,45 @@ mod tests {
     }
 
     #[test]
+    fn country_privacy_floor_suppresses_small_constrained_buckets() {
+        let mut country = None;
+        assert!(apply_country_privacy(
+            &mut country,
+            false,
+            1,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, None);
+
+        let mut country = Some("US".into());
+        assert!(apply_country_privacy(
+            &mut country,
+            false,
+            49,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, Some("XX".into()));
+
+        let mut country = Some("US".into());
+        assert!(!apply_country_privacy(
+            &mut country,
+            true,
+            49,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, Some("US".into()));
+
+        let mut country = Some("US".into());
+        assert!(apply_country_privacy(
+            &mut country,
+            true,
+            50,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, Some("US".into()));
+    }
+
+    #[test]
     fn response_format() {
         let test_project_1 = ProjectId(123);
         let test_project_2 = ProjectId(456);
@@ -775,10 +1033,13 @@ mod tests {
                 TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
                     source_project: test_project_3,
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        user_id: None,
                         revenue: Decimal::new(20000, 2),
                     }),
                 })]),
             ],
+            projects: HashMap::new(),
+            users: HashMap::new(),
             project_events: vec![],
         };
         let target = json!({
@@ -805,6 +1066,8 @@ mod tests {
                     }
                 ]
             ],
+            "projects": {},
+            "users": {},
             "project_events": []
         });
 

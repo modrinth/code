@@ -8,6 +8,420 @@
   "admin.billing.error.not-found": {
     "message": "المستخدم غير موجود"
   },
+  "ads-consent.accept": {
+    "message": "قبول الكل"
+  },
+  "ads-consent.manage": {
+    "message": "إدارة التفضيلات"
+  },
+  "ads-consent.reject": {
+    "message": "رفض الكل"
+  },
+  "analytics.action.add": {
+    "message": "إضافة"
+  },
+  "analytics.action.cancel": {
+    "message": "إلغاء"
+  },
+  "analytics.action.refresh": {
+    "message": "تحديث"
+  },
+  "analytics.action.reset": {
+    "message": "إعادة ضبط"
+  },
+  "analytics.breakdown.country": {
+    "message": "الدولة"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "يعتمد على"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "مشروع تابع"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "نوع المشروع التابع"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "سبب التنزيل"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "مصدر التنزيل"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "إصدار اللُعبة"
+  },
+  "analytics.breakdown.generic": {
+    "message": "التفاصيل"
+  },
+  "analytics.breakdown.loader": {
+    "message": "المحمل"
+  },
+  "analytics.breakdown.members": {
+    "message": "عضو"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "تحقيق الدخل"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "لا توجد أعطال"
+  },
+  "analytics.breakdown.project": {
+    "message": "المشروع"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "حالة المشروع"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "إصدار المشروع"
+  },
+  "analytics.breakdown.selected": {
+    "message": "التفصيل حسب {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "أظهار الكل"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "عرض محدود"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "عرض أفضل 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ساعة"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "نشط {count} "
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "التعليقات التوضيحية"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "عناصر التحكم في الرسوم البيانية التحليلية، {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "عناصر التحكم"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "عناصر التحكم في الرسوم البيانية التحليلية"
+  },
+  "analytics.chart.controls.display": {
+    "message": "عرض"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "فعاليات Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "لا توجد حالات Modrinth في الرسوم البيانية."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "لا توجد أحداث للمشروع في الرسم البياني."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "الفترة السابقة"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "فعاليات المشروع"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "النسبة"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "اختر عناصر من الجدول أدناه لتصور بياناتك."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# حدث تحليلي} other {# أحداث تحليلية}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "انظر الإعلان"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "عرض تفاصيل التحليلات المتعلقة بتحقيق الدخل"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "لا تُحتسب في عملية تحقيق الدخل سوى المشاهدات وعمليات التنزيل التي تتم عبر Modrinth، ويجب على المستخدمين تسجيل الدخول لإجراء عمليات التنزيل."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "تفاصيل التحليلات المُدرة للدخل"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (السابق)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "قد يؤدي عرض جميع الأسطر المحددة من الجدول إلى انخفاض أداء الصفحة."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "هل تُعرض جميع {count} الأسطر في الرسم البياني؟"
+  },
+  "analytics.chart.table-selection.all": {
+    "message": "يتم عرض جميع {itemType, select, project {{count, plural, one {مشروع} other {مشاريع}}} country {{count, plural, one {دولة} other {دول}}} monetization {{count, plural, one {قيمة الربح} other {قيم الربح}}} downloadSource {{count, plural, one {مصدر تحميل} other {مصادر تحميل}}} downloadReason {{count, plural, one {سبب تحميل} other {أسباب تحميل}}} member {{count, plural, one {عضو} other {أعضاء}}} projectVersion {{count, plural, one {نسخة مشروع} other {نسخ مشاريع}}} loader {{count, plural, one {محمل} other {محملات}}} gameVersion {{count, plural, one {نسخة لعبة} other {نسخ ألعاب}}} other {{count, plural, one {عنصر} other {عناصر}}}} من الجدول"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "يتم عرض {count} {itemType, select, project {{count, plural, one {مشروع} other {مشاريع}}} country {{count, plural, one {دولة} other {دول}}} monetization {{count, plural, one {قيمة الربح} other {قيم الربح}}} downloadSource {{count, plural, one {مصدر تحميل} other {مصادر تحميل}}} downloadReason {{count, plural, one {سبب تحميل} other {أسباب تحميل}}} member {{count, plural, one {عضو} other {أعضاء}}} projectVersion {{count, plural, one {نسخة مشروع} other {نسخ مشاريع}}} loader {{count, plural, one {محمل} other {محملات}}} gameVersion {{count, plural, one {نسخة لعبة} other {نسخ ألعاب}}} other {{count, plural, one {عنصر} other {عناصر}}}} من الجدول"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "يتم عرض {limit} {itemType, select, project {{limit, plural, one {مشروع} other {مشاريع}}} country {{limit, plural, one {دولة} other {دول}}} monetization {{limit, plural, one {قيمة الربح} other {قيم الربح}}} downloadSource {{limit, plural, one {مصدر تحميل} other {مصادر تحميل}}} downloadReason {{limit, plural, one {سبب تحميل} other {أسباب تحميل}}} member {{limit, plural, one {عضو} other {أعضاء}}} projectVersion {{limit, plural, one {نسخة مشروع} other {نسخ مشاريع}}} loader {{limit, plural, one {محمل} other {محملات}}} gameVersion {{limit, plural, one {نسخة لعبة} other {نسخ ألعاب}}} other {{limit, plural, one {عنصر} other {عناصر}}}} من الجدول"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "يتم عرض أعلى {count} {itemType, select, project {{count, plural, one {مشروع} other {مشاريع}}} country {{count, plural, one {دولة} other {دول}}} monetization {{count, plural, one {قيمة الربح} other {قيم الربح}}} downloadSource {{count, plural, one {مصدر تحميل} other {مصادر تحميل}}} downloadReason {{count, plural, one {سبب تحميل} other {أسباب تحميل}}} member {{count, plural, one {عضو} other {أعضاء}}} projectVersion {{count, plural, one {نسخة مشروع} other {نسخ مشاريع}}} loader {{count, plural, one {محمل} other {محملات}}} gameVersion {{count, plural, one {نسخة لعبة} other {نسخ ألعاب}}} other {{count, plural, one {عنصر} other {عناصر}}}} من الجدول"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "يعتمد على {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} يعتمد على {dependencyProject}، {version}"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# يوم} other {# أيام}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# ساعة} other {# ساعات}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# دقيقة} other {# دقائق}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "إخفاء {name} في الرسم البياني"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "تلميح الرسم البياني مثبت"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "مثبت"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(السابق)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "إظهار {name} في الرسم البياني"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "مجموع"
+  },
+  "analytics.chart.view.area": {
+    "message": "المنطقة"
+  },
+  "analytics.chart.view.bar": {
+    "message": "شريط"
+  },
+  "analytics.chart.view.line": {
+    "message": "خط"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "التبعية"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "مستقل"
+  },
+  "analytics.download-reason.update": {
+    "message": "تحديث"
+  },
+  "analytics.download-source.app": {
+    "message": "تطبيق Modrinth"
+  },
+  "analytics.download-source.website": {
+    "message": "موقع Modrinth الإلكتروني"
+  },
+  "analytics.downloads.suffix": {
+    "message": "التنزيلات"
+  },
+  "analytics.empty.no-data": {
+    "message": "لا توجد بيانات متاحة"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "لا توجد بيانات متاحة للتحليلات"
+  },
+  "analytics.empty.no-projects": {
+    "message": "لا توجد مشاريع متاحة"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "لا توجد مشاريع متاحة للتحليلات"
+  },
+  "analytics.empty.select-project": {
+    "message": "حدد مشروعًا واحدًا على الأقل لعرض البيانات"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "نوع إصدار اللعبة"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "الكل"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "إصدار نهائي"
+  },
+  "analytics.filter.search.countries": {
+    "message": "البحث عن الدول..."
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "البحث عن المشاريع..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "البحث عن مصادر التنزيل..."
+  },
+  "analytics.filter.search.members": {
+    "message": "البحث عن الأعضاء..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "البحث عن إصدارات المشاريع..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "البحث عن الإصدارات..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "التنزيلات بمرور الوقت"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "وقت اللعب بمرور الوقت"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "الإيرادات بمرور الوقت"
+  },
+  "analytics.graph.title.views": {
+    "message": "المشاهدات بمرور الوقت"
+  },
+  "analytics.group-by.1h": {
+    "message": "ساعة 1"
+  },
+  "analytics.group-by.6h": {
+    "message": "6 ساعات"
+  },
+  "analytics.group-by.date": {
+    "message": "التاريخ"
+  },
+  "analytics.group-by.day": {
+    "message": "يوم"
+  },
+  "analytics.group-by.month": {
+    "message": "شهر"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "التجميع حسب اليوم"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "التجميع حسب الساعة"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "التجميع حسب الشهر"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "التجميع كل 6 ساعات"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "التجميع حسب الأسبوع"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "التجميع حسب السنة"
+  },
+  "analytics.group-by.week": {
+    "message": "الأسبوع"
+  },
+  "analytics.group-by.year": {
+    "message": "السنة"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "جلب البيانات..."
+  },
+  "analytics.options.loading": {
+    "message": "تحميل..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "المشروع قُبل"
+  },
+  "analytics.project-event.project-private": {
+    "message": "وضع المشروع خاص"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "تم تغيير حالة المشروع"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "المشروع غير مُدرج"
+  },
+  "analytics.project-event.version-released": {
+    "message": ""
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "تم رفع الإصدار"
+  },
+  "analytics.project-status.approved": {
+    "message": "تمت الموافقة"
+  },
+  "analytics.project-status.archived": {
+    "message": "مؤرشف"
+  },
+  "analytics.project-status.draft": {
+    "message": "مسودة"
+  },
+  "analytics.project-status.other": {
+    "message": "أخرى"
+  },
+  "analytics.project-status.private": {
+    "message": "خاص"
+  },
+  "analytics.project-status.rejected": {
+    "message": "رُفض المشروع"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "غير مُدرج"
+  },
+  "analytics.project-status.withheld": {
+    "message": "محجوب"
+  },
+  "analytics.project.all": {
+    "message": "جميع المشاريع"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# مشروع} other {# مشاريع}}"
+  },
+  "analytics.project.icon-alt": {
+    "message": "أيقونة {name}"
+  },
+  "analytics.project.select": {
+    "message": "تحديد المشاريع"
+  },
+  "analytics.project.user": {
+    "message": "مشاريع {username}"
+  },
+  "analytics.project.your": {
+    "message": "مشاريعك"
+  },
+  "analytics.query.filter.add": {
+    "message": "إضافة عامل تصفية"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "التفصيل:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "مجمّع حسب"
+  },
+  "analytics.query.label.project": {
+    "message": "المشروع:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "الفترة الزمنية:"
+  },
+  "analytics.stat.downloads": {
+    "message": "التنزيلات"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "المشاهدات وعمليات التنزيل التي تتم عبر Modrinth فقط هي المؤهلة لتحقيق الأرباح، ويجب أن تجتاز عملية تصفية لمنع الاحتيال. كما تتطلب عمليات التنزيل من تطبيق Modrinth تسجيل دخول المستخدم. ونظرًا لأن جميع المشاريع لديها نسبة متشابهة من التنزيلات القابلة لتحقيق الأرباح، فلن يتغير إيرادك بشكل ملحوظ إذا تم احتساب جميع عمليات التنزيل."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "معرفة المزيد"
+  },
+  "analytics.stat.playtime": {
+    "message": "وقت اللعب"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} ساعة"
+  },
+  "analytics.stat.views": {
+    "message": "المشاهدات"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "بحث..."
+  },
   "app-marketing.download.description": {
     "message": "تطبيقنا لسطح المكتب متاح على جميع المنصات، اختر الإصدار الذي تريده."
   },
@@ -122,9 +536,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ ميغابايت"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ ميغابايت"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 ميغابايت"
   },
@@ -221,6 +632,9 @@
   "auth.authorize.error.no-redirect-url": {
     "message": "لم يتم العثور على وجهة إعادة التوجيه في الاستجابة"
   },
+  "auth.authorize.errro-title": {
+    "message": "حدثَ خطأ ما"
+  },
   "auth.authorize.redirect-url": {
     "message": "ستتم إعادة توجيهك إلى <redirect-url>{url}</redirect-url>"
   },
@@ -257,50 +671,20 @@
   "auth.reset-password.title.long": {
     "message": "تغيير كلمة المرور"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "يرجى إدخال رمز التحقق الثنائي للمتابعة."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "أدخل رمز التحقق الثنائي"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "أدخل الرمز..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>هل نسيت كلمة المرور؟</forgot-password-link> • <create-account-link>إنشاء حساب</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "تسجيل الدخول باستخدام"
   },
   "auth.sign-in.title": {
     "message": "تسجيل الدخول"
   },
-  "auth.sign-in.use-password": {
-    "message": "أو استخدم كلمة المرور"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "إنشاء حساب"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link> الخاصة بها."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "كلمتا المرور غير متطابقتين!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "هل لديك حساب بالفعل؟"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "اشترك لتصلك التحديثات حول مودرنث"
-  },
   "auth.sign-up.title": {
     "message": "إنشاء حساب"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "أو أنشئ حسابًا بنفسك"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "سجّل باستخدام"
   },
   "auth.verify-email.action.account-settings": {
     "message": "إعدادات الحساب"
@@ -331,21 +715,6 @@
   },
   "auth.verify-email.title": {
     "message": "تحقّق من البريد الإلكتروني"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "اشترك في التحديثات حول مودرنث"
-  },
-  "auth.welcome.description": {
-    "message": "أنت الآن جزء من مجتمع رائع من المبدعين والمستكشفين الذين يقومون بالفعل بإنشاء المودات المذهلة، تثبيتها، والبقاء على اطلاع بآخر التحديثات."
-  },
-  "auth.welcome.label.tos": {
-    "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "مرحبًا بك في مودرنث!"
-  },
-  "auth.welcome.title": {
-    "message": "مرحبًا"
   },
   "collection.button.edit-icon": {
     "message": "تعديل الأيقونة"
@@ -860,18 +1229,6 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "يرجى مراجعة بيانات تعريف البيئة"
   },
-  "dashboard.projects.sort.ascending": {
-    "message": "صعوداً"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "نزولا"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "الإسم"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "الحالة"
-  },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"
   },
@@ -901,9 +1258,6 @@
   },
   "dashboard.revenue.stats.withdrawn": {
     "message": "تم سحبه "
-  },
-  "dashboard.revenue.tos": {
-    "message": "بتحميل المشاريع إلى مودرينث وسحب الأموال من حسابك، فإنك توافق على <terms-link> المكافآت. تعرّف على المزيد حول </info-link> برنامج المكافآت. "
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "قم بالتنزيل كملف CSV "
@@ -1123,9 +1477,6 @@
   },
   "frog.title": {
     "message": "ضفدع"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "متاح في أمريكا الشمالية، أوروبا، و جنوب شرق اۤسيا لتغطية أوسع."
   },
   "hosting-marketing.billing.monthly": {
     "message": "ادفع شهريا"
@@ -1486,9 +1837,6 @@
   },
   "muralpay.placeholder.cuit-cuil": {
     "message": "أدخل CUIT أو CUIL"
-  },
-  "profile.user-id": {
-    "message": "معرّف المستخدم: {id}"
   },
   "project-member-header.success-decline": {
     "message": "لقد رفضت دعوة الفريق"

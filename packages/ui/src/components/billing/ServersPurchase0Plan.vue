@@ -81,6 +81,11 @@ const messages = defineMessages({
 		id: 'servers.purchase.step.plan.your-current-plan',
 		defaultMessage: 'Your current plan',
 	},
+	billedInterval: {
+		id: 'servers.purchase.step.plan.billed',
+		defaultMessage:
+			'billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}',
+	},
 })
 
 const isSameAsExistingPlan = computed(() => {
@@ -203,7 +208,8 @@ function selectCustom() {
 					</span>
 					<span class="text-sm">
 						/ month<template v-if="selectedInterval !== 'monthly'"
-							>, billed {{ selectedInterval }}</template
+							>,
+							{{ formatMessage(messages.billedInterval, { interval: selectedInterval }) }}</template
 						>
 					</span>
 				</div>
@@ -263,7 +269,10 @@ function selectCustom() {
 						</span>
 						<span class="text-sm">
 							/ month<template v-if="selectedInterval !== 'monthly'"
-								>, billed {{ selectedInterval }}</template
+								>,
+								{{
+									formatMessage(messages.billedInterval, { interval: selectedInterval })
+								}}</template
 							>
 						</span>
 					</div>
@@ -310,7 +319,8 @@ function selectCustom() {
 					</span>
 					<span class="text-sm">
 						/ month<template v-if="selectedInterval !== 'monthly'"
-							>, billed {{ selectedInterval }}</template
+							>,
+							{{ formatMessage(messages.billedInterval, { interval: selectedInterval }) }}</template
 						>
 					</span>
 				</div>

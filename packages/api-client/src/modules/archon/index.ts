@@ -1,3 +1,4 @@
+export * from './actions/v1'
 export * from './backups/v1'
 export * from './backups-queue/v1'
 export * from './content/v1'

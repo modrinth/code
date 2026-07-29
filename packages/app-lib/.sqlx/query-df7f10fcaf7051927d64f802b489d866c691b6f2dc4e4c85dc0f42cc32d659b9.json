@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT OR REPLACE INTO instance_links (\n            instance_id,\n            link_kind,\n            modrinth_project_id,\n            modrinth_version_id,\n            server_project_id,\n            content_project_id,\n            content_version_id,\n            hosting_server_id,\n            hosting_instance_ids,\n            hosting_active_instance_id,\n            shared_instance_id\n        )\n        VALUES (?, ?, ?, ?, ?, ?, ?, ?, jsonb(?), ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 11
+    },
+    "nullable": []
+  },
+  "hash": "df7f10fcaf7051927d64f802b489d866c691b6f2dc4e4c85dc0f42cc32d659b9"
+}

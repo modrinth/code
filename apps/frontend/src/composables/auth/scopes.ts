@@ -199,7 +199,7 @@ export const scopeMessages = defineMessages({
 	},
 	patCreateDescription: {
 		id: 'scopes.patCreate.description',
-		defaultMessage: 'Create personal API tokens',
+		defaultMessage: 'Create personal access tokens',
 	},
 	patReadLabel: {
 		id: 'scopes.patRead.label',
@@ -207,7 +207,7 @@ export const scopeMessages = defineMessages({
 	},
 	patReadDescription: {
 		id: 'scopes.patRead.description',
-		defaultMessage: 'View created API tokens',
+		defaultMessage: 'View created personal access tokens',
 	},
 	patWriteLabel: {
 		id: 'scopes.patWrite.label',
@@ -215,7 +215,7 @@ export const scopeMessages = defineMessages({
 	},
 	patWriteDescription: {
 		id: 'scopes.patWrite.description',
-		defaultMessage: 'Edit personal API tokens',
+		defaultMessage: 'Edit personal access tokens',
 	},
 	patDeleteLabel: {
 		id: 'scopes.patDelete.label',
@@ -223,7 +223,7 @@ export const scopeMessages = defineMessages({
 	},
 	patDeleteDescription: {
 		id: 'scopes.patDelete.description',
-		defaultMessage: 'Delete your personal API tokens',
+		defaultMessage: 'Delete your personal access tokens',
 	},
 	sessionReadLabel: {
 		id: 'scopes.sessionRead.label',

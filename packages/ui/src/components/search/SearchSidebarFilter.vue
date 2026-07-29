@@ -5,12 +5,18 @@
 		:button-class="buttonClass ?? 'flex flex-col gap-2 justify-start items-start'"
 		:content-class="contentClass"
 		title-wrapper-class="flex flex-col gap-2 justify-start items-start"
-		:open-by-default="!locked && (openByDefault !== undefined ? openByDefault : true)"
+		:open-by-default="openByDefault !== undefined ? openByDefault : true"
 	>
-		<template #title>
-			<slot name="header" :filter="filterType">
-				<h2>{{ filterType.formatted_name }}</h2>
-			</slot>
+		<template #button="{ open }">
+			<div class="flex items-center gap-1 w-full text-contrast">
+				<slot name="header" :filter="filterType">
+					<h2 class="text-base font-semibold text-red">{{ filterType.formatted_name }}</h2>
+				</slot>
+				<DropdownIcon
+					class="ml-auto size-5 transition-transform duration-300 shrink-0 text-primary group-hover:text-contrast"
+					:class="{ 'rotate-180': open }"
+				/>
+			</div>
 		</template>
 		<template
 			v-if="
@@ -39,7 +45,7 @@
 			</div>
 		</template>
 		<template v-if="locked" #default>
-			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider mx-2">
+			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider">
 				<p class="m-0 font-bold items-center">
 					<slot :name="`locked-${filterType.id}`">
 						{{ formatMessage(messages.lockedTitle, { type: filterType.formatted_name }) }}
@@ -78,7 +84,6 @@
 				input-class="!bg-button-bg"
 				wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
 			/>
-
 			<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
 				<div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
 					<template v-if="groupedOptions">
@@ -87,7 +92,7 @@
 							:key="`${filterType.id}-group-${groupName}`"
 							:group-name="groupName"
 							:options="options"
-							:supports-negative-filter="filterType.supports_negative_filter"
+							:supports="filterType.supports"
 							:included="isIncluded"
 							:excluded="isExcluded"
 							@toggle="toggleFilter"
@@ -101,7 +106,7 @@
 							:option="option"
 							:included="isIncluded(option)"
 							:excluded="isExcluded(option)"
-							:supports-negative-filter="filterType.supports_negative_filter"
+							:supports="filterType.supports"
 							:class="{
 								'mr-3': scrollable,
 							}"

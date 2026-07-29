@@ -30,6 +30,10 @@ on:
           - prod-with-staging-archon
         default: prod
         required: false
+      app-version-override:
+        description: Temporary app version override for updater testing
+        type: string
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -40,57 +44,64 @@ jobs:
     name: Build
     env:
       VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5
-      # SCCACHE_DIR: '/mnt/sccache'
-      # SCCACHE_CACHE_SIZE: '10G'
-      # SCCACHE_MULTILEVEL_CHAIN: 'disk,s3'
-      SCCACHE_S3_KEY_PREFIX: '${{ github.repository }}/'
-      SCCACHE_BUCKET: ${{ secrets.SCCACHE_BUCKET }}
-      SCCACHE_REGION: ${{ secrets.SCCACHE_REGION }}
-      SCCACHE_ENDPOINT: ${{ secrets.SCCACHE_ENDPOINT }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.SCCACHE_S3_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SCCACHE_S3_SECRET_ACCESS_KEY }}
       RUSTC_WRAPPER: 'sccache'
     strategy:
       fail-fast: false
       matrix:
-        platform: [
-            blacksmith-6vcpu-macos-26,
-            blacksmith-8vcpu-windows-2025, # At time of writing, Windows 4 vCPU VMs don't seem to actually exist
-            blacksmith-4vcpu-ubuntu-2404,
+        platform:
+          [
+            namespace-profile-medium-amd64-macos,
+            namespace-profile-medium-amd64-windows,
+            namespace-profile-medium-amd64,
           ]
         include:
-          - platform: blacksmith-6vcpu-macos-26
+          - platform: namespace-profile-medium-amd64-macos
             artifact-target-name: universal-apple-darwin
-          - platform: blacksmith-8vcpu-windows-2025
+          - platform: namespace-profile-medium-amd64-windows
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: blacksmith-4vcpu-ubuntu-2404
+          - platform: namespace-profile-medium-amd64
             artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
         with:
           rustflags: ''
-          target: ${{ contains(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
+          target: ${{ contains(matrix.artifact-target-name, 'darwin') && 'x86_64-apple-darwin' || '' }}
+
+      - name: Setup mold
+        if: contains(matrix.artifact-target-name, 'linux')
+        uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
       - name: Setup sccache
         uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      - name: Set up caches
+        if: contains(matrix.artifact-target-name, 'linux') || contains(matrix.artifact-target-name, 'darwin')
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
-          node-version-file: .nvmrc
-          cache: 'pnpm'
+          cache: |
+            rust
+            pnpm
+
+      - name: Configure sccache
+        if: contains(matrix.artifact-target-name, 'linux') || contains(matrix.artifact-target-name, 'darwin')
+        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Generate tauri-dev.conf.json
         shell: bash
@@ -108,11 +119,16 @@ jobs:
           EOF
 
       - name: Install Linux build dependencies
-        if: contains(matrix.platform, 'ubuntu')
-        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
+        if: contains(matrix.artifact-target-name, 'linux')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
-          packages: libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
-          version: v1 # cache key
+          distribution: temurin
+          java-version: 17
 
       - name: Setup Dasel
         uses: jaxxstorm/action-install-gh-release@25e24d2d23ae098373794ef1d6faecb48ee52da8 # v3.0.0
@@ -120,13 +136,16 @@ jobs:
           repo: TomWright/dasel
           tag: v2.8.1
           extension-matching: disable
-          rename-to: ${{ contains(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
+          rename-to: ${{ contains(matrix.artifact-target-name, 'windows') && 'dasel.exe' || 'dasel' }}
           chmod: 0755
 
       - name: Set application version and environment
         shell: bash
         run: |
-          APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
+          APP_VERSION="${{ inputs.app-version-override }}"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
+          fi
           BUILD_ENVIRONMENT="${{ inputs.environment || 'prod' }}"
           echo "Setting application version to $APP_VERSION"
           echo "Using environment $BUILD_ENVIRONMENT"
@@ -136,14 +155,11 @@ jobs:
 
           cp "packages/app-lib/.env.${BUILD_ENVIRONMENT}" packages/app-lib/.env
 
-      - name: Setup Turbo cache
-        uses: rharkor/caching-for-turbo@56219402aacc0d06b650d898c222996dbc1191ec # v2.3.14
-
       - name: Install dependencies
         run: pnpm install
 
       - name: Set up Windows code signing
-        if: contains(matrix.platform, 'windows')
+        if: contains(matrix.artifact-target-name, 'windows')
         shell: bash
         run: |
           if [ '${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}' = 'true' ]; then
@@ -153,8 +169,8 @@ jobs:
           fi
 
       - name: Build macOS app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
-        if: contains(matrix.platform, 'macos')
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
+        if: contains(matrix.artifact-target-name, 'darwin')
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
@@ -168,8 +184,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Build Linux app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
-        if: contains(matrix.platform, 'ubuntu')
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
+        if: contains(matrix.artifact-target-name, 'linux')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -179,9 +195,9 @@ jobs:
           [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
           $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
           $env:JAVA_HOME = "$env:JAVA_HOME_17_X64"
-          ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
+          ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
           Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
-        if: contains(matrix.platform, 'windows')
+        if: contains(matrix.artifact-target-name, 'windows')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}

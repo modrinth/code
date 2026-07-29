@@ -7,6 +7,7 @@ import svgLoader from 'vite-svg-loader'
 import { GenericModrinthClient, type Labrinth } from '../../packages/api-client/src/index.ts'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+const STAGING_SHARED_INSTANCES_API_URL = 'https://staging-shared-instances.modrinth.com'
 const API_CLIENT_SOURCE = fileURLToPath(
 	new URL('../../packages/api-client/src/index.ts', import.meta.url),
 )
@@ -75,10 +76,10 @@ export default defineNuxtConfig({
 		},
 		ssr: {
 			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
-			noExternal: ['v-tooltip'],
-			optimizeDeps: {
-				include: ['vue-router'],
-			},
+			noExternal: ['floating-vue', '@floating-ui/core', '@floating-ui/dom'],
+		},
+		optimizeDeps: {
+			include: ['vue-router', 'floating-vue', '@floating-ui/dom'],
 		},
 		define: {
 			global: {},
@@ -104,6 +105,9 @@ export default defineNuxtConfig({
 							params: {
 								overrides: {
 									removeViewBox: false,
+									cleanupIds: {
+										minify: false,
+									},
 								},
 							},
 						},
@@ -125,8 +129,6 @@ export default defineNuxtConfig({
 			const docTemplates = Object.keys(
 				await import('./src/templates/docs/index.ts').then((m) => m.default),
 			)
-			const blogArticles = await import('@modrinth/blog').then((m) => m.articles)
-			const { getChangelog } = await import('@modrinth/blog')
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
@@ -135,15 +137,6 @@ export default defineNuxtConfig({
 			}
 			for (const template of docTemplates) {
 				nitroConfig.prerender.routes.push(`/_internal/templates/doc/${template}`)
-			}
-			nitroConfig.prerender.routes.push('/news')
-			for (const article of blogArticles) {
-				nitroConfig.prerender.routes.push(`/news/article/${article.slug}`)
-			}
-			nitroConfig.prerender.routes.push('/news/changelog')
-			for (const entry of getChangelog()) {
-				const id = entry.version ?? entry.date.unix()
-				nitroConfig.prerender.routes.push(`/news/changelog/${entry.product}/${id}`)
 			}
 		},
 		async 'build:before'() {
@@ -218,6 +211,7 @@ export default defineNuxtConfig({
 		// @ts-ignore
 		rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
 		pyroBaseUrl: process.env.PYRO_BASE_URL,
+		sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 		intercomIdentitySecret:
 			process.env.INTERCOM_IDENTITY_SECRET ??
 			// @ts-ignore
@@ -225,6 +219,7 @@ export default defineNuxtConfig({
 		public: {
 			apiBaseUrl: getApiUrl(),
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
+			sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 			siteUrl: getDomain(),
 			intercomAppId:
 				process.env.INTERCOM_APP_ID ||
@@ -232,6 +227,7 @@ export default defineNuxtConfig({
 				globalThis.INTERCOM_APP_ID ||
 				'ykeritl9',
 			production: isProduction(),
+			cookieSecure: isProduction(),
 			buildEnv: process.env.BUILD_ENV,
 			preview: process.env.PREVIEW === 'true',
 			featureFlagOverrides: getFeatureFlagOverrides(),
@@ -361,6 +357,15 @@ function getApiUrl() {
 	return process.env.BROWSER_BASE_URL ?? globalThis.BROWSER_BASE_URL ?? STAGING_API_URL
 }
 
+function getSharedInstancesApiUrl() {
+	return (
+		process.env.SHARED_INSTANCES_API_BASE_URL ??
+		// @ts-ignore
+		globalThis.SHARED_INSTANCES_API_BASE_URL ??
+		STAGING_SHARED_INSTANCES_API_URL
+	)
+}
+
 function isProduction() {
 	return process.env.NODE_ENV === 'production'
 }
@@ -371,11 +376,7 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
 	if (process.env.NODE_ENV === 'production') {
-		// @ts-ignore
-		if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
-			// @ts-ignore
-			return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL
-		} else if (process.env.HEROKU_APP_NAME) {
+		if (process.env.HEROKU_APP_NAME) {
 			return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
 		} else if (process.env.VERCEL_URL) {
 			return `https://${process.env.VERCEL_URL}`

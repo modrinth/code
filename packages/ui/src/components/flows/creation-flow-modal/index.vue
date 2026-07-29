@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import MultiStageModal from '../../base/MultiStageModal.vue'
@@ -38,6 +38,8 @@ const props = withDefaults(
 		searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
 		getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 		getLoaderManifest?: LoaderManifestResolver
+		finishDisabled?: boolean
+		finishDisabledTooltip?: string
 	}>(),
 	{
 		type: 'world',
@@ -78,6 +80,8 @@ const ctx = createCreationFlowContext(
 		searchModpacks: props.searchModpacks,
 		getProjectVersions: props.getProjectVersions,
 		getLoaderManifest: props.getLoaderManifest,
+		finishDisabled: computed(() => props.finishDisabled ?? false),
+		finishDisabledTooltip: computed(() => props.finishDisabledTooltip),
 	},
 )
 provideCreationFlowContext(ctx)

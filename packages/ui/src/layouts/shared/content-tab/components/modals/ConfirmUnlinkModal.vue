@@ -1,18 +1,18 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header)"
+		:header="props.header ?? formatMessage(messages.header)"
 		fade="warning"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-				{{ formatMessage(messages.admonitionBody) }}
+			<Admonition type="warning" :header="admonitionHeader">
+				{{ admonitionBody }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				:backup-name="backupTip ? `Before unlink (${backupTip})` : 'Before unlink'"
+				:backup-name="props.backupTip ? `Before unlink (${props.backupTip})` : 'Before unlink'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -26,9 +26,13 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button :disabled="buttonsDisabled" @click="confirm">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="confirm"
+					>
 						<UnlinkIcon />
-						{{ formatMessage(server ? messages.header : messages.unlinkButton) }}
+						{{ formatMessage(actionMessage) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -38,22 +42,28 @@
 
 <script setup lang="ts">
 import { UnlinkIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
-defineProps<{
+const props = defineProps<{
+	header?: string
+	warning?: { header: string; body: string } | null
 	server?: boolean
 	backupTip?: string
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string
 }>()
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('ConfirmUnlinkModal')
 
 const messages = defineMessages({
 	header: {
@@ -82,14 +92,45 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
+const admonitionHeader = computed(() => {
+	if (props.warning) return props.warning.header
+	return formatMessage(messages.admonitionHeader)
+})
+const admonitionBody = computed(() => {
+	if (props.warning) return props.warning.body
+	return formatMessage(messages.admonitionBody)
+})
+const actionMessage = computed(() => (props.server ? messages.header : messages.unlinkButton))
 
 function show() {
+	debug('show: called', {
+		hasModalRef: !!modal.value,
+		hasBackupCreatorRef: !!backupCreator.value,
+		buttonsDisabled: buttonsDisabled.value,
+		actionDisabled: props.actionDisabled,
+	})
 	modal.value?.show()
+	debug('show: returned from modal.show', {
+		hasModalRef: !!modal.value,
+		hasBackupCreatorRef: !!backupCreator.value,
+		buttonsDisabled: buttonsDisabled.value,
+		actionDisabled: props.actionDisabled,
+	})
 }
 
 function confirm() {
+	debug('confirm: called', {
+		hasModalRef: !!modal.value,
+		buttonsDisabled: buttonsDisabled.value,
+		actionDisabled: props.actionDisabled,
+	})
+	if (props.actionDisabled) {
+		debug('confirm: ignored actionDisabled')
+		return
+	}
 	modal.value?.hide()
 	emit('unlink')
+	debug('confirm: emitted unlink')
 }
 
 defineExpose({

@@ -15,7 +15,7 @@ import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'
 import {
 	type DisplayStatus,
-	edit_server_in_profile,
+	edit_server_in_instance,
 	type ServerPackStatus,
 	type ServerWorld,
 	set_world_display_status,
@@ -46,8 +46,8 @@ const newDisplayStatus = computed(() => (hideFromHome.value ? 'hidden' : 'normal
 async function saveServer() {
 	const serverName = name.value ? name.value : address.value
 	const resourcePackStatus = resourcePack.value
-	await edit_server_in_profile(
-		props.instance.path,
+	await edit_server_in_instance(
+		props.instance.id,
 		index.value,
 		serverName,
 		address.value,
@@ -56,7 +56,7 @@ async function saveServer() {
 
 	if (newDisplayStatus.value !== displayStatus.value) {
 		await set_world_display_status(
-			props.instance.path,
+			props.instance.id,
 			'server',
 			address.value,
 			newDisplayStatus.value,

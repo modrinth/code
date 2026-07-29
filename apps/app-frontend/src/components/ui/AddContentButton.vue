@@ -4,7 +4,7 @@ import { ButtonStyled, injectNotificationManager, OverflowMenu } from '@modrinth
 import { open } from '@tauri-apps/plugin-dialog'
 import { useRouter } from 'vue-router'
 
-import { add_project_from_path } from '@/helpers/profile.js'
+import { add_project_from_path } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
 
@@ -22,14 +22,14 @@ const handleAddContentFromFile = async () => {
 	if (!newProject) return
 
 	for (const project of newProject) {
-		await add_project_from_path(props.instance.path, project.path ?? project).catch(handleError)
+		await add_project_from_path(props.instance.id, project.path ?? project).catch(handleError)
 	}
 }
 
 const handleSearchContent = async () => {
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'resourcepack' : 'mod'}`,
-		query: { i: props.instance.path },
+		query: { i: props.instance.id },
 	})
 }
 </script>

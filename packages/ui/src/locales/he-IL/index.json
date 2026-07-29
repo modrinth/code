@@ -140,9 +140,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "התקן מחדש חבילת מודים"
   },
-  "button.remove": {
-    "defaultMessage": "מחק"
-  },
   "button.remove-image": {
     "defaultMessage": "מחק תמונה"
   },
@@ -242,12 +239,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "אזהרת מחיקה"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "מחק {count} {itemType}{count, plural, one {} other {ים}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "מחק {itemType}{count, plural, one {} other {ים}}"
-  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} נוספו"
   },
@@ -265,9 +256,6 @@
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "צור גיבוי"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "אל תציג שוב"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "תוכן נוסף"
@@ -292,9 +280,6 @@
   },
   "content.page-layout.share.label": {
     "defaultMessage": "שתף"
-  },
-  "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "מעדכן {סוגתוכן}..."
   },
   "files.move-modal.current-location": {
     "defaultMessage": "מיקום נוכחי"
@@ -523,9 +508,6 @@
   },
   "label.rejected": {
     "defaultMessage": "נדחה"
-  },
-  "label.rewards-program-terms-agreement": {
-    "defaultMessage": "אני מסכים ל </terms-link>תנאי תוכנית התגמולים <terms-link>"
   },
   "label.saved": {
     "defaultMessage": "נשמר"
@@ -1145,9 +1127,6 @@
   "settings.pats.title": {
     "defaultMessage": "מפתחות גישה אישיים"
   },
-  "settings.profile.title": {
-    "defaultMessage": "פרופיל ציבורי"
-  },
   "settings.sessions.title": {
     "defaultMessage": "חיבורים פעילים"
   },
@@ -1260,4 +1239,3 @@
     "defaultMessage": "יש לך שינויים שלא נשמרו."
   }
 }
-

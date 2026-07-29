@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        update file_scans\n        set\n            attributions_scanned_at = $2,\n            attributions_scan_result = $3\n        where file_id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Timestamptz",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "11228045ad657e66693d4b384beacbd50d74251f59c1147e71b0ef293a19805e"
+}

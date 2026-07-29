@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        insert into file_scans (\n            file_id,\n            attributions_scanned_at,\n            attributions_scan_result\n        )\n        values ($1, now(), $2)\n        on conflict (file_id) do update set\n            attributions_scanned_at = now(),\n            attributions_scan_result = $2\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "89e0688880584ca6745961772445cede934143b33d5ca86b6c6f889e5beee543"
+}

@@ -3,7 +3,6 @@ use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
-use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
@@ -11,13 +10,15 @@ use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
-const USERS_NAMESPACE: &str = "users";
-const USER_USERNAMES_NAMESPACE: &str = "users_usernames";
-const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
+const USERS_NAMESPACE: &str = "users:v3";
+const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v3";
+const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v3";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBUser {
@@ -48,10 +49,28 @@ pub struct DBUser {
     pub created: DateTime<Utc>,
     pub role: String,
     pub badges: Badges,
+    #[serde(default)]
+    pub campaign_pride_26: Option<Pride26CampaignDonation>,
 
     pub allow_friend_requests: bool,
 
     pub is_subscribed_to_newsletter: bool,
+
+    pub eligibility_verified_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct DBSearchUser {
+    pub id: DBUserId,
+    pub username: String,
+    pub avatar_url: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug, utoipa::ToSchema)]
+pub struct Pride26CampaignDonation {
+    pub last_donated_at: DateTime<Utc>,
+    pub has_badge: bool,
+    pub has_midas: bool,
 }
 
 impl DBUser {
@@ -66,13 +85,15 @@ impl DBUser {
                 avatar_url, raw_avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
-                venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
+                venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
+                eligibility_verified_at
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19, $20, $21, $22
+                $14, $15, $16, $17, $18, $19, $20, $21, $22,
+                $23
             )
             ",
             self.id as DBUserId,
@@ -97,6 +118,7 @@ impl DBUser {
             self.stripe_customer_id,
             self.allow_friend_requests,
             self.is_subscribed_to_newsletter,
+            self.eligibility_verified_at,
         )
         .execute(&mut *transaction)
         .await?;
@@ -180,9 +202,20 @@ impl DBUser {
                     SELECT id, email,
                         avatar_url, raw_avatar_url, username, bio,
                         created, role, badges,
+                        (
+                            SELECT MAX(campaign_donations.donated_at)
+                            FROM campaign_donations
+                            WHERE campaign_donations.user_id = users.id
+                        ) AS campaign_pride_26_last_donated_at,
+                        (
+                            SELECT SUM(campaign_donations.amount_usd)
+                            FROM campaign_donations
+                            WHERE campaign_donations.user_id = users.id
+                        ) AS campaign_pride_26_total_amount_donated_usd,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
-                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
+                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
+                        eligibility_verified_at
                     FROM users
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                     ",
@@ -208,6 +241,21 @@ impl DBUser {
                             created: u.created,
                             role: u.role,
                             badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
+                            campaign_pride_26: u
+                                .campaign_pride_26_last_donated_at
+                                .zip(u.campaign_pride_26_total_amount_donated_usd)
+                                .map(
+                                    |(
+                                        last_donated_at,
+                                        total_amount_donated_usd,
+                                    )| Pride26CampaignDonation {
+                                        last_donated_at,
+                                        has_badge: total_amount_donated_usd
+                                            >= Decimal::ONE,
+                                        has_midas: total_amount_donated_usd
+                                            >= Decimal::from(5),
+                                    },
+                                ),
                             password: u.password,
                             paypal_id: u.paypal_id,
                             paypal_country: u.paypal_country,
@@ -217,6 +265,7 @@ impl DBUser {
                             totp_secret: u.totp_secret,
                             allow_friend_requests: u.allow_friend_requests,
                             is_subscribed_to_newsletter: u.is_subscribed_to_newsletter,
+                            eligibility_verified_at: u.eligibility_verified_at,
                         };
 
                         acc.insert(u.id, (Some(u.username), user));
@@ -224,9 +273,47 @@ impl DBUser {
                     })
                     .await?;
 
-                Ok(users)
+                Ok::<_, DatabaseError>(users)
             }).await?;
         Ok(val)
+    }
+
+    pub async fn search<'a, E>(
+        query: &str,
+        exec: E,
+    ) -> Result<Vec<DBSearchUser>, sqlx::Error>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        if query.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let lowercase_query = query.to_lowercase();
+        let escaped_query = format!("{}%", escape_like(&lowercase_query));
+
+        let users = sqlx::query!(
+            r#"
+            SELECT id, username, avatar_url
+            FROM users
+            WHERE LOWER(username) LIKE $1 ESCAPE '\'
+            ORDER BY LOWER(username) = $2 DESC, LOWER(username), username
+            LIMIT 25
+            "#,
+            escaped_query,
+            lowercase_query
+        )
+        .fetch_all(exec)
+        .await?
+        .into_iter()
+        .map(|row| DBSearchUser {
+            id: DBUserId(row.id),
+            username: row.username,
+            avatar_url: row.avatar_url,
+        })
+        .collect();
+
+        Ok(users)
     }
 
     pub async fn get_by_email<'a, E>(
@@ -302,13 +389,10 @@ impl DBUser {
 
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
-            let cached_projects = redis
-                .get_deserialized_from_json::<Vec<DBProjectId>>(
-                    USERS_PROJECTS_NAMESPACE,
-                    &user_id.0.to_string(),
-                )
-                .await?;
+            let cached_projects =
+                redis.get_deserialized::<Vec<DBProjectId>>(&key).await?;
 
             if let Some(projects) = cached_projects {
                 return Ok(projects);
@@ -330,15 +414,9 @@ impl DBUser {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
-        redis
-            .set_serialized_to_json(
-                USERS_PROJECTS_NAMESPACE,
-                user_id.0,
-                &db_projects,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &db_projects, None).await?;
 
         Ok(db_projects)
     }
@@ -469,18 +547,24 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-
-        redis
-            .delete_many(user_ids.iter().flat_map(|(id, username)| {
+        let keys = user_ids
+            .iter()
+            .flat_map(|(id, username)| {
                 [
-                    (USERS_NAMESPACE, Some(id.0.to_string())),
-                    (
-                        USER_USERNAMES_NAMESPACE,
-                        username.clone().map(|i| i.to_lowercase()),
-                    ),
+                    Some(redis.key().entity(USERS_NAMESPACE, id.0)),
+                    username.as_ref().map(|username| {
+                        redis.key().entity(
+                            USER_USERNAMES_NAMESPACE,
+                            username.to_lowercase(),
+                        )
+                    }),
                 ]
-            }))
-            .await?;
+                .into_iter()
+                .flatten()
+            })
+            .collect::<Vec<_>>();
+
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 
@@ -489,14 +573,12 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let keys = user_ids
+            .iter()
+            .map(|id| redis.key().entity(USERS_PROJECTS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
 
-        redis
-            .delete_many(
-                user_ids.iter().map(|id| {
-                    (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))
-                }),
-            )
-            .await?;
+        redis.delete_many(&keys).await?;
 
         Ok(())
     }
@@ -543,19 +625,6 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to update versions author_id")?;
-
-            sqlx::query!(
-                "
-                UPDATE shared_instances
-                SET owner_id = $1
-                WHERE owner_id = $2
-                ",
-                deleted_user as DBUserId,
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to update shared_instances owner_id")?;
 
             use futures::TryStreamExt;
             let notifications: Vec<i64> = sqlx::query!(
@@ -639,7 +708,7 @@ impl DBUser {
                 "
                 SELECT t.id
                 FROM threads t
-                INNER JOIN reports r ON t.report_id = r.id AND (r.user_id = $1 OR r.reporter = $1)
+                INNER JOIN reports r ON t.report_id = r.id AND r.reporter = $1
                 WHERE report_id IS NOT NULL
                 ",
                 id as DBUserId,
@@ -924,28 +993,6 @@ impl DBUser {
 
             sqlx::query!(
                 "
-				DELETE FROM shared_instance_users
-				WHERE user_id = $1
-				",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to delete shared_instance_users")?;
-
-            sqlx::query!(
-                "
-				DELETE FROM shared_instance_invited_users
-				WHERE invited_user_id = $1
-				",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to delete shared_instance_invited_users")?;
-
-            sqlx::query!(
-                "
 				UPDATE users_redeemals
 				SET user_id = $1
 				WHERE user_id = $2
@@ -1008,4 +1055,15 @@ impl DBUser {
             Ok(None)
         }
     }
+}
+
+fn escape_like(query: &str) -> String {
+    let mut escaped = String::with_capacity(query.len());
+    for ch in query.chars() {
+        if matches!(ch, '\\' | '%' | '_') {
+            escaped.push('\\');
+        }
+        escaped.push(ch);
+    }
+    escaped
 }

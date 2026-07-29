@@ -2,11 +2,152 @@
   "app.action-bar.downloading-java": {
     "message": "جاز تنزيل إصدار جافا {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "تحميل التحديث"
+  },
   "app.action-bar.downloads": {
     "message": "التنزيلات"
   },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "إخفاء المزيد من الحالات قيد التشغيل"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "تم النسخ"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "نسخ التفاصيل"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "التجاهل"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "فتح المثيل"
+  },
+  "app.action-bar.install.retry": {
+    "message": "إعادة المحاولة"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "تم الإلغاء بسبب إغلاق التطبيق"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "تعذّر قراءة حزمة التعديلات"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "تم الإلغاء"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "لم تكتمل عملية التنظيف"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "تعذّر تنزيل الملفات"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "الملف الذي تم تنزيله تالف"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "تعذّر حفظ الملفات"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "لم يكتمل التنزيل"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "تعذّر العثور على المثيل"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "مسار الملف غير صالح"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "بيانات حزمة التعديلات غير صالحة"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "تحتوي ملفات حزمة التعديلات على بيانات وصفية غير صالحة"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "لم يكتمل إعداد Java"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "فشل إعداد أداة التحميل"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "تعذر تحديث البيانات المحلية"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "فشل إعداد Minecraft"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "لم أتمكن من الوصول إلى Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "لا يوجد إذن للكتابة"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "تعذر تنزيل الحزمة"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "حدث خطأ ما"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "مثيل غير معروف"
+  },
+  "app.action-bar.installs": {
+    "message": "عمليات التثبيت"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "إنشاء نسخة أساسية"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "لا توجد نسخ قيد التشغيل"
+  },
   "app.action-bar.offline": {
     "message": "غير متصل"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "النسخة ألرئيسية"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "أعد التشغيل للتحديث"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "عرض المزيد من النسخ قيد التشغيل"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "إيقاف النسخة"
+  },
+  "app.action-bar.update": {
+    "message": "تحديث"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "عرض التحميلات الفعالة"
+  },
+  "app.action-bar.view-instance": {
+    "message": "عرض النسخة"
+  },
+  "app.action-bar.view-logs": {
+    "message": "عرض التسجيل"
+  },
+  "app.ads-consent.accept": {
+    "message": "قبول الكل"
+  },
+  "app.ads-consent.manage": {
+    "message": "إدارة التفضيلات"
+  },
+  "app.ads-consent.reject": {
+    "message": "رفض الكل"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "يتيح العرض المتقدم لتأثيرات مثل التشويش الذي قد تسبب مشكلات في الأداء دون استخدام العرض المسرع بالأجهزة."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "العرض المتقدم"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "اختر لون سمتك المفضل من أجل تطبيق Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "لون السمة"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "غير الصفحة التي يفتح عليها المشغل."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "صفحة الرئيسية"
@@ -14,11 +155,68 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "مكتبة"
   },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "الصفحة الرئيسة الافتراضية"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "ألغ تفعيل عرض الاسم فوق لاعبك في صفحة المظاهر."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "إخفاء عرض الاسم"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "يتضمن العوالم الحديثة في قسم \"العودة إلى اللعب\" على الصفحة الرئيسية."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "العودة إلى العوالم"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "قم بتصغير نافذة المشغل عند بدء تشغيل عملية Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "تصغير نافذة المشغل"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "استخدام إطار نافذة النظام (يتطلب إعادة تشغيل التطبيق)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "الزخارف التقليدية"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "يعرض مقدار الوقت الذي قضيته في لعب إحدى المهام."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "إظهار مدة التشغيل"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "يتخطى تلقائيًا عمليات التأكيد ذات المخاطر المنخفضة، مثل تثبيت حزم التعديلات المكررة، وحذف المحتوى العادي، والتحديثات الجماعية، وإلغاء ربط حزم التعديلات، ومطالبات الإصلاح. وسيستمر عرض التحذيرات الخطيرة."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "تخطي التحذيرات غير الضرورية"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "يتيح إمكانية إظهار الشريط الجانبي أو إخفائه."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "تبديل الشريط الجانبي"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "إذا حاولت تثبيت ملف Modrinth Pack (.mrpack) غير مستضاف على Modrinth، فسنتأكد من أنك على دراية بالمخاطر قبل تثبيته."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "أخبرني قبل تثبيت حزم التعديلات غير المعروفة"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "قد تكون خوادم مصادقة ماينكرافت معطلة حاليًا. تحقق من اتصالك بالإنترنت وحاول مرة أخرى لاحقًا."
   },
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "إضافة خادم إلى المثيل"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "إضافة إلى مثيل"
   },
   "app.browse.add-to-instance": {
     "message": "أضف للنموذج"
@@ -32,14 +230,26 @@
   "app.browse.already-added": {
     "message": "مضاف فعلا"
   },
-  "app.browse.discover-content": {
-    "message": "استكشف محتوى"
+  "app.browse.back-to-instance": {
+    "message": "العودة للنموذج"
   },
   "app.browse.discover-servers": {
     "message": "استكشف خوادم"
   },
+  "app.browse.hide-added-servers": {
+    "message": "إخفاء الخوادم التي تمت إضافتها بالفعل"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "حزم التعديل"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "قد تؤدي إضافة المحتوى إلى حدوث مشاكل في التوافق عند الاتصال بالخادم. كما سيُفقد أي محتوى تمت إضافته عند تحديث محتوى مثيل الخادم."
+  },
   "app.browse.server.installing": {
     "message": "جاري التثبيت"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "لا توجد إصدارات متاحة تتوافق مع {compatibilityLabel}. اختر إصدارًا لتثبيته على أي حال. لن يتم تثبيت التبعيات تلقائيًا."
   },
   "app.export-modal.description-placeholder": {
     "message": "أدخل وصف التعديل..."
@@ -62,6 +272,60 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.install.phase.downloading_content": {
+    "message": "تنزيل المحتوى"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "تنزيل لعبة Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "تنزيل ملف الحزمة"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "استخراج التجاوزات"
+  },
+  "app.install.phase.finalizing": {
+    "message": "وضع اللمسات الأخيرة"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "في قائمة الانتظار للتثبيت"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "التحضير لـ Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "تنزيل Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "استخراج Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "جلب Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "التحضير لـ Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "التحقق من صحة إصدار Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "قراءة قائمة المحتويات"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "معالج التحميل"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "حل مشكلة Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "معالجة المحتوى"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "التراجع"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "تشغيل معالجات التحميل"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "سيتم حذف جميع البيانات الخاصة لنموذجك نهائيًا، بما في ذلك عوالمك والتكوينات وكل المحتوى المثبت."
   },
@@ -75,16 +339,25 @@
     "message": "حذف النموذج"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "حُزْمَة التعديل هذه مثبته فعلًا في نموذج <bold>{instanceName}</bold>. هل انت متأكد بإرادة نسخه؟"
+    "message": "حُزْمَة التعديل مثبته مسبقًا فعلًا في نموذج <bold>{instanceName}</bold>. هل أنت متأكد بإرادة نسخه؟"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "إنشاء"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "حُزْمَة التعديل مثبتة بالفعل"
+    "message": "حُزْمَة التعديل مثبتة فعلًا"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "النموذج"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "جاري تنزيل {current, number}/{total, number} مشروعًا..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "آخر المستجدات حول عملية التشطيب..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "تحديد الإصدارات..."
   },
   "app.instance.mods.content-type-project": {
     "message": "مشروع"
@@ -99,7 +372,7 @@
     "message": "تحقق من المشاريع التي أستخدمها في حزمة التعديل الخاص بي!"
   },
   "app.instance.mods.share-title": {
-    "message": "مشاركة محتوى حزمة التعديل"
+    "message": "مشاركة محتوى حُزْمَة التعديل"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "تم الرفع بنجاح"
@@ -110,11 +383,17 @@
   "app.instance.worlds.browse-servers": {
     "message": "تصفح الخوادم"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "سيتم حذف '{name}' **نهائيا**, و لن هناك أي طريقة لاسترداده."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "حذف العالم"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "هل أنت متيقِّن من رغبتك بحذف هذا العالم نهائيا؟"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "حذف العالم"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "سيتم حذف هذا العالم نهائيًا من هذه النسخة. لا يمكن التراجع عن هذا الإجراء."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "حذف {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "معدّل"
@@ -134,26 +413,26 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "لم تتم إضافة أي من الخوادم أو العوالم"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "ستتم إزالة '{name}' من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "إزالة الخادم"
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "ستتم إزالة '{name}' ({address}) من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "إزالة الخادم"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "هل أنت متيقِّن من رغبتك في إزالة {name}؟"
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "سيتم حذف هذا الخادم من قائمة الخوادم الخاصة بك ومن قائمة الخوادم داخل اللعبة. يمكنك إضافته مرة أخرى لاحقًا إذا كنت تعرف عنوانه."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "إزالة {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ابحث بين ال{count} عوالم..."
   },
-  "app.instance.worlds.this-server": {
-    "message": "هذا الخادم"
-  },
-  "app.modal.install-to-play.content-required": {
-    "message": "المحتوى مطلوب"
-  },
   "app.modal.install-to-play.header": {
     "message": "نزل للعب"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "تثبيت على أي حال"
   },
   "app.modal.install-to-play.install-button": {
     "message": "تثبيت"
@@ -161,17 +440,17 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# تعديل} other {# تعديلات}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "حزمة التعديل مطلوبة"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "لا يتم مراجعة الملف إلا إذا تم نشره على Modrinth، بغض النظر عن صيغته (بما في ذلك .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "النماذج المشتركة"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "نماذج الخادم مشتركة"
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "تحذير ملفات غير معروفة"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "ملفات غير متعرّف عليها"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "عرض المحتويات"
@@ -179,11 +458,26 @@
   "app.modal.update-to-play.header": {
     "message": "حدث للعب"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "يلزم التحديث"
+  "app.project.install-button.already-installed": {
+    "message": "هذا المشروع مُثبَّت بالفعل"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "هناك تحديث مطلوب للعب بـ {name}. الرجاء التحديث إلى آخر اصدار لتشغيل اللعبة."
+  "app.project.install-button.switch-version": {
+    "message": "تغيير الإصدار"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "العودة إلى الاستكشاف"
+  },
+  "app.project.version.all-versions": {
+    "message": "جميع الإصدارات"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "التنزيل من المتصفح"
+  },
+  "app.project.version.installing": {
+    "message": "التثبيت"
+  },
+  "app.project.versions.already-installed": {
+    "message": "مثبت بالفعل"
   },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
@@ -209,8 +503,161 @@
   "app.settings.tabs.resource-management": {
     "message": "إدارة الموارد"
   },
-  "app.update-popup.body": {
-    "message": "تطبيق Modrinth v{version} جاهز للتثبيت! أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
+  "app.skins.add-button": {
+    "message": "إضافة مظهر"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "أسحب ثم أفلت"
+  },
+  "app.skins.apply-button": {
+    "message": "تطبيق"
+  },
+  "app.skins.delete-button": {
+    "message": "حذف المظهر"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "سيتم حذف المظهر بشكل نهائي، ولايمكن إرجاعه."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "هل أنت متأكد من حذف المظهر هذا؟"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "فشل قراءة الملف الذي تم إسقاطه."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "حدث خطأ أثناء معالجة الملف"
+  },
+  "app.skins.edit-button": {
+    "message": "تعديل المظهر"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "إضافة المظهر"
+  },
+  "app.skins.modal.add-title": {
+    "message": "إضافة المظهر"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "طراز الأذرع"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "نحيف"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "عريض"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "رداء"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "رداء"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "تعديل المظهر"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "عدل المظهر أولا للحفظ !"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "بدون رداء"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "لا شيء"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "استبدال النسيج"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "حفظ المظهر"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "حفظ..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "النسيج"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "أرفع المظهر أولا !"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "تعديل المظهر"
+  },
+  "app.skins.previewing-badge": {
+    "message": "أستعراض"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "أنت تقوم بتغيير مظهرك بشكل متكرر جدًّا. وقد قامت خوادم Mojang بحظر الطلبات الإضافية مؤقتًا. يرجى الانتظار قليلاً قبل إعادة المحاولة."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "تمهل !"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "تعذر حفظ طلبك المتعلق بشكل الشخصية."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "فشل إعادة ترتيب أشكال الشخصيات"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "البناة والبيئات الحيوية"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "الفوضى المربعة"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "انطلق نحو السماء"
+  },
+  "app.skins.section.default-skins": {
+    "message": "شكل الشخصية الافتراضية"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "فخر Modrinth"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "لقد حصلت على هذه أشكال الشخصيات مقابل تبرعك لحملة جمع التبرعات التي نظمتها Modrinth Pride خلال شهر الفخر."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "جبال الفوضى"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "المظاهر المحفوظة"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "البطل السائر بخطوات واسعة"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "العصر النحاسي"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "الحديقة تستيقظ"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "الاستحواذ الصغير"
+  },
+  "app.skins.sign-in.button": {
+    "message": "تسجيل الدخول"
+  },
+  "app.skins.sign-in.description": {
+    "message": "يرجى تسجيل الدخول إلى حسابك في Minecraft لاستخدام ميزات إدارة أشكال الشخصيات في تطبيق Modrinth."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "روبوت Modrinth المتحمس"
+  },
+  "app.skins.sign-in.title": {
+    "message": "الرجاء تسجيل الدخول"
+  },
+  "app.skins.title": {
+    "message": "اختيار المظهر"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "إيقاف"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "تشغيل"
   },
   "app.update-popup.body.download-complete": {
     "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
@@ -231,7 +678,7 @@
     "message": "اكتمل التنزيل"
   },
   "app.update-popup.reload": {
-    "message": "إعادة تحميل"
+    "message": "أعد التحميل للتحديث"
   },
   "app.update-popup.title": {
     "message": "تحديث متاح"
@@ -242,17 +689,8 @@
   "app.update.complete-toast.title": {
     "message": "تم تثبيت الإصدار {version} بنجاح!"
   },
-  "app.update.download-update": {
-    "message": "تنزيل التحديث"
-  },
-  "app.update.downloading-update": {
-    "message": "جار تنزيل التحديث ({percent}٪)"
-  },
-  "app.update.reload-to-update": {
-    "message": "أعد التحميل لتثبيت التحديث"
-  },
   "app.world.server-modal.placeholder-address": {
-    "message": "مثال.مودرنث.جج"
+    "message": "مثال (example.modrinth.gg)"
   },
   "app.world.server-modal.select-an-option": {
     "message": "حدد خيارا"
@@ -332,6 +770,24 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>سجّل الدخول إلى حساب Modrinth</link> لإضافة الأصدقاء ومعرفة ما الذي يلعبونه!"
   },
+  "instance.action.create-shortcut": {
+    "message": "إنشاء اختصار"
+  },
+  "instance.action.more-actions": {
+    "message": "مزيد من الخيارات"
+  },
+  "instance.action.open-folder": {
+    "message": "فتح المجلد"
+  },
+  "instance.action.repair": {
+    "message": "إصلاح"
+  },
+  "instance.action.starting": {
+    "message": "قيد التشغيل..."
+  },
+  "instance.action.stopping": {
+    "message": "قيد الإيقاف..."
+  },
   "instance.add-server.add-and-play": {
     "message": "إضافة واللعب"
   },
@@ -373,6 +829,9 @@
   },
   "instance.files.save-as": {
     "message": "حفظ ك..."
+  },
+  "instance.playtime.never-played": {
+    "message": "لم تُلعب من قبل"
   },
   "instance.server-modal.address": {
     "message": "العنوان"
@@ -440,6 +899,30 @@
   "instance.settings.tabs.general.name": {
     "message": "الاسم"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "تحديث القناة"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "نسخة أولية"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "ستظهر الإصدارات النهائية والإصدارات التجريبية والإصدارات الأولية كـ«تحديثات متاحة»."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "بيتا"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "ستظهر الإصدارات النهائية والإصدارات التجريبية كـ«تحديثات متاحة»."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "إصدار ثابت"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "لن تظهر سوى الإصدارات النهائية ضمن التحديثات المتاحة."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "اختر قناة التحديث"
+  },
   "instance.settings.tabs.hooks": {
     "message": "إجراءات تشغيل إضافية"
   },
@@ -488,6 +971,24 @@
   "instance.settings.tabs.java": {
     "message": "جافا والذاكرة"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "متغيرات البيئة المخصصة"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "معلمات Java المخصصة"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "تثبيت Java المخصص"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "تخصيص الذاكرة حسب الطلب"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "أدخل المتغيرات البيئية..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "أدخل معلمات Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "المتغيرات البيئية"
   },
@@ -502,6 +1003,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "الذاكرة المخصَّصة"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "النافذة"
@@ -542,6 +1046,9 @@
   "instance.worlds.copy_address": {
     "message": "نسخ العنوان"
   },
+  "instance.worlds.create_shortcut": {
+    "message": "إنشاء اختصار"
+  },
   "instance.worlds.dont_show_on_home": {
     "message": "عدم العرض في الصفحة الرئيسية"
   },
@@ -578,8 +1085,20 @@
   "minecraft-account.add-account": {
     "message": "إضافة حساب"
   },
+  "minecraft-account.label": {
+    "message": "حساب ماينكرافت"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "لم يتم تسجيل الدخول"
+  },
+  "minecraft-account.remove-account": {
+    "message": "حذف الحساب"
+  },
   "minecraft-account.select-account": {
     "message": "اختيار الحساب"
+  },
+  "minecraft-account.sign-in": {
+    "message": "سجل دخولك لـ ماينكرافت"
   },
   "search.filter.locked.instance": {
     "message": "مقدَّم من النسخة"

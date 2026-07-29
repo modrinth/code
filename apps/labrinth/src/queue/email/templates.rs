@@ -4,22 +4,25 @@ use crate::database::models::ids::*;
 use crate::database::models::notifications_template_item::{
     NotificationTemplate, get_or_set_cached_dynamic_html,
 };
+use crate::database::models::report_item::DBReport;
 use crate::database::models::{
     DBOrganization, DBProject, DBUser, DatabaseError,
 };
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
 use crate::util::error::Context;
+use crate::util::http::HTTP_CLIENT;
 use ariadne::ids::base62_impl::to_base62;
 use futures::TryFutureExt;
 use lettre::Message;
 use lettre::message::{Mailbox, MultiPart, SinglePart};
+use serde::Deserialize;
 use sqlx::query;
 use std::collections::HashMap;
 use std::time::Duration;
 use tracing::{error, warn};
+use xredis::RedisPool;
 
 const USER_NAME: &str = "user.name";
 const USER_EMAIL: &str = "user.email";
@@ -61,6 +64,10 @@ const ORGINVITE_INVITER_NAME: &str = "organizationinvite.inviter.name";
 const ORGINVITE_ORG_NAME: &str = "organizationinvite.organization.name";
 const ORGINVITE_ROLE_NAME: &str = "organizationinvite.role.name";
 
+const SERVERINVITE_INVITER_NAME: &str = "inviter.name";
+const SERVERINVITE_SERVER_NAME: &str = "server.name";
+const SERVERINVITE_ROLE_NAME: &str = "server.role";
+
 const STATUSCHANGE_PROJECT_NAME: &str = "statuschange.project.name";
 const STATUSCHANGE_OLD_STATUS: &str = "statuschange.old.status";
 const STATUSCHANGE_NEW_STATUS: &str = "statuschange.new.status";
@@ -85,6 +92,8 @@ const NEWOWNER_NAME: &str = "new_owner.name";
 
 const PAYOUTAVAILABLE_AMOUNT: &str = "payout.amount";
 const PAYOUTAVAILABLE_PERIOD: &str = "payout.period";
+
+const DISCORD_LINK_URL: &str = "discord.link_url";
 
 #[derive(Clone)]
 pub struct MailingIdentity {
@@ -306,6 +315,70 @@ enum EmailTemplate {
     },
 }
 
+#[derive(Deserialize)]
+struct SharedInstance {
+    name: String,
+}
+
+async fn resolve_report_title(
+    exec: &mut PgTransaction<'_>,
+    report_id: DBReportId,
+    title: String,
+) -> Result<String, ApiError> {
+    if title != "unknown" {
+        return Ok(title);
+    }
+
+    let Some(report) = DBReport::get(report_id, &mut *exec).await? else {
+        return Ok(title);
+    };
+    let Some(shared_instance_id) = report.shared_instance_id else {
+        return Ok(title);
+    };
+
+    let instance_id = to_base62(shared_instance_id.0 as u64);
+    let with_version = |name: String| match report.shared_instance_version_id {
+        Some(version) => format!("{name} (version {version})"),
+        None => name,
+    };
+    let fallback = with_version(format!("shared instance {instance_id}"));
+    let response = HTTP_CLIENT
+        .get(format!(
+            "{}/v1/instances/{instance_id}",
+            ENV.SHARED_INSTANCES_URL
+        ))
+        .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
+        .send()
+        .await
+        .and_then(reqwest::Response::error_for_status);
+
+    let response = match response {
+        Ok(response) => response,
+        Err(error) => {
+            warn!(
+                %error,
+                report_id = report_id.0,
+                %instance_id,
+                "Failed to fetch shared instance name for report email"
+            );
+            return Ok(fallback);
+        }
+    };
+
+    match response.json::<SharedInstance>().await {
+        Ok(instance) => Ok(with_version(instance.name)),
+        Err(error) => {
+            warn!(
+                %error,
+                report_id = report_id.0,
+                %instance_id,
+                "Failed to parse shared instance name for report email"
+            );
+            Ok(fallback)
+        }
+    }
+}
+
 async fn collect_template_variables(
     exec: &mut PgTransaction<'_>,
     redis: &RedisPool,
@@ -353,7 +426,15 @@ async fn collect_template_variables(
             .await?;
 
             map.insert(REPORT_ID, to_base62(report_id.0));
-            map.insert(REPORT_TITLE, result.title);
+            map.insert(
+                REPORT_TITLE,
+                resolve_report_title(
+                    exec,
+                    DBReportId(report_id.0 as i64),
+                    result.title,
+                )
+                .await?,
+            );
             map.insert(REPORT_DATE, date_human_readable(result.created));
             Ok(EmailTemplate::Static(map))
         }
@@ -374,7 +455,15 @@ async fn collect_template_variables(
             .fetch_one(&mut *exec)
             .await?;
 
-            map.insert(REPORT_TITLE, result.title);
+            map.insert(
+                REPORT_TITLE,
+                resolve_report_title(
+                    exec,
+                    DBReportId(report_id.0 as i64),
+                    result.title,
+                )
+                .await?,
+            );
             map.insert(NEWREPORT_ID, to_base62(report_id.0));
             Ok(EmailTemplate::Static(map))
         }
@@ -598,6 +687,15 @@ async fn collect_template_variables(
         | NotificationBody::PasswordChanged
         | NotificationBody::PasswordRemoved => Ok(EmailTemplate::Static(map)),
 
+        NotificationBody::DiscordRoleCreatorClub => {
+            map.insert(
+                DISCORD_LINK_URL,
+                format!("{}/discord/link", ENV.SITE_URL.trim_end_matches('/')),
+            );
+
+            Ok(EmailTemplate::Static(map))
+        }
+
         NotificationBody::EmailChanged {
             new_email,
             to_email: _,
@@ -735,7 +833,29 @@ async fn collect_template_variables(
             title: title.to_string(),
         }),
 
+        NotificationBody::ServerInvite {
+            server_name,
+            invited_by,
+            role,
+            ..
+        } => {
+            let inviter = DBUser::get_id(
+                DBUserId(invited_by.0 as i64),
+                &mut *exec,
+                redis,
+            )
+            .await?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
+
+            map.insert(SERVERINVITE_INVITER_NAME, inviter.username);
+            map.insert(SERVERINVITE_SERVER_NAME, server_name.clone());
+            map.insert(SERVERINVITE_ROLE_NAME, role.clone());
+
+            Ok(EmailTemplate::Static(map))
+        }
+
         NotificationBody::ProjectUpdate { .. }
+        | NotificationBody::SharedInstanceInvite { .. }
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(EmailTemplate::Static(map)),

@@ -123,12 +123,14 @@ setupLoadingStateProvider()
 const client = createModrinthClient(auth.value, {
 	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
 	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
+	sharedInstancesBaseUrl: config.public.sharedInstancesBaseUrl,
 	rateLimitKey: config.rateLimitKey,
 })
 provideModrinthClient(client)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(false),
 	showAds: ref(false),
+	adConsentAvailable: ref(false),
 	openExternalUrl: (url) => window.open(url, '_blank'),
 })
 

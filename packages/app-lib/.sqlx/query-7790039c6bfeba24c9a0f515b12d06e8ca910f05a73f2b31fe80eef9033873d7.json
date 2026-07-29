@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT OR IGNORE INTO instance_groups (instance_id, group_name)\n            VALUES (?, ?)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "7790039c6bfeba24c9a0f515b12d06e8ca910f05a73f2b31fe80eef9033873d7"
+}

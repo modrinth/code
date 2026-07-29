@@ -28,6 +28,7 @@ pub async fn url_to_data_stream(
         let response = INSECURE_REQWEST_CLIENT
             .get(url.as_str())
             .header("Accept", "image/png")
+            .timeout(std::time::Duration::from_secs(10))
             .send()
             .await
             .and_then(|response| response.error_for_status())?;

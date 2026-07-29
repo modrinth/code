@@ -1,6 +1,7 @@
+use std::cmp::Reverse;
 use std::collections::HashMap;
 
-use crate::database::PgPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
@@ -9,18 +10,18 @@ use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
+use xredis::RedisPool;
 
 use super::ApiError;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(forge_updates);
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct NeoForge {
     #[serde(default = "default_neoforge")]
     pub neoforge: String,
@@ -30,12 +31,22 @@ fn default_neoforge() -> String {
     "none".into()
 }
 
-#[get("{id}/forge_updates.json")]
+#[utoipa::path(
+	context_path = "/updates",
+	tag = "updates",
+	params(
+		("id" = String, Path),
+		("neoforge" = Option<String>, Query)
+	),
+	responses((status = OK))
+)]
+#[get("/{id}/forge_updates.json")]
 pub async fn forge_updates(
     req: HttpRequest,
     web::Query(neo): web::Query<NeoForge>,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -64,7 +75,7 @@ pub async fn forge_updates(
 
     let versions = database::models::DBVersion::get_many(
         &project.versions,
-        &**pool,
+        &***ro_pool,
         &redis,
     )
     .await?;
@@ -82,11 +93,12 @@ pub async fn forge_updates(
             .collect(),
         &user_option,
         &pool,
+        &ro_pool,
         &redis,
     )
     .await?;
 
-    versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+    versions.sort_by_key(|b| Reverse(b.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {

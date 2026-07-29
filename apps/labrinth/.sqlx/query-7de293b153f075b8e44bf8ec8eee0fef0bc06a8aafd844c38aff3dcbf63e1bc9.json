@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO user_passkeys (\n                id, user_id, name, credential_id, passkey, created_at, last_used\n            )\n            VALUES (\n                $1, $2 ,$3, $4, $5, $6, $7\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Bytea",
+        "Jsonb",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7de293b153f075b8e44bf8ec8eee0fef0bc06a8aafd844c38aff3dcbf63e1bc9"
+}

@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { defineMessage, useVIntl } from '@modrinth/ui'
+import { defineMessage, formatCategory, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -150,10 +150,7 @@ export const tagsNags: Nag[] = [
 				}),
 				{
 					count: resolutionTags.length,
-					tags: sortedTags
-						.join(', ')
-						.replace('8x-', '8x or lower')
-						.replace('512x+', '512x or higher'),
+					tags: sortedTags.map((tag) => formatCategory(formatMessage, tag)).join(', '),
 				},
 			)
 		},

@@ -1,4 +1,31 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "מוריד את ‏ Java ‏{version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "מוריד עדכון"
+  },
+  "app.action-bar.downloads": {
+    "message": "הורדות"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "החבא יותר התקנים רצים"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "הפוך למקרה ראשי"
+  },
+  "app.action-bar.offline": {
+    "message": "לא מקוון"
+  },
+  "app.action-bar.stop-instance": {
+    "message": ""
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "מאפשר עיבוד מתקדם כגון אפקטים טשטוש העלולים לגרום לבעיות ביצועים ללא עיבוד מואץ לחומרה."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "חזרה לעולמות"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
   },
@@ -17,9 +44,6 @@
   "app.browse.already-added": {
     "message": "כבר נוסף"
   },
-  "app.browse.discover-content": {
-    "message": "גלה תוכן"
-  },
   "app.browse.discover-servers": {
     "message": "גלה שרתים"
   },
@@ -31,9 +55,6 @@
   },
   "app.export-modal.header": {
     "message": "יצוא חבילת מודים"
-  },
-  "app.export-modal.modpack-name-label": {
-    "message": "שם חבילת המודים"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "שם חבילת המודים"
@@ -92,12 +113,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "עיון בשרתים"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' יימחק לצמיתות, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "האם אתה בטוח שברצונך למחוק לצמיתות את העולם הזה?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "עם מודים"
   },
@@ -116,23 +131,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "אין שרתים אן עולמות שנוספו"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "אתה בטוח שאתה רוצה להסיר {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "חיפוש ב-{count} עולמות..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "השרת הזה"
-  },
-  "app.modal.install-to-play.content-required": {
-    "message": "תוכן נדרש"
   },
   "app.modal.install-to-play.header": {
     "message": "צריך להתקין כדי לשחק"
@@ -143,29 +143,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {מוד אחד} other {# מודים}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "חבילת מודים נדרשת"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "שרת זה דורש מודים כדי לשחק. לחץ על \"התקן\" כדי להגדיר את הקבצים הנדרשים מ-Modrinth, ולאחר מכן הפעל ישירות לשרת."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "התקנה משותפת"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "התקנת שרת משותפת"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "הצג תוכן"
   },
   "app.modal.update-to-play.header": {
     "message": "צריך לעדכן כדי לשחק"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "עדכון נדרש"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "עדכון נדרש כדי לשחק ב{name}. ניתן להתחיל את המשחק רק לאחר עדכון לגרסה החדשה."
   },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
@@ -191,9 +176,6 @@
   "app.settings.tabs.resource-management": {
     "message": "ניהול משאבים"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} מוכנה להורדה!\nיש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} סיימה את תהליך ההורדה. יש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
   },
@@ -212,9 +194,6 @@
   "app.update-popup.download-complete": {
     "message": "הורדה הושלמה"
   },
-  "app.update-popup.reload": {
-    "message": "רענן"
-  },
   "app.update-popup.title": {
     "message": "עדכון זמין"
   },
@@ -223,15 +202,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "גרסה {version} הותקנה בהצלחה!"
-  },
-  "app.update.download-update": {
-    "message": "הורדת עדכון"
-  },
-  "app.update.downloading-update": {
-    "message": "מוריד עדכון ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "צריך לרענן כדי להתקין את העדכון"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

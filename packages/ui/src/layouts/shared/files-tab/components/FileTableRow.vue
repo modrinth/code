@@ -118,11 +118,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import { commonMessages } from '#ui/utils/common-messages'
-import {
-	getFileExtension,
-	isEditableFile as isEditableFileExt,
-	isImageFile,
-} from '#ui/utils/file-extensions'
+import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
 import {
 	fileDragActive,
@@ -133,6 +129,7 @@ import {
 } from '../composables/file-drag-state'
 import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
+import { joinDisplayPath } from '../utils'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -204,8 +201,7 @@ const fileExtension = computed(() => getFileExtension(props.name))
 const isZip = computed(() => fileExtension.value === 'zip')
 
 function getFullPath() {
-	const basePath = ctx.basePath?.value
-	return basePath ? `${basePath}/${props.path}`.replace(/\/+/g, '/') : props.path
+	return joinDisplayPath(ctx.basePath?.value, props.path)
 }
 
 const menuOptions = computed(() => {
@@ -303,8 +299,7 @@ const formattedCreationDate = computed(() => {
 
 const isEditableFile = computed(() => {
 	if (props.type === 'file') {
-		const ext = fileExtension.value
-		return !props.name.includes('.') || isEditableFileExt(ext) || isImageFile(ext)
+		return canOpenInFileEditor(props.name)
 	}
 	return false
 })

@@ -1,68 +1,98 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		selected?: boolean
 		tooltip?: string
+		dragActive?: boolean
+		dropzone?: boolean
+		disabled?: boolean
 	}>(),
 	{
 		selected: false,
 		tooltip: undefined,
+		dragActive: false,
+		dropzone: false,
+		disabled: false,
 	},
 )
 
-const emit = defineEmits<{ (e: 'click', event: MouseEvent): void }>()
+const emit = defineEmits<{
+	(e: 'click', event: MouseEvent): void
+	(e: 'dragenter' | 'dragover' | 'dragleave' | 'drop', event: DragEvent): void
+}>()
 
-const pressed = ref(false)
+const root = useTemplateRef<HTMLElement>('root')
+const isHighlighted = computed(() => props.selected || props.dragActive)
+
+function handleDragEvent(
+	eventName: 'dragenter' | 'dragover' | 'dragleave' | 'drop',
+	event: DragEvent,
+) {
+	if (props.disabled) {
+		return
+	}
+
+	if (props.dropzone) {
+		event.preventDefault()
+		if (event.dataTransfer) {
+			event.dataTransfer.dropEffect = 'copy'
+		}
+	}
+
+	emit(eventName, event)
+}
+
+function getRootElement() {
+	return root.value
+}
+
+defineExpose({ getRootElement })
 </script>
 
 <template>
 	<div
+		ref="root"
 		v-tooltip="tooltip ?? undefined"
-		class="group relative overflow-hidden rounded-xl border-2 transition-all duration-200"
-		:class="[selected ? 'border-brand' : 'border-transparent hover:border-inverted']"
+		class="group relative flex flex-col items-center justify-center overflow-hidden rounded-[20px] border border-dashed transition-[background,border-color,box-shadow] duration-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand"
+		:class="[
+			isHighlighted
+				? 'border-brand bg-brand-highlight'
+				: disabled
+					? 'border-surface-5 bg-surface-2'
+					: 'border-surface-5 bg-surface-2 hover:bg-surface-3',
+			disabled ? 'opacity-[0.65]' : '',
+		]"
+		@dragenter="handleDragEvent('dragenter', $event)"
+		@dragover="handleDragEvent('dragover', $event)"
+		@dragleave="handleDragEvent('dragleave', $event)"
+		@drop="handleDragEvent('drop', $event)"
 	>
 		<button
-			class="skin-btn-bg absolute inset-0 cursor-pointer p-0 border-none group-hover:brightness-125 transition-all duration-200"
-			:class="selected ? 'selected' : ''"
-			@mousedown="pressed = true"
-			@mouseup="pressed = false"
-			@mouseleave="pressed = false"
+			type="button"
+			:aria-label="tooltip ?? undefined"
+			class="absolute inset-0 z-0 cursor-pointer border-none bg-transparent p-0"
+			:class="{ 'cursor-not-allowed': disabled }"
+			:disabled="disabled"
 			@click="(e) => emit('click', e)"
 		></button>
 
 		<div
-			class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none z-10"
+			class="pointer-events-none relative z-10 flex h-full w-full flex-col items-center justify-center gap-4 px-3 text-center"
+			:class="dragActive ? 'text-brand' : 'text-contrast'"
 		>
-			<div v-if="$slots.icon" class="mb-2">
+			<div v-if="$slots.icon" class="size-8">
 				<slot name="icon" />
 			</div>
-			<span class="text-md text-center px-2 text-primary">
-				<slot />
-			</span>
+			<div class="flex flex-col items-center gap-0.5 whitespace-nowrap">
+				<span class="text-base font-semibold leading-6">
+					<slot />
+				</span>
+				<span v-if="$slots.subtitle" class="text-sm font-medium leading-5 text-primary">
+					<slot name="subtitle" />
+				</span>
+			</div>
 		</div>
 	</div>
 </template>
-
-<style scoped lang="scss">
-.skin-btn-bg {
-	background: var(--color-gradient-button-bg);
-}
-
-.skin-btn-bg.selected {
-	background:
-		linear-gradient(
-			157.61deg,
-			var(--color-brand) -76.68%,
-			rgba(27, 217, 106, 0.534) -38.61%,
-			rgba(12, 89, 44, 0.6) 100.4%
-		),
-		var(--color-bg);
-}
-
-.skin-btn-bg.selected:hover,
-.group:hover .skin-btn-bg.selected {
-	filter: brightness(1.15);
-}
-</style>

@@ -9,8 +9,10 @@
 							id="edit-allocation-name"
 							ref="editAllocationInput"
 							v-model="editAllocationName"
+							v-tooltip="advancedActionTooltip"
 							wrapper-class="w-full"
 							:maxlength="32"
+							:disabled="!canUseAdvancedSettings"
 							placeholder="e.g. Secondary allocation"
 						/>
 						<div class="mb-1 mt-4 flex justify-end gap-2.5">
@@ -18,7 +20,11 @@
 								<button @click="editAllocationModal?.hide()">Cancel</button>
 							</ButtonStyled>
 							<ButtonStyled color="brand">
-								<button :disabled="!editAllocationName || creatingAllocation" type="submit">
+								<button
+									v-tooltip="advancedActionTooltip"
+									:disabled="!editAllocationName || creatingAllocation || !canUseAdvancedSettings"
+									type="submit"
+								>
 									<SaveIcon /> Update allocation
 								</button>
 							</ButtonStyled>
@@ -70,15 +76,17 @@
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
 							<StyledInput
 								v-model="createAllocationName"
+								v-tooltip="advancedActionTooltip"
 								wrapper-class="grow max-w-[400px]"
 								:maxlength="32"
+								:disabled="!canUseAdvancedSettings"
 								placeholder="e.g. Secondary allocation"
 							/>
 
 							<ButtonStyled color="brand">
 								<button
-									v-tooltip="!createAllocationName ? 'Enter a name to create an allocation' : ''"
-									:disabled="!createAllocationName || creatingAllocation"
+									v-tooltip="createAllocationTooltip"
+									:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
 									@click="addNewAllocation"
 								>
 									<PlusIcon />
@@ -104,12 +112,20 @@
 									</ButtonStyled>
 									<template v-if="!row.primary">
 										<ButtonStyled type="transparent" circular>
-											<button @click="showEditAllocationModal(row.port)">
+											<button
+												v-tooltip="advancedActionTooltip"
+												:disabled="!canUseAdvancedSettings"
+												@click="showEditAllocationModal(row.port)"
+											>
 												<PencilIcon />
 											</button>
 										</ButtonStyled>
 										<ButtonStyled type="outlined" circular color="red">
-											<button @click="showConfirmDeleteModal(row.port)">
+											<button
+												v-tooltip="advancedActionTooltip"
+												:disabled="!canUseAdvancedSettings"
+												@click="showConfirmDeleteModal(row.port)"
+											>
 												<TrashIcon />
 											</button>
 										</ButtonStyled>
@@ -209,6 +225,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import { ButtonStyled, ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -219,6 +236,7 @@ const { addNotification } = injectNotificationManager()
 const { server, serverId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const { canUseAdvancedSettings, permissionDeniedMessage } = useServerPermissions()
 
 const data = server
 
@@ -271,8 +289,17 @@ const editAllocationName = ref('')
 const newAllocationPort = ref(0)
 const allocationToDelete = ref<number | null>(null)
 const creatingAllocation = ref(false)
+const advancedActionTooltip = computed(() =>
+	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
+)
+const createAllocationTooltip = computed(() => {
+	if (!canUseAdvancedSettings.value) return permissionDeniedMessage.value
+	if (!createAllocationName.value) return 'Enter a name to create an allocation'
+	return undefined
+})
 
 const addNewAllocation = async () => {
+	if (!canUseAdvancedSettings.value) return
 	if (!createAllocationName.value) return
 	creatingAllocation.value = true
 
@@ -295,6 +322,7 @@ const addNewAllocation = async () => {
 }
 
 const showEditAllocationModal = (port: number) => {
+	if (!canUseAdvancedSettings.value) return
 	newAllocationPort.value = port
 	editAllocationName.value = allocations.value?.find((a) => a.port === port)?.name ?? ''
 	editAllocationModal.value?.show()
@@ -306,11 +334,13 @@ const showEditAllocationModal = (port: number) => {
 }
 
 const showConfirmDeleteModal = (port: number) => {
+	if (!canUseAdvancedSettings.value) return
 	allocationToDelete.value = port
 	confirmDeleteModal.value?.show()
 }
 
 const confirmDeleteAllocation = async () => {
+	if (!canUseAdvancedSettings.value) return
 	if (allocationToDelete.value === null) return
 
 	await client.archon.servers_v0.deleteAllocation(serverId, allocationToDelete.value)
@@ -326,6 +356,7 @@ const confirmDeleteAllocation = async () => {
 }
 
 const editAllocation = async () => {
+	if (!canUseAdvancedSettings.value) return
 	if (!editAllocationName.value) return
 	creatingAllocation.value = true
 

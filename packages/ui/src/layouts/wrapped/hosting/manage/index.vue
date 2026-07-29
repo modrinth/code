@@ -2,7 +2,7 @@
 	<div
 		data-pyro-server-list-root
 		class="relative mx-auto mb-6 flex w-full flex-col p-6"
-		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-4.5rem)]'"
+		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-14.5rem)]'"
 	>
 		<ServersGuestPlanModal
 			ref="guestPlanModal"
@@ -23,7 +23,6 @@
 			:customer="customer"
 			:payment-methods="paymentMethods"
 			:currency="selectedCurrency"
-			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
@@ -68,7 +67,7 @@
 						<li v-if="fetchError" class="text-red">
 							<p>{{ formatMessage(messages.errorDetails) }}</p>
 							<CopyCode
-								:text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
+								:text="formatFetchError(fetchError)"
 								:copyable="false"
 								:selectable="false"
 								:language="'json'"
@@ -143,7 +142,7 @@
 					/>
 				</div>
 
-				<div v-else key="list">
+				<div v-else key="list" class="flex flex-col gap-6">
 					<Transition
 						enter-active-class="transition-all duration-300 ease-out"
 						enter-from-class="opacity-0 max-h-0"
@@ -161,29 +160,67 @@
 						</div>
 					</Transition>
 
-					<TransitionGroup
-						v-if="filteredData.length > 0 || isPollingForNewServers"
-						name="list"
-						tag="ul"
-						class="m-0 flex flex-col gap-3 p-0"
-					>
-						<MedalServerListing
-							v-for="server in filteredData.filter((s) => s.is_medal)"
-							:key="server.server_id"
-							v-bind="server"
-							@upgrade="openMedalUpgradeModal"
-						/>
-						<ServerListing
-							v-for="server in filteredData.filter((s) => !s.is_medal)"
-							:key="server.server_id"
-							v-bind="server"
-							:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
-							:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
-							:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
-							:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
-						/>
-					</TransitionGroup>
-					<div v-else>{{ formatMessage(messages.noServersFound) }}</div>
+					<section v-if="ownedServerList.length > 0" class="flex flex-col gap-3">
+						<h2 class="m-0 text-xl font-semibold text-primary">
+							{{ formatMessage(messages.yourServersTitle) }}
+						</h2>
+						<TransitionGroup
+							v-if="ownedFilteredData.length > 0"
+							name="list"
+							tag="ul"
+							class="m-0 flex flex-col gap-3 p-0"
+						>
+							<MedalServerListing
+								v-for="server in ownedFilteredData.filter((s) => s.is_medal)"
+								:key="`owned-medal-${server.server_id}`"
+								v-bind="server"
+								@upgrade="openMedalUpgradeModal"
+							/>
+							<ServerListing
+								v-for="server in ownedFilteredData.filter((s) => !s.is_medal)"
+								:key="`owned-${server.server_id}`"
+								v-bind="server"
+								:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
+								:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
+								:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
+								:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
+							/>
+						</TransitionGroup>
+						<div v-else class="text-secondary">
+							{{ formatMessage(messages.noOwnedServersFound) }}
+						</div>
+					</section>
+
+					<section v-if="sharedServerList.length > 0" class="flex flex-col gap-3">
+						<h2 class="m-0 text-xl font-semibold text-primary">
+							{{ formatMessage(messages.sharedServersTitle) }}
+						</h2>
+						<TransitionGroup
+							v-if="sharedFilteredData.length > 0"
+							name="list"
+							tag="ul"
+							class="m-0 flex flex-col gap-3 p-0"
+						>
+							<MedalServerListing
+								v-for="server in sharedFilteredData.filter((s) => s.is_medal)"
+								:key="`shared-medal-${server.server_id}`"
+								v-bind="server"
+								@upgrade="openMedalUpgradeModal"
+							/>
+							<ServerListing
+								v-for="server in sharedFilteredData.filter((s) => !s.is_medal)"
+								:key="`shared-${server.server_id}`"
+								v-bind="server"
+							/>
+						</TransitionGroup>
+						<div v-else class="text-secondary">
+							{{ formatMessage(messages.noSharedServersFound) }}
+						</div>
+					</section>
+
+					<div v-if="filteredData.length === 0 && !isPollingForNewServers">
+						{{ formatMessage(messages.noServersFound) }}
+					</div>
 				</div>
 			</Transition>
 		</template>
@@ -210,7 +247,6 @@ import {
 	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'
-import type { ModrinthServersFetchError } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -220,6 +256,7 @@ import { type ComponentPublicInstance, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
+import type { ServerListingOwner } from '#ui/components/servers/access'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
 import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from '#ui/providers'
@@ -270,11 +307,27 @@ const messages = defineMessages({
 		defaultMessage: 'Search {count} {count, plural, one {server} other {servers}}...',
 	},
 	newServerButton: { id: 'servers.manage.new-server-button', defaultMessage: 'New server' },
+	yourServersTitle: {
+		id: 'servers.manage.your-servers-title',
+		defaultMessage: 'Your servers',
+	},
+	sharedServersTitle: {
+		id: 'servers.manage.shared-servers-title',
+		defaultMessage: 'Shared servers',
+	},
 	checkingForNewServers: {
 		id: 'servers.manage.checking-for-new-servers',
 		defaultMessage: 'Checking for new servers...',
 	},
 	noServersFound: { id: 'servers.manage.no-servers-found', defaultMessage: 'No servers found.' },
+	noOwnedServersFound: {
+		id: 'servers.manage.no-owned-servers-found',
+		defaultMessage: 'No servers you own match your search.',
+	},
+	noSharedServersFound: {
+		id: 'servers.manage.no-shared-servers-found',
+		defaultMessage: 'No shared servers match your search.',
+	},
 	handleErrorTitle: {
 		id: 'servers.manage.handle-error.title',
 		defaultMessage: 'An error occurred',
@@ -353,12 +406,6 @@ const medalUpgradeModal = ref<UpgradeModalRef | null>(null)
 const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
 const affiliateCode = ref<string | null>(null)
 const selectedCurrency = ref<string>('USD')
-const regionPings = ref<
-	{
-		region: string
-		ping: number
-	}[]
->([])
 
 const pyroProducts = computed(() => {
 	return [...props.products]
@@ -399,19 +446,6 @@ const { data: regions, isLoading: regionsLoading } = useQuery({
 	enabled: loggedIn,
 })
 
-watch(
-	regions,
-	(newRegions) => {
-		regionPings.value = []
-		if (newRegions) {
-			newRegions.forEach((region) => {
-				runPingTest(region)
-			})
-		}
-	},
-	{ immediate: true },
-)
-
 async function fetchPaymentData() {
 	await Promise.all([refetchCustomer(), refetchPaymentMethods()])
 }
@@ -422,84 +456,6 @@ async function fetchStock(
 ): Promise<number> {
 	const result = await client.archon.servers_v0.checkStock(region.shortcode, request)
 	return result.available
-}
-
-const PING_COUNT = 20
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
-
-function runPingTest(region: Archon.Servers.v1.Region, index = 1) {
-	if (index > 10) {
-		regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
-		regionPings.value.push({
-			region: region.shortcode,
-			ping: -1,
-		})
-		return
-	}
-
-	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
-	try {
-		const socket = new WebSocket(wsUrl)
-		const pings: number[] = []
-		let finalized = false
-
-		const finalize = (ping: number) => {
-			if (finalized) return
-			finalized = true
-			clearTimeout(connectTimeout)
-			regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
-			regionPings.value.push({
-				region: region.shortcode,
-				ping,
-			})
-			socket.close()
-		}
-
-		const retryNext = () => {
-			if (finalized) return
-			finalized = true
-			clearTimeout(connectTimeout)
-			socket.close()
-			runPingTest(region, index + 1)
-		}
-
-		// Prevent hangs where the socket never opens or errors.
-		const connectTimeout = setTimeout(() => {
-			retryNext()
-		}, 3000)
-
-		socket.onopen = () => {
-			clearTimeout(connectTimeout)
-
-			for (let i = 0; i < PING_COUNT; i++) {
-				setTimeout(() => {
-					socket.send(String(performance.now()))
-				}, i * PING_INTERVAL)
-			}
-			setTimeout(
-				() => {
-					const median =
-						pings.length > 0
-							? Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
-							: -1
-					finalize(median)
-				},
-				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-			)
-		}
-
-		socket.onmessage = (event) => {
-			const start = Number(event.data)
-			pings.push(performance.now() - start)
-		}
-
-		socket.onerror = () => {
-			retryNext()
-		}
-	} catch {
-		runPingTest(region, index + 1)
-	}
 }
 
 const {
@@ -562,19 +518,15 @@ const serverList = computed<Archon.Servers.v0.Server[]>(() => {
 
 const showEmptyState = computed(
 	() =>
-		!showServersListLoading.value && serverList.value.length === 0 && !isPollingForNewServers.value,
+		!showServersListLoading.value &&
+		ownedServerList.value.length === 0 &&
+		sharedServerList.value.length === 0 &&
+		!isPollingForNewServers.value,
 )
 
 const searchInput = ref('')
 
-const fuse = computed(() => {
-	if (serverList.value.length === 0) return null
-	return new Fuse(serverList.value, {
-		keys: ['name', 'loader', 'mc_version', 'game', 'state'],
-		includeScore: true,
-		threshold: 0.4,
-	})
-})
+type ServerWithOwner = Archon.Servers.v0.Server & { owner?: ServerListingOwner }
 
 function isSetToCancel(server: Archon.Servers.v0.Server): boolean {
 	return (
@@ -611,14 +563,56 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 	return new Date() > thirtyDaysLater
 }
 
-const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
-	const base = !searchInput.value.trim()
-		? sortServers(serverList.value)
-		: fuse.value
-			? sortServers(fuse.value.search(searchInput.value).map((result) => result.item))
-			: []
-	return base.filter((server) => !filesExpired(server))
-})
+function isServerOwnedByCurrentUser(server: Archon.Servers.v0.Server): boolean {
+	return server.owner_id === auth.user.value?.id
+}
+
+function getServerOwner(server: Archon.Servers.v0.Server): ServerListingOwner | undefined {
+	const owner = serverResponse.value?.users?.[server.owner_id]
+	if (!owner) return undefined
+
+	return {
+		username: owner.username,
+		avatarUrl: owner.avatar_url ?? undefined,
+	}
+}
+
+const ownedServerList = computed<ServerWithOwner[]>(() =>
+	serverList.value.filter((server) => !filesExpired(server) && isServerOwnedByCurrentUser(server)),
+)
+const sharedServerList = computed<ServerWithOwner[]>(() =>
+	serverList.value
+		.filter((server) => !filesExpired(server) && !isServerOwnedByCurrentUser(server))
+		.map((server) => ({
+			...server,
+			owner: getServerOwner(server),
+		})),
+)
+
+function filterServersBySearch(servers: ServerWithOwner[]): ServerWithOwner[] {
+	const normalizedSearch = searchInput.value.trim()
+	if (!normalizedSearch) return sortServers(servers) as ServerWithOwner[]
+
+	const fuse = new Fuse(servers, {
+		keys: ['name', 'loader', 'mc_version', 'game', 'state', 'owner.username'],
+		includeScore: true,
+		threshold: 0.4,
+	})
+	return sortServers(
+		fuse.search(normalizedSearch).map((result) => result.item),
+	) as ServerWithOwner[]
+}
+
+const ownedFilteredData = computed<ServerWithOwner[]>(() =>
+	filterServersBySearch(ownedServerList.value),
+)
+const sharedFilteredData = computed<ServerWithOwner[]>(() =>
+	filterServersBySearch(sharedServerList.value),
+)
+const filteredData = computed<ServerWithOwner[]>(() => [
+	...ownedFilteredData.value,
+	...sharedFilteredData.value,
+])
 
 // Start polling only after initial data is available so the baseline is correct
 watch(serverResponse, (response) => {
@@ -680,6 +674,10 @@ function handleError(err: unknown) {
 		type: 'error',
 		text: error?.message ?? error?.data?.description ?? String(err),
 	})
+}
+
+function formatFetchError(error: unknown) {
+	return error instanceof Error && error.message ? error.message : 'Unknown error'
 }
 
 function handleSignIn() {

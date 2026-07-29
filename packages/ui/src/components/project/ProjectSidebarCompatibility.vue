@@ -2,7 +2,9 @@
 	<div v-if="project.versions?.length > 0" class="flex flex-col gap-3">
 		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<section class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
+			<h3 class="text-primary !font-normal text-base m-0">
+				{{ formatMessage(messages.minecraftJava) }}
+			</h3>
 			<div class="flex flex-wrap gap-1">
 				<TagItem
 					v-for="version in getVersionsToDisplay(project, tags.gameVersions)"
@@ -13,7 +15,9 @@
 			</div>
 		</section>
 		<section v-if="project.project_type !== 'resourcepack'" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.platforms) }}</h3>
+			<h3 class="text-primary !font-normal text-base m-0">
+				{{ formatMessage(messages.platforms) }}
+			</h3>
 			<div class="flex flex-wrap gap-1">
 				<template v-if="noModpackLoader">
 					<TagItem class="border !border-solid border-surface-5 hover:no-underline">
@@ -34,12 +38,11 @@
 			</div>
 		</section>
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
+			<h3 class="text-primary !font-normal text-base m-0">
+				{{ formatMessage(messages.environments) }}
+			</h3>
 			<div class="flex flex-wrap gap-1">
-				<TagItem v-for="tag in primaryEnvironmentTags" :key="`environment-tag-${tag.message.id}`">
-					<component :is="tag.icon" />
-					{{ formatMessage(tag.message) }}
-				</TagItem>
+				<EnvironmentTags :environment="primaryEnvironment" />
 			</div>
 		</section>
 		<section
@@ -100,18 +103,14 @@ import {
 	ServerIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { FormattedTag, TagItem } from '@modrinth/ui'
-import type { EnvironmentV3, GameVersionTag, PlatformTag } from '@modrinth/utils'
+import { FormattedTag, projectCompatibilityMessages, TagItem } from '@modrinth/ui'
+import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { getVersionsToDisplay } from '@modrinth/utils'
-import { type Component, computed } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import {
-	defineMessage,
-	defineMessages,
-	type MessageDescriptor,
-	useVIntl,
-} from '../../composables/i18n'
+import { useVIntl } from '../../composables/i18n'
+import EnvironmentTags from './EnvironmentTags.vue'
 
 const { formatMessage } = useVIntl()
 // TODO: anything in this component that uses the router will not work in the app. and this component is used in the app.
@@ -153,104 +152,9 @@ const showEnvironments = computed(
 		primaryEnvironment.value,
 )
 
-const primaryEnvironment = computed<EnvironmentV3 | undefined>(() =>
-	props.projectV3?.environment?.find((x) => x !== 'unknown'),
+const primaryEnvironment = computed<Labrinth.Projects.v3.Environment>(
+	() => props.projectV3?.environment?.find((x) => x !== 'unknown') ?? 'unknown',
 )
 
-type EnvironmentTag = {
-	icon: Component
-	message: MessageDescriptor
-	environments: EnvironmentV3[]
-}
-
-const environmentTags: EnvironmentTag[] = [
-	{
-		icon: ClientIcon,
-		message: defineMessage({
-			id: `project.about.compatibility.environments.client-side`,
-			defaultMessage: 'Client-side',
-		}),
-		environments: [
-			'client_only',
-			'client_only_server_optional',
-			'client_or_server',
-			'client_or_server_prefers_both',
-		],
-	},
-	{
-		icon: ServerIcon,
-		message: defineMessage({
-			id: `project.about.compatibility.environments.server-side`,
-			defaultMessage: 'Server-side',
-		}),
-		environments: [
-			'server_only',
-			'server_only_client_optional',
-			'client_or_server',
-			'client_or_server_prefers_both',
-		],
-	},
-	{
-		icon: ServerIcon,
-		message: defineMessage({
-			id: `project.about.compatibility.environments.dedicated-servers-only`,
-			defaultMessage: 'Dedicated servers only',
-		}),
-		environments: ['dedicated_server_only'],
-	},
-	{
-		icon: UserIcon,
-		message: defineMessage({
-			id: `project.about.compatibility.environments.singleplayer-only`,
-			defaultMessage: 'Singleplayer only',
-		}),
-		environments: ['singleplayer_only'],
-	},
-	{
-		icon: UserIcon,
-		message: defineMessage({
-			id: `project.about.compatibility.environments.singleplayer`,
-			defaultMessage: 'Singleplayer',
-		}),
-		environments: ['server_only'],
-	},
-	{
-		icon: MonitorSmartphoneIcon,
-		message: defineMessage({
-			id: `project.about.compatibility.environments.client-and-server`,
-			defaultMessage: 'Client and server',
-		}),
-		environments: [
-			'client_and_server',
-			'client_only_server_optional',
-			'server_only_client_optional',
-			'client_or_server_prefers_both',
-		],
-	},
-]
-
-const primaryEnvironmentTags = computed(() => {
-	return primaryEnvironment.value
-		? environmentTags.filter((x) => x.environments.includes(primaryEnvironment.value ?? 'unknown'))
-		: []
-})
-
-const messages = defineMessages({
-	title: {
-		id: `project.about.compatibility.title`,
-		defaultMessage: 'Compatibility',
-	},
-	minecraftJava: {
-		id: `project.about.compatibility.game.minecraftJava`,
-		defaultMessage: 'Minecraft: Java Edition',
-	},
-	platforms: {
-		id: `project.about.compatibility.platforms`,
-		defaultMessage: 'Platforms',
-	},
-	environments: {
-		id: `project.about.compatibility.environments`,
-		defaultMessage: 'Supported environments',
-	},
-})
+const messages = projectCompatibilityMessages
 </script>

@@ -17,17 +17,29 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Додайте адресу Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Додайте дійсний URL і назву ідентифікатора SPDX для власної ліцензії."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Додати деталі ліцензії"
+  },
   "nags.add-links-server.description": {
-    "defaultMessage": "Додайте будь-які доречні посилання, націлені за межі Modrinth, наприклад вебсайт, крамниця або запрошення Discord."
+    "defaultMessage": "Додайте будь-які доречні посилання поза Modrinth, як-от на вебсайт, крамницю або запрошення до Discord."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Додайте зовнішні посилання"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Додайте будь-які доречні посилання, націлені за межі Modrinth, наприклад на вихідний код, систему відстеження проблем чи запрошення Discord."
+    "defaultMessage": "Додайте будь-які доречні посилання, націлені за межі Modrinth, наприклад, на вихідний код, систему відстеження проблем чи запрошення Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Додайте зовнішні посилання"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Ви обрали всі доступні мови. Будь ласка, оберіть лише ті мови, які ваш сервер підтримує."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Обрати активні мови"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Ви обрали {totalAvailableTags, plural, one {# доступний теґ} other {всі # доступні теґи}}. Це суперечить меті теґів, які покликані допомогти користувачам знаходити відповідні проєкти. Будь ласка, вибирайте лише ті теґи, що стосуються вашого проєкту."
@@ -66,7 +78,7 @@
     "defaultMessage": "Відвідайте сторінку галереї"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ваш {type, select, mod {мод} plugin {плаґін} other {проєкт}} використовує ліцензію, яка вимагає наявности вихідного коду. Будь ласка, надайте посилання на вихідний код або файл з вихідними кодами для кожної додаткової версії або використовуйте іншу ліцензію."
+    "defaultMessage": "Ваш {type} використовує ліцензію, що вимагає відкритости вихідного коду. Надайте посилання на вихідний код (або файли з кодом) для кожної версії, або змініть ліцензію."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
@@ -75,7 +87,7 @@
     "defaultMessage": "Деякі з ваших посилань, схоже, однакові. Кожне посилання слід вводити лише один раз й у відповідне для нього поле."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Однакові посилання"
+    "defaultMessage": "Прибрати однакові посилання"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Ваш опис повинен містити достатню кількість простого тексту або альтернативного тексту зображень, щоби він був зрозумілим для тих, хто використовує читачі екрану або має повільне з’єднання з інтернетом."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Виберіть правильну роздільність"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Переконайтеся, що ви надали підтвердження дозволу на поширення будь-якого стороннього контенту у своєму мод паку."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Перевірити дозволи на використання стороннього контенту"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Виберіть, які версії підтримує ваш сервер, виберіть збірку або завантажте власну."
   },
@@ -159,7 +177,7 @@
     "defaultMessage": "Виберіть мову"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Виберіть ліцезію під якою поширюється {type, select, mod {ваш мод} modpack {ваша збірка} resourcepack {ваш пакет ресурсів} shader {ваш шейдер} plugin {ваш плаґін} datapack {ваш пакет даних} other {ваш проєкт}}."
+    "defaultMessage": "Оберіть ліцензію, за якою ваш {type} поширюватиметься."
   },
   "nags.select-license.title": {
     "defaultMessage": "Виберіть ліцензію"
@@ -181,6 +199,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Відвідайте налаштування посилань"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Перейти до панелі керування дозволами"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Відвідайте налаштування теґів"
@@ -212,6 +233,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Скоротіть назву"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Ви обрали {languageCount, plural, one {# мову} few {# мови} many {# мов} other {# мови}}. Будь ласка, оберіть лише ті мови, які ваш сервер підтримує."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Обрати активні мови"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Вами вибрано {tagCount, plural, one {# теґ} few {# теґи} other {# теґів}}. Будь ласка, зменште їх кількість до {maxTagCount}, щоб переконатися, що ваш сервер видно в доречних результатах пошуку."
   },
@@ -225,7 +252,10 @@
     "defaultMessage": "Виберіть відповідні теґи"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Хоча б одне зображення необхідне для демонстрації вмісту вашого {type, select, resourcepack {пакета ресурсів, за винятком звукових або локалізаційних пакетів. Якщо це описує ваш пакет, виберіть відповідний теґ} shader {шейдера} other {проєкту}}."
+    "defaultMessage": "Потрібно щонайменше одне зображення з галереї, щоб показати вміст вашого {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "пакет ресурсів, окрім аудіопакетів або пакетів локалізації. Якщо це відповідає вашому пакету, будь ласка, оберіть відповідний теґ"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Завантажте зображення до галереї"

@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Mengunduh Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Mengunduh pembaruan"
+  },
   "app.action-bar.downloads": {
     "message": "Unduhan"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instans utama"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Muat ulang untuk memperbarui"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Tampilkan lebih banyak instans yang sedang berjalan"
   },
   "app.action-bar.stop-instance": {
     "message": "Hentikan instans"
+  },
+  "app.action-bar.update": {
+    "message": "Perbarui"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Lihat pengunduhan berlangsung"
@@ -56,11 +65,20 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Pustaka"
   },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Halaman arahan bawaan"
+  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan label nama"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Menyertakan dunia terkini dalam bagian \"Masuk kembali\" pada Beranda."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Masuk kembali ke dunia"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Kecilkan pluncur ketika proses Minecraft berjalan."
@@ -68,8 +86,26 @@
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Kecilkan peluncur"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Pilih opsi"
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Gunakan bingkai jendela sistem (wajib menjalankan ulang aplikasi)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Hiasan asli"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Menampilkan seberapa lama Anda memainkan sebuah instans."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Tampilkan waktu bermain"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Menghidupkan kemampuan untuk menghidupkan dan mematikan bilah sisi."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Hidup/matikan bilah sisi"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Bila Anda mencoba memasangkan berkas Modrinth Pack (.mrpack) yang tidak dihoskan pada Modrinth, kami akan memastikan Anda untuk memahami risikonya sebelum memasangkannya."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Peringatkan saya sebelum memasang paket mod tidak dikenal"
@@ -101,26 +137,20 @@
   "app.browse.back-to-instance": {
     "message": "Kembali ke instans"
   },
-  "app.browse.discover-content": {
-    "message": "Temukan konten"
-  },
   "app.browse.discover-servers": {
     "message": "Temukan server"
-  },
-  "app.browse.hide-added-servers": {
-    "message": "Sembunyikan server yang sudah ditambah"
   },
   "app.browse.project-type.modpacks": {
     "message": "Paket Mod"
   },
+  "app.browse.server-instance-content-warning": {
+    "message": "Menambah konten dapat merusak kompatibilitas saat bergabung ke server. Konten tambahan apa pun akan hilang ketika Anda memperbarui konten instans server."
+  },
   "app.browse.server.installing": {
     "message": "Memasang"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Memasang paket mod..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
   },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan deskripsi paket mod..."
@@ -131,17 +161,8 @@
   "app.export-modal.header": {
     "message": "Ekspor paket mod"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Sertakan \"{file}\"?"
-  },
-  "app.export-modal.modpack-name-label": {
-    "message": "Nama Paket Mod"
-  },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nama paket mod"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Konfigurasikan berkas mana yang disertakan dalam pengeksporan ini"
   },
   "app.export-modal.version-number-label": {
     "message": "Nomor versi"
@@ -197,12 +218,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Telusuri server"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' akan **dihapus secara permanen**, dan Anda tidak akan dapat memulihkannya."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Apakah Anda yakin ingin menghapus dunia ini secara permanen?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Dimodifikasi"
   },
@@ -221,23 +236,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Tidak ada server atau dunia yang ditambahkan"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' akan dihapus dari daftar Anda, termasuk di dalam permainan, dan Anda tidak akan dapat memulihkannya."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) akan dihapus dari daftar Anda, termasuk di dalam permainan, dan Anda tidak akan dapat memulihkannya."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Apakah Anda yakin ingin menghapus {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "server ini"
-  },
-  "app.modal.install-to-play.content-required": {
-    "message": "Konten diperlukan"
   },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk memainkan"
@@ -248,17 +248,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Paket mod yang diperlukan"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Mod diperlukan untuk bermain di server ini. Klik pasang untuk menyiapkan berkas-berkas yang diperlukan dari Modrinth, kemudian luncurkan langsung sari server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instans terbagi"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instans server terbagi"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Lihat konten"
@@ -266,14 +257,11 @@
   "app.modal.update-to-play.header": {
     "message": "Perbarui untuk memainkan"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Perlu diperbarui"
+  "app.project.install-button.already-installed": {
+    "message": "Proyek ini sudah terpasang"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "{name} perlu diperbarui sebelum dimainkan. Mohon perbarui ke versi terkini untuk meluncurkan permainan."
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Pasang konten ke instans"
+  "app.project.install-context.back-to-browse": {
+    "message": "Kembali ke halaman pencarian"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
@@ -299,8 +287,152 @@
   "app.settings.tabs.resource-management": {
     "message": "Manajemen sumber"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} siap dipasang! Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+  "app.skins.add-button": {
+    "message": "Tambah rupa"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Seret dan lepas"
+  },
+  "app.skins.apply-button": {
+    "message": "Terapkan"
+  },
+  "app.skins.delete-button": {
+    "message": "Hapus rupa"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Ini akan menghapus rupa terpilih secara permanen. Tindakan ini tidak dapat dibatalkan."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Apakah Anda yakin ingin menghapus rupa ini?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Gagal membaca berkas yang diletakkan."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Kesalahan dalam memroses berkas"
+  },
+  "app.skins.edit-button": {
+    "message": "Sunting rupa"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Tambah rupa"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Menambah rupa"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Gaya lengan"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Ramping"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Lebar"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Jubah"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Jubah"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Menyunting rupa"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Sunting rupa terlebih dahulu!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Tanpa jubah"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Tidak ada"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Ganti tekstur"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Simpan rupa"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Menyimpan..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Tekstur"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Unggah rupa terlebih dahulu!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Sunting rupa"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Mempratinjau"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Anda terlalu sering mengganti rupa Anda. Server Mojang telah memblokir permintaan lebih lanjut untuk sementara. Mohon tunggu sebentar sebelum mencoba lagi."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Pelan-pelan!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "Urutan rupa Anda tidak dapat disimpan."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Gagal mengurut ulang rupa"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Rupa bawaan"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Anda mendapat rupa ini karena telah berdonasi ke penggalangan dana Modrinth Pride saat Pride Month."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Rupa tersimpan"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Masuk"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Mohon masuk ke akun Minecraft Anda untuk menggunakan fitur pengelolaan rupa dari Modrinth App."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Bot Modrinth penuh antusias"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Silakan masuk"
+  },
+  "app.skins.title": {
+    "message": "Pemilih rupa"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
@@ -321,7 +453,7 @@
     "message": "Selesai mengunduh"
   },
   "app.update-popup.reload": {
-    "message": "Muat ulang"
+    "message": "Muat ulang untuk memperbarui"
   },
   "app.update-popup.title": {
     "message": "Pembaruan tersedia"
@@ -331,15 +463,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versi {version} berhasil dipasang!"
-  },
-  "app.update.download-update": {
-    "message": "Unduh pembaruan"
-  },
-  "app.update.downloading-update": {
-    "message": "Mengunduh pembaruan ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Muat ulang untuk memasang pembaruan"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -530,6 +653,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Nama"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Perbarui kanal"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Versi rilisan, beta, dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Versi beta dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Rilisan"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Hanya versi rilisan yang akan ditampilkan sebagai pembaruan yang tersedia."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Pilih kanal pembaruan"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Luncurkan kait"
   },
@@ -578,6 +725,24 @@
   "instance.settings.tabs.java": {
     "message": "Java dan memori"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variabel lingkungan tersuai"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumen Java tersuai"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Pemasangan Java tersuai"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Alokasi memori tersuai"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Masukkan variabel lingkungan..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Masukkan argumen Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variabel lingkungan"
   },
@@ -592,6 +757,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memori yang teralokasikan"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/jalur/ke/java"
   },
   "instance.settings.tabs.window": {
     "message": "Jendela"
@@ -680,6 +848,9 @@
   "minecraft-account.select-account": {
     "message": "Pilih akun"
   },
+  "minecraft-account.sign-in": {
+    "message": "Masuk ke Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Disediakan oleh instans"
   },
@@ -703,20 +874,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Pemuat disediakan oleh server"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Jangan tampilkan peringatan ini lagi"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Konfirmasi pemasangan"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Tetap pasang"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Kami tidak dapat menemukan berkas ini di Modrinth. Kami sangat menyarankan Anda untuk hanya memasang berkas dari sumber-sumber terpercaya."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Peringatan berkas tidak dikenal"
   }
 }

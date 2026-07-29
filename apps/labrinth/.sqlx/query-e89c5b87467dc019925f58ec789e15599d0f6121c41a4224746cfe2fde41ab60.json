@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT n.id AS \"id!\"\n        FROM notifications n\n        INNER JOIN notifications_types nt ON nt.name = n.body ->> 'type'\n        WHERE n.id = ANY($1::BIGINT[])\n          AND nt.expose_in_site_notifications = TRUE\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e89c5b87467dc019925f58ec789e15599d0f6121c41a4224746cfe2fde41ab60"
+}

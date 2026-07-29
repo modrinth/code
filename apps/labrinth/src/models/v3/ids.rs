@@ -1,6 +1,8 @@
 use ariadne::ids::base62_id;
 
+base62_id!(AttributionGroupId);
 base62_id!(ChargeId);
+base62_id!(CampaignDonationId);
 base62_id!(CollectionId);
 base62_id!(FileId);
 base62_id!(ImageId);
@@ -17,8 +19,6 @@ base62_id!(ProductPriceId);
 base62_id!(ProjectId);
 base62_id!(ReportId);
 base62_id!(SessionId);
-base62_id!(SharedInstanceId);
-base62_id!(SharedInstanceVersionId);
 base62_id!(TeamId);
 base62_id!(TeamMemberId);
 base62_id!(ThreadId);
@@ -27,3 +27,4 @@ base62_id!(UserSubscriptionId);
 base62_id!(VersionId);
 base62_id!(AffiliateCodeId);
 base62_id!(AnalyticsEventId);
+base62_id!(PasskeyId);

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT display_order FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "display_order",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "18f04a0f6c262995b5f1eee10c2c5a396443ead9a9e295f6eea0986e40d65449"
+}

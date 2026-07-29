@@ -1,10 +1,11 @@
 use crate::auth::checks::is_visible_collection;
-use crate::auth::{filter_visible_collections, get_user_from_headers};
+use crate::auth::{
+    filter_visible_collections, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::models::{
     collection_item, generate_collection_id, project_item,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::{CollectionId, ProjectId};
@@ -19,30 +20,26 @@ use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::web::Data;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use eyre::eyre;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 use validator::Validate;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("collections", web::get().to(collections_get));
-    cfg.route("collection", web::post().to(collection_create));
-
-    cfg.service(
-        web::scope("collection")
-            .route("{id}", web::get().to(collection_get))
-            .route("{id}", web::delete().to(collection_delete))
-            .route("{id}", web::patch().to(collection_edit))
-            .route("{id}/icon", web::patch().to(collection_icon_edit))
-            .route("{id}/icon", web::delete().to(delete_collection_icon)),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(collections_get)
+        .service(collection_create)
+        .service(collection_get)
+        .service(collection_delete)
+        .service(collection_edit)
+        .service(collection_icon_edit)
+        .service(delete_collection_icon);
 }
 
-#[derive(Serialize, Deserialize, Validate, Clone)]
+#[derive(Serialize, Deserialize, Validate, Clone, utoipa::ToSchema)]
 pub struct CollectionCreateData {
     #[validate(
         length(min = 3, max = 64),
@@ -59,6 +56,8 @@ pub struct CollectionCreateData {
     pub projects: Vec<String>,
 }
 
+#[utoipa::path(tag = "collections", responses((status = OK)))]
+#[post("/collection")]
 pub async fn collection_create(
     req: HttpRequest,
     collection_create_data: web::Json<CollectionCreateData>,
@@ -78,6 +77,8 @@ pub async fn collection_create(
     )
     .await?
     .1;
+
+    require_verified_email(&current_user)?;
 
     let limits =
         UserLimits::get_for_collections(&current_user, &client).await?;
@@ -143,6 +144,12 @@ pub async fn collection_create(
 pub struct CollectionIds {
     pub ids: String,
 }
+#[utoipa::path(
+	tag = "collections",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
+#[get("/collections")]
 pub async fn collections_get(
     req: HttpRequest,
     web::Query(ids): web::Query<CollectionIds>,
@@ -179,6 +186,8 @@ pub async fn collections_get(
     Ok(HttpResponse::Ok().json(collections))
 }
 
+#[utoipa::path(tag = "collections", responses((status = OK)))]
+#[get("/collection/{id}")]
 pub async fn collection_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -210,7 +219,7 @@ pub async fn collection_get(
     Err(ApiError::NotFound)
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditCollection {
     #[validate(
         length(min = 3, max = 64),
@@ -224,11 +233,14 @@ pub struct EditCollection {
         with = "::serde_with::rust::double_option"
     )]
     pub description: Option<Option<String>>,
+    #[schema(value_type = Option<String>)]
     pub status: Option<CollectionStatus>,
     #[validate(length(max = 1024))]
     pub new_projects: Option<Vec<String>>,
 }
 
+#[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
+#[patch("/collection/{id}")]
 pub async fn collection_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -384,13 +396,20 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[utoipa::path(
+	tag = "collections",
+	params(("ext" = String, Query)),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
+	responses((status = NO_CONTENT))
+)]
+#[patch("/collection/{id}/icon")]
 pub async fn collection_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -423,7 +442,7 @@ pub async fn collection_icon_edit(
         collection_item.icon_url,
         collection_item.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -442,7 +461,7 @@ pub async fn collection_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -469,12 +488,14 @@ pub async fn collection_icon_edit(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
+#[delete("/collection/{id}/icon")]
 pub async fn delete_collection_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -505,7 +526,7 @@ pub async fn delete_collection_icon(
         collection_item.icon_url,
         collection_item.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
     let mut transaction = pool.begin().await?;
@@ -528,6 +549,8 @@ pub async fn delete_collection_icon(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
+#[delete("/collection/{id}")]
 pub async fn collection_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,

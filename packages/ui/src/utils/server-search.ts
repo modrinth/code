@@ -6,6 +6,7 @@ import { useRoute } from 'vue-router'
 
 import { defineMessage, LOCALES, useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
+import { formatSearchFilterValue } from './search'
 import { formatCategory, formatCategoryHeader } from './tag-messages'
 
 export const SERVER_REGIONS = {
@@ -156,7 +157,7 @@ export function useServerSearch(opts: {
 					supported_project_types: ['server'],
 					display: 'all',
 					query_param: 'sc',
-					supports_negative_filter: true,
+					supports: ['include', 'exclude'],
 					searchable: false,
 					options: [],
 				}
@@ -203,7 +204,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sct',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: false,
 				options: [
 					{
@@ -249,7 +250,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'scrollable',
 				query_param: 'sgv',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: true,
 				options: (tags.value?.gameVersions ?? []).map((gv) => ({
 					id: gv.version,
@@ -270,7 +271,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sr',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				searchable: false,
 				options: sortedRegions.map(([code, name]) => ({
 					id: code,
@@ -290,7 +291,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'scrollable',
 				query_param: 'sl',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: true,
 				options: sortedLanguages.map(([code, name]) => ({
 					id: code,
@@ -311,7 +312,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sst',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: false,
 				options: [
 					{
@@ -363,11 +364,11 @@ export function useServerSearch(opts: {
 			const included = matched.filter((f) => !f.negative)
 			const excluded = matched.filter((f) => f.negative)
 			if (included.length > 0) {
-				const values = included.map((f) => `"${f.option}"`).join(', ')
+				const values = included.map((f) => formatSearchFilterValue(f.option)).join(', ')
 				parts.push(`${field} IN [${values}]`)
 			}
 			if (excluded.length > 0) {
-				const values = excluded.map((f) => `"${f.option}"`).join(', ')
+				const values = excluded.map((f) => formatSearchFilterValue(f.option)).join(', ')
 				parts.push(`${field} NOT IN [${values}]`)
 			}
 		}
@@ -389,11 +390,11 @@ export function useServerSearch(opts: {
 			.map((filter) => filter.projectId)
 
 		if (includedProjectIds.length > 0) {
-			const values = includedProjectIds.map((projectId) => `"${projectId}"`).join(', ')
+			const values = includedProjectIds.map(formatSearchFilterValue).join(', ')
 			parts.push(`project_id IN [${values}]`)
 		}
 		if (excludedProjectIds.length > 0) {
-			const values = excludedProjectIds.map((projectId) => `"${projectId}"`).join(', ')
+			const values = excludedProjectIds.map(formatSearchFilterValue).join(', ')
 			parts.push(`project_id NOT IN [${values}]`)
 		}
 

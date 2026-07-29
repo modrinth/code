@@ -27,6 +27,15 @@ const messages = defineMessages({
 		id: 'hosting.plan.select-plan',
 		defaultMessage: 'Select plan',
 	},
+	perMonthBilling: {
+		id: 'servers.purchase.step.plan.per-month-billing',
+		defaultMessage:
+			'/ month{interval, select, monthly {} other {, billed {interval, select, quarterly {quarterly} yearly {yearly} other {{interval}}}}}',
+	},
+	mostPopularBadge: {
+		id: 'servers.purchase.step.plan.most-popular',
+		defaultMessage: 'Most popular',
+	},
 })
 
 const plans: Record<
@@ -126,13 +135,13 @@ const billingMonths = computed(() => {
 						v-if="plans[plan].mostPopular"
 						class="rounded-full bg-brand-highlight px-2 py-1 text-xs font-bold text-brand"
 					>
-						Most popular
+						{{ formatMessage(messages.mostPopularBadge) }}
 					</div>
 				</div>
 				<span class="m-0 text-2xl font-bold text-contrast">
 					{{ formatPrice(price / billingMonths, currency, true) }}
 					<span class="text-lg font-semibold text-secondary">
-						/ month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
+						{{ formatMessage(messages.perMonthBilling, { interval }) }}
 					</span>
 				</span>
 				<p class="m-0 max-w-[18rem]">{{ formatMessage(plans[plan].description) }}</p>

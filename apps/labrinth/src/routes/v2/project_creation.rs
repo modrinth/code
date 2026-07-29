@@ -1,6 +1,5 @@
 use crate::database::PgPool;
 use crate::database::models::version_item;
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::ImageId;
@@ -12,20 +11,21 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
+use crate::search::SearchState;
 use crate::util::http::HttpClient;
 use actix_multipart::Multipart;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use xredis::RedisPool;
 
 use std::collections::HashMap;
-use std::sync::Arc;
 use validator::Validate;
 
 use super::version_creation::InitialVersionData;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create);
 }
 
@@ -134,8 +134,9 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
-/// Create a new project with initial versions.
+/// Create a new project with initial versions.  
 #[utoipa::path(
+	tag = "project creation",
     post,
     operation_id = "createProject",
     request_body(
@@ -143,7 +144,7 @@ struct ProjectCreateData {
         description = "Multipart payload containing `data` and uploaded files"
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyProject),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -158,9 +159,10 @@ pub async fn project_create(
     payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     // Convert V2 multipart payload to V3 multipart payload
     let payload = v2_reroute::alter_actix_multipart(
@@ -184,6 +186,12 @@ pub async fn project_create(
                             server_side,
                         ),
                     );
+                    if let Some(environment) = v.environment {
+                        fields.insert(
+                            "environment".to_string(),
+                            json!(environment),
+                        );
+                    }
                     fields.insert(
                         "game_versions".to_string(),
                         json!(v.game_versions),
@@ -273,6 +281,7 @@ pub async fn project_create(
         file_host,
         session_queue,
         http,
+        search_state,
     )
     .await?;
 

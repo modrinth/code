@@ -2,30 +2,32 @@
 
 use actix_web::dev::Service;
 use actix_web::middleware::from_fn;
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpResponse, HttpServer, web};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 
 use labrinth::background_task::BackgroundTask;
-use labrinth::database::redis::RedisPool;
+use labrinth::database::redis;
 use labrinth::env::ENV;
-use labrinth::file_hosting::{FileHostKind, S3BucketConfig, S3Host};
+use labrinth::file_hosting::{FileHost, FileHostKind, S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::utoipa_app_config;
-use labrinth::{app_config, env};
+use labrinth::{app_data_config, app_fallback_config, app_routes_config, env};
 use labrinth::{clickhouse, database, file_hosting};
+use scalar_api_reference::actix_web::config as scalar_config;
+use serde_json::json;
 use std::ffi::CStr;
 use std::sync::Arc;
 use tracing::{Instrument, info, info_span};
 use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
-use utoipa_actix_web::AppExt;
-use utoipa_scalar::Servable;
+use utoipa::PartialSchema;
+use utoipa::openapi::Content;
+use utoipa::openapi::response::Response;
+use utoipa::openapi::schema::Components;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -108,47 +110,41 @@ async fn app() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_pool = RedisPool::new("");
+    let redis_pool = redis::from_env("").await;
 
     let storage_backend = ENV.STORAGE_BACKEND;
-    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
-        match storage_backend {
-            FileHostKind::S3 => {
-                let not_empty = |v: &str| -> String {
-                    assert!(!v.is_empty(), "S3 env var is empty");
-                    v.to_string()
-                };
+    let file_host: Arc<dyn FileHost> = match storage_backend {
+        FileHostKind::S3 => {
+            let not_empty = |v: &str| -> String {
+                assert!(!v.is_empty(), "S3 env var is empty");
+                v.to_string()
+            };
 
-                Arc::new(
-                    S3Host::new(
-                        S3BucketConfig {
-                            name: not_empty(&ENV.S3_PUBLIC_BUCKET_NAME),
-                            uses_path_style: ENV
-                                .S3_PUBLIC_USES_PATH_STYLE_BUCKET,
-                            region: not_empty(&ENV.S3_PUBLIC_REGION),
-                            url: not_empty(&ENV.S3_PUBLIC_URL),
-                            access_token: not_empty(
-                                &ENV.S3_PUBLIC_ACCESS_TOKEN,
-                            ),
-                            secret: not_empty(&ENV.S3_PUBLIC_SECRET),
-                        },
-                        S3BucketConfig {
-                            name: not_empty(&ENV.S3_PRIVATE_BUCKET_NAME),
-                            uses_path_style: ENV
-                                .S3_PRIVATE_USES_PATH_STYLE_BUCKET,
-                            region: not_empty(&ENV.S3_PRIVATE_REGION),
-                            url: not_empty(&ENV.S3_PRIVATE_URL),
-                            access_token: not_empty(
-                                &ENV.S3_PRIVATE_ACCESS_TOKEN,
-                            ),
-                            secret: not_empty(&ENV.S3_PRIVATE_SECRET),
-                        },
-                    )
-                    .unwrap(),
+            Arc::new(
+                S3Host::new(
+                    S3BucketConfig {
+                        name: not_empty(&ENV.S3_PUBLIC_BUCKET_NAME),
+                        uses_path_style: ENV.S3_PUBLIC_USES_PATH_STYLE_BUCKET,
+                        region: not_empty(&ENV.S3_PUBLIC_REGION),
+                        url: not_empty(&ENV.S3_PUBLIC_URL),
+                        access_token: not_empty(&ENV.S3_PUBLIC_ACCESS_TOKEN),
+                        secret: not_empty(&ENV.S3_PUBLIC_SECRET),
+                    },
+                    S3BucketConfig {
+                        name: not_empty(&ENV.S3_PRIVATE_BUCKET_NAME),
+                        uses_path_style: ENV.S3_PRIVATE_USES_PATH_STYLE_BUCKET,
+                        region: not_empty(&ENV.S3_PRIVATE_REGION),
+                        url: not_empty(&ENV.S3_PRIVATE_URL),
+                        access_token: not_empty(&ENV.S3_PRIVATE_ACCESS_TOKEN),
+                        secret: not_empty(&ENV.S3_PRIVATE_SECRET),
+                    },
                 )
-            }
-            FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
-        };
+                .unwrap(),
+            )
+        }
+        FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
+    };
+    let file_host = web::Data::<dyn FileHost>::from(file_host);
 
     info!("Initializing clickhouse connection");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
@@ -166,6 +162,10 @@ async fn app() -> std::io::Result<()> {
         .expect("Failed to create Gotenberg client");
     let muralpay = labrinth::queue::payouts::create_muralpay_client()
         .expect("Failed to create MuralPay client");
+    let kafka_client = actix_web::web::Data::new(
+        labrinth::util::kafka::KafkaClientState::new()
+            .expect("Kafka connection failed"),
+    );
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
@@ -174,6 +174,8 @@ async fn app() -> std::io::Result<()> {
             ro_pool.into_inner(),
             redis_pool,
             search_backend,
+            file_host,
+            kafka_client,
             clickhouse,
             stripe_client,
             anrok_client.clone(),
@@ -216,13 +218,23 @@ async fn app() -> std::io::Result<()> {
         anrok_client.clone(),
         email_queue,
         gotenberg_client,
+        kafka_client,
         !args.no_background_tasks,
     );
 
     info!("Starting Actix HTTP server!");
 
     HttpServer::new(move || {
-        App::new()
+        let mut docs_v2 = labrinth::routes::v2::ApiDoc::openapi();
+        let mut docs_v3 = labrinth::routes::v3::ApiDoc::openapi();
+        let mut docs_internal = labrinth::routes::internal::ApiDoc::openapi();
+        #[cfg(target_os = "linux")]
+        docs_v3.merge(labrinth::routes::debug::ApiDoc::openapi());
+        document_error_responses(&mut docs_v2);
+        document_error_responses(&mut docs_v3);
+        document_error_responses(&mut docs_internal);
+
+        let app = App::new()
             .wrap(TracingLogger::default())
             .wrap_fn(|req, srv| {
                 // We capture the same fields as `tracing-actix-web`'s `RootSpanBuilder`.
@@ -259,31 +271,158 @@ async fn app() -> std::io::Result<()> {
             // transactions out of HTTP requests. However, we have to use our
             // own - See `sentry::SentryErrorReporting` for why.
             .wrap(labrinth::util::sentry::SentryErrorReporting)
-            // Use `utoipa` for OpenAPI generation
-            .into_utoipa_app()
-            .configure(|cfg| utoipa_app_config(cfg, labrinth_config.clone()))
-            .openapi_service(|api| utoipa_scalar::Scalar::with_url("/docs", ApiDoc::openapi().merge_from(api)))
-            .into_app()
-            .configure(|cfg| app_config(cfg, labrinth_config.clone()))
+            .configure(|cfg| app_data_config(cfg, labrinth_config.clone()))
+            .configure(|cfg| app_routes_config(cfg, labrinth_config.clone()));
+
+        let scalar_configuration = json!({
+            "sources": [
+                {
+                    "title": "API v2",
+                    "slug": "v2",
+                    "url": "/openapi/v2.json",
+                    "default": true
+                },
+                {
+                    "title": "API v3 (UNSTABLE)",
+                    "slug": "v3",
+                    "url": "/openapi/v3.json"
+                },
+                {
+                    "title": "Internal API (HIGHLY UNSTABLE)",
+                    "slug": "internal",
+                    "url": "/openapi/internal.json"
+                }
+            ],
+            "agent": {
+                "disabled": true
+            },
+            "mcp": {
+                "disabled": true
+            },
+            "telemetry": false,
+
+            "metaData": {
+                "title": "Modrinth API Documentation",
+                "description": "Reference documentation for the Modrinth API.",
+                "ogTitle": "Modrinth API Documentation",
+                "ogDescription": "Reference documentation for the Modrinth API."
+            },
+
+            "modelsSectionLabel": "Schemas",
+            "defaultOpenFirstTag": true,
+            "defaultOpenAllTags": false,
+            "expandAllResponses": false,
+            "expandAllSchemaProperties": false,
+            "expandAllModelSections": false,
+            "orderSchemaPropertiesBy": "preserve",
+            "orderRequiredPropertiesFirst": true,
+            "hideSearch": false,
+            "searchHotKey": "k",
+            "showOperationId": false,
+
+            "defaultHttpClient": {
+                "targetKey": "shell",
+                "clientKey": "curl"
+            },
+
+            "persistAuth": false,
+            "showDeveloperTools": "never",
+        });
+
+        app.service(openapi_json_service("/openapi/v2.json", docs_v2))
+            .service(openapi_json_service("/openapi/v3.json", docs_v3))
+            .service(openapi_json_service(
+                "/openapi/internal.json",
+                docs_internal,
+            ))
+            .configure(scalar_config("/docs", &scalar_configuration))
+            .configure(app_fallback_config)
     })
     .bind(&ENV.BIND_ADDR)?
     .run()
     .await
 }
 
-#[derive(utoipa::OpenApi)]
-#[openapi(info(title = "Labrinth"), modifiers(&SecurityAddon))]
-struct ApiDoc;
+fn openapi_json_service(
+    path: &'static str,
+    openapi: utoipa::openapi::OpenApi,
+) -> actix_web::Resource {
+    web::resource(path).route(web::get().to(move || {
+        let openapi = openapi.clone();
+        async move { openapi_json(openapi) }
+    }))
+}
 
-struct SecurityAddon;
+fn openapi_json(openapi: utoipa::openapi::OpenApi) -> HttpResponse {
+    match serde_json::to_string_pretty(&openapi) {
+        Ok(body) => HttpResponse::Ok()
+            .content_type("application/json; charset=utf-8")
+            .body(body),
+        Err(error) => {
+            tracing::error!(%error, "Failed to serialize OpenAPI schema");
+            HttpResponse::InternalServerError().finish()
+        }
+    }
+}
 
-impl utoipa::Modify for SecurityAddon {
-    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        let components = openapi.components.as_mut().unwrap();
-        components.add_security_scheme(
-            "bearer_auth",
-            SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new(
-                "authorization",
+fn document_error_responses(openapi: &mut utoipa::openapi::OpenApi) {
+    let components = openapi.components.get_or_insert_with(Components::new);
+    components.schemas.insert(
+        "ApiError".to_string(),
+        labrinth::models::error::ApiError::schema(),
+    );
+
+    for path_item in openapi.paths.paths.values_mut() {
+        add_default_error_response(&mut path_item.get);
+        add_default_error_response(&mut path_item.put);
+        add_default_error_response(&mut path_item.post);
+        add_default_error_response(&mut path_item.delete);
+        add_default_error_response(&mut path_item.options);
+        add_default_error_response(&mut path_item.head);
+        add_default_error_response(&mut path_item.patch);
+        add_default_error_response(&mut path_item.trace);
+    }
+}
+
+fn add_default_error_response(
+    operation: &mut Option<utoipa::openapi::path::Operation>,
+) {
+    if let Some(operation) = operation {
+        for (status, response) in &mut operation.responses.responses {
+            if !is_error_response_status(status) {
+                continue;
+            }
+
+            if let utoipa::openapi::RefOr::T(response) = response {
+                add_error_content(response);
+            }
+        }
+
+        operation
+            .responses
+            .responses
+            .entry("500".to_string())
+            .or_insert_with(|| error_response().into());
+    }
+}
+
+fn is_error_response_status(status: &str) -> bool {
+    matches!(status.as_bytes().first(), Some(b'4' | b'5'))
+        || status == "default"
+}
+
+fn error_response() -> Response {
+    let mut response = Response::new("Error response");
+    add_error_content(&mut response);
+    response
+}
+
+fn add_error_content(response: &mut Response) {
+    if response.content.is_empty() {
+        response.content.insert(
+            "application/json".to_string(),
+            Content::new(Some(utoipa::openapi::Ref::from_schema_name(
+                "ApiError",
             ))),
         );
     }

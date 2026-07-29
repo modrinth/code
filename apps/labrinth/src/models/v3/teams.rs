@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub const DEFAULT_ROLE: &str = "Member";
 
 /// A team of users who control a project
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Team {
     /// The id of the team
     pub id: TeamId,
@@ -157,7 +157,7 @@ impl OrganizationPermissions {
 }
 
 /// A member of a team
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct TeamMember {
     /// The ID of the team this team member is a member of
     pub team_id: TeamId,

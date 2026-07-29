@@ -1,14 +1,15 @@
 use crate::database::DBProject;
 use crate::database::models::DBProjectId;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
 use crate::models::projects::ProjectStatus;
+use crate::search::incremental::IncrementalSearchQueue;
 use crate::{database::PgPool, util::error::Context};
 use async_minecraft_ping::ServerDescription;
 use chrono::{TimeDelta, Utc};
 use clickhouse::{Client, Row};
+use futures::future::join;
 use serde::Serialize;
 use sqlx::types::Json;
 use std::sync::Arc;
@@ -16,23 +17,32 @@ use std::time::{Duration, Instant};
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
 use tracing::{Instrument, info, info_span, trace, warn};
+use xredis::RedisPool;
 
 pub struct ServerPingQueue {
     pub db: PgPool,
     pub redis: RedisPool,
     pub clickhouse: Client,
+    pub incremental_search_queue: IncrementalSearchQueue,
 }
 
-pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
-pub const REDIS_FAILURE_NAMESPACE: &str = "minecraft_java_server_ping_failures";
+pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping:v3";
+pub const REDIS_FAILURE_NAMESPACE: &str =
+    "minecraft_java_server_ping_failures:v3";
 pub const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
 
 impl ServerPingQueue {
-    pub fn new(db: PgPool, redis: RedisPool, clickhouse: Client) -> Self {
+    pub fn new(
+        db: PgPool,
+        redis: RedisPool,
+        clickhouse: Client,
+        incremental_search_queue: IncrementalSearchQueue,
+    ) -> Self {
         Self {
             db,
             redis,
             clickhouse,
+            incremental_search_queue,
         }
     }
 
@@ -101,6 +111,12 @@ impl ServerPingQueue {
 
             for (project_id, ping) in &pings {
                 let data = ping.data.as_ref();
+                let ping_key =
+                    self.redis.key().entity(REDIS_NAMESPACE, project_id);
+                let failure_key = self
+                    .redis
+                    .key()
+                    .entity(REDIS_FAILURE_NAMESPACE, project_id);
 
                 let row = ServerPingRecord {
                     recorded: ping.when.timestamp_nanos_opt().unwrap()
@@ -124,18 +140,13 @@ impl ServerPingQueue {
                     // ping succeeded; immediately update its online status in redis
 
                     redis
-                        .set_serialized_to_json(
-                            REDIS_NAMESPACE,
-                            project_id,
-                            ping,
-                            None,
-                        )
+                        .set_serialized(&ping_key, ping, None)
                         .await
                         .wrap_err("failed to set redis key")?;
                     updated_project = true;
 
                     redis
-                        .delete(REDIS_FAILURE_NAMESPACE, project_id)
+                        .delete(&failure_key)
                         .await
                         .wrap_err("failed to delete failure count")?;
                 } else {
@@ -143,7 +154,7 @@ impl ServerPingQueue {
                     // otherwise, just add to the fail counter
 
                     let failure_count = redis
-                        .incr(REDIS_FAILURE_NAMESPACE, &project_id.to_string())
+                        .incr(&failure_key)
                         .await
                         .wrap_err("failed to increment failure count")?;
 
@@ -151,12 +162,7 @@ impl ServerPingQueue {
                         && count >= ENV.SERVER_PING_MAX_FAIL_COUNT
                     {
                         redis
-                            .set_serialized_to_json(
-                                REDIS_NAMESPACE,
-                                project_id,
-                                ping,
-                                None,
-                            )
+                            .set_serialized(&ping_key, ping, None)
                             .await
                             .wrap_err(
                                 "failed to set failed ping record in redis",
@@ -166,17 +172,23 @@ impl ServerPingQueue {
                 }
 
                 if updated_project {
-                    DBProject::clear_cache(
+                    let clear_cache = DBProject::clear_cache(
                         (*project_id).into(),
                         None,
                         None,
                         &self.redis,
-                    )
-                    .await
-                    .inspect_err(|err| {
-                        warn!("failed to clear project cache: {err:#}")
-                    })
-                    .ok();
+                    );
+                    let queue_search = self
+                        .incremental_search_queue
+                        .push_project_change(*project_id);
+
+                    let (clear_cache_result, _) =
+                        join(clear_cache, queue_search).await;
+                    clear_cache_result
+                        .inspect_err(|err| {
+                            warn!("failed to clear project cache: {err:#}")
+                        })
+                        .ok();
                 }
             }
 
@@ -236,14 +248,17 @@ impl ServerPingQueue {
         // and if we do miss an entry that we shouldn't, we just ping it again
         let all_project_ids = all_server_projects
             .iter()
-            .map(|row| ProjectId::from(DBProjectId(row.id)).to_string())
+            .map(|row| ProjectId::from(DBProjectId(row.id)))
+            .collect::<Vec<_>>();
+        let ping_keys = all_project_ids
+            .iter()
+            .map(|project_id| {
+                self.redis.key().entity(REDIS_NAMESPACE, project_id)
+            })
             .collect::<Vec<_>>();
 
         let all_server_last_pings = redis
-            .get_many_deserialized_from_json::<exp::minecraft::JavaServerPing>(
-                REDIS_NAMESPACE,
-                &all_project_ids,
-            )
+            .get_many_deserialized::<exp::minecraft::JavaServerPing>(&ping_keys)
             .await
             .wrap_err("failed to fetch server project last pings")?;
 

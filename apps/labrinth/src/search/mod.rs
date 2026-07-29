@@ -1,7 +1,7 @@
-use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::projects::DependencyType;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
@@ -10,12 +10,21 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, sync::Arc};
 use thiserror::Error;
 use utoipa::ToSchema;
+use xredis::RedisPool;
 
 pub mod backend;
+pub mod filter;
+pub mod incremental;
 pub mod indexing;
+
+#[derive(Clone)]
+pub struct SearchState {
+    pub backend: Arc<dyn SearchBackend>,
+    pub queue: incremental::IncrementalSearchQueue,
+}
 
 /// Search parameters which can fit in a URL query string.
 ///
@@ -97,13 +106,16 @@ pub trait SearchBackend: Send + Sync {
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError>;
 
-    async fn index_projects(
+    async fn rebuild_index(
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
     ) -> eyre::Result<()>;
 
-    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;
+    async fn apply_update(
+        &self,
+        update: SearchIndexUpdate<'_>,
+    ) -> eyre::Result<()>;
 
     async fn tasks(&self) -> eyre::Result<Value>;
 
@@ -132,14 +144,16 @@ async fn hydrate_search_results(
         HashMap::new()
     } else {
         let mut redis = redis_pool.connect().await?;
+        let ping_keys = project_ids
+            .iter()
+            .map(|project_id| {
+                redis_pool
+                    .key()
+                    .entity(server_ping::REDIS_NAMESPACE, project_id)
+            })
+            .collect::<Vec<_>>();
         let ping_results = redis
-            .get_many_deserialized_from_json::<JavaServerPing>(
-                server_ping::REDIS_NAMESPACE,
-                &project_ids
-                    .iter()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>(),
-            )
+            .get_many_deserialized::<JavaServerPing>(&ping_keys)
             .await?;
 
         ping_results
@@ -184,6 +198,7 @@ pub enum SearchField {
     Author,
     License,
     ProjectTypes,
+    AllProjectTypes,
     ProjectId,
     OpenSource,
     Environment,
@@ -195,6 +210,8 @@ pub enum SearchField {
     MinecraftJavaServerContentKind,
     MinecraftJavaServerContentSupportedGameVersions,
     MinecraftJavaServerPingData,
+    DependencyProjectIds,
+    CompatibleDependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -212,29 +229,40 @@ impl FromStr for SearchBackendKind {
     }
 }
 
+/// Nullable fields in Typesense-bound documents should use
+/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
+/// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
+    /// ID of the most recently published version.
     pub version_id: String,
     pub project_id: String,
     //
     pub project_types: Vec<String>,
+    #[serde(default)]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     pub author_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub organization: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<String>,
     pub indexed_author: String,
     pub name: String,
     pub indexed_name: String,
     pub summary: String,
     pub categories: Vec<String>,
+    pub project_categories: Vec<String>,
     pub display_categories: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
     pub log_downloads: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
     pub license: String,
     pub gallery: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub featured_gallery: Option<String>,
     /// RFC 3339 formatted creation date of the project
     pub date_created: DateTime<Utc>,
@@ -244,10 +272,17 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
-    /// Unix timestamp of the publication date of the version
+    /// Unix timestamp of the most recently published version.
     pub version_published_timestamp: i64,
     pub open_source: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<u32>,
+    #[serde(default)]
+    pub dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -259,7 +294,49 @@ pub struct UploadSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct UploadSearchVersion {
+    pub version_id: String,
+    pub project_id: String,
+    pub categories: Vec<String>,
+    pub project_types: Vec<String>,
+    pub version_published_timestamp: i64,
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+}
+
+#[derive(Debug, Default)]
+pub struct SearchDocumentBatch {
+    pub projects: Vec<UploadSearchProject>,
+    pub versions: Vec<UploadSearchVersion>,
+}
+
+/// A logical search index mutation. Removals are applied before replacements,
+/// so a document may be present in both a removed and replacement field.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SearchIndexUpdate<'a> {
+    pub projects: &'a [UploadSearchProject],
+    pub versions: &'a [UploadSearchVersion],
+    /// Projects and all of their version documents to remove.
+    pub removed_projects: &'a [ProjectId],
+    pub removed_versions: &'a [VersionId],
+}
+
+/// Nullable fields in Typesense-bound documents should use
+/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
+/// serialized as `null`.
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
+pub struct SearchProjectDependency {
+    pub project_id: String,
+    pub dependency_type: DependencyType,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub slug: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon_url: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct SearchResults {
     pub hits: Vec<ResultSearchProject>,
     pub page: usize,
@@ -267,11 +344,14 @@ pub struct SearchResults {
     pub total_hits: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
+    /// ID of the most recently published version.
     pub version_id: String,
     pub project_id: String,
     pub project_types: Vec<String>,
+    #[serde(default)]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     #[serde(default)]
@@ -295,6 +375,12 @@ pub struct ResultSearchProject {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+    #[serde(default)]
+    pub dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -314,6 +400,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             version_id: source.version_id,
             project_id: source.project_id,
             project_types: source.project_types,
+            all_project_types: source.all_project_types,
             slug: source.slug,
             author: source.author,
             author_id: Some(source.author_id),
@@ -332,6 +419,10 @@ impl From<UploadSearchProject> for ResultSearchProject {
             gallery: source.gallery,
             featured_gallery: source.featured_gallery,
             color: source.color,
+            dependency_project_ids: source.dependency_project_ids,
+            compatible_dependency_project_ids: source
+                .compatible_dependency_project_ids,
+            dependencies: source.dependencies,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,
             components: source.components,

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT OR REPLACE INTO instance_content_sets (\n            id,\n            instance_id,\n            name,\n            source_kind,\n            status,\n            game_version,\n            protocol_version,\n            loader,\n            loader_version,\n            created,\n            modified\n        )\n        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 11
+    },
+    "nullable": []
+  },
+  "hash": "fffdd9acffd9d2fdcfc9e67196817a12d6b35e12233496c879efa002fffcc6dc"
+}

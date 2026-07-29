@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO attached_world_data (instance_id, world_type, world_id, content_kind)\n\t\tVALUES (?, ?, ?, ?)\n\t\tON CONFLICT (instance_id, world_type, world_id) DO UPDATE\n\t\t\tSET content_kind = excluded.content_kind\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "984187e5399a37e49b158f2b85d07b8427f955204b757699b7ceab24f174ee4b"
+}

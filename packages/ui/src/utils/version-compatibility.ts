@@ -47,11 +47,15 @@ export function versionMatchesCompatibilityTarget(
 		return false
 	}
 
+	const normalizedVersionLoaders = version.loaders.map(normalizeLoaderAlias)
+
+	if (target.projectType === 'datapack') {
+		return normalizedVersionLoaders.includes('datapack')
+	}
+
 	if (target.projectType && NON_MOD_PROJECT_TYPES.has(target.projectType)) {
 		return true
 	}
-
-	const normalizedVersionLoaders = version.loaders.map(normalizeLoaderAlias)
 
 	if (
 		target.projectType === 'modpack' &&

@@ -121,6 +121,30 @@ function generateIconExports(): {
 		})
 	}
 
+	// Process badge icons from icons/badges/
+	const badgesDir = path.join(iconsDir, 'badges')
+	if (fs.existsSync(badgesDir)) {
+		const badgeFiles = fs.readdirSync(badgesDir).filter((file) => file.endsWith('.svg'))
+		badgeFiles.forEach((file) => {
+			const baseName = path.basename(file, '.svg')
+			let pascalName = toPascalCase(baseName)
+
+			if (pascalName === '') {
+				pascalName = 'Unknown'
+			}
+
+			if (!pascalName.endsWith('Badge')) {
+				pascalName += 'Badge'
+			}
+
+			icons.push({
+				importPath: `./icons/badges/${file}?component`,
+				pascalName,
+				privateName: `_${pascalName}`,
+			})
+		})
+	}
+
 	// Sort by import path using simple-import-sort's algorithm
 	icons.sort((a, b) => compareImportSources(a.importPath, b.importPath))
 
@@ -156,7 +180,7 @@ function generateIconExports(): {
 function runTests(): void {
 	console.log('🧪 Running conversion tests...\n')
 
-	const testCases: Array<{ input: string; expected: string }> = [
+	const testCases: Array<{ input: string; expected: string; suffix?: string }> = [
 		{ input: 'align-left', expected: 'AlignLeftIcon' },
 		{ input: 'arrow-big-up-dash', expected: 'ArrowBigUpDashIcon' },
 		{ input: 'check-check', expected: 'CheckCheckIcon' },
@@ -171,13 +195,17 @@ function runTests(): void {
 		{ input: 'list_bulleted', expected: 'ListBulletedIcon' },
 		{ input: 'test.name', expected: 'TestNameIcon' },
 		{ input: 'test-name_final.icon', expected: 'TestNameFinalIcon' },
+		{ input: 'downloads-500m', expected: 'Downloads500mBadge', suffix: 'Badge' },
+		{ input: 'early-modpack', expected: 'EarlyModpackBadge', suffix: 'Badge' },
+		{ input: 'plus', expected: 'PlusBadge', suffix: 'Badge' },
 	]
 
 	let passed = 0
 	let failed = 0
 
-	testCases.forEach(({ input, expected }) => {
-		const result = toPascalCase(input) + (toPascalCase(input).endsWith('Icon') ? '' : 'Icon')
+	testCases.forEach(({ input, expected, suffix = 'Icon' }) => {
+		const base = toPascalCase(input)
+		const result = base.endsWith(suffix) ? base : base + suffix
 		const success = result === expected
 
 		if (success) {
@@ -312,6 +340,26 @@ function getExpectedIconExports(iconsDir: string): string[] {
 		})
 	}
 
+	// Process badge icons from icons/badges/
+	const badgesDir = path.join(iconsDir, 'badges')
+	if (fs.existsSync(badgesDir)) {
+		const badgeFiles = fs.readdirSync(badgesDir).filter((file) => file.endsWith('.svg'))
+		badgeFiles.forEach((file) => {
+			const baseName = path.basename(file, '.svg')
+			let pascalName = toPascalCase(baseName)
+
+			if (pascalName === '') {
+				pascalName = 'Unknown'
+			}
+
+			if (!pascalName.endsWith('Badge')) {
+				pascalName += 'Badge'
+			}
+
+			exports.push(pascalName)
+		})
+	}
+
 	return exports.sort()
 }
 
@@ -321,14 +369,15 @@ function getActualIconExports(indexFile: string): string[] {
 	}
 
 	const content = fs.readFileSync(indexFile, 'utf8')
-	const exportMatches = content.match(/export const (\w+Icon) = _\w+Icon/g) || []
+	const exportMatches =
+		content.match(/export const (\w+(?:Icon|Badge)) = _\w+(?:Icon|Badge)/g) || []
 
 	return exportMatches
 		.map((match) => {
-			const result = match.match(/export const (\w+Icon)/)
+			const result = match.match(/export const (\w+(?:Icon|Badge))/)
 			return result ? result[1] : ''
 		})
-		.filter((name) => name.endsWith('Icon'))
+		.filter((name) => name.endsWith('Icon') || name.endsWith('Badge'))
 		.sort()
 }
 

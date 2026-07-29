@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instance_content_sets\n\t\tSET protocol_version = ?, modified = ?\n\t\tWHERE id = (\n\t\t\tSELECT applied_content_set_id\n\t\t\tFROM instances\n\t\t\tWHERE id = ?\n\t\t)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "5ad6333dd8cf97560ec5a60c1a4d9b6ab71407aefb316f6607bacaceb037486d"
+}

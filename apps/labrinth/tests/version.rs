@@ -14,13 +14,17 @@ use common::asserts::assert_common_version_ids;
 use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
-use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
+use labrinth::database::models::DBVersionId;
+use labrinth::database::models::version_item::{
+    VERSIONS_NAMESPACE, VersionQueryResult,
+};
 use labrinth::models::ids::VersionId;
 use labrinth::models::projects::{
     Dependency, DependencyType, VersionStatus, VersionType,
 };
 use labrinth::routes::v3::version_file::FileUpdateData;
 use serde_json::json;
+use xredis::RedisValue;
 
 pub mod common;
 
@@ -47,18 +51,21 @@ async fn test_get_version() {
         assert_eq!(&version.id.to_string(), alpha_version_id);
 
         let mut redis_conn = test_env.db.redis_pool.connect().await.unwrap();
-        let cached_project = redis_conn
-            .get(
-                VERSIONS_NAMESPACE,
-                &parse_base62(alpha_version_id).unwrap().to_string(),
-            )
+        let version_key = redis_conn.key().entity(
+            VERSIONS_NAMESPACE,
+            parse_base62(alpha_version_id).unwrap(),
+        );
+        let cached_version: RedisValue<
+            VersionQueryResult,
+            DBVersionId,
+            String,
+        > = redis_conn
+            .get_deserialized(&version_key)
             .await
             .unwrap()
             .unwrap();
-        let cached_project: serde_json::Value =
-            serde_json::from_str(&cached_project).unwrap();
         assert_eq!(
-            cached_project["val"]["inner"]["project_id"],
+            cached_version.value().inner.project_id.0,
             json!(parse_base62(alpha_project_id).unwrap())
         );
 
@@ -494,7 +501,8 @@ pub async fn test_patch_version() {
                 project_id: Some(*beta_project_id_parsed),
                 version_id: None,
                 file_name: Some("dummy_file_name".to_string()),
-                dependency_type: DependencyType::Required
+                dependency_type: DependencyType::Required,
+                attribution: None,
             }]
         );
         assert_eq!(version.loaders, vec!["forge".to_string()]);

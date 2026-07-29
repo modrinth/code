@@ -3,19 +3,21 @@
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<div class="flex flex-col gap-6">
-				<div class="text-2xl font-semibold text-contrast">Server details</div>
+				<div class="text-2xl font-semibold text-contrast">
+					{{ formatMessage(messages.serverDetailsHeading) }}
+				</div>
 
 				<!-- Region -->
 				<div class="max-w-[600px]">
 					<label for="server-region">
-						<span class="label__title">Region</span>
+						<span class="label__title">{{ formatMessage(messages.regionLabel) }}</span>
 					</label>
 					<Combobox
 						id="server-region"
 						v-model="region"
 						:options="regionOptions"
 						searchable
-						placeholder="Select region"
+						:placeholder="formatMessage(messages.selectRegionPlaceholder)"
 						:disabled="!hasPermission"
 					/>
 				</div>
@@ -24,7 +26,10 @@
 				<div class="max-w-[600px]">
 					<label for="server-language">
 						<span class="label__title"
-							>Languages <span class="font-normal text-secondary">(optional)</span></span
+							>{{ formatMessage(messages.languagesLabel) }}
+							<span class="font-normal text-secondary"
+								>({{ formatMessage(messages.optionalLabel) }})</span
+							></span
 						>
 					</label>
 					<MultiSelect
@@ -34,7 +39,7 @@
 						searchable
 						include-select-all-option
 						:max-tag-rows="2"
-						placeholder="Select languages"
+						:placeholder="formatMessage(messages.selectLanguagesPlaceholder)"
 						:disabled="!hasPermission"
 					/>
 				</div>
@@ -43,7 +48,9 @@
 				<div class="max-w-[600px]">
 					<div class="flex items-center justify-between">
 						<label for="java-address">
-							<span class="label__title !m-0 !text-contrast">Java address</span>
+							<span class="label__title !m-0 !text-contrast">{{
+								formatMessage(messages.javaAddressLabel)
+							}}</span>
 						</label>
 					</div>
 					<div
@@ -58,7 +65,7 @@
 						<StyledInput
 							id="java-address"
 							v-model="javaAddress"
-							placeholder="Enter address"
+							:placeholder="formatMessage(messages.enterAddressPlaceholder)"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
 							autocomplete="off"
@@ -80,7 +87,7 @@
 							color="oranges"
 						>
 							<button
-								v-tooltip="'Refresh ping'"
+								v-tooltip="formatMessage(messages.refreshPingTooltip)"
 								:disabled="javaPingLoading"
 								@click="pingJavaServer"
 							>
@@ -92,34 +99,35 @@
 							v-if="javaPingResult !== null && !javaPingLoading && javaPingResult.online"
 							class="mt-0.5 flex items-center gap-1.5 text-green"
 						>
-							Server is online!
+							{{ formatMessage(messages.serverOnline) }}
 							<template v-if="javaPingResult.latency">
-								Latency: {{ javaPingResult.latency }}ms
+								{{ formatMessage(messages.latencyLabel, { latency: javaPingResult.latency }) }}
 							</template>
 						</div>
 						<div v-else-if="javaPingResult !== null && !javaPingLoading" class="mt-0.5 text-orange">
-							We couldn’t ping this server. It may be blocked by your host so try refreshing a few
-							times. If it still doesn’t respond please
-							<a
-								class="inline underline"
-								href="https://support.modrinth.com"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								contact support</a
-							>.
+							<IntlFormatted :message-id="messages.pingFailedMessage">
+								<template #support-link="{ children }">
+									<a
+										class="inline underline"
+										href="https://support.modrinth.com"
+										target="_blank"
+										rel="noopener noreferrer"
+										><component :is="() => normalizeChildren(children)"
+									/></a>
+								</template>
+							</IntlFormatted>
 						</div>
 					</div>
 					<div v-else class="mt-2 text-sm">
-						If you have [SRV records]
-						<InfoIcon
-							v-tooltip="{
-								content:
-									'The address you enter here may have DNS SRV records _minecraft._tcp.{your domain} which point to your Minecraft server address and port.',
-								popperClass: 'max-w-xs',
-							}"
-						/>, you do not need to add a port. Otherwise if you have a port which isn't 25565, you
-						can include it as :12345
+						<IntlFormatted :message-id="messages.srvRecordsHint">
+							<template #srv-tooltip="{ children }"
+								><component :is="() => normalizeChildren(children)" /><InfoIcon
+									v-tooltip="{
+										content: formatMessage(messages.srvRecordsTooltip),
+										popperClass: 'max-w-xs',
+									}"
+							/></template>
+						</IntlFormatted>
 					</div>
 				</div>
 
@@ -127,15 +135,17 @@
 				<div class="max-w-[600px]">
 					<label for="bedrock-address">
 						<span class="label__title !text-contrast"
-							>Bedrock address
-							<span class="font-normal text-secondary">(optional)</span>
+							>{{ formatMessage(messages.bedrockAddressLabel) }}
+							<span class="font-normal text-secondary"
+								>({{ formatMessage(messages.optionalLabel) }})</span
+							>
 						</span>
 					</label>
 					<div class="mt-2 flex items-center gap-2">
 						<StyledInput
 							id="bedrock-address"
 							v-model="bedrockAddress"
-							placeholder="Enter address"
+							:placeholder="formatMessage(messages.enterAddressPlaceholder)"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
 							autocomplete="off"
@@ -163,10 +173,13 @@ import {
 	ButtonStyled,
 	Combobox,
 	ConfirmLeaveModal,
+	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	IntlFormatted,
 	MultiSelect,
+	normalizeChildren,
 	SERVER_LANGUAGES,
 	SERVER_REGIONS,
 	StyledInput,
@@ -180,6 +193,81 @@ import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCar
 const PING_TIMEOUT_MS = 5000
 
 const { formatMessage, locale } = useVIntl()
+
+const messages = defineMessages({
+	serverDetailsHeading: {
+		id: 'project.settings.server.details-heading',
+		defaultMessage: 'Server details',
+	},
+	regionLabel: {
+		id: 'project.settings.server.region-label',
+		defaultMessage: 'Region',
+	},
+	selectRegionPlaceholder: {
+		id: 'project.settings.server.select-region-placeholder',
+		defaultMessage: 'Select region',
+	},
+	languagesLabel: {
+		id: 'project.settings.server.languages-label',
+		defaultMessage: 'Languages',
+	},
+	optionalLabel: {
+		id: 'project.settings.server.optional-label',
+		defaultMessage: 'optional',
+	},
+	selectLanguagesPlaceholder: {
+		id: 'project.settings.server.select-languages-placeholder',
+		defaultMessage: 'Select languages',
+	},
+	javaAddressLabel: {
+		id: 'project.settings.server.java-address-label',
+		defaultMessage: 'Java address',
+	},
+	enterAddressPlaceholder: {
+		id: 'project.settings.server.enter-address-placeholder',
+		defaultMessage: 'Enter address',
+	},
+	refreshPingTooltip: {
+		id: 'project.settings.server.refresh-ping-tooltip',
+		defaultMessage: 'Refresh ping',
+	},
+	serverOnline: {
+		id: 'project.settings.server.server-online',
+		defaultMessage: 'Server is online!',
+	},
+	latencyLabel: {
+		id: 'project.settings.server.latency-label',
+		defaultMessage: 'Latency: {latency}ms',
+	},
+	pingFailedMessage: {
+		id: 'project.settings.server.ping-failed-message',
+		defaultMessage:
+			"We couldn't ping this server. It may be blocked by your host so try refreshing a few times. If it still doesn't respond please <support-link>contact support</support-link>.",
+	},
+	srvRecordsHint: {
+		id: 'project.settings.server.srv-records-hint',
+		defaultMessage:
+			"If you have <srv-tooltip>[SRV records]</srv-tooltip>, you do not need to add a port. Otherwise if you have a port which isn't 25565, you can include it as :12345",
+	},
+	srvRecordsTooltip: {
+		id: 'project.settings.server.srv-records-tooltip',
+		defaultMessage:
+			'The address you enter here may have DNS SRV records _minecraft._tcp.(your domain) which point to your Minecraft server address and port.',
+	},
+	bedrockAddressLabel: {
+		id: 'project.settings.server.bedrock-address-label',
+		defaultMessage: 'Bedrock address',
+	},
+	cannotSaveTitle: {
+		id: 'project.settings.server.cannot-save-title',
+		defaultMessage: 'Cannot save',
+	},
+	cannotSaveText: {
+		id: 'project.settings.server.cannot-save-text',
+		defaultMessage:
+			'The Java server must be reachable before saving. Please ensure the ping succeeds.',
+	},
+})
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -391,8 +479,8 @@ function resetChanges() {
 async function handleSave() {
 	if (javaAddress.value.trim() && !javaPingResult.value?.online) {
 		addNotification({
-			title: 'Cannot save',
-			text: 'The Java server must be reachable before saving. Please ensure the ping succeeds.',
+			title: formatMessage(messages.cannotSaveTitle),
+			text: formatMessage(messages.cannotSaveText),
 			type: 'error',
 		})
 		return

@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Add a Java address"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Add a valid URL and name or SPDX identifier for your custom license."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Add license details"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as a website, store, or a Discord invite."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Add external links"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "You've selected all available language options. Please list only the languages your server actively supports."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Select accurate languages"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project."
@@ -66,7 +78,7 @@
     "defaultMessage": "Visit gallery page"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Your {type, select, mod {mod} plugin {plugin} other {project}} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
+    "defaultMessage": "Your {type} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Provide source code"
@@ -75,7 +87,7 @@
     "defaultMessage": "Some of your external links appear to be identical. Each link should be entered only once and with the appropriate link type."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Identical Links"
+    "defaultMessage": "Clean up identical links"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Your Description should contain sufficient plain text or image alt-text, keeping it accessible to those using screen readers or with slow internet connections."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Select correct resolution"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Make sure you have provided proof of your permission to distribute any external content in your Modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Review external permissions"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Select what versions your server supports, choose a Modpack, or upload your own."
   },
@@ -159,7 +177,7 @@
     "defaultMessage": "Select a language"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Select the license your {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is distributed under."
+    "defaultMessage": "Select the license your {type} is distributed under."
   },
   "nags.select-license.title": {
     "defaultMessage": "Select a license"
@@ -181,6 +199,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Visit links settings"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visit permissions dashboard"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Visit tag settings"
@@ -212,6 +233,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Clean up the name"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "You've selected {languageCount, plural, one {# language} other {# languages}}. Please list only the languages your server actively supports."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Select accurate languages"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to make sure your server appears in relevant search results."
   },
@@ -225,7 +252,10 @@
     "defaultMessage": "Select accurate tags"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "At least one gallery image is required to showcase the content of your {type, select, resourcepack {resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag} shader {shader} other {project}}."
+    "defaultMessage": "At least one gallery image is required to showcase the content of your {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload a gallery image"

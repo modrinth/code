@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Недостатньо прав."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Створити партнерське посилання"
   },
@@ -47,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "Нове"
   },
+  "badge.release": {
+    "defaultMessage": "Випуск"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Скасувати"
   },
@@ -65,17 +71,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Не вдалося завантажити деталей підписки."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 днів"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/місяць"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/квартал"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/рік"
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 днів} monthly {/місяць} quarterly {/квартал} yearly {/рік} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Ваше наступне списання буде <charge-date>{date}</charge-date>."
@@ -102,10 +99,10 @@
     "defaultMessage": "Не знайдено результатів за вашим запитом!"
   },
   "browse.offline": {
-    "defaultMessage": "Ви наразі не в мережі. Під'єднайтеся до Інтернету, аби шукати на Modrinth!"
+    "defaultMessage": "Ви наразі не в мережі. Під'єднайтеся до інтернету, щоб шукати на Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Шукати {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} server {сервери} other {проєкти}}..."
+    "defaultMessage": "Шукати {projectType}…"
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Обрані проєкти"
@@ -224,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Відкрити теку"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Відкрити в переглядачу"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Відкрити в теці"
   },
@@ -293,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "Зупинити"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Перейти до версії"
+  },
   "button.switch-version": {
     "defaultMessage": "Змінити версію"
   },
@@ -320,8 +323,29 @@
   "changelog.product.web": {
     "defaultMessage": "Платформа"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Ця колекція порожня."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Завантаження проєктів…"
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "За вашим запитом не знайдено жодного проєкту."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Пошук проєктів"
+  },
   "collections.label.private": {
     "defaultMessage": "Приватно"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "вміст"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {# елемент} few {# елементи} other {# елементів}}"
   },
   "content.card.select-project": {
     "defaultMessage": "Обрати {project}"
@@ -342,16 +366,13 @@
     "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Видалення моду може назавжди вплинути на ваш світ й спричинити втрату вмісту або несподівані проблеми при його повторному завантаженні."
+    "defaultMessage": "Видалення мода може назавжди вплинути на ваш світ і спричинити втрату вмісту або несподівані проблеми під час його повторного завантаження."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Попередження щодо видалення"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Видалити {count} {itemType}"
-  },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Видалення {itemType}"
+    "defaultMessage": "Видалити {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Пониження} other {Підвищення}} може спричинити проблеми сумісности. Моди чи вміст, який ви додали в збірку, буде збережено, але може бути несумісним із новою версією."
@@ -377,6 +398,48 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Відв’язати"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Цей уміст потребується іншим умістом"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Залежний проєкт} other {Залежні проєкти}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Деякі вибрані проєкти встановлено як залежності. Якщо їх видалити, {context} може припинити працювати, а залежний уміст — завантажуватися неправильно."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "профіль"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "сервер"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Усе одно видалити"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Усе одно видалити {count, number} {itemType}"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Буде видалено"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Вимкнути залежний уміст після видалення"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Залежний уміст може не завантажитися або вимкнутися"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Ваш {context} може завершитися аварійно, не запускатися або працювати нестабільно"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Попередження про залежності"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} встановлено як залежність. Якщо його видалити, {context} може припинити працювати, а залежний уміст — завантажуватися неправильно."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Що тоді?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "Додано {count}"
   },
@@ -389,11 +452,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Оновлено"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Не встановлювати"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Додано"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Видалено"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Оновлено"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Усе одно встановити"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "Видалено {count}"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Файл перевірятиметься, лише якщо його опубліковано на Modrinth, незалежно від його формату (включно з .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Деякий уміст на вашому сервері не вдалося проаналізувати, тож ця зміна може вплинути на нього."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Це оновлення містить файли, які не є опубліковані на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Попередження про невідомі файли"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Невідомо"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} оновлено"
@@ -428,20 +518,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Створити резервну копію"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "профіль"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Утримуйте клавішу Shift під час натискання, щоб пропустити підтвердження."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "Ми рекомендуємо створити резервну копію перш ніж продовжувати, щоб ви могли відновити свій {type, select, server {світ} other {профіль}}, якщо щось піде не так."
+    "defaultMessage": "Ми рекомендуємо створити резервну копію перш ніж продовжувати, щоб ви могли відновити свій {type}, якщо щось піде не так."
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Уміст вашої збірки тепер можна знайти тут!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Уміст збірки перемістився"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Не показувати знову"
+  "content.inline-backup.world-label": {
+    "defaultMessage": "світ"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Додатковий уміст"
@@ -451,9 +538,6 @@
   },
   "content.page-layout.busy-description": {
     "defaultMessage": "Будь ласка, дочекайтеся завершення операції, перш ніж редагувати вміст."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Знайдіть або вивантажте {contentType, select, mod {мод} mods {моди} plugin {плаґін} plugins {плаґіни} datapack {пакет даних} datapacks {пакети даних} project {проєкт} projects {проєкти} other {вміст}}, щоб розпочати"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Додайте додатковий уміст до цієї збірки"
@@ -476,9 +560,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Будь ласка, зачекайте"
   },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "Пошук серед {count} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} проєкт {проєкту} проєктs {проєктів} other {елементів умісту}}…"
-  },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Назви файлів"
   },
@@ -495,7 +576,7 @@
     "defaultMessage": "Назви проєктів"
   },
   "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "За алфавітом"
+    "defaultMessage": "За абеткою"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Спочатку новіші"
@@ -518,32 +599,8 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Увесь вибраний уміст уже ввімкнено"
   },
-  "content.selection-bar.bulk.deleting": {
-    "defaultMessage": "Видалення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "Видалення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.disabling": {
-    "defaultMessage": "Вимкнення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.disabling-waiting": {
-    "defaultMessage": "Вимкнення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.enabling": {
-    "defaultMessage": "Увімкнення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.enabling-waiting": {
-    "defaultMessage": "Увімкнення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.updating": {
-    "defaultMessage": "Оновлення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "Оновлення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "Вибрано {count} {contentType, select, mod {мод} mods {{count, plural, few {моди} other {модів}}} plugin {плаґін} plugins {{count, plural, few {плаґіни} other {плаґінів}}} datapack {пакет даних} datapacks {{count, plural, few {пакети даних} other {пакетів даних}}} проєкт {проєкт} проєктs {{count, plural, few {проєкти} other {проєктів}}} other {{count, plural, one {елемент умісту} few {елементи вмісту} other {елементів умісту}}}}"
+    "defaultMessage": "{count, number} {contentType} вибрано"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Вибрано {count, number}"
@@ -818,6 +875,258 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Налаштування сервера"
   },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, one {Додати файл} few {Додати файли} many {Додати файли} other {Додати файли}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Оберіть усі файли, які потрібно перемістити в цю групу."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "В інших групах немає файлів, які можна перемістити сюди."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Не вдалося завантажити файли"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "За вашим запитом не знайдено жодного файлу."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Пошук файлів…"
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {Обрано # файл} few {Обрано # файли} many {Обрано # файлів} other {Обрано # файлу}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Додати файли до цієї групи"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Додати файли…"
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Не вдалося додати файли"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "Уміст заборонений"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Пройдено"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Доказ відхилено"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Завершено"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "Немає дозволів"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Не допущено"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "В очікуванні"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Інформацію відхилено"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Інше"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "Додати атрибуцію"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Усі права захищено/Без ліцензії"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Посилання на ліцензію"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "Назва ліцензії, бажано ідентифікатор SPDX"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Оберіть ліцензію."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "Посилання повинне бути дійсним URL."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "напр. MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(необов'язково)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Ліцензія"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "Посилання на роботу"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "посилання-на-ліцензію"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "посилання-на-роботу"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Схоже, що це посилання від Modrinth. Якщо цей уміст доступний на Modrinth, ваш пакет, імовірно, експортовано неправильно. Якщо ви завантажили його з іншого сайту, спробуйте завантажити версію Modrinth: інколи вони не є ідентичними файлами."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Нотатки"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Напишіть щось…"
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "Знімок доказу {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Видалити зображення"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "Докази"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "Перетягніть сюди зображення або натисніть, щоб обрати його"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Якщо ми виявимо, що ви відправили несправжні чи змінені зображення, то ваш проєкт та обліковий запис можуть стати заблокованими."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Персонал Modrinth може перевіряти відправлені докази"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Зберегти атрибуцію"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Оберіть ліцензію…"
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "Тип дозволу"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Надайте посилання на вашу ліцензію. Якщо ви її не маєте, краще вказати «Усі права захищено/Без ліцензії»"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Надайте пояснення або завантажте принаймні одне зображення як доказ."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Надайте посилання."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Надайте нотатку або завантажте принаймні одне зображення як доказ."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Використовуйте формат PNG, JPEG, GIF, WebP або BMP."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Завантажте принаймні одне зображення як доказ."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Необхідно надати короткий опис зображень."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Пояснення"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Група атрибуцій {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Уключені файли:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Є в {count, plural, one {в # версії} =2 {у # версіях} few {в # версіях} many {в # версіях} other {в # версіях}}:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "Востаннє оновлено {date} {user}"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Невідомо"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Ліцензія:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Посилання на роботу:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Причина"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Не вдалося зберегти розгляд модерації"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Ці файли не використовуються жодною версією."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Нотатки:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Немає"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Оригінальний проєкт"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Знімок доказу {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Докази:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Автоматично додано атрибуцію"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Ми вже бачили цей файл і підготували для вас атрибуцію. Якщо щось не так, зв'яжіться з підтримкою Modrinth через центр допомоги"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Ліцензія"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "Цю роботу можна поширювати у вашій збірці згідно з її ліцензією."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Завантажте підтверджувальну документацію щодо цієї ліцензії."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Мій проєкт"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Оригінальна робота, створена вами."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Завантажте файли, які можуть підтвердити, що цю роботу створили ви."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Немає дозволів"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Ми вже бачили цей файл, і його ліцензія забороняє поширення."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "Ви не маєте дозволу використовувати цю роботу."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Особливі дозволи"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "Ви отримали особливі дозволи для поширення цієї роботи у вашій збірці."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Видалити з групи"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Файл не розділено"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + ще {count}"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Модератор"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Ні"
   },
@@ -842,6 +1151,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Перезаписати"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Буде перезаписано<file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Понад 100 файлів буде перезаписано, якщо ви продовжите процес видобування. Ось деякі з них."
   },
@@ -851,17 +1163,14 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} перезаписано"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Перезаписано"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Файли будуть перезаписані"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "Створити {type, select, directory {теку} other {файл}}"
+    "defaultMessage": "Створено {type}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "Створити {type, select, directory {теку} other {файл}}"
+    "defaultMessage": "Створити {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "як-от my-folder"
@@ -875,8 +1184,11 @@
   "files.delete-modal.header": {
     "defaultMessage": "Видалити файл"
   },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Цю теку та весь її вміст буде назавжди видалено. Цю дію неможливо скасувати.} other {Цей файл буде назавжди видалено. Цю дію неможливо скасувати.}}"
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "Цей файл буде видалено назавжди. Цю дію не можна скасувати."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "Цю теку й весь її вміст буде видалено назавжди. Цю дію не можна скасувати."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Не вдалося завантажити вміст теки."
@@ -965,6 +1277,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Віддалити"
   },
+  "files.item-type.file": {
+    "defaultMessage": "файл"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "файли"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "тека"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "теки"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "Операції з файлами вимкнено, поки вони використовуються."
   },
@@ -1005,7 +1329,7 @@
     "defaultMessage": "як-от /my-folder"
   },
   "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Перемістити теку} other {Перемістити файл}}"
+    "defaultMessage": "Перемістити {type}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "На головну"
@@ -1076,6 +1400,9 @@
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# елемент} few {# елементи} other {# елементів}}"
   },
+  "files.row.parent-folder": {
+    "defaultMessage": "Батьківська тека"
+  },
   "files.table-header.created": {
     "defaultMessage": "Створено"
   },
@@ -1128,7 +1455,7 @@
     "defaultMessage": " — залишилося {count}"
   },
   "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Перемістіть сюди файли, щоб вивантажити їх"
+    "defaultMessage": "Перемістіть {type} сюди, щоб завантажити"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Назва може містити лише літери, цифри, тире, нижні підкреслення або пробіли."
@@ -1410,7 +1737,7 @@
     "defaultMessage": "Короткочасно до {cpus} ЦП"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "Короткочасне посилення ЦП дозволяє вашому серверу використовувати додаткові потоки для пом’якшення стрибків TPS. Натисніть, щоб дізнатися більше."
+    "defaultMessage": "Короткочасне посилення ЦП дає змогу вашому серверу використовувати додаткові потоки для пом’якшення стрибків TPS. Натисніть, щоб дізнатися більше."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} ГБ ОЗП"
@@ -1503,7 +1830,13 @@
     "defaultMessage": "Змінення завантажувача деструктивне"
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "{projectType, select, server {Пов’заний проєкт сервера} other {Пов’зана збірка}}"
+    "defaultMessage": "Зв'язаний {projectType}"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "збірка"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "проєкт серверу"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Версія {loader}"
@@ -1512,7 +1845,7 @@
     "defaultMessage": "Щоб змінювати завантажувач потрібно скинути сервер."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Перевстановлення зібрки скине вміст {type, select, server {сервера} other {профіля}} до початкового стану, видаливши всі моди та вміст, які ви додавали."
+    "defaultMessage": "Перевстановлення збірки скине вміст {type} до початкового стану, видаливши всі моди та вміст, які ви додавали."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Перевстановити збірку"
@@ -1541,11 +1874,23 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Пошук версій гри…"
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "профілю"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "профілю"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "сервера"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "сервера"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Відв’язати"
   },
   "installation-settings.unlink.description": {
-    "defaultMessage": "Відв’яжіть {type, select, server {сервер} other {профіль}} від проєкту {projectType, select, server {сервера} other {збірки}}. Це дозволить змінити завантажувач і версію Minecraft, але ви не будете отримувати майбутні оновлення."
+    "defaultMessage": "Відв'язання назавжди від'єднає цей {type} від проєкту {projectType}, дозволивши вам змінити завантажувач та версію Minecraft, але ви не зможете отримувати подальші оновлення."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Перевірка…"
@@ -1562,14 +1907,23 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Перевстановити збірку"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Лагодження перевстановить завантажувач та залежності Minecraft без видалення вашого вмісту. Це може розв’язати проблеми, якщо {type, select, server {ваш сервер не запускається належним чином} other {ваша гра не запускається через помилки запускача}}."
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "Лагодження перевстановить завантажувач та залежності Minecraft без видалення вашого вмісту. Це може розв’язати проблеми, якщо ваша гра не запускається через помилки запускача."
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "Лагодження перевстановлює завантажувач та залежності Minecraft без видалення вашого вмісту. Це може розв’язати проблеми, якщо ваш сервер не запускається належним чином."
   },
   "instance.confirm-repair.header": {
-    "defaultMessage": "Полагодити {type, select, server {сервер} other {профіль}}"
+    "defaultMessage": "Полагодити {type}"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "профіль"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Полагодити"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "сервер"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Режим пригод"
@@ -1597,6 +1951,9 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Установити проєкт"
+  },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "Цей профіль використовує інший завантажувач або версію гри, ніж вимагає цей проєкт."
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Установити"
@@ -1670,6 +2027,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Приховати несумісні"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "Вибрана версія не позначена як сумісна з цим профілем. Залежності не будуть встановлені автоматично."
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "Виберіть версію"
+  },
   "instances.updater-modal.incompatible-update.description": {
     "defaultMessage": "{version} не позначено як сумісну з цією інсталяцією. Вона може не запускатися або поводитися несподівано."
   },
@@ -1678,6 +2041,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "Усе одно оновитися"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Усе одно встановити"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Завантаження журналу змін…"
@@ -1803,7 +2169,7 @@
     "defaultMessage": "Версія гри"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Приховати вже встановлений вміст"
+    "defaultMessage": "Приховати вже встановлений уміст"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Приховати обраний вміст"
@@ -1906,6 +2272,9 @@
   },
   "label.server": {
     "defaultMessage": "Сервер"
+  },
+  "label.server-only": {
+    "defaultMessage": "Лише сервер"
   },
   "label.servers": {
     "defaultMessage": "Сервери"
@@ -2378,6 +2747,9 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.label.badges": {
+    "defaultMessage": "Значки"
+  },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Опубліковано {date}"
   },
@@ -2497,6 +2869,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "Платформи"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, =1 {Платформа} other {Платформи}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "Сумісність"
@@ -2665,6 +3040,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {відстежує} few {відстежують} other {відстежують}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "Не вдалося отримати текст ліцензії."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Завантажуємо текст ліцензії…"
+  },
+  "project.license.title": {
+    "defaultMessage": "Ліцензія"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} у мережі"
@@ -3071,6 +3455,12 @@
   "project.settings.view.title": {
     "defaultMessage": "Переглянути"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {завантаження} few {завантаження} many {завантажень} other {завантаження}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {стежить} few {стежать} many {стежать} other {стежать}}"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3079,6 +3469,21 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Перемкнути фільтр на {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "Завантажувач модів"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "Утримано"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "Версію утримано через відсутність дозволів"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Вирішити"
   },
   "project.visibility.archived": {
     "defaultMessage": "Архівовано"
@@ -3109,6 +3514,18 @@
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Команда зробила поза списком"
+  },
+  "report.item-type.content": {
+    "defaultMessage": "уміст"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "проєкт"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "користувач"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "версія"
   },
   "s.bg": {
     "defaultMessage": "Запуск завдання в тлі"
@@ -3142,6 +3559,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Показати більше"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Більше"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Виключити пакети даних"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Виключити моди"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Виключити плаґіни"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Середовище"
@@ -3200,8 +3629,557 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Ванільний"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Резервні копії"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Уміст і збірка"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Файли та SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Живлення та консоль"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Сервер"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Налаштування та середовище"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Користувачі та запрошення"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Дії"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "Пошук дій..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "Доданий уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Видалений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "Вимкнений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "Увімкнутий уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Оновлений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Завантажений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Створена резервна копія"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Видалена резервна копія"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Перейменована резервна копія"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "Відновлена резервна копія"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "Оберіть назву сервера"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "Оберіть субдомен сервера"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "Очищено консоль"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "Виконано команду консолі"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "Видалити файл"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "Редагувати файл"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "Перейменувати файл"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "Завантажити файл"
+  },
+  "servers.access-page.activity-log-filter.action.game-version-edited": {
+    "defaultMessage": "Оберіть версію Minecraft"
+  },
+  "servers.access-page.activity-log-filter.action.java-runtime-modified": {
+    "defaultMessage": "Змінено середовище виконання Java"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "Змінено версію Java"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "Обрати версію завантажувача"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "Обрати збірку"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Відв'язано збірку"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "Додано алокацію порту"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "Видалено алокацію порту"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "Створити сервер"
+  },
+  "servers.access-page.activity-log-filter.action.server-killed": {
+    "defaultMessage": "Примусово зупинено сервер"
+  },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "Змінено план"
+  },
+  "servers.access-page.activity-log-filter.action.server-properties-modified": {
+    "defaultMessage": "Змінено властивості сервера"
+  },
+  "servers.access-page.activity-log-filter.action.server-reallocated": {
+    "defaultMessage": "Перевиділено сервер"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "Відновлено сервер"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "Скинуто сервер"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "Перезапущено сервер"
+  },
+  "servers.access-page.activity-log-filter.action.server-started": {
+    "defaultMessage": "Запущено сервер"
+  },
+  "servers.access-page.activity-log-filter.action.server-stopped": {
+    "defaultMessage": "Зупинено сервер"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-login": {
+    "defaultMessage": "Виконано вхід через SFTP"
+  },
+  "servers.access-page.activity-log-filter.action.startup-command-modified": {
+    "defaultMessage": "Змінено команду запуску"
+  },
+  "servers.access-page.activity-log-filter.action.user-invite-revoked": {
+    "defaultMessage": "Відкликано запрошення користувача"
+  },
+  "servers.access-page.activity-log-filter.action.user-invited": {
+    "defaultMessage": "Запрошено користувача"
+  },
+  "servers.access-page.activity-log-filter.action.user-permission-modified": {
+    "defaultMessage": "Змінено дозволи користувача"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "Відкликано доступ"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "Додати фільтр"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "Очистити фільтри"
+  },
+  "servers.access-page.activity-log-filter.empty-options": {
+    "defaultMessage": "Немає доступних опцій."
+  },
+  "servers.access-page.activity-log-filter.empty-search": {
+    "defaultMessage": "Не знайдено опцій."
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Профілі"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Сервер"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "Підтримка"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Користувач"
+  },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "Журнал дій"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "Додати користувача"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "Не вдалося відправити запит у друзі"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "Відкликано запрошення для {target}."
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "Запрошення відкликано"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "Запрошення не відправлено"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "Відправити ще одне запрошення для {target}."
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Запрошення перевідправлено"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "Запрошено {target} на роль {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Запрошення надіслано"
+  },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "Перезапустіть сторінку та спробуйте ще раз."
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Доступ не завантажено"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Відкликано доступ для {target}."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Доступ відкликано"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Доступ не відкликано"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "Роль не оновлено"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Усе"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "Роль: {role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "Редагувальник"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "Може керувати профілями, файлами, резервними копіями та іншими налаштуваннями."
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Власник"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "Повний доступ, включно з оплатою, членами та незворотними діями."
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Обмежений"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Може запускати, зупиняти та переглядати сервер, не виконуючи зміни."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Пошук {count} {count, plural, one {користувача} few {користувачів} many {користувачів} other {користувачів}}…"
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "Редактор"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Власник"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Обмежений"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "Відкликати запрошення"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Відкликати доступ"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "Перевідправити запрошення"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "Перевідправити через {seconds}с"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Дії"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "Доєднався"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Роль"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Користувач"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "Не знайдено користувачів за вашим фільтром."
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "Дії для {username}"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "В очікуванні"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Запуск завдання в тлі"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Підтримка"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Дії"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Час"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Користувач"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "Профіль"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Серверні профілі — це ізольовані середовища з власним умістом та файлами світу."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "З'явиться незабаром!"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "Не знайдено дій за вашим фільтром."
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "Виконайте дію над вашим сервером, тоді вона з'явиться тут!"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "Додано вміст <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "Змінено вміст <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "Видалено вміст <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "Видалено вміст"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "Вимкнено вміст <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "Увімкнено вміст <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Оновлено вміст <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "Завантажено <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "Змінено резервну копію <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "Змінено резервну копію"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "Створено резервну копію <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "Створено резервну копію"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "Видалено резервну копію <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "Видалено резервну копію"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "Перейменовано резервну копію з <from></from> на <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "Перейменовано резервну копію"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "Відновлено резервну копію <backup></backup>"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "Відновлено резервну копію"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "Змінено конфігурацію сервера"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "Очищено консоль"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "Виконано команду консолі <command></command>"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "Змінено файл <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "Видалено файл <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Змінено файл <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "Перейменовано з <from></from> на <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "Завантажено файл <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Змінено версію Minecraft на <version></version>"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Змінено середовище виконання Java на <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Змінено версію Java на <java-version></java-version>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Змінено завантажувач на <loader></loader> <version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Змінено завантажувач на <loader></loader>"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "Змінено версію завантажувача на <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "Очищено версію завантажувача"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Змінено збірку"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Змінено збірку на <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "Змінено версію збірки на <version></version>"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Відв'язано збірку"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Відв'язано збірку <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Відв'язано версію збірки <version></version>"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "Додано алокацію порту <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Видалено алокацію порту <port></port>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "Створено сервер"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "Примусово зупинено сервер"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "Змінено метадані сервера"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "Змінено назву сервера на <name></name>"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "Змінено план на <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, one {# процесор} few {# процесори} many {# процесорів} other {# процесора}}"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "новий план"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} ГБ оперативної пам'яті"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} МБ оперативної пам'яті"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} ГБ пам'яті накопичувача"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} МБ пам'яті накопичувача"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Змінено властивості сервера <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Змінено властивості сервера"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Перевиділено сервер"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Відновлено сервер"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Скинуто сервер"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Перезапущено сервер"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Запущено сервер"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Зупинено сервер"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Змінено піддомен сервера на <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "Виконано вхід через SFTP"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "Змінено команду запуску на <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Невідома подія"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Записано активність сервера"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "Відкликано запрошення для <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "Запрошено <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "Запрошено <target-user></target-user> з <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "Змінено дозволи для <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Змінено дозволи для <target-user></target-user> на <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "Відкликано доступ для <target-user></target-user>"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Сервер"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Резервну копію {backupName} скасовано."
@@ -3323,6 +4301,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Розклад резервного копіювання"
   },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Підтримка"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Ручне резервне копіювання"
   },
@@ -3358,6 +4342,57 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Триває синхронізація вмісту"
+  },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Також відправити запит у друзі"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "Цього користувача вже запрошено"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "Скасувати"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "Додати користувача"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "Запросити"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "Перегляньте повний список дозволів для кожної ролі <link>тут</link>."
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "Редактор"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "Керуйте вмістом екземпляра, файлами, резервними копіями та іншими налаштуваннями."
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "Обрати роль"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Обмеження"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Запуск, зупинка та перегляд сервера без унесення змін."
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Не використовуйте їхнє ім'я гравця Minecraft."
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Ім'я користувача Modrinth"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "За вашим запитом користувачів не знайдено."
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Уведіть ім'я користувача Modrinth"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "Пошук…"
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Не вдалося встановити"
@@ -3465,16 +4500,16 @@
     "defaultMessage": "Новий"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Ваші файли зберігатимуться ще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дні} many {днів} other {днів} }</days-remaining>. Зверніться до служби підтримки, щоб завантажити файли, перш ніж їх буде видалено. "
+    "defaultMessage": "Ваші файли зберігатимуться ще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дні} many {днів} other {днів} }</days-remaining>. Зверніться до служби підтримки, щоб завантажити файли, перш ніж їх буде видалено."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Ваші файли зберігатимуться протягом 30 днів після скасування."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Ваш сервер призупинено модерацією. "
+    "defaultMessage": "Ваш сервер призупинено модерацією."
   },
   "servers.listing.notice.pending-change": {
-    "defaultMessage": "Ваш сервер буде {verb} до {planSize} плану <date>{formattedDate}</date>. "
+    "defaultMessage": "Ваш сервер {verb, select, downgrade {погіршиться} other {покращиться}} до плану «{planSize}» <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Зачекайте, поки ми налаштуємо ваш сервер. Це може тривати до 10 хвилин."
@@ -3483,7 +4518,7 @@
     "defaultMessage": "Вашу підписку скасовано."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Вашу підписку скасовано <date>{formattedDate}</date>. "
+    "defaultMessage": "Вашу підписку скасовано <date>{formattedDate}</date>."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Вашу підписку скасовано через помилку оплати."
@@ -3502,6 +4537,12 @@
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "Апаратне забезпечення вашого сервера зараз оновлюється та незабаром відновиться."
+  },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "Власник {username}"
   },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "Підписатися повторно"
@@ -3551,8 +4592,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "Новий сервер"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "Жоден сервер, якими ви володієте, не відповідає вашому пошуку."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "Серверів не знайдено."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "Жодний спільний сервер не відповідає вашому пошуку."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Платіжна інформація ще завантажується. Перевірка відкриється коли все буде готово."
@@ -3596,6 +4643,12 @@
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Налаштування вашого сервера переміщено"
   },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "Спільні сервери"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "Ваші сервери"
+  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "Залишилося <days-count>{days}</days-count> {days, plural, one {день} few {дні} other {днів}} <hours-count>{hours}</hours-count> {hours, plural, one {година} few {години} other {годин}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {хвилина} few {хвилини} other {хвилин}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {секунда} few {секунди} other {секунд}}…"
   },
@@ -3613,6 +4666,12 @@
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "Апаратне забезпечення вашого сервера зараз оновлюється та незабаром відновиться."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "Належить {username}"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Значок сервера"
@@ -3665,6 +4724,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Спосіб оплати"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "стягується {interval, select, monthly {щомісячно} quarterly {щоквартально} yearly {щорічно} other {{interval}}}"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Доступно у Північній Америці, Європі та Південно-східній Азії."
   },
@@ -3713,6 +4775,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Огляд"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Австралія"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Центральна Європа"
   },
@@ -3742,6 +4807,54 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Західна Європа"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "Додано {time}"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "Скасувати запрошення"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "Їх не буде додано до цього сервера"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "Ви можете надіслати їм інше запрошення пізніше"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "Скасувати запрошення"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "Якщо ви скасуєте це запрошення, {username} потребуватиме нового запрошення, перш ніж зможе приєднатися до цього сервера."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "Скасувати права"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "Запрошено {time}"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "Очікує запрошення"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "Скасувати доступ"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "Вони негайно втратять доступ до панелі сервера та більше не зможуть редагувати вміст"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "Вони все ще зможуть приєднатися та грати на сервері, якщо ви не внесете окремі зміни"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "Дата додавання невідома"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "Якщо ви скасуєте доступ користувача до вашого сервера, вам потрібно буде повторно запросити його, щоб відновити доступ."
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "Що відбудеться?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Під час установлення сталася несподівана помилка. Спробуйте ще раз пізніше."
@@ -3883,9 +4996,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Особистий токен доступу"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Публічний профіль"
   },
   "settings.sessions.title": {
     "defaultMessage": "Сеанси"
@@ -4095,7 +5205,7 @@
     "defaultMessage": "Мережа"
   },
   "tag.category.offline-mode": {
-    "defaultMessage": "Поза мережею"
+    "defaultMessage": "Режим «не в мережі»"
   },
   "tag.category.oneblock": {
     "defaultMessage": "One Block"
@@ -4313,6 +5423,93 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Застосувати"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Скасувати"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Очистити"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Користувацький проміжок часу…"
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Зменшити проміжок дат"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "Проміжок дат не обрано."
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "Кінець"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Збільшити проміжок дат"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "За {unit, select, hours {{amount, plural, one {останню {amount} годину} few {останні {amount} години} many {останні {amount} години} other {останні {amount} години}}} days {{amount, plural, one {останній {amount} день} few {останні {amount} дні} many {останні {amount} днів} other {останні {amount} дня}}} weeks {{amount, plural, one {останній {amount} тиждень} few {останні {amount} тижні} many {останні {amount} тижнів} other {останні {amount} тижня}}} months {{amount, plural, one {останній {amount} місяць} few {останні {amount} місяці} many {останні {amount} місяців} other {останні {amount} місяця}}} other {{amount} днів}}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "За останні"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Увесь час"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Останні 14 днів"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Останні 180 днів"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Останні 30 днів"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Останні 7 днів"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Останні 90 днів"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Сьогодні"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "Цей рік"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Учора"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Обрати проміжок дат"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Обрано"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Обирається"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "Початок"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Проміжок"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Одиниця проміжку"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "днів"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "годин"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "місяців"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "тижнів"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "У вас є незбережені зміни."
   },
@@ -4336,6 +5533,224 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Відхилити все"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Не встановлювати"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Більше не показувати це попередження"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Підтвердити установлення"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Усе одно встановити"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Шкідливе програмне забезпечення часто поширюють через моди, які публікуються на таких платформах, як Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " не є опублікований на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Попередження про невідомий файл"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " містить файли, які не є опубліковані на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Попередження про невідомі файли"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Файл перевірятиметься, лише якщо його опубліковано на Modrinth, незалежно від його формату (включно з .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Нерозпізнані файли"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Цей користувач з нами від Modrinth Alpha, який завершився в листопаді 2020."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Alpha-тестувальник"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Цей користувач з нами від Modrinth Beta, який завершився в лютому 2022."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Натисніть, аби прочитати про запуск Modrinth Beta."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Beta-тестувальник"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Проєкти цього користувача зібрали загалом {download_sum} завантажень."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} завантажень"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "Цей користувач допомагав нам тестувати пакети даних на Modrinth перед їхнім запуском у січні 2023."
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "Ранній тестувальник пакетів даних"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "Цей користувач допомагав нам тестувати збірки на Modrinth перед їхнім запуском у травні 2022."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "Ранній тестувальник збірок"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "Цей користувач допомагав нам тестувати плаґіни на Modrinth перед їхнім запуском у серпні 2022."
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "Ранній тестувальник плаґінів"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "Цей користувач допомагав нам тестувати пакети ресурсів на Modrinth перед їхнім запуском у серпні 2022."
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "Ранній тестувальник пакетів ресурсів"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "Цей користувач допомагав нам тестувати сервери на Modrinth перед їхнім запуском у березні 2026."
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "Ранній тестувальник серверів"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "Цей користувач допомагав нам тестувати шейдери на Modrinth перед їхнім запуском у січні 2023."
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "Ранній тестувальник шейдерів"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "Цей користувач брав участь у закритому альфа-тестуванні Modrinth Hosting перед запуском бета-тестування в листопаді 2024."
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "Альфа-тестувальник Modrinth Hosting"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "Цей користувач працює на Modrinth як модератор умісту."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Модератори вмісту на Modrinth розглядають проєкти, опрацьовують скарги та допомагають тримати Modrinth у безпеці."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "Модератор умісту"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Цей користувач активно підтримує Modrinth та творців на платформі."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Натисніть, аби дізнатися, як стати нашим підписником."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Підписник Modrinth+"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Цей користувач брав участь у принаймні одній благодійній акції Modrinth на підтримку спільноти ЛҐБТК+."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "Натисніть, аби переглянути останні акції."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Підтримувач прайду"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Цей користувач працює на Modrinth."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Команда Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Назва"
+  },
+  "version.content.version": {
+    "defaultMessage": "Версія"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "JAR для розробки"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "JAR із Javadoc"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "Необов'язковий пакет ресурсів"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Основний"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Обов'язковий пакет ресурсів"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "Файл підпису"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "JAR із вихідним кодом"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Інше"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Зміни"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Сумісність"
+  },
+  "version.section.content": {
+    "defaultMessage": "Уміст"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Пошук умісту…"
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Будь-яка сумісна версія"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Будь-яка версія"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Недоступна версія"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "Ця версія, можливо, видалена або розглядається модераторами."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "Ця обов'язкова версія, можливо, видалена або розглядається модераторами."
+  },
+  "version.section.files": {
+    "defaultMessage": "Файли"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Уключений уміст"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Відомі несумісності"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "Журналу змін не надано."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Без завантажувача"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Необов'язкові залежності"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Обов'язковий уміст"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Додаткові ресурси"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Файл"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Розмір"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Тип"
   }
 }
-

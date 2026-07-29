@@ -48,7 +48,12 @@
 					>{{ isIncome ? '' : '-' }}{{ formatMoney(transaction.amount) }}</span
 				>
 				<template v-if="transaction.type === 'withdrawal' && transaction.status === 'in-transit'">
-					<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
+					<Tooltip
+						theme="dismissable-prompt"
+						class="inline-flex shrink-0"
+						:triggers="['hover', 'focus']"
+						no-auto-focus
+					>
 						<span class="my-auto align-middle"
 							><ButtonStyled circular type="outlined" size="small">
 								<button class="align-middle" @click="cancelPayout">

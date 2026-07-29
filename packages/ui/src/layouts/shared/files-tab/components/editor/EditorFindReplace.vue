@@ -10,6 +10,7 @@
 				<ButtonStyled type="transparent" circular>
 					<button
 						v-tooltip="formatMessage(messages.toggleReplace)"
+						:disabled="props.readonly"
 						:aria-label="formatMessage(messages.toggleReplace)"
 						@click="toggleReplace"
 					>
@@ -88,6 +89,7 @@
 						type="search"
 						size="small"
 						autocomplete="off"
+						:disabled="props.readonly"
 						:placeholder="formatMessage(messages.replaceInFile)"
 						wrapper-class="w-44"
 					/>
@@ -95,7 +97,7 @@
 				<ButtonStyled type="outlined">
 					<button
 						class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
-						:disabled="findMatchCount === 0"
+						:disabled="props.readonly || findMatchCount === 0"
 						@click="emit('replace', replaceQuery)"
 					>
 						{{ formatMessage(messages.replace) }}
@@ -104,7 +106,7 @@
 				<ButtonStyled type="outlined">
 					<button
 						class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
-						:disabled="findMatchCount === 0"
+						:disabled="props.readonly || findMatchCount === 0"
 						@click="emit('replaceAll', replaceQuery)"
 					>
 						{{ formatMessage(messages.replaceAll) }}
@@ -129,6 +131,7 @@ const props = defineProps<{
 	findMatchCount: number
 	currentFindMatch: number
 	isEditingImage: boolean
+	readonly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -193,6 +196,7 @@ const findInputRef = ref<{ focus: () => void } | null>(null)
 const replaceInputRef = ref<{ focus: () => void } | null>(null)
 
 function toggleReplace() {
+	if (props.readonly) return
 	isReplaceOpen.value = !isReplaceOpen.value
 	if (isReplaceOpen.value) {
 		nextTick(() => replaceInputRef.value?.focus())
@@ -204,6 +208,7 @@ function focusFindInput() {
 }
 
 function openReplace() {
+	if (props.readonly) return
 	isReplaceOpen.value = true
 	nextTick(() => replaceInputRef.value?.focus())
 }

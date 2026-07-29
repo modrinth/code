@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH\n          user_project_downloads AS (\n            SELECT\n              tm.user_id,\n              SUM(m.downloads)::BIGINT total_downloads\n            FROM team_members tm\n            INNER JOIN mods m ON m.team_id = tm.team_id\n            WHERE tm.accepted = TRUE\n            GROUP BY tm.user_id\n          )\n        SELECT u.id AS \"id!\"\n        FROM users u\n        INNER JOIN user_project_downloads upd ON upd.user_id = u.id\n        WHERE u.email IS NOT NULL\n          AND u.email_verified = TRUE\n          AND upd.total_downloads > 20000\n          AND NOT EXISTS (\n            SELECT 1\n            FROM notifications n\n            WHERE n.user_id = u.id\n              AND n.body ->> 'type' = 'discord_role_creator_club'\n          )\n        ORDER BY upd.total_downloads DESC, u.id\n        LIMIT 1000\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ffb5c12a0af95670946839a2f17247fc27601850a7b74b92863b740efbf794c9"
+}

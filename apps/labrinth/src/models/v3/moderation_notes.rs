@@ -28,7 +28,7 @@ impl From<crate::database::models::DBModerationNote> for ModerationNote {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct PatchModerationNote {
     pub notes: Option<String>,
     pub user_rating: Option<i32>,

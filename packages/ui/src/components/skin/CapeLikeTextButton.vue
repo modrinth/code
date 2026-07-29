@@ -18,26 +18,31 @@ withDefaults(
 <template>
 	<button
 		v-tooltip="tooltip"
-		class="block border-0 m-0 p-0 bg-transparent group cursor-pointer"
+		type="button"
+		class="cape-like-text-button group m-0 block cursor-pointer border-0 bg-transparent p-0"
 		:aria-label="tooltip"
+		:aria-pressed="highlighted"
 		@click="emit('click')"
 	>
 		<span
 			:class="[
-				'block rounded-lg group-active:scale-95 transition-all border-2 relative',
-				highlighted
-					? 'border-brand highlighted-glow'
-					: 'border-transparent brightness-95 group-hover:brightness-100',
+				'relative block overflow-hidden rounded-lg border-0 p-[3px] shadow-[var(--shadow-button)] transition-[transform,background,color,filter] duration-200 group-active:scale-95 group-hover:brightness-[--hover-brightness] group-focus-visible:brightness-[--hover-brightness]',
+				highlighted ? 'bg-brand text-brand' : 'text-primary [background:var(--color-button-bg)]',
 			]"
 		>
-			<span class="block p-[3px] rounded-lg bg-button-bg">
-				<span
-					class="flex flex-col p-4 items-center justify-center aspect-[10/16] w-[60px] min-h-[96px] rounded-[5px] bg-black/10 relative overflow-hidden text-primary z-10"
-				>
-					<div class="mb-1">
+			<span
+				:class="[
+					'relative z-10 block aspect-[10/16] min-h-[96px] w-[60px] overflow-hidden rounded-[5px]',
+					highlighted
+						? '[background:linear-gradient(var(--color-brand-highlight),var(--color-brand-highlight)),var(--color-button-bg)]'
+						: '[background:var(--color-button-bg)]',
+				]"
+			>
+				<span class="absolute inset-0 flex flex-col items-center justify-center text-center">
+					<span class="mb-1 flex items-center justify-center leading-none">
 						<slot name="icon"></slot>
-					</div>
-					<span class="text-xs">
+					</span>
+					<span class="block text-xs leading-none">
 						<slot></slot>
 					</span>
 				</span>
@@ -45,19 +50,3 @@ withDefaults(
 		</span>
 	</button>
 </template>
-
-<style lang="scss" scoped>
-.highlighted-glow::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	border-radius: inherit;
-	pointer-events: none;
-}
-
-@supports (background-color: color-mix(in srgb, transparent, transparent)) {
-	.highlighted-glow::before {
-		box-shadow: inset 0 0 2px 2px color-mix(in srgb, var(--color-brand), transparent 10%);
-	}
-}
-</style>

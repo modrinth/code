@@ -1,12 +1,12 @@
 use super::DatabaseError;
 use crate::database::PgTransaction;
 use crate::models::ids::{
-    AffiliateCodeId, AnalyticsEventId, ChargeId, CollectionId, FileId, ImageId,
-    NotificationId, OAuthAccessTokenId, OAuthClientAuthorizationId,
-    OAuthClientId, OAuthRedirectUriId, OrganizationId, PatId, PayoutId,
-    ProductId, ProductPriceId, ProjectId, ReportId, SessionId,
-    SharedInstanceId, SharedInstanceVersionId, TeamId, TeamMemberId, ThreadId,
-    ThreadMessageId, UserSubscriptionId, VersionId,
+    AffiliateCodeId, AnalyticsEventId, AttributionGroupId, CampaignDonationId,
+    ChargeId, CollectionId, FileId, ImageId, NotificationId,
+    OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
+    OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId, ProductId,
+    ProductPriceId, ProjectId, ReportId, SessionId, TeamId, TeamMemberId,
+    ThreadId, ThreadMessageId, UserSubscriptionId, VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -165,8 +165,16 @@ db_id_interface!(
     generator: generate_charge_id @ "charges",
 );
 db_id_interface!(
+    CampaignDonationId,
+    generator: generate_campaign_donation_id @ "campaign_donations",
+);
+db_id_interface!(
     CollectionId,
     generator: generate_collection_id @ "collections",
+);
+db_id_interface!(
+    AttributionGroupId,
+    generator: generate_attribution_group_id @ "project_attribution_groups",
 );
 db_id_interface!(
     FileId,
@@ -230,14 +238,6 @@ db_id_interface!(
     generator: generate_session_id @ "sessions",
 );
 db_id_interface!(
-    SharedInstanceId,
-    generator: generate_shared_instance_id @ "shared_instances",
-);
-db_id_interface!(
-    SharedInstanceVersionId,
-    generator: generate_shared_instance_version_id @ "shared_instance_versions",
-);
-db_id_interface!(
     TeamId,
     generator: generate_team_id @ "teams",
 );
@@ -273,6 +273,10 @@ db_id_interface!(
     AnalyticsEventId,
     generator: generate_analytics_event_id @ "analytics_events",
 );
+db_id_interface!(
+    PasskeyId,
+    generator: generate_passkey_id @ "user_passkeys",
+);
 
 id_type!(CategoryId as i32);
 id_type!(GameId as i32);
@@ -288,3 +292,4 @@ id_type!(StatusId as i32);
 id_type!(DelphiReportId as i64);
 id_type!(DelphiReportIssueId as i64);
 id_type!(DelphiReportIssueDetailsId as i64);
+id_type!(SharedInstanceId as i64);

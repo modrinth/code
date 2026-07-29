@@ -1,19 +1,25 @@
 import type { ModrinthId } from '@modrinth/utils'
 
 export type GameInstance = {
+	id: string
 	path: string
 	install_stage: InstallStage
+	launcher_feature_version: string
 
 	name: string
 	icon_path?: string
 
 	game_version: string
+	protocol_version?: number
 	loader: InstanceLoader
 	loader_version?: string
 
 	groups: string[]
 
-	linked_data?: LinkedData
+	link?: InstanceLink | null
+	shared_instance?: SharedInstanceAttachment | null
+	quarantined: boolean
+	update_channel: ReleaseChannel
 
 	created: Date
 	modified: Date
@@ -39,16 +45,90 @@ type InstallStage =
 	| 'pack_installing'
 	| 'not_installed'
 
-type LinkedData = {
-	project_id: ModrinthId
-	version_id: ModrinthId
-
-	locked: boolean
+type InstanceLinkIdentity = {
+	project_id?: ModrinthId | null
+	version_id?: ModrinthId | null
+	server_project_id?: ModrinthId | null
+	content_project_id?: ModrinthId | null
+	content_version_id?: ModrinthId | null
 }
+
+export type InstanceLink = InstanceLinkIdentity &
+	(
+		| {
+				type: 'modrinth_modpack'
+				project_id: ModrinthId
+				version_id: ModrinthId
+		  }
+		| {
+				type: 'server_project'
+				project_id: ModrinthId
+		  }
+		| {
+				type: 'server_project_modpack'
+				server_project_id: ModrinthId
+				content_project_id?: ModrinthId | null
+				content_version_id: ModrinthId
+				project_id?: ModrinthId
+				version_id?: ModrinthId
+		  }
+		| {
+				type: 'imported_modpack'
+				project_id?: ModrinthId | null
+				version_id?: ModrinthId | null
+				name?: string | null
+				version_number?: string | null
+				filename?: string | null
+		  }
+		| {
+				type: 'modrinth_hosting'
+				server_id: string
+				instance_ids: string[]
+				active_instance_id?: string | null
+		  }
+		| {
+				type: 'shared_instance'
+				modpack_project_id?: ModrinthId | null
+				modpack_version_id?: ModrinthId | null
+		  }
+	)
+
+export type SharedInstanceAttachment = {
+	id: string
+	role: 'owner' | 'member'
+	manager_id?: string | null
+	server_manager_name?: string | null
+	server_manager_icon_url?: string | null
+	linked_user_id?: string | null
+	status:
+		| 'unknown'
+		| 'up_to_date'
+		| 'update_available'
+		| 'applying'
+		| 'stale'
+		| 'not_ready'
+		| 'error'
+	applied_version?: number | null
+	latest_version?: number | null
+}
+
+export type Instance = GameInstance
+
+type ReleaseChannel = 'release' | 'beta' | 'alpha'
 
 export type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
+export type ContentSourceKind =
+	| 'local'
+	| 'modrinth_modpack'
+	| 'server_project'
+	| 'modrinth_hosting'
+	| 'imported_modpack'
+	| 'shared_instance'
+
 type ContentFile = {
+	enabled: boolean
+	source_kind?: ContentSourceKind | null
 	metadata?: {
 		project_id: string
 		version_id: string
@@ -84,11 +164,18 @@ type Hooks = {
 
 type Manifest = {
 	gameVersions: ManifestGameVersion[]
+	versionGroups?: ManifestVersionGroup[]
 }
 
 type ManifestGameVersion = {
 	id: string
 	stable: boolean
+	versionGroup?: string
+	loaders: ManifestLoaderVersion[]
+}
+
+type ManifestVersionGroup = {
+	id: string
 	loaders: ManifestLoaderVersion[]
 }
 
@@ -102,7 +189,7 @@ type AppSettings = {
 	max_concurrent_downloads: number
 	max_concurrent_writes: number
 
-	theme: 'dark' | 'light' | 'oled'
+	theme: 'dark' | 'light' | 'oled' | 'retro' | 'system'
 	default_page: 'Home' | 'Library'
 	collapsed_navigation: boolean
 	advanced_rendering: boolean

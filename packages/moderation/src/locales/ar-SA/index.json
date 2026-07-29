@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "أضف عنوان جافا"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "أضف رابط URL صالحًا واسمًا أو معرّف SPDX للترخيص المخصص الخاص بك."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "أضف معلومات ترخيص"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "أضف أي روابط ذات صلة خارج Modrinth، مثل موقع إلكتروني، متجر، أو دعوة Discord."
   },
@@ -29,8 +35,14 @@
   "nags.add-links.title": {
     "defaultMessage": "إضافة روابط خارجية"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "لقد حددت جميع خيارات اللغات المتاحة. يُرجى إدراج اللغات التي يدعمها خادمك بشكل فعلي فقط."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "اختر اللغات الدقيقة"
+  },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "لقد حددت جميع العلامات المتاحة، هذا يفسد الغرض من العلامات، والتي تهدف إلى مساعدة المستخدمين في العثور على المشاريع ذات الصلة.\nيرجى تحديد العلامات ذات الصلة بمشروعك فقط."
+    "defaultMessage": "لقد قمت باختيار جميع {totalAvailableTags, plural, one {# وسم متاح} other {# وسوم متاحة}}. هذا يُفقد الأوسمة غايتها، حيث أن هدفها هو مساعدة المستخدمين في العثور على المشاريع ذات الصلة. يرجى اختيار الأوسمة ذات الصلة بمشروعك فقط."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "اختر علامة دقيقة"
@@ -66,7 +78,7 @@
     "defaultMessage": "زيارة مَعْرِض الصور"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "الـ {type, select, mod {mod} plugin {plugin} other {project}} الخاص بك يستخدم ترخيصًا يتطلب إتاحة الشيفرة المصدرية. يُرجى توفير رابط الشيفرة المصدرية أو ملف المصادر  لكل إصدار إضافي، أو التفكير في استخدام ترخيص مختلف.\n"
+    "defaultMessage": "ستخدم {type} الخاص بك ترخيصاً يتطلب توفير الكود المصدري. يرجى تقديم رابط للكود المصدري أو ملف المصادر لكل إصدار إضافي، أو فكر في استخدام ترخيص مختلف."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "توفير كود مصدري"
@@ -75,7 +87,7 @@
     "defaultMessage": "بعض روابطك الإضافية تبدو متطابقة. كل رابط يجب أن يكون فريدا بنوع رابط مناسب."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "روابط متطابقة"
+    "defaultMessage": "Clean up identical links"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "وصفك يجب أن يحتوي على نص عادي أو نص بديل للصورة، لتكون متاحة لمستخدمي قارئ الشاشة أو من لا توجد عنده اتصال إنترنت جيد."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "أختر قرار صحيح"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "الرجاء التأكد من توفير إثبات لحصولك على أُذون لنشر أي محتوى خارجي في حزمة التعديلات الخاصة بك."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "مراجعة الأُذون الخارجية"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "ماهي الإصدارات التي يدعمها خادمك. اختر مودباك, أو اضف من عندك."
   },
@@ -159,7 +177,7 @@
     "defaultMessage": "اختر لغة."
   },
   "nags.select-license.description": {
-    "defaultMessage": "اختر حقوق لـ {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} تحت الازعاج."
+    "defaultMessage": "اختر الترخيص الذي يتم توزيع {type} الخاص بك بموجبه."
   },
   "nags.select-license.title": {
     "defaultMessage": "اختر حقوقا"
@@ -181,6 +199,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "زيارة إعدادات الروابط"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "انتقل إلى لوحة التحكم بالأذونات"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "زيارة إعدادات العلامة"
@@ -212,6 +233,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "عدل اسم"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "لقد حددت {languageCount, plural, one {# لغة} other {# لغات}}. يُرجى إدراج اللغات التي يدعمها خادمك بشكل فعلي فقط."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "اختر اللغات الدقيقة"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "لقد اخترت{tagCount, plural, one {# tag} other {# tags}}. \nفكر في تقليلها الى {maxTagCount} او اقل من اجل عرض خادمك في بحوثات متعلقة."
   },
@@ -225,7 +252,10 @@
     "defaultMessage": "اختار علامات دقيقة"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "صورة واحدة على الاقل لازمةلعرض المحتوى الخاص بـ{type, select, resourcepack {resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag} shader {shader} other {project}}."
+    "defaultMessage": "يُطلب صورة واحدة على الأقل في المَعْرِض لعرض محتوى {type} الخاص بك."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "حُزْمَة موارد، باستثناء حزم الصوت أو التعريب. إذا كان هذا يصف حزمتك، يرجى اختيار الوسم المناسب"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "رفع صورة من المَعْرِض"

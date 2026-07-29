@@ -1,0 +1,95 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n\t\tm.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,\n\t\tm.components AS \"components: sqlx::types::Json<exp::ProjectSerial>\"\n\t\tFROM mods m\n\t\tWHERE m.status = ANY($1) AND m.id = ANY($2)\n\t\tGROUP BY m.id\n\t\tORDER BY m.id ASC;\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "summary",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "downloads",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "follows",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "approved",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "license",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "color",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "components: sqlx::types::Json<exp::ProjectSerial>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "881de045a10c1debe041ec558fd92fdfbf8b8ffa1b21d3d4a271ab6f9c8adb78"
+}

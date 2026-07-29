@@ -1,125 +1,115 @@
 <template>
 	<div>
-		<Modal ref="modalOpen" header="Transfer Projects">
-			<div class="universal-modal items">
-				<div class="table">
-					<div class="table-head table-row">
-						<div class="check-cell table-cell">
-							<Checkbox
-								:model-value="selectedProjects.length === props.projects.length"
-								@update:model-value="toggleSelectedProjects()"
-							/>
+		<NewModal
+			ref="modalOpen"
+			:header="formatMessage(messages.transferProjectsTitle)"
+			no-padding
+			width="60rem"
+		>
+			<div class="max-h-[70vh] overflow-y-auto">
+				<Table
+					class="!rounded-none !border-0"
+					:columns="projectTableColumns"
+					:data="props.projects"
+					row-key="id"
+					table-min-width="42rem"
+					table-layout="auto"
+				>
+					<template #empty-state>
+						<div class="flex h-48 items-center justify-center text-secondary">
+							{{ formatMessage(messages.noProjectsAvailable) }}
 						</div>
-						<div class="table-cell">Icon</div>
-						<div class="table-cell">Name</div>
-						<div class="table-cell">ID</div>
-						<div class="table-cell">Type</div>
-						<div class="table-cell" />
-					</div>
-					<div v-for="project in props.projects" :key="`project-${project.id}`" class="table-row">
-						<div class="check-cell table-cell">
-							<Checkbox
-								:disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
-								:model-value="selectedProjects.includes(project)"
-								@update:model-value="
-									selectedProjects.includes(project)
-										? (selectedProjects = selectedProjects.filter((it) => it !== project))
-										: selectedProjects.push(project)
-								"
-							/>
-						</div>
-						<div class="table-cell">
-							<nuxt-link tabindex="-1" :to="`/project/${project.slug ? project.slug : project.id}`">
-								<Avatar
+					</template>
+					<template #header-select>
+						<Checkbox
+							class="h-full w-full justify-center"
+							:model-value="allTransferableProjectsSelected"
+							@update:model-value="toggleAllTransferableProjects()"
+						/>
+					</template>
+					<template #cell-select="{ row: project }">
+						<Checkbox
+							class="h-full w-full justify-center"
+							:disabled="isProjectTransferDisabled(project)"
+							:model-value="isProjectSelected(project)"
+							@update:model-value="toggleProjectSelection(project)"
+						/>
+					</template>
+					<template #cell-name="{ row: project }">
+						<nuxt-link class="project-name-cell" :to="getProjectUrl(project)">
+							<span
+								class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+							>
+								<img
+									v-if="project.icon_url"
 									:src="project.icon_url"
-									aria-hidden="true"
-									:alt="'Icon for ' + project.name"
-									no-shadow
+									:alt="formatMessage(messages.projectIconAlt, { name: project.title })"
+									class="h-full w-full rounded object-cover"
 								/>
-							</nuxt-link>
-						</div>
-
-						<div class="table-cell">
-							<span class="project-title">
-								<nuxt-link
-									class="hover-link wrap-as-needed"
-									:to="`/project/${project.slug ? project.slug : project.id}`"
-								>
-									{{ project.title }}
-								</nuxt-link>
+								<BoxIcon v-else class="h-full w-full" />
 							</span>
-						</div>
-
-						<div class="table-cell">
+							<span class="wrap-as-needed">{{ project.title }}</span>
+						</nuxt-link>
+					</template>
+					<template #cell-id="{ row: project }">
+						<div class="flex items-center">
 							<CopyCode :text="project.id" />
 						</div>
-
-						<div class="table-cell">
-							<BoxIcon />
-							<span>{{
-								formatProjectType(
-									$getProjectTypeForDisplay(
-										project.project_types?.[0] ?? 'project',
-										project.loaders,
-									),
-								)
-							}}</span>
+					</template>
+					<template #cell-type="{ row: project }">
+						<div class="flex items-center">
+							{{ getProjectDisplayType(project) }}
 						</div>
-
-						<div class="table-cell">
-							<ButtonStyled circular>
-								<nuxt-link :to="`/project/${project.slug ? project.slug : project.id}/settings`">
-									<SettingsIcon />
-								</nuxt-link>
-							</ButtonStyled>
-						</div>
-					</div>
-				</div>
-				<div class="push-right input-group">
+					</template>
+				</Table>
+			</div>
+			<template #actions>
+				<div class="flex justify-end gap-2">
 					<ButtonStyled type="outlined">
-						<button @click="$refs.modalOpen?.hide()">
+						<button @click="hide()">
 							<XIcon />
-							Cancel
+							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button :disabled="!selectedProjects?.length" @click="onSubmitHandler()">
+						<button :disabled="selectedProjects.length === 0" @click="submitTransfer()">
 							<TransferIcon />
-							<span>
-								Transfer
-								<span>
-									{{
-										selectedProjects.length === props.projects.length
-											? 'All'
-											: selectedProjects.length
-									}}
-								</span>
-								<span>
-									{{ ' ' }}
-									{{ selectedProjects.length === 1 ? 'project' : 'projects' }}
-								</span>
-							</span>
+							{{
+								formatMessage(messages.transferSelectedProjects, {
+									count: selectedProjects.length,
+								})
+							}}
 						</button>
 					</ButtonStyled>
 				</div>
-			</div>
-		</Modal>
+			</template>
+		</NewModal>
 		<ButtonStyled>
-			<button @click="$refs.modalOpen?.show()">
+			<button @click="show($event)">
 				<TransferIcon />
-				<span>Transfer projects</span>
+				<span>{{ formatMessage(messages.transferProjectsTitle) }}</span>
 			</button>
 		</ButtonStyled>
 	</div>
 </template>
 
 <script setup>
-import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, Checkbox, CopyCode, Modal } from '@modrinth/ui'
+import { BoxIcon, TransferIcon, XIcon } from '@modrinth/assets'
+import {
+	ButtonStyled,
+	Checkbox,
+	commonMessages,
+	CopyCode,
+	defineMessages,
+	NewModal,
+	Table,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 
+import { getProjectTypeForUrl } from '~/helpers/projects.js'
+
 const EDIT_DETAILS = 1 << 2
-const modalOpen = ref(null)
 
 const props = defineProps({
 	projects: {
@@ -128,126 +118,144 @@ const props = defineProps({
 	},
 })
 
-// define emit for submission
 const emit = defineEmits(['submit'])
+const { formatMessage } = useVIntl()
 
-const selectedProjects = ref([])
+const messages = defineMessages({
+	transferProjectsTitle: {
+		id: 'organization.project-transfer.title',
+		defaultMessage: 'Transfer projects',
+	},
+	noProjectsAvailable: {
+		id: 'organization.project-transfer.no-projects-available',
+		defaultMessage: 'No projects available to transfer.',
+	},
+	projectIconAlt: {
+		id: 'organization.project-transfer.project-icon-alt',
+		defaultMessage: 'Icon for {name}',
+	},
+	transferSelectedProjects: {
+		id: 'organization.project-transfer.transfer-selected-projects',
+		defaultMessage: 'Transfer {count, plural, one {# project} other {# projects}}',
+	},
+	nameColumn: {
+		id: 'organization.project-transfer.name-column',
+		defaultMessage: 'Name',
+	},
+	idColumn: {
+		id: 'organization.project-transfer.id-column',
+		defaultMessage: 'ID',
+	},
+	typeColumn: {
+		id: 'organization.project-transfer.type-column',
+		defaultMessage: 'Type',
+	},
+})
 
-const toggleSelectedProjects = () => {
-	if (selectedProjects.value.length === props.projects.length) {
-		selectedProjects.value = []
-	} else {
-		selectedProjects.value = props.projects
-	}
+const modalOpen = ref(null)
+const selectedProjectIds = ref([])
+
+const projectTableColumns = computed(() => [
+	{
+		key: 'select',
+		width: '3rem',
+		headerClass: '!p-0',
+		cellClass: '!overflow-visible !p-0',
+	},
+	{
+		key: 'name',
+		label: formatMessage(messages.nameColumn),
+		width: '22rem',
+	},
+	{
+		key: 'id',
+		label: formatMessage(messages.idColumn),
+		width: '13rem',
+		cellClass: '!overflow-visible',
+	},
+	{
+		key: 'type',
+		label: formatMessage(messages.typeColumn),
+		width: '10rem',
+	},
+])
+
+const transferableProjects = computed(() =>
+	props.projects.filter((project) => !isProjectTransferDisabled(project)),
+)
+const selectedProjects = computed(() =>
+	props.projects.filter((project) => selectedProjectIds.value.includes(project.id)),
+)
+const allTransferableProjectsSelected = computed(
+	() =>
+		transferableProjects.value.length > 0 &&
+		transferableProjects.value.every((project) => selectedProjectIds.value.includes(project.id)),
+)
+
+function isProjectTransferDisabled(project) {
+	return (project.permissions & EDIT_DETAILS) === EDIT_DETAILS
 }
 
-const onSubmitHandler = () => {
-	if (selectedProjects.value.length === 0) {
+function isProjectSelected(project) {
+	return selectedProjectIds.value.includes(project.id)
+}
+
+function toggleProjectSelection(project) {
+	if (isProjectTransferDisabled(project)) return
+
+	if (isProjectSelected(project)) {
+		selectedProjectIds.value = selectedProjectIds.value.filter((id) => id !== project.id)
 		return
 	}
-	emit('submit', selectedProjects.value)
-	selectedProjects.value = []
+
+	selectedProjectIds.value = [...selectedProjectIds.value, project.id]
+}
+
+function toggleAllTransferableProjects() {
+	selectedProjectIds.value = allTransferableProjectsSelected.value
+		? []
+		: transferableProjects.value.map((project) => project.id)
+}
+
+function getProjectUrl(project) {
+	const projectType = getProjectTypeForUrl(project.project_type, project.loaders)
+	return '/' + projectType + '/' + (project.slug || project.id)
+}
+
+function getProjectDisplayType(project) {
+	return formatProjectType(getProjectTypeForUrl(project.project_type, project.loaders))
+}
+
+function show(event) {
+	modalOpen.value?.show(event)
+}
+
+function hide() {
 	modalOpen.value?.hide()
+}
+
+function submitTransfer() {
+	if (selectedProjects.value.length === 0) return
+
+	emit('submit', selectedProjects.value)
+	selectedProjectIds.value = []
+	hide()
 }
 </script>
 
 <style lang="scss" scoped>
-.table {
-	display: grid;
-	border-radius: var(--radius-md);
-	overflow: hidden;
-	margin-top: var(--gap-md);
-	border: 1px solid var(--color-divider);
-	background-color: var(--color-raised-bg);
-
-	.table-row {
-		grid-template-columns: 2.75rem 3.75rem 2fr 1fr 1fr 3.5rem;
-	}
-
-	.table-cell {
-		display: flex;
-		align-items: center;
-		gap: var(--gap-xs);
-		padding: var(--gap-md);
-		padding-left: 0;
-	}
-
-	.check-cell {
-		padding-left: var(--gap-md);
-	}
-
-	@media screen and (max-width: 750px) {
-		display: flex;
-		flex-direction: column;
-
-		.table-row {
-			display: grid;
-			grid-template: 'checkbox icon name type settings' 'checkbox icon id type settings';
-			grid-template-columns:
-				min-content min-content minmax(min-content, 2fr)
-				minmax(min-content, 1fr) min-content;
-
-			:nth-child(1) {
-				grid-area: checkbox;
-			}
-
-			:nth-child(2) {
-				grid-area: icon;
-			}
-
-			:nth-child(3) {
-				grid-area: name;
-			}
-
-			:nth-child(4) {
-				grid-area: id;
-				padding-top: 0;
-			}
-
-			:nth-child(5) {
-				grid-area: type;
-			}
-
-			:nth-child(6) {
-				grid-area: settings;
-			}
-		}
-
-		.table-head {
-			grid-template: 'checkbox settings';
-			grid-template-columns: min-content minmax(min-content, 1fr);
-
-			:nth-child(2),
-			:nth-child(3),
-			:nth-child(4),
-			:nth-child(5) {
-				display: none;
-			}
-		}
-	}
-
-	@media screen and (max-width: 560px) {
-		.table-row {
-			display: grid;
-			grid-template: 'checkbox icon name settings' 'checkbox icon id settings' 'checkbox icon type settings' 'checkbox icon status settings';
-			grid-template-columns: min-content min-content minmax(min-content, 1fr) min-content;
-
-			:nth-child(5) {
-				padding-top: 0;
-			}
-		}
-
-		.table-head {
-			grid-template: 'checkbox settings';
-			grid-template-columns: min-content minmax(min-content, 1fr);
-		}
-	}
+.project-name-cell {
+	display: flex;
+	min-width: 0;
+	min-height: 3.5rem;
+	align-items: center;
+	gap: var(--spacing-card-sm);
+	color: inherit;
+	text-decoration: none;
 }
 
-.items {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-md);
-	padding: var(--gap-md);
+.project-name-cell:hover,
+.project-name-cell:focus-visible {
+	text-decoration: underline;
 }
 </style>

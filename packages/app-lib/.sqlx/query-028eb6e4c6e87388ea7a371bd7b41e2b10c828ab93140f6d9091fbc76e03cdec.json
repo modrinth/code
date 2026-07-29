@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\t\tUPDATE instance_content_entries\n\t\t\t\tSET file_id = ?, modified_at = ?\n\t\t\t\tWHERE instance_id = ? AND file_id = ?\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "028eb6e4c6e87388ea7a371bd7b41e2b10c828ab93140f6d9091fbc76e03cdec"
+}

@@ -1,0 +1,147 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH ranked_local_traces AS (\n            SELECT\n                didws.key AS detail_key,\n                didws.id AS detail_id,\n                didws.issue_id,\n                dri.issue_type,\n                m.id AS project_id,\n                m.slug AS project_slug,\n                m.name AS project_name,\n                v.id AS version_id,\n                v.version_number,\n                f.id AS file_id,\n                f.filename AS file_name,\n                didws.jar,\n                didws.file_path,\n                didws.severity,\n                COALESCE(didv.verdict, 'pending'::delphi_report_issue_status)\n                    AS local_status,\n                didws.status AS effective_status,\n                ROW_NUMBER() OVER (\n                    PARTITION BY didws.key\n                    ORDER BY didws.id\n                ) AS row_num\n            FROM delphi_issue_details_with_statuses didws\n            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id\n            INNER JOIN delphi_reports dr ON dr.id = dri.report_id\n            INNER JOIN files f ON f.id = dr.file_id\n            INNER JOIN versions v ON v.id = f.version_id\n            INNER JOIN mods m ON m.id = v.mod_id\n            LEFT JOIN delphi_issue_detail_verdicts didv\n                ON didv.project_id = didws.project_id\n                AND didv.detail_key = didws.key\n            WHERE\n                didws.key = ANY($1::text[])\n                AND dri.issue_type != '__dummy'\n        )\n        SELECT\n            detail_key AS \"detail_key!\",\n            detail_id AS \"detail_id!: DelphiReportIssueDetailsId\",\n            issue_id AS \"issue_id!: DelphiReportIssueId\",\n            issue_type,\n            project_id AS \"project_id!: DBProjectId\",\n            project_slug AS \"project_slug?\",\n            project_name AS \"project_name!\",\n            version_id AS \"version_id!: DBVersionId\",\n            v.version_number,\n            file_id AS \"file_id!: DBFileId\",\n            file_name AS \"file_name!\",\n            jar AS \"jar?\",\n            file_path AS \"file_path!\",\n            severity AS \"severity!: DelphiSeverity\",\n            local_status AS \"local_status!: DelphiStatus\",\n            effective_status AS \"effective_status!: DelphiStatus\"\n        FROM ranked_local_traces v\n        WHERE row_num <= $2\n        ORDER BY detail_key, detail_id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "detail_key!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "detail_id!: DelphiReportIssueDetailsId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "issue_id!: DelphiReportIssueId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "issue_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "project_slug?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "project_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "version_id!: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "version_number",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "file_id!: DBFileId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "file_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "jar?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "file_path!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "severity!: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "local_status!: DelphiStatus",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "safe",
+                "unsafe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "effective_status!: DelphiStatus",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "safe",
+                "unsafe"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      null,
+      true
+    ]
+  },
+  "hash": "87d30e8802ebe69858141d0d918cafb5286f984cfe55ad1a7ac2219ec50539a4"
+}

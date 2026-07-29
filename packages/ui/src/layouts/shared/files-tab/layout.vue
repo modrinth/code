@@ -3,7 +3,12 @@
 	<FileUnsavedChangesModal ref="unsavedChangesModal" />
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileUploadConflictModal ref="uploadConflictModal" @proceed="handleExtractConfirm" />
-	<FileUploadZipUrlModal v-if="ctx.showInstallFromUrl" ref="uploadZipUrlModal" />
+	<FileUploadZipUrlModal
+		v-if="ctx.showInstallFromUrl"
+		ref="uploadZipUrlModal"
+		:disabled="isBusy"
+		:disabled-tooltip="busyTooltip"
+	/>
 	<FileRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 	<FileMoveItemModal
 		ref="moveItemModal"
@@ -64,6 +69,8 @@
 					<FileUploadDragAndDrop
 						ref="fileUploadRef"
 						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
+						:disabled="isBusy"
+						@drop-error="handleDropError"
 						@files-dropped="handleDroppedFiles"
 					>
 						<FileTableHeader
@@ -156,7 +163,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
-					<button @click="fileEditorRef?.saveFileContent(false)">
+					<button
+						v-tooltip="isBusy ? busyTooltip : undefined"
+						:disabled="isBusy"
+						@click="fileEditorRef?.saveFileContent(false)"
+					>
 						<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
 					</button>
 				</ButtonStyled>
@@ -211,9 +222,10 @@ import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
+import { injectFilePicker } from '#ui/providers/file-picker'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
-import { getFileExtension } from '#ui/utils/file-extensions'
+import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
 import FileEditor from './components/editor/FileEditor.vue'
 import FileContextMenu from './components/FileContextMenu.vue'
@@ -284,6 +296,7 @@ defineProps<{
 
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
+const filePicker = injectFilePicker(null)
 
 const editorComponent = shallowRef<Component | null>(null)
 import('vue3-ace-editor').then(async (mod) => {
@@ -370,6 +383,7 @@ async function confirmDiscardChanges(): Promise<boolean> {
 	if (!hasUnsavedChanges.value) return true
 	const result = await unsavedChangesModal.value?.prompt()
 	if (result === 'save') {
+		if (isBusy.value) return false
 		await fileEditorRef.value?.saveFileContent(false)
 		return true
 	}
@@ -412,10 +426,12 @@ async function handleEditorClose() {
 
 // CRUD handlers
 async function handleCreateNewItem(name: string) {
+	if (isBusy.value) return
 	await ctx.createItem(name, newItemType.value)
 }
 
 async function handleRenameItem(newName: string) {
+	if (isBusy.value) return
 	const item = selectedItem.value
 	if (!item) return
 
@@ -432,6 +448,7 @@ async function handleRenameItem(newName: string) {
 }
 
 async function handleMoveItem(destination: string) {
+	if (isBusy.value) return
 	const item = selectedItem.value
 	if (!item) return
 
@@ -450,6 +467,7 @@ async function handleMoveItem(destination: string) {
 }
 
 function handleDeleteItem() {
+	if (isBusy.value) return
 	const item = selectedItem.value
 	if (!item) return
 
@@ -513,6 +531,7 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 }
 
 async function handleExtractConfirm(path: string) {
+	if (isBusy.value) return
 	if (!ctx.extractFile) return
 	try {
 		await ctx.extractFile(path, true, false)
@@ -576,8 +595,32 @@ function handleDroppedFiles(files: File[]) {
 	ctx.uploadFiles(files)
 }
 
-function initiateFileUpload() {
+function handleDropError(error: unknown) {
+	addNotification({
+		title: formatMessage(commonMessages.uploadFailedLabel),
+		text: error instanceof Error ? error.message : undefined,
+		type: 'error',
+	})
+}
+
+async function initiateFileUpload() {
 	if (isBusy.value) return
+	if (filePicker?.pickFiles) {
+		try {
+			const picked = await filePicker.pickFiles({ multiple: true })
+			if (picked.length > 0) {
+				ctx.uploadFiles(picked.map((item) => item.file))
+			}
+		} catch (error) {
+			addNotification({
+				title: formatMessage(commonMessages.uploadFailedLabel),
+				text: error instanceof Error ? error.message : undefined,
+				type: 'error',
+			})
+		}
+		return
+	}
+
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.multiple = true
@@ -607,7 +650,7 @@ function handleItemHover(item: { type: string; path: string; name: string }) {
 				: `${currentPath}/${item.name}`
 			ctx.prefetchDirectory?.(navPath)
 		}, 150)
-	} else {
+	} else if (canOpenInFileEditor(item.name)) {
 		prefetchTimeout = setTimeout(() => {
 			ctx.prefetchFile?.(item.path)
 		}, 150)

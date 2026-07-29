@@ -12,10 +12,16 @@
     "defaultMessage": "Voeg een icoon toe"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Voeg het IP adres en poort toe die Java Editie spelers kunnen gebruiken om je server te joinen."
+    "defaultMessage": "Voeg het IP-adres en de poort toe die spelers van Java-editie kunnen gebruiken om verbinding te maken met je server."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Voeg een Java adres toe"
+    "defaultMessage": "Java-adres toevoegen"
+  },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Voer een geldige URL en een naam of SPDX-identificatie in voor je aangepaste licentie."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Licentiegegevens toevoegen"
   },
   "nags.add-links-server.description": {
     "defaultMessage": "Voeg relevante links buiten Modrinth toe, zoals een website, winkel of Discord invite."
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Voeg externe links toe"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Je hebt alle beschikbare taalopties geselecteerd. Geef alleen de talen op die je server daadwerkelijk ondersteunt."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Selecteer relevante talen"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": " Je hebt alle {totalAvailableTags, plural,one { # beschikbare tag} other {# beschikbare tags}}. Tags zijn bedoelt om gebruikers relevante projecten te helpen vinden. Selecteer graag alleen tags die relevant zijn aan jouw project."
@@ -66,7 +78,7 @@
     "defaultMessage": "Bezoek de galerij pagina"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Je {type, select,mod {mod}plugin {plugin}other {project}} gebruikt een licentie die vereist dat de source code beschikbaar is. Gelieve de source code link of source bestanden for elke extra versie te verstrekken, of overweeg een andere licentie te gebruiken."
+    "defaultMessage": "Je {type} maakt gebruik van een licentie die vereist dat de broncode beschikbaar is. Geef voor elke extra versie een link naar de broncode of het bronbestand op, of overweeg om een andere licentie te gebruiken."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
@@ -75,10 +87,10 @@
     "defaultMessage": "Sommige van je externe links lijken identiek te zijn, elke link moet maar een keer worden ingevuld met de juiste link type."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Identieke links"
+    "defaultMessage": "Identieke links opschonen"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "Uw beschrijving moet voldoende platte tekst of alternatieve afbeeldingstekst bevatten, zodat deze ook toegankelijk is voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
+    "defaultMessage": "Je beschrijving moet voldoende normale tekst of alternatieve tekst bij afbeeldingen bevatten, zodat deze toegankelijk blijft voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
   },
   "nags.image-heavy-description.title": {
     "defaultMessage": "Zorg voor toegankelijkheid"
@@ -108,7 +120,7 @@
     "defaultMessage": "Verkort koppen"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "Projecten mogen niet de merknaam van Minecraft gebruiken en \"Minecraft\" mag geen belangrijk onderdeel van de naam zijn."
+    "defaultMessage": "Projecten mogen geen gebruik maken van de huisstijl van Minecraft en mogen het woord \"Minecraft\" niet als een belangrijk onderdeel van de naam bevatten."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Voorkom merkinbreuk"
@@ -120,7 +132,7 @@
     "defaultMessage": "Alt-tekst voor afbeelding toevoegen"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord-uitnodigingen kunnen niet worden gebruikt voor andere linktypen. Plaats uw Discord-link alleen in het veld 'Discord-uitnodigingslink'."
+    "defaultMessage": "Discord-uitnodigingen kunnen niet worden gebruikt voor andere soorten links. Plaats je Discord-link alleen in het veld 'Discord-uitnodigingslink'."
   },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Verplaats Discord uitnodiging"
@@ -135,10 +147,16 @@
     "defaultMessage": "Feedback beoordelen"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Je hebt {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}) geselecteerd. Resource packs moeten typisch maar een resolutietag hebben dat hun primaire resolutie matcht."
+    "defaultMessage": "Je hebt {count, plural, one {# resolutietag} other {# resolutietags}} ({tags}) geselecteerd. Bronpakketten zouden normaal slechts één resolutietag moeten hebben die overeenkomt met hun primaire resolutie."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecteer juiste resolutie"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Zorg ervoor dat je bewijs hebt geleverd van je toestemming om eventuele externe inhoud in je modpack te verspreiden."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Externe toestemmingen controleren"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Selecteer welke versies je server ondersteunt, kies een Modpack, of upload je eigen."
@@ -159,7 +177,7 @@
     "defaultMessage": "Selecteer een taal"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selecteer de licentie waaronder je {type, select,mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is gedistibrueerd."
+    "defaultMessage": "Selecteer de licentie waaronder je {type} wordt gedistribueerd."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecteer een licentie"
@@ -181,6 +199,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Bekijk linkjes instellingen"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Ga naar dashboard voor toestemmingen"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Bekijk tag instellingen"
@@ -212,6 +233,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Maak de naam duidelijk"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Je hebt {languageCount, plural, one {# taal} other {# talen}} geselecteerd. Geef alleen de talen op die je server daadwerkelijk ondersteunt."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Selecteer relevante talen"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Je hebt {tagCount, plural, one {# tag} other {# tags}} geselecteerd. Verminder het naar {maxTagCount} of minder om zeker te weten dat je server verschijnt in relevante zoekresultaten."
   },
@@ -225,7 +252,10 @@
     "defaultMessage": "Selecteer relevante tags"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": ""
+    "defaultMessage": "Er is minstens één afbeelding in de galerij vereist om de inhoud van je {type} te tonen."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "bronpakket, met uitzondering van audio- of lokalisatiepakketten. Als dit op jouw pakket van toepassing is, selecteer dan de juiste tag"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"
@@ -237,7 +267,7 @@
     "defaultMessage": "Upload een versie"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "Sommige van uw externe links gebruiken mogelijk domeinen die niet geschikt zijn voor dat type link."
+    "defaultMessage": "Sommige van je externe links gebruiken mogelijk domeinnamen die niet geschikt zijn voor dat soort links."
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verifieer externe links"

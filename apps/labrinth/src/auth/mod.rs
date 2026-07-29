@@ -5,7 +5,7 @@ pub mod validate;
 pub use checks::{
     filter_enlisted_projects_ids, filter_enlisted_version_ids,
     filter_visible_collections, filter_visible_project_ids,
-    filter_visible_projects,
+    filter_visible_projects, require_verified_email,
 };
 use serde::{Deserialize, Serialize};
 pub use validate::{
@@ -46,11 +46,23 @@ pub enum AuthenticationError {
     #[error(
         "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
     )]
-    DuplicateUser,
+    DuplicateEmail,
+    #[error("Username is already taken on Modrinth.")]
+    UsernameTaken,
+    #[error(
+        "This authentication provider is already linked to another Modrinth account."
+    )]
+    ProviderAlreadyLinked,
     #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,
     #[error("Invalid callback URL specified")]
     Url,
+}
+
+impl From<xredis::Error> for AuthenticationError {
+    fn from(error: xredis::Error) -> Self {
+        Self::Database(error.into())
+    }
 }
 
 impl actix_web::ResponseError for AuthenticationError {
@@ -76,7 +88,11 @@ impl actix_web::ResponseError for AuthenticationError {
             AuthenticationError::FileHosting(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            AuthenticationError::DuplicateUser => StatusCode::BAD_REQUEST,
+            AuthenticationError::DuplicateEmail => StatusCode::BAD_REQUEST,
+            AuthenticationError::UsernameTaken => StatusCode::BAD_REQUEST,
+            AuthenticationError::ProviderAlreadyLinked => {
+                StatusCode::BAD_REQUEST
+            }
             AuthenticationError::SocketError => StatusCode::BAD_REQUEST,
         }
     }
@@ -105,7 +121,11 @@ impl AuthenticationError {
             AuthenticationError::InvalidClientId => "invalid_client_id",
             AuthenticationError::Url => "url_error",
             AuthenticationError::FileHosting(..) => "file_hosting",
-            AuthenticationError::DuplicateUser => "duplicate_user",
+            AuthenticationError::DuplicateEmail => "duplicate_email",
+            AuthenticationError::UsernameTaken => "username_taken",
+            AuthenticationError::ProviderAlreadyLinked => {
+                "provider_already_linked"
+            }
             AuthenticationError::SocketError => "socket",
         }
     }

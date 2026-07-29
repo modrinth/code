@@ -19,6 +19,9 @@
 					})
 				}}
 			</Admonition>
+			<Admonition v-if="managedWarning" type="warning" :header="managedWarning.header">
+				{{ managedWarning.body }}
+			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
 				:backup-name="backupName"
@@ -35,7 +38,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button :disabled="buttonsDisabled" @click="handleConfirm">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="handleConfirm"
+					>
 						<DownloadIcon />
 						{{
 							formatMessage(messages.confirmButton, { action: downgrade ? 'downgrade' : 'update' })
@@ -61,7 +68,10 @@ import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const props = defineProps<{
 	downgrade?: boolean
+	managedWarning?: { header: string; body: string } | null
 	backupTip?: string
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string
 }>()
 
 const { formatMessage } = useVIntl()
@@ -106,6 +116,7 @@ function show() {
 }
 
 function handleConfirm() {
+	if (props.actionDisabled) return
 	modal.value?.hide()
 	emit('confirm')
 }

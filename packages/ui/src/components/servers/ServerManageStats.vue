@@ -60,13 +60,13 @@
 
 <script setup lang="ts">
 import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
-import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { useFormatBytes } from '#ui/composables'
 import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
+import type { ServerStats } from '#ui/providers/server-context'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 
@@ -82,7 +82,7 @@ const { featureFlags } = injectPageContext()
 
 const props = withDefaults(
 	defineProps<{
-		data?: Stats
+		data?: ServerStats
 		loading?: boolean
 		showMemoryAsBytes?: boolean
 	}>(),

@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Javaadresse hinzufügen"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Gib eine gültige URL mit Namen oder eine SPDX-Kennung für deine benutzerdefinierte Lizenz ein."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Details zur Lizenz hinzufügen"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Füge alle relevanten Links hinzu, die außerhalb von Modrinth liegen, wie z. B. eine Website, einen Shop oder eine Discord-Einladung."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Externe Links hinzufügen"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Du hast alle verfügbaren Sprachoptionen ausgewählt. Bitte gib nur die Sprachen an, die dein Server aktiv unterstützt."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Wähle passende Sprachen aus"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Du hast alle {totalAvailableTags, plural, one {# verfügbaren Tag} other {# verfügbaren Tags}} ausgewählt. Das widerspricht dem Zweck von Tags, die dazu dienen, Nutzern zu helfen, relevante Projekte zu finden. Bitte wähle nur die Tags aus, die wirklich zu deinem Projekt passen."
@@ -66,7 +78,7 @@
     "defaultMessage": "Galerieseite besuchen"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Dein {type, select, mod {Mod} plugin {Plugin} other {Projekt}} verwendet eine Lizenz, die erfordert, dass der Quellcode verfügbar ist. Bitte gib für jede zusätzliche Version einen Link zum Quellcode oder eine Quelldatei an, oder erwäge, eine andere Lizenz zu verwenden."
+    "defaultMessage": "Dein {type} verwendet eine Lizenz, die erfordert, dass der Quellcode verfügbar ist. Bitte gib für jede zusätzliche Version einen Link zum Quellcode oder eine Quelldatei an, oder erwäge, eine andere Lizenz zu verwenden."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
@@ -75,7 +87,7 @@
     "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem entsprechenden Linktyp eingegeben werden."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Identische Links"
+    "defaultMessage": "Doppelte Links löschen"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Deine Beschreibung sollte ausreichend Klartext oder Alt-Text für Bilder enthalten, damit sie für Nutzer mit Bildschirmleseprogrammen oder langsamer Internetverbindung zugänglich bleibt."
@@ -117,7 +129,7 @@
     "defaultMessage": "Bei einigen deiner Bilder fehlt der Alt-Text, der besonders für sehbehinderte Nutzer wichtig ist, um die Barrierefreiheit zu gewährleisten."
   },
   "nags.missing-alt-text.title": {
-    "defaultMessage": "Alternativen Bild-Text Hinzufügen"
+    "defaultMessage": "Alternativen Bild-Text hinzufügen"
   },
   "nags.misused-discord-link-description": {
     "defaultMessage": "Discord-Einladungen können nicht für andere Link-Typen verwendet werden. Bitte füge deinen Discord-Link nur in das Feld „Discord-Einladungslink“ ein."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Stelle sicher, dass du einen Nachweis über deine Berechtigung zur Verbreitung externer Inhalte in deinem Modpack hinterlegt hast."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Externe Berechtigungen überprüfen"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Wähle aus, welche Versionen dein Server unterstützt, wähle ein Modpack aus oder lade dein eigenes hoch."
   },
@@ -150,7 +168,7 @@
     "defaultMessage": "Lass die Spieler wissen, in welcher Region sich dein Server befindet."
   },
   "nags.select-country.title": {
-    "defaultMessage": "Wählen eine Region aus"
+    "defaultMessage": "Region auswählen"
   },
   "nags.select-language.description": {
     "defaultMessage": "Wähle die Sprache oder Sprachen, welche auf deinem Server unterstützt werden."
@@ -159,7 +177,7 @@
     "defaultMessage": "Sprache auswählen"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Wähle die Lizenz aus, unter der dein {type, select, mod {Mod} modpack {Modpack} resourcepack {Ressourcenpaket} shader {Shader} plugin {Plugin} datapack {Datenpaket} other {Projekt}} veröffentlicht wird."
+    "defaultMessage": "Wähle die Lizenz aus, unter der dein {type} verbreitet wird."
   },
   "nags.select-license.title": {
     "defaultMessage": "Lizenz auswählen"
@@ -182,11 +200,14 @@
   "nags.settings.links.title": {
     "defaultMessage": "Linkeinstellungen ansehen"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Berechtigungs-Dashboard besuchen"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Tageinstellungen ansehen"
   },
   "nags.settings.title": {
-    "defaultMessage": "Einstellungen aufrufen"
+    "defaultMessage": "Allgemeine Einstellungen aufrufen"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Deine Zusammenfassung darf nicht identisch mit dem Namen deines Projekts sein. Es ist wichtig, eine informative und ansprechende Zusammenfassung zu erstellen."
@@ -212,20 +233,29 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Namen bereinigen"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Du hast {languageCount, plural, one {# Sprache} other {# Sprachen}} ausgewählt. Bitte gib nur die Sprachen an, die dein Server aktiv unterstützt."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Wähle passende Sprachen aus"
+  },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchen erscheint."
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchergebnissen erscheint."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Wähle passende Tags"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in den relevanten Suchergebnissen erscheint."
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in relevanten Suchergebnissen erscheint."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wähle passende Tags aus"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Mindestens ein Galeriebild ist erforderlich, um den Inhalt deines {type, select,\nresourcepack {Ressourcenpakets zu präsentieren, außer bei Audio- oder Sprachpaketen. Wenn dies auf dein Paket zutrifft, wähle bitte das entsprechende Tag aus} shader {Shaders} other {Projekts}} zu zeigen."
+    "defaultMessage": "Es ist mindestens ein Galeriebild erforderlich, um den Inhalt deines {type} zu präsentieren."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "Ressourcenpaket, mit Ausnahme von Audio- oder Lokalisierungspaketen. Wenn dies auf dein Paket zutrifft, wähle bitte den entsprechenden Tag aus"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriebild hochladen"

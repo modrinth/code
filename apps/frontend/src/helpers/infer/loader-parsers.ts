@@ -132,14 +132,22 @@ export function createLoaderParsers(
 				),
 			}
 		},
-		// Fabric
+		// Fabric (or Babric for mc version beta 1.7.3)
 		'fabric.mod.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 
-			const detectedGameVersions = metadata.depends
+			const mcDependency = metadata.depends?.minecraft
+			const mcDependencies = Array.isArray(mcDependency) ? mcDependency : [mcDependency]
+
+			let detectedGameVersions = metadata.depends
 				? getGameVersionsMatchingSemverRange(metadata.depends.minecraft, simplifiedGameVersions)
 				: []
 			const loaders: string[] = []
+
+			// Detect Beta 1.7.3 -> Babric
+			const hasBabricVersion = mcDependencies.some(
+				(version: string | undefined) => version?.includes('1.0.0-beta.7.3'), // this is fabric's normalized mc version format
+			)
 
 			// Detect 1.3-1.13 -> legacy-fabric
 			const hasLegacyVersions = detectedGameVersions.some((version) => {
@@ -147,8 +155,16 @@ export function createLoaderParsers(
 				return match && parseInt(match[1]) >= 3 && parseInt(match[1]) <= 13
 			})
 
-			if (hasLegacyVersions) loaders.push('legacy-fabric')
-			else loaders.push('fabric')
+			if (hasBabricVersion) {
+				loaders.push('babric')
+				detectedGameVersions = gameVersions
+					.filter((version) => version.version === 'b1.7.3')
+					.map((version) => version.version)
+			} else if (hasLegacyVersions) {
+				loaders.push('legacy-fabric')
+			} else {
+				loaders.push('fabric')
+			}
 
 			return {
 				name: `${project.title} ${metadata.version}`,

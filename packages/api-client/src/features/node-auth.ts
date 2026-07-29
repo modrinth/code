@@ -1,6 +1,7 @@
 import { AbstractFeature, type FeatureConfig } from '../core/abstract-feature'
 import { ModrinthApiError } from '../core/errors'
 import type { RequestContext } from '../types/request'
+import { getNodeBaseUrl } from '../utils/node-url'
 
 /**
  * Node authentication credentials
@@ -107,7 +108,7 @@ export class NodeAuthFeature extends AbstractFeature {
 	}
 
 	private applyAuth(context: RequestContext, auth: NodeAuth): void {
-		const baseUrl = `https://${auth.url.replace(/\/modrinth\/v\d+\/fs\/?$/, '')}`
+		const baseUrl = getNodeBaseUrl(auth.url)
 		context.url = this.buildUrl(context.path, baseUrl, context.options.version)
 
 		context.options.headers = {

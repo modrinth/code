@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tselect attribution, project_id as \"project_id: DBProjectId\"\n\t\tfrom project_attribution_groups\n\t\twhere id = $1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "attribution",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 1,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "262070fb8ef00ba6e7c7e7b3b5262e959448892945bf56117ba74446808cea76"
+}

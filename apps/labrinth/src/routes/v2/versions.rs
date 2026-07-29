@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::database::PgPool;
-use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::projects::{
@@ -11,16 +10,17 @@ use crate::models::projects::{
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
-use crate::search::SearchBackend;
+use crate::search::SearchState;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(versions_get);
     cfg.service(super::version_creation::version_create);
     cfg.service(
-        utoipa_actix_web::scope("/version")
+        web::scope("/version")
             .service(version_get)
             .service(version_delete)
             .service(version_edit)
@@ -44,39 +44,24 @@ fn default_true() -> bool {
     true
 }
 
-/// List versions for a project.
+/// List versions for a project.  
 #[utoipa::path(
+	context_path = "/project/{project_id}",
+	tag = "versions",
     get,
     operation_id = "getProjectVersions",
     params(
-        (
-            "project_id" = String,
-            Path,
-            description = "The ID or slug of the project"
-        ),
-        (
-            "loaders" = Option<String>,
-            Query,
-            description = "JSON array of loaders to filter by"
-        ),
-        (
-            "game_versions" = Option<String>,
-            Query,
-            description = "JSON array of game versions to filter by"
-        ),
-        (
-            "featured" = Option<bool>,
-            Query,
-            description = "Filter by featured status"
-        ),
-        (
-            "include_changelog" = Option<bool>,
-            Query,
-            description = "Whether to include changelog fields"
-        )
+        ("project_id" = String, Path, description = "The ID or slug of the project"),
+        ("loaders" = Option<String>, Query, description = "JSON array of loaders to filter by"),
+        ("game_versions" = Option<String>, Query, description = "JSON array of game versions to filter by"),
+        ("featured" = Option<bool>, Query, description = "Filter by featured status"),
+        ("version_type" = Option<VersionType>, Query, description = "Filter by version type"),
+        ("limit" = Option<usize>, Query, description = "Maximum number of versions"),
+        ("offset" = Option<usize>, Query, description = "Version offset"),
+        ("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -89,6 +74,7 @@ pub async fn version_list(
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -147,6 +133,7 @@ pub async fn version_list(
         info,
         web::Query(filters),
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -167,24 +154,18 @@ pub async fn version_list(
 }
 
 // Given a project ID/slug and a version slug
-/// Get a project version by ID or version number.
+/// Get a project version by ID or version number.  
 #[utoipa::path(
+	context_path = "/project/{project_id}",
+	tag = "versions",
     get,
     operation_id = "getVersionFromIdOrNumber",
     params(
-        (
-            "project_id" = String,
-            Path,
-            description = "The ID or slug of the project"
-        ),
-        (
-            "slug" = String,
-            Path,
-            description = "The version ID or version number"
-        )
+        ("project_id" = String, Path, description = "The ID or slug of the project"),
+        ("slug" = String, Path, description = "The version ID or version number")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -196,6 +177,7 @@ pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -204,6 +186,7 @@ pub async fn version_project_get(
         req,
         id,
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -226,18 +209,23 @@ pub struct VersionIds {
     pub include_changelog: bool,
 }
 
-/// Get multiple versions by ID.
+/// Get multiple versions by ID.  
 #[utoipa::path(
+	tag = "versions",
     get,
     operation_id = "getVersions",
-    params(("ids" = String, Query, description = "The JSON array of version IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+    params(
+        ("ids" = String, Query, description = "The JSON array of version IDs"),
+        ("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
+    ),
+    responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>))
 )]
 #[get("/versions")]
 pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -249,6 +237,7 @@ pub async fn versions_get(
         req,
         web::Query(ids),
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -268,13 +257,17 @@ pub async fn versions_get(
     }
 }
 
-/// Get a version by ID.
+/// Get a version by ID.  
 #[utoipa::path(
+	context_path = "/version",
+	tag = "versions",
     get,
     operation_id = "getVersion",
-    params(("version_id" = models::ids::VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = models::ids::VersionId, Path, description = "The ID of the version")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -286,15 +279,22 @@ pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let response =
-        v3::versions::version_get_helper(req, id, pool, redis, session_queue)
-            .await
-            .map(|b| HttpResponse::Ok().json(b))
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::versions::version_get_helper(
+        req,
+        id,
+        pool,
+        ro_pool,
+        redis,
+        session_queue,
+    )
+    .await
+    .map(|b| HttpResponse::Ok().json(b))
+    .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -314,7 +314,7 @@ pub struct EditVersion {
     pub name: Option<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex(path = *crate::util::validate::RE_URL_SAFE)
+        regex(path = *crate::util::validate::RE_URL_SAFE_RELAXED)
     )]
     pub version_number: Option<String>,
     #[validate(length(max = 65536))]
@@ -340,14 +340,18 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
-/// Modify an existing version.
+/// Update an existing version.  
 #[utoipa::path(
+	context_path = "/version",
+	tag = "versions",
     patch,
     operation_id = "modifyVersion",
-    params(("id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("id" = VersionId, Path, description = "The ID of the version")
+    ),
     request_body = EditVersion,
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -364,9 +368,11 @@ pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let new_version = new_version.into_inner();
 
@@ -383,6 +389,7 @@ pub async fn version_edit(
         req.clone(),
         (*info).0,
         pool.clone(),
+        ro_pool.clone(),
         redis.clone(),
         session_queue.clone(),
     )
@@ -445,19 +452,24 @@ pub async fn version_edit(
         redis,
         web::Json(serde_json::to_value(new_version)?),
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
     Ok(response)
 }
 
-/// Delete a version by ID.
+/// Delete a version by ID.  
 #[utoipa::path(
+	context_path = "/version",
+	tag = "versions",
     delete,
     operation_id = "deleteVersion",
-    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = VersionId, Path, description = "The ID of the version")
+    ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -476,7 +488,7 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_backend: web::Data<dyn SearchBackend>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::versions::version_delete(
@@ -485,7 +497,7 @@ pub async fn version_delete(
         pool,
         redis,
         session_queue,
-        search_backend,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)

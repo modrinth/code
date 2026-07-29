@@ -1,5 +1,7 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
-use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::auth::{
+    AuthenticationError, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
@@ -7,7 +9,6 @@ use crate::database::models::loader_fields::{
 };
 use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, DBUser, image_item};
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::exp;
@@ -15,13 +16,14 @@ use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectStatus,
+    License, Link, MonetizationStatus, Project, ProjectStatus,
     SideTypesMigrationReviewStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
+use crate::search::SearchState;
 use crate::util::guards::admin_key_guard;
 use crate::util::http::HttpClient;
 use crate::util::img::upload_image_optimized;
@@ -40,13 +42,13 @@ use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
+use xredis::RedisPool;
 
-mod new;
+pub mod new;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create)
         .service(project_create_with_id)
         .configure(new::config);
@@ -106,6 +108,9 @@ impl From<crate::routes::ApiError> for CreateError {
             }
             crate::routes::ApiError::CustomAuthentication(err) => {
                 Self::CustomAuthenticationError(err)
+            }
+            crate::routes::ApiError::Auth(err) => {
+                Self::CustomAuthenticationError(format!("{err:#}"))
             }
             crate::routes::ApiError::InvalidInput(err)
             | crate::routes::ApiError::Validation(err) => {
@@ -283,16 +288,26 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[utoipa::path]
+/// Create a project.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing project metadata and files"
+	),
+	responses((status = OK, body = Project))
+)]
 #[post("")]
 pub async fn project_create(
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
         req,
@@ -302,6 +317,7 @@ pub async fn project_create(
         file_host,
         session_queue,
         http,
+        search_state,
     )
     .await
 }
@@ -311,9 +327,10 @@ pub async fn project_create_internal(
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -325,7 +342,7 @@ pub async fn project_create_internal(
         req,
         &mut payload,
         &mut transaction,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
@@ -336,7 +353,7 @@ pub async fn project_create_internal(
     .await;
 
     if result.is_err() {
-        let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
+        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
         let rollback_result = transaction.rollback().await;
 
         undo_result?;
@@ -345,24 +362,41 @@ pub async fn project_create_internal(
         }
     } else {
         transaction.commit().await?;
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id.into(),
+            None,
+            None,
+        )
+        .await?;
     }
 
     result
 }
 
-/// Allows creating a project with a specific ID.
+/// Create a project with a specific ID.  
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[utoipa::path]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing project metadata and files"
+	),
+	responses((status = OK, body = Project))
+)]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
@@ -374,7 +408,7 @@ pub async fn project_create_with_id(
         req,
         &mut payload,
         &mut transaction,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
@@ -385,7 +419,7 @@ pub async fn project_create_with_id(
     .await;
 
     if result.is_err() {
-        let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
+        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
         let rollback_result = transaction.rollback().await;
 
         undo_result?;
@@ -394,6 +428,14 @@ pub async fn project_create_with_id(
         }
     } else {
         transaction.commit().await?;
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id.into(),
+            None,
+            None,
+        )
+        .await?;
     }
 
     result
@@ -453,6 +495,8 @@ async fn project_create_inner(
         Scopes::PROJECT_CREATE,
     )
     .await?;
+
+    require_verified_email(&current_user)?;
 
     let limits = UserLimits::get_for_projects(&current_user, pool).await?;
     if limits.current >= limits.max {
@@ -907,7 +951,7 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual
-            .insert(&mut *transaction, http)
+            .insert(&mut *transaction, redis, file_host, http)
             .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 

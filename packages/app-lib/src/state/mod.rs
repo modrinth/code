@@ -1,20 +1,21 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use dashmap::DashMap;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
-use tokio::sync::{OnceCell, Semaphore};
+use tokio::sync::{Mutex, OnceCell, OwnedMutexGuard, Semaphore};
 
-use crate::state::fs_watcher::FileWatcher;
+use crate::state::instances::watcher::FileWatcher;
 use sqlx::SqlitePool;
 
 // Submodules
 mod dirs;
 pub use self::dirs::*;
 
-mod profiles;
-pub use self::profiles::*;
+mod instance_types;
+pub use self::instance_types::*;
 
-mod instances;
+pub(crate) mod instances;
 pub use self::instances::*;
 
 mod settings;
@@ -44,7 +45,7 @@ mod tunnel;
 pub use self::tunnel::*;
 
 pub mod db;
-pub mod fs_watcher;
+pub(crate) mod db_backup;
 mod mr_auth;
 
 pub use self::mr_auth::*;
@@ -57,6 +58,7 @@ pub mod server_join_log;
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
+const MAX_CONCURRENT_INSTALL_JOBS: usize = 3;
 pub struct State {
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
@@ -68,6 +70,12 @@ pub struct State {
     /// Semaphore to limit concurrent API requests. This is separate from the fetch semaphore
     /// to keep API functionality while the app is performing intensive tasks.
     pub api_semaphore: FetchSemaphore,
+    pub(crate) install_job_semaphore: Semaphore,
+    pub(crate) install_db_semaphore: Semaphore,
+    /// Serializes filesystem reconciliation and content mutations per instance.
+    instance_content_locks: DashMap<String, Arc<Mutex<()>>>,
+    /// Serializes shared instance attachment and recipient mutations per instance.
+    shared_instance_locks: DashMap<String, Arc<Mutex<()>>>,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -92,21 +100,63 @@ pub struct State {
 }
 
 impl State {
+    pub(crate) async fn lock_instance_content(
+        &self,
+        instance_id: &str,
+    ) -> OwnedMutexGuard<()> {
+        let lock = self
+            .instance_content_locks
+            .entry(instance_id.to_string())
+            .or_insert_with(|| Arc::new(Mutex::new(())))
+            .clone();
+
+        lock.lock_owned().await
+    }
+
+    pub(crate) async fn lock_shared_instance(
+        &self,
+        instance_id: &str,
+    ) -> OwnedMutexGuard<()> {
+        let lock = self
+            .shared_instance_locks
+            .entry(instance_id.to_string())
+            .or_insert_with(|| Arc::new(Mutex::new(())))
+            .clone();
+
+        lock.lock_owned().await
+    }
+
+    pub(crate) fn remove_instance_locks(&self, instance_id: &str) {
+        let _ = self.instance_content_locks.remove(instance_id);
+        let _ = self.shared_instance_locks.remove(instance_id);
+    }
+
     pub async fn init(app_identifier: String) -> crate::Result<()> {
         let state = LAUNCHER_STATE
             .get_or_try_init(move || Self::initialize_state(app_identifier))
             .await?;
 
+        if let Err(e) =
+            crate::install::recovery::recover_interrupted_jobs(state).await
+        {
+            tracing::error!("Error recovering interrupted install jobs: {e}");
+        }
+
         tokio::task::spawn(async move {
-            fs_watcher::watch_profiles_init(
+            instances::watcher::watch_instances_init(
                 &state.file_watcher,
                 &state.directories,
+                &state.pool,
             )
             .await;
 
+            if let Err(e) = crate::api::instance::migrate_legacy_icons().await {
+                tracing::error!("Error migrating legacy instance icons: {e}");
+            }
+
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
-                Profile::refresh_all(),
+                instances::refresh_all_instances(),
                 Settings::migrate(&state.pool),
                 ModrinthCredentials::refresh_all(),
             );
@@ -187,7 +237,7 @@ impl State {
         let discord_rpc = DiscordGuard::init()?;
 
         tracing::info!("Initializing file watcher");
-        let file_watcher = fs_watcher::init_watcher().await?;
+        let file_watcher = instances::watcher::init_watcher().await?;
 
         let process_manager = ProcessManager::new();
 
@@ -198,6 +248,10 @@ impl State {
             fetch_semaphore,
             io_semaphore,
             api_semaphore,
+            install_job_semaphore: Semaphore::new(MAX_CONCURRENT_INSTALL_JOBS),
+            install_db_semaphore: Semaphore::new(1),
+            instance_content_locks: DashMap::new(),
+            shared_instance_locks: DashMap::new(),
             discord_rpc,
             process_manager,
             friends_socket,

@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { Avatar, ButtonStyled, injectModrinthClient, useFormatDateTime } from '@modrinth/ui'
+import {
+	ArticleBody,
+	Avatar,
+	ButtonStyled,
+	injectModrinthClient,
+	useFormatDateTime,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, onMounted } from 'vue'
@@ -169,7 +175,7 @@ onMounted(() => {
 				class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover sm:rounded-2xl"
 				:alt="article.title"
 			/>
-			<div class="markdown-body" v-html="article.html" />
+			<ArticleBody :html="article.html" />
 			<h3
 				class="mb-0 mt-4 border-0 border-t-[1px] border-solid border-divider pt-4 text-base font-extrabold sm:text-lg"
 			>

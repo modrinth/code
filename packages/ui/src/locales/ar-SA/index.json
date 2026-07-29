@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "ليس لديك صلاحية."
+  },
   "affiliate.create.button": {
     "defaultMessage": "إنشاء رابط تسويق بالعمولة"
   },
@@ -64,18 +67,6 @@
   },
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "فشل تحميل تفاصيل الاشتراك."
-  },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 أيام"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/شهر"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/ربع"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/سنة"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "سيتم تحصيل الرسوم التالية في <charge-date>{date}</charge-date>."
@@ -173,9 +164,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "إعادة تثبيت حزمة التعديل"
   },
-  "button.remove": {
-    "defaultMessage": "إزالة"
-  },
   "button.remove-image": {
     "defaultMessage": "إزالة الصورة"
   },
@@ -269,12 +257,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "تحذير الحذف"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "احذف {count} {count, plural, one {{itemType, select, project {project} version {version} user {user} other {project}}} other {{itemType, select, project {مشاريع} version {versions} user {users} other {projects}}}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "حذف {count, plural, one {{itemType, select, project {project} version {version} user {user} other {content}}} other {{itemType, select, project {مشاريع} version {versions} user {users} other {contents}}}}"
-  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "تحذير {action, select, downgrade {خفض الٳصدار} other {التحديث}}"
   },
@@ -283,9 +265,6 @@
   },
   "content.confirm-modpack-update.header": {
     "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": ""
   },
   "form.label.address-line": {
     "defaultMessage": "خط عنوان"
@@ -709,9 +688,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"

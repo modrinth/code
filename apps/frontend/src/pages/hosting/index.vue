@@ -21,7 +21,6 @@
 			:server-name="`${auth?.user?.username}'s server`"
 			:out-of-stock-url="outOfStockUrl"
 			:fetch-capacity-statuses="fetchCapacityStatuses"
-			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
@@ -681,6 +680,31 @@ const formatPrice = useFormatPrice()
 const flags = useFeatureFlags()
 
 const messages = defineMessages({
+	errorFetchingPaymentDataTitle: {
+		id: 'hosting-marketing.notification.error-fetching-payment-data-title',
+		defaultMessage: 'Error fetching payment data',
+	},
+	unexpectedErrorText: {
+		id: 'hosting-marketing.notification.unexpected-error-text',
+		defaultMessage: 'An unexpected error occurred',
+	},
+	serverCapacityFullTitle: {
+		id: 'hosting-marketing.notification.server-capacity-full-title',
+		defaultMessage: 'Server Capacity Full',
+	},
+	serverCapacityFullText: {
+		id: 'hosting-marketing.notification.server-capacity-full-text',
+		defaultMessage: 'We are currently at capacity. Please try again later.',
+	},
+	invalidProductTitle: {
+		id: 'hosting-marketing.notification.invalid-product-title',
+		defaultMessage: 'Invalid product',
+	},
+	invalidProductText: {
+		id: 'hosting-marketing.notification.invalid-product-text',
+		defaultMessage:
+			'The selected product was found but lacks necessary data. Please contact support.',
+	},
 	hostWithModrinth: {
 		id: 'hosting-marketing.hero.host-with-modrinth',
 		defaultMessage: 'Host your next server with Modrinth Hosting',
@@ -868,7 +892,7 @@ const messages = defineMessages({
 	faqLocationAnswer: {
 		id: 'hosting-marketing.faq.location.answer',
 		defaultMessage:
-			"We have servers available across North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
+			"We have servers available across North America, Europe, Southeast Asia, and Australia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
 	},
 	faqIncreaseStorage: {
 		id: 'hosting-marketing.faq.increase-storage',
@@ -921,7 +945,8 @@ const messages = defineMessages({
 	},
 	availableLocations: {
 		id: 'hosting-marketing.available-locations',
-		defaultMessage: 'Available in North America, Europe, and Southeast Asia for wide coverage.',
+		defaultMessage:
+			'Available in North America, Europe, Southeast Asia, and Australia for wide coverage.',
 	},
 	payMonthly: {
 		id: 'hosting-marketing.billing.monthly',
@@ -1106,7 +1131,7 @@ const startTyping = () => {
 
 const handleError = (err) => {
 	addNotification({
-		title: 'An error occurred',
+		title: formatMessage(commonMessages.errorNotificationTitle),
 		type: 'error',
 		text: err.message ?? (err.data ? err.data.description : err),
 	})
@@ -1124,9 +1149,9 @@ async function fetchPaymentData() {
 	} catch (error) {
 		console.error('Error fetching payment data:', error)
 		addNotification({
-			title: 'Error fetching payment data',
+			title: formatMessage(messages.errorFetchingPaymentDataTitle),
 			type: 'error',
-			text: error.message || 'An unexpected error occurred',
+			text: error.message || formatMessage(messages.unexpectedErrorText),
 		})
 	}
 }
@@ -1177,9 +1202,9 @@ const selectProduct = async (product) => {
 
 	if ((product === 'custom' && isCustomAtCapacity.value) || isAtCapacity.value) {
 		addNotification({
-			title: 'Server Capacity Full',
+			title: formatMessage(messages.serverCapacityFullTitle),
 			type: 'error',
-			text: 'We are currently at capacity. Please try again later.',
+			text: formatMessage(messages.serverCapacityFullText),
 		})
 		return
 	}
@@ -1192,9 +1217,9 @@ const selectProduct = async (product) => {
 		(product !== 'custom' && !selectedPlan.metadata)
 	) {
 		addNotification({
-			title: 'Invalid product',
+			title: formatMessage(messages.invalidProductTitle),
 			type: 'error',
-			text: 'The selected product was found but lacks necessary data. Please contact support.',
+			text: formatMessage(messages.invalidProductText),
 		})
 		return
 	}
@@ -1232,81 +1257,16 @@ const planQuery = async () => {
 }
 
 const regions = ref([])
-const regionPings = ref([])
-
-function pingRegions() {
+function fetchRegions() {
 	client.archon.servers_v1.getRegions().then((res) => {
 		regions.value = res
-		regions.value.forEach((region) => {
-			runPingTest(region)
-		})
 	})
-}
-
-const PING_COUNT = 20
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
-
-const initialIndex = {
-	'eu-lim': 31,
-}
-
-function runPingTest(region, index = initialIndex[region.shortcode] ?? 1) {
-	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
-		regionPings.value.push({
-			region: region.shortcode,
-			ping: -1,
-		})
-		return
-	}
-
-	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
-	try {
-		const socket = new WebSocket(wsUrl)
-		const pings = []
-
-		socket.onopen = () => {
-			for (let i = 0; i < PING_COUNT; i++) {
-				setTimeout(() => {
-					socket.send(performance.now())
-				}, i * PING_INTERVAL)
-			}
-			setTimeout(
-				() => {
-					socket.close()
-
-					const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
-					if (median) {
-						regionPings.value.push({
-							region: region.shortcode,
-							ping: median,
-						})
-					}
-				},
-				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-			)
-		}
-
-		socket.onmessage = (event) => {
-			pings.push(performance.now() - event.data)
-		}
-
-		socket.onerror = (event) => {
-			console.error(
-				`Failed to connect pingtest WebSocket with ${wsUrl}, trying index ${index + 1}:`,
-				event,
-			)
-			runPingTest(region, index + 1)
-		}
-	} catch (error) {
-		console.error(`Failed to connect pingtest WebSocket with ${wsUrl}:`, error)
-	}
 }
 
 onMounted(() => {
 	startTyping()
 	planQuery()
-	pingRegions()
+	fetchRegions()
 })
 
 watch(customer, (newCustomer) => {

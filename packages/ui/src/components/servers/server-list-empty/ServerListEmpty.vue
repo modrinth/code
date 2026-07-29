@@ -212,7 +212,7 @@ const messages = defineMessages({
 	},
 	oneClickModInstallsDescription: {
 		id: 'servers.list-empty.one-click-mod-installs-description',
-		defaultMessage: 'Pick your favourite mods and we handle the rest.',
+		defaultMessage: 'Pick your favorite mods and we handle the rest.',
 	},
 	simpleSetupTitle: {
 		id: 'servers.list-empty.simple-setup-title',

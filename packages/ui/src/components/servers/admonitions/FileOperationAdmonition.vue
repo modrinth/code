@@ -25,7 +25,13 @@
 		</span>
 		<template v-if="op.id" #top-right-actions>
 			<ButtonStyled v-if="!isTerminal" type="outlined" color="blue">
-				<button class="!border" type="button" @click="ctx.dismissOperation(op.id!, 'cancel')">
+				<button
+					v-tooltip="!canWriteFiles ? permissionDeniedMessage : undefined"
+					class="!border"
+					type="button"
+					:disabled="!canWriteFiles"
+					@click="cancelOperation"
+				>
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
@@ -41,6 +47,7 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { useFormatBytes } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -55,6 +62,7 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 const ctx = injectModrinthServerContext()
+const { canWriteFiles, permissionDeniedMessage } = useServerPermissions()
 
 const messages = defineMessages({
 	extracting: {
@@ -97,4 +105,9 @@ const title = computed(() => {
 	}
 	return formatMessage(messages.extracting, { source: sourceName.value })
 })
+
+function cancelOperation() {
+	if (!canWriteFiles.value || !props.op.id) return
+	ctx.dismissOperation(props.op.id, 'cancel')
+}
 </script>

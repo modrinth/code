@@ -73,6 +73,7 @@
 					:options="[userOption, ...ownerOptions]"
 					searchable
 					:disabled="hasHitLimit"
+					select-search-text-on-focus
 					show-icon-in-selected
 				/>
 				<span>{{ formatMessage(messages.ownerDescription) }}</span>
@@ -129,7 +130,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Chips,
@@ -144,6 +145,8 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
+
+import { generateUrlSlug } from '~/utils/slugs'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
@@ -164,9 +167,7 @@ defineExpose({
 	show,
 })
 
-const auth = (await useAuth()) as Ref<{
-	user: { id: string; username: string; avatar_url: string } | null
-}>
+const auth = await useAuth()
 
 const messages = defineMessages({
 	title: {
@@ -245,6 +246,18 @@ const messages = defineMessages({
 		id: 'create.project.missing-fields-tooltip',
 		defaultMessage: 'Missing fields: {fields}',
 	},
+	unknownUser: {
+		id: 'create.project.unknown-user',
+		defaultMessage: 'Unknown user',
+	},
+	userAvatarAlt: {
+		id: 'create.project.user-avatar-alt',
+		defaultMessage: 'User Avatar',
+	},
+	organizationIconAlt: {
+		id: 'create.project.organization-icon-alt',
+		defaultMessage: '{name} Icon',
+	},
 })
 
 const props = defineProps<{
@@ -317,7 +330,7 @@ const cancel = () => {
 
 const userOption = computed(() => ({
 	value: 'self',
-	label: auth.value.user?.username || 'Unknown user',
+	label: auth.value.user?.username || formatMessage(messages.unknownUser),
 	icon: auth.value.user?.avatar_url
 		? markRaw(
 				defineAsyncComponent(() =>
@@ -325,7 +338,7 @@ const userOption = computed(() => ({
 						setup: () => () =>
 							h('img', {
 								src: auth.value.user?.avatar_url,
-								alt: 'User Avatar',
+								alt: formatMessage(messages.userAvatarAlt),
 								class: 'h-5 w-5 rounded-full',
 							}),
 					}),
@@ -356,13 +369,19 @@ async function fetchOrganizations() {
 								setup: () => () =>
 									h('img', {
 										src: org.icon_url,
-										alt: `${org.name} Icon`,
+										alt: formatMessage(messages.organizationIconAlt, { name: org.name }),
 										class: 'h-5 w-5 rounded',
 									}),
 							}),
 						),
 					)
-				: undefined,
+				: markRaw(
+						defineAsyncComponent(() =>
+							Promise.resolve({
+								setup: () => () => h(OrganizationIcon, { class: 'size-5' }),
+							}),
+						),
+					),
 		}))
 		if (props.organizationId) owner.value = props.organizationId
 	} catch (err) {
@@ -395,6 +414,7 @@ async function createProject() {
 		server_side: 'required',
 		license_id: 'LicenseRef-Unknown',
 		is_draft: true,
+		organization_id: owner.value !== 'self' ? owner.value : undefined,
 	}
 
 	formData.append('data', JSON.stringify(projectData))
@@ -461,12 +481,7 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 
 function updatedName() {
 	if (!manualSlug.value) {
-		slug.value = name.value
-			.trim()
-			.toLowerCase()
-			.replaceAll(' ', '-')
-			.replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-			.replaceAll(/--+/gm, '-')
+		slug.value = generateUrlSlug(name.value)
 	}
 }
 </script>

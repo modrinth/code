@@ -6,7 +6,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("process")
         .invoke_handler(tauri::generate_handler![
             process_get_all,
-            process_get_by_profile_path,
+            process_get_by_instance_id,
             process_kill,
             process_wait_for,
         ])
@@ -19,10 +19,10 @@ pub async fn process_get_all() -> Result<Vec<ProcessMetadata>> {
 }
 
 #[tauri::command]
-pub async fn process_get_by_profile_path(
-    path: &str,
+pub async fn process_get_by_instance_id(
+    instance_id: &str,
 ) -> Result<Vec<ProcessMetadata>> {
-    Ok(process::get_by_profile_path(path).await?)
+    Ok(process::get_by_instance_id(instance_id).await?)
 }
 
 #[tauri::command]

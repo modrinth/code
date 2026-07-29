@@ -36,6 +36,7 @@ impl ModrinthCredentials {
                     Some(("Authorization", &*creds.session)),
                     None,
                     None,
+                    Some("/v2/session/refresh"),
                     semaphore,
                     exec,
                 )
@@ -194,6 +195,10 @@ pub const fn get_login_url() -> &'static str {
     concat!(env!("MODRINTH_URL"), "auth/sign-in")
 }
 
+pub const fn get_signup_url() -> &'static str {
+    concat!(env!("MODRINTH_URL"), "auth/sign-up")
+}
+
 pub async fn finish_login_flow(
     code: &str,
     semaphore: &FetchSemaphore,
@@ -228,6 +233,7 @@ async fn fetch_info(
         Some(("Authorization", token)),
         None,
         None,
+        Some("/v2/user"),
         semaphore,
         exec,
     )

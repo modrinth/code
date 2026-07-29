@@ -1,4 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
+
+import { compareByIndex } from './utils'
 // noinspection JSUnusedGlobalSymbols
 
 export const isApproved = (project) => {
@@ -27,6 +29,10 @@ export const isUnderReview = (project) => {
 
 export const isDraft = (project) => {
 	return project && DRAFT_PROJECT_STATUSES.includes(project.status)
+}
+
+export const showDownloadCount = (project) => {
+	return project && !['draft', 'processing', 'rejected'].includes(project.status)
 }
 
 export const APPROVED_PROJECT_STATUSES = ['approved', 'archived', 'unlisted', 'private']
@@ -255,7 +261,7 @@ export function getPrimaryProjectType(project: Labrinth.Projects.v3.Project): Di
 	} else {
 		const sorted = project.project_types
 			.slice()
-			.sort((a, b) => PROJECT_TYPE_PRECEDENCE.indexOf(a) - PROJECT_TYPE_PRECEDENCE.indexOf(b))
+			.sort((a, b) => compareByIndex(PROJECT_TYPE_PRECEDENCE, a, b))
 		if (sorted.length > 0) {
 			return sorted[0]
 		} else {

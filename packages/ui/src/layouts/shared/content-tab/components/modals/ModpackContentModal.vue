@@ -2,6 +2,7 @@
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
+	ExternalIcon,
 	FilterIcon,
 	GlassesIcon,
 	PaintbrushIcon,
@@ -13,11 +14,13 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectPageContext } from '#ui/providers/page-context'
 import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
@@ -26,26 +29,31 @@ import {
 } from '#ui/utils/common-messages'
 
 import { getClientWarningType, isClientOnlyEnvironment } from '../../composables/content-filtering'
-import type { ContentCardTableItem, ContentItem } from '../../types'
+import type { ContentCardProject, ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
 
 const { formatMessage } = useVIntl()
+const pageContext = injectPageContext(null)
 
 interface Props {
+	header?: string
 	modpackName?: string
 	modpackIconUrl?: string
 	enableToggle?: boolean
-	busy?: boolean
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 	switchVersion?: (item: ContentItem) => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	header: undefined,
 	modpackName: undefined,
 	modpackIconUrl: undefined,
 	enableToggle: false,
-	busy: false,
+	actionDisabled: false,
+	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
 	switchVersion: undefined,
 })
@@ -54,6 +62,7 @@ const emit = defineEmits<{
 	'update:enabled': [item: ContentItem, value: boolean]
 	'bulk:enable': [items: ContentItem[]]
 	'bulk:disable': [items: ContentItem[]]
+	hide: []
 }>()
 
 const messages = defineMessages({
@@ -81,6 +90,18 @@ const messages = defineMessages({
 		id: 'instances.modpack-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
+	externalContent: {
+		id: 'instances.modpack-content-modal.external-content',
+		defaultMessage: 'External',
+	},
+	externalContentDescription: {
+		id: 'instances.modpack-content-modal.external-content-description',
+		defaultMessage: 'This file is not published on Modrinth.',
+	},
+	openInSlicer: {
+		id: 'instances.modpack-content-modal.open-in-slicer',
+		defaultMessage: 'Open in Slicer',
+	},
 })
 
 export interface ModpackContentModalState {
@@ -92,6 +113,7 @@ export interface ModpackContentModalState {
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const scrollContainer = ref<HTMLElement | null>(null)
+const isOpen = ref(false)
 const items = ref<ContentItem[]>([])
 const disabledIds = ref(new Set<string>())
 const loading = ref(false)
@@ -100,18 +122,17 @@ const selectedFilters = ref<string[]>([])
 const selectedIds = ref<string[]>([])
 
 const selectedItems = computed(() =>
-	items.value.filter((item) => selectedIds.value.includes(item.file_name)),
+	items.value.filter((item) => selectedIds.value.includes(item.id)),
 )
 
 const allSelected = computed(() => {
 	if (filteredItems.value.length === 0) return false
-	return filteredItems.value.every((item) => selectedIds.value.includes(item.file_name))
+	return filteredItems.value.every((item) => selectedIds.value.includes(item.id))
 })
 
 const someSelected = computed(() => {
 	return (
-		filteredItems.value.some((item) => selectedIds.value.includes(item.file_name)) &&
-		!allSelected.value
+		filteredItems.value.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
 	)
 })
 
@@ -119,7 +140,7 @@ function toggleSelectAll() {
 	if (allSelected.value || someSelected.value) {
 		selectedIds.value = []
 	} else {
-		selectedIds.value = filteredItems.value.map((item) => item.file_name)
+		selectedIds.value = filteredItems.value.map((item) => item.id)
 	}
 }
 
@@ -156,7 +177,7 @@ const filterOptions = computed(() => {
 		options.push({ id: 'warnings', label: 'Warnings' })
 	}
 
-	if (items.value.some((item) => !item.enabled)) {
+	if (props.enableToggle && items.value.some((item) => item.enabled === false)) {
 		options.push({ id: 'disabled', label: 'Disabled' })
 	}
 
@@ -186,7 +207,7 @@ const attributeFilterIds = new Set(['disabled', 'warnings'])
 const typeFilteredCount = computed(() => {
 	if (selectedFilters.value.length === 0) return items.value.length
 	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
-	const hasDisabledFilter = selectedFilters.value.includes('disabled')
+	const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
 	const hasWarningsFilter = selectedFilters.value.includes('warnings')
 	return items.value.filter((item) => {
 		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
@@ -204,16 +225,12 @@ const filteredItems = computed(() => {
 	if (query) {
 		result = fuse.search(query).map(({ item }) => item)
 	} else {
-		result = [...items.value].sort((a, b) => {
-			const nameA = a.project?.title ?? a.file_name
-			const nameB = b.project?.title ?? b.file_name
-			return nameA.toLowerCase().localeCompare(nameB.toLowerCase())
-		})
+		result = sortContentItems(items.value)
 	}
 
 	if (selectedFilters.value.length > 0) {
 		const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
-		const hasDisabledFilter = selectedFilters.value.includes('disabled')
+		const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
 		const hasWarningsFilter = selectedFilters.value.includes('warnings')
 		result = result.filter((item) => {
 			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
@@ -224,38 +241,51 @@ const filteredItems = computed(() => {
 		})
 	}
 
-	return result
+	return sortContentItems(result, !query)
 })
 
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
-		id: item.file_name,
+		id: item.id,
 		project: item.project ?? {
-			id: item.file_name,
+			id: item.id,
 			slug: null,
 			title: item.file_name,
 			icon_url: null,
 		},
-		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
+		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
-			id: item.file_name,
+			id: item.id,
 			version_number: 'Unknown',
 			file_name: item.file_name,
 		},
 		owner: item.owner
 			? {
 					...item.owner,
-					link: `https://modrinth.com/${item.owner.type}/${item.owner.id}`,
+					link:
+						item.owner.type === 'user'
+							? `/user/${encodeURIComponent(item.owner.id)}`
+							: `https://modrinth.com/organization/${item.owner.id}`,
+				}
+			: undefined,
+		source: item.source
+			? {
+					...item.source,
+					link: item.source.link ?? sourceProjectLink(item.source.project),
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
 		installing: item.installing === true,
+		toggleDisabled: props.actionDisabled,
+		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		isClientOnly:
 			isClientOnlyEnvironment(item.environment) ||
 			!!item.pack_client_retained ||
 			!!item.pack_client_depends,
 		clientWarning: getClientWarningType(item),
-		disabled: props.busy || disabledIds.value.has(item.file_name) || item.installing === true,
+		disabled:
+			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
+		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		overflowOptions: [
 			...(props.switchVersion
 				? [
@@ -270,6 +300,20 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		],
 	})),
 )
+const externalItemIds = computed(
+	() => new Set(items.value.filter((item) => item.external && !item.source).map((item) => item.id)),
+)
+const externalSlicerUrls = computed(() => {
+	const urls: Record<string, string> = {}
+	for (const item of items.value) {
+		if (item.external && item.external_url) {
+			urls[item.id] = `https://slicer.run/?url=${encodeURIComponent(item.external_url)}`
+		}
+	}
+	return urls
+})
+const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
+const showTableActions = computed(() => props.enableToggle || hasExternalSlicerUrls.value)
 
 function getTypeIcon(type: string) {
 	switch (type) {
@@ -285,32 +329,53 @@ function getTypeIcon(type: string) {
 	}
 }
 
-function handleEnabledChange(fileName: string, value: boolean) {
-	if (props.busy) return
-	const item = items.value.find((i) => i.file_name === fileName)
+function sortContentItems(contentItems: ContentItem[], sortByName = true) {
+	return [...contentItems].sort((a, b) => {
+		const externalDiff = Number(b.external === true) - Number(a.external === true)
+		if (externalDiff !== 0) return externalDiff
+		if (!sortByName) return 0
+
+		return itemDisplayName(a).toLowerCase().localeCompare(itemDisplayName(b).toLowerCase())
+	})
+}
+
+function itemDisplayName(item: ContentItem) {
+	return item.project?.title ?? item.file_name
+}
+
+function sourceProjectLink(project: ContentCardProject) {
+	const projectId = project.slug ?? project.id
+	const url = `https://modrinth.com/modpack/${encodeURIComponent(projectId)}`
+	return pageContext ? () => pageContext.openExternalUrl(url) : url
+}
+
+function handleEnabledChange(id: string, value: boolean) {
+	if (props.actionDisabled) return
+	const item = items.value.find((item) => item.id === id)
 	if (!item) return
 	emit('update:enabled', item, value)
 }
 
 function bulkEnable() {
-	if (props.busy) return
+	if (props.actionDisabled) return
 	emit('bulk:enable', [...selectedItems.value])
 	selectedIds.value = []
 }
 
 function bulkDisable() {
-	if (props.busy) return
+	if (props.actionDisabled) return
 	emit('bulk:disable', [...selectedItems.value])
 	selectedIds.value = []
 }
 
 function show(contentItems: ContentItem[]) {
-	items.value = contentItems
+	items.value = contentItems.map((item) => ({ ...item }))
 	searchQuery.value = ''
 	selectedFilters.value = []
 	selectedIds.value = []
 	disabledIds.value = new Set()
 	loading.value = false
+	showModal()
 }
 
 function showLoading() {
@@ -319,11 +384,23 @@ function showLoading() {
 	selectedFilters.value = []
 	selectedIds.value = []
 	loading.value = true
-	modal.value?.show()
+	showModal()
+}
+
+function showModal() {
+	if (isOpen.value || !modal.value) return
+	isOpen.value = true
+	modal.value.show()
 }
 
 function hide() {
+	isOpen.value = false
 	modal.value?.hide()
+}
+
+function handleHide() {
+	isOpen.value = false
+	emit('hide')
 }
 
 function getState(): ModpackContentModalState | null {
@@ -337,11 +414,11 @@ function getState(): ModpackContentModalState | null {
 }
 
 async function restore(state: ModpackContentModalState) {
-	items.value = state.items
+	items.value = state.items.map((item) => ({ ...item }))
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
 	loading.value = false
-	modal.value?.show()
+	showModal()
 	await nextTick()
 	if (scrollContainer.value) {
 		scrollContainer.value.scrollTop = state.scrollTop
@@ -360,17 +437,17 @@ function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled
 	}
 	const { disabled: _, ...itemUpdates } = updates
 	if (Object.keys(itemUpdates).length > 0) {
-		const index = items.value.findIndex((i) => i.file_name === fileName)
-		if (index !== -1) {
-			items.value[index] = { ...items.value[index], ...itemUpdates }
-		}
+		items.value = items.value.map((item) =>
+			item.file_name === fileName ? { ...item, ...itemUpdates } : item,
+		)
 	}
 }
 
 function setItems(contentItems: ContentItem[]) {
+	const contentIds = new Set(contentItems.map((item) => item.id))
 	const contentFileNames = new Set(contentItems.map((item) => item.file_name))
-	items.value = contentItems
-	selectedIds.value = selectedIds.value.filter((id) => contentFileNames.has(id))
+	items.value = contentItems.map((item) => ({ ...item }))
+	selectedIds.value = selectedIds.value.filter((id) => contentIds.has(id))
 	disabledIds.value = new Set([...disabledIds.value].filter((id) => contentFileNames.has(id)))
 	loading.value = false
 }
@@ -383,6 +460,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		ref="modal"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
+		:on-hide="handleHide"
 		no-padding
 	>
 		<template #title>
@@ -393,7 +471,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				:tint-by="props.modpackName"
 			/>
 			<span class="text-lg font-extrabold text-contrast">
-				{{ formatMessage(messages.header) }}
+				{{ props.header ?? formatMessage(messages.header) }}
 			</span>
 		</template>
 		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">
@@ -477,7 +555,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						<div
 							class="flex min-w-0 items-center gap-4"
 							:class="
-								props.enableToggle
+								showTableActions
 									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
@@ -496,13 +574,13 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						</div>
 						<div
 							class="hidden @[800px]:flex"
-							:class="props.enableToggle ? 'flex-1 min-w-0' : 'flex-1'"
+							:class="showTableActions ? 'flex-1 min-w-0' : 'flex-1'"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.versionLabel)
 							}}</span>
 						</div>
-						<div v-if="props.enableToggle" class="min-w-[160px] shrink-0 text-right">
+						<div v-if="showTableActions" class="min-w-[160px] shrink-0 text-right">
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.actionsLabel)
 							}}</span>
@@ -513,6 +591,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							v-model:selected-ids="selectedIds"
 							:items="tableItems"
 							:show-selection="props.enableToggle"
+							:show-item-actions="hasExternalSlicerUrls"
 							hide-delete
 							hide-header
 							flat
@@ -521,7 +600,30 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
 									: {}
 							"
-						/>
+						>
+							<template #itemTitleBadges="{ item }">
+								<span
+									v-if="externalItemIds.has(item.id)"
+									v-tooltip="formatMessage(messages.externalContentDescription)"
+									class="inline-flex shrink-0 items-center rounded-full border border-solid border-orange bg-orange-highlight px-2 py-0.5 text-xs font-semibold leading-4 text-orange"
+								>
+									{{ formatMessage(messages.externalContent) }}
+								</span>
+							</template>
+							<template #itemButtonsRight="{ item }">
+								<ButtonStyled v-if="externalSlicerUrls[item.id]" circular type="transparent">
+									<a
+										v-tooltip="formatMessage(messages.openInSlicer)"
+										:aria-label="formatMessage(messages.openInSlicer)"
+										:href="externalSlicerUrls[item.id]"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<ExternalIcon class="size-4" />
+									</a>
+								</ButtonStyled>
+							</template>
+						</ContentCardTable>
 					</div>
 				</div>
 			</div>
@@ -558,7 +660,8 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		<ContentSelectionBar
 			v-if="props.enableToggle"
 			:selected-items="selectedItems"
-			:is-bulk-operating="props.busy"
+			:is-busy="props.actionDisabled"
+			:busy-tooltip="props.actionDisabledTooltip"
 			style="--left-bar-width: 0px; --right-bar-width: 0px"
 			@clear="selectedIds = []"
 			@enable="bulkEnable"

@@ -8,6 +8,7 @@ import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -43,6 +44,7 @@ const fileUploadSession = useUploadSessionUpload({
 })
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const { canWriteFiles, canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
 
 const route = useRoute()
 const router = useRouter()
@@ -51,6 +53,10 @@ const queryClient = useQueryClient()
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>
 	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
+)
+const fileWriteDisabled = computed(() => !canWriteFiles.value || serverBusy.value)
+const fileWriteDisabledTooltip = computed(() =>
+	canWriteFiles.value ? busyTooltip.value : permissionDeniedMessage.value,
 )
 const nonBackupBusyReasons = computed(() =>
 	busyReasons.value.filter(
@@ -325,6 +331,7 @@ const createMutation = useMutation({
 
 // Extraction
 async function extractFile(path: string, override: boolean, dry: boolean) {
+	if (fileWriteDisabled.value) return
 	if (dry) {
 		return await client.kyros.files_v0.extractFile(path, override, true)
 	}
@@ -346,6 +353,7 @@ async function readFileAsBlob(path: string): Promise<Blob> {
 }
 
 async function writeFile(path: string, content: string): Promise<void> {
+	if (fileWriteDisabled.value) return
 	await client.kyros.files_v0.updateFile(path, content)
 	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 }
@@ -383,6 +391,7 @@ onMounted(async () => {
 
 // Restart
 async function restartServer() {
+	if (!canUsePowerActions.value) return
 	await client.archon.servers_v0.power(serverId, 'Restart')
 }
 
@@ -392,7 +401,7 @@ function getSessionUploadFilename(fileName: string) {
 }
 
 async function uploadFiles(files: File[]) {
-	if (files.length === 0) return
+	if (fileWriteDisabled.value || files.length === 0) return
 
 	try {
 		const result = await fileUploadSession.uploadFiles(
@@ -426,16 +435,20 @@ provideFileManager({
 	startEditing,
 	stopEditing,
 	createItem: async (name, type) => {
+		if (fileWriteDisabled.value) return
 		const path = `${currentPath.value}/${name}`.replace('//', '/')
 		await createMutation.mutateAsync({ path, type })
 	},
 	renameItem: async (path, newName) => {
+		if (fileWriteDisabled.value) return
 		await renameMutation.mutateAsync({ path, newName })
 	},
 	moveItem: async (source, destination) => {
+		if (fileWriteDisabled.value) return
 		await moveMutation.mutateAsync({ source, destination })
 	},
 	deleteItem: async (path, recursive) => {
+		if (fileWriteDisabled.value) return
 		await deleteMutation.mutateAsync({ path, recursive })
 	},
 	readFile,
@@ -446,14 +459,14 @@ provideFileManager({
 	cancelUpload,
 	uploadState,
 	refresh: refreshList,
-	isBusy: serverBusy,
-	busyTooltip,
+	isBusy: fileWriteDisabled,
+	busyTooltip: fileWriteDisabledTooltip,
 	busyWarning,
 	extractFile,
 	prefetchDirectory,
 	prefetchFile,
 	showInstallFromUrl: true,
-	canRestart: true,
+	canRestart: canUsePowerActions.value,
 	restartServer,
 	canShareToMclogs: true,
 })

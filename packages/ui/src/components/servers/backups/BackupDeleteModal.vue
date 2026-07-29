@@ -67,7 +67,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="red">
-					<button @click="confirmDelete">
+					<button
+						v-tooltip="deleteDisabledTooltip"
+						:disabled="!props.canDelete"
+						@click="confirmDelete"
+					>
 						<TrashIcon />
 						{{ formatMessage(messages.confirm, { count }) }}
 					</button>
@@ -91,6 +95,17 @@ import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 
 const { formatMessage } = useVIntl()
+
+const props = withDefaults(
+	defineProps<{
+		canDelete?: boolean
+		permissionDeniedMessage?: string
+	}>(),
+	{
+		canDelete: true,
+		permissionDeniedMessage: undefined,
+	},
+)
 
 const emit = defineEmits<{
 	(e: 'delete', backup: Archon.BackupsQueue.v1.BackupQueueBackup | undefined): void
@@ -133,6 +148,11 @@ const count = computed(() => (isBulk.value ? bulkBackups.value.length : 1))
 const displayBackups = computed(() =>
 	isBulk.value ? bulkBackups.value : singleBackup.value ? [singleBackup.value] : [],
 )
+const deleteDisabledTooltip = computed(() =>
+	props.canDelete
+		? undefined
+		: (props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction)),
+)
 
 function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	singleBackup.value = backup
@@ -149,6 +169,7 @@ function showBulk(backups: Archon.BackupsQueue.v1.BackupQueueBackup[]) {
 }
 
 function confirmDelete() {
+	if (!props.canDelete) return
 	modal.value?.hide()
 	if (isBulk.value) {
 		emit('bulk-delete', bulkBackups.value)

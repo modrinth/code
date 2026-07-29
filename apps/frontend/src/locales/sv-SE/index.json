@@ -8,6 +8,438 @@
   "admin.billing.error.not-found": {
     "message": "Användaren hittades inte"
   },
+  "ads-consent.accept": {
+    "message": "Godkänn alla"
+  },
+  "ads-consent.body": {
+    "message": "Reklam gör Modrinth möjligt och finansierar utbetalningar till skapare. Våra partners kan lagra eller komma åt cookies i appen för att Personalisera reklam och mäta statistik."
+  },
+  "ads-consent.manage": {
+    "message": "Hantera inställningar"
+  },
+  "ads-consent.reject": {
+    "message": "Neka alla"
+  },
+  "ads-consent.title": {
+    "message": "Din integritet och hur reklam stödjer Modrinth"
+  },
+  "analytics.action.add": {
+    "message": "Lägg till"
+  },
+  "analytics.action.cancel": {
+    "message": "Avbryt"
+  },
+  "analytics.action.refresh": {
+    "message": "Uppdatera"
+  },
+  "analytics.action.reset": {
+    "message": "Återställ"
+  },
+  "analytics.breakdown.country": {
+    "message": "Land"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "Beroende på"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Nedladdningsanledning"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Nedladdningskälla"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Spelversion"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Analys"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Laddare"
+  },
+  "analytics.breakdown.members": {
+    "message": "Medlem"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Intäkter"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Ingen analys"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projekt"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Projektstatus"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Projektversion"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Analys efter {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Visa alla"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Visa begränsad"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Visa topp 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktiva"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Annoteringar"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Statistik diagram kontroller, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Kontroller"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Statistik diagram kontroller"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Skärm"
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Tidigare period"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Proportion"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Välj föremål från tabellen nedan för att visualisera din data."
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Se meddelande"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (förhandsvisa)"
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Visa alla {count} linjer i diagram?"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# dag} other {# dagar}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# timme} other {# timmar}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# minut} other {# minuter}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Visa {name} i diagram"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Fästa"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(förhandsvisa)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Visa {name} i diagram"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Totalt"
+  },
+  "analytics.chart.view.area": {
+    "message": "Area"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Stapel"
+  },
+  "analytics.chart.view.line": {
+    "message": "Linje"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Beroende"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modpaket"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Fristående"
+  },
+  "analytics.download-reason.update": {
+    "message": "Uppdatera"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth hemsida"
+  },
+  "analytics.downloads.suffix": {
+    "message": "nedladdningar"
+  },
+  "analytics.empty.no-data": {
+    "message": "Ingen data tillgänglig"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Ingen data tillgänglig för statistik"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Inga projekt tillgängliga"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Inga projekt tillgängliga för statistik"
+  },
+  "analytics.empty.select-project": {
+    "message": "Välj åtminstone ett projekt för att visa data"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Spelversionstyp"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Alla"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Utgåva"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Sök länder..."
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Sök efter projekt..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Sök nedladdningskällor..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Sök efter medlemmar..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Sök projektversioner..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Sök versioner..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Nedladdningar över tid"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Speltid över tid"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Intäkter över tid"
+  },
+  "analytics.graph.title.views": {
+    "message": "Visningar över tid"
+  },
+  "analytics.group-by.1h": {
+    "message": "1h"
+  },
+  "analytics.group-by.6h": {
+    "message": "6h"
+  },
+  "analytics.group-by.date": {
+    "message": "Datum"
+  },
+  "analytics.group-by.day": {
+    "message": "Dag"
+  },
+  "analytics.group-by.month": {
+    "message": "Månad"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Gruppera efter dag"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Gruppera efter timme"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Gruppera efter månad"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Gruppera efter var 6 timme"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Gruppera efter vecka"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Gruppera efter år"
+  },
+  "analytics.group-by.week": {
+    "message": "Vecka"
+  },
+  "analytics.group-by.year": {
+    "message": "År"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Hämtar resultat..."
+  },
+  "analytics.options.loading": {
+    "message": "Laddar..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projekt godkänt"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Projekt är privat markerat"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Projektstatus ändrad"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projekt är avlistat"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} släpptes"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Version uppladdad"
+  },
+  "analytics.project-status.approved": {
+    "message": "Godkänd"
+  },
+  "analytics.project-status.archived": {
+    "message": "Arkiverad"
+  },
+  "analytics.project-status.draft": {
+    "message": "Ukast"
+  },
+  "analytics.project-status.other": {
+    "message": "Annat"
+  },
+  "analytics.project-status.private": {
+    "message": "Privat"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Avslaget"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Olistad"
+  },
+  "analytics.project.all": {
+    "message": "Alla projekt"
+  },
+  "analytics.project.count": {
+    "message": "{count, number} projekt"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name} Ikon"
+  },
+  "analytics.project.select": {
+    "message": "Välj projekt"
+  },
+  "analytics.project.user": {
+    "message": "{username}s projekt"
+  },
+  "analytics.project.your": {
+    "message": "Dina projekt"
+  },
+  "analytics.query.filter.add": {
+    "message": "Lägg till filter"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Analys:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Grupperat efter"
+  },
+  "analytics.query.label.project": {
+    "message": "Projekt:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Tidsram:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Nedladdningar"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Läs mer"
+  },
+  "analytics.stat.playtime": {
+    "message": "Speltid"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.stat.revenue": {
+    "message": "Intäkter"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "Visningar"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start} till {end}"
+  },
+  "analytics.table.csv.filename": {
+    "message": "Modrinth statistik {breakdown} analys - {dateRange}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Speltid (sekunder)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "Valt intervall"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# dag} other {# dagar}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# timme} other {# timmar}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# minut} other {# minuter}}"
+  },
+  "analytics.table.export-csv": {
+    "message": "Exportera CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Kumulativt"
+  },
+  "analytics.table.export.grouped": {
+    "message": "Grupperad efter {groupBy}"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "Visar {start} till {end} av {total}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Sök..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Länder ovan"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Spelversioner ovan"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Projektversioner ovan"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Projekt ovan"
+  },
+  "analytics.title": {
+    "message": "Statistik"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Ingen"
+  },
+  "analytics.value.none": {
+    "message": "Ingen"
+  },
+  "analytics.value.other": {
+    "message": "Annan"
+  },
+  "analytics.value.unknown": {
+    "message": "Okänd"
+  },
   "app-marketing.download.description": {
     "message": "Vår skrivbordsapplikation är tillgänglig för alla plattformar, välj din önskade version."
   },
@@ -30,7 +462,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Linux-versionerna av Modrinth App <issues-link>kan ha problem</issues-link> på vissa system och konfigurationer. Om Modrinth App är instabilt på ditt system rekommenderar vi dig att testa andra appar som <prism-link>Prism Launcher</prism-link> för att enkelt installera innehåll från Modrinth."
+    "message": "Linuxversionerna av Modrinth Appen är <issues-link>kända att ha problem</issues-link> på vissa system och konfigurationer. Om Modrinth App är instabil på ditt system uppmuntrar vi dig att pröva andra appar som <prism-link>Prism Launcher</prism-link> för att enkelt installera innehåll från Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -123,7 +555,7 @@
     "message": "∞ MB"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -141,7 +573,7 @@
     "message": "RAM"
   },
   "app-marketing.features.performance.small": {
-    "message": "Lite"
+    "message": "Liten"
   },
   "app-marketing.features.performance.title": {
     "message": "Effektiv"
@@ -221,14 +653,71 @@
   "auth.authorize.error.no-redirect-url": {
     "message": "Ingen omdirigeringsposition hittad i respons"
   },
+  "auth.authorize.errro-title": {
+    "message": "Ett fel inträffade"
+  },
   "auth.authorize.redirect-url": {
     "message": "Du kommer bli flyttad till <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Fortsätt med {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Ålderskrav"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Avsluta registrering"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Vänligen ange ett giltigt födelsedatum. Året kan inte vara 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Ogiltligt födelsedatum"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Födelsedatum"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Välj ditt födelsedatum"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Vänligen ange ditt födelsedatum innan du fortsätter."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Födelsedatum behövs"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Du uppfyller inte ålderskravet för att skapa ett konto hos Modrinth."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Relevand källkod"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Vi lagrar inte ditt födelsedatum. Vi använder det endast under registreringen för att säkerställa COPPA efterlevnad"
+  },
+  "auth.create-account.page-title": {
+    "message": "Skapa konto"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Säkerhetskontroll"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Håll mig uppdaterad om de coola sakerna Modrinth arbetar på via e-post"
+  },
+  "auth.create-account.title": {
+    "message": "Skapa ett konto"
+  },
+  "auth.create-account.username.label": {
+    "message": "Användarnamn"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Ange användarnamn"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Skicka återställningsmejl"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Skriv in din e-post nedan så skickar vi en återställningslänk som låter dig återställa ditt konto."
+    "message": "Ange din e-post nedan så skickar vi en återställningslänk som låter dig återställa ditt konto."
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Ett e-postmeddelande med instruktioner har skickats till dig om din e-post tidigare har sparats på ditt konto."
@@ -258,52 +747,67 @@
     "message": "Återställ ditt lösenord"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Ange din tvåfaktorskod för att fortsätta."
+    "message": "Ange den 6-siffriga koden från din autentiseringsapp eller en av dina reservkoder."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Ange tvåfaktorskod"
+    "message": "Tvåfaktorsautentisering"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Ange kod..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Har du glömt lösenordet?</forgot-password-link> • <create-account-link>Skapa ett konto</create-account-link>"
+  "auth.sign-in.continue-with-email": {
+    "message": "Fortsätt med e-post"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Fortsätt med passkey"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Registrera"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Glömt lösenord"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Användes senast"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Har du inget konto?"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Logga in med"
+    "message": "Logga in på Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Logga in"
   },
-  "auth.sign-in.use-password": {
-    "message": "Eller använd ett lösenord"
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Ålderskrav"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "Skapa konto"
+  "auth.sign-up.continue-with-email": {
+    "message": "Fortsätt med e-post"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "Genom att skapa ett konto godkänner du Modrinths <terms-link>villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
   },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Lösenorden stämmer inte överens!"
+  "auth.sign-up.show-fewer-options": {
+    "message": "Visa färre inloggningsmetoder"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Visa andra inloggningsmetoder"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du redan ett konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Jag vill få uppdateringar om Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registrera dig"
   },
-  "auth.sign-up.title.create-account": {
-    "message": "Eller skapa ett konto själv"
-  },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Registrera dig med"
+    "message": "Skapa ett konto"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoinställningar"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Upptäck moddar"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Din e-post är redan verifierad!"
@@ -323,6 +827,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "Verifiering av e-post misslyckades"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "Ett e-postmeddelande med en verifieringslänk har skickats till {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "E-postmeddelande skickat"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Ett fel inträffade"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "Din e-postadress har verifierats!"
   },
@@ -332,20 +845,11 @@
   "auth.verify-email.title": {
     "message": "Verifiera e-post"
   },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Prenumerera för uppdateringar om Modrinth"
+  "collection.aria-label.upload-icon": {
+    "message": "Ladda upp ikon"
   },
-  "auth.welcome.description": {
-    "message": "Du är nu en del av ett grymt community av skapare och utforskare som redan bygger, laddar ner och håller sig uppdaterade med fantastiska moddar."
-  },
-  "auth.welcome.label.tos": {
-    "message": "När du skapar ett konto godkänner du Modrinths <terms-link>villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Välkommen till Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Välkommen"
+  "collection.button.discover-mods": {
+    "message": "Upptäck moddar"
   },
   "collection.button.edit-icon": {
     "message": "Redigera-ikon"
@@ -407,8 +911,167 @@
   "collection.title": {
     "message": "{name} - samling"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Lägg till privat anteckning"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Godkänn"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Godkänn med svar"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Stäng tråd"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Stäng med svar"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Avslå"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Avslå med svar"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Återuppta tråd"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Svara"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Svara tråd"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Skicka in igen för granskning"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Skicka in igen för granskning med svar"
+  },
+  "conversation-thread.action.send": {
+    "message": "Skicka"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Skicka in för granskning"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Skicka in för granskning med svar"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Sätt till utkast"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Sätt till utkast med svar"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Tillhandahåll"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Tillbakahåll med svar"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Fel vid stängning av rapport"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Fel vid öppning av rapport"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Kunde inte skicka meddelande"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Svara tråden..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Skicka ett meddelande..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Bekräfta att moderatorer inte aktivt övervakar detta"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Jag förstår att moderatorerna inte aktivt övervakar tråden."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Ditt projekt är redan godkänt. Moderatorteamet övervakar därför inte aktivt den här tråden. De kan dock fortfarande se ditt inlägg om det uppstår något problem med ditt projekt."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Svara tråden"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Ifall du behöver komma i kontakt med moderatorteamet, vänligen använd <help-center-link>Modrinth hjälpcenter</help-center-link> och klicka på den blåa bubblan nere till höger för att kontakta support."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Bekräfta att jag tagit itu med meddelandena från moderatorerna"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Jag bekräftar att jag ordentligt tagit itu med moderatorernas kommentarer."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Du skickar in <project-title>{projectTitle}</project-title> för att granskas igen av moderatorerna."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Skickar in igen för granskning"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Skickar in för granskning"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Se till att du tagit itu med alla kommentarer från moderationsteamet."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Upprepade inlämningar utan att ta itu med moderationsteamets kommentarer kan leda till tillfällig avstängning."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Kompletterande filer är avsedda för stödjande resurser som källkod, inte för alternativa versioner eller varianter."
+  },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Detaljer"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Filer"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Primärfil"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Ladda upp fil"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Detaljer"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Filer"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Versionsnummer"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "Versionsnummret urskiljer denna specifika version från andra."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Ange versionsnummer, t.ex. 1.2.3-alfa.1"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Filer"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Föreslagna"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Uppladdade filer"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Versioner"
   },
   "create.collection.collection-info": {
     "message": "Din nya samling kommer skapas som en offentlig samling {count, plural, =0 {utan några projekt} one {med # projekt} other {med # projekt}}."
@@ -506,6 +1169,9 @@
   "create.project.name-placeholder": {
     "message": "Ange projektnamn..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name} ikon"
+  },
   "create.project.owner-description": {
     "message": "Sätt projektägaren som dig själv eller en organisation du är medlem i."
   },
@@ -536,8 +1202,14 @@
   "create.project.type-server": {
     "message": "Server"
   },
+  "create.project.unknown-user": {
+    "message": "Okänd användare"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Användaravatar"
   },
   "create.project.visibility-description": {
     "message": "Synligheten av ditt projekt efter att det har godkänts."
@@ -620,6 +1292,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Nyligen uppdaterade"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "Stäng"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Ladda ner {formType}"
   },
@@ -686,6 +1361,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Affärsenhet"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Välj födelsedatum"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "En affärsenhet är en registrerad organisation såsom ett aktiebolag, ett handelsbolag eller ett LLC-bolag."
   },
@@ -694,6 +1372,9 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privat individ"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Sök länder..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Välj ditt land"
@@ -845,6 +1526,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Sök antal"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Sök {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Välj {category}"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Välj en valuta:"
   },
@@ -866,8 +1553,26 @@
   "dashboard.creator-withdraw-modal.withdraw-limit": {
     "message": "Uttagsgräns"
   },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Länka Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Hämta din Discord roll"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1 mn nedladdningar"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Kreatör"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Instrumentpanel"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Du har inga olästa notifikationer."
   },
   "dashboard.notifications.link.see-all": {
     "message": "Visa alla"
@@ -884,17 +1589,116 @@
   "dashboard.organizations.empty.cta": {
     "message": "Skapa en organisation!"
   },
+  "dashboard.organizations.error.fetch": {
+    "message": "Kunde inte hämta organisationer"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {medlem} other {medlemmar}}"
+  },
   "dashboard.organizations.title": {
     "message": "Organisationer"
   },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Markera allt som läst"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Visa historik"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Du har inte några olästa notifikationer."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Misslyckades att ladda notifikationer:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Historik"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Notifikationshistorik"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Laddar notifikationer..."
+  },
+  "dashboard.projects.empty": {
+    "message": "Du har inte några projekt än. Klicka på den gröna knappen ovan för att börja."
+  },
   "dashboard.projects.head-title": {
     "message": "Projekt"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "och {count} fler..."
   },
   "dashboard.projects.links.button.clear-link": {
     "message": "Rensa länk"
   },
   "dashboard.projects.links.button.edit": {
     "message": "Ändra länkar"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Ändringar kommer appliceras till <strong>{count}</strong> projekt."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discordinbjudan"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Redigera länkar"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Ange en giltig URL för Discordinbjudan"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Ange en giltig URL"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Visa alla projekt"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "En sida/kodförråd som innehåller källkoden till ditt projekt"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Källkod"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "En sida som innehåller information, dokumentation och hjälp för projektet"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wikisida"
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Ikon för {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Projektet har ett meddelande från moderatorerna. Se projektet för att se mer."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Vänligen verifiera miljömetadata"
+  },
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "Valda projektåtgärder"
+  },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count,plural,one{# projekt valt}other{# projekt valda}}"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Namn"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Typ"
+  },
+  "dashboard.report.title": {
+    "message": "Rapportera {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktiva rapporteringar"
+  },
+  "dashboard.reports.title": {
+    "message": "Rapporteringar"
   },
   "dashboard.revenue.available-now": {
     "message": "Tillgängligt nu"
@@ -929,20 +1733,62 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Ladda ner som CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Transaktionshistorik"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transaktioner"
   },
   "dashboard.revenue.transactions.none": {
     "message": "Inga transaktioner"
   },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Dina utbetalningar och utdrag kommer synas här."
+  },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Senaste månaden"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Denna månad"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Visa alla"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Alla år"
   },
   "dashboard.revenue.withdraw.card.title": {
     "message": "Ta ut"
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Ta ut"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Aktiva rapporter"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Statistik"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Skapare"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Kontrollpanel"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notifikationer"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisationer"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Översikt"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projekt"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Intäkter"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Konto"
@@ -983,11 +1829,17 @@
   "dashboard.withdraw.error.account-not-linked.title": {
     "message": "Konto inte länkat"
   },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Du måste verifiera din e-postadress innan du tar ut pengar."
+  },
   "dashboard.withdraw.error.email-verification.title": {
     "message": "E-post verifiering krävs"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Kan inte ta ut pengar"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Du har inte tillräckligt med pengar för att göra uttaget."
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Otillräcklig saldo"
@@ -1025,6 +1877,18 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Vänligen fyll i skatteblanketten"
   },
+  "discover.install.back-to-server": {
+    "message": "Tillbaka till server"
+  },
+  "discover.seo.description": {
+    "message": "Sök och bläddra bland tusen av Minecraft {projectType} på Modrinth med snabba, träffsäkra resultat. Våra filter hjälper dig att snabbt hitta de bästa Minecraft {projectType}."
+  },
+  "discover.seo.title": {
+    "message": "Sök {projectType}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Sök {projectType} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Du kan ha skrivit fel på samlingens URL."
   },
@@ -1040,6 +1904,12 @@
   "error.collection.404.title": {
     "message": "Samlingen hittades inte"
   },
+  "error.generic.401.signed-in-as": {
+    "message": "Du är för nuvarande inloggad som:"
+  },
+  "error.generic.401.title": {
+    "message": "Du har inte åtkomst till denna sida"
+  },
   "error.generic.404.subtitle": {
     "message": "Sidan du letade efter verkar inte finnas."
   },
@@ -1053,19 +1923,19 @@
     "message": "Innehåll otillgängligt av juridiska skäl"
   },
   "error.generic.default.list_item.1": {
-    "message": "Se om Modrinth är nere på vår <status-link>statussida</status-link>."
+    "message": "Se om Modrinth ligger nere på vår <status-link>statussida</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Om detta fortsätter hända borde du kontakta Modrinth-teamet via vår <discord-link>Discord server</discord-link>."
+    "message": "Om detta fortsätter hända borde du kanske kontakta Modrinth-teamet genom vår <discord-link>Discord server</discord-link>."
   },
   "error.generic.default.list_title": {
-    "message": "Vänligen försök igenom om några minuter."
+    "message": "Vänligen försök igen om några minuter."
   },
   "error.generic.default.subtitle": {
     "message": "Någonting gick fel."
   },
   "error.generic.default.title": {
-    "message": "Åh nej!"
+    "message": "Oj då!"
   },
   "error.organization.404.list_item.1": {
     "message": "Du kan ha skrivit fel på organisationens URL."
@@ -1120,9 +1990,6 @@
   },
   "frog.title": {
     "message": "Groda"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "Tillgänglig i Nordamerika, Europa och Sydostasien för bred täckning."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Betala månatligen"
@@ -1183,6 +2050,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Var finns Modrinth Hostings servrar? Kan jag välja region?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Vi har servrar tillgängliga runtom i Nordamerika, Europa, Sydostasien och Australien för tillfället som du kan välja vid köp. Fler regioner kommer i framtiden! Om du skulle vilja byta din region, vänligen kontakta support."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Vilka Minecraft versioner och loaders kan användas?"
@@ -1472,6 +2342,9 @@
   "layout.action.manage-affiliates": {
     "message": "Hantera affiliatelänk"
   },
+  "layout.action.manage-server-notices": {
+    "message": "Hantera servernotiser"
+  },
   "layout.action.new-collection": {
     "message": "Ny samling"
   },
@@ -1508,8 +2381,14 @@
   "layout.banner.add-email.description": {
     "message": "Modrinth kräver att du registrerar en e-postadress till ditt konto av säkerhetsskäl."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Ignorera alltid"
+  },
   "layout.banner.build-fail.description": {
     "message": "Denna distribution av Modrinths frontend kunde inte generera status från API:et. Detta kan bero på ett avbrott eller ett fel i konfigurationen. Bygg om när API:et är tillgängligt. Felkoder: {errors}; Nuvarande API-URL är: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignorera"
   },
   "layout.banner.build-fail.title": {
     "message": "Fel inträffade vid generering av status från API vid kompilering."
@@ -1564,6 +2443,21 @@
   },
   "layout.footer.about.status": {
     "message": "Status"
+  },
+  "layout.footer.based-on-label": {
+    "message": "Baserat på"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "Utvecklarläge har aktiverats"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Utvecklarläge aktiverat"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Utvecklarläge har avaktiverats"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Utvecklarläge avaktiverat"
   },
   "layout.footer.legal": {
     "message": "Rättsligt"
@@ -1634,6 +2528,9 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "okänd"
+  },
   "layout.menu-toggle.action": {
     "message": "Växla meny"
   },
@@ -1654,9 +2551,6 @@
   },
   "layout.nav.discover": {
     "message": "Utforska"
-  },
-  "layout.nav.discover-content": {
-    "message": "Utforska innehåll"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Installera Modrinth App"
@@ -1697,14 +2591,50 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Uppgradera till Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Du måste verifiera din e-post innan du publicerar på Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "E-post verifikation behövs"
+  },
   "moderation.moderate": {
     "message": "Moderera"
+  },
+  "moderation.page.external-projects": {
+    "message": "Externa projekt"
   },
   "moderation.page.projects": {
     "message": "Projekt"
   },
   "moderation.page.reports": {
     "message": "Rapporter"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Misslyckades"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Misslyckades att ladda versioner: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Laddar versioner..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "Nya filer"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "Nya grupper"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "Inga filer hittades"
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Inte skannad"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Skanna alla filer"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Skannar..."
   },
   "muralpay.account-type.checking": {
     "message": "Checkkonto"
@@ -1781,6 +2711,12 @@
   "muralpay.field.account-number": {
     "message": "Kontonummer"
   },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Kontonummer (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Kontonummer (CCI)"
+  },
   "muralpay.field.account-number-type": {
     "message": "Kontonummerstyp"
   },
@@ -1816,6 +2752,12 @@
   },
   "muralpay.pix-type.phone": {
     "message": "Telefonnummer"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Ange kontonummer"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Ange kontonummer"
   },
   "muralpay.placeholder.pix-phone": {
     "message": "+55..."
@@ -1853,95 +2795,26 @@
   "muralpay.rail.fiat-zar.name": {
     "message": "Banköverföring (ZAR)"
   },
-  "profile.bio.fallback.creator": {
-    "message": "En Modrinth kreatör."
+  "organization.label.downloads": {
+    "message": "nedladdningar"
   },
-  "profile.bio.fallback.user": {
-    "message": "En Modrinth användare."
+  "organization.label.members": {
+    "message": "medlemmar"
   },
-  "profile.button.billing": {
-    "message": "Hantera användarfakturering"
+  "organization.label.organization": {
+    "message": "Organisation"
   },
-  "profile.button.edit-role": {
-    "message": "Redigera roll"
+  "organization.label.projects": {
+    "message": "projekt"
   },
-  "profile.button.info": {
-    "message": "Visa användardetaljer"
+  "organization.project-transfer.id-column": {
+    "message": "ID"
   },
-  "profile.button.manage-projects": {
-    "message": "Hantera projekt"
+  "organization.project-transfer.name-column": {
+    "message": "Namn"
   },
-  "profile.details.label.auth-providers": {
-    "message": "Autentiseringsleverantörer"
-  },
-  "profile.details.label.email": {
-    "message": "E-post"
-  },
-  "profile.details.label.email-verified": {
-    "message": "E-post verifierad"
-  },
-  "profile.details.label.has-password": {
-    "message": "Har lösenord"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Har TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Betalningsmetoder"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "E-post ej verifierad"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "E-post verifierad"
-  },
-  "profile.error.not-found": {
-    "message": "Användare hittades inte"
-  },
-  "profile.label.affiliate": {
-    "message": "Affiliate"
-  },
-  "profile.label.badges": {
-    "message": "Märken"
-  },
-  "profile.label.collection": {
-    "message": "Samling"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {nedladdning} other {nedladdningar}}"
-  },
-  "profile.label.joined": {
-    "message": "Gick med"
-  },
-  "profile.label.no-collections": {
-    "message": "Denna användare har inga samlingar!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Du har inga samlingar.\nVill du <create-link>skapa en</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Denna användare har inga projekt!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Du har inga projekt.\nVill du <create-link>skapa ett</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organisationer"
-  },
-  "profile.label.saving": {
-    "message": "Sparar..."
-  },
-  "profile.meta.description": {
-    "message": "Ladda ner {username}s projekt på Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Ladda ned {username}s projekt på Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> följare} other {<stat>{count}</stat> följare}}"
-  },
-  "profile.user-id": {
-    "message": "Användar-ID: {id}"
+  "organization.project-transfer.type-column": {
+    "message": "Typ"
   },
   "project-member-header.error-decline": {
     "message": "Misslyckades att neka inbjudan"
@@ -2057,24 +2930,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Skapad {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licensierat {license}"
-  },
-  "project.about.details.published": {
-    "message": "Skapades {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Inskickad {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detaljer"
-  },
-  "project.about.details.updated": {
-    "message": "Uppdaterad {date}"
-  },
   "project.actions.create-server": {
     "message": "Skapa en server"
   },
@@ -2105,47 +2960,47 @@
   "project.description.title": {
     "message": "Beskrivning"
   },
-  "project.details.licensed": {
-    "message": "Licensierad"
+  "project.download.dependency-download-file": {
+    "message": "Ladda ner {filename}"
   },
-  "project.download.game-version": {
-    "message": "Spelversion: {version}"
+  "project.download.dependency-download-file-with-size": {
+    "message": "Ladda ner {filename} ({size})"
   },
-  "project.download.game-version-error": {
-    "message": "Fel: inga spelversioner hittades"
+  "project.download.download": {
+    "message": "Ladda ner"
   },
-  "project.download.game-version-tooltip": {
-    "message": "{title} är bara tillgängligt för {version}"
+  "project.download.download-as-zip": {
+    "message": "Ladda ner som .zip"
+  },
+  "project.download.download-version": {
+    "message": "Ladda ner {version}"
+  },
+  "project.download.file-unavailable": {
+    "message": "Denna fil kan inte laddas ner"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Installera med Modrinth App"
-  },
   "project.download.no-app": {
     "message": "Har du inte Modrinth appen?"
   },
+  "project.download.no-game-versions-found": {
+    "message": "Inga spelversioner hittades"
+  },
   "project.download.no-versions-available": {
-    "message": "Inga versioner finns tillgängliga för {gameVersion} och {platform}."
-  },
-  "project.download.platform": {
-    "message": "Plattform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Fel: ingen plattform hittades"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} är bara tillgängligt för {platform}"
+    "message": "Inga versioner tillgängliga för {gameVersion} och {platform}."
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} stöttar inte {platform} för {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Sök spelversioner..."
+  "project.download.recommended-title": {
+    "message": "Rekommenderat"
   },
-  "project.download.search-game-versions-label": {
-    "message": "Sök spelversioner..."
+  "project.download.required-resource-pack-short": {
+    "message": "Resurspaket"
+  },
+  "project.download.search-game-versions": {
+    "message": "Välj spelversion"
   },
   "project.download.select-game-version": {
     "message": "Välj spelversion"
@@ -2158,6 +3013,12 @@
   },
   "project.download.title": {
     "message": "Ladda ner {title}"
+  },
+  "project.download.zip-failed-text": {
+    "message": "En eller fler filer kunde inte laddas ner. Vänligen försök igen."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Kunde inte ladda ner filer"
   },
   "project.environment.migration-no-permission.message": {
     "message": "Vi har förbättrat miljösystemet på Modrinth och nya inställningar är tillgängliga. Du har inte behörighet att ändra dessa inställningar, men meddela en annan medlem i projektet att miljömetadatan måste verifieras."
@@ -2189,14 +3050,20 @@
   "project.gallery.title": {
     "message": "Galleri"
   },
-  "project.license.error": {
-    "message": "Licenstext kunde inte hämtas."
+  "project.moderation.admonition.under-review.header": {
+    "message": "Projekt under granskning"
   },
-  "project.license.loading": {
-    "message": "Laddar licenstext..."
+  "project.moderation.error.unauthorized": {
+    "message": "Obehörig"
   },
-  "project.license.title": {
-    "message": "Licens"
+  "project.moderation.thread.approved-warning": {
+    "message": "Denna tråd är inte aktivt följd, men kan bli undersökt för information om projektet om de behövs."
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Det här är en privat konversationstråd med Modrinth-moderatorerna. De kan meddela dig om problem angående detta projekt."
+  },
+  "project.moderation.thread.title": {
+    "message": "Moderationsmeddelanden"
   },
   "project.moderation.title": {
     "message": "Moderering"
@@ -2217,7 +3084,7 @@
     "message": "Projekt uppdaterat"
   },
   "project.settings.general.name.description": {
-    "message": "Undvik prefix, suffix, parenteser och beskrivningar—endast projektets riktiga namn."
+    "message": "Undvik prefix, suffix, parenteser och beskrivningar — endast projektets riktiga namn."
   },
   "project.settings.general.name.placeholder.1": {
     "message": "t.ex. Nether Overhaul 2"
@@ -2246,23 +3113,89 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Okänt externt innehåll"
+  },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Radera alla grupper"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Läs mer"
+  },
+  "project.settings.permissions.no-results": {
+    "message": "Inga externa filer matchade din sökning."
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Sök projekt..."
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Kan inte spara"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Serverdetaljer"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Ange adress"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Java-adress"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Språk"
+  },
+  "project.settings.server.region-label": {
+    "message": "Region"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Välj språk"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Välj region"
+  },
+  "project.settings.server.server-online": {
+    "message": "Servern är online!"
+  },
   "project.settings.title": {
     "message": "Inställningar"
   },
-  "project.stats.downloads-label": {
-    "message": "nedladdning{count, plural, one {} other {ar}}"
+  "project.status.archived.message": {
+    "message": "{title} har arkiverats. {title} kommer inte få några ytterligare uppdateringar såvida inte författaren bestämmer sig för att avarkivera projektet."
+  },
+  "project.versions.copy-id-option": {
+    "message": "Kopiera ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Kopiera länk"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Redigera filer"
   },
   "project.versions.title": {
     "message": "Versioner"
   },
+  "project.versions.version-deleted-text": {
+    "message": "Versionen har raderats."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Version raderad"
+  },
   "report.already-reported": {
     "message": "Du har redan rapporterat {title}"
   },
-  "report.already-reported-description": {
-    "message": "Du har redan en öppen rapport för {item, select, project {detta projekt} version {denna version} user {denna användare} other {detta innehåll}}. Du kan lägga till mer detaljer till din rapport om du har mer information att lägga till."
+  "report.back-to-item": {
+    "message": "Tillbaka till {item}"
   },
   "report.body.title": {
     "message": "Vänligen ge oss mer kontext om din rapport"
+  },
+  "report.checking": {
+    "message": "Kollar {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Kunde inte hitta {item}"
   },
   "report.for.violation": {
     "message": "Detta bryter mot Modrinths <rules-link>regler</rules-link> eller våra <terms-link>användarvillkor</terms-link>"
@@ -2276,20 +3209,35 @@
   "report.not-for.bug-reports": {
     "message": "Buggrapporter"
   },
+  "report.not-for.dmca": {
+    "message": "DMCA borttagning"
+  },
   "report.not-for.dmca.description": {
     "message": "Se våran <policy-link>Upphovsrättspolicy</policy-link>."
   },
   "report.please-report": {
     "message": "Vänligen rapportera:"
   },
+  "report.question.content-id": {
+    "message": "Vilket ID har {item}?"
+  },
   "report.question.content-type": {
     "message": "Vad för sorts innehåll är det du rapporterar?"
+  },
+  "report.question.report-reason": {
+    "message": "Vilken av Modrinths regler bryter {item} mot?"
+  },
+  "report.report-content": {
+    "message": "Rapportera innehåll till moderatorerna"
   },
   "report.report-item": {
     "message": "Rapportera {title} till moderatorerna"
   },
   "report.submit": {
     "message": "Skicka rapport"
+  },
+  "scopes.analytics.label": {
+    "message": "Visa statistik"
   },
   "scopes.category.analytics": {
     "message": "Statistik"
@@ -2305,6 +3253,9 @@
   },
   "scopes.category.pats": {
     "message": "PAT:s"
+  },
+  "scopes.category.payouts": {
+    "message": "Utbetalningar"
   },
   "scopes.category.projects": {
     "message": "Projekt"
@@ -2384,32 +3335,26 @@
   "scopes.organizationWrite.label": {
     "message": "Skriv organisationer"
   },
-  "scopes.patCreate.description": {
-    "message": "Skapa personlig API-token"
-  },
   "scopes.patCreate.label": {
     "message": "Skapa PAT:s"
-  },
-  "scopes.patDelete.description": {
-    "message": "Ta bort din personliga API-token"
   },
   "scopes.patDelete.label": {
     "message": "Radera PAT:s"
   },
-  "scopes.patRead.description": {
-    "message": "Visa skapade API-tokens"
-  },
   "scopes.patRead.label": {
     "message": "Läs PAT:s"
-  },
-  "scopes.patWrite.description": {
-    "message": "Redigera personliga API-tokens"
   },
   "scopes.patWrite.label": {
     "message": "Skriva PATs"
   },
   "scopes.payoutsRead.description": {
     "message": "Läs din data för utdragningar"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Läs utbetalningar"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Dra ut pengar"
   },
   "scopes.projectCreate.description": {
     "message": "Skapa nya projekt"
@@ -2570,6 +3515,15 @@
   "servers.plan.small.description": {
     "message": "Perfekt för 1–5 vänner med några få lätta moddar."
   },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Populärast"
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Radera kontot"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Är du säker på att du vill radera ditt konto?"
+  },
   "settings.account.delete.section.action": {
     "message": "Radera konto"
   },
@@ -2593,6 +3547,9 @@
   },
   "settings.account.email.modal.header.change": {
     "message": "Ändra e-post"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Din kontoinformation är inte synlig offentligt."
   },
   "settings.account.password.action.remove": {
     "message": "Radera lösenord"
@@ -2663,6 +3620,18 @@
   "settings.account.security.email.title": {
     "message": "E-post"
   },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Namn"
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Tillagd {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Senast använd {ago}"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Aldrig använd"
+  },
   "settings.account.security.password.action.add": {
     "message": "Lägg till lösenord"
   },
@@ -2684,14 +3653,65 @@
   "settings.account.security.providers.description": {
     "message": "Lägg till eller ta bort inloggningsmetoder från ditt konto, inklusive GitHub, GitLab, Microsoft, Discord, Steam och Google."
   },
+  "settings.account.security.title": {
+    "message": "Kontosäkerhet"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Ta bort 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Ställ in 2FA"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Ett extra lager säkerhet till ditt konto under inloggningsprocessen."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Ta bort 2FA"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Ställ in 2FA"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Tvåfaktorsautentisering"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Ladda ner och spara dessa reservkoder på en säker plats. Du kan använda dessa istället för en 2FA-kod om du skulle förlora tillgång till din enhet! Du borde förvara dessa koder som du gör dina lösenord."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Reservkoder kan endast användas en gång."
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Koden du angav är inkorrekt!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Vänligen ange din tvåfaktorskod för att fortsätta."
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Ange tvåfaktorskod"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Ange kod..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "Tvåfaktorsautentisering håller ditt konto säkert genom att behöva åtkomst till en enhet till för att kunna logga in."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Om QR-koden inte skannas kan du manuellt skriva in hemligheten:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Skanna QR-koden med <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> eller en annan 2FA-app för att börja."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Ange engångskoden från autentiseraren för att verifiera åtkomst."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Verifiera kod"
+  },
   "settings.applications.about": {
     "message": "Om"
   },
   "settings.applications.button.add-more": {
     "message": "Lägg till mer"
-  },
-  "settings.applications.button.cancel": {
-    "message": "Avbryt"
   },
   "settings.applications.button.create": {
     "message": "Skapa app"
@@ -2699,14 +3719,8 @@
   "settings.applications.button.delete": {
     "message": "Ta bort"
   },
-  "settings.applications.button.edit": {
-    "message": "Redigera"
-  },
   "settings.applications.button.new": {
     "message": "Ny applikation"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Spara ändringar"
   },
   "settings.applications.button.upload-icon": {
     "message": "Ladda upp ikon"
@@ -2765,8 +3779,14 @@
   "settings.authorizations.about-this-app": {
     "message": "Om appen"
   },
-  "settings.authorizations.by": {
-    "message": "av"
+  "settings.authorizations.head-title": {
+    "message": "Autentiseringar"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Återkalla"
+  },
+  "settings.billing.charges.description": {
+    "message": "Alla dina tidigare Modrinth fakturor listas här:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Medal provserver"
@@ -2777,26 +3797,20 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Tidigare fakturor"
+  },
   "settings.billing.expires": {
     "message": "Löper ut {date}"
   },
   "settings.billing.interval.month": {
     "message": "månad"
   },
-  "settings.billing.interval.monthly": {
-    "message": "månatligen"
-  },
   "settings.billing.interval.quarter": {
     "message": "kvartal"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "kvartalsvis"
-  },
   "settings.billing.interval.year": {
     "message": "år"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "årligen"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Annonsfritt surfande på modrinth.com och Modrinth App"
@@ -2882,14 +3896,23 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Server ID: {id}"
   },
   "settings.billing.pyro.ram": {
     "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Ett fel inträffade när du återprenumererade till din Modrinth server."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Fel vid återprenumerering"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "Din prenumerationsbetalning misslyckades. Vänligen uppdatera din betalmetod och återprenumerera sedan."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Din betalning behandlas just nu. Dina servrar kommer att aktiveras när betalningen slutförs."
   },
   "settings.billing.pyro.storage": {
     "message": "{gb} GB SSD"
@@ -2922,16 +3945,16 @@
     "message": "Prenumerationer"
   },
   "settings.billing.switch.switching-to-interval": {
-    "message": "Ändrar till {interval}"
+    "message": "Byter till {interval, select, monthly {månadsvis} yearly {årlig} other {{interval}}}"
   },
   "settings.billing.switch.to-interval": {
-    "message": "Ändra till {interval}"
+    "message": "Byt till {interval, select, monthly {månadsvis} yearly {årlig} other {{interval}}}"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Månatlig betalning kommer kosta dig ytterligare {amount} per år"
   },
   "settings.billing.switches-to-billing-on": {
-    "message": "Ändrar till {interval} betalning på {date}"
+    "message": "Byter till {interval, select, monthly {månadsvis} yearly {årlig} other {{interval}}} fakturering på {date}"
   },
   "settings.billing.update-method": {
     "message": "Uppdatera metod"
@@ -3089,27 +4112,6 @@
   "settings.pats.token.never-used": {
     "message": "Aldrig använd"
   },
-  "settings.profile.bio.description": {
-    "message": "En kort beskrivning för att berätta lite om dig själv."
-  },
-  "settings.profile.bio.title": {
-    "message": "Om mig"
-  },
-  "settings.profile.description": {
-    "message": "Din profilinformation visas offentligt på Modrinth och genom <docs-link>Modrinth API:t</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Profilinställningar"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profilinformation"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilbild"
-  },
-  "settings.profile.username.description": {
-    "message": "Ett unikt skift-känsligt namn för att identifiera din profil."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Återkalla session"
   },
@@ -3140,6 +4142,24 @@
   "settings.sidebar.label.display": {
     "message": "Visning"
   },
+  "shared-instance.invite.accept": {
+    "message": "Acceptera inbjudan"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "En Modrinth-användare"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Laddar inbjudan…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} har bjudit in dig till att spela"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "Denna inbjudan skapades av en annan Modrinth-användare, inte Modrinth. Acceptera endast inbjudningar från personer du litar på."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Känner du denna användare?"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Senaste nytt från Modrinth"
   },
@@ -3155,6 +4175,39 @@
   "ui.newsletter-button.tooltip": {
     "message": "Prenumerera på Modrinths nyhetsbrev"
   },
+  "version.all-versions": {
+    "message": "Alla versioner"
+  },
+  "version.confirm-delete.description": {
+    "message": "Denna versionen kommer permanent raderas. Denna åtgärd kan inte ångras."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Radera version"
+  },
+  "version.dependency.view-project": {
+    "message": "Visa projekt"
+  },
+  "version.dependency.view-version": {
+    "message": "Visa version"
+  },
+  "version.download.download-dependency": {
+    "message": "Välj en version att ladda ner"
+  },
+  "version.download.version": {
+    "message": "Ladda ner {version} ({size})"
+  },
+  "version.edit.button": {
+    "message": "Ändra"
+  },
+  "version.edit.details": {
+    "message": "Ändra detaljer"
+  },
+  "version.edit.files": {
+    "message": "Redigera filer"
+  },
+  "version.edit.metadata": {
+    "message": "Ändra metadata"
+  },
   "version.environment.none.description": {
     "message": "Miljön för denna version har inte specificerats."
   },
@@ -3166,5 +4219,11 @@
   },
   "version.environment.unknown.title": {
     "message": "Okänd miljö"
+  },
+  "version.notification.deleted-text": {
+    "message": "Versionen har raderats."
+  },
+  "version.notification.deleted-title": {
+    "message": "Version raderad"
   }
 }

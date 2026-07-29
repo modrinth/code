@@ -218,7 +218,7 @@
 							:level="notice.level"
 							:message="notice.message"
 							:dismissable="notice.dismissable"
-							:title="notice.title"
+							:title="notice.title ?? undefined"
 							preview
 						/>
 						<div class="mt-4 flex items-center gap-2">
@@ -260,6 +260,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -267,6 +268,7 @@ import {
 	commonMessages,
 	CopyCode,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
@@ -278,14 +280,13 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { NOTICE_LEVELS } from '@modrinth/ui/src/utils/notices.ts'
-import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import AssignNoticeModal from '~/components/ui/admin/AssignNoticeModal.vue'
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
@@ -297,6 +298,8 @@ const formatDateTimeShortMonth = useFormatDateTime({
 	dateStyle: 'medium',
 })
 
+type ServerNoticeType = Archon.Notices.v0.ListedNotice
+
 const notices = ref<ServerNoticeType[]>([])
 const createNoticeModal = ref<InstanceType<typeof NewModal>>()
 const assignNoticeModal = ref<InstanceType<typeof AssignNoticeModal>>()
@@ -304,16 +307,14 @@ const assignNoticeModal = ref<InstanceType<typeof AssignNoticeModal>>()
 await refreshNotices()
 
 async function refreshNotices() {
-	await useServersFetch('notices').then((res) => {
-		notices.value = res as ServerNoticeType[]
-		notices.value.sort((a, b) => {
-			const dateDiff = dayjs(b.announce_at).diff(dayjs(a.announce_at))
-			if (dateDiff === 0) {
-				return b.id - a.id
-			}
+	notices.value = await client.archon.notices_v0.list()
+	notices.value.sort((a, b) => {
+		const dateDiff = dayjs(b.announce_at).diff(dayjs(a.announce_at))
+		if (dateDiff === 0) {
+			return b.id - a.id
+		}
 
-			return dateDiff
-		})
+		return dateDiff
 	})
 }
 
@@ -347,7 +348,7 @@ function startEditing(notice: ServerNoticeType, assignments: boolean = false) {
 	newNoticeLevel.value = levelOptions.find((x) => x.id === notice.level) ?? levelOptions[0]
 	newNoticeDismissable.value = notice.dismissable
 	newNoticeMessage.value = notice.message
-	newNoticeTitle.value = notice.title
+	newNoticeTitle.value = notice.title ?? undefined
 	newNoticeScheduledDate.value = dayjs(notice.announce_at).format(DATE_TIME_FORMAT)
 	newNoticeExpiresDate.value = notice.expires
 		? dayjs(notice.expires).format(DATE_TIME_FORMAT)
@@ -361,9 +362,8 @@ function startEditing(notice: ServerNoticeType, assignments: boolean = false) {
 }
 
 async function deleteNotice(notice: ServerNoticeType) {
-	await useServersFetch(`notices/${notice.id}`, {
-		method: 'DELETE',
-	})
+	await client.archon.notices_v0
+		.delete(notice.id)
 		.then(() => {
 			addNotification({
 				title: `Successfully deleted notice #${notice.id}`,
@@ -412,9 +412,10 @@ async function saveChanges() {
 		return
 	}
 
-	await useServersFetch(`notices/${editingNotice.value?.id}`, {
-		method: 'PATCH',
-		body: {
+	if (!editingNotice.value) return
+
+	await client.archon.notices_v0
+		.update(editingNotice.value.id, {
 			message: newNoticeMessage.value,
 			title: newNoticeSurvey.value ? undefined : trimmedTitle.value,
 			level: newNoticeLevel.value.id,
@@ -425,14 +426,14 @@ async function saveChanges() {
 			expires: newNoticeExpiresDate.value
 				? dayjs(newNoticeExpiresDate.value).toISOString()
 				: undefined,
-		},
-	}).catch((err) => {
-		addNotification({
-			title: 'Error saving changes to notice',
-			text: err,
-			type: 'error',
 		})
-	})
+		.catch((err) => {
+			addNotification({
+				title: 'Error saving changes to notice',
+				text: err,
+				type: 'error',
+			})
+		})
 	await refreshNotices()
 	createNoticeModal.value?.hide()
 }
@@ -442,9 +443,8 @@ async function createNotice() {
 		return
 	}
 
-	await useServersFetch('notices', {
-		method: 'POST',
-		body: {
+	await client.archon.notices_v0
+		.create({
 			message: newNoticeMessage.value,
 			title: newNoticeSurvey.value ? undefined : trimmedTitle.value,
 			level: newNoticeLevel.value.id,
@@ -455,14 +455,14 @@ async function createNotice() {
 			expires: newNoticeExpiresDate.value
 				? dayjs(newNoticeExpiresDate.value).toISOString()
 				: undefined,
-		},
-	}).catch((err) => {
-		addNotification({
-			title: 'Error creating notice',
-			text: err,
-			type: 'error',
 		})
-	})
+		.catch((err) => {
+			addNotification({
+				title: 'Error creating notice',
+				text: err,
+				type: 'error',
+			})
+		})
 	await refreshNotices()
 	createNoticeModal.value?.hide()
 }

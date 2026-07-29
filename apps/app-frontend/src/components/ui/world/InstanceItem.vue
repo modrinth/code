@@ -27,10 +27,10 @@ import { useRouter } from 'vue-router'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project } from '@/helpers/cache'
 import { process_listener } from '@/helpers/events'
-import { get_by_profile_path } from '@/helpers/process'
-import { kill, run } from '@/helpers/profile'
+import { kill, run } from '@/helpers/instance'
+import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { showProfileInFolder } from '@/helpers/utils'
+import { showInstanceInFolder } from '@/helpers/utils'
 import { handleSevereError } from '@/store/error'
 
 const { handleError } = injectNotificationManager()
@@ -52,13 +52,13 @@ const props = defineProps<{
 	last_played: Dayjs
 }>()
 
-const loadingModpack = ref(!!props.instance.linked_data)
+const loadingModpack = ref(!!props.instance.link)
 
 const modpack = ref()
 
-if (props.instance.linked_data) {
+if (props.instance.link) {
 	nextTick().then(async () => {
-		modpack.value = await get_project(props.instance.linked_data?.project_id, 'must_revalidate')
+		modpack.value = await get_project(props.instance.link?.project_id, 'must_revalidate')
 		loadingModpack.value = false
 	})
 }
@@ -80,9 +80,10 @@ const playing = ref(false)
 
 const play = async (event: MouseEvent) => {
 	event?.stopPropagation()
+	if (props.instance.quarantined) return
 	loading.value = true
-	await run(props.instance.path)
-		.catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
+	await run(props.instance.id)
+		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
 		.finally(() => {
 			trackEvent('InstanceStart', {
 				loader: props.instance.loader,
@@ -97,7 +98,7 @@ const play = async (event: MouseEvent) => {
 const stop = async (event: MouseEvent) => {
 	event?.stopPropagation()
 	loading.value = true
-	await kill(props.instance.path).catch(handleError)
+	await kill(props.instance.id).catch(handleError)
 	trackEvent('InstanceStop', {
 		loader: props.instance.loader,
 		game_version: props.instance.game_version,
@@ -112,7 +113,7 @@ const unlistenProcesses = await process_listener(async () => {
 })
 
 const checkProcess = async () => {
-	const runningProcesses = await get_by_profile_path(props.instance.path).catch(handleError)
+	const runningProcesses = await get_by_instance_id(props.instance.id).catch(handleError)
 
 	playing.value = runningProcesses.length > 0
 }
@@ -130,7 +131,7 @@ onUnmounted(() => {
 		<template #clickable>
 			<router-link
 				class="no-click-animation"
-				:to="`/instance/${encodeURIComponent(instance.path)}`"
+				:to="`/instance/${encodeURIComponent(instance.id)}`"
 			/>
 		</template>
 		<div
@@ -138,7 +139,7 @@ onUnmounted(() => {
 		>
 			<Avatar
 				:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
-				:tint-by="instance.path"
+				:tint-by="instance.id"
 				size="48px"
 			/>
 			<div class="flex flex-col col-span-2 justify-between h-full">
@@ -192,8 +193,14 @@ onUnmounted(() => {
 				</ButtonStyled>
 				<ButtonStyled v-else>
 					<button
-						v-tooltip="playing ? 'Instance is already open' : null"
-						:disabled="playing || loading"
+						v-tooltip="
+							instance.quarantined
+								? 'This instance has been locked'
+								: playing
+									? 'Instance is already open'
+									: null
+						"
+						:disabled="instance.quarantined || playing || loading"
 						@click="play"
 					>
 						<SpinnerIcon v-if="loading" class="animate-spin" />
@@ -206,12 +213,12 @@ onUnmounted(() => {
 						:options="[
 							{
 								id: 'open-instance',
-								shown: !!instance.path,
-								action: () => router.push(encodeURI(`/instance/${instance.path}`)),
+								shown: !!instance.id,
+								action: () => router.push(encodeURI(`/instance/${instance.id}`)),
 							},
 							{
 								id: 'open-folder',
-								action: () => showProfileInFolder(instance.path),
+								action: () => showInstanceInFolder(instance.id),
 							},
 						]"
 					>

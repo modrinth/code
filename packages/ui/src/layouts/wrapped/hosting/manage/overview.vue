@@ -1,13 +1,24 @@
 <template>
-	<div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
-		<div class="flex flex-col gap-4">
+	<div
+		class="relative flex select-none flex-col gap-6"
+		:class="containedConsole ? 'h-full min-h-0 overflow-hidden' : ''"
+		data-pyro-server-manager-root
+	>
+		<div
+			class="flex flex-col gap-4"
+			:class="containedConsole ? 'min-h-0 flex-1 overflow-hidden' : ''"
+		>
 			<ServerManageStats
+				class="shrink-0"
 				:data="!isWsAuthIncorrect ? stats : undefined"
 				:loading="isWsAuthIncorrect"
 			/>
 
-			<div class="flex min-h-[700px] flex-col gap-2">
-				<span class="text-2xl font-semibold text-contrast">Console</span>
+			<div
+				class="flex flex-col gap-2"
+				:class="containedConsole ? 'min-h-0 flex-1 overflow-hidden' : 'min-h-[700px]'"
+			>
+				<span class="shrink-0 text-2xl font-semibold text-contrast">Console</span>
 
 				<ConsolePageLayout />
 			</div>
@@ -41,15 +52,18 @@ import { computed, ref, watch } from 'vue'
 
 import ServerManageStats from '#ui/components/servers/ServerManageStats.vue'
 import { useModrinthServersConsole } from '#ui/composables'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import { ConsolePageLayout, provideConsoleManager } from '#ui/layouts/shared/console'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 const props = withDefaults(
 	defineProps<{
 		showAdvancedDebugInfo?: boolean
+		containedConsole?: boolean
 	}>(),
 	{
 		showAdvancedDebugInfo: false,
+		containedConsole: false,
 	},
 )
 
@@ -64,6 +78,7 @@ const {
 	powerStateDetails: _powerStateDetails,
 } = injectModrinthServerContext()
 const modrinthServersConsole = useModrinthServersConsole()
+const { canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
 
 watch(
 	() => props.showAdvancedDebugInfo,
@@ -107,6 +122,7 @@ const dismissCrash = () => {
 provideConsoleManager({
 	logLines: modrinthServersConsole.output,
 	sendCommand: (cmd: string) => {
+		if (!canUsePowerActions.value) return
 		try {
 			client.archon.sockets.send(serverId, { event: 'command', cmd })
 		} catch (error) {
@@ -114,7 +130,12 @@ provideConsoleManager({
 		}
 	},
 	showCommandInput: true,
-	disableCommandInput: computed(() => serverPowerState.value !== 'running'),
+	disableCommandInput: computed(
+		() => !canUsePowerActions.value || serverPowerState.value !== 'running',
+	),
+	disableCommandInputTooltip: computed(() =>
+		canUsePowerActions.value ? undefined : permissionDeniedMessage.value,
+	),
 	loading: computed(
 		() =>
 			!isConnected.value ||
@@ -122,6 +143,7 @@ provideConsoleManager({
 			isWsAuthIncorrect.value,
 	),
 	onClear: async () => {
+		if (!canUsePowerActions.value) return
 		modrinthServersConsole.clear()
 		try {
 			await client.kyros.logs_v1.clear()
@@ -129,6 +151,10 @@ provideConsoleManager({
 			console.error('Failed to clear server logs:', error)
 		}
 	},
+	clearDisabled: computed(() => !canUsePowerActions.value),
+	clearDisabledTooltip: computed(() =>
+		canUsePowerActions.value ? undefined : permissionDeniedMessage.value,
+	),
 	shareDisabled: computed(() => !isConnected.value),
 	emptyStateType: 'server',
 	crashAnalysis,

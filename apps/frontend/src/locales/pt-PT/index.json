@@ -8,6 +8,519 @@
   "admin.billing.error.not-found": {
     "message": "Utilizador não encontrado"
   },
+  "analytics.action.add": {
+    "message": "Adicionar"
+  },
+  "analytics.action.cancel": {
+    "message": "Cancelar"
+  },
+  "analytics.action.refresh": {
+    "message": "Atualizar"
+  },
+  "analytics.action.reset": {
+    "message": "Redefinir"
+  },
+  "analytics.breakdown.country": {
+    "message": "País"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "Dependente de"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Projeto dependente"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Tipo de projeto dependente"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Tipo de descarregamento"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Fonte de descarregamento"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Versão do jogo"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Segmentação"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Membro"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetização"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Sem análise detalhada"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projeto"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Estado do projeto"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Versão do projeto"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Segmentação por {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Mostrar tudo"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Mostrar limitado"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Mostrar os 8 principais"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} ativos"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Anotações"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Controlos do gráfico de estatísticas, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Controlos"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Controlos do gráfico de estatísticas"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Visualização"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Eventos do Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Sem eventos do Modrinth no gráfico."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Sem eventos do projeto no gráfico."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Período anterior"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Eventos do projeto"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Rácio"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Seleciona itens da tabela abaixo para visualizares os teus dados."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# evento de estatísticas} other {# eventos de estatísticas}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Ver anúncio"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Ver detalhes das estatísticas monetizadas"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Apenas as visualizações e os descarregamentos efetuados através do Modrinth contam para a monetização, sendo que os descarregamentos exigem que os utilizadores tenham sessão iniciada."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Detalhes das estatísticas monetizadas"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Ant.)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "Mostrar todas as linhas selecionadas da tabela pode degradar o desempenho da página."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Mostrar todas as {count} linhas no gráfico?"
+  },
+  "analytics.chart.table-selection.all": {
+    "message": "A mostrar todos os {itemType, select, project {{count, plural, one {projeto} other {projetos}}} country {{count, plural, one {país} other {países}}} monetization {{count, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{count, plural, one {origem de descarregamento} other {origens de descarregamento}}} downloadReason {{count, plural, one {tipo de descarregamento} other {tipos de descarregamento}}} member {{count, plural, one {membro} other {membros}}} projectVersion {{count, plural, one {versão do projeto} other {versões do projeto}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {versão do jogo} other {versões do jogo}}} other {{count, plural, one {item} other {itens}}}} da tabela"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "A mostrar {count} {itemType, select, project {{count, plural, one {projeto} other {projetos}}} country {{count, plural, one {país} other {países}}} monetization {{count, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{count, plural, one {origem de descarregamento} other {origens de descarregamento}}} downloadReason {{count, plural, one {tipo de descarregamento} other {tipos de descarregamento}}} member {{count, plural, one {membro} other {membros}}} projectVersion {{count, plural, one {versão do projeto} other {versões do projeto}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {versão do jogo} other {versões do jogo}}} other {{count, plural, one {item} other {itens}}}} da tabela"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "A mostrar {limit} {itemType, select, project {{limit, plural, one {projeto} other {projetos}}} country {{limit, plural, one {país} other {países}}} monetization {{limit, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{limit, plural, one {origem de descarregamento} other {origens de descarregamento}}} downloadReason {{limit, plural, one {tipo de descarregamento} other {tipos de descarregamento}}} member {{limit, plural, one {membro} other {membros}}} projectVersion {{limit, plural, one {versão do projeto} other {versões do projeto}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {versão do jogo} other {versões do jogo}}} other {{limit, plural, one {item} other {itens}}}} da tabela"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "A mostrar os {count} principais {itemType, select, project {{count, plural, one {projeto} other {projetos}}} country {{count, plural, one {país} other {países}}} monetization {{count, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{count, plural, one {origem de descarregamento} other {origens de descarregamento}}} downloadReason {{count, plural, one {tipo de descarregamento} other {tipos de descarregamento}}} member {{count, plural, one {membro} other {membros}}} projectVersion {{count, plural, one {versão do projeto} other {versões do projeto}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {versão do jogo} other {versões do jogo}}} other {{count, plural, one {item} other {itens}}}} da tabela"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Dependente de {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} dependente de {dependencyProject}, {version}"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# dia} other {# dias}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# hora} other {# horas}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# minuto} other {# minutos}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Ocultar {name} no gráfico"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Dica do gráfico fixada"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Fixado"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(ant.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Mostrar {name} no gráfico"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Total"
+  },
+  "analytics.chart.view.area": {
+    "message": "Área"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Barras"
+  },
+  "analytics.chart.view.line": {
+    "message": "Linhas"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Dependência"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modpack"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Autónomo"
+  },
+  "analytics.download-reason.update": {
+    "message": "Atualização"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Site do Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "descarregamentos"
+  },
+  "analytics.empty.no-data": {
+    "message": "Nenhum dado disponível"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Nenhum dado disponível para estatísticas"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Nenhum projeto disponível"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Nenhum projeto disponível para estatísticas"
+  },
+  "analytics.empty.select-project": {
+    "message": "Seleciona pelo menos um projeto para veres os dados"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Tipo de versão do jogo"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Todas"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Lançamento"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Pesquisar países..."
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Pesquisar projetos..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Pesquisar origens de descarregamento..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Pesquisar membros..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Pesquisar versões do projeto..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Pesquisar versões..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Descarregamentos ao longo do tempo"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Tempo de jogo ao longo do tempo"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Receita ao longo do tempo"
+  },
+  "analytics.graph.title.views": {
+    "message": "Visualização ao longo do tempo"
+  },
+  "analytics.group-by.1h": {
+    "message": "1 h"
+  },
+  "analytics.group-by.6h": {
+    "message": "6 h"
+  },
+  "analytics.group-by.date": {
+    "message": "Data"
+  },
+  "analytics.group-by.day": {
+    "message": "Dia"
+  },
+  "analytics.group-by.month": {
+    "message": "Mês"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Agrupar por dia"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Agrupar por hora"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Agrupar por mês"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Agrupar por 6 horas"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Agrupar por semana"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Agrupar por ano"
+  },
+  "analytics.group-by.week": {
+    "message": "Semana"
+  },
+  "analytics.group-by.year": {
+    "message": "Ano"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "A obter resultados..."
+  },
+  "analytics.options.loading": {
+    "message": "A carregar..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projeto aprovado"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Projeto definido como privado"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Estado do projeto alterado"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projeto não listado"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} lançada"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Versão submetida"
+  },
+  "analytics.project-status.approved": {
+    "message": "Aprovado"
+  },
+  "analytics.project-status.archived": {
+    "message": "Arquivado"
+  },
+  "analytics.project-status.draft": {
+    "message": "Rascunho"
+  },
+  "analytics.project-status.other": {
+    "message": "Outro"
+  },
+  "analytics.project-status.private": {
+    "message": "Privado"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Rejeitado"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Não listado"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Retido"
+  },
+  "analytics.project.all": {
+    "message": "Todos os projetos"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# projeto} other {# projetos}}"
+  },
+  "analytics.project.icon-alt": {
+    "message": "Ícone de {name}"
+  },
+  "analytics.project.select": {
+    "message": "Selecionar Projetos"
+  },
+  "analytics.project.user": {
+    "message": "Projetos de {username}"
+  },
+  "analytics.project.your": {
+    "message": "Os teus projetos"
+  },
+  "analytics.query.filter.add": {
+    "message": "Adicionar filtro"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Segmentação:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Agrupado por"
+  },
+  "analytics.query.label.project": {
+    "message": "Projeto:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Período:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Descarregamentos"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Apenas as visualizações e os descarregamentos efetuados através do Modrinth são elegíveis para monetização e devem passar pela filtragem de prevenção de fraude. Os descarregamentos da Modrinth App também exigem que o utilizador tenha sessão iniciada. Como todos os projetos têm uma proporção semelhante de descarregamentos monetizados, a tua receita não mudaria significativamente se todos os descarregamentos fossem contabilizados."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Saber mais"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Como funciona a monetização?"
+  },
+  "analytics.stat.playtime": {
+    "message": "Tempo de jogo"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "vs. período ant."
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "vs. ant."
+  },
+  "analytics.stat.revenue": {
+    "message": "Receita"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/D"
+  },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "Estatística indisponível para a consulta atual"
+  },
+  "analytics.stat.views": {
+    "message": "Visualizações"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start} a {end}"
+  },
+  "analytics.table.csv.filename": {
+    "message": "Modrinth Analytics - Segmentação de {breakdown} - {dateRange}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Tempo de jogo (segundos)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "Intervalo selecionado"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# dia} other {# dias}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# hora} other {# horas}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# minuto} other {# minutos}}"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "Nenhuma linha de estatísticas correspondente"
+  },
+  "analytics.table.export-csv": {
+    "message": "Exportar CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Cumulativo"
+  },
+  "analytics.table.export.grouped": {
+    "message": "Agrupado por {groupBy}"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "A mostrar de {start} a {end} de {total}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Pesquisar..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Países acima"
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "Limite de descarregamentos por país"
+  },
+  "analytics.threshold.game-version-downloads-aria": {
+    "message": "Limite de descarregamentos por versão do jogo"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Versões do jogo acima"
+  },
+  "analytics.threshold.project-downloads-aria": {
+    "message": "Limite de descarregamentos do projeto"
+  },
+  "analytics.threshold.project-version-downloads-aria": {
+    "message": "Limite de descarregamentos por versão do projeto"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Versões do projeto acima"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Projetos acima"
+  },
+  "analytics.title": {
+    "message": "Estatísticas"
+  },
+  "analytics.value.monetized": {
+    "message": "Monetizado"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Nenhum"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Descarregado por outros motivos que não o de ser uma dependência"
+  },
+  "analytics.value.none": {
+    "message": "Nenhum"
+  },
+  "analytics.value.other": {
+    "message": "Outro"
+  },
+  "analytics.value.unknown": {
+    "message": "Desconhecido"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Não monetizado"
+  },
   "app-marketing.download.description": {
     "message": "A nossa aplicação para desktop está disponível em todas as plataformas, escolhe a tua versão desejada."
   },
@@ -123,7 +636,7 @@
     "message": "∞ MB"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -218,11 +731,38 @@
   "auth.authorize.authorize-app-name": {
     "message": "Autorizar {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Faltam parâmetros de consulta OAuth obrigatórios."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "Nenhum local de redirecionamento encontrado na resposta"
   },
+  "auth.authorize.errro-title": {
+    "message": "Ocorreu um erro"
+  },
   "auth.authorize.redirect-url": {
     "message": "Serás redirecionado para <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Continuar com {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Requisito de idade"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Concluir registo"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Introduz uma data de nascimento válida. O ano não pode ser 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Data de nascimento inválida"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Data de nascimento"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Seleciona a tua data de nascimento"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Enviar e-mail de recuperação"
@@ -257,50 +797,20 @@
   "auth.reset-password.title.long": {
     "message": "Redefine a tua palavra-passe"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Insere um código de dois fatores para continuar."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Autenticação de dois fatores"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Inserir código..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Esqueceste-te da palavra-passe?</forgot-password-link> • <create-account-link>Criar uma conta</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Iniciar sessão com"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sessão"
   },
-  "auth.sign-in.use-password": {
-    "message": "Ou utiliza uma palavra-passe"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Criar conta"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ao criares uma conta, concordas com os <terms-link>Termos</terms-link> e com a <privacy-policy-link>Política de Privacidade </privacy-policy-link> do Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "As palavras-passe não coincidem!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Já tens uma conta?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Receber novidades sobre o Modrinth por e-mail"
-  },
   "auth.sign-up.title": {
     "message": "Criar conta"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Ou cria uma conta tu mesmo"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Criar conta com"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Definições de conta"
@@ -331,21 +841,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verificar E-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Receber novidades sobre o Modrinth por e-mail"
-  },
-  "auth.welcome.description": {
-    "message": "Agora fazes parte da incrível comunidade de criadores e exploradores que criam, transferem e se mantêm atualizados com mods fantásticos."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Ao criares uma conta, concordas com os <terms-link>Termos</terms-link> e com a <privacy-policy-link>Política de Privacidade </privacy-policy-link> do Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Bem-vindo(a) ao Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Boas-vindas"
   },
   "collection.button.edit-icon": {
     "message": "Editar ícone"
@@ -434,20 +929,11 @@
   "create.collection.title": {
     "message": "Criar uma coleção"
   },
-  "create.limit-alert.approaching-limit": {
-    "message": "A alcançar o limite de {typePlural} ({current}/{max})"
-  },
   "create.limit-alert.approaching-limit-description": {
     "message": "Estás prestes a atingir o limite de {typePlural}, por favor contacta o suporte se precisas de mais do que {max} {typePlural}."
   },
   "create.limit-alert.contact-support": {
     "message": "Contacta o suporte"
-  },
-  "create.limit-alert.limit-reached": {
-    "message": "limite de {typePlural} atingido"
-  },
-  "create.limit-alert.limit-reached-description": {
-    "message": "Atingiste o teu limite de {typePlural} de {max}. Por favor contacta o suporte para aumentar o teu limite."
   },
   "create.limit-alert.type-collection": {
     "message": "coleção"
@@ -878,18 +1364,6 @@
   "dashboard.projects.links.wiki-page.label": {
     "message": "Página da Wiki"
   },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nome"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tipo"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ícone"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
@@ -1165,9 +1639,6 @@
   },
   "frog.title": {
     "message": "Sapo"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "Disponível na América do Norte, Europa e Ásia Sudeste para uma cobertura extensa."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Pagar mensalmente"
@@ -1712,9 +2183,6 @@
   "layout.nav.discover": {
     "message": "Descobrir"
   },
-  "layout.nav.discover-content": {
-    "message": "Descobrir conteúdo"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Obter a Modrinth App"
   },
@@ -2030,105 +2498,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Confirme o endereço da carteira. Fundos enviados para um endereço errado não podem ser recuperados."
   },
-  "profile.bio.fallback.creator": {
-    "message": "Um criador Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Um utilizador Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Gerir faturação do utilizador"
-  },
-  "profile.button.edit-role": {
-    "message": "Editar cargo"
-  },
-  "profile.button.info": {
-    "message": "Ver detalhes de utilizador"
-  },
-  "profile.button.manage-projects": {
-    "message": "Gerir projetos"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remover como afiliado"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Definir como afiliado"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Fornecedores de Autenticação"
-  },
-  "profile.details.label.email": {
-    "message": "E-mail"
-  },
-  "profile.details.label.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.details.label.has-password": {
-    "message": "Tem password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Tem TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Métodos de pagamento"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "E-mail não verificado"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.error.not-found": {
-    "message": "Utilizador não encontrado"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliado"
-  },
-  "profile.label.badges": {
-    "message": "Emblemas"
-  },
-  "profile.label.collection": {
-    "message": "Coleção"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {transferência} other {transferências}}"
-  },
-  "profile.label.joined": {
-    "message": "Entrou"
-  },
-  "profile.label.no-collections": {
-    "message": "Este utilizador não tem coleções!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Não tens nenhuma coleção.\nQueres <create-link>criar uma</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Este utilizador não tem projetos!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Não tens nenhum projeto.\nQueres <create-link>criar um</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizações"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural,one {projeto} other {projetos}}"
-  },
-  "profile.label.saving": {
-    "message": "A guardar..."
-  },
-  "profile.meta.description": {
-    "message": "Transfere os projetos de {username} no Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Transfere os projetos de {username} no Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> seguidor do projeto} other {<stat>{count}</stat> seguidores do projeto}}"
-  },
-  "profile.user-id": {
-    "message": "ID do utilizador: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Falha a rejeitar o convite de equipa"
   },
@@ -2243,24 +2612,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Criado {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licenciado {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publicado {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Enviado {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalhes"
-  },
-  "project.about.details.updated": {
-    "message": "Atualizado {date}"
-  },
   "project.actions.create-server": {
     "message": "Criar um servidor"
   },
@@ -2291,47 +2642,14 @@
   "project.description.title": {
     "message": "Descrição"
   },
-  "project.details.licensed": {
-    "message": "Licenciado"
-  },
-  "project.download.game-version": {
-    "message": "Versão do jogo: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Erro: nenhuma versão do jogo encontrada"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} apenas está disponível para {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} não suporta {gameVersion} para {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Instala com a Modrinth App"
   },
   "project.download.no-app": {
     "message": "Não tens a Modrinth App?"
   },
-  "project.download.no-versions-available": {
-    "message": "Nenhuma versão disponível para {gameVersion} e {platform}."
-  },
-  "project.download.platform": {
-    "message": "Plataforma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Erro: nenhuma plataforma encontrada"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} apenas está disponível para {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} não suporta {platform} para {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Procurar versões do jogo..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "Procurar versões do jogo..."
   },
   "project.download.select-game-version": {
     "message": "Selecionar versão do jogo"
@@ -2374,15 +2692,6 @@
   },
   "project.gallery.title": {
     "message": "Galeria"
-  },
-  "project.license.error": {
-    "message": "Não foi possível obter o texto da licença."
-  },
-  "project.license.loading": {
-    "message": "A carregar texto da licença..."
-  },
-  "project.license.title": {
-    "message": "Licença"
   },
   "project.moderation.title": {
     "message": "Moderação"
@@ -2453,12 +2762,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visitar o painel de projetos"
   },
-  "project.stats.downloads-label": {
-    "message": "transferência{count, plural,one { } other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "seguidor{count, plural, one {} other {es}}"
-  },
   "project.status.archived.message": {
     "message": "{title} foi arquivado. {title} não receberá mais atualizações, a menos que o autor decida desarquivar o projeto."
   },
@@ -2468,23 +2771,11 @@
   "report.already-reported": {
     "message": "Já denunciaste {title}"
   },
-  "report.already-reported-description": {
-    "message": "Já tens uma denúnia aberta para est{item, select,project {e projeto} version {a versão} user {e utilizador} other {e conteúdo}}. Podes adicionar mais detalhes à tua denúncia se tiveres mais informações."
-  },
-  "report.back-to-item": {
-    "message": "Voltar para {item, select,project {projeto} version {versão} user {utilizador} other {conteúdo}}"
-  },
   "report.body.description": {
     "message": "Inclui links e imagens se possível e relevante. Denúncias vazias ou insuficientes vão ser fechadas e ignoradas."
   },
   "report.body.title": {
     "message": "Por favor fornece contexto adicional sobre a tua denúncia"
-  },
-  "report.checking": {
-    "message": "Verificando {item, select,project {projeto} version {versão} user {utilizador} other {conteúdo}}..."
-  },
-  "report.could-not-find": {
-    "message": "Não foi possível encontrar {item, select,project {o projeto} version {a versão} user {o utilizador} other {o conteúdo}}"
   },
   "report.for.violation": {
     "message": "Violação das <rules-link>Regras</rules-link> ou <terms-link>Termos de Uso</terms-link> do Modrinth"
@@ -2525,14 +2816,8 @@
   "report.please-report": {
     "message": "Por favor denuncia:"
   },
-  "report.question.content-id": {
-    "message": "Qual é o ID d{item, select,project {o projeto} version {a versão} user {o utilizador} other {o conteúdo}}?"
-  },
   "report.question.content-type": {
     "message": "Que tipo de conteúdo estás a denunciar?"
-  },
-  "report.question.report-reason": {
-    "message": "Qual das regras do Modrinth est{item, select,project {e projeto} version {a versão} user {e utilizador} other {e conteúdo}} está a violar?"
   },
   "report.report-content": {
     "message": "Denunciar conteúdo aos moderadores"
@@ -2645,26 +2930,14 @@
   "scopes.organizationWrite.label": {
     "message": "Editar organizações"
   },
-  "scopes.patCreate.description": {
-    "message": "Criar tokens de API pessoais"
-  },
   "scopes.patCreate.label": {
     "message": "Criar TAPs"
-  },
-  "scopes.patDelete.description": {
-    "message": "Apaga os teu tokens de API pessoais"
   },
   "scopes.patDelete.label": {
     "message": "Apagar TAPs"
   },
-  "scopes.patRead.description": {
-    "message": "Ver tokens API criados"
-  },
   "scopes.patRead.label": {
     "message": "Ler TAPs"
-  },
-  "scopes.patWrite.description": {
-    "message": "Criar tokens de API pessoais"
   },
   "scopes.patWrite.label": {
     "message": "Editar TAPs"
@@ -3077,23 +3350,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Adicionar um endereço de redirecionamento"
   },
-  "settings.applications.button.cancel": {
-    "message": "Cancelar"
-  },
   "settings.applications.button.create": {
     "message": "Criar app"
   },
   "settings.applications.button.delete": {
     "message": "Apagar"
   },
-  "settings.applications.button.edit": {
-    "message": "Editar"
-  },
   "settings.applications.button.new": {
     "message": "Nova aplicação"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Guardar alterações"
   },
   "settings.applications.button.upload-icon": {
     "message": "Carregar ícone"
@@ -3167,14 +3431,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre esta aplicação"
   },
-  "settings.authorizations.by": {
-    "message": "por"
-  },
   "settings.authorizations.description": {
     "message": "Quando autorizas uma aplicação com a tua conta Modrinth, dás-lhe acesso à tua conta. Podes gerir e rever acesso à tua conta aqui quando quiseres."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Neste momento, não conseguimos mostrar as tuas aplicações autorizadas, estamos a tentar corrigir isto. Por favor tenta novamente mais tarde!"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
@@ -3209,14 +3467,8 @@
   "settings.billing.interval.month": {
     "message": "mês"
   },
-  "settings.billing.interval.monthly": {
-    "message": "mensal"
-  },
   "settings.billing.interval.year": {
     "message": "ano"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "anual"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Navegação sem anúncios em modrinth.com e Modrinth App"
@@ -3302,9 +3554,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPUs partilhadas (Reforço até {bursts} CPUs)"
   },
@@ -3364,12 +3613,6 @@
   },
   "settings.billing.subscription.title": {
     "message": "Subscrições"
-  },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Alterando para {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Alterar para {interval}"
   },
   "settings.billing.update-method": {
     "message": "Atualizar método"
@@ -3523,27 +3766,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
-  },
-  "settings.profile.bio.description": {
-    "message": "Uma breve descrição para que todos possam saber mais sobre ti."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biografia"
-  },
-  "settings.profile.description": {
-    "message": "As informações do teu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Definições do perfil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informação do perfil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Imagem do perfil"
-  },
-  "settings.profile.username.description": {
-    "message": "Um nome único sem distinção de maiúsculas de minúsculas para identificar o teu perfil."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revogar sessão"

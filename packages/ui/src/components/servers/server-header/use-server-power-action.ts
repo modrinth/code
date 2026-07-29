@@ -1,6 +1,7 @@
 import { computed, type Ref } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -15,6 +16,7 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { serverId, server, powerState, isSyncingContent, busyReasons } =
 		injectModrinthServerContext()
 	const { addNotification } = injectNotificationManager()
+	const { canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
 
 	const isInstalling = computed(
 		() =>
@@ -34,20 +36,27 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const showStopSplit = computed(() => isRunning.value || isStarting.value || isStopping.value)
 	const showRestartButton = computed(() => isRunning.value || isStarting.value)
 
-	const isBlockedByPropsOrBusy = computed(
-		() => Boolean(options?.disabled?.value) || busyReasons.value.length > 0,
+	const isBlockedByPropsBusyOrPermission = computed(
+		() =>
+			!canUsePowerActions.value ||
+			Boolean(options?.disabled?.value) ||
+			busyReasons.value.length > 0,
 	)
 
 	const busyTooltip = computed(() => {
+		if (!canUsePowerActions.value) return permissionDeniedMessage.value
 		if (isStarting.value) return 'Your server is starting'
 		return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
 	})
 
-	const canTakeAction = computed(() => !isTransitioning.value && !isBlockedByPropsOrBusy.value)
+	const canTakeAction = computed(
+		() => !isTransitioning.value && !isBlockedByPropsBusyOrPermission.value,
+	)
 
 	const canKill = computed(
 		() =>
-			!isBlockedByPropsOrBusy.value && (isStopping.value || isRunning.value || isStarting.value),
+			!isBlockedByPropsBusyOrPermission.value &&
+			(isStopping.value || isRunning.value || isStarting.value),
 	)
 
 	const primaryActionText = computed(() => {

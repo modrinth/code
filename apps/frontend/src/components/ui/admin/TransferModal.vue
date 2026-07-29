@@ -198,6 +198,7 @@ import {
 	ButtonStyled,
 	Chips,
 	Combobox,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
@@ -207,13 +208,12 @@ import {
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
-
 const emit = defineEmits<{
 	success: []
 }>()
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 
@@ -341,12 +341,12 @@ const submitDisabled = computed(() => {
 async function ensureOverview() {
 	if (regions.value.length || nodeHostnames.value.length) return
 	try {
-		const data = await useServersFetch<any>('/nodes/overview', { version: 'internal' })
-		regions.value = (data.regions || []).map((r: any) => ({
+		const data = await client.archon.nodes_internal.overview()
+		regions.value = data.regions.map((r) => ({
 			value: r.key,
 			label: `${r.display_name} (${r.key})`,
 		}))
-		nodeHostnames.value = data.node_hostnames || []
+		nodeHostnames.value = data.node_hostnames
 		if (!selectedRegion.value && regions.value.length) {
 			selectedRegion.value = regions.value[0].value
 		}
@@ -364,30 +364,22 @@ async function submit() {
 			scheduleOption.value === 'now' ? undefined : dayjs(scheduledDate.value).toISOString()
 
 		if (mode.value === 'servers') {
-			await useServersFetch('/transfers/schedule/servers', {
-				version: 'internal',
-				method: 'POST',
-				body: {
-					server_ids: parsedServerIds.value,
-					scheduled_at: scheduledAt,
-					target_region: selectedRegion.value || undefined,
-					node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
-					reason: reason.value.trim(),
-				},
+			await client.archon.transfers_internal.scheduleServers({
+				server_ids: parsedServerIds.value,
+				scheduled_at: scheduledAt,
+				target_region: selectedRegion.value || undefined,
+				node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
+				reason: reason.value.trim(),
 			})
 		} else {
-			await useServersFetch('/transfers/schedule/nodes', {
-				version: 'internal',
-				method: 'POST',
-				body: {
-					node_hostnames: selectedNodes.value.slice(),
-					scheduled_at: scheduledAt,
-					target_region: selectedRegion.value || undefined,
-					node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
-					reason: reason.value.trim(),
-					cordon_nodes: cordonNodes.value,
-					tag_nodes: tagNodes.value.trim() || undefined,
-				},
+			await client.archon.transfers_internal.scheduleNodes({
+				node_hostnames: selectedNodes.value.slice(),
+				scheduled_at: scheduledAt,
+				target_region: selectedRegion.value || undefined,
+				node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
+				reason: reason.value.trim(),
+				cordon_nodes: cordonNodes.value,
+				tag_nodes: tagNodes.value.trim() || undefined,
 			})
 		}
 

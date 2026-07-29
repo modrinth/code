@@ -1,12 +1,12 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Se requiere una descripción que explique claramente el propósito y la función del proyecto."
+    "defaultMessage": "Se requiere una descripción que describa claramente el propósito y la función del proyecto."
   },
   "nags.add-description.title": {
     "defaultMessage": "Añadir una descripción"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Añadir un icono único, relevante y atractivo hace que tu proyecto sea identificable y ayuda a que destaque."
+    "defaultMessage": "Añadir un icono único, relevante y atractivo hace que tu proyecto sea identificable y lo ayuda a destacar."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Añadir un icono"
@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Añadir enlaces externos"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "Has elegido todos los idiomas. Por favor elige solo a los que tu servidor de soporte activamente."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correspondientes"
+  },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Has seleccionado todas las {totalAvailableTags, plural, one {# etiqueta disponible} other {# etiquetas disponibles}}. Esto anula el propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
+    "defaultMessage": "Has seleccionado {totalAvailableTags, plural, one {la única etiqueta disponible} other {todas las # etiquetas disponibles}}. Esto anula el propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
@@ -66,16 +72,16 @@
     "defaultMessage": "Visitar la página de la galería"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Tu {type, select, mod {mod} plugin {plugin} other {proyecto}} utiliza una licencia que requiere que el código fuente esté de libre acceso. Por favor, proporciona un enlace al código fuente o un archivo(s) para cada versión adicional, o considera usar una licencia diferente."
+    "defaultMessage": "Tu {type} utiliza una licencia que requiere que el código fuente esté disponible. Proporciona un enlace al código fuente o un archivo de fuentes para cada versión adicional, o considera la posibilidad de utilizar una licencia diferente."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Proporcionar el código fuente"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado"
+    "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Enlaces idénticos"
+    "defaultMessage": "Limpiar links idénticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Tu Descripción debe contener suficiente texto sin formato o texto alternativo para imágenes, de modo que sea accesible para quienes utilizan lectores de pantalla o tienen conexiones lentas a Internet."
@@ -140,6 +146,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecciona la resolución correcta"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Asegúrate de haber proporcionado prueba de que cuentas con permiso para distribuir cualquier contenido externo en tu modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Revisar los permisos externos"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Selecciona qué versiones admite tu servidor, elige un Modpack o carga el tuyo propio."
   },
@@ -159,7 +171,7 @@
     "defaultMessage": "Selecciona un idioma"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selecciona la licencia bajo la que se distribuye tu {type, select, mod {mod} modpack {modpack} resourcepack {datapack} shader {shader} plugin {plugin} datapack {paquete de datos} other {proyecto}}."
+    "defaultMessage": "Seleccione la licencia bajo la cual se distribuye su {type}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Seleccionar una licencia"
@@ -181,6 +193,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Visitar la configuración de enlaces"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visitar el panel de proyectos"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Visitar la configuración de etiquetas"
@@ -207,10 +222,16 @@
     "defaultMessage": "Expandir el resumen"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el cargador se muestra automáticamente junto a tu proyecto."
+    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el loader se muestra automáticamente junto a tu proyecto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpiar el nombre"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Has seleccionado {languageCount, plural, one {# language} other {# languages}}. Por favor elige solo a los que tu servidor de soporte activamente."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correspondientes"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Por favor, redúcelas a {maxTagCount} o menos para que tu servidor aparezca en los resultados de búsqueda relevantes."
@@ -225,7 +246,10 @@
     "defaultMessage": "Selecciona etiquetas precisas"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type, select, resourcepack {paquete de recursos, excepto para paquetes de audio o de traducción. Si esto describe tu paquete, selecciona la etiqueta correspondiente} shader {shader} other {proyecto}}."
+    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pack de recursos, excepto para audio o packs de localización. Si esto describe tu pack, por favor, seleccionar la etiqueta apropiada"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

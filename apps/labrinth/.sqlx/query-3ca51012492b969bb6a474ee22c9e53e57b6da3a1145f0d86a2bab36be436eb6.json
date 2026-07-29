@@ -1,0 +1,185 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "raw_avatar_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "bio",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "role",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "badges",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "campaign_pride_26_last_donated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "campaign_pride_26_total_amount_donated_usd",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 11,
+        "name": "github_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "discord_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "gitlab_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 14,
+        "name": "google_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 15,
+        "name": "steam_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "microsoft_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "email_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 18,
+        "name": "password",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
+        "name": "totp_secret",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 20,
+        "name": "paypal_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 21,
+        "name": "paypal_country",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 22,
+        "name": "paypal_email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 23,
+        "name": "venmo_handle",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 24,
+        "name": "stripe_customer_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 25,
+        "name": "allow_friend_requests",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 26,
+        "name": "is_subscribed_to_newsletter",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 27,
+        "name": "eligibility_verified_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      null,
+      null,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "3ca51012492b969bb6a474ee22c9e53e57b6da3a1145f0d86a2bab36be436eb6"
+}
