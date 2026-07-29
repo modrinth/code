@@ -79,9 +79,10 @@ pub async fn init_client_with_database(
                 ip IPv6,
                 country String,
                 user_agent String,
-                headers Array(Tuple(String, String))
+                headers Array(Tuple(String, String)) DEFAULT [] TTL toDateTime(recorded) + INTERVAL 60 DAY
             )
             ENGINE = {engine}
+            PARTITION BY toYYYYMM(recorded)
             {ttl}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
@@ -106,9 +107,10 @@ pub async fn init_client_with_database(
                 ip IPv6,
                 country String,
                 user_agent String,
-                headers Array(Tuple(String, String))
+                headers Array(Tuple(String, String)) DEFAULT [] TTL toDateTime(recorded) + INTERVAL 60 DAY
             )
             ENGINE = {engine}
+            PARTITION BY toYYYYMM(recorded)
             {ttl}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
@@ -134,6 +136,7 @@ pub async fn init_client_with_database(
                 parent UInt64
             )
             ENGINE = {engine}
+            PARTITION BY toYYYYMM(recorded)
             {ttl}
             PRIMARY KEY (project_id, recorded, user_id)
             SETTINGS index_granularity = 8192
@@ -156,9 +159,10 @@ pub async fn init_client_with_database(
                 ip IPv6,
                 country String,
                 user_agent String,
-                headers Array(Tuple(String, String))
+                headers Array(Tuple(String, String)) DEFAULT [] TTL toDateTime(recorded) + INTERVAL 60 DAY
             )
             ENGINE = {engine}
+            PARTITION BY toYYYYMM(recorded)
             {ttl}
             PRIMARY KEY (affiliate_code_id, recorded)
             SETTINGS index_granularity = 8192
@@ -184,6 +188,7 @@ pub async fn init_client_with_database(
                 players_max Nullable(Int32)
             )
             ENGINE = {engine}
+            PARTITION BY toYYYYMM(recorded)
             {ttl}
             PRIMARY KEY (project_id, recorded)
             SETTINGS index_granularity = 8192
@@ -203,6 +208,7 @@ pub async fn init_client_with_database(
                 minecraft_uuid UUID
             )
             ENGINE = {engine}
+            PARTITION BY toYYYYMM(recorded)
             {ttl}
             PRIMARY KEY (project_id, recorded)
             SETTINGS index_granularity = 8192
