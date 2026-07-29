@@ -566,6 +566,9 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "world"
   },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "Installation settings"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
   },
