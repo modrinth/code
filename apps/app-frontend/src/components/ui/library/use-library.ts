@@ -550,7 +550,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 					.filter((instance) => selectedNewGroupInstanceIds.value.has(instance.id))
 					.map((instance) =>
 						edit(instance.id, {
-							group_ids: [group.id],
+							group_ids: [...instance.group_ids, group.id],
 						}),
 					),
 			)

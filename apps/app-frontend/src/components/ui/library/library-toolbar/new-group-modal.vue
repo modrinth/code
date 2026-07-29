@@ -70,13 +70,7 @@
 						<button @click="toggleNewGroupInstance(instance.id)">
 							<CheckIcon v-if="selectedNewGroupInstanceIds.has(instance.id)" />
 							{{
-								selectedNewGroupInstanceIds.has(instance.id)
-									? instance.group_ids.length > 0
-										? 'Moved'
-										: 'Added'
-									: instance.group_ids.length > 0
-										? 'Move'
-										: 'Add'
+								selectedNewGroupInstanceIds.has(instance.id) ? 'Added' : 'Add'
 							}}
 						</button>
 					</ButtonStyled>
