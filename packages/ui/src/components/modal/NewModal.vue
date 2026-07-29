@@ -5,7 +5,8 @@
 				:class="{ shown: visible }"
 				class="tauri-overlay"
 				data-tauri-drag-region
-				@click="() => (closeOnClickOutside && closable ? hide() : {})"
+				@pointerdown="onTauriOverlayPointerDown"
+				@click="onTauriOverlayClick"
 			/>
 			<div
 				:class="[
@@ -217,6 +218,30 @@ const props = withDefaults(
 )
 
 const effectiveNoblur = computed(() => props.noblur ?? modalBehavior?.noblur.value ?? false)
+
+const TAURI_DRAG_THRESHOLD_PX = 4
+let tauriPointerScreen: { x: number; y: number } | null = null
+
+function onTauriOverlayPointerDown(event: PointerEvent) {
+	if (event.button !== 0) {
+		return
+	}
+	tauriPointerScreen = { x: event.screenX, y: event.screenY }
+}
+
+function onTauriOverlayClick(event: MouseEvent) {
+	const start = tauriPointerScreen
+	tauriPointerScreen = null
+	if (
+		start &&
+		Math.hypot(event.screenX - start.x, event.screenY - start.y) >= TAURI_DRAG_THRESHOLD_PX
+	) {
+		return
+	}
+	if (props.closeOnClickOutside && props.closable && !props.disableClose) {
+		hide()
+	}
+}
 
 const computedFade = computed(() => {
 	if (props.fade) return props.fade
