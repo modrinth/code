@@ -20,7 +20,7 @@ const baseClasses = [
 ].join(' ')
 
 const sizeClasses: Record<ButtonSize, string> = {
-	sm: 'h-6 gap-1 rounded-lg px-1.5 text-sm font-semibold leading-5 [&>svg]:size-4 [&>svg]:min-h-4 [&>svg]:min-w-4 [&>svg]:shrink-0',
+	sm: 'h-8 gap-1 rounded-lg px-1.5 text-sm font-semibold leading-5 [&>svg]:size-4 [&>svg]:min-h-4 [&>svg]:min-w-4 [&>svg]:shrink-0',
 	default:
 		'h-9 gap-1.5 rounded-xl px-2.5 text-base font-semibold leading-5 [&>svg]:size-5 [&>svg]:min-h-5 [&>svg]:min-w-5 [&>svg]:shrink-0',
 	md: 'h-10 gap-2 rounded-[14px] px-4 text-base font-semibold leading-5 [&>svg]:size-5 [&>svg]:min-h-5 [&>svg]:min-w-5 [&>svg]:shrink-0',
@@ -28,7 +28,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 }
 
 const iconOnlySizeClasses: Record<ButtonSize, string> = {
-	sm: 'w-6 px-0',
+	sm: 'w-8 px-0',
 	default: 'w-9 px-0',
 	md: 'w-10 px-0',
 	lg: 'w-12 px-0',

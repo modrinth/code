@@ -1,5 +1,4 @@
 export { default as Button } from './Button.vue'
-export { default as ButtonFrame } from './ButtonFrame.vue'
 export { default as ButtonGroup } from './ButtonGroup.vue'
 export { default as ButtonLink } from './ButtonLink.vue'
 export { default as FileButton } from './FileButton.vue'

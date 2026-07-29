@@ -24,7 +24,6 @@ const props = withDefaults(
 		iconOnly?: boolean
 		placement?: TeleportPlacement
 		panelRole?: 'dialog' | 'region'
-		focusOnOpen?: boolean
 	}>(),
 	{
 		type: 'base',
@@ -33,7 +32,6 @@ const props = withDefaults(
 		iconOnly: false,
 		placement: 'bottom-end',
 		panelRole: 'dialog',
-		focusOnOpen: true,
 	},
 )
 
@@ -66,10 +64,10 @@ async function openMenu() {
 	if (props.disabled || isOpen.value) return
 	await open()
 	emit('open')
-	if (props.focusOnOpen) await nextTick(focusPanel)
+	await nextTick(focusPanel)
 }
 
-function closeMenu(restoreFocus = false) {
+function closeMenu(restoreFocus = true) {
 	if (!isOpen.value) return
 	close(restoreFocus)
 }
@@ -77,6 +75,12 @@ function closeMenu(restoreFocus = false) {
 async function toggleMenu() {
 	if (isOpen.value) closeMenu()
 	else await openMenu()
+}
+
+function handleTriggerKeydown(event: KeyboardEvent) {
+	if (event.key !== 'Escape' || !isOpen.value) return
+	event.preventDefault()
+	closeMenu()
 }
 
 function handlePanelKeydown(event: KeyboardEvent) {
@@ -98,15 +102,15 @@ defineExpose({ open: openMenu, close: closeMenu })
 		ref="triggerButton"
 		v-bind="$attrs"
 		:label="props.iconOnly ? props.label : undefined"
-		:aria-label="props.iconOnly ? undefined : props.label"
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
 		:disabled="props.disabled"
 		:aria-expanded="isOpen"
 		:aria-controls="panelId"
-		aria-haspopup="dialog"
+		:aria-haspopup="props.panelRole === 'dialog' ? 'dialog' : undefined"
 		@click="toggleMenu"
+		@keydown="handleTriggerKeydown"
 	>
 		<slot name="trigger" />
 	</component>

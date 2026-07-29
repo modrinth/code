@@ -1,25 +1,28 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { type RouteLocationRaw, RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonColor, ButtonSize, ButtonType } from './types'
+import type {
+	ButtonColor,
+	ButtonLinkDestination,
+	ButtonSize,
+	ButtonType,
+} from './types'
+
+type ButtonLinkProps = ButtonLinkDestination & {
+	type?: ButtonType
+	color?: ButtonColor
+	size?: ButtonSize
+	target?: string
+	rel?: string
+	download?: string | boolean
+	disabled?: boolean
+}
 
 const props = withDefaults(
-	defineProps<{
-		to?: RouteLocationRaw
-		href?: string
-		type?: ButtonType
-		color?: ButtonColor
-		size?: ButtonSize
-		target?: string
-		rel?: string
-		download?: string | boolean
-		disabled?: boolean
-	}>(),
+	defineProps<ButtonLinkProps>(),
 	{
-		to: undefined,
-		href: undefined,
 		type: 'base',
 		size: 'default',
 		target: undefined,
@@ -55,6 +58,7 @@ function handleClick(event: MouseEvent) {
 		:rel="resolvedRel"
 		:download="!props.disabled ? props.download : undefined"
 		:aria-disabled="props.disabled || undefined"
+		:role="props.disabled ? 'link' : undefined"
 		:tabindex="props.disabled ? -1 : undefined"
 		@click="handleClick"
 	>

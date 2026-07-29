@@ -50,10 +50,10 @@ const typeahead = ref('')
 let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
 
 const visibleOptions = computed(() => props.options.filter((option) => option.shown !== false))
-const interactiveOptions = computed(() =>
+const menuOptions = computed(() =>
 	visibleOptions.value.filter(
 		(option): option is OverflowMenuAction | OverflowMenuLink =>
-			option.type !== 'divider' && !option.disabled,
+			option.type !== 'divider',
 	),
 )
 
@@ -82,9 +82,7 @@ function isLink(option: OverflowMenuOption): option is OverflowMenuLink {
 function getMenuItems() {
 	if (!panelElement.value) return []
 	return Array.from(
-		panelElement.value.querySelectorAll<HTMLElement>(
-			'[role="menuitem"]:not([disabled]):not([aria-disabled="true"])',
-		),
+		panelElement.value.querySelectorAll<HTMLElement>('[role="menuitem"]'),
 	)
 }
 
@@ -124,7 +122,7 @@ function handleAction(option: OverflowMenuAction, event: MouseEvent) {
 	if (option.disabled) return
 	option.action(event)
 	emit('select', option)
-	if (!option.remainOpen) closeMenu()
+	if (!option.remainOpen) closeMenu(true)
 }
 
 function handleLink(option: OverflowMenuLink, event: MouseEvent) {
@@ -134,6 +132,13 @@ function handleLink(option: OverflowMenuLink, event: MouseEvent) {
 	}
 	emit('select', option)
 	if (!option.remainOpen) closeMenu()
+}
+
+function handleLinkKeydown(option: OverflowMenuLink, event: KeyboardEvent) {
+	if (event.key !== ' ') return
+	event.preventDefault()
+	if (option.disabled) return
+	;(event.currentTarget as HTMLElement).click()
 }
 
 function handleMenuKeydown(event: KeyboardEvent) {
@@ -162,15 +167,32 @@ function handleMenuKeydown(event: KeyboardEvent) {
 			closeMenu(true)
 			break
 		case 'Tab':
+			triggerElement.value?.focus()
 			closeMenu()
 			break
 		default: {
-			if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey) return
-			typeahead.value += event.key.toLocaleLowerCase()
-			const match = interactiveOptions.value.findIndex((option) =>
-				option.label.toLocaleLowerCase().startsWith(typeahead.value),
+			if (
+				event.key === ' ' ||
+				event.key.length !== 1 ||
+				event.ctrlKey ||
+				event.metaKey ||
+				event.altKey
 			)
-			if (match >= 0) focusItem(match)
+				return
+
+			const character = event.key.toLocaleLowerCase()
+			const query = typeahead.value === character ? character : `${typeahead.value}${character}`
+			const startIndex = query.length === 1 ? selectedIndex.value + 1 : 0
+			typeahead.value = query
+
+			for (let offset = 0; offset < menuOptions.value.length; offset++) {
+				const index = (startIndex + offset) % menuOptions.value.length
+				if (menuOptions.value[index]?.label.toLocaleLowerCase().startsWith(query)) {
+					focusItem(index)
+					break
+				}
+			}
+
 			if (typeaheadTimer) clearTimeout(typeaheadTimer)
 			typeaheadTimer = setTimeout(() => {
 				typeahead.value = ''
@@ -237,7 +259,9 @@ defineExpose({ open: openMenu, close: closeMenu })
 						:to="option.to"
 						:class="[menuItemClasses, option.tone === 'red' ? 'text-red [&>svg]:text-red' : '']"
 						role="menuitem"
+						tabindex="-1"
 						@click="handleLink(option, $event)"
+						@keydown="handleLinkKeydown(option, $event)"
 						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
 					>
 						<slot :name="option.id" :option="option">
@@ -254,10 +278,11 @@ defineExpose({ open: openMenu, close: closeMenu })
 						:rel="option.rel ?? (option.target === '_blank' ? 'noopener noreferrer' : undefined)"
 						:download="option.download"
 						:aria-disabled="option.disabled || undefined"
-						:tabindex="option.disabled ? -1 : undefined"
 						:class="[menuItemClasses, option.tone === 'red' ? 'text-red [&>svg]:text-red' : '']"
 						role="menuitem"
+						tabindex="-1"
 						@click="handleLink(option, $event)"
+						@keydown="handleLinkKeydown(option, $event)"
 						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
 					>
 						<slot :name="option.id" :option="option">
@@ -270,9 +295,10 @@ defineExpose({ open: openMenu, close: closeMenu })
 						v-else
 						v-tooltip="option.tooltip"
 						type="button"
-						:disabled="option.disabled"
+						:aria-disabled="option.disabled || undefined"
 						:class="[menuItemClasses, option.tone === 'red' ? 'text-red [&>svg]:text-red' : '']"
 						role="menuitem"
+						tabindex="-1"
 						@click="handleAction(option, $event)"
 						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
 					>
