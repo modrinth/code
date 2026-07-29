@@ -224,7 +224,7 @@ let tauriPointerScreen: { x: number; y: number } | null = null
 
 function onTauriOverlayPointerDown(event: PointerEvent) {
 	if (event.button !== 0) {
-	    return
+		return
 	}
 	tauriPointerScreen = { x: event.screenX, y: event.screenY }
 }
