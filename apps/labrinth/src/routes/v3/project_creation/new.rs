@@ -4,9 +4,10 @@ use eyre::eyre;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 use crate::{
-    auth::get_user_from_headers,
+    auth::{get_user_from_headers, require_verified_email},
     database::{
         PgPool,
         models::{
@@ -14,7 +15,6 @@ use crate::{
             project_item::ProjectBuilder, thread_item::ThreadBuilder,
             version_item::VersionBuilder,
         },
-        redis::RedisPool,
     },
     file_hosting::FileHost,
     models::{
@@ -139,6 +139,8 @@ pub async fn create(
     )
     .await
     .map_err(ApiError::from)?;
+
+    require_verified_email(&user)?;
 
     let limits = UserLimits::get_for_projects(&user, &db)
         .await

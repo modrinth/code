@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url'
 import type { StorybookConfig } from '@storybook/vue3-vite'
 import { mergeConfig } from 'vite'
 
+const storybookDirectory = path.dirname(fileURLToPath(import.meta.url))
+
 const config: StorybookConfig = {
 	framework: {
 		name: '@storybook/vue3-vite',
@@ -14,6 +16,9 @@ const config: StorybookConfig = {
 	addons: ['@storybook/addon-themes', '@storybook/addon-a11y'],
 	viteFinal: async (config) =>
 		mergeConfig(config, {
+			build: {
+				reportCompressedSize: false,
+			},
 			resolve: {
 				alias: {
 					'@modrinth/api-client': fileURLToPath(

@@ -560,9 +560,6 @@
   "settings.language.title": {
     "defaultMessage": "Kieli"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Julkinen profiili"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Istunnot"
   },
@@ -570,4 +567,3 @@
     "defaultMessage": "Sinulla on tallentamattomia muutoksia."
   }
 }
-

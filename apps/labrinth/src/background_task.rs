@@ -2,7 +2,6 @@ use crate::database;
 use crate::database::PgPool;
 use crate::database::models::ids::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::NotificationBody;
 use crate::queue::analytics::cache::cache_analytics;
@@ -19,7 +18,8 @@ use crate::util::anrok;
 use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
-use tracing::info;
+use tracing::{info, instrument};
+use xredis::RedisPool;
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
@@ -50,6 +50,7 @@ pub enum BackgroundTask {
 
 impl BackgroundTask {
     #[allow(clippy::too_many_arguments)]
+    #[instrument(skip_all, fields(background_task = ?self))]
     pub async fn run(
         self,
         pool: PgPool,
@@ -176,7 +177,7 @@ pub async fn index_search(
     search_backend: web::Data<dyn SearchBackend>,
 ) -> eyre::Result<()> {
     info!("Indexing local database");
-    search_backend.index_projects(ro_pool, redis_pool).await
+    search_backend.rebuild_index(ro_pool, redis_pool).await
 }
 
 pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
@@ -386,11 +387,11 @@ mod version_updater {
 
     use crate::database::PgPool;
     use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-    use crate::database::redis::RedisPool;
     use chrono::{DateTime, Utc};
     use serde::Deserialize;
     use thiserror::Error;
     use tracing::warn;
+    use xredis::RedisPool;
 
     #[derive(Deserialize)]
     struct InputFormat<'a> {

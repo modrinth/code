@@ -128,7 +128,7 @@ const { data: globals } = useQuery<AuthGlobalsResponse>({
 	},
 })
 
-async function completeOAuthSignUp() {
+async function completeOAuthSignUp(accountConsent: boolean) {
 	startLoading()
 	try {
 		if (!oauthFlowState.value) {
@@ -140,6 +140,7 @@ async function completeOAuthSignUp() {
 			state: oauthFlowState.value,
 			challenge: token.value,
 			sign_up_newsletter: subscribe.value,
+			account_consent: accountConsent,
 		})
 
 		await finishSignIn(res.session)

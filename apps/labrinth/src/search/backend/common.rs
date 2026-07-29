@@ -50,14 +50,7 @@ pub enum SearchIndex {
     MinecraftJavaServerPlayersOnline,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SearchIndexName {
-    Projects,
-    ProjectsFiltered,
-}
-
 pub struct SearchSort {
-    pub index_name: SearchIndexName,
     pub index: SearchIndex,
 }
 
@@ -65,16 +58,12 @@ pub fn parse_search_index(
     index: &str,
     new_filters: Option<&str>,
 ) -> Result<SearchSort, ApiError> {
-    let projects_name = SearchIndexName::Projects;
-    let projects_filtered_name = SearchIndexName::ProjectsFiltered;
-
     // TODO: this is a dumb hack, the frontend should pass the project type it's filtering directly
     let is_server = new_filters
         .is_some_and(|f| f.contains("project_types = minecraft_java_server"));
 
     Ok(match index {
         "relevance" => SearchSort {
-            index_name: projects_name,
             index: if is_server {
                 SearchIndex::MinecraftJavaServerVerifiedPlays2w
             } else {
@@ -82,27 +71,21 @@ pub fn parse_search_index(
             },
         },
         "downloads" => SearchSort {
-            index_name: projects_filtered_name,
             index: SearchIndex::Downloads,
         },
         "follows" => SearchSort {
-            index_name: projects_name,
             index: SearchIndex::Follows,
         },
         "updated" | "date_modified" => SearchSort {
-            index_name: projects_name,
             index: SearchIndex::Updated,
         },
         "newest" | "date_created" => SearchSort {
-            index_name: projects_name,
             index: SearchIndex::Newest,
         },
         "minecraft_java_server.verified_plays_2w" => SearchSort {
-            index_name: projects_name,
             index: SearchIndex::MinecraftJavaServerVerifiedPlays2w,
         },
         "minecraft_java_server.ping.data.players_online" => SearchSort {
-            index_name: projects_name,
             index: SearchIndex::MinecraftJavaServerPlayersOnline,
         },
         i => return Err(ApiError::Request(eyre!("invalid index '{i}'"))),

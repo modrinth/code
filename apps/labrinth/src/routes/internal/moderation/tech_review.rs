@@ -1,4 +1,5 @@
 use std::{collections::HashMap, fmt};
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, get, patch, post, put, web};
@@ -22,7 +23,6 @@ use crate::{
             thread_item::ThreadMessageBuilder,
             version_item::VersionQueryResult,
         },
-        redis::RedisPool,
     },
     models::{
         ids::{FileId, ProjectId, ThreadId, VersionId},
@@ -443,7 +443,7 @@ async fn fetch_project_reports(
     }
 
     let version_id_rows = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[])",
+        "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[]) ORDER BY id",
         &project_ids.iter().map(|id| id.0).collect::<Vec<_>>()
     )
     .fetch_all(pool)
@@ -469,6 +469,7 @@ async fn fetch_project_reports(
             size
         FROM files
         WHERE version_id = ANY($1::bigint[])
+        ORDER BY version_id, id
         "#,
         &version_ids.iter().map(|id| id.0).collect::<Vec<_>>()
     )
@@ -485,6 +486,7 @@ async fn fetch_project_reports(
             severity AS "severity!: DelphiSeverity"
         FROM delphi_reports
         WHERE file_id = ANY($1::bigint[])
+        ORDER BY file_id, created, id
         "#,
         &file_rows.iter().map(|f| f.file_id.0).collect::<Vec<_>>()
     )
@@ -500,6 +502,7 @@ async fn fetch_project_reports(
             issue_type
         FROM delphi_report_issues
         WHERE report_id = ANY($1::bigint[])
+        ORDER BY report_id, id
         "#,
         &report_rows
             .iter()
@@ -528,6 +531,7 @@ async fn fetch_project_reports(
             didws.status AS "status!: DelphiStatus"
         FROM delphi_issue_details_with_statuses didws
         WHERE didws.issue_id = ANY($1::bigint[])
+        ORDER BY didws.issue_id, didws.id
         "#,
         &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
     )

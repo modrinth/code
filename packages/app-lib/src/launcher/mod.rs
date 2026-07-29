@@ -290,6 +290,7 @@ pub async fn install_minecraft_with_reporter(
     };
 
     let state = State::get().await?;
+    let previous_install_stage = instance.install_stage;
 
     crate::state::instances::commands::set_instance_install_stage(
         &instance.id,
@@ -299,6 +300,7 @@ pub async fn install_minecraft_with_reporter(
     .await?;
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
+    let result = async {
     let instance_path = get_instance_full_path(&instance.path).await?;
     if let Some(reporter) = &reporter {
         reporter
@@ -601,24 +603,53 @@ pub async fn install_minecraft_with_reporter(
 
     let protocol_version = read_protocol_version_from_jar(client_path).await?;
 
-    crate::state::instances::commands::set_instance_install_stage(
-        &instance.id,
-        InstanceInstallStage::Installed,
-        &state.pool,
-    )
-    .await?;
-    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
     crate::state::instances::commands::set_applied_content_set_protocol_version(
         &instance.id,
         protocol_version,
         &state.pool,
     )
     .await?;
+	if reporter.is_none() {
+		crate::state::instances::commands::set_instance_install_stage(
+			&instance.id,
+			InstanceInstallStage::Installed,
+			&state.pool,
+		)
+		.await?;
+		emit_instance(&instance.id, InstancePayloadType::Edited).await?;
+	}
     if let Some(loading_bar) = &loading_bar {
         emit_loading(loading_bar, 1.0, Some("Finished installing"))?;
     }
 
-    Ok(())
+    Ok::<(), crate::Error>(())
+    }
+    .await;
+
+    if result.is_err() {
+        if let Err(error) =
+            crate::state::instances::commands::set_instance_install_stage(
+                &instance.id,
+                previous_install_stage,
+                &state.pool,
+            )
+            .await
+        {
+            tracing::error!(
+                "Failed to restore install stage for instance {}: {error}",
+                instance.id
+            );
+        } else if let Err(error) =
+            emit_instance(&instance.id, InstancePayloadType::Edited).await
+        {
+            tracing::error!(
+                "Failed to emit restored install stage for instance {}: {error}",
+                instance.id
+            );
+        }
+    }
+
+    result
 }
 
 pub async fn install_minecraft_for_instance_id_with_reporter(

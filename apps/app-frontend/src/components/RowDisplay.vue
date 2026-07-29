@@ -73,8 +73,7 @@ async function duplicateInstance(p) {
 
 const handleInstanceRightClick = async (event, passedInstance) => {
 	const baseOptions = [
-		{ name: 'add_content' },
-		{ type: 'divider' },
+		...(passedInstance.quarantined ? [] : [{ name: 'add_content' }, { type: 'divider' }]),
 		{ name: 'edit' },
 		{ name: 'duplicate' },
 		{ name: 'open_folder' },
@@ -98,10 +97,14 @@ const handleInstanceRightClick = async (event, passedInstance) => {
 					...baseOptions,
 				]
 			: [
-					{
-						name: 'play',
-						color: 'primary',
-					},
+					...(passedInstance.quarantined
+						? []
+						: [
+								{
+									name: 'play',
+									color: 'primary',
+								},
+							]),
 					...baseOptions,
 				]
 

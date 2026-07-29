@@ -7,8 +7,8 @@ use crate::database::models::categories::{
 use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
-use crate::database::redis::RedisPool;
 use actix_web::{HttpResponse, get, web};
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use itertools::Itertools;

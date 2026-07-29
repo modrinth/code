@@ -169,7 +169,7 @@
 						</div>
 						<div
 							v-else-if="selectedVersion.changelog"
-							class="markdown [&_img]:max-w-full [&_img]:h-auto"
+							class="markdown-body"
 							v-html="renderHighlightedString(selectedVersion.changelog)"
 						/>
 						<div v-else class="text-secondary italic">

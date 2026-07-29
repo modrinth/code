@@ -144,7 +144,7 @@
     "defaultMessage": "Examinez et traitez toutes les remarques de l’équipe de modération avant de soumettre à nouveau."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Retour de revue"
+    "defaultMessage": "Retours de revue"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Vous avez sélectionné {count, plural, one {# tag de résolution} other {# tags de résolution}} ({tags}). Les packs de ressources ne devraient généralement avoir qu’un seul tag de résolution correspondant à leur résolution principale."
@@ -171,13 +171,13 @@
     "defaultMessage": "Supprimer une région"
   },
   "nags.select-language.description": {
-    "defaultMessage": "Lisyez la ou les langues prises en charge par votre serveur."
+    "defaultMessage": "Listez la ou les langues prises en charge par votre serveur."
   },
   "nags.select-language.title": {
     "defaultMessage": "Sélectionner une langue"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Sélectionnez la licence votre {type} est distribué."
+    "defaultMessage": "Sélectionnez la licence sous laquelle votre {type} est distribué."
   },
   "nags.select-license.title": {
     "defaultMessage": "Sélectionner une licence"
@@ -255,7 +255,7 @@
     "defaultMessage": "Au moins une image dans la galerie est nécessaire pour montrer le contenu de votre {type}."
   },
   "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "Les Packs de ressources, sauf l'audio ou les packs de localisation. Si ceci décrit votre pack, merci d'utiliser des étiquettes appropriées"
+    "defaultMessage": "pack de ressource, sauf pour les packs d'audio ou de localisation. Si cela décrit votre pack, veuillez sélectionner les étiquettes appropriées"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ajouter une image à la galerie"
@@ -273,7 +273,7 @@
     "defaultMessage": "Vérifier les liens externes"
   },
   "nags.versions.title": {
-    "defaultMessage": "Voir les versions"
+    "defaultMessage": "Voir la page des versions"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Accéder aux paramètres des liens"

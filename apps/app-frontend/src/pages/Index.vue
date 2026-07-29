@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { HomeIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
 import type { SearchResult } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, onUnmounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 import RowDisplay from '@/components/RowDisplay.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
@@ -11,13 +11,17 @@ import { get_search_results } from '@/helpers/cache.js'
 import { instance_listener } from '@/helpers/events'
 import { list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 const { handleError } = injectNotificationManager()
-const route = useRoute()
-const breadcrumbs = useBreadcrumbs()
 
-breadcrumbs.setRootContext({ name: 'Home', link: route.path })
+useRootBreadcrumb({
+	slot: 'root',
+	id: 'home',
+	label: 'Home',
+	to: '/',
+	visual: { type: 'icon', component: HomeIcon },
+})
 
 const instances = ref<GameInstance[]>([])
 

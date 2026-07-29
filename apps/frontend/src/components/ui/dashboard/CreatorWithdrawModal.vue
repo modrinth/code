@@ -54,7 +54,7 @@
 			<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
 			<LegacyPaypalDetailsStage v-else-if="currentStage === 'paypal-details'" />
 			<CompletionStage v-else-if="currentStage === 'completion'" />
-			<div v-else>Something went wrong</div>
+			<div v-else>{{ formatMessage(commonMessages.errorNotificationTitle) }}</div>
 		</div>
 		<template #actions>
 			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
@@ -96,7 +96,7 @@
 	</NewModal>
 	<CreatorTaxFormModal
 		ref="taxFormModal"
-		close-button-text="Continue"
+		:close-button-text="formatMessage(commonMessages.continueButton)"
 		@success="onTaxFormSuccess"
 		@cancelled="onTaxFormCancelled"
 	/>
@@ -429,6 +429,18 @@ function getWithdrawalError(
 
 	// === MuralPay-only patterns ===
 	if (provider === 'muralpay') {
+		const muralError = error?.data?.details
+		if (
+			muralError?.name === 'PayoutMethodError' &&
+			muralError?.params?.payoutMethodErrorReason === 'DISABLED_BY_PROVIDER'
+		) {
+			return {
+				title: formatMessage(messages.errorPayoutMethodDisabledTitle),
+				text: formatBilingualText(messages.errorPayoutMethodDisabledText),
+				supportData,
+			}
+		}
+
 		// Invalid crypto wallet address
 		if (
 			(description.includes('wallet') && description.includes('invalid')) ||
@@ -640,6 +652,15 @@ const messages = defineMessages({
 		id: 'dashboard.withdraw.error.invalid-bank.text',
 		defaultMessage:
 			'The bank account details you provided are invalid. Please verify your information.',
+	},
+	errorPayoutMethodDisabledTitle: {
+		id: 'dashboard.withdraw.error.payout-method-disabled.title',
+		defaultMessage: 'Payout method unavailable',
+	},
+	errorPayoutMethodDisabledText: {
+		id: 'dashboard.withdraw.error.payout-method-disabled.text',
+		defaultMessage:
+			'This payout method has been disabled by the payment provider. Please use a different payout method or contact support.',
 	},
 	errorInvalidAddressTitle: {
 		id: 'dashboard.withdraw.error.invalid-address.title',

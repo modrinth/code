@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_links (\n\t\t\tinstance_id,\n\t\t\tlink_kind,\n\t\t\tmodrinth_project_id,\n\t\t\tmodrinth_version_id,\n\t\t\tserver_project_id,\n\t\t\tcontent_project_id,\n\t\t\tcontent_version_id,\n\t\t\thosting_server_id,\n\t\t\thosting_instance_ids,\n\t\t\thosting_active_instance_id,\n\t\t\timported_name,\n\t\t\timported_version_number,\n\t\t\timported_filename\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, jsonb(?), ?, ?, ?, ?)\n\t\tON CONFLICT (instance_id) DO UPDATE SET\n\t\t\tlink_kind = excluded.link_kind,\n\t\t\tmodrinth_project_id = excluded.modrinth_project_id,\n\t\t\tmodrinth_version_id = excluded.modrinth_version_id,\n\t\t\tserver_project_id = excluded.server_project_id,\n\t\t\tcontent_project_id = excluded.content_project_id,\n\t\t\tcontent_version_id = excluded.content_version_id,\n\t\t\thosting_server_id = excluded.hosting_server_id,\n\t\t\thosting_instance_ids = excluded.hosting_instance_ids,\n\t\t\thosting_active_instance_id = excluded.hosting_active_instance_id,\n\t\t\timported_name = excluded.imported_name,\n\t\t\timported_version_number = excluded.imported_version_number,\n\t\t\timported_filename = excluded.imported_filename\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 13
+    },
+    "nullable": []
+  },
+  "hash": "bf813910a5b0db8563a689088eedf95c67b5ceda04aa1b0eb782b581e23ec06b"
+}

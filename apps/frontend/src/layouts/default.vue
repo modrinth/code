@@ -253,7 +253,7 @@
 							/>
 							<CompassIcon v-else aria-hidden="true" />
 							<span class="hidden md:contents">{{
-								formatMessage(navMenuMessages.discoverContent)
+								formatMessage(commonMessages.discoverContentLabel)
 							}}</span>
 							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
 							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
@@ -443,20 +443,23 @@
 						:options="[
 							{
 								id: 'new-project',
-								action: (event) => $refs.modal_creation.show(event),
+								action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
 							},
 							{
 								id: 'new-server-project',
-								action: (event) => $refs.modal_creation.show(event, { type: 'server' }),
+								action: (event) =>
+									requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
 							},
 							{
 								id: 'new-collection',
-								action: (event) => $refs.modal_collection_creation.show(event),
+								action: (event) =>
+									requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
 							},
 							{ divider: true },
 							{
 								id: 'new-organization',
-								action: (event) => $refs.modal_organization_creation.show(event),
+								action: (event) =>
+									requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 							},
 						]"
 					>
@@ -777,6 +780,7 @@ import {
 	createHostingIntercomIdentityKey,
 	defineMessages,
 	injectModrinthClient,
+	injectNotificationManager,
 	injectPageContext,
 	OverflowMenu,
 	providePageContext,
@@ -814,6 +818,7 @@ const generatedState = useGeneratedState()
 const country = useUserCountry()
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 
 const auth = await useAuth()
 const user = await useUser()
@@ -906,6 +911,19 @@ async function fetchIntercomToken() {
 	})
 }
 
+function requireVerifiedEmail(action) {
+	if (!auth.value.user?.email_verified) {
+		addNotification({
+			title: formatMessage(messages.emailVerificationRequired),
+			text: formatMessage(messages.verifyEmailBeforePublishing),
+			type: 'error',
+		})
+		return
+	}
+
+	action()
+}
+
 const navMenuMessages = defineMessages({
 	home: {
 		id: 'layout.nav.home',
@@ -914,10 +932,6 @@ const navMenuMessages = defineMessages({
 	search: {
 		id: 'layout.nav.search',
 		defaultMessage: 'Search',
-	},
-	discoverContent: {
-		id: 'layout.nav.discover-content',
-		defaultMessage: 'Discover content',
 	},
 	discover: {
 		id: 'layout.nav.discover',
@@ -961,6 +975,14 @@ const messages = defineMessages({
 	publish: {
 		id: 'layout.action.publish',
 		defaultMessage: 'Publish',
+	},
+	emailVerificationRequired: {
+		id: 'layout.publish.email-verification-required.title',
+		defaultMessage: 'Email verification required',
+	},
+	verifyEmailBeforePublishing: {
+		id: 'layout.publish.email-verification-required.description',
+		defaultMessage: 'You must verify your email before publishing on Modrinth.',
 	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',

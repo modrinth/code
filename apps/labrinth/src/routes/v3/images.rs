@@ -6,7 +6,6 @@ use crate::database::PgPool;
 use crate::database::models::{
     project_item, report_item, thread_item, version_item,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
@@ -16,6 +15,7 @@ use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(images_add);

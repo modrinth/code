@@ -250,7 +250,7 @@ function isUsernameTakenValidationError(error: unknown): boolean {
 	return errorCode === 'username_taken'
 }
 
-async function createAccount() {
+async function createAccount(accountConsent: boolean) {
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.createAccount({
@@ -259,6 +259,7 @@ async function createAccount() {
 			email: email.value,
 			challenge: token.value,
 			sign_up_newsletter: subscribe.value,
+			account_consent: accountConsent,
 		})
 
 		await useAuth(res.session)

@@ -1,12 +1,12 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::redis::RedisPool;
 use crate::{database::models::DatabaseError, models::images::ImageContext};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-const IMAGES_NAMESPACE: &str = "images";
+const IMAGES_NAMESPACE: &str = "images:v3";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DBImage {
@@ -217,7 +217,7 @@ impl DBImage {
                     })
                     .await?;
 
-                Ok(images)
+                Ok::<_, DatabaseError>(images)
             },
         ).await?;
 
@@ -229,8 +229,9 @@ impl DBImage {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(IMAGES_NAMESPACE, id.0);
 
-        redis.delete(IMAGES_NAMESPACE, id.0).await?;
+        redis.delete(&key).await?;
         Ok(())
     }
 }

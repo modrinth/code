@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tDELETE FROM instance_content_set_remote_refs\n\t\tWHERE content_set_id = ? AND ref_type = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "76988815779ec3c1def6712dcb4156fd72100b0cf97b4ecb11045c6c4f550652"
+}

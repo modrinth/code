@@ -1,4 +1,3 @@
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::routes::ApiError;
@@ -9,12 +8,23 @@ use chrono::{DateTime, Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use std::time::Duration;
+use xredis::RedisPool;
 
 pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
 pub const MODRINTH_PAYMENT_ID: HeaderName =
     HeaderName::from_static("modrinth-payment-id");
-pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements";
+pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements:v3";
+const REDIS_TIMEOUT_MARGIN_MS: u64 = 250;
+
+pub(crate) fn payment_statement_key(
+    redis: &RedisPool,
+    payment_id: &PayoutId,
+) -> String {
+    redis
+        .key()
+        .with_slot(PAYMENT_STATEMENTS_NAMESPACE, payment_id, payment_id)
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentStatement {
@@ -180,30 +190,26 @@ impl GotenbergClient {
         &self,
         statement: &PaymentStatement,
     ) -> Result<GotenbergDocument, ApiError> {
-        let mut redis = self
-            .redis
-            .connect()
-            .await
-            .wrap_internal_err("failed to get Redis connection")?;
-
         self.generate_payment_statement(statement).await?;
 
         let timeout_ms = ENV.GOTENBERG_TIMEOUT;
+        let redis_timeout_ms =
+            timeout_ms.saturating_sub(REDIS_TIMEOUT_MARGIN_MS).max(1);
+        let client_timeout_ms = timeout_ms.max(redis_timeout_ms + 1);
+        let response_key =
+            payment_statement_key(&self.redis, &statement.payment_id);
 
         let [_key, document] = tokio::time::timeout(
-            Duration::from_millis(timeout_ms),
-            redis.brpop(
-                PAYMENT_STATEMENTS_NAMESPACE,
-                &statement.payment_id.to_string(),
-                None,
-            ),
+            Duration::from_millis(client_timeout_ms),
+            self.redis
+                .brpop(&response_key, Duration::from_millis(redis_timeout_ms)),
         )
         .await
         .wrap_internal_err("Gotenberg document generation timed out")?
         .wrap_internal_err("failed to get document over Redis")?
         .wrap_internal_err("no document was returned from Redis")?;
 
-        let document = serde_json::from_str::<
+        let document = postcard::from_bytes::<
             Result<GotenbergDocument, GotenbergError>,
         >(&document)
         .wrap_internal_err("failed to deserialize Redis document response")?

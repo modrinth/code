@@ -9,7 +9,7 @@
 	<div class="flex w-full flex-col gap-6">
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
-				Version type <span class="text-red">*</span>
+				{{ formatMessage(messages.versionType) }} <span class="text-red">*</span>
 			</span>
 			<Chips
 				v-model="draftVersion.version_type"
@@ -22,31 +22,33 @@
 		</div>
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
-				Version number <span class="text-red">*</span>
+				{{ formatMessage(messages.versionNumber) }} <span class="text-red">*</span>
 			</span>
 			<StyledInput
 				id="version-number"
 				v-model="draftVersion.version_number"
 				:disabled="isUploading"
-				placeholder="Enter version number, e.g. 1.2.3-alpha.1"
+				:placeholder="formatMessage(messages.versionNumberPlaceholder)"
 				autocomplete="off"
 				:maxlength="32"
 			/>
-			<span> The version number differentiates this specific version from others. </span>
+			<span>{{ formatMessage(messages.versionNumberDescription) }}</span>
 		</div>
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast"> Version subtitle </span>
+			<span class="font-semibold text-contrast">{{ formatMessage(messages.versionSubtitle) }}</span>
 			<StyledInput
 				id="version-number"
 				v-model="draftVersion.name"
-				placeholder="Enter subtitle..."
+				:placeholder="formatMessage(messages.versionSubtitlePlaceholder)"
 				autocomplete="off"
 				:maxlength="256"
 				:disabled="isUploading"
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast"> Version changelog </span>
+			<span class="font-semibold text-contrast">{{
+				formatMessage(messages.versionChangelog)
+			}}</span>
 
 			<div class="w-full">
 				<MarkdownEditor
@@ -61,18 +63,70 @@
 </template>
 
 <script lang="ts" setup>
-import { Chips, MarkdownEditor, StyledInput, Tabs, type TabsTab } from '@modrinth/ui'
+import {
+	Chips,
+	defineMessages,
+	MarkdownEditor,
+	StyledInput,
+	Tabs,
+	type TabsTab,
+	useVIntl,
+} from '@modrinth/ui'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const { draftVersion, isUploading, editingVersion, modal } = injectManageVersionContext()
+const { formatMessage } = useVIntl()
 
-const editTabs: TabsTab[] = [
-	{ label: 'Metadata', value: 'metadata' },
-	{ label: 'Details', value: 'add-details' },
-	{ label: 'Files', value: 'add-files' },
-]
+const messages = defineMessages({
+	versionType: {
+		id: 'create-project-version.create-modal.stage.details.version-type',
+		defaultMessage: 'Version type',
+	},
+	versionNumber: {
+		id: 'create-project-version.create-modal.stage.details.version-number',
+		defaultMessage: 'Version number',
+	},
+	versionNumberPlaceholder: {
+		id: 'create-project-version.create-modal.stage.details.version-number-placeholder',
+		defaultMessage: 'Enter version number, e.g. 1.2.3-alpha.1',
+	},
+	versionNumberDescription: {
+		id: 'create-project-version.create-modal.stage.details.version-number-description',
+		defaultMessage: 'The version number differentiates this specific version from others.',
+	},
+	versionSubtitle: {
+		id: 'create-project-version.create-modal.stage.details.version-subtitle',
+		defaultMessage: 'Version subtitle',
+	},
+	versionSubtitlePlaceholder: {
+		id: 'create-project-version.create-modal.stage.details.version-subtitle-placeholder',
+		defaultMessage: 'Enter subtitle...',
+	},
+	versionChangelog: {
+		id: 'create-project-version.create-modal.stage.details.version-changelog',
+		defaultMessage: 'Version changelog',
+	},
+	metadataTab: {
+		id: 'create-project-version.create-modal.stage.details.metadata-tab',
+		defaultMessage: 'Metadata',
+	},
+	detailsTab: {
+		id: 'create-project-version.create-modal.stage.details.details-tab',
+		defaultMessage: 'Details',
+	},
+	filesTab: {
+		id: 'create-project-version.create-modal.stage.details.files-tab',
+		defaultMessage: 'Files',
+	},
+})
+
+const editTabs = computed<TabsTab[]>(() => [
+	{ label: formatMessage(messages.metadataTab), value: 'metadata' },
+	{ label: formatMessage(messages.detailsTab), value: 'add-details' },
+	{ label: formatMessage(messages.filesTab), value: 'add-files' },
+])
 
 function setEditTab(tab: TabsTab) {
 	modal.value?.setStage(tab.value)

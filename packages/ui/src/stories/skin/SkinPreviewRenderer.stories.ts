@@ -1,6 +1,6 @@
 import { CheckIcon, EyeIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 
 import SkinPreviewRenderer from '../../components/skin/SkinPreviewRenderer.vue'
 
@@ -59,6 +59,76 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+export const FileUpload: Story = {
+	render: () => ({
+		components: { SkinPreviewRenderer },
+		setup() {
+			const textureSrc = ref(steveSkin)
+			const fileName = ref('Steve skin')
+			let objectUrl: string | undefined
+
+			function revokeObjectUrl() {
+				if (!objectUrl) return
+				URL.revokeObjectURL(objectUrl)
+				objectUrl = undefined
+			}
+
+			function uploadSkin(event: Event) {
+				const input = event.target as HTMLInputElement
+				const file = input.files?.[0]
+				if (!file) return
+
+				revokeObjectUrl()
+				objectUrl = URL.createObjectURL(file)
+				textureSrc.value = objectUrl
+				fileName.value = file.name
+			}
+
+			function resetSkin() {
+				revokeObjectUrl()
+				textureSrc.value = steveSkin
+				fileName.value = 'Steve skin'
+			}
+
+			onBeforeUnmount(revokeObjectUrl)
+
+			return {
+				fileName,
+				resetSkin,
+				textureSrc,
+				uploadSkin,
+			}
+		},
+		template: /* html */ `
+			<div class="flex flex-wrap items-start gap-6">
+				<div class="h-[80vh] min-h-[32rem] max-h-[48rem] w-[22rem]">
+					<SkinPreviewRenderer :texture-src="textureSrc" variant="CLASSIC" />
+				</div>
+				<div class="flex w-72 flex-col gap-3 rounded-xl bg-surface-2 p-4">
+					<label class="text-sm font-semibold text-contrast" for="skin-preview-upload">
+						Upload skin
+					</label>
+					<input
+						id="skin-preview-upload"
+						class="text-sm text-primary file:mr-3 file:rounded-lg file:border-0 file:bg-surface-4 file:px-3 file:py-2 file:text-primary"
+						type="file"
+						accept="image/png"
+						@change="uploadSkin"
+					/>
+					<div class="truncate text-sm text-secondary">{{ fileName }}</div>
+					<button
+						class="rounded-lg border-0 bg-surface-4 px-4 py-2 text-primary"
+						type="button"
+						@click="resetSkin"
+					>
+						Reset
+					</button>
+				</div>
+			</div>
+		`,
+	}),
+}
 
 export const RepeatInteract: Story = {
 	render: (args) => ({
