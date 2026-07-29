@@ -150,7 +150,7 @@ const addCategory = async () => {
 
 	if (text.length > 0) {
 		try {
-			const group = await create_group(text.substring(0, 32))
+			const group = await create_group(text.substring(0, 128))
 			availableGroups.value.push(group)
 			groupIds.value.push(group.id)
 			newCategoryInput.value = ''
@@ -383,6 +383,7 @@ const messages = defineMessages({
 					<StyledInput
 						v-model="newCategoryInput"
 						:placeholder="formatMessage(messages.libraryGroupsEnterName)"
+						:maxlength="128"
 						class="w-full max-w-[300px]"
 						@submit="() => addCategory"
 					/>

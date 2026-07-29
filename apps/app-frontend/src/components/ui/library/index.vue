@@ -16,7 +16,7 @@ import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
-import { provideLibrary } from '@/components/ui/library/use-library'
+import { getLibraryInstanceSelectionKey, provideLibrary } from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import type { GameInstance } from '@/helpers/types'
 
@@ -30,8 +30,8 @@ const {
 	confirmDeleteModal,
 	deleteInstance,
 	handleInstanceOption,
-	selectedLibraryInstanceIds,
-	setSelectedLibraryInstanceIds,
+	selectedLibraryInstances,
+	setSelectedLibraryInstances,
 	toggleLibraryInstanceSelection,
 } = provideLibrary(toRef(props, 'instances'))
 
@@ -62,36 +62,37 @@ function handleToggleInstance(groupId: string, instanceId: string, shiftKey: boo
 		)
 
 		if (anchorIndex === -1 || targetIndex === -1) {
-			toggleLibraryInstanceSelection(instanceId)
+			toggleLibraryInstanceSelection({ groupId, instanceId })
 			return
 		}
 
 		const start = Math.min(anchorIndex, targetIndex)
 		const end = Math.max(anchorIndex, targetIndex)
 		const range = displayedInstances.slice(start, end + 1)
-		const nextSelectedIds = new Set(selectedLibraryInstanceIds.value)
+		const nextSelectedInstances = new Map(selectedLibraryInstances.value)
+		const targetKey = getLibraryInstanceSelectionKey({ groupId, instanceId })
 
-		if (nextSelectedIds.has(instanceId)) {
+		if (nextSelectedInstances.has(targetKey)) {
 			for (const instance of range) {
-				nextSelectedIds.delete(instance.instanceId)
+				nextSelectedInstances.delete(getLibraryInstanceSelectionKey(instance))
 			}
 		} else {
 			for (const instance of range) {
-				nextSelectedIds.add(instance.instanceId)
+				nextSelectedInstances.set(getLibraryInstanceSelectionKey(instance), instance)
 			}
 		}
 
-		setSelectedLibraryInstanceIds(nextSelectedIds)
+		setSelectedLibraryInstances(nextSelectedInstances.values())
 		anchorInstance.value = null
 		return
 	}
 
-	toggleLibraryInstanceSelection(instanceId)
+	toggleLibraryInstanceSelection({ groupId, instanceId })
 	anchorInstance.value = { groupId, instanceId }
 }
 
 watch(
-	() => selectedLibraryInstanceIds.value.size,
+	() => selectedLibraryInstances.value.size,
 	(selectedInstanceCount) => {
 		if (selectedInstanceCount === 0) {
 			anchorInstance.value = null

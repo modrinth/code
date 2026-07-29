@@ -68,10 +68,7 @@
 		<component :is="currentStage?.stageContent" />
 
 		<template #actions>
-			<div
-				class="flex flex-col justify-end gap-2 sm:flex-row"
-				:class="leftButtonConfig || rightButtonConfig ? 'mt-4' : ''"
-			>
+			<div class="flex flex-col justify-end gap-2 sm:flex-row">
 				<ButtonStyled v-if="leftButtonConfig" type="outlined">
 					<button
 						v-tooltip="leftButtonConfig.tooltip"

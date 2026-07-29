@@ -19,7 +19,7 @@
 				ref="groupNameInput"
 				v-model="newGroupName"
 				placeholder="Enter group name"
-				:maxlength="32"
+				:maxlength="128"
 				@click="groupNameInput?.select()"
 			/>
 		</div>

@@ -8,7 +8,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InstanceFileIcon from '@/assets/icons/instance-file.svg'
-import { useLibrary } from '@/components/ui/library/use-library'
+import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
@@ -28,9 +28,9 @@ type ProcessEventPayload = {
 const { handleError } = injectNotificationManager()
 const {
 	displayState,
-	selectedLibraryInstanceIds,
+	selectedLibraryInstances,
 	isLibraryInstanceSelectionActive,
-	activeDraggedInstanceIds,
+	activeDraggedInstanceKeys,
 } = useLibrary()
 
 const props = defineProps<{
@@ -55,10 +55,16 @@ const modLoading = computed(
 )
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
-const selected = computed(() => selectedLibraryInstanceIds.value.has(props.instance.id))
+const selectionKey = computed(() =>
+	getLibraryInstanceSelectionKey({
+		instanceId: props.instance.id,
+		groupId: props.instanceGroupId,
+	}),
+)
+const selected = computed(() => selectedLibraryInstances.value.has(selectionKey.value))
 const keys = useMagicKeys()
 const holdingShift = computed(() => keys.shift.value)
-const isPartOfActiveDrag = computed(() => activeDraggedInstanceIds.value.has(props.instance.id))
+const isPartOfActiveDrag = computed(() => activeDraggedInstanceKeys.value.has(selectionKey.value))
 const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupId}:${props.instance.id}`),
 	element: instanceCard,

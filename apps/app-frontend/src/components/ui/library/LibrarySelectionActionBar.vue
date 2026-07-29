@@ -6,7 +6,7 @@
 	>
 		<div class="flex items-center gap-0.5">
 			<span class="px-4 py-2.5 text-base font-semibold text-contrast tabular-nums">
-				{{ formatMessage(messages.selectedCount, { count: selectedLibraryInstanceIds.size }) }}
+				{{ formatMessage(messages.selectedCount, { count: selectedLibraryInstances.size }) }}
 			</span>
 			<div class="mx-1 h-6 w-px bg-surface-5" />
 			<ButtonStyled type="transparent">
@@ -21,6 +21,12 @@
 			</ButtonStyled>
 		</div>
 		<div class="ml-auto flex items-center gap-0.5">
+			<ButtonStyled type="transparent">
+				<button type="button" :disabled="busy" @click="createGroupFromSelection">
+					<PlusIcon />
+					<span class="bar-label">{{ formatMessage(messages.createGroup) }}</span>
+				</button>
+			</ButtonStyled>
 			<ButtonStyled v-if="selectedGroupedInstances.length > 0" type="transparent">
 				<button type="button" :disabled="busy" @click="removeSelectedInstancesFromGroups">
 					<MinusIcon />
@@ -43,13 +49,13 @@
 	</FloatingActionBar>
 	<ConfirmDeleteInstanceModal
 		ref="confirmDeleteModal"
-		:count="selectedInstanceCount"
+		:count="selectedInstanceIds.size"
 		@delete="deleteSelectedInstances"
 	/>
 </template>
 
 <script setup lang="ts">
-import { MinusIcon, TrashIcon } from '@modrinth/assets'
+import { MinusIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -60,7 +66,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { useLibrary } from '@/components/ui/library/use-library'
+import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { toError } from '@/helpers/errors'
 import { edit, remove } from '@/helpers/instance'
@@ -69,20 +75,25 @@ const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const {
 	instances,
-	selectedLibraryInstanceIds,
+	selectedLibraryInstances,
 	clearLibraryInstanceSelection,
-	setSelectedLibraryInstanceIds,
+	setSelectedLibraryInstances,
+	openNewGroupModal,
 } = useLibrary()
 
 const confirmDeleteModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
 const deleting = ref(false)
 const removingFromGroup = ref(false)
-const selectedInstanceCount = computed(() => selectedLibraryInstanceIds.value.size)
+const selectedInstanceCount = computed(() => selectedLibraryInstances.value.size)
+const selectedInstanceIds = computed(
+	() =>
+		new Set([...selectedLibraryInstances.value.values()].map((selection) => selection.instanceId)),
+)
 const selectedGroupedInstances = computed(() =>
-	instances.value.filter(
-		(instance) =>
-			selectedLibraryInstanceIds.value.has(instance.id) && instance.group_ids.length > 0,
-	),
+	[...selectedLibraryInstances.value.values()].flatMap((selection) => {
+		const instance = instances.value.find((candidate) => candidate.id === selection.instanceId)
+		return instance?.group_ids.includes(selection.groupId) ? [{ instance, selection }] : []
+	}),
 )
 const busy = computed(() => deleting.value || removingFromGroup.value)
 
@@ -99,26 +110,59 @@ const messages = defineMessages({
 		id: 'app.library.selection.deleting',
 		defaultMessage: 'Deleting selected instances',
 	},
+	createGroup: {
+		id: 'app.library.selection.create-group',
+		defaultMessage: 'Create group',
+	},
 	removeFromGroup: {
 		id: 'app.library.selection.remove-from-group',
 		defaultMessage: 'Remove from group',
 	},
 })
 
+function createGroupFromSelection() {
+	openNewGroupModal(selectedInstanceIds.value)
+}
+
 async function removeSelectedInstancesFromGroups() {
 	if (busy.value || selectedGroupedInstances.value.length === 0) return
 
 	removingFromGroup.value = true
+	const selectedGroupIdsByInstanceId = new Map<string, Set<string>>()
+	for (const { instance, selection } of selectedGroupedInstances.value) {
+		const groupIds = selectedGroupIdsByInstanceId.get(instance.id) ?? new Set()
+		groupIds.add(selection.groupId)
+		selectedGroupIdsByInstanceId.set(instance.id, groupIds)
+	}
+	const operations = [...selectedGroupIdsByInstanceId].flatMap(([instanceId, groupIds]) => {
+		const instance = instances.value.find((candidate) => candidate.id === instanceId)
+		return instance ? [{ instance, groupIds }] : []
+	})
 	const results = await Promise.allSettled(
-		selectedGroupedInstances.value.map((instance) => edit(instance.id, { group_ids: [] })),
+		operations.map(({ instance, groupIds }) => {
+			return edit(instance.id, {
+				group_ids: instance.group_ids.filter((groupId) => !groupIds.has(groupId)),
+			})
+		}),
 	)
 
-	for (const result of results) {
+	const nextSelectedInstances = new Map(selectedLibraryInstances.value)
+	for (const [index, result] of results.entries()) {
 		if (result.status === 'rejected') {
 			handleError(toError(result.reason))
+		} else {
+			for (const groupId of operations[index].groupIds) {
+				nextSelectedInstances.delete(
+					getLibraryInstanceSelectionKey({
+						instanceId: operations[index].instance.id,
+						groupId,
+					}),
+				)
+			}
 		}
 	}
 
+	setSelectedLibraryInstances(nextSelectedInstances.values())
 	removingFromGroup.value = false
 }
 
@@ -126,19 +170,23 @@ async function deleteSelectedInstances() {
 	if (busy.value || selectedInstanceCount.value === 0) return
 
 	deleting.value = true
-	const instanceIds = [...selectedLibraryInstanceIds.value]
+	const instanceIds = [...selectedInstanceIds.value]
 	const results = await Promise.allSettled(instanceIds.map((instanceId) => remove(instanceId)))
-	const nextSelectedInstanceIds = new Set(selectedLibraryInstanceIds.value)
+	const deletedInstanceIds = new Set<string>()
 
 	for (const [index, result] of results.entries()) {
 		if (result.status === 'rejected') {
 			handleError(toError(result.reason))
 		} else {
-			nextSelectedInstanceIds.delete(instanceIds[index])
+			deletedInstanceIds.add(instanceIds[index])
 		}
 	}
 
-	setSelectedLibraryInstanceIds(nextSelectedInstanceIds)
+	setSelectedLibraryInstances(
+		[...selectedLibraryInstances.value.values()].filter(
+			(selection) => !deletedInstanceIds.has(selection.instanceId),
+		),
+	)
 	deleting.value = false
 }
 </script>

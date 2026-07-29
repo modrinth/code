@@ -59,7 +59,7 @@ export function useInstanceDragGather(instances: Ref<GameInstance[]>) {
 		clear()
 
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-		if (!drag || drag.instanceIds.length < 2 || reduceMotion) return
+		if (!drag || drag.instances.length < 2 || reduceMotion) return
 
 		const instanceCards = Array.from(
 			document.querySelectorAll<HTMLElement>('[data-library-instance-card]'),
@@ -78,13 +78,13 @@ export function useInstanceDragGather(instances: Ref<GameInstance[]>) {
 			}
 		}
 
-		items.value = drag.instanceIds.flatMap((instanceId) => {
+		items.value = drag.instances.flatMap(({ instanceId, groupId }) => {
 			const instance = instances.value.find((candidate) => candidate.id === instanceId)
 			const matchingCards = instanceCards.filter(
 				(card) => card.dataset.instanceId === instanceId && card.getClientRects().length > 0,
 			)
 			const card =
-				matchingCards.find((candidate) => candidate.dataset.instanceGroup === source.fromGroup) ??
+				matchingCards.find((candidate) => candidate.dataset.instanceGroup === groupId) ??
 				matchingCards[0]
 			if (!instance || !card) return []
 

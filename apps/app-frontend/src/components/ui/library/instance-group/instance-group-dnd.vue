@@ -44,10 +44,8 @@ const draggedInstances = computed(() => {
 	const drag = activeInstanceGroupDrag.value
 	if (!drag) return []
 
-	return drag.instanceIds.flatMap((instanceId) => {
-		const instance = props.instances.find((candidate) => candidate.id === instanceId)
-		return instance ? [instance] : []
-	})
+	const draggedInstanceIds = new Set(drag.instances.map((selection) => selection.instanceId))
+	return props.instances.filter((instance) => draggedInstanceIds.has(instance.id))
 })
 const draggedInstance = computed(() => {
 	const drag = activeInstanceGroupDrag.value

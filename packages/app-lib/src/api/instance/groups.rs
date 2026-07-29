@@ -5,7 +5,7 @@ use crate::state::instances::adapters::sqlite::instance_rows;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-const MAX_GROUP_NAME_LENGTH: usize = 32;
+const MAX_GROUP_NAME_LENGTH: usize = 128;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct InstanceGroup {

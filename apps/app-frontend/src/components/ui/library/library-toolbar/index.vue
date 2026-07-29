@@ -24,7 +24,7 @@ const showCreationModal = inject<() => void>('showCreationModal')
 				wrapper-class="min-w-[16rem] flex-1"
 			/>
 			<ButtonStyled>
-				<button type="button" @click="openNewGroupModal">
+				<button type="button" @click="openNewGroupModal()">
 					<PlusIcon />
 					New group
 				</button>
