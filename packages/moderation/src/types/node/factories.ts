@@ -162,6 +162,12 @@ export function externalGroup(path: string[]) {
   )
 }
 
+const optionValue = {
+  _getValue: () => true,
+  _setValue: () => undefined,
+  _isActive: () => true,
+}
+
 export function option(value: string, label: string) {
   return pipe(
     {value, label} as { value: string; label: string },
@@ -169,6 +175,7 @@ export function option(value: string, label: string) {
     withShown,
     withMessaging,
     withPriority,
+    (n) => withValue(n, optionValue),
   )
 }
 
