@@ -129,7 +129,6 @@ export type {
 	Item as TeleportOverflowMenuItem,
 	Option as TeleportOverflowMenuOption,
 } from './TeleportOverflowMenu.vue'
-export { default as TeleportOverflowMenu } from './TeleportOverflowMenu.vue'
 export type {
 	TimeFrameLastUnit,
 	TimeFrameLastUnitOption,
