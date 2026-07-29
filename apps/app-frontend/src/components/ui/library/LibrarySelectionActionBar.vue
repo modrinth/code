@@ -78,7 +78,8 @@ const {
 	selectedLibraryInstances,
 	clearLibraryInstanceSelection,
 	setSelectedLibraryInstances,
-	openNewGroupModal,
+	creatingGroup,
+	createDefaultGroup,
 } = useLibrary()
 
 const confirmDeleteModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
@@ -95,7 +96,7 @@ const selectedGroupedInstances = computed(() =>
 		return instance?.group_ids.includes(selection.groupId) ? [{ instance, selection }] : []
 	}),
 )
-const busy = computed(() => deleting.value || removingFromGroup.value)
+const busy = computed(() => deleting.value || removingFromGroup.value || creatingGroup.value)
 
 const messages = defineMessages({
 	ariaLabel: {
@@ -120,8 +121,10 @@ const messages = defineMessages({
 	},
 })
 
-function createGroupFromSelection() {
-	openNewGroupModal(selectedInstanceIds.value)
+async function createGroupFromSelection() {
+	if (busy.value) return
+
+	await createDefaultGroup(selectedInstanceIds.value)
 }
 
 async function removeSelectedInstancesFromGroups() {

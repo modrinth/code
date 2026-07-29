@@ -108,6 +108,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const selectedLibraryInstances = ref(new Map<string, LibraryInstanceSelection>())
 	const isLibraryInstanceSelectionActive = computed(() => selectedLibraryInstances.value.size > 0)
 	const creatingGroup = ref(false)
+	const groupIdPendingNameEdit = ref<string | null>(null)
 	const activeInstanceGroupDrag = ref<ActiveInstanceGroupDrag | null>(null)
 	const activeDraggedInstanceKeys = computed(
 		() =>
@@ -411,6 +412,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const getInstanceGroupDropState = (groupId: string) => {
 		const drag = activeInstanceGroupDrag.value
+		const draggedSelectionsByInstanceId = new Map<string, LibraryInstanceSelection[]>()
+		for (const selection of drag?.instances ?? []) {
+			const selections = draggedSelectionsByInstanceId.get(selection.instanceId) ?? []
+			selections.push(selection)
+			draggedSelectionsByInstanceId.set(selection.instanceId, selections)
+		}
 		const draggedInstanceIds = new Set(
 			drag?.instances.map((selection) => selection.instanceId) ?? [],
 		)
@@ -425,9 +432,16 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				return toGroup !== null && !instance.group_ids.includes(toGroup)
 			}
 
-			return toGroup === null
-				? instance.group_ids.length > 0
-				: instance.group_ids.length !== 1 || instance.group_ids[0] !== toGroup
+			if (toGroup !== null) {
+				return !instance.group_ids.includes(toGroup)
+			}
+
+			const sourceGroupIds = new Set(
+				(draggedSelectionsByInstanceId.get(instance.id) ?? [])
+					.map((selection) => normalizeInstanceGroupId(selection.groupId))
+					.filter((sourceGroupId): sourceGroupId is string => sourceGroupId !== null),
+			)
+			return instance.group_ids.some((sourceGroupId) => sourceGroupIds.has(sourceGroupId))
 		})
 
 		return {
@@ -462,29 +476,73 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		if (!dropState.canDrop) return false
 
 		const shouldAdd = addToGroup && toGroup !== null
-		const draggedInstanceIds = new Set(drag.instances.map((selection) => selection.instanceId))
+		const draggedSelectionsByInstanceId = new Map<string, LibraryInstanceSelection[]>()
+		for (const selection of drag.instances) {
+			const selections = draggedSelectionsByInstanceId.get(selection.instanceId) ?? []
+			selections.push(selection)
+			draggedSelectionsByInstanceId.set(selection.instanceId, selections)
+		}
+		const draggedInstanceIds = new Set(draggedSelectionsByInstanceId.keys())
 		const draggedInstances = instances.value.filter((instance) =>
 			draggedInstanceIds.has(instance.id),
 		)
-		const results = await Promise.allSettled(
-			draggedInstances.map((instance) => {
-				const nextGroupIds = shouldAdd ? [...instance.group_ids] : toGroup ? [toGroup] : []
-				if (shouldAdd && toGroup && !nextGroupIds.includes(toGroup)) {
+		const operations = draggedInstances.flatMap((instance) => {
+			if (toGroup && instance.group_ids.includes(toGroup)) {
+				return []
+			}
+
+			const selections = draggedSelectionsByInstanceId.get(instance.id) ?? []
+			let nextGroupIds = [...instance.group_ids]
+			if (shouldAdd && toGroup) {
+				nextGroupIds.push(toGroup)
+			} else {
+				const sourceGroupIds = new Set(
+					selections
+						.map((selection) => normalizeInstanceGroupId(selection.groupId))
+						.filter((sourceGroupId): sourceGroupId is string => sourceGroupId !== null),
+				)
+				nextGroupIds = nextGroupIds.filter((sourceGroupId) => !sourceGroupIds.has(sourceGroupId))
+				if (toGroup) {
 					nextGroupIds.push(toGroup)
 				}
+			}
 
-				return edit(instance.id, { group_ids: nextGroupIds })
-			}),
-		)
+			return [
+				{
+					instanceId: instance.id,
+					selections,
+					destinationSelectionGroupId:
+						toGroup !== null || nextGroupIds.length === 0 ? groupId : null,
+					promise: edit(instance.id, { group_ids: nextGroupIds }),
+				},
+			]
+		})
+		const results = await Promise.allSettled(operations.map((operation) => operation.promise))
 		let movedInstanceCount = 0
+		const nextSelectedInstances = new Map(selectedLibraryInstances.value)
 
-		for (const result of results) {
+		for (const [index, result] of results.entries()) {
 			if (result.status === 'rejected') {
 				handleError(toError(result.reason))
 			} else {
 				movedInstanceCount++
+				const operation = operations[index]
+				const selectedMovedSelections = operation.selections.filter((selection) =>
+					nextSelectedInstances.has(getLibraryInstanceSelectionKey(selection)),
+				)
+				for (const selection of selectedMovedSelections) {
+					nextSelectedInstances.delete(getLibraryInstanceSelectionKey(selection))
+				}
+				if (selectedMovedSelections.length > 0 && operation.destinationSelectionGroupId !== null) {
+					const movedSelection = {
+						instanceId: operation.instanceId,
+						groupId: operation.destinationSelectionGroupId,
+					}
+					nextSelectedInstances.set(getLibraryInstanceSelectionKey(movedSelection), movedSelection)
+				}
 			}
 		}
+		selectedLibraryInstances.value = nextSelectedInstances
 
 		return movedInstanceCount > 0
 	}
@@ -503,13 +561,17 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		isAddingInstanceToGroup.value = false
 	})
 
-	const openNewGroupModal = (instanceIds: Iterable<string> = []) => {
+	const getDefaultNewGroupName = () => {
 		let groupNumber = groupNames.value.size + 1
 		while (existingGroupNames.value.has(`group ${groupNumber}`.toLowerCase())) {
 			groupNumber++
 		}
 
-		newGroupName.value = `Group ${groupNumber}`
+		return `Group ${groupNumber}`
+	}
+
+	const openNewGroupModal = (instanceIds: Iterable<string> = []) => {
+		newGroupName.value = getDefaultNewGroupName()
 		newGroupSearch.value = ''
 		selectedNewGroupInstanceIds.value = new Set(instanceIds)
 		isNewGroupModalOpen.value = true
@@ -594,6 +656,57 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			return false
 		} finally {
 			creatingGroup.value = false
+		}
+	}
+
+	const createDefaultGroup = async (instanceIds: Iterable<string> = []) => {
+		if (creatingGroup.value) return false
+
+		creatingGroup.value = true
+
+		try {
+			const group = await createInstanceGroup(getDefaultNewGroupName())
+			libraryGroups.value = [
+				...libraryGroups.value.filter((existingGroup) => existingGroup.id !== group.id),
+				group,
+			]
+
+			const selectedInstanceIds = new Set(instanceIds)
+			const instancesToAdd = instances.value.filter((instance) =>
+				selectedInstanceIds.has(instance.id),
+			)
+			await Promise.all(
+				instancesToAdd.map((instance) =>
+					edit(instance.id, {
+						group_ids: [...instance.group_ids, group.id],
+					}),
+				),
+			)
+
+			if (instancesToAdd.length > 0) {
+				setSelectedLibraryInstances(
+					instancesToAdd.map((instance) => ({
+						instanceId: instance.id,
+						groupId: group.id,
+					})),
+				)
+			}
+
+			displayState.value.group = 'Group'
+			groupIdPendingNameEdit.value = group.id
+			return true
+		} catch (error) {
+			handleError(toError(error))
+			await refreshGroups()
+			return false
+		} finally {
+			creatingGroup.value = false
+		}
+	}
+
+	const completePendingGroupNameEdit = (groupId: string) => {
+		if (groupIdPendingNameEdit.value === groupId) {
+			groupIdPendingNameEdit.value = null
 		}
 	}
 
@@ -735,6 +848,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		instanceGroupDragStatus,
 		isAddingInstanceToGroup,
 		creatingGroup,
+		groupIdPendingNameEdit,
 		newGroupInstances,
 		canCreateGroup,
 		instanceOptions,
@@ -754,6 +868,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		setSelectedLibraryInstances,
 		toggleLibraryInstanceSelection,
 		createGroup,
+		createDefaultGroup,
+		completePendingGroupNameEdit,
 		deleteGroup,
 		renameGroup,
 		deleteInstance,

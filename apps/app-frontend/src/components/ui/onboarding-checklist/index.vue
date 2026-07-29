@@ -33,11 +33,11 @@ const messages = defineMessages({
 	},
 	loginMinecraft: {
 		id: 'onboarding-checklist.login-minecraft',
-		defaultMessage: 'Log in to Minecraft',
+		defaultMessage: 'Sign in to Minecraft',
 	},
 	loginModrinth: {
 		id: 'onboarding-checklist.login-modrinth',
-		defaultMessage: 'Log in to Modrinth',
+		defaultMessage: 'Sign in to Modrinth',
 	},
 })
 

@@ -12,7 +12,7 @@ import {
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/library/instance-group/instance.vue'
@@ -41,6 +41,8 @@ const {
 	setSectionCollapsed,
 	deleteGroup,
 	renameGroup,
+	groupIdPendingNameEdit,
+	completePendingGroupNameEdit,
 	handleInstanceContextMenu,
 	displayState,
 	activeInstanceGroupDrag,
@@ -235,6 +237,18 @@ watch(
 	(value) => {
 		groupName.value = value
 	},
+)
+
+watch(
+	[() => props.instanceGroup.id, groupIdPendingNameEdit],
+	async ([groupId, pendingGroupId]) => {
+		if (groupId !== pendingGroupId) return
+
+		await nextTick()
+		await groupNameInput.value?.startEditing()
+		completePendingGroupNameEdit(groupId)
+	},
+	{ immediate: true, flush: 'post' },
 )
 
 watch(

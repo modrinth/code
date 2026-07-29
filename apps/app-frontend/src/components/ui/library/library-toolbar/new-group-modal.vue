@@ -118,6 +118,7 @@ const {
 	closeNewGroupModal,
 	toggleNewGroupInstance,
 	createGroup,
+	clearLibraryInstanceSelection,
 } = useLibrary()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -134,6 +135,7 @@ watch(isNewGroupModalOpen, (open) => {
 
 async function handleCreateGroup() {
 	if (await createGroup()) {
+		clearLibraryInstanceSelection()
 		modal.value?.hide()
 	}
 }
