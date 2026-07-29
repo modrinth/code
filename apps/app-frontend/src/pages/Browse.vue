@@ -3,9 +3,11 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	ClipboardCopyIcon,
+	CompassIcon,
 	ExternalIcon,
 	GlobeIcon,
 	PlusIcon,
+	ServerStackIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
 import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
@@ -15,6 +17,7 @@ import {
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
+	formatProjectTypeSentence,
 	getLatestMatchingInstallVersion,
 	getSelectedInstallPreferences,
 	getTargetInstallPreferences,
@@ -31,9 +34,9 @@ import {
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
-import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
@@ -52,13 +55,17 @@ import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_instance_worlds } from '@/helpers/worlds'
+import {
+	type BreadcrumbDefinition,
+	useBreadcrumb,
+	useRootBreadcrumb,
+} from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {
 	createServerInstallContent,
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
@@ -71,6 +78,40 @@ const debugLog = useDebugLogger('Browse')
 
 const router = useRouter()
 const route = useRoute()
+const displayedBrowseRoute = shallowRef(router.currentRoute.value)
+watch(
+	() => router.currentRoute.value,
+	(nextRoute) => {
+		if (nextRoute.path.startsWith('/browse/')) {
+			displayedBrowseRoute.value = nextRoute
+		}
+	},
+	{ immediate: true },
+)
+const breadcrumbMessages = defineMessages({
+	discoverProjectType: {
+		id: 'app.browse.discover-project-type',
+		defaultMessage: 'Discover {projectType}',
+	},
+	discoverServers: {
+		id: 'app.browse.discover-servers',
+		defaultMessage: 'Discover servers',
+	},
+})
+const breadcrumbLabel = computed(() => {
+	const browseRoute = displayedBrowseRoute.value
+	if (browseRoute.query.from === 'worlds' || browseRoute.params.projectType === 'server') {
+		return formatMessage(breadcrumbMessages.discoverServers)
+	}
+
+	return formatMessage(breadcrumbMessages.discoverProjectType, {
+		projectType: formatProjectTypeSentence(
+			formatMessage,
+			String(browseRoute.params.projectType ?? ''),
+			2,
+		),
+	})
+})
 const themeStore = useTheming()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
@@ -111,6 +152,86 @@ const {
 	markServerProjectInstalled,
 } = serverInstallContent
 
+type Instance = {
+	game_version: string
+	loader: string
+	path: string
+	install_stage: string
+	icon_path?: string
+	name: string
+	link?: {
+		type: string
+		project_id: string
+		version_id: string
+	}
+}
+
+const initialInstanceId = String(route.query.i ?? '')
+const instance: Ref<Instance | null> = ref(
+	queryClient.getQueryData<Instance>(['instances', 'summary', initialInstanceId]) ?? null,
+)
+const installedProjectIds: Ref<string[] | null> = ref(null)
+const instanceHideInstalled = ref(false)
+const newlyInstalled = ref<string[]>([])
+const hiddenInstanceProjectIds = ref<Set<string>>(new Set())
+const hiddenInstanceProjectIdsInitialized = ref(false)
+const isServerInstance = ref(false)
+
+const instanceBreadcrumb = route.query.i
+	? useBreadcrumb({
+			slot: 'instance',
+			id: () => `instance:${String(displayedBrowseRoute.value.query.i ?? '')}`,
+			label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+			visual: () => ({
+				type: 'image',
+				src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+				alt: instance.value?.name,
+				tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
+			}),
+			to: () => {
+				const instancePath = `/instance/${encodeURIComponent(
+					String(displayedBrowseRoute.value.query.i ?? ''),
+				)}`
+				return displayedBrowseRoute.value.query.from === 'worlds'
+					? `${instancePath}/worlds`
+					: instancePath
+			},
+		})
+	: undefined
+const serverBreadcrumbTo = ref(serverBackUrl.value)
+watch(serverBackUrl, (value) => {
+	if (route.path.startsWith('/browse/')) {
+		serverBreadcrumbTo.value = value
+	}
+})
+const serverBreadcrumb =
+	!instanceBreadcrumb && serverIdQuery.value
+		? useBreadcrumb({
+				slot: 'server',
+				id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
+				label: () =>
+					serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
+				visual: { type: 'icon', component: ServerStackIcon },
+				to: serverBreadcrumbTo,
+			})
+		: undefined
+const breadcrumbParent = instanceBreadcrumb ?? serverBreadcrumb
+const breadcrumbDefinition = {
+	slot: 'browse',
+	id: () =>
+		`browse:${String(displayedBrowseRoute.value.params.projectType ?? '')}:${String(
+			displayedBrowseRoute.value.query.i ?? '',
+		)}:${String(displayedBrowseRoute.value.query.sid ?? '')}:${String(
+			displayedBrowseRoute.value.query.from ?? '',
+		)}`,
+	label: breadcrumbLabel,
+	to: () => displayedBrowseRoute.value.fullPath,
+	visual: { type: 'icon', component: CompassIcon },
+} satisfies BreadcrumbDefinition
+const browseBreadcrumb = breadcrumbParent
+	? useBreadcrumb(breadcrumbDefinition, { parent: breadcrumbParent })
+	: useRootBreadcrumb(breadcrumbDefinition)
+
 debugLog('fetching tags (categories, loaders, gameVersions)')
 const [categories, loaders, availableGameVersions] = await Promise.all([
 	get_categories()
@@ -129,28 +250,6 @@ const tags: Ref<Tags> = computed(() => ({
 	loaders: loaders.value ?? [],
 	categories: categories.value ?? [],
 }))
-
-type Instance = {
-	game_version: string
-	loader: string
-	path: string
-	install_stage: string
-	icon_path?: string
-	name: string
-	link?: {
-		type: string
-		project_id: string
-		version_id: string
-	}
-}
-
-const instance: Ref<Instance | null> = ref(null)
-const installedProjectIds: Ref<string[] | null> = ref(null)
-const instanceHideInstalled = ref(false)
-const newlyInstalled = ref<string[]>([])
-const hiddenInstanceProjectIds = ref<Set<string>>(new Set())
-const hiddenInstanceProjectIdsInitialized = ref(false)
-const isServerInstance = ref(false)
 
 if (isFromWorlds.value && route.params.projectType !== 'server') {
 	router.replace({
@@ -385,10 +484,6 @@ const messages = defineMessages({
 		id: 'app.browse.add-to-an-instance',
 		defaultMessage: 'Add to an instance',
 	},
-	discoverServers: {
-		id: 'app.browse.discover-servers',
-		defaultMessage: 'Discover servers',
-	},
 	environmentProvidedByServer: {
 		id: 'search.filter.locked.server-environment.title',
 		defaultMessage: 'Only client-side mods can be added to the server instance',
@@ -444,31 +539,6 @@ const messages = defineMessages({
 	},
 })
 
-const breadcrumbs = useBreadcrumbs()
-const browseTitle = computed(() =>
-	formatMessage(
-		isFromWorlds.value ? messages.discoverServers : commonMessages.discoverContentLabel,
-	),
-)
-breadcrumbs.setName('BrowseTitle', browseTitle.value)
-if (instance.value) {
-	const instanceLink = `/instance/${encodeURIComponent(instance.value.id)}`
-	breadcrumbs.setContext({
-		name: instance.value.name,
-		link: isFromWorlds.value ? `${instanceLink}/worlds` : instanceLink,
-	})
-} else {
-	breadcrumbs.setContext(null)
-}
-
-onBeforeRouteLeave(() => {
-	breadcrumbs.setContext({
-		name: browseTitle.value,
-		link: `/browse/${projectType.value}`,
-		query: route.query,
-	})
-})
-
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
 
 function resetInstanceContext() {
@@ -482,8 +552,7 @@ function resetInstanceContext() {
 	hiddenInstanceProjectIds.value = new Set()
 	hiddenInstanceProjectIdsInitialized.value = false
 	isServerInstance.value = false
-	breadcrumbs.setName('BrowseTitle', formatMessage(commonMessages.discoverContentLabel))
-	breadcrumbs.setContext(null)
+	browseBreadcrumb.reset()
 }
 
 watch(
@@ -898,6 +967,14 @@ async function search(requestParams: string) {
 			serverHits: [],
 			total_hits: 0,
 			per_page: 20,
+		}
+	}
+
+	for (const hit of rawResults.result.hits) {
+		for (const identifier of [hit.project_id, hit.slug]) {
+			if (identifier) {
+				queryClient.setQueryData(['projects', 'summary', identifier], hit)
+			}
 		}
 	}
 

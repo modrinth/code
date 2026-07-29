@@ -13,9 +13,10 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, inject, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 
 import {
@@ -29,12 +30,11 @@ import {
 	unblock_user,
 } from '@/helpers/users'
 import { appSettingsModalOpenProfileKey } from '@/providers/app-settings-modal'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumb } from '@/providers/breadcrumbs'
 
 const route = useRoute()
 const openProfileSettings = inject(appSettingsModalOpenProfileKey, () => {})
 const queryClient = useQueryClient()
-const breadcrumbs = useBreadcrumbs()
 const userProfile = provideUserProfile({
 	getUser: get_user_profile,
 	getProjects: get_user_projects,
@@ -55,17 +55,54 @@ const projectType = computed(() => {
 	return Array.isArray(value) ? value[0] : value
 })
 
+function getCachedUserSummary(id: string) {
+	return queryClient.getQueryData<Labrinth.Users.v3.User>(['users', 'summary', id])
+}
+
+const { data: user } = useQuery({
+	queryKey: computed(() => ['user', userId.value]),
+	queryFn: () => userProfile.getUser(userId.value),
+	enabled: false,
+	staleTime: 30_000,
+})
+
+const breadcrumbUserId = ref(userId.value)
+const breadcrumbLabel = ref(getCachedUserSummary(userId.value)?.username ?? userId.value)
+const breadcrumbTo = ref(route.fullPath)
+watch(
+	[userId, user, () => route.fullPath],
+	([currentUserId, currentUser, currentPath]) => {
+		if (route.name !== 'User') return
+		breadcrumbUserId.value = currentUserId
+		breadcrumbLabel.value = currentUser?.username ?? currentUserId
+		breadcrumbTo.value = currentPath
+	},
+	{ immediate: true, flush: 'sync' },
+)
+
+useBreadcrumb({
+	slot: 'user',
+	id: () => `user:${breadcrumbUserId.value}`,
+	label: breadcrumbLabel,
+	to: breadcrumbTo,
+	visual: () => ({
+		type: 'image',
+		src: user.value?.avatar_url ?? getCachedUserSummary(breadcrumbUserId.value)?.avatar_url,
+		alt: breadcrumbLabel.value,
+		circle: true,
+		tintBy: breadcrumbUserId.value,
+	}),
+})
+
 async function ensureUserProfileData(id: string): Promise<void> {
 	if (!id) return
 
-	let breadcrumbName = id
 	try {
-		const user = await queryClient.ensureQueryData({
+		await queryClient.ensureQueryData({
 			queryKey: ['user', id],
 			queryFn: () => userProfile.getUser(id),
 			staleTime: 30_000,
 		})
-		breadcrumbName = user.username
 	} catch {
 		// Let the mounted layout's useQuery surface errors; do not fail route setup.
 	}
@@ -87,8 +124,6 @@ async function ensureUserProfileData(id: string): Promise<void> {
 			staleTime: 30_000,
 		}),
 	])
-
-	breadcrumbs.setName('User', breadcrumbName)
 }
 
 onBeforeRouteUpdate(async (to) => {
@@ -97,21 +132,5 @@ onBeforeRouteUpdate(async (to) => {
 	await ensureUserProfileData(id)
 })
 
-breadcrumbs.setName('User', userId.value)
 await ensureUserProfileData(userId.value)
-
-const { data: user } = useQuery({
-	queryKey: computed(() => ['user', userId.value]),
-	queryFn: () => userProfile.getUser(userId.value),
-	enabled: false,
-	staleTime: 30_000,
-})
-
-watch(
-	[userId, user],
-	([currentUserId, value]) => {
-		breadcrumbs.setName('User', value?.username ?? currentUserId)
-	},
-	{ immediate: true },
-)
 </script>

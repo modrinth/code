@@ -3860,23 +3860,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Añadir una URI de redirección"
   },
-  "settings.applications.button.cancel": {
-    "message": "Cancelar"
-  },
   "settings.applications.button.create": {
     "message": "Crear aplicación"
   },
   "settings.applications.button.delete": {
     "message": "Eliminar"
   },
-  "settings.applications.button.edit": {
-    "message": "Editar"
-  },
   "settings.applications.button.new": {
     "message": "Nueva aplicación"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Guardar cambios"
   },
   "settings.applications.button.upload-icon": {
     "message": "Subir icono"

@@ -10,9 +10,10 @@ import {
 } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
+	ChevronLeftIcon,
+	ChevronRightIcon,
 	CompassIcon,
 	HomeIcon,
-	LeftArrowIcon,
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
@@ -46,6 +47,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	TextLogo,
 	useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
@@ -63,7 +65,6 @@ import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
-import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
@@ -129,6 +130,7 @@ import {
 	openAppUpdateChangelog,
 	setAppUpdateActions,
 } from '@/providers/app-update.ts'
+import { createBreadcrumbManager, provideBreadcrumbManager } from '@/providers/breadcrumbs'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
 	provideAppUpdateDownloadProgress,
@@ -151,6 +153,19 @@ import { appSettingsModalOpenProfileKey } from './providers/app-settings-modal'
 const themeStore = useTheming()
 const router = useRouter()
 const route = useRoute()
+const breadcrumbManager = createBreadcrumbManager()
+provideBreadcrumbManager(breadcrumbManager)
+const canNavigateBack = ref(false)
+const canNavigateForward = ref(false)
+
+function updateHistoryNavigationState() {
+	const historyState = window.history.state
+	canNavigateBack.value = historyState?.back != null
+	canNavigateForward.value = historyState?.forward != null
+}
+
+updateHistoryNavigationState()
+
 const APP_LEFT_NAV_WIDTH = '4rem'
 const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
@@ -655,6 +670,7 @@ router.beforeEach(() => {
 	routerToken = loading.begin()
 })
 router.afterEach((to, from, failure) => {
+	updateHistoryNavigationState()
 	trackEvent('PageView', {
 		path: to.path,
 		fromPath: from.path,
@@ -1623,23 +1639,37 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-			<div data-tauri-drag-region class="flex min-w-0 flex-1 overflow-hidden p-3">
-				<ModrinthAppLogo class="h-full w-auto shrink-0 text-contrast pointer-events-none" />
-				<div data-tauri-drag-region class="flex shrink-0 items-center gap-1 ml-3">
-					<button
-						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
-						@click="router.back()"
-					>
-						<LeftArrowIcon />
-					</button>
-					<button
-						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
-						@click="router.forward()"
-					>
-						<RightArrowIcon />
-					</button>
+			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
+				<TextLogo class="h-7 w-auto shrink-0 text-contrast pointer-events-none" />
+				<div data-tauri-drag-region class="ml-2 flex shrink-0 items-center gap-2">
+					<ButtonStyled type="outlined" circular>
+						<button
+							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
+							:disabled="!canNavigateBack"
+							aria-label="Go back"
+							@click="router.back()"
+						>
+							<ChevronLeftIcon
+								class="!size-4 !text-primary"
+								:class="{ 'opacity-20': !canNavigateBack }"
+							/>
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="outlined" circular>
+						<button
+							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
+							:disabled="!canNavigateForward"
+							aria-label="Go forward"
+							@click="router.forward()"
+						>
+							<ChevronRightIcon
+								class="!size-4 !text-primary"
+								:class="{ 'opacity-20': !canNavigateForward }"
+							/>
+						</button>
+					</ButtonStyled>
 				</div>
-				<Breadcrumbs class="pt-[2px]" />
+				<Breadcrumbs />
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
 				<ButtonStyled

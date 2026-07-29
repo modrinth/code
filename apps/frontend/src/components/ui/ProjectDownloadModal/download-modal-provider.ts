@@ -86,10 +86,17 @@ export function provideDownloadModalProvider(
 	const tags = useGeneratedState()
 
 	const shouldResolveDependencies = computed(
-		() => !!options.project.value && !!options.selectedVersion.value,
+		() =>
+			!!options.project.value &&
+			!!options.selectedVersion.value &&
+			!!options.currentGameVersion.value,
 	)
 	const dependencyResolutionPreferences = computed(() =>
-		createResolutionPreferences(options.selectedVersion.value, options.currentPlatform.value),
+		createResolutionPreferences(
+			options.selectedVersion.value,
+			options.currentGameVersion.value,
+			options.currentPlatform.value,
+		),
 	)
 
 	const { data: dependencyResolution, isFetching: dependencyResolutionFetching } = useQuery({
@@ -309,10 +316,12 @@ export function provideDownloadModalProvider(
 	})
 
 	async function preloadDependenciesForSelection(selection: ProjectDownloadSelection) {
-		if (!options.project.value || !selection.selectedVersion) return
+		if (!options.project.value || !selection.selectedVersion || !selection.currentGameVersion)
+			return
 
 		const preferences = createResolutionPreferences(
 			selection.selectedVersion,
+			selection.currentGameVersion,
 			selection.currentPlatform,
 		)
 
@@ -548,10 +557,11 @@ function dependencyProjectsQueryOptions(
 
 function createResolutionPreferences(
 	version: Labrinth.Versions.v3.Version | null,
+	currentGameVersion: string | null,
 	currentPlatform: string | null,
 ): Labrinth.Content.v3.ResolutionPreferences {
 	return {
-		game_versions: version?.game_versions || [],
+		game_versions: currentGameVersion ? [currentGameVersion] : [],
 		loaders: currentPlatform ? [currentPlatform] : version?.loaders || [],
 	}
 }

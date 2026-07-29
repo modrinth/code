@@ -109,8 +109,8 @@
 				</template>
 			</div>
 			<ConversationThread
-				v-if="thread"
-				:thread="thread"
+				v-if="prefixedThread"
+				:thread="prefixedThread"
 				:project="project"
 				:set-status="setStatus"
 				:current-member="currentMember ?? undefined"
@@ -151,6 +151,7 @@ import {
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
+import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
@@ -216,6 +217,26 @@ const {
 	allMembers,
 	thread,
 } = injectProjectPageContext()
+
+const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
+
+const prefixedThread = computed(() => {
+	const projectDate = project.value?.queued ?? project.value?.approved ?? project.value?.published
+	if (thread.value && projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
+		const newThread = JSON.parse(JSON.stringify(thread.value))
+		newThread.messages.unshift({
+			id: '69',
+			author_id: null,
+			body: {
+				type: 'legacy_project_message',
+			},
+			created: THREADS_RELEASE_DATE,
+			hide_identity: false,
+		})
+		return newThread
+	}
+	return thread.value
+})
 
 const canAccess = computed(() => !!currentMember.value)
 const staff = computed(() => isStaff(currentMember.value?.user))

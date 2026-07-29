@@ -13,7 +13,14 @@
 			<Table :columns="inviteColumns" :data="activeInvites" row-key="id" table-min-width="36rem">
 				<template #empty-state>
 					<div class="flex h-40 items-center justify-center text-secondary">
-						{{ formatMessage(messages.noActiveInvites) }}
+						<SpinnerIcon
+							v-if="activeInvitesQuery.isLoading.value"
+							class="animate-spin"
+							aria-hidden="true"
+						/>
+						<template v-else>
+							{{ formatMessage(messages.noActiveInvites) }}
+						</template>
 					</div>
 				</template>
 				<template #cell-id="{ row }">
@@ -41,10 +48,19 @@
 										code: row.id,
 									})
 								"
+								:disabled="revokeInviteMutation.isPending.value || isBusy"
 								class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
 								@click="revokeInviteModal?.show(row.id)"
 							>
-								<XIcon aria-hidden="true" />
+								<SpinnerIcon
+									v-if="
+										revokeInviteMutation.isPending.value &&
+										revokeInviteMutation.variables.value?.inviteId === row.id
+									"
+									class="animate-spin"
+									aria-hidden="true"
+								/>
+								<XIcon v-else aria-hidden="true" />
 							</button>
 						</ButtonStyled>
 					</div>
@@ -64,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
+import { SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	CopyCode,
@@ -75,13 +91,18 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import ConfirmRevokeSharedInstanceInviteModal from '@/components/ui/shared-instances/ConfirmRevokeSharedInstanceInviteModal.vue'
 import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
 import { config } from '@/config'
-import { type SharedInstanceInvite, unpublish_shared_instance } from '@/helpers/instance'
+import {
+	get_shared_instance_invites,
+	revoke_shared_instance_invite,
+	type SharedInstanceInvite,
+	unpublish_shared_instance,
+} from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
@@ -93,11 +114,51 @@ const unpublishing = ref(false)
 const revokeInviteModal = ref<InstanceType<typeof ConfirmRevokeSharedInstanceInviteModal>>()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
-const isBusy = computed(
-	() => instance.value.install_stage !== 'installed' || unpublishing.value || !!offline,
-)
 
 type InviteTableColumn = 'id' | 'uses' | 'expiration' | 'actions'
+type ActiveInvitesQueryKey = readonly ['sharedInstanceInvites', string]
+
+const activeInvitesQueryKey = computed(
+	() => ['sharedInstanceInvites', instance.value.id] as const satisfies ActiveInvitesQueryKey,
+)
+const activeInvitesQuery = useQuery({
+	queryKey: activeInvitesQueryKey,
+	queryFn: async ({ queryKey }) => {
+		try {
+			return await get_shared_instance_invites(queryKey[1])
+		} catch (error) {
+			notifySharedInstanceError(error)
+			throw error
+		}
+	},
+	enabled: () => !!instance.value.id && !offline,
+	retry: false,
+	staleTime: Infinity,
+	refetchOnMount: 'always',
+	refetchOnReconnect: false,
+	refetchOnWindowFocus: false,
+})
+const activeInvites = computed(() => activeInvitesQuery.data.value ?? [])
+
+const revokeInviteMutation = useMutation({
+	mutationFn: ({ instanceId, inviteId }: { instanceId: string; inviteId: string }) =>
+		revoke_shared_instance_invite(instanceId, inviteId),
+	onSuccess: (_data, { instanceId, inviteId }) => {
+		queryClient.setQueryData<SharedInstanceInvite[]>(
+			['sharedInstanceInvites', instanceId],
+			(invites = []) => invites.filter((invite) => invite.id !== inviteId),
+		)
+	},
+	onError: notifySharedInstanceError,
+})
+
+const isBusy = computed(
+	() =>
+		instance.value.install_stage !== 'installed' ||
+		unpublishing.value ||
+		revokeInviteMutation.isPending.value ||
+		!!offline,
+)
 
 const inviteColumns = computed<TableColumn<InviteTableColumn>[]>(() => [
 	{
@@ -123,32 +184,9 @@ const inviteColumns = computed<TableColumn<InviteTableColumn>[]>(() => [
 	},
 ])
 
-const now = Date.now()
-
-// TODO: Use actual endpoint
-const activeInvites = ref<SharedInstanceInvite[]>([
-	{
-		id: 'wqHPxNagZr',
-		expiration: new Date(now + 6 * 24 * 60 * 60 * 1000).toISOString(),
-		maxUses: 10,
-		uses: 0,
-	},
-	{
-		id: 'GbRGfY7hbs',
-		expiration: new Date(now + 3 * 24 * 60 * 60 * 1000).toISOString(),
-		maxUses: 10,
-		uses: 2,
-	},
-	{
-		id: 'k9mvD2QxLc',
-		expiration: new Date(now + 90 * 60 * 1000).toISOString(),
-		maxUses: 5,
-		uses: 4,
-	},
-])
-
 function revokeInvite(inviteId: string) {
-	activeInvites.value = activeInvites.value.filter((invite) => invite.id !== inviteId)
+	if (revokeInviteMutation.isPending.value) return
+	revokeInviteMutation.mutate({ instanceId: instance.value.id, inviteId })
 }
 
 async function unpublishSharedInstance() {

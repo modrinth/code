@@ -138,7 +138,14 @@ import {
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { injectAuth, injectNotificationManager, NavTabs, useLoadingBarToken } from '@modrinth/ui'
+import {
+	commonMessages,
+	injectAuth,
+	injectNotificationManager,
+	NavTabs,
+	useLoadingBarToken,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -185,9 +192,10 @@ import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useTheming } from '@/store/state'
+import { useTheming } from '@/store/state'
 
 import { provideSharedInstanceState, useSharedInstanceState } from './use-shared-instance-state'
 
@@ -198,10 +206,10 @@ const { playServerProject } = injectServerInstall()
 const auth = injectAuth()
 const queryClient = useQueryClient()
 const route = useRoute()
+const { formatMessage } = useVIntl()
 
 const router = useRouter()
 const displayedInstanceRoute = shallowRef(router.currentRoute.value)
-const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_instance_play_time'))
 const contentSubpageRouteNames = new Set(['Mods', 'ModsFilter'])
@@ -214,7 +222,23 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const instance = ref<GameInstance>()
+const initialInstanceId = String(displayedInstanceRoute.value.params.id ?? '')
+const instance = ref<GameInstance | undefined>(
+	queryClient.getQueryData<GameInstance>(['instances', 'summary', initialInstanceId]),
+)
+useRootBreadcrumb({
+	slot: 'instance',
+	id: () => `instance:${String(displayedInstanceRoute.value.params.id ?? '')}`,
+	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: () => ({
+		type: 'image',
+		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		alt: instance.value?.name,
+		tintBy: instance.value?.id ?? String(displayedInstanceRoute.value.params.id ?? ''),
+	}),
+	to: () => `/instance/${encodeURIComponent(String(displayedInstanceRoute.value.params.id ?? ''))}`,
+})
+
 const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)
 const loading = ref(false)
@@ -339,6 +363,9 @@ async function fetchInstance() {
 	}
 
 	instance.value = nextInstance ?? undefined
+	if (nextInstance) {
+		queryClient.setQueryData(['instances', 'summary', nextInstance.id], nextInstance)
+	}
 	displayedInstanceRoute.value = nextRoute
 	sharedInstanceState.reset()
 	sharedInstanceState.refreshAvailability()
@@ -502,20 +529,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-if (instance.value) {
-	breadcrumbs.setName(
-		'Instance',
-		instance.value.name.length > 40
-			? instance.value.name.substring(0, 40) + '...'
-			: instance.value.name,
-	)
-	breadcrumbs.setContext({
-		name: instance.value.name,
-		link: displayedInstanceRoute.value.path,
-		query: displayedInstanceRoute.value.query,
-	})
-}
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 

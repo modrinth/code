@@ -2918,23 +2918,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Tambah URI pengarahan ulang"
   },
-  "settings.applications.button.cancel": {
-    "message": "Batal"
-  },
   "settings.applications.button.create": {
     "message": "Buat aplikasi"
   },
   "settings.applications.button.delete": {
     "message": "Hapus"
   },
-  "settings.applications.button.edit": {
-    "message": "Sunting"
-  },
   "settings.applications.button.new": {
     "message": "Aplikasi baru"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Simpan perubahan"
   },
   "settings.applications.button.upload-icon": {
     "message": "Unggah ikon"

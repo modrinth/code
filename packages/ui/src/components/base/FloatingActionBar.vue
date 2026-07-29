@@ -198,6 +198,9 @@ async function nudge(): Promise<void> {
 }
 
 defineExpose({ nudge })
+defineOptions({
+	inheritAttrs: false,
+})
 </script>
 
 <template>
@@ -205,6 +208,7 @@ defineExpose({ nudge })
 		<Transition name="floating-action-bar" appear>
 			<div
 				v-if="shown"
+				v-bind="$attrs"
 				ref="barEl"
 				class="floating-action-bar drop-shadow-2xl"
 				:class="inline ? 'floating-action-bar--inline z-10' : 'fixed bottom-0 p-4'"

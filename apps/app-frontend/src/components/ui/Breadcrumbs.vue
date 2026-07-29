@@ -2,7 +2,7 @@
 	<div
 		ref="outerRef"
 		data-tauri-drag-region
-		class="min-w-0 overflow-hidden pl-3"
+		class="min-w-0 overflow-hidden pl-4"
 		:class="{ 'breadcrumb-fade-mask': isOverflowing }"
 		:style="isOverflowing ? { '--scroll-distance': `-${overflowAmount}px` } : undefined"
 		@mouseenter="onMouseEnter"
@@ -11,30 +11,48 @@
 		<div
 			ref="innerRef"
 			data-tauri-drag-region
-			class="flex w-fit items-center gap-1"
+			class="flex w-fit items-center gap-2 pr-4"
 			:class="{ 'breadcrumbs-scroll': isAnimating }"
 			@animationiteration="onAnimationIteration"
 		>
-			{{ breadcrumbData.resetToNames(breadcrumbs) }}
-			<template v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name">
-				<router-link
-					v-if="breadcrumb.link"
-					:to="{
-						path: breadcrumb.link.replace('{id}', encodeURIComponent($route.params.id as string)),
-						query: breadcrumb.query,
-					}"
-					class="shrink-0 whitespace-nowrap text-primary"
+			<template v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.slot">
+				<component
+					:is="index < breadcrumbs.length - 1 && breadcrumb.to ? RouterLink : 'span'"
+					v-bind="index < breadcrumbs.length - 1 && breadcrumb.to ? { to: breadcrumb.to } : {}"
+					:data-tauri-drag-region="index === breadcrumbs.length - 1 ? '' : undefined"
+					class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-base font-medium leading-6"
+					:class="
+						index === breadcrumbs.length - 1
+							? 'cursor-default select-none text-contrast'
+							: 'text-primary hover:text-contrast'
+					"
+					:aria-current="index === breadcrumbs.length - 1 ? 'page' : undefined"
 				>
-					{{ resolveLabel(breadcrumb.name) }}
-				</router-link>
-				<span
-					v-else
+					<Avatar
+						v-if="breadcrumb.visual?.type === 'image'"
+						:src="breadcrumb.visual.src"
+						:alt="breadcrumb.visual.alt ?? breadcrumb.label"
+						:circle="breadcrumb.visual.circle"
+						:tint-by="breadcrumb.visual.tintBy ?? breadcrumb.id"
+						size="20px"
+						no-shadow
+						raised
+						class="inline-block shrink-0 align-middle"
+						:class="{ '!rounded-md': !breadcrumb.visual.circle }"
+					/>
+					<component
+						:is="breadcrumb.visual.component"
+						v-else-if="breadcrumb.visual?.type === 'icon'"
+						class="size-5 shrink-0 text-primary"
+						aria-hidden="true"
+					/>
+					<span>{{ breadcrumb.label }}</span>
+				</component>
+				<ChevronRightIcon
+					v-if="index < breadcrumbs.length - 1"
 					data-tauri-drag-region
-					class="shrink-0 whitespace-nowrap text-contrast font-semibold cursor-default select-none"
-				>
-					{{ resolveLabel(breadcrumb.name) }}
-				</span>
-				<ChevronRightIcon v-if="breadcrumb.link" data-tauri-drag-region class="w-5 h-5 shrink-0" />
+					class="size-5 shrink-0 text-primary"
+				/>
 			</template>
 		</div>
 	</div>
@@ -42,34 +60,13 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { Avatar } from '@modrinth/ui'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { injectBreadcrumbManager } from '@/providers/breadcrumbs'
 
-interface Breadcrumb {
-	name: string
-	link?: string
-	query?: Record<string, string>
-}
-
-const route = useRoute()
-const breadcrumbData = useBreadcrumbs()
-
-const breadcrumbs = computed<Breadcrumb[]>(() => {
-	const additionalContext =
-		route.meta.useContext === true
-			? breadcrumbData.context
-			: route.meta.useRootContext === true
-				? breadcrumbData.rootContext
-				: null
-	const crumbs = (route.meta.breadcrumb ?? []) as Breadcrumb[]
-	return additionalContext ? [additionalContext as Breadcrumb, ...crumbs] : crumbs
-})
-
-function resolveLabel(name: string): string {
-	return name.charAt(0) === '?' ? breadcrumbData.getName(name.slice(1)) : name
-}
+const { entries: breadcrumbs } = injectBreadcrumbManager()
 
 // Overflow detection
 const outerRef = ref<HTMLDivElement | null>(null)
@@ -83,9 +80,13 @@ let stopping = false
 
 function checkOverflow() {
 	if (!outerRef.value || !innerRef.value) return
-	const overflow = innerRef.value.scrollWidth - outerRef.value.clientWidth
+	const outerStyles = window.getComputedStyle(outerRef.value)
+	const horizontalPadding =
+		Number.parseFloat(outerStyles.paddingLeft) + Number.parseFloat(outerStyles.paddingRight)
+	const availableWidth = outerRef.value.clientWidth - horizontalPadding
+	const overflow = innerRef.value.scrollWidth - availableWidth
 	isOverflowing.value = overflow > 0
-	overflowAmount.value = overflow + 12
+	overflowAmount.value = overflow
 }
 
 function onMouseEnter() {

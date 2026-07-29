@@ -6,6 +6,7 @@ import {
 	EyeIcon,
 	LogInIcon,
 	RotateCounterClockwiseIcon,
+	ShirtIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
@@ -56,9 +57,18 @@ import {
 	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/state'
 import { appMessages } from '@/utils/app-messages'
+
+useRootBreadcrumb({
+	slot: 'root',
+	id: 'skins',
+	label: 'Skin selector',
+	to: '/skins',
+	visual: { type: 'icon', component: ShirtIcon },
+})
 
 type UnlistenFn = () => void
 type VirtualSkinSectionListExpose = {
