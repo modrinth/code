@@ -65,6 +65,7 @@ pub enum FeatureFlag {
     SkipNonEssentialWarnings,
     AdvancedFiltersCollapsed,
     AlwaysShowCopyDetails,
+    HideInstalledModpacks,
 }
 
 impl Settings {
