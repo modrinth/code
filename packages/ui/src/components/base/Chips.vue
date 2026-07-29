@@ -1,30 +1,31 @@
 <template>
 	<div class="chips" role="radiogroup" :aria-label="ariaLabel">
-		<Button
+		<ButtonStyled
 			v-for="item in items"
 			:key="formatLabel(item)"
-			v-tooltip="isDisabled(item) ? disabledTooltip : undefined"
-			role="radio"
-			:aria-checked="selected === item"
-			:disabled="isDisabled(item)"
-			class="btn !brightness-100 hover:!brightness-125"
-			:class="{
-				selected: selected === item,
-				capitalize: capitalize,
-				'!px-2.5 !py-1.5': size === 'small',
-			}"
-			@click="toggleItem(item)"
+			type="chip"
+			:size="size"
+			:color="selected === item ? 'brand' : 'standard'"
 		>
-			<CheckIcon v-if="selected === item && !hideCheckmarkIcon" />
-			<span>{{ formatLabel(item) }}</span>
-		</Button>
+			<button
+				v-tooltip="isDisabled(item) ? disabledTooltip : undefined"
+				role="radio"
+				:aria-checked="selected === item"
+				:disabled="isDisabled(item)"
+				:class="{ capitalize }"
+				@click="toggleItem(item)"
+			>
+				<CheckIcon v-if="selected === item && !hideCheckmarkIcon" />
+				<span>{{ formatLabel(item) }}</span>
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 
 <script setup lang="ts" generic="T">
 import { CheckIcon } from '@modrinth/assets'
 
-import Button from './Button.vue'
+import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -74,26 +75,12 @@ function toggleItem(item: T) {
 	grid-gap: 0.5rem;
 	flex-wrap: wrap;
 
-	.btn {
-		border: 1px solid transparent;
-		&.capitalize {
-			text-transform: capitalize;
-		}
-
-		svg {
-			width: 1em;
-			height: 1em;
-		}
-
-		&:focus-visible {
-			outline: 0.25rem solid var(--color-focus-ring);
-		}
+	:deep(button) {
+		transition-property: scale, filter !important;
 	}
 
-	.selected {
-		color: var(--color-brand);
-		background-color: var(--color-brand-highlight);
-		border: 1px solid var(--color-brand);
+	.capitalize {
+		text-transform: capitalize;
 	}
 }
 </style>
