@@ -84,7 +84,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	})
 	const serverProjectIds = ref(new Set<string>())
 	const libraryGroups = ref<InstanceGroupDefinition[]>([])
-	const groupIdsByName = ref(new Map<string, string>())
 	const isNewGroupModalOpen = ref(false)
 	const newGroupName = ref('')
 	const newGroupSearch = ref('')
@@ -102,7 +101,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const isAddingInstanceToGroup = ref(false)
 	const instanceOptions = ref<InstanceContextMenu | null>(null)
 	const currentDeleteInstanceId = ref<string | null>(null)
-	const currentContextGroupName = ref<string | null>(null)
+	const currentContextGroupId = ref<string | null>(null)
 	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
 
 	const displayState = useStorage<{
@@ -129,10 +128,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const groupNames = computed(
 		() =>
 			new Set(
-				[
-					...libraryGroups.value.map((group) => group.name),
-					...instances.value.flatMap((instance) => instance.groups),
-				]
+				libraryGroups.value
+					.map((group) => group.name)
 					.map((group) => group.trim())
 					.filter((group) => group && group.toLowerCase() !== 'none'),
 			),
@@ -141,9 +138,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		() => new Set(['none', ...Array.from(groupNames.value, (group) => group.toLowerCase())]),
 	)
 	const normalizedNewGroupName = computed(() => newGroupName.value.trim().substring(0, 32))
-	const newGroupNameExists = computed(() =>
-		existingGroupNames.value.has(normalizedNewGroupName.value.toLowerCase()),
-	)
 	const newGroupInstances = computed(() => {
 		const query = newGroupSearch.value.trim().toLowerCase()
 
@@ -151,25 +145,19 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			.filter((instance) => !query || instance.name.toLowerCase().includes(query))
 			.slice()
 			.sort((a, b) => {
-				const groupedDifference = Number(a.groups.length > 0) - Number(b.groups.length > 0)
+				const groupedDifference = Number(a.group_ids.length > 0) - Number(b.group_ids.length > 0)
 				if (groupedDifference !== 0) return groupedDifference
 
 				return a.name.localeCompare(b.name)
 			})
 	})
 	const canCreateGroup = computed(
-		() =>
-			normalizedNewGroupName.value.length > 0 && !newGroupNameExists.value && !creatingGroup.value,
+		() => normalizedNewGroupName.value.length > 0 && !creatingGroup.value,
 	)
 
 	const refreshGroups = async () => {
 		try {
-			const groups = await listInstanceGroups()
-			libraryGroups.value = groups
-			groupIdsByName.value = new Map([
-				...groupIdsByName.value,
-				...groups.map((group) => [group.name, group.id] as const),
-			])
+			libraryGroups.value = await listInstanceGroups()
 		} catch (error) {
 			handleError(toError(error))
 		}
@@ -259,66 +247,61 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				break
 		}
 
-		const groupedInstances = new Map<string, GameInstance[]>()
-		const addToGroup = (key: string, instance: GameInstance) => {
-			const group = groupedInstances.get(key) ?? []
-			group.push(instance)
-			groupedInstances.set(key, group)
+		const groupedInstances = new Map<string, { name: string; instances: GameInstance[] }>()
+		const addToGroup = (id: string, name: string, instance: GameInstance) => {
+			const group = groupedInstances.get(id) ?? { name, instances: [] }
+			group.instances.push(instance)
+			groupedInstances.set(id, group)
 		}
+		const groupsById = new Map(libraryGroups.value.map((group) => [group.id, group]))
 
 		for (const instance of visibleInstances) {
 			switch (displayState.value.group) {
 				case 'Loader':
-					addToGroup(formatLoader(formatMessage, instance.loader), instance)
+					{
+						const name = formatLoader(formatMessage, instance.loader)
+						addToGroup(`Loader:${name}`, name, instance)
+					}
 					break
 				case 'Game version':
-					addToGroup(instance.game_version, instance)
+					addToGroup(`Game version:${instance.game_version}`, instance.game_version, instance)
 					break
 				case 'Group':
-					for (const group of instance.groups.length > 0 ? instance.groups : ['None']) {
-						addToGroup(group, instance)
+					if (instance.group_ids.length === 0) {
+						addToGroup('group:none', 'None', instance)
+					} else {
+						for (const groupId of instance.group_ids) {
+							const group = groupsById.get(groupId)
+							addToGroup(groupId, group?.name ?? groupId, instance)
+						}
 					}
 					break
 				case 'None':
-					addToGroup('None', instance)
+					addToGroup('None:None', 'None', instance)
 					break
 			}
 		}
 
-		const resolveGroupId = (groupName: string) =>
-			groupIdsByName.value.get(groupName) ?? `group-name:${groupName}`
-
 		if (displayState.value.group === 'Group') {
-			if (!groupedInstances.has('None')) {
-				groupedInstances.set('None', [])
+			if (!groupedInstances.has('group:none')) {
+				groupedInstances.set('group:none', { name: 'None', instances: [] })
 			}
 
-			const populatedGroupIds = new Set(
-				instances.value.flatMap((instance) =>
-					instance.groups.map((groupName) => resolveGroupId(groupName)),
-				),
-			)
-
 			for (const group of libraryGroups.value) {
-				if (!populatedGroupIds.has(group.id) && !groupedInstances.has(group.name)) {
-					groupedInstances.set(group.name, [])
+				if (!groupedInstances.has(group.id)) {
+					groupedInstances.set(group.id, { name: group.name, instances: [] })
 				}
 			}
 		}
 
-		const groups = Array.from(groupedInstances, ([key, groupInstances]) => ({
-			id:
-				displayState.value.group === 'Group'
-					? key === 'None'
-						? 'group:none'
-						: resolveGroupId(key)
-					: `${displayState.value.group}:${key}`,
-			key,
-			instances: groupInstances,
+		const groups = Array.from(groupedInstances, ([id, group]) => ({
+			id,
+			key: group.name,
+			instances: group.instances,
 		}))
 
 		if (displayState.value.sortBy === 'Name') {
-			groups.sort((a, b) => a.key.localeCompare(b.key))
+			groups.sort((a, b) => a.key.localeCompare(b.key) || a.id.localeCompare(b.id))
 		}
 
 		if (displayState.value.group === 'Game version') {
@@ -329,20 +312,20 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			groups.sort((a, b) => {
 				if (a.key === 'None') return 1
 				if (b.key === 'None') return -1
-				return a.key.localeCompare(b.key)
+				return a.key.localeCompare(b.key) || a.id.localeCompare(b.id)
 			})
 		}
 
 		return groups
 	})
 
-	const getSectionKey = (sectionName: string) => `${displayState.value.group}:${sectionName}`
+	const getSectionKey = (sectionId: string) => `${displayState.value.group}:${sectionId}`
 
-	const isSectionCollapsed = (sectionName: string) =>
-		collapsedSectionKeys.value.has(getSectionKey(sectionName))
+	const isSectionCollapsed = (sectionId: string) =>
+		collapsedSectionKeys.value.has(getSectionKey(sectionId))
 
-	const setSectionCollapsed = (sectionName: string, collapsed: boolean) => {
-		const sectionKey = getSectionKey(sectionName)
+	const setSectionCollapsed = (sectionId: string, collapsed: boolean) => {
+		const sectionKey = getSectionKey(sectionId)
 		const collapsedSections = new Set(displayState.value.collapsedGroups)
 
 		if (collapsed) {
@@ -354,8 +337,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		displayState.value.collapsedGroups = [...collapsedSections]
 	}
 
-	const normalizeInstanceGroupName = (groupName: string) =>
-		groupName === 'None' ? null : groupName
+	const normalizeInstanceGroupId = (groupId: string) => (groupId === 'group:none' ? null : groupId)
 
 	const updateInstanceGroupDrag = (
 		pointer?: { x: number; y: number },
@@ -372,7 +354,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const startInstanceGroupDrag = (
 		instanceId: string,
-		groupName: string,
+		groupId: string,
 		pointer?: { x: number; y: number },
 		altKey = false,
 	) => {
@@ -390,7 +372,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		activeInstanceGroupDrag.value = {
 			instanceIds,
 			primaryInstanceId: instanceId,
-			fromGroup: normalizeInstanceGroupName(groupName),
+			fromGroup: normalizeInstanceGroupId(groupId),
 		}
 		updateInstanceGroupDrag(pointer, altKey)
 	}
@@ -401,26 +383,26 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		isAddingInstanceToGroup.value = false
 	}
 
-	const setInstanceGroupDragTarget = (groupName: string | null) => {
-		instanceGroupDragTarget.value = groupName
+	const setInstanceGroupDragTarget = (groupId: string | null) => {
+		instanceGroupDragTarget.value = groupId
 	}
 
-	const getInstanceGroupDropState = (groupName: string) => {
+	const getInstanceGroupDropState = (groupId: string) => {
 		const drag = activeInstanceGroupDrag.value
 		const draggedInstances = drag
 			? instances.value.filter((instance) => drag.instanceIds.includes(instance.id))
 			: []
-		const toGroup = normalizeInstanceGroupName(groupName)
+		const toGroup = normalizeInstanceGroupId(groupId)
 		const operation = isAddingInstanceToGroup.value ? 'add' : 'move'
 		const canAddToGroup = operation !== 'add' || toGroup !== null
 		const hasChanges = draggedInstances.some((instance) => {
 			if (operation === 'add') {
-				return toGroup !== null && !instance.groups.includes(toGroup)
+				return toGroup !== null && !instance.group_ids.includes(toGroup)
 			}
 
 			return toGroup === null
-				? instance.groups.length > 0
-				: instance.groups.length !== 1 || instance.groups[0] !== toGroup
+				? instance.group_ids.length > 0
+				: instance.group_ids.length !== 1 || instance.group_ids[0] !== toGroup
 		})
 
 		return {
@@ -444,12 +426,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		return
 	})
 
-	const moveDraggedInstancesToGroup = async (groupName: string, addToGroup = false) => {
+	const moveDraggedInstancesToGroup = async (groupId: string, addToGroup = false) => {
 		const drag = activeInstanceGroupDrag.value
-		const toGroup = normalizeInstanceGroupName(groupName)
+		const toGroup = normalizeInstanceGroupId(groupId)
 		if (!drag) return false
 
-		const dropState = getInstanceGroupDropState(groupName)
+		const dropState = getInstanceGroupDropState(groupId)
 		if (!dropState.canDrop) return false
 
 		const shouldAdd = addToGroup && toGroup !== null
@@ -458,12 +440,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 		const results = await Promise.allSettled(
 			draggedInstances.map((instance) => {
-				const nextGroups = shouldAdd ? [...instance.groups] : toGroup ? [toGroup] : []
-				if (shouldAdd && toGroup && !nextGroups.includes(toGroup)) {
-					nextGroups.push(toGroup)
+				const nextGroupIds = shouldAdd ? [...instance.group_ids] : toGroup ? [toGroup] : []
+				if (shouldAdd && toGroup && !nextGroupIds.includes(toGroup)) {
+					nextGroupIds.push(toGroup)
 				}
 
-				return edit(instance.id, { groups: nextGroups })
+				return edit(instance.id, { group_ids: nextGroupIds })
 			}),
 		)
 		let movedInstanceCount = 0
@@ -562,14 +544,13 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				...libraryGroups.value.filter((existingGroup) => existingGroup.id !== group.id),
 				group,
 			]
-			groupIdsByName.value = new Map(groupIdsByName.value).set(group.name, group.id)
 
 			await Promise.all(
 				instances.value
 					.filter((instance) => selectedNewGroupInstanceIds.value.has(instance.id))
 					.map((instance) =>
 						edit(instance.id, {
-							groups: [group.name],
+							group_ids: [group.id],
 						}),
 					),
 			)
@@ -583,13 +564,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		}
 	}
 
-	const deleteGroup = async (groupName: string) => {
+	const deleteGroup = async (groupId: string) => {
 		try {
-			await deleteInstanceGroup(groupName)
-			libraryGroups.value = libraryGroups.value.filter((group) => group.name !== groupName)
-			const nextGroupIdsByName = new Map(groupIdsByName.value)
-			nextGroupIdsByName.delete(groupName)
-			groupIdsByName.value = nextGroupIdsByName
+			await deleteInstanceGroup(groupId)
+			libraryGroups.value = libraryGroups.value.filter((group) => group.id !== groupId)
 			return true
 		} catch (error) {
 			handleError(toError(error))
@@ -598,60 +576,19 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		}
 	}
 
-	const isValidGroupName = (groupName: string, currentGroupName: string) => {
-		const normalizedGroupName = groupName.trim()
-		if (
-			normalizedGroupName.length === 0 ||
-			normalizedGroupName.length > 32 ||
-			normalizedGroupName.toLowerCase() === 'none'
-		) {
-			return false
-		}
-
-		return !Array.from(groupNames.value).some(
-			(existingGroupName) =>
-				existingGroupName.toLowerCase() === normalizedGroupName.toLowerCase() &&
-				existingGroupName !== currentGroupName,
-		)
-	}
-
-	const renameGroup = async (groupId: string, oldName: string, newName: string) => {
+	const renameGroup = async (groupId: string, newName: string) => {
 		const normalizedNewName = newName.trim()
-		if (oldName === normalizedNewName) return true
-		if (!isValidGroupName(normalizedNewName, oldName)) return false
-
-		const previousNewNameId = groupIdsByName.value.get(normalizedNewName)
-		groupIdsByName.value = new Map(groupIdsByName.value).set(normalizedNewName, groupId)
+		const currentGroup = libraryGroups.value.find((group) => group.id === groupId)
+		if (currentGroup?.name === normalizedNewName) return true
 
 		try {
-			const renamedGroup = await renameInstanceGroup(oldName, normalizedNewName)
+			const renamedGroup = await renameInstanceGroup(groupId, normalizedNewName)
 			libraryGroups.value = [
 				...libraryGroups.value.filter((group) => group.id !== groupId),
 				renamedGroup,
 			]
-			groupIdsByName.value = new Map(groupIdsByName.value).set(renamedGroup.name, renamedGroup.id)
-
-			const oldSectionKey = getSectionKey(oldName)
-			const newSectionKey = getSectionKey(renamedGroup.name)
-			if (collapsedSectionKeys.value.has(oldSectionKey)) {
-				displayState.value.collapsedGroups = displayState.value.collapsedGroups.map((sectionKey) =>
-					sectionKey === oldSectionKey ? newSectionKey : sectionKey,
-				)
-			}
-
-			if (currentContextGroupName.value === oldName) {
-				currentContextGroupName.value = renamedGroup.name
-			}
-
 			return true
 		} catch (error) {
-			const nextGroupIdsByName = new Map(groupIdsByName.value)
-			if (previousNewNameId) {
-				nextGroupIdsByName.set(normalizedNewName, previousNewNameId)
-			} else {
-				nextGroupIdsByName.delete(normalizedNewName)
-			}
-			groupIdsByName.value = nextGroupIdsByName
 			handleError(toError(error))
 			await refreshGroups()
 			return false
@@ -672,11 +609,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const handleInstanceContextMenu = (
 		event: MouseEvent,
 		item: InstanceCard,
-		instanceGroupName: string,
+		instanceGroupId: string,
 	) => {
-		currentContextGroupName.value =
-			displayState.value.group === 'Group' && instanceGroupName !== 'None'
-				? instanceGroupName
+		currentContextGroupId.value =
+			displayState.value.group === 'Group' && instanceGroupId !== 'group:none'
+				? instanceGroupId
 				: null
 
 		const baseOptions = [
@@ -685,7 +622,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			{ name: 'duplicate' },
 			{ name: 'open' },
 			{ name: 'copy' },
-			...(currentContextGroupName.value
+			...(currentContextGroupId.value
 				? [{ name: 'remove_from_group' }, { type: 'divider' }]
 				: [{ type: 'divider' }]),
 			{ name: 'delete', color: 'danger' },
@@ -729,10 +666,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				await navigator.clipboard.writeText(item.instance.id)
 				break
 			case 'remove_from_group':
-				if (currentContextGroupName.value) {
-					const groupName = currentContextGroupName.value
+				if (currentContextGroupId.value) {
+					const groupId = currentContextGroupId.value
 					await edit(item.instance.id, {
-						groups: item.instance.groups.filter((group) => group !== groupName),
+						group_ids: item.instance.group_ids.filter(
+							(instanceGroupId) => instanceGroupId !== groupId,
+						),
 					}).catch((error) => handleError(toError(error)))
 				}
 				break
@@ -745,6 +684,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	return {
 		instances,
+		libraryGroups,
 		search,
 		filters,
 		displayState,
@@ -762,7 +702,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		instanceGroupDragStatus,
 		isAddingInstanceToGroup,
 		creatingGroup,
-		newGroupNameExists,
 		newGroupInstances,
 		canCreateGroup,
 		instanceOptions,
@@ -783,7 +722,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		toggleLibraryInstanceSelection,
 		createGroup,
 		deleteGroup,
-		isValidGroupName,
 		renameGroup,
 		deleteInstance,
 		handleInstanceContextMenu,

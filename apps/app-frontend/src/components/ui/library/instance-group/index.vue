@@ -40,7 +40,6 @@ const {
 	isSectionCollapsed,
 	setSectionCollapsed,
 	deleteGroup,
-	isValidGroupName,
 	renameGroup,
 	handleInstanceContextMenu,
 	displayState,
@@ -57,7 +56,7 @@ const groupNameInput = ref<InstanceType<typeof InlineEditableText>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
-const isUngrouped = computed(() => props.instanceGroup.key === 'None')
+const isUngrouped = computed(() => props.instanceGroup.id === 'group:none')
 const groupContextMenuOpen = ref(false)
 const isGroupToggleBlocked = computed(
 	() => groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
@@ -74,7 +73,7 @@ useDroppable({
 	element: groupDropTarget,
 	disabled: computed(() => displayState.value.group !== 'Group'),
 	data: computed(() => ({
-		groupName: props.instanceGroup.key,
+		groupId: props.instanceGroup.id,
 	})),
 })
 
@@ -107,21 +106,17 @@ const messages = defineMessages({
 		id: 'app.library.group.name-reserved',
 		defaultMessage: '"None" is reserved and cannot be used as a group name.',
 	},
-	groupNameDuplicate: {
-		id: 'app.library.group.name-duplicate',
-		defaultMessage: 'A group with this name already exists.',
-	},
 	deleteGroupDescription: {
 		id: 'app.library.group.delete-description',
 		defaultMessage: 'Instances in this group will be ungrouped.',
 	},
 })
 
-function openInstanceContextMenu(event: MouseEvent, instanceId: string, instanceGroupName: string) {
+function openInstanceContextMenu(event: MouseEvent, instanceId: string, instanceGroupId: string) {
 	const instanceComponent = instanceComponents.get(instanceId)
 	if (!instanceComponent) return
 
-	handleInstanceContextMenu(event, instanceComponent, instanceGroupName)
+	handleInstanceContextMenu(event, instanceComponent, instanceGroupId)
 }
 
 function setInstanceComponent(instanceId: string, component: unknown) {
@@ -136,7 +131,7 @@ async function removeGroup() {
 	if (deletingGroup.value) return
 
 	deletingGroup.value = true
-	const deleted = await deleteGroup(props.instanceGroup.key)
+	const deleted = await deleteGroup(props.instanceGroup.id)
 	deletingGroup.value = false
 
 	if (deleted) {
@@ -217,8 +212,6 @@ function validateGroupName(value: string) {
 		reason = formatMessage(messages.groupNameTooLong)
 	} else if (normalizedGroupName.toLowerCase() === 'none') {
 		reason = formatMessage(messages.groupNameReserved)
-	} else if (!isValidGroupName(normalizedGroupName, props.instanceGroup.key)) {
-		reason = formatMessage(messages.groupNameDuplicate)
 	}
 
 	if (reason) {
@@ -234,7 +227,7 @@ function validateGroupName(value: string) {
 }
 
 async function updateGroupName(value: string) {
-	return await renameGroup(props.instanceGroup.id, props.instanceGroup.key, value)
+	return await renameGroup(props.instanceGroup.id, value)
 }
 
 watch(
@@ -272,8 +265,8 @@ watch(
 			<div
 				v-if="
 					activeInstanceGroupDrag &&
-					instanceGroupDragTarget === instanceGroup.key &&
-					getInstanceGroupDropState(instanceGroup.key).canDrop
+					instanceGroupDragTarget === instanceGroup.id &&
+					getInstanceGroupDropState(instanceGroup.id).canDrop
 				"
 				class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-50 border-dashed border-brand bg-transparent"
 			/>
@@ -344,10 +337,10 @@ watch(
 		</div>
 		<Accordion
 			ref="groupAccordion"
-			:open-by-default="hideHeader || !isSectionCollapsed(instanceGroup.key)"
+			:open-by-default="hideHeader || !isSectionCollapsed(instanceGroup.id)"
 			class="w-full"
-			@on-open="setSectionCollapsed(instanceGroup.key, false)"
-			@on-close="setSectionCollapsed(instanceGroup.key, true)"
+			@on-open="setSectionCollapsed(instanceGroup.id, false)"
+			@on-close="setSectionCollapsed(instanceGroup.id, true)"
 		>
 			<section
 				class="grid min-h-[45px] mt-2.5 w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
@@ -356,13 +349,13 @@ watch(
 					<Instance
 						:ref="(component: unknown) => setInstanceComponent(instance.id, component)"
 						:instance="instance"
-						:instance-group-name="instanceGroup.key"
+						:instance-group-id="instanceGroup.id"
 						:is-selection-anchor="selectionAnchorInstanceId === instance.id"
 						@toggle-selection="
 							(shiftKey: boolean) => emit('toggle-selection', instance.id, shiftKey)
 						"
 						@contextmenu.prevent.stop="
-							(event: MouseEvent) => openInstanceContextMenu(event, instance.id, instanceGroup.key)
+							(event: MouseEvent) => openInstanceContextMenu(event, instance.id, instanceGroup.id)
 						"
 					/>
 				</div>

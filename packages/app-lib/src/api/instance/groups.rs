@@ -52,24 +52,6 @@ pub async fn list_groups() -> crate::Result<Vec<InstanceGroup>> {
 pub async fn create_group(name: String) -> crate::Result<InstanceGroup> {
     let name = validate_group_name(&name)?;
     let state = State::get().await?;
-    let existing_group = sqlx::query_scalar::<_, String>(
-        "
-		SELECT name
-		FROM instance_groups
-		WHERE lower(name) = lower(?)
-		",
-    )
-    .bind(name)
-    .fetch_optional(&state.pool)
-    .await?;
-
-    if existing_group.is_some() {
-        return Err(crate::ErrorKind::InputError(
-            "A group with this name already exists".to_string(),
-        )
-        .into());
-    }
-
     let id = Uuid::new_v4().to_string();
     instance_rows::create_instance_group(&id, name, &state.pool).await?;
 
@@ -80,47 +62,12 @@ pub async fn create_group(name: String) -> crate::Result<InstanceGroup> {
 }
 
 pub async fn rename_group(
-    old_name: String,
+    id: String,
     new_name: String,
 ) -> crate::Result<InstanceGroup> {
     let new_name = validate_group_name(&new_name)?;
     let state = State::get().await?;
     let mut tx = state.pool.begin().await?;
-    let group_id = sqlx::query_scalar::<_, String>(
-        "
-		SELECT id
-		FROM instance_groups
-		WHERE name = ?
-		",
-    )
-    .bind(&old_name)
-    .fetch_optional(&mut *tx)
-    .await?
-    .ok_or_else(|| {
-        crate::Error::from(crate::ErrorKind::InputError(format!(
-            "Unknown instance group {old_name}"
-        )))
-    })?;
-
-    let existing_group = sqlx::query_scalar::<_, String>(
-        "
-		SELECT id
-		FROM instance_groups
-		WHERE lower(name) = lower(?)
-			AND id != ?
-		",
-    )
-    .bind(new_name)
-    .bind(&group_id)
-    .fetch_optional(&mut *tx)
-    .await?;
-
-    if existing_group.is_some() {
-        return Err(crate::ErrorKind::InputError(
-            "A group with this name already exists".to_string(),
-        )
-        .into());
-    }
 
     let instance_ids = sqlx::query_scalar::<_, String>(
         "
@@ -129,11 +76,11 @@ pub async fn rename_group(
 		WHERE group_id = ?
 		",
     )
-    .bind(&group_id)
+    .bind(&id)
     .fetch_all(&mut *tx)
     .await?;
 
-    sqlx::query(
+    let result = sqlx::query(
         "
 		UPDATE instance_groups
 		SET name = ?
@@ -141,9 +88,16 @@ pub async fn rename_group(
 		",
     )
     .bind(new_name)
-    .bind(&group_id)
+    .bind(&id)
     .execute(&mut *tx)
     .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Unknown instance group {id}"
+        ))
+        .into());
+    }
 
     tx.commit().await?;
 
@@ -152,40 +106,38 @@ pub async fn rename_group(
     }
 
     Ok(InstanceGroup {
-        id: group_id,
+        id,
         name: new_name.to_string(),
     })
 }
 
-pub async fn delete_group(name: String) -> crate::Result<()> {
+pub async fn delete_group(id: String) -> crate::Result<()> {
     let state = State::get().await?;
     let mut tx = state.pool.begin().await?;
     let instance_ids = sqlx::query_scalar::<_, String>(
         "
-		SELECT memberships.instance_id
-		FROM instance_group_memberships memberships
-		INNER JOIN instance_groups groups
-			ON groups.id = memberships.group_id
-		WHERE groups.name = ?
+		SELECT instance_id
+		FROM instance_group_memberships
+		WHERE group_id = ?
 		",
     )
-    .bind(&name)
+    .bind(&id)
     .fetch_all(&mut *tx)
     .await?;
 
     let result = sqlx::query(
         "
 		DELETE FROM instance_groups
-		WHERE name = ?
+		WHERE id = ?
 		",
     )
-    .bind(&name)
+    .bind(&id)
     .execute(&mut *tx)
     .await?;
 
     if result.rows_affected() == 0 {
         return Err(crate::ErrorKind::InputError(format!(
-            "Unknown instance group {name}"
+            "Unknown instance group {id}"
         ))
         .into());
     }

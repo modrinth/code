@@ -14,7 +14,7 @@ export type GameInstance = {
 	loader: InstanceLoader
 	loader_version?: string
 
-	groups: string[]
+	group_ids: string[]
 
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null

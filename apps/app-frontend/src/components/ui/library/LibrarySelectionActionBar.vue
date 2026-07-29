@@ -80,7 +80,8 @@ const removingFromGroup = ref(false)
 const selectedInstanceCount = computed(() => selectedLibraryInstanceIds.value.size)
 const selectedGroupedInstances = computed(() =>
 	instances.value.filter(
-		(instance) => selectedLibraryInstanceIds.value.has(instance.id) && instance.groups.length > 0,
+		(instance) =>
+			selectedLibraryInstanceIds.value.has(instance.id) && instance.group_ids.length > 0,
 	),
 )
 const busy = computed(() => deleting.value || removingFromGroup.value)
@@ -109,7 +110,7 @@ async function removeSelectedInstancesFromGroups() {
 
 	removingFromGroup.value = true
 	const results = await Promise.allSettled(
-		selectedGroupedInstances.value.map((instance) => edit(instance.id, { groups: [] })),
+		selectedGroupedInstances.value.map((instance) => edit(instance.id, { group_ids: [] })),
 	)
 
 	for (const result of results) {

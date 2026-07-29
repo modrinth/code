@@ -22,9 +22,6 @@
 				:maxlength="32"
 				@click="groupNameInput?.select()"
 			/>
-			<span v-if="newGroupNameExists" class="text-sm font-medium text-red">
-				A group with this name already exists.
-			</span>
 		</div>
 
 		<div class="h-px bg-divider" />
@@ -62,8 +59,8 @@
 						/>
 						<div class="flex min-w-0 items-center gap-2">
 							<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
-							<TagItem v-if="instance.groups[0]" class="shrink-0">
-								{{ instance.groups[0] }}
+							<TagItem v-if="instance.group_ids[0]" class="shrink-0">
+								{{ groupNamesById.get(instance.group_ids[0]) ?? 'Unknown group' }}
 							</TagItem>
 						</div>
 					</div>
@@ -74,10 +71,10 @@
 							<CheckIcon v-if="selectedNewGroupInstanceIds.has(instance.id)" />
 							{{
 								selectedNewGroupInstanceIds.has(instance.id)
-									? instance.groups.length > 0
+									? instance.group_ids.length > 0
 										? 'Moved'
 										: 'Added'
-									: instance.groups.length > 0
+									: instance.group_ids.length > 0
 										? 'Move'
 										: 'Add'
 							}}
@@ -111,17 +108,17 @@
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, NewModal, StyledInput, TagItem } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
 
 const {
 	isNewGroupModalOpen,
+	libraryGroups,
 	newGroupName,
 	newGroupSearch,
 	selectedNewGroupInstanceIds,
 	creatingGroup,
-	newGroupNameExists,
 	newGroupInstances,
 	canCreateGroup,
 	closeNewGroupModal,
@@ -131,6 +128,9 @@ const {
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const groupNameInput = ref<InstanceType<typeof StyledInput>>()
+const groupNamesById = computed(
+	() => new Map(libraryGroups.value.map((group) => [group.id, group.name])),
+)
 
 watch(isNewGroupModalOpen, (open) => {
 	if (open) {

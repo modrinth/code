@@ -164,7 +164,7 @@ pub(crate) struct InstanceMetadataRecord {
     pub applied_content_set: ContentSet,
     pub link: InstanceLink,
     pub shared_instance: Option<SharedInstanceAttachment>,
-    pub groups: Vec<String>,
+    pub group_ids: Vec<String>,
     pub launch_overrides: InstanceLaunchOverrides,
 }
 
@@ -221,7 +221,7 @@ struct InstanceMetadataRow {
     imported_name: Option<String>,
     imported_version_number: Option<String>,
     imported_filename: Option<String>,
-    groups: String,
+    group_ids: String,
     launch_overrides: Option<String>,
 }
 
@@ -333,7 +333,7 @@ impl InstanceMetadataRow {
             self.shared_sync_applied_update_id,
             self.shared_sync_latest_available_update_id,
         )?;
-        let groups = parse_groups(self.groups)?;
+        let group_ids = parse_group_ids(self.group_ids)?;
         let launch_overrides =
             launch_overrides_from_json(instance_id, self.launch_overrides)?;
 
@@ -342,7 +342,7 @@ impl InstanceMetadataRow {
             applied_content_set,
             link,
             shared_instance,
-            groups,
+            group_ids,
             launch_overrides,
         })
     }
@@ -576,16 +576,16 @@ macro_rules! query_instance_metadata {
                     link.imported_version_number AS "imported_version_number?: String",
                     link.imported_filename AS "imported_filename?: String",
                     COALESCE((
-                        SELECT json_group_array(name)
+                        SELECT json_group_array(id)
                         FROM (
-                            SELECT groups.name
+                            SELECT groups.id
                             FROM instance_group_memberships memberships
                             INNER JOIN instance_groups groups
                                 ON groups.id = memberships.group_id
                             WHERE memberships.instance_id = i.id
                             ORDER BY groups.name
                         )
-                    ), '[]') AS "groups!: String",
+                    ), '[]') AS "group_ids!: String",
                     json(overrides.overrides) AS "launch_overrides?: String"
                 "#
                 + $from
@@ -748,7 +748,7 @@ where
 {
     let rows = sqlx::query_scalar!(
         "
-		SELECT groups.name
+		SELECT groups.id
 		FROM instance_group_memberships memberships
 		INNER JOIN instance_groups groups
 			ON groups.id = memberships.group_id
@@ -770,7 +770,7 @@ pub(crate) async fn list_instance_groups(
         "
 		SELECT id, name
 		FROM instance_groups
-		ORDER BY name
+		ORDER BY name, id
 		",
     )
     .fetch_all(pool)
@@ -1071,7 +1071,7 @@ pub(crate) async fn set_shared_instance_attachment(
 
 pub(crate) async fn replace_instance_groups(
     instance_id: &str,
-    groups: &[String],
+    group_ids: &[String],
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
@@ -1084,35 +1084,7 @@ pub(crate) async fn replace_instance_groups(
     .execute(&mut **tx)
     .await?;
 
-    for group in groups {
-        let group_id = match sqlx::query_scalar::<_, String>(
-            "
-			SELECT id
-			FROM instance_groups
-			WHERE name = ?
-			",
-        )
-        .bind(group)
-        .fetch_optional(&mut **tx)
-        .await?
-        {
-            Some(group_id) => group_id,
-            None => {
-                let group_id = Uuid::new_v4().to_string();
-                sqlx::query(
-                    "
-					INSERT INTO instance_groups (id, name)
-					VALUES (?, ?)
-					",
-                )
-                .bind(&group_id)
-                .bind(group)
-                .execute(&mut **tx)
-                .await?;
-                group_id
-            }
-        };
-
+    for group_id in group_ids {
         sqlx::query(
             "
 			INSERT OR IGNORE INTO instance_group_memberships (
@@ -1334,7 +1306,7 @@ fn required_i64(value: Option<i64>, column: &str) -> crate::Result<i64> {
     })
 }
 
-fn parse_groups(value: String) -> crate::Result<Vec<String>> {
+fn parse_group_ids(value: String) -> crate::Result<Vec<String>> {
     serde_json::from_str(&value).map_err(|err| {
         crate::ErrorKind::InputError(format!(
             "Invalid instance groups JSON: {err}"

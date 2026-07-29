@@ -4,8 +4,7 @@ CREATE TABLE instance_groups (
 	id TEXT NOT NULL,
 	name TEXT NOT NULL,
 
-	PRIMARY KEY (id),
-	UNIQUE (name)
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE instance_group_memberships (
@@ -30,6 +29,22 @@ SELECT
 	groups.id
 FROM legacy_instance_group_memberships legacy
 INNER JOIN instance_groups groups ON groups.name = legacy.group_name;
+
+UPDATE install_jobs
+SET state = json_remove(
+	json_set(
+		state,
+		'$.rollback.instance.group_ids',
+		json(COALESCE((
+			SELECT json_group_array(groups.id)
+			FROM json_each(state, '$.rollback.instance.groups') legacy_groups
+			INNER JOIN instance_groups groups
+				ON groups.name = legacy_groups.value
+		), '[]'))
+	),
+	'$.rollback.instance.groups'
+)
+WHERE json_type(state, '$.rollback.instance.groups') = 'array';
 
 DROP TABLE legacy_instance_group_memberships;
 

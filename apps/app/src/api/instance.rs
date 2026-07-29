@@ -83,7 +83,7 @@ pub struct Instance {
     pub protocol_version: Option<u32>,
     pub loader: ModLoader,
     pub loader_version: Option<String>,
-    pub groups: Vec<String>,
+    pub group_ids: Vec<String>,
     pub link: Option<InstanceLink>,
     pub shared_instance: Option<SharedInstanceAttachment>,
     pub quarantined: bool,
@@ -179,7 +179,7 @@ pub struct EditInstance {
     )]
     pub loader_version: Option<Option<String>>,
 
-    pub groups: Option<Vec<String>>,
+    pub group_ids: Option<Vec<String>>,
 
     #[serde(
         default,
@@ -246,7 +246,7 @@ impl From<InstanceMetadata> for Instance {
             protocol_version: metadata.applied_content_set.protocol_version,
             loader: metadata.applied_content_set.loader,
             loader_version: metadata.applied_content_set.loader_version,
-            groups: metadata.groups,
+            group_ids: metadata.group_ids,
             link: InstanceLink::from_core(metadata.link),
             shared_instance: metadata.shared_instance.map(Into::into),
             quarantined: metadata.quarantined,
@@ -414,7 +414,7 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
         name: edit_instance.name,
         icon_path: None,
         update_channel: edit_instance.update_channel,
-        groups: edit_instance.groups,
+        group_ids: edit_instance.group_ids,
         link: edit_instance
             .link
             .map(|link| match link {
@@ -479,7 +479,8 @@ pub async fn instance_list() -> Result<Vec<Instance>> {
 }
 
 #[tauri::command]
-pub async fn instance_list_groups() -> Result<Vec<theseus::instance::InstanceGroup>> {
+pub async fn instance_list_groups()
+-> Result<Vec<theseus::instance::InstanceGroup>> {
     Ok(theseus::instance::list_groups().await?)
 }
 
@@ -492,15 +493,15 @@ pub async fn instance_create_group(
 
 #[tauri::command]
 pub async fn instance_rename_group(
-    old_name: String,
+    id: String,
     new_name: String,
 ) -> Result<theseus::instance::InstanceGroup> {
-    Ok(theseus::instance::rename_group(old_name, new_name).await?)
+    Ok(theseus::instance::rename_group(id, new_name).await?)
 }
 
 #[tauri::command]
-pub async fn instance_delete_group(name: String) -> Result<()> {
-    Ok(theseus::instance::delete_group(name).await?)
+pub async fn instance_delete_group(id: String) -> Result<()> {
+    Ok(theseus::instance::delete_group(id).await?)
 }
 
 #[tauri::command]

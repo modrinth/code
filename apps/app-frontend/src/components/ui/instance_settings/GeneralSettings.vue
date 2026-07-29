@@ -19,8 +19,10 @@ import { useRouter } from 'vue-router'
 
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
+import { toError } from '@/helpers/errors'
 import { install_duplicate_instance } from '@/helpers/install'
-import { edit, edit_icon, list, remove } from '@/helpers/instance'
+import { edit, edit_icon, remove } from '@/helpers/instance'
+import { create_group, list_groups } from '@/helpers/instance-groups'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
 import type { GameInstance } from '../../../helpers/types'
@@ -38,7 +40,7 @@ const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
-const groups = ref([...instance.value.groups])
+const groupIds = ref([...instance.value.group_ids])
 const savingReleaseChannel = ref(false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
@@ -57,10 +59,7 @@ async function duplicateInstance() {
 	})
 }
 
-const allInstances = ref((await list()) as GameInstance[])
-const availableGroups = computed(() => [
-	...new Set([...allInstances.value.flatMap((instance) => instance.groups), ...groups.value]),
-])
+const availableGroups = ref(await list_groups())
 
 function formatReleaseChannelLabel(channel: ReleaseChannel) {
 	switch (channel) {
@@ -135,28 +134,34 @@ async function setIcon() {
 
 const editInstanceObject = computed(() => ({
 	name: title.value.trim().substring(0, 32) ?? 'Instance',
-	groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
+	group_ids: groupIds.value,
 }))
 
-const toggleGroup = (group: string) => {
-	if (groups.value.includes(group)) {
-		groups.value = groups.value.filter((x) => x !== group)
+const toggleGroup = (groupId: string) => {
+	if (groupIds.value.includes(groupId)) {
+		groupIds.value = groupIds.value.filter((id) => id !== groupId)
 	} else {
-		groups.value.push(group)
+		groupIds.value.push(groupId)
 	}
 }
 
-const addCategory = () => {
+const addCategory = async () => {
 	const text = newCategoryInput.value.trim()
 
 	if (text.length > 0) {
-		groups.value.push(text.substring(0, 32))
-		newCategoryInput.value = ''
+		try {
+			const group = await create_group(text.substring(0, 32))
+			availableGroups.value.push(group)
+			groupIds.value.push(group.id)
+			newCategoryInput.value = ''
+		} catch (error) {
+			handleError(toError(error))
+		}
 	}
 }
 
 watch(
-	[title, groups, groups],
+	[title, groupIds],
 	async () => {
 		if (removing.value) return
 		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
@@ -369,10 +374,10 @@ const messages = defineMessages({
 			<div class="flex flex-col gap-1">
 				<Checkbox
 					v-for="group in availableGroups"
-					:key="group"
-					:model-value="groups.includes(group)"
-					:label="group"
-					@click="toggleGroup(group)"
+					:key="group.id"
+					:model-value="groupIds.includes(group.id)"
+					:label="group.name"
+					@click="toggleGroup(group.id)"
 				/>
 				<div class="flex gap-2 items-center">
 					<StyledInput

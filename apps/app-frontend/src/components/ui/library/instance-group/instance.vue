@@ -35,7 +35,7 @@ const {
 
 const props = defineProps<{
 	instance: GameInstance
-	instanceGroupName: string
+	instanceGroupId: string
 	isSelectionAnchor?: boolean
 }>()
 
@@ -60,12 +60,12 @@ const keys = useMagicKeys()
 const holdingShift = computed(() => keys.shift.value)
 const isPartOfActiveDrag = computed(() => activeDraggedInstanceIds.value.has(props.instance.id))
 const { isDragging } = useDraggable({
-	id: computed(() => `instance:${props.instanceGroupName}:${props.instance.id}`),
+	id: computed(() => `instance:${props.instanceGroupId}:${props.instance.id}`),
 	element: instanceCard,
 	disabled: computed(() => displayState.value.group !== 'Group'),
 	data: computed(() => ({
 		instanceId: props.instance.id,
-		fromGroup: props.instanceGroupName,
+		fromGroup: props.instanceGroupId,
 	})),
 })
 
@@ -218,7 +218,7 @@ onUnmounted(() => unlisten())
 		}"
 		data-library-instance-card
 		:data-instance-id="instance.id"
-		:data-instance-group="instanceGroupName"
+		:data-instance-group="instanceGroupId"
 		role="button"
 		tabindex="0"
 		:aria-label="

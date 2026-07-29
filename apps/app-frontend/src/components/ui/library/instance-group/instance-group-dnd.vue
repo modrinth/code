@@ -21,7 +21,7 @@ type InstanceDragData = {
 }
 
 type InstanceGroupDndDropData = {
-	groupName: string
+	groupId: string
 }
 
 const props = defineProps<{
@@ -134,15 +134,15 @@ function handleDragMove(event: DragMoveEvent) {
 
 function handleDragOver(event: DragOverEvent) {
 	const targetData = event.operation.target?.data as InstanceGroupDndDropData | undefined
-	setInstanceGroupDragTarget(targetData?.groupName ?? null)
+	setInstanceGroupDragTarget(targetData?.groupId ?? null)
 }
 
 function handleDragEnd(event: DragEndEvent) {
 	const targetData = event.operation.target?.data as InstanceGroupDndDropData | undefined
 	if (!event.canceled && targetData) {
-		const dropState = getInstanceGroupDropState(targetData.groupName)
+		const dropState = getInstanceGroupDropState(targetData.groupId)
 		if (dropState.canDrop) {
-			void moveDraggedInstancesToGroup(targetData.groupName, dropState.operation === 'add')
+			void moveDraggedInstancesToGroup(targetData.groupId, dropState.operation === 'add')
 		}
 	}
 
