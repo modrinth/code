@@ -575,9 +575,6 @@
   "app.library.group.edit-name": {
     "message": "Edit group name"
   },
-  "app.library.group.name-duplicate": {
-    "message": "A group with this name already exists."
-  },
   "app.library.group.name-empty": {
     "message": "Group names cannot be empty."
   },
@@ -595,6 +592,9 @@
   },
   "app.library.selection.aria-label": {
     "message": "Selected instances"
+  },
+  "app.library.selection.create-group": {
+    "message": "Create group"
   },
   "app.library.selection.deleting": {
     "message": "Deleting selected instances"
@@ -1578,10 +1578,10 @@
     "message": "Create first instance"
   },
   "onboarding-checklist.login-minecraft": {
-    "message": "Log in to Minecraft"
+    "message": "Sign in to Minecraft"
   },
   "onboarding-checklist.login-modrinth": {
-    "message": "Log in to Modrinth"
+    "message": "Sign in to Modrinth"
   },
   "onboarding-checklist.title": {
     "message": "Getting started"
