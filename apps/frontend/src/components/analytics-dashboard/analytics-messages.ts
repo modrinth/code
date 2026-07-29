@@ -32,6 +32,14 @@ export const analyticsMessages = defineMessages({
 		id: 'analytics.action.refresh',
 		defaultMessage: 'Refresh',
 	},
+	saveButton: {
+		id: 'analytics.action.save',
+		defaultMessage: 'Save',
+	},
+	cancelButton: {
+		id: 'analytics.action.cancel',
+		defaultMessage: 'Cancel',
+	},
 	fetchingResults: {
 		id: 'analytics.loading.fetching-results',
 		defaultMessage: 'Fetching results...',
@@ -128,6 +136,102 @@ export const analyticsMessages = defineMessages({
 	breakdownLabel: {
 		id: 'analytics.query.label.breakdown',
 		defaultMessage: 'Breakdown:',
+	},
+	breakdownGroupsButton: {
+		id: 'analytics.breakdown-groups.button',
+		defaultMessage: 'Group series',
+	},
+	breakdownGroupsNoGrouping: {
+		id: 'analytics.breakdown-groups.none',
+		defaultMessage: 'No grouping',
+	},
+	breakdownGroupsCreate: {
+		id: 'analytics.breakdown-groups.create',
+		defaultMessage: 'Create group',
+	},
+	breakdownGroupsEdit: {
+		id: 'analytics.breakdown-groups.edit',
+		defaultMessage: 'Edit group',
+	},
+	breakdownGroupsDelete: {
+		id: 'analytics.breakdown-groups.delete',
+		defaultMessage: 'Delete group',
+	},
+	breakdownGroupsDeleteTitle: {
+		id: 'analytics.breakdown-groups.delete-title',
+		defaultMessage: 'Delete {name}?',
+	},
+	breakdownGroupsDeleteDescription: {
+		id: 'analytics.breakdown-groups.delete-description',
+		defaultMessage: 'This saved breakdown group will be permanently deleted from this browser.',
+	},
+	breakdownGroupsModalCreateTitle: {
+		id: 'analytics.breakdown-groups.modal.create-title',
+		defaultMessage: 'Create breakdown group',
+	},
+	breakdownGroupsModalEditTitle: {
+		id: 'analytics.breakdown-groups.modal.edit-title',
+		defaultMessage: 'Edit breakdown group',
+	},
+	breakdownGroupsGroupName: {
+		id: 'analytics.breakdown-groups.group-name',
+		defaultMessage: 'Group name',
+	},
+	breakdownGroupsGroupNamePlaceholder: {
+		id: 'analytics.breakdown-groups.group-name-placeholder',
+		defaultMessage: 'For example, Platform families',
+	},
+	breakdownGroupsSeriesName: {
+		id: 'analytics.breakdown-groups.series-name',
+		defaultMessage: 'Series name',
+	},
+	breakdownGroupsSeriesValues: {
+		id: 'analytics.breakdown-groups.series-values',
+		defaultMessage: 'Breakdown values',
+	},
+	breakdownGroupsSelectValues: {
+		id: 'analytics.breakdown-groups.select-values',
+		defaultMessage: 'Select values',
+	},
+	breakdownGroupsAddSeries: {
+		id: 'analytics.breakdown-groups.add-series',
+		defaultMessage: 'Add series',
+	},
+	breakdownGroupsRemoveSeries: {
+		id: 'analytics.breakdown-groups.remove-series',
+		defaultMessage: 'Remove series',
+	},
+	breakdownGroupsOtherDescription: {
+		id: 'analytics.breakdown-groups.other-description',
+		defaultMessage: '{count, plural, one {# unassigned value} other {# unassigned values}}',
+	},
+	breakdownGroupsUnavailableValue: {
+		id: 'analytics.breakdown-groups.unavailable-value',
+		defaultMessage: '{value} (not in current results)',
+	},
+	breakdownGroupsNameRequired: {
+		id: 'analytics.breakdown-groups.validation.name-required',
+		defaultMessage: 'Enter a group name.',
+	},
+	breakdownGroupsNameDuplicate: {
+		id: 'analytics.breakdown-groups.validation.name-duplicate',
+		defaultMessage: 'A group with this name already exists for this breakdown.',
+	},
+	breakdownGroupsSeriesRequired: {
+		id: 'analytics.breakdown-groups.validation.series-required',
+		defaultMessage: 'Add at least one custom series.',
+	},
+	breakdownGroupsSeriesNameRequired: {
+		id: 'analytics.breakdown-groups.validation.series-name-required',
+		defaultMessage: 'Every custom series needs a name.',
+	},
+	breakdownGroupsSeriesNameDuplicate: {
+		id: 'analytics.breakdown-groups.validation.series-name-duplicate',
+		defaultMessage: 'Custom series names must be unique.',
+	},
+	breakdownGroupsSeriesValuesRequired: {
+		id: 'analytics.breakdown-groups.validation.series-values-required',
+		defaultMessage: 'Assign at least one breakdown value to every custom series.',
 	},
 	addFilterButton: {
 		id: 'analytics.query.filter.add',

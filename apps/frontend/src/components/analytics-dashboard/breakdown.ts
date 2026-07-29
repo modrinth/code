@@ -13,7 +13,7 @@ export const COMBINED_BREAKDOWN_DATASET_ID_PREFIX = 'breakdowns:'
 export function getAnalyticsBreakdownValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
 	selectedBreakdown: AnalyticsBreakdownPreset,
-	formatMessage: FormatMessage,
+	_formatMessage: FormatMessage,
 ): string {
 	switch (selectedBreakdown) {
 		case 'none':
@@ -29,13 +29,10 @@ export function getAnalyticsBreakdownValue(
 			return ALL_BREAKDOWN_VALUE
 		}
 		case 'user_agent': {
-			const downloadSource = normalizeBreakdownValue(
+			return normalizeBreakdownValue(
 				'user_agent' in point ? point.user_agent : undefined,
 				UNKNOWN_BREAKDOWN_VALUE,
 			)
-			return downloadSource === UNKNOWN_BREAKDOWN_VALUE
-				? UNKNOWN_BREAKDOWN_VALUE
-				: getDownloadSourceLabel(downloadSource, formatMessage)
 		}
 		case 'download_reason':
 			return normalizeBreakdownValue(

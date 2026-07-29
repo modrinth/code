@@ -47,6 +47,21 @@ export type AnalyticsBreakdownPreset =
 	| 'dependent_project_download'
 
 export type AnalyticsSelectedBreakdowns = Exclude<AnalyticsBreakdownPreset, 'none'>[]
+export type AnalyticsBreakdownGroupSeries = {
+	id: string
+	name: string
+	values: string[]
+}
+export type AnalyticsBreakdownGroup = {
+	id: string
+	name: string
+	breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>
+	series: AnalyticsBreakdownGroupSeries[]
+}
+export type AnalyticsActiveBreakdownGroup = {
+	breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>
+	groupId: string
+}
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
 export type AnalyticsTableSortColumn =

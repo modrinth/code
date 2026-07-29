@@ -80,6 +80,8 @@ import {
 	UNKNOWN_ORGANIZATION_NAME,
 } from './analytics-project-utils'
 import type {
+	AnalyticsActiveBreakdownGroup,
+	AnalyticsBreakdownGroup,
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardFilterOptions,
 	AnalyticsDashboardPercentChanges,
@@ -109,6 +111,9 @@ export {
 	getProjectIdsMatchingStatusFilter,
 } from './analytics-project-utils'
 export type {
+	AnalyticsActiveBreakdownGroup,
+	AnalyticsBreakdownGroup,
+	AnalyticsBreakdownGroupSeries,
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardFilterOptions,
 	AnalyticsDashboardPercentChanges,
@@ -186,6 +191,12 @@ export interface AnalyticsDashboardContextValue {
 	selectedGroupBy: Ref<AnalyticsGroupByPreset>
 	analyticsAllTimeStartDate: ComputedRef<Date>
 	selectedBreakdowns: Ref<AnalyticsSelectedBreakdowns>
+	breakdownGroups: Ref<AnalyticsBreakdownGroup[]>
+	activeBreakdownGroup: Ref<AnalyticsActiveBreakdownGroup | null>
+	resolvedActiveBreakdownGroup: ComputedRef<AnalyticsBreakdownGroup | null>
+	upsertBreakdownGroup: (group: AnalyticsBreakdownGroup) => void
+	deleteBreakdownGroup: (groupId: string) => void
+	setActiveBreakdownGroup: (activeGroup: AnalyticsActiveBreakdownGroup | null) => void
 	selectedFilters: Ref<AnalyticsSelectedFilters>
 	queryRefreshTimestamp: Ref<number>
 	queryResetToken: Ref<number>
@@ -315,6 +326,8 @@ export function createAnalyticsDashboardContext(
 	)
 	const selectedGroupBy = ref<AnalyticsGroupByPreset>(initialQueryState.selectedGroupBy)
 	const selectedBreakdowns = ref<AnalyticsSelectedBreakdowns>(initialQueryState.selectedBreakdowns)
+	const breakdownGroups = ref<AnalyticsBreakdownGroup[]>([])
+	const activeBreakdownGroup = ref<AnalyticsActiveBreakdownGroup | null>(null)
 	const selectedFilters = ref<AnalyticsSelectedFilters>(initialQueryState.selectedFilters)
 	const queryRefreshTimestamp = ref(Date.now())
 	const queryResetToken = ref(0)
@@ -323,6 +336,64 @@ export function createAnalyticsDashboardContext(
 	const hasCompletedAnalyticsLoading = ref(false)
 	let revenueHourlyGroupByBeforeOverride: AnalyticsGroupByPreset | null = null
 	let mobileLayoutMedia: MediaQueryList | null = null
+
+	const resolvedActiveBreakdownGroup = computed<AnalyticsBreakdownGroup | null>(() => {
+		const activeGroup = activeBreakdownGroup.value
+		if (!activeGroup || !selectedBreakdowns.value.includes(activeGroup.breakdown)) return null
+		return (
+			breakdownGroups.value.find(
+				(group) => group.id === activeGroup.groupId && group.breakdown === activeGroup.breakdown,
+			) ?? null
+		)
+	})
+
+	function resetGraphDatasetSelection() {
+		hiddenGraphDatasetIds.value = []
+		hasExplicitGraphDatasetSelection.value = false
+		selectedGraphDatasetIds.value = []
+	}
+
+	function setActiveBreakdownGroup(nextActiveGroup: AnalyticsActiveBreakdownGroup | null) {
+		const current = activeBreakdownGroup.value
+		if (
+			current?.breakdown === nextActiveGroup?.breakdown &&
+			current?.groupId === nextActiveGroup?.groupId
+		) {
+			return
+		}
+		activeBreakdownGroup.value = nextActiveGroup
+		resetGraphDatasetSelection()
+	}
+
+	function upsertBreakdownGroup(group: AnalyticsBreakdownGroup) {
+		const groupIndex = breakdownGroups.value.findIndex((candidate) => candidate.id === group.id)
+		if (groupIndex === -1) {
+			breakdownGroups.value = [...breakdownGroups.value, group]
+		} else {
+			const nextGroups = [...breakdownGroups.value]
+			nextGroups[groupIndex] = group
+			breakdownGroups.value = nextGroups
+		}
+		if (activeBreakdownGroup.value?.groupId === group.id) {
+			resetGraphDatasetSelection()
+		}
+	}
+
+	function deleteBreakdownGroup(groupId: string) {
+		breakdownGroups.value = breakdownGroups.value.filter((group) => group.id !== groupId)
+		if (activeBreakdownGroup.value?.groupId === groupId) {
+			setActiveBreakdownGroup(null)
+		}
+	}
+
+	watch(selectedBreakdowns, (nextBreakdowns) => {
+		if (
+			activeBreakdownGroup.value &&
+			!nextBreakdowns.includes(activeBreakdownGroup.value.breakdown)
+		) {
+			setActiveBreakdownGroup(null)
+		}
+	})
 
 	function syncMobileLayoutState() {
 		isMobileLayout.value = mobileLayoutMedia?.matches ?? false
@@ -707,7 +778,7 @@ export function createAnalyticsDashboardContext(
 			selectedProjectIds.value,
 		)
 
-		return isQueryBuilderDefault && isGraphDefault
+		return isQueryBuilderDefault && isGraphDefault && activeBreakdownGroup.value === null
 	})
 	const isRevenueTimeframeAvailable = computed(
 		() =>
@@ -1867,6 +1938,7 @@ export function createAnalyticsDashboardContext(
 		selectedCustomTimeframeEndDate.value = defaultQueryState.selectedCustomTimeframeEndDate
 		selectedGroupBy.value = defaultQueryState.selectedGroupBy
 		selectedBreakdowns.value = defaultQueryState.selectedBreakdowns
+		setActiveBreakdownGroup(null)
 		selectedFilters.value = defaultQueryState.selectedFilters
 		activeStat.value = defaultGraphState.activeStat
 		activeGraphViewMode.value = defaultGraphState.activeGraphViewMode
@@ -1940,6 +2012,12 @@ export function createAnalyticsDashboardContext(
 		selectedGroupBy,
 		analyticsAllTimeStartDate,
 		selectedBreakdowns,
+		breakdownGroups,
+		activeBreakdownGroup,
+		resolvedActiveBreakdownGroup,
+		upsertBreakdownGroup,
+		deleteBreakdownGroup,
+		setActiveBreakdownGroup,
 		selectedFilters,
 		queryRefreshTimestamp,
 		queryResetToken,

@@ -1,6 +1,7 @@
 import type { TableColumn } from '@modrinth/ui'
 
 import type {
+	AnalyticsBreakdownGroup,
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardStat,
 	AnalyticsSelectedFilters,
@@ -23,6 +24,7 @@ type BuildAnalyticsTableColumnsOptions = {
 	selectedBreakdowns: readonly AnalyticsTableBreakdownPreset[]
 	selectedFilters: AnalyticsSelectedFilters
 	showBreakdownColumn: boolean
+	breakdownGroup: AnalyticsBreakdownGroup | null
 	formatMessage: FormatMessage
 	getRelevantAnalyticsDashboardStats: (
 		breakdowns: readonly AnalyticsBreakdownPreset[],
@@ -42,6 +44,7 @@ export function buildAnalyticsTableColumns({
 	selectedBreakdowns,
 	selectedFilters,
 	showBreakdownColumn,
+	breakdownGroup,
 	formatMessage,
 	getRelevantAnalyticsDashboardStats,
 }: BuildAnalyticsTableColumnsOptions): TableColumn<AnalyticsTableColumnKey>[] {
@@ -62,7 +65,10 @@ export function buildAnalyticsTableColumns({
 		for (const breakdown of selectedBreakdowns) {
 			nextColumns.push({
 				key: getAnalyticsTableBreakdownColumnKey(breakdown),
-				label: getAnalyticsTableBreakdownColumnLabel(breakdown, formatMessage),
+				label:
+					breakdownGroup?.breakdown === breakdown
+						? breakdownGroup.name
+						: getAnalyticsTableBreakdownColumnLabel(breakdown, formatMessage),
 				enableSorting: true,
 				width: breakdown === 'project' && selectedBreakdowns.length === 1 ? '45%' : undefined,
 			})
