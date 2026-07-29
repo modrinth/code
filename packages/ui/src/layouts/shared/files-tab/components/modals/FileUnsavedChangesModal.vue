@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" fade="warning" :header="formatMessage(messages.header)" max-width="500px">
+	<Modal ref="modal" fade="warning" :header="formatMessage(messages.header)" max-width="500px">
 		<p class="m-0 text-secondary">
 			{{ formatMessage(messages.body) }}
 		</p>
@@ -25,7 +25,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +33,7 @@ import { SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -57,7 +57,7 @@ const messages = defineMessages({
 
 export type UnsavedChangesResult = 'cancel' | 'discard' | 'save'
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 let resolvePromise: ((value: UnsavedChangesResult) => void) | null = null
 
 function prompt(): Promise<UnsavedChangesResult> {

@@ -153,9 +153,9 @@ For components that need user interaction to show:
 ```typescript
 export const Default: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Modal, ButtonStyled },
 		setup() {
-			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof Modal> | null>(null)
 			return { modalRef }
 		},
 		template: /* html */ `
@@ -163,9 +163,9 @@ export const Default: Story = {
                 <ButtonStyled @click="modalRef?.show()">
                     <button>Open Modal</button>
                 </ButtonStyled>
-                <NewModal ref="modalRef" header="Example Modal">
+                <Modal ref="modalRef" header="Example Modal">
                     <p>Modal content</p>
-                </NewModal>
+                </Modal>
             </div>
         `,
 	}),

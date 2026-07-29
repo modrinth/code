@@ -5,7 +5,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
@@ -29,7 +29,7 @@ const props = defineProps<{
 	instance: GameInstance
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const name = ref('')
 const address = ref('')
@@ -88,7 +88,7 @@ const messages = defineMessages({
 defineExpose({ show, hide })
 </script>
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)" width="500px" max-width="500px">
+	<Modal ref="modal" :header="formatMessage(messages.title)" width="500px" max-width="500px">
 		<ServerModalBody
 			v-model:name="name"
 			v-model:address="address"
@@ -116,5 +116,5 @@ defineExpose({ show, hide })
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>

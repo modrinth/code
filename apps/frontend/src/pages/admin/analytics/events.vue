@@ -7,7 +7,7 @@
 		@proceed="confirmDeleteEvent"
 	/>
 
-	<NewModal
+	<Modal
 		ref="eventModal"
 		:header="modalMode === 'create' ? 'New event' : 'Edit event'"
 		width="480px"
@@ -121,7 +121,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 
 	<div class="normal-page no-sidebar">
 		<div class="normal-page__content flex flex-col gap-4">
@@ -245,9 +245,9 @@ import {
 	DatePicker,
 	injectModrinthClient,
 	injectNotificationManager,
+	Modal,
 	MultiSelect,
 	type MultiSelectOption,
-	NewModal,
 	type SortDirection,
 	StyledInput,
 	Table,
@@ -318,7 +318,7 @@ const metricKindOptions: MultiSelectOption<AnalyticsEventMetricKind>[] = [
 const allMetricKinds = metricKindOptions.map((option) => option.value)
 
 const deleteEventModal = ref<InstanceType<typeof ConfirmModal> | null>(null)
-const eventModal = ref<InstanceType<typeof NewModal> | null>(null)
+const eventModal = ref<InstanceType<typeof Modal> | null>(null)
 const titleInput = ref<InstanceType<typeof StyledInput> | null>(null)
 const searchQuery = ref('')
 const sortColumn = ref<EventColumnKey | undefined>('date')

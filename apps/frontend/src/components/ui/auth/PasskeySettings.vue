@@ -10,7 +10,7 @@
 			@proceed="removePasskey()"
 		/>
 
-		<NewModal
+		<Modal
 			ref="managePasskeyModal"
 			width="600px"
 			:header="formatMessage(messages.managePasskeyTitle)"
@@ -99,9 +99,9 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 
-		<NewModal
+		<Modal
 			ref="addPasskeyModal"
 			width="500px"
 			:header="formatMessage(messages.passkeyAddModalTitle)"
@@ -138,9 +138,9 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 
-		<NewModal
+		<Modal
 			ref="renamePasskeyModal"
 			width="500px"
 			:header="formatMessage(messages.renamePasskeyModalHeader)"
@@ -177,7 +177,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 
 		<div class="adjacent-input mb-0">
 			<label for="manage-passkeys">
@@ -215,7 +215,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	useFormatDateTime,
 	useRelativeTime,
@@ -316,9 +316,9 @@ const messages = defineMessages({
 })
 
 const removePasskeyModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('removePasskeyModal')
-const managePasskeyModal = useTemplateRef<InstanceType<typeof NewModal>>('managePasskeyModal')
-const addPasskeyModal = useTemplateRef<InstanceType<typeof NewModal>>('addPasskeyModal')
-const renamePasskeyModal = useTemplateRef<InstanceType<typeof NewModal>>('renamePasskeyModal')
+const managePasskeyModal = useTemplateRef<InstanceType<typeof Modal>>('managePasskeyModal')
+const addPasskeyModal = useTemplateRef<InstanceType<typeof Modal>>('addPasskeyModal')
+const renamePasskeyModal = useTemplateRef<InstanceType<typeof Modal>>('renamePasskeyModal')
 
 const pendingPasskey = ref<Labrinth.Auth.v2.PasskeyRegisterFinishRequest | null>(null)
 const passkeyToRemove = ref<Labrinth.Auth.v2.Passkey | null>(null)

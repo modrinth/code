@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NewModal
+		<Modal
 			ref="modalOpen"
 			:header="formatMessage(messages.transferProjectsTitle)"
 			no-padding
@@ -83,7 +83,7 @@
 					</ButtonStyled>
 				</div>
 			</template>
-		</NewModal>
+		</Modal>
 		<ButtonStyled>
 			<button @click="show($event)">
 				<TransferIcon />
@@ -101,7 +101,7 @@ import {
 	commonMessages,
 	CopyCode,
 	defineMessages,
-	NewModal,
+	Modal,
 	Table,
 	useVIntl,
 } from '@modrinth/ui'

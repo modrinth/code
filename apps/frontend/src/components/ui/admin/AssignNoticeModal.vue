@@ -6,7 +6,7 @@ import {
 	ButtonStyled,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	ServerNotice,
 	StyledInput,
 	TagItem,
@@ -18,7 +18,7 @@ const client = injectModrinthClient()
 
 type ServerNoticeType = Archon.Notices.v0.ListedNotice
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const emit = defineEmits<{
 	(e: 'close'): void
@@ -107,7 +107,7 @@ function hide() {
 defineExpose({ show, hide })
 </script>
 <template>
-	<NewModal ref="modal" :on-hide="() => emit('close')">
+	<Modal ref="modal" :on-hide="() => emit('close')">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">
 				Editing assignments of notice #{{ notice?.id }}
@@ -202,5 +202,5 @@ defineExpose({ show, hide })
 				</div>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

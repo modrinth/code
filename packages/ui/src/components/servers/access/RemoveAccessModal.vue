@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="
 			formatMessage(modalState.shouldCancel ? messages.cancelHeader : messages.header, {
@@ -79,7 +79,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -92,7 +92,7 @@ import { commonMessages } from '../../../utils/common-messages'
 import Admonition from '../../base/Admonition.vue'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
-import NewModal from '../../modal/NewModal.vue'
+import Modal from '../../modal/Modal.vue'
 import type { ServerAccessRole } from './types'
 
 const props = withDefaults(
@@ -122,7 +122,7 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const cachedState = ref({
 	username: '',
 	avatarUrl: undefined as string | undefined,

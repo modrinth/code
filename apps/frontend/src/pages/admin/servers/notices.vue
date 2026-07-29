@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="createNoticeModal">
+	<Modal ref="createNoticeModal">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">{{
 				editingNotice ? `Editing notice #${editingNotice?.id}` : 'Creating a notice'
@@ -118,7 +118,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 	<AssignNoticeModal ref="assignNoticeModal" @close="refreshNotices" />
 	<div class="page">
 		<div
@@ -270,7 +270,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	ServerNotice,
 	StyledInput,
 	TagItem,
@@ -301,7 +301,7 @@ const formatDateTimeShortMonth = useFormatDateTime({
 type ServerNoticeType = Archon.Notices.v0.ListedNotice
 
 const notices = ref<ServerNoticeType[]>([])
-const createNoticeModal = ref<InstanceType<typeof NewModal>>()
+const createNoticeModal = ref<InstanceType<typeof Modal>>()
 const assignNoticeModal = ref<InstanceType<typeof AssignNoticeModal>>()
 
 await refreshNotices()

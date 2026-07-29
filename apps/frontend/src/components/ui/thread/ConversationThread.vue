@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NewModal
+		<Modal
 			ref="modalSubmit"
 			:header="
 				formatMessage(
@@ -56,8 +56,8 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
-		<NewModal ref="modalReply" :header="formatMessage(messages.replyModalHeader)">
+		</Modal>
+		<Modal ref="modalReply" :header="formatMessage(messages.replyModalHeader)">
 			<div class="flex max-w-[45rem] flex-col gap-3">
 				<p class="m-0">{{ formatMessage(messages.replyModalDescription) }}</p>
 				<p class="m-0">
@@ -98,7 +98,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 		<div v-if="flags.developerMode" class="mx-4 mb-3 font-semibold">
 			Thread ID:
 			<CopyCode :text="thread.id" />
@@ -430,7 +430,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	MarkdownEditor,
-	NewModal,
+	Modal,
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'

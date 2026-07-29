@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px" actions-divider>
+	<Modal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px" actions-divider>
 		<template #title>
 			<template v-if="project">
 				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
@@ -87,7 +87,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -102,7 +102,7 @@ import {
 	injectNotificationManager,
 	type JoinedButtonAction,
 	JoinedButtons,
-	NewModal,
+	Modal,
 	ServersPromo,
 	truncatedTooltip,
 	useDebugLogger,
@@ -146,7 +146,7 @@ type DownloadedFile = DownloadableFile & {
 
 type DownloadActionType = 'zip' | 'dependencies' | 'recommended'
 
-type NewModalRef = {
+type ModalRef = {
 	show: (event?: MouseEvent) => void
 	hide: () => void
 }
@@ -191,7 +191,7 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadModal')
 
-const modal = ref<NewModalRef | null>(null)
+const modal = ref<ModalRef | null>(null)
 const downloadTitleRef = ref<HTMLElement | null>(null)
 const modalOpening = ref(false)
 const modalOpen = ref(false)

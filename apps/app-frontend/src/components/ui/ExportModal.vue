@@ -6,7 +6,7 @@ import {
 	defineMessages,
 	FileTreeSelect,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
@@ -233,7 +233,7 @@ function isExportCandidateDisabled(path) {
 </script>
 
 <template>
-	<NewModal
+	<Modal
 		ref="exportModal"
 		:header="formatMessage(messages.header)"
 		scrollable
@@ -300,5 +300,5 @@ function isExportCandidateDisabled(path) {
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>

@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
@@ -253,7 +253,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 
 	<ConfirmModal
 		ref="incompatibleUpdateModal"
@@ -297,7 +297,7 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -478,7 +478,7 @@ const emit = defineEmits<{
 	versionHover: [version: Labrinth.Versions.v2.Version]
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const incompatibleUpdateModal = ref<InstanceType<typeof ConfirmModal>>()
 const searchQuery = ref('')
 const hideIncompatibleState = ref(true)

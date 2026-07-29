@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" header="Renaming backup" width="500px" @show="focusInput">
+	<Modal ref="modal" header="Renaming backup" width="500px" @show="focusInput">
 		<div class="flex flex-col gap-2">
 			<label for="backup-name-input">
 				<span class="text-lg font-semibold text-contrast"> Name </span>
@@ -46,7 +46,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -64,7 +64,7 @@ import {
 import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
-import NewModal from '../../modal/NewModal.vue'
+import Modal from '../../modal/Modal.vue'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -93,7 +93,7 @@ const renameMutation = useMutation({
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const input = ref<HTMLInputElement>()
 const backupName = ref('')
 const originalName = ref('')

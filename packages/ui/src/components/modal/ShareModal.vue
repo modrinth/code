@@ -14,7 +14,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import { injectNotificationManager } from '#ui/providers'
 
-import { ButtonStyled, NewModal, StyledInput } from '../index'
+import { ButtonStyled, Modal, StyledInput } from '../index'
 
 const props = defineProps({
 	header: {
@@ -147,7 +147,7 @@ defineExpose({
 </script>
 
 <template>
-	<NewModal ref="shareModal" :header="header" :noblur="noblur" :on-hide="onHide">
+	<Modal ref="shareModal" :header="header" :noblur="noblur" :on-hide="onHide">
 		<div class="flex flex-col items-center gap-2">
 			<div
 				:class="['flex items-center justify-center', link ? 'flex-wrap gap-4' : 'flex-col gap-2']"
@@ -280,5 +280,5 @@ defineExpose({
 				</div>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

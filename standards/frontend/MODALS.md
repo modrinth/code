@@ -22,27 +22,27 @@
 
 # Regular Modals
 
-Use the `NewModal` component (`packages/ui/src/components/modal/NewModal.vue`) for all standard modals.
+Use the `Modal` component (`packages/ui/src/components/modal/Modal.vue`) for all standard modals.
 
 - Set the modal’s width via the `width` or `maxWidth` props. For responsive sizing, use `min(base-size, calc(95vw - 10rem))`.
-- `ModalWrapper` is deprecated — modal behavior is automatically handled via the `injectModalBehavior` DI utility.
+- Modal behavior (ads, blur, etc.) is automatically handled via the `injectModalBehavior` DI utility.
 
 ## Basic Usage
 
 ```vue
 <script setup lang="ts">
 import { ref } from ‘vue’
-import { NewModal } from ‘@modrinth/ui’
+import { Modal } from ‘@modrinth/ui’
 
-const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const modal = ref<InstanceType<typeof Modal> | null>(null)
 </script>
 
 <template>
 	<button @click="modal?.show($event)">Open</button>
 
-	<NewModal ref="modal" header="My Modal">
+	<Modal ref="modal" header="My Modal">
 		<p>Modal content here.</p>
-	</NewModal>
+	</Modal>
 </template>
 ```
 
@@ -77,9 +77,9 @@ Call `show(event?)` to open the modal. Passing the `MouseEvent` triggers an anim
 The main content area. Rendered inside a padded, optionally scrollable container.
 
 ```vue
-<NewModal ref="modal" header="Confirm">
+<Modal ref="modal" header="Confirm">
 	<p>Are you sure you want to proceed?</p>
-</NewModal>
+</Modal>
 ```
 
 ### `title` slot
@@ -87,13 +87,13 @@ The main content area. Rendered inside a padded, optionally scrollable container
 Replaces the default header text. Use this when you need custom markup in the header (e.g. an icon next to the title or a badge).
 
 ```vue
-<NewModal ref="modal">
+<Modal ref="modal">
 	<template #title>
 		<AlertIcon />
 		<span class="text-2xl font-semibold text-contrast">Custom Title</span>
 	</template>
 	<p>Content here.</p>
-</NewModal>
+</Modal>
 ```
 
 ### `actions` slot
@@ -101,7 +101,7 @@ Replaces the default header text. Use this when you need custom markup in the he
 Renders a bottom action bar below the content area (with `p-4 pt-0` padding). Use this for confirm/cancel buttons.
 
 ```vue
-<NewModal ref="modal" header="Delete Item" fade="danger">
+<Modal ref="modal" header="Delete Item" fade="danger">
 	<p>This action cannot be undone.</p>
 	<template #actions>
 		<ButtonStyled color="danger">
@@ -111,7 +111,7 @@ Renders a bottom action bar below the content area (with `p-4 pt-0` padding). Us
 			<button @click="modal?.hide()">Cancel</button>
 		</ButtonStyled>
 	</template>
-</NewModal>
+</Modal>
 ```
 
 ## Scrollable Content
@@ -119,9 +119,9 @@ Renders a bottom action bar below the content area (with `p-4 pt-0` padding). Us
 Set `scrollable` to enable scroll tracking. The modal renders animated fade gradients at the top and bottom edges when content is scrolled, giving users a visual cue that more content exists.
 
 ```vue
-<NewModal ref="modal" header="Long Content" scrollable max-content-height="60vh">
+<Modal ref="modal" header="Long Content" scrollable max-content-height="60vh">
 	<!-- Long content that may overflow -->
-</NewModal>
+</Modal>
 ```
 
 The `checkScrollState` method is exposed via ref — call it after dynamically changing content to re-evaluate whether fade indicators should appear.
@@ -133,17 +133,17 @@ When `scrollable` is `false` (the default), content uses `overflow-y: auto` with
 When `mergeHeader` is set, the header bar is hidden and a floating close button is rendered in the top-right corner of the modal. Content receives extra top padding to avoid overlapping the button. This is useful for modals with hero images or full-bleed content at the top.
 
 ```vue
-<NewModal ref="modal" merge-header no-padding>
+<Modal ref="modal" merge-header no-padding>
 	<img src="..." class="w-full" />
 	<div class="p-6">
 		<p>Content below the image.</p>
 	</div>
-</NewModal>
+</Modal>
 ```
 
 ## Modal Stacking
 
-`NewModal` integrates with a modal stack (`useModalStack`). Multiple modals can be open simultaneously — only the topmost modal responds to the Escape key. The document body scroll is locked when any modal is open and restored when the last modal closes.
+`Modal` integrates with a modal stack (`useModalStack`). Multiple modals can be open simultaneously — only the topmost modal responds to the Escape key. The document body scroll is locked when any modal is open and restored when the last modal closes.
 
 ## Exposed Methods
 

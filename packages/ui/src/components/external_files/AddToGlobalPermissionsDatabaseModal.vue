@@ -9,7 +9,7 @@ import {
 	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
-	NewModal,
+	Modal,
 	StyledInput,
 } from '#ui/components'
 
@@ -35,7 +35,7 @@ const emit = defineEmits<{
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 
-const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
+const modalRef = useTemplateRef<InstanceType<typeof Modal>>('modalRef')
 
 const statusOptions: ComboboxOption<ExternalLicenseStatus>[] = [
 	{ value: 'yes', label: 'Yes' },
@@ -140,7 +140,7 @@ defineExpose({ show, hide })
 </script>
 
 <template>
-	<NewModal
+	<Modal
 		ref="modalRef"
 		header="Adding to global permissions database"
 		max-width="640px"
@@ -241,5 +241,5 @@ defineExpose({ show, hide })
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

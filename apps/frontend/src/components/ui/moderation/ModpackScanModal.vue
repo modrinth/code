@@ -15,7 +15,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	Table,
 	type TableColumn,
 	useVIntl,
@@ -136,7 +136,7 @@ const props = defineProps<{
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
-const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
+const modalRef = useTemplateRef<InstanceType<typeof Modal>>('modalRef')
 const clearModalRef = useTemplateRef<InstanceType<typeof ConfirmModal>>('clearModalRef')
 const { formatMessage } = useVIntl()
 
@@ -373,7 +373,7 @@ defineExpose({ show, hide })
 		@proceed="clearAllGroups"
 	/>
 
-	<NewModal
+	<Modal
 		ref="modalRef"
 		width="60vw"
 		:close-on-click-outside="false"
@@ -517,5 +517,5 @@ defineExpose({ show, hide })
 				</template>
 			</Table>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

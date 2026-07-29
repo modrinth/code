@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :scrollable="true" max-content-height="82vh" :closable="true">
+	<Modal ref="modal" :scrollable="true" max-content-height="82vh" :closable="true">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">Edit project Environment</span>
 		</template>
@@ -23,7 +23,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -35,7 +35,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { commonMessages } from '../../../../utils/common-messages'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
-import { NewModal } from '../../../modal'
+import { Modal } from '../../../modal'
 import EnvironmentMigration from './EnvironmentMigration.vue'
 
 const { formatMessage } = useVIntl()
@@ -47,7 +47,7 @@ const messages = defineMessages({
 	},
 })
 
-const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
+const modal = useTemplateRef<InstanceType<typeof Modal>>('modal')
 const environmentMigration =
 	useTemplateRef<InstanceType<typeof EnvironmentMigration>>('environmentMigration')
 

@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:scrollable="true"
 		max-content-height="72vh"
@@ -114,12 +114,12 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script lang="ts">
 import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { ButtonStyled, Modal } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
@@ -175,7 +175,7 @@ const props = withDefaults(
 	},
 )
 
-const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
+const modal = useTemplateRef<InstanceType<typeof Modal>>('modal')
 const currentStageIndex = ref<number>(0)
 
 function show() {

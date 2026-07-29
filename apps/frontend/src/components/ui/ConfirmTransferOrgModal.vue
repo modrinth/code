@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" fade="warning" width="550px">
+	<Modal ref="modal" fade="warning" width="550px">
 		<template #title>
 			<div class="flex items-center gap-2">
 				<span class="text-lg font-extrabold text-contrast">Transfer</span>
@@ -71,12 +71,12 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
 import { RightArrowIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
+import { Admonition, Avatar, ButtonStyled, Modal, StyledInput } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
@@ -86,7 +86,7 @@ const props = defineProps<{
 	onConfirm: () => void
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const confirmationText = ref('')
 
 const isConfirmEnabled = computed(

@@ -4,7 +4,7 @@ import { PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { Accordion, ButtonStyled, NewModal, StyledInput } from '#ui/components'
+import { Accordion, ButtonStyled, Modal, StyledInput } from '#ui/components'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import AttributionGroupFilePicker from './AttributionGroupFilePicker.vue'
@@ -41,7 +41,7 @@ type ExternalProject = {
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 
-const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
+const modalRef = useTemplateRef<InstanceType<typeof Modal>>('modalRef')
 const searchAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('searchAccordionRef')
 const filesAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('filesAccordionRef')
 const searchInputRef = useTemplateRef<InstanceType<typeof StyledInput>>('searchInputRef')
@@ -185,7 +185,7 @@ defineExpose({ show, hide })
 </script>
 
 <template>
-	<NewModal
+	<Modal
 		ref="modalRef"
 		header="Add to existing entry"
 		max-width="720px"
@@ -324,5 +324,5 @@ defineExpose({ show, hide })
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

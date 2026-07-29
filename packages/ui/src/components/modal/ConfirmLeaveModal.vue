@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="localizeIfPossible(title)" fade="warning" max-width="500px">
+	<Modal ref="modal" :header="localizeIfPossible(title)" fade="warning" max-width="500px">
 		<div class="flex flex-col gap-6">
 			<Admonition :type="admonitionType" :header="localizeIfPossible(header)">
 				{{ localizeIfPossible(body) }}
@@ -22,7 +22,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +33,7 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessage, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 
-import NewModal from './NewModal.vue'
+import Modal from './Modal.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -80,7 +80,7 @@ function localizeIfPossible(message: MessageDescriptor | string) {
 	return typeof message === 'string' ? message : formatMessage(message)
 }
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 let resolvePromise: ((value: boolean) => void) | null = null
 
 function prompt(): Promise<boolean> {

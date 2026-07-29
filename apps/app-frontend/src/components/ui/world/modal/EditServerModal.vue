@@ -5,7 +5,7 @@ import {
 	commonMessages,
 	defineMessage,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
@@ -32,7 +32,7 @@ const props = defineProps<{
 	instance: GameInstance
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const name = ref<string>('')
 const address = ref<string>('')
@@ -96,7 +96,7 @@ const titleMessage = defineMessage({
 })
 </script>
 <template>
-	<NewModal ref="modal" :header="formatMessage(titleMessage)" width="500px" max-width="500px">
+	<Modal ref="modal" :header="formatMessage(titleMessage)" width="500px" max-width="500px">
 		<ServerModalBody
 			v-model:name="name"
 			v-model:address="address"
@@ -119,5 +119,5 @@ const titleMessage = defineMessage({
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>

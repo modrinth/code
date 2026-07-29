@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(messages.header)"
 		max-width="470px"
@@ -44,7 +44,7 @@
 				>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -55,7 +55,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
@@ -64,7 +64,7 @@ import { methodLabels, type ShareRow } from './shared-instance-share-types'
 
 const props = defineProps<{ row: ShareRow | null; memberCount: number }>()
 const emit = defineEmits<{ confirm: [row: ShareRow]; clear: [] }>()
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const { formatMessage } = useVIntl()
 const username = computed(() => props.row?.username ?? '')
 const messages = defineMessages({

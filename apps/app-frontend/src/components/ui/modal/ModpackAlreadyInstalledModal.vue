@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="warning" max-width="500px">
+	<Modal ref="modal" :header="formatMessage(messages.header)" fade="warning" max-width="500px">
 		<p class="m-0 text-secondary">
 			<IntlFormatted :message-id="messages.body" :values="{ instanceName }">
 				<template #bold="{ children }">
@@ -30,7 +30,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -40,7 +40,7 @@ import {
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
@@ -72,7 +72,7 @@ const emit = defineEmits<{
 	(e: 'create-anyway'): void
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const instanceName = ref('')
 const instanceId = ref('')
 

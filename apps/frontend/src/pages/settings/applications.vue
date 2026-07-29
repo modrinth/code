@@ -7,7 +7,7 @@
 			:proceed-label="formatMessage(messages.deleteConfirmButton)"
 			@proceed="removeApp(editingId)"
 		/>
-		<NewModal ref="appModal" :header="formatMessage(messages.modalHeader)" width="40rem" scrollable>
+		<Modal ref="appModal" :header="formatMessage(messages.modalHeader)" width="40rem" scrollable>
 			<div class="flex flex-col">
 				<label for="app-name" class="m-0 mb-2 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.nameLabel) }}
@@ -146,7 +146,7 @@
 					</ButtonStyled>
 				</div>
 			</template>
-		</NewModal>
+		</Modal>
 
 		<div class="header__row">
 			<div class="header__title">
@@ -263,7 +263,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
-	NewModal,
+	Modal,
 	normalizeChildren,
 	StyledInput,
 	useFormatDateTime,

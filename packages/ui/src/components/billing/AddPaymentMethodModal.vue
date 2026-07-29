@@ -5,13 +5,13 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
-import { ButtonStyled, NewModal } from '../index'
+import { ButtonStyled, Modal } from '../index'
 import type { AddPaymentMethodProps } from './AddPaymentMethod.vue'
 import AddPaymentMethod from './AddPaymentMethod.vue'
 
 const { formatMessage } = useVIntl()
 
-const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
+const modal = useTemplateRef<InstanceType<typeof Modal>>('modal')
 const addPaymentMethod = useTemplateRef<InstanceType<typeof AddPaymentMethod>>('addPaymentMethod')
 
 const props = defineProps<AddPaymentMethodProps>()
@@ -40,7 +40,7 @@ defineExpose({
 </script>
 
 <template>
-	<NewModal ref="modal">
+	<Modal ref="modal">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">
 				{{ formatMessage(messages.addingPaymentMethod) }}
@@ -71,5 +71,5 @@ defineExpose({
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

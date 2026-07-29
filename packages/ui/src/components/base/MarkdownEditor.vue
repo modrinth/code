@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="linkModal" :header="formatMessage(messages.linkModalHeader)" class="!w-[40rem]">
+	<Modal ref="linkModal" :header="formatMessage(messages.linkModalHeader)" class="!w-[40rem]">
 		<div class="modal-insert">
 			<label class="label" for="insert-link-label">
 				<span class="label__title">{{ formatMessage(messages.linkModalLabelFieldTitle) }}</span>
@@ -66,8 +66,8 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
-	<NewModal ref="imageModal" :header="formatMessage(messages.imageModalHeader)" class="!w-[40rem]">
+	</Modal>
+	<Modal ref="imageModal" :header="formatMessage(messages.imageModalHeader)" class="!w-[40rem]">
 		<div class="modal-insert">
 			<label class="label" for="insert-image-alt">
 				<span class="label__title">
@@ -164,8 +164,8 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
-	<NewModal ref="videoModal" :header="formatMessage(messages.videoModalHeader)" class="!w-[40rem]">
+	</Modal>
+	<Modal ref="videoModal" :header="formatMessage(messages.videoModalHeader)" class="!w-[40rem]">
 		<div class="modal-insert">
 			<label class="label" for="insert-video-url">
 				<span class="label__title">
@@ -224,7 +224,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 	<div class="block grow w-full">
 		<div class="editor-action-row w-full">
 			<div class="w-full flex justify-between items-center flex-wrap gap-2">
@@ -335,7 +335,7 @@ import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'
-import NewModal from '../modal/NewModal.vue'
+import Modal from '../modal/Modal.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
@@ -1042,9 +1042,9 @@ const videoMarkdown = computed(() => {
 	return ''
 })
 
-const linkModal = ref<InstanceType<typeof NewModal> | null>(null)
-const imageModal = ref<InstanceType<typeof NewModal> | null>(null)
-const videoModal = ref<InstanceType<typeof NewModal> | null>(null)
+const linkModal = ref<InstanceType<typeof Modal> | null>(null)
+const imageModal = ref<InstanceType<typeof Modal> | null>(null)
+const videoModal = ref<InstanceType<typeof Modal> | null>(null)
 
 function resetModalStates() {
 	linkText.value = ''

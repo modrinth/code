@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" fade="danger" :header="formatMessage(messages.header)" max-width="500px">
+	<Modal ref="modal" fade="danger" :header="formatMessage(messages.header)" max-width="500px">
 		<Admonition type="critical" class="md:min-w-[400px]">
 			<template #header>{{ formatMessage(messages.deletingName, { name: item?.name }) }}</template>
 			{{
@@ -24,7 +24,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +33,7 @@ import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -69,7 +69,7 @@ const emit = defineEmits<{
 	delete: []
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const handleSubmit = () => {
 	emit('delete')

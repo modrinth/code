@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(messages.header, { count })"
 		fade="danger"
@@ -78,7 +78,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -91,7 +91,7 @@ import { useScrollIndicator } from '../../../composables/scroll-indicator'
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
-import NewModal from '../../modal/NewModal.vue'
+import Modal from '../../modal/Modal.vue'
 import BackupItem from './BackupItem.vue'
 
 const { formatMessage } = useVIntl()
@@ -136,7 +136,7 @@ const messages = defineMessages({
 	},
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const backupListRef = ref<HTMLElement | null>(null)
 const singleBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup>()
 const bulkBackups = ref<Archon.BackupsQueue.v1.BackupQueueBackup[]>([])

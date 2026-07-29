@@ -18,8 +18,8 @@ import { defineMessage, type MessageDescriptor, useVIntl } from '../../composabl
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
 import { ButtonStyled } from '../index'
+import Modal from '../modal/Modal.vue'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
-import NewModal from '../modal/NewModal.vue'
 import PlanSelector from './ServersPurchase0Plan.vue'
 import RegionSelector from './ServersPurchase1Region.vue'
 import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
@@ -65,7 +65,7 @@ const props = defineProps<{
 	affiliateCode?: string | null
 }>()
 
-const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
+const modal = useTemplateRef<InstanceType<typeof Modal>>('modal')
 const selectedPlan = ref<Labrinth.Billing.Internal.Product>()
 const selectedInterval = ref<ServerBillingInterval>('quarterly')
 const loading = ref(false)
@@ -448,7 +448,7 @@ function goToBreadcrumbStep(id: string) {
 }
 </script>
 <template>
-	<NewModal ref="modal" @hide="handleHide">
+	<Modal ref="modal" @hide="handleHide">
 		<template #title>
 			<div class="flex items-center gap-1 font-bold text-secondary">
 				<template v-for="(step, index) in visibleSteps" :key="step">
@@ -601,5 +601,5 @@ function goToBreadcrumbStep(id: string) {
 				</button>
 			</ButtonStyled>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

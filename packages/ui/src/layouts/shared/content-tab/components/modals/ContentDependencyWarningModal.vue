@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(messages.header)"
 		fade="danger"
@@ -186,7 +186,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -196,7 +196,7 @@ import { computed, nextTick, ref } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useScrollIndicator } from '#ui/composables/scroll-indicator'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -297,7 +297,7 @@ const messages = defineMessages({
 	},
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const deletingListRef = ref<HTMLElement | null>(null)
 const dependentListRef = ref<HTMLElement | null>(null)

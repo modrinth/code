@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="editModal" header="Edit external project">
+	<Modal ref="editModal" header="Edit external project">
 		<form class="flex flex-col gap-2" @submit.prevent="saveExternalProjectEdit">
 			<label class="font-semibold text-contrast" for="edit-form-title">Title</label>
 			<StyledInput id="edit-form-title" v-model="editForm.title" type="text" />
@@ -47,7 +47,7 @@
 				</ButtonStyled>
 			</div>
 		</form>
-	</NewModal>
+	</Modal>
 	<div>
 		<form class="flex gap-2" @submit.prevent="executeSearch">
 			<StyledInput
@@ -139,7 +139,7 @@ import {
 	externalProjectLicenseStatusMessages,
 	ExternalProjectLookupCard,
 	injectModrinthClient,
-	NewModal,
+	Modal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
@@ -150,7 +150,7 @@ const query = ref('')
 const isLoading = ref(false)
 const isSavingEdit = ref(false)
 const client = injectModrinthClient()
-const editModal = useTemplateRef<InstanceType<typeof NewModal>>('editModal')
+const editModal = useTemplateRef<InstanceType<typeof Modal>>('editModal')
 
 useHead({ title: 'External projects - Modrinth' })
 

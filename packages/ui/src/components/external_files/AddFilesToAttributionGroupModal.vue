@@ -3,7 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, NewModal, StyledInput } from '#ui/components'
+import { ButtonStyled, Modal, StyledInput } from '#ui/components'
 import { commonMessages } from '#ui/utils'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -60,7 +60,7 @@ type AssignableFileEntry = {
 	sourceLabel: string
 }
 
-const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
+const modalRef = ref<InstanceType<typeof Modal> | null>(null)
 const assignableEntries = ref<AssignableFileEntry[]>([])
 const searchQuery = ref('')
 const searchInputRef = ref<{ focus: () => void } | null>(null)
@@ -176,7 +176,7 @@ defineExpose({ show, hide })
 </script>
 
 <template>
-	<NewModal
+	<Modal
 		ref="modalRef"
 		:header="formatMessage(messages.addFilesModalTitle)"
 		max-width="560px"
@@ -283,5 +283,5 @@ defineExpose({ show, hide })
 				</div>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>

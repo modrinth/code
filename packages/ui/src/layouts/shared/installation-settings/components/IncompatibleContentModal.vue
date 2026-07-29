@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="!loading" no-padding>
+	<Modal ref="modal" :header="formatMessage(messages.header)" :closable="!loading" no-padding>
 		<div class="flex max-w-[500px] flex-col gap-6 p-6">
 			<Admonition
 				:type="variant === 'loader-change' ? 'critical' : 'warning'"
@@ -79,7 +79,7 @@
 				</template>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -95,7 +95,7 @@ import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -116,7 +116,7 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const buttonsDisabled = ref(false)
 const loadingAction = ref<'auto-fix' | 'disable-conflicts' | null>(null)
 

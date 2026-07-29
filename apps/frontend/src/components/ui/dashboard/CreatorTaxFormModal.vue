@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="taxFormModal"
 		:header="formatMessage(messages.taxFormHeader)"
 		:hide-header="currentStage === 'download-confirmation'"
@@ -151,7 +151,7 @@
 				</div>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -171,7 +171,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
-	NewModal,
+	Modal,
 	normalizeChildren,
 	useVIntl,
 } from '@modrinth/ui'
@@ -191,7 +191,7 @@ const props = withDefaults(
 
 const { addNotification } = injectNotificationManager()
 
-const taxFormModal = ref<InstanceType<typeof NewModal> | null>(null)
+const taxFormModal = ref<InstanceType<typeof Modal> | null>(null)
 
 type ModalStage = 'form-selection' | 'download-confirmation'
 const currentStage = ref<ModalStage>('form-selection')

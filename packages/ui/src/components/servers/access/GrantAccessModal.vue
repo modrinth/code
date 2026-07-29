@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(messages.header)"
 		width="min(34rem, calc(100vw - 2rem))"
@@ -140,7 +140,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -155,7 +155,7 @@ import ButtonStyled from '../../base/ButtonStyled.vue'
 import Checkbox from '../../base/Checkbox.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
-import NewModal from '../../modal/NewModal.vue'
+import Modal from '../../modal/Modal.vue'
 import type {
 	GrantServerAccessPayload,
 	ServerAccessInviteSuggestion,
@@ -185,7 +185,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const modal = ref<InstanceType<typeof Modal> | null>(null)
 const target = ref('')
 const selectedRole = ref<Exclude<ServerAccessRole, 'owner'>>('editor')
 const addAsFriend = ref(true)

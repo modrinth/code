@@ -4,7 +4,7 @@ import { ChevronRightIcon, ExternalIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import ButtonStyled from '../base/ButtonStyled.vue'
-import NewModal from '../modal/NewModal.vue'
+import Modal from '../modal/Modal.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import PlanSelector from './ServersPurchase0Plan.vue'
 
@@ -23,7 +23,7 @@ const emit = defineEmits<{
 	(e: 'continue', payload: { interval: ServerBillingInterval; planId: string | null }): void
 }>()
 
-const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
+const modal = useTemplateRef<InstanceType<typeof Modal>>('modal')
 
 const selectedPlan = ref<Labrinth.Billing.Internal.Product>()
 const selectedInterval = ref<ServerBillingInterval>('quarterly')
@@ -91,7 +91,7 @@ defineExpose({
 </script>
 
 <template>
-	<NewModal ref="modal" :on-hide="handleModalHide" no-padding>
+	<Modal ref="modal" :on-hide="handleModalHide" no-padding>
 		<template #title>
 			<div class="flex items-center gap-1 font-bold text-secondary">
 				<span class="text-contrast">Plan</span>
@@ -165,5 +165,5 @@ defineExpose({
 				</div>
 			</Transition>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

@@ -1,10 +1,10 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="false">
+	<Modal ref="modal" :header="formatMessage(messages.header)" :closable="false">
 		<div class="flex flex-col gap-4 md:w-[400px]">
 			<AppearingProgressBar :max-value="totalBytes" :current-value="uploadedBytes" />
 			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.warningText) }}</p>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -14,7 +14,7 @@ import { ref } from 'vue'
 import { AppearingProgressBar } from '#ui/components/base'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
-import NewModal from './NewModal.vue'
+import Modal from './Modal.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -29,7 +29,7 @@ const messages = defineMessages({
 	},
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const uploadedBytes = ref(0)
 const totalBytes = ref(0)
 

@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="header"
 		width="min(34rem, calc(100vw - 2rem))"
@@ -128,7 +128,7 @@
 				</div>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 
 	<InvitePlayersModalInviteLinkEditor
 		v-if="updateInviteLink"
@@ -149,7 +149,7 @@ import { injectNotificationManager } from '../../../providers'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox from '../../base/Combobox.vue'
-import NewModal from '../../modal/NewModal.vue'
+import Modal from '../../modal/Modal.vue'
 import InvitePlayersModalInviteLinkEditor from './invite-players-modal-invite-link-editor.vue'
 import InvitePlayersModalUserRow from './invite-players-modal-user-row.vue'
 import type {
@@ -202,7 +202,7 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 const notificationManager = injectNotificationManager(null)
-const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const modal = ref<InstanceType<typeof Modal> | null>(null)
 const inviteLinkEditor = ref<InstanceType<typeof InvitePlayersModalInviteLinkEditor> | null>(null)
 
 const messages = defineMessages({

@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="refundModal">
+	<Modal ref="refundModal">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">Refund charge</span>
 		</template>
@@ -57,8 +57,8 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
-	<NewModal ref="modifyModal">
+	</Modal>
+	<Modal ref="modifyModal">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">Modify charge</span>
 		</template>
@@ -96,8 +96,8 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
-	<NewModal ref="creditModal">
+	</Modal>
+	<Modal ref="creditModal">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">Credit subscription</span>
 		</template>
@@ -131,7 +131,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 	<div class="page">
 		<div
 			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
@@ -232,7 +232,7 @@ import {
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	Toggle,
 	useFormatDateTime,

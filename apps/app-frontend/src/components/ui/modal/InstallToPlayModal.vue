@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(messages.installToPlay)"
 		:closable="true"
@@ -151,7 +151,7 @@
 				</div>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 
 	<ModpackContentModal
 		ref="modpackContentModal"
@@ -171,8 +171,8 @@ import {
 	type ContentItem,
 	defineMessages,
 	formatLoader,
+	Modal,
 	ModpackContentModal,
-	NewModal,
 	Table,
 	type TableColumn,
 	useScrollIndicator,
@@ -191,7 +191,7 @@ type ExternalFileRow = {
 	name: string
 }
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const project = ref<Labrinth.Projects.v3.Project | null>(null)
