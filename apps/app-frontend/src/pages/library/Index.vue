@@ -42,16 +42,24 @@ onUnmounted(() => {
 <template>
 	<div class="p-6 flex flex-col gap-3">
 		<h1 class="m-0 text-2xl hidden">Library</h1>
-		<NavTabs
-			:links="[
-				{ label: 'All instances', href: `/library` },
-				{ label: 'Modpacks', href: `/library/modpacks` },
-				{ label: 'Servers', href: `/library/servers` },
-				{ label: 'Custom', href: `/library/custom` },
-				{ label: 'Shared with me', href: `/library/shared`, shown: false },
-				{ label: 'Saved', href: `/library/saved`, shown: false },
-			]"
-		/>
+		<div class="flex items-center justify-between gap-3">
+			<NavTabs
+				:links="[
+					{ label: 'All instances', href: `/library` },
+					{ label: 'Modpacks', href: `/library/modpacks` },
+					{ label: 'Servers', href: `/library/servers` },
+					{ label: 'Custom', href: `/library/custom` },
+					{ label: 'Shared with me', href: `/library/shared`, shown: false },
+					{ label: 'Saved', href: `/library/saved`, shown: false },
+				]"
+			/>
+			<ButtonStyled color="brand">
+				<button :disabled="offline" @click="showCreationModal?.()">
+					<PlusIcon />
+					New instance
+				</button>
+			</ButtonStyled>
+		</div>
 		<template v-if="instances && instances.length > 0">
 			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
 		</template>
