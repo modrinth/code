@@ -11,6 +11,35 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-29T21:32:06+00:00`,
+		product: 'app',
+		version: '0.17.3',
+		body: `## Added
+- Added button to create a new instance on the Library page.
+
+## Changed
+- Added a toggle to hide modpacks that are already installed.
+- Added tooltip to installation settings button in installed modpack card.
+
+## Fixed
+- Improved error when shared instances reach a config file limit.
+- When pushing updates to shared instances, will now scroll to the top when entering a sub-page.
+- Fixed instance installations getting stuck when the instance is deleted.
+- Fixed error when failing to fetch a shared instance icon.
+- Installing content from Discover content will now install the latest that matches the game version and loader filters, not the absolute latest.`,
+	},
+	{
+		date: `2026-07-29T21:32:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Incomplete current day revenue hides that day's line segment instead of showing a dip to \$0.
+- Updated the modal for creating OAuth applications.
+
+## Fixed
+- Fixed dependencies in project download modal could give dependency with wrong Minecraft version.
+- Fixed PATS page new generated tokens invalidating in the same session.`,
+	},
+	{
 		date: `2026-07-28T23:36:10+00:00`,
 		product: 'web',
 		body: `## Changed
@@ -71,21 +100,21 @@ const VERSIONS: VersionEntry[] = [
 		date: `2026-07-28T20:40:11+00:00`,
 		product: 'web',
 		body: `## Added
-	- You can now block users on their profile page. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
-	- Added new social settings page, where you can manage users you have blocked and in the future set who can send you friend requests and invitations to shared instances and Modrinth Hosting server panels.
+- You can now block users on their profile page. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
+- Added new social settings page, where you can manage users you have blocked and in the future set who can send you friend requests and invitations to shared instances and Modrinth Hosting server panels.
 
-	## Changed
-	- Cleaned up the layout of and renamed the Public profile settings page to Profile settings.
-	- Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
-	- Updated translations. Want to help translate Modrinth's website? [Click here](https://translate.modrinth.com)
+## Changed
+- Cleaned up the layout of and renamed the Public profile settings page to Profile settings.
+- Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
+- Updated translations. Want to help translate Modrinth's website? [Click here](https://translate.modrinth.com)
 
-	## Fixed
-	- Fixed profile pictures still being deleted after resetting a pending removal in Profile settings.
-	- Fixed shared instance reports not showing up in the dashboard's Reports page.
-	- Fixed shared instance report emails saying "Unknown" rather than the shared instance's name.
-	- Fixed the settings page for Authorized apps being broken.
-	- Broken Retro theme colors
-	- Improved vertical alignment of status indicators in notifications.`,
+## Fixed
+- Fixed profile pictures still being deleted after resetting a pending removal in Profile settings.
+- Fixed shared instance reports not showing up in the dashboard's Reports page.
+- Fixed shared instance report emails saying "Unknown" rather than the shared instance's name.
+- Fixed the settings page for Authorized apps being broken.
+- Broken Retro theme colors
+- Improved vertical alignment of status indicators in notifications.`,
 	},
 	{
 		date: `2026-07-28T20:40:11+00:00`,
