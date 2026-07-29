@@ -141,7 +141,7 @@ export function getProjectStatusIcon(status: ProjectStatus): Component {
 }
 
 export function getProjectStatusColor(status: ProjectStatus): BadgeColor {
-  return PROJECT_STATUS_COLORS[status] ?? `gray`
+	return PROJECT_STATUS_COLORS[status] ?? `gray`
 }
 
 export function getDirectoryIcon(name: string): Component {

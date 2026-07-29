@@ -344,7 +344,9 @@ export interface StageMeta {
 	_shownSticky: boolean | undefined
 	hint(this: this, hint: string): this
 	guidance(this: this, url: string): this
-	navigate(this: this, path: string): this
+	// A stage-relative path (e.g. '/versions'). Omit entirely to mean the
+	// project's own base page, rather than passing '/' as a magic string.
+	navigate(this: this, path?: string): this
 	sticky(this: this): this
 }
 
@@ -362,8 +364,8 @@ export function withStageMeta<T extends object>(node: T): T & StageMeta {
 			this._guidanceUrl = url
 			return this
 		},
-		navigate(this: any, path: string) {
-			this._navigate = path
+		navigate(this: any, path?: string) {
+			this._navigate = path ?? ''
 			return this
 		},
 		sticky(this: any) {

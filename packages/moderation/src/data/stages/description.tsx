@@ -15,7 +15,7 @@ export default function () {
       "https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e",
     )
     .icon(LibraryIcon)
-    .navigate("/")
+    .navigate()
     .children(
       group()
         .title("Description Issues?")

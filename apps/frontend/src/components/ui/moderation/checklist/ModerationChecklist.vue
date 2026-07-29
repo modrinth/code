@@ -61,6 +61,15 @@
 						{{ checklistTitleText }}
 					</button>
 				</h1>
+				<ButtonStyled v-if="!isPseudoStage && stageNavigateTarget" circular>
+					<button
+						v-tooltip="`Navigate to ${stageNavigateLabel}`"
+						:disabled="route.path === stageNavigateTarget"
+						@click="navigateToStagePage"
+					>
+						<MapPinIcon />
+					</button>
+				</ButtonStyled>
 				<ButtonStyled v-if="!isPseudoStage && currentStageObj._guidanceUrl" circular>
 					<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj._guidanceUrl">
 						<FileTextIcon />
@@ -383,6 +392,7 @@ import {
 	RightArrowIcon,
 	ScaleIcon,
 	SpinnerIcon,
+	MapPinIcon,
 	ToggleLeftIcon,
 	ToggleRightIcon,
 	UndoIcon,
@@ -413,8 +423,6 @@ import {
 import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
 import type { FixBuilder } from '@modrinth/moderation/src/types/node/fix'
 import type { Writer } from '@modrinth/moderation/src/types/node/mutate'
-import LoaderPicker from '~/components/ui/create-project-version/components/LoaderPicker.vue'
-import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import {
 	Avatar,
 	ButtonStyled,
@@ -428,13 +436,15 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
-import { renderHighlightedString } from '@modrinth/utils'
 import type { ProjectStatus } from '@modrinth/utils'
+import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
 import { computed, nextTick, provide, ref, toRaw, watch, watchEffect } from 'vue'
 
+import LoaderPicker from '~/components/ui/create-project-version/components/LoaderPicker.vue'
+import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
@@ -1154,6 +1164,30 @@ if (!persistedState) {
 }
 
 const router = useRouter()
+const route = useRoute()
+
+const projectUrlType = computed(() =>
+	getProjectTypeForUrlShorthand(projectV2.value.project_type, projectV2.value.loaders ?? [], tags.value),
+)
+
+const stageNavigateTarget = computed(() => {
+	const navigate = currentStageObj.value?._navigate
+	if (navigate === undefined || !projectV2.value) return null
+	const base = `/${projectUrlType.value}/${projectV2.value.slug}`
+	return navigate === '' ? base : `${base}${navigate}`
+})
+
+const stageNavigateLabel = computed(() => {
+	const navigate = currentStageObj.value?._navigate
+	if (navigate === '') return 'Project Page'
+	const segment = navigate?.split('/').filter(Boolean).pop()
+	if (!segment) return ''
+	return segment.charAt(0).toUpperCase() + segment.slice(1)
+})
+
+function navigateToStagePage() {
+	if (stageNavigateTarget.value) router.push(stageNavigateTarget.value)
+}
 
 let persistenceEnabled = true
 let persistenceTimer: ReturnType<typeof setTimeout> | null = null
@@ -1373,8 +1407,8 @@ watch(
 	(newIndex, oldIndex) => {
 		const stage = resolvedStages.value[newIndex]
 		// only navigate when the stage actually changes (not on initial mount/remount)
-		if (oldIndex !== undefined && newIndex !== oldIndex && stage?._navigate) {
-			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage._navigate}`)
+		if (oldIndex !== undefined && newIndex !== oldIndex && stage?._navigate !== undefined) {
+			router.push(`/${projectUrlType.value}/${projectV2.value.slug}${stage._navigate}`)
 		}
 	},
 	{ immediate: true },
@@ -1564,7 +1598,7 @@ async function generateMessage() {
 
 	loadingMessage.value = true
 
-	router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}/moderation`)
+	router.push(`/${projectUrlType.value}/${projectV2.value.slug}/moderation`)
 
 	try {
 		missingMdPaths.clear()
@@ -1600,8 +1634,8 @@ if (finishedId === projectV2.value.id) {
 	alreadyReviewed.value = true
 } else {
 	const initialStage = resolvedStages.value[currentStage.value]
-	if (initialStage?._navigate) {
-		navigateTo(`/${projectV2.value.project_type}/${projectV2.value.slug}${initialStage._navigate}`)
+	if (initialStage?._navigate !== undefined) {
+		navigateTo(`/${projectUrlType.value}/${projectV2.value.slug}${initialStage._navigate}`)
 	}
 }
 
