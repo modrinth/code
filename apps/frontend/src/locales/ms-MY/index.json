@@ -3653,23 +3653,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Tambah URI pengubah hala"
   },
-  "settings.applications.button.cancel": {
-    "message": "Batal"
-  },
   "settings.applications.button.create": {
     "message": "Cipta aplikasi"
   },
   "settings.applications.button.delete": {
     "message": "Padam"
   },
-  "settings.applications.button.edit": {
-    "message": "Sunting"
-  },
   "settings.applications.button.new": {
     "message": "Aplikasi baharu"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Simpan perubahan"
   },
   "settings.applications.button.upload-icon": {
     "message": "Muat naik ikon"

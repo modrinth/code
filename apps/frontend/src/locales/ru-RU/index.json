@@ -4655,23 +4655,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Добавить адрес перенаправления"
   },
-  "settings.applications.button.cancel": {
-    "message": "Отмена"
-  },
   "settings.applications.button.create": {
     "message": "Создать приложение"
   },
   "settings.applications.button.delete": {
     "message": "Удалить"
   },
-  "settings.applications.button.edit": {
-    "message": "Изменить"
-  },
   "settings.applications.button.new": {
     "message": "Новое приложение"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Сохранить изменения"
   },
   "settings.applications.button.upload-icon": {
     "message": "Загрузить иконку"

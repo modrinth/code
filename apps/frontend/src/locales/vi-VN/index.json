@@ -3818,23 +3818,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Thêm URI chuyển hướng"
   },
-  "settings.applications.button.cancel": {
-    "message": "Huỷ"
-  },
   "settings.applications.button.create": {
     "message": "Tạo ứng dụng"
   },
   "settings.applications.button.delete": {
     "message": "Xoá"
   },
-  "settings.applications.button.edit": {
-    "message": "Chỉnh sửa"
-  },
   "settings.applications.button.new": {
     "message": "Ứng dụng mới"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Lưu thay đổi"
   },
   "settings.applications.button.upload-icon": {
     "message": "Tải lên biểu tượng"

@@ -3539,23 +3539,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Legg til en omdirings-URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Avbryt"
-  },
   "settings.applications.button.create": {
     "message": "Lag app"
   },
   "settings.applications.button.delete": {
     "message": "Slett"
   },
-  "settings.applications.button.edit": {
-    "message": "Regiser"
-  },
   "settings.applications.button.new": {
     "message": "Ny søknad"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Lagre endringer"
   },
   "settings.applications.button.upload-icon": {
     "message": "Last opp ikon"

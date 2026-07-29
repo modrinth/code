@@ -2744,23 +2744,14 @@
   "settings.applications.about": {
     "message": "O"
   },
-  "settings.applications.button.cancel": {
-    "message": "Zrušit"
-  },
   "settings.applications.button.create": {
     "message": "Vytvořit aplikaci"
   },
   "settings.applications.button.delete": {
     "message": "Smazat"
   },
-  "settings.applications.button.edit": {
-    "message": "Upravit"
-  },
   "settings.applications.button.new": {
     "message": "Nová aplikace"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Uložit změny"
   },
   "settings.applications.button.upload-icon": {
     "message": "Nahrát ikonu"
