@@ -328,7 +328,7 @@ const isLinux = platform() === 'linux'
 const linuxRefreshCount = ref(0)
 
 const protocolVersion = ref<ProtocolVersion | null>(null)
-
+const protocolVersionReady = ref(false)
 const gameVersions = ref<GameVersion[]>([])
 const supportsServerQuickPlay = computed(() =>
 	hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
@@ -342,8 +342,13 @@ watch(
 	(data) => {
 		if (data) {
 			worlds.value = [...data]
-			refreshServers(worlds.value, serverData.value, protocolVersion.value)
 			hadNoWorlds.value = worlds.value.length === 0
+			refreshServers(
+				worlds.value,
+				serverData.value,
+				protocolVersion.value,
+				protocolVersionReady.value,
+			)
 		}
 	},
 	{ immediate: true },
@@ -443,9 +448,14 @@ async function initWorldsTab() {
 	unlistenInstance = _unlistenInstance
 	protocolVersion.value = resolvedProtocolVersion
 	gameVersions.value = resolvedGameVersions
+	protocolVersionReady.value = true
+
+	if (worlds.value.length > 0) {
+		refreshServers(worlds.value, serverData.value, protocolVersion.value)
+	}
 }
 
-await initWorldsTab()
+void initWorldsTab()
 
 async function refreshServer(address: string) {
 	if (!serverData.value[address]) {
@@ -453,6 +463,7 @@ async function refreshServer(address: string) {
 			refreshing: true,
 		}
 	}
+	if (!protocolVersionReady.value) return
 	await refreshServerData(serverData.value[address], protocolVersion.value, address)
 }
 

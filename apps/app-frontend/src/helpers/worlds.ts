@@ -439,6 +439,7 @@ export function refreshServers(
 	worlds: World[],
 	serverData: Record<string, ServerData>,
 	protocolVersion: ProtocolVersion | null,
+	ping = true,
 ) {
 	const servers = worlds.filter(isServerWorld)
 	servers.forEach((server) => {
@@ -450,6 +451,10 @@ export function refreshServers(
 			serverData[server.address].refreshing = true
 		}
 	})
+
+	if (!ping) {
+		return
+	}
 
 	// noinspection ES6MissingAwait - handled by refreshServerData
 	Object.keys(serverData).forEach((address) =>
