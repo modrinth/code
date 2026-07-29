@@ -195,7 +195,10 @@ export function resolveActionState(
 ): Record<string, NodeState> {
 	if (!hasValueCap(node)) return localState
 	const childState = getBooleanChildState(nodeState)
-	return hasChildrenCap(node) ? withDefaults(childState, resolveChildren(node, childState)) : childState
+	const base = hasChildrenCap(node)
+		? withDefaults(childState, resolveChildren(node, childState))
+		: childState
+	return { ...base, value: getEffectiveValue(node, nodeState, localState) as NodeState }
 }
 
 function emptyScope(children: ChildNode[]): Record<string, NodeState> {
