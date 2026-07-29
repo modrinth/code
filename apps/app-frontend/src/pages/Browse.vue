@@ -25,6 +25,7 @@ import {
 	preferencesDiffer,
 	provideBrowseManager,
 	requestInstall,
+	resolveInstallPlan,
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
 	useBrowseSearch,
@@ -798,6 +799,27 @@ async function chooseInstanceInstallVersion(
 	return { versionId: selectedVersion.id }
 }
 
+async function chooseFilterMatchingInstallVersion(
+	project: Labrinth.Search.v3.ResultSearchProject,
+	projectTypeValue: string,
+) {
+	const plan = await resolveInstallPlan({
+		project: {
+			project_id: project.project_id,
+			title: project.title,
+			icon_url: project.icon_url,
+		},
+		contentType: projectTypeValue as BrowseInstallContentType,
+		selectedFilters: searchState.currentFilters.value,
+		providedFilters: combinedProvidedFilters.value,
+		overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+		targetPreferences: {},
+		getProjectVersions: getInstallProjectVersions,
+	})
+
+	return { versionId: plan.versionId }
+}
+
 function getCardActions(
 	result: Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
@@ -927,7 +949,9 @@ function getCardActions(
 				try {
 					const selectedInstall = instance.value
 						? await chooseInstanceInstallVersion(projectResult, currentProjectType)
-						: { versionId: null as string | null }
+						: isModpack
+							? await chooseFilterMatchingInstallVersion(projectResult, currentProjectType)
+							: { versionId: null as string | null }
 					if (selectedInstall === null) {
 						setProjectInstalling(projectResult.project_id, false)
 						return
