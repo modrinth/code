@@ -268,7 +268,7 @@ watch(
 					instanceGroupDragTarget === instanceGroup.id &&
 					getInstanceGroupDropState(instanceGroup.id).canDrop
 				"
-				class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-50 border-dashed border-brand bg-transparent"
+				class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-40 border-dashed border-contrast bg-transparent"
 			/>
 		</Transition>
 		<div

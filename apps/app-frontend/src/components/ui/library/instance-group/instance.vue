@@ -214,9 +214,11 @@ onUnmounted(() => unlisten())
 <template>
 	<div
 		ref="instanceCard"
-		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all hover:brightness-110 select-none"
+		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid bg-surface-3 p-4 text-left transition-all hover:brightness-110 select-none"
 		:class="{
-			'border-primary': selected,
+			'[border-color:color-mix(in_srgb,var(--color-text-primary)_20%,transparent)] brightness-110':
+				selected,
+			'border-surface-4': !selected,
 			'!scale-100': isDragging,
 			'opacity-50': isPartOfActiveDrag,
 			'[&:active:not(:has(.selection-button:active))]:scale-[0.95]':
