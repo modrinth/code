@@ -285,9 +285,10 @@ export function walkNodes(
 				const selectedValue = typeof rawNodeState === 'string' ? rawNodeState : undefined
 				const selected = node._options.find((o) => o.value === selectedValue)
 				if (selected && isShown(selected)) {
-					visitor(selected, undefined, stageState, path)
+					const selectedPath = [...path, selected.value]
+					visitor(selected, undefined, stageState, selectedPath)
 					if (hasChildrenCap(selected)) {
-						walkNodes(resolveChildren(selected, stageState), stageState, visitor, path)
+						walkNodes(resolveChildren(selected, stageState), stageState, visitor, selectedPath)
 					}
 				}
 				continue
