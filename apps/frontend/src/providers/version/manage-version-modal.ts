@@ -64,6 +64,11 @@ export type SuggestedDependency = Labrinth.Versions.v3.Dependency & {
 	versionNumber?: string
 }
 
+export interface DependencyVersionOption extends ComboboxOption<string> {
+	gameVersions: string[]
+	platforms: string[]
+}
+
 export interface PrimaryFile {
 	name: string
 	fileType?: string
@@ -85,7 +90,7 @@ export interface ManageVersionContextValue {
 	newDependencyProjectId: Ref<string | undefined>
 	newDependencyType: Ref<Labrinth.Versions.v2.DependencyType>
 	newDependencyVersionId: Ref<string | null>
-	newDependencyVersions: Ref<ComboboxOption<string>[]>
+	newDependencyVersions: Ref<DependencyVersionOption[]>
 	visibleSuggestedDependencies: ComputedRef<SuggestedDependency[]>
 	primaryFile: ComputedRef<PrimaryFile | null>
 
@@ -228,7 +233,7 @@ export function createManageVersionContext(
 	const newDependencyProjectId = ref<string>()
 	const newDependencyType = ref<Labrinth.Versions.v2.DependencyType>('required')
 	const newDependencyVersionId = ref<string | null>(null)
-	const newDependencyVersions = ref<ComboboxOption<string>[]>([])
+	const newDependencyVersions = ref<DependencyVersionOption[]>([])
 
 	const isSubmitting = ref(false)
 	const isUploading = ref(false)
@@ -670,6 +675,8 @@ export function createManageVersionContext(
 			newDependencyVersions.value = versions.map((version) => ({
 				label: version.version_number,
 				value: version.id,
+				gameVersions: version.game_versions,
+				platforms: version.loaders,
 			}))
 		} catch (error: any) {
 			addNotification({
