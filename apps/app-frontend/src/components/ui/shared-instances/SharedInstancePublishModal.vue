@@ -26,10 +26,7 @@
 					</span>
 				</template>
 				<div class="flex min-w-0 flex-col gap-3 pt-4">
-					<div
-						ref="configFileTreeContainer"
-						class="max-h-[292px] overflow-y-auto rounded-[20px]"
-					>
+					<div ref="configFileTreeContainer" class="max-h-[292px] overflow-y-auto rounded-[20px]">
 						<FileTreeSelect
 							v-model="selectedConfigPaths"
 							:items="configFileItems"
