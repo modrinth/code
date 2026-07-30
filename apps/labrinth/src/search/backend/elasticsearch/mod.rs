@@ -4,13 +4,15 @@
 //! This keeps version filters correlated without duplicating every version
 //! into its project document.
 
+use std::collections::{HashMap, HashSet};
+
 use async_trait::async_trait;
 use eyre::{Result, eyre};
 use itertools::Itertools;
 use reqwest::{Method, Response, StatusCode};
 use serde::Serialize;
 use serde_json::{Map, Value, json};
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 use xredis::RedisPool;
 
 use crate::database::PgPool;
@@ -33,9 +35,11 @@ use crate::util::error::Context;
 use self::filter::{ElasticsearchFilter, serialize_filter};
 
 mod filter;
+mod typesense_parity;
 
 const DELETE_FILTER_ID_BATCH_SIZE: usize = 1024;
 const MAX_RESULT_WINDOW: usize = 10_000;
+const MAX_CACHED_HITS: usize = 250;
 
 #[derive(Debug, Clone)]
 pub struct ElasticsearchConfig {
@@ -46,6 +50,8 @@ pub struct ElasticsearchConfig {
 	pub meta_namespace: String,
 	pub index_chunk_size: i64,
 	pub bulk_batch_size: usize,
+	pub project_import_batch_size: usize,
+	pub typesense_parity: bool,
 }
 
 impl ElasticsearchConfig {
@@ -58,6 +64,9 @@ impl ElasticsearchConfig {
 			meta_namespace: meta_namespace.unwrap_or_default(),
 			index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
 			bulk_batch_size: ENV.ELASTICSEARCH_BULK_BATCH_SIZE,
+			project_import_batch_size:
+				typesense_parity::project_import_batch_size(),
+			typesense_parity: ENV.ELASTICSEARCH_TYPESENSE_PARITY,
 		}
 	}
 
@@ -312,300 +321,6 @@ impl Elasticsearch {
 		Self { config, client }
 	}
 
-	fn index_schema() -> Value {
-		json!({
-			"settings": {
-				"number_of_shards": 3,
-				"number_of_replicas": 1,
-				"refresh_interval": "30s",
-				"index.mapping.total_fields.limit": 5000,
-				"analysis": {
-					"char_filter": {
-						"hyphen_separator": {
-							"type": "pattern_replace",
-							"pattern": "-",
-							"replacement": " "
-						},
-						"strip_symbols": {
-							"type": "pattern_replace",
-							"pattern": r"[^\p{L}\p{N}\s]",
-							"replacement": ""
-						}
-					},
-					"filter": {
-						"typesense_stemmer": {
-							"type": "stemmer",
-							"language": "light_english"
-						}
-					},
-					"analyzer": {
-						"typesense_text": {
-							"type": "custom",
-							"char_filter": ["strip_symbols"],
-							"tokenizer": "whitespace",
-							"filter": ["lowercase"]
-						},
-						"typesense_hyphen_text": {
-							"type": "custom",
-							"char_filter": [
-								"hyphen_separator",
-								"strip_symbols"
-							],
-							"tokenizer": "whitespace",
-							"filter": ["lowercase"]
-						},
-						"typesense_stemmed_text": {
-							"type": "custom",
-							"char_filter": ["strip_symbols"],
-							"tokenizer": "whitespace",
-							"filter": ["lowercase", "typesense_stemmer"]
-						}
-					}
-				}
-			},
-			"mappings": {
-				"dynamic_templates": [
-					{
-						"strings_as_keywords": {
-							"match_mapping_type": "string",
-							"mapping": {
-								"type": "keyword",
-								"ignore_above": 8191
-							}
-						}
-					}
-				],
-				"properties": {
-					"document_type": {
-						"type": "join",
-						"relations": {"project": "version"},
-						"eager_global_ordinals": true
-					},
-					"version_id": {"type": "keyword"},
-					"project_id": {"type": "keyword"},
-					"project_types": {"type": "keyword"},
-					"all_project_types": {"type": "keyword"},
-					"slug": {
-						"type": "text",
-						"analyzer": "typesense_text",
-						"index_options": "docs",
-						"norms": false,
-						"index_prefixes": {
-							"min_chars": 1,
-							"max_chars": 10
-						},
-						"fields": {
-							"keyword": {"type": "keyword", "ignore_above": 8191}
-						}
-					},
-					"author": {
-						"type": "text",
-						"analyzer": "typesense_hyphen_text",
-						"index_options": "docs",
-						"norms": false,
-						"index_prefixes": {
-							"min_chars": 1,
-							"max_chars": 10
-						},
-						"fields": {
-							"keyword": {"type": "keyword", "ignore_above": 8191}
-						}
-					},
-					"indexed_author": {
-						"type": "text",
-						"analyzer": "typesense_text",
-						"index_options": "docs",
-						"norms": false,
-						"index_prefixes": {
-							"min_chars": 1,
-							"max_chars": 10
-						}
-					},
-					"name": {
-						"type": "text",
-						"analyzer": "typesense_hyphen_text",
-						"index_options": "docs",
-						"norms": false,
-						"index_prefixes": {
-							"min_chars": 1,
-							"max_chars": 10
-						},
-						"fields": {
-							"keyword": {"type": "keyword", "ignore_above": 8191}
-						}
-					},
-					"indexed_name": {
-						"type": "text",
-						"analyzer": "typesense_stemmed_text",
-						"index_options": "docs",
-						"norms": false,
-						"index_prefixes": {
-							"min_chars": 1,
-							"max_chars": 10
-						}
-					},
-					"summary": {
-						"type": "text",
-						"analyzer": "typesense_text",
-						"index_options": "docs",
-						"norms": false,
-						"index_prefixes": {
-							"min_chars": 1,
-							"max_chars": 10
-						},
-						"fields": {
-							"keyword": {"type": "keyword", "ignore_above": 8191}
-						}
-					},
-					"categories": {"type": "keyword"},
-					"project_categories": {"type": "keyword"},
-					"display_categories": {"type": "keyword"},
-					"license": {"type": "keyword"},
-					"open_source": {"type": "boolean"},
-					"environment": {"type": "keyword"},
-					"game_versions": {"type": "keyword"},
-					"client_side": {"type": "keyword"},
-					"server_side": {"type": "keyword"},
-					"dependency_project_ids": {"type": "keyword"},
-					"compatible_dependency_project_ids": {"type": "keyword"},
-					"downloads": {"type": "integer"},
-					"log_downloads": {"type": "double"},
-					"follows": {"type": "integer"},
-					"created_timestamp": {"type": "long"},
-					"modified_timestamp": {"type": "long"},
-					"version_published_timestamp": {"type": "long"},
-					"date_created": {"type": "date"},
-					"date_modified": {"type": "date"},
-					"project_loader_fields": {"type": "object", "enabled": false},
-					"minecraft_java_server": {
-						"properties": {
-							"verified_plays_2w": {"type": "long"},
-							"is_online": {"type": "boolean"},
-							"ping": {
-								"properties": {
-									"data": {
-										"properties": {
-											"players_online": {"type": "integer"}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		})
-	}
-
-	fn text_query(query: &str) -> Value {
-		if query.is_empty() {
-			return json!({"match_all": {}});
-		}
-
-		let tokens = query.split_whitespace().collect_vec();
-		if tokens.is_empty() {
-			return json!({"match_all": {}});
-		}
-		let fields = [
-			("name", 15),
-			("indexed_name", 15),
-			("slug", 10),
-			("author", 3),
-			("indexed_author", 3),
-			("summary", 1),
-		];
-		let token_queries =
-			|token: &str, prefix: bool, exact_boost: bool| {
-				let mut queries = Vec::with_capacity(fields.len() * 3);
-				for (field, weight) in fields {
-					if exact_boost && field != "indexed_name" {
-						queries.push(json!({
-							"constant_score": {
-								"filter": {
-									"match": {
-										(field): {
-											"query": token,
-											"fuzziness": 0
-										}
-									}
-								},
-								"boost": weight + 1
-							}
-						}));
-					}
-					if prefix {
-						queries.push(json!({
-							"constant_score": {
-								"filter": {
-									"match_bool_prefix": {
-										(field): {"query": token}
-									}
-								},
-								"boost": weight
-							}
-						}));
-					}
-					queries.push(json!({
-						"constant_score": {
-							"filter": {
-								"match": {
-									(field): {
-										"query": token,
-										"fuzziness": "AUTO:4,7",
-										"prefix_length": 1,
-										"max_expansions": 2
-									}
-								}
-							},
-							"boost": weight
-						}
-					}));
-				}
-				queries
-			};
-		let queries_by_token = tokens
-			.iter()
-			.enumerate()
-			.map(|(index, token)| {
-				// Typesense caps candidates globally, while Elasticsearch
-				// expands them per field and shard. These bounds keep broad
-				// prefixes and stem-only matches out of the top relevance
-				// bucket while preserving short autocomplete queries.
-				let is_last = index == tokens.len() - 1;
-				let prefix =
-					is_last && (tokens.len() == 1 || token.chars().count() < 6);
-				let exact_boost =
-					tokens.len() > 1 || token.chars().count() >= 6;
-				token_queries(token, prefix, exact_boost)
-			})
-			.collect_vec();
-		let scoring_query = json!({
-			"dis_max": {
-				"queries": queries_by_token.iter().flatten().collect_vec(),
-				"tie_breaker": 0
-			}
-		});
-		if tokens.len() == 1 {
-			scoring_query
-		} else {
-			json!({
-				"bool": {
-					"must": [scoring_query],
-					"filter": queries_by_token
-						.into_iter()
-						.map(|queries| {
-							json!({
-								"dis_max": {
-									"queries": queries,
-									"tie_breaker": 0
-								}
-							})
-						})
-						.collect_vec()
-				}
-			})
-		}
-	}
 
 	fn sort(index: SearchIndex) -> Vec<Value> {
 		let descending = |field: &str| {
@@ -681,12 +396,22 @@ impl Elasticsearch {
 		body: &Value,
 		sort_only: bool,
 	) -> Result<Value, ApiError> {
+		let request_cache = if body["size"]
+			.as_u64()
+			.is_some_and(|size| size <= MAX_CACHED_HITS as u64)
+		{
+			"&request_cache=true"
+		} else {
+			""
+		};
 		let path = if sort_only {
 			format!(
-				"/{alias}/_search?filter_path=hits.total,hits.hits.sort"
+				"/{alias}/_search?filter_path=hits.total,hits.hits.sort&preference=labrinth{request_cache}"
 			)
 		} else {
-			format!("/{alias}/_search")
+			format!(
+				"/{alias}/_search?preference=labrinth{request_cache}"
+			)
 		};
 		let response = self
 			.client
@@ -695,10 +420,257 @@ impl Elasticsearch {
 			.send()
 			.await
 			.wrap_internal_err("failed to execute Elasticsearch search")?;
-		response_json(response, "execute Elasticsearch search")
+		let mut body = response_json(response, "execute Elasticsearch search")
 			.await
-			.map_err(ApiError::Internal)
+			.map_err(ApiError::Internal)?;
+		if sort_only && !body["hits"]["hits"].is_array() {
+			body["hits"]["hits"] = Value::Array(Vec::new());
+		}
+		Ok(body)
 	}
+
+	async fn open_point_in_time(
+		&self,
+		alias: &str,
+	) -> Result<String, ApiError> {
+		let response = self
+			.client
+			.request(
+				Method::POST,
+				&format!(
+					"/{alias}/_pit?keep_alive=1m&preference=labrinth"
+				),
+			)
+			.send()
+			.await
+			.wrap_internal_err(
+				"failed to open Elasticsearch point in time",
+			)?;
+		let body = response_json(response, "open Elasticsearch point in time")
+			.await
+			.map_err(ApiError::Internal)?;
+		body["id"]
+			.as_str()
+			.map(ToOwned::to_owned)
+			.ok_or_else(|| {
+				ApiError::Internal(eyre!(
+					"Elasticsearch point in time response did not contain an ID"
+				))
+			})
+	}
+
+	async fn close_point_in_time(&self, id: &str) -> Result<(), ApiError> {
+		let response = self
+			.client
+			.request(Method::DELETE, "/_pit")
+			.json(&json!({"id": id}))
+			.send()
+			.await
+			.wrap_internal_err(
+				"failed to close Elasticsearch point in time",
+			)?;
+		response_json(response, "close Elasticsearch point in time")
+			.await
+			.map_err(ApiError::Internal)?;
+		Ok(())
+	}
+
+	async fn execute_point_in_time_search(
+		&self,
+		body: &Value,
+		sort_only: bool,
+	) -> Result<Value, ApiError> {
+		let path = if sort_only {
+			"/_search?filter_path=pit_id,hits.total,hits.hits.sort"
+		} else {
+			"/_search"
+		};
+		let response = self
+			.client
+			.request(Method::POST, path)
+			.json(body)
+			.send()
+			.await
+			.wrap_internal_err(
+				"failed to execute Elasticsearch point in time search",
+			)?;
+		let mut body = response_json(
+			response,
+			"execute Elasticsearch point in time search",
+		)
+		.await
+		.map_err(ApiError::Internal)?;
+		if sort_only && !body["hits"]["hits"].is_array() {
+			body["hits"]["hits"] = Value::Array(Vec::new());
+		}
+		Ok(body)
+	}
+
+	#[allow(clippy::too_many_arguments)]
+	async fn execute_deep_search(
+		&self,
+		alias: &str,
+		query: &Value,
+		sort: &[Value],
+		offset: usize,
+		size: usize,
+	) -> Result<Value, ApiError> {
+		let mut point_in_time_id = self.open_point_in_time(alias).await?;
+		let result = self
+			.execute_deep_search_with_point_in_time(
+				query,
+				sort,
+				offset,
+				size,
+				&mut point_in_time_id,
+			)
+			.await;
+		if let Err(error) = self.close_point_in_time(&point_in_time_id).await {
+			warn!(
+				?error,
+				"failed to close Elasticsearch deep-search point in time"
+			);
+		}
+		result
+	}
+
+	async fn execute_deep_search_with_point_in_time(
+		&self,
+		query: &Value,
+		sort: &[Value],
+		offset: usize,
+		size: usize,
+		point_in_time_id: &mut String,
+	) -> Result<Value, ApiError> {
+		let mut remaining_offset = offset;
+		let mut search_after = None;
+		let mut total_hits = None;
+		while remaining_offset > 0 {
+			let skipped = remaining_offset.min(MAX_RESULT_WINDOW);
+			let mut body = Self::search_body(
+				query,
+				sort,
+				0,
+				skipped,
+				total_hits.is_none(),
+				search_after.as_ref(),
+				false,
+			);
+			body["pit"] = json!({
+				"id": point_in_time_id,
+				"keep_alive": "1m"
+			});
+			let body = self
+				.execute_point_in_time_search(&body, true)
+				.await?;
+			if let Some(id) = body["pit_id"].as_str() {
+				*point_in_time_id = id.to_string();
+			}
+			if total_hits.is_none() {
+				let exact_total_hits = body["hits"]["total"]["value"]
+					.as_u64()
+					.unwrap_or_default()
+					as usize;
+				if offset >= exact_total_hits {
+					return Ok(json!({
+						"hits": {
+							"total": {
+								"value": exact_total_hits,
+								"relation": "eq"
+							},
+							"hits": []
+						}
+					}));
+				}
+				total_hits = Some(exact_total_hits);
+			}
+			let pagination_hits = body["hits"]["hits"].as_array();
+			let Some(anchor) = pagination_hits
+				.and_then(|hits| hits.last())
+				.and_then(|hit| hit.get("sort"))
+				.cloned()
+			else {
+				return Ok(json!({
+					"hits": {
+						"total": {
+							"value": total_hits.unwrap_or_default(),
+							"relation": "eq"
+						},
+						"hits": []
+					}
+				}));
+			};
+			debug!(
+				requested_offset = offset,
+				remaining_offset,
+				skipped,
+				hit_count = pagination_hits.map_or(0, Vec::len),
+				?anchor,
+				"advanced Elasticsearch search-after cursor"
+			);
+			search_after = Some(anchor);
+			remaining_offset -= skipped;
+		}
+
+		let mut body = Self::search_body(
+			query,
+			sort,
+			0,
+			size,
+			true,
+			search_after.as_ref(),
+			true,
+		);
+		body["pit"] = json!({
+			"id": point_in_time_id,
+			"keep_alive": "1m"
+		});
+		let body = self
+			.execute_point_in_time_search(&body, false)
+			.await?;
+		if let Some(id) = body["pit_id"].as_str() {
+			*point_in_time_id = id.to_string();
+		}
+		Ok(body)
+	}
+
+	async fn has_matches(
+		&self,
+		alias: &str,
+		query: &Value,
+	) -> Result<bool, ApiError> {
+		let body = json!({
+			"_source": false,
+			"size": 1,
+			"terminate_after": 1,
+			"track_total_hits": false,
+			"query": query
+		});
+		let response = self.execute_search(alias, &body, false).await?;
+		Ok(response["hits"]["hits"]
+			.as_array()
+			.is_some_and(|hits| !hits.is_empty()))
+	}
+
+	async fn count_matches(
+		&self,
+		alias: &str,
+		query: &Value,
+	) -> Result<usize, ApiError> {
+		let response = self
+			.client
+			.request(Method::POST, &format!("/{alias}/_count"))
+			.json(&json!({"query": query}))
+			.send()
+			.await
+			.wrap_internal_err("failed to count Elasticsearch matches")?;
+		let body = response_json(response, "count Elasticsearch matches")
+			.await
+			.map_err(ApiError::Internal)?;
+		Ok(body["count"].as_u64().unwrap_or_default() as usize)
+	}
+
+	#[allow(clippy::too_many_arguments)]
 
 	fn search_body(
 		query: &Value,
@@ -747,26 +719,6 @@ impl Elasticsearch {
 		Ok(indices)
 	}
 
-	async fn import_projects(
-		&self,
-		indices: &[String],
-		documents: &[UploadSearchProject],
-	) -> Result<()> {
-		let batch_size = self.config.bulk_batch_size.max(1);
-		for documents in documents.chunks(batch_size) {
-			let body = projects_to_bulk(documents)?;
-			for index in indices {
-				info!(
-					index,
-					document_count = documents.len(),
-					content_length_bytes = body.len(),
-					"sending Elasticsearch project bulk request"
-				);
-				self.client.bulk(index, body.clone()).await?;
-			}
-		}
-		Ok(())
-	}
 
 	async fn import_versions(
 		&self,
@@ -810,11 +762,31 @@ impl Elasticsearch {
 		}
 		Ok(())
 	}
-}
 
-#[async_trait]
-impl SearchBackend for Elasticsearch {
-	async fn search_for_project_raw(
+	fn native_text_query(query: &str) -> Value {
+		if query.is_empty() || query.trim() == "*" {
+			return json!({"match_all": {}});
+		}
+
+		json!({
+			"multi_match": {
+				"query": query,
+				"fields": [
+					"name^15",
+					"indexed_name^15",
+					"slug^10",
+					"author^3",
+					"indexed_author^3",
+					"summary"
+				],
+				"type": "best_fields",
+				"operator": "and",
+				"fuzziness": "AUTO"
+			}
+		})
+	}
+
+	async fn search_for_project_raw_native(
 		&self,
 		info: &SearchRequest,
 	) -> Result<SearchResults, ApiError> {
@@ -822,7 +794,6 @@ impl SearchBackend for Elasticsearch {
 		let search_sort =
 			parse_search_index(parsed.index, info.new_filters.as_deref())?;
 		let filter = Self::build_filter(info)?;
-
 		let mut filters =
 			vec![json!({"term": {"document_type": "project"}})];
 		if let Some(filter) = &filter {
@@ -830,74 +801,37 @@ impl SearchBackend for Elasticsearch {
 		}
 		let query = json!({
 			"bool": {
-				"must": [Self::text_query(parsed.query)],
+				"must": [Self::native_text_query(parsed.query)],
 				"filter": filters
 			}
 		});
-		let alias = self.config.alias_name();
 		let sort = Self::sort(search_sort.index);
-		let mut remaining_offset = parsed.offset;
-		let mut search_after = None;
-		let mut total_hits = None;
-		let deep_pagination = remaining_offset
+		let alias = self.config.alias_name();
+		let body = if parsed
+			.offset
 			.saturating_add(parsed.hits_per_page)
-			> MAX_RESULT_WINDOW;
-
-		while deep_pagination && remaining_offset > 0 {
-			let skipped = remaining_offset.min(MAX_RESULT_WINDOW);
+			> MAX_RESULT_WINDOW
+		{
+			self.execute_deep_search(
+				&alias,
+				&query,
+				&sort,
+				parsed.offset,
+				parsed.hits_per_page,
+			)
+			.await?
+		} else {
 			let body = Self::search_body(
 				&query,
 				&sort,
-				0,
-				skipped,
-				total_hits.is_none(),
-				search_after.as_ref(),
-				false,
+				parsed.offset,
+				parsed.hits_per_page,
+				true,
+				None,
+				true,
 			);
-			let body = self.execute_search(&alias, &body, true).await?;
-			if total_hits.is_none() {
-				let exact_total_hits = body["hits"]["total"]["value"]
-					.as_u64()
-					.unwrap_or_default()
-					as usize;
-				if parsed.offset >= exact_total_hits {
-					return Ok(SearchResults {
-						hits: Vec::new(),
-						page: parsed.page,
-						hits_per_page: parsed.hits_per_page,
-						total_hits: exact_total_hits,
-					});
-				}
-				total_hits = Some(exact_total_hits);
-			}
-			let Some(anchor) = body["hits"]["hits"]
-				.as_array()
-				.and_then(|hits| hits.last())
-				.and_then(|hit| hit.get("sort"))
-				.cloned()
-			else {
-				return Ok(SearchResults {
-					hits: Vec::new(),
-					page: parsed.page,
-					hits_per_page: parsed.hits_per_page,
-					total_hits: total_hits.unwrap_or_default(),
-				});
-			};
-			search_after = Some(anchor);
-			remaining_offset -= skipped;
-		}
-
-		let body = Self::search_body(
-			&query,
-			&sort,
-			remaining_offset,
-			parsed.hits_per_page,
-			true,
-			search_after.as_ref(),
-			true,
-		);
-		let body = self.execute_search(&alias, &body, false).await?;
-
+			self.execute_search(&alias, &body, false).await?
+		};
 		let total_hits = body["hits"]["total"]["value"]
 			.as_u64()
 			.unwrap_or_default() as usize;
@@ -909,16 +843,16 @@ impl SearchBackend for Elasticsearch {
 				let mut document = hit["_source"].clone();
 				let object = document.as_object_mut()?;
 				object.remove("document_type");
+				object.remove("_search_tokens");
 				if filter
 					.as_ref()
 					.is_some_and(|filter| filter.has_version_filter)
+					&& let Some(version_id) = matching_version_id(hit)
 				{
-					if let Some(version_id) = matching_version_id(hit) {
-						object.insert(
-							"version_id".to_string(),
-							Value::String(version_id),
-						);
-					}
+					object.insert(
+						"version_id".to_string(),
+						Value::String(version_id),
+					);
 				}
 
 				let metadata = info.show_metadata.then(|| {
@@ -942,6 +876,20 @@ impl SearchBackend for Elasticsearch {
 			hits_per_page: parsed.hits_per_page,
 			total_hits,
 		})
+	}
+}
+
+#[async_trait]
+impl SearchBackend for Elasticsearch {
+	async fn search_for_project_raw(
+		&self,
+		info: &SearchRequest,
+	) -> Result<SearchResults, ApiError> {
+		if self.config.typesense_parity {
+			self.search_for_project_raw_typesense_parity(info).await
+		} else {
+			self.search_for_project_raw_native(info).await
+		}
 	}
 
 	async fn rebuild_index(
@@ -1144,35 +1092,6 @@ fn matching_version_id(hit: &Value) -> Option<String> {
 		})
 		.max_by_key(|(published, _)| *published)
 		.map(|(_, version_id)| version_id)
-}
-
-fn projects_to_bulk(documents: &[UploadSearchProject]) -> Result<String> {
-	let mut output = String::new();
-	for document in documents {
-		let id = format!("project:{}", document.project_id);
-		push_json_line(
-			&mut output,
-			&json!({
-				"index": {
-					"_id": id,
-					"routing": document.project_id
-				}
-			}),
-		)?;
-
-		let mut source = serde_json::to_value(document)
-			.wrap_err("failed to serialize `UploadSearchProject`")?;
-		let object = source
-			.as_object_mut()
-			.ok_or_else(|| eyre!("project search document is not an object"))?;
-		object.insert(
-			"document_type".to_string(),
-			Value::String("project".to_string()),
-		);
-		add_server_online_field(object);
-		push_json_line(&mut output, &source)?;
-	}
-	Ok(output)
 }
 
 fn versions_to_bulk(documents: &[UploadSearchVersion]) -> Result<String> {

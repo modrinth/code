@@ -221,7 +221,8 @@ fn version_query(
 				"size": 1,
 				"_source": ["version_id", "version_published_timestamp"],
 				"sort": [
-					{"version_published_timestamp": {"order": "desc"}}
+					{"version_published_timestamp": {"order": "desc"}},
+					{"version_id": {"order": "desc"}}
 				]
 			}
 		}
