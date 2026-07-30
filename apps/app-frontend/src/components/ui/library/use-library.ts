@@ -28,7 +28,6 @@ import {
 import type { GameInstance } from '@/helpers/types'
 
 export const librarySortOptions = [
-	'Manual',
 	'Name',
 	'Last played',
 	'Hours played',
@@ -260,8 +259,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 
 		switch (displayState.value.sortBy) {
-			case 'Manual':
-				break
 			case 'Name':
 				visibleInstances.sort((a, b) => a.name.localeCompare(b.name))
 				break
