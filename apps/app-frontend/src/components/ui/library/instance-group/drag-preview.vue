@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PageRoundIcon } from '@modrinth/assets'
 import { Avatar, TagItem } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed } from 'vue'
@@ -42,12 +43,17 @@ const instanceType = computed(() => {
 			class="relative flex min-h-[76px] w-full items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left opacity-90 shadow-lg"
 		>
 			<Avatar
-				class="pointer-events-none !border-none !bg-transparent !rounded-[26px] !rounded-br-[42px] !absolute -top-[40px] right-[18px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
-				size="100px"
-				:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+				v-if="instance.icon_path"
+				class="pointer-events-none !border-none !bg-transparent !rounded-[26px] !rounded-br-[42px] !absolute -top-[26px] right-[20px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
+				size="84px"
+				:src="convertFileSrc(instance.icon_path)"
 				:tint-by="instance.id"
 				alt=""
 				no-shadow
+			/>
+			<PageRoundIcon
+				aria-hidden="true"
+				class="pointer-events-none absolute -top-[52px] right-[0px] size-[124px] opacity-10 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
 			/>
 			<TagItem
 				v-if="count > 1"
