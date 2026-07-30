@@ -375,9 +375,9 @@ watch(
 				</div>
 				<p
 					v-if="instanceGroup.instances.length === 0"
-					class="col-span-full m-0 py-2.5 pl-0.5 text-base font-medium text-secondary"
+					class="col-span-full m-0 pt-1 pl-0.5 text-base font-base text-secondary opacity-80"
 				>
-					No instances in this group.
+					This group is empty. Drag and drop to add instances.
 				</p>
 			</section>
 		</Accordion>
