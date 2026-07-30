@@ -50,11 +50,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(medal::config)
             .configure(mural::config)
             .configure(statuses::config),
-    )
-    .service(
-        web::scope("/v3/analytics-event")
-            .wrap(default_cors())
-            .configure(super::v3::analytics_event::config),
     );
 }
 
