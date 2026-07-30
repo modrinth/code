@@ -31,11 +31,6 @@ pub mod oauth_clients;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/v3/analytics-event")
-            .wrap(default_cors())
-            .configure(analytics_event::config),
-    );
-    cfg.service(
         web::scope("/v3/analytics")
             .wrap(default_cors())
             .configure(analytics_get::config),
@@ -54,6 +49,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/v3")
             .wrap(default_cors())
+            .configure(analytics_event::config)
             .configure(limits::config)
             .configure(collections::config)
             .configure(images::config)

@@ -12,12 +12,11 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(analytics_events_get);
 }
 
-/// List analytics events.  
+/// List analytics events.
 #[utoipa::path(
-	context_path = "/v3/analytics-event",
 	tag = "v3 analytics", responses((status = OK, body = Vec<AnalyticsEvent>))
 )]
-#[get("")]
+#[get("/analytics-event")]
 pub async fn analytics_events_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
