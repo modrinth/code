@@ -1,9 +1,9 @@
+use crate::database::models::DBProjectDisclosure;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use strum::IntoStaticStr;
 use utoipa::ToSchema;
-use ariadne::ids::UserId;
-use crate::database::models::DBProjectDisclosure;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, IntoStaticStr)]
 #[serde(rename_all = "snake_case", tag = "type")]
