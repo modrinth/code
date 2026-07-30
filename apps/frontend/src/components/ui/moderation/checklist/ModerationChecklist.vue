@@ -511,11 +511,10 @@ const alreadyReviewed = ref(false)
 
 // Prefetch queue for parallel lock checking and instant navigation
 interface PrefetchedProject {
-	projectId: string
+	project: string
 	slug: string // For canonical URL navigation
 	projectType: string // For canonical URL navigation
 	validatedAt: number
-	skippedIds: string[] // IDs that were locked when this was prefetched
 }
 
 const prefetchQueue = ref<PrefetchedProject[]>([])
@@ -646,9 +645,9 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 	// Quick re-check if close to expiry (last 5 seconds of TTL)
 	if (now - next.validatedAt > PREFETCH_STALE_MS - 5000) {
 		const recheckResults = await batchCheckQueueCandidates(client, moderationQueue, [
-			next.projectId,
+			next.project,
 		])
-		const recheck = recheckResults.get(next.projectId)
+		const recheck = recheckResults.get(next.project)
 		if (!isEligibleQueueCandidate(recheck)) {
 			prefetchQueue.value.shift()
 			return navigateToNextUnlockedProject()
@@ -657,17 +656,11 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 
 	prefetchQueue.value.shift()
 
-	await Promise.all(
-		next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-	)
-
-	notifySkippedQueueProjects(next.skippedIds.length)
-
 	maintainPrefetchQueue()
 
 	navigateToQueueProject(
 		{ slug: next.slug, projectType: next.projectType, locked: false, isProcessing: true },
-		next.projectId,
+		next.project,
 	)
 	return true
 }
@@ -702,6 +695,7 @@ function markStageVisited(stageId: string | undefined) {
 		visitedStages: [...visitedStages.value],
 	})
 }
+
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
 const generatedActiveActions = ref<ActiveAction2[] | null>(null)
@@ -792,16 +786,6 @@ function reviewAnyway() {
 	maintainPrefetchQueue()
 }
 
-function notifySkippedQueueProjects(count: number) {
-	if (count <= 0) return
-	addNotification({
-		title: 'Skipped projects',
-		text: `Skipped ${count} project(s) already moderated or locked by others.`,
-		type: 'info',
-		autoCloseMs: 2000,
-	})
-}
-
 function navigateToQueueProject(result: QueueCandidateCheck, projectId: string) {
 	if (result.slug && result.projectType) {
 		const urlType = getProjectTypeForUrlShorthand(result.projectType, [], tags.value)
@@ -831,14 +815,14 @@ async function maintainPrefetchQueue() {
 		prefetchQueue.value = prefetchQueue.value.filter((p) => now - p.validatedAt < PREFETCH_STALE_MS)
 
 		if (currentProjectId) {
-			prefetchQueue.value = prefetchQueue.value.filter((p) => p.projectId !== currentProjectId)
+			prefetchQueue.value = prefetchQueue.value.filter((p) => p.project !== currentProjectId)
 		}
 
 		if (prefetchQueue.value.length >= PREFETCH_TARGET_COUNT) {
 			return
 		}
 
-		const prefetchedIds = new Set(prefetchQueue.value.map((p) => p.projectId))
+		const prefetchedIds = new Set(prefetchQueue.value.map((p) => p.project))
 		const queueItems = [...moderationQueue.currentQueue.items]
 		const currentIndex = currentProjectId ? queueItems.indexOf(currentProjectId) : -1
 		const remainingItems =
@@ -848,7 +832,6 @@ async function maintainPrefetchQueue() {
 
 		if (candidateIds.length === 0) return
 
-		const skippedIds: string[] = []
 		let checkedCount = 0
 
 		while (
@@ -864,16 +847,15 @@ async function maintainPrefetchQueue() {
 				const result = results.get(id)
 				if (isEligibleQueueCandidate(result)) {
 					prefetchQueue.value.push({
-						projectId: id,
+						project: id,
 						slug: result?.slug ?? '',
 						projectType: result?.projectType ?? '',
 						validatedAt: Date.now(),
-						skippedIds: [...skippedIds],
 					})
 
 					if (prefetchQueue.value.length >= PREFETCH_TARGET_COUNT) break
 				} else {
-					skippedIds.push(id)
+					void moderationQueue.excludeProject(id)
 				}
 			}
 		}
@@ -884,6 +866,21 @@ async function maintainPrefetchQueue() {
 
 const debouncedPrefetch = useDebounceFn(maintainPrefetchQueue, 300)
 
+async function goToNextEligibleProject(candidateIds: string[]): Promise<boolean> {
+	if (candidateIds.length === 0) return false
+
+	const next = await findNextEligibleQueueProject(client, moderationQueue, candidateIds)
+
+	if (!next) {
+		await Promise.all(candidateIds.map((id) => moderationQueue.excludeProject(id)))
+		return false
+	}
+
+	await Promise.all(next.excluded.map((id) => moderationQueue.excludeProject(id)))
+	navigateToQueueProject(next.result, next.project)
+	return true
+}
+
 async function skipToNextProject() {
 	const currentProjectId = projectV2.value?.id
 	if (!currentProjectId) {
@@ -893,7 +890,7 @@ async function skipToNextProject() {
 	debug('[skipToNextProject] Starting. Current project:', currentProjectId)
 	debug('[skipToNextProject] Queue before complete:', [...moderationQueue.currentQueue.items])
 
-	await moderationQueue.completeCurrentProject(currentProjectId, 'skipped')
+	await moderationQueue.deferProject(currentProjectId)
 
 	debug('[skipToNextProject] Queue after complete:', [...moderationQueue.currentQueue.items])
 	debug('[skipToNextProject] hasItems:', moderationQueue.hasItems)
@@ -908,20 +905,7 @@ async function skipToNextProject() {
 	const remainingIds = moderationQueue.currentQueue.items.filter((id) => id !== currentProjectId)
 
 	if (remainingIds.length > 0) {
-		const next = await findNextEligibleQueueProject(client, moderationQueue, remainingIds)
-
-		if (next) {
-			await Promise.all(
-				next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-			)
-			notifySkippedQueueProjects(next.skippedIds.length)
-			navigateToQueueProject(next.result, next.projectId)
-			return
-		}
-
-		await Promise.all(
-			remainingIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-		)
+		if (await goToNextEligibleProject(remainingIds)) return
 
 		debug('[skipToNextProject] No eligible projects in queue')
 		addNotification({
@@ -1531,6 +1515,7 @@ async function generateMessage() {
 	if (loadingMessage.value) return
 
 	loadingMessage.value = true
+	markStageVisited(currentStageObj.value.id)
 
 	router.push(`/${projectUrlType.value}/${projectV2.value.slug}/moderation`)
 
@@ -1665,7 +1650,7 @@ async function sendMessage(status: ProjectStatus) {
 
 		await refreshModerationCaches(threadId)
 
-		const willHaveNext = await moderationQueue.completeCurrentProject(projectId, 'completed')
+		const willHaveNext = await moderationQueue.completeProject(projectId)
 
 		await Promise.race([
 			moderationQueue.releaseLock(projectId),
@@ -1701,22 +1686,23 @@ async function endChecklist(status?: string) {
 	await clearProjectLocalStorage()
 
 	if (!hasNextProject.value) {
+		const currentProjectId = projectV2.value?.id
+		const isRealQueue =
+			!!currentProjectId &&
+			(moderationQueue.currentQueue.completed.includes(currentProjectId) ||
+				moderationQueue.currentQueue.skipped.includes(currentProjectId))
+
 		await navigateTo({
 			name: 'moderation',
 			state: {
 				confetti: true,
+				queueSummary: isRealQueue,
 			},
 		})
 
 		await nextTick()
 
-		if (moderationQueue.currentQueue.total > 1) {
-			addNotification({
-				title: 'Moderation completed',
-				text: `You have completed the moderation queue.`,
-				type: 'success',
-			})
-		} else {
+		if (!isRealQueue) {
 			addNotification({
 				title: 'Moderation submitted',
 				text: `Project ${status ?? 'completed successfully'}.`,
@@ -1730,30 +1716,15 @@ async function endChecklist(status?: string) {
 				(id) => id !== currentProjectId,
 			)
 
-			let foundEligible = false
-			if (remainingIds.length > 0) {
-				const next = await findNextEligibleQueueProject(client, moderationQueue, remainingIds)
-
-				if (next) {
-					await Promise.all(
-						next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-					)
-					notifySkippedQueueProjects(next.skippedIds.length)
-					navigateToQueueProject(next.result, next.projectId)
-					foundEligible = true
-				} else {
-					await Promise.all(
-						remainingIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-					)
+			if (!(await goToNextEligibleProject(remainingIds))) {
+				if (remainingIds.length > 0) {
 					addNotification({
 						title: 'No projects available',
 						text: 'All remaining projects are already moderated or locked by others.',
 						type: 'warning',
 					})
 				}
-			}
 
-			if (!foundEligible) {
 				await navigateTo({
 					name: 'moderation',
 				})
@@ -1778,7 +1749,7 @@ async function skipCurrentProject() {
 		new Promise((r) => setTimeout(r, 2000)),
 	])
 
-	hasNextProject.value = await moderationQueue.completeCurrentProject(projectId, 'skipped')
+	hasNextProject.value = await moderationQueue.deferProject(projectId)
 
 	await endChecklist('skipped')
 }

@@ -13,9 +13,9 @@ export interface QueueCandidateCheck {
 }
 
 export interface EligibleQueueProject {
-	projectId: string
+	project: string
 	result: QueueCandidateCheck
-	skippedIds: string[]
+	excluded: string[]
 }
 
 const BATCH_SIZE = 5
@@ -69,7 +69,7 @@ export async function findNextEligibleQueueProject(
 	moderationQueue: ModerationQueueService,
 	candidateIds: string[],
 ): Promise<EligibleQueueProject | null> {
-	const skippedIds: string[] = []
+	const excluded: string[] = []
 	let checkedCount = 0
 
 	while (checkedCount < candidateIds.length) {
@@ -81,9 +81,9 @@ export async function findNextEligibleQueueProject(
 		for (const id of batch) {
 			const result = results.get(id)
 			if (isEligibleQueueCandidate(result)) {
-				return { projectId: id, result: result!, skippedIds: [...skippedIds] }
+				return { project: id, result: result!, excluded: [...excluded] }
 			}
-			skippedIds.push(id)
+			excluded.push(id)
 		}
 	}
 

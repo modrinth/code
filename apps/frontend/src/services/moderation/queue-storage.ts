@@ -5,9 +5,9 @@ export interface PersistedModerationQueueState {
 	savedAt: string
 	currentQueue: {
 		items: string[]
+		skipped?: string[]
 		total: number
-		completed: number
-		skipped: number
+		completed: string[]
 		lastUpdated: string
 	}
 	isQueueMode: boolean
@@ -31,9 +31,9 @@ function isPersistedStateCandidate(value: unknown): value is PersistedModeration
 	const queue = candidate.currentQueue
 	if (!queue || typeof queue !== 'object') return false
 	if (!isStringArray(queue.items)) return false
+	if (queue.skipped !== undefined && !isStringArray(queue.skipped)) return false
 	if (typeof queue.total !== 'number' || Number.isNaN(queue.total)) return false
-	if (typeof queue.completed !== 'number' || Number.isNaN(queue.completed)) return false
-	if (typeof queue.skipped !== 'number' || Number.isNaN(queue.skipped)) return false
+	if (!isStringArray(queue.completed)) return false
 	if (typeof queue.lastUpdated !== 'string') return false
 
 	return true

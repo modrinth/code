@@ -10,9 +10,9 @@ import {
 
 export interface ModerationQueue {
 	items: string[]
+	skipped: string[]
 	total: number
-	completed: number
-	skipped: number
+	completed: string[]
 	lastUpdated: Date
 }
 
@@ -29,11 +29,14 @@ export interface ModerationQueueService {
 
 	queueLength: number
 	hasItems: boolean
+	hasSkipped: boolean
 	progress: number
 
 	setQueue(projectIds: string[]): Promise<void>
-	setSingleProject(projectId: string): Promise<void>
-	completeCurrentProject(projectId: string, status?: 'completed' | 'skipped'): Promise<boolean>
+	completeProject(projectId: string): Promise<boolean>
+	deferProject(projectId: string): Promise<boolean>
+	excludeProject(projectId: string): Promise<boolean>
+	startSkippedReview(): Promise<void>
 	getCurrentProjectId(): string | null
 	resetQueue(): Promise<void>
 
@@ -46,31 +49,31 @@ export interface ModerationQueueService {
 
 const EMPTY_QUEUE: ModerationQueue = {
 	items: [],
+	skipped: [],
 	total: 0,
-	completed: 0,
-	skipped: 0,
+	completed: [],
 	lastUpdated: new Date(),
 }
 
 function createEmptyQueue(): ModerationQueue {
-	return { ...EMPTY_QUEUE, lastUpdated: new Date(), items: [] }
+	return { ...EMPTY_QUEUE, lastUpdated: new Date(), items: [], skipped: [], completed: [] }
 }
 
 function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): ModerationQueue {
 	const lastUpdated = new Date(raw.lastUpdated)
 	const items = raw.items.filter((id): id is string => typeof id === 'string')
-	const completed = Number.isFinite(raw.completed) ? Math.max(Math.trunc(raw.completed), 0) : 0
-	const skipped = Number.isFinite(raw.skipped) ? Math.max(Math.trunc(raw.skipped), 0) : 0
-	const minimumTotal = items.length + completed + skipped
+	const skipped = (raw.skipped ?? []).filter((id): id is string => typeof id === 'string')
+	const completed = (raw.completed ?? []).filter((id): id is string => typeof id === 'string')
+	const minimumTotal = items.length + completed.length
 	const total = Number.isFinite(raw.total)
 		? Math.max(Math.trunc(raw.total), minimumTotal)
 		: minimumTotal
 
 	return {
 		items,
+		skipped,
 		total,
 		completed,
-		skipped,
 		lastUpdated: Number.isNaN(lastUpdated.getTime()) ? new Date() : lastUpdated,
 	}
 }
@@ -84,9 +87,9 @@ function persistedPayload(
 		savedAt: new Date().toISOString(),
 		currentQueue: {
 			items: [...queue.items],
+			skipped: [...queue.skipped],
 			total: queue.total,
-			completed: queue.completed,
-			skipped: queue.skipped,
+			completed: [...queue.completed],
 			lastUpdated: queue.lastUpdated.toISOString(),
 		},
 		isQueueMode,
@@ -101,9 +104,10 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 
 	const queueLength = computed(() => currentQueue.value.items.length)
 	const hasItems = computed(() => currentQueue.value.items.length > 0)
+	const hasSkipped = computed(() => currentQueue.value.skipped.length > 0)
 	const progress = computed(() => {
 		if (currentQueue.value.total === 0) return 0
-		return (currentQueue.value.completed + currentQueue.value.skipped) / currentQueue.value.total
+		return (currentQueue.value.total - currentQueue.value.items.length) / currentQueue.value.total
 	})
 	let mutationChain = Promise.resolve()
 
@@ -148,48 +152,67 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		return result
 	}
 
-	function setQueueState(items: string[], mode: boolean) {
-		isQueueMode.value = mode
+	function setQueueState(items: string[]) {
+		isQueueMode.value = true
 		currentQueue.value = {
 			items: [...items],
+			skipped: [],
 			total: items.length,
-			completed: 0,
-			skipped: 0,
+			completed: [],
 			lastUpdated: new Date(),
 		}
 	}
 
 	async function setQueue(projectIds: string[]): Promise<void> {
 		await withMutation(() => {
-			setQueueState(projectIds, true)
+			setQueueState(projectIds)
 		})
 	}
 
-	async function setSingleProject(projectId: string): Promise<void> {
-		await withMutation(() => {
-			setQueueState([projectId], false)
-		})
-	}
-
-	async function completeCurrentProject(
-		projectId: string,
-		status: 'completed' | 'skipped' = 'completed',
-	): Promise<boolean> {
+	async function completeProject(projectId: string): Promise<boolean> {
 		return withMutation(() => {
 			if (!currentQueue.value.items.includes(projectId)) {
 				return currentQueue.value.items.length > 0
 			}
 
-			if (status === 'completed') {
-				currentQueue.value.completed++
-			} else {
-				currentQueue.value.skipped++
+			currentQueue.value.completed = [...currentQueue.value.completed, projectId]
+			currentQueue.value.items = currentQueue.value.items.filter((id) => id !== projectId)
+			currentQueue.value.lastUpdated = new Date()
+
+			return currentQueue.value.items.length > 0
+		})
+	}
+
+	async function excludeProject(projectId: string): Promise<boolean> {
+		return withMutation(() => {
+			if (!currentQueue.value.items.includes(projectId)) {
+				return currentQueue.value.items.length > 0
 			}
 
 			currentQueue.value.items = currentQueue.value.items.filter((id) => id !== projectId)
 			currentQueue.value.lastUpdated = new Date()
 
 			return currentQueue.value.items.length > 0
+		})
+	}
+
+	async function deferProject(projectId: string): Promise<boolean> {
+		return withMutation(() => {
+			if (!currentQueue.value.items.includes(projectId)) {
+				return currentQueue.value.items.length > 0
+			}
+
+			currentQueue.value.items = currentQueue.value.items.filter((id) => id !== projectId)
+			currentQueue.value.skipped = [...currentQueue.value.skipped, projectId]
+			currentQueue.value.lastUpdated = new Date()
+
+			return currentQueue.value.items.length > 0
+		})
+	}
+
+	async function startSkippedReview(): Promise<void> {
+		await withMutation(() => {
+			setQueueState(currentQueue.value.skipped)
 		})
 	}
 
@@ -294,11 +317,14 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 
 		queueLength,
 		hasItems,
+		hasSkipped,
 		progress,
 
 		setQueue,
-		setSingleProject,
-		completeCurrentProject,
+		completeProject,
+		deferProject,
+		excludeProject,
+		startSkippedReview,
 		getCurrentProjectId,
 		resetQueue,
 
