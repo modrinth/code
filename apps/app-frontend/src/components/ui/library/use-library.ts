@@ -37,10 +37,23 @@ export const librarySortOptions = [
 
 export const libraryGroupOptions = [
 	{ value: 'Group', label: 'Custom group' },
+	{ value: 'Instance type', label: 'Instance type' },
 	{ value: 'Loader', label: 'Loader' },
 	{ value: 'Game version', label: 'Game version' },
 	{ value: 'None', label: 'No grouping' },
 ] as const
+
+const libraryInstanceTypeLabels = {
+	custom: 'Custom',
+	modpack: 'Modpack',
+	server: 'Server',
+} as const
+
+const libraryLoaderPriority: Record<string, number> = {
+	fabric: 0,
+	forge: 1,
+	neoforge: 2,
+}
 
 export type LibrarySort = (typeof librarySortOptions)[number]
 export type LibraryGroupBy = (typeof libraryGroupOptions)[number]['value']
@@ -300,6 +313,16 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 		for (const instance of visibleInstances) {
 			switch (displayState.value.group) {
+				case 'Instance type':
+					{
+						const instanceType = getInstanceType(instance)
+						addToGroup(
+							`Instance type:${instanceType}`,
+							libraryInstanceTypeLabels[instanceType],
+							instance,
+						)
+					}
+					break
 				case 'Loader':
 					{
 						const name = formatLoader(formatMessage, instance.loader)
@@ -347,8 +370,20 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			groups.sort((a, b) => a.key.localeCompare(b.key) || a.id.localeCompare(b.id))
 		}
 
+		if (displayState.value.group === 'Loader') {
+			groups.sort((a, b) => {
+				const aPriority = libraryLoaderPriority[a.key.toLowerCase()] ?? Number.MAX_SAFE_INTEGER
+				const bPriority = libraryLoaderPriority[b.key.toLowerCase()] ?? Number.MAX_SAFE_INTEGER
+				return aPriority - bPriority || a.key.localeCompare(b.key) || a.id.localeCompare(b.id)
+			})
+		}
+
+		if (displayState.value.group === 'Instance type') {
+			groups.sort((a, b) => a.key.localeCompare(b.key) || a.id.localeCompare(b.id))
+		}
+
 		if (displayState.value.group === 'Game version') {
-			groups.sort((a, b) => a.key.localeCompare(b.key, undefined, { numeric: true }))
+			groups.sort((a, b) => b.key.localeCompare(a.key, undefined, { numeric: true }))
 		}
 
 		if (displayState.value.group === 'Group') {
