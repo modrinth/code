@@ -11,7 +11,7 @@ const props = withDefaults(
 		maxWidth?: string
 		maxLength?: number
 		editLabel?: string
-		activationMode?: 'text' | 'icon'
+		activationMode?: 'text' | 'icon' | 'manual'
 		inputClass?: string
 		buttonClass?: string
 		iconTextClass?: string
@@ -231,7 +231,7 @@ defineExpose({
 			</span>
 		</div>
 		<button
-			v-else
+			v-else-if="activationMode === 'text'"
 			type="button"
 			class="flex w-full max-w-full items-center gap-2 truncate border-0 bg-transparent p-0 text-left text-inherit transition-colors hover:text-brand focus-visible:text-contrast [font:inherit]"
 			:class="buttonClass"
@@ -241,5 +241,8 @@ defineExpose({
 		>
 			<span class="min-w-0 truncate">{{ displayValue }}</span>
 		</button>
+		<span v-else class="min-w-0 truncate" :title="model || displayValue">
+			{{ displayValue }}
+		</span>
 	</div>
 </template>

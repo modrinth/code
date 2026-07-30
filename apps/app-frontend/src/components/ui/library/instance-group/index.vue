@@ -22,6 +22,7 @@ import {
 import { computed, inject, nextTick, ref, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
 import type {
 	InstanceCard as InstanceCardExposed,
@@ -353,7 +354,7 @@ watch(
 					v-if="!isUngrouped"
 					ref="groupNameInput"
 					v-model="groupName"
-					activation-mode="icon"
+					activation-mode="manual"
 					class="text-base font-semibold !h-10 text-primary select-none group-hover/open-target:text-contrast"
 					:edit-label="formatMessage(commonMessages.renameButton)"
 					max-width="24rem"
@@ -376,18 +377,13 @@ watch(
 				</TagItem>
 			</div>
 			<div class="min-w-0 flex-1" />
-			<ButtonStyled v-if="!isUngrouped" circular type="transparent">
-				<button
-					v-tooltip="formatMessage(messages.deleteGroup)"
-					class="opacity-0 !transition-all duration-150 group-hover/instance-container:opacity-100 -m-1.5"
-					type="button"
-					:aria-label="formatMessage(messages.deleteGroup)"
-					:disabled="deletingGroup"
-					@click.stop="requestGroupDeletion"
-				>
-					<TrashIcon class="!size-4 !min-h-4 !min-w-4" />
-				</button>
-			</ButtonStyled>
+			<GroupActionButtons
+				v-if="!isUngrouped"
+				:deleting="deletingGroup"
+				:on-add-to-group="() => openGroupInstancesModal(instanceGroup.id)"
+				:on-delete-group="requestGroupDeletion"
+				:on-edit-group-name="() => groupNameInput?.startEditing()"
+			/>
 		</div>
 		<Accordion
 			ref="groupAccordion"
@@ -428,9 +424,7 @@ watch(
 		@menu-closed="groupContextMenuOpen = false"
 		@option-clicked="handleGroupOption"
 	>
-		<template #new_instance>
-			<PlusIcon /> {{ formatMessage(messages.newInstance) }}
-		</template>
+		<template #new_instance> <PlusIcon /> {{ formatMessage(messages.newInstance) }} </template>
 		<template #add_instances>
 			<SquarePlusIcon /> {{ formatMessage(messages.addToGroup) }}
 		</template>
