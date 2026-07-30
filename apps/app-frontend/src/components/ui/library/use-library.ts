@@ -455,6 +455,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		const target = instanceGroupDragTarget.value
 		if (target) {
 			const dropState = getInstanceGroupDropState(target)
+			const isSourceGroup =
+				normalizeInstanceGroupId(target) === activeInstanceGroupDrag.value?.fromGroup
+			if (!isSourceGroup && !dropState.canDrop && dropState.alreadyInGroup) {
+				return 'Already in this group'
+			}
 			if (!dropState.canDrop || dropState.operation !== 'add') return
 
 			const count = new Set(

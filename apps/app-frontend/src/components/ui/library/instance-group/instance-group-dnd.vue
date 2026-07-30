@@ -68,7 +68,7 @@ let statusPopoverFrame: number | undefined
 
 const instanceGroupDragStatusStyle = computed(() => ({
 	left: `${Math.min(instanceGroupDragPointer.value.x + 4, window.innerWidth - 220)}px`,
-	top: `${Math.min(instanceGroupDragPointer.value.y, window.innerHeight - 48)}px`,
+	top: `${Math.min(instanceGroupDragPointer.value.y + 4, window.innerHeight - 48)}px`,
 }))
 
 watch(
