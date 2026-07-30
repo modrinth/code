@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 const MAX_GROUP_NAME_LENGTH: usize = 128;
+pub const FAVORITES_GROUP_ID: &str = "group:favorites";
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct InstanceGroup {
@@ -65,6 +66,13 @@ pub async fn rename_group(
     id: String,
     new_name: String,
 ) -> crate::Result<InstanceGroup> {
+    if id == FAVORITES_GROUP_ID {
+        return Err(crate::ErrorKind::InputError(
+            "Favorites cannot be renamed".to_string(),
+        )
+        .into());
+    }
+
     let new_name = validate_group_name(&new_name)?;
     let state = State::get().await?;
     let mut tx = state.pool.begin().await?;
@@ -112,6 +120,13 @@ pub async fn rename_group(
 }
 
 pub async fn delete_group(id: String) -> crate::Result<()> {
+    if id == FAVORITES_GROUP_ID {
+        return Err(crate::ErrorKind::InputError(
+            "Favorites cannot be deleted".to_string(),
+        )
+        .into());
+    }
+
     let state = State::get().await?;
     let mut tx = state.pool.begin().await?;
     let instance_ids = sqlx::query_scalar::<_, String>(
@@ -153,7 +168,9 @@ pub async fn delete_group(id: String) -> crate::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::validate_group_name;
+    use super::{
+        FAVORITES_GROUP_ID, MAX_GROUP_NAME_LENGTH, validate_group_name,
+    };
 
     #[test]
     fn group_name_validation_trims_valid_names() {
@@ -171,7 +188,20 @@ mod tests {
     }
 
     #[test]
+    fn group_name_validation_allows_favorites() {
+        assert_eq!(validate_group_name("Favorites").unwrap(), "Favorites");
+    }
+
+    #[test]
     fn group_name_validation_rejects_long_names() {
-        assert!(validate_group_name(&"a".repeat(33)).is_err());
+        assert!(
+            validate_group_name(&"a".repeat(MAX_GROUP_NAME_LENGTH + 1))
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn favorites_group_id_is_stable() {
+        assert_eq!(FAVORITES_GROUP_ID, "group:favorites");
     }
 }

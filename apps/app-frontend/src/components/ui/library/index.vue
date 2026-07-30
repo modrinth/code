@@ -6,6 +6,7 @@ import {
 	MinusIcon,
 	PlayIcon,
 	PlusIcon,
+	StarIcon,
 	StopCircleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
@@ -18,6 +19,7 @@ import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-gr
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
 import { getLibraryInstanceSelectionKey, provideLibrary } from '@/components/ui/library/use-library'
+import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import type { GameInstance } from '@/helpers/types'
 
@@ -42,10 +44,11 @@ const hasActiveFilters = computed(() =>
 )
 
 const visibleInstanceGroups = computed(() =>
-	instanceGroups.value.filter(
-		(instanceGroup) =>
-			instanceGroup.instances.length > 0 ||
-			(!hasActiveFilters.value && instanceGroup.key !== 'None'),
+	instanceGroups.value.filter((instanceGroup) =>
+		instanceGroup.id === FAVORITES_GROUP_ID
+			? instanceGroup.instances.length > 0
+			: instanceGroup.instances.length > 0 ||
+				(!hasActiveFilters.value && instanceGroup.key !== 'None'),
 	),
 )
 
@@ -107,22 +110,19 @@ function setConfirmDeleteModal(component: unknown) {
 	confirmDeleteModal.value = component as InstanceType<typeof ConfirmDeleteInstanceModal> | null
 }
 
-watch(
-	selectedLibraryInstances,
-	(selectedInstances) => {
-		if (selectedInstances.size === 0) {
-			anchorInstance.value = null
-			return
-		}
+watch(selectedLibraryInstances, (selectedInstances) => {
+	if (selectedInstances.size === 0) {
+		anchorInstance.value = null
+		return
+	}
 
-		if (
-			anchorInstance.value &&
-			!selectedInstances.has(getLibraryInstanceSelectionKey(anchorInstance.value))
-		) {
-			anchorInstance.value = null
-		}
-	},
-)
+	if (
+		anchorInstance.value &&
+		!selectedInstances.has(getLibraryInstanceSelectionKey(anchorInstance.value))
+	) {
+		anchorInstance.value = null
+	}
+})
 </script>
 
 <template>
@@ -153,6 +153,11 @@ watch(
 	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">
 		<template #play> <PlayIcon /> Play </template>
 		<template #stop> <StopCircleIcon /> Stop </template>
+		<template #add_to_favorites> <StarIcon /> Add to favorites </template>
+		<template #remove_from_favorites>
+			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" /> Remove
+			from favorites
+		</template>
 		<template #add_content> <PlusIcon /> Add content </template>
 		<template #edit> <EyeIcon /> View instance </template>
 		<template #duplicate> <ClipboardCopyIcon /> Duplicate instance</template>

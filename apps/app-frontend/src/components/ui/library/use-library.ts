@@ -20,6 +20,7 @@ import { edit, remove } from '@/helpers/instance'
 import {
 	create_group as createInstanceGroup,
 	delete_group as deleteInstanceGroup,
+	FAVORITES_GROUP_ID,
 	type InstanceGroupDefinition,
 	list_groups as listInstanceGroups,
 	rename_group as renameInstanceGroup,
@@ -152,6 +153,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		() =>
 			new Set(
 				libraryGroups.value
+					.filter((group) => group.id !== FAVORITES_GROUP_ID)
 					.map((group) => group.name)
 					.map((group) => group.trim())
 					.filter((group) => group && group.toLowerCase() !== 'none'),
@@ -345,6 +347,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 		if (displayState.value.group === 'Group') {
 			groups.sort((a, b) => {
+				if (a.id === b.id) return 0
+				if (a.id === FAVORITES_GROUP_ID) return -1
+				if (b.id === FAVORITES_GROUP_ID) return 1
 				if (a.key === 'None') return 1
 				if (b.key === 'None') return -1
 				return a.key.localeCompare(b.key) || a.id.localeCompare(b.id)
@@ -894,12 +899,22 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		instanceGroupId: string,
 	) => {
 		currentContextGroupId.value =
-			displayState.value.group === 'Group' && instanceGroupId !== 'group:none'
+			displayState.value.group === 'Group' &&
+			instanceGroupId !== 'group:none' &&
+			instanceGroupId !== FAVORITES_GROUP_ID
 				? instanceGroupId
 				: null
 
 		const baseOptions = [
-			...(item.instance.quarantined ? [] : [{ name: 'add_content' }, { type: 'divider' }]),
+			{
+				name: item.instance.group_ids.includes(FAVORITES_GROUP_ID)
+					? 'remove_from_favorites'
+					: 'add_to_favorites',
+			},
+			{ type: 'divider' },
+			...(!item.instance.quarantined && !item.instance.link
+				? [{ name: 'add_content' }, { type: 'divider' }]
+				: []),
 			{ name: 'edit' },
 			{ name: 'duplicate' },
 			{ name: 'open' },
@@ -932,6 +947,18 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				break
 			case 'add_content':
 				await item.addContent()
+				break
+			case 'add_to_favorites':
+				await edit(item.instance.id, {
+					group_ids: [...new Set([...item.instance.group_ids, FAVORITES_GROUP_ID])],
+				}).catch((error) => handleError(toError(error)))
+				break
+			case 'remove_from_favorites':
+				await edit(item.instance.id, {
+					group_ids: item.instance.group_ids.filter(
+						(instanceGroupId) => instanceGroupId !== FAVORITES_GROUP_ID,
+					),
+				}).catch((error) => handleError(toError(error)))
 				break
 			case 'edit':
 				await item.seeInstance()

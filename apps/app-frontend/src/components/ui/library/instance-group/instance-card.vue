@@ -2,7 +2,7 @@
 import { useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
-import { useMagicKeys } from '@vueuse/core'
+import { useEventListener, useMagicKeys } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -47,6 +47,7 @@ const instanceCardElement = ref<InstanceType<typeof InstanceCardView> | null>(nu
 const playing = ref(false)
 const loading = ref(false)
 const currentEvent = ref<ProcessEvent | null>(null)
+const isPrimaryPointerDown = ref(false)
 const modLoading = computed(
 	() =>
 		loading.value ||
@@ -84,6 +85,20 @@ const seeInstance = async () => {
 const toggleSelection = (event?: MouseEvent) => {
 	emit('toggle-selection', event?.shiftKey ?? false)
 }
+
+const handlePointerDown = (event: PointerEvent) => {
+	isPrimaryPointerDown.value =
+		event.button === 0 &&
+		!(event.target instanceof Element && event.target.closest('.selection-button'))
+}
+
+const resetPrimaryPointer = () => {
+	isPrimaryPointerDown.value = false
+}
+
+useEventListener(window, 'pointerup', resetPrimaryPointer)
+useEventListener(window, 'pointercancel', resetPrimaryPointer)
+useEventListener(window, 'blur', resetPrimaryPointer)
 
 const activateCard = (event: MouseEvent) => {
 	if (isLibraryInstanceSelectionActive.value || event.shiftKey) {
@@ -207,8 +222,7 @@ onUnmounted(() => unlisten())
 		:class="{
 			'!scale-100': isDragging,
 			'opacity-50': isPartOfActiveDrag,
-			'[&:active:not(:has(.selection-button:active))]:scale-[0.95]':
-				!isLibraryInstanceSelectionActive,
+			'scale-[0.95]': isPrimaryPointerDown && !isLibraryInstanceSelectionActive,
 		}"
 		:instance="instance"
 		:selected="selected"
@@ -226,6 +240,7 @@ onUnmounted(() => unlisten())
 		@click="activateCard"
 		@keydown="handleCardKeydown"
 		@mouseenter="checkProcess"
+		@pointerdown="handlePointerDown"
 	>
 		<template #leading="{ instanceType }">
 			<div class="relative flex size-10 shrink-0 items-center justify-center">
@@ -237,9 +252,7 @@ onUnmounted(() => unlisten())
 							!instance.quarantined && !isLibraryInstanceSelectionActive,
 					}"
 				>
-					<InstanceFileIcon
-						class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current"
-					/>
+					<InstanceFileIcon class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current" />
 					<span class="h-3.5 text-sm font-extrabold leading-[13px]">
 						{{ instanceType }}
 					</span>

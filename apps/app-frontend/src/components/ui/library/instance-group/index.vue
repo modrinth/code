@@ -29,6 +29,7 @@ import type {
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
+import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 
 const props = withDefaults(
 	defineProps<{
@@ -69,7 +70,10 @@ const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
 const isUngrouped = computed(() => props.instanceGroup.id === 'group:none')
-const isCustomGroup = computed(() => displayState.value.group === 'Group' && !isUngrouped.value)
+const isFavorites = computed(() => props.instanceGroup.id === FAVORITES_GROUP_ID)
+const isCustomGroup = computed(
+	() => displayState.value.group === 'Group' && !isUngrouped.value && !isFavorites.value,
+)
 const groupContextMenuOpen = ref(false)
 const isGroupToggleBlocked = computed(
 	() => groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
@@ -94,6 +98,10 @@ const messages = defineMessages({
 	ungrouped: {
 		id: 'app.library.group.ungrouped',
 		defaultMessage: 'Ungrouped',
+	},
+	favorites: {
+		id: 'app.library.group.favorites',
+		defaultMessage: 'Favorites',
 	},
 	deleteGroup: {
 		id: 'app.library.group.delete',
@@ -165,7 +173,7 @@ async function removeGroup() {
 }
 
 function requestGroupDeletion() {
-	if (isUngrouped.value) return
+	if (isUngrouped.value || isFavorites.value) return
 
 	if (props.instanceGroup.instances.length > 0) {
 		confirmDeleteGroupModal.value?.show()
@@ -181,15 +189,17 @@ function openGroupContextMenu(event: MouseEvent) {
 	groupOptions.value?.showMenu(
 		event,
 		props.instanceGroup,
-		isCustomGroup.value
-			? [
-					{ name: 'new_instance' },
-					{ name: 'add_instances' },
-					{ name: 'edit_name' },
-					{ type: 'divider' },
-					{ name: 'delete_group', color: 'danger' },
-				]
-			: [{ name: 'new_instance' }],
+		isFavorites.value
+			? [{ name: 'new_instance' }]
+			: isCustomGroup.value
+				? [
+						{ name: 'new_instance' },
+						{ name: 'add_instances' },
+						{ name: 'edit_name' },
+						{ type: 'divider' },
+						{ name: 'delete_group', color: 'danger' },
+					]
+				: [{ name: 'new_instance' }],
 	)
 }
 
@@ -351,7 +361,7 @@ watch(
 					/>
 				</button>
 				<InlineEditableText
-					v-if="!isUngrouped"
+					v-if="!isUngrouped && !isFavorites"
 					ref="groupNameInput"
 					v-model="groupName"
 					activation-mode="manual"
@@ -364,10 +374,16 @@ watch(
 					:validate="validateGroupName"
 				/>
 				<span
-					v-else
+					v-else-if="isUngrouped"
 					class="text-base font-semibold text-primary select-none group-hover/open-target:text-contrast"
 				>
 					{{ formatMessage(messages.ungrouped) }}
+				</span>
+				<span
+					v-else
+					class="flex items-center gap-1.5 text-base font-semibold text-primary select-none group-hover/open-target:text-contrast"
+				>
+					{{ formatMessage(messages.favorites) }}
 				</span>
 				<TagItem
 					v-if="instanceGroup.instances.length"
@@ -378,7 +394,7 @@ watch(
 			</div>
 			<div class="min-w-0 flex-1" />
 			<GroupActionButtons
-				v-if="!isUngrouped"
+				v-if="!isUngrouped && !isFavorites"
 				:deleting="deletingGroup"
 				:on-add-to-group="() => openGroupInstancesModal(instanceGroup.id)"
 				:on-delete-group="requestGroupDeletion"
