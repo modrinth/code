@@ -1,6 +1,9 @@
+use ariadne::ids::UserId;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use strum::IntoStaticStr;
 use utoipa::ToSchema;
+use crate::database::models::DBProjectDisclosure;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, IntoStaticStr)]
 #[serde(rename_all = "snake_case", tag = "type")]
@@ -28,6 +31,57 @@ pub enum ProjectDisclosure {
     PaidFeatures {
         features: Vec<String>,
     },
+}
+
+impl ProjectDisclosure {
+    pub fn to_parts(
+        &self,
+    ) -> Result<(&'static str, serde_json::Value), serde_json::Error> {
+        let serde_json::Value::Object(mut object) = serde_json::to_value(self)?
+        else {
+            return Err(serde::ser::Error::custom(
+                "project disclosure must serialize to a JSON object",
+            ));
+        };
+        object.remove("type");
+        Ok((self.into(), serde_json::Value::Object(object)))
+    }
+
+    pub fn from_parts(
+        kind: &str,
+        metadata: serde_json::Value,
+    ) -> Result<Self, serde_json::Error> {
+        let serde_json::Value::Object(mut object) = metadata else {
+            return Err(serde::ser::Error::custom(
+                "project disclosure metadata must be a JSON object, this should never be reachable",
+            ));
+        };
+        object.insert(
+            "type".to_owned(),
+            serde_json::Value::String(kind.to_owned()),
+        );
+        serde_json::from_value(serde_json::Value::Object(object))
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ProjectDisclosureData {
+    #[serde(flatten)]
+    pub disclosure: ProjectDisclosure,
+    pub set_by_moderator: bool,
+    pub updated_at: DateTime<Utc>,
+    pub updated_by: UserId,
+}
+
+impl From<DBProjectDisclosure> for ProjectDisclosureData {
+    fn from(db: DBProjectDisclosure) -> Self {
+        Self {
+            disclosure: db.disclosure,
+            set_by_moderator: db.set_by_moderator,
+            updated_at: db.updated_at,
+            updated_by: db.updated_by.into()
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]

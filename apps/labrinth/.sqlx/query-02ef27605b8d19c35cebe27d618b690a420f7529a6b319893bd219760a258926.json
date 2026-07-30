@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tINSERT INTO project_disclosures (project_id, type, metadata, updated_by, support)\n\t\t\tVALUES ($1, $2, $3, $4, $5)\n\t\t\tON CONFLICT (project_id, type) DO UPDATE SET\n\t\t\t\tmetadata = $3,\n\t\t\t\tupdated_at = now(),\n\t\t\t\tupdated_by = $4,\n\t\t\t\tsupport = $5\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Jsonb",
+        "Int8",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "02ef27605b8d19c35cebe27d618b690a420f7529a6b319893bd219760a258926"
+}

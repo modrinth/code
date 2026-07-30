@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT project_id, type AS \"disclosure_type!\", metadata, updated_at, updated_by, moderator\n\t\t\tFROM project_disclosures\n\t\t\tWHERE project_id = $1\n\t\t\tORDER BY updated_at DESC\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "disclosure_type!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "updated_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "moderator",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "e6db9cff0b164399dba86a54ac512813c1374a86daf5737f14fe49944de5d73f"
+}
