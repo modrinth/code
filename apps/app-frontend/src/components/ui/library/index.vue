@@ -130,21 +130,29 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 		<section data-library-page-background class="flex flex-col gap-3 pb-16">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">Library</h2>
 			<LibraryToolbar />
-			<div data-library-page-background class="flex flex-col">
-				<InstanceGroup
-					v-for="instanceGroup in visibleInstanceGroups"
-					:key="instanceGroup.id"
-					:hide-header="instanceGroup.key === 'None' && visibleInstanceGroups.length === 1"
-					:instance-group="instanceGroup"
-					:selection-anchor-instance-id="
-						anchorInstance?.groupId === instanceGroup.id ? anchorInstance.instanceId : null
-					"
-					@toggle-selection="
-						(instanceId: string, shiftKey: boolean) =>
-							handleToggleInstance(instanceGroup.id, instanceId, shiftKey)
-					"
-				/>
-			</div>
+			<TransitionGroup
+				data-library-page-background
+				tag="div"
+				class="flex flex-col"
+				move-class="transition-transform duration-200 ease-out"
+				enter-active-class="transition-[opacity,transform] duration-200 ease-out"
+				enter-from-class="opacity-0 -translate-y-2"
+				enter-to-class="opacity-100 translate-y-0"
+			>
+				<div v-for="instanceGroup in visibleInstanceGroups" :key="instanceGroup.id" class="min-w-0">
+					<InstanceGroup
+						:hide-header="instanceGroup.key === 'None' && visibleInstanceGroups.length === 1"
+						:instance-group="instanceGroup"
+						:selection-anchor-instance-id="
+							anchorInstance?.groupId === instanceGroup.id ? anchorInstance.instanceId : null
+						"
+						@toggle-selection="
+							(instanceId: string, shiftKey: boolean) =>
+								handleToggleInstance(instanceGroup.id, instanceId, shiftKey)
+						"
+					/>
+				</div>
+			</TransitionGroup>
 		</section>
 	</InstanceGroupDnd>
 	<LibrarySelectionActionBar />

@@ -94,11 +94,16 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { formatMessage } = useVIntl()
 
 	const search = ref('')
-	const filters = ref<LibraryFilters>({
-		instanceType: [],
-		gameVersion: [],
-		loader: [],
-	})
+	const filters = useStorage<LibraryFilters>(
+		'Instances-grid-filters',
+		{
+			instanceType: [],
+			gameVersion: [],
+			loader: [],
+		},
+		localStorage,
+		{ mergeDefaults: true },
+	)
 	const serverProjectIds = ref(new Set<string>())
 	const libraryGroups = ref<InstanceGroupDefinition[]>([])
 	const isNewGroupModalOpen = ref(false)
@@ -144,6 +149,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	if (!librarySortOptions.includes(displayState.value.sortBy)) {
 		displayState.value.sortBy = 'Name'
+	}
+
+	if (!libraryGroupOptions.some((option) => option.value === displayState.value.group)) {
+		displayState.value.group = 'Group'
 	}
 
 	const linkedInstances = computed(() => instances.value.filter((instance) => instance.link))
@@ -804,11 +813,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 		try {
 			const group = await createInstanceGroup(getDefaultNewGroupName())
-			libraryGroups.value = [
-				...libraryGroups.value.filter((existingGroup) => existingGroup.id !== group.id),
-				group,
-			]
-
 			const selectedInstanceIds = new Set(instanceIds)
 			const instancesToAdd = instances.value.filter((instance) =>
 				selectedInstanceIds.has(instance.id),
@@ -821,14 +825,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				),
 			)
 
-			if (instancesToAdd.length > 0) {
-				setSelectedLibraryInstances(
-					instancesToAdd.map((instance) => ({
-						instanceId: instance.id,
-						groupId: group.id,
-					})),
-				)
-			}
+			libraryGroups.value = [
+				...libraryGroups.value.filter((existingGroup) => existingGroup.id !== group.id),
+				group,
+			]
 
 			displayState.value.group = 'Group'
 			groupIdPendingNameEdit.value = group.id

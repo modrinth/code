@@ -21,10 +21,10 @@
 			</ButtonStyled>
 		</div>
 		<div class="ml-auto flex items-center gap-0.5">
-			<ButtonStyled type="transparent">
+			<ButtonStyled v-if="displayState.group === 'Group'" type="transparent">
 				<button type="button" :disabled="busy" @click="createGroupFromSelection">
-					<PlusIcon />
-					<span class="bar-label">{{ formatMessage(messages.createGroup) }}</span>
+					<SquarePlusIcon />
+					<span class="bar-label">{{ formatMessage(messages.newGroup) }}</span>
 				</button>
 			</ButtonStyled>
 			<ButtonStyled v-if="selectedGroupedInstances.length > 0" type="transparent">
@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { MinusIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import { MinusIcon, SquarePlusIcon, TrashIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -80,6 +80,7 @@ const {
 	setSelectedLibraryInstances,
 	creatingGroup,
 	createDefaultGroup,
+	displayState,
 } = useLibrary()
 
 const confirmDeleteModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
@@ -111,9 +112,9 @@ const messages = defineMessages({
 		id: 'app.library.selection.deleting',
 		defaultMessage: 'Deleting selected instances',
 	},
-	createGroup: {
-		id: 'app.library.selection.create-group',
-		defaultMessage: 'Create group',
+	newGroup: {
+		id: 'app.library.selection.new-group',
+		defaultMessage: 'New group',
 	},
 	removeFromGroup: {
 		id: 'app.library.selection.remove-from-group',
@@ -124,7 +125,9 @@ const messages = defineMessages({
 async function createGroupFromSelection() {
 	if (busy.value) return
 
-	await createDefaultGroup(selectedInstanceIds.value)
+	const instanceIds = selectedInstanceIds.value
+	clearLibraryInstanceSelection()
+	await createDefaultGroup(instanceIds)
 }
 
 async function removeSelectedInstancesFromGroups() {

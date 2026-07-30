@@ -296,6 +296,7 @@ watch(
 		if (groupId !== pendingGroupId) return
 
 		await nextTick()
+		groupDropTarget.value?.scrollIntoView({ block: 'nearest' })
 		await groupNameInput.value?.startEditing()
 		completePendingGroupNameEdit(groupId)
 	},
