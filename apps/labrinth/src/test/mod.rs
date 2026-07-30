@@ -37,6 +37,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     let search_backend = db.search_backend.clone();
     let file_host: Arc<dyn FileHost> = Arc::new(file_hosting::MockHost::new());
     let file_host = web::Data::<dyn FileHost>::from(file_host);
+    clickhouse::run_migrations().await.unwrap();
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
     let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
