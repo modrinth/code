@@ -779,15 +779,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Zrušit vše"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Už víš modpack, který chceš nainstalovat?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Nenalezeny žádné výsledky"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Hledat modpack"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Instance je nastavení Minecraftu s konkrétním loaderem, verzí a módy."
   },
@@ -4551,4 +4542,3 @@
     "defaultMessage": "Typ"
   }
 }
-

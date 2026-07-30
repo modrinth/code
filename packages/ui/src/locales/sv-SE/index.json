@@ -815,15 +815,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Töm allt"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Vet du redan modpaketet du vill installera?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Inga resultat hittades"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Sök efter modpaket"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "En instans är ett Minecraft-upplägg med en specifik laddare, version och moddar."
   },

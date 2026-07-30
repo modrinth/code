@@ -731,15 +731,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Kosongkan semua"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Sudah tahu pek mod yang ingin anda pasang?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Tiada hasil dijumpai"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Cari pek mod"
-  },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Persediaan tersuai"
   },
@@ -5028,4 +5019,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

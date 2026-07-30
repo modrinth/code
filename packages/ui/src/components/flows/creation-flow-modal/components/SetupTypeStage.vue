@@ -1,15 +1,15 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<span class="font-semibold text-contrast">
-			{{ formatMessage(messages.knownModpackPrompt) }}
+			{{ formatMessage(messages.knownProjectPrompt) }}
 		</span>
 		<Combobox
-			v-model="ctx.modpackSearchProjectId.value"
+			v-model="ctx.projectSearchProjectId.value"
 			v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
-			:options="ctx.modpackSearchOptions.value"
+			:options="ctx.projectSearchOptions.value"
 			searchable
 			:disabled="ctx.finishDisabled.value"
-			:search-placeholder="formatMessage(messages.searchModpackPlaceholder)"
+			:search-placeholder="formatMessage(messages.searchProjectPlaceholder)"
 			:no-options-message="
 				searchLoading
 					? formatMessage(commonMessages.loadingLabel)
@@ -18,10 +18,20 @@
 			:disable-search-filter="true"
 			@search-input="handleSearch"
 		>
-			<template #option-suffix>
-				<RightArrowIcon
-					class="size-5 shrink-0 text-secondary opacity-0 transition-opacity group-hover/option:opacity-100 group-data-[focused=true]/option:opacity-100"
-				/>
+			<template #option-suffix="{ item }">
+				<div
+					class="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-secondary opacity-0 transition-opacity group-hover/option:opacity-100 group-data-[focused=true]/option:opacity-100"
+				>
+					<span>
+						{{
+							formatMessage(
+								isModpackOption(item.value) ? messages.installModpack : messages.createInstance,
+							)
+						}}
+					</span>
+					<DownloadIcon v-if="isModpackOption(item.value)" class="size-5 shrink-0" />
+					<RightArrowIcon v-else class="size-5 shrink-0" />
+				</div>
 			</template>
 		</Combobox>
 
@@ -104,6 +114,7 @@ import {
 	BoxIcon,
 	BoxImportIcon,
 	CompassIcon,
+	DownloadIcon,
 	ImportIcon,
 	RightArrowIcon,
 } from '@modrinth/assets'
@@ -126,17 +137,25 @@ const { formatMessage } = useVIntl()
 const searchLoading = ref(false)
 
 const messages = defineMessages({
-	knownModpackPrompt: {
-		id: 'creation-flow.modal.modpack.known-modpack.prompt',
-		defaultMessage: 'Already know the modpack you want to install?',
+	knownProjectPrompt: {
+		id: 'creation-flow.modal.project.known-project.prompt',
+		defaultMessage: 'Already know what you want to play?',
 	},
-	searchModpackPlaceholder: {
-		id: 'creation-flow.modal.modpack.search.placeholder',
-		defaultMessage: 'Search for modpack',
+	searchProjectPlaceholder: {
+		id: 'creation-flow.modal.project.search.placeholder',
+		defaultMessage: 'Search mods, modpacks, and more...',
 	},
 	noResultsFound: {
-		id: 'creation-flow.modal.modpack.search.no-results',
+		id: 'creation-flow.modal.project.search.no-results',
 		defaultMessage: 'No results found',
+	},
+	installModpack: {
+		id: 'creation-flow.modal.project.search.install-modpack',
+		defaultMessage: 'Install modpack',
+	},
+	createInstance: {
+		id: 'creation-flow.modal.project.search.create-instance',
+		defaultMessage: 'Create instance',
 	},
 	instanceTypeTitle: {
 		id: 'creation-flow.modal.setup-type.title.instance',
@@ -206,6 +225,10 @@ const setupTypeTitle = computed(() => {
 	return formatMessage(messages.worldTypeTitle)
 })
 
+function isModpackOption(projectId: string) {
+	return ctx.projectSearchHits.value[projectId]?.projectType === 'modpack'
+}
+
 function setSetupType(type: 'custom' | 'vanilla') {
 	debug('selected:', type)
 	_setSetupType(type)
@@ -249,18 +272,23 @@ async function triggerFileInput() {
 
 async function search(query: string) {
 	try {
-		const results = await ctx.searchModpacks(query.trim(), 10)
+		if (!query.trim()) {
+			ctx.projectSearchOptions.value = []
+			return
+		}
+		const results = await ctx.searchProjects(query.trim(), 10)
 
-		ctx.modpackSearchHits.value = {}
+		ctx.projectSearchHits.value = {}
 		for (const hit of results.hits) {
-			ctx.modpackSearchHits.value[hit.project_id] = {
+			ctx.projectSearchHits.value[hit.project_id] = {
 				title: hit.title,
 				iconUrl: hit.icon_url,
 				latestVersion: hit.latest_version,
+				projectType: hit.project_type ?? 'modpack',
 			}
 		}
 
-		ctx.modpackSearchOptions.value = results.hits.map((hit) => ({
+		ctx.projectSearchOptions.value = results.hits.map((hit) => ({
 			label: hit.title,
 			value: hit.project_id,
 			icon: defineAsyncComponent(() =>
@@ -275,8 +303,8 @@ async function search(query: string) {
 			),
 		}))
 	} catch (error) {
-		debug('modpack search failed:', error)
-		ctx.modpackSearchOptions.value = []
+		debug('project search failed:', error)
+		ctx.projectSearchOptions.value = []
 	} finally {
 		searchLoading.value = false
 	}
@@ -288,23 +316,26 @@ async function handleSearch(query: string) {
 }
 
 onMounted(() => {
-	ctx.modpackSearchProjectId.value = undefined
+	ctx.projectSearchProjectId.value = undefined
 	search('')
 })
 
 watch(
-	() => ctx.modpackSearchProjectId.value,
+	() => ctx.projectSearchProjectId.value,
 	async (projectId, oldProjectId) => {
 		if (projectId === oldProjectId) return
 
-		ctx.modpackSearchVersionId.value = undefined
-		ctx.modpackVersionOptions.value = []
 		if (!projectId) return
+		const hit = ctx.projectSearchHits.value[projectId]
 
-		const hit = ctx.modpackSearchHits.value[projectId]
+		if (ctx.flowType === 'instance') {
+			void ctx.selectProject(projectId, hit?.projectType ?? 'mod')
+			return
+		}
+
 		try {
 			const versions = await ctx.getProjectVersions(projectId)
-			if (ctx.modpackSearchProjectId.value !== projectId || versions.length === 0) return
+			if (ctx.projectSearchProjectId.value !== projectId || versions.length === 0) return
 
 			selectModpack()
 			ctx.modpackSelection.value = {
@@ -315,7 +346,7 @@ watch(
 			}
 			proceedWithModpack()
 		} catch (error) {
-			debug('failed to load modpack versions:', error)
+			debug('failed to load project versions:', error)
 		}
 	},
 )

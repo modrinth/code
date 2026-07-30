@@ -884,15 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Effacer tout"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Vous avez déjà le modpack en tête ?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Aucun résultat"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Rechercher un modpack"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Une instance est un setup Minecraft avec un mod loader, une version, et des mods spécifiques."
   },

@@ -280,8 +280,7 @@ const {
 	fetchExistingInstanceNames,
 	handleCreate,
 	handleBrowseModpacks,
-	searchModpacks,
-	getProjectVersions,
+	searchProjects,
 	getLoaderManifest,
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
@@ -719,6 +718,7 @@ const {
 	projectInfo: contentInstallProjectInfo,
 	handleInstallToInstance,
 	handleCreateAndInstall,
+	prepareNewInstance,
 	handleNavigate: handleContentInstallNavigate,
 	handleCancel: handleContentInstallCancel,
 	setContentInstallModal,
@@ -737,6 +737,35 @@ const {
 	handleIncompatibilityWarningInstall: handleContentInstallIncompatibilityWarningInstall,
 	handleIncompatibilityWarningCancel: handleContentInstallIncompatibilityWarningCancel,
 } = contentInstall
+
+async function prepareCreationProjectInstall(projectId, projectType) {
+	if (projectType === 'modpack') {
+		await contentInstall.install(
+			projectId,
+			null,
+			null,
+			'CreationModalProject',
+			undefined,
+			(instanceId) => void router.push(`/instance/${encodeURIComponent(instanceId)}`),
+		)
+		return null
+	}
+
+	await prepareNewInstance(projectId)
+	const info = contentInstallProjectInfo.value
+	if (!info) throw new Error(`Project information is unavailable: '${projectId}'`)
+
+	return {
+		projectId,
+		title: info.title,
+		iconUrl: info.iconUrl,
+		link: info.link,
+		owner: info.owner,
+		compatibleLoaders: [...contentInstallLoaders.value],
+		gameVersions: [...contentInstallGameVersions.value],
+		releaseGameVersions: new Set(contentInstallReleaseGameVersions.value),
+	}
+}
 
 const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
 provideServerInstall(serverInstall)
@@ -1581,8 +1610,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			type="instance"
 			show-snapshot-toggle
 			:fetch-existing-instance-names="fetchExistingInstanceNames"
-			:search-modpacks="searchModpacks"
-			:get-project-versions="getProjectVersions"
+			:search-projects="searchProjects"
+			:prepare-project-install="prepareCreationProjectInstall"
+			:create-project-install="handleCreateAndInstall"
 			:get-loader-manifest="getLoaderManifest"
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"

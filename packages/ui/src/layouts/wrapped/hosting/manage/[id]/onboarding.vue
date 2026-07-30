@@ -65,7 +65,7 @@
 			type="server-onboarding"
 			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 			:show-snapshot-toggle="true"
-			:search-modpacks="searchModpacks"
+			:search-projects="searchModpacks"
 			:get-project-versions="getProjectVersions"
 			:finish-disabled="!canSetup"
 			:finish-disabled-tooltip="!canSetup ? permissionDeniedMessage : undefined"

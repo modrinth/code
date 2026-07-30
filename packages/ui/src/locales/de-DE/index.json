@@ -884,15 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Alle entfernen"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Weißt du schon, welches Modpack du installieren möchtest?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Keine Ergebnisse gefunden"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Nach Modpack suchen"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Eine Instanz ist eine Einrichtung von Minecraft mit einem bestimmten Loader, einer bestimmten Version und Mods."
   },
@@ -5931,4 +5922,3 @@
     "defaultMessage": "Typ"
   }
 }
-

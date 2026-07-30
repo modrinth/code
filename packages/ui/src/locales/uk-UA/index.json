@@ -806,15 +806,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Очистити всі"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Уже знаєте яку збірку хочете встановити?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Результатів не знайдено"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Пошук збірок"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Профіль — це налаштування Minecraft із певним завантажувачем, версією та модами."
   },

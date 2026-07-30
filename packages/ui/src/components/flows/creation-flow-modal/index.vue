@@ -19,7 +19,9 @@ import {
 	type CreationFlowContextValue,
 	type FlowType,
 	type LoaderManifestResolver,
-	type ModpackSearchResult,
+	type ProjectInstallCreateData,
+	type ProjectInstallSelection,
+	type ProjectSearchResult,
 	provideCreationFlowContext,
 } from './creation-flow-context'
 
@@ -35,7 +37,12 @@ const props = withDefaults(
 		fetchExistingInstanceNames?: () => Promise<string[]>
 		onBack?: (() => void) | null
 		fade?: 'standard' | 'warning' | 'danger'
-		searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
+		searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
+		prepareProjectInstall?: (
+			projectId: string,
+			projectType: string,
+		) => Promise<ProjectInstallSelection | null>
+		createProjectInstall?: (data: ProjectInstallCreateData) => Promise<void>
 		getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 		getLoaderManifest?: LoaderManifestResolver
 		finishDisabled?: boolean
@@ -77,7 +84,9 @@ const ctx = createCreationFlowContext(
 		initialGameVersion: props.initialGameVersion,
 		fetchExistingInstanceNames: props.fetchExistingInstanceNames,
 		onBack: props.onBack ?? undefined,
-		searchModpacks: props.searchModpacks,
+		searchProjects: props.searchProjects,
+		prepareProjectInstall: props.prepareProjectInstall,
+		createProjectInstall: props.createProjectInstall,
 		getProjectVersions: props.getProjectVersions,
 		getLoaderManifest: props.getLoaderManifest,
 		finishDisabled: computed(() => props.finishDisabled ?? false),

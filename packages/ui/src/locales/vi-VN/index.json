@@ -785,15 +785,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Xóa hết"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Biết modpack bạn định cài là gì rồi?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Không tìm thấy"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Tìm modpack"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Cấu hình là một bản cài Minecraft với mod, phiên bản và loader của riêng nó."
   },
@@ -5076,4 +5067,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-

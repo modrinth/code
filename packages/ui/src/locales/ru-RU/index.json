@@ -824,15 +824,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Очистить всë"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Уже знаете, какую сборку хотите скачать?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ничего не найдено"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Поиск сборки"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Сборка — это установка Minecraft с определённым загрузчиком модов, версией и модами."
   },

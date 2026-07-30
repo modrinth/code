@@ -851,15 +851,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "모두 해제"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "설치하고 싶은 모드팩을 이미 알고 계신가요?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "결과 없음"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "모드팩 검색"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "인스턴스란 특정 로더, 버전 및 모드가 적용된 Minecraft 환경을 의미합니다."
   },

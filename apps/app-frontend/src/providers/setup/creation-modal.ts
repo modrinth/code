@@ -10,7 +10,7 @@ import { useRouter } from 'vue-router'
 import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_versions, get_search_results } from '@/helpers/cache.js'
+import { get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
 import {
 	type CreatePackLocation,
@@ -185,8 +185,10 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 		router.push('/browse/modpack')
 	}
 
-	async function searchModpacks(query: string, limit: number = 10) {
-		const params = [`facets=[["project_type:modpack"]]`, `limit=${limit}`]
+	async function searchProjects(query: string, limit: number = 10) {
+		const projectTypes = ['mod', 'modpack', 'resourcepack', 'shader', 'datapack']
+		const facets = JSON.stringify([projectTypes.map((type) => `project_type:${type}`)])
+		const params = [`facets=${encodeURIComponent(facets)}`, `limit=${limit}`]
 		if (query) {
 			params.push(`query=${encodeURIComponent(query)}`)
 		}
@@ -195,19 +197,13 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 		return { hits: [], offset: 0, limit, total_hits: 0 }
 	}
 
-	async function getProjectVersions(projectId: string) {
-		const versions = await get_project_versions(projectId)
-		return versions ?? []
-	}
-
 	return {
 		installationModal,
 		unknownPackWarningModal,
 		fetchExistingInstanceNames,
 		handleCreate,
 		handleBrowseModpacks,
-		searchModpacks,
-		getProjectVersions,
+		searchProjects,
 		getLoaderManifest,
 		setModpackAlreadyInstalledModal,
 		handleModpackDuplicateCreateAnyway,

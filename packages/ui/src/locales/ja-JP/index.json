@@ -854,15 +854,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "全ての選択を解除"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "インストールしたいMODパックは既に決まっていますか？"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "見つかりません"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Modパックを検索"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "インスタンスとは、特定のローダー、バージョン、およびModを備えたMinecraftの起動構成のことです"
   },

@@ -884,14 +884,20 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Clear all"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Already know the modpack you want to install?"
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Already know what you want to play?"
   },
-  "creation-flow.modal.modpack.search.no-results": {
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Create instance"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Install modpack"
+  },
+  "creation-flow.modal.project.search.no-results": {
     "defaultMessage": "No results found"
   },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Search for modpack"
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Search mods, modpacks, and more..."
   },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "An instance is a Minecraft setup with a specific loader, version, and mods."

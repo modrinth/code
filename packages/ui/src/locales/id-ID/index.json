@@ -740,9 +740,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Kosongkan semua"
   },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Hasil pencarian tidak ditemukan"
-  },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Minecraft klasik tanpa mod atau pasang-masuk."
   },
@@ -2988,4 +2985,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

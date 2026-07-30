@@ -851,15 +851,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Obriši sve"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Već znaš koji modpak želiš da instaliraš?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Nema pronađenih rezultata"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Potraži modpack"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Instanca je podešavanje Mínecrafta sa određenim programom za učitavanje, verzijom i modovima."
   },
@@ -5778,4 +5769,3 @@
     "defaultMessage": "Tip"
   }
 }
-

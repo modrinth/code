@@ -491,12 +491,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Ryd alle"
   },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ingen resultater fundet"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Søg efter modpack"
-  },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Installer modpack"
   },
@@ -2241,4 +2235,3 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
-

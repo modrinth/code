@@ -860,15 +860,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Deseleziona tutto"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Sai già quale pacchetto di mod installare?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Nessun risultato trovato"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Cerca tra i pacchetti"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Un'istanza è una combinazione di loader, versione e mod per Minecraft."
   },

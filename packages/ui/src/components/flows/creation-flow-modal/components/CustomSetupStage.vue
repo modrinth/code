@@ -1,5 +1,50 @@
 <template>
 	<div class="space-y-6">
+		<div
+			v-if="ctx.projectInstall.value"
+			class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3"
+		>
+			<AutoLink :to="ctx.projectInstall.value.link" class="shrink-0">
+				<div
+					class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
+				>
+					<Avatar
+						v-if="ctx.projectInstall.value.iconUrl"
+						:src="ctx.projectInstall.value.iconUrl"
+						:alt="ctx.projectInstall.value.title"
+						size="100%"
+						no-shadow
+					/>
+				</div>
+			</AutoLink>
+			<div class="flex flex-col gap-1">
+				<AutoLink
+					:to="ctx.projectInstall.value.link"
+					class="font-semibold text-contrast hover:underline"
+				>
+					{{ ctx.projectInstall.value.title }}
+				</AutoLink>
+				<div
+					v-if="ctx.projectInstall.value.owner"
+					class="flex items-center gap-2 text-sm text-secondary"
+				>
+					<AutoLink
+						:to="ctx.projectInstall.value.owner.link"
+						class="flex items-center gap-1.5 text-inherit no-underline hover:underline"
+					>
+						<Avatar
+							:src="ctx.projectInstall.value.owner.iconUrl"
+							:alt="ctx.projectInstall.value.owner.name"
+							size="1.25rem"
+							:circle="ctx.projectInstall.value.owner.circle"
+							no-shadow
+						/>
+						<span class="font-medium">{{ ctx.projectInstall.value.owner.name }}</span>
+					</AutoLink>
+				</div>
+			</div>
+		</div>
+
 		<!-- Instance-specific: Icon upload -->
 		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-4">
 			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" />
@@ -156,6 +201,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
+import AutoLink from '../../../base/AutoLink.vue'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
@@ -269,6 +315,9 @@ function formatLoaderVersionTypeLabel(type: LoaderVersionType): string {
 // For instance flow, prepend 'vanilla' to available loaders.
 // For server flows, vanilla is a separate option in the setup type stage, so exclude it here.
 const effectiveLoaders = computed(() => {
+	if (ctx.projectInstall.value) {
+		return ctx.projectInstall.value.compatibleLoaders
+	}
 	if (ctx.flowType === 'instance') {
 		return ['vanilla', ...ctx.availableLoaders.filter((l) => l !== 'vanilla')]
 	}
@@ -337,6 +386,7 @@ function toApiLoaderName(loader: string): string {
 }
 
 const gameVersionsLoading = computed(() => {
+	if (ctx.projectInstall.value) return false
 	const loader = selectedLoader.value
 	if (!loader || loader === 'vanilla') return false
 	if (loader === 'paper') return ctx.paperSupportedVersions.value === null
@@ -346,6 +396,16 @@ const gameVersionsLoading = computed(() => {
 
 // Game versions from tags provider, filtered by loader support
 const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
+	if (ctx.projectInstall.value) {
+		const versions =
+			ctx.showSnapshots.value || ctx.projectInstall.value.releaseGameVersions.size === 0
+				? ctx.projectInstall.value.gameVersions
+				: ctx.projectInstall.value.gameVersions.filter((version) =>
+						ctx.projectInstall.value!.releaseGameVersions.has(version),
+					)
+		return versions.map((version) => ({ value: version, label: version }))
+	}
+
 	const versions = ctx.showSnapshots.value
 		? tags.gameVersions.value
 		: tags.gameVersions.value.filter((v) => v.version_type === 'release')
@@ -510,6 +570,7 @@ function getLoaderVersionsForGameVersion(
 watch(
 	() => selectedLoader.value,
 	async (loader) => {
+		if (ctx.projectInstall.value) return
 		await fetchLoaderMetadata(loader)
 	},
 	{ immediate: true },
@@ -525,6 +586,7 @@ watch(
 		loaderVersionsData.value = []
 		selectedLoaderVersion.value = null
 
+		if (ctx.projectInstall.value) return
 		if (!loader || !gameVersion || loader === 'vanilla') return
 
 		loaderVersionsLoading.value = true

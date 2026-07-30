@@ -884,15 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Alles wissen"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Weet je al welk modpack je wilt installeren?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Geen resultaten gevonden"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Modpack zoeken"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Een instantie is een Minecraft-installatie met een specifieke loader, versie en mods."
   },

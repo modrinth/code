@@ -884,15 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "清除全部"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "已經選好想要安裝的模組包了嗎？"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "找不到結果"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "搜尋模組包"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "實例是指具有特定載入器、版本及模組的 Minecraft 設定。"
   },
@@ -5931,4 +5922,3 @@
     "defaultMessage": "類型"
   }
 }
-

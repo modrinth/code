@@ -884,15 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "清除所有"
   },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "已经知道你想安装哪个整合包？"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "未找到结果"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "搜索整合包"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "实例是带有特定加载器、游戏版本和模组的一套 Minecraft 配置。"
   },
@@ -5931,4 +5922,3 @@
     "defaultMessage": "类型"
   }
 }
-
