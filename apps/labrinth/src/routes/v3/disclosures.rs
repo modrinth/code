@@ -54,6 +54,9 @@ pub async fn get_project_disclosures(
         return Err(ApiError::NotFound);
     }
 
+    let viewer_is_moderator =
+        user_option.is_some_and(|user| user.role.is_mod());
+
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         project.inner.id,
         &***ro_pool,
@@ -64,7 +67,9 @@ pub async fn get_project_disclosures(
     Ok(web::Json(
         disclosures
             .into_iter()
-            .map(ProjectDisclosureData::from)
+            .map(|disclosure| {
+                ProjectDisclosureData::from_db(disclosure, viewer_is_moderator)
+            })
             .collect(),
     ))
 }

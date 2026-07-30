@@ -70,16 +70,23 @@ pub struct ProjectDisclosureData {
     pub disclosure: ProjectDisclosure,
     pub set_by_moderator: bool,
     pub updated_at: DateTime<Utc>,
-    pub updated_by: UserId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<UserId>,
 }
 
-impl From<DBProjectDisclosure> for ProjectDisclosureData {
-    fn from(db: DBProjectDisclosure) -> Self {
+impl ProjectDisclosureData {
+    pub fn from_db(
+        value: DBProjectDisclosure,
+        viewer_is_moderator: bool,
+    ) -> Self {
+        let updated_by = (!value.set_by_moderator || viewer_is_moderator)
+            .then_some(value.updated_by.into());
+
         Self {
-            disclosure: db.disclosure,
-            set_by_moderator: db.set_by_moderator,
-            updated_at: db.updated_at,
-            updated_by: db.updated_by.into()
+            disclosure: value.disclosure,
+            set_by_moderator: value.set_by_moderator,
+            updated_at: value.updated_at,
+            updated_by,
         }
     }
 }
