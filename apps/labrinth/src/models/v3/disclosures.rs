@@ -22,7 +22,7 @@ pub enum ProjectDisclosure {
         note: Option<String>,
     },
     Telemetry {
-        consent: TelementryConsent,
+        consent: TelemetryConsent,
         data_collected: Vec<String>,
     },
     DerivativeWork {
@@ -93,7 +93,7 @@ impl ProjectDisclosureData {
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum TelementryConsent {
+pub enum TelemetryConsent {
     OptIn,
     OptOut,
     AlwaysActive,
