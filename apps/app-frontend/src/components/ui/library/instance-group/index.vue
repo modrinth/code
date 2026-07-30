@@ -15,9 +15,9 @@ import {
 import { computed, nextTick, ref, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import Instance from '@/components/ui/library/instance-group/instance.vue'
+import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
 import type {
-	InstanceCard,
+	InstanceCard as InstanceCardExposed,
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
@@ -50,7 +50,7 @@ const {
 	getInstanceGroupDropState,
 } = useLibrary()
 
-const instanceComponents = new Map<string, InstanceCard>()
+const instanceComponents = new Map<string, InstanceCardExposed>()
 const groupDropTarget = ref<HTMLElement>()
 const groupAccordion = ref<InstanceType<typeof Accordion>>()
 const groupOptions = ref<InstanceType<typeof ContextMenu>>()
@@ -123,7 +123,7 @@ function openInstanceContextMenu(event: MouseEvent, instanceId: string, instance
 
 function setInstanceComponent(instanceId: string, component: unknown) {
 	if (component) {
-		instanceComponents.set(instanceId, component as InstanceCard)
+		instanceComponents.set(instanceId, component as InstanceCardExposed)
 	} else {
 		instanceComponents.delete(instanceId)
 	}
@@ -360,7 +360,7 @@ watch(
 				class="grid min-h-[45px] mt-2.5 w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
 			>
 				<div v-for="instance in instanceGroup.instances" :key="instance.id" class="min-w-0 w-full">
-					<Instance
+					<InstanceCard
 						:ref="(component: unknown) => setInstanceComponent(instance.id, component)"
 						:instance="instance"
 						:instance-group-id="instanceGroup.id"

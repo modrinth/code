@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { PageRoundIcon } from '@modrinth/assets'
-import { Avatar, TagItem } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { computed } from 'vue'
+import { TagItem } from '@modrinth/ui'
 
-import InstanceFileIcon from '@/assets/icons/instance-file.svg'
+import InstanceCardContent from '@/components/ui/library/instance-group/instance-card-content.vue'
 import type { GameInstance } from '@/helpers/types'
 
-const props = withDefaults(
+withDefaults(
 	defineProps<{
 		instance: GameInstance
 		count?: number
@@ -16,17 +13,6 @@ const props = withDefaults(
 		count: 1,
 	},
 )
-
-const instanceType = computed(() => {
-	if (
-		props.instance.link?.type === 'server_project' ||
-		props.instance.link?.type === 'server_project_modpack'
-	) {
-		return 'SRV'
-	}
-
-	return props.instance.link?.type === 'modrinth_modpack' ? 'MPK' : 'CST'
-})
 </script>
 
 <template>
@@ -42,41 +28,13 @@ const instanceType = computed(() => {
 		<div
 			class="relative flex min-h-[76px] w-full items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left opacity-90 shadow-lg"
 		>
-			<Avatar
-				v-if="instance.icon_path"
-				class="pointer-events-none !border-none !bg-transparent !rounded-[26px] !rounded-br-[42px] !absolute -top-[26px] right-[20px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
-				size="84px"
-				:src="convertFileSrc(instance.icon_path)"
-				:tint-by="instance.id"
-				alt=""
-				no-shadow
-			/>
-			<PageRoundIcon
-				aria-hidden="true"
-				class="pointer-events-none absolute -top-[52px] right-[0px] size-[124px] opacity-10 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
-			/>
+			<InstanceCardContent :instance="instance" />
 			<TagItem
 				v-if="count > 1"
 				class="!absolute right-3 top-3 z-[2] border-surface-5 bg-surface-2 font-semibold tabular-nums text-contrast"
 			>
 				{{ count }}
 			</TagItem>
-			<div class="relative z-[1] flex min-w-0 flex-1 items-center gap-2 pr-20">
-				<div
-					class="flex size-10 shrink-0 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary"
-				>
-					<InstanceFileIcon class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current" />
-					<span class="h-3.5 text-sm font-extrabold leading-[13px]">{{ instanceType }}</span>
-				</div>
-				<div class="flex min-w-0 flex-1 flex-col justify-center gap-1">
-					<p class="m-0 truncate text-base font-semibold leading-5 text-contrast">
-						{{ instance.name }}
-					</p>
-					<p class="m-0 truncate text-sm font-medium capitalize leading-[18px] text-primary">
-						{{ instance.loader }} {{ instance.game_version }}
-					</p>
-				</div>
-			</div>
 		</div>
 	</div>
 </template>

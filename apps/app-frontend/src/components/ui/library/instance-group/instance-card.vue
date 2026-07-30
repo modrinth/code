@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import { useDraggable } from '@dnd-kit/vue'
-import {
-	CheckIcon,
-	DownloadIcon,
-	PageRoundIcon,
-	PlayIcon,
-	SpinnerIcon,
-	StopCircleIcon,
-} from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
+import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
+import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InstanceFileIcon from '@/assets/icons/instance-file.svg'
+import InstanceCardContent from '@/components/ui/library/instance-group/instance-card-content.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
@@ -50,7 +43,7 @@ const emit = defineEmits<{
 	(e: 'toggle-selection', shiftKey: boolean): void
 }>()
 
-const instanceCard = ref<HTMLElement | null>(null)
+const instanceCardElement = ref<HTMLElement | null>(null)
 const playing = ref(false)
 const loading = ref(false)
 const currentEvent = ref<ProcessEvent | null>(null)
@@ -74,23 +67,12 @@ const holdingShift = computed(() => keys.shift.value)
 const isPartOfActiveDrag = computed(() => activeDraggedInstanceKeys.value.has(selectionKey.value))
 const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupId}:${props.instance.id}`),
-	element: instanceCard,
+	element: instanceCardElement,
 	disabled: computed(() => displayState.value.group !== 'Group'),
 	data: computed(() => ({
 		instanceId: props.instance.id,
 		fromGroup: props.instanceGroupId,
 	})),
-})
-
-const instanceType = computed(() => {
-	if (
-		props.instance.link?.type === 'server_project' ||
-		props.instance.link?.type === 'server_project_modpack'
-	) {
-		return 'SRV'
-	}
-
-	return props.instance.link?.type === 'modrinth_modpack' ? 'MPK' : 'CST'
 })
 
 const router = useRouter()
@@ -220,10 +202,10 @@ onUnmounted(() => unlisten())
 
 <template>
 	<div
-		ref="instanceCard"
+		ref="instanceCardElement"
 		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid bg-surface-3 p-4 text-left transition-all hover:brightness-110 select-none"
 		:class="{
-			'[border-color:color-mix(in_srgb,var(--color-text-primary)_20%,transparent)] brightness-110':
+			'[border-color:color-mix(in_srgb,var(--color-text-primary)_15%,transparent)] brightness-110':
 				selected,
 			'border-surface-4': !selected,
 			'!scale-100': isDragging,
@@ -246,19 +228,6 @@ onUnmounted(() => unlisten())
 		@keydown="handleCardKeydown"
 		@mouseenter="checkProcess"
 	>
-		<Avatar
-			v-if="instance.icon_path"
-			class="pointer-events-none !border-none !bg-transparent !rounded-[26px] !rounded-br-[42px] !absolute -top-[26px] right-[20px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
-			size="84px"
-			:src="convertFileSrc(instance.icon_path)"
-			:tint-by="instance.id"
-			alt=""
-			no-shadow
-		/>
-		<PageRoundIcon
-			aria-hidden="true"
-			class="pointer-events-none absolute -top-[52px] right-[0px] size-[124px] opacity-10 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
-		/>
 		<button
 			type="button"
 			class="selection-button group/selection absolute right-0 top-0 z-[2] flex size-[50px] h-full cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
@@ -280,73 +249,71 @@ onUnmounted(() => unlisten())
 				<CheckIcon v-if="selected" class="relative size-4 invert [stroke-width:3] top-px" />
 			</span>
 		</button>
-		<div class="relative z-[1] flex min-w-0 flex-1 items-center gap-2 pr-20">
-			<div class="relative flex size-10 shrink-0 items-center justify-center">
-				<div
-					v-if="!playing && !modLoading && !installing"
-					class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-opacity"
-					:class="{
-						'group-hover/card:scale-75 group-hover/card:opacity-0':
-							!instance.quarantined && !isLibraryInstanceSelectionActive,
-					}"
-				>
-					<InstanceFileIcon class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current" />
-					<span class="h-3.5 text-sm font-extrabold leading-[13px]">{{ instanceType }}</span>
-				</div>
-				<div class="absolute inset-0 flex items-center justify-center">
-					<ButtonStyled v-if="playing" color="red" circular>
-						<button
-							v-tooltip="'Stop'"
-							class="card-shadow"
-							@click="(e) => stop(e, 'InstanceCard')"
-							@mouseenter="checkProcess"
-						>
-							<StopCircleIcon />
-						</button>
-					</ButtonStyled>
-					<SpinnerIcon
-						v-else-if="modLoading || installing"
-						v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
-						class="size-8 animate-spin"
-						tabindex="-1"
-					/>
-					<ButtonStyled
-						v-else-if="!isLibraryInstanceSelectionActive && !installed && !instance.quarantined"
-						color="brand"
-						circular
+		<InstanceCardContent :instance="instance">
+			<template #leading="{ instanceType }">
+				<div class="relative flex size-10 shrink-0 items-center justify-center">
+					<div
+						v-if="!playing && !modLoading && !installing"
+						class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-opacity"
+						:class="{
+							'group-hover/card:scale-75 group-hover/card:opacity-0':
+								!instance.quarantined && !isLibraryInstanceSelectionActive,
+						}"
 					>
-						<button
-							v-tooltip="'Repair'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
-							@click="(e) => repair(e)"
+						<InstanceFileIcon
+							class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current"
+						/>
+						<span class="h-3.5 text-sm font-extrabold leading-[13px]">
+							{{ instanceType }}
+						</span>
+					</div>
+					<div class="absolute inset-0 flex items-center justify-center">
+						<ButtonStyled v-if="playing" color="red" circular>
+							<button
+								v-tooltip="'Stop'"
+								class="card-shadow"
+								@click="(e) => stop(e, 'InstanceCard')"
+								@mouseenter="checkProcess"
+							>
+								<StopCircleIcon />
+							</button>
+						</ButtonStyled>
+						<SpinnerIcon
+							v-else-if="modLoading || installing"
+							v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
+							class="size-8 animate-spin"
+							tabindex="-1"
+						/>
+						<ButtonStyled
+							v-else-if="!isLibraryInstanceSelectionActive && !installed && !instance.quarantined"
+							color="brand"
+							circular
 						>
-							<DownloadIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled
-						v-else-if="!isLibraryInstanceSelectionActive && !instance.quarantined"
-						color="brand"
-						circular
-					>
-						<button
-							v-tooltip="'Play'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
-							@click="(e) => play(e, 'InstanceCard')"
-							@mouseenter="checkProcess"
+							<button
+								v-tooltip="'Repair'"
+								class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+								@click="(e) => repair(e)"
+							>
+								<DownloadIcon />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled
+							v-else-if="!isLibraryInstanceSelectionActive && !instance.quarantined"
+							color="brand"
+							circular
 						>
-							<PlayIcon class="translate-x-px" />
-						</button>
-					</ButtonStyled>
+							<button
+								v-tooltip="'Play'"
+								class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+								@click="(e) => play(e, 'InstanceCard')"
+								@mouseenter="checkProcess"
+							>
+								<PlayIcon class="translate-x-px" />
+							</button>
+						</ButtonStyled>
+					</div>
 				</div>
-			</div>
-			<div class="flex min-w-0 flex-1 flex-col justify-center gap-1">
-				<p class="m-0 truncate text-base font-semibold leading-5 text-contrast">
-					{{ instance.name }}
-				</p>
-				<p class="m-0 truncate text-sm font-medium capitalize leading-[18px] text-primary">
-					{{ instance.loader }} {{ instance.game_version }}
-				</p>
-			</div>
-		</div>
+			</template>
+		</InstanceCardContent>
 	</div>
 </template>
