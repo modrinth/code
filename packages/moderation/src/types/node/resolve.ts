@@ -198,7 +198,12 @@ export function resolveActionState(
 	const base = hasChildrenCap(node)
 		? withDefaults(childState, resolveChildren(node, childState))
 		: childState
-	return { ...base, value: getEffectiveValue(node, nodeState, localState) as NodeState }
+	return new Proxy(base, {
+		get(target, key, receiver) {
+			if (key === 'value') return getEffectiveValue(node, nodeState, localState) as NodeState
+			return Reflect.get(target, key, receiver)
+		},
+	})
 }
 
 function emptyScope(children: ChildNode[]): Record<string, NodeState> {

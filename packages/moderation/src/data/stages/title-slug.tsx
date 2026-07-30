@@ -321,6 +321,7 @@ export default function () {
 									fix().project((patch, state) => {
 										const slug = state['correct-slug'] as string
 										if (!slug || slug === project.value.slug) return
+										if (correctSlugConflict.value) return
 										patch.slug = slug
 									}),
 								),
