@@ -357,7 +357,7 @@ watch(
 			@on-close="setSectionCollapsed(instanceGroup.id, true)"
 		>
 			<section
-				class="grid min-h-[45px] mt-2.5 w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
+				class="grid min-h-[45px] mt-2.5 w-full grid-cols-[repeat(auto-fill,minmax(min(20rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
 			>
 				<div v-for="instance in instanceGroup.instances" :key="instance.id" class="min-w-0 w-full">
 					<InstanceCard

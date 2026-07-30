@@ -49,7 +49,7 @@ const hasVisibleIcon = computed(() => Boolean(iconSrc.value) && !avatarFailed.va
 	<div
 		class="relative flex min-h-[76px] w-full select-none items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid bg-surface-3 p-4 text-left transition-all"
 		:class="{
-			'[border-color:color-mix(in_srgb,var(--color-text-primary)_15%,transparent)] brightness-110':
+			'[border-color:color-mix(in_srgb,var(--color-text-primary)_20%,transparent)] brightness-110':
 				selected,
 			'border-surface-4': !selected,
 		}"
