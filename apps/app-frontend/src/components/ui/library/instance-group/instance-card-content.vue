@@ -26,7 +26,7 @@ const instanceType = computed(() => {
 <template>
 	<Avatar
 		v-if="instance.icon_path"
-		class="pointer-events-none !border-none !bg-transparent !rounded-[26px] !rounded-br-[42px] !absolute -top-[26px] right-[20px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
+		class="pointer-events-none !border-none ![background-color:color-mix(in_srgb,var(--color-contrast)_5%,transparent)] !rounded-[22px] !p-0 !rounded-br-[38px] !absolute -top-[26px] right-[20px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
 		size="84px"
 		:src="convertFileSrc(instance.icon_path)"
 		:tint-by="instance.id"
@@ -35,7 +35,8 @@ const instanceType = computed(() => {
 	/>
 	<PageRoundIcon
 		aria-hidden="true"
-		class="pointer-events-none absolute -top-[52px] right-[0px] size-[124px] opacity-10 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
+		class="pointer-events-none absolute -top-[52px] right-[0px] size-[124px] [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
+		:class="{ 'opacity-[0.03]': instance.icon_path, 'opacity-5': !instance.icon_path }"
 	/>
 	<div class="relative z-[1] flex min-w-0 flex-1 items-center gap-2 pr-20">
 		<slot name="leading" :instance-type="instanceType">
