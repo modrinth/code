@@ -12,6 +12,7 @@ import {
 import { computed, ref, toRef, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
@@ -27,6 +28,8 @@ const props = defineProps<{
 const {
 	instanceGroups,
 	filters,
+	instanceOptions,
+	confirmDeleteModal,
 	deleteInstance,
 	handleInstanceOption,
 	selectedLibraryInstances,
@@ -96,10 +99,26 @@ function handleToggleInstance(groupId: string, instanceId: string, shiftKey: boo
 	anchorInstance.value = { groupId, instanceId }
 }
 
+function setInstanceOptions(component: unknown) {
+	instanceOptions.value = component as InstanceType<typeof ContextMenu> | null
+}
+
+function setConfirmDeleteModal(component: unknown) {
+	confirmDeleteModal.value = component as InstanceType<typeof ConfirmDeleteInstanceModal> | null
+}
+
 watch(
-	() => selectedLibraryInstances.value.size,
-	(selectedInstanceCount) => {
-		if (selectedInstanceCount === 0) {
+	selectedLibraryInstances,
+	(selectedInstances) => {
+		if (selectedInstances.size === 0) {
+			anchorInstance.value = null
+			return
+		}
+
+		if (
+			anchorInstance.value &&
+			!selectedInstances.has(getLibraryInstanceSelectionKey(anchorInstance.value))
+		) {
 			anchorInstance.value = null
 		}
 	},
@@ -108,10 +127,10 @@ watch(
 
 <template>
 	<InstanceGroupDnd :instances="instances">
-		<section class="flex flex-col gap-3 pb-16">
+		<section data-library-page-background class="flex flex-col gap-3 pb-16">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">Library</h2>
 			<LibraryToolbar />
-			<div class="flex flex-col">
+			<div data-library-page-background class="flex flex-col">
 				<InstanceGroup
 					v-for="instanceGroup in visibleInstanceGroups"
 					:key="instanceGroup.id"
@@ -129,8 +148,9 @@ watch(
 		</section>
 	</InstanceGroupDnd>
 	<LibrarySelectionActionBar />
-	<ConfirmDeleteInstanceModal ref="confirmDeleteModal" @delete="deleteInstance" />
-	<ContextMenu ref="instanceOptions" @option-clicked="handleInstanceOption">
+	<GroupInstancesModal />
+	<ConfirmDeleteInstanceModal :ref="setConfirmDeleteModal" @delete="deleteInstance" />
+	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">
 		<template #play> <PlayIcon /> Play </template>
 		<template #stop> <StopCircleIcon /> Stop </template>
 		<template #add_content> <PlusIcon /> Add content </template>

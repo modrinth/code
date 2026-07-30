@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { useDroppable } from '@dnd-kit/vue'
-import { DropdownIcon, EditIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import {
+	DropdownIcon,
+	EditIcon,
+	PlusIcon,
+	SquarePlusIcon,
+	TrashIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Accordion,
 	ButtonStyled,
@@ -12,7 +19,7 @@ import {
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, inject, nextTick, ref, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
@@ -44,11 +51,13 @@ const {
 	groupIdPendingNameEdit,
 	completePendingGroupNameEdit,
 	handleInstanceContextMenu,
+	openGroupInstancesModal,
 	displayState,
 	activeInstanceGroupDrag,
 	instanceGroupDragTarget,
 	getInstanceGroupDropState,
 } = useLibrary()
+const showCreationModal = inject<() => void>('showCreationModal')
 
 const instanceComponents = new Map<string, InstanceCardExposed>()
 const groupDropTarget = ref<HTMLElement>()
@@ -59,6 +68,7 @@ const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
 const isUngrouped = computed(() => props.instanceGroup.id === 'group:none')
+const isCustomGroup = computed(() => displayState.value.group === 'Group' && !isUngrouped.value)
 const groupContextMenuOpen = ref(false)
 const isGroupToggleBlocked = computed(
 	() => groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
@@ -112,6 +122,18 @@ const messages = defineMessages({
 		id: 'app.library.group.delete-description',
 		defaultMessage: 'Instances in this group will be ungrouped.',
 	},
+	newInstance: {
+		id: 'app.library.context-menu.create-instance',
+		defaultMessage: 'New instance',
+	},
+	addToGroup: {
+		id: 'app.library.group.context-menu.add-to-group',
+		defaultMessage: 'Add to group',
+	},
+	emptyGroup: {
+		id: 'app.library.group.empty',
+		defaultMessage: 'Drag and drop to add instances.',
+	},
 })
 
 function openInstanceContextMenu(event: MouseEvent, instanceId: string, instanceGroupId: string) {
@@ -152,17 +174,35 @@ function requestGroupDeletion() {
 }
 
 function openGroupContextMenu(event: MouseEvent) {
-	if (isUngrouped.value) return
+	if (displayState.value.group !== 'Group') return
 
 	groupContextMenuOpen.value = true
-	groupOptions.value?.showMenu(event, props.instanceGroup, [
-		{ name: 'edit_name' },
-		{ type: 'divider' },
-		{ name: 'delete_group', color: 'danger' },
-	])
+	groupOptions.value?.showMenu(
+		event,
+		props.instanceGroup,
+		isCustomGroup.value
+			? [
+					{ name: 'new_instance' },
+					{ name: 'add_instances' },
+					{ name: 'edit_name' },
+					{ type: 'divider' },
+					{ name: 'delete_group', color: 'danger' },
+				]
+			: [{ name: 'new_instance' }],
+	)
 }
 
 function handleGroupOption({ option }: { option: string }) {
+	if (option === 'new_instance') {
+		showCreationModal?.()
+		return
+	}
+
+	if (option === 'add_instances') {
+		openGroupInstancesModal(props.instanceGroup.id)
+		return
+	}
+
 	if (option === 'edit_name') {
 		void groupNameInput.value?.startEditing()
 		return
@@ -377,7 +417,7 @@ watch(
 					v-if="instanceGroup.instances.length === 0"
 					class="col-span-full m-0 pt-1 pl-0.5 text-base font-base text-secondary opacity-80"
 				>
-					This group is empty. Drag and drop to add instances.
+					{{ formatMessage(messages.emptyGroup) }}
 				</p>
 			</section>
 		</Accordion>
@@ -388,6 +428,12 @@ watch(
 		@menu-closed="groupContextMenuOpen = false"
 		@option-clicked="handleGroupOption"
 	>
+		<template #new_instance>
+			<PlusIcon /> {{ formatMessage(messages.newInstance) }}
+		</template>
+		<template #add_instances>
+			<SquarePlusIcon /> {{ formatMessage(messages.addToGroup) }}
+		</template>
 		<template #edit_name> <EditIcon /> {{ formatMessage(messages.editGroupName) }} </template>
 		<template #delete_group> <TrashIcon /> {{ formatMessage(messages.deleteGroup) }} </template>
 	</ContextMenu>

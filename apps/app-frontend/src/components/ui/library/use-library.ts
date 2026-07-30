@@ -105,6 +105,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const newGroupName = ref('')
 	const newGroupSearch = ref('')
 	const selectedNewGroupInstanceIds = ref(new Set<string>())
+	const isGroupInstancesModalOpen = ref(false)
+	const groupInstancesModalGroupId = ref<string | null>(null)
+	const groupInstancesSearch = ref('')
+	const selectedGroupInstanceIds = ref(new Set<string>())
+	const savingGroupInstances = ref(false)
 	const selectedLibraryInstances = ref(new Map<string, LibraryInstanceSelection>())
 	const isLibraryInstanceSelectionActive = computed(() => selectedLibraryInstances.value.size > 0)
 	const creatingGroup = ref(false)
@@ -168,6 +173,18 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 				return a.name.localeCompare(b.name)
 			})
+	})
+	const groupInstancesModalGroup = computed(
+		() =>
+			libraryGroups.value.find((group) => group.id === groupInstancesModalGroupId.value) ?? null,
+	)
+	const groupInstances = computed(() => {
+		const query = groupInstancesSearch.value.trim().toLowerCase()
+
+		return instances.value
+			.filter((instance) => !query || instance.name.toLowerCase().includes(query))
+			.slice()
+			.sort((a, b) => a.name.localeCompare(b.name))
 	})
 	const canCreateGroup = computed(
 		() => normalizedNewGroupName.value.length > 0 && !creatingGroup.value,
@@ -586,6 +603,120 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		isNewGroupModalOpen.value = false
 	}
 
+	const openGroupInstancesModal = (groupId: string) => {
+		const group = libraryGroups.value.find((candidate) => candidate.id === groupId)
+		if (!group) return
+
+		groupInstancesModalGroupId.value = groupId
+		groupInstancesSearch.value = ''
+		selectedGroupInstanceIds.value = new Set(
+			instances.value
+				.filter((instance) => instance.group_ids.includes(groupId))
+				.map((instance) => instance.id),
+		)
+		isGroupInstancesModalOpen.value = true
+	}
+
+	const closeGroupInstancesModal = () => {
+		isGroupInstancesModalOpen.value = false
+		groupInstancesModalGroupId.value = null
+	}
+
+	const toggleGroupInstance = (instanceId: string) => {
+		const selectedIds = new Set(selectedGroupInstanceIds.value)
+
+		if (selectedIds.has(instanceId)) {
+			selectedIds.delete(instanceId)
+		} else {
+			selectedIds.add(instanceId)
+		}
+
+		selectedGroupInstanceIds.value = selectedIds
+	}
+
+	const saveGroupInstances = async () => {
+		const groupId = groupInstancesModalGroupId.value
+		if (!groupId || savingGroupInstances.value) return false
+
+		const changedInstances = instances.value.filter(
+			(instance) =>
+				instance.group_ids.includes(groupId) !== selectedGroupInstanceIds.value.has(instance.id),
+		)
+		const operations = changedInstances.map((instance) => {
+			const shouldIncludeGroup = selectedGroupInstanceIds.value.has(instance.id)
+			const nextGroupIds = shouldIncludeGroup
+				? [...instance.group_ids, groupId]
+				: instance.group_ids.filter((instanceGroupId) => instanceGroupId !== groupId)
+
+			return {
+				instance,
+				shouldIncludeGroup,
+				nextGroupIds,
+			}
+		})
+		savingGroupInstances.value = true
+
+		try {
+			await Promise.all(
+				operations.map(({ instance, nextGroupIds }) =>
+					edit(instance.id, { group_ids: nextGroupIds }),
+				),
+			)
+
+			const nextSelectedInstances = new Map(selectedLibraryInstances.value)
+			for (const { instance, shouldIncludeGroup, nextGroupIds } of operations) {
+				const instanceSelections = [...nextSelectedInstances.values()].filter(
+					(selection) => selection.instanceId === instance.id,
+				)
+				if (shouldIncludeGroup && instanceSelections.length > 0) {
+					for (const selection of instanceSelections) {
+						nextSelectedInstances.delete(getLibraryInstanceSelectionKey(selection))
+					}
+					const destinationSelection = {
+						instanceId: instance.id,
+						groupId,
+					}
+					nextSelectedInstances.set(
+						getLibraryInstanceSelectionKey(destinationSelection),
+						destinationSelection,
+					)
+					continue
+				}
+
+				const validSelectionGroupIds = new Set(
+					nextGroupIds.length > 0 ? nextGroupIds : ['group:none'],
+				)
+				const invalidSelections = instanceSelections.filter(
+					(selection) => !validSelectionGroupIds.has(selection.groupId),
+				)
+				for (const selection of invalidSelections) {
+					nextSelectedInstances.delete(getLibraryInstanceSelectionKey(selection))
+				}
+
+				const hasValidSelection = [...nextSelectedInstances.values()].some(
+					(selection) => selection.instanceId === instance.id,
+				)
+				if (invalidSelections.length > 0 && !hasValidSelection) {
+					const replacementSelection = {
+						instanceId: instance.id,
+						groupId: nextGroupIds[0] ?? 'group:none',
+					}
+					nextSelectedInstances.set(
+						getLibraryInstanceSelectionKey(replacementSelection),
+						replacementSelection,
+					)
+				}
+			}
+			selectedLibraryInstances.value = nextSelectedInstances
+			return true
+		} catch (error) {
+			handleError(toError(error))
+			return false
+		} finally {
+			savingGroupInstances.value = false
+		}
+	}
+
 	const toggleNewGroupInstance = (instanceId: string) => {
 		const selectedIds = new Set(selectedNewGroupInstanceIds.value)
 
@@ -844,6 +975,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		newGroupName,
 		newGroupSearch,
 		selectedNewGroupInstanceIds,
+		isGroupInstancesModalOpen,
+		groupInstancesModalGroup,
+		groupInstancesSearch,
+		selectedGroupInstanceIds,
+		savingGroupInstances,
 		selectedLibraryInstances,
 		isLibraryInstanceSelectionActive,
 		activeInstanceGroupDrag,
@@ -855,6 +991,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		creatingGroup,
 		groupIdPendingNameEdit,
 		newGroupInstances,
+		groupInstances,
 		canCreateGroup,
 		instanceOptions,
 		confirmDeleteModal,
@@ -868,7 +1005,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		moveDraggedInstancesToGroup,
 		openNewGroupModal,
 		closeNewGroupModal,
+		openGroupInstancesModal,
+		closeGroupInstancesModal,
 		toggleNewGroupInstance,
+		toggleGroupInstance,
+		saveGroupInstances,
 		clearLibraryInstanceSelection,
 		setSelectedLibraryInstances,
 		toggleLibraryInstanceSelection,
