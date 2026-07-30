@@ -89,6 +89,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Bilinmeyen kurulum"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Paylaşılmış içerik güncelleniyor"
+  },
   "app.action-bar.installs": {
     "message": "Yüklenenler"
   },
@@ -135,7 +138,7 @@
     "message": "Tercihleri yönet"
   },
   "app.ads-consent.reject": {
-    "message": "Hepsini redder"
+    "message": "Hepsini reddet"
   },
   "app.ads-consent.title": {
     "message": "Sizin mahremiyetiniz ve reklamlar Modrinth'i nasıl destekler"
@@ -188,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Yerel pencere öğeleri"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Bir seçenek seçin"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Bir oyun oturumunda ne kadar zaman geçirdiğinizi gösterir."
   },
@@ -241,9 +241,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Kuruluma dön"
-  },
-  "app.browse.discover-content": {
-    "message": "İçerik keşfet"
   },
   "app.browse.discover-servers": {
     "message": "Sunucuları keşfet"
@@ -338,6 +335,36 @@
   "app.install.phase.running_loader_processors": {
     "message": "Yükleyici işlemcileri çalıştırılıyor"
   },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Eklendi"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Yerel instance, paylaştığın kullanıcıların kurulumundan daha güncel."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Değişiklikler henüz paylaşılmadı"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Güncellemeyi Yayınla"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Yayınlıyor..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Kaldırıldı"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Güncellemeyi yayınla"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Bu kurulumu kullanan herkesle paylaşılacak içerik değişikliklerini gözden geçirin."
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Değişimleri inceleniyor"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "İnceleniyor..."
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Dünyalarınız, yapılandırmalarınız ve yüklü tüm içerikler ve tüm veriler kalıcı olarak silinecek."
   },
@@ -374,6 +401,9 @@
   "app.instance.mods.content-type-project": {
     "message": "proje"
   },
+  "app.instance.mods.locked-content": {
+    "message": "İnstance'ta kilitli olan içerikler değiştirilemez."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" eklendi"
   },
@@ -388,6 +418,51 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Başarıyla yüklendi"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Bu instance'ı arkadaşlarınla paylaşabilirsin!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Hiçbir arkadaş davet edilmedi"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Arkadaşlarını davet et"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Paylaş {name}"
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Giriş yapmanız gerekiyor"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "sayfaya giriş yapabilmeniz işin."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "bağlı hesap"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Giriş yapılmadı"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Hesap değiştir"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Hatalı hesap"
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "Artık bu paylaşılan kurulum için güncelleme almayacaklar"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Daha önce yükledikleri kopyalar cihazlarında kalmaya devam edecek"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Ne olur?"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "{username} nın avatarı"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Giriş yap"
   },
   "app.instance.worlds.add-server": {
     "message": "Sunucu Ekle"

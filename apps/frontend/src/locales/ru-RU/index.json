@@ -216,7 +216,7 @@
     "message": "Сборка"
   },
   "analytics.download-reason.standalone": {
-    "message": "Прямая загрузка"
+    "message": "Напрямую"
   },
   "analytics.download-reason.update": {
     "message": "Обновление"
@@ -225,7 +225,7 @@
     "message": "Modrinth App"
   },
   "analytics.download-source.website": {
-    "message": "Веб-сайт Modrinth"
+    "message": "Сайт Modrinth"
   },
   "analytics.downloads.suffix": {
     "message": "скачиваний"
@@ -903,7 +903,7 @@
     "message": "Создание аккаунта"
   },
   "auth.verify-email.action.account-settings": {
-    "message": "Настройки учётной записи"
+    "message": "Настройки"
   },
   "auth.verify-email.action.discover-mods": {
     "message": "Найти моды"
@@ -1641,16 +1641,16 @@
     "message": "Почти исчерпан лимит вывода: доступно ещё <b>{amountRemaining}</b>. Для снятия лимита заполните налоговую форму."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
-    "message": "Учётная запись"
+    "message": "Аккаунт"
   },
   "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
-    "message": "Отвязать учётную запись"
+    "message": "Отвязать аккаунт"
   },
   "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
     "message": "Способ вывода"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
-    "message": "Учётная запись PayPal"
+    "message": "Аккаунт PayPal"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Подключите свой PayPal и получайте выплаты напрямую."
@@ -2079,10 +2079,10 @@
     "message": "Кошелёк"
   },
   "dashboard.withdraw.error.account-not-linked.text": {
-    "message": "Привяжите платёжную учётную запись перед выводом средств."
+    "message": "Привяжите платёжный аккаунт перед выводом средств."
   },
   "dashboard.withdraw.error.account-not-linked.title": {
-    "message": "Учётная запись не привязана"
+    "message": "Аккаунт не привязан"
   },
   "dashboard.withdraw.error.email-verification.text": {
     "message": "Перед выводом средств необходимо подтвердить адрес электронной почты."
@@ -2873,9 +2873,6 @@
   "layout.nav.discover": {
     "message": "Найти"
   },
-  "layout.nav.discover-content": {
-    "message": "Найти проекты"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Скачать Modrinth App"
   },
@@ -2921,11 +2918,8 @@
   "layout.publish.email-verification-required.title": {
     "message": "Необходимо подтвердить почту"
   },
-  "modal.shared-instance.open-in-app.benefit.install": {
-    "message": "Автоустановка необходимой игры и загрузчика"
-  },
   "modal.shared-instance.open-in-app.get-app": {
-    "message": "Скачать Modrinth App"
+    "message": "Скачать лаунчер"
   },
   "modal.shared-instance.open-in-app.managed-by": {
     "message": "Управляется"
@@ -2960,6 +2954,18 @@
   "moderation.page.technicalReview": {
     "message": "Техпроверка"
   },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Все группы атрибуции для этого проекта и все находящиеся в них файлы будут удалены навсегда. Это действие необратимо."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Не удалось удалить все группы: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Удалить"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Все группы успешно удалены."
+  },
   "modpack-scan-modal.failed": {
     "message": "Ошибка"
   },
@@ -2991,10 +2997,13 @@
     "message": "Сканировать все файлы"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Не удалось просканировать некоторые файлы: {error}"
+    "message": "Не удалось просканировать некоторые файлы: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Сканирование..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "Готово"
   },
   "muralpay.account-type.checking": {
     "message": "Расчётный"
@@ -3308,117 +3317,6 @@
   "organization.projects.none-with-create-prompt": {
     "message": "У этой организации ещё нет проектов. Хотите <create-link>создать новый</create-link>?"
   },
-  "profile.bio.fallback.creator": {
-    "message": "Автор на Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Пользователь Modrinth."
-  },
-  "profile.button.analytics": {
-    "message": "Посмотреть аналитику"
-  },
-  "profile.button.billing": {
-    "message": "Управление платежами"
-  },
-  "profile.button.edit-role": {
-    "message": "Изменить роль"
-  },
-  "profile.button.info": {
-    "message": "Посмотреть подробности"
-  },
-  "profile.button.manage-projects": {
-    "message": "Управление проектами"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Убрать из партнёров"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Сделать партнёром"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Сервисы входа"
-  },
-  "profile.details.label.email": {
-    "message": "Почта"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Почта подтверждена"
-  },
-  "profile.details.label.has-password": {
-    "message": "Есть пароль"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Есть TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Способы оплаты"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Почта не подтверждена"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Почта подтверждена"
-  },
-  "profile.error.not-found": {
-    "message": "Пользователь не найден"
-  },
-  "profile.label.affiliate": {
-    "message": "Партнёр"
-  },
-  "profile.label.badges": {
-    "message": "Значки"
-  },
-  "profile.label.collection": {
-    "message": "Коллекция"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
-  },
-  "profile.label.joined": {
-    "message": "Регистрация:"
-  },
-  "profile.label.no-collections": {
-    "message": "У этого пользователя нет коллекций!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "У вас ещё нет коллекций.\nХотите <create-link>создать новую</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "У этого пользователя нет проектов!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "У вас ещё нет проектов.\nХотите <create-link>создать новый</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Организации"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {проект} few {проекта} other {проектов}}"
-  },
-  "profile.label.saving": {
-    "message": "Сохранение..."
-  },
-  "profile.meta.description": {
-    "message": "Скачать проекты {username} на Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} — Скачать проекты {username} на Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Официальный аккаунт Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Официальный аккаунт Modrinth. Связаться с поддержкой можно по ссылке <support-link></support-link> или по электронной почте: <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> подписчик} few {<stat>{count}</stat> подписчика} other {<stat>{count}</stat> подписчиков}} у проектов"
-  },
-  "profile.user-id": {
-    "message": "ID пользователя: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Не удалось отклонить приглашение в команду"
   },
@@ -3543,7 +3441,7 @@
     "message": "Больше не показывать"
   },
   "project.actions.edit-project": {
-    "message": "Изменить проект"
+    "message": "Настроить проект"
   },
   "project.actions.rescan-modpack": {
     "message": "Пересканировать сборку"
@@ -3768,7 +3666,10 @@
     "message": "Вы по-прежнему можете редактировать проект — это не повлияет на его положение в очереди."
   },
   "project.moderation.admonition.under-review.body.4": {
-    "message": "Мы стараемся проверять проекты в течение 24-48 часов, однако иногда возможны задержки. Это не означает, что с вашим проектом что-то не так."
+    "message": "Мы стараемся проверять проекты в течение 24–48 часов, однако иногда возможны задержки. Это не означает, что с вашим проектом что-то не так."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Мы стараемся проверять проекты в течение недели, однако иногда возможны задержки. Это не означает, что с вашим проектом что-то не так."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Мы ценим ваше терпение, пока модераторы усердно работают над поддержанием безопасности Modrinth, и с нетерпением ждём возможности помочь вам поделиться своим контентом! 💚</emphasis>"
@@ -3889,6 +3790,9 @@
   },
   "project.settings.permissions.delete-all-groups": {
     "message": "Удалить все группы"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Все {count, plural, one {# группу атрибуции} few {# группы атрибуции} other {# групп атрибуции}} для этого проекта и все находящиеся {count, plural, =1 {ней} other {них}} файлы будут удалены навсегда. Это действие необратимо."
   },
   "project.settings.permissions.delete-all-groups-confirmation.title": {
     "message": "Удалить все группы атрибуции?"
@@ -4013,9 +3917,6 @@
   "project.settings.tags.features-description": {
     "message": "Выберите все особенности, которые использует ваш {type}"
   },
-  "project.settings.tags.multiple-resolution-tags-warning": {
-    "message": "Вы выбрали {count} тегов разрешения ({tags}). Ресурс паки обычно должны иметь только один тег разрешения."
-  },
   "project.settings.tags.performance-impact-description": {
     "message": "Выберите реалистичное влияние на производительность вашего {type}. Выберите несколько, если {type} можно конфигурировать разными уровнями влияния на производительность."
   },
@@ -4030,15 +3931,6 @@
   },
   "project.settings.tags.title": {
     "message": "Теги"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Вы выбрали {count} тегов. Подумайте уменьшать до 8 или меньше, чтобы держать ваш проект в фокусе и легче, чтобы его можно было найти."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Вы выбрали {count} тегов. Пожалуйста, уменьшите до 18 или меньше, чтобы держать ваш проект в фокусе и легче, чтобы его можно было найти."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Вы выбрали {count} тегов. Пожалуйста, уменьшите до 12 или меньше, чтобы держать ваш проект в фокусе и легче, чтобы его можно было найти."
   },
   "project.settings.tags.upload-version-first": {
     "message": "Загрузите версию перед тем, как выбрать теги!"
@@ -4763,23 +4655,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Добавить адрес перенаправления"
   },
-  "settings.applications.button.cancel": {
-    "message": "Отмена"
-  },
   "settings.applications.button.create": {
     "message": "Создать приложение"
   },
   "settings.applications.button.delete": {
     "message": "Удалить"
   },
-  "settings.applications.button.edit": {
-    "message": "Изменить"
-  },
   "settings.applications.button.new": {
     "message": "Новое приложение"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Сохранить изменения"
   },
   "settings.applications.button.upload-icon": {
     "message": "Загрузить иконку"
@@ -4853,14 +4736,8 @@
   "settings.authorizations.about-this-app": {
     "message": "О приложении"
   },
-  "settings.authorizations.by": {
-    "message": "от"
-  },
   "settings.authorizations.description": {
     "message": "Авторизованные приложения получают доступ к аккаунту Modrinth. Здесь можно просматривать и отзывать этот доступ."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Список приложений временно недоступен. Мы работаем над исправлением — загляните сюда позже."
   },
   "settings.authorizations.head-title": {
     "message": "Авторизации"
@@ -5213,27 +5090,6 @@
   "settings.pats.token.never-used": {
     "message": "Не использовался"
   },
-  "settings.profile.bio.description": {
-    "message": "Возможность кратко рассказать всем о себе."
-  },
-  "settings.profile.bio.title": {
-    "message": "О себе"
-  },
-  "settings.profile.description": {
-    "message": "Информация в вашем профиле доступна публично на Modrinth и через <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Настройки профиля"
-  },
-  "settings.profile.profile-info": {
-    "message": "Информация в профиле"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Изображение профиля"
-  },
-  "settings.profile.username.description": {
-    "message": "Уникальное имя для идентификации профиля. Регистр не имеет значения."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Завершить сеанс"
   },
@@ -5265,16 +5121,19 @@
     "message": "Отображение"
   },
   "shared-instance.invite.accept": {
-    "message": "Принять"
+    "message": "Принять приглашение"
   },
   "shared-instance.invite.inviter.unknown": {
     "message": "Пользователь Modrinth"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# человек} few {# человека} other {# человек}} уже присоединились"
   },
   "shared-instance.invite.loading": {
     "message": "Загрузка приглашения..."
   },
   "shared-instance.invite.title": {
-    "message": "{name} пригласил вас"
+    "message": "{name} приглашает сыграть"
   },
   "shared-instance.invite.trust.description": {
     "message": "Это приглашение создано другим пользователем Modrinth. Принимайте приглашения только от тех, кому доверяете."
@@ -5283,7 +5142,7 @@
     "message": "Вы знакомы с этим пользователем?"
   },
   "shared-instance.invite.unavailable.title": {
-    "message": "Это приглашение недоступно"
+    "message": "Приглашение недоступно"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Последние новости от Modrinth"
@@ -5304,7 +5163,7 @@
     "message": "Все версии"
   },
   "version.confirm-delete.description": {
-    "message": "Эта версия будет удалена навсегда. Отменить это действие нельзя."
+    "message": "Эта версия будет удалена навсегда. Это действие необратимо."
   },
   "version.confirm-delete.proceed": {
     "message": "Удалить версию"

@@ -1663,6 +1663,8 @@ export namespace Labrinth {
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
 				github_id?: number
+				discord_id?: string
+				steam_id?: string
 			}
 
 			export type SearchUser = {
@@ -1686,6 +1688,18 @@ export namespace Labrinth {
 				accepted: boolean
 				created: string
 			}
+		}
+	}
+
+	export namespace BlockedUsers {
+		export namespace Internal {
+			export type BlockStatus = {
+				blocked: boolean
+			}
+		}
+
+		export namespace v3 {
+			export type BlockedUserId = string
 		}
 	}
 

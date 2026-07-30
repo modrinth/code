@@ -431,6 +431,9 @@
   "content.dependency-warning.what-happens-label": {
     "defaultMessage": "Что произойдёт?"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Изменённые файлы настройки"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Добавлен (зависимость)"
   },
@@ -438,7 +441,7 @@
     "defaultMessage": "Отключён"
   },
   "content.diff-modal.diff-type.removed-disabled": {
-    "defaultMessage": "Удалено (отключено)"
+    "defaultMessage": "Удалён (отключён)"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Обновлён"
@@ -447,13 +450,13 @@
     "defaultMessage": "Не устанавливать"
   },
   "content.diff-modal.external-diff-type.added": {
-    "defaultMessage": "Добавленный"
+    "defaultMessage": "Добавлен"
   },
   "content.diff-modal.external-diff-type.removed": {
-    "defaultMessage": "Удалённый"
+    "defaultMessage": "Удалён"
   },
   "content.diff-modal.external-diff-type.updated": {
-    "defaultMessage": "Обновлённый"
+    "defaultMessage": "Обновлён"
   },
   "content.diff-modal.file-count": {
     "defaultMessage": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
@@ -466,6 +469,18 @@
   },
   "content.diff-modal.loader-updated": {
     "defaultMessage": "Загрузчик"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Связанная сборка"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Несвязанная сборка"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Обновлённая сборка"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Без изменений"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
@@ -1121,8 +1136,17 @@
   "external-files.permissions-card.remove-group": {
     "defaultMessage": "Удалить группу"
   },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Эта группа атрибуции и все находящиеся в ней файлы будут удалены навсегда. Это действие необратимо."
+  },
   "external-files.permissions-card.remove-group-confirmation.title": {
     "defaultMessage": "Удалить {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Не удалось удалить группу"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Удерживайте Shift при нажатии, чтобы пропустить подтверждение."
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Удалить из группы"
@@ -1182,7 +1206,7 @@
     "defaultMessage": "Удаление файла"
   },
   "files.delete-modal.warning.file": {
-    "defaultMessage": "Этот файл будет удален навсегда. Отменить это действие нельзя."
+    "defaultMessage": "Этот файл будет удалён навсегда. Это действие необратимо."
   },
   "files.delete-modal.warning.folder": {
     "defaultMessage": "Эта папка и всё её содержимое будут удалены навсегда. Отменить это действие нельзя."
@@ -1979,6 +2003,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Сборка пуста"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Сторонний"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Файл не опубликован на Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Содержимое сборки"
   },
@@ -1987,6 +2017,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Не найдены проекты, соответствующие запросу."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Открыть в Slicer"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
@@ -4374,7 +4407,7 @@
     "defaultMessage": "Имя пользователя Modrinth"
   },
   "servers.grant-access-modal.target.no-suggestions": {
-    "defaultMessage": "Пользователи не найдены."
+    "defaultMessage": "Пользователи не найдены."
   },
   "servers.grant-access-modal.target.placeholder": {
     "defaultMessage": "Введите имя пользователя Modrinth"
@@ -4985,9 +5018,6 @@
   "settings.pats.title": {
     "defaultMessage": "Личные токены доступа"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Публичный профиль"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Сеансы"
   },
@@ -5004,34 +5034,52 @@
     "defaultMessage": "Аватар {username}"
   },
   "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Отменить"
+    "defaultMessage": "Отозвать"
   },
   "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Отменить"
+    "defaultMessage": "Отмена"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Настроить ссылку."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Настройка ссылки"
   },
   "sharing.invite-players-modal.expiry-label": {
     "defaultMessage": "Срок действия"
   },
-  "sharing.invite-players-modal.friends-heading": {
-    "defaultMessage": "Ваши друзья - {count}"
-  },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "Пригласить"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Ссылка действует {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Или отправьте ссылку-приглашение"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "Ссылка-приглашение скопирована в буфер обмена."
   },
   "sharing.invite-players-modal.link-copied-title": {
     "defaultMessage": "Ссылка скопирована"
   },
   "sharing.invite-players-modal.link-copy-failed-title": {
-    "defaultMessage": "Не удалось скопировать ссылку"
+    "defaultMessage": "Не удалось скопировать ссылку"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Лимит использований"
   },
   "sharing.invite-players-modal.no-friends": {
-    "defaultMessage": "Друзья не найдены."
+    "defaultMessage": "Друзья не найдены."
   },
   "sharing.invite-players-modal.no-search-results": {
-    "defaultMessage": "Пользователи не найдены."
+    "defaultMessage": "Пользователи не найдены."
   },
   "sharing.invite-players-modal.requested": {
     "defaultMessage": "Запрос отправлен"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} необходимо сначала принять запрос в друзья "
   },
   "sharing.invite-players-modal.save-button": {
     "defaultMessage": "Сохранить"
@@ -5041,6 +5089,9 @@
   },
   "sharing.invite-players-modal.searching": {
     "defaultMessage": "Поиск..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Не удалось обновить ссылку"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

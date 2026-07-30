@@ -173,9 +173,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Zavičajni ukrasi"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Izaberi opciju"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Pokazuje koliko vremena si proveo igrajući instancu."
   },
@@ -226,9 +223,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Nazad na instancu"
-  },
-  "app.browse.discover-content": {
-    "message": "Otkrij sadržaj"
   },
   "app.browse.discover-servers": {
     "message": "Otkrij servere"

@@ -566,6 +566,9 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "world"
   },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "Installation settings"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
   },
@@ -2240,6 +2243,9 @@
   "label.details": {
     "defaultMessage": "Details"
   },
+  "label.discover-content": {
+    "defaultMessage": "Discover content"
+  },
   "label.done": {
     "defaultMessage": "Done"
   },
@@ -2317,6 +2323,9 @@
   },
   "label.password": {
     "defaultMessage": "Password"
+  },
+  "label.permissions": {
+    "defaultMessage": "Permissions"
   },
   "label.plan-custom": {
     "defaultMessage": "Custom"
@@ -2849,8 +2858,161 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "A Modrinth creator."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "A Modrinth user."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} will not be able to send you friend requests, invite you to shared instances or invite you to Modrinth Hosting servers."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Are you sure you want to block this user?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "An error occurred while blocking this user. Please try again."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Failed to block user"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} has been blocked."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "User blocked"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Block {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "View user analytics"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "Manage user billing"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Block"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "Create a collection"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Create a project"
+  },
+  "profile.button.edit-role": {
+    "defaultMessage": "Edit role"
+  },
+  "profile.button.info": {
+    "defaultMessage": "View user details"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "Manage projects"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "Remove as affiliate"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "Set as affiliate"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Unblock"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {# project} other {# projects}}"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "Auth providers"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "Email verified"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Has password"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Has TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "Payment methods"
+  },
+  "profile.details.title": {
+    "defaultMessage": "User details"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "Email not verified"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "Email verified"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "The user profile could not be loaded."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "User not found"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "Affiliate"
+  },
   "profile.label.badges": {
     "defaultMessage": "Badges"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "Collection"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, one {download} other {downloads}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Joined"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "This user has no collections!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "You don't have any collections yet."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "This user has no projects!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "You don't have any projects yet."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Organizations"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, one {project} other {projects}}"
+  },
+  "profile.label.saving": {
+    "defaultMessage": "Saving..."
+  },
+  "profile.official-account": {
+    "defaultMessage": "Official Modrinth account"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
+  },
+  "profile.role.select-placeholder": {
+    "defaultMessage": "Select a role"
+  },
+  "profile.role.update-error-description": {
+    "defaultMessage": "An error occurred while updating the user role. Please try again."
+  },
+  "profile.role.update-error-title": {
+    "defaultMessage": "Failed to update role"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "An error occurred while unblocking this user. Please try again."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Failed to unblock user"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} has been unblocked."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "User unblocked"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Published {date}"
@@ -2878,6 +3040,9 @@
   },
   "project-type.all": {
     "defaultMessage": "All"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "Collections"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
@@ -5105,11 +5270,119 @@
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Public profile"
+  "settings.profile.bio.description": {
+    "defaultMessage": "A short description to tell everyone a little bit about you."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Bio"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Profile"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Profile picture"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "Your profile information is publicly <profile-link>viewable on Modrinth</profile-link> and through the <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Failed to update profile"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "An error occurred while updating your profile. Please try again."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Sign in with a Modrinth account to customize your public profile."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinth account required"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "A unique case-insensitive name to identify your profile."
   },
   "settings.sessions.title": {
     "defaultMessage": "Sessions"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Actions"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "User"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "These are the users you have blocked on Modrinth. They cannot:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "You haven't blocked anyone."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "Blocked users could not be loaded."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Loading blocked users…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "Send you friend requests"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Invite you to manage a Modrinth Hosting server."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "Invite you to shared instances"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Blocked users"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Unblock"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "Failed to unblock user"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "An error occurred while unblocking this user. Please try again."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "Unblock {username}"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Control who can send you friend requests on Modrinth."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Friend requests"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "Coming soon!"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Everyone"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Friends"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Friends of friends"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "No one"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Control who can send you invites to shared instances and Modrinth Hosting panels."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Invitations"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "You can control who can interact with you, and manage blocked users with a Modrinth Account"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Modrinth account required"
+  },
+  "settings.social.title": {
+    "defaultMessage": "Social"
   },
   "sharing.invite-players-modal.add": {
     "defaultMessage": "Add"
@@ -5120,6 +5393,9 @@
   "sharing.invite-players-modal.already-invited": {
     "defaultMessage": "This user has already been invited."
   },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Apply"
+  },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username}'s avatar"
   },
@@ -5129,11 +5405,35 @@
   "sharing.invite-players-modal.cancel-button": {
     "defaultMessage": "Cancel"
   },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Custom..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Custom: {date}"
+  },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Edit invite link."
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
     "defaultMessage": "Edit invite link"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "In 1 day"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "In 1 hour"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "In 7 days"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "In 6 hours"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "In 3 days"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "In 12 hours"
   },
   "sharing.invite-players-modal.expiry-label": {
     "defaultMessage": "Expiry date"

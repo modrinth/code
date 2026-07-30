@@ -2423,9 +2423,6 @@
   "settings.pats.title": {
     "defaultMessage": "Personlig tilgang nøkler"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Offentlig profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Økter"
   },
@@ -2781,4 +2778,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

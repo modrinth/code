@@ -174,10 +174,10 @@
     "message": "Exibindo {count} {itemType, select, project {{count, plural, one {projeto} other {os projetos}}} country {{count, plural, one {país} other {os países}}} monetization {{count, plural, one {valor monetário} other {os valores monetários}}} downloadSource {{count, plural, one {fonte do download} other {as fontes do download}}} downloadReason {{count, plural, one {motivo do download} other {os motivos do download}}} member {{count, plural, one {membro} other {os membros}}} projectVersion {{count, plural, one {versão do projeto} other {as versões do projeto}}} loader {{count, plural, one {loader} other {os loaders}}} gameVersion {{count, plural, one {versão do jogo} other {as versões do jogo}}} other {{count, plural, one {item} other {itens}}}} do topo da tabela"
   },
   "analytics.chart.tooltip.dependent-on-project": {
-    "message": "Dependente em {project}"
+    "message": "Dependente de {project}"
   },
   "analytics.chart.tooltip.dependent-project-version": {
-    "message": "{dependentProject} dependente em {dependencyProject}, {version}"
+    "message": "{dependentProject} dependente de {dependencyProject}, {version}"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dia} other {# dias}}"
@@ -744,7 +744,7 @@
     "message": "Autorizar"
   },
   "auth.authorize.action.decline": {
-    "message": "Negar"
+    "message": "Rejeitar"
   },
   "auth.authorize.app-info": {
     "message": "<strong>{appName}</strong> por <creator-link>{creator}</creator-link> poderá:"
@@ -1665,7 +1665,7 @@
     "message": "Nome de usuário Venmo salvo com sucesso!"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
-    "message": "Iniciar sessão com o PayPal"
+    "message": "Iniciar sessão com PayPal"
   },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
     "message": "Insira o nome de usuário Venmo para receber pagamentos."
@@ -2132,6 +2132,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Quantia muito baixo"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "Este método de pagamento foi desativado pelo provedor de pagamento. Use o método de pagamento diferente ou entre em contato com o suporte."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Método de pagamento indisponível"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Selecione a opção de transferência do PayPal correspondente à sua região (BR ou Internacional)."
   },
@@ -2499,10 +2505,10 @@
     "message": "Selecione o plano"
   },
   "landing.button.discover-mods": {
-    "message": "Descubra mods"
+    "message": "Descobrir mods"
   },
   "landing.button.go-to-dashboard": {
-    "message": "Visitar painel"
+    "message": "Acessar painel"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "Obtenha a melhor experiência possível de mods com atualizações constantes da equipe do Modrinth"
@@ -2583,7 +2589,7 @@
     "message": "servidores"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "sombreadores"
+    "message": "shaders"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -2873,9 +2879,6 @@
   "layout.nav.discover": {
     "message": "Descubra"
   },
-  "layout.nav.discover-content": {
-    "message": "Descubra conteúdo"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Baixe o Modrinth App"
   },
@@ -2921,6 +2924,30 @@
   "layout.publish.email-verification-required.title": {
     "message": "Verificação de e-mail necessária"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Instalar tudo automaticamente enquanto estiver jogando"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Jogue o mesmo conteúdo que seus amigos"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Mantenha o conteúdo compartilhado atualizado a cada mudança"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Baixe o Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Gerenciado por"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "O Modrinth App vai abrir automaticamente..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Abrindo o Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Por que usar o Modrinth App"
+  },
   "moderation.exclude-technical-review": {
     "message": "Excluir RT"
   },
@@ -2941,6 +2968,24 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revisão técnica"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} por lote"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Quantidade do lote"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Isso excluirá permanentemente todos os grupos de atribuição para este projeto e todos os arquivos contidos. Esta ação não pode ser desfeita."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Falhou ao excluir todos os grupos: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Excluir"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Todos os grupos excluídos com sucesso."
   },
   "modpack-scan-modal.failed": {
     "message": "Falhou"
@@ -2973,10 +3018,13 @@
     "message": "Verificar todos os arquivos"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Alguns arquivos não puderam ser verificados: {error}"
+    "message": "Alguns arquivos falharam ao escanear: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Verificando..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "Sucesso"
   },
   "modpack-scan-modal.title": {
     "message": "Verificação do pacote de mods ({scanned}/{total} Arquivos)"
@@ -3292,117 +3340,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "Esta organização ainda não tem nenhum projeto. Gostaria de <create-link>criar um</create-link>?"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Um criador Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Usuário comum."
-  },
-  "profile.button.analytics": {
-    "message": "Ver estatísticas do usuário"
-  },
-  "profile.button.billing": {
-    "message": "Gerenciar cobrança do usuário"
-  },
-  "profile.button.edit-role": {
-    "message": "Editar cargo"
-  },
-  "profile.button.info": {
-    "message": "Ver detalhes do usuário"
-  },
-  "profile.button.manage-projects": {
-    "message": "Gerenciar projetos"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remover como afiliado"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Configurar como afiliado"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# projeto} other {# projetos}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Provedores de autenticação"
-  },
-  "profile.details.label.email": {
-    "message": "E-mail"
-  },
-  "profile.details.label.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.details.label.has-password": {
-    "message": "Possui senha"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Possui TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Métodos de pagamento"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "E-mail não verificado"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.error.not-found": {
-    "message": "Usuário não encontrado"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliado"
-  },
-  "profile.label.badges": {
-    "message": "Emblemas"
-  },
-  "profile.label.collection": {
-    "message": "Coleção"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "Entrou"
-  },
-  "profile.label.no-collections": {
-    "message": "Este usuário não possui coleções!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Você não tem nenhuma coleção.\nGostaria de <create-link>criar uma</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Este usuário não tem projetos!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Você não tem nenhum projeto.\nGostaria de <create-link>criar um</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizações"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {projeto} other {projetos}}"
-  },
-  "profile.label.saving": {
-    "message": "Salvando..."
-  },
-  "profile.meta.description": {
-    "message": "Baixe os projetos de {username} no Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} — Baixe os projetos de {username} no Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Conta oficial do Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Conta oficial do Modrinth. Obtenha suporte em<support-link></support-link> ou por e-mail via <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, =0 {{count} seguidores} one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
-  },
-  "profile.user-id": {
-    "message": "ID do usuário: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Falha ao recusar o convite da equipe"
@@ -3753,7 +3690,10 @@
     "message": "Você ainda pode modificar seu projeto, isso não afetará sua posição na fila."
   },
   "project.moderation.admonition.under-review.body.4": {
-    "message": "Nosso objetivo é analisar as submissões em 24 a 48 horas, mas alguns projetos podem sofrer atrasos. Isso não significa que haja algum problema com a sua submissão."
+    "message": "Buscamos revisar submissões dentro de 24–48 horas, mas alguns projetos talvez sofram atrasos. Isso não significa que há um problema com sua submissão."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Buscamos revisar submissões dentro de uma semana, mas alguns projetos talvez sofram atrasos. Isso não significa que há um problema com sua submissão."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Agradecemos sua paciência enquanto nossos moderadores trabalham arduamente para manter o Modrinth seguro e estamos ansiosos para ajudá-lo(a) a compartilhar seu conteúdo! 💚</emphasis>"
@@ -3871,6 +3811,21 @@
   },
   "project.settings.permissions.completed.title": {
     "message": "Permissões concluídas!"
+  },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Excluir todos os grupos"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Isso excluirá permanentemente {count, plural, one {# grupo de atribuição} other {todos os # grupos de atribuição}} para este projeto e todos arquivos contidos. Esta ação não pode ser desfeita."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Excluir todos os grupos de atribuição?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Não foi possível excluir todos os grupos de atribuição"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Todos os grupos de atribuição foram excluídos."
   },
   "project.settings.permissions.empty-state.description": {
     "message": "Nenhuma das versões do seu projeto contém conteúdo externo, não há o que se preocupar sobre adquirir permissões."
@@ -4754,23 +4709,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Adicionar URI de redirecionamento"
   },
-  "settings.applications.button.cancel": {
-    "message": "Cancelar"
-  },
   "settings.applications.button.create": {
     "message": "Criar app"
   },
   "settings.applications.button.delete": {
     "message": "Excluir"
   },
-  "settings.applications.button.edit": {
-    "message": "Editar"
-  },
   "settings.applications.button.new": {
     "message": "Novo aplicativo"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Salvar alterações"
   },
   "settings.applications.button.upload-icon": {
     "message": "Enviar ícone"
@@ -4844,14 +4790,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre este aplicativo"
   },
-  "settings.authorizations.by": {
-    "message": "por"
-  },
   "settings.authorizations.description": {
     "message": "Ao autorizar um aplicativo com sua conta do Modrinth, você concede acesso à sua conta. Você pode gerenciar e revisar o acesso à sua conta aqui a qualquer momento."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "No momento, não podemos exibir seus aplicativos autorizados. Estamos trabalhando para corrigir isso. Visite esta página novamente mais tarde!"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
@@ -5210,27 +5150,6 @@
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
   },
-  "settings.profile.bio.description": {
-    "message": "Uma breve descrição para falar um pouco sobre você para todos."
-  },
-  "settings.profile.bio.title": {
-    "message": "Sobre"
-  },
-  "settings.profile.description": {
-    "message": "As informações do seu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>API do Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Configurações de perfil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informação do perfil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Foto de perfil"
-  },
-  "settings.profile.username.description": {
-    "message": "Um nome único sem distinção de maiúsculas e minúsculas para identificar o seu perfil."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Encerrar sessão"
   },
@@ -5260,6 +5179,33 @@
   },
   "settings.sidebar.label.display": {
     "message": "Interface"
+  },
+  "shared-instance.invite.accept": {
+    "message": "Aceitar convite"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Um usuário do Modrinth"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# pessoa} other {# pessoas}} já entraram"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Carregando convite…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} convidou você para jogar"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "Este convite foi criado por outro usuário do Modrinth, não pelo próprio Modrinth. Só aceite convites de pessoas que você confia."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Você conhece este usuário?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Pode ter expirado, atingido o limite de uso ou ter sido removido pela pessoa que o compartilhou."
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "Este convite não está disponível"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Notícias recentes do Modrinth"

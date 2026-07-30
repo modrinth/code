@@ -89,6 +89,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Неизвестная сборка"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Обновление совместного контента"
+  },
   "app.action-bar.installs": {
     "message": "Установки"
   },
@@ -188,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Системное оформление"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Выберите вариант"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показывать время, проведённое в сборке."
   },
@@ -241,9 +241,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Вернуться к сборке"
-  },
-  "app.browse.discover-content": {
-    "message": "Поиск проектов"
   },
   "app.browse.discover-servers": {
     "message": "Поиск серверов"
@@ -338,6 +335,27 @@
   "app.install.phase.running_loader_processors": {
     "message": "Запуск процессоров загрузчика"
   },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Добавлен"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Локальная сборка опережает версию других участников."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Изменения не отправлены"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Отправить изменения"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Отправка..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Удалён"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Отправка изменений"
+  },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Проверьте изменения"
   },
@@ -380,6 +398,9 @@
   "app.instance.mods.content-type-project": {
     "message": "проект"
   },
+  "app.instance.mods.locked-content": {
+    "message": "Содержимое заблокированных экземпляров нельзя изменить."
+  },
   "app.instance.mods.project-was-added": {
     "message": "«{name}» добавлен"
   },
@@ -392,11 +413,29 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Успешно загружено"
   },
+  "app.instance.share.empty.description": {
+    "message": "Поделитесь сборкой со своими друзьями!"
+  },
   "app.instance.share.empty.heading": {
-    "message": "Друзья не приглашены"
+    "message": "Нет приглашённых друзей"
   },
   "app.instance.share.empty.invite-friends-button": {
     "message": "Пригласить друзей"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Доступ к {name}"
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Необходимо войти как"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "для доступа к этой странице."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "связанный аккаунт"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Вход не выполнен"
   },
   "app.instance.share.locked.switch-account-button": {
     "message": "Сменить аккаунт"
@@ -418,6 +457,12 @@
   },
   "app.instance.share.sign-in.button": {
     "message": "Войти"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "Сборка уже установлена"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Всё равно установить"
   },
   "app.instance.shared-instance-already-installed.instance": {
     "message": "Сборка"
@@ -444,7 +489,7 @@
     "message": "Удаление мира"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
-    "message": "Этот мир будет удалён навсегда из этой сборки. Отменить это действие нельзя."
+    "message": "Этот мир будет удалён навсегда из этой сборки. Это действие необратимо."
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
     "message": "Удаление {name}"
@@ -479,6 +524,12 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Удаление {name}"
   },
+  "app.modal.install-to-play.additional-context": {
+    "message": "Дополнительный контекст"
+  },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "При желании прикрепите ссылки и изображения"
+  },
   "app.modal.install-to-play.delete-instance": {
     "message": "Удалить сборку"
   },
@@ -500,14 +551,38 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
+  "app.modal.install-to-play.report-description": {
+    "message": "Используйте эту форму, чтобы отправить жалобу на сборки, которые могут нарушать наши <rules-link>Правила</rules-link> или <terms-link>Условия использования</terms-link>."
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "Размер файла превышает лимит в 1 МиБ"
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "Какое правило нарушает данная сборка?"
+  },
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "Неприемлемое содержимое"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "Вредоносное содержимое"
+  },
   "app.modal.install-to-play.report-reason.spam": {
     "message": "Спам"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Жалоба отправлена"
   },
   "app.modal.install-to-play.reviewed-files": {
     "message": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Сборка"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Контент"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Сборка содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Сборка этого сервера содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
@@ -525,6 +600,15 @@
     "message": "Обновление перед запуском"
   },
   "app.modal.update-to-play.removed": {
+    "message": "Удалён"
+  },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "Обновление сборки этого сервера содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Добавлен"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
     "message": "Удалён"
   },
   "app.modal.update-to-play.update-required": {
@@ -797,6 +881,12 @@
   "content.shared-instance.disable-button": {
     "message": "Всё равно отключить"
   },
+  "content.shared-instance.disable-many-button": {
+    "message": "Всё равно отключить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "content.shared-instance.warning-header": {
+    "message": "Это часть сборки"
+  },
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
   },
@@ -859,6 +949,21 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и следить за ними!"
+  },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "Связанная сборка"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "Отвязать сборку"
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Отвязка..."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "message": "Отвязка сборки"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "message": "Отвязка сборки"
   },
   "instance.action.create-shortcut": {
     "message": "Создать ярлык"
@@ -1106,6 +1211,9 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/путь/к/java"
   },
+  "instance.settings.tabs.sharing": {
+    "message": "Доступ"
+  },
   "instance.settings.tabs.window": {
     "message": "Окно"
   },
@@ -1136,11 +1244,29 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Введите ширину..."
   },
+  "instance.shared-instance.error.title": {
+    "message": "Произошла ошибка"
+  },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Добавлен"
   },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Отправка изменений игрокам"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Выберите файлы настройки"
+  },
   "instance.shared-instance.publish-review.header": {
     "message": "Проверьте изменения"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Отправить изменения"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Удалён"
+  },
+  "instance.shared-instance.unavailable.locked-title": {
+    "message": "Сборка заблокирована"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"
@@ -1188,19 +1314,19 @@
     "message": "Мир используется"
   },
   "minecraft-account.add-account": {
-    "message": "Добавить"
+    "message": "Добавить аккаунт"
   },
   "minecraft-account.label": {
-    "message": "Учётная запись Minecraft"
+    "message": "Аккаунт Minecraft"
   },
   "minecraft-account.not-signed-in": {
     "message": "Вход не выполнен"
   },
   "minecraft-account.remove-account": {
-    "message": "Удалить"
+    "message": "Удалить аккаунт"
   },
   "minecraft-account.select-account": {
-    "message": "Выберите профиль"
+    "message": "Выберите аккаунт"
   },
   "minecraft-account.sign-in": {
     "message": "Войти в Minecraft"
@@ -1226,8 +1352,11 @@
   "minecraft-required.sign-in": {
     "message": "Войти в Microsoft"
   },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "Открылась вкладка для входа. Завершение вход и вернитесь в приложение."
+  },
   "modal.modrinth-account-required.cancel-button": {
-    "message": "Отменить"
+    "message": "Отмена"
   },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Продолжите в браузере"
@@ -1235,8 +1364,14 @@
   "modal.modrinth-account-required.create-account-button": {
     "message": "Создать аккаунт"
   },
+  "modal.modrinth-account-required.description": {
+    "message": "Войдите в аккаунт Modrinth, чтобы использовать эту функцию."
+  },
   "modal.modrinth-account-required.header": {
     "message": "Требуется аккаунт"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Открыть браузер снова"
   },
   "modal.modrinth-account-required.sign-in-button": {
     "message": "Войти в Modrinth"

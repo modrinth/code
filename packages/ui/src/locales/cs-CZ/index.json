@@ -4076,9 +4076,6 @@
   "settings.pats.title": {
     "defaultMessage": "Osobní přístupové tokeny"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Veřejný profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Relace"
   },
@@ -4560,4 +4557,3 @@
     "defaultMessage": "Typ"
   }
 }
-

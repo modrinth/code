@@ -2873,9 +2873,6 @@
   "layout.nav.discover": {
     "message": "탐색"
   },
-  "layout.nav.discover-content": {
-    "message": "콘텐츠 탐색하기"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth App 받기"
   },
@@ -2971,9 +2968,6 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "전체 파일 스캔"
-  },
-  "modpack-scan-modal.scan-error": {
-    "message": "일부 파일을 스캔하지 못했습니다: {error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "스캔중..."
@@ -3292,117 +3286,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "이 조직에는 아직 프로젝트가 없습니다. <create-link>하나 생성하시겠습니까?</create-link>?"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Modrinth 창작자입니다."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Modrinth 사용자입니다."
-  },
-  "profile.button.analytics": {
-    "message": "사용자 분석 보기"
-  },
-  "profile.button.billing": {
-    "message": "사용자 청구 관리"
-  },
-  "profile.button.edit-role": {
-    "message": "역할 수정"
-  },
-  "profile.button.info": {
-    "message": "사용자 상세 정보 보기"
-  },
-  "profile.button.manage-projects": {
-    "message": "프로젝트 관리"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "제휴 취소"
-  },
-  "profile.button.set-affiliate": {
-    "message": "제휴사로 설정"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {프로젝트 #개} other {프로젝트 #개}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "인증 제공자"
-  },
-  "profile.details.label.email": {
-    "message": "이메일"
-  },
-  "profile.details.label.email-verified": {
-    "message": "이메일 인증됨"
-  },
-  "profile.details.label.has-password": {
-    "message": "비밀번호 사용"
-  },
-  "profile.details.label.has-totp": {
-    "message": "TOTP 사용"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "결제 수단"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "이메일이 인증되지 않음"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "이메일 인증됨"
-  },
-  "profile.error.not-found": {
-    "message": "사용자를 찾을 수 없습니다"
-  },
-  "profile.label.affiliate": {
-    "message": "제휴"
-  },
-  "profile.label.badges": {
-    "message": "배지"
-  },
-  "profile.label.collection": {
-    "message": "컬렉션"
-  },
-  "profile.label.download-count": {
-    "message": ""
-  },
-  "profile.label.joined": {
-    "message": "가입"
-  },
-  "profile.label.no-collections": {
-    "message": "이 사용자는 컬렉션이 없습니다!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "아직 컬렉션이 없습니다.\n<create-link>새 컬렉션</create-link>을 생성하시겠습니까?"
-  },
-  "profile.label.no-projects": {
-    "message": "이 사용자는 프로젝트가 없습니다!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "아직 프로젝트가 없습니다.\n<create-link>새 프로젝트</create-link>를 생성하시겠습니까?"
-  },
-  "profile.label.organizations": {
-    "message": "조직"
-  },
-  "profile.label.project-count": {
-    "message": ""
-  },
-  "profile.label.saving": {
-    "message": "저장..."
-  },
-  "profile.meta.description": {
-    "message": "Modrinth에서 {username}의 프로젝트 다운로드"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Modrinth에서 {username}의 프로젝트 다운로드"
-  },
-  "profile.official-account": {
-    "message": "공식 Modrinth 계정"
-  },
-  "profile.official-account.bio": {
-    "message": "Modrinth의 공식 사용자 계정입니다. <support-link></support-link> 또는 <email></email> 이메일을 통해 지원을 받으실 수 있습니다"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> 프로젝트 팔로워}}"
-  },
-  "profile.user-id": {
-    "message": "사용자 ID: {id}"
   },
   "project-member-header.error-decline": {
     "message": "팀 초대를 거절하지 못했습니다"
@@ -3751,9 +3634,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "프로젝트를 수정해도 대기열 우선 순위에는 영향을 미치지 않습니다."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "제출한 내용을 24~48시간 이내에 검토하는 것을 목표로 하고 있으나, 일부 프로젝트의 경우 지연될 수 있습니다. 이는 제출한 내용에 문제가 있다는 것을 의미하지 않습니다."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>운영진들이 Modrinth의 안전한 환경을 유지하기 위해 최선을 다하고 있는 동안 기다려 주셔서 감사합니다. 여러분의 콘텐츠를 공유하실 수 있도록 도와드릴 수 있기를 기대합니다! 💚</emphasis>"
@@ -4751,23 +4631,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "리디렉션 URI 를 추가하세요"
   },
-  "settings.applications.button.cancel": {
-    "message": "취소"
-  },
   "settings.applications.button.create": {
     "message": "앱 만들기"
   },
   "settings.applications.button.delete": {
     "message": "지우기"
   },
-  "settings.applications.button.edit": {
-    "message": "편집"
-  },
   "settings.applications.button.new": {
     "message": "새 애플리케이션"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "변경사항 저장"
   },
   "settings.applications.button.upload-icon": {
     "message": "아이콘 업로드"
@@ -4841,14 +4712,8 @@
   "settings.authorizations.about-this-app": {
     "message": "이 앱에 대해"
   },
-  "settings.authorizations.by": {
-    "message": "제작자"
-  },
   "settings.authorizations.description": {
     "message": "Modrinth 계정으로 애플리케이션에 권한을 부여하면, 해당 앱이 귀하의 계정에 접근할 수 있게 됩니다. 여기에서 언제든지 계정 접근 권한을 관리하고 확인할 수 있습니다."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "현재 승인한 애플리케이션을 표시할 수 없습니다. 이 문제를 해결하기 위해 노력 중입니다. 나중에 다시 확인해 주세요!"
   },
   "settings.authorizations.head-title": {
     "message": "승인"
@@ -5206,27 +5071,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "사용된 적 없음"
-  },
-  "settings.profile.bio.description": {
-    "message": "모든 사람에게 당신을 소개하는 간단한 설명입니다."
-  },
-  "settings.profile.bio.title": {
-    "message": "자기소개"
-  },
-  "settings.profile.description": {
-    "message": "당신의 프로필 정보는 Modrinth 나 <docs-link>Modrinth API</docs-link>를 통해 공개될 수 있습니다."
-  },
-  "settings.profile.head-title": {
-    "message": "프로필 설정"
-  },
-  "settings.profile.profile-info": {
-    "message": "프로필 정보"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "프로필 사진"
-  },
-  "settings.profile.username.description": {
-    "message": "대소문자 구분 없이 프로필을 식별할 수 있는 이름"
   },
   "settings.sessions.action.revoke-session": {
     "message": "세션 제거"

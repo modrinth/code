@@ -285,7 +285,7 @@
     "defaultMessage": "Iniciar sessão"
   },
   "button.sign-out": {
-    "defaultMessage": "Finalizar sessão"
+    "defaultMessage": "Encerrar sessão"
   },
   "button.sign-up": {
     "defaultMessage": "Criar conta"
@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Excluir {itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Desativar {itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {O retrocesso de versão} other {A atualização}} pode causar problemas de compatibilidade. Mods ou conteúdo que você adicionou além do pacote de mods serão mantidos, mas podem não ser compatíveis com a nova versão."
   },
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} adicionado"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Arquivos de configuração alterados"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Adicionado (dependência)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Desativado"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Removido (desativado)"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Atualizado"
@@ -467,11 +476,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Atualizado"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# arquivo} other {# arquivos}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Versão do jogo"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Instalar mesmo assim"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Loader"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Pacote de mods vinculado"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Unlinked modpack"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Pacote de mods atualizado"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Nenhuma alteração de conteúdo"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removido"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} removido (desativado)"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Um arquivo só é revisado se for publicado no Modrinth, independente do formato de arquivo (incluindo .mrpack)."
@@ -1159,6 +1192,21 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Você obteve permissão especial para redistribuir este trabalho em seu pacote de mods."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Excluir grupo"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Isso excluirá permanentemente este grupo de atribuição e todos os arquivos dentro dele. Esta ação não pode ser desfeita."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Excluir {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Não foi possível excluir o grupo"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Segure Shift ao clicar para pular a confirmação."
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Remover do grupo"
@@ -2039,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nenhum conteúdo encontrado"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Externo"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Este arquivo não está publicado no Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Conteúdo do pacote de mods"
   },
@@ -2047,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Nenhum projeto corresponde com sua busca."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Abrir no Slicer"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Busque {count, number} {count, plural, one {projeto} other {projetos}}"
@@ -5045,11 +5102,83 @@
   "settings.pats.title": {
     "defaultMessage": "Token de acesso pessoal"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Perfil público"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessões"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Adicionar"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Adicionado"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Este usuário já foi convidado."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Cancelar"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Editar link de convite."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Editar link de convite"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Data de expiração"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Seus amigos - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Convidar"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Seu link de convite expira em {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Ou use um link de convite"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "O link de convite foi copiado para a sua área de transferência."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Link copiado"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Não foi possível copiar o link"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Usos máximos"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Nenhum amigo encontrado."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Nenhum usuário correspondente encontrado."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Solicitação enviada"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} precisa aceitar seu pedido de amizade primeiro"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Salvar"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Insira o nome de usuário do Modrinth"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Buscando..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Falha ao atualizar o link de convite"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

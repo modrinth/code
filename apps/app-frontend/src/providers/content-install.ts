@@ -1,6 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentInstallInstance, ContentInstallProjectInfo, ContentItem } from '@modrinth/ui'
-import { createContext, defineMessage, useVIntl } from '@modrinth/ui'
+import {
+	createContext,
+	defineMessage,
+	getLatestMatchingInstallVersion,
+	useVIntl,
+} from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -475,7 +480,7 @@ export function createContentInstall(opts: {
 										name: owner.user.username,
 										iconUrl: owner.user.avatar_url,
 										circle: true,
-										link: () => openUrl(`https://modrinth.com/user/${owner.user.username}`),
+										link: `/user/${encodeURIComponent(owner.user.username)}`,
 									},
 								}
 							}
@@ -813,7 +818,22 @@ export function createContentInstall(opts: {
 		}
 
 		if (project.project_type === 'modpack') {
-			const version = versionId ?? project.versions[project.versions.length - 1]
+			let version = versionId ?? null
+			if (!version) {
+				const hasHints = !!(hints?.preferredGameVersion || hints?.preferredLoader)
+				if (hasHints) {
+					const versions = (await get_version_many(
+						project.versions,
+						'must_revalidate',
+					)) as Labrinth.Versions.v2.Version[]
+					const matching = getLatestMatchingInstallVersion(versions, {
+						gameVersions: hints?.preferredGameVersion ? [hints.preferredGameVersion] : undefined,
+						loaders: hints?.preferredLoader ? [hints.preferredLoader] : undefined,
+					})
+					version = matching?.id ?? null
+				}
+				version ??= project.versions[project.versions.length - 1]
+			}
 			const packs = await list()
 			const existingPack = packs.find((pack) => pack.link?.project_id === project.id)
 

@@ -5063,9 +5063,6 @@
   "settings.pats.title": {
     "defaultMessage": "Token di accesso (PAT)"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Profilo pubblico"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessioni"
   },

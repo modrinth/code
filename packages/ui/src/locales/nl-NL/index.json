@@ -60,7 +60,7 @@
     "defaultMessage": "{sharedCpus} Gedeelde CPU's"
   },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "U staat op het punt uw abonnement op <server-name>{serverName}</server-name> te verlengen. Uw abonnement wordt opnieuw geactiveerd en uw server blijft zonder onderbreking draaien."
+    "defaultMessage": "Je staat op het punt je abonnement op <server-name>{serverName}</server-name> te verlengen. Je abonnement wordt opnieuw geactiveerd en je server blijft zonder onderbreking draaien."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Abonnement kan niet opnieuw worden afgesloten; het laden van de abonnementsgegevens is mislukt."
@@ -75,7 +75,7 @@
     "defaultMessage": "{intervalOption, select, fiveDays {/5 dagen} monthly {/maand} quarterly {/kwartaal} yearly {/jaar} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Uw volgende afschrijving vindt plaats op <charge-date>{date}</charge-date>."
+    "defaultMessage": "Je volgende afschrijving vindt plaats op <charge-date>{date}</charge-date>."
   },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Plan"
@@ -96,10 +96,10 @@
     "defaultMessage": "Resultaten filteren..."
   },
   "browse.no-results": {
-    "defaultMessage": "Er zijn geen resultaten gevonden voor uw zoekopdracht!"
+    "defaultMessage": "Geen resultaten gevonden voor je zoekopdracht!"
   },
   "browse.offline": {
-    "defaultMessage": "U bent momenteel offline. Verbind met internet om verder te gaan op Modrinth!"
+    "defaultMessage": "Je bent op dit moment offline. Maak verbinding met internet om Modrinth te bekijken!"
   },
   "browse.search.placeholder": {
     "defaultMessage": "Zoeken naar {projectType}..."
@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} verwijderen"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType} uitschakelen"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Terugzetten} other {Bijwerken}} kan compatibiliteitsproblemen veroorzaken. Mods of content die je bovenop het modpack hebt toegevoegd, blijven behouden, maar zijn mogelijk niet compatibel met de nieuwe versie."
   },
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} toegevoegd"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Gewijzigde configuratiebestanden"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Toegevoegd (afhankelijkheid)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Uitgeschakeld"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Verwijderd (uitgeschakeld)"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Geüpdate"
@@ -467,11 +476,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Bijgewerkt"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# bestand} other {# bestanden}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Spelversie"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Toch installeren"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Loader"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Gekoppeld modpack"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Niet-gekoppeld modpack"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Bijgewerkt modpack"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Geen inhoudelijke wijzigingen"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} verwijderd"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} verwijderd (uitgeschakeld)"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
@@ -1160,6 +1193,21 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Je hebt speciale toestemming gekregen om dit werk in je modpack te verspreiden."
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Groep verwijderen"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Hiermee wordt deze groep en alle bestanden daarin definitief verwijderd. Deze handeling kan niet ongedaan worden gemaakt."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "{title} verwijderen?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Groep kon niet verwijderd worden"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Houd Shift ingedrukt terwijl je klikt om de bevestiging over te slaan."
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Uit groep verwijderen"
   },
@@ -1200,10 +1248,10 @@
     "defaultMessage": "<file-path>{path}</file-path> wordt overschreven"
   },
   "files.conflict-modal.overwrite-many-warning": {
-    "defaultMessage": "Als u doorgaat met het uitpakken, worden meer dan 100 bestanden overschreven; hieronder vind je er een aantal."
+    "defaultMessage": "Als je doorgaat met het uitpakken, worden meer dan 100 bestanden overschreven; hieronder vindt je er een paar."
   },
   "files.conflict-modal.overwrite-warning": {
-    "defaultMessage": "De volgende {count} bestanden staan al op uw server en worden overschreven als u doorgaat met het uitpakken."
+    "defaultMessage": "De volgende {count} bestanden staan al op je server en worden overschreven als je doorgaat met uitpakken."
   },
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} Overschreven"
@@ -1248,7 +1296,7 @@
     "defaultMessage": "Delen van bestand is mislukt"
   },
   "files.editor.file-saved-text": {
-    "defaultMessage": "Uw bestand is opgeslagen."
+    "defaultMessage": "Je bestand is opgeslagen."
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Bestand opgeslagen"
@@ -1458,7 +1506,7 @@
     "defaultMessage": "Maat"
   },
   "files.unsaved-changes-modal.body": {
-    "defaultMessage": "Er zijn wijzigingen die nog niet zijn opgeslagen. Deze gaan verloren als u de pagina verlaat. Wilt u ze opslaan voordat u de pagina verlaat?"
+    "defaultMessage": "Je hebt wijzigingen die nog niet zijn opgeslagen. Deze gaan verloren als je de pagina verlaat. Wil je ze opslaan voordat je de pagina verlaat?"
   },
   "files.unsaved-changes-modal.discard": {
     "defaultMessage": "Verwijderen"
@@ -1779,7 +1827,7 @@
     "defaultMessage": "Burst tot {cpus} CPU's"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "Met CPU-bursting kan uw server tijdelijk extra threads gebruiken om TPS-pieken te verminderen. Klik hier voor meer informatie."
+    "defaultMessage": "Met CPU-bursting kan je server tijdelijk extra threads gebruiken om pieken in het aantal transacties per seconde (TPS) op te vangen. Klik hier voor meer informatie."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
@@ -2036,6 +2084,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Geen inhoud gevonden"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Extern"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Dit bestand is niet gepubliceerd op Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Inhoud van modpack"
   },
@@ -2044,6 +2098,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Geen projecten voldoen aan je zoekopdracht."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "In Slicer openen"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Zoek naar {count, number} {count, plural, one {project} other {projecten}}"
@@ -2801,8 +2858,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Client of server"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Toegewezen server"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Server"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Alleen spelen"
   },
   "project-type.all": {
     "defaultMessage": "Alles"
@@ -2889,7 +2952,7 @@
     "defaultMessage": "Clientzijde"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Alleen voor toegewijde server"
+    "defaultMessage": "Alleen toegewezen servers"
   },
   "project.about.compatibility.environments.server-side": {
     "defaultMessage": "Serverzijde"
@@ -3015,7 +3078,7 @@
     "defaultMessage": "Client en server op beide verreist"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "De meeste functies werken aan de gebruikerszijde, maar door het op de server te installeren, krijgt u toegang tot uitgebreidere mogelijkheden."
+    "defaultMessage": "De meeste functies werken aan de clientzijde, maar door het op de server te installeren, krijg je toegang tot uitgebreidere mogelijkheden."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client en server optioneel op server"
@@ -3039,13 +3102,13 @@
     "defaultMessage": "Client en server optioneel voor beide"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Alle functionaliteit wordt aan de serverzijde uitgevoerd en is compatibel met standaard clients. Werkt alleen op toegewijde servers."
+    "defaultMessage": "Alle functionaliteit wordt aan de serverzijde uitgevoerd en is compatibel met standaardclients. Werkt alleen op toegewezen servers."
   },
   "project.environment.dedicated-server-only.title": {
-    "defaultMessage": "Enkel serverzijde"
+    "defaultMessage": "Alleen serverzijde"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "De meeste functies werken aan de serverzijde, maar door de software op de client te installeren, krijgt u toegang tot uitgebreidere mogelijkheden."
+    "defaultMessage": "De meeste functionaliteit bevindt zich aan de serverzijde, maar door het op de client te installeren, krijgt je toegang tot uitgebreidere functionaliteit."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Client en server optioneel voor client"
@@ -3076,6 +3139,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "De licentietekst kon niet worden opgehaald."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Licentietekst laden..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Licentie"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
@@ -3396,7 +3468,7 @@
     "defaultMessage": "Verschillende versies van je project hebben verschillende omgevingen geselecteerd, dus je kan ze niet op hetzelfde moment globaal aanpassen."
   },
   "project.settings.environment.notice.multiple-environments.title": {
-    "defaultMessage": "Uw project heeft meerdere omgevingen"
+    "defaultMessage": "Je project heeft meerdere omgevingen"
   },
   "project.settings.environment.notice.review-options.description": {
     "defaultMessage": "We hebben het Environments-systeem op Modrinth zojuist grondig herzien en er zijn nu nieuwe opties beschikbaar. Zorg ervoor dat je hieronder de juiste optie selecteert en klik vervolgens op ‘Verifiëren’ als je klaar bent!"
@@ -3411,7 +3483,7 @@
     "defaultMessage": "Dit projecttype ondersteunt geen omgevingsmetadata"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
-    "defaultMessage": "Slechts toegewijde server"
+    "defaultMessage": "Alleen toegewezen server"
   },
   "project.settings.environment.server_only.description": {
     "defaultMessage": "Alle functionaliteit ligt op serverzijde, en is volledig bruikbaar met vanilla-clienten."
@@ -3561,7 +3633,7 @@
     "defaultMessage": "Filter vergrendeld"
   },
   "search.filter.locked.default.description": {
-    "defaultMessage": "Het uitschakelen van dit filter kan ertoe leiden dat u incompatibele inhoud installeert."
+    "defaultMessage": "Als je dit filter uitschakelt, kun je mogelijk inhoud installeren die niet compatibel is."
   },
   "search.filter.locked.default.sync": {
     "defaultMessage": "Synchroniseer filter"
@@ -4527,10 +4599,10 @@
     "defaultMessage": "Nieuw"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Uw bestanden worden nog voor <days-remaining>{daysRemaining} {daysRemaining, plural, one {dag} other {dagen}}</days-remaining> bewaard. Neem contact op met de klantenservice om de bestanden te downloaden voordat ze worden verwijderd."
+    "defaultMessage": "Je bestanden worden nog <days-remaining>{daysRemaining} {daysRemaining, plural, one {dag} other {dagen}}</days-remaining> bewaard. Neem contact op met de klantenservice om de bestanden te downloaden voordat ze worden verwijderd."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
-    "defaultMessage": "Uw bestanden blijven na opzegging nog 30 dagen bewaard."
+    "defaultMessage": "Je bestanden blijven na opzegging nog 30 dagen bewaard."
   },
   "servers.listing.notice.moderated": {
     "defaultMessage": "Je server is opgeschort als gevolg van een moderatiemaatregel."
@@ -4539,25 +4611,25 @@
     "defaultMessage": "Je server wordt op <date>{formattedDate}</date> {verb, select, downgrade {teruggezet} other {geüpgraded}} naar het {planSize} pakket."
   },
   "servers.listing.notice.provisioning": {
-    "defaultMessage": "Even geduld a.u.b. terwijl we uw server instellen. Dit kan tot 10 minuten duren."
+    "defaultMessage": "Even geduld terwijl we je server instellen. Dit kan tot 10 minuten duren."
   },
   "servers.listing.notice.subscription-cancelled": {
-    "defaultMessage": "Uw abonnement is opgezegd."
+    "defaultMessage": "Je abonnement is opgezegd."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
     "defaultMessage": "Je abonnement is op <date>{formattedDate}</date> opgezegd."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
-    "defaultMessage": "Uw abonnement is opgezegd vanwege een mislukte betaling."
+    "defaultMessage": "Je abonnement is opgezegd vanwege een mislukte betaling."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
-    "defaultMessage": "Uw abonnement is op <date>{formattedDate}</date> opgezegd vanwege een mislukte betaling. "
+    "defaultMessage": "Je abonnement is op <date>{formattedDate}</date> opgezegd vanwege een mislukte betaling. "
   },
   "servers.listing.notice.subscription-set-to-cancel": {
-    "defaultMessage": "Uw abonnement wordt opgezegd."
+    "defaultMessage": "Je abonnement wordt bijna opgezegd."
   },
   "servers.listing.notice.subscription-set-to-cancel-on-date": {
-    "defaultMessage": "Uw abonnement wordt op <date>{formattedDate}</date> opgezegd. "
+    "defaultMessage": "Je abonnement wordt op <date>{formattedDate}</date> opgezegd. "
   },
   "servers.listing.notice.suspended": {
     "defaultMessage": "Je server is opgeschort. Neem contact op met de klantenservice van Modrinth voor meer informatie."
@@ -4587,7 +4659,7 @@
     "defaultMessage": "Op zoek naar nieuwe servers..."
   },
   "servers.manage.confirm-leave.body": {
-    "defaultMessage": "Er wordt momenteel een bestand geüpload. Als u deze pagina verlaat, wordt het uploaden geannuleerd."
+    "defaultMessage": "Er wordt op dit moment een bestand geüpload. Als je deze pagina verlaat, wordt het uploaden geannuleerd."
   },
   "servers.manage.confirm-leave.upload-in-progress": {
     "defaultMessage": "Bezig met uploaden"
@@ -4605,7 +4677,7 @@
     "defaultMessage": "Foutdetails:"
   },
   "servers.manage.error.queue-notice": {
-    "defaultMessage": "Als u onlangs een server bij Modrinth Hosting hebt aangeschaft, staat deze momenteel in de wachtrij en verschijnt hij hier zodra hij klaar is. <warning>Probeer geen nieuwe server aan te schaffen.</warning>"
+    "defaultMessage": "Als je kort geleden een Modrinth Hosting-server hebt gekocht, staat deze momenteel in de wachtrij en zal hij hier verschijnen zodra hij klaar is. <warning>Probeer geen nieuwe server aan te schaffen.</warning>"
   },
   "servers.manage.error.support-notice": {
     "defaultMessage": "Als je persoonlijke ondersteuning nodig hebt met betrekking tot de status van uw server, neem dan contact op met Modrinth Support."
@@ -4794,7 +4866,7 @@
     "defaultMessage": "Plan"
   },
   "servers.purchase.step.plan.your-current-plan": {
-    "defaultMessage": "Uw huidige abonnement"
+    "defaultMessage": "Je huidige abonnement"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Regio"
@@ -4878,7 +4950,7 @@
     "defaultMessage": "Avatar van {username}"
   },
   "servers.remove-access-modal.warning-body": {
-    "defaultMessage": "Als je de toegang van een gebruiker tot je server intrekt, moet je hem of haar opnieuw uitnodigen om de toegang te herstellen."
+    "defaultMessage": "Als je de toegang van een gebruiker tot je server intrekt, moet je die persoon opnieuw uitnodigen om de toegang te herstellen."
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Wat gebeurt er dan?"
@@ -5024,11 +5096,83 @@
   "settings.pats.title": {
     "defaultMessage": "Persoonlijke toegangstokens"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Openbaar profiel"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessies"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Toevoegen"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Toegevoegd"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Deze gebruiker is al uitgenodigd."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Avatar van {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Annuleren"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Annuleren"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Uitnodigingslink bewerken."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Uitnodigingslink bewerken"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Vervaldatum"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Je vrienden - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Uitnodigen"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Je uitnodigingslink verloopt over {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Of gebruik een uitnodigingslink"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "De uitnodigingslink is naar je klembord gekopieerd."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Link gekopieerd"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Kopiëren van de link is mislukt"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Maximaal aantal keer gebruiken"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Geen vrienden gevonden."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Geen overeenkomende gebruikers gevonden."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Verzoek verzonden"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} moet je vriendschapsverzoek eerst accepteren"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Opslaan"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Voer Modrinth-gebruikersnaam in"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Bezig met zoeken..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Het bijwerken van de uitnodigingslink is mislukt"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -5544,7 +5688,7 @@
     "defaultMessage": "Sommigen wijzigingen zijn nog niet opgeslagen."
   },
   "ui.confirm-leave-modal.body": {
-    "defaultMessage": "Er zijn wijzigingen die nog niet zijn opgeslagen. Deze gaan verloren als u deze pagina verlaat."
+    "defaultMessage": "Je hebt nog niet-opgeslagen wijzigingen die verloren gaan als je deze pagina verlaat."
   },
   "ui.confirm-leave-modal.header": {
     "defaultMessage": "Er zijn wijzigingen die nog niet zijn opgeslagen"

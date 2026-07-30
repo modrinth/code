@@ -16,6 +16,8 @@
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<SharedInstanceUpdateModal
 				ref="sharedInstanceUpdateModal"
+				@accepted="hideAcceptedSharedInstanceUpdate"
+				@complete="handleSharedInstanceUpdateComplete"
 				@shared-instance-unavailable="handleSharedInstanceUnavailable"
 				@report="(event) => reportSharedInstance(event, true)"
 			/>
@@ -62,8 +64,10 @@
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
 				:shared-instance-signed-out="sharedInstanceSignedOut"
+				:shared-instance-update-available="showSharedInstanceUpdateAdmonition"
 				@published="fetchInstance"
 				@delete="requestInstanceDeletion"
+				@review-update="reviewSharedInstanceUpdate"
 			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
@@ -134,7 +138,14 @@ import {
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { injectAuth, injectNotificationManager, NavTabs, useLoadingBarToken } from '@modrinth/ui'
+import {
+	commonMessages,
+	injectAuth,
+	injectNotificationManager,
+	NavTabs,
+	useLoadingBarToken,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -181,9 +192,10 @@ import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useTheming } from '@/store/state'
+import { useTheming } from '@/store/state'
 
 import { provideSharedInstanceState, useSharedInstanceState } from './use-shared-instance-state'
 
@@ -194,10 +206,10 @@ const { playServerProject } = injectServerInstall()
 const auth = injectAuth()
 const queryClient = useQueryClient()
 const route = useRoute()
+const { formatMessage } = useVIntl()
 
 const router = useRouter()
 const displayedInstanceRoute = shallowRef(router.currentRoute.value)
-const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_instance_play_time'))
 const contentSubpageRouteNames = new Set(['Mods', 'ModsFilter'])
@@ -210,7 +222,23 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const instance = ref<GameInstance>()
+const initialInstanceId = String(displayedInstanceRoute.value.params.id ?? '')
+const instance = ref<GameInstance | undefined>(
+	queryClient.getQueryData<GameInstance>(['instances', 'summary', initialInstanceId]),
+)
+useRootBreadcrumb({
+	slot: 'instance',
+	id: () => `instance:${String(displayedInstanceRoute.value.params.id ?? '')}`,
+	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: () => ({
+		type: 'image',
+		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		alt: instance.value?.name,
+		tintBy: instance.value?.id ?? String(displayedInstanceRoute.value.params.id ?? ''),
+	}),
+	to: () => `/instance/${encodeURIComponent(String(displayedInstanceRoute.value.params.id ?? ''))}`,
+})
+
 const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)
 const loading = ref(false)
@@ -223,6 +251,7 @@ const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateMo
 const sharedInstanceReportModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
 const deleteConfirmModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
 const selectedInstanceToDelete = ref<GameInstance | null>(null)
+const hiddenSharedInstanceUpdateKey = ref<string | null>(null)
 
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 
@@ -253,8 +282,19 @@ const {
 	signedOut: sharedInstanceSignedOut,
 	unavailableManager: sharedInstanceUnavailableManager,
 	unavailableReason: sharedInstanceUnavailableReason,
+	updatePreview: sharedInstanceUpdatePreview,
 	wrongAccount: sharedInstanceWrongAccount,
 } = sharedInstanceState
+const sharedInstanceUpdateKey = computed(() => {
+	const instanceId = instance.value?.id
+	const latestVersion = sharedInstanceUpdatePreview.value?.latestVersion
+	return instanceId && latestVersion !== undefined ? `${instanceId}:${latestVersion}` : null
+})
+const showSharedInstanceUpdateAdmonition = computed(
+	() =>
+		sharedInstanceUpdatePreview.value?.updateAvailable === true &&
+		sharedInstanceUpdateKey.value !== hiddenSharedInstanceUpdateKey.value,
+)
 
 watch(
 	() => router.currentRoute.value,
@@ -323,6 +363,9 @@ async function fetchInstance() {
 	}
 
 	instance.value = nextInstance ?? undefined
+	if (nextInstance) {
+		queryClient.setQueryData(['instances', 'summary', nextInstance.id], nextInstance)
+	}
 	displayedInstanceRoute.value = nextRoute
 	sharedInstanceState.reset()
 	sharedInstanceState.refreshAvailability()
@@ -487,20 +530,6 @@ watch(
 	{ immediate: true },
 )
 
-if (instance.value) {
-	breadcrumbs.setName(
-		'Instance',
-		instance.value.name.length > 40
-			? instance.value.name.substring(0, 40) + '...'
-			: instance.value.name,
-	)
-	breadcrumbs.setContext({
-		name: instance.value.name,
-		link: displayedInstanceRoute.value.path,
-		query: displayedInstanceRoute.value.query,
-	})
-}
-
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
 const launchInstance = async (context: string) => {
@@ -530,6 +559,37 @@ async function handleSharedInstanceUnavailable(
 	setSharedInstanceUnavailable(reason)
 }
 
+function reviewSharedInstanceUpdate(event: MouseEvent) {
+	const currentInstance = instance.value
+	const preview = sharedInstanceUpdatePreview.value
+	if (
+		!currentInstance ||
+		currentInstance.shared_instance?.role !== 'member' ||
+		!preview?.updateAvailable
+	) {
+		return
+	}
+
+	sharedInstanceUpdateModal.value?.show(
+		currentInstance,
+		preview,
+		async () => {
+			await fetchInstance()
+		},
+		event,
+	)
+}
+
+function hideAcceptedSharedInstanceUpdate() {
+	hiddenSharedInstanceUpdateKey.value = sharedInstanceUpdateKey.value
+}
+
+function handleSharedInstanceUpdateComplete(successful: boolean) {
+	if (!successful && hiddenSharedInstanceUpdateKey.value === sharedInstanceUpdateKey.value) {
+		hiddenSharedInstanceUpdateKey.value = null
+	}
+}
+
 const startInstance = async (context: string) => {
 	if (!instance.value || instance.value.quarantined) return
 	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
@@ -540,17 +600,16 @@ const startInstance = async (context: string) => {
 		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value
 
 	if (canCheckSharedInstanceUpdate) {
-		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>>
+		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>> = null
 		checkingSharedInstanceLaunch.value = true
 		try {
 			preview = await refreshSharedInstanceUpdatePreview()
 		} catch (error) {
 			if (isSharedInstanceUnavailableError(error)) {
 				await handleSharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
-			} else {
-				notifySharedInstanceError(error)
+				return
 			}
-			return
+			notifySharedInstanceError(error)
 		} finally {
 			checkingSharedInstanceLaunch.value = false
 		}
@@ -655,9 +714,9 @@ async function reportSharedInstance(event?: MouseEvent, closeUpdateModal = false
 		)
 		if (instance.value?.id !== reportInstance.id) return
 		if (closeUpdateModal) sharedInstanceUpdateModal.value?.hide()
-		sharedInstanceReportModal.value?.showReport(preview, event)
+		sharedInstanceReportModal.value?.showReport(preview, sharedInstance.manager_id, event)
 	} catch (error) {
-		handleError(error as Error)
+		notifySharedInstanceError(error)
 	}
 }
 

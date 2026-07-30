@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} öğesini sil"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType} öğesini sil"
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
   },
@@ -5011,9 +5014,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Kişisel erişim tokenleri"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Herkese açık profil"
   },
   "settings.sessions.title": {
     "defaultMessage": "Oturumlar"

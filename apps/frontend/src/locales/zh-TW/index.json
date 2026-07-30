@@ -747,7 +747,7 @@
     "message": "拒絕"
   },
   "auth.authorize.app-info": {
-    "message": "由 <creator-link>{creator}</creator-link> 開發的「<strong>{appName}</strong>」將可執行下列操作："
+    "message": "由 <creator-link>{creator}</creator-link> 開發的「<strong>{appName}</strong>」將可執行下列動作："
   },
   "auth.authorize.authorize-app-name": {
     "message": "授權「{appName}」"
@@ -2132,6 +2132,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "金額過低"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "這個付款方式已被付款服務提供商停用。請改用其他付款方式，或聯絡客服。"
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "無法使用付款方式"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "請使用適合你所在地區的 PayPal 轉帳選項（美國或國際）。"
   },
@@ -2769,13 +2775,13 @@
     "message": "基於"
   },
   "layout.footer.developer-mode-activated.text": {
-    "message": "已啟用開發人員模式"
+    "message": "開發人員模式已被啟用"
   },
   "layout.footer.developer-mode-activated.title": {
     "message": "開發人員模式已啟用"
   },
   "layout.footer.developer-mode-deactivated.text": {
-    "message": "已停用開發人員模式"
+    "message": "開發人員模式已被停用"
   },
   "layout.footer.developer-mode-deactivated.title": {
     "message": "開發人員模式已停用"
@@ -2873,9 +2879,6 @@
   "layout.nav.discover": {
     "message": "探索"
   },
-  "layout.nav.discover-content": {
-    "message": "探索內容"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "取得 Modrinth App"
   },
@@ -2921,11 +2924,29 @@
   "layout.publish.email-verification-required.title": {
     "message": "需要驗證電子郵件地址"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "自動安裝好友遊玩的所有內容"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "與好友遊玩相同內容"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "當共用內容變更時及時更新"
+  },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "取得 Modrinth App"
   },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "管理者："
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Modrinth App 將自動開啟..."
+  },
   "modal.shared-instance.open-in-app.title": {
     "message": "正在開啟 Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "為何使用 Modrinth App"
   },
   "moderation.exclude-technical-review": {
     "message": "排除技術審查"
@@ -2947,6 +2968,24 @@
   },
   "moderation.page.technicalReview": {
     "message": "技術審查"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "每批 {amount} 個"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "批量數量"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "這會永久刪除這個專案的所有引用標註群組及其中的所有檔案，這項動作無法復原。"
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "無法清除所有群組：{error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "清除"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "已成功清除所有群組。"
   },
   "modpack-scan-modal.failed": {
     "message": "失敗"
@@ -2979,10 +3018,13 @@
     "message": "掃描所有檔案"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "無法掃描部分檔案：{error}"
+    "message": "無法掃描部分檔案：\n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "正在掃描..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "成功"
   },
   "modpack-scan-modal.title": {
     "message": "模組包掃描（{scanned}/{total} 個檔案）"
@@ -3298,117 +3340,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "這個組織還沒有任何專案。你想要<create-link>建立一個</create-link>嗎？"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "一位 Modrinth 創作者。"
-  },
-  "profile.bio.fallback.user": {
-    "message": "一位 Modrinth 使用者。"
-  },
-  "profile.button.analytics": {
-    "message": "檢視使用者數據分析"
-  },
-  "profile.button.billing": {
-    "message": "管理使用者帳務"
-  },
-  "profile.button.edit-role": {
-    "message": "編輯角色"
-  },
-  "profile.button.info": {
-    "message": "檢視使用者詳細資訊"
-  },
-  "profile.button.manage-projects": {
-    "message": "管理專案"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "移除聯盟行銷夥伴資格"
-  },
-  "profile.button.set-affiliate": {
-    "message": "設為聯盟行銷夥伴"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, other {# 個專案}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "驗證提供者"
-  },
-  "profile.details.label.email": {
-    "message": "電子郵件"
-  },
-  "profile.details.label.email-verified": {
-    "message": "電子郵件已驗證"
-  },
-  "profile.details.label.has-password": {
-    "message": "是否有密碼"
-  },
-  "profile.details.label.has-totp": {
-    "message": "是否有 TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "付款方式"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "電子郵件尚未驗證"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "電子郵件已驗證"
-  },
-  "profile.error.not-found": {
-    "message": "找不到使用者"
-  },
-  "profile.label.affiliate": {
-    "message": "聯盟行銷"
-  },
-  "profile.label.badges": {
-    "message": "徽章"
-  },
-  "profile.label.collection": {
-    "message": "收藏"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, other {次下載}}"
-  },
-  "profile.label.joined": {
-    "message": "加入時間："
-  },
-  "profile.label.no-collections": {
-    "message": "這個使用者沒有任何收藏！"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "你還沒有任何收藏。\n你想要<create-link>建立一個</create-link>嗎？"
-  },
-  "profile.label.no-projects": {
-    "message": "這個使用者沒有任何專案！"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "你還沒有任何專案。\n你想要<create-link>建立一個</create-link>嗎？"
-  },
-  "profile.label.organizations": {
-    "message": "組織"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, other {個專案}}"
-  },
-  "profile.label.saving": {
-    "message": "儲存中..."
-  },
-  "profile.meta.description": {
-    "message": "前往 Modrinth 下載 {username} 的專案"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} — 前往 Modrinth 下載 {username} 的專案"
-  },
-  "profile.official-account": {
-    "message": "Modrinth 官方帳號"
-  },
-  "profile.official-account.bio": {
-    "message": "Modrinth 的官方使用者帳號。請至 <support-link></support-link> 取得支援，或透過電子郵件 <email></email> 聯絡客服團隊"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> 位專案追蹤者}}"
-  },
-  "profile.user-id": {
-    "message": "使用者 ID：{id}"
   },
   "project-member-header.error-decline": {
     "message": "拒絕團隊邀請失敗"
@@ -3760,6 +3691,9 @@
   },
   "project.moderation.admonition.under-review.body.4": {
     "message": "我們的目標是在 24 至 48 小時內審查你提交的專案。部分專案可能需要較長時間，但這不代表你的專案有問題。"
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "我們的目標是在一週內審查你提交的專案。部分專案可能需要較長時間，但這不代表你的專案有問題。"
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>感謝你的耐心等候，我們的管理員正努力維護 Modrinth 的安全，我們期待能協助你分享你的內容！💚</emphasis>"
@@ -4775,23 +4709,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "新增重新導向 URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "取消"
-  },
   "settings.applications.button.create": {
     "message": "建立應用程式"
   },
   "settings.applications.button.delete": {
     "message": "刪除"
   },
-  "settings.applications.button.edit": {
-    "message": "編輯"
-  },
   "settings.applications.button.new": {
     "message": "新的應用程式"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "儲存變更"
   },
   "settings.applications.button.upload-icon": {
     "message": "上傳圖示"
@@ -4865,14 +4790,8 @@
   "settings.authorizations.about-this-app": {
     "message": "關於這個應用程式"
   },
-  "settings.authorizations.by": {
-    "message": "作者"
-  },
   "settings.authorizations.description": {
     "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳戶的權限。你可以隨時在這裡管理並審查帳號的存取權。"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "目前無法顯示你已授權的應用程式，我們正在努力修正這個問題。請稍後再回來查看！"
   },
   "settings.authorizations.head-title": {
     "message": "授權"
@@ -5097,7 +5016,7 @@
     "message": "開發者模式已被停用"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
-    "message": "開發者模式已停用"
+    "message": "開發人員模式已停用"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "資料包頁面"
@@ -5231,27 +5150,6 @@
   "settings.pats.token.never-used": {
     "message": "從未使用"
   },
-  "settings.profile.bio.description": {
-    "message": "簡單介紹一下你自己。"
-  },
-  "settings.profile.bio.title": {
-    "message": "關於我"
-  },
-  "settings.profile.description": {
-    "message": "你的個人檔案資訊會公開顯示在 Modrinth 上，並可透過 <docs-link>Modrinth API</docs-link> 查詢。"
-  },
-  "settings.profile.head-title": {
-    "message": "個人設定"
-  },
-  "settings.profile.profile-info": {
-    "message": "個人檔案資訊"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "頭貼"
-  },
-  "settings.profile.username.description": {
-    "message": "獨特且不區分大小寫的名稱，用於識別你的個人檔案。"
-  },
   "settings.sessions.action.revoke-session": {
     "message": "撤銷工作階段"
   },
@@ -5285,8 +5183,29 @@
   "shared-instance.invite.accept": {
     "message": "接受邀請"
   },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "一位 Modrinth 使用者"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "已有 {count, plural, other {# 人}}加入"
+  },
+  "shared-instance.invite.loading": {
+    "message": "正在載入邀請資訊..."
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} 邀請你一起遊玩"
+  },
   "shared-instance.invite.trust.description": {
     "message": "這份邀請是由另一位 Modrinth 使用者建立，並非由 Modrinth 官方建立。請僅接受來自你信任的人的邀請。"
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "你認識這位使用者嗎？"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "邀請可能已過期、達到使用次數上限，或是已被共用者撤銷。"
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "這個邀請無法使用"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"
@@ -5307,7 +5226,7 @@
     "message": "所有版本"
   },
   "version.confirm-delete.description": {
-    "message": "這個版本將永久刪除。這個操作無法復原。"
+    "message": "這個版本將永久刪除，這項動作無法復原。"
   },
   "version.confirm-delete.proceed": {
     "message": "刪除版本"

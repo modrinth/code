@@ -1,5 +1,4 @@
 import { AbstractModule } from '../../../core/abstract-module'
-import type { UploadHandle } from '../../../types/upload'
 import type { Labrinth } from '../types'
 
 export class LabrinthOAuthInternalModule extends AbstractModule {
@@ -45,14 +44,15 @@ export class LabrinthOAuthInternalModule extends AbstractModule {
 	 * @returns Promise resolving to an array of OAuth clients
 	 */
 	public async getApps(ids: string[]): Promise<Labrinth.OAuth.Internal.OAuthClient[]> {
-		return this.client.request<Labrinth.OAuth.Internal.OAuthClient[]>(
-			`/oauth/apps?ids=${encodeURIComponent(JSON.stringify(ids))}`,
-			{
-				api: 'labrinth',
-				version: 'internal',
-				method: 'GET',
-			},
-		)
+		if (ids.length === 0) {
+			return []
+		}
+
+		// bulk `/oauth/apps` is broken on backend, fetch by id instead
+		// TODO: Remove this once the backend is fixed
+		const results = await Promise.all(ids.map((id) => this.getApp(id).catch(() => null)))
+
+		return results.filter((app): app is Labrinth.OAuth.Internal.OAuthClient => app !== null)
 	}
 
 	/**
@@ -109,14 +109,14 @@ export class LabrinthOAuthInternalModule extends AbstractModule {
 	 * @param id - The OAuth client ID
 	 * @param file - The icon file
 	 * @param ext - The file extension (e.g. 'png', 'jpeg')
-	 * @returns UploadHandle for progress tracking and cancellation
 	 */
-	public uploadAppIcon(id: string, file: File | Blob, ext: string): UploadHandle<void> {
-		return this.client.upload<void>(`/oauth/app/${id}/icon`, {
+	public async uploadAppIcon(id: string, file: File | Blob, ext: string): Promise<void> {
+		return this.client.request(`/oauth/app/${id}/icon`, {
 			api: 'labrinth',
 			version: 'internal',
-			file,
+			method: 'PATCH',
 			params: { ext },
+			body: file,
 		})
 	}
 

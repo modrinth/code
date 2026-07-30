@@ -2126,9 +2126,6 @@
   "settings.pats.title": {
     "defaultMessage": "Tokens de acesso pessoal"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Perfil público"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessões"
   },
@@ -2529,4 +2526,3 @@
     "defaultMessage": "Tens alterações por guardar."
   }
 }
-

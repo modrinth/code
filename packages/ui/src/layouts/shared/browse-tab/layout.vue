@@ -107,7 +107,11 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 	</template>
 	<SelectedProjectsFloatingBar v-if="ctx.installContext?.value && ctx.variant !== 'web'" />
 
-	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
+	<NavTabs
+		v-if="ctx.showProjectTypeTabs.value"
+		:links="ctx.selectableProjectTypes.value"
+		:replace="ctx.variant === 'app'"
+	/>
 
 	<StyledInput
 		v-model="ctx.query.value"
@@ -280,9 +284,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 						name: result.organization == null ? result.author : result.organization,
 						link:
 							result.organization_id == null
-								? ctx.variant === 'web'
-									? `/user/${result.author_id ?? result.author}`
-									: `https://modrinth.com/user/${result.author_id ?? result.author}`
+								? `/user/${encodeURIComponent(result.author_id ?? result.author)}`
 								: ctx.variant === 'web'
 									? `/organization/${result.organization_id}`
 									: `https://modrinth.com/organization/${result.organization_id}`,

@@ -5027,9 +5027,6 @@
   "settings.pats.title": {
     "defaultMessage": "Lični tokeni za pristup"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Javni profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sesije"
   },
@@ -5787,4 +5784,3 @@
     "defaultMessage": "Tip"
   }
 }
-

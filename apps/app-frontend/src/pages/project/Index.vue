@@ -31,8 +31,9 @@
 				:organization="organization"
 				:members="members"
 				:org-link="(slug) => `https://modrinth.com/organization/${slug}`"
-				:user-link="(username) => `https://modrinth.com/user/${username}`"
+				:user-link="(username) => `/user/${encodeURIComponent(username)}`"
 				link-target="_blank"
+				:user-link-target="null"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarDetails
@@ -294,10 +295,10 @@ import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerAddress } from '@/helpers/worlds'
+import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -306,8 +307,29 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+const displayedProjectRoute = shallowRef(router.currentRoute.value)
+watch(
+	() => router.currentRoute.value,
+	(nextRoute) => {
+		if (nextRoute.path.startsWith('/project/')) {
+			displayedProjectRoute.value = nextRoute
+		}
+	},
+	{ immediate: true },
+)
+const projectBreadcrumbTo = computed(() => {
+	const currentRoute = displayedProjectRoute.value
+	if (currentRoute.name === 'Version') {
+		return {
+			name: 'Versions',
+			params: { id: currentRoute.params.id },
+			query: currentRoute.query,
+		}
+	}
+
+	return currentRoute.fullPath
+})
 const queryClient = useQueryClient()
-const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
 
@@ -315,6 +337,10 @@ const messages = defineMessages({
 	backToBrowse: {
 		id: 'app.project.install-context.back-to-browse',
 		defaultMessage: 'Back to discover',
+	},
+	backToInstance: {
+		id: 'app.project.install-context.back-to-instance',
+		defaultMessage: 'Back to instance',
 	},
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
@@ -330,6 +356,40 @@ const { installingServerProjects, playServerProject, showAddServerToInstanceModa
 	injectServerInstall()
 const installing = ref(false)
 const data = shallowRef(null)
+
+function getProjectBreadcrumbSummary(projectId) {
+	const identifier = Array.isArray(projectId) ? projectId[0] : projectId
+	if (typeof identifier !== 'string' || !identifier) return undefined
+
+	return queryClient.getQueryData(['projects', 'summary', identifier])
+}
+
+function getProjectBreadcrumbLabel(projectId) {
+	const summary = getProjectBreadcrumbSummary(projectId)
+	return summary?.name ?? summary?.title ?? formatMessage(commonMessages.loadingLabel)
+}
+
+const projectBreadcrumbLabel = ref(getProjectBreadcrumbLabel(route.params.id))
+const projectBreadcrumb = useBreadcrumb({
+	slot: 'project',
+	id: () => `project:${String(displayedProjectRoute.value.params.id ?? '')}`,
+	label: projectBreadcrumbLabel,
+	visual: () => {
+		const identifier = String(displayedProjectRoute.value.params.id ?? '')
+		const loadedProject =
+			data.value?.id === identifier || data.value?.slug === identifier ? data.value : undefined
+		const project = loadedProject ?? getProjectBreadcrumbSummary(identifier)
+		return {
+			type: 'image',
+			src: project?.icon_url,
+			alt: projectBreadcrumbLabel.value,
+			tintBy: identifier,
+		}
+	},
+	to: projectBreadcrumbTo,
+})
+provideBreadcrumbParent(projectBreadcrumb)
+
 const versions = shallowRef([])
 const members = shallowRef([])
 const categories = shallowRef([])
@@ -409,9 +469,18 @@ const projectGalleryHref = computed(() => buildProjectHref(`/project/${route.par
 const projectBrowseBackUrl = computed(() => {
 	const browsePath = route.query.b
 	if (typeof browsePath === 'string' && browsePath.startsWith('/browse/')) return browsePath
+	const instanceId = route.query.i
+	if (typeof instanceId === 'string' && instanceId) {
+		return `/instance/${encodeURIComponent(instanceId)}`
+	}
 	const type = data.value?.project_type ? `${data.value.project_type}` : 'mod'
 	return buildBrowseHref(`/browse/${type}`)
 })
+const projectBackLabel = computed(() =>
+	typeof route.query.i === 'string' && typeof route.query.b !== 'string'
+		? formatMessage(messages.backToInstance)
+		: formatMessage(messages.backToBrowse),
+)
 
 const projectInstallContext = computed(() => {
 	const serverData = serverInstallContent.serverContextServerData.value
@@ -425,7 +494,7 @@ const projectInstallContext = computed(() => {
 			iconSrc: null,
 			isMedal: serverData.is_medal,
 			backUrl: projectBrowseBackUrl.value,
-			backLabel: formatMessage(messages.backToBrowse),
+			backLabel: projectBackLabel.value,
 			heading: serverInstallContent.serverBrowseHeading.value,
 			queuedCount: serverInstallContent.queuedServerInstallCount.value,
 			selectedProjects: serverInstallContent.selectedServerInstallProjects.value,
@@ -445,7 +514,7 @@ const projectInstallContext = computed(() => {
 			gameVersion: instance.value.game_version,
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 			backUrl: projectBrowseBackUrl.value,
-			backLabel: formatMessage(messages.backToBrowse),
+			backLabel: projectBackLabel.value,
 			heading: formatMessage(commonMessages.installingContentLabel),
 		}
 	}
@@ -606,6 +675,7 @@ function reportProject() {
 }
 
 async function fetchProjectData() {
+	projectBreadcrumbLabel.value = getProjectBreadcrumbLabel(route.params.id)
 	const [project, projectV3Result] = await Promise.all([
 		get_project(route.params.id, 'must_revalidate').catch(handleError),
 		get_project_v3(route.params.id, 'must_revalidate').catch(handleError),
@@ -618,6 +688,7 @@ async function fetchProjectData() {
 	}
 
 	data.value = project
+	projectBreadcrumbLabel.value = project.title
 	;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
 		await Promise.all([
 			get_version_many(project.versions, 'must_revalidate').catch(handleError),
@@ -626,6 +697,14 @@ async function fetchProjectData() {
 			route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
 			route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
 		])
+
+	for (const member of members.value ?? []) {
+		for (const identifier of [member.user.id, member.user.username]) {
+			if (identifier) {
+				queryClient.setQueryData(['users', 'summary', identifier], member.user)
+			}
+		}
+	}
 
 	versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
@@ -645,8 +724,6 @@ async function fetchProjectData() {
 
 	isServerProject.value = projectV3.value?.minecraft_server != null
 	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping?.data
-
-	breadcrumbs.setName('Project', data.value.title)
 
 	fetchDeferredServerData(project)
 }

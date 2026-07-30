@@ -6,6 +6,7 @@ use serde_json::json;
 
 pub mod analytics_event;
 pub mod analytics_get;
+pub mod blocked_users;
 pub mod collections;
 pub mod content;
 pub mod friends;
@@ -66,6 +67,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(version_file::config)
             .configure(versions::config)
             .configure(friends::config)
+            .configure(blocked_users::config)
             .configure(content::config),
     );
 }
@@ -227,6 +229,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		friends::add_friend,
 		friends::remove_friend,
 		friends::friends,
+		blocked_users::block_user,
+		blocked_users::unblock_user,
+		blocked_users::get_blocked_users,
 		content::resolve_content,
 	),
 	modifiers(&V3PathModifier, &SecurityAddon)

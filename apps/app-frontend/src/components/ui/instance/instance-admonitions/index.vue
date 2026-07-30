@@ -6,6 +6,11 @@
 				:instance="instance"
 				@published="emit('published')"
 			/>
+			<InstanceAdmonitionsSharedInstanceUpdateAvailable
+				v-else-if="item.kind === 'shared-instance-update-available'"
+				:instance-name="instance.name"
+				@review="emit('review-update', $event)"
+			/>
 			<InstanceAdmonitionsSharedInstanceWrongAccount
 				v-else-if="item.kind === 'shared-instance-wrong-account'"
 				:expected-user-id="sharedInstanceExpectedUserId"
@@ -33,6 +38,7 @@ import type { GameInstance } from '@/helpers/types'
 
 import InstanceAdmonitionsSharedInstanceStale from './instance-admonitions-shared-instance-stale.vue'
 import InstanceAdmonitionsSharedInstanceUnavailable from './instance-admonitions-shared-instance-unavailable.vue'
+import InstanceAdmonitionsSharedInstanceUpdateAvailable from './instance-admonitions-shared-instance-update-available.vue'
 import InstanceAdmonitionsSharedInstanceWrongAccount from './instance-admonitions-shared-instance-wrong-account.vue'
 import type { InstanceAdmonitionItem, SharedInstanceRole } from './types'
 
@@ -48,11 +54,13 @@ const props = defineProps<{
 	sharedInstanceExpectedUserId?: string | null
 	sharedInstanceRole?: SharedInstanceRole | null
 	sharedInstanceSignedOut?: boolean
+	sharedInstanceUpdateAvailable?: boolean
 }>()
 
 const emit = defineEmits<{
 	published: []
 	delete: []
+	'review-update': [event: MouseEvent]
 }>()
 
 const sharedInstanceWrongAccount = computed(() => props.sharedInstanceWrongAccount ?? false)
@@ -67,6 +75,14 @@ const showSharedInstancePublishAdmonition = computed(
 		props.instance.install_stage === 'installed' &&
 		props.instance.shared_instance?.role === 'owner' &&
 		props.instance.shared_instance.status === 'stale',
+)
+const showSharedInstanceUpdateAdmonition = computed(
+	() =>
+		!sharedInstanceWrongAccount.value &&
+		!displayedSharedInstanceUnavailableReason.value &&
+		props.instance.install_stage === 'installed' &&
+		props.sharedInstanceRole === 'member' &&
+		props.sharedInstanceUpdateAvailable === true,
 )
 
 const stackItems = computed<InstanceAdmonitionItem[]>(() => {
@@ -101,6 +117,15 @@ const stackItems = computed<InstanceAdmonitionItem[]>(() => {
 			type: 'warning',
 			dismissible: false,
 			kind: 'shared-instance-stale',
+		})
+	}
+
+	if (showSharedInstanceUpdateAdmonition.value) {
+		items.push({
+			id: 'shared-instance-update-available',
+			type: 'info',
+			dismissible: false,
+			kind: 'shared-instance-update-available',
 		})
 	}
 

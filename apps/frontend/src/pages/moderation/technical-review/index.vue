@@ -728,6 +728,7 @@ watch(totalPages, (pages) => {
 					:item="item"
 					:loading-issues="loadingIssues"
 					:decompiled-sources="decompiledSources"
+					:collapsed="true"
 					@refetch="refetch"
 					@load-issue-sources="handleLoadIssueSources"
 					@mark-complete="handleMarkComplete"
