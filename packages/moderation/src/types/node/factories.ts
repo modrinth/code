@@ -208,9 +208,9 @@ function getStringValue(raw: NodeState): string {
 function setStringValue(raw: NodeState, next: string, isDefault?: boolean): NodeState {
   if (raw && typeof raw === "object" && !(raw instanceof Set)) {
     const {value: _v, ...children} = raw as NodeStateWithChildren & Record<string, NodeState>
-    if (Object.keys(children).length > 0) return isDefault ? children : {...children, value: next || undefined}
+    if (Object.keys(children).length > 0) return isDefault ? children : {...children, value: next}
   }
-  return isDefault ? undefined : next || undefined
+  return isDefault ? undefined : next
 }
 
 const dropdownValue = {

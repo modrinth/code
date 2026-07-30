@@ -1,27 +1,16 @@
-import type { Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError } from '@modrinth/api-client'
-import {
-	BookOpenIcon,
-	TagCategoryRefreshCcwIcon,
-	TagCategoryWandSparklesIcon,
-	UserPlusIcon,
-} from '@modrinth/assets'
-import {
-	Alert,
-	injectModrinthClient,
-	injectProjectPageContext,
-	ProjectStatusLink,
-} from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import type {Labrinth} from "@modrinth/api-client"
+import {ModrinthApiError} from "@modrinth/api-client"
+import {BookOpenIcon, TagCategoryRefreshCcwIcon, TagCategoryWandSparklesIcon, UserPlusIcon, WrenchIcon} from "@modrinth/assets"
+import {Alert, injectModrinthClient, injectProjectPageContext, ProjectStatusLink} from "@modrinth/ui"
+import {useQueryClient} from "@tanstack/vue-query"
+import {computed, ref, watch} from "vue"
 
-import { md, type NodeState } from '../../types/node'
-import { button, check, fix, group, stage, text, toggle } from '../../types/node'
+import {button, check, fix, group, md, type NodeState, stage, text, toggle} from "../../types/node"
 
 const STALE_TIME = 1000 * 60 * 5
 
 type AutoSlugStatus = 'loading' | 'available' | 'unavailable'
-type SlugValidation = 'checking' | 'available' | 'unchanged' | 'taken' | null
+type SlugValidation = 'checking' | 'available' | 'unchanged' | 'taken' | 'empty' | 'invalid' | null
 
 //TODO: make this not a copy of frontend/src/utils/slugs.generateUrlSlug
 // (as in move the other one so we can use it here)
@@ -92,6 +81,18 @@ export default function () {
 			return (
 				<Alert type="success" class="w-full">
 					Slug is available
+				</Alert>
+			)
+		if (v === 'empty')
+			return (
+				<Alert type="error" class="w-full">
+					Slug cannot be empty
+				</Alert>
+			)
+		if (v === 'invalid')
+			return (
+				<Alert type="error" class="w-full">
+					Invalid Slug
 				</Alert>
 			)
 		const by = correctSlugConflict.value
@@ -203,13 +204,9 @@ export default function () {
 			group('title')
 				.title('Title Issues?')
 				.children(
-					toggle('useless-info', 'Contains Useless Info')
-						.suggestedStatus('flagged')
-						.message(),
+					toggle('useless-info', 'Contains Useless Info').suggestedStatus('flagged').message(),
 
-					toggle('minecraft-branding', 'Minecraft Title')
-						.suggestedStatus('flagged')
-						.message(),
+					toggle('minecraft-branding', 'Minecraft Title').suggestedStatus('flagged').message(),
 
 					toggle('similarities', 'Title Similarities')
 						.suggestedStatus('flagged')
@@ -234,98 +231,114 @@ export default function () {
 				.title('Slug Issues')
 				.shown(computed(() => hasCustomSlug(project.value)))
 				.children(
-					group()
-						.children(
-							toggle('misused', 'Misused')
-								.children(
-									group()
-										.title('Correct Slug')
-										.children(
-											text('correct-slug')
-												.initial(() => resolvedAutoSlug.value ?? project.value.slug ?? "")
-												.onChange((value, { override }) => {
-													if (!value) return override(project.value.slug ?? '')
-													clearTimeout(slugDebounceTimer)
-													if (value === project.value.slug) {
-														slugValidation.value = 'unchanged'
-														return
+					group().children(
+						toggle('misused', 'Misused')
+							.children(
+								group()
+									.title('Correct Slug')
+									.children(
+										text('correct-slug')
+											.initial(() => resolvedAutoSlug.value ?? project.value.slug ?? '')
+											.onChange((value, { override }) => {
+												clearTimeout(slugDebounceTimer)
+												if (value === project.value.slug) {
+													slugValidation.value = 'unchanged'
+													return
+												}
+												if (!value) {
+													slugValidation.value = 'empty'
+													correctSlugConflict.value = null
+													return
+												}
+												if (generateUrlSlug(value) !== value) {
+													slugValidation.value = 'invalid'
+													correctSlugConflict.value = null
+													return
+												}
+												slugValidation.value = 'checking'
+												slugDebounceTimer = setTimeout(async () => {
+													const conflict = await checkSlugTaken(value).catch(() => null)
+													if (conflict !== null && conflict.id !== project.value.id) {
+														correctSlugConflict.value = conflict
+														slugValidation.value = 'taken'
+													} else {
+														correctSlugConflict.value = null
+														slugValidation.value = 'available'
 													}
-													slugValidation.value = 'checking'
-													slugDebounceTimer = setTimeout(async () => {
-														const conflict = await checkSlugTaken(value).catch(() => null)
-														if (conflict !== null && conflict.id !== project.value.id) {
-															correctSlugConflict.value = conflict
-															slugValidation.value = 'taken'
-														} else {
-															correctSlugConflict.value = null
-															slugValidation.value = 'available'
-														}
-													}, 400)
-												}),
+												}, 400)
+											}),
 
-											button()
-												.icon(TagCategoryWandSparklesIcon)
-												.tooltip(computed(() => resolvedAutoSlug.value ?? ''))
-												.enabled(
-													(state) =>
-														autoSlugStatus.value === 'available' &&
-														resolvedAutoSlug.value !== null &&
-														resolvedAutoSlug.value !== currentSlug(state),
-												)
-												.onClick((_state, write) => {
-													if (resolvedAutoSlug.value) write('correct-slug', resolvedAutoSlug.value)
-												}),
+										button()
+											.icon(TagCategoryWandSparklesIcon)
+											.tooltip(computed(() => resolvedAutoSlug.value ?? ''))
+											.enabled(
+												(state) =>
+													autoSlugStatus.value === 'available' &&
+													resolvedAutoSlug.value !== null &&
+													resolvedAutoSlug.value !== currentSlug(state),
+											)
+											.onClick((state) => {
+												if (resolvedAutoSlug.value) state['correct-slug'] = resolvedAutoSlug.value
+											}),
 
-											button()
-												.icon(UserPlusIcon)
-												.tooltip((state) => {
-													const current = currentSlug(state)
-													if (!ownerUsername.value || current?.includes(ownerUsername.value))
-														return current ?? ''
-													return `${current}-${ownerUsername.value}`
-												})
-												.enabled(
-													(state) =>
-														ownerUsername.value !== null &&
-														!currentSlug(state)?.includes(ownerUsername.value),
-												)
-												.onClick((state, write) => {
-													write('correct-slug', `${currentSlug(state)}-${ownerUsername.value}`)
-												}),
+										button()
+											.icon(UserPlusIcon)
+											.tooltip((state) => {
+												const current = currentSlug(state)
+												if (!ownerUsername.value || current?.includes(ownerUsername.value))
+													return current ?? ''
+												return `${current}-${ownerUsername.value}`
+											})
+											.enabled(
+												(state) =>
+													ownerUsername.value !== null &&
+													!currentSlug(state)?.includes(ownerUsername.value),
+											)
+											.onClick(
+												(state) =>
+													(state['correct-slug'] = `${currentSlug(state)}-${ownerUsername.value}`),
+											),
 
-											button()
-												.icon(TagCategoryRefreshCcwIcon)
-												.tooltip(computed(() => project.value.slug ?? ''))
-												.enabled((state) => currentSlug(state) !== project.value.slug)
-												.onClick((_state, write) => {
-													write('correct-slug', project.value.slug)
-												}),
+										button()
+											.icon(WrenchIcon)
+											.tooltip((state) => generateUrlSlug(currentSlug(state) ?? ''))
+											.enabled(
+												(state) => generateUrlSlug(currentSlug(state) ?? '') !== currentSlug(state),
+											)
+											.onClick(
+												(state) =>
+													(state['correct-slug'] = generateUrlSlug(currentSlug(state) ?? '')),
+											),
 
-											SlugStatus,
-										),
-								)
-								.rawMessage(async (state) => {
-									let correct = ''
-									if (slugValidation.value === 'available') {
-										const slug = state['correct-slug'] as string | undefined
-										if (slug)
-											correct = await md('checklist/messages/title-slug/slug/correction', () => ({
-												SUGGESTED_SLUG: slug,
-											}))(state)
-									}
-									return md('checklist/messages/title-slug/slug/misused', () => ({
-										CORRECT: correct,
-									}))(state)
-								})
-								.fix(
-									fix().project((patch, state) => {
-										const slug = state['correct-slug'] as string
-										if (!slug || slug === project.value.slug) return
-										if (correctSlugConflict.value) return
-										patch.slug = slug
-									}),
-								),
-						),
+										button()
+											.icon(TagCategoryRefreshCcwIcon)
+											.tooltip(computed(() => project.value.slug ?? ''))
+											.enabled((state) => currentSlug(state) !== project.value.slug)
+											.onClick((state) => (state['correct-slug'] = project.value.slug)),
+
+										SlugStatus,
+									),
+							)
+							.rawMessage(async (state) => {
+								let correct = ''
+								if (slugValidation.value === 'available') {
+									const slug = state['correct-slug'] as string | undefined
+									if (slug)
+										correct = await md('checklist/messages/title-slug/slug/correction', () => ({
+											SUGGESTED_SLUG: slug,
+										}))(state)
+								}
+								return md('checklist/messages/title-slug/slug/misused', () => ({
+									CORRECT: correct,
+								}))(state)
+							})
+							.fix(
+								fix().project((patch, state) => {
+									if (slugValidation.value !== 'available') return
+                  patch.slug = state['correct-slug'] as string
+								}),
+							),
+					),
 				),
 		)
 }

@@ -237,7 +237,7 @@ export function withValue<T extends object, V>(
 }
 
 export interface Clickable {
-	_onClick: ((state: Record<string, NodeState>, write: (id: string, value: NodeState) => void) => void) | undefined
+	_onClick: ((state: Record<string, NodeState>) => void) | undefined
 	onClick(this: this, fn: Clickable['_onClick']): this
 }
 
@@ -344,8 +344,6 @@ export interface StageMeta {
 	_shownSticky: boolean | undefined
 	hint(this: this, hint: string): this
 	guidance(this: this, url: string): this
-	// A stage-relative path (e.g. '/versions'). Omit entirely to mean the
-	// project's own base page, rather than passing '/' as a magic string.
 	navigate(this: this, path?: string): this
 	sticky(this: this): this
 }

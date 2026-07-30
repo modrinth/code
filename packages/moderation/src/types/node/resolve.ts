@@ -3,6 +3,8 @@ import { toValue } from 'vue'
 
 import type { AnyNode, ChildEntry, ChildNode, HasChildren } from './builder'
 import type { HasValue, Identified } from './capabilities'
+import { childWriter, writeNodeValue } from './mutate'
+import type { Writer } from './mutate'
 import type { NodeState, NodeStateWithChildren } from './state'
 import { resolve } from './state'
 
@@ -131,7 +133,11 @@ function optionChildrenFor(node: object, state: Record<string, NodeState>): Chil
 	return resolveChildren(selected, state)
 }
 
-export function withDefaults<T extends Record<string, NodeState>>(rawState: T, children: ChildNode[]): T {
+export function withDefaults<T extends Record<string, NodeState>>(
+	rawState: T,
+	children: ChildNode[],
+	write?: Writer,
+): T {
 	if (rawState == null || typeof rawState !== 'object' || rawState instanceof Set) return rawState
 
 	const childMap = buildChildMap(children, rawState)
@@ -154,7 +160,11 @@ export function withDefaults<T extends Record<string, NodeState>>(rawState: T, c
 					const effective = getEffectiveValue(child, undefined, proxy)
 					const grandchildren = hasChildrenCap(child) ? resolveChildren(child, {}) : []
 					if (grandchildren.length > 0) {
-						return withDefaults({ value: effective } as Record<string, NodeState>, grandchildren)
+						return withDefaults(
+							{ value: effective } as Record<string, NodeState>,
+							grandchildren,
+							write && childWriter(target, write, key),
+						)
 					}
 					value = child._setValue(undefined, effective)
 				} finally {
@@ -170,7 +180,7 @@ export function withDefaults<T extends Record<string, NodeState>>(rawState: T, c
 				!(value instanceof Set)
 			) {
 				const nested = value as Record<string, NodeState>
-				return withDefaults(nested, resolveChildren(child, nested))
+				return withDefaults(nested, resolveChildren(child, nested), write && childWriter(target, write, key))
 			}
 
 			if (value === undefined && child && hasChildrenCap(child)) {
@@ -181,6 +191,12 @@ export function withDefaults<T extends Record<string, NodeState>>(rawState: T, c
 			return value
 		},
 		set(target, key, value, receiver) {
+			if (typeof key !== 'string') return Reflect.set(target, key, value, receiver)
+			const child = childMap.get(key)
+			if (child && hasValueCap(child) && write) {
+				writeNodeValue(child as HasValue & Identified, target, write, value as never, proxy)
+				return true
+			}
 			return Reflect.set(target, key, value, receiver)
 		},
 	}) as T

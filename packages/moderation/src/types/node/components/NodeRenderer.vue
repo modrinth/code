@@ -76,7 +76,7 @@ function isFixActionable(node: object): boolean {
 	return metaCtx?.value.metaMap.get(node)?.isFixActionable ?? false
 }
 
-const wrappedState = computed(() => withDefaults(props.state, props.nodes))
+const wrappedState = computed(() => withDefaults(props.state, props.nodes, props.write))
 
 function isEnabled(node: Partial<Enableable>): boolean {
 	if (node._enabled === undefined) return true
@@ -182,7 +182,7 @@ function resolveTooltip(node: object): Record<string, unknown> | undefined {
 
 function clickButton(node: object): void {
 	if (!hasCap(node, '_onClick')) return
-	;(node._onClick as (state: Record<string, NodeState>, write: Writer) => void)?.(wrappedState.value, props.write)
+	;(node._onClick as (state: Record<string, NodeState>) => void)?.(wrappedState.value)
 }
 
 function nodeKey(item: ChildNode, idx: number): string {
@@ -220,7 +220,8 @@ watchEffect(() => {
 		const value = getEffectiveValue(node, props.state[node.id], wrappedState.value)
 		if (seenOnChangeValues.has(node) && seenOnChangeValues.get(node) === value) continue
 		seenOnChangeValues.set(node, value)
-		updateValue(node as RenderableValueNode, value)
+		const onChange = (node as RenderableValueNode)._onChange as OnChangeFn | undefined
+		onChange?.(value as never, { override: (ov) => ({ __override: ov }) })
 	}
 })
 </script>
