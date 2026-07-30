@@ -1,4 +1,6 @@
 use actix_web::{HttpRequest, get, web};
+use serde::Serialize;
+use utoipa::ToSchema;
 use xredis::RedisPool;
 
 use crate::auth::checks::is_visible_project;
@@ -15,10 +17,15 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get_project_disclosures);
 }
 
+#[derive(Serialize, ToSchema)]
+pub struct GetProjectDisclosures {
+    pub disclosures: Vec<ProjectDisclosureData>,
+}
+
 #[utoipa::path(
 	context_path = "/project",
 	tag = "project_disclosures",
-	responses((status = OK, body = [ProjectDisclosureData]))
+	responses((status = OK, body = GetProjectDisclosures))
 )]
 #[get("/{project_id}/disclosures")]
 pub async fn get_project_disclosures(
@@ -28,7 +35,7 @@ pub async fn get_project_disclosures(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<ProjectDisclosureData>>, ApiError> {
+) -> Result<web::Json<GetProjectDisclosures>, ApiError> {
     let (string,) = info.into_inner();
 
     let project = db_models::DBProject::get(&string, &***ro_pool, &redis)
@@ -64,12 +71,12 @@ pub async fn get_project_disclosures(
     .await
     .wrap_internal_err("failed to fetch project disclosures")?;
 
-    Ok(web::Json(
-        disclosures
+    Ok(web::Json(GetProjectDisclosures {
+        disclosures: disclosures
             .into_iter()
             .map(|disclosure| {
                 ProjectDisclosureData::from_db(disclosure, viewer_is_moderator)
             })
-            .collect(),
-    ))
+            .collect()
+    }))
 }
