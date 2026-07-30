@@ -98,7 +98,7 @@ async fn app() -> std::io::Result<()> {
         info!("Starting labrinth on {}", &ENV.BIND_ADDR);
 
         if !args.no_migrations {
-            database::check_for_migrations()
+            labrinth::background_task::run_migrations()
                 .await
                 .expect("An error occurred while running migrations.");
         }

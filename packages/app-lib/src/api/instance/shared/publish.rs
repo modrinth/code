@@ -836,11 +836,29 @@ async fn config_bundle_bytes(
     entries: &BTreeMap<String, Vec<u8>>,
 ) -> crate::Result<Vec<u8>> {
     if entries.len() > MAX_CONFIG_BUNDLE_ENTRIES {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle contains too many entries"
-                .to_string(),
-        )
-        .into());
+        let mut folder_entry_counts = HashMap::new();
+        for path in entries.keys() {
+            if let Some((folder, _)) = path.split_once('/') {
+                *folder_entry_counts.entry(folder).or_insert(0_usize) += 1;
+            }
+        }
+
+        if let Some((folder, count)) = folder_entry_counts
+            .into_iter()
+            .filter(|(_, count)| *count > MAX_CONFIG_BUNDLE_ENTRIES)
+            .max_by_key(|(_, count)| *count)
+        {
+            return Err(crate::ErrorKind::InputError(format!(
+				"The \"{folder}\" config folder has too many files to share ({count}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files from this folder."
+			))
+			.into());
+        }
+
+        return Err(crate::ErrorKind::InputError(format!(
+			"Too many config files were selected to share ({}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files.",
+			entries.len()
+		))
+		.into());
     }
     let mut total_size = 0_u64;
     for bytes in entries.values() {

@@ -25,6 +25,7 @@ import {
 	preferencesDiffer,
 	provideBrowseManager,
 	requestInstall,
+	resolveInstallPlan,
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
 	useBrowseSearch,
@@ -50,6 +51,7 @@ import { instance_listener } from '@/helpers/events.js'
 import {
 	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
+	list as listInstances,
 } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -171,7 +173,7 @@ const instance: Ref<Instance | null> = ref(
 	queryClient.getQueryData<Instance>(['instances', 'summary', initialInstanceId]) ?? null,
 )
 const installedProjectIds: Ref<string[] | null> = ref(null)
-const instanceHideInstalled = ref(false)
+const instanceHideInstalled = ref(route.query.ai === 'true')
 const newlyInstalled = ref<string[]>([])
 const hiddenInstanceProjectIds = ref<Set<string>>(new Set())
 const hiddenInstanceProjectIdsInitialized = ref(false)
@@ -288,7 +290,17 @@ watchServerContextChanges()
 await initInstanceContext()
 
 async function refreshInstalledProjectIds() {
-	if (!route.query.i) return
+	if (!route.query.i) {
+		const instances = await listInstances().catch(handleError)
+		if (!instances) return
+
+		const ids = instances
+			.map((gameInstance) => gameInstance.link?.project_id)
+			.filter((id): id is string => !!id)
+		debugLog('installedInstanceProjectIds loaded', { count: ids.length })
+		installedProjectIds.value = ids
+		return
+	}
 
 	if (route.query.from === 'worlds') {
 		const worlds = await get_instance_worlds(route.query.i as string).catch(handleError)
@@ -318,6 +330,7 @@ async function initInstanceContext() {
 		queryFrom: route.query.from,
 	})
 	await initServerContext()
+	await refreshInstalledProjectIds()
 
 	if (route.query.i) {
 		instance.value = (await getInstance(route.query.i as string).catch(handleError)) ?? null
@@ -326,8 +339,6 @@ async function initInstanceContext() {
 			loader: instance.value?.loader,
 			gameVersion: instance.value?.game_version,
 		})
-
-		await refreshInstalledProjectIds()
 
 		if (instance.value?.link?.project_id) {
 			debugLog('checking linked project for server status', instance.value.link.project_id)
@@ -341,12 +352,22 @@ async function initInstanceContext() {
 			}
 		}
 	}
-
-	if (route.query.ai && !(route.params.projectType === 'modpack')) {
-		debugLog('setting instanceHideInstalled from query', route.query.ai)
-		instanceHideInstalled.value = route.query.ai === 'true'
-	}
 }
+
+function setBrowseHideInstalledFlag(flag: 'hide_installed_modpacks', value: boolean) {
+	themeStore.featureFlags[flag] = value
+	getSettings()
+		.then((settings) => {
+			settings.feature_flags[flag] = value
+			return setSettings(settings)
+		})
+		.catch(handleError)
+}
+
+const hideInstalledModpacks = computed({
+	get: () => themeStore.getFeatureFlag('hide_installed_modpacks'),
+	set: (value: boolean) => setBrowseHideInstalledFlag('hide_installed_modpacks', value),
+})
 
 const instanceFilters = computed(() => {
 	const filters = []
@@ -367,11 +388,15 @@ const instanceFilters = computed(() => {
 		if (isServerInstance.value) {
 			filters.push({ type: 'environment', option: 'client' })
 		}
+	}
 
-		if (instanceHideInstalled.value && hiddenInstanceProjectIds.value.size > 0) {
-			for (const id of hiddenInstanceProjectIds.value) {
-				filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
-			}
+	if (
+		(instance.value || projectType.value === 'modpack') &&
+		(projectType.value === 'modpack' ? hideInstalledModpacks.value : instanceHideInstalled.value) &&
+		hiddenInstanceProjectIds.value.size > 0
+	) {
+		for (const id of hiddenInstanceProjectIds.value) {
+			filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
 		}
 	}
 
@@ -430,6 +455,12 @@ const serverContextFilters = computed(() => {
 			{ type: 'environment', option: 'client' },
 			{ type: 'environment', option: 'server' },
 		)
+
+		if (hideInstalledModpacks.value && hiddenInstanceProjectIds.value.size > 0) {
+			for (const id of hiddenInstanceProjectIds.value) {
+				filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
+			}
+		}
 	}
 
 	if (serverHideInstalled.value && hiddenServerContentProjectIds.value.size > 0) {
@@ -500,6 +531,10 @@ const messages = defineMessages({
 		id: 'app.browse.hide-added-servers',
 		defaultMessage: 'Hide servers already added',
 	},
+	hideInstalledModpacks: {
+		id: 'app.browse.hide-installed-modpacks',
+		defaultMessage: 'Hide already installed',
+	},
 	installingToServer: {
 		id: 'app.browse.server.installing',
 		defaultMessage: 'Installing',
@@ -553,6 +588,7 @@ function resetInstanceContext() {
 	hiddenInstanceProjectIdsInitialized.value = false
 	isServerInstance.value = false
 	browseBreadcrumb.reset()
+	void refreshInstalledProjectIds()
 }
 
 watch(
@@ -763,6 +799,27 @@ async function chooseInstanceInstallVersion(
 	return { versionId: selectedVersion.id }
 }
 
+async function chooseFilterMatchingInstallVersion(
+	project: Labrinth.Search.v3.ResultSearchProject,
+	projectTypeValue: string,
+) {
+	const plan = await resolveInstallPlan({
+		project: {
+			project_id: project.project_id,
+			title: project.title,
+			icon_url: project.icon_url,
+		},
+		contentType: projectTypeValue as BrowseInstallContentType,
+		selectedFilters: searchState.currentFilters.value,
+		providedFilters: combinedProvidedFilters.value,
+		overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+		targetPreferences: {},
+		getProjectVersions: getInstallProjectVersions,
+	})
+
+	return { versionId: plan.versionId }
+}
+
 function getCardActions(
 	result: Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
@@ -781,6 +838,7 @@ function getCardActions(
 		serverContentProjectIds.value.has(projectResult.project_id || '') ||
 		serverContextServerData.value?.upstream?.project_id === projectResult.project_id
 	const isInstalling = installingProjectIds.value.has(projectResult.project_id)
+	const showAsInstalled = isInstalled && currentProjectType !== 'modpack'
 
 	if (
 		isServerContext.value &&
@@ -790,7 +848,7 @@ function getCardActions(
 		const isInstallingSelection = isInstallingQueuedServerInstalls.value
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
-		const installLabel = isInstalled
+		const installLabel = showAsInstalled
 			? commonMessages.installedLabel
 			: isQueued
 				? isInstalling || isInstallingSelection
@@ -810,11 +868,11 @@ function getCardActions(
 				icon:
 					isInstalling || isInstallingSelection
 						? SpinnerIcon
-						: isQueued || isInstalled
+						: isQueued || showAsInstalled
 							? CheckIcon
 							: PlusIcon,
 				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
-				disabled: isInstalled || isInstalling || isInstallingSelection,
+				disabled: showAsInstalled || isInstalling || isInstallingSelection,
 				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
@@ -875,15 +933,15 @@ function getCardActions(
 			label: formatMessage(
 				isInstalling
 					? messages.installingToServer
-					: isInstalled
+					: showAsInstalled
 						? commonMessages.installedLabel
 						: shouldUseInstallIcon
 							? commonMessages.installButton
 							: messages.addToAnInstance,
 			),
-			icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
+			icon: isInstalling ? SpinnerIcon : showAsInstalled ? CheckIcon : PlusIcon,
 			iconClass: isInstalling ? 'animate-spin' : undefined,
-			disabled: isInstalled || isInstalling,
+			disabled: showAsInstalled || isInstalling,
 			color: 'brand',
 			type: 'outlined',
 			onClick: async () => {
@@ -891,7 +949,9 @@ function getCardActions(
 				try {
 					const selectedInstall = instance.value
 						? await chooseInstanceInstallVersion(projectResult, currentProjectType)
-						: { versionId: null as string | null }
+						: isModpack
+							? await chooseFilterMatchingInstallVersion(projectResult, currentProjectType)
+							: { versionId: null as string | null }
 					if (selectedInstall === null) {
 						setProjectInstalling(projectResult.project_id, false)
 						return
@@ -994,10 +1054,11 @@ async function search(requestParams: string) {
 			...hit,
 		}
 
-		if (instance.value || isServerContext.value) {
-			const installedIds = instance.value
-				? new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])])
-				: serverContentProjectIds.value
+		if (instance.value || isServerContext.value || projectType.value === 'modpack') {
+			const installedIds =
+				isServerContext.value && projectType.value !== 'modpack'
+					? serverContentProjectIds.value
+					: new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])])
 			mapped.installed = installedIds.has(hit.project_id)
 		}
 
@@ -1057,9 +1118,9 @@ watch(
 		() => projectType.value,
 	],
 	() => {
-		if (isServerContext.value) {
+		if (isServerContext.value && projectType.value !== 'modpack') {
 			syncHiddenServerContentProjectIds()
-		} else if (instance.value) {
+		} else if (instance.value || projectType.value === 'modpack') {
 			syncHiddenInstanceProjectIds()
 		}
 	},
@@ -1091,6 +1152,18 @@ let unlistenInstances: UnlistenFn | null = null
 
 onMounted(() => {
 	instance_listener(async (event: { event: string; instance_id: string }) => {
+		if (event.event === 'added' || event.event === 'created' || event.event === 'removed') {
+			if (!route.query.i) {
+				await refreshInstalledProjectIds()
+				if (projectType.value === 'modpack') {
+					if (event.event === 'removed') {
+						syncHiddenInstanceProjectIds()
+					}
+					await searchState.refreshSearch()
+				}
+			}
+		}
+
 		if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
 			await refreshInstalledProjectIds()
 			await searchState.refreshSearch()
@@ -1156,8 +1229,17 @@ provideBrowseManager({
 	installContext,
 	providedFilters: combinedProvidedFilters,
 	hideInstalled: computed({
-		get: () => (isServerContext.value ? serverHideInstalled.value : instanceHideInstalled.value),
+		get: () => {
+			if (projectType.value === 'modpack') return hideInstalledModpacks.value
+			if (isServerContext.value) return serverHideInstalled.value
+			return instanceHideInstalled.value
+		},
 		set: (val: boolean) => {
+			if (projectType.value === 'modpack') {
+				hideInstalledModpacks.value = val
+				if (val) syncHiddenInstanceProjectIds()
+				return
+			}
 			if (isServerContext.value) {
 				serverHideInstalled.value = val
 				if (val) syncHiddenServerContentProjectIds()
@@ -1168,11 +1250,18 @@ provideBrowseManager({
 		},
 	}),
 	showHideInstalled: computed(
-		() => (isServerContext.value && projectType.value !== 'modpack') || !!instance.value,
+		() =>
+			projectType.value === 'modpack' ||
+			(isServerContext.value && projectType.value !== 'modpack') ||
+			!!instance.value,
 	),
 	hideInstalledLabel: computed(() =>
 		formatMessage(
-			isFromWorlds.value ? messages.hideAddedServers : commonMessages.hideInstalledContentLabel,
+			isFromWorlds.value
+				? messages.hideAddedServers
+				: projectType.value === 'modpack'
+					? messages.hideInstalledModpacks
+					: commonMessages.hideInstalledContentLabel,
 		),
 	),
 	hideSelected: hideSelectedServerInstalls,

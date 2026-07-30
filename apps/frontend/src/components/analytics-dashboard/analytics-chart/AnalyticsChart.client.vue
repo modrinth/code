@@ -27,6 +27,7 @@ import {
 	LineController,
 	LineElement,
 	PointElement,
+	type ScriptableLineSegmentContext,
 	Tooltip,
 } from 'chart.js'
 
@@ -446,6 +447,12 @@ function buildDatasets() {
 			pointHoverBackgroundColor: colors.borderColor,
 			pointHoverBorderWidth: 0,
 			pointHitRadius: 16,
+			segment: dataset.lastDataPointUnavailable
+				? {
+						borderColor: (context: ScriptableLineSegmentContext) =>
+							context.p1DataIndex === dataset.data.length - 1 ? 'transparent' : undefined,
+					}
+				: undefined,
 			stack: props.stacked ? 'analytics' : undefined,
 		}
 	})

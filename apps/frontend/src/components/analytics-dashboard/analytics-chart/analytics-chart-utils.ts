@@ -38,6 +38,7 @@ export type ChartDataset = {
 	projectName?: string
 	tooltip?: string
 	data: number[]
+	lastDataPointUnavailable?: boolean
 	borderColor: string
 	backgroundColor: string
 	borderDash?: number[]
