@@ -1,6 +1,6 @@
 import type { NodeState } from '@modrinth/moderation/src/types/node'
 
-import { dbDelete, dbGet, dbPut, dbScan } from './moderation-db.ts'
+import { dbDelete, dbGet, dbPut, dbScan } from './db.ts'
 
 export interface PersistedChecklistState {
 	savedAt: string

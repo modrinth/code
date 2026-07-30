@@ -158,7 +158,8 @@ import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
 import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
-import { useModerationQueue } from '~/services/moderation-queue.ts'
+import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
 
@@ -506,38 +507,24 @@ function notifySkippedProjects(skippedCount: number) {
 }
 
 async function findFirstEligibleProject(): Promise<string | null> {
-	let skippedCount = 0
+	const candidateIds = [...moderationQueue.currentQueue.items]
+	if (candidateIds.length === 0) return null
 
-	while (moderationQueue.hasItems) {
-		const currentId = moderationQueue.getCurrentProjectId()
-		if (!currentId) return null
+	const next = await findNextEligibleQueueProject(client, moderationQueue, candidateIds)
 
-		const project = projectsById.value.get(currentId)
-
-		if (project && project.project.status !== 'processing') {
-			await moderationQueue.completeCurrentProject(currentId, 'skipped')
-			skippedCount++
-			continue
-		}
-
-		try {
-			const lockStatus = await moderationQueue.checkLock(currentId)
-
-			if (!lockStatus.locked || lockStatus.expired || lockStatus.is_own_lock) {
-				notifySkippedProjects(skippedCount)
-				return currentId
-			}
-
-			await moderationQueue.completeCurrentProject(currentId, 'skipped')
-			skippedCount++
-		} catch {
-			return currentId
-		}
+	if (!next) {
+		await Promise.all(
+			candidateIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
+		)
+		notifySkippedProjects(candidateIds.length)
+		return null
 	}
 
-	notifySkippedProjects(skippedCount)
-
-	return null
+	await Promise.all(
+		next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
+	)
+	notifySkippedProjects(next.skippedIds.length)
+	return next.projectId
 }
 
 function getProjectRouteParam(projectId: string): string {

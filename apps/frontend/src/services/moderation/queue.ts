@@ -6,7 +6,7 @@ import {
 	loadQueueState,
 	type PersistedModerationQueueState,
 	saveQueueState,
-} from './moderation-queue-storage.ts'
+} from './queue-storage.ts'
 
 export interface ModerationQueue {
 	items: string[]

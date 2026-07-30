@@ -451,14 +451,20 @@ import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import {
 	getSessionChecklistState,
 	patchSessionChecklistState,
-} from '~/services/moderation-checklist-session-storage.ts'
+} from '~/services/moderation/checklist-session-storage.ts'
 import {
 	clearChecklistState,
 	loadChecklistState,
 	saveChecklistState,
-} from '~/services/moderation-checklist-storage.ts'
-import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
-import { useModerationQueue } from '~/services/moderation-queue.ts'
+} from '~/services/moderation/checklist-storage.ts'
+import {
+	batchCheckQueueCandidates,
+	findNextEligibleQueueProject,
+	isEligibleQueueCandidate,
+	type QueueCandidateCheck,
+} from '~/services/moderation/queue-eligibility.ts'
+import type { LockAcquireResponse } from '~/services/moderation/queue.ts'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
 
 import { type LiveNode, STATE_KEY } from './checklist-context'
 
@@ -639,7 +645,9 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 
 	// Quick re-check if close to expiry (last 5 seconds of TTL)
 	if (now - next.validatedAt > PREFETCH_STALE_MS - 5000) {
-		const recheckResults = await batchCheckQueueCandidates([next.projectId])
+		const recheckResults = await batchCheckQueueCandidates(client, moderationQueue, [
+			next.projectId,
+		])
 		const recheck = recheckResults.get(next.projectId)
 		if (!isEligibleQueueCandidate(recheck)) {
 			prefetchQueue.value.shift()
@@ -784,21 +792,6 @@ function reviewAnyway() {
 	maintainPrefetchQueue()
 }
 
-interface QueueCandidateCheck {
-	locked: boolean
-	expired?: boolean
-	isOwnLock?: boolean
-	slug?: string
-	projectType?: string
-	status?: string
-	isProcessing: boolean
-}
-
-function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
-	if (!result?.isProcessing) return false
-	return !result.locked || !!result.expired || !!result.isOwnLock
-}
-
 function notifySkippedQueueProjects(count: number) {
 	if (count <= 0) return
 	addNotification({
@@ -823,65 +816,6 @@ function navigateToQueueProject(result: QueueCandidateCheck, projectId: string) 
 			state: { showChecklist: true },
 		})
 	}
-}
-
-async function batchCheckQueueCandidates(
-	projectIds: string[],
-): Promise<Map<string, QueueCandidateCheck>> {
-	const results = new Map<string, QueueCandidateCheck>()
-
-	const projects = await client.labrinth.projects_v3.getMultiple(projectIds).catch(() => [])
-	const projectsById = new Map(projects.map((project) => [project.id, project]))
-
-	const checks = await Promise.allSettled(
-		projectIds.map(async (id) => {
-			const lockResponse = await moderationQueue.checkLock(id)
-			const project = projectsById.get(id) ?? null
-
-			return {
-				id,
-				locked: lockResponse.locked,
-				expired: lockResponse.expired,
-				isOwnLock: lockResponse.is_own_lock,
-				slug: project?.slug,
-				projectType: project?.project_types[0],
-				status: project?.status,
-				isProcessing: project === null ? true : project.status === 'processing',
-			}
-		}),
-	)
-
-	checks.forEach((result, index) => {
-		if (result.status === 'fulfilled') {
-			results.set(result.value.id, result.value)
-		} else {
-			results.set(projectIds[index], { locked: false, isProcessing: true })
-		}
-	})
-
-	return results
-}
-
-async function findNextEligibleQueueProject(candidateIds: string[]) {
-	const skippedIds: string[] = []
-	let checkedCount = 0
-
-	while (checkedCount < candidateIds.length) {
-		const batch = candidateIds.slice(checkedCount, checkedCount + PREFETCH_BATCH_SIZE)
-		checkedCount += batch.length
-
-		const results = await batchCheckQueueCandidates(batch)
-
-		for (const id of batch) {
-			const result = results.get(id)
-			if (isEligibleQueueCandidate(result)) {
-				return { projectId: id, result: result!, skippedIds: [...skippedIds] }
-			}
-			skippedIds.push(id)
-		}
-	}
-
-	return null
 }
 
 async function maintainPrefetchQueue() {
@@ -924,7 +858,7 @@ async function maintainPrefetchQueue() {
 			const batch = candidateIds.slice(checkedCount, checkedCount + PREFETCH_BATCH_SIZE)
 			checkedCount += batch.length
 
-			const results = await batchCheckQueueCandidates(batch)
+			const results = await batchCheckQueueCandidates(client, moderationQueue, batch)
 
 			for (const id of batch) {
 				const result = results.get(id)
@@ -974,7 +908,7 @@ async function skipToNextProject() {
 	const remainingIds = moderationQueue.currentQueue.items.filter((id) => id !== currentProjectId)
 
 	if (remainingIds.length > 0) {
-		const next = await findNextEligibleQueueProject(remainingIds)
+		const next = await findNextEligibleQueueProject(client, moderationQueue, remainingIds)
 
 		if (next) {
 			await Promise.all(
@@ -1798,7 +1732,7 @@ async function endChecklist(status?: string) {
 
 			let foundEligible = false
 			if (remainingIds.length > 0) {
-				const next = await findNextEligibleQueueProject(remainingIds)
+				const next = await findNextEligibleQueueProject(client, moderationQueue, remainingIds)
 
 				if (next) {
 					await Promise.all(

@@ -1,4 +1,4 @@
-import { dbDelete, dbGet, dbPut } from './moderation-db.ts'
+import { dbDelete, dbGet, dbPut } from './db.ts'
 
 export interface PersistedModerationQueueState {
 	version: 1

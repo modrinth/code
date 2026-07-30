@@ -12,7 +12,6 @@ export {
 export * from './locales'
 export * from './types/keybinds'
 export * from './types/settings'
-export * from './types/messages'
 export * from './types/nags'
 export * from './types/priority'
 export * from './types/quick-reply'
