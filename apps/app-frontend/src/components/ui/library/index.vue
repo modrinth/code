@@ -26,8 +26,7 @@ const props = defineProps<{
 
 const {
 	instanceGroups,
-	instanceOptions,
-	confirmDeleteModal,
+	filters,
 	deleteInstance,
 	handleInstanceOption,
 	selectedLibraryInstances,
@@ -35,9 +34,15 @@ const {
 	toggleLibraryInstanceSelection,
 } = provideLibrary(toRef(props, 'instances'))
 
+const hasActiveFilters = computed(() =>
+	Object.values(filters.value).some((selectedValues) => selectedValues.length > 0),
+)
+
 const visibleInstanceGroups = computed(() =>
 	instanceGroups.value.filter(
-		(instanceGroup) => instanceGroup.key !== 'None' || instanceGroup.instances.length > 0,
+		(instanceGroup) =>
+			instanceGroup.instances.length > 0 ||
+			(!hasActiveFilters.value && instanceGroup.key !== 'None'),
 	),
 )
 

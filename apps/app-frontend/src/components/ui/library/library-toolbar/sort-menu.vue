@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowUpDownIcon, LayoutGridIcon } from '@modrinth/assets'
 import { Combobox, type ComboboxOption } from '@modrinth/ui'
 
 import {
@@ -24,9 +25,13 @@ const groupOptions: ComboboxOption<LibraryGroupBy>[] = [...libraryGroupOptions]
 		class="w-max"
 		:options="sortOptions"
 		:show-icon-in-selected="false"
+		dropdown-min-width="160px"
 	>
 		<template #prefix>
-			<span class="font-semibold text-primary">Sort by:</span>
+			<ArrowUpDownIcon class="size-5 text-primary" aria-label="Sort by" />
+		</template>
+		<template #selected="{ label }">
+			<span>{{ label }}</span>
 		</template>
 	</Combobox>
 	<Combobox
@@ -36,7 +41,10 @@ const groupOptions: ComboboxOption<LibraryGroupBy>[] = [...libraryGroupOptions]
 		:show-icon-in-selected="false"
 	>
 		<template #prefix>
-			<span class="font-semibold text-primary">Group by:</span>
+			<LayoutGridIcon class="size-5 text-primary" aria-label="Group by" />
+		</template>
+		<template #selected="{ label }">
+			<span>{{ label }}</span>
 		</template>
 	</Combobox>
 </template>
