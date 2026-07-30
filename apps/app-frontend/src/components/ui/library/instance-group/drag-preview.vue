@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TagItem } from '@modrinth/ui'
 
-import InstanceCardContent from '@/components/ui/library/instance-group/instance-card-content.vue'
+import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
 import type { GameInstance } from '@/helpers/types'
 
 withDefaults(
@@ -25,16 +25,15 @@ withDefaults(
 			v-if="count > 1"
 			class="absolute inset-x-1.5 -bottom-1 top-1 rounded-[20px] border border-solid border-surface-4 bg-surface-3 opacity-80 shadow-md"
 		/>
-		<div
-			class="relative flex min-h-[76px] w-full items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left opacity-90 shadow-lg"
-		>
-			<InstanceCardContent :instance="instance" />
-			<TagItem
-				v-if="count > 1"
-				class="!absolute right-3 top-3 z-[2] border-surface-5 bg-surface-2 font-semibold tabular-nums text-contrast"
-			>
-				{{ count }}
-			</TagItem>
-		</div>
+		<InstanceCardView :instance="instance" class="opacity-90 shadow-lg">
+			<template #overlay>
+				<TagItem
+					v-if="count > 1"
+					class="!absolute right-3 top-3 z-[2] border-surface-5 bg-surface-2 font-semibold tabular-nums text-contrast"
+				>
+					{{ count }}
+				</TagItem>
+			</template>
+		</InstanceCardView>
 	</div>
 </template>

@@ -52,6 +52,10 @@ const pixelated = ref(false)
 const img = useTemplateRef<HTMLImageElement>('img')
 const failed = ref(false)
 
+defineExpose({
+	failed,
+})
+
 const props = withDefaults(
 	defineProps<{
 		src?: string | null
