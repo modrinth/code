@@ -114,6 +114,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		projects::project_get_organization,
 		projects::dependency_list,
 		disclosures::get_project_disclosures,
+		disclosures::modify_project_disclosures,
 		project_creation::project_create,
 		project_creation::project_create_with_id,
 		project_creation::new::create,

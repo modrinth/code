@@ -86,6 +86,26 @@ impl DBProjectDisclosure {
             .collect()
     }
 
+    pub async fn any_set_by_moderator(
+        project_id: DBProjectId,
+        types: &[String],
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<bool, DatabaseError> {
+        let existing = sqlx::query_scalar!(
+            r#"
+			SELECT 1 FROM project_disclosures
+			WHERE project_id = $1 AND type = ANY($2) AND set_by_moderator
+			LIMIT 1
+			"#,
+            project_id as DBProjectId,
+            types,
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(existing.is_some())
+    }
+
     pub async fn remove(
         project_id: DBProjectId,
         disclosure_type: &str,
