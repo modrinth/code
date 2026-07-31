@@ -139,8 +139,8 @@ jobs:
       artifacts-name: labrinth-docker-context
 
   deploy:
-    needs: docker-build
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/prod' }}
+    needs: [skip-if-clean, docker-build]
+    if: ${{ needs.skip-if-clean.outputs.internal == 'true' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/prod') }}
     uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}

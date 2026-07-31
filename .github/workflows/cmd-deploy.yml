@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   deploy:
+    if: ${{ github.event.client_payload.pull_request.head.repo.full_name == github.repository }}
     uses: SparkUniverse/workflows/.github/workflows/deploy-command.yaml@main
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
