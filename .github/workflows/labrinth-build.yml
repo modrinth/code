@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'prod'
     paths:
       - .github/workflows/labrinth-build.yml
       - 'apps/labrinth/**'
