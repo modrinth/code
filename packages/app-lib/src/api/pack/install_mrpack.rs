@@ -1,4 +1,5 @@
 use crate::State;
+use crate::api::instance::CONFIG_FILE_EXTENSIONS;
 use crate::event::emit::loading_try_for_each_concurrent;
 use crate::install::{
     InstallErrorContext, InstallJobEventKind, InstallPhaseDetails,
@@ -43,6 +44,19 @@ type ExtractProgressFn<'a> = dyn FnMut(u64) -> Pin<Box<dyn Future<Output = crate
     + 'a;
 type HashProgressFn<'a> = dyn FnMut(u64) -> crate::Result<()> + Send + 'a;
 const MODPACK_CONTENT_DOWNLOAD_CONCURRENCY: usize = 4;
+const MRPACK_WARNING_IGNORED_EXTENSIONS: &[&str] = &["rpo"];
+
+fn is_ignored_mrpack_warning_file(path: &str) -> bool {
+    Path::new(path)
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            CONFIG_FILE_EXTENSIONS
+                .iter()
+                .chain(MRPACK_WARNING_IGNORED_EXTENSIONS)
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
+}
 
 #[derive(Clone)]
 struct ModpackContentInstallContext {
@@ -267,6 +281,9 @@ pub(crate) async fn get_external_files_from_mrpack(
         .into_iter()
         .filter_map(|file| {
             let path = file.path.as_str();
+            if is_ignored_mrpack_warning_file(path) {
+                return None;
+            }
             let hash = file.hashes.get(&PackFileHash::Sha1)?.clone();
             let file_name = path.rsplit('/').next()?.to_string();
             Some((file_name, hash))
@@ -371,6 +388,7 @@ fn external_override_relative_path(path: &str) -> Option<&str> {
         .strip_prefix("overrides/")
         .or_else(|| path.strip_prefix("client-overrides/"))?;
     (!path.ends_with('/')
+        && !is_ignored_mrpack_warning_file(relative_path)
         && ProjectType::get_from_parent_folder(relative_path).is_some())
     .then_some(relative_path)
 }
