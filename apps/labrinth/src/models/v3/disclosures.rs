@@ -11,6 +11,9 @@ use utoipa::ToSchema;
 pub enum ProjectDisclosure {
     AiContent {
         note: Option<String>,
+        code: bool,
+        assets: bool,
+        test: bool,
     },
     Advertisements {
         note: Option<String>,
