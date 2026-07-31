@@ -439,11 +439,8 @@ onBeforeUnmount(() => {
 						class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
 						move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
 						enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
-						enter-from-class="opacity-0 scale-[0.98]"
+						enter-from-class="opacity-0"
 						enter-to-class="opacity-100 scale-100"
-						leave-active-class="transition-[opacity,transform] duration-[150ms] ease-in motion-reduce:transition-none"
-						leave-from-class="opacity-100 scale-100"
-						leave-to-class="opacity-0 scale-[0.98]"
 					>
 						<div
 							v-for="instance in instanceGroup.instances"
