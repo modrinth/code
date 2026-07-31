@@ -213,6 +213,10 @@ export const analyticsMessages = defineMessages({
 		id: 'analytics.filter.game-version-type.all',
 		defaultMessage: 'All',
 	},
+	dependentProjectSearchFailedTitle: {
+		id: 'analytics.filter.dependent-project-search-failed-title',
+		defaultMessage: 'Dependent projects failed to load',
+	},
 })
 
 export const analyticsStatMessages = defineMessages({
@@ -683,6 +687,10 @@ export const analyticsChartMessages = defineMessages({
 	hideEntryInGraph: {
 		id: 'analytics.chart.tooltip.hide-entry',
 		defaultMessage: 'Hide {name} in graph',
+	},
+	noData: {
+		id: 'analytics.chart.tooltip.no-data',
+		defaultMessage: 'No data',
 	},
 	durationDays: {
 		id: 'analytics.chart.tooltip.duration.days',

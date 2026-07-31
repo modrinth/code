@@ -40,6 +40,30 @@ const messages = defineMessages({
 		defaultMessage:
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
 	},
+	basedOnLabel: {
+		id: 'layout.footer.based-on-label',
+		defaultMessage: 'Based on',
+	},
+	unknownCommit: {
+		id: 'layout.footer.unknown-commit',
+		defaultMessage: 'unknown',
+	},
+	developerModeActivatedTitle: {
+		id: 'layout.footer.developer-mode-activated.title',
+		defaultMessage: 'Developer mode activated',
+	},
+	developerModeActivatedText: {
+		id: 'layout.footer.developer-mode-activated.text',
+		defaultMessage: 'Developer mode has been enabled',
+	},
+	developerModeDeactivatedTitle: {
+		id: 'layout.footer.developer-mode-deactivated.title',
+		defaultMessage: 'Developer mode deactivated',
+	},
+	developerModeDeactivatedText: {
+		id: 'layout.footer.developer-mode-deactivated.text',
+		defaultMessage: 'Developer mode has been disabled',
+	},
 })
 
 const socialLinks: {
@@ -215,14 +239,14 @@ function developerModeIncrement() {
 		saveFeatureFlags()
 		if (flags.value.developerMode) {
 			addNotification({
-				title: 'Developer mode activated',
-				text: 'Developer mode has been enabled',
+				title: formatMessage(messages.developerModeActivatedTitle),
+				text: formatMessage(messages.developerModeActivatedText),
 				type: 'success',
 			})
 		} else {
 			addNotification({
-				title: 'Developer mode deactivated',
-				text: 'Developer mode has been disabled',
+				title: formatMessage(messages.developerModeDeactivatedTitle),
+				text: formatMessage(messages.developerModeDeactivatedText),
 				type: 'success',
 			})
 		}
@@ -320,7 +344,7 @@ function developerModeIncrement() {
 				</div>
 			</div>
 			<p v-if="flags.developerMode" class="m-0 text-sm text-secondary">
-				Based on
+				{{ formatMessage(messages.basedOnLabel) }}
 				<a
 					v-if="config.public.owner && config.public.branch"
 					class="hover:underline"
@@ -330,7 +354,9 @@ function developerModeIncrement() {
 					{{ config.public.owner }}/{{ config.public.branch }}
 				</a>
 				@
-				<span v-if="config.public.hash === 'unknown'">unknown</span>
+				<span v-if="config.public.hash === 'unknown'">{{
+					formatMessage(messages.unknownCommit)
+				}}</span>
 				<AutoLink
 					v-else
 					class="text-link"

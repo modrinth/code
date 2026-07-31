@@ -18,7 +18,7 @@
 							<Avatar size="sm" :src="organization.icon_url" />
 							<div class="flex flex-col justify-center gap-1">
 								<h2 class="m-0 text-base">
-									<nuxt-link :to="`/organization/${organization.slug}/settings`">
+									<nuxt-link :to="`/organization/${organization.slug}`">
 										{{ organization.name }}
 									</nuxt-link>
 								</h2>
@@ -62,86 +62,16 @@
 		</template>
 		<template v-else>
 			<div class="normal-page__header py-4">
-				<ContentPageHeader>
-					<template #icon>
-						<Avatar :src="organization.icon_url" :alt="organization.name" size="96px" />
-					</template>
-					<template #title>
-						{{ organization.name }}
-					</template>
-					<template #title-suffix>
-						<div class="ml-1 flex items-center gap-2 font-semibold">
-							<OrganizationIcon />
-							Organization
-						</div>
-					</template>
-					<template #summary>
-						{{ organization.description }}
-					</template>
-					<template #stats>
-						<div
-							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-						>
-							<UsersIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(acceptedMembers?.length || 0) }}
-							members
-						</div>
-						<div
-							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-						>
-							<BoxIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(projects?.length || 0) }}
-							projects
-						</div>
-						<div
-							v-tooltip="formatNumber(sumDownloads)"
-							class="flex items-center gap-2 font-semibold"
-						>
-							<DownloadIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(sumDownloads) }}
-							downloads
-						</div>
-					</template>
-					<template #actions>
-						<ButtonStyled v-if="auth.user && currentMember" size="large">
-							<NuxtLink :to="`/organization/${organization.slug}/settings`">
-								<SettingsIcon aria-hidden="true" />
-								Manage
-							</NuxtLink>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'manage-projects',
-										action: () =>
-											router.push('/organization/' + organization?.slug + '/settings/projects'),
-										hoverFilledOnly: true,
-										shown: !!(auth.user && currentMember),
-									},
-									{ divider: true, shown: !!(auth?.user && currentMember) },
-									{ id: 'copy-id', action: () => copyId() },
-									{ id: 'copy-permalink', action: () => copyPermalink() },
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #manage-projects>
-									<BoxIcon aria-hidden="true" />
-									Manage projects
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyIdButton) }}
-								</template>
-								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyPermalinkButton) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ContentPageHeader>
+				<OrganizationPageHeader
+					:organization="organization"
+					:members-count="acceptedMembers?.length || 0"
+					:projects-count="projects?.length || 0"
+					:downloads="sumDownloads"
+					:can-manage="!!(auth.user && currentMember)"
+					@manage-projects="router.push(`/organization/${organization.slug}/settings/projects`)"
+					@copy-id="copyId"
+					@copy-permalink="copyPermalink"
+				/>
 			</div>
 			<div class="normal-page__sidebar">
 				<AdPlaceholder v-if="!auth.user" />
@@ -253,14 +183,7 @@
 							:downloads="project.downloads"
 							:followers="project.followers"
 							:tags="project.categories"
-							:environment="
-								project.client_side && project.server_side
-									? {
-											clientSide: project.client_side,
-											serverSide: project.server_side,
-										}
-									: undefined
-							"
+							:environment="project.environment?.[0]"
 							:status="
 								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
 									? (project.status as ProjectStatus)
@@ -275,11 +198,16 @@
 					<UpToDate class="icon" />
 					<br />
 					<span class="preserve-lines text">
-						This organization doesn't have any projects yet.
 						<template v-if="isPermission(currentMember?.permissions, 1 << 4)">
-							Would you like to
-							<a class="link" @click="modal_creation?.show()">create one</a>?
+							<IntlFormatted :message-id="messages.noProjectsWithCreatePrompt">
+								<template #create-link="{ children }">
+									<a class="link" @click="modal_creation?.show()"
+										><component :is="() => normalizeChildren(children)"
+									/></a>
+								</template>
+							</IntlFormatted>
 						</template>
+						<template v-else>{{ formatMessage(messages.noProjects) }}</template>
 					</span>
 				</div>
 			</div>
@@ -293,11 +221,7 @@ import {
 	BoxIcon,
 	ChartIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
 	CrownIcon,
-	DownloadIcon,
-	MoreVerticalIcon,
-	OrganizationIcon,
 	SettingsIcon,
 	SpinnerIcon,
 	UsersIcon,
@@ -307,16 +231,16 @@ import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
-	ContentPageHeader,
+	defineMessages,
 	injectModrinthClient,
+	IntlFormatted,
 	NavTabs,
-	OverflowMenu,
+	normalizeChildren,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectCard,
 	ProjectCardList,
 	SidebarCard,
 	useCompactNumber,
-	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
@@ -326,6 +250,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
+import OrganizationPageHeader from '~/components/ui/OrganizationPageHeader.vue'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,
@@ -334,15 +259,23 @@ import {
 import { isPermission } from '~/utils/permissions.ts'
 import { projectUserSorting } from '~/utils/projects.ts'
 
-type ProjectV3 = Labrinth.Projects.v3.Project & {
-	client_side: 'required' | 'optional' | 'unsupported'
-	server_side: 'required' | 'optional' | 'unsupported'
-}
+type ProjectV3 = Labrinth.Projects.v3.Project
 
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
-const formatNumber = useFormatNumber()
+const messages = defineMessages({
+	noProjects: {
+		id: 'organization.projects.none',
+		defaultMessage: "This organization doesn't have any projects yet.",
+	},
+	noProjectsWithCreatePrompt: {
+		id: 'organization.projects.none-with-create-prompt',
+		defaultMessage:
+			"This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?",
+	},
+})
+
 const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
@@ -410,31 +343,7 @@ const {
 				categories = categories.concat(project.mrpack_loaders as string[])
 			}
 
-			const singleplayer = project.singleplayer && (project.singleplayer as string[])[0]
-			const clientAndServer =
-				project.client_and_server && (project.client_and_server as string[])[0]
-			const clientOnly = project.client_only && (project.client_only as string[])[0]
-			const serverOnly = project.server_only && (project.server_only as string[])[0]
-
-			let client_side: ProjectV3['client_side'] | undefined
-			let server_side: ProjectV3['server_side'] | undefined
-
-			// quick and dirty hack to show envs as legacy
-			if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-				client_side = 'required'
-				server_side = 'required'
-			} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-				client_side = 'required'
-				server_side = 'unsupported'
-			} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-				client_side = 'unsupported'
-				server_side = 'required'
-			} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-				client_side = 'optional'
-				server_side = 'optional'
-			}
-
-			return { ...project, categories, client_side, server_side }
+			return { ...project, categories }
 		})
 	},
 	placeholderData: [],

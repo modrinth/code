@@ -1,7 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBProject;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
 use crate::models::ids::ProjectId;
@@ -22,6 +21,7 @@ use std::sync::Arc;
 use tracing::trace;
 use url::Url;
 use uuid::Uuid;
+use xredis::RedisPool;
 
 pub const FILTERED_HEADERS: &[&str] = &[
     "authorization",

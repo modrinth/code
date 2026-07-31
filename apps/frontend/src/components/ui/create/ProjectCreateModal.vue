@@ -246,6 +246,18 @@ const messages = defineMessages({
 		id: 'create.project.missing-fields-tooltip',
 		defaultMessage: 'Missing fields: {fields}',
 	},
+	unknownUser: {
+		id: 'create.project.unknown-user',
+		defaultMessage: 'Unknown user',
+	},
+	userAvatarAlt: {
+		id: 'create.project.user-avatar-alt',
+		defaultMessage: 'User Avatar',
+	},
+	organizationIconAlt: {
+		id: 'create.project.organization-icon-alt',
+		defaultMessage: '{name} Icon',
+	},
 })
 
 const props = defineProps<{
@@ -318,7 +330,7 @@ const cancel = () => {
 
 const userOption = computed(() => ({
 	value: 'self',
-	label: auth.value.user?.username || 'Unknown user',
+	label: auth.value.user?.username || formatMessage(messages.unknownUser),
 	icon: auth.value.user?.avatar_url
 		? markRaw(
 				defineAsyncComponent(() =>
@@ -326,7 +338,7 @@ const userOption = computed(() => ({
 						setup: () => () =>
 							h('img', {
 								src: auth.value.user?.avatar_url,
-								alt: 'User Avatar',
+								alt: formatMessage(messages.userAvatarAlt),
 								class: 'h-5 w-5 rounded-full',
 							}),
 					}),
@@ -357,7 +369,7 @@ async function fetchOrganizations() {
 								setup: () => () =>
 									h('img', {
 										src: org.icon_url,
-										alt: `${org.name} Icon`,
+										alt: formatMessage(messages.organizationIconAlt, { name: org.name }),
 										class: 'h-5 w-5 rounded',
 									}),
 							}),

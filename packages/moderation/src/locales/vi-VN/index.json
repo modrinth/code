@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Thêm địa chỉ Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Thêm một URL hợp lệ và tên hoặc mã định danh SPDX cho giấy phép tuỳ chỉnh của bạn."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Thông tin giấy phép"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như trang web, cửa hàng hoặc lời mời tham gia Discord."
   },
@@ -29,8 +35,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Thêm liên kết ngoài"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "Bạn đã chọn tất cả ngôn ngữ có sẵn. Xin hãy chỉ chọn những ngôn ngữ máy chủ của bạn hỗ trợ tích cực."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Chọn ngôn ngữ chính xác"
+  },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Bạn đã chọn tất cả {totalAvailableTags, plural, one {# thẻ có sẵn} other {# thẻ có sẵn}}. Điều này làm mất đi mục đích của thẻ, vốn được dùng để giúp người dùng tìm thấy các dự án phù hợp. Vui lòng chỉ chọn những thẻ thực sự liên quan đến dự án của bạn."
+    "defaultMessage": "Bạn đã chọn tất cả {totalAvailableTags} thẻ có sẵn. Điều này làm mất đi mục đích của thẻ, vốn được dùng để giúp người dùng tìm thấy các dự án phù hợp. Vui lòng chỉ chọn những thẻ thực sự liên quan đến dự án của bạn."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Chọn độ phân giải đúng"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Chắc chắn rằng bạn đã cung cấp bằng chứng về quyền của bạn để phân phối bất kì nội dung ngoài nào trong Modpack của bạn."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Xem lại quyền bên ngoài"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Chọn các phiên bản mà máy chủ của bạn hỗ trợ, chọn một Modpack hoặc tải lên Modpack của riêng bạn."
   },
@@ -182,6 +200,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "Truy cập cài đặt liên kết"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Truy cập bảng quản lý quyền"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Truy cập cài đặt thẻ"
   },
@@ -201,7 +222,7 @@
     "defaultMessage": "Làm gọn phần tóm tắt"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Phần tóm tắt của bạn hiện có {length, plural, one {# ký tự} other {# ký tự}}. Khuyến nghị nên có ít nhất {minChars, plural, one {# ký tự} other {# ký tự}} để tạo ra một bản tóm tắt đầy đủ thông tin và hấp dẫn."
+    "defaultMessage": "Phần tóm tắt của bạn hiện có {length} ký tự. Khuyến nghị nên có ít nhất {minChars} ký tự để tạo ra một bản tóm tắt đầy đủ thông tin và hấp dẫn."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Mở rộng phần tóm tắt"
@@ -212,11 +233,17 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Làm gọn tên dự án"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Bạn đã chọn {languageCount} ngôn ngữ. Xin hãy chỉ chọn những ngôn ngữ máy chủ của bạn hỗ trợ tích cực."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Chọn ngôn ngữ chính xác"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# tag} other {# tags}}. vui lòng giảm {maxTagCount} hoặc ít hơn để đảm bảo máy chủ của bạn xuất hiện trong kết quả tìm kiếm có liên quan."
   },
   "nags.too-many-tags-server.title": {
-    "defaultMessage": "Chọn thẻ"
+    "defaultMessage": "Chọn thẻ chính xác"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# thẻ} other {# thẻ}}. Hãy cân nhắc giảm xuống còn {maxTagCount} thẻ hoặc ít hơn để đảm bảo dự án của bạn xuất hiện trong các kết quả tìm kiếm phù hợp."

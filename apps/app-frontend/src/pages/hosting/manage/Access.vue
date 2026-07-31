@@ -5,7 +5,6 @@ import {
 	ServersManageAccessPage,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { openUrl } from '@tauri-apps/plugin-opener'
 
 const client = injectModrinthClient()
 const { serverId } = injectModrinthServerContext()
@@ -29,7 +28,7 @@ try {
 }
 
 function userProfileLink(username: string) {
-	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
+	return `/user/${encodeURIComponent(username)}`
 }
 </script>
 

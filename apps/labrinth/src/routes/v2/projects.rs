@@ -1,6 +1,5 @@
 use crate::database::models::categories::LinkPlatform;
 use crate::database::models::{project_item, version_item};
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
 use crate::models::projects::{
@@ -18,6 +17,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_search);

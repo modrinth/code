@@ -1,5 +1,7 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
-use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::auth::{
+    AuthenticationError, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
@@ -7,7 +9,6 @@ use crate::database::models::loader_fields::{
 };
 use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, DBUser, image_item};
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::exp;
@@ -43,6 +44,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use thiserror::Error;
 use validator::Validate;
+use xredis::RedisPool;
 
 pub mod new;
 
@@ -106,6 +108,9 @@ impl From<crate::routes::ApiError> for CreateError {
             }
             crate::routes::ApiError::CustomAuthentication(err) => {
                 Self::CustomAuthenticationError(err)
+            }
+            crate::routes::ApiError::Auth(err) => {
+                Self::CustomAuthenticationError(format!("{err:#}"))
             }
             crate::routes::ApiError::InvalidInput(err)
             | crate::routes::ApiError::Validation(err) => {
@@ -490,6 +495,8 @@ async fn project_create_inner(
         Scopes::PROJECT_CREATE,
     )
     .await?;
+
+    require_verified_email(&current_user)?;
 
     let limits = UserLimits::get_for_projects(&current_user, pool).await?;
     if limits.current >= limits.max {

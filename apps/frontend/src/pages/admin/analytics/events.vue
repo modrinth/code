@@ -485,9 +485,9 @@ async function saveEvent() {
 		const payload = buildEventPayload()
 
 		if (modalMode.value === 'edit' && editingEventId.value !== null) {
-			await client.labrinth.analytics_v3.editEvent(editingEventId.value, payload)
+			await client.labrinth.analytics_internal.editEvent(editingEventId.value, payload)
 		} else {
-			await client.labrinth.analytics_v3.createEvent(payload)
+			await client.labrinth.analytics_internal.createEvent(payload)
 		}
 
 		await queryClient.invalidateQueries({ queryKey: analyticsEventsQueryKey })
@@ -528,7 +528,7 @@ async function deleteEvent(eventId: Labrinth.Analytics.v3.AnalyticsEventId) {
 	setDeletingEvent(eventId, true)
 
 	try {
-		await client.labrinth.analytics_v3.deleteEvent(eventId)
+		await client.labrinth.analytics_internal.deleteEvent(eventId)
 		await queryClient.invalidateQueries({ queryKey: analyticsEventsQueryKey })
 		addNotification({
 			title: 'Analytics event deleted',
@@ -581,7 +581,7 @@ function commitAnnouncementUrl() {
 	committedAnnouncementUrl.value = form.value.announcementUrl
 }
 
-function buildEventPayload(): Labrinth.Analytics.v3.AnalyticsEventUpsert {
+function buildEventPayload(): Labrinth.Analytics.Internal.AnalyticsEventUpsert {
 	const selectedRange = getEventFormDateRange()
 	if (!selectedRange) {
 		throw new Error('Select a valid start and end date')

@@ -4,21 +4,22 @@ use std::hash::Hasher;
 use super::DatabaseError;
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-const GAMES_LIST_NAMESPACE: &str = "games";
-const LOADER_ID: &str = "loader_id";
-const LOADERS_LIST_NAMESPACE: &str = "loaders";
-const LOADER_FIELDS_NAMESPACE: &str = "loader_fields";
-const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all";
-const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums";
-pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str = "loader_field_enum_values";
+const GAMES_LIST_NAMESPACE: &str = "games:v3";
+const LOADER_ID: &str = "loader_id:v3";
+const LOADERS_LIST_NAMESPACE: &str = "loaders:v3";
+const LOADER_FIELDS_NAMESPACE: &str = "loader_fields:v3";
+const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all:v3";
+const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums:v3";
+pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str =
+    "loader_field_enum_values:v3";
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Game {
@@ -53,9 +54,9 @@ impl Game {
     {
         {
             let mut redis = redis.connect().await?;
-            let cached_games: Option<Vec<Game>> = redis
-                .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
-                .await?;
+            let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
+            let cached_games: Option<Vec<Game>> =
+                redis.get_deserialized(&key).await?;
             if let Some(cached_games) = cached_games {
                 return Ok(cached_games);
             }
@@ -78,15 +79,9 @@ impl Game {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
 
-        redis
-            .set_serialized_to_json(
-                GAMES_LIST_NAMESPACE,
-                "games",
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -113,8 +108,8 @@ impl Loader {
     {
         {
             let mut redis = redis.connect().await?;
-            let cached_id: Option<i32> =
-                redis.get_deserialized_from_json(LOADER_ID, name).await?;
+            let key = redis.key().metadata(LOADER_ID, name);
+            let cached_id: Option<i32> = redis.get_deserialized(&key).await?;
             if let Some(cached_id) = cached_id {
                 return Ok(Some(LoaderId(cached_id)));
             }
@@ -133,9 +128,8 @@ impl Loader {
 
         if let Some(result) = result {
             let mut redis = redis.connect().await?;
-            redis
-                .set_serialized_to_json(LOADER_ID, name, &result.0, None)
-                .await?;
+            let key = redis.key().metadata(LOADER_ID, name);
+            redis.set_serialized(&key, &result.0, None).await?;
         }
 
         Ok(result)
@@ -150,9 +144,9 @@ impl Loader {
     {
         {
             let mut redis = redis.connect().await?;
-            let cached_loaders: Option<Vec<Loader>> = redis
-                .get_deserialized_from_json(LOADERS_LIST_NAMESPACE, "all")
-                .await?;
+            let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
+            let cached_loaders: Option<Vec<Loader>> =
+                redis.get_deserialized(&key).await?;
             if let Some(cached_loaders) = cached_loaders {
                 return Ok(cached_loaders);
             }
@@ -191,15 +185,9 @@ impl Loader {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
 
-        redis
-            .set_serialized_to_json(
-                LOADERS_LIST_NAMESPACE,
-                "all",
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -450,7 +438,7 @@ impl LoaderField {
                     })
                     .await?;
 
-                Ok(result)
+                Ok::<_, DatabaseError>(result)
             },
         ).await?;
 
@@ -469,11 +457,10 @@ impl LoaderField {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
 
             let cached_fields: Option<Vec<LoaderField>> =
-                redis.get(LOADER_FIELDS_NAMESPACE_ALL, "").await?.and_then(
-                    |x| serde_json::from_str::<Vec<LoaderField>>(&x).ok(),
-                );
+                redis.get_deserialized(&key).await?;
 
             if let Some(cached_fields) = cached_fields {
                 return Ok(cached_fields);
@@ -504,15 +491,9 @@ impl LoaderField {
             .collect();
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
 
-        redis
-            .set_serialized_to_json(
-                LOADER_FIELDS_NAMESPACE_ALL,
-                "",
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -528,13 +509,11 @@ impl LoaderFieldEnum {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis
+                .key()
+                .metadata(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name);
 
-            let cached_enum = redis
-                .get_deserialized_from_json(
-                    LOADER_FIELD_ENUMS_ID_NAMESPACE,
-                    enum_name,
-                )
-                .await?;
+            let cached_enum = redis.get_deserialized(&key).await?;
             if let Some(cached_enum) = cached_enum {
                 return Ok(cached_enum);
             }
@@ -559,15 +538,11 @@ impl LoaderFieldEnum {
         });
 
         let mut redis = redis.connect().await?;
+        let key = redis
+            .key()
+            .metadata(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name);
 
-        redis
-            .set_serialized_to_json(
-                LOADER_FIELD_ENUMS_ID_NAMESPACE,
-                enum_name,
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -670,7 +645,7 @@ impl LoaderFieldEnumValue {
                     })
                     .await?;
 
-                Ok(values)
+                Ok::<_, DatabaseError>(values)
             },
         ).await?;
 

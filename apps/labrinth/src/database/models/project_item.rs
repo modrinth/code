@@ -4,7 +4,6 @@ use super::loader_fields::{
 };
 use super::{DBUser, ids::*};
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
@@ -22,10 +21,11 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects";
-pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs";
-const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies";
+pub const PROJECTS_NAMESPACE: &str = "projects:v3";
+pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v3";
+const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v3";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
@@ -942,7 +942,7 @@ impl DBProject {
                     })
                     ?;
 
-                Ok(projects)
+                Ok::<_, DatabaseError>(projects)
             },
         )
         .await
@@ -974,13 +974,10 @@ impl DBProject {
 
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
-            let dependencies = redis
-                .get_deserialized_from_json::<Dependencies>(
-                    PROJECTS_DEPENDENCIES_NAMESPACE,
-                    &id.0.to_string(),
-                )
-                .await?;
+            let dependencies =
+                redis.get_deserialized::<Dependencies>(&key).await?;
             if let Some(dependencies) = dependencies {
                 return Ok(dependencies);
             }
@@ -1012,15 +1009,9 @@ impl DBProject {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
-        redis
-            .set_serialized_to_json(
-                PROJECTS_DEPENDENCIES_NAMESPACE,
-                id.0,
-                &dependencies,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &dependencies, None).await?;
         Ok(dependencies)
     }
 
@@ -1031,21 +1022,21 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let mut keys = vec![redis.key().entity(PROJECTS_NAMESPACE, id.0)];
+        if let Some(slug) = slug {
+            keys.push(
+                redis
+                    .key()
+                    .entity(PROJECTS_SLUGS_NAMESPACE, slug.to_lowercase()),
+            );
+        }
+        if clear_dependencies.unwrap_or(false) {
+            keys.push(
+                redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0),
+            );
+        }
 
-        redis
-            .delete_many([
-                (PROJECTS_NAMESPACE, Some(id.0.to_string())),
-                (PROJECTS_SLUGS_NAMESPACE, slug.map(|x| x.to_lowercase())),
-                (
-                    PROJECTS_DEPENDENCIES_NAMESPACE,
-                    if clear_dependencies.unwrap_or(false) {
-                        Some(id.0.to_string())
-                    } else {
-                        None
-                    },
-                ),
-            ])
-            .await?;
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 }

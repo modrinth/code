@@ -246,7 +246,7 @@ export const coreNags: Nag[] = [
 			id: 'nags.review-permissions.title',
 			defaultMessage: 'Review external permissions',
 		}),
-		description: (context: NagContext) => {
+		description: (_context: NagContext) => {
 			const { formatMessage } = useVIntl()
 			return formatMessage(
 				defineMessage({

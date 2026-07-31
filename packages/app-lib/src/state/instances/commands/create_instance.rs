@@ -8,7 +8,7 @@ use crate::state::{
     InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
     State,
 };
-use crate::util::fetch::{self, write_cached_icon};
+use crate::util::fetch;
 use crate::util::io;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -55,8 +55,12 @@ pub(crate) async fn create_instance(
             None
         };
 
-        let icon_path =
-            resolve_icon_path(input.icon_path.as_deref(), state).await?;
+        let icon_path = resolve_icon_path(
+            input.icon_path.as_deref(),
+            matches!(&input.link, InstanceLink::SharedInstance { .. }),
+            state,
+        )
+        .await?;
         let now = Utc::now();
         let instance_id = format!("local:{}", Uuid::new_v4());
         let content_set_id = format!("content-set:{}", Uuid::new_v4());
@@ -168,16 +172,15 @@ async fn path_available(
 
 async fn resolve_icon_path(
     icon_path: Option<&str>,
+    ignore_missing_remote_icon: bool,
     state: &State,
 ) -> crate::Result<Option<String>> {
     let Some(icon) = icon_path else {
         return Ok(None);
     };
 
-    let (bytes, file_name) = if icon.starts_with("https://")
-        || icon.starts_with("http://")
-    {
-        let fetched = fetch::fetch(
+    let file = if icon.starts_with("https://") || icon.starts_with("http://") {
+        let bytes = match fetch::fetch(
             icon,
             None,
             None,
@@ -185,23 +188,38 @@ async fn resolve_icon_path(
             &state.fetch_semaphore,
             &state.pool,
         )
-        .await?;
-        let name = icon.rsplit('/').next().unwrap_or("icon").to_string();
-        (fetched, name)
+        .await
+        {
+            Ok(bytes) => bytes,
+            Err(error)
+                if ignore_missing_remote_icon && is_not_found_error(&error) =>
+            {
+                return Ok(None);
+            }
+            Err(error) => return Err(error),
+        };
+        crate::api::instance::cache_icon(bytes, state).await?
     } else {
-        let data = io::read(state.directories.caches_dir().join(icon)).await?;
-        (bytes::Bytes::from(data), icon.to_string())
+        crate::api::instance::cache_icon_from_path(
+            &state.directories.caches_dir().join(icon),
+            state,
+        )
+        .await?
     };
 
-    let file = write_cached_icon(
-        &file_name,
-        &state.directories.caches_dir(),
-        bytes,
-        &state.io_semaphore,
-    )
-    .await?;
-
     Ok(Some(file.to_string_lossy().to_string()))
+}
+
+fn is_not_found_error(error: &crate::Error) -> bool {
+    match error.raw.as_ref() {
+        crate::ErrorKind::FetchError(error) => {
+            error.status() == Some(reqwest::StatusCode::NOT_FOUND)
+        }
+        crate::ErrorKind::LabrinthError(error) => {
+            error.status == Some(reqwest::StatusCode::NOT_FOUND.as_u16())
+        }
+        _ => false,
+    }
 }
 
 fn content_source_kind(link: &InstanceLink) -> ContentSourceKind {

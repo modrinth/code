@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Adj hozzá egy Java címet"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Adjon meg az egyéni licenszének érvényes URL-címét és nevét, illetve SPDX-azonosítóját."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Add meg a license információit"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Adj hozzá bármilyen releváns linket ami a Modrinthon kívűl található, például a weboldalad, webshopod vagy egy discord meghívó."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Az összes elérhető nyelvi beállítást kiválasztottad. Kérlek, csak azokat a nyelveket sorold fel, amelyeket a szerver valóban támogat."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Válassza ki a megfelelő nyelveket"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Mind a {totalAvailableTags} elérhető címkét kiválasztottad. A címkék célja az, hogy segítsék a felhasználókat a megfelelő projektek megtalálásában. Kérjük, csak a projekthez releváns címkéket válaszd ki."
@@ -143,6 +155,9 @@
   "nags.review-permissions.description": {
     "defaultMessage": "Győződj meg arról, hogy rendelkezésre áll-e az a bizonyíték, amely igazolja, hogy jogosult vagy a modcsomagodban szereplő bármely külső tartalom terjesztésére."
   },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Külső jogosultságok ellenőrzése"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Válaszd ki, hogy a szervered mely verziókat támogatja, válassz egy modcsomagot, vagy tölts fel sajátot."
   },
@@ -185,6 +200,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Jogosultságok kezelése"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Látogasd meg a címke beállításokat"
   },
@@ -217,6 +235,9 @@
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "{languageCount} nyelvet választottál ki. Kérlek csak azokat a nyelveket válaszd ki, amelyeket a szerver aktívan támogat."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Válassza ki a megfelelő nyelveket"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy szervered biztosan megjelenjen a releváns keresési eredmények között."

@@ -3,12 +3,12 @@ use crate::database::models::{
     generate_charge_id, generate_user_subscription_id, product_item,
     products_tax_identifier_item, user_subscription_item,
 };
-use crate::database::redis::RedisPool;
 use crate::models::ids::*;
 use crate::models::v3::billing::SubscriptionStatus;
 use crate::models::v3::users::User;
 use crate::routes::ApiError;
 use crate::util::anrok;
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use ariadne::ids::base62_impl::to_base62;

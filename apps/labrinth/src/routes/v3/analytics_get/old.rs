@@ -3,7 +3,6 @@
 use super::ApiError;
 use crate::database;
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::models::teams::ProjectPermissions;
 use crate::{
     auth::get_user_from_headers,
@@ -20,6 +19,7 @@ use sqlx::postgres::types::PgInterval;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::num::NonZeroU32;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(playtimes_get)

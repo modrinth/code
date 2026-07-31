@@ -6,7 +6,6 @@ use crate::database::models::ids::{DBNotificationId, DBUserId};
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
-use crate::database::redis::RedisPool;
 use crate::models::notifications::NotificationDeliveryStatus;
 use crate::models::users::Role;
 use crate::models::v3::notifications::{Notification, NotificationBody};
@@ -27,6 +26,7 @@ use ariadne::ids::UserId;
 use eyre::eyre;
 use lettre::message::Mailbox;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(create)
@@ -427,7 +427,7 @@ async fn broadcast_notifications(
             redis,
             RedisFriendsMessage::Notification {
                 to_user,
-                notification,
+                notification_id,
             },
         )
         .await

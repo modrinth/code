@@ -202,11 +202,20 @@ pub async fn emit_install_job(
     {
         use tauri::Emitter;
 
-        let event_state = crate::EventState::get()?;
-        event_state
-            .app
-            .emit("install_job", snapshot)
-            .map_err(crate::event::EventError::from)?;
+        let result: crate::Result<()> = (|| {
+            let event_state = crate::EventState::get()?;
+            event_state
+                .app
+                .emit("install_job", snapshot)
+                .map_err(crate::event::EventError::from)?;
+            Ok(())
+        })();
+        if let Err(error) = result {
+            tracing::warn!(
+                "Failed to emit install job {} update: {error}",
+                snapshot.job_id
+            );
+        }
     }
 
     Ok(())

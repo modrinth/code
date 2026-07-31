@@ -2285,9 +2285,6 @@
   "layout.nav.discover": {
     "message": "Utforsk"
   },
-  "layout.nav.discover-content": {
-    "message": "Utforsk innhold"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Skaff deg Modrinth App-en"
   },
@@ -2609,117 +2606,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Dobbeltsjekk lommeboksadressa di. Penger sendt til feil adresse kan ikke bli gjenoppretta."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Endringer blir utført på {count, plural, one {prosjekt} other {prosjekter}}."
-  },
-  "profile.bio.fallback.creator": {
-    "message": "En Modrinth-skaper."
-  },
-  "profile.bio.fallback.user": {
-    "message": "En Modrinth-bruker."
-  },
-  "profile.button.analytics": {
-    "message": "Vis brukerstatistikk"
-  },
-  "profile.button.billing": {
-    "message": "Hold styr på brukerfakturering"
-  },
-  "profile.button.edit-role": {
-    "message": "Rediger rolle"
-  },
-  "profile.button.info": {
-    "message": "Vis brukerdetaljer"
-  },
-  "profile.button.manage-projects": {
-    "message": "Hold styr på prosjekt"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Fjern tilknyting"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Sett som tilknyting"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# prosjekt} other {# prosjekter}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Autoriseringsgivere"
-  },
-  "profile.details.label.email": {
-    "message": "Epost"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Epostbekreftelse"
-  },
-  "profile.details.label.has-password": {
-    "message": "Har passord"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Har TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Betalingsmetoder"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Epost ikke bekrefta"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Epost bekrefta"
-  },
-  "profile.error.not-found": {
-    "message": "Bruker ikke funnet"
-  },
-  "profile.label.affiliate": {
-    "message": "Tilknytt"
-  },
-  "profile.label.badges": {
-    "message": "Merker"
-  },
-  "profile.label.collection": {
-    "message": "Samling"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {nedlasting} other {nedlastinger}}"
-  },
-  "profile.label.joined": {
-    "message": "Blei med"
-  },
-  "profile.label.no-collections": {
-    "message": "Denne brukeren har ingen samlinger!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Du har ikke noen samlinger.\nHar du lyst å <create-link>lage en</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Denne brukeren har ingen prosjekt!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Du har ikke noen prosjekt.\nHar du lyst å <create-link>lage en</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organisasjoner"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {projekt} other {projekt}}"
-  },
-  "profile.label.saving": {
-    "message": "Lagrer..."
-  },
-  "profile.meta.description": {
-    "message": "Last ned prosjekta til {username} på Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Last ned prosjekta til {username} på Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Offisiell Modrinth-bruker"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> prosjektfølger} other {<stat>{count}</stat> prosjektfølgere}}"
-  },
-  "profile.user-id": {
-    "message": "Bruker-ID: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Kunne ikke avslå laginvitasjonen"
   },
@@ -2834,24 +2720,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Oppretta {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Lisensiert {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publisert {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Sendt inn {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detaljer"
-  },
-  "project.about.details.updated": {
-    "message": "Oppdatert {date}"
-  },
   "project.actions.create-server": {
     "message": "Lag en server"
   },
@@ -2881,9 +2749,6 @@
   },
   "project.description.title": {
     "message": "Beskrivelse"
-  },
-  "project.details.licensed": {
-    "message": "Lisensert"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} støtter ikke {gameVersion} for {platform}"
@@ -2935,15 +2800,6 @@
   },
   "project.gallery.title": {
     "message": "Galleri"
-  },
-  "project.license.error": {
-    "message": "Lisenstekst kunne ikke bli henta."
-  },
-  "project.license.loading": {
-    "message": "Laster inn linsenstekst..."
-  },
-  "project.license.title": {
-    "message": "Lisens"
   },
   "project.moderation.admonition.approved.header": {
     "message": "Prosjekt godkjent"
@@ -3037,12 +2893,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Besøk prosjekt-dashbordet"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {nedlasting} other {nedlastinger}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {følger} other {følgere}}"
   },
   "project.status.archived.message": {
     "message": "{title} har blitt arkivert. {title} kommer ikke til å få noen nye oppdateringer, hvis ikke forfatteren bestemmer seg for å dearkivere prosjektet."
@@ -3689,23 +3539,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Legg til en omdirings-URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Avbryt"
-  },
   "settings.applications.button.create": {
     "message": "Lag app"
   },
   "settings.applications.button.delete": {
     "message": "Slett"
   },
-  "settings.applications.button.edit": {
-    "message": "Regiser"
-  },
   "settings.applications.button.new": {
     "message": "Ny søknad"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Lagre endringer"
   },
   "settings.applications.button.upload-icon": {
     "message": "Last opp ikon"
@@ -3779,14 +3620,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Om denne appen"
   },
-  "settings.authorizations.by": {
-    "message": "fra"
-  },
   "settings.authorizations.description": {
     "message": "Når du autoriserer en applikasjon med Modrinth-kontoen din, så gir du tilgang til kontoen din. Du kan handere og gå gjennom tilgang til kontoen din her når som helst."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Vi kan ikke vise de autoriserte appene dine akkurat nå, vi jobber med å fikse det. Vær så snill å besøk denne sida seinere!"
   },
   "settings.authorizations.head-title": {
     "message": "Autoriseringer"
@@ -4129,27 +3964,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Aldri brukt"
-  },
-  "settings.profile.bio.description": {
-    "message": "En kort beskrivelse sånn at alle veit litt om deg."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Profilinformasjonen din er offentlig lesbar på Modrinth og gjennom <docs-link>Modrinth API</docs-link>-en."
-  },
-  "settings.profile.head-title": {
-    "message": "Profilinnstillinger"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profilinformasjon"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilbilde"
-  },
-  "settings.profile.username.description": {
-    "message": "Et unikt navn (som ikke skiller mellom store og små bokstaver) for å identifisere profilen din."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Tilbakekall økta"

@@ -4,7 +4,7 @@
 		<section class="universal-card">
 			<div class="label">
 				<h3>
-					<span class="label__title size-card-header">Tags</span>
+					<span class="label__title size-card-header">{{ formatMessage(messages.tagsTitle) }}</span>
 				</h3>
 			</div>
 
@@ -27,16 +27,18 @@
 			</div>
 
 			<p>
-				Accurate tagging is important to help people find your
-				{{ formatProjectType(project.project_type).toLowerCase() }}. Make sure to select all tags
-				that apply.
+				{{
+					formatMessage(messages.taggingImportanceDescription, {
+						type: formatProjectType(project.project_type).toLowerCase(),
+					})
+				}}
 			</p>
 
 			<p
 				v-if="project.versions.length === 0 && projectV3?.minecraft_server == null"
 				class="known-errors"
 			>
-				Please upload a version first in order to select tags!
+				{{ formatMessage(messages.uploadVersionFirst) }}
 			</p>
 			<template v-else>
 				<template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
@@ -46,22 +48,32 @@
 						</h4>
 						<span class="label__description">
 							<template v-if="header === 'categories'">
-								Select all categories that reflect the themes or function of your
-								{{ formatProjectType(project.project_type).toLowerCase() }}.
+								{{
+									formatMessage(messages.categoriesDescription, {
+										type: formatProjectType(project.project_type).toLowerCase(),
+									})
+								}}
 							</template>
 							<template v-else-if="header === 'features'">
-								Select all of the features that your
-								{{ formatProjectType(project.project_type).toLowerCase() }} makes use of.
+								{{
+									formatMessage(messages.featuresDescription, {
+										type: formatProjectType(project.project_type).toLowerCase(),
+									})
+								}}
 							</template>
 							<template v-else-if="header === 'resolutions'">
-								Select the resolution(s) of textures in your
-								{{ formatProjectType(project.project_type).toLowerCase() }}.
+								{{
+									formatMessage(messages.resolutionsDescription, {
+										type: formatProjectType(project.project_type).toLowerCase(),
+									})
+								}}
 							</template>
 							<template v-else-if="header === 'performance impact'">
-								Select the realistic performance impact of your
-								{{ formatProjectType(project.project_type).toLowerCase() }}. Select multiple if the
-								{{ formatProjectType(project.project_type).toLowerCase() }} is configurable to
-								different levels of performance impact.
+								{{
+									formatMessage(messages.performanceImpactDescription, {
+										type: formatProjectType(project.project_type).toLowerCase(),
+									})
+								}}
 							</template>
 						</span>
 					</div>
@@ -90,15 +102,16 @@
 				</template>
 				<div class="label">
 					<h4>
-						<span class="label__title"><StarIcon /> Featured tags</span>
+						<span class="label__title"
+							><StarIcon /> {{ formatMessage(messages.featuredTags) }}</span
+						>
 					</h4>
-					<span class="label__description">
-						You can feature up to 3 of your most relevant tags. Other tags may be promoted to
-						featured if you do not select all 3.
-					</span>
+					<span class="label__description">{{
+						formatMessage(messages.featuredTagsDescription)
+					}}</span>
 				</div>
 				<p v-if="current.selectedTags.length < 1">
-					Select at least one category in order to feature a category.
+					{{ formatMessage(messages.selectAtLeastOneCategory) }}
 				</p>
 				<div class="category-list input-div">
 					<Checkbox
@@ -145,6 +158,7 @@ import {
 import {
 	Checkbox,
 	ConfirmLeaveModal,
+	defineMessages,
 	formatCategory,
 	formatCategoryHeader,
 	FormattedTag,
@@ -166,6 +180,77 @@ interface Category {
 
 const tags = useGeneratedState()
 const { formatMessage, locale } = useVIntl()
+
+const messages = defineMessages({
+	tagsTitle: {
+		id: 'project.settings.tags.title',
+		defaultMessage: 'Tags',
+	},
+	taggingImportanceDescription: {
+		id: 'project.settings.tags.tagging-importance-description',
+		defaultMessage:
+			'Accurate tagging is important to help people find your {type}. Make sure to select all tags that apply.',
+	},
+	uploadVersionFirst: {
+		id: 'project.settings.tags.upload-version-first',
+		defaultMessage: 'Please upload a version first in order to select tags!',
+	},
+	categoriesDescription: {
+		id: 'project.settings.tags.categories-description',
+		defaultMessage: 'Select all categories that reflect the themes or function of your {type}.',
+	},
+	featuresDescription: {
+		id: 'project.settings.tags.features-description',
+		defaultMessage: 'Select all of the features that your {type} makes use of.',
+	},
+	resolutionsDescription: {
+		id: 'project.settings.tags.resolutions-description',
+		defaultMessage: 'Select the resolution(s) of textures in your {type}.',
+	},
+	performanceImpactDescription: {
+		id: 'project.settings.tags.performance-impact-description',
+		defaultMessage:
+			'Select the realistic performance impact of your {type}. Select multiple if the {type} is configurable to different levels of performance impact.',
+	},
+	featuredTags: {
+		id: 'project.settings.tags.featured-tags',
+		defaultMessage: 'Featured tags',
+	},
+	featuredTagsDescription: {
+		id: 'project.settings.tags.featured-tags-description',
+		defaultMessage:
+			'You can feature up to 3 of your most relevant tags. Other tags may be promoted to featured if you do not select all 3.',
+	},
+	selectAtLeastOneCategory: {
+		id: 'project.settings.tags.select-at-least-one-category',
+		defaultMessage: 'Select at least one category in order to feature a category.',
+	},
+	tooManyTagsServerHardWarning: {
+		id: 'project.settings.tags.too-many-tags-server-hard-warning',
+		defaultMessage:
+			"You've selected {count} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover.",
+	},
+	tooManyTagsServerSoftWarning: {
+		id: 'project.settings.tags.too-many-tags-server-soft-warning',
+		defaultMessage:
+			"You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover.",
+	},
+	tooManyTagsProjectWarning: {
+		id: 'project.settings.tags.too-many-tags-project-warning',
+		defaultMessage:
+			"You've selected {count} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.",
+	},
+	multipleResolutionTagsWarning: {
+		id: 'project.settings.tags.multiple-resolution-tags-warning',
+		defaultMessage:
+			"You've selected {count} resolution tags ({tags}). Resource packs should typically only have one resolution tag.",
+	},
+	allTagsSelectedWarning: {
+		id: 'project.settings.tags.all-tags-selected-warning',
+		defaultMessage:
+			"You've selected all {count} available tags. Please select only the tags that truly apply to your project.",
+	},
+})
 
 const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
 
@@ -268,12 +353,12 @@ const tooManyTagsWarning = computed(() => {
 	const tagCount = current.value.selectedTags.length
 	if (projectV3?.value?.minecraft_server != null) {
 		if (tagCount > 18) {
-			return `You've selected ${tagCount} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover.`
+			return formatMessage(messages.tooManyTagsServerHardWarning, { count: tagCount })
 		} else if (tagCount > 12) {
-			return `You've selected ${tagCount} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover.`
+			return formatMessage(messages.tooManyTagsServerSoftWarning, { count: tagCount })
 		}
 	} else if (tagCount > 8) {
-		return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`
+		return formatMessage(messages.tooManyTagsProjectWarning, { count: tagCount })
 	}
 	return null
 })
@@ -286,14 +371,15 @@ const multipleResolutionTagsWarning = computed(() => {
 	)
 
 	if (resolutionTags.length > 1) {
-		return `You've selected ${resolutionTags.length} resolution tags (${resolutionTags
+		const tagsList = resolutionTags
 			.map((t) => t.name)
 			.join(', ')
 			.replace('8x-', '8x or lower')
-			.replace(
-				'512x+',
-				'512x or higher',
-			)}). Resource packs should typically only have one resolution tag.`
+			.replace('512x+', '512x or higher')
+		return formatMessage(messages.multipleResolutionTagsWarning, {
+			count: resolutionTags.length,
+			tags: tagsList,
+		})
 	}
 	return null
 })
@@ -310,7 +396,9 @@ const allTagsSelectedWarning = computed(() => {
 		totalSelectedTags === categoriesForProjectType.length &&
 		categoriesForProjectType.length > 0
 	) {
-		return `You've selected all ${categoriesForProjectType.length} available tags. Please select only the tags that truly apply to your project.`
+		return formatMessage(messages.allTagsSelectedWarning, {
+			count: categoriesForProjectType.length,
+		})
 	}
 	return null
 })

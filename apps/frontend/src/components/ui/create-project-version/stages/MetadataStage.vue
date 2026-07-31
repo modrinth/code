@@ -9,12 +9,12 @@
 	<div class="flex flex-col gap-6">
 		<div v-if="!editingVersion" class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
-				<span class="font-semibold text-contrast"> Uploaded files </span>
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.uploadedFiles) }}</span>
 
 				<ButtonStyled type="transparent" size="standard">
 					<button @click="editFiles">
 						<EditIcon />
-						Edit
+						{{ formatMessage(messages.editButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -43,23 +43,27 @@
 		<div class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast">
-					{{ usingDetectedLoaders ? 'Detected loaders' : 'Loaders' }}
+					{{
+						usingDetectedLoaders
+							? formatMessage(messages.detectedLoaders)
+							: formatMessage(messages.loaders)
+					}}
 				</span>
 
 				<ButtonStyled type="transparent" size="standard">
 					<button
 						v-tooltip="
 							isModpack
-								? 'Modpack loaders cannot be edited'
+								? formatMessage(messages.modpackLoadersTooltip)
 								: isResourcePack
-									? 'Resource pack loaders cannot be edited'
+									? formatMessage(messages.resourcePackLoadersTooltip)
 									: undefined
 						"
 						:disabled="isModpack || isResourcePack"
 						@click="editLoaders"
 					>
 						<EditIcon />
-						Edit
+						{{ formatMessage(messages.editButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -88,9 +92,11 @@
 						v-if="!draftVersionLoaders.length && projectType === 'modpack'"
 						class="border !border-solid border-surface-5 hover:no-underline"
 					>
-						No mod loader
+						{{ formatMessage(messages.noModLoader) }}
 					</TagItem>
-					<span v-else-if="!draftVersionLoaders.length">No loaders selected.</span>
+					<span v-else-if="!draftVersionLoaders.length">{{
+						formatMessage(messages.noLoadersSelected)
+					}}</span>
 				</div>
 			</div>
 		</div>
@@ -98,17 +104,21 @@
 		<div class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast">
-					{{ usingDetectedVersions ? 'Detected versions' : 'Versions' }}
+					{{
+						usingDetectedVersions
+							? formatMessage(messages.detectedVersions)
+							: formatMessage(messages.versions)
+					}}
 				</span>
 
 				<ButtonStyled type="transparent" size="standard">
 					<button
-						v-tooltip="isModpack ? 'Modpack versions cannot be edited' : undefined"
+						v-tooltip="isModpack ? formatMessage(messages.modpackVersionsTooltip) : undefined"
 						:disabled="isModpack"
 						@click="editVersions"
 					>
 						<EditIcon />
-						Edit
+						{{ formatMessage(messages.editButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -125,7 +135,9 @@
 						{{ version }}
 					</TagItem>
 
-					<span v-if="!draftVersion.game_versions.length">No versions selected.</span>
+					<span v-if="!draftVersion.game_versions.length">{{
+						formatMessage(messages.noVersionsSelected)
+					}}</span>
 				</div>
 			</div>
 		</div>
@@ -134,14 +146,16 @@
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-2">
-						<span class="font-semibold text-contrast"> Environment </span>
-						<UnknownIcon v-tooltip="'Pre-filled from a previous similar version'" />
+						<span class="font-semibold text-contrast">{{
+							formatMessage(messages.environment)
+						}}</span>
+						<UnknownIcon v-tooltip="formatMessage(messages.prefilledEnvironmentTooltip)" />
 					</div>
 
 					<ButtonStyled type="transparent" size="standard">
 						<button @click="editEnvironment">
 							<EditIcon />
-							Edit
+							{{ formatMessage(messages.editButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -154,7 +168,9 @@
 						<div class="text-sm font-medium">{{ environmentCopy.description }}</div>
 					</div>
 
-					<span v-else class="text-sm font-medium">No environment has been set.</span>
+					<span v-else class="text-sm font-medium">{{
+						formatMessage(messages.noEnvironmentSet)
+					}}</span>
 				</div>
 			</div>
 		</template>
@@ -163,12 +179,14 @@
 			<div class="flex flex-col gap-2.5">
 				<div class="flex flex-col gap-1">
 					<div class="flex items-center justify-between">
-						<span class="font-semibold text-contrast"> Dependencies </span>
+						<span class="font-semibold text-contrast">{{
+							formatMessage(messages.dependencies)
+						}}</span>
 
 						<ButtonStyled type="transparent" size="standard">
 							<button @click="addDependency">
 								<PlusIcon />
-								Add dependency
+								{{ formatMessage(messages.addDependency) }}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -177,13 +195,15 @@
 						<DependenciesList />
 					</div>
 					<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
-						<span class="text-sm font-medium">No dependencies added.</span>
+						<span class="text-sm font-medium">{{
+							formatMessage(messages.noDependenciesAdded)
+						}}</span>
 					</div>
 				</div>
 
 				<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-2.5">
 					<div class="flex items-center justify-between">
-						<span class="font-medium"> Suggested </span>
+						<span class="font-medium">{{ formatMessage(messages.suggested) }}</span>
 					</div>
 					<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
 				</div>
@@ -231,11 +251,11 @@ const { projectV2 } = injectProjectPageContext()
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 
-const editTabs: TabsTab[] = [
-	{ label: 'Metadata', value: 'metadata' },
-	{ label: 'Details', value: 'add-details' },
-	{ label: 'Files', value: 'add-files' },
-]
+const editTabs = computed<TabsTab[]>(() => [
+	{ label: formatMessage(messages.metadataTab), value: 'metadata' },
+	{ label: formatMessage(messages.detailsTab), value: 'add-details' },
+	{ label: formatMessage(messages.filesTab), value: 'add-files' },
+])
 
 function setEditTab(tab: TabsTab) {
 	modal.value?.setStage(tab.value)
@@ -340,6 +360,97 @@ const supplementaryExistingFiles = computed(() => {
 })
 
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	uploadedFiles: {
+		id: 'create-project-version.create-modal.stage.metadata.uploaded-files',
+		defaultMessage: 'Uploaded files',
+	},
+	editButton: {
+		id: 'create-project-version.create-modal.stage.metadata.edit-button',
+		defaultMessage: 'Edit',
+	},
+	detectedLoaders: {
+		id: 'create-project-version.create-modal.stage.metadata.detected-loaders',
+		defaultMessage: 'Detected loaders',
+	},
+	loaders: {
+		id: 'create-project-version.create-modal.stage.metadata.loaders',
+		defaultMessage: 'Loaders',
+	},
+	modpackLoadersTooltip: {
+		id: 'create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip',
+		defaultMessage: 'Modpack loaders cannot be edited',
+	},
+	resourcePackLoadersTooltip: {
+		id: 'create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip',
+		defaultMessage: 'Resource pack loaders cannot be edited',
+	},
+	noModLoader: {
+		id: 'create-project-version.create-modal.stage.metadata.no-mod-loader',
+		defaultMessage: 'No mod loader',
+	},
+	noLoadersSelected: {
+		id: 'create-project-version.create-modal.stage.metadata.no-loaders-selected',
+		defaultMessage: 'No loaders selected.',
+	},
+	detectedVersions: {
+		id: 'create-project-version.create-modal.stage.metadata.detected-versions',
+		defaultMessage: 'Detected versions',
+	},
+	versions: {
+		id: 'create-project-version.create-modal.stage.metadata.versions',
+		defaultMessage: 'Versions',
+	},
+	modpackVersionsTooltip: {
+		id: 'create-project-version.create-modal.stage.metadata.modpack-versions-tooltip',
+		defaultMessage: 'Modpack versions cannot be edited',
+	},
+	noVersionsSelected: {
+		id: 'create-project-version.create-modal.stage.metadata.no-versions-selected',
+		defaultMessage: 'No versions selected.',
+	},
+	environment: {
+		id: 'create-project-version.create-modal.stage.metadata.environment',
+		defaultMessage: 'Environment',
+	},
+	prefilledEnvironmentTooltip: {
+		id: 'create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip',
+		defaultMessage: 'Pre-filled from a previous similar version',
+	},
+	noEnvironmentSet: {
+		id: 'create-project-version.create-modal.stage.metadata.no-environment-set',
+		defaultMessage: 'No environment has been set.',
+	},
+	dependencies: {
+		id: 'create-project-version.create-modal.stage.metadata.dependencies',
+		defaultMessage: 'Dependencies',
+	},
+	addDependency: {
+		id: 'create-project-version.create-modal.stage.metadata.add-dependency',
+		defaultMessage: 'Add dependency',
+	},
+	noDependenciesAdded: {
+		id: 'create-project-version.create-modal.stage.metadata.no-dependencies-added',
+		defaultMessage: 'No dependencies added.',
+	},
+	suggested: {
+		id: 'create-project-version.create-modal.stage.metadata.suggested',
+		defaultMessage: 'Suggested',
+	},
+	metadataTab: {
+		id: 'create-project-version.create-modal.stage.metadata.metadata-tab',
+		defaultMessage: 'Metadata',
+	},
+	detailsTab: {
+		id: 'create-project-version.create-modal.stage.metadata.details-tab',
+		defaultMessage: 'Details',
+	},
+	filesTab: {
+		id: 'create-project-version.create-modal.stage.metadata.files-tab',
+		defaultMessage: 'Files',
+	},
+})
 
 const noEnvironmentMessage = defineMessages({
 	title: {

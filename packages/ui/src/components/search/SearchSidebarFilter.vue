@@ -112,7 +112,7 @@
 								:key="`${filterType.id}-group-${groupName}`"
 								:group-name="groupName"
 								:options="options"
-								:supports-negative-filter="filterType.supports_negative_filter"
+								:supports="filterType.supports"
 								:included="isIncluded"
 								:excluded="isExcluded"
 								@toggle="toggleFilter"
@@ -126,7 +126,7 @@
 								:option="option"
 								:included="isIncluded(option)"
 								:excluded="isExcluded(option)"
-								:supports-negative-filter="filterType.supports_negative_filter"
+								:supports="filterType.supports"
 								:class="{
 									'mr-3': scrollable,
 								}"
@@ -162,9 +162,7 @@
 								:class="{ 'rotate-180': showMore }"
 							/>
 							<span class="truncate text-sm">
-								{{
-									showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore)
-								}}
+								{{ showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore) }}
 							</span>
 						</button>
 					</div>
@@ -213,7 +211,6 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
-import Toggle from '../base/Toggle.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'

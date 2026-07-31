@@ -43,7 +43,7 @@ import {
 
 // Load locale messages from the UI package's locales
 // @ts-ignore
-const localeModules = import.meta.glob('../src/locales/*/index.json', {
+const localeModules = import.meta.glob('../src/locales/en-US/index.json', {
 	eager: true,
 }) as Record<string, { default: CrowdinMessages }>
 

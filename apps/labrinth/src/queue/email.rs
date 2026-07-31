@@ -3,7 +3,6 @@ use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::models::user_item::DBUser;
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::notifications::{NotificationBody, NotificationType};
@@ -23,6 +22,7 @@ use thiserror::Error;
 use tokio::sync::Mutex as TokioMutex;
 use tokio::sync::Semaphore;
 use tracing::{error, info, instrument, warn};
+use xredis::RedisPool;
 
 const EMAIL_RETRY_DELAY_SECONDS: i64 = 10;
 

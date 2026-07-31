@@ -42,7 +42,7 @@
     "defaultMessage": "選擇精確的語言"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你選擇了全部 {totalAvailableTags, plural, other {# 個可用標籤}}。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
+    "defaultMessage": "你選擇了所有 {totalAvailableTags, plural, other {# 個可用標籤}}。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"

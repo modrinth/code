@@ -4,7 +4,6 @@ use crate::database::PgPool;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ThreadId, ThreadMessageId};
@@ -19,6 +18,7 @@ use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use futures::TryStreamExt;
 use serde::Deserialize;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(thread_get_route)

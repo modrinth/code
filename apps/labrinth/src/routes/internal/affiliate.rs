@@ -1,13 +1,11 @@
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use crate::env::ENV;
 use crate::{
     auth::get_user_from_headers,
-    database::{
-        models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
-        redis::RedisPool,
-    },
+    database::models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
     models::{
         analytics::AffiliateCodeClick, ids::AffiliateCodeId, pats::Scopes,
         users::Badges, v3::affiliate_code::AffiliateCode,

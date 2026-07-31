@@ -1,12 +1,12 @@
 use crate::database::PgPool;
 use crate::{
     auth::get_user_from_headers,
-    database::redis::RedisPool,
     models::{pats::Scopes, v3::user_limits::UserLimits},
     queue::session::AuthQueue,
     routes::ApiError,
 };
 use actix_web::{HttpRequest, get, web};
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_project_limits)

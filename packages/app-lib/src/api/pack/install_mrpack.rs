@@ -798,6 +798,16 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 let downloaded_bytes = file.len() as u64;
 
                 let path = target_path;
+				content_context
+					.reporter
+					.preserve_failure_context(
+						context.clone(),
+						write(&path, &file, &state.io_semaphore).await,
+					)
+					.await?;
+				let modified_at_ns = crate::state::file_modified_at_ns(
+					&io::metadata(&path).await?,
+				)?;
 
                 {
                     let _permit = state.install_db_semaphore.acquire().await?;
@@ -809,6 +819,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                                 file.clone(),
                                 &content_context.instance_path,
                                 project.path.as_str(),
+								modified_at_ns,
                                 project
                                     .hashes
                                     .get(&PackFileHash::Sha1)
@@ -821,14 +832,6 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         )
                         .await?;
                 }
-
-                content_context
-                    .reporter
-                    .preserve_failure_context(
-                        context.clone(),
-                        write(&path, &file, &state.io_semaphore).await,
-                    )
-                    .await?;
 
                 if let Some(project_type) =
                     ProjectType::get_from_parent_folder(project.path.as_str())
@@ -998,6 +1001,8 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         let (size, hash) = reporter
             .preserve_failure_context(override_context, extract_result)
             .await?;
+        let modified_at_ns =
+            crate::state::file_modified_at_ns(&io::metadata(&path).await?)?;
 
         {
             let _permit = state.install_db_semaphore.acquire().await?;
@@ -1016,6 +1021,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         &instance_path,
                         relative_override_file_path.as_str(),
                         size,
+                        modified_at_ns,
                         hash.clone(),
                         ProjectType::get_from_parent_folder(
                             relative_override_file_path.as_str(),

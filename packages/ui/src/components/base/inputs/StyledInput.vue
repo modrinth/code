@@ -85,6 +85,7 @@ const props = withDefaults(
 		autocorrect?: 'on' | 'off'
 		clearLabel?: string
 		clearable?: boolean
+		clamp?: boolean
 		controlClass?: string
 		disabled?: boolean
 		error?: boolean
@@ -109,6 +110,7 @@ const props = withDefaults(
 		appearance: 'surface',
 		clearLabel: 'Clear input',
 		clearable: false,
+		clamp: false,
 		disabled: false,
 		error: false,
 		readonly: false,
@@ -137,12 +139,19 @@ function controlAttrs() {
 
 function onInput(event: Event) {
 	const target = event.target as HTMLInputElement
-	model.value =
-		props.type === 'number'
-			? target.value === ''
-				? undefined
-				: target.valueAsNumber
-			: target.value
+	if (props.type !== 'number') {
+		model.value = target.value
+	} else if (target.value === '') {
+		model.value = undefined
+	} else {
+		let value = target.valueAsNumber
+		if (props.clamp) {
+			if (props.min !== undefined) value = Math.max(props.min, value)
+			if (props.max !== undefined) value = Math.min(props.max, value)
+			target.value = String(value)
+		}
+		model.value = value
+	}
 
 	emit('input', event)
 }
