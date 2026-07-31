@@ -662,6 +662,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 			:selected-items="selectedItems"
 			:is-busy="props.actionDisabled"
 			:busy-tooltip="props.actionDisabledTooltip"
+			:hide-when-modal-open="false"
 			style="--left-bar-width: 0px; --right-bar-width: 0px"
 			@clear="selectedIds = []"
 			@enable="bulkEnable"
