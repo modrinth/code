@@ -4457,9 +4457,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Već imaš server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Saznaj više o Modrinth hostiranju"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth hostiranje"
   },
@@ -4468,9 +4465,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Instaliraj modove, pozvi prijatelje, i igraj skupa ave u Modrinth aplikaciji."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Nema još servera"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Izaberi svoje omiljene modove, a mi ćemo se pobrinuti za ostalo."
@@ -4486,12 +4480,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Prijavi se"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Podesi svoj server baš kao samostalni svet."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Jednostavno podešavanje"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Kopirano"

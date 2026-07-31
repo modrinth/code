@@ -3950,9 +3950,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Đã có máy chủ rồi?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Tìm hiểu thêm về Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3961,9 +3958,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Cài mod, mời bạn bè, và chơi cùng nhau mà chỉ cần Ứng dụng Modrinth."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Không máy chủ khả dụng"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Chọn bản mod mà bạn yêu thích và chúng tôi sẽ làm tất cả phần còn lại."
@@ -3979,12 +3973,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Đăng nhập"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Thiết lập máy chủ giống như thế giới chơi đơn."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Thiết lập đơn giản"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Đã sao chép"

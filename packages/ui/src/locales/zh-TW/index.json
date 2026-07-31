@@ -4535,9 +4535,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已經有伺服器了嗎？"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "深入了解 Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4546,9 +4543,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "安裝模組、邀請好友並一起暢玩，這一切都能在 Modrinth App 中輕鬆完成。"
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "目前還沒有伺服器"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "挑選你喜愛的模組，剩下的就交給我們處理。"
@@ -4564,12 +4558,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "登入"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "設定伺服器就像建立單人遊戲世界一樣簡單。"
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "簡單設定"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "已複製"

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ImportIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
+import frog from '@modrinth/ui/src/assets/welcome/frog.png'
+import iconTexture from '@modrinth/ui/src/assets/welcome/icon-texture.png'
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
-import frog from '../../assets/welcome/frog.png'
 import iconLights from '../../assets/welcome/icon-lights.svg?url'
 import iconLogo from '../../assets/welcome/icon-logo.svg?url'
-import iconTexture from '../../assets/welcome/icon-texture.png'
 
 const showCreationModal = inject<() => void>('showCreationModal')
 const showImportModal = inject<() => void>('showImportModal')

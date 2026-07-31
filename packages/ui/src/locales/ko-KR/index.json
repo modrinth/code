@@ -4472,9 +4472,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "서버가 이미 있으신가요?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Modrinth 호스팅에 관하여 알아보기"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth 호스팅"
   },
@@ -4483,9 +4480,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Modrinth 앱에서 모드를 설치하고, 친구를 초대해 함께 플레이하세요."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "서버 없음"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "즐겨찾는 모드들을 선택하시고 나머지는 저희에게 맡겨주세요."
@@ -4501,12 +4495,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "로그인"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "싱글 플레이어 월드처럼 서버를 설정하세요."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "간단한 설정"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "복사됨"

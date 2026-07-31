@@ -3701,9 +3701,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Už máte server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Zjistěte víc o Modrinth hostingu"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3712,9 +3709,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Instalujte mody, zvěte přátele a hrajte společně, to vše z Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Zatím žádné servery"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Vyberte si své oblíbené mody a o zbytek se postaráme."
@@ -3730,9 +3724,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Přihlásit se"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Nastavte si server stejně jako svět pro jednoho hráče."
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Zkopírováno"

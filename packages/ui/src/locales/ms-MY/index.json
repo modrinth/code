@@ -3932,9 +3932,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Sudah mempunyai pelayan?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Ketahui lebih lanjut tentang Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3943,9 +3940,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Pasang mod, jemput rakan dan main bersama-sama, semuanya dari Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Belum ada pelayan"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Pilih mod kegemaran anda dan kami uruskan selebihnya."
@@ -3961,12 +3955,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Daftar masuk"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Sediakan pelayan anda seperti dunia ekapemain."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Persediaan yang mudah"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Disalin"

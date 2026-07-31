@@ -3773,9 +3773,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Már van egy szervered?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Tudj meg többet a Modrinth Hostingról"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3784,9 +3781,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Telepíts modokat, hívd meg a barátaidat, és játsszatok együtt, mindezt a Modrinth Appban."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Még nincsenek szerverek"
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Modok telepítése egy kattintással"
@@ -3799,12 +3793,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Bejelentkezés"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Állítsd be a szerveredet úgy, mint egy egyjátékos világot."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Egyszerű beállítás"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Másolva"

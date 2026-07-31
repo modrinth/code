@@ -4451,9 +4451,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Zaten sunucunuz var mı?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Modrinth Hosting hakkında daha fazla bilgi edinin"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4462,9 +4459,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Mod kur, arkadaş davet et, birlikte oyna ve hepsini Modrinth App'ten yap."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Daha sunucu yok"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Beğendiğiniz modları seçin ve biz geri kalan işi hallederiz."
@@ -4480,12 +4474,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Giriş yap"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Sunucunuzu tıpkı tek oyunculu bir dünya gibi kurun."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Basit kurulum"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Kopyalandı"

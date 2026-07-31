@@ -4526,9 +4526,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Heb je al een server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Meer informatie over Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4537,9 +4534,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installeer mods, nodig vrienden uit en speel samen – allemaal via de Modrinth app."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Nog geen servers"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Kies je favoriete mods en wij regelen de rest."
@@ -4555,12 +4549,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Inloggen"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Stel je server in net zoals een eigen wereld."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Eenvoudige set-up"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Gekopieerd"

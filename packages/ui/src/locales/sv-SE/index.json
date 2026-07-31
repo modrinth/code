@@ -3890,9 +3890,6 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installera moddar, bjud in vänner och spela tillsammans, allt från Modrinth-appen."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Inga servrar än"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Välj dina favorit moddar så hanterar vi resten."
   },

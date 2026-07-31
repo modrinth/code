@@ -4493,9 +4493,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Hai già un server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Scopri di più su Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4504,9 +4501,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Crea un server, con o senza mod, e invita chi vuoi tramite la Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Ancora nessun server"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Scegli le tue mod preferite, al resto ci pensiamo noi."
@@ -4522,12 +4516,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Accedi"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Configura il tuo server come vuoi tu, senza alcuno sforzo."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Configurazione immediata"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Copiato"

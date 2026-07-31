@@ -4673,8 +4673,8 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Learn more about Modrinth Hosting"
+  "servers.list-empty.demo-button": {
+    "defaultMessage": "Demo"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4685,9 +4685,6 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Install mods, invite friends, and play together all from the Modrinth App."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "No servers yet"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Pick your favorite mods and we handle the rest."
   },
@@ -4695,19 +4692,19 @@
     "defaultMessage": "One-click mod installs"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Invite friends and get them set up right in the Modrinth App."
+    "defaultMessage": "Invite friends to play your server with one-click play from the Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Play with friends"
   },
+  "servers.list-empty.server-instances-description": {
+    "defaultMessage": "Switch between server instances and play different mods."
+  },
+  "servers.list-empty.server-instances-title": {
+    "defaultMessage": "Server instances"
+  },
   "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Sign in"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Set up your server just like a single player world."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Simple setup"
+    "defaultMessage": "Sign in to Modrinth"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Copied"
@@ -5261,6 +5258,9 @@
   "sharing.invite-players-modal.friends-heading": {
     "defaultMessage": "Your friends - {count}"
   },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "Invite players"
+  },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "Invite"
   },
@@ -5305,6 +5305,18 @@
   },
   "sharing.invite-players-modal.update-invite-link-failed-title": {
     "defaultMessage": "Failed to update invite link"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "Accept"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "Decline"
+  },
+  "sharing.invite-players-toast.invited-you-to": {
+    "defaultMessage": "invited you to"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "server."
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

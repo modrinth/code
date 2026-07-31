@@ -4448,9 +4448,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже есть сервер?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Подробнее о Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4459,9 +4456,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Играйте в сборки вместе с друзьями через Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Серверов ещё нет"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Выбирайте любимые моды, а мы сделаем всё остальное."
@@ -4477,12 +4471,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Войти"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Настраивайте сервер подобно одиночному миру."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Простая настройка"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Скопировано"
