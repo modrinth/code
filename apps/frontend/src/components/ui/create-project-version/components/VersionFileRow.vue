@@ -27,7 +27,7 @@
 				</div>
 			</template>
 
-			<Button v-if="onRemove" aria-label="Remove file" class="!shadow-none" @click="onRemove">
+			<Button v-if="onRemove" aria-label="Remove file" @click="onRemove">
 				<XIcon aria-hidden="true" />
 			</Button>
 			<Button v-if="isPrimary"
@@ -37,7 +37,6 @@
 							: 'Replace primary file'
 					"
 					aria-label="Change primary file"
-					class="!shadow-none"
 					:disabled="editingVersion"
 					@click="primaryFileInput?.click()"
 				>

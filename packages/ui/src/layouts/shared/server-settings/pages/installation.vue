@@ -24,7 +24,6 @@
 					<div>
 						<Button type="colored" color="red"
 								v-tooltip="resetServerDisabledTooltip"
-								class="!shadow-none"
 								:disabled="resetServerDisabled"
 								@click="showResetServerModal"
 							>
@@ -57,10 +56,9 @@
 				{{ formatMessage(messages.supportOptionsTitle) }}
 			</span>
 			<div>
-				<Button type="colored" color="red"
-						v-tooltip="supportResetToOnboardingTooltip"
-						class="!shadow-none"
-						:disabled="supportResetToOnboardingDisabled"
+			<Button type="colored" color="red"
+					v-tooltip="supportResetToOnboardingTooltip"
+					:disabled="supportResetToOnboardingDisabled"
 						@click="showResetToOnboardingModal"
 					>
 					<RotateCounterClockwiseIcon class="size-5" />

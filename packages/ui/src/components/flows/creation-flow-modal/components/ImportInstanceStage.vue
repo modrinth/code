@@ -70,12 +70,12 @@
 
 			<!-- Add launcher path -->
 			<div v-if="!showAddPath">
-				<Button class="w-full !shadow-none" @click="showAddPath = true">
+				<Button class="w-full" @click="showAddPath = true">
 					{{ formatMessage(messages.addLauncherPath) }}
 				</Button>
 			</div>
 			<div v-else class="flex items-center gap-2">
-				<IconButton label="Browse for launcher path" class="!shadow-none" @click="browseForLauncherPath">
+				<IconButton label="Browse for launcher path" @click="browseForLauncherPath">
 					<FolderSearchIcon />
 				</IconButton>
 				<StyledInput
@@ -83,7 +83,7 @@
 					:placeholder="formatMessage(messages.launcherPathPlaceholder)"
 					class="flex-1"
 				/>
-				<Button class="!shadow-none" :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
+				<Button :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
 					{{ formatMessage(messages.add) }}
 				</Button>
 			</div>

@@ -30,7 +30,6 @@
 				<Button
 						v-tooltip="'Replace file'"
 						aria-label="Replace file"
-						class="!shadow-none"
 						@click="fileInput?.click()"
 					>
 					<ArrowLeftRightIcon aria-hidden="true" />

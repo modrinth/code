@@ -22,7 +22,7 @@
 			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
 				<section v-if="mode === 'edit' && canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.textureSection) }}</h2>
-					<Button class="!shadow-none" @click="openTextureFileBrowser">
+					<Button @click="openTextureFileBrowser">
 						<UploadIcon /> {{ formatMessage(messages.replaceTextureButton) }}
 					</Button>
 					<input

@@ -350,7 +350,7 @@ const messages = defineMessages({
 						v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
 						aria-labelledby="duplicate-instance-label"
 						:disabled="installing"
-						class="w-max !shadow-none"
+						class="w-max"
 						@click="duplicateInstance"
 					>
 					<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
@@ -380,7 +380,7 @@ const messages = defineMessages({
 						class="w-full max-w-[300px]"
 						@submit="() => addCategory"
 					/>
-					<Button class="w-fit !shadow-none" @click="() => addCategory()">
+					<Button class="w-fit" @click="() => addCategory()">
 						<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
 					</Button>
 				</div>
@@ -414,7 +414,7 @@ const messages = defineMessages({
 			<Button type="colored" color="red"
 					aria-labelledby="delete-instance-label"
 					:disabled="removing"
-					class="w-fit !shadow-none"
+					class="w-fit"
 					@click="deleteConfirmModal.show()"
 				>
 				<SpinnerIcon v-if="removing" class="animate-spin" />

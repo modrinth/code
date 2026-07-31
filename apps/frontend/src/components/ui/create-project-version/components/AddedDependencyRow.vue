@@ -25,7 +25,7 @@
 		</div>
 
 		<div v-if="!hideRemove" class="flex shrink-0 items-center justify-end gap-1">
-			<Button aria-label="Remove file" class="-mr-2 !shadow-none" @click="emitRemove">
+			<Button aria-label="Remove file" class="-mr-2" @click="emitRemove">
 				<XIcon aria-hidden="true" />
 			</Button>
 		</div>

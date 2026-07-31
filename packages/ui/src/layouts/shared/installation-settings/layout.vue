@@ -699,7 +699,6 @@ const messages = defineMessages({
 					<div>
 						<Button type="colored" color="orange"
 								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="handleShowUnlinkModal"
 							>
@@ -731,7 +730,6 @@ const messages = defineMessages({
 					<div>
 						<Button type="colored" color="red"
 								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="handleShowReinstallModal"
 							>
@@ -918,7 +916,6 @@ const messages = defineMessages({
 						<div class="flex flex-wrap gap-2">
 							<Button type="colored" color="brand"
 									v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-									class="!shadow-none"
 									:disabled="
 										!form.isValid.value ||
 										!form.hasChanges.value ||
@@ -963,7 +960,6 @@ const messages = defineMessages({
 					<div class="flex flex-wrap gap-2">
 						<Button type="colored" color="orange"
 								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="handleStartEditing"
 							>

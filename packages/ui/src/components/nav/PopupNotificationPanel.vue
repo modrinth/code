@@ -141,7 +141,7 @@
 					/>
 					<div v-if="item.buttons?.length" class="flex gap-1.5">
 						<Button :type="(btn.color || (idx === 0 ? 'brand' : undefined)) && (btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard' ? 'colored' : 'base'" :color="(btn.color || (idx === 0 ? 'brand' : undefined)) && (btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard' ? ((btn.color || (idx === 0 ? 'brand' : undefined)) === 'medal-promo' ? 'medal_promotion' : (btn.color || (idx === 0 ? 'brand' : undefined))) : undefined" v-for="(btn, idx) in item.buttons"
-							:key="idx" class="!shadow-none" @click="handleButtonClick(item.id, btn)">
+							:key="idx" @click="handleButtonClick(item.id, btn)">
 							<component :is="btn.icon" v-if="btn.icon" />
 							{{ btn.label }}
 						</Button>

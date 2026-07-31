@@ -78,7 +78,7 @@ watch(
 			{{ formatMessage(messages.adsConsentTitle) }}
 		</h2>
 		<div class="mt-2 flex flex-col gap-2.5 items-start">
-			<Button class="!shadow-none" @click="manageAdsPreferences">
+			<Button @click="manageAdsPreferences">
 				<Settings2Icon aria-hidden="true" />
 				{{ formatMessage(messages.adsConsentManage) }}
 			</Button>

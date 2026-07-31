@@ -15,7 +15,7 @@
 				<Button type="quiet" @click="modal?.hide()">
 					{{ formatMessage(analyticsChartMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="orange" class="!shadow-none" @click="confirm">
+				<Button type="colored" color="orange" @click="confirm">
 					{{ formatMessage(analyticsChartMessages.showAll) }}
 				</Button>
 			</div>

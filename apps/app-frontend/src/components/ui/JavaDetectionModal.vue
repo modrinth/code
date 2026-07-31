@@ -14,11 +14,11 @@
 				</template>
 				<template #cell-actions="{ row }">
 					<div class="flex items-center justify-end">
-						<Button v-if="currentSelected.path === row.path" class="!shadow-none" disabled>
+						<Button v-if="currentSelected.path === row.path" disabled>
 							<CheckIcon aria-hidden="true" />
 							{{ formatMessage(messages.selected) }}
 						</Button>
-						<Button v-else class="!shadow-none" @click="setJavaInstall(row)">
+						<Button v-else @click="setJavaInstall(row)">
 							<PlusIcon aria-hidden="true" />
 							{{ formatMessage(messages.select) }}
 						</Button>
@@ -32,7 +32,7 @@
 			</Table>
 			<div class="flex justify-end">
 				<Button type="outlined"
-						class="!shadow-none !border-surface-4 !border"
+						class="!border-surface-4 !border"
 						@click="$refs.detectJavaModal.hide()"
 					>
 					<XIcon aria-hidden="true" />

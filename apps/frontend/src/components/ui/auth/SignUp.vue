@@ -7,7 +7,6 @@
 		</div>
 		<section class="flex flex-col gap-2.5">
 			<ButtonLink
-					class="!shadow-none"
 					:href="getAuthUrl('google', redirectTarget)"
 					@click="onOAuthProviderClick('google')"
 				>
@@ -15,7 +14,6 @@
 				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
 			</ButtonLink>
 			<ButtonLink
-					class="!shadow-none"
 					:href="getAuthUrl('microsoft', redirectTarget)"
 					@click="onOAuthProviderClick('microsoft')"
 				>
@@ -23,7 +21,6 @@
 				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
 			</ButtonLink>
 			<ButtonLink
-					class="!shadow-none"
 					:href="getAuthUrl('discord', redirectTarget)"
 					@click="onOAuthProviderClick('discord')"
 				>
@@ -32,7 +29,6 @@
 			</ButtonLink>
 			<template v-if="showOtherOptions">
 				<ButtonLink
-						class="!shadow-none"
 						:href="getAuthUrl('github', redirectTarget)"
 						@click="onOAuthProviderClick('github')"
 					>
@@ -40,7 +36,6 @@
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
 				</ButtonLink>
 				<ButtonLink
-						class="!shadow-none"
 						:href="getAuthUrl('gitlab', redirectTarget)"
 						@click="onOAuthProviderClick('gitlab')"
 					>
@@ -48,7 +43,6 @@
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
 				</ButtonLink>
 				<ButtonLink
-						class="!shadow-none"
 						:href="getAuthUrl('steam', redirectTarget)"
 						@click="onOAuthProviderClick('steam')"
 					>

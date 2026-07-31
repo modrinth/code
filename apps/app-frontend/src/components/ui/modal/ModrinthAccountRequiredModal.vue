@@ -19,7 +19,7 @@
 
 			<div class="flex flex-col gap-6">
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-					<Button class="w-full !shadow-none" native-type="button" @click="authenticate('sign-up')">
+					<Button class="w-full" native-type="button" @click="authenticate('sign-up')">
 						<UserPlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createAccountButton) }}
 					</Button>
@@ -70,7 +70,7 @@
 						{{ formatMessage(messages.cancelButton) }}
 					</Button>
 					<Button
-							class="w-full !shadow-none"
+							class="w-full"
 							native-type="button"
 							:disabled="reopeningBrowser"
 							@click="reopenBrowser"

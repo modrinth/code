@@ -41,7 +41,7 @@
 
 				<section class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
 					<ButtonLink v-for="provider in oauthProviders" :key="provider.id"
-							class="relative w-full !justify-center overflow-visible !shadow-none"
+							class="relative w-full !justify-center overflow-visible"
 							:class="{
 								'!border !border-[var(--color-green)]': lastSignInProvider === provider.id,
 							}"
@@ -61,7 +61,7 @@
 						</span>
 					</ButtonLink>
 					<Button
-							class="relative w-full !justify-center overflow-visible !shadow-none sm:col-span-2"
+							class="relative w-full !justify-center overflow-visible sm:col-span-2"
 							:class="{ '!border !border-[var(--color-green)]': lastSignInProvider === 'passkey' }"
 							role="button"
 							tabindex="0"

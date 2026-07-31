@@ -89,7 +89,7 @@
 						<template v-if="item.buttons?.length">
 							<div class="col-span-2 flex flex-wrap gap-1.5 pt-1">
 								<Button :type="(button.color) && (button.color) !== 'standard' ? 'colored' : 'base'" :color="(button.color) && (button.color) !== 'standard' ? ((button.color) === 'medal-promo' ? 'medal_promotion' : (button.color)) : undefined" v-for="(button, buttonIndex) in item.buttons"
-									:key="buttonIndex" class="!shadow-none" @click="handleButtonClick(item, button)">
+									:key="buttonIndex" @click="handleButtonClick(item, button)">
 									<component :is="button.icon" v-if="button.icon" />
 									{{ button.label }}
 								</Button>

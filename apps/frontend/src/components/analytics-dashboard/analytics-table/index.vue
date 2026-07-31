@@ -32,7 +32,7 @@
 							@focusin="selectSearchInputText"
 						/>
 						<TeleportOverflowMenu label="More options"
-								class="!shadow-none !w-auto !px-2.5 !rounded-xl"
+								class="!w-auto !px-2.5 !rounded-xl"
 								:options="csvExportOptions"
 								:disabled="isDataLoading || filteredRows.length === 0"
 							>

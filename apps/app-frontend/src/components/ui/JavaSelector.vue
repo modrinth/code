@@ -27,7 +27,7 @@
 						: undefined
 				"
 					:aria-label="formatMessage(messages.testJavaInstallation)"
-					class="!shadow-none !text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
+					class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
 					:disabled="testingJava || props.disabled"
 					@click="runTest(props.modelValue?.path)"
 					@mouseenter="!props.disabled && (hoveringTest = true)"
@@ -65,7 +65,6 @@
 					v-tooltip="
 						testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
 					"
-					class="!shadow-none"
 					:disabled="props.disabled || installingJava || testingJavaSuccess === true"
 					@click="reinstallJava"
 				>
@@ -76,11 +75,11 @@
 						: formatMessage(messages.installRecommended)
 				}}
 			</Button>
-			<Button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
+			<Button :disabled="props.disabled" @click="autoDetect">
 				<SearchIcon />
 				{{ formatMessage(messages.detect) }}
 			</Button>
-			<Button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
+			<Button :disabled="props.disabled" @click="handleJavaFileInput()">
 				<FolderSearchIcon />
 				{{ formatMessage(messages.browse) }}
 			</Button>

@@ -26,7 +26,7 @@
 		</div>
 
 		<div class="flex shrink-0 items-center justify-end gap-1">
-			<Button type="quiet" aria-label="Add dependency" class="!shadow-none" @click="emitAddSuggestion">
+			<Button type="quiet" aria-label="Add dependency" @click="emitAddSuggestion">
 				<PlusIcon aria-hidden="true" />
 			</Button>
 		</div>

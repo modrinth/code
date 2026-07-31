@@ -31,7 +31,7 @@
 				wrapper-class="max-w-[20rem]"
 			/>
 			<div class="flex gap-2 justify-end">
-				<Button class="!shadow-none" @click="hide()">
+				<Button @click="hide()">
 					<XIcon />
 					Cancel
 				</Button>

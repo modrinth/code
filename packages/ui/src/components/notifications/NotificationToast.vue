@@ -132,7 +132,7 @@
 					class="col-start-1 col-end-3 row-start-3 mt-2 flex min-w-0 flex-wrap items-center gap-2"
 				>
 					<Button :type="(action.color || (index === 0 ? 'brand' : undefined)) && (action.color || (index === 0 ? 'brand' : undefined)) !== 'standard' ? 'colored' : 'base'" :color="(action.color || (index === 0 ? 'brand' : undefined)) && (action.color || (index === 0 ? 'brand' : undefined)) !== 'standard' ? ((action.color || (index === 0 ? 'brand' : undefined)) === 'medal-promo' ? 'medal_promotion' : (action.color || (index === 0 ? 'brand' : undefined))) : undefined" v-for="(action, index) in actions"
-						:key="index" class="!shadow-none" @click="$emit('action', index)">
+						:key="index" @click="$emit('action', index)">
 						<component :is="action.icon" v-if="action.icon" />
 						{{ action.label }}
 					</Button>

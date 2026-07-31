@@ -18,7 +18,6 @@
 								? formatMessage(messages.backupInProgress)
 								: undefined
 					"
-					class="!shadow-none"
 					:disabled="
 						!canManageBackups || backup.isBackingUp.value || backup.externalBackupInProgress.value
 					"

@@ -50,7 +50,6 @@
 		<template v-if="showDependencyDownloadActions" #actions>
 			<div class="flex flex-wrap justify-end gap-2 p-2">
 				<Button
-						class="!shadow-none"
 						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
 						@click="downloadSelectedVersionZip"
 					>
@@ -80,7 +79,6 @@
 					{{ formatMessage(messages.downloadWithDependencies) }}
 				</SplitButton>
 				<Button type="colored" color="brand" v-else
-						class="!shadow-none"
 						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
 						@click="downloadFilesWithDependencies"
 					>

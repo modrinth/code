@@ -86,7 +86,6 @@
 					:type="rightButtonConfig.color && rightButtonConfig.color !== 'standard' ? 'colored' : 'base'"
 					:color="rightButtonConfig.color === 'standard' ? undefined : rightButtonConfig.color"
 						v-tooltip="rightButtonConfig.tooltip"
-						class="!shadow-none"
 						:class="rightButtonConfig.buttonClass"
 						:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
 						@click="rightButtonConfig.onClick"
