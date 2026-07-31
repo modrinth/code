@@ -1644,9 +1644,15 @@ async function sendMessage(status: ProjectStatus) {
 			}
 		}
 
-		await refreshModerationCaches(threadId)
-
 		const willHaveNext = await moderationQueue.completeCurrentProject(projectId, 'completed')
+		// Set both states together - hasNextProject MUST be set before done
+		// to avoid the race condition where done=true renders with hasNextProject=false
+		hasNextProject.value = willHaveNext
+		done.value = true
+		clearGeneratedMessageState()
+		await nextTick()
+
+		await refreshModerationCaches(threadId)
 
 		await Promise.race([
 			moderationQueue.releaseLock(projectId),
@@ -1656,16 +1662,9 @@ async function sendMessage(status: ProjectStatus) {
 		if (projectFixChanges?.slug) {
 			const urlType = getProjectTypeForUrlShorthand(projectV2.value.project_type, [], tags.value)
 			localStorage.setItem('moderation-checklist-finished', projectId)
-			clearGeneratedMessageState()
 			await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, { replace: true })
 			return
 		}
-
-		// Set both states together - hasNextProject MUST be set before done
-		// to avoid the race condition where done=true renders with hasNextProject=false
-		hasNextProject.value = willHaveNext
-		done.value = true
-		clearGeneratedMessageState()
 	} catch (error) {
 		console.error('Error submitting moderation:', error)
 		addNotification({
