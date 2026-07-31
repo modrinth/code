@@ -101,10 +101,12 @@
 				</div>
 			</div>
 
-			<Button type="colored" color="brand" size="xl" @click="acceptInvite">
-				<UserPlusIcon aria-hidden="true" />
-				{{ formatMessage(messages.acceptInvite) }}
-			</Button>
+			<ButtonStyled color="brand" size="large">
+				<button type="button" @click="acceptInvite">
+					<UserPlusIcon />
+					{{ formatMessage(messages.acceptInvite) }}
+				</button>
+			</ButtonStyled>
 
 			<div class="flex w-full flex-col gap-2.5">
 				<span class="pl-3 font-medium text-primary">{{
@@ -131,11 +133,11 @@ import {
 import {
 	Admonition,
 	Avatar,
+	ButtonStyled,
 	defineMessages,
 	injectModrinthClient,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, onServerPrefetch, useTemplateRef } from 'vue'
 

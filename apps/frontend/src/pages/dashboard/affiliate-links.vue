@@ -26,10 +26,12 @@
 					:placeholder="formatMessage(messages.searchAffiliateLinks)"
 					clearable
 				/>
-				<Button type="colored" color="brand" @click="createModal?.show">
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.createButton) }}
-				</Button>
+				<ButtonStyled color="brand">
+					<button @click="createModal?.show">
+						<PlusIcon />
+						{{ formatMessage(messages.createButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 		<Admonition v-if="error" type="critical">
@@ -57,11 +59,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
+	ButtonStyled,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,

@@ -4,14 +4,18 @@
 		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-4">
 			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" />
 			<div class="flex flex-col gap-2">
-				<Button type="outlined" @click="triggerIconInput">
-					<UploadIcon aria-hidden="true" />
-					{{ formatMessage(messages.selectIcon) }}
-				</Button>
-				<Button type="outlined" :disabled="!ctx.instanceIcon.value" @click="removeIcon">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(messages.removeIcon) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="triggerIconInput">
+						<UploadIcon />
+						{{ formatMessage(messages.selectIcon) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled type="outlined">
+					<button :disabled="!ctx.instanceIcon.value" @click="removeIcon">
+						<XIcon />
+						{{ formatMessage(messages.removeIcon) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 
@@ -153,7 +157,7 @@ import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
-import Button from '../../../base/buttons/Button.vue'
+import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'

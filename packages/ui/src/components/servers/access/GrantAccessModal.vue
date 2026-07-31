@@ -126,20 +126,18 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="outlined" @click="hide">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(messages.cancelButton) }}
-				</Button>
-				<Button
-					v-tooltip="grantPermissionTooltip"
-					type="colored"
-					color="brand"
-					:disabled="!canSubmit"
-					@click="submit"
-				>
-					<UserPlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.inviteButton) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="hide">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(messages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button v-tooltip="grantPermissionTooltip" :disabled="!canSubmit" @click="submit">
+						<UserPlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.inviteButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -153,7 +151,7 @@ import { computed, ref } from 'vue'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import Checkbox from '../../base/Checkbox.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'

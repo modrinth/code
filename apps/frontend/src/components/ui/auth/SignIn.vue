@@ -28,10 +28,11 @@
 						@keyup.enter="onTwoFactorSignIn()"
 					/>
 				</div>
-				<Button type="colored" color="brand" @click="onTwoFactorSignIn()">
-					{{ formatMessage(commonMessages.signInButton) }}
-					<RightArrowIcon aria-hidden="true" />
-				</Button>
+				<ButtonStyled color="brand">
+					<button @click="onTwoFactorSignIn()">
+						{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 		<template v-else>
@@ -41,40 +42,47 @@
 				</div>
 
 				<section class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-					<ButtonLink
-						v-for="provider in oauthProviders"
-						:key="provider.id"
-						class="relative w-full overflow-visible"
-						:class="{
-							'!border !border-[var(--color-green)]': lastSignInProvider === provider.id,
-						}"
-						:href="getAuthUrl(provider.id, redirectTarget)"
-						:aria-label="formatMessage(messages.continueWithProvider, { provider: provider.name })"
-						@click="onOAuthProviderClick(provider.id)"
-					>
-						<component :is="provider.icon" aria-hidden="true" />
-						<span>{{ provider.name }}</span>
-						<span
-							v-if="lastSignInProvider === provider.id"
-							class="oauth-provider-last-sign-in-badge"
+					<ButtonStyled v-for="provider in oauthProviders" :key="provider.id">
+						<a
+							class="relative w-full !justify-center overflow-visible !shadow-none"
+							:class="{
+								'!border !border-[var(--color-green)]': lastSignInProvider === provider.id,
+							}"
+							:href="getAuthUrl(provider.id, redirectTarget)"
+							:aria-label="
+								formatMessage(messages.continueWithProvider, { provider: provider.name })
+							"
+							@click="onOAuthProviderClick(provider.id)"
 						>
-							{{ formatMessage(messages.lastSignInLabel) }}
-						</span>
-					</ButtonLink>
-					<Button
-						class="relative w-full overflow-visible sm:col-span-2"
-						:class="{ '!border !border-[var(--color-green)]': lastSignInProvider === 'passkey' }"
-						@click="onPasskeySignIn"
-					>
-						<UserKeyIcon aria-hidden="true" />
-						<span>{{ formatMessage(messages.continueWithPasskey) }}</span>
-						<span
-							v-if="lastSignInProvider === 'passkey'"
-							class="oauth-provider-last-sign-in-badge"
+							<component :is="provider.icon" />
+							<span>{{ provider.name }}</span>
+							<span
+								v-if="lastSignInProvider === provider.id"
+								class="oauth-provider-last-sign-in-badge"
+							>
+								{{ formatMessage(messages.lastSignInLabel) }}
+							</span>
+						</a>
+					</ButtonStyled>
+					<ButtonStyled>
+						<a
+							class="relative w-full !justify-center overflow-visible !shadow-none sm:col-span-2"
+							:class="{ '!border !border-[var(--color-green)]': lastSignInProvider === 'passkey' }"
+							role="button"
+							tabindex="0"
+							@click="onPasskeySignIn"
+							@keydown.enter="onPasskeySignIn"
 						>
-							{{ formatMessage(messages.lastSignInLabel) }}
-						</span>
-					</Button>
+							<UserKeyIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithPasskey) }}</span>
+							<span
+								v-if="lastSignInProvider === 'passkey'"
+								class="oauth-provider-last-sign-in-badge"
+							>
+								{{ formatMessage(messages.lastSignInLabel) }}
+							</span>
+						</a>
+					</ButtonStyled>
 				</section>
 
 				<div class="h-px w-full bg-surface-5"></div>
@@ -109,16 +117,15 @@
 						v-model="tokenModel"
 					/>
 
-					<Button
-						class="w-full"
-						type="colored"
-						color="brand"
-						:disabled="globals?.captcha_enabled ? !tokenModel : false"
-						@click="onPasswordSignIn()"
-					>
-						{{ formatMessage(messages.continueWithEmail) }}
-						<RightArrowIcon aria-hidden="true" />
-					</Button>
+					<ButtonStyled color="brand">
+						<button
+							class="!w-full"
+							:disabled="globals?.captcha_enabled ? !tokenModel : false"
+							@click="onPasswordSignIn()"
+						>
+							{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
+						</button>
+					</ButtonStyled>
 
 					<div class="flex flex-wrap items-center justify-center gap-2.5 !text-base">
 						<NuxtLink
@@ -160,8 +167,7 @@ import {
 	SteamColorIcon,
 	UserKeyIcon,
 } from '@modrinth/assets'
-import { ButtonLink, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { ButtonStyled, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import type { LocationQuery } from 'vue-router'

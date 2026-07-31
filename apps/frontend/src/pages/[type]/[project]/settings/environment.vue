@@ -12,13 +12,14 @@
 				</div>
 				<div>Visit Project Settings to manage environments for each version.</div>
 			</div>
-			<ButtonLink
-				type="colored"
-				color="green"
-				:to="`/${projectV2.project_type}/${projectV2.id}/settings/versions`"
-			>
-				<SettingsIcon aria-hidden="true" /> Edit versions
-			</ButtonLink>
+			<ButtonStyled color="green">
+				<nuxt-link
+					:to="`/${projectV2.project_type}/${projectV2.id}/settings/versions`"
+					class="items flex"
+				>
+					<SettingsIcon /> Edit versions
+				</nuxt-link>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>
@@ -26,7 +27,7 @@
 <script setup lang="ts">
 import { SettingsIcon } from '@modrinth/assets'
 import {
-	ButtonLink,
+	ButtonStyled,
 	EnvironmentMigration,
 	injectProjectPageContext,
 	LoadingIndicator,

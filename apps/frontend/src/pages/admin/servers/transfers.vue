@@ -13,10 +13,12 @@
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>
 			<h1 class="m-0 text-2xl">Server transfers</h1>
-			<Button type="colored" color="brand" @click="openTransferModal">
-				<PlusIcon aria-hidden="true" />
-				New transfer
-			</Button>
+			<ButtonStyled color="brand">
+				<button @click="openTransferModal">
+					<PlusIcon />
+					New transfer
+				</button>
+			</ButtonStyled>
 		</div>
 		<div>
 			<div v-if="loading" class="py-8 text-center text-secondary">Loading transfers...</div>
@@ -65,15 +67,12 @@
 								<span class="text-sm text-secondary">
 									{{ batch.log_count }} transfer{{ batch.log_count === 1 ? '' : 's' }}
 								</span>
-								<Button
-									v-if="canCancel(batch)"
-									type="quiet"
-									color="red"
-									@click="showCancelModal(batch.id)"
-								>
-									<XCircleIcon aria-hidden="true" />
-									Cancel
-								</Button>
+								<ButtonStyled v-if="canCancel(batch)" color="red" color-fill="text">
+									<button @click="showCancelModal(batch.id)">
+										<XCircleIcon />
+										Cancel
+									</button>
+								</ButtonStyled>
 							</div>
 						</div>
 						<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-secondary">
@@ -111,9 +110,9 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, XCircleIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
+	ButtonStyled,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,

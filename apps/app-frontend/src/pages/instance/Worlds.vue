@@ -35,11 +35,14 @@
 					"
 				/>
 				<div class="flex gap-2">
-					<Button type="outlined" class="!h-10" @click="addServerModal?.show()">
+					<ButtonStyled type="outlined">
+						<button class="!h-10" @click="addServerModal?.show()">
 							<PlusIcon class="size-5" />
 							{{ formatMessage(messages.addServer) }}
-						</Button>
-					<Button color="brand" type="colored"
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
 							class="!h-10 flex items-center gap-2"
 							@click="
 								router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
@@ -47,7 +50,8 @@
 						>
 							<CompassIcon class="size-5" />
 							<span>{{ formatMessage(messages.browseServers) }}</span>
-						</Button>
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<div class="flex flex-wrap items-center justify-between gap-2">
@@ -68,10 +72,12 @@
 						{{ option.label }}
 					</button>
 				</div>
-				<Button type="quiet" :disabled="refreshingAll" @click="refreshAllWorlds">
+				<ButtonStyled type="transparent" hover-color-fill="none">
+					<button :disabled="refreshingAll" @click="refreshAllWorlds">
 						<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
 						{{ formatMessage(commonMessages.refreshButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 			<div class="flex flex-col w-full gap-2">
 				<WorldItem
@@ -117,11 +123,14 @@
 			:description="formatMessage(messages.noWorldsDescription)"
 		>
 			<template #actions>
-				<Button type="outlined" class="!h-10" @click="addServerModal?.show()">
+				<ButtonStyled type="outlined">
+					<button class="!h-10" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
-					</Button>
-				<Button color="brand" type="colored"
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
 						class="!h-10 flex items-center gap-2"
 						@click="
 							router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
@@ -129,15 +138,16 @@
 					>
 						<CompassIcon class="size-5" />
 						<span>{{ formatMessage(messages.browseServers) }}</span>
-					</Button>
+					</button>
+				</ButtonStyled>
 			</template>
 		</EmptyState>
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
 import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	EmptyState,

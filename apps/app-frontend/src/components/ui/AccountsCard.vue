@@ -4,11 +4,13 @@
 		class="flex flex-col gap-3 bg-button-bg border border-solid border-surface-5 rounded-xl p-3 mt-2"
 	>
 		<span>{{ formatMessage(messages.notSignedIn) }}</span>
-		<Button color="brand" type="colored" :disabled="loginDisabled" @click="login()">
+		<ButtonStyled color="brand">
+			<button color="primary" :disabled="loginDisabled" @click="login()">
 				<LogInIcon v-if="!loginDisabled" />
 				<SpinnerIcon v-else class="animate-spin" />
 				{{ formatMessage(messages.signInToMinecraft) }}
-			</Button>
+			</button>
+		</ButtonStyled>
 	</div>
 	<Accordion
 		v-else
@@ -58,25 +60,24 @@
 							{{ account.profile.name }}
 						</p>
 					</button>
-					<IconButton color="red" type="colored" :label="formatMessage(messages.removeAccount)"
+					<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
+						<button
 							v-tooltip="formatMessage(messages.removeAccount)"
 							class="mr-2"
 							@click="logout(account.profile.id)"
 						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
+							<TrashIcon />
+						</button>
+					</ButtonStyled>
 				</div>
 			</template>
 			<div class="flex flex-col gap-2 px-2 pt-2">
-				<Button
-					v-if="accounts.length > 0"
-					class="w-full"
-					:disabled="loginDisabled"
-					@click="login()"
-				>
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.addAccount) }}
-				</Button>
+				<ButtonStyled v-if="accounts.length > 0" class="w-full">
+					<button :disabled="loginDisabled" @click="login()">
+						<PlusIcon />
+						{{ formatMessage(messages.addAccount) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</Accordion>
@@ -91,11 +92,10 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	IconButton,
 	Accordion,
 	Avatar,
+	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	useVIntl,

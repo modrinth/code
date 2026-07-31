@@ -39,19 +39,18 @@
 						</div>
 					</div>
 				</div>
-				<Button
-					v-if="content"
-					type="outlined"
-					:disabled="!hasPermission"
-					@click="handleSwitchCompatibility"
-				>
-					<ArrowLeftRightIcon aria-hidden="true" />
-					Switch type
-				</Button>
-				<Button v-else :disabled="!hasPermission" @click="handleSetCompatibility">
-					<ComponentIcon aria-hidden="true" />
-					Set compatibility
-				</Button>
+				<ButtonStyled v-if="content" type="outlined">
+					<button :disabled="!hasPermission" @click="handleSwitchCompatibility">
+						<ArrowLeftRightIcon />
+						Switch type
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else>
+					<button :disabled="!hasPermission" @click="handleSetCompatibility">
+						<ComponentIcon />
+						Set compatibility
+					</button>
+				</ButtonStyled>
 			</div>
 
 			<div
@@ -183,15 +182,16 @@
 					</div>
 				</div>
 
-				<Button
-					v-if="content"
-					class="w-full max-w-[160px]"
-					:disabled="!hasPermission"
-					@click="handleUpdateContent"
-				>
-					<RefreshCwIcon aria-hidden="true" />
-					Update
-				</Button>
+				<ButtonStyled v-if="content">
+					<button
+						class="!w-full !max-w-[160px]"
+						:disabled="!hasPermission"
+						@click="handleUpdateContent"
+					>
+						<RefreshCwIcon />
+						Update
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 		<ServerCompatibilityModal v-if="hasPermission" ref="serverCompatibilityModal" />
@@ -211,12 +211,12 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	FormattedTag,
 	injectModrinthClient,
 	injectProjectPageContext,
 	TagItem,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 

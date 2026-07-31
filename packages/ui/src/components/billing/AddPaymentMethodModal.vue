@@ -5,8 +5,7 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
-import Button from '../base/buttons/Button.vue'
-import { NewModal } from '../index'
+import { ButtonStyled, NewModal } from '../index'
 import type { AddPaymentMethodProps } from './AddPaymentMethod.vue'
 import AddPaymentMethod from './AddPaymentMethod.vue'
 
@@ -58,19 +57,18 @@ defineExpose({
 				@stop-loading="loading = false"
 			/>
 			<div class="input-group mt-auto pt-4">
-				<Button
-					type="colored"
-					color="brand"
-					:loading="loading"
-					@click="addPaymentMethod.submit()"
-				>
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.paymentMethodAdd) }}
-				</Button>
-				<Button @click="modal.hide()">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
+				<ButtonStyled color="brand">
+					<button :disabled="loading" @click="addPaymentMethod.submit()">
+						<PlusIcon />
+						{{ formatMessage(messages.paymentMethodAdd) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="modal.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>

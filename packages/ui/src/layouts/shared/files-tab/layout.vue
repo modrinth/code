@@ -157,16 +157,20 @@
 				{{ formatMessage(messages.unsavedChanges) }}
 			</p>
 			<div class="ml-auto flex gap-2">
-				<Button type="quiet" @click="fileEditorRef?.revertChanges()">
+				<ButtonStyled type="transparent">
+					<button @click="fileEditorRef?.revertChanges()">
 						<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
-					</Button>
-				<Button color="brand" type="colored"
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
 						v-tooltip="isBusy ? busyTooltip : undefined"
 						:disabled="isBusy"
 						@click="fileEditorRef?.saveFileContent(false)"
 					>
 						<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</FloatingActionBar>
 		<FloatingActionBar :shown="selectedItems.size > 0">
@@ -175,18 +179,25 @@
 					{{ formatMessage(messages.selectedCount, { count: selectedItems.size }) }}
 				</span>
 				<div class="mx-1 h-6 w-px bg-surface-5" />
-				<Button type="quiet" class="!text-primary" @click="deselectAll">
+				<ButtonStyled type="transparent">
+					<button class="!text-primary" @click="deselectAll">
 						<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 			<div class="ml-auto flex items-center gap-0.5">
 				<div class="mx-1 h-6 w-px bg-surface-5" />
-				<Button type="quiet"
+				<ButtonStyled
+					type="transparent"
 					color="red"
-				 v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal">
+					color-fill="text"
+					hover-color-fill="background"
+				>
+					<button v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal">
 						<TrashIcon />
 						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</FloatingActionBar>
 	</div>
@@ -206,7 +217,7 @@ import {
 import type { Component } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'

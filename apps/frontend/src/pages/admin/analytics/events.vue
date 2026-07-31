@@ -33,18 +33,19 @@
 				<div class="flex items-center justify-between">
 					<span class="label__title font-semibold">Announcement link (optional)</span>
 
-					<ButtonLink
-						v-if="committedNormalizedAnnouncementUrl"
-						type="quiet"
-						size="sm"
-						:href="committedNormalizedAnnouncementUrl"
-						target="_blank"
-						aria-label="Check announcement link"
-						title="Check announcement link"
-					>
-						<ExternalIcon aria-hidden="true" />
-						Open link
-					</ButtonLink>
+					<ButtonStyled v-if="committedNormalizedAnnouncementUrl" type="transparent" size="small">
+						<a
+							:href="committedNormalizedAnnouncementUrl"
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="Check announcement link"
+							title="Check announcement link"
+							class="text-sm"
+						>
+							<ExternalIcon aria-hidden="true" />
+							Open link
+						</a>
+					</ButtonStyled>
 				</div>
 				<div class="flex items-center gap-2">
 					<StyledInput
@@ -109,17 +110,15 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="quiet" @click="eventModal?.hide()">Cancel</Button>
-				<Button
-					type="colored"
-					color="brand"
-					:loading="isSaving"
-					:disabled="!canSaveEvent"
-					@click="saveEvent"
-				>
-					<SaveIcon aria-hidden="true" />
-					{{ modalMode === 'create' ? 'Create event' : 'Save' }}
-				</Button>
+				<ButtonStyled type="transparent">
+					<button @click="eventModal?.hide()">Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!canSaveEvent || isSaving" @click="saveEvent">
+						<SaveIcon aria-hidden="true" />
+						{{ modalMode === 'create' ? 'Create event' : 'Save' }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -138,10 +137,12 @@
 						clearable
 						wrapper-class="w-full sm:w-72"
 					/>
-					<Button type="colored" color="brand" :disabled="isSaving" @click="openCreateModal">
-						<PlusIcon aria-hidden="true" />
-						New event
-					</Button>
+					<ButtonStyled color="brand">
+						<button :disabled="isSaving" @click="openCreateModal">
+							<PlusIcon aria-hidden="true" />
+							New event
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 
@@ -195,23 +196,21 @@
 
 				<template #cell-actions="{ row }">
 					<div class="flex justify-end gap-2">
-						<IconButton
-							:label="`Delete ${row.title}`"
-							type="outlined"
-							color="red"
-							:loading="isDeletingEvent(row.id)"
-							@click="openDeleteEventModal(row)"
-						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
-						<Button
-							type="outlined"
-							:disabled="isSaving || isDeletingEvent(row.id)"
-							@click="openEditModal(row)"
-						>
-							Edit
-							<EditIcon aria-hidden="true" />
-						</Button>
+						<ButtonStyled circular type="outlined" color="red">
+							<button
+								:aria-label="`Delete ${row.title}`"
+								:disabled="isDeletingEvent(row.id)"
+								@click="openDeleteEventModal(row)"
+							>
+								<TrashIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled type="outlined">
+							<button :disabled="isSaving || isDeletingEvent(row.id)" @click="openEditModal(row)">
+								Edit
+								<EditIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
 					</div>
 				</template>
 
@@ -240,14 +239,12 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	ButtonLink,
+	ButtonStyled,
 	ConfirmModal,
 	DatePicker,
 	injectModrinthClient,
 	injectNotificationManager,
-	IconButton,
 	MultiSelect,
 	type MultiSelectOption,
 	NewModal,

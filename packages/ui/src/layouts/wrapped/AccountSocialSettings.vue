@@ -15,10 +15,12 @@
 			</div>
 		</template>
 		<template #actions>
-			<Button type="colored" color="brand" size="xl" @click="requestSignIn">
-				<LogInIcon aria-hidden="true" />
-				{{ formatMessage(commonMessages.signInButton) }}
-			</Button>
+			<ButtonStyled color="brand" size="large">
+				<button type="button" @click="requestSignIn">
+					<LogInIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.signInButton) }}
+				</button>
+			</ButtonStyled>
 		</template>
 	</EmptyState>
 
@@ -110,9 +112,11 @@
 								</div>
 								<div v-else-if="loadError" class="flex flex-col items-center gap-3">
 									<span>{{ formatMessage(messages.loadError) }}</span>
-									<Button type="outlined" @click="retry">
-										{{ formatMessage(commonMessages.retryButton) }}
-									</Button>
+									<ButtonStyled type="outlined">
+										<button type="button" @click="retry">
+											{{ formatMessage(commonMessages.retryButton) }}
+										</button>
+									</ButtonStyled>
 								</div>
 								<span v-else>{{ formatMessage(messages.noBlockedUsers) }}</span>
 							</div>
@@ -141,24 +145,25 @@
 
 						<template #cell-actions="{ row }">
 							<div class="flex justify-end">
-								<Button
-									type="outlined"
-									:loading="unblockingUserId === row.id"
-									:disabled="unblockingUserId !== null && unblockingUserId !== row.id"
-									:aria-label="
-										formatMessage(messages.unblockUserAriaLabel, {
-											username: row.username,
-										})
-									"
-									@click="unblock(row)"
-								>
-									<SpinnerIcon
-										v-if="unblockingUserId === row.id"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									{{ formatMessage(messages.unblockButton) }}
-								</Button>
+								<ButtonStyled type="outlined">
+									<button
+										type="button"
+										:disabled="unblockingUserId !== null"
+										:aria-label="
+											formatMessage(messages.unblockUserAriaLabel, {
+												username: row.username,
+											})
+										"
+										@click="unblock(row)"
+									>
+										<SpinnerIcon
+											v-if="unblockingUserId === row.id"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										{{ formatMessage(messages.unblockButton) }}
+									</button>
+								</ButtonStyled>
 							</div>
 						</template>
 					</Table>
@@ -190,7 +195,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import Table, { type TableColumn } from '#ui/components/base/Table.vue'

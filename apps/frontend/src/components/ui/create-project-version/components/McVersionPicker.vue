@@ -26,35 +26,36 @@
 			<div v-for="group in groupedGameVersions" :key="group.key" class="space-y-1.5">
 				<span class="font-semibold">{{ group.key }}</span>
 				<div class="flex flex-wrap gap-2 gap-x-1.5">
-					<Button
+					<ButtonStyled
 						v-for="version in group.versions"
 						:key="version"
-						:type="
-							holdingShift && version === anchorVersion
-								? 'colored'
-								: modelValue.includes(version)
-									? 'colored'
-									: 'outlined'
-						"
 						:color="
 							holdingShift && version === anchorVersion
 								? 'purple'
 								: modelValue.includes(version)
 									? 'green'
-									: undefined
+									: 'standard'
 						"
-						size="sm"
-						:class="versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16'"
-						:disabled="disabled"
-						@click="() => handleToggleVersion(version)"
-						@blur="
-							() => {
-								if (!holdingShift) anchorVersion = ''
-							}
-						"
+						:highlighted="modelValue.includes(version)"
+						type="chip"
 					>
-						{{ version }}
-					</Button>
+						<button
+							class="!py-1.5 focus:outline-none"
+							:class="[
+								versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16',
+								modelValue.includes(version) ? '!text-contrast' : '',
+							]"
+							:disabled="disabled"
+							@click="() => handleToggleVersion(version)"
+							@blur="
+								() => {
+									if (!holdingShift) anchorVersion = ''
+								}
+							"
+						>
+							{{ version }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 
@@ -67,8 +68,7 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
-import { Chips, StyledInput } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { ButtonStyled, Chips, StyledInput } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 

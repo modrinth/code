@@ -1,7 +1,7 @@
 <script setup>
 import { XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	FileTreeSelect,
@@ -286,14 +286,18 @@ function isExportCandidateDisabled(path) {
 		</div>
 		<template #actions>
 			<div class="flex items-center justify-end gap-2">
-				<Button type="outlined" @click="exportModal.hide">
+				<ButtonStyled type="outlined">
+					<button @click="exportModal.hide">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-				<Button color="brand" type="colored" @click="exportPack">
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button @click="exportPack">
 						<PackageIcon />
 						{{ formatMessage(messages.exportButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>

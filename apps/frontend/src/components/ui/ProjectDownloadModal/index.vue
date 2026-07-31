@@ -49,50 +49,42 @@
 		</template>
 		<template v-if="showDependencyDownloadActions" #actions>
 			<div class="flex flex-wrap justify-end gap-2 p-2">
-				<Button
-					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-					@click="downloadSelectedVersionZip"
-				>
-					<SpinnerIcon
-						v-if="downloadingActionType === 'zip'"
-						aria-hidden="true"
-						class="animate-spin"
-					/>
-					<DownloadIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.downloadAsZip) }}
-				</Button>
-				<SplitButton
+				<ButtonStyled>
+					<button
+						class="!shadow-none"
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadSelectedVersionZip"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'zip'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadAsZip) }}
+					</button>
+				</ButtonStyled>
+				<JoinedButtons
 					v-if="hasRecommendedDownloadFiles"
-					:menu-label="formatMessage(messages.downloadOptions)"
-					type="colored"
 					color="brand"
-					:options="downloadWithRecommendedOptions"
+					:actions="downloadWithRecommendedActions"
 					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-					@click="downloadFilesWithDependencies"
-				>
-					<SpinnerIcon
-						v-if="downloadingActionType === 'dependencies'"
-						aria-hidden="true"
-						class="animate-spin"
-					/>
-					<DownloadIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.downloadWithDependencies) }}
-				</SplitButton>
-				<Button
-					v-else
-					type="colored"
-					color="brand"
-					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-					@click="downloadFilesWithDependencies"
-				>
-					<SpinnerIcon
-						v-if="downloadingActionType === 'dependencies'"
-						aria-hidden="true"
-						class="animate-spin"
-					/>
-					<DownloadIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.downloadWithDependencies) }}
-				</Button>
+				/>
+				<ButtonStyled v-else color="brand">
+					<button
+						class="!shadow-none"
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadFilesWithDependencies"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'dependencies'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadWithDependencies) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -103,19 +95,19 @@ import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	type JoinedButtonAction,
+	JoinedButtons,
 	NewModal,
 	ServersPromo,
 	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import SplitButton from '@modrinth/ui/src/components/base/buttons/SplitButton.vue'
-import type { OverflowMenuOption } from '@modrinth/ui/src/components/base/buttons/types'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
@@ -350,7 +342,13 @@ const showDependencyDownloadActions = computed(
 			hasRecommendedDownloadFiles.value),
 )
 
-const downloadWithRecommendedOptions = computed<OverflowMenuOption[]>(() => [
+const downloadWithRecommendedActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'download-with-dependencies',
+		label: formatMessage(messages.downloadWithDependencies),
+		icon: downloadingActionType.value === 'dependencies' ? SpinnerIcon : DownloadIcon,
+		action: () => void downloadFilesWithDependencies(),
+	},
 	{
 		id: 'download-with-recommended',
 		label: formatMessage(messages.downloadWithRecommended),
@@ -391,10 +389,6 @@ const messages = defineMessages({
 	downloadWithRecommendedAsZip: {
 		id: 'project.download.download-with-recommended-as-zip',
 		defaultMessage: 'Download with recommended as .zip',
-	},
-	downloadOptions: {
-		id: 'project.download.download-options',
-		defaultMessage: 'Download options',
 	},
 	downloadZipFailedTitle: {
 		id: 'project.download.zip-failed-title',

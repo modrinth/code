@@ -42,55 +42,64 @@
 						:key="isDivider(option) ? `divider-${index}` : option.id"
 					>
 						<div v-if="isDivider(option)" class="h-px w-full bg-surface-5"></div>
-						<Button
-							v-else-if="typeof option.action === 'function' || option.disabled"
-							:ref="(el) => setMenuItemRef(index, el)"
-							v-tooltip="option.tooltip"
-							type="quiet"
+						<ButtonStyled
+							v-else
+							type="transparent"
 							role="menuitem"
-							class="w-full justify-start whitespace-nowrap focus-visible:outline-none"
 							:color="optionButtonColor(option)"
-							:disabled="option.disabled"
-							:aria-label="option.ariaLabel ?? option.label ?? option.id"
-							:aria-selected="index === selectedIndex"
-							:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
-							@click="(event) => handleItemClick(option, index, event)"
-							@focus="selectedIndex = index"
-							@mouseover="handleMouseOver(index)"
 						>
-							<slot :name="option.id">
-								<component :is="option.icon" v-if="option.icon" class="size-5" />
-								{{ option.label ?? option.id }}
-							</slot>
-						</Button>
-						<ButtonLink
-							v-else-if="optionLink(option)"
-							:ref="(el) => setMenuItemRef(index, el)"
-							type="quiet"
-							role="menuitem"
-							class="w-full justify-start whitespace-nowrap focus-visible:outline-none"
-							:color="optionButtonColor(option)"
-							:to="option.external ? undefined : optionLink(option)"
-							:href="option.external ? optionLink(option) : undefined"
-							:target="option.external ? '_blank' : undefined"
-							:aria-label="option.ariaLabel ?? option.label ?? option.id"
-							:aria-selected="index === selectedIndex"
-							:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
-							@click="(event) => handleItemClick(option, index, event)"
-							@focus="selectedIndex = index"
-							@mouseover="handleMouseOver(index)"
-						>
-							<slot :name="option.id">
-								<component :is="option.icon" v-if="option.icon" class="size-5" />
-								{{ option.label ?? option.id }}
-							</slot>
-						</ButtonLink>
-						<span v-else>
-							<slot :name="option.id">
-								<component :is="option.icon" v-if="option.icon" class="size-5" />
-								{{ option.label ?? option.id }}
-							</slot>
-						</span>
+							<button
+								v-if="typeof option.action === 'function' || option.disabled"
+								:ref="
+									(el) => {
+										if (el) menuItemsRef[index] = el as HTMLElement
+									}
+								"
+								v-tooltip="option.tooltip"
+								:disabled="option.disabled"
+								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+								:aria-label="option.ariaLabel ?? option.label ?? option.id"
+								:aria-selected="index === selectedIndex"
+								:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
+								@click="(event) => handleItemClick(option, index, event)"
+								@focus="selectedIndex = index"
+								@mouseover="handleMouseOver(index)"
+							>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.label ?? option.id }}
+								</slot>
+							</button>
+							<AutoLink
+								v-else-if="optionLink(option)"
+								:ref="
+									(el) => {
+										if (el) menuItemsRef[index] = el as HTMLElement
+									}
+								"
+								:to="optionLink(option)"
+								:target="option.external ? '_blank' : undefined"
+								:rel="option.external ? 'noopener noreferrer' : undefined"
+								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+								:aria-label="option.ariaLabel ?? option.label ?? option.id"
+								:aria-selected="index === selectedIndex"
+								:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
+								@click="(event) => handleItemClick(option, index, event)"
+								@focus="selectedIndex = index"
+								@mouseover="handleMouseOver(index)"
+							>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.label ?? option.id }}
+								</slot>
+							</AutoLink>
+							<span v-else>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.label ?? option.id }}
+								</slot>
+							</span>
+						</ButtonStyled>
 					</template>
 				</div>
 			</Transition>
@@ -100,20 +109,10 @@
 
 <script setup lang="ts">
 import { onClickOutside, useElementHover } from '@vueuse/core'
-import {
-	type Component,
-	type ComponentPublicInstance,
-	computed,
-	nextTick,
-	onMounted,
-	onUnmounted,
-	ref,
-	watch,
-} from 'vue'
+import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import Button from './buttons/Button.vue'
-import ButtonLink from './buttons/ButtonLink.vue'
-import type { ButtonColor } from './buttons/types'
+import AutoLink from './AutoLink.vue'
+import ButtonStyled from './ButtonStyled.vue'
 
 type OptionColor =
 	| 'standard'
@@ -343,19 +342,6 @@ const handleMouseOver = (index: number) => {
 	menuItemsRef.value[selectedIndex.value]?.focus?.()
 }
 
-function setMenuItemRef(
-	index: number,
-	element: Element | ComponentPublicInstance | null,
-) {
-	if (element instanceof HTMLElement) {
-		menuItemsRef.value[index] = element
-		return
-	}
-	if (element?.$el instanceof HTMLElement) {
-		menuItemsRef.value[index] = element.$el
-	}
-}
-
 const focusFirstMenuItem = () => {
 	if (menuItemsRef.value.length > 0) {
 		menuItemsRef.value[0]?.focus?.()
@@ -520,7 +506,7 @@ function optionLink(option: Option) {
 	return option.link
 }
 
-function optionButtonColor(option: Option): ButtonColor | undefined {
+function optionButtonColor(option: Option) {
 	switch (option.color) {
 		case 'primary':
 			return 'brand'
@@ -528,10 +514,9 @@ function optionButtonColor(option: Option): ButtonColor | undefined {
 			return 'red'
 		case 'secondary':
 		case 'highlight':
-		case 'standard':
-			return undefined
+			return 'standard'
 		default:
-			return option.color
+			return option.color ?? 'standard'
 	}
 }
 </script>

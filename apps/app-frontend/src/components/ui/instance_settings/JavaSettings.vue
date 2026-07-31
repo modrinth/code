@@ -8,8 +8,8 @@ import {
 	SpinnerIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
@@ -224,19 +224,21 @@ const messages = defineMessages({
 							wrapper-class="flex-1 min-w-0"
 							@update:model-value="(val) => (javaPath = String(val))"
 						/>
-						<Button
-							type="quiet"
+						<ButtonStyled
 							:color="
 								!hoveringTest && !testingJava
 									? javaTestResult === true
 										? 'green'
 										: 'red'
-									: undefined
+									: 'standard'
 							"
-							:disabled="!overrideJavaInstall || testingJava"
-							@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
-							@mouseenter="overrideJavaInstall && (hoveringTest = true)"
-							@mouseleave="hoveringTest = false"
+							color-fill="text"
+						>
+							<button
+								:disabled="!overrideJavaInstall || testingJava"
+								@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
+								@mouseenter="overrideJavaInstall && (hoveringTest = true)"
+								@mouseleave="hoveringTest = false"
 							>
 								<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
 								<CheckCircleIcon
@@ -245,17 +247,22 @@ const messages = defineMessages({
 								/>
 								<XCircleIcon v-else-if="javaTestResult !== true && !hoveringTest" class="h-4 w-4" />
 								<RefreshCwIcon v-else-if="overrideJavaInstall" class="h-4 w-4" />
-							</Button>
+							</button>
+						</ButtonStyled>
 					</div>
 					<div v-if="overrideJavaInstall" class="flex gap-2">
-						<Button @click="handleDetectJava">
+						<ButtonStyled>
+							<button @click="handleDetectJava">
 								<SearchIcon />
 								Detect
-							</Button>
-						<Button @click="handleBrowseJava">
+							</button>
+						</ButtonStyled>
+						<ButtonStyled>
+							<button @click="handleBrowseJava">
 								<FolderSearchIcon />
 								Browse
-							</Button>
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>

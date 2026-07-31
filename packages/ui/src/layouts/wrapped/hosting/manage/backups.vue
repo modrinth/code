@@ -19,9 +19,9 @@
 					<p>
 						<span class="break-all font-mono">{{ error.message }}</span>
 					</p>
-					<Button type="colored" color="brand" size="xl" class="mt-6 !w-full" @click="refetch">
-						Retry
-					</Button>
+					<ButtonStyled size="large" color="brand" @click="refetch">
+						<button class="mt-6 !w-full">Retry</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
@@ -71,16 +71,16 @@
 							<template #all>{{ formatMessage(commonMessages.allProjectType) }}</template>
 						</FilterPills>
 					</div>
-					<Button
-						v-tooltip="backupCreationDisabled"
-						type="colored"
-						color="brand"
-						:disabled="!!backupCreationDisabled"
-						@click="showCreateModel"
-					>
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createBackup) }}
-					</Button>
+					<ButtonStyled color="brand">
+						<button
+							v-tooltip="backupCreationDisabled"
+							:disabled="!!backupCreationDisabled"
+							@click="showCreateModel"
+						>
+							<PlusIcon class="size-5" />
+							{{ formatMessage(messages.createBackup) }}
+						</button>
+					</ButtonStyled>
 				</div>
 
 				<div class="flex w-full flex-col gap-1.5">
@@ -95,17 +95,17 @@
 							:description="formatMessage(messages.emptyDescription)"
 						>
 							<template #actions>
-								<Button
-									v-tooltip="backupCreationDisabled"
-									type="colored"
-									color="brand"
-									:disabled="!!backupCreationDisabled"
-									class="mx-auto w-min"
-									@click="showCreateModel"
-								>
-									<PlusIcon aria-hidden="true" />
-									{{ formatMessage(messages.createBackup) }}
-								</Button>
+								<ButtonStyled color="brand">
+									<button
+										v-tooltip="backupCreationDisabled"
+										:disabled="!!backupCreationDisabled"
+										class="mx-auto w-min"
+										@click="showCreateModel"
+									>
+										<PlusIcon class="size-5" />
+										{{ formatMessage(messages.createBackup) }}
+									</button>
+								</ButtonStyled>
 							</template>
 						</EmptyState>
 						<EmptyState
@@ -115,9 +115,11 @@
 							:description="formatMessage(messages.filteredEmptyDescription)"
 						>
 							<template #actions>
-								<Button type="outlined" @click="clearBackupFilters">
-									{{ formatMessage(messages.clearFilters) }}
-								</Button>
+								<ButtonStyled type="outlined">
+									<button @click="clearBackupFilters">
+										{{ formatMessage(messages.clearFilters) }}
+									</button>
+								</ButtonStyled>
 							</template>
 						</EmptyState>
 					</div>
@@ -196,22 +198,30 @@
 							}}
 						</span>
 						<div class="mx-1 h-6 w-px bg-surface-5" />
-						<Button type="quiet" :disabled="isBulkOperating" @click="deselectAll">
-							{{ formatMessage(commonMessages.clearButton) }}
-						</Button>
+						<ButtonStyled type="transparent">
+							<button
+								type="button"
+								:disabled="isBulkOperating"
+								:class="{ 'pointer-events-none opacity-60': isBulkOperating }"
+								@click="deselectAll"
+							>
+								{{ formatMessage(commonMessages.clearButton) }}
+							</button>
+						</ButtonStyled>
 					</div>
 
 					<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
-						<Button
-							v-tooltip="!canManageBackups ? permissionDeniedMessage : undefined"
-							type="quiet"
-							color="red"
-							:disabled="!canManageBackups"
-							@click="confirmBulkDelete"
-						>
-							<TrashIcon aria-hidden="true" />
-							<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-						</Button>
+						<ButtonStyled type="transparent" color="red" hover-color-fill="background">
+							<button
+								v-tooltip="!canManageBackups ? permissionDeniedMessage : undefined"
+								type="button"
+								:disabled="!canManageBackups"
+								@click="confirmBulkDelete"
+							>
+								<TrashIcon />
+								<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+							</button>
+						</ButtonStyled>
 					</div>
 
 					<div v-else class="ml-auto flex items-center" aria-live="polite">
@@ -263,7 +273,7 @@ import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills, { type FilterPillOption } from '#ui/components/base/FilterPills.vue'

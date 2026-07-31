@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ModrinthIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
 
-import ButtonLink from '../base/buttons/ButtonLink.vue'
-import IconButton from '../base/buttons/IconButton.vue'
+import AutoLink from '../base/AutoLink.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
 const emit = defineEmits<{
 	(e: 'close'): void
@@ -36,29 +36,16 @@ withDefaults(
 			<span class="text-sm font-medium">Create a server with Modrinth in just a few clicks.</span>
 		</div>
 		<div class="flex flex-col items-end justify-end z-10">
-			<ButtonLink
-				v-if="link.startsWith('/')"
-				type="colored"
-				color="brand"
-				:to="link"
-			>
-				View plans
-				<RightArrowIcon aria-hidden="true" />
-			</ButtonLink>
-			<ButtonLink v-else type="colored" color="brand" :href="link">
-				View plans
-				<RightArrowIcon aria-hidden="true" />
-			</ButtonLink>
+			<ButtonStyled color="brand">
+				<AutoLink :to="link"> View plans <RightArrowIcon /> </AutoLink>
+			</ButtonStyled>
 		</div>
 		<div class="absolute top-2 right-2 z-10">
-			<IconButton
-				v-if="closable"
-				label="Don't show again"
-				size="sm"
-				@click="emit('close')"
-			>
-				<XIcon aria-hidden="true" />
-			</IconButton>
+			<ButtonStyled v-if="closable" size="small" circular>
+				<button v-tooltip="`Don't show again`" @click="emit('close')">
+					<XIcon aria-hidden="true" />
+				</button>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>

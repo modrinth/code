@@ -19,14 +19,18 @@
 
 			<div class="flex flex-col gap-6">
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-					<Button class="w-full !shadow-none" @click="authenticate('sign-up')">
+					<ButtonStyled>
+						<button class="w-full !shadow-none" type="button" @click="authenticate('sign-up')">
 							<UserPlusIcon aria-hidden="true" />
 							{{ formatMessage(messages.createAccountButton) }}
-						</Button>
-					<Button color="brand" type="colored" class="w-full" @click="authenticate('sign-in')">
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button class="w-full" type="button" @click="authenticate('sign-in')">
 							<LogInIcon aria-hidden="true" />
 							{{ formatMessage(messages.signInButton) }}
-						</Button>
+						</button>
+					</ButtonStyled>
 				</div>
 
 				<p class="m-0 text-center text-base font-medium leading-6 text-primary">
@@ -65,18 +69,23 @@
 
 			<div class="flex flex-col gap-6">
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-					<Button type="outlined" class="w-full" @click="modal?.hide()">
+					<ButtonStyled type="outlined">
+						<button class="w-full" type="button" @click="modal?.hide()">
 							<XIcon aria-hidden="true" />
 							{{ formatMessage(messages.cancelButton) }}
-						</Button>
-					<Button
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button
 							class="w-full !shadow-none"
+							type="button"
 							:disabled="reopeningBrowser"
 							@click="reopenBrowser"
 						>
 							<RefreshCwIcon aria-hidden="true" />
 							{{ formatMessage(messages.openBrowserAgainButton) }}
-						</Button>
+						</button>
+					</ButtonStyled>
 				</div>
 
 				<p class="m-0 text-center text-base font-medium leading-6 text-primary">
@@ -99,8 +108,7 @@
 
 <script setup lang="ts">
 import { LogInIcon, RefreshCwIcon, SpinnerIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import { defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'
 

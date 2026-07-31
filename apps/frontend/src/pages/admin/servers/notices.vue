@@ -100,30 +100,22 @@
 				/>
 			</div>
 			<div class="flex gap-2">
-				<Button
-					v-if="editingNotice"
-					type="colored"
-					color="brand"
-					:disabled="!!noticeSubmitError"
-					@click="() => saveChanges()"
-				>
-					<SaveIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.saveChangesButton) }}
-				</Button>
-				<Button
-					v-else
-					type="colored"
-					color="brand"
-					:disabled="!!noticeSubmitError"
-					@click="() => createNotice()"
-				>
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.createNotice) }}
-				</Button>
-				<Button @click="createNoticeModal?.hide">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
+				<ButtonStyled color="brand">
+					<button v-if="editingNotice" :disabled="!!noticeSubmitError" @click="() => saveChanges()">
+						<SaveIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.saveChangesButton) }}
+					</button>
+					<button v-else :disabled="!!noticeSubmitError" @click="() => createNotice()">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createNotice) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="createNoticeModal?.hide">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -131,12 +123,14 @@
 	<div class="page">
 		<div
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
-			>
+		>
 			<h1 class="m-0 text-2xl">Server notices</h1>
-			<Button type="colored" color="brand" @click="openNewNoticeModal">
-				<PlusIcon aria-hidden="true" />
-				{{ formatMessage(messages.createNotice) }}
-			</Button>
+			<ButtonStyled color="brand">
+				<button @click="openNewNoticeModal">
+					<PlusIcon />
+					{{ formatMessage(messages.createNotice) }}
+				</button>
+			</ButtonStyled>
 		</div>
 		<div>
 			<div v-if="!notices || notices.length === 0">
@@ -207,12 +201,16 @@
 							</TagItem>
 						</div>
 						<div class="col-span-2 flex gap-2 md:col-span-1">
-							<Button @click="() => startEditing(notice)">
-								<EditIcon aria-hidden="true" /> {{ formatMessage(commonMessages.editButton) }}
-							</Button>
-							<Button type="colored" color="red" @click="() => deleteNotice(notice)">
-								<TrashIcon aria-hidden="true" /> {{ formatMessage(commonMessages.deleteLabel) }}
-							</Button>
+							<ButtonStyled>
+								<button @click="() => startEditing(notice)">
+									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="red">
+								<button @click="() => deleteNotice(notice)">
+									<TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 					<div class="col-span-full grid">
@@ -264,8 +262,8 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	Combobox,
 	commonMessages,
 	CopyCode,

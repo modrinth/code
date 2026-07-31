@@ -20,10 +20,12 @@
 					/>
 				</div>
 				<div class="flex gap-2">
-					<Button type="colored" color="brand" @click="getUserFromEmail">
-						<MailIcon aria-hidden="true" />
-						Get user account
-					</Button>
+					<ButtonStyled color="brand">
+						<button @click="getUserFromEmail">
+							<MailIcon aria-hidden="true" />
+							Get user account
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
@@ -31,8 +33,7 @@
 </template>
 <script setup lang="ts">
 import { MailIcon } from '@modrinth/assets'
-import { injectNotificationManager, StyledInput } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { ButtonStyled, injectNotificationManager, StyledInput } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 

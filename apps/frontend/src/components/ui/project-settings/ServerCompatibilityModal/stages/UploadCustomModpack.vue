@@ -27,16 +27,23 @@
 					</span>
 				</div>
 
-				<FileButton
-					v-tooltip="'Replace file'"
-					aria-label="Replace file"
-					prompt=""
-					accept=".mrpack"
-					:allow-drop="false"
-					@change="handleFileUpload"
-				>
-					<ArrowLeftRightIcon aria-hidden="true" />
-				</FileButton>
+				<ButtonStyled size="standard" :circular="true">
+					<button
+						v-tooltip="'Replace file'"
+						aria-label="Replace file"
+						class="!shadow-none"
+						@click="fileInput?.click()"
+					>
+						<ArrowLeftRightIcon aria-hidden="true" />
+						<input
+							ref="fileInput"
+							class="hidden"
+							type="file"
+							accept=".mrpack"
+							@change="handleFileInputChange"
+						/>
+					</button>
+				</ButtonStyled>
 			</div>
 
 			<Checkbox v-model="ctx.hasLicensePermission.value">
@@ -58,7 +65,7 @@
 
 <script setup lang="ts">
 import { ArrowLeftRightIcon, FileIcon } from '@modrinth/assets'
-import { Checkbox, DropzoneFileInput, FileButton } from '@modrinth/ui'
+import { ButtonStyled, Checkbox, DropzoneFileInput } from '@modrinth/ui'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 
@@ -66,9 +73,20 @@ import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
 const ctx = injectServerCompatibilityContext()
 
+const fileInput = useTemplateRef<HTMLInputElement>('fileInput')
+
 function handleFileUpload(files: File[]) {
 	if (files.length > 0) {
 		ctx.customModpackFile.value = files[0]
 	}
+}
+
+function handleFileInputChange(e: Event) {
+	const target = e.target as HTMLInputElement
+	const file = target.files?.[0]
+	if (file) {
+		ctx.customModpackFile.value = file
+	}
+	target.value = ''
 }
 </script>

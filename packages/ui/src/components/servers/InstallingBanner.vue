@@ -27,16 +27,18 @@
 			</div>
 		</div>
 		<template v-if="contentError" #top-right-actions>
-			<Button
-				v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
-				type="quiet"
-				color="red"
-				:disabled="retryDisabled"
-				@click="emit('retry')"
-			>
-				<RotateCounterClockwiseIcon aria-hidden="true" />
-				{{ formatMessage(commonMessages.retryButton) }}
-			</Button>
+			<ButtonStyled color="red" type="outlined">
+				<button
+					v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
+					class="!border"
+					type="button"
+					:disabled="retryDisabled"
+					@click="emit('retry')"
+				>
+					<RotateCounterClockwiseIcon class="size-5" />
+					{{ formatMessage(commonMessages.retryButton) }}
+				</button>
+			</ButtonStyled>
 		</template>
 	</Admonition>
 </template>
@@ -49,7 +51,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import Admonition from '../base/Admonition.vue'
-import Button from '../base/buttons/Button.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
 export interface SyncProgress {
 	phase: 'Analyzing' | 'InstallingPack' | 'InstallingLoader' | 'Addons'

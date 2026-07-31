@@ -22,26 +22,28 @@
 		</div>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="hide">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
-				<Button
-					v-tooltip="renameDisabledTooltip"
-					type="colored"
-					color="brand"
-					:disabled="renameDisabled"
-					@click="renameBackup"
-				>
-					<template v-if="renameMutation.isPending.value">
-						<SpinnerIcon class="animate-spin" aria-hidden="true" />
-						Renaming...
-					</template>
-					<template v-else>
-						<SaveIcon aria-hidden="true" />
-						Save changes
-					</template>
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="hide">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						v-tooltip="renameDisabledTooltip"
+						:disabled="renameDisabled"
+						@click="renameBackup"
+					>
+						<template v-if="renameMutation.isPending.value">
+							<SpinnerIcon class="animate-spin" />
+							Renaming...
+						</template>
+						<template v-else>
+							<SaveIcon />
+							Save changes
+						</template>
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -60,7 +62,7 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 

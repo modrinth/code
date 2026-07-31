@@ -19,15 +19,15 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type { MessageDescriptor } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	OverflowMenu,
 	SmartClickable,
 	TagItem,
-	TeleportOverflowMenu,
 	useFormatDateTime,
 	useFormatNumber,
 	useRelativeTime,
@@ -39,6 +39,7 @@ import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { copyToClipboard, createInstanceShortcut } from '@/helpers/utils'
 import type {
@@ -60,6 +61,7 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 
+const router = useRouter()
 const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
@@ -410,14 +412,17 @@ const messages = defineMessages({
 				</template>
 			</div>
 			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-				<Button
+				<ButtonStyled
 					v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
 					color="red"
-				 type="colored" @click="emit('stop')">
+				>
+					<button @click="emit('stop')">
 						<StopCircleIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.stopButton) }}
-					</Button>
-				<Button v-else
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else>
+					<button
 						v-tooltip="
 							quarantined
 								? 'This instance has been locked'
@@ -449,45 +454,34 @@ const messages = defineMessages({
 						<SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
 						<PlayIcon v-else aria-hidden="true" />
 						{{ formatMessage(commonMessages.playButton) }}
-					</Button>
-				<TeleportOverflowMenu
-					:label="formatMessage(commonMessages.moreOptionsButton)"
-					type="quiet"
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular type="transparent">
+					<OverflowMenu
 						:options="[
 							{
 								id: 'play-instance',
-								label: formatMessage(messages.playInstance),
-								icon: PlayIcon,
 								shown: !!instanceId,
 								disabled: playingInstance || quarantined,
 								action: () => emit('play-instance'),
 							},
 							{
 								id: 'open-instance',
-								label: formatMessage(messages.viewInstance),
-								icon: EyeIcon,
-								type: 'link',
-								to: `/instance/${encodeURIComponent(instanceId)}`,
 								shown: !!instanceId,
+								action: () => router.push(`/instance/${encodeURIComponent(instanceId)}`),
 							},
 							{
 								id: 'refresh',
-								label: formatMessage(commonMessages.refreshButton),
-								icon: UpdatedIcon,
 								shown: world.type === 'server',
 								action: () => emit('refresh'),
 							},
 							{
 								id: 'copy-address',
-								label: formatMessage(messages.copyAddress),
-								icon: ClipboardCopyIcon,
 								shown: world.type === 'server',
 								action: () => copyToClipboard((world as ServerWorld).address),
 							},
 							{
 								id: 'edit',
-								label: formatMessage(commonMessages.editButton),
-								icon: EditIcon,
 								action: () => emit('edit'),
 								shown: !instanceId,
 								disabled: locked || managed,
@@ -499,19 +493,15 @@ const messages = defineMessages({
 							},
 							{
 								id: 'open-folder',
-								label: formatMessage(commonMessages.openFolderButton),
-								icon: FolderOpenIcon,
 								shown: world.type === 'singleplayer',
 								action: () => (world.type === 'singleplayer' ? emit('open-folder', world) : {}),
 							},
 							{
-								type: 'divider',
+								divider: true,
 								shown: !!instanceId,
 							},
 							{
 								id: 'dont-show-on-home',
-								label: formatMessage(messages.dontShowOnHome),
-								icon: XIcon,
 								shown: !!instanceId,
 								action: () => {
 									set_world_display_status(
@@ -526,24 +516,17 @@ const messages = defineMessages({
 							},
 							{
 								id: 'create-shortcut',
-								label: formatMessage(messages.createShortcut),
-								icon: ExternalIcon,
 								shown: !!shortcutInstanceId && !quarantined,
 								action: () => createShortcut(),
 							},
 							{
-								type: 'divider',
+								divider: true,
 								shown: !instanceId,
 							},
 							{
 								id: 'delete',
-								label: formatMessage(
-									world.type === 'server'
-										? commonMessages.removeButton
-										: commonMessages.deleteLabel,
-								),
-								icon: TrashIcon,
-								tone: 'red',
+								color: 'red',
+								hoverFilled: true,
 								action: () => emit('delete'),
 								shown: !instanceId,
 								disabled: locked || managed,
@@ -555,8 +538,51 @@ const messages = defineMessages({
 							},
 						]"
 					>
-					<MoreVerticalIcon aria-hidden="true" />
-				</TeleportOverflowMenu>
+						<MoreVerticalIcon aria-hidden="true" />
+						<template #play-instance>
+							<PlayIcon aria-hidden="true" />
+							{{ formatMessage(messages.playInstance) }}
+						</template>
+						<template #open-instance>
+							<EyeIcon aria-hidden="true" />
+							{{ formatMessage(messages.viewInstance) }}
+						</template>
+						<template #edit>
+							<EditIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.editButton) }}
+						</template>
+						<template #open-folder>
+							<FolderOpenIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.openFolderButton) }}
+						</template>
+						<template #copy-address>
+							<ClipboardCopyIcon aria-hidden="true" />
+							{{ formatMessage(messages.copyAddress) }}
+						</template>
+						<template #refresh>
+							<UpdatedIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.refreshButton) }}
+						</template>
+						<template #create-shortcut>
+							<ExternalIcon aria-hidden="true" />
+							{{ formatMessage(messages.createShortcut) }}
+						</template>
+						<template #dont-show-on-home>
+							<XIcon aria-hidden="true" />
+							{{ formatMessage(messages.dontShowOnHome) }}
+						</template>
+						<template #delete>
+							<TrashIcon aria-hidden="true" />
+							{{
+								formatMessage(
+									world.type === 'server'
+										? commonMessages.removeButton
+										: commonMessages.deleteLabel,
+								)
+							}}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
 			</div>
 		</div>
 	</SmartClickable>

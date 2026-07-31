@@ -54,17 +54,19 @@
 				<p class="m-0 text-secondary text-sm">
 					{{ formatMessage(messages.lockedDescription) }}
 				</p>
-				<Button
-					class="w-fit"
-					@click="
-						() => {
-							overriddenProvidedFilterTypes.push(filterType.id)
-						}
-					"
-				>
-					<LockOpenIcon aria-hidden="true" />
-					{{ formatMessage(messages.unlockFilterButton) }}
-				</Button>
+				<ButtonStyled>
+					<button
+						class="w-fit"
+						@click="
+							() => {
+								overriddenProvidedFilterTypes.push(filterType.id)
+							}
+						"
+					>
+						<LockOpenIcon />
+						{{ formatMessage(messages.unlockFilterButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 		<template v-else #default>
@@ -155,23 +157,25 @@
 					@update:model-value="toggleGroup(group.id)"
 				/>
 				<div v-if="hasProvidedFilter" class="mt-2 mx-1">
-					<Button
-						class="w-fit"
-						@click="
-							() => {
-								overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
-									(id) => id !== filterType.id,
-								)
-								accordion?.close()
-								clearFilters()
-							}
-						"
-					>
-						<UpdatedIcon aria-hidden="true" />
-						<slot name="sync-button">
-							{{ formatMessage(messages.syncFilterButton) }}
-						</slot>
-					</Button>
+					<ButtonStyled>
+						<button
+							class="w-fit"
+							@click="
+								() => {
+									overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
+										(id) => id !== filterType.id,
+									)
+									accordion?.close()
+									clearFilters()
+								}
+							"
+						>
+							<UpdatedIcon />
+							<slot name="sync-button">
+								{{ formatMessage(messages.syncFilterButton) }}
+							</slot>
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</template>
@@ -185,7 +189,7 @@ import { computed, ref } from 'vue'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
-import Button from '../base/buttons/Button.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'

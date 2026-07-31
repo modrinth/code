@@ -27,12 +27,11 @@ of importing it directly.
 Use the component that matches the interaction's semantics. Do not use a click handler
 on `ButtonLink` for an action, and do not perform navigation from a `Button`.
 
-The new `Button` currently shares its name with the legacy root export. Until the legacy
-component is removed, import it directly:
+Import public button components from `@modrinth/ui`. Inside `packages/ui`, use the
+corresponding `#ui/components/base/buttons/*` path:
 
 ```ts
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import { ButtonLink, IconButton } from '@modrinth/ui'
+import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 ```
 
 ## Basic usage

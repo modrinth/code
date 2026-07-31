@@ -17,7 +17,7 @@ import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
-import Button from '../base/buttons/Button.vue'
+import { ButtonStyled } from '../index'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import NewModal from '../modal/NewModal.vue'
 import PlanSelector from './ServersPurchase0Plan.vue'
@@ -555,56 +555,51 @@ function goToBreadcrumbStep(id: string) {
 			</div>
 		</div>
 		<div class="flex gap-2 justify-between mt-4">
-			<Button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
-				<LeftArrowIcon aria-hidden="true" />
-				{{ formatMessage(commonMessages.backButton) }}
-			</Button>
-			<Button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
-				<XIcon aria-hidden="true" />
-				{{ formatMessage(commonMessages.cancelButton) }}
-			</Button>
-			<Button
-				v-if="currentStep !== 'plan'"
-				v-tooltip="
-					currentStep === 'review' && !acceptedEula && !noPaymentRequired
-						? 'You must accept the Minecraft EULA to proceed.'
-						: undefined
-				"
-				type="colored"
-				color="brand"
-				:disabled="!canProceed"
-				:loading="completingPurchase"
-				@click="
-					noPaymentRequired && currentStep === 'review'
-						? (async () => {
-								if (props.onFinalizeNoPaymentChange) {
-									try {
-										await props.onFinalizeNoPaymentChange()
-									} catch (e) {
-										return
+			<ButtonStyled>
+				<button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
+					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
+				</button>
+				<button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-if="currentStep !== 'plan'" color="brand">
+				<button
+					v-tooltip="
+						currentStep === 'review' && !acceptedEula && !noPaymentRequired
+							? 'You must accept the Minecraft EULA to proceed.'
+							: undefined
+					"
+					:disabled="!canProceed"
+					@click="
+						noPaymentRequired && currentStep === 'review'
+							? (async () => {
+									if (props.onFinalizeNoPaymentChange) {
+										try {
+											await props.onFinalizeNoPaymentChange()
+										} catch (e) {
+											return
+										}
 									}
-								}
-								modal?.hide()
-							})()
-						: setStep(nextStep)
-				"
-			>
-				<template v-if="currentStep === 'review'">
-					<template v-if="noPaymentRequired">
-						<CheckCircleIcon aria-hidden="true" />
-						Confirm Change
+									modal?.hide()
+								})()
+							: setStep(nextStep)
+					"
+				>
+					<template v-if="currentStep === 'review'">
+						<template v-if="noPaymentRequired"><CheckCircleIcon /> Confirm Change</template>
+						<template v-else>
+							<SpinnerIcon v-if="completingPurchase" class="animate-spin" />
+							<CheckCircleIcon v-else />
+							Subscribe
+						</template>
 					</template>
 					<template v-else>
-						<SpinnerIcon v-if="completingPurchase" aria-hidden="true" class="animate-spin" />
-						<CheckCircleIcon v-else aria-hidden="true" />
-						Subscribe
+						{{ formatMessage(commonMessages.nextButton) }} <RightArrowIcon />
 					</template>
-				</template>
-				<template v-else>
-					{{ formatMessage(commonMessages.nextButton) }}
-					<RightArrowIcon aria-hidden="true" />
-				</template>
-			</Button>
+				</button>
+			</ButtonStyled>
 		</div>
 	</NewModal>
 </template>

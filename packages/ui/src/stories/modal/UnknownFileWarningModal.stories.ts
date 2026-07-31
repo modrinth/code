@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import Button from '../../components/base/buttons/Button.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import UnknownFileWarningModal from '../../components/modal/UnknownFileWarningModal.vue'
 
 const meta = {
@@ -17,13 +17,15 @@ type Story = StoryObj<typeof meta>
 
 export const Modpack: Story = {
 	render: () => ({
-		components: { Button, UnknownFileWarningModal },
+		components: { ButtonStyled, UnknownFileWarningModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UnknownFileWarningModal> | null>(null)
 			return { modalRef }
 		},
 		template: /* html */ `
-			<Button color="brand" type="colored" @click="modalRef?.show()">Open modpack warning</Button>
+			<ButtonStyled color="brand">
+				<button @click="modalRef?.show()">Open modpack warning</button>
+			</ButtonStyled>
 			<UnknownFileWarningModal
 				ref="modalRef"
 				mode="modpack"
@@ -43,13 +45,15 @@ export const Modpack: Story = {
 
 export const Mod: Story = {
 	render: () => ({
-		components: { Button, UnknownFileWarningModal },
+		components: { ButtonStyled, UnknownFileWarningModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UnknownFileWarningModal> | null>(null)
 			return { modalRef }
 		},
 		template: /* html */ `
-			<Button color="brand" type="colored" @click="modalRef?.show()">Open file warning</Button>
+			<ButtonStyled color="brand">
+				<button @click="modalRef?.show()">Open file warning</button>
+			</ButtonStyled>
 			<UnknownFileWarningModal
 				ref="modalRef"
 				mode="mod"

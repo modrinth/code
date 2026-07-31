@@ -73,14 +73,15 @@
 					:placeholder="formatMessage(messages.searchPlaceholder)"
 					class="flex-1"
 				/>
-				<IconButton
-					:label="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
-					type="outlined"
-					@click="hideUninstallable = !hideUninstallable"
-				>
-					<EyeOffIcon v-if="hideUninstallable" aria-hidden="true" />
-					<EyeIcon v-else aria-hidden="true" />
-				</IconButton>
+				<ButtonStyled type="outlined" circular>
+					<button
+						v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
+						@click="hideUninstallable = !hideUninstallable"
+					>
+						<EyeOffIcon v-if="hideUninstallable" />
+						<EyeIcon v-else />
+					</button>
+				</ButtonStyled>
 			</div>
 
 			<div v-if="loading" class="flex items-center justify-center py-12">
@@ -109,24 +110,30 @@
 							inst.name
 						}}</span>
 					</button>
-					<Button v-if="inst.installed" disabled>
-						<CheckIcon aria-hidden="true" />
-						{{ formatMessage(messages.installedBadge) }}
-					</Button>
-					<Button
+					<ButtonStyled v-if="inst.installed">
+						<button disabled>
+							<CheckIcon />
+							{{ formatMessage(messages.installedBadge) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled
 						v-else
-						v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
-						:type="inst.compatible ? 'base' : 'outlined'"
-						:disabled="inst.installing"
-						@click="emit('install', inst)"
+						:type="inst.compatible ? 'standard' : 'outlined'"
+						:color="inst.compatible ? 'standard' : 'orange'"
 					>
-							<TriangleAlertIcon v-if="!inst.compatible" aria-hidden="true" />
+						<button
+							v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
+							:disabled="inst.installing"
+							@click="emit('install', inst)"
+						>
+							<TriangleAlertIcon v-if="!inst.compatible" />
 							{{
 								inst.installing
 									? formatMessage(commonMessages.installingLabel)
 									: formatMessage(messages.installButton)
 							}}
-					</Button>
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
@@ -136,14 +143,18 @@
 			<div class="flex items-center gap-4">
 				<Avatar :src="iconPreviewUrl ?? undefined" size="5rem" rounded="2xl" />
 				<div class="flex flex-col gap-2">
-					<Button type="outlined" @click="selectIcon">
-						<UploadIcon aria-hidden="true" />
-						{{ formatMessage(messages.selectIcon) }}
-					</Button>
-					<Button type="outlined" :disabled="!iconPreviewUrl" @click="removeIcon">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.removeIcon) }}
-					</Button>
+					<ButtonStyled type="outlined">
+						<button @click="selectIcon">
+							<UploadIcon />
+							{{ formatMessage(messages.selectIcon) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="outlined">
+						<button :disabled="!iconPreviewUrl" @click="removeIcon">
+							<XIcon />
+							{{ formatMessage(messages.removeIcon) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 
@@ -207,26 +218,27 @@
 						{{ formatMessage(messages.compatibleCount, { count: compatibleCount }) }}
 					</span>
 				</div>
-				<Button type="outlined" @click="modal?.hide()">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="modal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 
 			<div v-else class="flex items-center justify-end gap-2">
-				<Button type="outlined" @click="modal?.hide()">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button
-					type="colored"
-					color="brand"
-					:disabled="!instanceName"
-					@click="handleCreateAndInstall"
-				>
-					<DownloadIcon aria-hidden="true" />
-					{{ formatMessage(messages.installButton) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="modal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!instanceName" @click="handleCreateAndInstall">
+						<DownloadIcon />
+						{{ formatMessage(messages.installButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -248,8 +260,7 @@ import { computed, ref, watch } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
-import IconButton from '#ui/components/base/buttons/IconButton.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'

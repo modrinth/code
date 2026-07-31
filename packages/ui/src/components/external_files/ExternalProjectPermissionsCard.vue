@@ -18,7 +18,7 @@ import { renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
-import { Collapsible, ConfirmModal, OverflowMenu } from '#ui/components'
+import { ButtonStyled, Collapsible, ConfirmModal, OverflowMenu } from '#ui/components'
 import type { OverflowMenuOption } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
 
@@ -29,8 +29,6 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 } from '../../providers'
-import Button from '../base/buttons/Button.vue'
-import IconButton from '../base/buttons/IconButton.vue'
 import type { QuickReply } from '../../providers/attribution-moderation'
 import StyledInput from '../base/StyledInput.vue'
 import AddFilesToAttributionGroupModal from './AddFilesToAttributionGroupModal.vue'
@@ -579,28 +577,28 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 							</span>
 						</div>
 						<div class="flex items-center gap-1 my-auto">
-							<IconButton
-								v-if="group.files.length > 1"
-								v-tooltip="formatMessage(messages.splitFile)"
-								:label="formatMessage(messages.splitFile)"
-								size="sm"
-								:disabled="splitFileMutation.isPending.value"
-								@click="handleSplitFile(file.sha1)"
-							>
-								<SpinnerIcon
-									v-if="splitFileMutation.isPending.value && pendingSplitSha1 === file.sha1"
-									class="size-4 shrink-0 animate-spin"
-									aria-hidden="true"
-								/>
-								<XIcon v-else class="size-4 shrink-0" aria-hidden="true" />
-							</IconButton>
+							<ButtonStyled v-if="group.files.length > 1" circular size="small">
+								<button
+									v-tooltip="formatMessage(messages.splitFile)"
+									class="m-1"
+									:disabled="splitFileMutation.isPending.value"
+									@click="handleSplitFile(file.sha1)"
+								>
+									<SpinnerIcon
+										v-if="splitFileMutation.isPending.value && pendingSplitSha1 === file.sha1"
+										class="size-4 shrink-0 animate-spin"
+									/>
+									<XIcon v-else class="size-4 shrink-0" />
+								</button>
+							</ButtonStyled>
 						</div>
 					</span>
 					<div>
-						<Button @click="handleAddFilesToGroup($event)">
-							<PlusIcon class="size-4 shrink-0" aria-hidden="true" />
-							{{ formatMessage(messages.addFilesToGroup) }}
-						</Button>
+						<ButtonStyled>
+							<button @click="handleAddFilesToGroup($event)">
+								<PlusIcon class="size-4 shrink-0" /> {{ formatMessage(messages.addFilesToGroup) }}
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 				<template v-if="(containingVersions?.length ?? 0) > 0">
@@ -646,10 +644,11 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 						"
 						#actions
 					>
-						<Button @click="startEditingAttribution">
-							<EditIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.editButton) }}
-						</Button>
+						<ButtonStyled>
+							<button @click="startEditingAttribution">
+								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+							</button>
+						</ButtonStyled>
 					</template>
 					<template
 						v-if="
@@ -715,81 +714,81 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 											class="mt-3"
 										/>
 										<div class="flex items-center gap-2 flex-wrap mt-3">
-											<OverflowMenu
-												v-if="visibleQuickReplies.length > 0"
-												:options="visibleQuickReplies"
-											>
-												Reply presets
-												<ChevronDownIcon />
-											</OverflowMenu>
-											<Button
-												type="quiet"
-												color="green"
-												:disabled="setModerationStatusMutation.isPending.value"
-												@click="handleSetModerationStatus('approved')"
-											>
-												<SpinnerIcon
-													v-if="
-														setModerationStatusMutation.isPending.value &&
-														pendingModerationStatusKind === 'approved'
-													"
-													class="size-4 shrink-0 animate-spin"
-													aria-hidden="true"
-												/>
-												<CheckCircleIcon v-else aria-hidden="true" />
-												Approve
-											</Button>
-											<Button
-												type="quiet"
-												color="red"
-												:disabled="setModerationStatusMutation.isPending.value"
-												@click="handleSetModerationStatus('bad_proof')"
-											>
-												<SpinnerIcon
-													v-if="
-														setModerationStatusMutation.isPending.value &&
-														pendingModerationStatusKind === 'bad_proof'
-													"
-													class="size-4 shrink-0 animate-spin"
-													aria-hidden="true"
-												/>
-												<XCircleIcon v-else aria-hidden="true" />
-												Reject: Insufficient proof
-											</Button>
-											<Button
-												type="quiet"
-												color="red"
-												:disabled="setModerationStatusMutation.isPending.value"
-												@click="handleSetModerationStatus('not_allowed')"
-											>
-												<SpinnerIcon
-													v-if="
-														setModerationStatusMutation.isPending.value &&
-														pendingModerationStatusKind === 'not_allowed'
-													"
-													class="size-4 shrink-0 animate-spin"
-													aria-hidden="true"
-												/>
-												<ReportIcon v-else aria-hidden="true" />
-												Reject: Not allowed
-											</Button>
-											<Button
-												v-if="isEditingModerationReview"
-												type="outlined"
-												:disabled="setModerationStatusMutation.isPending.value"
-												@click="cancelModerationReviewEditing"
-											>
-												<XIcon aria-hidden="true" />
-												{{ formatMessage(commonMessages.cancelButton) }}
-											</Button>
+											<ButtonStyled v-if="visibleQuickReplies.length > 0">
+												<OverflowMenu :options="visibleQuickReplies">
+													Reply presets
+													<ChevronDownIcon />
+												</OverflowMenu>
+											</ButtonStyled>
+											<ButtonStyled color="green" color-fill="text">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="handleSetModerationStatus('approved')"
+												>
+													<SpinnerIcon
+														v-if="
+															setModerationStatusMutation.isPending.value &&
+															pendingModerationStatusKind === 'approved'
+														"
+														class="size-4 shrink-0 animate-spin"
+													/>
+													<CheckCircleIcon v-else />
+													Approve
+												</button>
+											</ButtonStyled>
+											<ButtonStyled color="red" color-fill="text">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="handleSetModerationStatus('bad_proof')"
+												>
+													<SpinnerIcon
+														v-if="
+															setModerationStatusMutation.isPending.value &&
+															pendingModerationStatusKind === 'bad_proof'
+														"
+														class="size-4 shrink-0 animate-spin"
+													/>
+													<XCircleIcon v-else />
+													Reject: Insufficient proof
+												</button>
+											</ButtonStyled>
+											<ButtonStyled color="red" color-fill="text">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="handleSetModerationStatus('not_allowed')"
+												>
+													<SpinnerIcon
+														v-if="
+															setModerationStatusMutation.isPending.value &&
+															pendingModerationStatusKind === 'not_allowed'
+														"
+														class="size-4 shrink-0 animate-spin"
+													/>
+													<ReportIcon v-else />
+													Reject: Not allowed
+												</button>
+											</ButtonStyled>
+											<ButtonStyled v-if="isEditingModerationReview" type="outlined">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="cancelModerationReviewEditing"
+												>
+													<XIcon />
+													{{ formatMessage(commonMessages.cancelButton) }}
+												</button>
+											</ButtonStyled>
 										</div>
 										<div class="flex items-center gap-2 flex-wrap mt-3">
-											<Button @click="handleAddToGlobalDatabase">
-												<ScaleIcon aria-hidden="true" /> Add files to database...
-											</Button>
-											<Button @click="handleAddToExistingEntry">
-												<ScaleIcon aria-hidden="true" /> Add to existing entry...
-											</Button>
+											<ButtonStyled>
+												<button @click="handleAddToGlobalDatabase">
+													<ScaleIcon /> Add files to database...
+												</button>
+											</ButtonStyled>
+											<ButtonStyled>
+												<button @click="handleAddToExistingEntry">
+													<ScaleIcon /> Add to existing entry...
+												</button>
+											</ButtonStyled>
 										</div>
 									</template>
 								</template>
@@ -809,10 +808,12 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 								"
 								class="ml-auto"
 							>
-								<Button type="colored" color="orange" @click="startEditingModerationReview">
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.editButton) }}
-								</Button>
+								<ButtonStyled color="orange">
+									<button @click="startEditingModerationReview">
+										<ScaleIcon />
+										{{ formatMessage(commonMessages.editButton) }}
+									</button>
+								</ButtonStyled>
 							</div>
 						</div>
 					</template>
@@ -834,20 +835,16 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 					/>
 				</div>
 				<div v-if="isModerator" class="flex justify-end pt-2">
-					<Button
-						type="outlined"
-						color="red"
-						:disabled="deleteGroupMutation.isPending.value"
-						@click="handleDeleteGroup"
-					>
-						<SpinnerIcon
-							v-if="deleteGroupMutation.isPending.value"
-							class="size-4 shrink-0 animate-spin"
-							aria-hidden="true"
-						/>
-						<TrashIcon v-else class="size-4 shrink-0" aria-hidden="true" />
-						{{ formatMessage(messages.removeGroup) }}
-					</Button>
+					<ButtonStyled color="red" type="outlined">
+						<button :disabled="deleteGroupMutation.isPending.value" @click="handleDeleteGroup">
+							<SpinnerIcon
+								v-if="deleteGroupMutation.isPending.value"
+								class="size-4 shrink-0 animate-spin"
+							/>
+							<TrashIcon v-else class="size-4 shrink-0" />
+							{{ formatMessage(messages.removeGroup) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</Collapsible>

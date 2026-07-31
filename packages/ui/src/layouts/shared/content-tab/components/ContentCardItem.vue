@@ -15,6 +15,7 @@ import type { RouteLocationRaw } from 'vue-router'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
@@ -30,7 +31,6 @@ import type {
 	ContentOwner,
 	ContentSource,
 } from '../types'
-import IconButton from '#ui/components/base/buttons/IconButton.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -313,43 +313,43 @@ const deleteHovered = ref(false)
 				v-if="hasUpdateListener || hasSwitchVersionListener"
 				class="flex w-8 items-center justify-center"
 			>
-				<IconButton
+				<ButtonStyled
 					v-if="hasUpdate"
-					type="quiet"
+					circular
+					type="transparent"
 					color="green"
-					:label="
-						isDisabled && disabledTooltip
-							? disabledTooltip
-							: formatMessage(commonMessages.updateAvailableLabel)
-					"
-					v-tooltip="
-						isDisabled && disabledTooltip
-							? disabledTooltip
-							: formatMessage(commonMessages.updateAvailableLabel)
-					"
-					:disabled="isDisabled"
-					@click="emit('update')"
+					color-fill="text"
+					hover-color-fill="background"
 				>
-					<DownloadIcon aria-hidden="true" class="size-5" />
-				</IconButton>
-				<IconButton
+					<button
+						v-tooltip="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.updateAvailableLabel)
+						"
+						:disabled="isDisabled"
+						@click="emit('update')"
+					>
+						<DownloadIcon class="size-5" />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled
 					v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
-					type="quiet"
-					:label="
-						isDisabled && disabledTooltip
-							? disabledTooltip
-							: formatMessage(commonMessages.switchVersionButton)
-					"
-					v-tooltip="
-						isDisabled && disabledTooltip
-							? disabledTooltip
-							: formatMessage(commonMessages.switchVersionButton)
-					"
-					:disabled="isDisabled"
-					@click="emit('switchVersion')"
+					circular
+					type="transparent"
 				>
-					<ArrowLeftRightIcon aria-hidden="true" class="size-5" />
-				</IconButton>
+					<button
+						v-tooltip="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.switchVersionButton)
+						"
+						:disabled="isDisabled"
+						@click="emit('switchVersion')"
+					>
+						<ArrowLeftRightIcon class="size-5" />
+					</button>
+				</ButtonStyled>
 			</div>
 
 			<Toggle
@@ -366,55 +366,46 @@ const deleteHovered = ref(false)
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
-			<IconButton
-				v-if="hasDeleteListener && !props.hideDelete"
-				type="quiet"
-				:label="
-					isDisabled && disabledTooltip
-						? disabledTooltip
-						: formatMessage(
-								shiftHeld && deleteHovered
-									? commonMessages.deleteImmediatelyLabel
-									: commonMessages.deleteLabel,
-							)
-				"
-				v-tooltip="
-					isDisabled && disabledTooltip
-						? disabledTooltip
-						: formatMessage(
-								shiftHeld && deleteHovered
-									? commonMessages.deleteImmediatelyLabel
-									: commonMessages.deleteLabel,
-							)
-				"
-				:disabled="isDisabled"
-				@click="emit('delete', $event)"
-				@mouseenter="deleteHovered = true"
-				@mouseleave="deleteHovered = false"
-			>
-				<span class="relative size-5">
-					<TrashIcon
-						aria-hidden="true"
-						class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
-						:class="shiftHeld && deleteHovered ? 'opacity-0' : 'opacity-100'"
-					/>
-					<TrashExclamationIcon
-						aria-hidden="true"
-						class="absolute inset-0 size-5 text-red transition-opacity duration-200"
-						:class="shiftHeld && deleteHovered ? 'opacity-100' : 'opacity-0'"
-					/>
-				</span>
-			</IconButton>
+			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
+				<button
+					v-tooltip="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(
+									shiftHeld && deleteHovered
+										? commonMessages.deleteImmediatelyLabel
+										: commonMessages.deleteLabel,
+								)
+					"
+					:disabled="isDisabled"
+					@click="emit('delete', $event)"
+					@mouseenter="deleteHovered = true"
+					@mouseleave="deleteHovered = false"
+				>
+					<span class="relative size-5">
+						<TrashIcon
+							class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
+							:class="shiftHeld && deleteHovered ? 'opacity-0' : 'opacity-100'"
+						/>
+						<TrashExclamationIcon
+							class="absolute inset-0 size-5 text-red transition-opacity duration-200"
+							:class="shiftHeld && deleteHovered ? 'opacity-100' : 'opacity-0'"
+						/>
+					</span>
+				</button>
+			</ButtonStyled>
 
 			<slot name="additionalButtonsRight" />
 
-			<TeleportOverflowMenu
-				v-if="overflowOptions?.length"
-				:options="overflowOptions"
-				:disabled="isDisabled"
-			>
-				<MoreVerticalIcon class="size-5" />
-			</TeleportOverflowMenu>
+			<ButtonStyled circular type="transparent">
+				<TeleportOverflowMenu
+					v-if="overflowOptions?.length"
+					:options="overflowOptions"
+					:disabled="isDisabled"
+				>
+					<MoreVerticalIcon class="size-5" />
+				</TeleportOverflowMenu>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>

@@ -15,7 +15,8 @@
 			:dependency-link-creator="createDependencyLink"
 		>
 			<template #headerActions>
-				<Button color="brand" type="colored"
+				<ButtonStyled color="brand">
+					<button
 						:disabled="installing || (installed && installedVersion === version.id)"
 						@click="() => version && install(version.id)"
 					>
@@ -31,38 +32,45 @@
 										? formatMessage(commonMessages.switchToVersionButton)
 										: formatMessage(commonMessages.installButton)
 						}}
-					</Button>
-				<TeleportOverflowMenu
-					:label="formatMessage(commonMessages.moreOptionsButton)"
-					type="outlined"
-					:options="[
-						{
-							id: 'open-in-browser',
-							label: formatMessage(commonMessages.openInBrowserButton),
-							icon: ExternalIcon,
-							type: 'link',
-							href: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
-							target: '_blank',
-						},
-						{
-							id: 'report',
-							label: formatMessage(commonMessages.reportButton),
-							icon: ReportIcon,
-							type: 'link',
-							href: `https://modrinth.com/report?item=version&itemID=${version.id}`,
-							target: '_blank',
-							tone: 'red',
-						},
-					]"
-				>
-					<MoreVerticalIcon aria-hidden="true" />
-				</TeleportOverflowMenu>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled type="outlined" circular>
+					<OverflowMenu
+						v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:options="[
+							{
+								id: 'open-in-browser',
+								link: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
+								external: true,
+							},
+							{
+								id: 'report',
+								color: 'red',
+								hoverFilled: true,
+								link: `https://modrinth.com/report?item=version&itemID=${version.id}`,
+								external: true,
+							},
+						]"
+						aria-label="More options"
+					>
+						<MoreVerticalIcon aria-hidden="true" />
+						<template #open-in-browser>
+							<ExternalIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.openInBrowserButton) }}
+						</template>
+						<template #report>
+							<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
 			</template>
 			<template #supplementaryResourceActions="{ file }">
-				<ButtonLink :href="file.url" :download="file.filename" target="_blank">
-					<DownloadIcon aria-hidden="true" />
-					{{ formatMessage(messages.downloadInBrowser) }}
-				</ButtonLink>
+				<ButtonStyled>
+					<a :href="file.url" :download="file.filename" target="_blank">
+						<DownloadIcon aria-hidden="true" />
+						{{ formatMessage(messages.downloadInBrowser) }}
+					</a>
+				</ButtonStyled>
 			</template>
 		</VersionPage>
 	</div>
@@ -79,13 +87,12 @@ import {
 	ReportIcon,
 	VersionIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	ButtonLink,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	type DependencyContext,
-	TeleportOverflowMenu,
+	OverflowMenu,
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'

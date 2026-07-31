@@ -84,7 +84,9 @@
 												:style="{ width: item.progress + '%' }"
 											/>
 										</div>
-										<Button color="red" type="quiet" @click="cancelUpload(item)">{{ formatMessage(commonMessages.cancelButton) }}</Button>
+										<ButtonStyled color="red" type="transparent" @click="cancelUpload(item)">
+											<button>{{ formatMessage(commonMessages.cancelButton) }}</button>
+										</ButtonStyled>
 									</template>
 									<template v-else-if="item.status === 'cancelled'">
 										<span class="text-red">{{ formatMessage(messages.cancelled) }}</span>
@@ -112,7 +114,7 @@
 import { CheckCircleIcon, FolderOpenIcon, SpinnerIcon, XCircleIcon } from '@modrinth/assets'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { useFormatBytes } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers/api-client'

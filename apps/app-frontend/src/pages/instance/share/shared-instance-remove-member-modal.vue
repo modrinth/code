@@ -32,12 +32,16 @@
 				</ul>
 			</div>
 			<div class="flex justify-end gap-2 pt-1">
-				<Button type="outlined" @click="modal?.hide()">
-					<XIcon aria-hidden="true" />{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button type="colored" color="orange" :disabled="!row" @click="confirm">
-					<UserXIcon aria-hidden="true" />{{ formatMessage(messages.removeButton) }}
-				</Button>
+				<ButtonStyled type="outlined"
+					><button class="!border !border-surface-5" @click="modal?.hide()">
+						<XIcon aria-hidden="true" />{{ formatMessage(commonMessages.cancelButton) }}
+					</button></ButtonStyled
+				>
+				<ButtonStyled color="orange"
+					><button :disabled="!row" @click="confirm">
+						<UserXIcon aria-hidden="true" />{{ formatMessage(messages.removeButton) }}
+					</button></ButtonStyled
+				>
 			</div>
 		</div>
 	</NewModal>
@@ -45,10 +49,10 @@
 
 <script setup lang="ts">
 import { UserXIcon, XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
 	Avatar,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	NewModal,

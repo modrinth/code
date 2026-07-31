@@ -16,10 +16,12 @@
 			</div>
 		</div>
 		<div class="mx-2 my-8 flex w-full items-center justify-center">
-			<ButtonLink to="/news" type="colored" color="brand" size="lg">
-				<NewspaperIcon aria-hidden="true" />
-				{{ formatMessage(messages.viewAll) }}
-			</ButtonLink>
+			<ButtonStyled color="brand" size="large">
+				<nuxt-link to="/news">
+					<NewspaperIcon />
+					{{ formatMessage(messages.viewAll) }}
+				</nuxt-link>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>
@@ -27,7 +29,7 @@
 <script setup lang="ts">
 import { NewspaperIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { ButtonLink, defineMessages, NewsArticleCard, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, NewsArticleCard, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 const { formatMessage } = useVIntl()

@@ -10,24 +10,26 @@
 
 		<div v-if="backup.available" class="flex items-center gap-2">
 			<!-- Button / Loading state -->
-			<Button
-				v-if="!backup.backupComplete.value && !backup.backupFailed.value"
-				v-tooltip="
-					!canManageBackups
-						? permissionDeniedMessage
-						: backup.externalBackupInProgress.value
-							? formatMessage(messages.backupInProgress)
-							: undefined
-				"
-				:disabled="
-					!canManageBackups || backup.isBackingUp.value || backup.externalBackupInProgress.value
-				"
-				@click="startBackup"
-			>
-				<SpinnerIcon v-if="backup.isBackingUp.value" class="animate-spin" aria-hidden="true" />
-				<PlusIcon v-else aria-hidden="true" />
-				{{ formatMessage(backup.isBackingUp.value ? messages.backingUp : messages.createBackup) }}
-			</Button>
+			<ButtonStyled v-if="!backup.backupComplete.value && !backup.backupFailed.value">
+				<button
+					v-tooltip="
+						!canManageBackups
+							? permissionDeniedMessage
+							: backup.externalBackupInProgress.value
+								? formatMessage(messages.backupInProgress)
+								: undefined
+					"
+					class="!shadow-none"
+					:disabled="
+						!canManageBackups || backup.isBackingUp.value || backup.externalBackupInProgress.value
+					"
+					@click="startBackup"
+				>
+					<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
+					<PlusIcon v-else class="size-5" />
+					{{ formatMessage(backup.isBackingUp.value ? messages.backingUp : messages.createBackup) }}
+				</button>
+			</ButtonStyled>
 
 			<!-- Success -->
 			<div
@@ -59,7 +61,7 @@
 import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { computed, watch } from 'vue'
 
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { hasServerPermission } from '#ui/composables/server-permissions'
 import { injectModrinthServerContext } from '#ui/providers'

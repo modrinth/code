@@ -1,10 +1,10 @@
 <script setup>
 import { TrashIcon, UploadIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
+	ButtonStyled,
 	ConfirmModal,
-	FileButton,
+	FileInput,
 	injectNotificationManager,
 	StyledInput,
 	UnsavedChangesPopup,
@@ -162,23 +162,26 @@ const onDeleteOrganization = useClientTry(async () => {
 					class="project__icon"
 				/>
 				<div class="flex flex-col gap-2">
-					<FileButton
-						prompt="Upload icon"
-						:max-size="262144"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						:disabled="!hasPermission"
-						@change="showPreviewImage"
-					>
-						<UploadIcon aria-hidden="true" />
-					</FileButton>
-					<Button
-						v-if="!deletedIcon && (previewImage || organization.icon_url)"
-						:disabled="!hasPermission"
-						@click="markIconForDeletion"
-					>
-						<TrashIcon aria-hidden="true" />
-						Remove icon
-					</Button>
+					<ButtonStyled>
+						<FileInput
+							id="project-icon"
+							:max-size="262144"
+							:show-icon="true"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							class="button-like"
+							prompt="Upload icon"
+							:disabled="!hasPermission"
+							@change="showPreviewImage"
+						>
+							<UploadIcon />
+						</FileInput>
+					</ButtonStyled>
+					<ButtonStyled v-if="!deletedIcon && (previewImage || organization.icon_url)">
+						<button :disabled="!hasPermission" @click="markIconForDeletion">
+							<TrashIcon />
+							Remove icon
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 
@@ -228,10 +231,12 @@ const onDeleteOrganization = useClientTry(async () => {
 				Deleting your organization will transfer all of its projects to the organization owner. This
 				action cannot be undone.
 			</p>
-			<Button type="colored" color="red" @click="() => $refs.modal_deletion.show()">
-				<TrashIcon aria-hidden="true" />
-				Delete organization
-			</Button>
+			<ButtonStyled color="red">
+				<button @click="() => $refs.modal_deletion.show()">
+					<TrashIcon />
+					Delete organization
+				</button>
+			</ButtonStyled>
 		</div>
 		<UnsavedChangesPopup
 			:original="originalState"

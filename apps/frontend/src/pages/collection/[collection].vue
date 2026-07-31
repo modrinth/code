@@ -117,19 +117,23 @@
 					</RadioButtons>
 				</div>
 				<div class="flex justify-end gap-2">
-					<Button class="w-24" @click="() => editModal?.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button type="colored" color="brand" class="w-36" :disabled="saving" @click="save()">
-						<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
-						<SaveIcon v-else aria-hidden="true" />
-						{{
-							saving
-								? formatMessage(commonMessages.savingButton)
-								: formatMessage(commonMessages.saveButton)
-						}}
-					</Button>
+					<ButtonStyled>
+						<button class="w-24" @click="() => editModal?.hide()">
+							<XIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button class="w-36" :disabled="saving" @click="save()">
+							<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
+							<SaveIcon v-else aria-hidden="true" />
+							{{
+								saving
+									? formatMessage(commonMessages.savingButton)
+									: formatMessage(commonMessages.saveButton)
+							}}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -200,10 +204,12 @@
 						</div>
 						<div class="col-span-2 flex items-center gap-2 sm:col-span-1">
 							<template v-if="canEdit">
-								<Button size="xl" @click="openEditModal">
-									<EditIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.editButton) }}
-								</Button>
+								<ButtonStyled size="large">
+									<button @click="openEditModal">
+										<EditIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.editButton) }}
+									</button>
+								</ButtonStyled>
 								<ButtonStyled size="large" circular type="transparent">
 									<OverflowMenu
 										:dropdown-id="`${baseId}-more-options`"
@@ -344,24 +350,30 @@
 					"
 				>
 					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<Button v-if="canEdit" class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
-							<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-							<XIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.removeProjectButton) }}
-						</Button>
-						<Button v-if="collection.id === 'following'" @click="unfollowProject(project)">
-							<HeartMinusIcon aria-hidden="true" />
-							{{ formatMessage(messages.unfollowProjectButton) }}
-						</Button>
+						<ButtonStyled v-if="canEdit">
+							<button class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
+								<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+								<XIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.removeProjectButton) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="collection.id === 'following'">
+							<button @click="unfollowProject(project)">
+								<HeartMinusIcon aria-hidden="true" />
+								{{ formatMessage(messages.unfollowProjectButton) }}
+							</button>
+						</ButtonStyled>
 					</template>
 				</ProjectCard>
 			</ProjectCardList>
 			<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
 				<template #actions>
-					<ButtonLink v-if="auth.user && auth.user.id === creator.id" type="colored" color="brand" class="mx-auto w-min" to="/discover/mods">
-						<CompassIcon aria-hidden="true" class="size-5" />
-						{{ formatMessage(messages.discoverModsButton) }}
-					</ButtonLink>
+					<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
+						<nuxt-link class="mx-auto w-min" to="/discover/mods">
+							<CompassIcon class="size-5" />
+							{{ formatMessage(messages.discoverModsButton) }}
+						</nuxt-link>
+					</ButtonStyled>
 				</template>
 			</EmptyState>
 		</NormalPage>
@@ -416,7 +428,6 @@ import {
 	useRelativeTime,
 	useSavable,
 	useVIntl,
-	ButtonLink,
 } from '@modrinth/ui'
 import { isAdmin, renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -424,7 +435,6 @@ import dayjs from 'dayjs'
 import { onServerPrefetch } from 'vue'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()

@@ -63,17 +63,21 @@
 
 		<template #actions>
 			<div class="flex w-full items-center justify-end gap-2">
-				<Button type="outlined" @click="hide">
+				<ButtonStyled type="outlined">
+					<button type="button" @click="hide">
 						<XIcon />
 						{{
 							submitted
 								? formatMessage(commonMessages.closeButton)
 								: formatMessage(commonMessages.cancelButton)
 						}}
-					</Button>
-				<Button color="brand" type="colored"
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
 						v-tooltip="submitTooltip"
-						:disabled="submitDisabled" native-type="submit"
+						:disabled="submitDisabled"
+						type="submit"
 						@click="handleSubmit"
 					>
 						<SpinnerIcon v-if="submitted" class="animate-spin" />
@@ -83,7 +87,8 @@
 								? formatMessage(commonMessages.installingLabel)
 								: formatMessage(messages.installButton)
 						}}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -100,7 +105,7 @@ import {
 } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

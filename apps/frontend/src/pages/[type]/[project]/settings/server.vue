@@ -79,19 +79,22 @@
 							'items-start': javaPingResult && !javaPingResult.online,
 						}"
 					>
-						<IconButton
+						<ButtonStyled
 							v-if="(javaAddress && javaPingResult) || javaPingLoading"
-							v-tooltip="formatMessage(messages.refreshPingTooltip)"
-							:label="formatMessage(messages.refreshPingTooltip)"
-							type="quiet"
-							size="sm"
-							color="orange"
-							:loading="javaPingLoading"
-							@click="pingJavaServer"
+							circular
+							type="transparent"
+							size="small"
+							color="oranges"
 						>
-							<SpinnerIcon v-if="javaPingLoading" class="animate-spin" aria-hidden="true" />
-							<RefreshCwIcon v-else aria-hidden="true" />
-						</IconButton>
+							<button
+								v-tooltip="formatMessage(messages.refreshPingTooltip)"
+								:disabled="javaPingLoading"
+								@click="pingJavaServer"
+							>
+								<SpinnerIcon v-if="javaPingLoading" class="animate-spin" />
+								<RefreshCwIcon v-else />
+							</button>
+						</ButtonStyled>
 						<div
 							v-if="javaPingResult !== null && !javaPingLoading && javaPingResult.online"
 							class="mt-0.5 flex items-center gap-1.5 text-green"
@@ -167,6 +170,7 @@
 <script setup>
 import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Combobox,
 	ConfirmLeaveModal,
 	defineMessages,
@@ -174,7 +178,6 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	IntlFormatted,
-	IconButton,
 	MultiSelect,
 	normalizeChildren,
 	SERVER_LANGUAGES,

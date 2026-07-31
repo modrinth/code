@@ -6,7 +6,7 @@
 		:show-label="showLabel"
 		:show-preview-filter-icon="showPreviewFilterIcon"
 		:preview-trigger-class="previewTriggerClass"
-		:add-button-props="addButtonProps"
+		:add-button-class="addButtonClass"
 		:clear-label="formatMessage(analyticsMessages.resetButton)"
 		:add-label="resolvedAddLabel"
 		checkbox-position="right"
@@ -213,7 +213,6 @@ import {
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import type { ButtonProps } from '@modrinth/ui/src/components/base/buttons/types'
 import type { ComponentPublicInstance } from 'vue'
 
 import { useFormattedCountries } from '@/composables/country.ts'
@@ -273,7 +272,7 @@ const props = withDefaults(
 		showLabel?: boolean
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
-		addButtonProps?: ButtonProps
+		addButtonClass?: string
 		showClearAction?: boolean
 	}>(),
 	{

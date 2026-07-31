@@ -3,7 +3,7 @@ import { PowerIcon, PowerOffIcon, XIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -218,52 +218,55 @@ const bulkProgressMessage = computed(() => {
 				{{ selectedCountText }}
 			</span>
 			<div class="mx-0.5 h-6 w-px bg-surface-5" />
-			<Button
-				v-tooltip="formatMessage(commonMessages.clearButton)"
-				type="quiet"
-				:disabled="isBulkOperating"
-				@click="emit('clear')"
-			>
-				<XIcon class="hidden cq-show-icon" aria-hidden="true" />
-				<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
-			</Button>
+			<ButtonStyled type="transparent">
+				<button
+					v-tooltip="formatMessage(commonMessages.clearButton)"
+					class="!text-primary"
+					:disabled="isBulkOperating"
+					:class="{ 'opacity-60 pointer-events-none': isBulkOperating }"
+					@click="emit('clear')"
+				>
+					<XIcon class="hidden cq-show-icon" />
+					<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+				</button>
+			</ButtonStyled>
 		</div>
 
 		<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
 			<slot name="actions" />
 
-			<Button
-				v-if="hasToggleActions"
-				v-tooltip="
-					isBusy && busyTooltip
-						? busyTooltip
-						: allEnabled
-							? formatMessage(messages.allAlreadyEnabled)
-							: formatMessage(commonMessages.enableButton)
-				"
-				type="quiet"
-				:disabled="isBusy || allEnabled"
-				@click="emit('enable')"
-			>
-				<PowerIcon aria-hidden="true" />
-				<span class="bar-label">{{ formatMessage(commonMessages.enableButton) }}</span>
-			</Button>
-			<Button
-				v-if="hasToggleActions"
-				v-tooltip="
-					isBusy && busyTooltip
-						? busyTooltip
-						: allDisabled
-							? formatMessage(messages.allAlreadyDisabled)
-							: formatMessage(commonMessages.disableButton)
-				"
-				type="quiet"
-				:disabled="isBusy || allDisabled"
-				@click="emit('disable')"
-			>
-				<PowerOffIcon aria-hidden="true" />
-				<span class="bar-label">{{ formatMessage(commonMessages.disableButton) }}</span>
-			</Button>
+			<ButtonStyled v-if="hasToggleActions" type="transparent">
+				<button
+					v-tooltip="
+						isBusy && busyTooltip
+							? busyTooltip
+							: allEnabled
+								? formatMessage(messages.allAlreadyEnabled)
+								: formatMessage(commonMessages.enableButton)
+					"
+					:disabled="isBusy || allEnabled"
+					@click="emit('enable')"
+				>
+					<PowerIcon />
+					<span class="bar-label">{{ formatMessage(commonMessages.enableButton) }}</span>
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-if="hasToggleActions" type="transparent">
+				<button
+					v-tooltip="
+						isBusy && busyTooltip
+							? busyTooltip
+							: allDisabled
+								? formatMessage(messages.allAlreadyDisabled)
+								: formatMessage(commonMessages.disableButton)
+					"
+					:disabled="isBusy || allDisabled"
+					@click="emit('disable')"
+				>
+					<PowerOffIcon />
+					<span class="bar-label">{{ formatMessage(commonMessages.disableButton) }}</span>
+				</button>
+			</ButtonStyled>
 
 			<slot name="actions-end" />
 		</div>

@@ -50,13 +50,40 @@
 					{{ formatMessage(commonMessages.actionsLabel) }}
 				</span>
 				<div class="col-start-1 row-start-1 flex justify-end">
-					<TeleportOverflowMenu
-						:label="formatMessage(commonMessages.actionsLabel)"
-						type="quiet"
-						:options="menuOptions"
-					>
-						<MoreHorizontalIcon aria-hidden="true" />
-					</TeleportOverflowMenu>
+					<ButtonStyled circular type="transparent">
+						<TeleportOverflowMenu :options="menuOptions">
+							<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+							<template #copy-filename
+								><ClipboardCopyIcon />
+								{{ formatMessage(commonMessages.copyFilenameButton) }}</template
+							>
+							<template #copy-full-path
+								><ClipboardCopyIcon />
+								{{ formatMessage(commonMessages.copyFullPathButton) }}</template
+							>
+							<template #open-in-folder
+								><FolderOpenIcon /> {{ formatMessage(commonMessages.openInFolderButton) }}</template
+							>
+							<template #extract
+								><PackageOpenIcon /> {{ formatMessage(commonMessages.extractButton) }}</template
+							>
+							<template #rename
+								><EditIcon /> {{ formatMessage(commonMessages.renameButton) }}</template
+							>
+							<template #move
+								><RightArrowIcon /> {{ formatMessage(commonMessages.moveButton) }}</template
+							>
+							<template #download
+								><DownloadIcon />
+								{{
+									ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton)
+								}}</template
+							>
+							<template #delete
+								><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template
+							>
+						</TeleportOverflowMenu>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
@@ -82,9 +109,9 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import TeleportOverflowMenu from '#ui/components/base/buttons/TeleportOverflowMenu.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons/types'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -177,14 +204,13 @@ function getFullPath() {
 	return joinDisplayPath(ctx.basePath?.value, props.path)
 }
 
-const menuOptions = computed<OverflowMenuOption[]>(() => {
+const menuOptions = computed(() => {
 	const item = { name: props.name, type: props.type, path: props.path }
 	const wd = props.writeDisabled
 	const wdTooltip = props.writeDisabledTooltip
 	return [
 		{
 			id: 'copy-filename',
-			label: formatMessage(commonMessages.copyFilenameButton),
 			icon: ClipboardCopyIcon,
 			action: () => {
 				navigator.clipboard.writeText(props.name)
@@ -196,7 +222,6 @@ const menuOptions = computed<OverflowMenuOption[]>(() => {
 		},
 		{
 			id: 'copy-full-path',
-			label: formatMessage(commonMessages.copyFullPathButton),
 			icon: ClipboardCopyIcon,
 			action: () => {
 				navigator.clipboard.writeText(getFullPath())
@@ -205,56 +230,45 @@ const menuOptions = computed<OverflowMenuOption[]>(() => {
 		},
 		{
 			id: 'open-in-folder',
-			label: formatMessage(commonMessages.openInFolderButton),
 			icon: FolderOpenIcon,
 			shown: !!ctx.openInFolder,
 			action: () => ctx.openInFolder?.(getFullPath()),
 		},
-		{ type: 'divider' },
+		{ divider: true },
 		{
 			id: 'extract',
-			label: formatMessage(commonMessages.extractButton),
-			icon: PackageOpenIcon,
 			shown: isZip.value,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('extract', item),
 		},
 		{
-			type: 'divider',
+			divider: true,
 			shown: isZip.value,
 		},
 		{
 			id: 'rename',
-			label: formatMessage(commonMessages.renameButton),
-			icon: EditIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('rename', item),
 		},
 		{
 			id: 'move',
-			label: formatMessage(commonMessages.moveButton),
-			icon: RightArrowIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('move', item),
 		},
 		{
 			id: 'download',
-			label: ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton),
-			icon: DownloadIcon,
 			action: () => emit('download', item),
 			shown: props.type !== 'directory',
 		},
 		{
 			id: 'delete',
-			label: formatMessage(commonMessages.deleteLabel),
-			icon: TrashIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('delete', item),
-			tone: 'red',
+			color: 'red' as const,
 		},
 	]
 })

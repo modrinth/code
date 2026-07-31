@@ -7,9 +7,9 @@
 		:class="dropdownClass"
 		@apply-hide="focusTrigger"
 	>
-		<Button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
+		<button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
 			<slot></slot>
-		</Button>
+		</button>
 		<template #popper="{ hide: hideFunction }">
 			<button class="dummy-button" @focusin="hideAndFocusTrigger(hideFunction)"></button>
 			<div ref="menu" class="contents">
@@ -20,14 +20,11 @@
 	</Dropdown>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { Dropdown } from 'floating-vue'
 import { ref } from 'vue'
 
-import Button from './buttons/Button.vue'
-import type { ButtonElementHandle } from './buttons/types'
-
-const trigger = ref<ButtonElementHandle | null>(null)
+const trigger = ref()
 const menu = ref()
 const dropdown = ref()
 
@@ -60,7 +57,7 @@ function hideAndFocusTrigger(hide) {
 }
 
 function focusTrigger() {
-	trigger.value?.element?.focus()
+	trigger.value.focus()
 }
 
 defineOptions({

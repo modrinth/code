@@ -60,20 +60,22 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="outlined" @click="modal?.hide()">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button
-					v-tooltip="deleteDisabledTooltip"
-					type="colored"
-					color="red"
-					:disabled="!props.canDelete"
-					@click="confirmDelete"
-				>
-					<TrashIcon aria-hidden="true" />
-					{{ formatMessage(messages.confirm, { count }) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="modal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button
+						v-tooltip="deleteDisabledTooltip"
+						:disabled="!props.canDelete"
+						@click="confirmDelete"
+					>
+						<TrashIcon />
+						{{ formatMessage(messages.confirm, { count }) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -88,7 +90,7 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { useScrollIndicator } from '../../../composables/scroll-indicator'
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 

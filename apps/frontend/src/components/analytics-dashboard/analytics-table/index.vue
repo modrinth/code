@@ -31,20 +31,23 @@
 							wrapper-class="w-full sm:w-64"
 							@focusin="selectSearchInputText"
 						/>
-						<OverflowMenu
-							:options="csvExportOptions"
-							:disabled="isDataLoading || filteredRows.length === 0"
-						>
-							<DownloadIcon />
-							{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
-							<DropdownIcon />
-							<template #cumulative-csv>
-								{{ formatMessage(analyticsTableMessages.cumulativeCsv) }}
-							</template>
-							<template #grouped-csv>
-								{{ formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel }) }}
-							</template>
-						</OverflowMenu>
+						<ButtonStyled>
+							<OverflowMenu
+								class="!shadow-none"
+								:options="csvExportOptions"
+								:disabled="isDataLoading || filteredRows.length === 0"
+							>
+								<DownloadIcon />
+								{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
+								<DropdownIcon />
+								<template #cumulative-csv>
+									{{ formatMessage(analyticsTableMessages.cumulativeCsv) }}
+								</template>
+								<template #grouped-csv>
+									{{ formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel }) }}
+								</template>
+							</OverflowMenu>
+						</ButtonStyled>
 					</div>
 				</div>
 			</template>
@@ -189,6 +192,7 @@
 <script setup lang="ts">
 import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	OverflowMenu,
 	type OverflowMenuOption,
 	Pagination,

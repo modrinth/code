@@ -69,18 +69,17 @@
 					</Combobox>
 				</div>
 
-				<Button
-					type="colored"
-					color="orange"
-					size="lg"
-					class="w-full sm:w-auto"
-					:disabled="pending || paginatedProjects?.length === 0"
-					@click="moderateAllInFilter()"
-				>
-					<ScaleIcon aria-hidden="true" />
-					<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
-					<span class="sm:hidden">Moderate</span>
-				</Button>
+				<ButtonStyled color="orange">
+					<button
+						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+						:disabled="pending || paginatedProjects?.length === 0"
+						@click="moderateAllInFilter()"
+					>
+						<ScaleIcon class="flex-shrink-0" />
+						<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
+						<span class="sm:hidden">Moderate</span>
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 
@@ -140,8 +139,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,

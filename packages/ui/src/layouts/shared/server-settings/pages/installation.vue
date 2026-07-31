@@ -22,16 +22,17 @@
 						formatMessage(messages.resetServerTitle)
 					}}</span>
 					<div>
-						<Button
-							v-tooltip="resetServerDisabledTooltip"
-							type="colored"
-							color="red"
-							:disabled="resetServerDisabled"
-							@click="showResetServerModal"
-						>
-							<RotateCounterClockwiseIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.resetServerButton) }}
-						</Button>
+						<ButtonStyled color="red">
+							<button
+								v-tooltip="resetServerDisabledTooltip"
+								class="!shadow-none"
+								:disabled="resetServerDisabled"
+								@click="showResetServerModal"
+							>
+								<RotateCounterClockwiseIcon class="size-5" />
+								{{ formatMessage(commonMessages.resetServerButton) }}
+							</button>
+						</ButtonStyled>
 					</div>
 					<span class="text-primary">
 						{{ formatMessage(messages.resetServerDescription) }}
@@ -58,16 +59,17 @@
 				{{ formatMessage(messages.supportOptionsTitle) }}
 			</span>
 			<div>
-				<Button
-					v-tooltip="supportResetToOnboardingTooltip"
-					type="colored"
-					color="red"
-					:disabled="supportResetToOnboardingDisabled"
-					@click="showResetToOnboardingModal"
-				>
-					<RotateCounterClockwiseIcon aria-hidden="true" />
-					{{ formatMessage(messages.resetToOnboardingButton) }}
-				</Button>
+				<ButtonStyled color="red">
+					<button
+						v-tooltip="supportResetToOnboardingTooltip"
+						class="!shadow-none"
+						:disabled="supportResetToOnboardingDisabled"
+						@click="showResetToOnboardingModal"
+					>
+						<RotateCounterClockwiseIcon class="size-5" />
+						{{ formatMessage(messages.resetToOnboardingButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -77,6 +79,7 @@
 import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -97,7 +100,6 @@ import {
 	useServerPermissions,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 

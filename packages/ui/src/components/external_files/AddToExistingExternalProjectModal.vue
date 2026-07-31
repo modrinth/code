@@ -4,10 +4,9 @@ import { PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { Accordion, NewModal, StyledInput } from '#ui/components'
+import { Accordion, ButtonStyled, NewModal, StyledInput } from '#ui/components'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
-import Button from '../base/buttons/Button.vue'
 import AttributionGroupFilePicker from './AttributionGroupFilePicker.vue'
 import {
 	MODERATOR_ATTRIBUTION_KIND_LABELS,
@@ -229,15 +228,12 @@ defineExpose({ show, hide })
 							wrapper-class="flex-1 min-w-[12rem]"
 							:disabled="addFilesMutation.isPending.value"
 						/>
-						<Button
-							type="colored"
-							color="brand"
-							native-type="submit"
-							:disabled="addFilesMutation.isPending.value"
-						>
-							<SearchIcon aria-hidden="true" />
-							Search
-						</Button>
+						<ButtonStyled color="brand">
+							<button type="submit" :disabled="addFilesMutation.isPending.value">
+								<SearchIcon aria-hidden="true" />
+								Search
+							</button>
+						</ButtonStyled>
 					</form>
 					<div
 						class="flex flex-col min-h-0 max-h-[min(50vh,24rem)] overflow-y-auto overflow-x-hidden"
@@ -273,14 +269,17 @@ defineExpose({ show, hide })
 								class="mx-4 mt-3"
 							>
 								<template #actions>
-									<Button
-										type="colored"
-										color="brand"
-										:disabled="selectedProjectId === project.id || addFilesMutation.isPending.value"
-										@click="selectProject(project.id)"
-									>
-										{{ selectedProjectId === project.id ? 'Selected' : 'Select' }}
-									</Button>
+									<ButtonStyled color="brand">
+										<button
+											type="button"
+											:disabled="
+												selectedProjectId === project.id || addFilesMutation.isPending.value
+											"
+											@click="selectProject(project.id)"
+										>
+											{{ selectedProjectId === project.id ? 'Selected' : 'Select' }}
+										</button>
+									</ButtonStyled>
 								</template>
 							</ExternalProjectLookupCard>
 						</div>
@@ -307,22 +306,22 @@ defineExpose({ show, hide })
 				/>
 			</Accordion>
 			<div class="flex justify-end gap-2 w-full">
-				<Button
-					type="outlined"
-					:disabled="addFilesMutation.isPending.value"
-					@click="hide"
-				>
-					<XIcon class="size-4 shrink-0" />
-					Cancel
-				</Button>
-				<Button type="colored" color="brand" :disabled="!canSubmit" @click="handleSubmit">
-					<SpinnerIcon
-						v-if="addFilesMutation.isPending.value"
-						class="size-4 shrink-0 animate-spin"
-					/>
-					<PlusIcon v-else class="size-4 shrink-0" />
-					Add files to entry
-				</Button>
+				<ButtonStyled type="outlined">
+					<button type="button" :disabled="addFilesMutation.isPending.value" @click="hide">
+						<XIcon class="size-4 shrink-0" />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button type="button" :disabled="!canSubmit" @click="handleSubmit">
+						<SpinnerIcon
+							v-if="addFilesMutation.isPending.value"
+							class="size-4 shrink-0 animate-spin"
+						/>
+						<PlusIcon v-else class="size-4 shrink-0" />
+						Add files to entry
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>

@@ -30,15 +30,12 @@
 					<span class="font-semibold text-secondary">{{ selected }}</span>
 				</DropdownSelect>
 
-				<Button
-					type="colored"
-					color="brand"
-					class="ml-auto"
-					@click="(event) => $refs.modal_creation.show(event)"
-				>
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.createNewButton) }}
-				</Button>
+				<ButtonStyled color="brand">
+					<button class="ml-auto" @click="(event) => $refs.modal_creation.show(event)">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createNewButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 		<div class="collections-grid">
@@ -147,6 +144,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
@@ -155,7 +153,6 @@ import {
 	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { useQuery } from '@tanstack/vue-query'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'

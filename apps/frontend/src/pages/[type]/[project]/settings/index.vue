@@ -82,23 +82,27 @@
 							class="project__icon"
 						/>
 						<div class="flex flex-col gap-2">
-							<FileButton
-								prompt="Upload icon"
-								:max-size="262144000"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								:disabled="!hasPermission"
-								@change="showPreviewImage"
-							>
-								<UploadIcon aria-hidden="true" />
-							</FileButton>
-							<Button
-								v-if="!deletedIcon && (previewImage || project.icon_url)"
-								:disabled="!hasPermission"
-								@click="markIconForDeletion"
-							>
-								<TrashIcon aria-hidden="true" />
-								Remove icon
-							</Button>
+							<ButtonStyled>
+								<FileInput
+									id="project-icon"
+									:max-size="262144000"
+									:show-icon="true"
+									accept="image/png,image/jpeg,image/gif,image/webp"
+									class="button-like choose-image"
+									prompt="Upload icon"
+									aria-label="Upload icon"
+									:disabled="!hasPermission"
+									@change="showPreviewImage"
+								>
+									<UploadIcon aria-hidden="true" />
+								</FileInput>
+							</ButtonStyled>
+							<ButtonStyled v-if="!deletedIcon && (previewImage || project.icon_url)">
+								<button :disabled="!hasPermission" @click="markIconForDeletion">
+									<TrashIcon aria-hidden="true" />
+									Remove icon
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</div>
@@ -156,23 +160,25 @@
 							</label>
 						</div>
 						<div class="mt-2 flex items-center gap-2">
-							<FileButton
-								prompt="Upload banner"
-								:max-size="524288"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								:disabled="!hasPermission"
-								@change="showBannerPreview"
-							>
-								<UploadIcon aria-hidden="true" />
-							</FileButton>
-							<Button
-								v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
-								:disabled="!hasPermission"
-								@click="markBannerForDeletion"
-							>
-								<TrashIcon aria-hidden="true" />
-								Remove banner
-							</Button>
+							<ButtonStyled>
+								<FileInput
+									:max-size="524288"
+									:show-icon="true"
+									accept="image/png,image/jpeg,image/gif,image/webp"
+									class="button-like"
+									prompt="Upload banner"
+									:disabled="!hasPermission"
+									@change="showBannerPreview"
+								>
+									<UploadIcon aria-hidden="true" />
+								</FileInput>
+							</ButtonStyled>
+							<ButtonStyled v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)">
+								<button :disabled="!hasPermission" @click="markBannerForDeletion">
+									<TrashIcon aria-hidden="true" />
+									Remove banner
+								</button>
+							</ButtonStyled>
 						</div>
 						<div class="mt-2 text-secondary">Gif, 468×60px recommended.</div>
 					</div>
@@ -273,26 +279,24 @@
 					</span>
 				</div>
 				<div v-if="isStaff" class="mt-2">
-					<Button
-						v-if="!isForceDemonetized"
-						type="colored"
-						color="orange"
-						:disabled="loadingModeratorMonetization"
-						@click="updateMonetizationStatus('force-demonetized')"
-					>
-						<ScaleIcon aria-hidden="true" />
-						Disable monetization
-					</Button>
-					<Button
-						v-else
-						type="colored"
-						color="orange"
-						:disabled="loadingModeratorMonetization"
-						@click="updateMonetizationStatus('monetized')"
-					>
-						<ScaleIcon aria-hidden="true" />
-						Allow monetization
-					</Button>
+					<ButtonStyled color="orange">
+						<button
+							v-if="!isForceDemonetized"
+							:disabled="loadingModeratorMonetization"
+							@click="updateMonetizationStatus('force-demonetized')"
+						>
+							<ScaleIcon aria-hidden="true" />
+							Disable monetization
+						</button>
+						<button
+							v-else
+							:disabled="loadingModeratorMonetization"
+							@click="updateMonetizationStatus('monetized')"
+						>
+							<ScaleIcon aria-hidden="true" />
+							Allow monetization
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</section>
@@ -307,15 +311,12 @@
 				Removes your project from Modrinth's servers and search. Clicking on this will delete your
 				project, so be extra careful!
 			</p>
-			<Button
-				type="colored"
-				color="red"
-				:disabled="!hasDeletePermission"
-				@click="$refs.modal_confirm.show()"
-			>
-				<TrashIcon aria-hidden="true" />
-				Delete project
-			</Button>
+			<ButtonStyled color="red">
+				<button :disabled="!hasDeletePermission" @click="$refs.modal_confirm.show()">
+					<TrashIcon aria-hidden="true" />
+					Delete project
+				</button>
+			</ButtonStyled>
 		</section>
 		<UnsavedChangesPopup
 			:original="original"
@@ -333,10 +334,10 @@ import { ImageIcon, ScaleIcon, TrashIcon, TriangleAlertIcon, UploadIcon } from '
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
+	ButtonStyled,
 	Combobox,
 	ConfirmLeaveModal,
 	ConfirmModal,
-	FileButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -346,9 +347,9 @@ import {
 	useFormatBytes,
 	usePageLeaveSafety,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
+import FileInput from '~/components/ui/FileInput.vue'
 import { useAuth } from '~/composables/auth.js'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 

@@ -17,14 +17,17 @@
 							:placeholder="getLinkInputPlaceholder(editLinks.issues.clear)"
 							:maxlength="2048"
 						/>
-						<IconButton
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:label="formatMessage(messages.clearLinkLabel)"
-							:data-active="editLinks.issues.clear"
-							@click="editLinks.issues.clear = !editLinks.issues.clear"
-						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.issues.clear"
+								@click="editLinks.issues.clear = !editLinks.issues.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label for="source-code-input" :title="formatMessage(messages.sourceCodeDescription)">
 						<span class="label__title">{{ formatMessage(messages.sourceCodeLabel) }}</span>
@@ -39,14 +42,17 @@
 							:maxlength="2048"
 							:placeholder="getLinkInputPlaceholder(editLinks.source.clear)"
 						/>
-						<IconButton
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:label="formatMessage(messages.clearLinkLabel)"
-							:data-active="editLinks.source.clear"
-							@click="editLinks.source.clear = !editLinks.source.clear"
-						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.source.clear"
+								@click="editLinks.source.clear = !editLinks.source.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label for="wiki-page-input" :title="formatMessage(messages.wikiPageDescription)">
 						<span class="label__title">{{ formatMessage(messages.wikiPageLabel) }}</span>
@@ -61,14 +67,17 @@
 							:maxlength="2048"
 							:placeholder="getLinkInputPlaceholder(editLinks.wiki.clear)"
 						/>
-						<IconButton
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:label="formatMessage(messages.clearLinkLabel)"
-							:data-active="editLinks.wiki.clear"
-							@click="editLinks.wiki.clear = !editLinks.wiki.clear"
-						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.wiki.clear"
+								@click="editLinks.wiki.clear = !editLinks.wiki.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label
 						for="discord-invite-input"
@@ -86,14 +95,17 @@
 							:maxlength="2048"
 							:placeholder="getLinkInputPlaceholder(editLinks.discord.clear, true)"
 						/>
-						<IconButton
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:label="formatMessage(messages.clearLinkLabel)"
-							:data-active="editLinks.discord.clear"
-							@click="editLinks.discord.clear = !editLinks.discord.clear"
-						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.discord.clear"
+								@click="editLinks.discord.clear = !editLinks.discord.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 				</section>
 				<p>
@@ -129,14 +141,18 @@
 					:description="formatMessage(messages.showAllProjects)"
 				/>
 				<div class="input-group ml-auto mt-4">
-					<Button type="outlined" @click="$refs.editLinksModal.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button type="colored" color="brand" @click="bulkEditLinks()">
-						<SaveIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</Button>
+					<ButtonStyled type="outlined">
+						<button @click="$refs.editLinksModal.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button @click="bulkEditLinks()">
+							<SaveIcon />
+							{{ formatMessage(commonMessages.saveChangesButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -161,10 +177,12 @@
 								:projects="usersOwnedProjects || []"
 								@submit="onProjectTransferSubmit"
 							/>
-							<Button type="colored" color="brand" @click="$refs.modal_creation.show($event)">
-								<PlusIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.createAProjectButton) }}
-							</Button>
+							<ButtonStyled color="brand">
+								<button @click="$refs.modal_creation.show($event)">
+									<PlusIcon />
+									{{ formatMessage(commonMessages.createAProjectButton) }}
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</template>
@@ -237,23 +255,22 @@
 				</template>
 				<template #cell-actions="{ row: project }">
 					<div class="flex !flex-row items-center !justify-end gap-2">
-						<ButtonLink
-							v-if="hasEnvironmentMigrationWarning(project)"
-							v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
-							type="quiet"
-							color="orange"
-							:aria-label="formatMessage(messages.reviewEnvironmentMetadata)"
-							:to="`${getProjectUrl(project)}?showEnvironmentMigrationWarning=true`"
-						>
-							<TriangleAlertIcon aria-hidden="true" />
-						</ButtonLink>
-						<ButtonLink
-							v-tooltip="formatMessage(commonMessages.settingsLabel)"
-							:aria-label="formatMessage(commonMessages.settingsLabel)"
-							:to="`${getProjectUrl(project)}/settings`"
-						>
-							<SettingsIcon aria-hidden="true" />
-						</ButtonLink>
+						<ButtonStyled v-if="hasEnvironmentMigrationWarning(project)" circular color="orange">
+							<nuxt-link
+								v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
+								:to="`${getProjectUrl(project)}?showEnvironmentMigrationWarning=true`"
+							>
+								<TriangleAlertIcon />
+							</nuxt-link>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<nuxt-link
+								v-tooltip="formatMessage(commonMessages.settingsLabel)"
+								:to="`${getProjectUrl(project)}/settings`"
+							>
+								<SettingsIcon />
+							</nuxt-link>
+						</ButtonStyled>
 					</div>
 				</template>
 			</Table>
@@ -303,26 +320,25 @@
 					{{ formatMessage(messages.selectedProjectsCount, { count: selectedProjects.length }) }}
 				</span>
 				<div class="mx-0.5 h-6 w-px bg-surface-5" />
-				<Button
-					v-tooltip="formatMessage(commonMessages.clearButton)"
-					type="quiet"
-					@click="clearProjectSelection()"
-				>
-					<XIcon class="cq-show-icon hidden" aria-hidden="true" />
-					<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
-				</Button>
+				<ButtonStyled type="transparent">
+					<button
+						v-tooltip="formatMessage(commonMessages.clearButton)"
+						class="!text-primary"
+						@click="clearProjectSelection()"
+					>
+						<XIcon class="cq-show-icon hidden" />
+						<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+					</button>
+				</ButtonStyled>
 			</div>
 
 			<div class="ml-auto flex items-center gap-0.5">
-				<Button
-					v-tooltip="formatMessage(messages.editLinksButton)"
-					type="colored"
-					color="brand"
-					@click="showEditLinksModal()"
-				>
-					<EditIcon aria-hidden="true" />
-					<span class="bar-label">{{ formatMessage(messages.editLinksButton) }}</span>
-				</Button>
+				<ButtonStyled color="brand">
+					<button v-tooltip="formatMessage(messages.editLinksButton)" @click="showEditLinksModal()">
+						<EditIcon />
+						<span class="bar-label">{{ formatMessage(messages.editLinksButton) }}</span>
+					</button>
+				</ButtonStyled>
 			</div>
 		</FloatingActionBar>
 	</div>
@@ -340,15 +356,13 @@ import {
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	ButtonLink,
+	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	CopyCode,
 	defineMessages,
 	FloatingActionBar,
-	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,

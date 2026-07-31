@@ -11,24 +11,27 @@
 				{{ version.name }}
 			</p>
 		</div>
-		<ButtonLink
-			type="colored"
-			color="brand"
-			:href="downloadUrl"
-			:download="primaryFilename"
-			class="min-w-0"
-			@click="emit('onDownload')"
-		>
-			<DownloadIcon aria-hidden="true" />
-			Download
-		</ButtonLink>
-		<IconButton
-			label="View version"
-			class="min-w-0"
-			@click="emit('onNavigate', `/project/${props.version.project_id}/version/${props.version.id}`)"
-		>
-			<ExternalIcon aria-hidden="true" />
-		</IconButton>
+		<ButtonStyled color="brand">
+			<a
+				:href="downloadUrl"
+				:download="primaryFilename"
+				class="min-w-0"
+				@click="emit('onDownload')"
+			>
+				<DownloadIcon aria-hidden="true" /> Download
+			</a>
+		</ButtonStyled>
+		<ButtonStyled circular>
+			<button
+				class="min-w-0"
+				aria-label="View version"
+				@click="
+					emit('onNavigate', `/project/${props.version.project_id}/version/${props.version.id}`)
+				"
+			>
+				<ExternalIcon aria-hidden="true" />
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 
@@ -37,9 +40,7 @@ import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import type { Version, VersionFile } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import ButtonLink from '../base/buttons/ButtonLink.vue'
-import IconButton from '../base/buttons/IconButton.vue'
-import { VersionChannelIndicator } from '../index'
+import { ButtonStyled, VersionChannelIndicator } from '../index'
 
 const props = defineProps<{
 	version: Version

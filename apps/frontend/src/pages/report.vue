@@ -23,22 +23,21 @@
 					})
 				}}
 				<div class="flex gap-2">
-					<ButtonLink v-if="itemLink" :to="itemLink">
-						<LeftArrowIcon aria-hidden="true" />
-						{{
-							formatMessage(messages.backToItem, {
-								item: formatReportItemType(formatMessage, reportItem),
-							})
-						}}
-					</ButtonLink>
-					<ButtonLink
-						type="colored"
-						color="brand"
-						:to="`/dashboard/report/${existingReport.id}`"
-					>
-						{{ formatMessage(messages.goToReport) }}
-						<RightArrowIcon aria-hidden="true" />
-					</ButtonLink>
+					<ButtonStyled v-if="itemLink">
+						<nuxt-link :to="itemLink">
+							<LeftArrowIcon />
+							{{
+								formatMessage(messages.backToItem, {
+									item: formatReportItemType(formatMessage, reportItem),
+								})
+							}}
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<nuxt-link :to="`/dashboard/report/${existingReport.id}`">
+							{{ formatMessage(messages.goToReport) }} <RightArrowIcon />
+						</nuxt-link>
+					</ButtonStyled>
 				</div>
 			</div>
 			<template v-else>
@@ -197,15 +196,11 @@
 								item: formatReportItemType(formatMessage, reportItem),
 							})
 						}}
-						<ButtonLink
-							type="colored"
-							color="brand"
-							:to="`/dashboard/report/${existingReport.id}`"
-							class="w-fit"
-						>
-							{{ formatMessage(messages.goToReport) }}
-							<RightArrowIcon aria-hidden="true" />
-						</ButtonLink>
+						<ButtonStyled color="brand">
+							<nuxt-link :to="`/dashboard/report/${existingReport.id}`" class="w-fit">
+								{{ formatMessage(messages.goToReport) }} <RightArrowIcon />
+							</nuxt-link>
+						</ButtonStyled>
 					</template>
 					<template v-else>
 						<div class="flex flex-col gap-2" :class="{ hidden: !reportItemID }">
@@ -257,17 +252,16 @@
 							/>
 						</div>
 						<div :class="{ hidden: !reportType }">
-							<Button
-								id="submit-button"
-								type="colored"
-								color="brand"
-								:loading="submitLoading"
-								:disabled="!canSubmit"
-								@click="submitReport"
-							>
-								<SendIcon aria-hidden="true" />
-								{{ formatMessage(messages.submitReport) }}
-							</Button>
+							<ButtonStyled color="brand">
+								<button
+									id="submit-button"
+									:disabled="submitLoading || !canSubmit"
+									@click="submitReport"
+								>
+									<SendIcon aria-hidden="true" />
+									{{ formatMessage(messages.submitReport) }}
+								</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</div>
@@ -290,11 +284,10 @@ import {
 	VersionIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	AutoLink,
 	Avatar,
-	ButtonLink,
+	ButtonStyled,
 	commonMessages,
 	defineMessage,
 	defineMessages,

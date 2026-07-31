@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import StackedAdmonitionsRaw, {
 	type StackedAdmonitionItem,
 } from '../../components/base/StackedAdmonitions.vue'
-import Button from '../../components/base/buttons/Button.vue'
 
 // The generic type signature of StackedAdmonitions breaks Storybook's Meta
 // inference and Vue's components record type. Cast to `any` for story wiring;
@@ -383,7 +383,7 @@ interface RichItem extends StackedAdmonitionItem {
 
 export const RichContent: Story = {
 	render: () => ({
-		components: { StackedAdmonitions, Admonition, Button },
+		components: { StackedAdmonitions, Admonition, ButtonStyled },
 		setup() {
 			const items = ref<RichItem[]>([
 				{
@@ -429,8 +429,12 @@ export const RichContent: Story = {
 					>
 						{{ item.body }}
 						<template #top-right-actions>
-							<Button v-if="item.canCancel" type="outlined" class="!border" @click="dismiss(item.id)">Cancel</Button>
-							<Button v-if="item.canRetry" color="red" type="colored" @click="dismiss(item.id)">Retry</Button>
+							<ButtonStyled v-if="item.canCancel" type="outlined" color="blue">
+								<button class="!border" type="button" @click="dismiss(item.id)">Cancel</button>
+							</ButtonStyled>
+							<ButtonStyled v-if="item.canRetry" color="red">
+								<button type="button" @click="dismiss(item.id)">Retry</button>
+							</ButtonStyled>
 						</template>
 					</Admonition>
 				</template>

@@ -3,6 +3,7 @@ import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
+	ButtonStyled,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
@@ -10,7 +11,6 @@ import {
 	StyledInput,
 	TagItem,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { ref } from 'vue'
 
 const { addNotification } = injectNotificationManager()
@@ -181,18 +181,24 @@ defineExpose({ show, hide })
 						wrapper-class="w-full"
 						autocomplete="off"
 					/>
-					<Button type="quiet" color="green" class="shrink-0" @click="() => assign(true)">
-						<PlusIcon aria-hidden="true" />
-						Add server
-					</Button>
-					<Button type="quiet" color="blue" class="shrink-0" @click="() => assign(false)">
-						<PlusIcon aria-hidden="true" />
-						Add node
-					</Button>
-					<Button type="quiet" color="red" class="shrink-0" @click="() => unassignDetect()">
-						<XIcon aria-hidden="true" />
-						Remove
-					</Button>
+					<ButtonStyled color="green" color-fill="text">
+						<button class="shrink-0" @click="() => assign(true)">
+							<PlusIcon />
+							Add server
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="blue" color-fill="text">
+						<button class="shrink-0" @click="() => assign(false)">
+							<PlusIcon />
+							Add node
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red" color-fill="text">
+						<button class="shrink-0" @click="() => unassignDetect()">
+							<XIcon />
+							Remove
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>

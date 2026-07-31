@@ -6,14 +6,18 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="modal?.hide()">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button type="colored" color="red" @click="confirm">
-					<TrashIcon aria-hidden="true" />
-					{{ formatMessage(messages.deleteButton) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="modal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button @click="confirm">
+						<TrashIcon />
+						{{ formatMessage(messages.deleteButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -21,9 +25,9 @@
 
 <script setup lang="ts">
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	NewModal,

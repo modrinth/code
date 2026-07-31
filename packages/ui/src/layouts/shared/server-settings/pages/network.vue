@@ -16,16 +16,18 @@
 							placeholder="e.g. Secondary allocation"
 						/>
 						<div class="mb-1 mt-4 flex justify-end gap-2.5">
-							<Button @click="editAllocationModal?.hide()">Cancel</Button>
-							<Button
-								v-tooltip="advancedActionTooltip"
-								type="colored"
-								color="brand"
-								native-type="submit"
-								:disabled="!editAllocationName || creatingAllocation || !canUseAdvancedSettings"
-							>
-								<SaveIcon aria-hidden="true" /> Update allocation
-							</Button>
+							<ButtonStyled>
+								<button @click="editAllocationModal?.hide()">Cancel</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand">
+								<button
+									v-tooltip="advancedActionTooltip"
+									:disabled="!editAllocationName || creatingAllocation || !canUseAdvancedSettings"
+									type="submit"
+								>
+									<SaveIcon /> Update allocation
+								</button>
+							</ButtonStyled>
 						</div>
 					</form>
 				</NewModal>
@@ -59,15 +61,9 @@
 								allocationsError?.message ?? 'Unknown error'
 							}}</span>
 						</p>
-						<Button
-							class="mt-6 !w-full"
-							size="lg"
-							type="colored"
-							color="brand"
-							@click="() => refetchAllocations()"
-						>
-							Retry
-						</Button>
+						<ButtonStyled size="large" color="brand" @click="() => refetchAllocations()">
+							<button class="mt-6 !w-full">Retry</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>
@@ -87,16 +83,16 @@
 								placeholder="e.g. Secondary allocation"
 							/>
 
-							<Button
-								v-tooltip="createAllocationTooltip"
-								type="colored"
-								color="brand"
-								:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
-								@click="addNewAllocation"
-							>
-								<PlusIcon aria-hidden="true" />
-								<span>Create allocation</span>
-							</Button>
+							<ButtonStyled color="brand">
+								<button
+									v-tooltip="createAllocationTooltip"
+									:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
+									@click="addNewAllocation"
+								>
+									<PlusIcon />
+									<span>Create allocation</span>
+								</button>
+							</ButtonStyled>
 						</div>
 
 						<Table :columns="allocationColumns" :data="allocationRows" row-key="port">
@@ -109,33 +105,30 @@
 							</template>
 							<template #cell-actions="{ row }">
 								<div class="flex items-center justify-end gap-2">
-									<IconButton
-										:label="formatMessage(messages.copyAllocation)"
-										type="quiet"
-										@click="copyText(`${serverIP}:${row.port}`)"
-									>
-										<CopyIcon aria-hidden="true" />
-									</IconButton>
+									<ButtonStyled type="transparent" circular>
+										<button @click="copyText(`${serverIP}:${row.port}`)">
+											<CopyIcon />
+										</button>
+									</ButtonStyled>
 									<template v-if="!row.primary">
-										<IconButton
-											v-tooltip="advancedActionTooltip"
-											:label="formatMessage(messages.editAllocation)"
-											type="quiet"
-											:disabled="!canUseAdvancedSettings"
-											@click="showEditAllocationModal(row.port)"
-										>
-											<PencilIcon aria-hidden="true" />
-										</IconButton>
-										<IconButton
-											v-tooltip="advancedActionTooltip"
-											:label="formatMessage(messages.deleteAllocation)"
-											type="outlined"
-											color="red"
-											:disabled="!canUseAdvancedSettings"
-											@click="showConfirmDeleteModal(row.port)"
-										>
-											<TrashIcon aria-hidden="true" />
-										</IconButton>
+										<ButtonStyled type="transparent" circular>
+											<button
+												v-tooltip="advancedActionTooltip"
+												:disabled="!canUseAdvancedSettings"
+												@click="showEditAllocationModal(row.port)"
+											>
+												<PencilIcon />
+											</button>
+										</ButtonStyled>
+										<ButtonStyled type="outlined" circular color="red">
+											<button
+												v-tooltip="advancedActionTooltip"
+												:disabled="!canUseAdvancedSettings"
+												@click="showConfirmDeleteModal(row.port)"
+											>
+												<TrashIcon />
+											</button>
+										</ButtonStyled>
 									</template>
 								</div>
 							</template>
@@ -160,14 +153,16 @@
 								:placeholder="exampleDomain"
 							/>
 
-							<Button
-								class="!w-full sm:!w-auto"
-								:disabled="userDomain == ''"
-								@click="exportDnsRecords"
-							>
-								<UploadIcon aria-hidden="true" />
-								<span>Export</span>
-							</Button>
+							<ButtonStyled>
+								<button
+									class="!w-full sm:!w-auto"
+									:disabled="userDomain == ''"
+									@click="exportDnsRecords"
+								>
+									<UploadIcon />
+									<span>Export</span>
+								</button>
+							</ButtonStyled>
 						</div>
 
 						<Table :columns="dnsColumns" :data="dnsRecords">
@@ -228,33 +223,15 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
+import { ButtonStyled, ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import IconButton from '@modrinth/ui/src/components/base/buttons/IconButton.vue'
 
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	copyAllocation: {
-		id: 'servers.network.copy-allocation',
-		defaultMessage: 'Copy allocation address',
-	},
-	editAllocation: {
-		id: 'servers.network.edit-allocation',
-		defaultMessage: 'Edit allocation',
-	},
-	deleteAllocation: {
-		id: 'servers.network.delete-allocation',
-		defaultMessage: 'Delete allocation',
-	},
-})
 const { addNotification } = injectNotificationManager()
 const { server, serverId } = injectModrinthServerContext()
 const client = injectModrinthClient()

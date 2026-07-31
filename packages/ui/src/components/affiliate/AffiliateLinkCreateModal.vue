@@ -46,17 +46,13 @@
 						input-class="pl-10"
 					/>
 				</div>
-				<Button
-					type="colored"
-					color="brand"
-					:disabled="!canCreate"
-					:loading="creatingLink"
-					@click="createAffiliateLink"
-				>
-					<SpinnerIcon v-if="creatingLink" aria-hidden="true" class="animate-spin" />
-					<PlusIcon v-else aria-hidden="true" />
-					{{ formatMessage(creatingLink ? messages.creatingButton : messages.createButton) }}
-				</Button>
+				<ButtonStyled color="brand">
+					<button :disabled="creatingLink || !canCreate" @click="createAffiliateLink">
+						<SpinnerIcon v-if="creatingLink" class="animate-spin" />
+						<PlusIcon v-else />
+						{{ formatMessage(creatingLink ? messages.creatingButton : messages.createButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -68,8 +64,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import Button from '../base/buttons/Button.vue'
-import { AutoBrandIcon, NewModal, StyledInput } from '../index'
+import { AutoBrandIcon, ButtonStyled, NewModal, StyledInput } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(

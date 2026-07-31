@@ -2,7 +2,7 @@ import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Admonition from '../../components/base/Admonition.vue'
-import Button from '../../components/base/buttons/Button.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 
 type AdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 type ActionType = 'Cancel' | 'Retry' | 'Dismiss'
@@ -191,7 +191,7 @@ const sections: CopySection[] = [
 
 export const AllCopy: Story = {
 	render: () => ({
-		components: { Admonition, Button, RotateCounterClockwiseIcon },
+		components: { Admonition, ButtonStyled, RotateCounterClockwiseIcon },
 		setup() {
 			return { sections }
 		},
@@ -221,14 +221,19 @@ export const AllCopy: Story = {
 									"
 									#top-right-actions
 								>
-									<Button v-if="item.action === 'Cancel'" type="outlined" class="!border">Cancel</Button>
-									<Button
+									<ButtonStyled v-if="item.action === 'Cancel'" type="outlined" color="blue">
+										<button class="!border" type="button">Cancel</button>
+									</ButtonStyled>
+									<ButtonStyled
 										v-else
 										type="outlined"
-									 class="!border">
+										color="red"
+									>
+										<button class="!border" type="button">
 											<RotateCounterClockwiseIcon class="size-5" />
 											Retry
-										</Button>
+										</button>
+									</ButtonStyled>
 								</template>
 							</Admonition>
 						</div>
@@ -241,7 +246,7 @@ export const AllCopy: Story = {
 
 export const TitleTreatmentExperiment: Story = {
 	render: () => ({
-		components: { Admonition, Button, RotateCounterClockwiseIcon },
+		components: { Admonition, ButtonStyled, RotateCounterClockwiseIcon },
 		template: /* html */ `
 			<div style="max-width: 840px;">
 				<Admonition
@@ -251,10 +256,12 @@ export const TitleTreatmentExperiment: Story = {
 				>
 					Something went wrong while creating World backup. Please try again or contact support if the issue continues.
 					<template #top-right-actions>
-						<Button type="outlined" class="!border">
+						<ButtonStyled type="outlined" color="red">
+							<button class="!border" type="button">
 								<RotateCounterClockwiseIcon class="size-5" />
 								Retry
-							</Button>
+							</button>
+						</ButtonStyled>
 					</template>
 				</Admonition>
 			</div>

@@ -85,55 +85,66 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<Button v-if="isInstalling" color="brand" size="lg" type="colored" disabled>
+				<ButtonStyled v-if="isInstalling" color="brand" size="large">
+					<button type="button" disabled>
 						{{ formatMessage(commonMessages.installingLabel) }}
-					</Button>
-				<Button v-else-if="playing" color="red" size="lg" type="colored" :disabled="stopping" @click="emit('stop')">
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="playing" color="red" size="large">
+					<button type="button" :disabled="stopping" @click="emit('stop')">
 						<StopCircleIcon />
 						{{
 							stopping ? formatMessage(messages.stopping) : formatMessage(commonMessages.stopButton)
 						}}
-					</Button>
-				<Button v-else-if="instance.quarantined" color="brand" size="lg" type="colored" v-tooltip="formatMessage(messages.lockedPlayTooltip)" disabled>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="instance.quarantined" color="brand" size="large">
+					<button v-tooltip="formatMessage(messages.lockedPlayTooltip)" type="button" disabled>
 						<PlayIcon />
 						{{ formatMessage(commonMessages.playButton) }}
-					</Button>
-				<Button v-else-if="instance.install_stage !== 'installed'" color="brand" size="lg" type="colored" @click="emit('repair')">
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
+					<button type="button" @click="emit('repair')">
 						<DownloadIcon />
 						{{ formatMessage(messages.repair) }}
-					</Button>
-				<SplitButton
+					</button>
+				</ButtonStyled>
+				<JoinedButtons
 					v-else-if="!loading && isServerInstance"
-					:options="serverPlayOptions"
+					:actions="serverPlayActions"
 					color="brand"
-					size="lg"
-					type="colored"
-					:menu-label="formatMessage(messages.launchInstance)"
-					@click="emit('playServer')"
-				>
-					<PlayIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.playButton) }}
-				</SplitButton>
-				<Button v-else-if="!loading" color="brand" size="lg" type="colored" @click="emit('play')">
+					size="large"
+				/>
+				<ButtonStyled v-else-if="!loading" color="brand" size="large">
+					<button type="button" @click="emit('play')">
 						<PlayIcon />
 						{{ formatMessage(commonMessages.playButton) }}
-					</Button>
-				<Button v-else color="brand" size="lg" type="colored" disabled>{{ formatMessage(messages.starting) }}</Button>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else color="brand" size="large">
+					<button type="button" disabled>{{ formatMessage(messages.starting) }}</button>
+				</ButtonStyled>
 
-				<IconButton size="lg" :label="formatMessage(messages.instanceSettings)"
+				<ButtonStyled circular size="large">
+					<button
 						v-tooltip="formatMessage(messages.instanceSettings)"
+						type="button"
+						:aria-label="formatMessage(messages.instanceSettings)"
 						@click="emit('settings')"
 					>
 						<SettingsIcon />
-					</IconButton>
-				<TeleportOverflowMenu
-					:options="moreActions"
-					:label="formatMessage(messages.moreActions)"
-					size="lg"
-					type="quiet"
-				>
-					<MoreVerticalIcon aria-hidden="true" />
-				</TeleportOverflowMenu>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular size="large" type="transparent">
+					<TeleportOverflowMenu
+						:options="moreActions"
+						:tooltip="formatMessage(messages.moreActions)"
+						:aria-label="formatMessage(messages.moreActions)"
+					>
+						<MoreVerticalIcon />
+					</TeleportOverflowMenu>
+				</ButtonStyled>
 			</PageHeaderActions>
 		</template>
 	</PageHeader>
@@ -156,23 +167,23 @@ import {
 	TimerIcon,
 	UnknownIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	IconButton,
 	Avatar,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
+	type JoinedButtonAction,
+	JoinedButtons,
 	LoaderIcon as ServerLoaderIcon,
-	type OverflowMenuOption,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
 	type ServerLoader,
-	SplitButton,
 	TeleportOverflowMenu,
+	type TeleportOverflowMenuItem,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
@@ -339,7 +350,13 @@ const playtimeLabel = computed(() => {
 	const seconds = Math.floor(props.timePlayed)
 	return `${seconds} second${seconds > 1 ? 's' : ''}`
 })
-const serverPlayOptions = computed<OverflowMenuOption[]>(() => [
+const serverPlayActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'join_server',
+		label: formatMessage(commonMessages.playButton),
+		icon: PlayIcon,
+		action: () => emit('playServer'),
+	},
 	{
 		id: 'launch_instance',
 		label: formatMessage(messages.launchInstance),
@@ -347,8 +364,8 @@ const serverPlayOptions = computed<OverflowMenuOption[]>(() => [
 		action: () => emit('play'),
 	},
 ])
-const moreActions = computed<OverflowMenuOption[]>(() => {
-	const actions: OverflowMenuOption[] = [
+const moreActions = computed<TeleportOverflowMenuItem[]>(() => {
+	const actions: TeleportOverflowMenuItem[] = [
 		{
 			id: 'open-folder',
 			label: formatMessage(messages.openFolder),
@@ -376,12 +393,12 @@ const moreActions = computed<OverflowMenuOption[]>(() => {
 
 	if (props.instance.shared_instance?.role === 'member') {
 		actions.push(
-			{ type: 'divider' },
+			{ divider: true },
 			{
 				id: 'report-shared-instance',
 				label: formatMessage(commonMessages.reportButton),
 				icon: ReportIcon,
-				tone: 'red',
+				color: 'red',
 				action: (event) => emit('report', event),
 			},
 		)

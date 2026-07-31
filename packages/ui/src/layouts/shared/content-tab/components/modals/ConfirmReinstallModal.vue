@@ -19,14 +19,18 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="modal?.hide()">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button type="colored" color="red" :disabled="buttonsDisabled" @click="confirm">
-					<DownloadIcon aria-hidden="true" />
-					{{ formatMessage(messages.reinstallButton) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="modal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button :disabled="buttonsDisabled" @click="confirm">
+						<DownloadIcon />
+						{{ formatMessage(messages.reinstallButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -37,7 +41,7 @@ import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

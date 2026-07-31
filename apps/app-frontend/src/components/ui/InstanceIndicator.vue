@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
-import { Avatar, ButtonLink, FormattedTag } from '@modrinth/ui'
+import { Avatar, ButtonStyled, FormattedTag } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed } from 'vue'
 
@@ -48,10 +48,9 @@ const instanceLink = computed(() => {
 				</span>
 			</span>
 		</router-link>
-		<ButtonLink :to="instanceLink">
-			<LeftArrowIcon aria-hidden="true" />
-			Back to instance
-		</ButtonLink>
+		<ButtonStyled>
+			<router-link :to="instanceLink"> <LeftArrowIcon /> Back to instance </router-link>
+		</ButtonStyled>
 	</div>
 </template>
 

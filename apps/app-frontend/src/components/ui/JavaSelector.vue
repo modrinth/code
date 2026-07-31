@@ -17,21 +17,23 @@
 					}
 				"
 			/>
-			<Button
-				type="quiet"
+			<ButtonStyled
 				:color="
 					!hoveringTest && !testingJava
 						? testingJavaSuccess === true
 							? 'green'
 							: 'red'
-						: undefined
+						: 'standard'
 				"
-				:aria-label="formatMessage(messages.testJavaInstallation)"
-				class="!shadow-none"
-				:disabled="testingJava || props.disabled"
-				@click="runTest(props.modelValue?.path)"
-				@mouseenter="!props.disabled && (hoveringTest = true)"
-				@mouseleave="hoveringTest = false"
+				color-fill="text"
+			>
+				<button
+					:aria-label="formatMessage(messages.testJavaInstallation)"
+					class="!shadow-none"
+					:disabled="testingJava || props.disabled"
+					@click="runTest(props.modelValue?.path)"
+					@mouseenter="!props.disabled && (hoveringTest = true)"
+					@mouseleave="hoveringTest = false"
 				>
 					<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
 					<CheckCircleIcon
@@ -40,10 +42,12 @@
 					/>
 					<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
 					<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
-				</Button>
+				</button>
+			</ButtonStyled>
 		</div>
 		<span class="installation-buttons">
-			<Button v-if="props.version"
+			<ButtonStyled v-if="props.version">
+				<button
 					v-tooltip="
 						testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
 					"
@@ -57,15 +61,20 @@
 							? formatMessage(messages.installing)
 							: formatMessage(messages.installRecommended)
 					}}
-				</Button>
-			<Button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
 					<SearchIcon />
 					{{ formatMessage(messages.detect) }}
-				</Button>
-			<Button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
 					<FolderSearchIcon />
 					{{ formatMessage(messages.browse) }}
-				</Button>
+				</button>
+			</ButtonStyled>
 		</span>
 	</div>
 </template>
@@ -80,8 +89,8 @@ import {
 	SpinnerIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	StyledInput,

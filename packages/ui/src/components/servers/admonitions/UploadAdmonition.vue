@@ -16,7 +16,11 @@
 			}}%)
 		</span>
 		<template v-if="cancelable" #top-right-actions>
-			<Button type="outlined" :loading="cancelling" @click="$emit('cancel')">Cancel</Button>
+			<ButtonStyled type="outlined" color="blue">
+				<button class="!border" type="button" :disabled="cancelling" @click="$emit('cancel')">
+					Cancel
+				</button>
+			</ButtonStyled>
 		</template>
 	</Admonition>
 </template>
@@ -26,7 +30,7 @@ import { UploadIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { useFormatBytes } from '#ui/composables'
 import { injectModrinthServerContext } from '#ui/providers'
 

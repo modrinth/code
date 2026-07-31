@@ -6,12 +6,12 @@ import { computed, ref, useTemplateRef } from 'vue'
 
 import {
 	Accordion,
+	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	NewModal,
 	StyledInput,
 } from '#ui/components'
-import Button from '#ui/components/base/buttons/Button.vue'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import AttributionGroupFilePicker from './AttributionGroupFilePicker.vue'
@@ -223,19 +223,22 @@ defineExpose({ show, hide })
 				</div>
 			</Accordion>
 			<div class="flex justify-end gap-2 w-full">
-				<Button type="outlined" :disabled="createMutation.isPending.value" @click="hide">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
-				<Button type="colored" color="brand" :disabled="!canSubmit" @click="handleSubmit">
-					<SpinnerIcon
-						v-if="createMutation.isPending.value"
-						class="animate-spin"
-						aria-hidden="true"
-					/>
-					<PlusIcon v-else aria-hidden="true" />
-					Add to global database
-				</Button>
+				<ButtonStyled type="outlined">
+					<button type="button" :disabled="createMutation.isPending.value" @click="hide">
+						<XIcon class="size-4 shrink-0" />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button type="button" :disabled="!canSubmit" @click="handleSubmit">
+						<SpinnerIcon
+							v-if="createMutation.isPending.value"
+							class="size-4 shrink-0 animate-spin"
+						/>
+						<PlusIcon v-else class="size-4 shrink-0" />
+						Add to global database
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>

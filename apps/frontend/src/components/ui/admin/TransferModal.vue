@@ -56,10 +56,12 @@
 							placeholder="us-vin200, us-vin201"
 							@keydown.enter.prevent="addNodes"
 						/>
-						<Button type="quiet" color="blue" class="shrink-0" @click="addNodes">
-							<PlusIcon aria-hidden="true" />
-							Add
-						</Button>
+						<ButtonStyled color="blue" color-fill="text">
+							<button class="shrink-0" @click="addNodes">
+								<PlusIcon />
+								Add
+							</button>
+						</ButtonStyled>
 					</div>
 					<div v-if="selectedNodes.length" class="mt-1 flex flex-wrap gap-2">
 						<TagItem v-for="h in selectedNodes" :key="`node-${h}`" :action="() => removeNode(h)">
@@ -120,10 +122,12 @@
 						placeholder="ovh-gen4"
 						@keydown.enter.prevent="addTag"
 					/>
-					<Button type="quiet" color="blue" class="shrink-0" @click="addTag">
-						<PlusIcon aria-hidden="true" />
-						Add
-					</Button>
+					<ButtonStyled color="blue" color-fill="text">
+						<button class="shrink-0" @click="addTag">
+							<PlusIcon />
+							Add
+						</button>
+					</ButtonStyled>
 				</div>
 				<div v-if="selectedTags.length" class="mt-1 flex flex-wrap gap-2">
 					<TagItem v-for="t in selectedTags" :key="`tag-${t}`" :action="() => removeTag(t)">
@@ -171,19 +175,18 @@
 			</div>
 
 			<div class="flex gap-2">
-				<Button
-					type="colored"
-					color="brand"
-					:disabled="submitDisabled || submitting"
-					@click="submit"
-				>
-					<SendIcon aria-hidden="true" />
-					{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
-				</Button>
-				<Button @click="modal?.hide?.()">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
+				<ButtonStyled color="brand">
+					<button :disabled="submitDisabled || submitting" @click="submit">
+						<SendIcon aria-hidden="true" />
+						{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="modal?.hide?.()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -192,6 +195,7 @@
 <script setup lang="ts">
 import { PlusIcon, SendIcon, XIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Chips,
 	Combobox,
 	injectModrinthClient,
@@ -201,7 +205,6 @@ import {
 	TagItem,
 	Toggle,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 

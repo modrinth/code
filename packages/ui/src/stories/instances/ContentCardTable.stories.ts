@@ -3,8 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { onMounted, onUnmounted, ref } from 'vue'
 
-import Button from '../../components/base/buttons/Button.vue'
-import IconButton from '../../components/base/buttons/IconButton.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import ContentCardTable from '../../layouts/shared/content-tab/components/ContentCardTable.vue'
 import type { ContentCardTableItem } from '../../layouts/shared/content-tab/types'
 
@@ -540,7 +539,7 @@ export const InteractiveActions: Story = {
 
 export const WithCustomItemButtons: Story = {
 	render: () => ({
-		components: { ContentCardTable, IconButton, EyeIcon, FolderOpenIcon, DownloadIcon },
+		components: { ContentCardTable, ButtonStyled, EyeIcon, FolderOpenIcon, DownloadIcon },
 		setup() {
 			return { items: sampleItems }
 		},
@@ -552,17 +551,23 @@ export const WithCustomItemButtons: Story = {
 				@delete="(id) => console.log('Delete', id)"
 			>
 				<template #itemButtonsLeft="{ item }">
-					<IconButton v-tooltip="'Download'" type="quiet" color="green" :label="'Download'" @click="console.log('Download', item.id)">
-						<DownloadIcon aria-hidden="true" class="size-5" />
-					</IconButton>
+					<ButtonStyled v-tooltip="'Download'" circular type="transparent" color="green" color-fill="text">
+						<button @click="console.log('Download', item.id)">
+							<DownloadIcon class="size-5" />
+						</button>
+					</ButtonStyled>
 				</template>
 				<template #itemButtonsRight="{ item }">
-					<IconButton v-tooltip="'View on Modrinth'" type="quiet" :label="'View on Modrinth'" @click="console.log('View', item.id)">
-						<EyeIcon aria-hidden="true" class="size-5 text-secondary" />
-					</IconButton>
-					<IconButton v-tooltip="'Open folder'" type="quiet" :label="'Open folder'" @click="console.log('Open folder', item.id)">
-						<FolderOpenIcon aria-hidden="true" class="size-5 text-secondary" />
-					</IconButton>
+					<ButtonStyled v-tooltip="'View on Modrinth'" circular type="transparent">
+						<button @click="console.log('View', item.id)">
+							<EyeIcon class="size-5 text-secondary" />
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-tooltip="'Open folder'" circular type="transparent">
+						<button @click="console.log('Open folder', item.id)">
+							<FolderOpenIcon class="size-5 text-secondary" />
+						</button>
+					</ButtonStyled>
 				</template>
 			</ContentCardTable>
 		`,
@@ -577,13 +582,15 @@ export const WithEmptyState: Story = {
 
 export const WithCustomEmptyState: Story = {
 	render: () => ({
-		components: { Button, ContentCardTable },
+		components: { ContentCardTable, ButtonStyled },
 		template: /*html*/ `
 			<ContentCardTable :items="[]">
 				<template #empty>
 					<div class="flex flex-col items-center gap-4 py-8">
 						<span class="text-lg text-secondary">No mods installed</span>
-						<Button color="green" type="colored">Browse mods</Button>
+						<ButtonStyled color="green">
+							<button>Browse mods</button>
+						</ButtonStyled>
 					</div>
 				</template>
 			</ContentCardTable>
@@ -774,7 +781,7 @@ export const WithOverflowMenu: Story = {
 
 export const BulkActionsDemo: Story = {
 	render: () => ({
-		components: { Button, ContentCardTable },
+		components: { ContentCardTable, ButtonStyled },
 		setup() {
 			const items = ref<ContentCardTableItem[]>([
 				{ ...sodiumItem, enabled: true },
@@ -818,9 +825,15 @@ export const BulkActionsDemo: Story = {
 				<div class="flex items-center gap-2">
 					<span class="text-sm text-secondary">{{ selectedIds.length }} selected</span>
 					<template v-if="selectedIds.length > 0">
-						<Button size="sm" color="green" type="colored" @click="enableSelected">Enable</Button>
-						<Button size="sm" type="quiet" @click="disableSelected">Disable</Button>
-						<Button size="sm" color="red" type="colored" @click="deleteSelected">Delete</Button>
+						<ButtonStyled size="small" color="green">
+							<button @click="enableSelected">Enable</button>
+						</ButtonStyled>
+						<ButtonStyled size="small" type="transparent">
+							<button @click="disableSelected">Disable</button>
+						</ButtonStyled>
+						<ButtonStyled size="small" color="red">
+							<button @click="deleteSelected">Delete</button>
+						</ButtonStyled>
 					</template>
 				</div>
 				<ContentCardTable

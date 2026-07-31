@@ -6,15 +6,11 @@
 				v-tooltip="'Can be used without the checklist open if setting enabled.'"
 			/>
 			{{ props.title }}
-			<IconButton
-				:label="formatMessage(commonMessages.resetButton)"
-				size="sm"
-				type="quiet"
-				:disabled="!hasChanged"
-				@click="resetToDefault"
-			>
-				<RotateCounterClockwiseIcon aria-hidden="true" />
-			</IconButton>
+			<ButtonStyled size="small" circular type="transparent">
+				<Button :disabled="!hasChanged" @click="resetToDefault">
+					<RotateCounterClockwiseIcon />
+				</Button>
+			</ButtonStyled>
 		</span>
 		<div class="flex flex-row items-center gap-2">
 			<kbd
@@ -46,8 +42,7 @@
 <script setup lang="ts">
 import { GlobeIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
 import { type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
-import { commonMessages, useVIntl } from '@modrinth/ui'
-import IconButton from '@modrinth/ui/src/components/base/buttons/IconButton.vue'
+import { Button, ButtonStyled } from '@modrinth/ui'
 import { onUnmounted } from 'vue'
 
 const props = defineProps<{
@@ -58,7 +53,6 @@ const props = defineProps<{
 	onChange: (definitions: KeybindDefinition[]) => void
 }>()
 
-const { formatMessage } = useVIntl()
 const keybinding = useTemplateRef('keybinding')
 const definitions = ref(JSON.parse(JSON.stringify(props.definitions)))
 const editing = ref(-1)

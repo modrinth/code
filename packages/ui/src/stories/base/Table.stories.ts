@@ -3,9 +3,9 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
 import Badge from '../../components/base/Badge.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import OverflowMenu from '../../components/base/OverflowMenu.vue'
 import Table from '../../components/base/Table.vue'
-import Button from '../../components/base/buttons/Button.vue'
 
 interface User {
 	id: string
@@ -365,7 +365,7 @@ export const WithCustomHeaderSlots: StoryObj = {
 export const WithHeaderSlot: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Button },
+		components: { Table, ButtonStyled },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -383,7 +383,9 @@ export const WithHeaderSlot: StoryObj = {
 					<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
 						<div class="text-lg font-semibold text-contrast">Team Members</div>
 						<div class="flex items-center gap-2">
-							<Button type="colored" color="brand">Invite member</Button>
+							<ButtonStyled color="brand">
+								<button type="button">Invite member</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</template>
@@ -395,7 +397,7 @@ export const WithHeaderSlot: StoryObj = {
 export const WithActionsColumn: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Button, EditIcon, TrashIcon },
+		components: { Table, ButtonStyled, EditIcon, TrashIcon },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -419,14 +421,18 @@ export const WithActionsColumn: StoryObj = {
 			<Table :columns="columns" :data="data">
 				<template #cell-actions="{ row }">
 					<div class="flex items-center justify-end gap-2">
-						<Button @click="handleEdit(row)" type="quiet" color="brand" class="flex items-center gap-1">
-							<EditIcon aria-hidden="true" class="size-4" />
-							Edit
-						</Button>
-						<Button @click="handleDelete(row)" type="quiet" color="red" class="flex items-center gap-1">
-							<TrashIcon aria-hidden="true" class="size-4" />
-							Delete
-						</Button>
+						<ButtonStyled color="brand" type="transparent" @click="handleEdit(row)">
+							<button class="flex items-center gap-1">
+								<EditIcon class="size-4" />
+								Edit
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="red" type="transparent" @click="handleDelete(row)">
+							<button class="flex items-center gap-1">
+								<TrashIcon class="size-4" />
+								Delete
+							</button>
+						</ButtonStyled>
 					</div>
 				</template>
 			</Table>
@@ -437,7 +443,7 @@ export const WithActionsColumn: StoryObj = {
 export const WithLocalizedActionsColumn: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Button, EditIcon, TrashIcon },
+		components: { Table, ButtonStyled, EditIcon, TrashIcon },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Nombre' },
@@ -461,14 +467,18 @@ export const WithLocalizedActionsColumn: StoryObj = {
 			<Table :columns="columns" :data="data">
 				<template #cell-actions="{ row }">
 					<div class="flex items-center justify-end gap-2">
-						<Button @click="handleEdit(row)" type="quiet" color="brand" class="flex items-center gap-1">
-							<EditIcon aria-hidden="true" class="size-4" />
-							Editar
-						</Button>
-						<Button @click="handleDelete(row)" type="quiet" color="red" class="flex items-center gap-1">
-							<TrashIcon aria-hidden="true" class="size-4" />
-							Eliminar
-						</Button>
+						<ButtonStyled color="brand" type="transparent" @click="handleEdit(row)">
+							<button class="flex items-center gap-1">
+								<EditIcon class="size-4" />
+								Editar
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="red" type="transparent" @click="handleDelete(row)">
+							<button class="flex items-center gap-1">
+								<TrashIcon class="size-4" />
+								Eliminar
+							</button>
+						</ButtonStyled>
 					</div>
 				</template>
 			</Table>
@@ -479,7 +489,7 @@ export const WithLocalizedActionsColumn: StoryObj = {
 export const FullFeatured: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Badge, Button, EditIcon, TrashIcon },
+		components: { Table, Badge, ButtonStyled, EditIcon, TrashIcon },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name', enableSorting: true },
@@ -555,14 +565,18 @@ export const FullFeatured: StoryObj = {
 					</template>
 					<template #cell-actions="{ row }">
 						<div class="flex items-center justify-end gap-2">
-							<Button @click="handleEdit(row)" type="quiet" color="brand" class="flex items-center gap-1">
-								<EditIcon aria-hidden="true" class="size-4" />
-								Edit
-							</Button>
-							<Button @click="handleDelete(row)" type="quiet" color="red" class="flex items-center gap-1">
-								<TrashIcon aria-hidden="true" class="size-4" />
-								Delete
-							</Button>
+							<ButtonStyled color="brand" type="transparent" @click="handleEdit(row)">
+								<button class="flex items-center gap-1">
+									<EditIcon class="size-4" />
+									Edit
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="red" type="transparent" @click="handleDelete(row)">
+								<button class="flex items-center gap-1">
+									<TrashIcon class="size-4" />
+									Delete
+								</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</Table>
@@ -696,7 +710,7 @@ export const VirtualizedLargeData: StoryObj = {
 export const WithOverflowMenu: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Badge, Button, OverflowMenu, MoreVerticalIcon, EditIcon, TrashIcon },
+		components: { Table, Badge, ButtonStyled, OverflowMenu, MoreVerticalIcon, EditIcon, TrashIcon },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -752,25 +766,26 @@ export const WithOverflowMenu: StoryObj = {
 				</template>
 				<template #cell-actions="{ row }">
 					<div class="flex justify-end">
-						<OverflowMenu
-							:options="getMenuOptions(row)"
-							type="quiet"
-							aria-label="More options"
-						>
-							<MoreVerticalIcon aria-hidden="true" />
-							<template #edit>
-								<EditIcon class="size-4" aria-hidden="true" />
-								Edit
-							</template>
-							<template #duplicate>
-								<EditIcon class="size-4" aria-hidden="true" />
-								Duplicate
-							</template>
-							<template #delete>
-								<TrashIcon class="size-4" aria-hidden="true" />
-								Delete
-							</template>
-						</OverflowMenu>
+						<ButtonStyled circular type="transparent">
+							<OverflowMenu
+								:options="getMenuOptions(row)"
+								aria-label="More options"
+							>
+								<MoreVerticalIcon aria-hidden="true" />
+								<template #edit>
+									<EditIcon class="size-4" aria-hidden="true" />
+									Edit
+								</template>
+								<template #duplicate>
+									<EditIcon class="size-4" aria-hidden="true" />
+									Duplicate
+								</template>
+								<template #delete>
+									<TrashIcon class="size-4" aria-hidden="true" />
+									Delete
+								</template>
+							</OverflowMenu>
+						</ButtonStyled>
 					</div>
 				</template>
 			</Table>

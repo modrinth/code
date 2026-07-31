@@ -46,20 +46,22 @@
 		</div>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="hideModal">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
-				<Button
-					v-tooltip="createDisabledTooltip"
-					type="colored"
-					color="brand"
-					:disabled="createDisabled"
-					@click="createBackup"
-				>
-					<PlusIcon aria-hidden="true" />
-					Create backup
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="hideModal">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						v-tooltip="createDisabledTooltip"
+						:disabled="createDisabled"
+						@click="createBackup"
+					>
+						<PlusIcon />
+						Create backup
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -78,7 +80,7 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 

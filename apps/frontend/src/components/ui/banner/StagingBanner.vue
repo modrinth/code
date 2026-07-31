@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
 import {
-	IconButton,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	PagewideBanner,
@@ -38,13 +38,11 @@ function hideStagingBanner() {
 			{{ formatMessage(messages.description) }}
 		</template>
 		<template #actions_top_right>
-			<IconButton
-				:label="formatMessage(commonMessages.closeButton)"
-				type="quiet"
-				@click="hideStagingBanner"
-			>
-				<XIcon aria-hidden="true" />
-			</IconButton>
+			<ButtonStyled type="transparent" circular>
+				<button :aria-label="formatMessage(commonMessages.closeButton)" @click="hideStagingBanner">
+					<XIcon aria-hidden="true" />
+				</button>
+			</ButtonStyled>
 		</template>
 	</PagewideBanner>
 </template>

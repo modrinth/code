@@ -400,6 +400,7 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 						!ctx.customModpackFile.value ||
 						!ctx.hasLicensePermission.value,
 					onClick: () => ctx.handleSave(),
+					buttonClass: 'tabular-nums',
 				}
 			: {
 					label: getUploadLabel(ctx),
@@ -412,6 +413,7 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 						!ctx.customModpackFile.value ||
 						!ctx.hasLicensePermission.value,
 					onClick: () => ctx.handleSave(),
+					buttonClass: 'tabular-nums',
 				},
 	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }

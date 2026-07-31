@@ -39,44 +39,40 @@
 				</div>
 				<div class="controls">
 					<div class="buttons">
-						<IconButton :label="formatMessage(messages.close)" class="close" @click="hideImage">
-							<XIcon aria-hidden="true" />
-						</IconButton>
-						<ButtonLink
-							:aria-label="formatMessage(messages.openOriginal)"
-							class="open btn icon-only"
-							target="_blank"
-							:href="
-								expandedGalleryItem.raw_url
-									? expandedGalleryItem.raw_url
-									: 'https://cdn.modrinth.com/placeholder-banner.svg'
-							"
-						>
-							<ExternalIcon aria-hidden="true" />
-						</ButtonLink>
-						<IconButton
-							:label="formatMessage(zoomedIn ? messages.zoomOut : messages.zoomIn)"
-							@click="zoomedIn = !zoomedIn"
-						>
-							<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-							<ContractIcon v-else aria-hidden="true" />
-						</IconButton>
-						<IconButton
-							v-if="filteredGallery.length > 1"
-							:label="formatMessage(messages.previous)"
-							class="previous"
-							@click="previousImage()"
-						>
-							<LeftArrowIcon aria-hidden="true" />
-						</IconButton>
-						<IconButton
-							v-if="filteredGallery.length > 1"
-							:label="formatMessage(messages.next)"
-							class="next"
-							@click="nextImage()"
-						>
-							<RightArrowIcon aria-hidden="true" />
-						</IconButton>
+						<ButtonStyled circular>
+							<button class="close" @click="hideImage">
+								<XIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<a
+								class="open btn icon-only"
+								target="_blank"
+								:href="
+									expandedGalleryItem.raw_url
+										? expandedGalleryItem.raw_url
+										: 'https://cdn.modrinth.com/placeholder-banner.svg'
+								"
+							>
+								<ExternalIcon aria-hidden="true" />
+							</a>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<button @click="zoomedIn = !zoomedIn">
+								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+								<ContractIcon v-else aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="filteredGallery.length > 1" circular>
+							<button class="previous" @click="previousImage()">
+								<LeftArrowIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="filteredGallery.length > 1" circular>
+							<button class="next" @click="nextImage()">
+								<RightArrowIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>
@@ -94,22 +90,13 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonLink, Card, defineMessages, IconButton, useFormatDateTime, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, Card, useFormatDateTime } from '@modrinth/ui'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { trackEvent } from '@/helpers/analytics'
 
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	close: { id: 'app.project.gallery.close', defaultMessage: 'Close gallery' },
-	openOriginal: { id: 'app.project.gallery.open-original', defaultMessage: 'Open original image' },
-	zoomIn: { id: 'app.project.gallery.zoom-in', defaultMessage: 'Zoom in' },
-	zoomOut: { id: 'app.project.gallery.zoom-out', defaultMessage: 'Zoom out' },
-	previous: { id: 'app.project.gallery.previous', defaultMessage: 'Previous image' },
-	next: { id: 'app.project.gallery.next', defaultMessage: 'Next image' },
-})
 
 const formatDate = useFormatDateTime({
 	year: 'numeric',

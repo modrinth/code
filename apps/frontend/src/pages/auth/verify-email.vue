@@ -12,13 +12,17 @@
 			</Admonition>
 
 			<div class="grid grid-cols-2 gap-2">
-				<ButtonLink class="shadow-none" to="/settings/account">
-					<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.accountSettings) }}
-				</ButtonLink>
-				<ButtonLink type="colored" color="brand" to="/discover/mods">
-					{{ formatMessage(messages.discoverMods) }}
-					<RightArrowIcon aria-hidden="true" />
-				</ButtonLink>
+				<ButtonStyled>
+					<NuxtLink class="shadow-none" to="/settings/account">
+						<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
+					</NuxtLink>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<NuxtLink to="/discover/mods">
+						{{ formatMessage(messages.discoverMods) }}
+						<RightArrowIcon />
+					</NuxtLink>
+				</ButtonStyled>
 			</div>
 		</template>
 
@@ -33,25 +37,25 @@
 
 			<template v-if="auth.user">
 				<div class="grid grid-cols-2 gap-2">
-					<ButtonLink to="/settings/account">
-						<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.accountSettings) }}
-					</ButtonLink>
-					<ButtonLink type="colored" color="brand" to="/discover/mods">
-						{{ formatMessage(messages.discoverMods) }}
-						<RightArrowIcon aria-hidden="true" />
-					</ButtonLink>
+					<ButtonStyled>
+						<NuxtLink to="/settings/account">
+							<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
+						</NuxtLink>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<NuxtLink to="/discover/mods">
+							{{ formatMessage(messages.discoverMods) }}
+							<RightArrowIcon />
+						</NuxtLink>
+					</ButtonStyled>
 				</div>
 			</template>
-			<ButtonLink
-				v-else
-				type="colored"
-				color="brand"
-				to="/auth/sign-in"
-				class="!w-full"
-			>
-				{{ formatMessage(commonMessages.signInButton) }}
-				<RightArrowIcon aria-hidden="true" />
-			</ButtonLink>
+			<ButtonStyled v-else color="brand">
+				<NuxtLink to="/auth/sign-in" class="!w-full">
+					{{ formatMessage(commonMessages.signInButton) }}
+					<RightArrowIcon />
+				</NuxtLink>
+			</ButtonStyled>
 		</template>
 
 		<template v-else>
@@ -66,35 +70,26 @@
 				{{ formatMessage(failedVerificationMessages.description) }}
 			</Admonition>
 
-			<Button
-				v-if="auth.user"
-				type="colored"
-				color="brand"
-				class="!w-full"
-				@click="handleResendEmailVerification"
-			>
-				{{ formatMessage(failedVerificationMessages.action) }}
-				<RightArrowIcon aria-hidden="true" />
-			</Button>
-			<ButtonLink
-				v-else
-				type="colored"
-				color="brand"
-				to="/auth/sign-in"
-				class="!w-full"
-			>
-				{{ formatMessage(commonMessages.signInButton) }}
-				<RightArrowIcon aria-hidden="true" />
-			</ButtonLink>
+			<ButtonStyled v-if="auth.user" color="brand">
+				<button class="!w-full" @click="handleResendEmailVerification">
+					{{ formatMessage(failedVerificationMessages.action) }}
+					<RightArrowIcon />
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-else color="brand">
+				<NuxtLink to="/auth/sign-in" class="!w-full">
+					{{ formatMessage(commonMessages.signInButton) }}
+					<RightArrowIcon />
+				</NuxtLink>
+			</ButtonStyled>
 		</template>
 	</div>
 </template>
 <script setup lang="ts">
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
-	ButtonLink,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,

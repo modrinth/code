@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import IconButton from '#ui/components/base/buttons/IconButton.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
@@ -146,14 +146,16 @@ async function handleSelectedProjectsLeaveResult(
 			truncate-title
 		>
 			<template #leading>
-				<IconButton
-					v-tooltip="installContext.backLabel"
-					:label="installContext.backLabel"
-					size="xl"
-					@click="handleBack"
-				>
-					<LeftArrowIcon aria-hidden="true" />
-				</IconButton>
+				<ButtonStyled circular size="large">
+					<button
+						v-tooltip="installContext.backLabel"
+						type="button"
+						:aria-label="installContext.backLabel"
+						@click="handleBack"
+					>
+						<LeftArrowIcon />
+					</button>
+				</ButtonStyled>
 				<Avatar
 					v-if="iconSrc"
 					:src="iconSrc"

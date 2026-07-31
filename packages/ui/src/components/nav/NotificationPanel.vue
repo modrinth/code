@@ -59,25 +59,22 @@
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
 								x{{ item.count }}
 							</div>
-							<IconButton
-								v-if="item.copyable !== false"
-								:label="
-									item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
-								"
-								size="xs"
-								@click="copyToClipboard(item)"
-							>
-								<CheckIcon v-if="copied[getCopyKey(item)]" aria-hidden="true" />
-								<CopyIcon v-else aria-hidden="true" />
-							</IconButton>
-							<IconButton
-								v-if="item.dismissible !== false"
-								label="Dismiss"
-								size="xs"
-								@click="dismissNotification(index)"
-							>
-								<XIcon aria-hidden="true" />
-							</IconButton>
+							<ButtonStyled v-if="item.copyable !== false" circular size="small">
+								<button
+									v-tooltip="
+										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
+									"
+									@click="copyToClipboard(item)"
+								>
+									<CheckIcon v-if="copied[getCopyKey(item)]" />
+									<CopyIcon v-else />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-if="item.dismissible !== false" circular size="small">
+								<button v-tooltip="`Dismiss`" @click="dismissNotification(index)">
+									<XIcon />
+								</button>
+							</ButtonStyled>
 						</div>
 						<div v-if="item.type !== 'neutral'"></div>
 						<div
@@ -93,17 +90,16 @@
 						</template>
 						<template v-if="item.buttons?.length">
 							<div class="col-span-2 flex flex-wrap gap-1.5 pt-1">
-								<Button
+								<ButtonStyled
 									v-for="(button, buttonIndex) in item.buttons"
 									:key="buttonIndex"
-									size="xs"
-									:type="button.color && button.color !== 'standard' ? 'colored' : 'base'"
-									:color="button.color === 'standard' ? undefined : button.color"
-									@click="handleButtonClick(item, button)"
+									:color="button.color"
 								>
-									<component :is="button.icon" v-if="button.icon" aria-hidden="true" />
-									{{ button.label }}
-								</Button>
+									<button class="!shadow-none" @click="handleButtonClick(item, button)">
+										<component :is="button.icon" v-if="button.icon" />
+										{{ button.label }}
+									</button>
+								</ButtonStyled>
 							</div>
 						</template>
 					</div>
@@ -132,8 +128,7 @@ import {
 	type WebNotification,
 	type WebNotificationButton,
 } from '../../providers'
-import Button from '../base/buttons/Button.vue'
-import IconButton from '../base/buttons/IconButton.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
 const notificationManager = injectNotificationManager()
 const notifications = computed<WebNotification[]>(() => notificationManager.getNotifications())

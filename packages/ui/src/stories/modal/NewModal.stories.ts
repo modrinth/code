@@ -1,7 +1,7 @@
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import Button from '../../components/base/buttons/Button.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import NewModal from '../../components/modal/NewModal.vue'
 
 const meta = {
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof NewModal>
 
 export const Default: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -22,7 +22,9 @@ export const Default: Story = {
 		},
 		template: `
 			<div>
-				<Button color="brand" type="colored" @click="openModal">Open Modal</Button>
+				<ButtonStyled color="brand">
+					<button @click="openModal">Open Modal</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" header="Example Modal">
 					<p>This is the modal content.</p>
 					<p class="text-secondary mt-2">You can put any content here.</p>
@@ -34,7 +36,7 @@ export const Default: Story = {
 
 export const WithActions: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -42,13 +44,19 @@ export const WithActions: Story = {
 		},
 		template: `
 			<div>
-				<Button color="brand" type="colored" @click="openModal">Open Modal with Actions</Button>
+				<ButtonStyled color="brand">
+					<button @click="openModal">Open Modal with Actions</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" header="Confirm Action">
 					<p>Are you sure you want to proceed with this action?</p>
 					<template #actions>
 						<div class="flex gap-2 justify-end">
-							<Button @click="modalRef?.hide()">Cancel</Button>
-							<Button color="brand" type="colored" @click="modalRef?.hide()">Confirm</Button>
+							<ButtonStyled>
+								<button @click="modalRef?.hide()">Cancel</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand">
+								<button @click="modalRef?.hide()">Confirm</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</NewModal>
@@ -59,7 +67,7 @@ export const WithActions: Story = {
 
 export const DangerFade: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -67,13 +75,19 @@ export const DangerFade: Story = {
 		},
 		template: `
 			<div>
-				<Button color="red" type="colored" @click="openModal">Open Danger Modal</Button>
+				<ButtonStyled color="red">
+					<button @click="openModal">Open Danger Modal</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" header="Delete Item" fade="danger">
 					<p>Are you sure you want to delete this item? This action cannot be undone.</p>
 					<template #actions>
 						<div class="flex gap-2 justify-end">
-							<Button @click="modalRef?.hide()">Cancel</Button>
-							<Button color="red" type="colored" @click="modalRef?.hide()">Delete</Button>
+							<ButtonStyled>
+								<button @click="modalRef?.hide()">Cancel</button>
+							</ButtonStyled>
+							<ButtonStyled color="red">
+								<button @click="modalRef?.hide()">Delete</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</NewModal>
@@ -84,7 +98,7 @@ export const DangerFade: Story = {
 
 export const WarningFade: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -92,13 +106,19 @@ export const WarningFade: Story = {
 		},
 		template: `
 			<div>
-				<Button color="orange" type="colored" @click="openModal">Open Warning Modal</Button>
+				<ButtonStyled color="orange">
+					<button @click="openModal">Open Warning Modal</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" header="Warning" fade="warning">
 					<p>This action may have unintended consequences. Please review before proceeding.</p>
 					<template #actions>
 						<div class="flex gap-2 justify-end">
-							<Button @click="modalRef?.hide()">Cancel</Button>
-							<Button color="orange" type="colored" @click="modalRef?.hide()">Proceed</Button>
+							<ButtonStyled>
+								<button @click="modalRef?.hide()">Cancel</button>
+							</ButtonStyled>
+							<ButtonStyled color="orange">
+								<button @click="modalRef?.hide()">Proceed</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</NewModal>
@@ -109,7 +129,7 @@ export const WarningFade: Story = {
 
 export const Scrollable: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -117,7 +137,9 @@ export const Scrollable: Story = {
 		},
 		template: `
 			<div>
-				<Button color="brand" type="colored" @click="openModal">Open Scrollable Modal</Button>
+				<ButtonStyled color="brand">
+					<button @click="openModal">Open Scrollable Modal</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" header="Scrollable Content" scrollable max-content-height="300px">
 					<div class="space-y-4">
 						<p v-for="i in 20" :key="i">
@@ -126,7 +148,9 @@ export const Scrollable: Story = {
 					</div>
 					<template #actions>
 						<div class="flex gap-2 justify-end">
-							<Button color="brand" type="colored" @click="modalRef?.hide()">Close</Button>
+							<ButtonStyled color="brand">
+								<button @click="modalRef?.hide()">Close</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</NewModal>
@@ -137,7 +161,7 @@ export const Scrollable: Story = {
 
 export const MergedHeader: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -145,7 +169,9 @@ export const MergedHeader: Story = {
 		},
 		template: `
 			<div>
-				<Button color="brand" type="colored" @click="openModal">Open Modal (Merged Header)</Button>
+				<ButtonStyled color="brand">
+					<button @click="openModal">Open Modal (Merged Header)</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" hide-header merge-header>
 					<div class="text-center py-8">
 						<h2 class="text-xl font-bold mb-4">Custom Header Area</h2>
@@ -159,7 +185,7 @@ export const MergedHeader: Story = {
 
 export const NotClosable: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -167,13 +193,17 @@ export const NotClosable: Story = {
 		},
 		template: `
 			<div>
-				<Button color="brand" type="colored" @click="openModal">Open Non-Closable Modal</Button>
+				<ButtonStyled color="brand">
+					<button @click="openModal">Open Non-Closable Modal</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" header="Processing..." :closable="false" :close-on-esc="false" :close-on-click-outside="false">
 					<p>This modal cannot be closed by clicking outside or pressing escape.</p>
 					<p class="text-secondary mt-2">Only the action button can close it.</p>
 					<template #actions>
 						<div class="flex justify-end">
-							<Button color="brand" type="colored" @click="modalRef?.hide()">I understand, close</Button>
+							<ButtonStyled color="brand">
+								<button @click="modalRef?.hide()">I understand, close</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</NewModal>
@@ -184,7 +214,7 @@ export const NotClosable: Story = {
 
 export const NoPadding: Story = {
 	render: () => ({
-		components: { Button, NewModal },
+		components: { NewModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -192,12 +222,16 @@ export const NoPadding: Story = {
 		},
 		template: `
 			<div>
-				<Button color="brand" type="colored" @click="openModal">Open Modal (No Padding)</Button>
+				<ButtonStyled color="brand">
+					<button @click="openModal">Open Modal (No Padding)</button>
+				</ButtonStyled>
 				<NewModal ref="modalRef" header="No Padding Modal" no-padding>
 					<p>This modal has no default padding on the content area.</p>
 					<template #actions>
 						<div class="flex gap-2 justify-end p-6 pt-0">
-							<Button color="brand" type="colored" @click="modalRef?.hide()">Close</Button>
+							<ButtonStyled color="brand">
+								<button @click="modalRef?.hide()">Close</button>
+							</ButtonStyled>
 						</div>
 					</template>
 				</NewModal>

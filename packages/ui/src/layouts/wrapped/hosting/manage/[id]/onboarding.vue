@@ -42,23 +42,22 @@
 		</div>
 
 		<div class="w-full">
-			<Button v-if="uploading" size="xl" class="ml-auto" loading>
-				<SpinnerIcon class="animate-spin" aria-hidden="true" />
-				{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
-			</Button>
-			<Button
-				v-else
-				v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
-				type="colored"
-				color="brand"
-				size="xl"
-				class="ml-auto"
-				:disabled="!canSetup"
-				@click="openModal"
-			>
-				{{ formatMessage(messages.setupServerButton) }}
-				<RightArrowIcon aria-hidden="true" />
-			</Button>
+			<ButtonStyled v-if="uploading" size="large">
+				<button class="ml-auto" disabled>
+					<SpinnerIcon class="animate-spin" />
+					{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-else color="brand" size="large">
+				<button
+					v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
+					class="ml-auto"
+					:disabled="!canSetup"
+					@click="openModal"
+				>
+					{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
+				</button>
+			</ButtonStyled>
 		</div>
 
 		<CreationFlowModal
@@ -80,8 +79,8 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
-import Button from '#ui/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,

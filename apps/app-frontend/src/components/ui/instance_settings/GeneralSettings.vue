@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
+	ButtonStyled,
 	Checkbox,
 	Chips,
 	defineMessages,
@@ -352,7 +352,8 @@ const messages = defineMessages({
 				<h2 id="duplicate-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
-				<Button
+				<ButtonStyled>
+					<button
 						v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
 						aria-labelledby="duplicate-instance-label"
 						:disabled="installing"
@@ -360,7 +361,8 @@ const messages = defineMessages({
 						@click="duplicateInstance"
 					>
 						<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 				<p class="m-0">
 					{{ formatMessage(messages.duplicateInstanceDescription) }}
 				</p>
@@ -386,9 +388,11 @@ const messages = defineMessages({
 						class="w-full max-w-[300px]"
 						@submit="() => addCategory"
 					/>
-					<Button class="w-fit !shadow-none" @click="() => addCategory()">
+					<ButtonStyled>
+						<button class="w-fit !shadow-none" @click="() => addCategory()">
 							<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
-						</Button>
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<p class="m-0">
@@ -417,7 +421,8 @@ const messages = defineMessages({
 			<h2 id="delete-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.deleteInstance) }}
 			</h2>
-			<Button color="red" type="colored"
+			<ButtonStyled color="red">
+				<button
 					aria-labelledby="delete-instance-label"
 					:disabled="removing"
 					class="w-fit !shadow-none"
@@ -430,7 +435,8 @@ const messages = defineMessages({
 							? formatMessage(messages.deletingInstanceButton)
 							: formatMessage(messages.deleteInstanceButton)
 					}}
-				</Button>
+				</button>
+			</ButtonStyled>
 			<p class="m-0">
 				{{ formatMessage(messages.deleteInstanceDescription) }}
 			</p>

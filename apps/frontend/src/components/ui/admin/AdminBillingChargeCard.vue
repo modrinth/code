@@ -87,28 +87,29 @@
 				</div>
 			</div>
 			<div class="flex gap-2">
-				<Button v-if="isRefunded" disabled>
-					<CheckIcon aria-hidden="true" />
-					Charge refunded
-				</Button>
-				<Button
+				<ButtonStyled v-if="isRefunded">
+					<div class="button-like disabled"><CheckIcon /> Charge refunded</div>
+				</ButtonStyled>
+				<ButtonStyled
 					v-else-if="charge.status === 'succeeded' && charge.type !== 'refund'"
-					type="quiet"
 					color="red"
-					@click="emit('refund', charge)"
+					color-fill="text"
 				>
-					<CurrencyIcon aria-hidden="true" />
-					Refund options
-				</Button>
-				<Button
+					<button @click="emit('refund', charge)">
+						<CurrencyIcon />
+						Refund options
+					</button>
+				</ButtonStyled>
+				<ButtonStyled
 					v-else-if="charge.status === 'failed' || charge.status === 'open'"
-					type="quiet"
 					color="red"
-					@click="emit('modify', charge, subscription)"
+					color-fill="text"
 				>
-					<CurrencyIcon aria-hidden="true" />
-					Modify charge
-				</Button>
+					<button @click="emit('modify', charge, subscription)">
+						<CurrencyIcon />
+						Modify charge
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -116,8 +117,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, CurrencyIcon } from '@modrinth/assets'
-import { useFormatDateTime, useFormatPrice, useRelativeTime } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { ButtonStyled, useFormatDateTime, useFormatPrice, useRelativeTime } from '@modrinth/ui'
 import dayjs from 'dayjs'
 
 import { products } from '~/generated/state.json'

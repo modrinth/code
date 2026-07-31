@@ -181,27 +181,31 @@
 								:auto-hide="false"
 								placement="bottom-end"
 							>
-								<IconButton
-									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
-									label="Server settings"
-									size="xl"
-									@click="handleOpenServerSettings"
-								>
-									<SettingsIcon aria-hidden="true" />
-								</IconButton>
+								<ButtonStyled circular size="large">
+									<button
+										v-tooltip="showSettingsHint ? undefined : 'Server settings'"
+										type="button"
+										aria-label="Server settings"
+										@click="handleOpenServerSettings"
+									>
+										<SettingsIcon />
+									</button>
+								</ButtonStyled>
 								<template #popper>
 									<div class="grid grid-cols-[min-content] gap-1">
 										<div class="flex min-w-48 items-center justify-between gap-8">
 											<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
 												{{ formatMessage(settingsHintMessages.title) }}
 											</h3>
-											<IconButton
-												:label="formatMessage(settingsHintMessages.dismiss)"
-												size="sm"
-												@click="dismissSettingsHint"
-											>
-												<XIcon aria-hidden="true" />
-											</IconButton>
+											<ButtonStyled size="small" circular>
+												<button
+													type="button"
+													:aria-label="formatMessage(settingsHintMessages.dismiss)"
+													@click="dismissSettingsHint"
+												>
+													<XIcon aria-hidden="true" />
+												</button>
+											</ButtonStyled>
 										</div>
 										<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
 											{{ formatMessage(settingsHintMessages.description) }}
@@ -209,15 +213,15 @@
 									</div>
 								</template>
 							</Tooltip>
-							<TeleportOverflowMenu
-								label="More server options"
-								:options="serverMenuOptions"
-								:disabled="!!installError"
-								type="quiet"
-								size="xl"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-							</TeleportOverflowMenu>
+							<ButtonStyled circular type="transparent" size="large">
+								<TeleportOverflowMenu
+									:options="serverMenuOptions"
+									:disabled="!!installError"
+									aria-label="More server options"
+								>
+									<MoreVerticalIcon aria-hidden="true" />
+								</TeleportOverflowMenu>
+							</ButtonStyled>
 						</PageHeaderActions>
 					</template>
 				</PageHeader>
@@ -280,11 +284,13 @@
 												If you're stuck, please contact Modrinth Support with the information below:
 											</li>
 										</ul>
-										<Button class="mt-2" @click="copyServerDebugInfo">
-											<CopyIcon v-if="!copied" aria-hidden="true" />
-											<CheckIcon v-else aria-hidden="true" />
-											Copy Debug Info
-										</Button>
+										<ButtonStyled>
+											<button class="mt-2" @click="copyServerDebugInfo">
+												<CopyIcon v-if="!copied" />
+												<CheckIcon v-else />
+												Copy Debug Info
+											</button>
+										</ButtonStyled>
 									</div>
 									<div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
 										An internal error occurred while installing your server. Don't fret — try
@@ -304,24 +310,25 @@
 										v-if="errorTitle === 'Installation error'"
 										class="mt-2 flex flex-col gap-4 sm:flex-row"
 									>
-										<Button v-if="errorLog" @click="openInstallLog">
-											<FileIcon aria-hidden="true" />
-											Open Installation Log
-										</Button>
-										<Button @click="copyServerDebugInfo">
-											<CopyIcon v-if="!copied" aria-hidden="true" />
-											<CheckIcon v-else aria-hidden="true" />
-											Copy Debug Info
-										</Button>
-										<Button
-											type="colored"
-											color="red"
-											class="whitespace-pre"
-											@click="openServerSettingsModal('installation')"
-										>
-											<RightArrowIcon aria-hidden="true" />
-											Change Loader
-										</Button>
+										<ButtonStyled v-if="errorLog">
+											<button @click="openInstallLog"><FileIcon />Open Installation Log</button>
+										</ButtonStyled>
+										<ButtonStyled>
+											<button @click="copyServerDebugInfo">
+												<CopyIcon v-if="!copied" />
+												<CheckIcon v-else />
+												Copy Debug Info
+											</button>
+										</ButtonStyled>
+										<ButtonStyled color="red" type="standard">
+											<button
+												class="whitespace-pre"
+												@click="openServerSettingsModal('installation')"
+											>
+												<RightArrowIcon />
+												Change Loader
+											</button>
+										</ButtonStyled>
 									</div>
 								</div>
 							</div>
@@ -423,9 +430,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
-import IconButton from '#ui/components/base/buttons/IconButton.vue'
-import TeleportOverflowMenu from '#ui/components/base/buttons/TeleportOverflowMenu.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'
@@ -433,6 +438,7 @@ import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.v
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'

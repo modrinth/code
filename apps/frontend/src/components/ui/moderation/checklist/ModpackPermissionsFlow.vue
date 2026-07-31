@@ -19,15 +19,16 @@
 			<div v-if="modPackData[currentIndex].type === 'unknown'">
 				<p>What is the approval type of {{ modPackData[currentIndex].file_name }}?</p>
 				<div class="input-group">
-					<Button
+					<ButtonStyled
 						v-for="(option, index) in fileApprovalTypes"
 						:key="index"
-						:type="modPackData[currentIndex].status === option.id ? 'colored' : 'base'"
-						:color="modPackData[currentIndex].status === option.id ? 'brand' : undefined"
+						:color="modPackData[currentIndex].status === option.id ? 'brand' : 'standard'"
 						@click="setStatus(currentIndex, option.id)"
 					>
-						{{ option.name }}
-					</Button>
+						<button>
+							{{ option.name }}
+						</button>
+					</ButtonStyled>
 				</div>
 				<div v-if="modPackData[currentIndex].status !== 'unidentified'" class="flex flex-col gap-1">
 					<label for="proof">
@@ -73,15 +74,16 @@
 					>)?
 				</p>
 				<div class="input-group">
-					<Button
+					<ButtonStyled
 						v-for="(option, index) in fileApprovalTypes"
 						:key="index"
-						:type="modPackData[currentIndex].status === option.id ? 'colored' : 'base'"
-						:color="modPackData[currentIndex].status === option.id ? 'brand' : undefined"
+						:color="modPackData[currentIndex].status === option.id ? 'brand' : 'standard'"
 						@click="setStatus(currentIndex, option.id)"
 					>
-						{{ option.name }}
-					</Button>
+						<button>
+							{{ option.name }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 
@@ -108,42 +110,40 @@
 					>?
 				</p>
 				<div class="input-group">
-					<Button
+					<ButtonStyled
 						v-for="(option, index) in filePermissionTypes"
 						:key="index"
-						:type="modPackData[currentIndex].approved === option.id ? 'colored' : 'base'"
-						:color="modPackData[currentIndex].approved === option.id ? 'brand' : undefined"
+						:color="modPackData[currentIndex].approved === option.id ? 'brand' : 'standard'"
 						@click="setApproval(currentIndex, option.id)"
 					>
-						{{ option.name }}
-					</Button>
+						<button>
+							{{ option.name }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
 
 		<div class="mt-4 flex gap-2">
-			<Button :disabled="currentIndex <= 0" @click="goToPrevious">
-				<LeftArrowIcon aria-hidden="true" />
-				Previous
-			</Button>
-			<Button
-				v-if="modPackData && currentIndex < modPackData.length"
-				type="colored"
-				color="blue"
-				:disabled="!canGoNext"
-				@click="goToNext"
-			>
-				<RightArrowIcon aria-hidden="true" />
-				{{ currentIndex + 1 >= modPackData.length ? 'Complete' : 'Next' }}
-			</Button>
+			<ButtonStyled>
+				<button :disabled="currentIndex <= 0" @click="goToPrevious">
+					<LeftArrowIcon aria-hidden="true" />
+					Previous
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-if="modPackData && currentIndex < modPackData.length" color="blue">
+				<button :disabled="!canGoNext" @click="goToNext">
+					<RightArrowIcon aria-hidden="true" />
+					{{ currentIndex + 1 >= modPackData.length ? 'Complete' : 'Next' }}
+				</button>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
-import { StyledInput } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { ButtonStyled, StyledInput } from '@modrinth/ui'
 import type {
 	ModerationFlameModpackItem,
 	ModerationJudgements,

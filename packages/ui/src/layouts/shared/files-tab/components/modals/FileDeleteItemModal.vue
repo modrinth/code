@@ -10,14 +10,18 @@
 		</Admonition>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="hide">
+				<ButtonStyled type="outlined">
+					<button @click="hide">
 						<XIcon class="h-5 w-5" />
 						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-				<Button color="red" type="colored" @click="handleSubmit">
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button @click="handleSubmit">
 						<TrashIcon class="h-5 w-5" />
 						{{ formatMessage(commonMessages.deleteLabel) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -28,7 +32,7 @@ import { TrashIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

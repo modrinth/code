@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { IconButton, NewModal, StyledInput } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import emails from '~/templates/emails'
@@ -183,7 +182,9 @@ onMounted(() => {
 					</div>
 
 					<div class="input-group mt-4">
-						<Button type="quiet" @click="closePreview">Close</Button>
+						<ButtonStyled type="transparent">
+							<button @click="closePreview">Close</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>
@@ -199,15 +200,12 @@ onMounted(() => {
 					wrapper-class="w-72"
 				/>
 
-				<Button
-					type="colored"
-					color="brand"
-					:disabled="filtered.length === 0"
-					@click="openAll"
-				>
-					<LibraryIcon aria-hidden="true" />
-					Open all ({{ counts.shown }})
-				</Button>
+				<ButtonStyled color="brand">
+					<button :disabled="filtered.length === 0" @click="openAll">
+						<LibraryIcon class="h-4 w-4" aria-hidden="true" />
+						Open all ({{ counts.shown }})
+					</button>
+				</ButtonStyled>
 
 				<span class="text-sm text-secondary">
 					Showing <span class="font-medium text-contrast">{{ counts.shown }}</span> of
@@ -238,14 +236,18 @@ onMounted(() => {
 					</div>
 
 					<div class="mt-auto flex gap-2">
-						<Button type="colored" color="brand" @click="openPreview(id, $event)">
-							<PlayIcon aria-hidden="true" />
-							Preview
-						</Button>
+						<ButtonStyled color="brand">
+							<button @click="openPreview(id, $event)">
+								<PlayIcon aria-hidden="true" />
+								Preview
+							</button>
+						</ButtonStyled>
 
-						<IconButton label="Copy preview URL" type="outlined" @click="copy(id)">
-							<CopyIcon aria-hidden="true" />
-						</IconButton>
+						<ButtonStyled circular type="outlined">
+							<button title="Copy preview URL" @click="copy(id)">
+								<CopyIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
 					</div>
 				</li>
 			</ul>

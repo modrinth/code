@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { ButtonLink, injectModrinthClient } from '@modrinth/ui'
+import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import MaliciousSummaryModal, {
@@ -274,10 +274,12 @@ function refetch() {
 <template>
 	<div class="flex flex-col gap-4">
 		<div>
-			<ButtonLink to="/moderation/technical-review">
-				<ArrowLeftIcon aria-hidden="true" />
-				Back to queue
-			</ButtonLink>
+			<ButtonStyled
+				><nuxt-link :to="'/moderation/technical-review'">
+					<ArrowLeftIcon class="size-5" />
+					Back to queue
+				</nuxt-link></ButtonStyled
+			>
 		</div>
 
 		<div v-if="isLoading" class="flex flex-col gap-4">

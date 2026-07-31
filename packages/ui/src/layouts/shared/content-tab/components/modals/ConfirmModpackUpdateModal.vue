@@ -31,22 +31,24 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="handleCancel">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button
-					v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
-					type="colored"
-					color="orange"
-					:disabled="buttonsDisabled || props.actionDisabled"
-					@click="handleConfirm"
-				>
-					<DownloadIcon aria-hidden="true" />
-					{{
-						formatMessage(messages.confirmButton, { action: downgrade ? 'downgrade' : 'update' })
-					}}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="handleCancel">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="orange">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="handleConfirm"
+					>
+						<DownloadIcon />
+						{{
+							formatMessage(messages.confirmButton, { action: downgrade ? 'downgrade' : 'update' })
+						}}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -57,7 +59,7 @@ import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

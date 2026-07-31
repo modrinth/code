@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Settings2Icon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	injectPageContext,
@@ -78,10 +78,12 @@ watch(
 			{{ formatMessage(messages.adsConsentTitle) }}
 		</h2>
 		<div class="mt-2 flex flex-col gap-2.5 items-start">
-			<Button class="!shadow-none" @click="manageAdsPreferences">
+			<ButtonStyled>
+				<button class="!shadow-none" @click="manageAdsPreferences">
 					<Settings2Icon aria-hidden="true" />
 					{{ formatMessage(messages.adsConsentManage) }}
-				</Button>
+				</button>
+			</ButtonStyled>
 			<div>
 				{{ formatMessage(messages.adsConsentIntro) }}
 			</div>

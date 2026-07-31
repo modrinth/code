@@ -6,54 +6,78 @@
 			{{ formatMessage(messages.signUpWithTitle) }}
 		</div>
 		<section class="flex flex-col gap-2.5">
-			<ButtonLink :href="getAuthUrl('google', redirectTarget)" @click="onOAuthProviderClick('google')">
-				<GoogleColorIcon aria-hidden="true" />
-				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
-			</ButtonLink>
-			<ButtonLink
-				:href="getAuthUrl('microsoft', redirectTarget)"
-				@click="onOAuthProviderClick('microsoft')"
-			>
-				<MicrosoftColorIcon aria-hidden="true" />
-				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
-			</ButtonLink>
-			<ButtonLink
-				:href="getAuthUrl('discord', redirectTarget)"
-				@click="onOAuthProviderClick('discord')"
-			>
-				<DiscordColorIcon aria-hidden="true" />
-				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Discord' }) }}</span>
-			</ButtonLink>
+			<ButtonStyled>
+				<a
+					class="!shadow-none"
+					:href="getAuthUrl('google', redirectTarget)"
+					@click="onOAuthProviderClick('google')"
+				>
+					<GoogleColorIcon />
+					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a
+					class="!shadow-none"
+					:href="getAuthUrl('microsoft', redirectTarget)"
+					@click="onOAuthProviderClick('microsoft')"
+				>
+					<MicrosoftColorIcon />
+					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a
+					class="!shadow-none"
+					:href="getAuthUrl('discord', redirectTarget)"
+					@click="onOAuthProviderClick('discord')"
+				>
+					<DiscordColorIcon />
+					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Discord' }) }}</span>
+				</a>
+			</ButtonStyled>
 			<template v-if="showOtherOptions">
-				<ButtonLink
-					:href="getAuthUrl('github', redirectTarget)"
-					@click="onOAuthProviderClick('github')"
-				>
-					<GitHubColorIcon aria-hidden="true" />
-					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
-				</ButtonLink>
-				<ButtonLink
-					:href="getAuthUrl('gitlab', redirectTarget)"
-					@click="onOAuthProviderClick('gitlab')"
-				>
-					<GitLabColorIcon aria-hidden="true" />
-					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
-				</ButtonLink>
-				<ButtonLink
-					:href="getAuthUrl('steam', redirectTarget)"
-					@click="onOAuthProviderClick('steam')"
-				>
-					<SteamColorIcon aria-hidden="true" />
-					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Steam' }) }}</span>
-				</ButtonLink>
+				<ButtonStyled>
+					<a
+						class="!shadow-none"
+						:href="getAuthUrl('github', redirectTarget)"
+						@click="onOAuthProviderClick('github')"
+					>
+						<GitHubColorIcon />
+						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a
+						class="!shadow-none"
+						:href="getAuthUrl('gitlab', redirectTarget)"
+						@click="onOAuthProviderClick('gitlab')"
+					>
+						<GitLabColorIcon />
+						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a
+						class="!shadow-none"
+						:href="getAuthUrl('steam', redirectTarget)"
+						@click="onOAuthProviderClick('steam')"
+					>
+						<SteamColorIcon />
+						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Steam' }) }}</span>
+					</a>
+				</ButtonStyled>
 			</template>
-			<Button type="quiet" class="mx-auto -mb-3" @click="onToggleOtherOptions()">
+			<button
+				class="mx-auto -mb-3 bg-transparent pt-1 text-center text-base font-semibold text-secondary transition-all hover:text-primary"
+				@click="onToggleOtherOptions()"
+			>
 				{{
 					showOtherOptions
 						? formatMessage(messages.showFewerOptions)
 						: formatMessage(messages.showOtherOptions)
 				}}
-			</Button>
+			</button>
 		</section>
 
 		<div class="h-px w-full bg-surface-5"></div>
@@ -81,16 +105,15 @@
 				wrapper-class="w-full"
 			/>
 
-			<Button
-				class="w-full"
-				type="colored"
-				color="brand"
-				:disabled="!emailModel || !passwordModel"
-				@click="onContinueWithEmail()"
-			>
-				{{ formatMessage(messages.continueWithEmail) }}
-				<RightArrowIcon aria-hidden="true" />
-			</Button>
+			<ButtonStyled color="brand">
+				<button
+					class="!w-full"
+					:disabled="!emailModel || !passwordModel"
+					@click="onContinueWithEmail()"
+				>
+					{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
+				</button>
+			</ButtonStyled>
 
 			<p v-if="!routeQuery.launcher" class="m-0 text-center">
 				<IntlFormatted :message-id="messages.legalDisclaimer">
@@ -136,14 +159,13 @@ import {
 	SteamColorIcon,
 } from '@modrinth/assets'
 import {
-	ButtonLink,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { useStorage } from '@vueuse/core'
 import type { LocationQuery } from 'vue-router'
 

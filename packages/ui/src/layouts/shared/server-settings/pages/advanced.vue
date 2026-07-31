@@ -6,17 +6,20 @@
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
 						<span class="text-lg font-semibold text-contrast">SFTP</span>
-						<ButtonLink
-							v-tooltip="sftpActionTooltip"
-							class="!w-full sm:!w-auto"
-							:href="sftpUrl"
-							:disabled="!canWriteFiles"
-							target="_blank"
-							@click="handleSftpLaunchClick"
-						>
-							<ExternalIcon class="h-5 w-5" aria-hidden="true" />
-							Launch SFTP
-						</ButtonLink>
+						<ButtonStyled>
+							<a
+								v-tooltip="sftpActionTooltip"
+								class="!w-full sm:!w-auto"
+								:class="{ 'opacity-60': !canWriteFiles }"
+								:href="canWriteFiles ? sftpUrl : undefined"
+								:aria-disabled="!canWriteFiles"
+								target="_blank"
+								@click="handleSftpLaunchClick"
+							>
+								<ExternalIcon class="h-5 w-5" />
+								Launch SFTP
+							</a>
+						</ButtonStyled>
 					</div>
 
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
@@ -73,24 +76,24 @@
 											<CopyIcon class="h-5 w-5" />
 										</div>
 
-										<IconButton
-											v-tooltip="
-												canWriteFiles
-													? formatMessage(
-															showPassword ? messages.hidePassword : messages.showPassword,
-														)
-													: permissionDeniedMessage
-											"
-											:label="
-												formatMessage(showPassword ? messages.hidePassword : messages.showPassword)
-											"
-											type="quiet"
-											:disabled="!canWriteFiles"
-											@click.stop="togglePasswordVisibility"
-										>
-											<EyeIcon v-if="showPassword" class="h-5 w-5" aria-hidden="true" />
-											<EyeOffIcon v-else class="h-5 w-5" aria-hidden="true" />
-										</IconButton>
+										<ButtonStyled type="transparent" circular>
+											<button
+												v-tooltip="
+													canWriteFiles
+														? showPassword
+															? 'Hide password'
+															: 'Show password'
+														: permissionDeniedMessage
+												"
+												class="hover:bg-button-bg-hover grid h-10 w-10 place-content-center rounded-lg"
+												:disabled="!canWriteFiles"
+												@click.stop="togglePasswordVisibility"
+											>
+												<!-- look into doing stop propagation here -->
+												<EyeIcon v-if="showPassword" class="h-5 w-5" />
+												<EyeOffIcon v-else class="h-5 w-5" />
+											</button>
+										</ButtonStyled>
 									</div>
 								</div>
 							</div>
@@ -104,21 +107,21 @@
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
 							<span class="text-lg font-semibold text-contrast">Startup command</span>
 						</label>
-						<Button
-							v-if="startupCommand !== defaultStartupCommand"
-							v-tooltip="advancedActionTooltip"
-							type="quiet"
-							:disabled="
-								isStartupLoading ||
-								startupCommand === defaultStartupCommand ||
-								!canUseAdvancedSettings
-							"
-							class="relative !w-full sm:!w-auto"
-							@click="resetToDefault"
-						>
-							<UpdatedIcon class="h-5 w-5" aria-hidden="true" />
-							Default
-						</Button>
+						<ButtonStyled v-if="startupCommand !== defaultStartupCommand" type="transparent">
+							<button
+								v-tooltip="advancedActionTooltip"
+								:disabled="
+									isStartupLoading ||
+									startupCommand === defaultStartupCommand ||
+									!canUseAdvancedSettings
+								"
+								class="relative !w-full sm:!w-auto"
+								@click="resetToDefault"
+							>
+								<UpdatedIcon class="h-5 w-5" />
+								Default
+							</button>
+						</ButtonStyled>
 					</div>
 					<div class="relative">
 						<StyledInput
@@ -226,30 +229,15 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { Combobox, StyledInput } from '#ui/components'
+import { ButtonStyled, Combobox, StyledInput } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import ButtonLink from '@modrinth/ui/src/components/base/buttons/ButtonLink.vue'
-import IconButton from '@modrinth/ui/src/components/base/buttons/IconButton.vue'
 
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	showPassword: {
-		id: 'servers.advanced.show-password',
-		defaultMessage: 'Show password',
-	},
-	hidePassword: {
-		id: 'servers.advanced.hide-password',
-		defaultMessage: 'Hide password',
-	},
-})
 const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId } = injectModrinthServerContext()
 const client = injectModrinthClient()

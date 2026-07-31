@@ -12,20 +12,23 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="quiet" @click="modal?.hide()">
-					{{ formatMessage(analyticsChartMessages.cancelButton) }}
-				</Button>
-				<Button type="colored" color="orange" @click="confirm">
-					{{ formatMessage(analyticsChartMessages.showAll) }}
-				</Button>
+				<ButtonStyled type="transparent">
+					<button @click="modal?.hide()">
+						{{ formatMessage(analyticsChartMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="orange">
+					<button class="!shadow-none" @click="confirm">
+						{{ formatMessage(analyticsChartMessages.showAll) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
-import { NewModal, useVIntl } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { ButtonStyled, NewModal, useVIntl } from '@modrinth/ui'
 
 import { analyticsChartMessages } from '../../analytics-messages'
 

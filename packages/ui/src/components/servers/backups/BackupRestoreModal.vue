@@ -17,21 +17,23 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="modal?.hide()">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
-				<Button
-					v-tooltip="restoreDisabledTooltip"
-					type="colored"
-					color="red"
-					:disabled="restoreDisabled"
-					@click="restoreBackup"
-				>
-					<SpinnerIcon v-if="isRestoring" class="animate-spin" aria-hidden="true" />
-					<RotateCounterClockwiseIcon v-else aria-hidden="true" />
-					{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="modal?.hide()">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button
+						v-tooltip="restoreDisabledTooltip"
+						:disabled="restoreDisabled"
+						@click="restoreBackup"
+					>
+						<SpinnerIcon v-if="isRestoring" class="animate-spin" />
+						<RotateCounterClockwiseIcon v-else />
+						{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -51,7 +53,7 @@ import {
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 

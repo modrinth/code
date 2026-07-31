@@ -84,16 +84,16 @@
 			<label for="create-account-consent">I agree to receive account updates by email</label>
 		</div>
 
-		<Button
-			class="w-full"
-			type="colored"
-			color="brand"
-			:disabled="globals?.captcha_enabled ? !tokenModel : false"
-			@click="onCompleteSignUpClick"
-		>
-			{{ formatMessage(messages.completeSignUpButton) }}
-			<RightArrowIcon aria-hidden="true" />
-		</Button>
+		<ButtonStyled color="brand">
+			<button
+				class="!w-full font-bold"
+				:disabled="globals?.captcha_enabled ? !tokenModel : false"
+				@click="onCompleteSignUpClick"
+			>
+				{{ formatMessage(messages.completeSignUpButton) }}
+				<RightArrowIcon />
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 
@@ -101,6 +101,7 @@
 import { RightArrowIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	ButtonStyled,
 	Checkbox,
 	DatePicker,
 	defineMessages,
@@ -108,7 +109,6 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed, ref } from 'vue'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'

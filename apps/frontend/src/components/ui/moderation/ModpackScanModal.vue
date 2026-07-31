@@ -8,11 +8,11 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	ConfirmModal,
 	defineMessages,
-	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
@@ -20,7 +20,6 @@ import {
 	type TableColumn,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { renderString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -406,24 +405,26 @@ defineExpose({ show, hide })
 							</span>
 						</template>
 					</Combobox>
-					<IconButton
-						:label="formatMessage(messages.deleteAllGroups)"
-						type="quiet"
-						color="red"
-						:disabled="titleButtonsDisabled"
-						@click="showConfirmClearGroups"
-					>
-						<TrashIcon v-if="!isClearing" aria-hidden="true" />
-						<SpinnerIcon v-else class="animate-spin" aria-hidden="true" />
-					</IconButton>
-					<IconButton
-						:label="formatMessage(messages.scanAllFiles)"
-						:disabled="titleButtonsDisabled"
-						@click="fetchAllScans"
-					>
-						<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
-						<SpinnerIcon v-else class="animate-spin" aria-hidden="true" />
-					</IconButton>
+					<ButtonStyled circular color="red" color-fill="none">
+						<button
+							v-tooltip="formatMessage(messages.deleteAllGroups)"
+							:disabled="titleButtonsDisabled"
+							@click="showConfirmClearGroups"
+						>
+							<TrashIcon v-if="!isClearing" aria-hidden="true" />
+							<SpinnerIcon v-else class="animate-spin" />
+						</button>
+					</ButtonStyled>
+					<ButtonStyled circular>
+						<button
+							v-tooltip="formatMessage(messages.scanAllFiles)"
+							:disabled="titleButtonsDisabled"
+							@click="fetchAllScans"
+						>
+							<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
+							<SpinnerIcon v-else class="animate-spin" />
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</template>
@@ -453,15 +454,17 @@ defineExpose({ show, hide })
 				<template #cell-newFiles="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<Button
+						<ButtonStyled
 							class="justify-self-center"
+							color="red"
 							type="outlined"
-							:disabled="rescanButtonsDisabled"
-							@click="() => fetchScan(row.id)"
+							hover-color-fill="background"
 						>
-							<RotateCounterClockwiseIcon aria-hidden="true" />
-							{{ formatMessage(messages.failed) }}
-						</Button>
+							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
+								<RotateCounterClockwiseIcon />
+								{{ formatMessage(messages.failed) }}
+							</button>
+						</ButtonStyled>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_files }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>
@@ -469,15 +472,17 @@ defineExpose({ show, hide })
 				<template #cell-newGroups="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<Button
+						<ButtonStyled
 							class="justify-self-center"
+							color="red"
 							type="outlined"
-							:disabled="rescanButtonsDisabled"
-							@click="() => fetchScan(row.id)"
+							hover-color-fill="background"
 						>
-							<RotateCounterClockwiseIcon aria-hidden="true" />
-							{{ formatMessage(messages.failed) }}
-						</Button>
+							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
+								<RotateCounterClockwiseIcon />
+								{{ formatMessage(messages.failed) }}
+							</button>
+						</ButtonStyled>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_groups }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>

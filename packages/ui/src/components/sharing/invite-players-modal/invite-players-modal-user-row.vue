@@ -30,24 +30,29 @@
 			</AutoLink>
 		</div>
 
-		<Button v-if="status === 'added'" disabled>
-			<CheckIcon aria-hidden="true" />
-			{{ addedLabel }}
-		</Button>
-		<Button
-			v-else-if="status === 'pending'"
-			type="outlined"
-			:disabled="disabled"
-			@click="$emit('cancel', user)"
-		>
-			{{ cancelLabel }}
-		</Button>
+		<ButtonStyled v-if="status === 'added'" type="standard" color-fill="none">
+			<button disabled>
+				<CheckIcon aria-hidden="true" />
+				{{ addedLabel }}
+			</button>
+		</ButtonStyled>
+		<ButtonStyled v-else-if="status === 'pending'" type="outlined">
+			<button :disabled="disabled" @click="$emit('cancel', user)">
+				{{ cancelLabel }}
+			</button>
+		</ButtonStyled>
 		<span v-else-if="status === 'requested'" v-tooltip="requestedTooltip" class="inline-flex">
-			<Button disabled>{{ requestedLabel }}</Button>
+			<ButtonStyled type="standard" color-fill="none">
+				<button disabled>
+					{{ requestedLabel }}
+				</button>
+			</ButtonStyled>
 		</span>
-		<Button v-else :disabled="disabled" @click="$emit('invite', user)">
-			{{ inviteLabel }}
-		</Button>
+		<ButtonStyled v-else color-fill="none">
+			<button :disabled="disabled" @click="$emit('invite', user)">
+				{{ inviteLabel }}
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 
@@ -57,7 +62,7 @@ import { computed } from 'vue'
 
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import type { InvitePlayersUser, InvitePlayersUserProfileLink } from './types'
 
 const props = withDefaults(

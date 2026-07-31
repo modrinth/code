@@ -2,7 +2,7 @@
 import { InfoIcon, XIcon } from '@modrinth/assets'
 import { computed, toValue } from 'vue'
 
-import IconButton from '#ui/components/base/buttons/IconButton.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 import { useVIntl } from '#ui/composables/i18n'
@@ -103,12 +103,11 @@ function getFilterOpenByDefault(filterId: string): boolean {
 			class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
 		>
 			<h3 class="m-0 text-lg text-contrast">{{ formatMessage(commonMessages.filtersLabel) }}</h3>
-			<IconButton
-				:label="formatMessage(commonMessages.closeButton)"
-				@click="closeFiltersMenu"
-			>
-				<XIcon aria-hidden="true" />
-			</IconButton>
+			<ButtonStyled circular>
+				<button @click="closeFiltersMenu">
+					<XIcon />
+				</button>
+			</ButtonStyled>
 		</div>
 
 		<div

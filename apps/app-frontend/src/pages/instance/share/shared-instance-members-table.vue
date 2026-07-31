@@ -11,7 +11,8 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<Button type="outlined"
+					<ButtonStyled type="outlined">
+						<button
 							class="flex !h-10 shrink-0 items-center gap-2 !border"
 							:disabled="pushUpdateDisabled"
 							@click="emit('push-update', $event)"
@@ -19,8 +20,10 @@
 							<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
 							<UploadIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.pushUpdate) }}
-						</Button>
-					<Button color="brand" type="colored"
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
 							:disabled="invitePending || inviteDisabled"
 							@click="emit('invite', $event)"
@@ -28,7 +31,8 @@
 							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
 							<UserPlusIcon v-else aria-hidden="true" />
 							Invite friends
-						</Button>
+						</button>
+					</ButtonStyled>
 				</template>
 			</div>
 			<div v-if="hasMultipleMethods" class="flex flex-wrap items-center gap-1.5">
@@ -116,15 +120,15 @@
 			</template>
 			<template #cell-actions="{ row }">
 				<div v-if="!actionsLocked" class="flex items-center justify-end">
-					<IconButton
-						:label="formatMessage(messages.revokeAccess, { username: row.username })"
-						type="quiet"
-						color="red"
-						class="text-secondary"
-						@click="emit('remove', row)"
-					>
-						<XIcon aria-hidden="true" />
-					</IconButton>
+					<ButtonStyled circular type="transparent"
+						><button
+							v-tooltip="'Revoke access'"
+							:aria-label="`Revoke access for ${row.username}`"
+							class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
+							@click="emit('remove', row)"
+						>
+							<XIcon aria-hidden="true" /></button
+					></ButtonStyled>
 				</div>
 			</template>
 		</Table>
@@ -132,7 +136,6 @@
 </template>
 
 <script setup lang="ts">
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	FilterIcon,
 	LinkIcon,
@@ -145,8 +148,8 @@ import {
 import {
 	AutoLink,
 	Avatar,
+	ButtonStyled,
 	defineMessages,
-	IconButton,
 	type SortDirection,
 	StyledInput,
 	Table,
@@ -303,10 +306,6 @@ const messages = defineMessages({
 	noUsersMatchFilters: {
 		id: 'app.instance.share.members.no-filter-results',
 		defaultMessage: 'No users match your filters.',
-	},
-	revokeAccess: {
-		id: 'app.instance.share.members.revoke-access',
-		defaultMessage: 'Revoke access for {username}',
 	},
 })
 function userProfileLink(username: string) {

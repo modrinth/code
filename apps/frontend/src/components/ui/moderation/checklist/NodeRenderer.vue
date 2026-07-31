@@ -26,7 +26,7 @@ import {
 	setMessageProject,
 } from '@modrinth/moderation'
 import {
-	Button,
+	ButtonStyled,
 	Checkbox,
 	Combobox,
 	injectProjectPageContext,
@@ -555,24 +555,25 @@ watchEffect(async () => {
 									v-for="child in visibleChildren(asIdentified(item))"
 									:key="asIdentified(child).id"
 								>
-									<Button
-										type="colored"
+									<ButtonStyled
 										:color="
 											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
 												? hasActionableFixes(asIdentified(child))
 													? 'blue'
 													: 'brand'
-												: undefined
+												: 'standard'
 										"
+										:circular="!!asIdentified(child)._icon"
 										@click="toggleChip(asIdentified(item), asIdentified(child))"
 									>
-										<component
-											:is="asIdentified(child)._icon"
-											v-if="asIdentified(child)._icon"
-											aria-hidden="true"
-										/>
-										<template v-else>{{ asLabeled(child).label }}</template>
-									</Button>
+										<button
+											v-tooltip="getTooltipConfig(asIdentified(child))"
+											:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
+										>
+											<component :is="asIdentified(child)._icon" v-if="asIdentified(child)._icon" />
+											<template v-else>{{ asLabeled(child).label }}</template>
+										</button>
+									</ButtonStyled>
 								</template>
 							</div>
 							<template
@@ -600,23 +601,22 @@ watchEffect(async () => {
 									v-for="child in visibleChildren(asIdentified(item))"
 									:key="asIdentified(child).id"
 								>
-									<Button
-										type="colored"
+									<ButtonStyled
 										:color="
 											getSelectState(asIdentified(item)) === asIdentified(child).id
 												? 'brand'
-												: undefined
+												: 'standard'
 										"
-										:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
-										@click="toggleSelect(asIdentified(item), asIdentified(child))"
+										:circular="!!asIdentified(child)._icon"
 									>
-										<component
-											:is="asIdentified(child)._icon"
-											v-if="asIdentified(child)._icon"
-											aria-hidden="true"
-										/>
-										<template v-else>{{ asLabeled(child).label }}</template>
-									</Button>
+										<button
+											:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
+											@click="toggleSelect(asIdentified(item), asIdentified(child))"
+										>
+											<component :is="asIdentified(child)._icon" v-if="asIdentified(child)._icon" />
+											<template v-else>{{ asLabeled(child).label }}</template>
+										</button>
+									</ButtonStyled>
 								</template>
 							</div>
 							<template
@@ -680,31 +680,32 @@ watchEffect(async () => {
 
 					<!-- button -->
 					<template v-else-if="item.type === 'button'">
-						<Button
-							:type="item._icon && !asButton(item).label ? 'quiet' : 'base'"
-							:aria-label="item._icon && !asButton(item).label ? asButton(item).label : undefined"
-							v-tooltip="getTooltipConfig(item, showContext)"
-							:disabled="!isButtonEnabled(asButton(item))"
-							@click="handleButtonClick(asButton(item))"
-						>
-							<component :is="item._icon" v-if="item._icon" aria-hidden="true" />
-							{{ asButton(item).label }}
-						</Button>
+						<ButtonStyled :circular="!!item._icon && !asButton(item).label">
+							<button
+								v-tooltip="getTooltipConfig(item, showContext)"
+								:disabled="!isButtonEnabled(asButton(item))"
+								:aria-label="item._icon && !asButton(item).label ? asButton(item).label : undefined"
+								@click="handleButtonClick(asButton(item))"
+							>
+								<component :is="item._icon" v-if="item._icon" />
+								{{ asButton(item).label }}
+							</button>
+						</ButtonStyled>
 					</template>
 
 					<!-- toggle -->
 					<template v-else-if="item.type === 'toggle'">
-						<Button
-							type="colored"
-							:color="getBooleanColor(asBool(item))"
-							v-tooltip="getTooltipConfig(asBool(item))"
-							:disabled="!isEnabled(asIdentified(item))"
-							:aria-label="item._icon ? asLabeled(item).label : undefined"
-							@click="toggleBoolean(asBool(item))"
-						>
-							<component :is="item._icon" v-if="item._icon" aria-hidden="true" />
-							<template v-else>{{ asLabeled(item).label }}</template>
-						</Button>
+						<ButtonStyled :color="getBooleanColor(asBool(item))" :circular="!!item._icon">
+							<button
+								v-tooltip="getTooltipConfig(asBool(item))"
+								:disabled="!isEnabled(asIdentified(item))"
+								:aria-label="item._icon ? asLabeled(item).label : undefined"
+								@click="toggleBoolean(asBool(item))"
+							>
+								<component :is="item._icon" v-if="item._icon" />
+								<template v-else>{{ asLabeled(item).label }}</template>
+							</button>
+						</ButtonStyled>
 					</template>
 
 					<!-- check -->

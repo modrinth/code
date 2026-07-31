@@ -95,15 +95,11 @@
 									</div>
 								</template>
 							</div>
-							<IconButton
-								v-if="item.dismissible !== false"
-								label="Dismiss notification"
-								type="quiet"
-								class="-m-1.5"
-								@click="dismiss(item.id)"
-							>
-								<XIcon aria-hidden="true" />
-							</IconButton>
+							<ButtonStyled v-if="item.dismissible !== false" type="transparent" circular>
+								<button class="-m-1.5" @click="dismiss(item.id)">
+									<XIcon />
+								</button>
+							</ButtonStyled>
 						</div>
 						<span v-if="item.text" class="text-primary">
 							{{ item.text }}
@@ -146,22 +142,16 @@
 						full-width
 					/>
 					<div v-if="item.buttons?.length" class="flex gap-1.5">
-						<Button
+						<ButtonStyled
 							v-for="(btn, idx) in item.buttons"
 							:key="idx"
-							:type="
-								(btn.color && btn.color !== 'standard') || (!btn.color && idx === 0)
-									? 'colored'
-									: 'base'
-							"
-							:color="
-								btn.color === 'standard' ? undefined : btn.color || (idx === 0 ? 'brand' : undefined)
-							"
-							@click="handleButtonClick(item.id, btn)"
+							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
 						>
-							<component :is="btn.icon" v-if="btn.icon" aria-hidden="true" />
-							{{ btn.label }}
-						</Button>
+							<button class="!shadow-none" @click="handleButtonClick(item.id, btn)">
+								<component :is="btn.icon" v-if="btn.icon" />
+								{{ btn.label }}
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>
@@ -188,8 +178,7 @@ import {
 	type PopupNotificationButton,
 	type PopupNotificationProgressItem,
 } from '../../providers'
-import Button from '../base/buttons/Button.vue'
-import IconButton from '../base/buttons/IconButton.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import ProgressBar from '../base/ProgressBar.vue'
 import NotificationToast from '../notifications/NotificationToast.vue'
 

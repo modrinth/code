@@ -54,16 +54,12 @@
 						:triggers="['hover', 'focus']"
 						no-auto-focus
 					>
-						<span class="my-auto align-middle">
-							<IconButton
-								label="Cancel transaction"
-								type="outlined"
-								size="sm"
-								@click="cancelPayout"
-							>
-								<XIcon aria-hidden="true" />
-							</IconButton>
-						</span>
+						<span class="my-auto align-middle"
+							><ButtonStyled circular type="outlined" size="small">
+								<button class="align-middle" @click="cancelPayout">
+									<XIcon />
+								</button> </ButtonStyled
+						></span>
 						<template #popper>
 							<div class="font-semibold text-contrast">Cancel transaction</div>
 						</template>
@@ -86,8 +82,8 @@ import {
 } from '@modrinth/assets'
 import {
 	BulletDivider,
+	ButtonStyled,
 	getCurrencyIcon,
-	IconButton,
 	injectNotificationManager,
 	useFormatDateTime,
 	useFormatMoney,

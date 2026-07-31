@@ -9,7 +9,7 @@ export { default as Badge } from './Badge.vue'
 export { default as BaseTerminal } from './BaseTerminal.vue'
 export { default as BigOptionButton } from './BigOptionButton.vue'
 export { default as BulletDivider } from './BulletDivider.vue'
-export { default as Button } from './buttons/Button.vue'
+export { default as Button } from './Button.vue'
 export { default as ButtonGroup } from './buttons/ButtonGroup.vue'
 export { default as ButtonLink } from './buttons/ButtonLink.vue'
 export { default as FileButton } from './buttons/FileButton.vue'
@@ -20,7 +20,6 @@ export { default as TeleportPopoutMenu } from './buttons/TeleportPopoutMenu.vue'
 export type {
 	ButtonColor,
 	ButtonNativeType,
-	ButtonProps,
 	ButtonSize,
 	ButtonType,
 	ButtonVisualProps,
@@ -30,6 +29,7 @@ export type {
 	OverflowMenuOption,
 	TeleportPlacement,
 } from './buttons/types'
+export { default as ButtonStyled } from './ButtonStyled.vue'
 export { default as Card } from './Card.vue'
 export { default as Checkbox } from './Checkbox.vue'
 export { default as Chips } from './Chips.vue'
@@ -65,6 +65,8 @@ export { default as HorizontalRule } from './HorizontalRule.vue'
 export { default as I18nDebugPanel } from './I18nDebugPanel.vue'
 export { default as IconSelect } from './IconSelect.vue'
 export { default as IntlFormatted } from './IntlFormatted.vue'
+export type { JoinedButtonAction } from './JoinedButtons.vue'
+export { default as JoinedButtons } from './JoinedButtons.vue'
 export { default as LoadingBar } from './LoadingBar.vue'
 export { default as LoadingIndicator } from './LoadingIndicator.vue'
 export { default as ManySelect } from './ManySelect.vue'

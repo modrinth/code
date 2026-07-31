@@ -1,19 +1,18 @@
 <template>
 	<div v-if="count > 1" class="flex items-center gap-1">
-		<template v-if="page > 1">
-			<ButtonLink
+		<ButtonStyled v-if="page > 1" circular type="transparent">
+			<a
 				v-if="linkFunction"
-				type="quiet"
 				aria-label="Previous Page"
-				:href="linkFunction(page - 1) ?? ''"
+				:href="linkFunction(page - 1)"
 				@click.prevent="switchPage(page - 1)"
 			>
-				<ChevronLeftIcon aria-hidden="true" />
-			</ButtonLink>
-			<IconButton v-else label="Previous Page" type="quiet" @click="switchPage(page - 1)">
-				<ChevronLeftIcon aria-hidden="true" />
-			</IconButton>
-		</template>
+				<ChevronLeftIcon />
+			</a>
+			<button v-else aria-label="Previous Page" @click="switchPage(page - 1)">
+				<ChevronLeftIcon />
+			</button>
+		</ButtonStyled>
 		<div
 			v-for="(item, index) in pages"
 			:key="'page-' + item + '-' + index"
@@ -26,50 +25,50 @@
 			<div v-if="item === '-'" class="rotate-90 grid place-content-center">
 				<EllipsisVerticalIcon />
 			</div>
-			<ButtonLink
-				v-else-if="linkFunction"
-				:href="linkFunction(item) ?? ''"
-				type="quiet"
-				:color="page === item ? 'brand' : undefined"
-				:aria-current="page === item ? 'page' : undefined"
-				@click.prevent="page !== item ? switchPage(item) : null"
-			>
-				{{ item }}
-			</ButtonLink>
-			<Button
+			<ButtonStyled
 				v-else
-				type="quiet"
-				:color="page === item ? 'brand' : undefined"
-				:aria-current="page === item ? 'page' : undefined"
-				@click="page !== item ? switchPage(item) : null"
+				circular
+				:color="page === item ? 'brand' : 'standard'"
+				:type="page === item ? 'highlight' : 'transparent'"
 			>
-				{{ item }}
-			</Button>
+				<a
+					v-if="linkFunction"
+					:href="linkFunction(item)"
+					:class="page === item ? '!text-brand' : ''"
+					@click.prevent="page !== item ? switchPage(item) : null"
+				>
+					{{ item }}
+				</a>
+				<button
+					v-else
+					:class="page === item ? '!text-brand' : ''"
+					@click="page !== item ? switchPage(item) : null"
+				>
+					{{ item }}
+				</button>
+			</ButtonStyled>
 		</div>
 
-		<template v-if="page !== pages[pages.length - 1]">
-			<ButtonLink
+		<ButtonStyled v-if="page !== pages[pages.length - 1]" circular type="transparent">
+			<a
 				v-if="linkFunction"
-				type="quiet"
 				aria-label="Next Page"
-				:href="linkFunction(page + 1) ?? ''"
+				:href="linkFunction(page + 1)"
 				@click.prevent="switchPage(page + 1)"
 			>
-				<ChevronRightIcon aria-hidden="true" />
-			</ButtonLink>
-			<IconButton v-else label="Next Page" type="quiet" @click="switchPage(page + 1)">
-				<ChevronRightIcon aria-hidden="true" />
-			</IconButton>
-		</template>
+				<ChevronRightIcon />
+			</a>
+			<button v-else aria-label="Next Page" @click="switchPage(page + 1)">
+				<ChevronRightIcon />
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon, EllipsisVerticalIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import Button from './buttons/Button.vue'
-import ButtonLink from './buttons/ButtonLink.vue'
-import IconButton from './buttons/IconButton.vue'
+import ButtonStyled from './ButtonStyled.vue'
 
 const emit = defineEmits<{
 	'switch-page': [page: number]

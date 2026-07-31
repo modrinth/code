@@ -55,42 +55,48 @@
 							</div>
 						</div>
 						<div class="flex gap-2">
-							<IconButton
-								v-tooltip="formatMessage(commonMessages.renameButton)"
-								:label="formatMessage(commonMessages.renameButton)"
-								@click="
-									() => {
-										passkeyToRename = { ...passkey }
-										renamePasskeyModal?.show()
-									}
-								"
-							>
-								<EditIcon aria-hidden="true" />
-							</IconButton>
-							<IconButton
-								v-tooltip="formatMessage(messages.deletePasskeyButton)"
-								:label="formatMessage(messages.deletePasskeyButton)"
-								@click="
-									() => {
-										passkeyToRemove = passkey
-										removePasskeyModal?.show()
-									}
-								"
-							>
-								<TrashIcon aria-hidden="true" />
-							</IconButton>
+							<ButtonStyled circular>
+								<button
+									v-tooltip="formatMessage(commonMessages.renameButton)"
+									@click="
+										() => {
+											passkeyToRename = { ...passkey }
+											renamePasskeyModal?.show()
+										}
+									"
+								>
+									<EditIcon />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular>
+								<button
+									v-tooltip="formatMessage(messages.deletePasskeyButton)"
+									@click="
+										() => {
+											passkeyToRemove = passkey
+											removePasskeyModal?.show()
+										}
+									"
+								>
+									<TrashIcon />
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</template>
 				<div class="input-group self-end">
-					<Button @click="registerPasskey()">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
-					</Button>
-					<Button @click="managePasskeyModal?.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.closeButton) }}
-					</Button>
+					<ButtonStyled>
+						<button @click="registerPasskey()">
+							<PlusIcon />
+							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="managePasskeyModal?.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.closeButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -118,19 +124,18 @@
 					</div>
 				</div>
 				<div class="flex justify-end gap-2.5">
-					<Button @click="addPasskeyModal?.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						:disabled="!pendingPasskeyName"
-						@click="finishRegisterPasskey()"
-					>
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
-					</Button>
+					<ButtonStyled>
+						<button @click="addPasskeyModal?.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button :disabled="!pendingPasskeyName" @click="finishRegisterPasskey()">
+							<PlusIcon />
+							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -158,19 +163,18 @@
 					</div>
 				</div>
 				<div class="flex justify-end gap-2.5">
-					<Button @click="renamePasskeyModal?.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						:disabled="!passkeyToRenameName"
-						@click="renamePasskey()"
-					>
-						<SaveIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.saveButton) }}
-					</Button>
+					<ButtonStyled>
+						<button @click="renamePasskeyModal?.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button :disabled="!passkeyToRenameName" @click="renamePasskey()">
+							<SaveIcon />
+							{{ formatMessage(commonMessages.saveButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -183,10 +187,11 @@
 				}}</span>
 			</label>
 			<div>
-				<Button id="manage-passkeys" @click="showPasskeyModal">
-					<UserKeyIcon aria-hidden="true" />
-					{{ formatMessage(messages.managePasskeyButton) }}
-				</Button>
+				<ButtonStyled>
+					<button id="manage-passkeys" @click="showPasskeyModal">
+						<UserKeyIcon /> {{ formatMessage(messages.managePasskeyButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -204,19 +209,18 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	IconButton,
 	NewModal,
 	StyledInput,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { createPasskeyCredential } from '~/helpers/passkey.ts'

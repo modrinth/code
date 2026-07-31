@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import Button from '../../components/base/buttons/Button.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import RemoveAccessModal from '../../components/servers/access/RemoveAccessModal.vue'
 
 const meta = {
@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	render: () => ({
-		components: { Button, RemoveAccessModal },
+		components: { ButtonStyled, RemoveAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 			const removed = ref(false)
@@ -28,7 +28,9 @@ export const Default: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<Button color="red" type="colored" @click="modalRef?.show()">Remove user</Button>
+				<ButtonStyled color="red">
+					<button @click="modalRef?.show()">Remove user</button>
+				</ButtonStyled>
 				<p v-if="removed" class="m-0 text-sm text-secondary">User removed</p>
 				<RemoveAccessModal
 					ref="modalRef"
@@ -44,7 +46,7 @@ export const Default: Story = {
 
 export const CancelInvite: Story = {
 	render: () => ({
-		components: { Button, RemoveAccessModal },
+		components: { ButtonStyled, RemoveAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 			const cancelled = ref(false)
@@ -55,7 +57,9 @@ export const CancelInvite: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<Button color="red" type="colored" @click="modalRef?.show()">Cancel invite</Button>
+				<ButtonStyled color="red">
+					<button @click="modalRef?.show()">Cancel invite</button>
+				</ButtonStyled>
 				<p v-if="cancelled" class="m-0 text-sm text-secondary">Invite cancelled</p>
 				<RemoveAccessModal
 					ref="modalRef"

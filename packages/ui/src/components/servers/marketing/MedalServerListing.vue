@@ -120,17 +120,11 @@
 			</div>
 
 			<div class="z-10 ml-auto">
-				<Button
-					type="colored"
-					color="medal_promotion"
-					size="lg"
-					class="my-auto"
-					data-server-listing-button
-					@click="handleUpgrade"
-				>
-					<RocketIcon aria-hidden="true" />
-					{{ formatMessage(messages.upgradeButton) }}
-				</Button>
+				<ButtonStyled color="medal-promo" type="outlined" size="large">
+					<button class="my-auto" data-server-listing-button @click="handleUpgrade">
+						<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 
@@ -177,7 +171,7 @@ import { useRouter } from 'vue-router'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectModrinthClient } from '../../../providers/api-client'
 import Avatar from '../../base/Avatar.vue'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import CopyCode from '../../base/CopyCode.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
 import type { ServerListingOwner } from '../access/types'

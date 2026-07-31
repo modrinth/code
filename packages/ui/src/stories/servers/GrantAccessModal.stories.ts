@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import Button from '../../components/base/buttons/Button.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import GrantAccessModal from '../../components/servers/access/GrantAccessModal.vue'
 import type {
 	GrantServerAccessPayload,
@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	render: () => ({
-		components: { Button, GrantAccessModal },
+		components: { ButtonStyled, GrantAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 			const lastAddedUser = ref('')
@@ -49,7 +49,9 @@ export const Default: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<Button color="brand" type="colored" @click="modalRef?.show($event)">Add user</Button>
+				<ButtonStyled color="brand">
+					<button @click="modalRef?.show($event)">Add user</button>
+				</ButtonStyled>
 				<p v-if="lastAddedUser" class="m-0 text-sm text-secondary">Last added: {{ lastAddedUser }}</p>
 				<GrantAccessModal ref="modalRef" :search-users="searchUsers" @grant="handleGrant" />
 			</div>
@@ -59,7 +61,7 @@ export const Default: Story = {
 
 export const ExistingMember: Story = {
 	render: () => ({
-		components: { Button, GrantAccessModal },
+		components: { ButtonStyled, GrantAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 			const users = [
@@ -86,7 +88,9 @@ export const ExistingMember: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<Button color="brand" type="colored" @click="modalRef?.show($event)">Add existing user</Button>
+				<ButtonStyled color="brand">
+					<button @click="modalRef?.show($event)">Add existing user</button>
+				</ButtonStyled>
 				<GrantAccessModal ref="modalRef" :members="members" :search-users="searchUsers" />
 			</div>
 		`,

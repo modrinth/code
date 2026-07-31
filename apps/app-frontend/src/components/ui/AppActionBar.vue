@@ -1,11 +1,15 @@
 <template>
 	<div class="flex gap-2 items-center">
-		<IconButton
+		<ButtonStyled
 			v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts"
-			color="brand" type="quiet"
-		 :label="formatMessage(messages.viewActiveDownloads)" v-tooltip="formatMessage(messages.viewActiveDownloads)" @click="openDownloadToast()">
+			color="brand"
+			type="transparent"
+			circular
+		>
+			<button v-tooltip="formatMessage(messages.viewActiveDownloads)" @click="openDownloadToast()">
 				<DownloadIcon />
-			</IconButton>
+			</button>
+		</ButtonStyled>
 		<div v-if="offline" class="flex items-center gap-1">
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
@@ -32,11 +36,8 @@
 						@show="showInstances = true"
 						@hide="showInstances = false"
 					>
-						<IconButton type="quiet" size="sm" :label="
-									showInstances
-										? formatMessage(messages.hideMoreRunningInstances)
-										: formatMessage(messages.showMoreRunningInstances)
-								"
+						<ButtonStyled type="transparent" circular size="small">
+							<button
 								v-tooltip="
 									showInstances
 										? formatMessage(messages.hideMoreRunningInstances)
@@ -44,7 +45,8 @@
 								"
 							>
 								<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
-							</IconButton>
+							</button>
+						</ButtonStyled>
 						<template #popper>
 							<div class="flex w-[20rem] max-h-[24rem] flex-col gap-2 overflow-auto">
 								<div
@@ -124,7 +126,7 @@ import {
 	UnplugIcon,
 } from '@modrinth/assets'
 import {
-	IconButton,
+	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	injectPopupNotificationManager,

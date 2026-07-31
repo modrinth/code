@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ChevronRightIcon, SaveIcon, UndoIcon, XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
@@ -113,18 +113,24 @@ const messages = defineMessages({
 			<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
 		</div>
 		<div class="flex gap-2 mt-4">
-			<Button color="brand" type="colored" @click="saveWorld">
+			<ButtonStyled color="brand">
+				<button @click="saveWorld">
 					<SaveIcon />
 					{{ formatMessage(commonMessages.saveChangesButton) }}
-				</Button>
-			<Button :disabled="removeIcon || !icon" @click="removeIcon = true">
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button :disabled="removeIcon || !icon" @click="removeIcon = true">
 					<UndoIcon />
 					{{ formatMessage(messages.resetIcon) }}
-				</Button>
-			<Button @click="hide()">
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button @click="hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
+				</button>
+			</ButtonStyled>
 		</div>
 	</ModalWrapper>
 </template>

@@ -43,14 +43,18 @@
 				<Toggle id="unprovision" v-model="unprovision" />
 			</div>
 			<div class="flex gap-2">
-				<Button type="colored" color="brand" :loading="refunding" @click="refundCharge">
-					<CheckIcon aria-hidden="true" />
-					Refund charge
-				</Button>
-				<Button @click="refundModal.hide()">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
+				<ButtonStyled color="brand">
+					<button :disabled="refunding" @click="refundCharge">
+						<CheckIcon aria-hidden="true" />
+						Refund charge
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="refundModal.hide()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -78,14 +82,18 @@
 				<Toggle id="cancel" v-model="cancel" />
 			</div>
 			<div class="flex gap-2">
-				<Button type="colored" color="brand" :loading="modifying" @click="modifyCharge">
-					<CheckIcon aria-hidden="true" />
-					Modify charge
-				</Button>
-				<Button @click="modifyModal.hide()">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
+				<ButtonStyled color="brand">
+					<button :disabled="modifying" @click="modifyCharge">
+						<CheckIcon aria-hidden="true" />
+						Modify charge
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="modifyModal.hide()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -109,14 +117,18 @@
 				<Toggle id="sendEmail" v-model="creditSendEmail" />
 			</div>
 			<div class="flex gap-2">
-				<Button type="colored" color="brand" :loading="crediting" @click="applyCredit">
-					<CheckIcon aria-hidden="true" />
-					Apply credit
-				</Button>
-				<Button @click="creditModal.hide()">
-					<XIcon aria-hidden="true" />
-					Cancel
-				</Button>
+				<ButtonStyled color="brand">
+					<button :disabled="crediting" @click="applyCredit">
+						<CheckIcon aria-hidden="true" />
+						Apply credit
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="creditModal.hide()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -129,11 +141,13 @@
 				<h1 class="m-0 text-2xl font-extrabold">{{ user?.username }}'s subscriptions</h1>
 			</div>
 			<div class="flex items-center gap-2">
-				<ButtonLink :to="`/user/${user?.id}`">
-					<UserIcon aria-hidden="true" />
-					User profile
-					<ExternalIcon aria-hidden="true" />
-				</ButtonLink>
+				<ButtonStyled>
+					<nuxt-link :to="`/user/${user?.id}`">
+						<UserIcon aria-hidden="true" />
+						User profile
+						<ExternalIcon class="h-4 w-4" />
+					</nuxt-link>
+				</ButtonStyled>
 			</div>
 		</div>
 		<div>
@@ -162,21 +176,25 @@
 					</div>
 					<div v-if="subscription.metadata?.id" class="flex flex-col items-end gap-2">
 						<CopyCode :text="subscription.metadata.id" />
-						<ButtonLink
+						<ButtonStyled
 							v-if="
 								subscription.metadata?.type === 'pyro' || subscription.metadata?.type === 'medal'
 							"
-							:to="`/hosting/manage/${subscription.metadata.id}`"
-							target="_blank"
-							class="w-fit"
 						>
-							<ServerIcon aria-hidden="true" /> Server panel
-							<ExternalIcon aria-hidden="true" />
-						</ButtonLink>
-						<Button @click="showCreditModal(subscription)">
-							<CurrencyIcon aria-hidden="true" />
-							Credit
-						</Button>
+							<nuxt-link
+								:to="`/hosting/manage/${subscription.metadata.id}`"
+								target="_blank"
+								class="w-fit"
+							>
+								<ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
+							</nuxt-link>
+						</ButtonStyled>
+						<ButtonStyled>
+							<button @click="showCreditModal(subscription)">
+								<CurrencyIcon />
+								Credit
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 				<div class="flex flex-col gap-2">
@@ -206,10 +224,9 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
-	ButtonLink,
+	ButtonStyled,
 	CopyCode,
 	defineMessages,
 	DropdownSelect,

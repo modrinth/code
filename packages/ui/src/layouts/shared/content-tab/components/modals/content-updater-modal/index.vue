@@ -95,15 +95,25 @@
 					class="absolute bottom-0 left-0 right-0 pointer-events-none flex flex-col items-center justify-end bg-gradient-to-b from-transparent to-bg-raised to-70% pb-3 h-24"
 				>
 					<div class="pointer-events-auto">
-						<Button type="quiet" @click="hideIncompatibleState = !hideIncompatibleState">
-							<EyeIcon v-if="hideIncompatibleState" aria-hidden="true" />
-							<EyeOffIcon v-else aria-hidden="true" />
-							{{
-								hideIncompatibleState
-									? formatMessage(messages.showIncompatible)
-									: formatMessage(messages.hideIncompatible)
-							}}
-						</Button>
+						<ButtonStyled type="transparent" :circular="true">
+							<button
+								class="flex items-center gap-1.5"
+								:aria-label="
+									hideIncompatibleState
+										? formatMessage(messages.showIncompatible)
+										: formatMessage(messages.hideIncompatible)
+								"
+								@click="hideIncompatibleState = !hideIncompatibleState"
+							>
+								<EyeIcon v-if="hideIncompatibleState" class="h-6 w-6" />
+								<EyeOffIcon v-else class="h-6 w-6" />
+								<span class="font-medium">{{
+									hideIncompatibleState
+										? formatMessage(messages.showIncompatible)
+										: formatMessage(messages.hideIncompatible)
+								}}</span>
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>
@@ -204,24 +214,25 @@
 				}}</span>
 			</div>
 			<div class="flex flex-row gap-2 shrink-0 ml-auto">
-				<Button type="outlined" @click="handleCancel">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button
-					v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
-					type="colored"
-					:color="incompatibilityWarningMode ? 'orange' : 'brand'"
-					:disabled="
-						actionLoading ||
-						props.actionDisabled ||
-						!selectedVersion ||
-						(!incompatibilityWarningMode && selectedVersion.id === currentVersionId)
-					"
-					@click="handleUpdate"
-				>
-						<SpinnerIcon v-if="actionLoading" class="animate-spin" aria-hidden="true" />
-						<DownloadIcon v-else aria-hidden="true" />
+				<ButtonStyled type="outlined">
+					<button @click="handleCancel">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled :color="incompatibilityWarningMode ? 'orange' : 'brand'">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="
+							actionLoading ||
+							props.actionDisabled ||
+							!selectedVersion ||
+							(!incompatibilityWarningMode && selectedVersion.id === currentVersionId)
+						"
+						@click="handleUpdate"
+					>
+						<SpinnerIcon v-if="actionLoading" class="size-5 animate-spin" />
+						<DownloadIcon v-else />
 						{{
 							actionLoading
 								? formatMessage(commonMessages.installingLabel)
@@ -238,7 +249,8 @@
 											},
 										)
 						}}
-				</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -282,7 +294,7 @@ import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, toRef } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'

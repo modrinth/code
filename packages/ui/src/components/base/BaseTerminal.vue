@@ -12,16 +12,11 @@
 				/>
 			</Transition>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4 z-10">
-				<IconButton
-					label="Scroll to bottom"
-					type="colored"
-					color="brand"
-					size="xl"
-					class="shadow-2xl"
-					@click="scrollToBottom"
-				>
-					<ChevronDownIcon aria-hidden="true" />
-				</IconButton>
+				<ButtonStyled circular type="highlight" size="large">
+					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
+						<ChevronDownIcon />
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 		<div
@@ -48,7 +43,7 @@ import { ChevronDownIcon, TerminalSquareIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import IconButton from '#ui/components/base/buttons/IconButton.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { useTerminal } from '#ui/composables/terminal'
 

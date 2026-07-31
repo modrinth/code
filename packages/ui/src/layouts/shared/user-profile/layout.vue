@@ -13,20 +13,19 @@
 
 			<template #actions>
 				<div class="flex justify-end gap-2">
-					<Button type="outlined" :disabled="isBlockingUser" @click="blockUserModal?.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="red"
-						:loading="isBlockingUser"
-						@click="confirmBlockUser"
-					>
-						<SpinnerIcon v-if="isBlockingUser" class="animate-spin" aria-hidden="true" />
-						<BanIcon v-else aria-hidden="true" />
-						{{ formatMessage(messages.blockButton) }}
-					</Button>
+					<ButtonStyled type="outlined">
+						<button type="button" :disabled="isBlockingUser" @click="blockUserModal?.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red">
+						<button type="button" :disabled="isBlockingUser" @click="confirmBlockUser">
+							<SpinnerIcon v-if="isBlockingUser" class="animate-spin" />
+							<BanIcon v-else />
+							{{ formatMessage(messages.blockButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</template>
 		</NewModal>
@@ -43,25 +42,28 @@
 					:placeholder="formatMessage(messages.selectRolePlaceholder)"
 				/>
 				<div class="flex justify-end gap-2">
-					<Button @click="cancelRoleEdit">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						:loading="isSavingRole"
-						:disabled="!selectedRole || selectedRole === user.role"
-						@click="saveRoleEdit"
-					>
-						<SpinnerIcon v-if="isSavingRole" class="animate-spin" aria-hidden="true" />
-						<SaveIcon v-else aria-hidden="true" />
-						{{
-							isSavingRole
-								? formatMessage(messages.savingLabel)
-								: formatMessage(commonMessages.saveChangesButton)
-						}}
-					</Button>
+					<ButtonStyled>
+						<button type="button" @click="cancelRoleEdit">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							type="button"
+							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+							@click="saveRoleEdit"
+						>
+							<template v-if="isSavingRole">
+								<SpinnerIcon class="animate-spin" />
+								{{ formatMessage(messages.savingLabel) }}
+							</template>
+							<template v-else>
+								<SaveIcon />
+								{{ formatMessage(commonMessages.saveChangesButton) }}
+							</template>
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -268,9 +270,11 @@
 						"
 					>
 						<template v-if="isSelf" #actions>
-							<Button type="colored" color="brand" @click="createProject">
-								{{ formatMessage(messages.createProjectButton) }}
-							</Button>
+							<ButtonStyled color="brand">
+								<button type="button" @click="createProject">
+									{{ formatMessage(messages.createProjectButton) }}
+								</button>
+							</ButtonStyled>
 						</template>
 					</EmptyState>
 
@@ -350,9 +354,11 @@
 						"
 					>
 						<template v-if="isSelf" #actions>
-							<Button type="colored" color="brand" @click="createCollection">
-								{{ formatMessage(messages.createCollectionButton) }}
-							</Button>
+							<ButtonStyled color="brand">
+								<button type="button" @click="createCollection">
+									{{ formatMessage(messages.createCollectionButton) }}
+								</button>
+							</ButtonStyled>
 						</template>
 					</EmptyState>
 				</div>
@@ -405,9 +411,11 @@
 			:description="formatMessage(messages.userLoadErrorDescription)"
 		>
 			<template #actions>
-				<Button type="colored" color="brand" @click="retryQueries">
-					{{ formatMessage(commonMessages.retryButton) }}
-				</Button>
+				<ButtonStyled color="brand">
+					<button type="button" @click="retryQueries">
+						{{ formatMessage(commonMessages.retryButton) }}
+					</button>
+				</ButtonStyled>
 			</template>
 		</EmptyState>
 	</div>
@@ -439,7 +447,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'

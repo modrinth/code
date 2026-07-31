@@ -9,16 +9,12 @@
 			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
-				<IconButton
-					type="quiet"
-					:color="installed && version.id === installedVersion ? undefined : 'green'"
-					:label="
-							!installed
-								? formatMessage(commonMessages.installButton)
-								: version.id !== installedVersion
-									? formatMessage(commonMessages.switchToVersionButton)
-									: formatMessage(messages.alreadyInstalled)
-						"
+				<ButtonStyled
+					circular
+					type="transparent"
+					:color="installed && version.id === installedVersion ? 'standard' : 'green'"
+				>
+					<button
 						v-tooltip="
 							!installed
 								? formatMessage(commonMessages.installButton)
@@ -29,31 +25,60 @@
 						:disabled="installing || (installed && version.id === installedVersion)"
 						@click.stop="() => install(version.id)"
 					>
-						<DownloadIcon v-if="!installed" aria-hidden="true" />
-						<SwapIcon v-else-if="installed && version.id !== installedVersion" aria-hidden="true" />
-						<CheckIcon v-else aria-hidden="true" />
-					</IconButton>
-				<ButtonLink
-					:aria-label="formatMessage(commonMessages.openInBrowserButton)"
-					type="quiet"
-					:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
-					target="_blank"
-				>
-					<ExternalIcon aria-hidden="true" />
-				</ButtonLink>
+						<DownloadIcon v-if="!installed" />
+						<SwapIcon v-else-if="installed && version.id !== installedVersion" />
+						<CheckIcon v-else />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular type="transparent">
+					<OverflowMenu
+						v-if="false"
+						:options="[
+							{
+								id: 'install-elsewhere',
+								action: () => {},
+								shown: false && !!instance,
+								color: 'primary',
+								hoverFilled: true,
+							},
+							{
+								id: 'open-in-browser',
+								link: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
+							},
+						]"
+						aria-label="More options"
+					>
+						<MoreVerticalIcon aria-hidden="true" />
+						<template #install-elsewhere>
+							<DownloadIcon aria-hidden="true" />
+							Add to another instance
+						</template>
+						<template #open-in-browser>
+							<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+						</template>
+					</OverflowMenu>
+					<a
+						v-else
+						v-tooltip="formatMessage(commonMessages.openInBrowserButton)"
+						:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
+						target="_blank"
+					>
+						<ExternalIcon />
+					</a>
+				</ButtonStyled>
 			</template>
 		</ProjectPageVersions>
 	</div>
 </template>
 
 <script setup>
-import { CheckIcon, DownloadIcon, ExternalIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
 import {
-	ButtonLink,
-	IconButton,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	OverflowMenu,
 	ProjectPageVersions,
 	useVIntl,
 } from '@modrinth/ui'

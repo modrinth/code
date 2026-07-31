@@ -1,7 +1,7 @@
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import Button from '../../components/base/buttons/Button.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import ConfirmLeaveModal from '../../components/modal/ConfirmLeaveModal.vue'
 
 const meta = {
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof ConfirmLeaveModal>
 
 export const Default: Story = {
 	render: () => ({
-		components: { Button, ConfirmLeaveModal },
+		components: { ConfirmLeaveModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 			const result = ref<string>('')
@@ -27,7 +27,9 @@ export const Default: Story = {
 		},
 		template: /* html */ `
 			<div>
-				<Button color="red" type="colored" @click="openModal">Trigger Leave Confirmation</Button>
+				<ButtonStyled color="red">
+					<button @click="openModal">Trigger Leave Confirmation</button>
+				</ButtonStyled>
 				<p v-if="result" class="mt-4 text-secondary">{{ result }}</p>
 				<ConfirmLeaveModal ref="modalRef" />
 			</div>
@@ -37,7 +39,7 @@ export const Default: Story = {
 
 export const CustomMessages: Story = {
 	render: () => ({
-		components: { Button, ConfirmLeaveModal },
+		components: { ConfirmLeaveModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 			const openModal = () => modalRef.value?.prompt()
@@ -45,7 +47,9 @@ export const CustomMessages: Story = {
 		},
 		template: /* html */ `
 			<div>
-				<Button color="red" type="colored" @click="openModal">Discard Draft?</Button>
+				<ButtonStyled color="red">
+					<button @click="openModal">Discard Draft?</button>
+				</ButtonStyled>
 				<ConfirmLeaveModal
 					ref="modalRef"
 					title="Discard draft?"
@@ -61,7 +65,7 @@ export const CustomMessages: Story = {
 
 export const WarningAdmonition: Story = {
 	render: () => ({
-		components: { Button, ConfirmLeaveModal },
+		components: { ConfirmLeaveModal, ButtonStyled },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 			const openModal = () => modalRef.value?.prompt()
@@ -69,7 +73,9 @@ export const WarningAdmonition: Story = {
 		},
 		template: /* html */ `
 			<div>
-				<Button color="orange" type="colored" @click="openModal">Open Warning Variant</Button>
+				<ButtonStyled color="orange">
+					<button @click="openModal">Open Warning Variant</button>
+				</ButtonStyled>
 				<ConfirmLeaveModal
 					ref="modalRef"
 					admonition-type="warning"

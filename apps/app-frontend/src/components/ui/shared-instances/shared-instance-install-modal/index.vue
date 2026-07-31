@@ -193,39 +193,53 @@
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 			<div v-if="!reportMode" class="flex w-full items-center justify-between gap-2">
-				<Button color="red" type="quiet" @click="reportMode = true">
+				<ButtonStyled color="red" type="transparent">
+					<button @click="reportMode = true">
 						<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 				<div class="flex items-center gap-2">
 					<template v-if="hasExternalFiles">
-						<Button type="quiet" color="orange" @click="accept">
+						<ButtonStyled type="transparent" color="orange">
+							<button @click="accept">
 								{{ formatMessage(messages.installAnyway) }}
-							</Button>
-						<Button color="brand" type="colored" @click="handleCancel">
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="handleCancel">
 								<BanIcon />{{ formatMessage(messages.dontInstall) }}
-							</Button>
+							</button>
+						</ButtonStyled>
 					</template>
 					<template v-else>
-						<Button type="outlined" class="!border" @click="handleCancel">
+						<ButtonStyled type="outlined">
+							<button class="!border" @click="handleCancel">
 								<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-							</Button>
-						<Button color="brand" type="colored" @click="accept">
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="accept">
 								<DownloadIcon />{{ formatMessage(messages.installButton) }}
-							</Button>
+							</button>
+						</ButtonStyled>
 					</template>
 				</div>
 			</div>
 		</div>
 		<template v-if="reportMode" #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="outlined" class="!border" :disabled="submitLoading" @click="handleCancel">
+				<ButtonStyled type="outlined">
+					<button class="!border" :disabled="submitLoading" @click="handleCancel">
 						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-				<Button color="brand" type="colored" :disabled="!canSubmitReport" @click="submitReport">
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!canSubmitReport" @click="submitReport">
 						<SpinnerIcon v-if="submitLoading" class="animate-spin" />
 						<SendIcon v-else />
 						{{ formatMessage(commonMessages.reportButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -240,12 +254,12 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { BanIcon, DownloadIcon, ReportIcon, SendIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
 	AutoLink,
 	Avatar,
 	blockedUsersQueryKey,
+	ButtonStyled,
 	Checkbox,
 	Combobox,
 	type ComboboxOption,

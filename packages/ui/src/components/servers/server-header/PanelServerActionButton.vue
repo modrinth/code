@@ -1,75 +1,60 @@
 <template>
 	<div class="contents">
 		<div class="flex flex-row items-center gap-2 rounded-lg">
-			<Button v-if="isInstalling" type="colored" color="brand" size="lg" disabled>
-				<LoaderCircleIcon class="size-5 animate-spin" aria-hidden="true" /> Installing...
-			</Button>
+			<ButtonStyled v-if="isInstalling" type="standard" color="brand" size="large">
+				<button disabled class="flex-shrink-0">
+					<LoaderCircleIcon class="size-5 animate-spin" /> Installing...
+				</button>
+			</ButtonStyled>
 
 			<template v-else-if="showRestartButton">
-				<Button
-					v-tooltip="busyTooltip"
-					type="colored"
-					color="orange"
-					size="lg"
-					:disabled="!canTakeAction"
-					@click="handlePrimaryAction"
-				>
-					<UpdatedIcon aria-hidden="true" />
-					<span>{{ primaryActionText }}</span>
-				</Button>
+				<ButtonStyled type="standard" color="orange" size="large">
+					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
+						<UpdatedIcon />
+						<span>{{ primaryActionText }}</span>
+					</button>
+				</ButtonStyled>
 
-				<SplitButton
-					v-tooltip="busyTooltip"
-					:menu-label="formatMessage(messages.serverPowerOptions)"
-					type="colored"
+				<JoinedButtons
 					color="red"
-					size="lg"
-					:options="stopSplitOptions"
+					size="large"
+					:actions="stopSplitActions"
 					:primary-disabled="!canTakeAction"
-					:menu-disabled="!canKill"
-					@click="initiateAction('Stop')"
+					:dropdown-disabled="!canKill"
+					:primary-tooltip="busyTooltip"
+					:dropdown-tooltip="busyTooltip"
 				>
-					<StopCircleIcon aria-hidden="true" />
-					{{ isStopping ? 'Stopping' : 'Stop' }}
 					<template #kill_server>
-						<SlashIcon class="h-5 w-5" aria-hidden="true" />
+						<SlashIcon class="h-5 w-5" />
 						Kill server
 					</template>
-				</SplitButton>
+				</JoinedButtons>
 			</template>
 
 			<template v-else-if="isStopping">
-				<SplitButton
-					v-tooltip="busyTooltip"
-					:menu-label="formatMessage(messages.serverPowerOptions)"
-					type="colored"
+				<JoinedButtons
 					color="red"
-					size="lg"
-					:options="stopSplitOptions"
+					size="large"
+					:actions="stopSplitActions"
 					:primary-disabled="true"
-					:menu-disabled="!canKill"
+					:dropdown-disabled="!canKill"
+					:primary-muted="true"
+					:dropdown-tooltip="busyTooltip"
 				>
-					<StopCircleIcon aria-hidden="true" />
-					Stopping
 					<template #kill_server>
-						<SlashIcon class="h-5 w-5" aria-hidden="true" />
+						<SlashIcon class="h-5 w-5" />
 						Kill server
 					</template>
-				</SplitButton>
+				</JoinedButtons>
 			</template>
 
 			<template v-else>
-				<Button
-					v-tooltip="busyTooltip"
-					type="colored"
-					color="brand"
-					size="lg"
-					:disabled="!canTakeAction"
-					@click="handlePrimaryAction"
-				>
-					<PlayIcon aria-hidden="true" />
-					<span>{{ primaryActionText }}</span>
-				</Button>
+				<ButtonStyled type="standard" color="brand" size="large">
+					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
+						<PlayIcon />
+						<span>{{ primaryActionText }}</span>
+					</button>
+				</ButtonStyled>
 			</template>
 		</div>
 	</div>
@@ -85,10 +70,7 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import SplitButton from '@modrinth/ui/src/components/base/buttons/SplitButton.vue'
-import type { OverflowMenuOption } from '@modrinth/ui/src/components/base/buttons/types'
+import { ButtonStyled, type JoinedButtonAction, JoinedButtons } from '#ui/components'
 
 import { useServerPowerAction } from './use-server-power-action'
 
@@ -100,14 +82,6 @@ const props = withDefaults(
 		disabled: false,
 	},
 )
-
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	serverPowerOptions: {
-		id: 'servers.power.options',
-		defaultMessage: 'Server power options',
-	},
-})
 
 const {
 	isInstalling,
@@ -123,7 +97,13 @@ const {
 	disabled: computed(() => props.disabled),
 })
 
-const stopSplitOptions = computed<OverflowMenuOption[]>(() => [
+const stopSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'stop',
+		label: isStopping.value ? 'Stopping' : 'Stop',
+		icon: StopCircleIcon,
+		action: () => initiateAction('Stop'),
+	},
 	{
 		id: 'kill_server',
 		label: 'Kill server',

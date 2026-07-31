@@ -8,18 +8,19 @@
 	>
 		{{ formatSharedInstanceUnavailable(reason ?? null, manager) }}
 		<template v-if="reason === 'quarantined'" #actions>
-			<Button color="orange" type="colored" class="!h-10" @click="emit('delete')">
+			<ButtonStyled color="orange">
+				<button class="!h-10" @click="emit('delete')">
 					<TrashIcon aria-hidden="true" />
 					{{ formatMessage(messages.deleteInstance) }}
-				</Button>
+				</button>
+			</ButtonStyled>
 		</template>
 	</Admonition>
 </template>
 
 <script setup lang="ts">
 import { TrashIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import { Admonition, defineMessages, useVIntl } from '@modrinth/ui'
+import { Admonition, ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
 
 import type { SharedInstanceUnavailableReason } from '@/helpers/install'
 import {

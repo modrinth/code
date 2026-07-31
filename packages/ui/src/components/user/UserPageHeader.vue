@@ -57,18 +57,21 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<ButtonLink v-if="isSelf" :to="editProfileLink" size="xl">
-					<EditIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.editButton) }}
-				</ButtonLink>
-				<TeleportOverflowMenu
-					:options="moreActions"
-					:label="formatMessage(commonMessages.moreOptionsButton)"
-					size="xl"
-					type="quiet"
-				>
-					<MoreVerticalIcon aria-hidden="true" />
-				</TeleportOverflowMenu>
+				<ButtonStyled v-if="isSelf" size="large">
+					<AutoLink :to="editProfileLink">
+						<EditIcon />
+						{{ formatMessage(commonMessages.editButton) }}
+					</AutoLink>
+				</ButtonStyled>
+				<ButtonStyled circular size="large" type="transparent">
+					<TeleportOverflowMenu
+						:options="moreActions"
+						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
+					>
+						<MoreVerticalIcon />
+					</TeleportOverflowMenu>
+				</ButtonStyled>
 			</PageHeaderActions>
 		</template>
 	</PageHeader>
@@ -93,16 +96,17 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
+import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonLink from '#ui/components/base/buttons/ButtonLink.vue'
-import TeleportOverflowMenu from '#ui/components/base/buttons/TeleportOverflowMenu.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons/types'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataNumberItem from '#ui/components/base/page-header/metadata/page-header-metadata-number-item.vue'
 import PageHeaderMetadataTimeItem from '#ui/components/base/page-header/metadata/page-header-metadata-time-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
+import type { Item as TeleportOverflowMenuItem } from '#ui/components/base/TeleportOverflowMenu.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { defineMessages, useFormatDateTime, useFormatNumber, useVIntl } from '#ui/composables'
 import type { AuthUser } from '#ui/providers/auth'
 import { commonMessages } from '#ui/utils'
@@ -224,7 +228,7 @@ const formatDateTime = useFormatDateTime({
 const downloadsTooltip = computed(() => formatNumber(props.downloads))
 const joinedTooltip = computed(() => formatDateTime(props.user.created))
 
-const moreActions = computed<OverflowMenuOption[]>(() => [
+const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.profileManageProjectsButton),
@@ -233,7 +237,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		shown: props.isSelf,
 	},
 	{
-		type: 'divider',
+		divider: true,
 		shown: props.isSelf,
 	},
 	{
@@ -241,7 +245,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
 		action: () => emit('report'),
-		tone: 'red',
+		color: 'red',
 		shown: props.authUser?.id !== props.user.id,
 	},
 	{
@@ -249,7 +253,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		label: formatMessage(props.isBlocked ? messages.unblockButton : messages.blockButton),
 		icon: BanIcon,
 		action: () => emit('block'),
-		tone: 'red',
+		color: 'red',
 		shown: props.authUser?.id !== props.user.id,
 	},
 	{
@@ -265,7 +269,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		action: () => emit('copyPermalink'),
 	},
 	{
-		type: 'divider',
+		divider: true,
 		shown: props.showStaffActions && (props.isAdmin || props.isStaff),
 	},
 	{
@@ -283,8 +287,8 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		icon: AffiliateIcon,
 		action: () => emit('toggleAffiliate'),
 		shown: props.showStaffActions && props.isAdmin,
-		remainOpen: true,
-		tone: props.isAffiliate ? 'red' : 'default',
+		remainOnClick: true,
+		color: props.isAffiliate ? 'red' : 'orange',
 	},
 	{
 		id: 'open-info',

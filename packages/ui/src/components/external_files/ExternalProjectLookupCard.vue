@@ -9,9 +9,8 @@ import {
 import { Menu } from 'floating-vue'
 import { computed } from 'vue'
 
-import { CopyCode } from '#ui/components'
+import { ButtonStyled, CopyCode } from '#ui/components'
 
-import IconButton from '../base/buttons/IconButton.vue'
 import ExternalProjectLicenseStateTag from './ExternalProjectLicenseStateTag.vue'
 import type { ExternalLicenseStatus } from './types.ts'
 
@@ -59,15 +58,11 @@ async function copyProjectLink() {
 						</template>
 						<template v-else> <LinkIcon class="size-5 shrink-0" /> Project link </template>
 					</a>
-					<IconButton
-						v-tooltip="'Copy link'"
-						label="Copy link"
-						size="sm"
-						type="quiet"
-						@click="copyProjectLink"
-					>
-						<ClipboardCopyIcon aria-hidden="true" />
-					</IconButton>
+					<ButtonStyled circular type="transparent" size="small">
+						<button v-tooltip="'Copy link'" @click="copyProjectLink">
+							<ClipboardCopyIcon />
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<slot name="actions" />

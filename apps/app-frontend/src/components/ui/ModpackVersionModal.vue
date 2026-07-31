@@ -1,6 +1,6 @@
 <script setup>
 import { CheckIcon } from '@modrinth/assets'
-import { Badge, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
+import { Badge, ButtonStyled } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { SwapIcon } from '@/assets/icons/index.js'
@@ -17,11 +17,6 @@ const props = defineProps({
 		type: Object,
 		default: null,
 	},
-})
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	switchVersion: { id: 'app.modpack-version.switch', defaultMessage: 'Switch to this version' },
-	installedVersion: { id: 'app.modpack-version.installed', defaultMessage: 'Version installed' },
 })
 
 defineExpose({
@@ -79,22 +74,18 @@ const onHide = () => {
 							@click="$router.push(`/project/${version.project_id}/version/${version.id}`)"
 						>
 							<div class="table-cell table-text">
-								<IconButton
-									:label="
-										formatMessage(
-											version.id === installedVersion
-												? messages.installedVersion
-												: messages.switchVersion,
-										)
-									"
-									:type="version.id === installedVersion ? 'base' : 'colored'"
-									:color="version.id === installedVersion ? undefined : 'brand'"
-									:disabled="inProgress || installing || version.id === installedVersion"
-									@click.stop="() => switchVersion(version.id)"
+								<ButtonStyled
+									circular
+									:color="version.id === installedVersion ? 'standard' : 'brand'"
 								>
-									<SwapIcon v-if="version.id !== installedVersion" aria-hidden="true" />
-									<CheckIcon v-else aria-hidden="true" />
-								</IconButton>
+									<button
+										:disabled="inProgress || installing || version.id === installedVersion"
+										@click.stop="() => switchVersion(version.id)"
+									>
+										<SwapIcon v-if="version.id !== installedVersion" />
+										<CheckIcon v-else />
+									</button>
+								</ButtonStyled>
 							</div>
 							<div class="name-cell table-cell table-text">
 								<div class="version-link">

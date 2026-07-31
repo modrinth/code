@@ -65,36 +65,38 @@
 			</div>
 			<template #actions>
 				<div class="flex justify-end gap-2">
-					<Button type="outlined" @click="hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						:disabled="selectedProjects.length === 0"
-						@click="submitTransfer()"
-					>
-						<TransferIcon aria-hidden="true" />
-						{{
-							formatMessage(messages.transferSelectedProjects, {
-								count: selectedProjects.length,
-							})
-						}}
-					</Button>
+					<ButtonStyled type="outlined">
+						<button @click="hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button :disabled="selectedProjects.length === 0" @click="submitTransfer()">
+							<TransferIcon />
+							{{
+								formatMessage(messages.transferSelectedProjects, {
+									count: selectedProjects.length,
+								})
+							}}
+						</button>
+					</ButtonStyled>
 				</div>
 			</template>
 		</NewModal>
-		<Button @click="show($event)">
-			<TransferIcon aria-hidden="true" />
-			<span>{{ formatMessage(messages.transferProjectsTitle) }}</span>
-		</Button>
+		<ButtonStyled>
+			<button @click="show($event)">
+				<TransferIcon />
+				<span>{{ formatMessage(messages.transferProjectsTitle) }}</span>
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 
 <script setup>
 import { BoxIcon, TransferIcon, XIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	CopyCode,
@@ -103,7 +105,6 @@ import {
 	Table,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { formatProjectType } from '@modrinth/utils'
 
 import { getProjectTypeForUrl } from '~/helpers/projects.js'

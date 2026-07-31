@@ -26,9 +26,11 @@
 		</div>
 
 		<div class="flex shrink-0 items-center justify-end gap-1">
-			<IconButton label="Add dependency" type="quiet" @click="emitAddSuggestion">
-				<PlusIcon aria-hidden="true" />
-			</IconButton>
+			<ButtonStyled size="standard" :circular="true" type="transparent">
+				<button aria-label="Add dependency" class="!shadow-none" @click="emitAddSuggestion">
+					<PlusIcon aria-hidden="true" />
+				</button>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>
@@ -36,7 +38,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon } from '@modrinth/assets'
-import { Avatar, IconButton, TagItem } from '@modrinth/ui'
+import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
 
 const emit = defineEmits<{
 	(e: 'onAddSuggestion'): void

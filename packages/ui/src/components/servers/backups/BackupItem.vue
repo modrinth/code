@@ -18,7 +18,7 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages, truncatedTooltip } from '../../../utils'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
-import Button from '../../base/buttons/Button.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 
 const { formatMessage } = useVIntl()
@@ -265,35 +265,35 @@ const creatorAvatarSrc = computed(() =>
 
 		<!-- Right side actions -->
 		<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
-			<Button
-				v-tooltip="props.restoreDisabled"
-				type="outlined"
-				color="brand"
-				:disabled="!!props.restoreDisabled"
-				@click="() => emit('restore')"
-			>
-				<RotateCounterClockwiseIcon class="size-5" aria-hidden="true" />
-				{{ formatMessage(messages.restore) }}
-			</Button>
-			<OverflowMenu
-				:options="overflowMenuOptions"
-				:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-			>
-				<MoreVerticalIcon class="size-5" aria-hidden="true" />
-				<template #copy-id>
-					<ClipboardCopyIcon class="size-5" />
-					{{ formatMessage(commonMessages.copyIdButton) }}
-				</template>
-				<template #download>
-					<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
-				</template>
-				<template #rename>
-					<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
-				</template>
-				<template #delete>
-					<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
-				</template>
-			</OverflowMenu>
+			<ButtonStyled color="brand" type="outlined">
+				<button
+					v-tooltip="props.restoreDisabled"
+					class="!border"
+					:disabled="!!props.restoreDisabled"
+					@click="() => emit('restore')"
+				>
+					<RotateCounterClockwiseIcon class="size-5" />
+					{{ formatMessage(messages.restore) }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled circular type="transparent">
+				<OverflowMenu :options="overflowMenuOptions">
+					<MoreVerticalIcon class="size-5" />
+					<template #copy-id>
+						<ClipboardCopyIcon class="size-5" />
+						{{ formatMessage(commonMessages.copyIdButton) }}
+					</template>
+					<template #download>
+						<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
+					</template>
+					<template #rename>
+						<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+					</template>
+					<template #delete>
+						<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
+					</template>
+				</OverflowMenu>
+			</ButtonStyled>
 		</div>
 
 		<pre v-if="!preview && showDebugInfo" class="w-full rounded-xl bg-surface-4 p-2 text-xs">{{

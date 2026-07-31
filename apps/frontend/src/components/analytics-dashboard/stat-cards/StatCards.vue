@@ -12,16 +12,12 @@
 				{{ formatMessage(analyticsStatCardMessages.monetizationBannerBody) }}
 			</div>
 			<template #actions>
-				<ButtonLink
-					href="https://modrinth.com/legal/cmp-info"
-					target="_blank"
-					type="colored"
-					color="blue"
-					class="w-fit"
-				>
-					{{ formatMessage(analyticsStatCardMessages.monetizationBannerLearnMore) }}
-					<RightArrowIcon aria-hidden="true" />
-				</ButtonLink>
+				<ButtonStyled color="blue">
+					<a href="https://modrinth.com/legal/cmp-info" target="_blank" class="w-fit !px-4">
+						{{ formatMessage(analyticsStatCardMessages.monetizationBannerLearnMore) }}
+						<RightArrowIcon aria-hidden="true" />
+					</a>
+				</ButtonStyled>
 			</template>
 		</Admonition>
 		<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -43,7 +39,7 @@
 
 <script setup lang="ts">
 import { RightArrowIcon } from '@modrinth/assets'
-import { Admonition, ButtonLink, useFormatNumber, useVIntl } from '@modrinth/ui'
+import { Admonition, ButtonStyled, useFormatNumber, useVIntl } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
 
 import {

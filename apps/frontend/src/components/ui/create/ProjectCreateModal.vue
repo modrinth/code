@@ -111,20 +111,18 @@
 				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
 			<div class="flex justify-end gap-2.5">
-				<Button type="outlined" @click="cancel">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button
-					v-tooltip="missingFieldsTooltip"
-					type="colored"
-					color="brand"
-					:disabled="disableCreate"
-					@click="createProject"
-				>
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.createProject) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="cancel">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button v-tooltip="missingFieldsTooltip" :disabled="disableCreate" @click="createProject">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createProject) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -134,6 +132,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Chips,
 	Combobox,
 	type ComboboxOption,
@@ -145,7 +144,6 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed, defineAsyncComponent, h } from 'vue'
 
 import { generateUrlSlug } from '~/utils/slugs'

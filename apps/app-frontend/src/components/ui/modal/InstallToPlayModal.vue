@@ -18,10 +18,12 @@
 						{{ formatMessage(messages.sharedInstance) }}
 					</span>
 
-					<Button type="quiet" @click="openViewContents">
+					<ButtonStyled type="transparent">
+						<button @click="openViewContents">
 							<EyeIcon />
 							{{ formatMessage(messages.viewContents) }}
-						</Button>
+						</button>
+					</ButtonStyled>
 				</div>
 
 				<div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
@@ -111,30 +113,40 @@
 			</p>
 
 			<div class="flex w-full items-center justify-between gap-2">
-				<Button type="quiet" color="red" @click="handleReport">
+				<ButtonStyled type="transparent" color="red">
+					<button @click="handleReport">
 						<ReportIcon />
 						{{ formatMessage(commonMessages.reportButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 
 				<div class="flex items-center gap-2">
 					<template v-if="hasExternalFiles">
-						<Button type="quiet" color="orange" @click="handleAccept">
+						<ButtonStyled type="transparent" color="orange">
+							<button @click="handleAccept">
 								{{ formatMessage(messages.installAnyway) }}
-							</Button>
-						<Button color="brand" type="colored" @click="handleDecline">
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="handleDecline">
 								<BanIcon />
 								{{ formatMessage(messages.dontInstall) }}
-							</Button>
+							</button>
+						</ButtonStyled>
 					</template>
 					<template v-else>
-						<Button @click="handleDecline">
+						<ButtonStyled>
+							<button @click="handleDecline">
 								<XIcon />
 								{{ formatMessage(commonMessages.cancelButton) }}
-							</Button>
-						<Button color="brand" type="colored" @click="handleAccept">
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="handleAccept">
 								<DownloadIcon />
 								{{ formatMessage(messages.installButton) }}
-							</Button>
+							</button>
+						</ButtonStyled>
 					</template>
 				</div>
 			</div>
@@ -151,10 +163,10 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { BanIcon, DownloadIcon, EyeIcon, ReportIcon, XIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
 	Avatar,
+	ButtonStyled,
 	commonMessages,
 	type ContentItem,
 	defineMessages,

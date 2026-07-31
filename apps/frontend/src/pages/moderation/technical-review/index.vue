@@ -638,7 +638,7 @@ watch(totalPages, (pages) => {
 					</template>
 				</Combobox>
 
-				<FloatingPanel :button-props="{ size: 'lg' }">
+				<FloatingPanel button-class="!h-10 !shadow-none !text-contrast">
 					<BlendIcon class="size-5" /> Advanced filters
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">

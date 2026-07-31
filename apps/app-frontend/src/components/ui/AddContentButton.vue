@@ -1,28 +1,12 @@
 <script setup lang="ts">
 import { DropdownIcon, FolderOpenIcon, PlusIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import {
-	ButtonGroup,
-	defineMessages,
-	injectNotificationManager,
-	TeleportOverflowMenu,
-	useVIntl,
-} from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, OverflowMenu } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useRouter } from 'vue-router'
 
 import { add_project_from_path } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	installContent: { id: 'app.instance.content.install', defaultMessage: 'Install content' },
-	addFromFile: { id: 'app.instance.content.add-from-file', defaultMessage: 'Add from file' },
-	moreInstallOptions: {
-		id: 'app.instance.content.more-install-options',
-		defaultMessage: 'More install options',
-	},
-})
 
 const props = defineProps({
 	instance: {
@@ -51,23 +35,28 @@ const handleSearchContent = async () => {
 </script>
 
 <template>
-	<ButtonGroup>
-		<Button @click="handleSearchContent">
-			<PlusIcon aria-hidden="true" />
-			{{ formatMessage(messages.installContent) }}
-		</Button>
-		<TeleportOverflowMenu
-			:label="formatMessage(messages.moreInstallOptions)"
-			:options="[
-				{
-					id: 'from_file',
-					label: formatMessage(messages.addFromFile),
-					icon: FolderOpenIcon,
-					action: handleAddContentFromFile,
-				},
-			]"
-		>
-			<DropdownIcon aria-hidden="true" />
-		</TeleportOverflowMenu>
-	</ButtonGroup>
+	<div class="joined-buttons">
+		<ButtonStyled>
+			<button @click="handleSearchContent">
+				<PlusIcon />
+				Install content
+			</button>
+		</ButtonStyled>
+		<ButtonStyled>
+			<OverflowMenu
+				:options="[
+					{
+						id: 'from_file',
+						action: handleAddContentFromFile,
+					},
+				]"
+			>
+				<DropdownIcon />
+				<template #from_file>
+					<FolderOpenIcon />
+					<span class="no-wrap"> Add from file </span>
+				</template>
+			</OverflowMenu>
+		</ButtonStyled>
+	</div>
 </template>

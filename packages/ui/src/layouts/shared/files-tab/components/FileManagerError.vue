@@ -7,14 +7,18 @@
 				{{ message }}
 			</p>
 			<div class="flex gap-2">
-				<Button size="sm" @click="$emit('refetch')">
+				<ButtonStyled>
+					<button size="sm" @click="$emit('refetch')">
 						<RefreshCwIcon class="h-5 w-5" />
 						{{ formatMessage(messages.tryAgain) }}
-					</Button>
-				<Button size="sm" @click="$emit('home')">
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button size="sm" @click="$emit('home')">
 						<HomeIcon class="h-5 w-5" />
 						{{ formatMessage(messages.goToHome) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -23,7 +27,7 @@
 <script setup lang="ts">
 import { FileIcon, HomeIcon, RefreshCwIcon } from '@modrinth/assets'
 
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const { formatMessage } = useVIntl()

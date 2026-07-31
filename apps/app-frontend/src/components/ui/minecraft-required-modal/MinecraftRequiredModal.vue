@@ -21,11 +21,14 @@
 
 		<div class="flex flex-col gap-6 px-6 pb-6">
 			<div class="flex justify-end gap-2">
-				<ButtonLink class="w-full" href="https://support.modrinth.com">
-					<MessagesSquareIcon aria-hidden="true" />
-					{{ formatMessage(messages.getSupport) }}
-				</ButtonLink>
-				<Button color="brand" type="colored" class="w-full !shadow-none" :disabled="loadingSignIn" @click="signIn">
+				<ButtonStyled>
+					<a class="w-full !shadow-none" href="https://support.modrinth.com" @click="modal?.hide()">
+						<MessagesSquareIcon />
+						{{ formatMessage(messages.getSupport) }}
+					</a>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button class="w-full !shadow-none" :disabled="loadingSignIn" @click="signIn">
 						<SpinnerIcon v-if="loadingSignIn" class="animate-spin" />
 						<svg
 							v-else
@@ -48,7 +51,8 @@
 							/>
 						</svg>
 						{{ formatMessage(messages.signIn) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 			<p class="m-0 text-center text-sm text-secondary">
 				{{ formatMessage(messages.dontHaveAccount) }}
@@ -65,8 +69,7 @@
 
 <script setup lang="ts">
 import { MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
-import { ButtonLink, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
 import { inject, type Ref, ref } from 'vue'
 
 import steveImage from '@/assets/steve-look-up-left.webp'

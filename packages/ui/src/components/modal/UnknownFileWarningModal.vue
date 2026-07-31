@@ -86,13 +86,17 @@
 			/>
 
 			<div class="flex items-center gap-2">
-				<Button type="quiet" color="orange" @click="continueInstallation">
-					{{ formatMessage(messages.installAnyway) }}
-				</Button>
-				<Button type="colored" color="brand" @click="cancelInstallation">
-					<BanIcon aria-hidden="true" />
-					{{ formatMessage(messages.dontInstall) }}
-				</Button>
+				<ButtonStyled type="transparent" color="orange">
+					<button type="button" @click="continueInstallation">
+						{{ formatMessage(messages.installAnyway) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button type="button" @click="cancelInstallation">
+						<BanIcon aria-hidden="true" />
+						{{ formatMessage(messages.dontInstall) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -105,7 +109,7 @@ import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import Admonition from '../base/Admonition.vue'
-import Button from '../base/buttons/Button.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Table, { type TableColumn } from '../base/Table.vue'
 import NewModal from './NewModal.vue'

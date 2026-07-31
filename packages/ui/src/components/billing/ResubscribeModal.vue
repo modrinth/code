@@ -78,19 +78,18 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="outlined" @click="handleCancel">
-					<XIcon aria-hidden="true" />
-					{{ formatMessage(messages.cancelButton) }}
-				</Button>
-				<Button
-					type="colored"
-					color="brand"
-					:disabled="!canResubscribe"
-					@click="handleResubscribe"
-				>
-					<RotateCounterClockwiseIcon aria-hidden="true" />
-					{{ formatMessage(messages.resubscribeButton) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="handleCancel">
+						<XIcon />
+						{{ formatMessage(messages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!canResubscribe" @click="handleResubscribe">
+						<RotateCounterClockwiseIcon />
+						{{ formatMessage(messages.resubscribeButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -106,8 +105,7 @@ import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 import { useFormatDateTime, useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import IntlFormatted from '../base/IntlFormatted.vue'
-import Button from '../base/buttons/Button.vue'
-import { NewModal } from '../index'
+import { ButtonStyled, NewModal } from '../index'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

@@ -6,14 +6,18 @@
 		</p>
 		<p v-else>{{ getFormattedMessage(messages.invitationNoRole) }}</p>
 		<div class="input-group">
-			<Button type="colored" color="brand" @click="acceptInvite()">
-				<CheckIcon aria-hidden="true" />
-				{{ getFormattedMessage(commonMessages.acceptButton) }}
-			</Button>
-			<Button type="colored" color="red" @click="declineInvite">
-				<XIcon aria-hidden="true" />
-				{{ getFormattedMessage(commonMessages.declineButton) }}
-			</Button>
+			<ButtonStyled color="brand">
+				<button class="brand-button" @click="acceptInvite()">
+					<CheckIcon />
+					{{ getFormattedMessage(commonMessages.acceptButton) }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled color="red">
+				<button @click="declineInvite">
+					<XIcon />
+					{{ getFormattedMessage(commonMessages.declineButton) }}
+				</button>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>
@@ -21,13 +25,13 @@
 <script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	type MessageDescriptor,
 	useVIntl,
 } from '@modrinth/ui'
-import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import type { Project, User, Version } from '@modrinth/utils'
 import { computed } from 'vue'
 

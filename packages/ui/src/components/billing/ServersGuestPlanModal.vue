@@ -3,8 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { ChevronRightIcon, ExternalIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import Button from '../base/buttons/Button.vue'
-import IconButton from '../base/buttons/IconButton.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import NewModal from '../modal/NewModal.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import PlanSelector from './ServersPurchase0Plan.vue'
@@ -144,9 +143,11 @@ defineExpose({
 					class="absolute inset-x-0 bottom-0 -m-px z-30 rounded-2xl border border-solid border-surface-5 bg-bg-raised p-6 shadow-2xl"
 				>
 					<div class="absolute right-4 top-4">
-						<IconButton label="Close sign in prompt" type="quiet" @click="closeSignInPrompt">
-							<XIcon aria-hidden="true" />
-						</IconButton>
+						<ButtonStyled circular type="transparent">
+							<button aria-label="Close sign in prompt" @click="closeSignInPrompt">
+								<XIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 
 					<div class="mx-auto flex max-w-xl flex-col items-center gap-4 text-center">
@@ -154,10 +155,12 @@ defineExpose({
 							<div class="font-semibold text-contrast">Sign in to continue your purchase</div>
 							<div class="">You need a Modrinth account to add your billing details.</div>
 						</div>
-						<Button type="colored" color="brand" class="mt-2" @click="continueToAuth">
-							Sign in or create an account
-							<ExternalIcon aria-hidden="true" />
-						</Button>
+						<ButtonStyled color="brand">
+							<button class="mt-2" @click="continueToAuth">
+								Sign in or create an account
+								<ExternalIcon class="size-4" />
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</Transition>

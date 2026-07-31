@@ -13,14 +13,18 @@
 		</form>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<Button type="outlined" @click="hide">
+				<ButtonStyled type="outlined">
+					<button @click="hide">
 						<XIcon class="h-5 w-5" />
 						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-				<Button color="brand" type="colored" :disabled="!!error && submitted" @click="handleSubmit">
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!!error && submitted" @click="handleSubmit">
 						<EditIcon class="h-5 w-5" />
 						{{ formatMessage(commonMessages.renameButton) }}
-					</Button>
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -30,7 +34,7 @@
 import { EditIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import Button from '#ui/components/base/buttons/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

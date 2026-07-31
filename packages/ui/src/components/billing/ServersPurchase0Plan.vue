@@ -6,7 +6,7 @@ import { computed } from 'vue'
 import { useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
-import Button from '../base/buttons/Button.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import OptionGroup from '../base/OptionGroup.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersSpecs from './ServersSpecs.vue'
@@ -218,19 +218,19 @@ function selectCustom() {
 				</div>
 			</div>
 			<div class="w-full">
-				<Button
-					type="colored"
-					color="blue"
-					class="w-full"
-					:disabled="existingPlan?.id === plansByRam.small.id"
-					@click="selectPlan(plansByRam.small!)"
-				>
-					{{
-						existingPlan?.id === plansByRam.small.id
-							? formatMessage(messages.yourCurrentPlan)
-							: formatMessage(messages.selectPlan)
-					}}
-				</Button>
+				<ButtonStyled color="blue">
+					<button
+						class="w-full"
+						:disabled="existingPlan?.id === plansByRam.small.id"
+						@click="selectPlan(plansByRam.small!)"
+					>
+						{{
+							existingPlan?.id === plansByRam.small.id
+								? formatMessage(messages.yourCurrentPlan)
+								: formatMessage(messages.selectPlan)
+						}}
+					</button>
+				</ButtonStyled>
 			</div>
 			<ServersSpecs
 				v-if="smallSpecs"
@@ -281,19 +281,19 @@ function selectCustom() {
 					</div>
 				</div>
 				<div class="w-full">
-					<Button
-						type="colored"
-						color="brand"
-						class="w-full"
-						:disabled="existingPlan?.id === plansByRam.medium.id"
-						@click="selectPlan(plansByRam.medium!)"
-					>
-						{{
-							existingPlan?.id === plansByRam.medium.id
-								? formatMessage(messages.yourCurrentPlan)
-								: formatMessage(messages.selectPlan)
-						}}
-					</Button>
+					<ButtonStyled color="brand" class="w-full">
+						<button
+							class="w-full"
+							:disabled="existingPlan?.id === plansByRam.medium.id"
+							@click="selectPlan(plansByRam.medium!)"
+						>
+							{{
+								existingPlan?.id === plansByRam.medium.id
+									? formatMessage(messages.yourCurrentPlan)
+									: formatMessage(messages.selectPlan)
+							}}
+						</button>
+					</ButtonStyled>
 				</div>
 				<ServersSpecs
 					v-if="mediumSpecs"
@@ -329,19 +329,19 @@ function selectCustom() {
 				</div>
 			</div>
 			<div class="w-full">
-				<Button
-					type="colored"
-					color="purple"
-					class="w-full"
-					:disabled="existingPlan?.id === plansByRam.large.id"
-					@click="selectPlan(plansByRam.large!)"
-				>
-					{{
-						existingPlan?.id === plansByRam.large.id
-							? formatMessage(messages.yourCurrentPlan)
-							: formatMessage(messages.selectPlan)
-					}}
-				</Button>
+				<ButtonStyled color="purple" class="w-full">
+					<button
+						class="w-full"
+						:disabled="existingPlan?.id === plansByRam.large.id"
+						@click="selectPlan(plansByRam.large!)"
+					>
+						{{
+							existingPlan?.id === plansByRam.large.id
+								? formatMessage(messages.yourCurrentPlan)
+								: formatMessage(messages.selectPlan)
+						}}
+					</button>
+				</ButtonStyled>
 			</div>
 			<ServersSpecs
 				v-if="largeSpecs"
@@ -366,10 +366,11 @@ function selectCustom() {
 			</div>
 		</div>
 		<div class="flex flex-col items-end gap-2 shrink-0">
-			<Button @click="selectCustom">
-				{{ formatMessage(messages.getStarted) }}
-				<RightArrowIcon aria-hidden="true" />
-			</Button>
+			<ButtonStyled>
+				<button class="flex items-center gap-2" @click="selectCustom">
+					{{ formatMessage(messages.getStarted) }} <RightArrowIcon class="h-4 w-4" />
+				</button>
+			</ButtonStyled>
 			<div class="text-sm text-secondary whitespace-nowrap">
 				Starting at {{ formatPrice(customStartingPrice, currency, true) }}/mo
 			</div>
