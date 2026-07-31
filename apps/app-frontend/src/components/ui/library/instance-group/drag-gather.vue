@@ -2,7 +2,10 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import DragPreview from '@/components/ui/library/instance-group/drag-preview.vue'
-import type { InstanceDragGatherItem } from '@/components/ui/library/instance-group/use-instance-drag-gather'
+import {
+	gatherDuration,
+	type InstanceDragGatherItem,
+} from '@/components/ui/library/instance-group/use-instance-drag-gather'
 
 const props = defineProps<{
 	items: InstanceDragGatherItem[]
@@ -15,8 +18,6 @@ const props = defineProps<{
 const emit = defineEmits<{
 	complete: []
 }>()
-
-const gatherDuration = 500
 
 const gathered = ref(false)
 const finishing = ref(false)

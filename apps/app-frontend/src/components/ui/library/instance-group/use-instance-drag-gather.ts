@@ -13,6 +13,8 @@ type InstanceDragData = {
 	fromGroup: string
 }
 
+export const gatherDuration = 500
+
 export type InstanceDragGatherItem = {
 	instance: GameInstance
 	rect: {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Avatar } from '@modrinth/ui'
+import { Avatar, truncatedTooltip } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
 
@@ -18,6 +18,9 @@ const props = withDefaults(
 const iconSrc = computed(() =>
 	props.instance.icon_path ? convertFileSrc(props.instance.icon_path) : undefined,
 )
+
+const nameRef = ref<HTMLElement | null>(null)
+const versionRef = ref<HTMLElement | null>(null)
 </script>
 
 <template>
@@ -43,10 +46,18 @@ const iconSrc = computed(() =>
 			</div>
 		</div>
 		<div class="flex min-w-0 w-full flex-col items-start justify-center gap-1 px-0.5">
-			<p class="m-0 w-full truncate text-base font-semibold leading-5 text-contrast">
+			<p
+				ref="nameRef"
+				v-tooltip="truncatedTooltip(nameRef, instance.name)"
+				class="m-0 w-full truncate text-base font-semibold leading-5 text-contrast"
+			>
 				{{ instance.name }}
 			</p>
-			<p class="m-0 w-full truncate text-sm font-medium capitalize leading-[18px] text-primary">
+			<p
+				ref="versionRef"
+				v-tooltip="truncatedTooltip(versionRef, `${instance.loader} ${instance.game_version}`)"
+				class="m-0 w-full truncate text-sm font-medium capitalize leading-[18px] text-primary"
+			>
 				{{ instance.loader }} {{ instance.game_version }}
 			</p>
 		</div>
