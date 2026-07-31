@@ -25,10 +25,9 @@
 					</span>
 					<span>Server IDs (one per line or comma-separated.)</span>
 				</label>
-				<StyledInput
+				<StyledTextarea
 					id="server-ids"
 					v-model="serverIdsInput"
-					multiline
 					:rows="4"
 					input-class="bg-surface-3"
 					placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
@@ -147,7 +146,7 @@
 					:format-label="(item) => scheduleOptionLabels[item]"
 					:capitalize="false"
 				/>
-				<StyledInput
+				<NativeDateInput
 					v-if="scheduleOption === 'later'"
 					v-model="scheduledDate"
 					type="datetime-local"
@@ -164,10 +163,9 @@
 					</span>
 					<span>Provide a reason for this transfer batch.</span>
 				</label>
-				<StyledInput
+				<StyledTextarea
 					id="reason"
 					v-model="reason"
-					multiline
 					:rows="2"
 					input-class="bg-surface-3"
 					placeholder="Node maintenance scheduled"
@@ -200,8 +198,10 @@ import {
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
+	NativeDateInput,
 	NewModal,
 	StyledInput,
+	StyledTextarea,
 	TagItem,
 	Toggle,
 } from '@modrinth/ui'

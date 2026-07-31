@@ -7,6 +7,7 @@ import {
 	FileInput,
 	injectNotificationManager,
 	StyledInput,
+	StyledTextarea,
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
@@ -212,10 +213,9 @@ const onDeleteOrganization = useClientTry(async () => {
 			<label for="project-summary">
 				<span class="label__title">Summary</span>
 			</label>
-			<StyledInput
+			<StyledTextarea
 				id="project-summary"
 				v-model="current.summary"
-				multiline
 				:maxlength="256"
 				:disabled="!hasPermission"
 				resize="vertical"

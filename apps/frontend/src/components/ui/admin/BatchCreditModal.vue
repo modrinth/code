@@ -92,10 +92,9 @@
 					class="text-muted flex flex-col gap-2 rounded-lg border border-surface-5 bg-button-bg p-4"
 				>
 					<span>Hi {user.name},</span>
-					<StyledInput
+					<StyledTextarea
 						id="message-batch"
 						v-model="message"
-						multiline
 						:rows="3"
 						input-class="!bg-surface-3"
 					/>
@@ -137,6 +136,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
+	StyledTextarea,
 	TagItem,
 	Toggle,
 } from '@modrinth/ui'

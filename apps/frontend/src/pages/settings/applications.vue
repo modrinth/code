@@ -59,11 +59,10 @@
 				>
 					{{ formatMessage(messages.descriptionLabel) }}
 				</label>
-				<StyledInput
+				<StyledTextarea
 					v-if="editingId"
 					id="app-description"
 					v-model="description"
-					multiline
 					:maxlength="255"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
@@ -266,6 +265,7 @@ import {
 	NewModal,
 	normalizeChildren,
 	StyledInput,
+	StyledTextarea,
 	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'

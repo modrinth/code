@@ -45,11 +45,10 @@
 					placeholder="E.g. rXGtq2"
 					autocomplete="off"
 				/>
-				<StyledInput
+				<StyledTextarea
 					v-else
 					id="notice-message"
 					v-model="newNoticeMessage"
-					multiline
 					wrapper-class="h-32"
 				/>
 			</div>
@@ -65,7 +64,7 @@
 					<span class="text-lg font-semibold text-contrast"> Announcement date </span>
 					<span>Leave blank for notice to be available immediately.</span>
 				</label>
-				<StyledInput
+				<NativeDateInput
 					id="scheduled-date"
 					v-model="newNoticeScheduledDate"
 					type="datetime-local"
@@ -77,7 +76,7 @@
 					<span class="text-lg font-semibold text-contrast"> Expiration date </span>
 					<span>The notice will automatically be deleted after this date.</span>
 				</label>
-				<StyledInput
+				<NativeDateInput
 					id="expiration-date"
 					v-model="newNoticeExpiresDate"
 					type="datetime-local"
@@ -270,9 +269,11 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	NativeDateInput,
 	NewModal,
 	ServerNotice,
 	StyledInput,
+	StyledTextarea,
 	TagItem,
 	Toggle,
 	useFormatDateTime,
