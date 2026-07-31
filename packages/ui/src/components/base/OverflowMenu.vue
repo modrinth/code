@@ -16,36 +16,36 @@
 					:key="`divider-${index}`"
 					class="h-px mx-[0.625rem] my-2 bg-surface-5"
 				></div>
+				<ButtonLink
+					v-else-if="option.link"
+					:key="`option-${option.id}`"
+					v-tooltip="option.tooltip"
+					class="w-full justify-start whitespace-nowrap"
+					type="quiet"
+					:color="optionButtonColor(option)"
+					:v-close-popper="!option.remainOnClick"
+					:href="option.link"
+					:download="option.download"
+					:target="option.external ? '_blank' : undefined"
+					:disabled="option.disabled"
+					@click="!option.remainOnClick && close()"
+				>
+					<template v-if="!$slots[option.id]">
+						<component :is="option.icon" v-if="option.icon" class="size-5" />
+						{{ option.id }}
+					</template>
+					<slot :name="option.id"></slot>
+				</ButtonLink>
 				<Button
 					v-else
 					:key="`option-${option.id}`"
 					v-tooltip="option.tooltip"
-					:color="option.color ? option.color : 'default'"
-					:hover-filled="option.hoverFilled"
-					:hover-filled-only="option.hoverFilledOnly"
-					transparent
+					class="w-full justify-start whitespace-nowrap"
+					type="quiet"
+					:color="optionButtonColor(option)"
 					:v-close-popper="!option.remainOnClick"
-					:action="
-						option.action
-							? (event: MouseEvent) => {
-									option.action?.(event)
-									if (!option.remainOnClick) {
-										close()
-									}
-								}
-							: undefined
-					"
-					:link="option.link ? option.link : undefined"
-					:download="option.download ? option.download : undefined"
-					:external="option.external ? option.external : false"
 					:disabled="option.disabled"
-					@click="
-						() => {
-							if (option.link && !option.remainOnClick) {
-								close()
-							}
-						}
-					"
+					@click="handleOptionAction(option, $event)"
 				>
 					<template v-if="!$slots[option.id]">
 						<component :is="option.icon" v-if="option.icon" class="size-5" />
@@ -61,7 +61,9 @@
 <script setup lang="ts">
 import { type Component, type Ref, ref } from 'vue'
 
-import Button from './Button.vue'
+import Button from './buttons/Button.vue'
+import ButtonLink from './buttons/ButtonLink.vue'
+import type { ButtonColor } from './buttons/types'
 import PopoutMenu from './PopoutMenu.vue'
 
 interface BaseOption {
@@ -127,6 +129,30 @@ const close = () => {
 
 const open = () => {
 	dropdown.value?.show()
+}
+
+function handleOptionAction(option: Item, event: MouseEvent) {
+	option.action?.(event)
+	if (!option.remainOnClick) {
+		close()
+	}
+}
+
+function optionButtonColor(option: Item): ButtonColor | undefined {
+	switch (option.color) {
+		case 'primary':
+			return 'brand'
+		case 'danger':
+		case 'red':
+			return 'red'
+		case 'orange':
+		case 'green':
+		case 'blue':
+		case 'purple':
+			return option.color
+		default:
+			return undefined
+	}
 }
 
 function isDivider(option: BaseOption): option is Divider {

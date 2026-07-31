@@ -27,39 +27,25 @@
 				</div>
 			</template>
 
-			<ButtonStyled v-if="onRemove" size="standard" :circular="true">
-				<button aria-label="Remove file" class="!shadow-none" @click="onRemove">
-					<XIcon aria-hidden="true" />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-if="isPrimary" size="standard" :circular="true">
-				<button
-					v-tooltip="
-						editingVersion
-							? 'Primary file cannot be changed after version is uploaded'
-							: 'Replace primary file'
-					"
-					aria-label="Change primary file"
-					class="!shadow-none"
-					:disabled="editingVersion"
-					@click="primaryFileInput?.click()"
-				>
-					<ArrowLeftRightIcon aria-hidden="true" />
-					<input
-						ref="primaryFileInput"
-						class="hidden"
-						type="file"
-						:accept="acceptFileFromProjectType(projectV2.project_type)"
-						:disabled="editingVersion"
-						@change="
-							(e) => {
-								emit('setPrimaryFile', (e.target as HTMLInputElement)?.files?.[0])
-								;(e.target as HTMLInputElement).value = ''
-							}
-						"
-					/>
-				</button>
-			</ButtonStyled>
+			<IconButton v-if="onRemove" label="Remove file" @click="onRemove">
+				<XIcon aria-hidden="true" />
+			</IconButton>
+			<FileButton
+				v-if="isPrimary"
+				v-tooltip="
+					editingVersion
+						? 'Primary file cannot be changed after version is uploaded'
+						: 'Replace primary file'
+				"
+				aria-label="Change primary file"
+				prompt=""
+				:disabled="editingVersion"
+				:allow-drop="false"
+				:accept="acceptFileFromProjectType(projectV2.project_type)"
+				@change="([file]) => emit('setPrimaryFile', file)"
+			>
+				<ArrowLeftRightIcon aria-hidden="true" />
+			</FileButton>
 		</div>
 	</div>
 </template>
@@ -67,7 +53,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
+import { Combobox, FileButton, IconButton, injectProjectPageContext } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
@@ -93,8 +79,6 @@ const { name, isPrimary, onRemove, initialFileType, editingVersion } = definePro
 }>()
 
 const selectedType = ref<Labrinth.Versions.v3.FileType | 'primary'>(initialFileType || 'unknown')
-const primaryFileInput = ref<HTMLInputElement>()
-
 const isDatapackProject = computed(() => projectType.value === 'datapack')
 
 const versionTypes = computed(

@@ -221,19 +221,14 @@ export const AllCopy: Story = {
 									"
 									#top-right-actions
 								>
-									<ButtonStyled v-if="item.action === 'Cancel'" type="outlined" color="blue">
-										<button class="!border" type="button">Cancel</button>
-									</ButtonStyled>
-									<ButtonStyled
+									<Button v-if="item.action === 'Cancel'" type="outlined" class="!border">Cancel</Button>
+									<Button
 										v-else
 										type="outlined"
-										color="red"
-									>
-										<button class="!border" type="button">
+									 class="!border">
 											<RotateCounterClockwiseIcon class="size-5" />
 											Retry
-										</button>
-									</ButtonStyled>
+										</Button>
 								</template>
 							</Admonition>
 						</div>
@@ -256,12 +251,10 @@ export const TitleTreatmentExperiment: Story = {
 				>
 					Something went wrong while creating World backup. Please try again or contact support if the issue continues.
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="red">
-							<button class="!border" type="button">
+						<Button type="outlined" class="!border">
 								<RotateCounterClockwiseIcon class="size-5" />
 								Retry
-							</button>
-						</ButtonStyled>
+							</Button>
 					</template>
 				</Admonition>
 			</div>

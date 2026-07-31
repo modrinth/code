@@ -105,24 +105,22 @@
 	</MultiSelect>
 
 	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
-		<ButtonStyled type="outlined">
-			<button
-				ref="addMenuTrigger"
-				type="button"
-				:class="addButtonClass ?? '!border'"
-				:aria-expanded="isAddMenuOpen"
-				aria-haspopup="menu"
-				@click="handleAddMenuTriggerClick"
-				@keydown="handleAddMenuTriggerKeydown"
-			>
-				<PlusIcon />
-				{{ addLabel }}
-			</button>
-		</ButtonStyled>
+		<Button
+			ref="addMenuTriggerButton"
+			v-bind="addButtonProps"
+			:type="addButtonProps?.type ?? 'outlined'"
+			:aria-expanded="isAddMenuOpen"
+			aria-haspopup="menu"
+			@click="handleAddMenuTriggerClick"
+			@keydown="handleAddMenuTriggerKeydown"
+		>
+			<PlusIcon aria-hidden="true" />
+			{{ addLabel }}
+		</Button>
 
-		<ButtonStyled v-if="shouldShowClear" type="transparent">
-			<button type="button" @click="clearAllFilters">{{ clearLabel }}</button>
-		</ButtonStyled>
+		<Button v-if="shouldShowClear" type="quiet" @click="clearAllFilters">
+			{{ clearLabel }}
+		</Button>
 	</div>
 
 	<Teleport to="#teleports">
@@ -386,7 +384,8 @@ import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
-import ButtonStyled from './ButtonStyled.vue'
+import Button from './buttons/Button.vue'
+import type { ButtonElementHandle, ButtonProps } from './buttons/types'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 import StyledInput from './StyledInput.vue'
 
@@ -513,7 +512,7 @@ const props = withDefaults(
 		applyImmediately?: boolean
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
-		addButtonClass?: string
+		addButtonProps?: ButtonProps
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
@@ -549,7 +548,8 @@ const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
 const isMobileAddMenuLayout = ref(false)
 const submenuOpenDirection = ref<SubmenuOpenDirection>('right')
-const addMenuTrigger = ref<HTMLElement | null>(null)
+const addMenuTriggerButton = ref<ButtonElementHandle | null>(null)
+const addMenuTrigger = computed(() => addMenuTriggerButton.value?.element ?? null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
 const activeCategoryOptionsScrollbar = ref<HTMLElement | null>(null)

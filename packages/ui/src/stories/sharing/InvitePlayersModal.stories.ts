@@ -166,9 +166,7 @@ function createRender(args: Record<string, unknown>) {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show($event)">Open modal</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show($event)">Open modal</Button>
 				<p v-if="lastAction" class="m-0 text-sm text-secondary">{{ lastAction }}</p>
 				<InvitePlayersModal
 					ref="modalRef"

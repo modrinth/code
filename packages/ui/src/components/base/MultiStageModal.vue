@@ -72,46 +72,62 @@
 				class="flex flex-col justify-end gap-2 sm:flex-row"
 				:class="leftButtonConfig || rightButtonConfig ? 'mt-4' : ''"
 			>
-				<ButtonStyled v-if="leftButtonConfig" type="outlined">
-					<button
-						v-tooltip="leftButtonConfig.tooltip"
-						:class="leftButtonConfig.buttonClass"
-						:disabled="leftButtonConfig.disabled"
-						@click="leftButtonConfig.onClick"
-					>
-						<component :is="leftButtonConfig.icon" />
-						{{ leftButtonConfig.label }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
-					<button
-						v-tooltip="rightButtonConfig.tooltip"
-						class="!shadow-none"
-						:class="rightButtonConfig.buttonClass"
-						:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
-						@click="rightButtonConfig.onClick"
-					>
-						<SpinnerIcon
-							v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'before'"
-							class="animate-spin"
-						/>
-						<component
-							:is="rightButtonConfig.icon"
-							v-else-if="rightButtonConfig.iconPosition === 'before'"
-							:class="rightButtonConfig.iconClass"
-						/>
-						{{ rightButtonConfig.label }}
-						<SpinnerIcon
-							v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'after'"
-							class="animate-spin"
-						/>
-						<component
-							:is="rightButtonConfig.icon"
-							v-else-if="rightButtonConfig.iconPosition === 'after'"
-							:class="rightButtonConfig.iconClass"
-						/>
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="leftButtonConfig"
+					v-tooltip="leftButtonConfig.tooltip"
+					v-bind="leftButtonConfig.buttonProps"
+					:type="leftButtonConfig.buttonProps?.type ?? 'outlined'"
+					:disabled="leftButtonConfig.buttonProps?.disabled ?? leftButtonConfig.disabled"
+					@click="leftButtonConfig.onClick"
+				>
+					<component :is="leftButtonConfig.icon" aria-hidden="true" />
+					{{ leftButtonConfig.label }}
+				</Button>
+				<Button
+					v-if="rightButtonConfig"
+					v-tooltip="rightButtonConfig.tooltip"
+					v-bind="rightButtonConfig.buttonProps"
+					:type="
+						rightButtonConfig.buttonProps?.type ??
+						(rightButtonConfig.color === 'standard' || !rightButtonConfig.color
+							? 'base'
+							: 'colored')
+					"
+					:color="
+						rightButtonConfig.buttonProps?.color ??
+						(rightButtonConfig.color === 'standard' ? undefined : rightButtonConfig.color)
+					"
+					:disabled="
+						rightButtonConfig.buttonProps?.disabled ??
+						(rightButtonConfig.disabled || rightButtonConfig.loading)
+					"
+					:loading="rightButtonConfig.buttonProps?.loading ?? rightButtonConfig.loading"
+					@click="rightButtonConfig.onClick"
+				>
+					<SpinnerIcon
+						v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'before'"
+						aria-hidden="true"
+						class="animate-spin"
+					/>
+					<component
+						:is="rightButtonConfig.icon"
+						v-else-if="rightButtonConfig.iconPosition === 'before'"
+						aria-hidden="true"
+						:class="rightButtonConfig.iconClass"
+					/>
+					{{ rightButtonConfig.label }}
+					<SpinnerIcon
+						v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'after'"
+						aria-hidden="true"
+						class="animate-spin"
+					/>
+					<component
+						:is="rightButtonConfig.icon"
+						v-else-if="rightButtonConfig.iconPosition === 'after'"
+						aria-hidden="true"
+						:class="rightButtonConfig.iconClass"
+					/>
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -119,20 +135,26 @@
 
 <script lang="ts">
 import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { NewModal } from '@modrinth/ui'
+import type {
+	ButtonColor,
+	ButtonProps,
+} from '@modrinth/ui/src/components/base/buttons/types'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+
+import Button from './buttons/Button.vue'
 
 export interface StageButtonConfig {
 	label?: string
 	icon?: Component | null
 	iconPosition?: 'before' | 'after'
-	color?: InstanceType<typeof ButtonStyled>['$props']['color']
+	color?: ButtonColor | 'standard'
 	disabled?: boolean
 	loading?: boolean
 	tooltip?: string
 	iconClass?: string | null
-	buttonClass?: string | null
+	buttonProps?: ButtonProps
 	onClick?: () => void
 }
 

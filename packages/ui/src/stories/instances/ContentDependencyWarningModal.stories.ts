@@ -186,9 +186,7 @@ export const InstanceDependency: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="orange">
-					<button @click="modalRef?.show()">Delete dependency</button>
-				</ButtonStyled>
+				<Button color="orange" type="colored" @click="modalRef?.show()">Delete dependency</Button>
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"
@@ -227,9 +225,7 @@ export const ServerDependency: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="orange">
-					<button @click="modalRef?.show()">Delete server dependency</button>
-				</ButtonStyled>
+				<Button color="orange" type="colored" @click="modalRef?.show()">Delete server dependency</Button>
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Server dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"
@@ -267,9 +263,7 @@ export const BulkDependencies: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="orange">
-					<button @click="modalRef?.show()">Delete selected dependencies</button>
-				</ButtonStyled>
+				<Button color="orange" type="colored" @click="modalRef?.show()">Delete selected dependencies</Button>
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Bulk dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"

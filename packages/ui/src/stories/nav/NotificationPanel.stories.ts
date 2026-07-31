@@ -87,24 +87,12 @@ export const Default: StoryObj = {
 		template: /* html */ `
 			<div>
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled color="green">
-						<button @click="showSuccess">Success</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="showError">Error</button>
-					</ButtonStyled>
-					<ButtonStyled color="orange">
-						<button @click="showWarning">Warning</button>
-					</ButtonStyled>
-					<ButtonStyled color="blue">
-						<button @click="showInfo">Info</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showActions">Actions</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="clearAll">Clear All</button>
-					</ButtonStyled>
+					<Button color="green" type="colored" @click="showSuccess">Success</Button>
+					<Button color="red" type="colored" @click="showError">Error</Button>
+					<Button color="orange" type="colored" @click="showWarning">Warning</Button>
+					<Button color="blue" type="colored" @click="showInfo">Info</Button>
+					<Button @click="showActions">Actions</Button>
+					<Button @click="clearAll">Clear All</Button>
 				</div>
 				<NotificationPanel />
 			</div>
@@ -161,21 +149,11 @@ export const LeftSide: StoryObj = {
 		template: /* html */ `
 			<div>
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled color="green">
-						<button @click="showSuccess">Success</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="showError">Error</button>
-					</ButtonStyled>
-					<ButtonStyled color="orange">
-						<button @click="showWarning">Warning</button>
-					</ButtonStyled>
-					<ButtonStyled color="blue">
-						<button @click="showInfo">Info</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="clearAll">Clear All</button>
-					</ButtonStyled>
+					<Button color="green" type="colored" @click="showSuccess">Success</Button>
+					<Button color="red" type="colored" @click="showError">Error</Button>
+					<Button color="orange" type="colored" @click="showWarning">Warning</Button>
+					<Button color="blue" type="colored" @click="showInfo">Info</Button>
+					<Button @click="clearAll">Clear All</Button>
 				</div>
 				<NotificationPanel />
 			</div>

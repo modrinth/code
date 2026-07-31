@@ -17,13 +17,14 @@ import {
 	Accordion,
 	Avatar,
 	Badge,
-	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 import ATLauncher from '~/assets/images/external/atlauncher.svg?component'
 import CurseForge from '~/assets/images/external/curseforge.svg?component'
@@ -275,6 +276,10 @@ const messages = defineMessages({
 	searchMods: {
 		id: 'app-marketing.features.mod-management.search-mods',
 		defaultMessage: 'Search mods',
+	},
+	removeMod: {
+		id: 'app-marketing.features.mod-management.remove-mod',
+		defaultMessage: 'Remove {mod}',
 	},
 	name: {
 		id: 'app-marketing.features.mod-management.name',
@@ -546,20 +551,22 @@ useSeoMeta({
 				{{ formatMessage(messages.description) }}
 			</h2>
 			<div class="button-group">
-				<ButtonStyled v-if="os" color="brand" size="large">
-					<button rel="noopener nofollow" @click="handleDownload">
-						<LinuxIcon v-if="os === 'Linux'" />
-						<WindowsIcon v-else-if="os === 'Windows'" />
-						<AppleIcon v-else-if="os === 'Mac'" />
-						{{ formatMessage(messages.downloadModrinthAppButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined" size="large">
-					<button @click="scrollToSection">
-						<ArrowDownIcon />
-						{{ formatMessage(messages.moreDownloadOptions) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="os"
+					type="colored"
+					color="brand"
+					size="xl"
+					@click="handleDownload"
+				>
+					<LinuxIcon v-if="os === 'Linux'" aria-hidden="true" />
+					<WindowsIcon v-else-if="os === 'Windows'" aria-hidden="true" />
+					<AppleIcon v-else-if="os === 'Mac'" aria-hidden="true" />
+					{{ formatMessage(messages.downloadModrinthAppButton) }}
+				</Button>
+				<Button type="outlined" size="xl" @click="scrollToSection">
+					<ArrowDownIcon aria-hidden="true" />
+					{{ formatMessage(messages.moreDownloadOptions) }}
+				</Button>
 			</div>
 			<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="" />
 			<div class="bottom-transition" />
@@ -602,11 +609,13 @@ useSeoMeta({
 							<div class="cell">{{ mod.version }}</div>
 							<div class="cell check">
 								<Checkbox :model-value="true" tabindex="-1" />
-								<ButtonStyled circular type="transparent">
-									<button tabindex="-1">
-										<TrashIcon />
-									</button>
-								</ButtonStyled>
+								<IconButton
+									:label="formatMessage(messages.removeMod, { mod: mod.name })"
+									type="quiet"
+									tabindex="-1"
+								>
+									<TrashIcon aria-hidden="true" />
+								</IconButton>
 							</div>
 						</div>
 					</div>

@@ -109,11 +109,10 @@
 				</span>
 			</template>
 			<template #actions>
-				<ButtonStyled color="brand"
-					><button class="!h-10" @click="signInToShare">
+				<Button color="brand"
+					 type="colored" class="!h-10" @click="signInToShare">
 						<LogInIcon aria-hidden="true" />{{ formatMessage(lockedActionButton) }}
-					</button></ButtonStyled
-				>
+					</Button>
 			</template>
 		</SharedInstanceShareEmptyState>
 
@@ -123,8 +122,8 @@
 			:description="formatMessage(messages.noFriendsInvitedDescription)"
 		>
 			<template #actions>
-				<ButtonStyled color="brand"
-					><button
+				<Button color="brand"
+					 type="colored"
 						class="!h-10"
 						:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
 						@click="showInvitePlayers($event)"
@@ -136,8 +135,7 @@
 						/><UserPlusIcon v-else aria-hidden="true" />{{
 							formatMessage(messages.inviteFriendsButton)
 						}}
-					</button></ButtonStyled
-				>
+					</Button>
 			</template>
 		</SharedInstanceShareEmptyState>
 	</div>
@@ -145,9 +143,9 @@
 
 <script setup lang="ts">
 import { LogInIcon, SpinnerIcon, UserPlusIcon } from '@modrinth/assets'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
-	ButtonStyled,
 	ConfirmUnlinkModal,
 	defineMessages,
 	injectAuth,

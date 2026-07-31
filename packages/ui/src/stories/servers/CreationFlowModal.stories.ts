@@ -36,9 +36,7 @@ export const CreateWorld: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4 items-center">
-				<ButtonStyled color="brand">
-					<button @click="openModal">Create World</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Create World</Button>
 				<p v-if="lastEvent" class="text-sm text-secondary mt-2">Last event: {{ lastEvent }}</p>
 				<CreationFlowModal
 					ref="modalRef"
@@ -73,9 +71,7 @@ export const ServerOnboarding: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4 items-center">
-				<ButtonStyled color="brand">
-					<button @click="openModal">Set Up Server</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Set Up Server</Button>
 				<p v-if="lastEvent" class="text-sm text-secondary mt-2">Last event: {{ lastEvent }}</p>
 				<CreationFlowModal
 					ref="modalRef"
@@ -110,9 +106,7 @@ export const Instance: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4 items-center">
-				<ButtonStyled color="brand">
-					<button @click="openModal">Create Instance</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Create Instance</Button>
 				<p v-if="lastEvent" class="text-sm text-secondary mt-2">Last event: {{ lastEvent }}</p>
 				<CreationFlowModal
 					ref="modalRef"

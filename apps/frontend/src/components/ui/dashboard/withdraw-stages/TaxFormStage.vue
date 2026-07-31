@@ -47,11 +47,9 @@
 					<FileTextIcon :class="iconClass" />
 				</template>
 				<template #actions>
-					<ButtonStyled color="orange">
-						<button @click="showTaxFormModal">
-							{{ formatMessage(messages.completeTaxForm) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="orange" @click="showTaxFormModal">
+						{{ formatMessage(messages.completeTaxForm) }}
+					</Button>
 				</template>
 			</Admonition>
 		</template>
@@ -76,13 +74,13 @@
 import { FileTextIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed } from 'vue'
 
 import { getTaxThreshold, getTaxThresholdActual } from '@/providers/creator-withdraw.ts'

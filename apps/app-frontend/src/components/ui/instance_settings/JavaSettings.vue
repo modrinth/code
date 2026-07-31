@@ -8,8 +8,8 @@ import {
 	SpinnerIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	ButtonStyled,
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
@@ -224,21 +224,19 @@ const messages = defineMessages({
 							wrapper-class="flex-1 min-w-0"
 							@update:model-value="(val) => (javaPath = String(val))"
 						/>
-						<ButtonStyled
+						<Button
+							type="quiet"
 							:color="
 								!hoveringTest && !testingJava
 									? javaTestResult === true
 										? 'green'
 										: 'red'
-									: 'standard'
+									: undefined
 							"
-							color-fill="text"
-						>
-							<button
-								:disabled="!overrideJavaInstall || testingJava"
-								@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
-								@mouseenter="overrideJavaInstall && (hoveringTest = true)"
-								@mouseleave="hoveringTest = false"
+							:disabled="!overrideJavaInstall || testingJava"
+							@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
+							@mouseenter="overrideJavaInstall && (hoveringTest = true)"
+							@mouseleave="hoveringTest = false"
 							>
 								<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
 								<CheckCircleIcon
@@ -247,22 +245,17 @@ const messages = defineMessages({
 								/>
 								<XCircleIcon v-else-if="javaTestResult !== true && !hoveringTest" class="h-4 w-4" />
 								<RefreshCwIcon v-else-if="overrideJavaInstall" class="h-4 w-4" />
-							</button>
-						</ButtonStyled>
+							</Button>
 					</div>
 					<div v-if="overrideJavaInstall" class="flex gap-2">
-						<ButtonStyled>
-							<button @click="handleDetectJava">
+						<Button @click="handleDetectJava">
 								<SearchIcon />
 								Detect
-							</button>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button @click="handleBrowseJava">
+							</Button>
+						<Button @click="handleBrowseJava">
 								<FolderSearchIcon />
 								Browse
-							</button>
-						</ButtonStyled>
+							</Button>
 					</div>
 				</div>
 			</div>

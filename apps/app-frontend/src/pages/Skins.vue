@@ -9,8 +9,8 @@ import {
 	ShirtIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -1180,8 +1180,7 @@ await loadSkins()
 										>Ears</router-link
 									>
 								</div>
-								<ButtonStyled type="outlined">
-									<button
+								<Button type="outlined"
 										class="ears-feature-toggle-button !h-10 !rounded-[14px] !px-4 shadow-md"
 										:aria-pressed="earsFeaturesEnabled"
 										:aria-label="
@@ -1200,8 +1199,7 @@ await loadSkins()
 													: messages.toggleEarsFeaturesOn,
 											)
 										}}
-									</button>
-								</ButtonStyled>
+									</Button>
 								<Toggle
 									v-model="earsFeaturesEnabled"
 									v-tooltip="
@@ -1278,13 +1276,17 @@ await loadSkins()
 				<p class="text-lg m-0">
 					{{ formatMessage(messages.signInDescription) }}
 				</p>
-				<ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
-					<button :disabled="accountsCard.loginDisabled" @click="login">
+				<Button
+					v-show="accountsCard"
+					color="brand"
+					type="colored"
+					:disabled="accountsCard.loginDisabled"
+					@click="login"
+				>
 						<LogInIcon v-if="!accountsCard.loginDisabled" />
 						<SpinnerIcon v-else class="animate-spin" />
 						{{ formatMessage(messages.signInButton) }}
-					</button>
-				</ButtonStyled>
+					</Button>
 			</div>
 		</div>
 	</div>

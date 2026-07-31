@@ -588,9 +588,7 @@ export const WithCustomEmptyState: Story = {
 				<template #empty>
 					<div class="flex flex-col items-center gap-4 py-8">
 						<span class="text-lg text-secondary">No mods installed</span>
-						<ButtonStyled color="green">
-							<button>Browse mods</button>
-						</ButtonStyled>
+						<Button color="green" type="colored">Browse mods</Button>
 					</div>
 				</template>
 			</ContentCardTable>
@@ -825,15 +823,9 @@ export const BulkActionsDemo: Story = {
 				<div class="flex items-center gap-2">
 					<span class="text-sm text-secondary">{{ selectedIds.length }} selected</span>
 					<template v-if="selectedIds.length > 0">
-						<ButtonStyled size="small" color="green">
-							<button @click="enableSelected">Enable</button>
-						</ButtonStyled>
-						<ButtonStyled size="small" type="transparent">
-							<button @click="disableSelected">Disable</button>
-						</ButtonStyled>
-						<ButtonStyled size="small" color="red">
-							<button @click="deleteSelected">Delete</button>
-						</ButtonStyled>
+						<Button size="sm" color="green" type="colored" @click="enableSelected">Enable</Button>
+						<Button size="sm" type="quiet" @click="disableSelected">Disable</Button>
+						<Button size="sm" color="red" type="colored" @click="deleteSelected">Delete</Button>
 					</template>
 				</div>
 				<ContentCardTable

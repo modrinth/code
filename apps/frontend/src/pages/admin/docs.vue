@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Card, StyledInput } from '@modrinth/ui'
+import { Card, IconButton, StyledInput } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed, onMounted, ref } from 'vue'
 
 import docs from '~/templates/docs'
@@ -60,12 +61,15 @@ onMounted(() => {
 						wrapper-class="w-72"
 					/>
 
-					<ButtonStyled color="brand">
-						<button :disabled="filtered.length === 0" @click="openAll">
-							<LibraryIcon class="h-4 w-4" aria-hidden="true" />
-							Open all ({{ counts.shown }})
-						</button>
-					</ButtonStyled>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="filtered.length === 0"
+						@click="openAll"
+					>
+						<LibraryIcon aria-hidden="true" />
+						Open all ({{ counts.shown }})
+					</Button>
 
 					<span class="text-sm text-secondary">
 						Showing <span class="font-medium text-contrast">{{ counts.shown }}</span> of
@@ -96,18 +100,19 @@ onMounted(() => {
 						</div>
 
 						<div class="mt-auto flex gap-2">
-							<ButtonStyled color="brand">
-								<button class="w-full flex-1 justify-center" @click="openPreview(id)">
-									<PlayIcon class="h-4 w-4" aria-hidden="true" />
-									Preview
-								</button>
-							</ButtonStyled>
+							<Button
+								type="colored"
+								color="brand"
+								class="w-full flex-1 justify-center"
+								@click="openPreview(id)"
+							>
+								<PlayIcon aria-hidden="true" />
+								Preview
+							</Button>
 
-							<ButtonStyled>
-								<button class="justify-center" title="Copy preview URL" @click="copy(id)">
-									<CopyIcon class="h-4 w-4" aria-hidden="true" />
-								</button>
-							</ButtonStyled>
+							<IconButton label="Copy preview URL" @click="copy(id)">
+								<CopyIcon aria-hidden="true" />
+							</IconButton>
 						</div>
 					</li>
 				</ul>

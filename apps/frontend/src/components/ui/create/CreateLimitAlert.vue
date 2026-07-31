@@ -13,11 +13,15 @@
 			<template v-if="hasHitLimit">
 				{{ formatMessage(messages.limitReachedDescription, { type: typeName.singular, max }) }}
 				<div class="w-min">
-					<ButtonStyled color="red">
-						<NuxtLink to="https://support.modrinth.com" target="_blank">
-							<MessageIcon />{{ formatMessage(messages.contactSupport) }}</NuxtLink
-						>
-					</ButtonStyled>
+					<ButtonLink
+						href="https://support.modrinth.com"
+						target="_blank"
+						type="colored"
+						color="red"
+					>
+						<MessageIcon aria-hidden="true" />
+						{{ formatMessage(messages.contactSupport) }}
+					</ButtonLink>
 				</div>
 			</template>
 			<template v-else>
@@ -29,11 +33,15 @@
 					})
 				}}
 				<div class="w-min">
-					<ButtonStyled color="orange">
-						<NuxtLink to="https://support.modrinth.com" target="_blank">
-							<MessageIcon />{{ formatMessage(messages.contactSupport) }}</NuxtLink
-						>
-					</ButtonStyled>
+					<ButtonLink
+						href="https://support.modrinth.com"
+						target="_blank"
+						type="colored"
+						color="orange"
+					>
+						<MessageIcon aria-hidden="true" />
+						{{ formatMessage(messages.contactSupport) }}
+					</ButtonLink>
 				</div>
 			</template>
 		</div>
@@ -44,7 +52,7 @@
 import { MessageIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
+	ButtonLink,
 	defineMessages,
 	injectModrinthClient,
 	useVIntl,

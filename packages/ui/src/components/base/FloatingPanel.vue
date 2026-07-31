@@ -2,7 +2,8 @@
 import { onClickOutside } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
-import ButtonStyled from './ButtonStyled.vue'
+import Button from './buttons/Button.vue'
+import type { ButtonElementHandle, ButtonProps } from './buttons/types'
 
 const PANEL_VIEWPORT_MARGIN = 8
 
@@ -11,7 +12,7 @@ const props = withDefaults(
 		placement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end'
 		distance?: number
 		disabled?: boolean
-		buttonClass?: string
+		buttonProps?: ButtonProps
 		panelClass?: string
 		autoFocus?: boolean
 	}>(),
@@ -29,7 +30,8 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const triggerRef = ref<HTMLElement>()
+const triggerButton = ref<ButtonElementHandle | null>(null)
+const triggerRef = computed(() => triggerButton.value?.element ?? null)
 const panelRef = ref<HTMLElement>()
 const rafId = ref<number | null>(null)
 
@@ -249,19 +251,17 @@ defineExpose({
 
 <template>
 	<div class="relative inline-block">
-		<ButtonStyled v-bind="$attrs">
-			<button
-				ref="triggerRef"
-				:class="buttonClass"
-				:disabled="disabled"
-				:aria-expanded="isOpen"
-				aria-haspopup="true"
-				@click="toggle"
-				@keydown="handleTriggerKeydown"
-			>
-				<slot></slot>
-			</button>
-		</ButtonStyled>
+		<Button
+			ref="triggerButton"
+			v-bind="{ ...$attrs, ...buttonProps }"
+			:disabled="disabled || buttonProps?.disabled"
+			:aria-expanded="isOpen"
+			aria-haspopup="true"
+			@click="toggle"
+			@keydown="handleTriggerKeydown"
+		>
+			<slot></slot>
+		</Button>
 
 		<Teleport to="body">
 			<Transition

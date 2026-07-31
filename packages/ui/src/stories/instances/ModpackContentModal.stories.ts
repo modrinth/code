@@ -417,9 +417,7 @@ export const Default: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Modpack Content (Mixed)</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">View Modpack Content (Mixed)</Button>
 				<ModpackContentModal
 					ref="modalRef"
 					modpack-name="Cobblemon Official Modpack"
@@ -440,9 +438,7 @@ export const ModsOnly: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Modpack Content (Mods Only)</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">View Modpack Content (Mods Only)</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -469,9 +465,7 @@ export const LoadingState: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Content (With Loading)</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">View Content (With Loading)</Button>
 				<ModpackContentModal
 					ref="modalRef"
 					modpack-name="Fabulously Optimized"
@@ -496,9 +490,7 @@ export const EmptyContent: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Empty Modpack</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">View Empty Modpack</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -519,9 +511,7 @@ export const LargeModpack: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Large Modpack (47 items)</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">View Large Modpack (47 items)</Button>
 				<ModpackContentModal
 					ref="modalRef"
 					modpack-name="All the Mods 10"
@@ -549,9 +539,7 @@ export const SearchDemo: Story = {
 				<p class="text-sm text-secondary max-w-md text-center">
 					Click the button and try searching for "sodium", "shader", or "faithful" to test the search functionality.
 				</p>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Test Search</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Test Search</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -575,9 +563,7 @@ export const FilterDemo: Story = {
 				<p class="text-sm text-secondary max-w-md text-center">
 					Click the button and try the filter chips (Mods, Shaders, Resource Packs) to filter content by type.
 				</p>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Test Filters</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Test Filters</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -608,9 +594,7 @@ export const MixedOwnerTypes: Story = {
 				<p class="text-sm text-secondary max-w-md text-center">
 					Shows content with different owner types: users (circular avatar) and organizations (rounded + icon).
 				</p>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Mixed Owners</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">View Mixed Owners</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,

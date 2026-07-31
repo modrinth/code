@@ -27,9 +27,10 @@ import {
 	UserIcon,
 } from '@modrinth/assets'
 import {
+	IconButton,
 	Admonition,
 	Avatar,
-	ButtonStyled,
+	ButtonLink,
 	commonMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
@@ -454,6 +455,18 @@ const messages = defineMessages({
 	viewAllNews: {
 		id: 'app.news.view-all',
 		defaultMessage: 'View all news',
+	},
+	toggleSidebar: {
+		id: 'app.sidebar.toggle',
+		defaultMessage: 'Toggle sidebar',
+	},
+	goBack: {
+		id: 'app.navigation.go-back',
+		defaultMessage: 'Go back',
+	},
+	goForward: {
+		id: 'app.navigation.go-forward',
+		defaultMessage: 'Go forward',
 	},
 	playingAs: {
 		id: 'app.sidebar.playing-as',
@@ -1642,49 +1655,40 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
 				<TextLogo class="h-7 w-auto shrink-0 text-contrast pointer-events-none" />
 				<div data-tauri-drag-region class="ml-2 flex shrink-0 items-center gap-2">
-					<ButtonStyled type="outlined" circular>
-						<button
+					<IconButton type="outlined" :label="formatMessage(messages.goBack)"
 							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 							:disabled="!canNavigateBack"
-							aria-label="Go back"
 							@click="router.back()"
 						>
 							<ChevronLeftIcon
 								class="!size-4 !text-primary"
 								:class="{ 'opacity-20': !canNavigateBack }"
 							/>
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined" circular>
-						<button
+						</IconButton>
+					<IconButton type="outlined" :label="formatMessage(messages.goForward)"
 							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 							:disabled="!canNavigateForward"
-							aria-label="Go forward"
 							@click="router.forward()"
 						>
 							<ChevronRightIcon
 								class="!size-4 !text-primary"
 								:class="{ 'opacity-20': !canNavigateForward }"
 							/>
-						</button>
-					</ButtonStyled>
+						</IconButton>
 				</div>
 				<Breadcrumbs />
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
-				<ButtonStyled
+				<IconButton
 					v-if="!forceSidebar && themeStore.toggleSidebar"
-					:type="sidebarToggled ? 'standard' : 'transparent'"
-					circular
+					:label="formatMessage(messages.toggleSidebar)"
+					:type="sidebarToggled ? 'base' : 'quiet'"
+					class="mr-3 transition-transform"
+					:class="{ 'rotate-180': !sidebarToggled }"
+					@click="sidebarToggled = !sidebarToggled"
 				>
-					<button
-						class="mr-3 transition-transform"
-						:class="{ 'rotate-180': !sidebarToggled }"
-						@click="sidebarToggled = !sidebarToggled"
-					>
-						<RightArrowIcon />
-					</button>
-				</ButtonStyled>
+					<RightArrowIcon aria-hidden="true" />
+				</IconButton>
 				<div class="flex mr-3">
 					<Suspense>
 						<AppActionBar />
@@ -1793,12 +1797,17 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 								:key="`news-${index}`"
 								:article="item"
 							/>
-							<ButtonStyled color="brand" size="large">
-								<a href="https://modrinth.com/news" target="_blank" class="my-4">
-									<NewspaperIcon />
-									{{ formatMessage(messages.viewAllNews) }}
-								</a>
-							</ButtonStyled>
+							<ButtonLink
+								href="https://modrinth.com/news"
+								target="_blank"
+								class="my-4"
+								color="brand"
+								size="lg"
+								type="colored"
+							>
+								<NewspaperIcon aria-hidden="true" />
+								{{ formatMessage(messages.viewAllNews) }}
+							</ButtonLink>
 						</div>
 					</div>
 				</div>

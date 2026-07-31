@@ -28,9 +28,7 @@ export const Default: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="red">
-					<button @click="modalRef?.show()">Remove user</button>
-				</ButtonStyled>
+				<Button color="red" type="colored" @click="modalRef?.show()">Remove user</Button>
 				<p v-if="removed" class="m-0 text-sm text-secondary">User removed</p>
 				<RemoveAccessModal
 					ref="modalRef"
@@ -57,9 +55,7 @@ export const CancelInvite: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="red">
-					<button @click="modalRef?.show()">Cancel invite</button>
-				</ButtonStyled>
+				<Button color="red" type="colored" @click="modalRef?.show()">Cancel invite</Button>
 				<p v-if="cancelled" class="m-0 text-sm text-secondary">Invite cancelled</p>
 				<RemoveAccessModal
 					ref="modalRef"

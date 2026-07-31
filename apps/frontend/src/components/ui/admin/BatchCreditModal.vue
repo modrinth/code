@@ -42,12 +42,10 @@
 							wrapper-class="w-32"
 							autocomplete="off"
 						/>
-						<ButtonStyled color="blue" color-fill="text">
-							<button class="shrink-0" @click="addNode">
-								<PlusIcon />
-								Add
-							</button>
-						</ButtonStyled>
+						<Button type="quiet" color="blue" class="shrink-0" @click="addNode">
+							<PlusIcon aria-hidden="true" />
+							Add
+						</Button>
 					</div>
 					<div v-if="selectedNodes.length" class="mt-1 flex flex-wrap gap-2">
 						<TagItem v-for="h in selectedNodes" :key="`node-${h}`" :action="() => removeNode(h)">
@@ -111,18 +109,14 @@
 			</div>
 
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="applyDisabled" @click="apply">
-						<CheckIcon aria-hidden="true" />
-						Apply credits
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="modal?.hide?.()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="applyDisabled" @click="apply">
+					<CheckIcon aria-hidden="true" />
+					Apply credits
+				</Button>
+				<Button @click="modal?.hide?.()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -131,7 +125,6 @@
 <script setup lang="ts">
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -140,6 +133,7 @@ import {
 	TagItem,
 	Toggle,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { computed, ref } from 'vue'
 

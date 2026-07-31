@@ -72,9 +72,7 @@ export const ExternalFiles: Story = {
 			return { diffs, DownloadIcon, modalRef }
 		},
 		template: /* html */ `
-			<ButtonStyled color="brand">
-				<button @click="modalRef?.show()">Open update warning</button>
-			</ButtonStyled>
+			<Button color="brand" type="colored" @click="modalRef?.show()">Open update warning</Button>
 			<ContentDiffModal
 				ref="modalRef"
 				header="Update to play"

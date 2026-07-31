@@ -17,48 +17,40 @@
 				tabindex="-1"
 				@mousedown.stop
 			>
-				<ButtonStyled type="transparent">
-					<button
+				<Button type="quiet"
 						class="w-full !justify-start !whitespace-nowrap"
 						role="menuitem"
 						@click="handleCopyFilename"
 					>
 						<ClipboardCopyIcon class="size-5" />
 						{{ formatMessage(commonMessages.copyFilenameButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="transparent">
-					<button
+					</Button>
+				<Button type="quiet"
 						class="w-full !justify-start !whitespace-nowrap"
 						role="menuitem"
 						@click="handleCopyPath"
 					>
 						<ClipboardCopyIcon class="size-5" />
 						{{ formatMessage(commonMessages.copyFullPathButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="ctx.openInFolder" type="transparent">
-					<button
+					</Button>
+				<Button v-if="ctx.openInFolder" type="quiet"
 						class="w-full !justify-start !whitespace-nowrap"
 						role="menuitem"
 						@click="handleOpenInFolder"
 					>
 						<FolderOpenIcon class="size-5" />
 						{{ formatMessage(commonMessages.openInFolderButton) }}
-					</button>
-				</ButtonStyled>
+					</Button>
 				<div class="h-px w-full bg-surface-5" />
 				<template v-for="(option, index) in menuOptions" :key="index">
 					<div
 						v-if="'divider' in option && option.divider && option.shown !== false"
 						class="h-px w-full bg-surface-5"
 					/>
-					<ButtonStyled
-						v-else-if="'id' in option && option.shown !== false"
-						type="transparent"
+					<Button
+						v-else-if="'id' in option && option.shown !== false" type="quiet"
 						:color="option.color"
-					>
-						<button
+					
 							v-tooltip="option.tooltip"
 							:disabled="option.disabled"
 							class="w-full !justify-start !whitespace-nowrap"
@@ -66,8 +58,7 @@
 							@click="handleOptionClick(option)"
 						>
 							<slot :name="option.id" />
-						</button>
-					</ButtonStyled>
+						</Button>
 				</template>
 			</div>
 		</Transition>
@@ -78,7 +69,7 @@
 import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'

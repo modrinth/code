@@ -1,23 +1,22 @@
 <template>
-	<ButtonStyled>
-		<PopoutMenu
-			v-if="options.length > 1 || showAlways"
-			v-bind="$attrs"
-			:disabled="disabled"
-			:position="position"
-			:direction="direction"
-			:dropdown-id="dropdownId"
-			:dropdown-class="dropdownClass"
-			:tooltip="tooltip"
-			@open="
-				() => {
-					searchQuery = ''
-				}
-			"
-		>
-			<slot />
-			<DropdownIcon class="h-5 w-5 text-secondary" />
-			<template #menu>
+	<PopoutMenu
+		v-if="options.length > 1 || showAlways"
+		v-bind="$attrs"
+		:disabled="disabled"
+		:position="position"
+		:direction="direction"
+		:dropdown-id="dropdownId"
+		:dropdown-class="dropdownClass"
+		:tooltip="tooltip"
+		@open="
+			() => {
+				searchQuery = ''
+			}
+		"
+	>
+		<slot />
+		<DropdownIcon class="h-5 w-5 text-secondary" />
+		<template #menu>
 				<StyledInput
 					v-if="search"
 					id="search-input"
@@ -37,10 +36,9 @@
 					<Button
 						v-for="(option, index) in filteredOptions"
 						:key="`option-${index}`"
-						:transparent="!manyValues.includes(option)"
-						:action="() => toggleOption(option)"
+						:type="manyValues.includes(option) ? 'base' : 'quiet'"
 						class="!w-full"
-						:color="manyValues.includes(option) ? 'secondary' : 'default'"
+						@click="toggleOption(option)"
 					>
 						<slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>
 						<CheckIcon
@@ -53,10 +51,9 @@
 					<Button
 						v-for="(option, index) in filteredOptions"
 						:key="`option-${index}`"
-						:transparent="!manyValues.includes(option)"
-						:action="() => toggleOption(option)"
+						:type="manyValues.includes(option) ? 'base' : 'quiet'"
 						class="!w-full"
-						:color="manyValues.includes(option) ? 'secondary' : 'default'"
+						@click="toggleOption(option)"
 					>
 						<slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>
 						<CheckIcon
@@ -65,16 +62,16 @@
 						/>
 					</Button>
 				</div>
-				<slot name="footer" />
-			</template>
-		</PopoutMenu>
-	</ButtonStyled>
+			<slot name="footer" />
+		</template>
+	</PopoutMenu>
 </template>
 <script setup lang="ts">
 import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Button, ButtonStyled, PopoutMenu, StyledInput } from '../index'
+import { PopoutMenu, StyledInput } from '../index'
+import Button from './buttons/Button.vue'
 import ScrollablePanel from './ScrollablePanel.vue'
 
 type Option = string | number | object

@@ -26,11 +26,9 @@
 					<span class="font-semibold leading-tight">{{ item.label }}</span>
 				</template>
 			</Combobox>
-			<ButtonStyled>
-				<button class="px-4 py-2" :disabled="isDisabled" @click="setMaxAmount">
-					{{ formatMessage(commonMessages.maxButton) }}
-				</button>
-			</ButtonStyled>
+			<Button :disabled="isDisabled" @click="setMaxAmount">
+				{{ formatMessage(commonMessages.maxButton) }}
+			</Button>
 		</div>
 		<div>
 			<span class="my-1 mt-0 text-secondary">{{ formatMoney(safeMaxAmount) }} available.</span>
@@ -50,7 +48,6 @@
 
 <script setup lang="ts">
 import {
-	ButtonStyled,
 	Combobox,
 	commonMessages,
 	formFieldPlaceholders,
@@ -58,6 +55,7 @@ import {
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed, ref, watch } from 'vue'
 
 const props = withDefaults(

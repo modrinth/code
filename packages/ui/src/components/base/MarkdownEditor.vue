@@ -46,24 +46,24 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => linkModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!!linkValidationErrorMessage || !linkUrl"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
-								linkModal?.hide()
-							}
-						"
-					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="() => linkModal?.hide()">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
+							linkModal?.hide()
+						}
+					"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -144,24 +144,24 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => imageModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!canInsertImage"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
-								imageModal?.hide()
-							}
-						"
-					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="() => imageModal?.hide()">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!canInsertImage"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
+							imageModal?.hide()
+						}
+					"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -204,24 +204,24 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => videoModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!!linkValidationErrorMessage || !linkUrl"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
-								videoModal?.hide()
-							}
-						"
-					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="() => videoModal?.hide()">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
+							videoModal?.hide()
+						}
+					"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -235,17 +235,14 @@
 					>
 						<div class="divider"></div>
 						<template v-for="button in buttonGroup.buttons" :key="button.label.id">
-							<ButtonStyled circular>
-								<button
-									v-tooltip="formatMessage(button.label)"
-									:aria-label="formatMessage(button.label)"
-									:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
-									:disabled="previewMode || disabled"
-									@click="() => button.action(editor)"
-								>
-									<component :is="button.icon" />
-								</button>
-							</ButtonStyled>
+							<IconButton
+								:label="formatMessage(button.label)"
+								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
+								:disabled="previewMode || disabled"
+								@click="() => button.action(editor)"
+							>
+								<component :is="button.icon" aria-hidden="true" />
+							</IconButton>
 						</template>
 					</template>
 				</div>
@@ -336,7 +333,8 @@ import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'
 import NewModal from '../modal/NewModal.vue'
-import ButtonStyled from './ButtonStyled.vue'
+import Button from './buttons/Button.vue'
+import IconButton from './buttons/IconButton.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
 import IntlFormatted from './IntlFormatted.vue'

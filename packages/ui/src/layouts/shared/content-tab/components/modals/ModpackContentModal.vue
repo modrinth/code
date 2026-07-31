@@ -14,7 +14,7 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import ButtonLink from '#ui/components/base/buttons/ButtonLink.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -611,17 +611,16 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 								</span>
 							</template>
 							<template #itemButtonsRight="{ item }">
-								<ButtonStyled v-if="externalSlicerUrls[item.id]" circular type="transparent">
-									<a
-										v-tooltip="formatMessage(messages.openInSlicer)"
-										:aria-label="formatMessage(messages.openInSlicer)"
-										:href="externalSlicerUrls[item.id]"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<ExternalIcon class="size-4" />
-									</a>
-								</ButtonStyled>
+								<ButtonLink
+									v-if="externalSlicerUrls[item.id]"
+									v-tooltip="formatMessage(messages.openInSlicer)"
+									:aria-label="formatMessage(messages.openInSlicer)"
+									:href="externalSlicerUrls[item.id]"
+									type="quiet"
+									target="_blank"
+								>
+									<ExternalIcon class="size-4" aria-hidden="true" />
+								</ButtonLink>
 							</template>
 						</ContentCardTable>
 					</div>

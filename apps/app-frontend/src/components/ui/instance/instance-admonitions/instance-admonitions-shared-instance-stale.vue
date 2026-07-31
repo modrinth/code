@@ -6,8 +6,7 @@
 	>
 		{{ formatMessage(messages.sharedInstanceChangesBody) }}
 		<template #actions>
-			<ButtonStyled color="blue">
-				<button class="!h-10" :disabled="isPublishButtonDisabled" @click="reviewChanges">
+			<Button color="blue" type="colored" class="!h-10" :disabled="isPublishButtonDisabled" @click="reviewChanges">
 					<SpinnerIcon
 						v-if="isReviewingPublish || isPublishing"
 						class="animate-spin"
@@ -21,8 +20,7 @@
 								? formatMessage(messages.sharedInstanceReviewingButton)
 								: formatMessage(messages.sharedInstancePublishButton)
 					}}
-				</button>
-			</ButtonStyled>
+				</Button>
 		</template>
 	</Admonition>
 
@@ -36,7 +34,8 @@
 
 <script setup lang="ts">
 import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { Admonition, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'

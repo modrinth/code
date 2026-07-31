@@ -23,11 +23,17 @@
 				</div>
 			</div>
 			<div class="input-group">
-				<ButtonStyled circular>
-					<button :class="{ '[&>svg]:rotate-180': !collapsed }" @click="$emit('toggleCollapsed')">
-						<DropdownIcon class="duration-250 transition-transform ease-in-out" />
-					</button>
-				</ButtonStyled>
+				<IconButton
+					:label="getFormattedMessage(messages.publishingChecklist)"
+					:aria-expanded="!collapsed"
+					@click="$emit('toggleCollapsed')"
+				>
+					<DropdownIcon
+						aria-hidden="true"
+						class="duration-250 transition-transform ease-in-out"
+						:class="{ 'rotate-180': !collapsed }"
+					/>
+				</IconButton>
 			</div>
 		</div>
 		<div v-if="!collapsed" class="mt-4 grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-2">
@@ -61,21 +67,19 @@
 					{{ getFormattedMessage(nag.link.title) }}
 					<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
 				</NuxtLink>
-				<ButtonStyled
+				<Button
 					v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+					v-tooltip="
+						!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
+					"
+					type="colored"
 					color="orange"
+					:disabled="!canSubmitForReview"
 					@click="submitForReview"
 				>
-					<button
-						v-tooltip="
-							!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
-						"
-						:disabled="!canSubmitForReview"
-					>
-						<SendIcon />
-						{{ getFormattedMessage(messages.submitForReviewButton) }}
-					</button>
-				</ButtonStyled>
+					<SendIcon aria-hidden="true" />
+					{{ getFormattedMessage(messages.submitForReviewButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>
@@ -94,7 +98,8 @@ import {
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nags } from '@modrinth/moderation'
-import { ButtonStyled, defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import { defineMessages, IconButton, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 

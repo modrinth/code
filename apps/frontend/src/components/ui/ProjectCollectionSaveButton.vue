@@ -1,65 +1,64 @@
 <template>
-	<ButtonStyled size="large" circular>
-		<PopoutMenu
-			v-if="authUser"
-			:tooltip="
-				saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
-			"
-			from="top-right"
-			:aria-label="formatMessage(commonMessages.saveButton)"
-			:dropdown-id="`${baseId}-save`"
-		>
-			<BookmarkIcon aria-hidden="true" :fill="saved ? 'currentColor' : 'none'" />
-			<template #menu>
-				<StyledInput
-					v-model="displayCollectionsSearch"
-					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-					wrapper-class="menu-search"
-				/>
-				<div v-if="filteredCollections.length > 0" class="collections-list text-primary">
-					<Checkbox
-						v-for="option in filteredCollections"
-						:key="option.id"
-						:model-value="option.projects.includes(projectId)"
-						class="popout-checkbox"
-						@update:model-value="() => collectProject(option, projectId)"
-					>
-						{{ option.name }}
-					</Checkbox>
-				</div>
+	<PopoutMenu
+		v-if="authUser"
+		:tooltip="
+			saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
+		"
+		from="top-right"
+		:aria-label="formatMessage(commonMessages.saveButton)"
+		:dropdown-id="`${baseId}-save`"
+		size="lg"
+	>
+		<BookmarkIcon aria-hidden="true" :fill="saved ? 'currentColor' : 'none'" />
+		<template #menu>
+			<StyledInput
+				v-model="displayCollectionsSearch"
+				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+				wrapper-class="menu-search"
+			/>
+			<div v-if="filteredCollections.length > 0" class="collections-list text-primary">
+				<Checkbox
+					v-for="option in filteredCollections"
+					:key="option.id"
+					:model-value="option.projects.includes(projectId)"
+					class="popout-checkbox"
+					@update:model-value="() => collectProject(option, projectId)"
+				>
+					{{ option.name }}
+				</Checkbox>
+			</div>
 
-				<div v-else class="menu-text">
-					<p class="popout-text">{{ noCollectionsLabel }}</p>
-				</div>
-				<ButtonStyled>
-					<button class="mx-3 mb-3" @click="createCollection">
-						<PlusIcon aria-hidden="true" />
-						{{ createNewCollectionLabel }}
-					</button>
-				</ButtonStyled>
-			</template>
-		</PopoutMenu>
-		<nuxt-link
-			v-else
-			v-tooltip="formatMessage(commonMessages.saveButton)"
-			:to="signInRoute"
-			:aria-label="formatMessage(commonMessages.saveButton)"
-		>
-			<BookmarkIcon aria-hidden="true" />
-		</nuxt-link>
-	</ButtonStyled>
+			<div v-else class="menu-text">
+				<p class="popout-text">{{ noCollectionsLabel }}</p>
+			</div>
+			<Button class="mx-3 mb-3" @click="createCollection">
+				<PlusIcon aria-hidden="true" />
+				{{ createNewCollectionLabel }}
+			</Button>
+		</template>
+	</PopoutMenu>
+	<ButtonLink
+		v-else
+		v-tooltip="formatMessage(commonMessages.saveButton)"
+		:to="signInRoute"
+		:aria-label="formatMessage(commonMessages.saveButton)"
+		size="lg"
+	>
+		<BookmarkIcon aria-hidden="true" />
+	</ButtonLink>
 </template>
 
 <script setup lang="ts">
 import { BookmarkIcon, PlusIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	PopoutMenu,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import ButtonLink from '@modrinth/ui/src/components/base/buttons/ButtonLink.vue'
 import { computed, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 

@@ -51,26 +51,22 @@
 					<SpinnerIcon class="size-8 animate-spin text-contrast" />
 				</div>
 				<template v-else>
-					<ButtonStyled
+					<Button
 						v-for="method in paymentOptions"
 						:key="method.value"
-						:color="withdrawData.selection.method === method.value ? 'green' : 'standard'"
-						:highlighted="withdrawData.selection.method === method.value"
-						type="chip"
+						class="w-full justify-start text-left"
+						:type="withdrawData.selection.method === method.value ? 'colored' : 'outlined'"
+						:color="withdrawData.selection.method === method.value ? 'green' : undefined"
+						@click="handleMethodSelection(method)"
 					>
-						<button
-							class="!justify-start !gap-2 !text-left sm:!h-10"
-							@click="handleMethodSelection(method)"
-						>
-							<component :is="method.icon" class="shrink-0" />
-							<span class="flex-1 truncate text-sm sm:text-[1rem]">
-								{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
-							</span>
-							<span class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm">{{
-								method.fee
-							}}</span>
-						</button>
-					</ButtonStyled>
+						<component :is="method.icon" class="shrink-0" aria-hidden="true" />
+						<span class="flex-1 truncate text-sm sm:text-[1rem]">
+							{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
+						</span>
+						<span class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm">{{
+							method.fee
+						}}</span>
+					</Button>
 				</template>
 			</div>
 		</div>
@@ -81,7 +77,6 @@
 import { SpinnerIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	Combobox,
 	defineMessages,
 	injectNotificationManager,
@@ -91,6 +86,7 @@ import {
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { useGeolocation } from '@vueuse/core'
 
 import { useCountries, useFormattedCountries, useUserCountry } from '@/composables/country.ts'

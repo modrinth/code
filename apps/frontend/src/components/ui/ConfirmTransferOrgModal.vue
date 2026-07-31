@@ -57,18 +57,19 @@
 		</div>
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<button @click="hide">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button :disabled="!isConfirmEnabled" @click="onConfirmClick">
-						<TransferIcon />
-						Transfer ownership
-					</button>
-				</ButtonStyled>
+				<Button @click="hide">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
+				<Button
+					type="colored"
+					color="red"
+					:disabled="!isConfirmEnabled"
+					@click="onConfirmClick"
+				>
+					<TransferIcon aria-hidden="true" />
+					Transfer ownership
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -76,7 +77,8 @@
 
 <script setup lang="ts">
 import { RightArrowIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
+import { Admonition, Avatar, NewModal, StyledInput } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{

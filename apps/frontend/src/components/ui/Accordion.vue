@@ -1,13 +1,19 @@
 <template>
 	<div>
-		<ButtonStyled v-if="!!slots.title" :type="type">
-			<button class="!w-full" @click="() => (isOpen ? close() : open())">
-				<slot name="title" /><DropdownIcon
-					class="ml-auto size-5 text-contrast transition-transform duration-300"
-					:class="{ 'rotate-180': isOpen }"
-				/>
-			</button>
-		</ButtonStyled>
+		<Button
+			v-if="!!slots.title"
+			class="w-full"
+			:type="type === 'transparent' ? 'quiet' : type === 'standard' ? 'base' : type"
+			:aria-expanded="isOpen"
+			@click="() => (isOpen ? close() : open())"
+		>
+			<slot name="title" />
+			<DropdownIcon
+				aria-hidden="true"
+				class="ml-auto size-5 text-contrast transition-transform duration-300"
+				:class="{ 'rotate-180': isOpen }"
+			/>
+		</Button>
 		<div class="accordion-content" :class="{ open: isOpen }">
 			<div>
 				<div :class="{ 'mt-2': !!slots.title }" v-bind="$attrs" :inert="!isOpen">
@@ -20,7 +26,7 @@
 
 <script setup lang="ts">
 import { DropdownIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 const props = withDefaults(
 	defineProps<{

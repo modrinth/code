@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SaveIcon, XIcon } from '@modrinth/assets'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessage,
 	injectNotificationManager,
@@ -105,18 +105,14 @@ const titleMessage = defineMessage({
 		<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hide()">
+				<Button type="outlined" @click="hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!address" @click="saveServer">
+					</Button>
+				<Button color="brand" type="colored" :disabled="!address" @click="saveServer">
 						<SaveIcon />
 						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</button>
-				</ButtonStyled>
+					</Button>
 			</div>
 		</template>
 	</NewModal>

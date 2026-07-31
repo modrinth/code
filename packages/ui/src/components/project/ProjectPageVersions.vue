@@ -9,9 +9,15 @@
 				@update:query="updateQuery"
 			/>
 
-			<ButtonStyled v-if="openModal" :color="createVersionButtonSecondary ? 'standard' : 'green'">
-				<button @click="openModal"><PlusIcon /> Create version</button>
-			</ButtonStyled>
+			<Button
+				v-if="openModal"
+				:type="createVersionButtonSecondary ? 'base' : 'colored'"
+				:color="createVersionButtonSecondary ? undefined : 'green'"
+				@click="openModal"
+			>
+				<PlusIcon aria-hidden="true" />
+				Create version
+			</Button>
 
 			<Pagination
 				v-if="!openModal"
@@ -445,7 +451,6 @@ import {
 } from '@modrinth/assets'
 import {
 	AutoLink,
-	ButtonStyled,
 	Pagination,
 	SmartClickable,
 	Table,
@@ -457,6 +462,7 @@ import {
 	VersionChannelIndicator,
 	VersionFilterControl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'

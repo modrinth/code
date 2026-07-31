@@ -9,7 +9,15 @@ import {
 	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Collapsible, injectNotificationManager } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import {
+	ButtonLink,
+	Collapsible,
+	defineMessages,
+	IconButton,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { ChatIcon } from '@/assets/icons'
@@ -21,6 +29,10 @@ import { cancel_directory_change } from '@/helpers/settings.ts'
 import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	copyDebugInfo: { id: 'app.error.copy-debug-info', defaultMessage: 'Copy debug info' },
+})
 
 const errorModal = ref()
 const error = ref()
@@ -273,12 +285,8 @@ async function copyToClipboard(text) {
 				</template>
 			</div>
 			<div class="flex items-center gap-2">
-				<ButtonStyled>
-					<a :href="supportLink" @click="errorModal.hide()"><ChatIcon /> Get support</a>
-				</ButtonStyled>
-				<ButtonStyled v-if="closable">
-					<button @click="errorModal.hide()"><XIcon /> Close</button>
-				</ButtonStyled>
+				<ButtonLink :href="supportLink"><ChatIcon aria-hidden="true" /> Get support</ButtonLink>
+				<Button v-if="closable" @click="errorModal.hide()"><XIcon /> Close</Button>
 			</div>
 			<template v-if="hasDebugInfo">
 				<div class="flex flex-col gap-2">
@@ -307,16 +315,14 @@ async function copyToClipboard(text) {
 								>
 									{{ debugInfo }}
 								</div>
-								<ButtonStyled circular>
-									<button
-										v-tooltip="'Copy debug info'"
+								<IconButton
+										:label="formatMessage(messages.copyDebugInfo)"
 										:disabled="copied"
 										@click="copyToClipboard(debugInfo)"
 									>
 										<template v-if="copied"> <CheckIcon class="text-green" /> </template>
 										<template v-else> <CopyIcon /> </template>
-									</button>
-								</ButtonStyled>
+									</IconButton>
 							</div>
 						</Collapsible>
 					</div>

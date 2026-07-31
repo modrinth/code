@@ -23,9 +23,7 @@ export const Modpack: Story = {
 			return { modalRef }
 		},
 		template: /* html */ `
-			<ButtonStyled color="brand">
-				<button @click="modalRef?.show()">Open modpack warning</button>
-			</ButtonStyled>
+			<Button color="brand" type="colored" @click="modalRef?.show()">Open modpack warning</Button>
 			<UnknownFileWarningModal
 				ref="modalRef"
 				mode="modpack"
@@ -51,9 +49,7 @@ export const Mod: Story = {
 			return { modalRef }
 		},
 		template: /* html */ `
-			<ButtonStyled color="brand">
-				<button @click="modalRef?.show()">Open file warning</button>
-			</ButtonStyled>
+			<Button color="brand" type="colored" @click="modalRef?.show()">Open file warning</Button>
 			<UnknownFileWarningModal
 				ref="modalRef"
 				mode="mod"

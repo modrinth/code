@@ -35,16 +35,16 @@
 		>
 			<template #actions>
 				<div class="flex">
-					<ButtonStyled color="orange">
-						<nuxt-link
-							:to="`/${project.project_type}/${
-								project.slug ? project.slug : project.id
-							}/settings/permissions`"
-						>
-							{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
-							<RightArrowIcon />
-						</nuxt-link>
-					</ButtonStyled>
+					<ButtonLink
+						:to="`/${project.project_type}/${
+							project.slug ? project.slug : project.id
+						}/settings/permissions`"
+						type="colored"
+						color="orange"
+					>
+						{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
+						<RightArrowIcon aria-hidden="true" />
+					</ButtonLink>
 				</div>
 			</template>
 		</Admonition>
@@ -304,11 +304,14 @@
 					<div class="text-2xl font-semibold text-contrast">No versions created</div>
 					<div>Create your first project version.</div>
 					<br />
-					<ButtonStyled color="green">
-						<button @click="() => createProjectVersionModal?.openCreateVersionModal()">
-							<PlusIcon /> Create version
-						</button>
-					</ButtonStyled>
+					<Button
+						type="colored"
+						color="green"
+						@click="() => createProjectVersionModal?.openCreateVersionModal()"
+					>
+						<PlusIcon aria-hidden="true" />
+						Create version
+					</Button>
 				</div>
 			</div>
 		</template>
@@ -336,6 +339,7 @@ import {
 import {
 	Admonition,
 	ButtonStyled,
+	ButtonLink,
 	commonMessages,
 	commonProjectSettingsMessages,
 	ConfirmModal,
@@ -347,6 +351,7 @@ import {
 	ProjectPageVersions,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'

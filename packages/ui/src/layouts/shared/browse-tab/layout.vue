@@ -3,7 +3,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { computed, ref, toValue } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
+import IconButton from '#ui/components/base/buttons/IconButton.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -57,6 +58,10 @@ const messages = defineMessages({
 		id: 'browse.filter-results',
 		defaultMessage: 'Filter results...',
 	},
+	cycleDisplayMode: {
+		id: 'browse.cycle-display-mode',
+		defaultMessage: 'Change display mode',
+	},
 	offline: {
 		id: 'browse.offline',
 		defaultMessage: 'You are currently offline. Connect to the internet to browse Modrinth!',
@@ -66,6 +71,12 @@ const messages = defineMessages({
 		defaultMessage: 'No results found for your query!',
 	},
 })
+
+function getButtonType(type?: 'standard' | 'outlined' | 'transparent') {
+	if (type === 'outlined') return 'outlined'
+	if (type === 'transparent') return 'quiet'
+	return 'base'
+}
 
 function getLoaderFieldValues(
 	result: Labrinth.Search.v3.ResultSearchProject,
@@ -164,18 +175,18 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		</Combobox>
 
 		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
-			<ButtonStyled>
-				<button @click="ctx.filtersMenuOpen.value = true">
-					{{ formatMessage(messages.filterResults) }}
-				</button>
-			</ButtonStyled>
+			<Button @click="ctx.filtersMenuOpen.value = true">
+				{{ formatMessage(messages.filterResults) }}
+			</Button>
 		</div>
 
-		<ButtonStyled v-if="ctx.cycleDisplayMode" circular>
-			<button @click="ctx.cycleDisplayMode!()">
-				<slot name="display-mode-icon" />
-			</button>
-		</ButtonStyled>
+		<IconButton
+			v-if="ctx.cycleDisplayMode"
+			:label="formatMessage(messages.cycleDisplayMode)"
+			@click="ctx.cycleDisplayMode!()"
+		>
+			<slot name="display-mode-icon" />
+		</IconButton>
 
 		<Pagination
 			:page="ctx.currentPage.value"
@@ -253,22 +264,20 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 				>
 					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
-							<ButtonStyled
+							<component
+								:is="action.circular ? IconButton : Button"
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
 								:key="action.key"
 								:color="action.color"
-								:type="action.type"
-								:circular="action.circular"
+								:type="getButtonType(action.type)"
+								:label="action.circular ? action.label : undefined"
+								v-tooltip="action.tooltip"
+								:disabled="action.disabled"
+								@click.stop="action.onClick"
 							>
-								<button
-									v-tooltip="action.tooltip"
-									:disabled="action.disabled"
-									@click.stop="action.onClick"
-								>
-									<component :is="action.icon" :class="action.iconClass" />
-									<template v-if="!action.circular">{{ action.label }}</template>
-								</button>
-							</ButtonStyled>
+								<component :is="action.icon" :class="action.iconClass" aria-hidden="true" />
+								<template v-if="!action.circular">{{ action.label }}</template>
+							</component>
 						</div>
 					</template>
 				</ProjectCard>
@@ -315,22 +324,20 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 				>
 					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
-							<ButtonStyled
+							<component
+								:is="action.circular ? IconButton : Button"
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
 								:key="action.key"
 								:color="action.color"
-								:type="action.type"
-								:circular="action.circular"
+								:type="getButtonType(action.type)"
+								:label="action.circular ? action.label : undefined"
+								v-tooltip="action.tooltip"
+								:disabled="action.disabled"
+								@click.stop="action.onClick"
 							>
-								<button
-									v-tooltip="action.tooltip"
-									:disabled="action.disabled"
-									@click.stop="action.onClick"
-								>
-									<component :is="action.icon" :class="action.iconClass" />
-									<template v-if="!action.circular">{{ action.label }}</template>
-								</button>
-							</ButtonStyled>
+								<component :is="action.icon" :class="action.iconClass" aria-hidden="true" />
+								<template v-if="!action.circular">{{ action.label }}</template>
+							</component>
 						</div>
 					</template>
 				</ProjectCard>

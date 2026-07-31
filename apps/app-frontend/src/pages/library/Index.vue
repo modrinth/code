@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { LibraryIcon, PlusIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, NavTabs } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { injectNotificationManager, NavTabs } from '@modrinth/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -53,12 +54,10 @@ onUnmounted(() => {
 					{ label: 'Saved', href: `/library/saved`, shown: false },
 				]"
 			/>
-			<ButtonStyled color="brand">
-				<button :disabled="offline" @click="showCreationModal?.()">
+			<Button color="brand" type="colored" :disabled="offline" @click="showCreationModal?.()">
 					<PlusIcon />
 					New instance
-				</button>
-			</ButtonStyled>
+				</Button>
 		</div>
 		<template v-if="instances && instances.length > 0">
 			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
@@ -68,12 +67,10 @@ onUnmounted(() => {
 				<NewInstanceImage />
 			</div>
 			<h3>No instances found</h3>
-			<ButtonStyled color="brand">
-				<button :disabled="offline" @click="showCreationModal?.()">
+			<Button color="brand" type="colored" :disabled="offline" @click="showCreationModal?.()">
 					<PlusIcon />
 					Create new instance
-				</button>
-			</ButtonStyled>
+				</Button>
 		</div>
 	</div>
 </template>

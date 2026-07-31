@@ -30,9 +30,7 @@ export const LinkShare: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Open Link Share Modal</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Open Link Share Modal</Button>
 				<ShareModal ref="modalRef" v-bind="args" />
 			</div>
 		`,
@@ -57,9 +55,7 @@ export const TextShare: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Open Text Share Modal</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Open Text Share Modal</Button>
 				<ShareModal ref="modalRef" v-bind="args" />
 			</div>
 		`,

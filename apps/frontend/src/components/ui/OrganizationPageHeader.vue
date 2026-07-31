@@ -38,21 +38,22 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<ButtonStyled v-if="canManage" size="large">
-					<nuxt-link :to="`/organization/${organization.slug}/settings`">
-						<SettingsIcon />
-						{{ formatMessage(messages.manage) }}
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled circular size="large" type="transparent">
-					<TeleportOverflowMenu
-						:options="moreActions"
-						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-					>
-						<MoreVerticalIcon />
-					</TeleportOverflowMenu>
-				</ButtonStyled>
+				<ButtonLink
+					v-if="canManage"
+					size="lg"
+					:to="`/organization/${organization.slug}/settings`"
+				>
+					<SettingsIcon aria-hidden="true" />
+					{{ formatMessage(messages.manage) }}
+				</ButtonLink>
+				<TeleportOverflowMenu
+					:options="moreActions"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					size="lg"
+					type="quiet"
+				>
+					<MoreVerticalIcon aria-hidden="true" />
+				</TeleportOverflowMenu>
 			</PageHeaderActions>
 		</template>
 	</PageHeader>
@@ -70,7 +71,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	PageHeader,
@@ -78,11 +78,12 @@ import {
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataNumberItem,
-	TeleportOverflowMenu,
-	type TeleportOverflowMenuItem,
 	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
+import ButtonLink from '@modrinth/ui/src/components/base/buttons/ButtonLink.vue'
+import TeleportOverflowMenu from '@modrinth/ui/src/components/base/buttons/TeleportOverflowMenu.vue'
+import type { OverflowMenuOption } from '@modrinth/ui/src/components/base/buttons/types'
 import { computed } from 'vue'
 
 const messages = defineMessages({
@@ -135,7 +136,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
 
-const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
+const moreActions = computed<OverflowMenuOption[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.manageProjects),
@@ -144,7 +145,7 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		shown: props.canManage,
 	},
 	{
-		divider: true,
+		type: 'divider',
 		shown: props.canManage,
 	},
 	{

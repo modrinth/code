@@ -49,9 +49,7 @@ export const Default: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show($event)">Add user</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show($event)">Add user</Button>
 				<p v-if="lastAddedUser" class="m-0 text-sm text-secondary">Last added: {{ lastAddedUser }}</p>
 				<GrantAccessModal ref="modalRef" :search-users="searchUsers" @grant="handleGrant" />
 			</div>
@@ -88,9 +86,7 @@ export const ExistingMember: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show($event)">Add existing user</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show($event)">Add existing user</Button>
 				<GrantAccessModal ref="modalRef" :members="members" :search-users="searchUsers" />
 			</div>
 		`,

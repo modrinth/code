@@ -70,11 +70,9 @@ export const WithActions: Story = {
 			<div class="w-[156px]">
 				<SkinButton v-bind="args">
 					<template #overlay-buttons>
-						<ButtonStyled color="brand">
-							<button class="pointer-events-auto">
+						<Button color="brand" type="colored" class="pointer-events-auto">
 								<EditIcon /> Edit
-							</button>
-						</ButtonStyled>
+							</Button>
 						<ButtonStyled circular color="red">
 							<button class="pointer-events-auto" aria-label="Delete skin">
 								<TrashIcon />

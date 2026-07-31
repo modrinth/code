@@ -56,18 +56,14 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2 pt-4">
-				<ButtonStyled type="outlined">
-					<button @click="hide">
+				<Button type="outlined" @click="hide">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button @click="handleProceed">
+					</Button>
+				<Button color="brand" type="colored" @click="handleProceed">
 						<CheckIcon />
 						{{ formatMessage(messages.overwriteButton) }}
-					</button>
-				</ButtonStyled>
+					</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -78,7 +74,7 @@ import { CheckIcon, MinusIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

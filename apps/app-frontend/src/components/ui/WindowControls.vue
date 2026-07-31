@@ -4,34 +4,38 @@
 		class="flex items-center gap-2 mr-1.5"
 		data-tauri-drag-region-exclude
 	>
-		<ButtonStyled type="transparent" circular>
-			<button class="relative expanded-button" @click="() => getCurrentWindow().minimize()">
-				<MinimizeIcon />
-			</button>
-		</ButtonStyled>
-		<ButtonStyled type="transparent" circular>
-			<button class="relative expanded-button" @click="() => getCurrentWindow().toggleMaximize()">
-				<RestoreIcon v-if="isMaximized" />
-				<MaximizeIcon v-else />
-			</button>
-		</ButtonStyled>
-		<ButtonStyled
-			type="transparent"
-			color="red"
-			color-fill="none"
-			hover-color-fill="background"
-			circular
+		<IconButton
+			:label="formatMessage(messages.minimize)"
+			type="quiet"
+			class="relative expanded-button"
+			@click="() => getCurrentWindow().minimize()"
 		>
-			<button class="relative expanded-button close-button" @click="handleClose">
-				<XIcon />
-			</button>
-		</ButtonStyled>
+			<MinimizeIcon aria-hidden="true" />
+		</IconButton>
+		<IconButton
+			:label="formatMessage(messages.toggleMaximize)"
+			type="quiet"
+			class="relative expanded-button"
+			@click="() => getCurrentWindow().toggleMaximize()"
+		>
+			<RestoreIcon v-if="isMaximized" aria-hidden="true" />
+			<MaximizeIcon v-else aria-hidden="true" />
+		</IconButton>
+		<IconButton
+			:label="formatMessage(messages.close)"
+			type="quiet"
+			color="red"
+			class="relative expanded-button close-button"
+			@click="handleClose"
+		>
+			<XIcon aria-hidden="true" />
+		</IconButton>
 	</section>
 </template>
 
 <script setup>
 import { MaximizeIcon, MinimizeIcon, RestoreIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
@@ -45,6 +49,15 @@ const themeStore = useTheming()
 const nativeDecorations = ref(true)
 const isMaximized = ref(false)
 const os = ref('')
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	minimize: { id: 'app.window-controls.minimize', defaultMessage: 'Minimize window' },
+	toggleMaximize: {
+		id: 'app.window-controls.toggle-maximize',
+		defaultMessage: 'Toggle maximize window',
+	},
+	close: { id: 'app.window-controls.close', defaultMessage: 'Close window' },
+})
 
 const alwaysShowAppControls = computed(() => themeStore.getFeatureFlag('always_show_app_controls'))
 

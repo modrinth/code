@@ -130,22 +130,20 @@
 			</span>
 		</span>
 		<div v-if="isStaff(auth.user) && message.author_id === auth.user.id" class="message__actions">
-			<ButtonStyled circular type="transparent">
-				<OverflowMenu
-					class="btn-dropdown-animation"
-					:options="[
-						{
-							id: 'delete',
-							action: () => deleteMessage(),
-							color: 'red',
-							hoverFilled: true,
-						},
-					]"
-				>
-					<MoreHorizontalIcon />
-					<template #delete> <TrashIcon /> Delete </template>
-				</OverflowMenu>
-			</ButtonStyled>
+			<OverflowMenu
+				:options="[
+					{
+						id: 'delete',
+						action: () => deleteMessage(),
+						color: 'red',
+						hoverFilled: true,
+					},
+				]"
+				aria-label="Message actions"
+			>
+				<MoreHorizontalIcon />
+				<template #delete> <TrashIcon /> Delete </template>
+			</OverflowMenu>
 		</div>
 	</div>
 </template>
@@ -165,7 +163,6 @@ import {
 	AutoLink,
 	Avatar,
 	Badge,
-	ButtonStyled,
 	OverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,

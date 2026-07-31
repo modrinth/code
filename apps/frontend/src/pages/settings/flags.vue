@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, StyledInput, Toggle } from '@modrinth/ui'
+import { StyledInput, Toggle } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import Fuse from 'fuse.js'
 import { computed, ref, shallowReactive } from 'vue'
 
@@ -68,11 +69,13 @@ useSeoMeta({
 				</p>
 			</label>
 			<div class="flex items-center gap-2">
-				<ButtonStyled type="transparent">
-					<button :disabled="flags[flag] === DEFAULT_FEATURE_FLAGS[flag]" @click="resetFlag(flag)">
-						Reset to default
-					</button>
-				</ButtonStyled>
+				<Button
+					type="quiet"
+					:disabled="flags[flag] === DEFAULT_FEATURE_FLAGS[flag]"
+					@click="resetFlag(flag)"
+				>
+					Reset to default
+				</Button>
 				<Toggle
 					:id="`toggle-${flag}`"
 					v-model="flags[flag]"

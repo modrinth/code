@@ -13,16 +13,15 @@
 					"
 					listbox
 				/>
-				<ButtonStyled circular>
-					<button
-						v-tooltip="formatMessage(messages.downloadCsv)"
-						:disabled="buildingCsv"
-						@click="onDownloadCSV"
-					>
-						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
-						<DownloadIcon v-else />
-					</button>
-				</ButtonStyled>
+				<IconButton
+					v-tooltip="formatMessage(messages.downloadCsv)"
+					:label="formatMessage(messages.downloadCsv)"
+					:loading="buildingCsv"
+					@click="onDownloadCSV"
+				>
+					<SpinnerIcon v-if="buildingCsv" class="animate-spin" aria-hidden="true" />
+					<DownloadIcon v-else aria-hidden="true" />
+				</IconButton>
 			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -90,10 +89,10 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	defineMessages,
 	EmptyState,
+	IconButton,
 	injectModrinthClient,
 	useFormatDateTime,
 	useFormatMoney,

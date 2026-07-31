@@ -48,29 +48,24 @@
 				</span>
 			</div>
 		</div>
-		<ButtonStyled
+		<ButtonLink
 			v-if="primaryFile && showDownload"
-			:color="color"
-			:type="type"
-			:circular="circular"
+			:type="type === 'transparent' ? 'quiet' : color === 'brand' ? 'colored' : 'base'"
+			:color="color === 'brand' ? 'brand' : undefined"
+			:href="primaryFileDownloadUrl"
+			:download="primaryFile.filename"
+			:aria-label="
+				formatMessage(messages.downloadVersion, {
+					version: version.version_number,
+				})
+			"
+			@click="emit('download')"
 		>
-			<a
-				v-tooltip="circular ? formatMessage(messages.download) : null"
-				:href="primaryFileDownloadUrl"
-				:download="primaryFile.filename"
-				:aria-label="
-					formatMessage(messages.downloadVersion, {
-						version: version.version_number,
-					})
-				"
-				@click="emit('download')"
-			>
-				<DownloadIcon aria-hidden="true" />
-				<template v-if="!circular">
-					{{ formatMessage(messages.download) }}
-				</template>
-			</a>
-		</ButtonStyled>
+			<DownloadIcon aria-hidden="true" />
+			<template v-if="!circular">
+				{{ formatMessage(messages.download) }}
+			</template>
+		</ButtonLink>
 	</div>
 </template>
 
@@ -78,7 +73,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
 	truncatedTooltip,
@@ -87,6 +81,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import ButtonLink from '@modrinth/ui/src/components/base/buttons/ButtonLink.vue'
 import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
 import { capitalizeString, type DisplayProjectType } from '@modrinth/utils'
 import { computed, ref } from 'vue'

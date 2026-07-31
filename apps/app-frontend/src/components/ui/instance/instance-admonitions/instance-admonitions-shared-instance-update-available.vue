@@ -6,19 +6,18 @@
 	>
 		{{ formatMessage(messages.sharedInstanceUpdateAvailableBody, { name: instanceName }) }}
 		<template #actions>
-			<ButtonStyled color="blue">
-				<button class="!h-10" @click="emit('review', $event)">
+			<Button color="blue" type="colored" class="!h-10" @click="emit('review', $event)">
 					<DownloadIcon aria-hidden="true" />
 					{{ formatMessage(messages.sharedInstanceReviewUpdateButton) }}
-				</button>
-			</ButtonStyled>
+				</Button>
 		</template>
 	</Admonition>
 </template>
 
 <script setup lang="ts">
 import { DownloadIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { Admonition, useVIntl } from '@modrinth/ui'
 
 import { instanceAdmonitionsMessages as messages } from './instance-admonitions-messages'
 

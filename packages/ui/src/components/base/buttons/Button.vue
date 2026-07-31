@@ -2,17 +2,10 @@
 import { computed, ref } from 'vue'
 
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonColor, ButtonNativeType, ButtonSize, ButtonType } from './types'
+import type { ButtonProps } from './types'
 
 const props = withDefaults(
-	defineProps<{
-		type?: ButtonType
-		color?: ButtonColor
-		size?: ButtonSize
-		nativeType?: ButtonNativeType
-		disabled?: boolean
-		loading?: boolean
-	}>(),
+	defineProps<ButtonProps>(),
 	{
 		type: 'base',
 		size: 'md',

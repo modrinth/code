@@ -7,7 +7,16 @@ import {
 	MessagesSquareIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, Collapsible, NewModal } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import {
+	Admonition,
+	ButtonLink,
+	Collapsible,
+	defineMessages,
+	IconButton,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -17,6 +26,10 @@ import { handleSevereError } from '@/store/error.js'
 import { findMinecraftAuthError, type MinecraftAuthError } from './minecraft-auth-errors'
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	copyDebugInfo: { id: 'app.minecraft-auth-error.copy-debug-info', defaultMessage: 'Copy debug info' },
+})
 const rawError = ref<string>('')
 const matchedError = ref<MinecraftAuthError | null>(null)
 const debugCollapsed = ref(true)
@@ -137,16 +150,12 @@ async function copyToClipboard(text: string) {
 
 			<!-- Action buttons -->
 			<div class="flex items-center gap-2">
-				<ButtonStyled>
-					<a href="https://support.modrinth.com" class="!w-full" @click="modal?.hide()">
-						<MessagesSquareIcon /> Contact support
-					</a>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="loadingSignIn" class="!w-full" @click="signInAgain">
+				<ButtonLink href="https://support.modrinth.com" class="w-full">
+					<MessagesSquareIcon aria-hidden="true" /> Contact support
+				</ButtonLink>
+				<Button color="brand" type="colored" :disabled="loadingSignIn" class="!w-full" @click="signInAgain">
 						<LogInIcon /> Sign in again
-					</button>
-				</ButtonStyled>
+					</Button>
 			</div>
 
 			<div class="flex flex-col gap-2">
@@ -176,16 +185,14 @@ async function copyToClipboard(text: string) {
 							>
 								{{ debugInfo }}
 							</div>
-							<ButtonStyled circular>
-								<button
-									v-tooltip="'Copy debug info'"
+							<IconButton
+									:label="formatMessage(messages.copyDebugInfo)"
 									:disabled="copied"
 									@click="copyToClipboard(debugInfo)"
 								>
 									<template v-if="copied"> <CheckIcon class="text-green" /> </template>
 									<template v-else> <CopyIcon /> </template>
-								</button>
-							</ButtonStyled>
+								</IconButton>
 						</div>
 					</Collapsible>
 				</div>

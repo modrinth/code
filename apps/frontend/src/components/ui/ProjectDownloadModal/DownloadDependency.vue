@@ -56,26 +56,26 @@
 					{{ metadataLabel }}
 				</span>
 			</span>
-			<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
-				<a
-					v-tooltip="downloadTooltip"
-					:href="dependency.downloadHref"
-					:download="dependency.filename"
-					:aria-label="downloadTooltip"
-					@click="emit('download')"
-				>
-					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
-				</a>
-			</ButtonStyled>
-			<ButtonStyled v-else circular type="transparent">
-				<button
-					v-tooltip="dependency.unavailableTooltip"
-					disabled
-					:aria-label="dependency.unavailableTooltip"
-				>
-					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
-				</button>
-			</ButtonStyled>
+			<ButtonLink
+				v-if="dependency.downloadHref"
+				v-tooltip="downloadTooltip"
+				:href="dependency.downloadHref"
+				:download="dependency.filename"
+				:aria-label="downloadTooltip"
+				type="quiet"
+				@click="emit('download')"
+			>
+				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+			</ButtonLink>
+			<IconButton
+				v-else
+				v-tooltip="dependency.unavailableTooltip"
+				:label="dependency.unavailableTooltip"
+				type="quiet"
+				disabled
+			>
+				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+			</IconButton>
 		</div>
 		<div
 			v-for="childDependency in dependency.dependencies"
@@ -100,13 +100,14 @@
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	defineMessages,
 	TagItem,
 	truncatedTooltip,
 	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
+import ButtonLink from '@modrinth/ui/src/components/base/buttons/ButtonLink.vue'
+import IconButton from '@modrinth/ui/src/components/base/buttons/IconButton.vue'
 import { type Component, computed, ref } from 'vue'
 
 defineOptions({

@@ -27,9 +27,7 @@ export const Default: Story = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="red">
-					<button @click="openModal">Trigger Leave Confirmation</button>
-				</ButtonStyled>
+				<Button color="red" type="colored" @click="openModal">Trigger Leave Confirmation</Button>
 				<p v-if="result" class="mt-4 text-secondary">{{ result }}</p>
 				<ConfirmLeaveModal ref="modalRef" />
 			</div>
@@ -47,9 +45,7 @@ export const CustomMessages: Story = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="red">
-					<button @click="openModal">Discard Draft?</button>
-				</ButtonStyled>
+				<Button color="red" type="colored" @click="openModal">Discard Draft?</Button>
 				<ConfirmLeaveModal
 					ref="modalRef"
 					title="Discard draft?"
@@ -73,9 +69,7 @@ export const WarningAdmonition: Story = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="orange">
-					<button @click="openModal">Open Warning Variant</button>
-				</ButtonStyled>
+				<Button color="orange" type="colored" @click="openModal">Open Warning Variant</Button>
 				<ConfirmLeaveModal
 					ref="modalRef"
 					admonition-type="warning"

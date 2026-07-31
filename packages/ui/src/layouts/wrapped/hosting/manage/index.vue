@@ -75,14 +75,18 @@
 						</li>
 					</ul>
 				</div>
-				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com">{{
-						formatMessage(messages.contactSupportButton)
-					}}</AutoLink>
-				</ButtonStyled>
-				<ButtonStyled size="large" @click="() => router.go(0)">
-					<button class="mt-3 !w-full">{{ formatMessage(messages.reloadButton) }}</button>
-				</ButtonStyled>
+				<ButtonLink
+					type="colored"
+					color="brand"
+					size="xl"
+					class="mt-6 !w-full"
+					href="https://support.modrinth.com"
+				>
+					{{ formatMessage(messages.contactSupportButton) }}
+				</ButtonLink>
+				<Button size="xl" class="mt-3 !w-full" @click="() => router.go(0)">
+					{{ formatMessage(messages.reloadButton) }}
+				</Button>
 			</div>
 		</div>
 
@@ -106,12 +110,10 @@
 						:placeholder="formatMessage(messages.searchPlaceholder, { count: filteredData.length })"
 						wrapper-class="w-full md:w-72"
 					/>
-					<ButtonStyled type="standard" color="brand">
-						<button @click="openPurchaseModal">
-							<PlusIcon />
-							{{ formatMessage(messages.newServerButton) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="openPurchaseModal">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.newServerButton) }}
+					</Button>
 				</div>
 			</div>
 
@@ -230,9 +232,10 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
+import Button from '#ui/components/base/buttons/Button.vue'
 import {
 	AutoLink,
-	ButtonStyled,
+	ButtonLink,
 	CopyCode,
 	defineMessages,
 	injectAuth,

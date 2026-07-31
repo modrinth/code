@@ -88,9 +88,7 @@ export const WithTopRightActions: Story = {
 				>
 					Uploading server files...
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="blue">
-							<button class="!border" type="button">Cancel</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border">Cancel</Button>
 					</template>
 				</Admonition>
 				<Admonition
@@ -100,9 +98,7 @@ export const WithTopRightActions: Story = {
 				>
 					Something went wrong while extracting the archive.
 					<template #top-right-actions>
-						<ButtonStyled color="red">
-							<button type="button">Retry</button>
-						</ButtonStyled>
+						<Button color="red" type="colored">Retry</Button>
 					</template>
 				</Admonition>
 				<Admonition type="success" header="Extraction complete" :dismissible="true">
@@ -127,9 +123,7 @@ export const WithProgressBar: Story = {
 				>
 					128 KB / 1.2 MB (45%)
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="blue">
-							<button class="!border" type="button">Cancel</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border">Cancel</Button>
 					</template>
 				</Admonition>
 				<Admonition
@@ -141,9 +135,7 @@ export const WithProgressBar: Story = {
 				>
 					24 MB extracted — config/settings.yml
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="blue">
-							<button class="!border" type="button">Cancel</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border">Cancel</Button>
 					</template>
 				</Admonition>
 				<Admonition

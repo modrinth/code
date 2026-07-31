@@ -102,23 +102,20 @@
 					formatMessage(messages.openingAutomatically)
 				}}</span>
 				<div v-else class="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
-					<ButtonStyled>
-						<button class="flex-1" type="button" @click="hide">
-							<XIcon />
-							{{ formatMessage(commonMessages.closeButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<a
-							class="flex-1"
-							href="https://modrinth.com/app"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<DownloadIcon />
-							{{ formatMessage(messages.getApp) }}
-						</a>
-					</ButtonStyled>
+					<Button class="flex-1" @click="hide">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.closeButton) }}
+					</Button>
+					<ButtonLink
+						href="https://modrinth.com/app"
+						target="_blank"
+						type="colored"
+						color="brand"
+						class="flex-1"
+					>
+						<DownloadIcon aria-hidden="true" />
+						{{ formatMessage(messages.getApp) }}
+					</ButtonLink>
 				</div>
 			</div>
 		</div>
@@ -127,7 +124,8 @@
 
 <script setup lang="ts">
 import { CheckIcon, DownloadIcon, XIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import { Avatar, ButtonLink, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 const { formatMessage } = useVIntl()

@@ -209,39 +209,17 @@ export const Default: StoryObj = {
 		template: /* html */ `
 			<div>
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled color="green">
-						<button @click="showSuccess">Install Complete</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="showError">Download Failed</button>
-					</ButtonStyled>
-					<ButtonStyled color="orange">
-						<button @click="showWarning">Update Available (Permanent)</button>
-					</ButtonStyled>
-					<ButtonStyled color="blue">
-						<button @click="showInfo">Download Complete</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showNoButtons">No Buttons</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showPermanent">Permanent</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showBlocking">Blocking</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showWaitingProgress">Waiting Progress</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showDeterminateProgress">Determinate Progress</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showGroupedDownloads">Grouped Downloads</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="clearAll">Clear All</button>
-					</ButtonStyled>
+					<Button color="green" type="colored" @click="showSuccess">Install Complete</Button>
+					<Button color="red" type="colored" @click="showError">Download Failed</Button>
+					<Button color="orange" type="colored" @click="showWarning">Update Available (Permanent)</Button>
+					<Button color="blue" type="colored" @click="showInfo">Download Complete</Button>
+					<Button @click="showNoButtons">No Buttons</Button>
+					<Button @click="showPermanent">Permanent</Button>
+					<Button @click="showBlocking">Blocking</Button>
+					<Button @click="showWaitingProgress">Waiting Progress</Button>
+					<Button @click="showDeterminateProgress">Determinate Progress</Button>
+					<Button @click="showGroupedDownloads">Grouped Downloads</Button>
+					<Button @click="clearAll">Clear All</Button>
 				</div>
 				<PopupNotificationPanel />
 			</div>

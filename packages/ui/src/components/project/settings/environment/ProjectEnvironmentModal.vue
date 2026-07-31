@@ -8,19 +8,27 @@
 		</div>
 		<template #actions>
 			<div v-if="canSave" class="flex justify-end gap-2 mt-2">
-				<ButtonStyled v-if="canReset" type="transparent">
-					<button :disabled="saving || !hasChanges" @click="resetEnvironment">
-						<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="saving || !hasChanges" @click="saveEnvironment">
-						<SpinnerIcon v-if="saving" class="animate-spin" />
-						<CheckIcon v-else-if="needsToVerify" />
-						<SaveIcon v-else />
-						{{ saveButtonLabel }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="canReset"
+					type="quiet"
+					:disabled="saving || !hasChanges"
+					@click="resetEnvironment"
+				>
+					<HistoryIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.resetButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!hasChanges"
+					:loading="saving"
+					@click="saveEnvironment"
+				>
+					<SpinnerIcon v-if="saving" aria-hidden="true" class="animate-spin" />
+					<CheckIcon v-else-if="needsToVerify" aria-hidden="true" />
+					<SaveIcon v-else aria-hidden="true" />
+					{{ saveButtonLabel }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -34,7 +42,7 @@ import { useRoute } from 'vue-router'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { commonMessages } from '../../../../utils/common-messages'
-import ButtonStyled from '../../../base/ButtonStyled.vue'
+import Button from '../../../base/buttons/Button.vue'
 import { NewModal } from '../../../modal'
 import EnvironmentMigration from './EnvironmentMigration.vue'
 

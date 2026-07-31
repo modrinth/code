@@ -9,11 +9,9 @@
 					</strong>
 				</template>
 			</IntlFormatted>
-			<ButtonStyled color="red" type="highlight">
-				<button class="mt-3" @click="disableDeveloperMode()">
-					{{ formatMessage(developerModeBanner.deactivate) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="red" class="mt-3" @click="disableDeveloperMode()">
+				{{ formatMessage(developerModeBanner.deactivate) }}
+			</Button>
 		</MessageBanner>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
@@ -180,7 +178,6 @@
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
@@ -189,6 +186,7 @@ import {
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { formatProjectType } from '@modrinth/utils'
 
 import MessageBanner from '~/components/ui/MessageBanner.vue'

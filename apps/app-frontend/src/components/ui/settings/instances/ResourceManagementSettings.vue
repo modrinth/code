@@ -1,7 +1,7 @@
 <script setup>
 import { BoxIcon, FolderOpenIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	IconButton,
 	defineMessages,
 	injectNotificationManager,
 	Slider,
@@ -183,16 +183,13 @@ async function findLauncherDir() {
 				wrapper-class="w-full"
 			>
 				<template #right>
-					<ButtonStyled circular>
-						<button
+					<IconButton :label="formatMessage(messages.browseAppDirectory)"
 							v-tooltip="formatMessage(messages.browseAppDirectory)"
-							:aria-label="formatMessage(messages.browseAppDirectory)"
 							class="ml-1.5"
 							@click="findLauncherDir"
 						>
 							<FolderSearchIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+						</IconButton>
 				</template>
 			</StyledInput>
 			<p class="m-0 leading-tight text-secondary">

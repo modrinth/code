@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ButtonStyled, Toggle } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { Toggle } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -33,14 +34,12 @@ watch(
 				</h2>
 			</div>
 			<div class="flex items-center gap-2">
-				<ButtonStyled type="transparent">
-					<button
+				<Button type="quiet"
 						:disabled="themeStore.getFeatureFlag(option) === DEFAULT_FEATURE_FLAGS[option]"
 						@click="setFeatureFlag(option, DEFAULT_FEATURE_FLAGS[option])"
 					>
 						Reset to default
-					</button>
-				</ButtonStyled>
+					</Button>
 				<Toggle
 					id="advanced-rendering"
 					:model-value="themeStore.getFeatureFlag(option)"

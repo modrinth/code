@@ -70,61 +70,46 @@
 				>
 					<template #actions>
 						<template v-if="isServerProject">
-							<ButtonStyled v-if="serverPlaying" color="red" size="large">
-								<button type="button" @click="handleStopServer">
+							<Button v-if="serverPlaying" color="red" size="lg" type="colored" @click="handleStopServer">
 									<StopCircleIcon />
 									{{ formatMessage(commonMessages.stopButton) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" size="large">
-								<button type="button" :disabled="serverInstallLoading" @click="handleClickPlay">
+								</Button>
+							<Button v-else color="brand" size="lg" type="colored" :disabled="serverInstallLoading" @click="handleClickPlay">
 									<PlayIcon />
 									{{
 										serverInstallLoading
 											? formatMessage(commonMessages.installingLabel)
 											: formatMessage(commonMessages.playButton)
 									}}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large">
-								<button
+								</Button>
+							<IconButton size="lg" :label="formatMessage(commonMessages.addServerToInstanceButton)"
 									v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
-									type="button"
-									:aria-label="formatMessage(commonMessages.addServerToInstanceButton)"
 									@click="handleAddServerToInstance"
 								>
 									<PlusIcon />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
-									:options="serverProjectHeaderMoreActions"
-									tooltip="More options"
-									aria-label="More options"
-								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+								</IconButton>
+							<TeleportOverflowMenu
+								:options="serverProjectHeaderMoreActions"
+								:label="formatMessage(commonMessages.moreOptionsButton)"
+								size="lg"
+								type="quiet"
+							>
+								<MoreVerticalIcon aria-hidden="true" />
+							</TeleportOverflowMenu>
 						</template>
 						<template v-else>
-							<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
-								<button v-tooltip="formatMessage(messages.alreadyInstalled)" type="button" disabled>
+							<Button v-if="showSwitchVersion && onVersionsPage" size="lg" v-tooltip="formatMessage(messages.alreadyInstalled)" disabled>
 									<CheckIcon />
 									{{ formatMessage(commonMessages.installedLabel) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else-if="showSwitchVersion" size="large">
-								<button type="button" @click="goToVersions">
+								</Button>
+							<Button v-else-if="showSwitchVersion" size="lg" @click="goToVersions">
 									<SwapIcon />
 									{{ formatMessage(messages.switchVersion) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" size="large">
-								<button
+								</Button>
+							<Button v-else color="brand" size="lg" type="colored"
 									v-tooltip="
 										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
 									"
-									type="button"
 									:disabled="installButtonDisabled"
 									@click="install(null)"
 								>
@@ -140,17 +125,15 @@
 														? formatMessage(commonMessages.selectedLabel)
 														: formatMessage(commonMessages.installButton)
 									}}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
-									:options="projectHeaderMoreActions"
-									tooltip="More options"
-									aria-label="More options"
-								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+								</Button>
+							<TeleportOverflowMenu
+								:options="projectHeaderMoreActions"
+								:label="formatMessage(commonMessages.moreOptionsButton)"
+								size="lg"
+								type="quiet"
+							>
+								<MoreVerticalIcon aria-hidden="true" />
+							</TeleportOverflowMenu>
 						</template>
 					</template>
 				</ProjectPageHeader>
@@ -239,9 +222,10 @@ import {
 	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
+	IconButton,
 	BrowseInstallHeader,
-	ButtonStyled,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -570,14 +554,12 @@ const serverProjectHeaderMoreActions = computed(() => [
 		icon: ExternalIcon,
 		action: openProjectInBrowser,
 	},
-	{
-		divider: true,
-	},
+	{ type: 'divider' },
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
-		color: 'red',
+		tone: 'red',
 		action: reportProject,
 	},
 ])
@@ -604,14 +586,12 @@ const projectHeaderMoreActions = computed(() => [
 		icon: ExternalIcon,
 		action: openProjectInBrowser,
 	},
-	{
-		divider: true,
-	},
+	{ type: 'divider' },
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
-		color: 'red',
+		tone: 'red',
 		action: reportProject,
 	},
 ])

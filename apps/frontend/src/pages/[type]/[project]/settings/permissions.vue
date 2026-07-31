@@ -14,6 +14,7 @@ import {
 	UnfoldVerticalIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
 	ButtonStyled,
@@ -606,31 +607,27 @@ function dismissInfoBanner() {
 						</template>
 					</Combobox>
 				</div>
-				<ButtonStyled>
-					<button type="button" class="!h-[40px]" @click="toggleAllCardsCollapsed">
-						<UnfoldVerticalIcon
-							v-if="allCardsCollapsed"
-							class="size-5 flex-shrink-0 text-secondary"
-						/>
-						<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
-						{{ expandCollapseAllLabel }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="isModerator" color="red" type="outlined">
-					<button
-						type="button"
-						class="!h-[40px]"
-						:disabled="deleteAllGroupsMutation.isPending.value"
-						@click="showDeleteAllGroupsConfirmation"
-					>
-						<SpinnerIcon
-							v-if="deleteAllGroupsMutation.isPending.value"
-							class="size-5 flex-shrink-0 animate-spin"
-						/>
-						<TrashIcon v-else class="size-5 flex-shrink-0" />
-						{{ formatMessage(messages.deleteAllGroups) }}
-					</button>
-				</ButtonStyled>
+				<Button size="lg" @click="toggleAllCardsCollapsed">
+					<UnfoldVerticalIcon v-if="allCardsCollapsed" aria-hidden="true" />
+					<FoldVerticalIcon v-else aria-hidden="true" />
+					{{ expandCollapseAllLabel }}
+				</Button>
+				<Button
+					v-if="isModerator"
+					type="outlined"
+					color="red"
+					size="lg"
+					:loading="deleteAllGroupsMutation.isPending.value"
+					@click="showDeleteAllGroupsConfirmation"
+				>
+					<SpinnerIcon
+						v-if="deleteAllGroupsMutation.isPending.value"
+						class="animate-spin"
+						aria-hidden="true"
+					/>
+					<TrashIcon v-else aria-hidden="true" />
+					{{ formatMessage(messages.deleteAllGroups) }}
+				</Button>
 			</div>
 		</div>
 		<div v-if="isModerator" class="mt-4 flex flex-wrap items-center gap-3">

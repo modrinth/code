@@ -40,12 +40,14 @@
 					</div>
 				</div>
 				<div>
-					<ButtonStyled color="red">
-						<button @click="emit('revoke', authorization.app_id)">
-							<XCircleIcon />
-							{{ formatMessage(messages.revokeAction) }}
-						</button>
-					</ButtonStyled>
+					<Button
+						type="colored"
+						color="red"
+						@click="emit('revoke', authorization.app_id)"
+					>
+						<XCircleIcon aria-hidden="true" />
+						{{ formatMessage(messages.revokeAction) }}
+					</Button>
 				</div>
 			</div>
 			<div v-if="showUnofficialDisclosure" class="flex items-center gap-1 text-orange">
@@ -82,7 +84,6 @@ import type { Labrinth } from '@modrinth/api-client'
 import { BadgeCheckIcon, CheckIcon, IssuesIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
@@ -90,6 +91,7 @@ import {
 	PageHeaderMetadataItem,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { isOfficialAccount } from '@modrinth/utils'
 
 import { useScopes } from '~/composables/auth/scopes.ts'

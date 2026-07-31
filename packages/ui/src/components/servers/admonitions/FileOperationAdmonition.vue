@@ -24,17 +24,15 @@
 			</span>
 		</span>
 		<template v-if="op.id" #top-right-actions>
-			<ButtonStyled v-if="!isTerminal" type="outlined" color="blue">
-				<button
-					v-tooltip="!canWriteFiles ? permissionDeniedMessage : undefined"
-					class="!border"
-					type="button"
-					:disabled="!canWriteFiles"
-					@click="cancelOperation"
-				>
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="!isTerminal"
+				v-tooltip="!canWriteFiles ? permissionDeniedMessage : undefined"
+				type="outlined"
+				:disabled="!canWriteFiles"
+				@click="cancelOperation"
+			>
+				{{ formatMessage(commonMessages.cancelButton) }}
+			</Button>
 		</template>
 	</Admonition>
 </template>
@@ -44,7 +42,7 @@ import { PackageOpenIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
 import { useFormatBytes } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'

@@ -24,7 +24,7 @@ export type FileContextMenuOption =
 			action?: () => void
 			disabled?: boolean
 			tooltip?: string
-			color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'medal-promo'
+			color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'medal_promotion'
 			shown?: boolean
 	  }
 	| { divider: true; shown?: boolean }

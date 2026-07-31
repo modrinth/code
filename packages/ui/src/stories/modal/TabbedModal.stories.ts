@@ -66,9 +66,7 @@ export const Default: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open Tabbed Modal</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show()">Open Tabbed Modal</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -96,9 +94,7 @@ export const WithTitleSlot: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Title Slot</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show()">Open with Title Slot</Button>
 				<TabbedModal ref="modalRef" :tabs="tabs">
 					<template #title>
 						<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
@@ -137,9 +133,7 @@ export const WithFooter: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Footer</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show()">Open with Footer</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs">
 					<template #footer>
 						<div class="mt-auto text-secondary text-sm">
@@ -170,9 +164,7 @@ export const WithFloatingActionBar: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="dirty = true; modalRef?.show()">Open with Floating Action Bar</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="dirty = true; modalRef?.show()">Open with Floating Action Bar</Button>
 				<TabbedModal
 					ref="modalRef"
 					header="Settings"
@@ -221,9 +213,7 @@ export const WithBadge: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Badge</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show()">Open with Badge</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -257,9 +247,7 @@ export const HiddenTabs: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Hidden Tab</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show()">Open with Hidden Tab</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -331,9 +319,7 @@ export const ManyTabs: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Many Tabs</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show()">Open with Many Tabs</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -361,9 +347,7 @@ export const ScrollableContent: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Scrollable Content</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="modalRef?.show()">Open with Scrollable Content</Button>
 				<TabbedModal ref="modalRef" header="Scrollable Demo" :tabs="tabs" />
 			</div>
 		`,

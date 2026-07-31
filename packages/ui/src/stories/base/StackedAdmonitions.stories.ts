@@ -429,12 +429,8 @@ export const RichContent: Story = {
 					>
 						{{ item.body }}
 						<template #top-right-actions>
-							<ButtonStyled v-if="item.canCancel" type="outlined" color="blue">
-								<button class="!border" type="button" @click="dismiss(item.id)">Cancel</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="item.canRetry" color="red">
-								<button type="button" @click="dismiss(item.id)">Retry</button>
-							</ButtonStyled>
+							<Button v-if="item.canCancel" type="outlined" class="!border" @click="dismiss(item.id)">Cancel</Button>
+							<Button v-if="item.canRetry" color="red" type="colored" @click="dismiss(item.id)">Retry</Button>
 						</template>
 					</Admonition>
 				</template>

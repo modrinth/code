@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { XCircleIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
@@ -57,18 +58,14 @@ function alwaysIgnoreBanner() {
 			}}
 		</template>
 		<template #actions_right>
-			<ButtonStyled color="red" type="transparent" hover-color-fill="background">
-				<button @click="alwaysIgnoreBanner">
-					<XCircleIcon />
-					{{ formatMessage(messages.alwaysIgnore) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled color="red">
-				<button @click="tempIgnored = true">
-					<XIcon />
-					{{ formatMessage(messages.ignoreErrors) }}
-				</button>
-			</ButtonStyled>
+			<Button type="quiet" color="red" @click="alwaysIgnoreBanner">
+				<XCircleIcon aria-hidden="true" />
+				{{ formatMessage(messages.alwaysIgnore) }}
+			</Button>
+			<Button type="colored" color="red" @click="tempIgnored = true">
+				<XIcon aria-hidden="true" />
+				{{ formatMessage(messages.ignoreErrors) }}
+			</Button>
 		</template>
 	</PagewideBanner>
 </template>

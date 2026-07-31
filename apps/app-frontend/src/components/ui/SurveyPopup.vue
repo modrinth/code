@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { NotepadTextIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { type } from '@tauri-apps/plugin-os'
 import { $fetch } from 'ofetch'
 import { onMounted, ref } from 'vue'
@@ -193,18 +194,14 @@ onMounted(async () => {
 				{{ formatMessage(messages.surveyFooter) }}
 			</p>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button @click="openSurvey">
+				<Button color="brand" type="colored" @click="openSurvey">
 						<NotepadTextIcon />
 						{{ formatMessage(messages.takeSurvey) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="dismissSurvey">
+					</Button>
+				<Button @click="dismissSurvey">
 						<XIcon />
 						{{ formatMessage(messages.surveyNoThanks) }}
-					</button>
-				</ButtonStyled>
+					</Button>
 			</div>
 		</div>
 	</transition>

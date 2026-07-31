@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { FileTextIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	PagewideBanner,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { computed } from 'vue'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
@@ -56,9 +56,10 @@ function openTaxForm(e: MouseEvent) {
 			}}</span>
 		</template>
 		<template #actions_right>
-			<ButtonStyled color="orange">
-				<button @click="openTaxForm"><FileTextIcon /> {{ formatMessage(messages.action) }}</button>
-			</ButtonStyled>
+			<Button type="colored" color="orange" @click="openTaxForm">
+				<FileTextIcon aria-hidden="true" />
+				{{ formatMessage(messages.action) }}
+			</Button>
 		</template>
 	</PagewideBanner>
 </template>

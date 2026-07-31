@@ -30,9 +30,16 @@
 			</Transition>
 		</div>
 
-		<ButtonStyled color="medal-promo" type="outlined" size="large">
-			<button class="z-10 my-auto" @click="openUpgradeModal"><RocketIcon /> Upgrade</button>
-		</ButtonStyled>
+		<Button
+			type="colored"
+			color="medal_promotion"
+			size="lg"
+			class="z-10 my-auto"
+			@click="openUpgradeModal"
+		>
+			<RocketIcon aria-hidden="true" />
+			Upgrade
+		</Button>
 	</div>
 	<ServersUpgradeModalWrapper
 		ref="upgradeModal"
@@ -50,7 +57,7 @@ import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import { type ComponentPublicInstance, computed, onMounted, onUnmounted, ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
 import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import { injectModrinthClient } from '#ui/providers'
 

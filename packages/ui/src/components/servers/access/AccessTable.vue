@@ -74,29 +74,27 @@
 
 		<template #cell-actions="{ row: member }">
 			<div v-if="!member.isOwner" class="flex items-center justify-end gap-1">
-				<ButtonStyled v-if="member.pending" circular type="transparent">
-					<button
-						v-tooltip="resendInviteTooltip(member)"
-						:aria-label="resendInviteLabel(member)"
-						:disabled="resendInviteDisabled(member)"
-						class="text-secondary hover:!filter-none hover:text-contrast focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
-						@click="handleResendInvite(member)"
-					>
-						<SendIcon aria-hidden="true" />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<button
-						v-tooltip="memberAccessActionTooltip(member)"
-						:aria-label="memberAccessActionLabel(member)"
-						:disabled="!canManageUsers"
-						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
-						@click="member.pending ? handleCancelInvite(member) : handleRemoveMember(member)"
-					>
-						<XIcon v-if="member.pending" aria-hidden="true" />
-						<UserXIcon v-else aria-hidden="true" />
-					</button>
-				</ButtonStyled>
+				<IconButton
+					v-if="member.pending"
+					v-tooltip="resendInviteTooltip(member)"
+					:label="resendInviteLabel(member)"
+					type="quiet"
+					:disabled="resendInviteDisabled(member)"
+					@click="handleResendInvite(member)"
+				>
+					<SendIcon aria-hidden="true" />
+				</IconButton>
+				<IconButton
+					v-tooltip="memberAccessActionTooltip(member)"
+					:label="memberAccessActionLabel(member)"
+					type="quiet"
+					color="red"
+					:disabled="!canManageUsers"
+					@click="member.pending ? handleCancelInvite(member) : handleRemoveMember(member)"
+				>
+					<XIcon v-if="member.pending" aria-hidden="true" />
+					<UserXIcon v-else aria-hidden="true" />
+				</IconButton>
 			</div>
 		</template>
 	</Table>
@@ -223,29 +221,27 @@
 				<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
 			</div>
 			<div class="flex min-w-0 items-center justify-end pr-4">
-				<ButtonStyled v-if="!member.isOwner" circular type="transparent">
-					<TeleportOverflowMenu
-						:options="memberActionOptions(member)"
-						btn-class="hover:!filter-none focus-visible:!filter-none active:!scale-100 active:!filter-none"
-					>
-						<MoreVerticalIcon aria-hidden="true" class="size-5" />
-						<span class="sr-only">
-							{{ formatMessage(messages.memberActionsLabel, { username: member.user.username }) }}
-						</span>
-						<template #resend-invite>
-							<SendIcon aria-hidden="true" />
-							{{ resendInviteLabel(member) }}
-						</template>
-						<template #cancel-invite>
-							<XIcon aria-hidden="true" />
-							{{ formatMessage(messages.cancelInvite) }}
-						</template>
-						<template #remove-user>
-							<UserXIcon aria-hidden="true" />
-							{{ formatMessage(messages.removeUser) }}
-						</template>
-					</TeleportOverflowMenu>
-				</ButtonStyled>
+				<TeleportOverflowMenu
+					v-if="!member.isOwner"
+					:options="memberActionOptions(member)"
+					:aria-label="
+						formatMessage(messages.memberActionsLabel, { username: member.user.username })
+					"
+				>
+					<MoreVerticalIcon aria-hidden="true" class="size-5" />
+					<template #resend-invite>
+						<SendIcon aria-hidden="true" />
+						{{ resendInviteLabel(member) }}
+					</template>
+					<template #cancel-invite>
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(messages.cancelInvite) }}
+					</template>
+					<template #remove-user>
+						<UserXIcon aria-hidden="true" />
+						{{ formatMessage(messages.removeUser) }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 	</div>
@@ -291,7 +287,7 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
+import IconButton from '../../base/buttons/IconButton.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import Table, { type SortDirection, type TableColumn } from '../../base/Table.vue'
 import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'

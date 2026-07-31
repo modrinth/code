@@ -17,13 +17,11 @@
 		/>
 
 		<div class="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
-			<ButtonStyled circular type="transparent">
-				<button class="flex items-center gap-1 text-xs" @click="collapsed = !collapsed">
-					<ExpandIcon v-if="collapsed" />
-					<CollapseIcon v-else />
-					{{ collapsed ? expandText : collapseText }}
-				</button>
-			</ButtonStyled>
+			<Button size="sm" type="quiet" @click="collapsed = !collapsed">
+				<ExpandIcon v-if="collapsed" aria-hidden="true" />
+				<CollapseIcon v-else aria-hidden="true" />
+				{{ collapsed ? expandText : collapseText }}
+			</Button>
 		</div>
 	</div>
 </template>
@@ -31,7 +29,7 @@
 <script setup lang="ts">
 import { CollapseIcon, ExpandIcon } from '@modrinth/assets'
 
-import ButtonStyled from './ButtonStyled.vue'
+import Button from './buttons/Button.vue'
 
 withDefaults(
 	defineProps<{

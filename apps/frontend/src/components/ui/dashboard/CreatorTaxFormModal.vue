@@ -81,16 +81,15 @@
 					</div>
 				</Transition>
 				<div class="mt-4 flex justify-end gap-3">
-					<ButtonStyled @click="handleCancel">
-						<button><XIcon /> {{ formatMessage(messages.cancel) }}</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button :disabled="!canContinue || loading" @click="continueForm">
-							{{ formatMessage(messages.continue) }}
-							<RightArrowIcon v-if="!loading" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
+					<Button @click="handleCancel">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(messages.cancel) }}
+					</Button>
+					<Button :disabled="!canContinue || loading" @click="continueForm">
+						{{ formatMessage(messages.continue) }}
+						<RightArrowIcon v-if="!loading" aria-hidden="true" />
+						<SpinnerIcon v-else class="animate-spin" aria-hidden="true" />
+					</Button>
 				</div>
 			</div>
 
@@ -136,18 +135,13 @@
 					</span>
 				</div>
 				<div class="flex w-full flex-row justify-stretch gap-2">
-					<ButtonStyled>
-						<button class="w-full text-contrast" @click="handleClose">
-							{{ props.closeButtonText ?? formatMessage(messages.closeButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="green">
-						<button class="w-full text-contrast" @click="downloadTaxForm">
-							<DownloadIcon />{{
-								formatMessage(messages.downloadButton, { formType: determinedFormType })
-							}}
-						</button>
-					</ButtonStyled>
+					<Button class="w-full" @click="handleClose">
+						{{ props.closeButtonText ?? formatMessage(messages.closeButton) }}
+					</Button>
+					<Button class="w-full" type="colored" color="green" @click="downloadTaxForm">
+						<DownloadIcon aria-hidden="true" />
+						{{ formatMessage(messages.downloadButton, { formType: determinedFormType }) }}
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -165,7 +159,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	Chips,
 	commonMessages,
 	defineMessages,
@@ -175,6 +168,7 @@ import {
 	normalizeChildren,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
 

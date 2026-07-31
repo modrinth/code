@@ -190,7 +190,7 @@
 				:show-label="false"
 				show-preview-filter-icon
 				:show-clear-action="false"
-				:add-button-class="analyticsQueryAddFilterButtonClass"
+				:add-button-props="analyticsQueryAddFilterButtonProps"
 			/>
 		</div>
 
@@ -375,15 +375,14 @@
 						/>
 					</div>
 				</div>
-				<ButtonStyled v-if="!isTimeframeAndGroupByDefault" type="transparent">
-					<button
-						type="button"
-						:disabled="isTimeframeAndGroupByDefault"
-						@click="resetTimeframeAndGroupBy"
-					>
-						{{ formatMessage(analyticsMessages.resetButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="!isTimeframeAndGroupByDefault"
+					type="quiet"
+					:disabled="isTimeframeAndGroupByDefault"
+					@click="resetTimeframeAndGroupBy"
+				>
+					{{ formatMessage(analyticsMessages.resetButton) }}
+				</Button>
 			</div>
 
 			<div class="flex flex-wrap items-start gap-2">
@@ -454,7 +453,6 @@ import {
 	UserIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	MultiSelect,
@@ -462,6 +460,8 @@ import {
 	type MultiSelectOption,
 	useVIntl,
 } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import type { ButtonProps } from '@modrinth/ui/src/components/base/buttons/types'
 
 import {
 	buildDefaultAnalyticsQueryBuilderState,
@@ -504,7 +504,9 @@ import TimeFramePicker from './TimeframePicker.vue'
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '14rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
-const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
+const analyticsQueryAddFilterButtonProps: ButtonProps = {
+	size: 'lg',
+}
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 type ProjectSelectionPreset = 'user' | 'all'
 

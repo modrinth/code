@@ -40,6 +40,15 @@ export type ButtonVisualProps = {
 
 export type ButtonNativeType = 'button' | 'submit' | 'reset'
 
+export interface ButtonProps {
+	type?: ButtonType
+	color?: ButtonColor
+	size?: ButtonSize
+	nativeType?: ButtonNativeType
+	disabled?: boolean
+	loading?: boolean
+}
+
 export type ButtonLinkDestination =
 	| {
 			to: RouteLocationRaw

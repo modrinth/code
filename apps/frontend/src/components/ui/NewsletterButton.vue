@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, MailIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -61,12 +62,19 @@ async function subscribe() {
 </script>
 
 <template>
-	<ButtonStyled v-if="isSuccess && showSubscribeButton" color="brand" type="outlined">
-		<button v-tooltip="formatMessage(messages.tooltipSubscribe)" @click="subscribe">
-			<template v-if="!showSubscriptionConfirmation">
-				<MailIcon /> {{ formatMessage(messages.subscribe) }}
-			</template>
-			<template v-else> <CheckIcon /> {{ formatMessage(messages.subscribed) }} </template>
-		</button>
-	</ButtonStyled>
+	<Button
+		v-if="isSuccess && showSubscribeButton"
+		v-tooltip="formatMessage(messages.tooltipSubscribe)"
+		type="outlined"
+		@click="subscribe"
+	>
+		<template v-if="!showSubscriptionConfirmation">
+			<MailIcon aria-hidden="true" />
+			{{ formatMessage(messages.subscribe) }}
+		</template>
+		<template v-else>
+			<CheckIcon aria-hidden="true" />
+			{{ formatMessage(messages.subscribed) }}
+		</template>
+	</Button>
 </template>

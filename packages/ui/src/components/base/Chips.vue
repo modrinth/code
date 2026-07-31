@@ -7,11 +7,13 @@
 			role="radio"
 			:aria-checked="selected === item"
 			:disabled="isDisabled(item)"
+			:size="size === 'small' ? 'sm' : 'md'"
+			:type="selected === item ? 'quiet' : 'base'"
+			:color="selected === item ? 'brand' : undefined"
 			class="btn !brightness-100 hover:!brightness-125"
 			:class="{
 				selected: selected === item,
 				capitalize: capitalize,
-				'!px-2.5 !py-1.5': size === 'small',
 			}"
 			@click="toggleItem(item)"
 		>
@@ -24,7 +26,7 @@
 <script setup lang="ts" generic="T">
 import { CheckIcon } from '@modrinth/assets'
 
-import Button from './Button.vue'
+import Button from './buttons/Button.vue'
 
 const props = withDefaults(
 	defineProps<{

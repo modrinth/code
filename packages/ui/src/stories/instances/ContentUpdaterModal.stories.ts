@@ -277,9 +277,7 @@ export const ModExample: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Update Sodium</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Update Sodium</Button>
 				<ContentUpdaterModal
 					ref="modalRef"
 					v-bind="args"
@@ -318,9 +316,7 @@ export const ModpackExample: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Update Cobblemon Modpack</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Update Cobblemon Modpack</Button>
 				<ContentUpdaterModal
 					ref="modalRef"
 					v-bind="args"
@@ -355,9 +351,7 @@ export const WithIncompatibleVersions: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Update (Shows Incompatible)</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">Update (Shows Incompatible)</Button>
 				<ContentUpdaterModal
 					ref="modalRef"
 					v-bind="args"
@@ -389,9 +383,7 @@ export const AllVersionTypes: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View All Version Types</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="openModal">View All Version Types</Button>
 				<ContentUpdaterModal
 					ref="modalRef"
 					v-bind="args"

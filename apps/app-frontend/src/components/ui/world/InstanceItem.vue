@@ -7,13 +7,14 @@ import {
 	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	injectNotificationManager,
-	OverflowMenu,
 	SmartClickable,
+	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
@@ -22,7 +23,6 @@ import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
 import { get_project } from '@/helpers/cache'
@@ -35,13 +35,14 @@ import { handleSevereError } from '@/store/error'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	viewInstance: { id: 'app.worlds.instance.view-instance', defaultMessage: 'View instance' },
+})
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
-
-const router = useRouter()
 
 const emit = defineEmits<{
 	(e: 'play' | 'stop'): void
@@ -185,14 +186,11 @@ onUnmounted(() => {
 				</div>
 			</div>
 			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-				<ButtonStyled v-if="playing && !loading" color="red">
-					<button @click="stop">
+				<Button v-if="playing && !loading" color="red" type="colored" @click="stop">
 						<StopCircleIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.stopButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else>
-					<button
+					</Button>
+				<Button v-else
 						v-tooltip="
 							instance.quarantined
 								? 'This instance has been locked'
@@ -206,33 +204,29 @@ onUnmounted(() => {
 						<SpinnerIcon v-if="loading" class="animate-spin" />
 						<PlayIcon v-else aria-hidden="true" />
 						{{ formatMessage(commonMessages.playButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						:options="[
-							{
-								id: 'open-instance',
-								shown: !!instance.id,
-								action: () => router.push(encodeURI(`/instance/${instance.id}`)),
-							},
-							{
-								id: 'open-folder',
-								action: () => showInstanceInFolder(instance.id),
-							},
-						]"
-					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #open-instance>
-							<EyeIcon aria-hidden="true" />
-							View instance
-						</template>
-						<template #open-folder>
-							<FolderOpenIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.openFolderButton) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+					</Button>
+				<TeleportOverflowMenu
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					type="quiet"
+					:options="[
+						{
+							id: 'open-instance',
+							label: formatMessage(messages.viewInstance),
+							icon: EyeIcon,
+							type: 'link',
+							to: encodeURI(`/instance/${instance.id}`),
+							shown: !!instance.id,
+						},
+						{
+							id: 'open-folder',
+							label: formatMessage(commonMessages.openFolderButton),
+							icon: FolderOpenIcon,
+							action: () => showInstanceInFolder(instance.id),
+						},
+					]"
+				>
+					<MoreVerticalIcon aria-hidden="true" />
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 	</SmartClickable>

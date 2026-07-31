@@ -63,9 +63,7 @@ export const Default: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="startUpload">Upload 50MB file (3s)</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="startUpload">Upload 50MB file (3s)</Button>
 				<UploadProgressModal ref="modalRef" />
 			</div>
 		`,
@@ -85,9 +83,7 @@ export const LargeFile: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="startUpload">Upload 500MB file (8s)</button>
-				</ButtonStyled>
+				<Button color="brand" type="colored" @click="startUpload">Upload 500MB file (8s)</Button>
 				<UploadProgressModal ref="modalRef" />
 			</div>
 		`,

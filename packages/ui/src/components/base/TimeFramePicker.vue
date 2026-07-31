@@ -103,16 +103,17 @@
 						</div>
 
 						<div class="flex items-center gap-2">
-							<ButtonStyled type="outlined">
-								<button type="button" @click="handleCustomRangeCancel">
-									{{ formatMessage(messages.cancel) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand">
-								<button type="button" :disabled="!hasCompleteRange" @click="handleCustomRangeApply">
-									{{ formatMessage(messages.apply) }}
-								</button>
-							</ButtonStyled>
+							<Button type="outlined" @click="handleCustomRangeCancel">
+								{{ formatMessage(messages.cancel) }}
+							</Button>
+							<Button
+								type="colored"
+								color="brand"
+								:disabled="!hasCompleteRange"
+								@click="handleCustomRangeApply"
+							>
+								{{ formatMessage(messages.apply) }}
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -197,7 +198,7 @@ import { MinusIcon, PlusIcon } from '@modrinth/assets'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import ButtonStyled from './ButtonStyled.vue'
+import Button from './buttons/Button.vue'
 import Combobox, { type ComboboxOption } from './Combobox.vue'
 import DatePicker from './DatePicker.vue'
 

@@ -30,28 +30,27 @@
 			<div class="h-[1px] w-full flex-1 bg-surface-5" />
 		</div>
 		<div class="flex gap-3">
-			<ButtonStyled type="outlined">
-				<button
-					v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
-					class="flex-1"
-					:disabled="ctx.finishDisabled.value"
-					@click="triggerFileInput"
-				>
-					<ImportIcon />
-					{{ formatMessage(messages.importModpack) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled color="brand">
-				<button
-					v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
-					class="flex-1"
-					:disabled="ctx.finishDisabled.value"
-					@click="ctx.browseModpacks()"
-				>
-					<CompassIcon />
-					{{ formatMessage(messages.browseModpacks) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
+				class="flex-1"
+				type="outlined"
+				:disabled="ctx.finishDisabled.value"
+				@click="triggerFileInput"
+			>
+				<ImportIcon aria-hidden="true" />
+				{{ formatMessage(messages.importModpack) }}
+			</Button>
+			<Button
+				v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
+				class="flex-1"
+				type="colored"
+				color="brand"
+				:disabled="ctx.finishDisabled.value"
+				@click="ctx.browseModpacks()"
+			>
+				<CompassIcon aria-hidden="true" />
+				{{ formatMessage(messages.browseModpacks) }}
+			</Button>
 		</div>
 	</div>
 </template>
@@ -64,7 +63,7 @@ import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { injectFilePicker } from '../../../../providers'
-import ButtonStyled from '../../../base/ButtonStyled.vue'
+import Button from '../../../base/buttons/Button.vue'
 import Combobox from '../../../base/Combobox.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 

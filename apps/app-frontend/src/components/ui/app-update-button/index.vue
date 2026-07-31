@@ -1,8 +1,6 @@
 <template>
-	<ButtonStyled color="brand" type="outlined" hover-color-fill="background">
-		<button
+	<Button type="outlined"
 			v-if="showUpdatePill"
-			type="button"
 			class="!h-[34px] text-sm !transition-[opacity,transform,background-color,color,filter] !duration-200 ease-out"
 			:class="{
 				'opacity-0 scale-[0.96]': finishedDownloading && !animateReadyPill,
@@ -19,13 +17,13 @@
 				<span class="inline-block w-[3ch] text-right tabular-nums">{{ downloadPercent }}%</span>
 			</span>
 			<span v-else>{{ updateLabel }}</span>
-		</button>
-	</ButtonStyled>
+		</Button>
 </template>
 
 <script setup lang="ts">
 import { DownloadIcon, RefreshCwIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import {
