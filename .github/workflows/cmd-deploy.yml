@@ -5,6 +5,10 @@ on:
   repository_dispatch:
     types: [deploy-command]
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   deploy:
     uses: SparkUniverse/workflows/.github/workflows/deploy-command.yaml@main
