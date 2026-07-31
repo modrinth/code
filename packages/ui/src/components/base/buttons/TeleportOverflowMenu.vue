@@ -30,6 +30,7 @@ const props = withDefaults(
 		interaction?: ButtonInteraction
 		disabled?: boolean
 		iconOnly?: boolean
+		circular?: boolean
 		tooltip?: string
 		placement?: TeleportPlacement
 		distance?: number
@@ -39,6 +40,7 @@ const props = withDefaults(
 		size: 'md',
 		disabled: false,
 		iconOnly: true,
+		circular: true,
 		placement: 'bottom-end',
 		distance: 8,
 	},
@@ -249,6 +251,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 		v-tooltip="props.tooltip"
 		:label="props.iconOnly ? props.label : undefined"
 		:aria-label="props.iconOnly ? undefined : props.label"
+		:circular="props.iconOnly ? props.circular : undefined"
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"

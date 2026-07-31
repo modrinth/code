@@ -74,6 +74,7 @@ const forwardedSlots = computed(() => Object.keys(slots).filter((name) => name !
 			:color="props.color"
 			:size="props.size"
 			:interaction="props.interaction"
+			:circular="false"
 			:disabled="props.disabled || props.menuDisabled"
 			:placement="props.placement"
 			@select="emit('select', $event)"

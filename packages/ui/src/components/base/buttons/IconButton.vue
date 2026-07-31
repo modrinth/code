@@ -18,6 +18,7 @@ const props = withDefaults(
 		size?: ButtonSize
 		interaction?: ButtonInteraction
 		nativeType?: ButtonNativeType
+		circular?: boolean
 		disabled?: boolean
 		loading?: boolean
 	}>(),
@@ -25,6 +26,7 @@ const props = withDefaults(
 		type: 'base',
 		size: 'md',
 		nativeType: 'button',
+		circular: true,
 		disabled: false,
 		loading: false,
 	},
@@ -41,7 +43,7 @@ defineExpose({ element })
 		ref="frame"
 		as="button"
 		icon-only
-		circular
+		:circular="props.circular"
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
