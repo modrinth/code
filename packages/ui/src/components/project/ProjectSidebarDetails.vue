@@ -13,7 +13,52 @@
 			<div class="markdown-body" v-html="licenseHtml" />
 		</NewModal>
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
-		<div class="flex flex-col gap-3 [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
+		<div
+			class="flex flex-col gap-3 [&>div>svg]:shrink-0 [&>div>svg]:mt-[1px] [&>div]:flex [&>div]:gap-2 [&>div]:items-start"
+		>
+			<div>
+				<SparklesIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.aiGeneratedContent, { type: 'code' })) }}
+					</span>
+					<span class="text-sm text-secondary">
+						The Chinese and Arabic translations are AI-generated
+					</span>
+				</div>
+			</div>
+			<div>
+				<MegaphoneIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.advertisingTitle)) }}
+					</span>
+					<span class="text-sm text-secondary"> Title screen has Essential promotion </span>
+				</div>
+			</div>
+			<div>
+				<CircleDollarSignIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.paidFeatures)) }}
+					</span>
+					<span class="text-sm text-secondary"> Cosmetics available as Patreon reward </span>
+				</div>
+			</div>
+			<div>
+				<RadioTowerIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.telemetryTitle, { consent: 'opt_out' })) }}
+					</span>
+					<span class="text-sm text-secondary">
+						Update checker provides anonymous launch analytics to Modrinth
+					</span>
+					<span class="text-sm text-blue flex items-center gap-1">
+						View privacy policy <ExternalIcon />
+					</span>
+				</div>
+			</div>
 			<div v-if="!hideLicense">
 				<BookTextIcon aria-hidden="true" />
 				<div>
@@ -39,6 +84,20 @@
 							<span v-else>{{ licenseIdDisplay }}</span>
 						</template>
 					</IntlFormatted>
+				</div>
+			</div>
+			<div>
+				<GitForkIcon aria-hidden="true" />
+				<div class="flex flex-col gap-2">
+					<span>
+						{{ capitalizeString(formatMessage(messages.derivativeWork)) }}
+					</span>
+					<div class="flex flex-col gap-1">
+						<span class="text-blue text-sm flex items-center gap-1">
+							Modification Menu <ExternalIcon />
+						</span>
+						<span class="text-sm text-secondary"> Forked to add Fun Mode </span>
+					</div>
 				</div>
 			</div>
 			<div v-if="showFollowers">
@@ -94,7 +153,19 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BookTextIcon, CalendarIcon, HeartIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
+import {
+	BookTextIcon,
+	CalendarIcon,
+	CircleDollarSignIcon,
+	ExternalIcon,
+	GitForkIcon,
+	HeartIcon,
+	MegaphoneIcon,
+	RadioTowerIcon,
+	ScaleIcon,
+	SparklesIcon,
+	VersionIcon,
+} from '@modrinth/assets'
 import { capitalizeString, renderString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -142,6 +213,28 @@ const messages = defineMessages({
 	loadingLicenseText: {
 		id: 'project.license.loading',
 		defaultMessage: 'Loading license text...',
+	},
+	advertisingTitle: {
+		id: 'project.disclosure.advertising.title',
+		defaultMessage: 'Contains advertising',
+	},
+	paidFeatures: {
+		id: 'project.disclosure.paid-features.title',
+		defaultMessage: 'Contains paid features',
+	},
+	aiGeneratedContent: {
+		id: 'project.disclosure.ai-generated-content.title',
+		defaultMessage:
+			'Contains AI-generated {type, select, code {code} assets {assets} code_assets {code and assets} text {text} other {content}}',
+	},
+	derivativeWork: {
+		id: 'project.disclosure.derivative-work.title',
+		defaultMessage: 'This is a derivative work of:',
+	},
+	telemetryTitle: {
+		id: 'project.disclosure.telemetry.title',
+		defaultMessage:
+			'Contains {consent, select, opt_in {opt-in telemetry} opt_out {opt-out telemetry} other {telemetry}}',
 	},
 })
 
