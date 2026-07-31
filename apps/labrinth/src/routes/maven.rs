@@ -265,8 +265,11 @@ fn find_file<'a>(
 
         if file_name.eq_ignore_ascii_case(&formatted_name) {
             return filtered_files
-                .find(|x| x.primary)
-                .or_else(|| filtered_files.next_back());
+                .try_fold(
+                    None,
+                    |_, x| if x.primary { Err(x) } else { Ok(Some(x)) },
+                )
+                .map_or_else(|found| Some(found), |last| last);
         } else if file_name.len() > formatted_name.len()
             && file_name.as_bytes()[..formatted_name.len()]
                 .eq_ignore_ascii_case(formatted_name.as_bytes())
