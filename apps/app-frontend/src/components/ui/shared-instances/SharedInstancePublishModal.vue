@@ -28,7 +28,8 @@
 				<div class="flex min-w-0 flex-col gap-3 pt-4">
 					<div ref="configFileTreeContainer" class="max-h-[292px] overflow-y-auto rounded-[20px]">
 						<FileTreeSelect
-							v-model="selectedConfigPaths"
+							v-model="includedConfigPaths"
+							v-model:excluded-paths="excludedConfigPaths"
 							:items="configFileItems"
 							:show-size="false"
 							:show-modified="false"
@@ -79,11 +80,20 @@ const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
 const configFileTreeContainer = ref<HTMLElement>()
 const publishDiffs = ref<ContentDiffItem[]>([])
 const configFilePaths = ref<string[]>([])
-const selectedConfigPaths = ref<string[]>([])
+const includedConfigPaths = ref<string[]>([])
+const excludedConfigPaths = ref<string[]>([])
 const state = ref<SharedInstancePublishState>('idle')
 const configFileItems = computed<FileTreeSelectItem[]>(() =>
 	configFilePaths.value.map((path) => ({ path, type: 'file' })),
 )
+const selectedConfigPaths = computed(() => {
+	const includedPaths = new Set(includedConfigPaths.value)
+	const excludedPaths = new Set(excludedConfigPaths.value)
+
+	return configFilePaths.value.filter((path) =>
+		isConfigPathSelected(path, includedPaths, excludedPaths),
+	)
+})
 
 async function show(e?: MouseEvent) {
 	if (state.value !== 'idle') return
@@ -108,7 +118,8 @@ async function show(e?: MouseEvent) {
 			disabled: diff.disabled,
 		}))
 		configFilePaths.value = preview.configFiles
-		selectedConfigPaths.value = []
+		includedConfigPaths.value = []
+		excludedConfigPaths.value = []
 		if (!publishReviewModal.value) return
 
 		publishReviewModal.value.show(e)
@@ -132,6 +143,23 @@ async function publishChanges() {
 	} finally {
 		setState('idle')
 	}
+}
+
+function isConfigPathSelected(
+	path: string,
+	includedPaths: Set<string>,
+	excludedPaths: Set<string>,
+) {
+	let selected = false
+	let prefix = ''
+
+	for (const segment of path.split('/').filter(Boolean)) {
+		prefix = prefix ? `${prefix}/${segment}` : segment
+		if (includedPaths.has(prefix)) selected = true
+		if (excludedPaths.has(prefix)) selected = false
+	}
+
+	return selected
 }
 
 function scrollConfigFileTreeToTop() {
