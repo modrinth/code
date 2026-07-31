@@ -21,8 +21,13 @@ use std::time::UNIX_EPOCH;
 use tokio::fs::File;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 
-const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] =
-    &["mods", "datapacks", "resourcepacks", "shaderpacks", "config"];
+const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
+    "mods",
+    "datapacks",
+    "resourcepacks",
+    "shaderpacks",
+    "config",
+];
 const EXPORT_CANDIDATE_METADATA_CONCURRENCY: usize = 32;
 
 const NEVER_EXPORTABLE_PATH_PREFIXES: &[&str] = &[

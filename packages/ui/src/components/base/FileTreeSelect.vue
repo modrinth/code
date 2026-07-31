@@ -293,8 +293,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-	(e: 'update:modelValue', value: string[]): void
-	(e: 'update:excludedPaths', value: string[]): void
+	(e: 'update:modelValue' | 'update:excludedPaths', value: string[]): void
 	(e: 'navigate', path: string): void
 }>()
 
@@ -698,20 +697,10 @@ function toggleAllVisible(selected: boolean) {
 	const nextExcludedPaths = new Set(excludedPaths.value)
 
 	if (currentPath.value) {
-		applySelection(
-			nextSelectedPaths,
-			nextExcludedPaths,
-			currentPath.value,
-			selected,
-		)
+		applySelection(nextSelectedPaths, nextExcludedPaths, currentPath.value, selected)
 	} else {
 		for (const entry of visibleSelectableEntries.value) {
-			applySelection(
-				nextSelectedPaths,
-				nextExcludedPaths,
-				entry.path,
-				selected,
-			)
+			applySelection(nextSelectedPaths, nextExcludedPaths, entry.path, selected)
 		}
 	}
 
