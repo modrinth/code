@@ -30,6 +30,7 @@ const props = withDefaults(
 		interaction?: ButtonInteraction
 		disabled?: boolean
 		iconOnly?: boolean
+		tooltip?: string
 		placement?: TeleportPlacement
 		distance?: number
 	}>(),
@@ -77,7 +78,7 @@ const { isOpen, panelStyle, anchorStyle, resolvedSide, open, close } = useAnchor
 const menuItemClasses =
 	'overflow-menu-item flex min-h-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
 	'cursor-pointer whitespace-nowrap hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:outline-none ' +
-	'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&[aria-disabled=true]]:pointer-events-none [&[aria-disabled=true]]:opacity-50 ' +
+	'disabled:cursor-not-allowed disabled:opacity-50 [&[aria-disabled=true]]:cursor-not-allowed [&[aria-disabled=true]]:opacity-50 ' +
 	'[&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:text-primary'
 
 const toneVariables: Record<ButtonColor, string> = {
@@ -245,6 +246,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 		:is="triggerComponent"
 		ref="triggerButton"
 		v-bind="$attrs"
+		v-tooltip="props.tooltip"
 		:label="props.iconOnly ? props.label : undefined"
 		:aria-label="props.iconOnly ? undefined : props.label"
 		:type="props.type"

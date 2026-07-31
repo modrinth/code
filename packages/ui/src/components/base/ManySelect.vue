@@ -4,6 +4,7 @@
 			v-bind="$attrs"
 			:disabled="disabled"
 			:label="tooltip || 'Select options'"
+			:tooltip="tooltip"
 			placement="bottom-start"
 			@open="searchQuery = ''"
 		>

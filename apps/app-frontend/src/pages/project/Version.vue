@@ -33,7 +33,7 @@
 					}}
 				</Button>
 				<TeleportOverflowMenu type="outlined" label="More options"
-						v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 						:options="[
 							{
 								id: 'open-in-browser',

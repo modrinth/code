@@ -52,7 +52,7 @@
 						<DownloadIcon aria-hidden="true" />
 					</ButtonLink>
 					<TeleportOverflowMenu type="quiet" label="Edit version" v-if="currentMember"
-							v-tooltip="'Edit version'"
+							tooltip="Edit version"
 							class="hover:!bg-button-bg"
 							:options="[
 								{
@@ -87,7 +87,7 @@
 						</template>
 					</TeleportOverflowMenu>
 					<TeleportOverflowMenu type="quiet" label="More options"
-							v-tooltip="'More options'"
+							tooltip="More options"
 							class="hover:!bg-button-bg"
 							@select="$event.id === 'download' && emit('onDownload')"
 							:options="[

@@ -348,6 +348,7 @@
 							/>
 
 							<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(commonMessages.moreOptionsButton)"
+									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 									:options="projectHeaderMoreActions"
 								>
 								<MoreVerticalIcon />

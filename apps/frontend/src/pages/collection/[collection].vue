@@ -17,7 +17,7 @@
 				<div class="flow-root">
 					<div class="group relative float-end ml-4">
 						<TeleportOverflowMenu :label="formatMessage(messages.editIconButton)"
-							v-tooltip="formatMessage(messages.editIconButton)"
+							:tooltip="formatMessage(messages.editIconButton)"
 							class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
 							:options="[
 								{

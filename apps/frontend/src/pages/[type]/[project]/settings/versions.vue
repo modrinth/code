@@ -66,7 +66,7 @@
 		>
 			<template #actions="{ version }">
 				<TeleportOverflowMenu type="quiet" :label="formatMessage(messages.editVersionTooltip)"
-						v-tooltip="formatMessage(messages.editVersionTooltip)"
+						:tooltip="formatMessage(messages.editVersionTooltip)"
 						class="hover:!bg-button-bg [&>svg]:!text-green"
 						:options="[
 							{
@@ -101,7 +101,7 @@
 					</template>
 				</TeleportOverflowMenu>
 				<TeleportOverflowMenu type="quiet" :label="formatMessage(commonMessages.moreOptionsButton)"
-						v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 						class="hover:!bg-button-bg"
 						@select="$event.id === 'download' && emit('onDownload')"
 						:options="[

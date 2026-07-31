@@ -21,8 +21,8 @@ const baseClasses = [
 	'hover:brightness-[--hover-brightness]',
 	// Accessibility
 	'focus-visible:brightness-[--hover-brightness] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow',
-	'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
-	'[&[aria-disabled=true]]:pointer-events-none [&[aria-disabled=true]]:cursor-not-allowed [&[aria-disabled=true]]:opacity-50',
+	'disabled:cursor-not-allowed disabled:opacity-50',
+	'[&[aria-disabled=true]]:cursor-not-allowed [&[aria-disabled=true]]:opacity-50',
 ].join(' ')
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -34,11 +34,11 @@ const sizeClasses: Record<ButtonSize, string> = {
 }
 
 const iconOnlySizeClasses: Record<ButtonSize, string> = {
-	xs: '!w-7 !px-0',
-	sm: '!w-8 !px-0',
-	md: '!w-9 !px-0',
-	lg: '!w-10 !px-0',
-	xl: '!w-12 !px-0',
+	xs: 'w-7 !px-0',
+	sm: 'w-8 !px-0',
+	md: 'w-9 !px-0',
+	lg: 'w-10 !px-0',
+	xl: 'w-12 !px-0',
 }
 
 const typeClasses: Record<ButtonType, string> = {

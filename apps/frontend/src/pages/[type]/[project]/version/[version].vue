@@ -168,8 +168,8 @@
 								{{ formatMessage(messages.packageAsMod) }}
 							</Button>
 							<TeleportOverflowMenu
-								v-tooltip="formatMessage(messages.edit)"
 								:label="formatMessage(messages.edit)"
+								:tooltip="formatMessage(messages.edit)"
 								:options="[
 									{
 										id: 'edit-metadata',
@@ -216,7 +216,7 @@
 							</TeleportOverflowMenu>
 						</template>
 						<TeleportOverflowMenu type="outlined" :label="formatMessage(commonMessages.moreOptionsButton)"
-								v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
+								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
 									{
 										id: 'report',
@@ -273,6 +273,7 @@
 							{{ formatMessage(commonMessages.downloadButton) }}
 						</ButtonLink>
 						<TeleportOverflowMenu type="outlined" :label="formatMessage(commonMessages.moreOptionsButton)"
+								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
 									{
 										id: 'copy-sha1',

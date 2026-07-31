@@ -24,6 +24,7 @@ const props = withDefaults(
 		interaction?: ButtonInteraction
 		disabled?: boolean
 		iconOnly?: boolean
+		tooltip?: string
 		autoFocus?: boolean
 		placement?: TeleportPlacement
 		panelRole?: 'dialog' | 'region'
@@ -105,6 +106,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 		:is="triggerComponent"
 		ref="triggerButton"
 		v-bind="$attrs"
+		v-tooltip="props.tooltip"
 		:label="props.iconOnly ? props.label : undefined"
 		:type="props.type"
 		:color="props.color"

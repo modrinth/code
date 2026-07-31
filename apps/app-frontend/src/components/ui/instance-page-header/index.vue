@@ -128,6 +128,7 @@
 					<SettingsIcon />
 				</IconButton>
 				<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(messages.moreActions)"
+						:tooltip="formatMessage(messages.moreActions)"
 						:options="moreActions"
 					>
 					<MoreVerticalIcon />

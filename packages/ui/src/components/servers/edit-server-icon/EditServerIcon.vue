@@ -3,7 +3,7 @@
 		<span class="text-lg font-semibold text-contrast">Icon</span>
 		<div class="group relative w-fit">
 			<TeleportOverflowMenu :label="editIconTooltip"
-				v-tooltip="editIconTooltip"
+				:tooltip="editIconTooltip"
 				:icon-only="false"
 				type="quiet"
 				interaction="none"

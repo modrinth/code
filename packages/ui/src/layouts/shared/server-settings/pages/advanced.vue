@@ -57,22 +57,38 @@
 							</div>
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Password</span>
-								<Button
-									native-type="button"
-									size="lg"
-									v-tooltip="sftpCopyTooltip('Copy SFTP password')"
-									class="w-full !justify-between text-left"
-									:disabled="!canWriteFiles"
-									@click="copyToClipboard('Password', server?.sftp_password)"
-								>
-									<span class="min-w-0 truncate text-base font-semibold text-primary">
-										{{ '*'.repeat(server?.sftp_password?.length ?? 0) }}
-									</span>
-									<ClipboardCopyIcon
-										class="size-5 shrink-0 text-secondary"
-										aria-hidden="true"
-									/>
-								</Button>
+								<div class="flex items-center gap-1.5">
+									<Button
+										native-type="button"
+										size="lg"
+										v-tooltip="sftpCopyTooltip('Copy SFTP password')"
+										class="min-w-0 grow !justify-between text-left"
+										:disabled="!canWriteFiles"
+										@click="copyToClipboard('Password', server?.sftp_password)"
+									>
+										<span class="min-w-0 truncate text-base font-semibold text-primary">
+											{{
+												showPassword
+													? server?.sftp_password
+													: '*'.repeat(server?.sftp_password?.length ?? 0)
+											}}
+										</span>
+										<ClipboardCopyIcon
+											class="size-5 shrink-0 text-secondary"
+											aria-hidden="true"
+										/>
+									</Button>
+									<IconButton
+										:label="passwordVisibilityTooltip"
+										v-tooltip="passwordVisibilityTooltip"
+										size="lg"
+										:disabled="!canWriteFiles"
+										@click="togglePasswordVisibility"
+									>
+										<EyeIcon v-if="showPassword" />
+										<EyeOffIcon v-else />
+									</IconButton>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -194,7 +210,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '#ui/components/base/buttons'
+import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
@@ -222,6 +238,7 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
 
+const showPassword = ref(false)
 const sftpUrl = computed(() => `sftp://${server.value?.sftp_username}@${server.value?.sftp_host}`)
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
@@ -233,6 +250,13 @@ const sftpActionTooltip = computed(() =>
 )
 const sftpCopyTooltip = (label: string) =>
 	canWriteFiles.value ? label : permissionDeniedMessage.value
+const passwordVisibilityTooltip = computed(() =>
+	canWriteFiles.value
+		? showPassword.value
+			? 'Hide password'
+			: 'Show password'
+		: permissionDeniedMessage.value,
+)
 
 function handleSftpLaunchClick(event: MouseEvent) {
 	if (canWriteFiles.value) return
@@ -246,6 +270,11 @@ const copyToClipboard = (name: string, textToCopy?: string) => {
 		type: 'success',
 		title: `${name} copied to clipboard!`,
 	})
+}
+
+function togglePasswordVisibility() {
+	if (!canWriteFiles.value) return
+	showPassword.value = !showPassword.value
 }
 
 // Startup state

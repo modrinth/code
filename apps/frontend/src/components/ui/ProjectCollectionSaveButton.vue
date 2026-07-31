@@ -6,6 +6,9 @@
 		:label="
 				saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
 			"
+		:tooltip="
+				saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
+			"
 		placement="top-end"
 	>
 		<template #trigger>

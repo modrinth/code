@@ -123,6 +123,7 @@
 
 				<TeleportOverflowMenu type="outlined" :label="formatMessage(messages.createNew)"
 						:disabled="disabled"
+						:tooltip="disabled ? disabledTooltip : undefined"
 						size="lg"
 						class="justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
 						:options="[
