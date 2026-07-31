@@ -269,7 +269,7 @@ fn find_file<'a>(
                     None,
                     |_, x| if x.primary { Err(x) } else { Ok(Some(x)) },
                 )
-                .map_or_else(|found| Some(found), |last| last);
+                .unwrap_or_else(Some);
         } else if file_name.len() > formatted_name.len()
             && file_name.as_bytes()[..formatted_name.len()]
                 .eq_ignore_ascii_case(formatted_name.as_bytes())
