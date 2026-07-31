@@ -50,10 +50,11 @@
 </template>
 
 <script setup>
-import { Button } from '#ui/components/base/buttons'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import StyledInput from '../base/StyledInput.vue'
 import NewModal from './NewModal.vue'

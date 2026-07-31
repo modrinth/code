@@ -40,8 +40,7 @@ export function useAnchoredTeleport(
 		const panelRect = panel.value.getBoundingClientRect()
 		const offset = distance.value
 		const alignsEnd = placement.value.endsWith('end')
-		const isHorizontal =
-			placement.value.startsWith('right') || placement.value.startsWith('left')
+		const isHorizontal = placement.value.startsWith('right') || placement.value.startsWith('left')
 		let idealTop: number
 		let idealLeft: number
 

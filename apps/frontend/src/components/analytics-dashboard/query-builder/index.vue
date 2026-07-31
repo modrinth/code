@@ -381,11 +381,13 @@
 						/>
 					</div>
 				</div>
-				<Button type="quiet" v-if="!isTimeframeAndGroupByDefault"
-						native-type="button"
-						:disabled="isTimeframeAndGroupByDefault"
-						@click="resetTimeframeAndGroupBy"
-					>
+				<Button
+					v-if="!isTimeframeAndGroupByDefault"
+					type="quiet"
+					native-type="button"
+					:disabled="isTimeframeAndGroupByDefault"
+					@click="resetTimeframeAndGroupBy"
+				>
 					{{ formatMessage(analyticsMessages.resetButton) }}
 				</Button>
 			</div>
@@ -446,7 +448,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BlocksIcon,
@@ -459,6 +460,7 @@ import {
 	LayersIcon,
 	UserIcon,
 } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	Combobox,
 	type ComboboxOption,

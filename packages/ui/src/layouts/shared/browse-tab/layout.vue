@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { computed, ref, toValue } from 'vue'
 
+import { Button, IconButton } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -83,11 +83,9 @@ function cardActionClass(action: CardAction) {
 	if (action.type !== 'outlined' || !action.color || action.color === 'standard') return undefined
 
 	return {
-		brand:
-			'!text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]',
+		brand: '!text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]',
 		red: '!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]',
-		green:
-			'!text-green [&>svg]:!text-green !shadow-[inset_0_0_0_1px_var(--color-green)]',
+		green: '!text-green [&>svg]:!text-green !shadow-[inset_0_0_0_1px_var(--color-green)]',
 	}[action.color]
 }
 
@@ -195,7 +193,11 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 			</Button>
 		</div>
 
-		<IconButton label="Change display mode" v-if="ctx.cycleDisplayMode" @click="ctx.cycleDisplayMode!()">
+		<IconButton
+			v-if="ctx.cycleDisplayMode"
+			label="Change display mode"
+			@click="ctx.cycleDisplayMode!()"
+		>
 			<slot name="display-mode-icon" />
 		</IconButton>
 
@@ -281,22 +283,22 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 							>
 								<IconButton
 									v-if="action.circular"
-								:type="cardActionType(action)"
-								:color="cardActionColor(action)"
-								:class="cardActionClass(action)"
-								:label="action.label || action.tooltip || action.key"
 									v-tooltip="action.tooltip"
-									:disabled="action.disabled"
-									@click.stop="action.onClick"
-								>
-								<component :is="action.icon" :class="action.iconClass" />
-								</IconButton>
-								<Button
-									v-else
 									:type="cardActionType(action)"
 									:color="cardActionColor(action)"
 									:class="cardActionClass(action)"
+									:label="action.label || action.tooltip || action.key"
+									:disabled="action.disabled"
+									@click.stop="action.onClick"
+								>
+									<component :is="action.icon" :class="action.iconClass" />
+								</IconButton>
+								<Button
+									v-else
 									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
@@ -356,22 +358,22 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 							>
 								<IconButton
 									v-if="action.circular"
-								:type="cardActionType(action)"
-								:color="cardActionColor(action)"
-								:class="cardActionClass(action)"
-								:label="action.label || action.tooltip || action.key"
 									v-tooltip="action.tooltip"
-									:disabled="action.disabled"
-									@click.stop="action.onClick"
-								>
-								<component :is="action.icon" :class="action.iconClass" />
-								</IconButton>
-								<Button
-									v-else
 									:type="cardActionType(action)"
 									:color="cardActionColor(action)"
 									:class="cardActionClass(action)"
+									:label="action.label || action.tooltip || action.key"
+									:disabled="action.disabled"
+									@click.stop="action.onClick"
+								>
+									<component :is="action.icon" :class="action.iconClass" />
+								</IconButton>
+								<Button
+									v-else
 									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>

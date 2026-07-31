@@ -49,16 +49,25 @@
 							</template>
 						</template>
 					</p>
-					<IconButton type="quiet" size="xs" label="Dismiss notification" v-if="dismissible"
-							native-type="button"
-							class="notification-toast-dismiss !size-6"
-							@click="$emit('dismiss')"
-						>
+					<IconButton
+						v-if="dismissible"
+						type="quiet"
+						size="xs"
+						label="Dismiss notification"
+						native-type="button"
+						class="notification-toast-dismiss !size-6"
+						@click="$emit('dismiss')"
+					>
 						<XIcon />
 					</IconButton>
 				</div>
 				<div class="flex items-center gap-2">
-					<Button type="colored" color="brand" :disabled="actionLoading != null" @click="$emit('accept')">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="actionLoading != null"
+						@click="$emit('accept')"
+					>
 						<SpinnerIcon v-if="actionLoading === 'accept'" class="animate-spin" />
 						<CheckIcon v-else />
 						Accept
@@ -89,11 +98,15 @@
 					{{ entityLabel }}
 				</p>
 				<div class="col-start-2 row-start-1 justify-self-end">
-					<IconButton type="quiet" size="xs" label="Dismiss notification" v-if="dismissible"
-							native-type="button"
-							class="notification-toast-dismiss !size-6"
-							@click="$emit('dismiss')"
-						>
+					<IconButton
+						v-if="dismissible"
+						type="quiet"
+						size="xs"
+						label="Dismiss notification"
+						native-type="button"
+						class="notification-toast-dismiss !size-6"
+						@click="$emit('dismiss')"
+					>
 						<XIcon />
 					</IconButton>
 				</div>
@@ -131,8 +144,25 @@
 					v-if="type === 'instance-download' && actions?.length"
 					class="col-start-1 col-end-3 row-start-3 mt-2 flex min-w-0 flex-wrap items-center gap-2"
 				>
-					<Button :type="(action.color || (index === 0 ? 'brand' : undefined)) && (action.color || (index === 0 ? 'brand' : undefined)) !== 'standard' ? 'colored' : 'base'" :color="(action.color || (index === 0 ? 'brand' : undefined)) && (action.color || (index === 0 ? 'brand' : undefined)) !== 'standard' ? ((action.color || (index === 0 ? 'brand' : undefined)) === 'medal-promo' ? 'medal_promotion' : (action.color || (index === 0 ? 'brand' : undefined))) : undefined" v-for="(action, index) in actions"
-						:key="index" @click="$emit('action', index)">
+					<Button
+						v-for="(action, index) in actions"
+						:key="index"
+						:type="
+							(action.color || (index === 0 ? 'brand' : undefined)) &&
+							(action.color || (index === 0 ? 'brand' : undefined)) !== 'standard'
+								? 'colored'
+								: 'base'
+						"
+						:color="
+							(action.color || (index === 0 ? 'brand' : undefined)) &&
+							(action.color || (index === 0 ? 'brand' : undefined)) !== 'standard'
+								? (action.color || (index === 0 ? 'brand' : undefined)) === 'medal-promo'
+									? 'medal_promotion'
+									: action.color || (index === 0 ? 'brand' : undefined)
+								: undefined
+						"
+						@click="$emit('action', index)"
+					>
 						<component :is="action.icon" v-if="action.icon" />
 						{{ action.label }}
 					</Button>
@@ -160,9 +190,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import { CheckIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
+
+import { Button, IconButton } from '#ui/components/base/buttons'
 
 import { useFormatBytes, useFormatNumber } from '../../composables'
 import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'

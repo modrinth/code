@@ -51,7 +51,12 @@
 						<PowerOffIcon v-else class="size-5" />
 						{{ formatMessage(messages.disableConflictsButton) }}
 					</Button>
-					<Button type="colored" color="orange" :disabled="buttonsDisabled || loading" @click="handleAutoFix">
+					<Button
+						type="colored"
+						color="orange"
+						:disabled="buttonsDisabled || loading"
+						@click="handleAutoFix"
+					>
 						<SpinnerIcon
 							v-if="loading && loadingAction === 'auto-fix'"
 							class="size-5 animate-spin"
@@ -61,7 +66,12 @@
 					</Button>
 				</template>
 				<template v-else>
-					<Button type="colored" color="red" :disabled="buttonsDisabled || loading" @click="handleConfirmLoaderChange">
+					<Button
+						type="colored"
+						color="red"
+						:disabled="buttonsDisabled || loading"
+						@click="handleConfirmLoaderChange"
+					>
 						<SpinnerIcon v-if="loading" class="size-5 animate-spin" />
 						<CircleAlertIcon v-else class="size-5" />
 						{{ formatMessage(messages.changeLoaderButton) }}
@@ -73,7 +83,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import {
 	CircleAlertIcon,
 	HammerIcon,
@@ -85,6 +94,7 @@ import {
 import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

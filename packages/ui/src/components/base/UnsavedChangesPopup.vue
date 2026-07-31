@@ -1,8 +1,9 @@
 <script setup lang="ts" generic="T">
-import { Button } from '#ui/components/base/buttons'
 import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import { isEqual } from 'es-toolkit'
 import { type Component, computed, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
@@ -62,7 +63,7 @@ defineExpose({ nudge })
 	<FloatingActionBar ref="actionBar" :shown="shown" :inline="inline">
 		<p class="m-0 font-semibold text-sm md:text-base">{{ localizeIfPossible(text) }}</p>
 		<div class="ml-auto flex gap-2">
-			<Button type="quiet" v-if="canReset" :disabled="saving" @click="(e) => emit('reset', e)">
+			<Button v-if="canReset" type="quiet" :disabled="saving" @click="(e) => emit('reset', e)">
 				<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
 			</Button>
 			<Button type="colored" color="brand" :disabled="saving" @click="(e) => emit('save', e)">

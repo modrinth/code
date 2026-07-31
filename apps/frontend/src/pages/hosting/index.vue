@@ -58,7 +58,13 @@
 									: formatMessage(messages.startYourServer)
 							}}
 						</ButtonLink>
-						<ButtonLink type="outlined" size="xl" v-if="hasServers" class="w-fit" to="/hosting/manage">
+						<ButtonLink
+							v-if="hasServers"
+							type="outlined"
+							size="xl"
+							class="w-fit"
+							to="/hosting/manage"
+						>
 							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
 						</ButtonLink>
 					</div>
@@ -618,7 +624,6 @@
 </template>
 
 <script setup>
-import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	BoxIcon,
 	GameIcon,
@@ -629,6 +634,8 @@ import {
 	VersionIcon,
 } from '@modrinth/assets'
 import {
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

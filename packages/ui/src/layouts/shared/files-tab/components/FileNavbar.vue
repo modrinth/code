@@ -24,13 +24,14 @@
 			>
 				<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
 					<li class="mr-4 flex-shrink-0">
-						<IconButton :label="formatMessage(messages.backToHome)"
-								v-tooltip="formatMessage(messages.backToHome)"
-								native-type="button"
-								class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								@click="$emit('navigateHome')"
-								@mouseenter="$emit('prefetchHome')"
-							>
+						<IconButton
+							v-tooltip="formatMessage(messages.backToHome)"
+							:label="formatMessage(messages.backToHome)"
+							native-type="button"
+							class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+							@click="$emit('navigateHome')"
+							@mouseenter="$emit('prefetchHome')"
+						>
 							<HomeIcon />
 							<span class="sr-only">{{ formatMessage(messages.home) }}</span>
 						</IconButton>
@@ -62,16 +63,17 @@
 									class="relative flex shrink-0 items-center text-sm"
 								>
 									<div class="flex shrink-0 items-center">
-										<Button type="quiet"
-												class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-												:aria-current="
-													!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
-												"
-												:class="{
-													'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
-												}"
-												@click="$emit('navigate', index)"
-											>
+										<Button
+											type="quiet"
+											class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+											:aria-current="
+												!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
+											"
+											:class="{
+												'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
+											}"
+											@click="$emit('navigate', index)"
+										>
 											{{ segment || '' }}
 										</Button>
 										<ChevronRightIcon
@@ -107,12 +109,14 @@
 					@update:model-value="$emit('update:searchQuery', $event)"
 				/>
 
-				<Button type="outlined" v-if="showRefreshButton"
-						native-type="button"
-						size="lg"
-						:disabled="refreshing"
-						@click="handleRefresh"
-					>
+				<Button
+					v-if="showRefreshButton"
+					type="outlined"
+					native-type="button"
+					size="lg"
+					:disabled="refreshing"
+					@click="handleRefresh"
+				>
 					<RefreshCwIcon
 						aria-hidden="true"
 						class="h-5 w-5 transition-transform"
@@ -121,31 +125,50 @@
 					{{ formatMessage(commonMessages.refreshButton) }}
 				</Button>
 
-				<TeleportOverflowMenu type="outlined" :label="formatMessage(messages.createNew)"
-						:disabled="disabled"
-						:tooltip="disabled ? disabledTooltip : undefined"
-						size="lg"
-						class="justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
-						:options="[
-							{ id: 'file', label: formatMessage(messages.newFile), action: () => $emit('create', 'file') },
-							{ id: 'directory', label: formatMessage(messages.newFolder), action: () => $emit('create', 'directory') },
-							{ id: 'upload', label: formatMessage(messages.uploadFile), action: () => $emit('upload') },
-							{ type: 'divider', shown: showInstallFromUrl ?? false },
-							{ id: 'upload-zip', label: formatMessage(messages.uploadFromZip), shown: false, action: () => $emit('uploadZip') },
-							{
-								id: 'install-from-url',
-								label: formatMessage(messages.uploadFromZipUrl),
-								shown: showInstallFromUrl ?? false,
-								action: () => $emit('unzipFromUrl', false),
-							},
-							{
-								id: 'install-cf-pack',
-								label: formatMessage(messages.installCurseForgePack),
-								shown: showInstallFromUrl ?? false,
-								action: () => $emit('unzipFromUrl', true),
-							},
-						]"
-					>
+				<TeleportOverflowMenu
+					type="outlined"
+					:label="formatMessage(messages.createNew)"
+					:disabled="disabled"
+					:tooltip="disabled ? disabledTooltip : undefined"
+					size="lg"
+					class="justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
+					:options="[
+						{
+							id: 'file',
+							label: formatMessage(messages.newFile),
+							action: () => $emit('create', 'file'),
+						},
+						{
+							id: 'directory',
+							label: formatMessage(messages.newFolder),
+							action: () => $emit('create', 'directory'),
+						},
+						{
+							id: 'upload',
+							label: formatMessage(messages.uploadFile),
+							action: () => $emit('upload'),
+						},
+						{ type: 'divider', shown: showInstallFromUrl ?? false },
+						{
+							id: 'upload-zip',
+							label: formatMessage(messages.uploadFromZip),
+							shown: false,
+							action: () => $emit('uploadZip'),
+						},
+						{
+							id: 'install-from-url',
+							label: formatMessage(messages.uploadFromZipUrl),
+							shown: showInstallFromUrl ?? false,
+							action: () => $emit('unzipFromUrl', false),
+						},
+						{
+							id: 'install-cf-pack',
+							label: formatMessage(messages.installCurseForgePack),
+							shown: showInstallFromUrl ?? false,
+							action: () => $emit('unzipFromUrl', true),
+						},
+					]"
+				>
 					<PlusIcon aria-hidden="true" class="h-5 w-5" />
 					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
 					<template #file>
@@ -171,20 +194,23 @@
 			</div>
 
 			<div v-else-if="!isEditingImage" class="flex gap-2">
-				<IconButton type="quiet" :label="formatMessage(messages.shareToMclogs)" v-if="isLogFile"
-						v-tooltip="formatMessage(messages.shareToMclogs)"
-						@click="$emit('share')"
-					>
+				<IconButton
+					v-if="isLogFile"
+					v-tooltip="formatMessage(messages.shareToMclogs)"
+					type="quiet"
+					:label="formatMessage(messages.shareToMclogs)"
+					@click="$emit('share')"
+				>
 					<ShareIcon />
 				</IconButton>
 				<IconButton
+					v-tooltip="formatMessage(messages.findInFile)"
 					:type="isEditorFindOpen ? 'colored' : 'quiet'"
 					:color="isEditorFindOpen ? 'brand' : undefined"
 					:label="formatMessage(messages.findInFile)"
-						v-tooltip="formatMessage(messages.findInFile)"
-						:aria-pressed="isEditorFindOpen"
-						@click="$emit('find')"
-					>
+					:aria-pressed="isEditorFindOpen"
+					@click="$emit('find')"
+				>
 					<SearchIcon />
 				</IconButton>
 			</div>
@@ -193,7 +219,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import {
 	BoxIcon,
 	ChevronRightIcon,
@@ -211,6 +236,7 @@ import {
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

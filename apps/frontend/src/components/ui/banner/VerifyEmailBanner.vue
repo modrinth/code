@@ -99,11 +99,11 @@ async function handleResendEmailVerification() {
 		</template>
 		<template #actions_right>
 			<Button v-if="hasEmail" type="colored" color="orange" @click="handleResendEmailVerification">
-					{{ formatMessage(verifyEmailBannerMessages.action) }}
+				{{ formatMessage(verifyEmailBannerMessages.action) }}
 			</Button>
 			<ButtonLink v-else type="colored" color="orange" to="/settings/account">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(addEmailBannerMessages.action) }}
+				<SettingsIcon aria-hidden="true" />
+				{{ formatMessage(addEmailBannerMessages.action) }}
 			</ButtonLink>
 		</template>
 	</PagewideBanner>

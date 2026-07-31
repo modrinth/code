@@ -99,9 +99,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { BanIcon } from '@modrinth/assets'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'

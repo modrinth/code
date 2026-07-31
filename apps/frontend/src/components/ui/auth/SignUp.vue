@@ -7,45 +7,45 @@
 		</div>
 		<section class="flex flex-col gap-2.5">
 			<ButtonLink
-					:href="getAuthUrl('google', redirectTarget)"
-					@click="onOAuthProviderClick('google')"
-				>
+				:href="getAuthUrl('google', redirectTarget)"
+				@click="onOAuthProviderClick('google')"
+			>
 				<GoogleColorIcon />
 				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
 			</ButtonLink>
 			<ButtonLink
-					:href="getAuthUrl('microsoft', redirectTarget)"
-					@click="onOAuthProviderClick('microsoft')"
-				>
+				:href="getAuthUrl('microsoft', redirectTarget)"
+				@click="onOAuthProviderClick('microsoft')"
+			>
 				<MicrosoftColorIcon />
 				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
 			</ButtonLink>
 			<ButtonLink
-					:href="getAuthUrl('discord', redirectTarget)"
-					@click="onOAuthProviderClick('discord')"
-				>
+				:href="getAuthUrl('discord', redirectTarget)"
+				@click="onOAuthProviderClick('discord')"
+			>
 				<DiscordColorIcon />
 				<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Discord' }) }}</span>
 			</ButtonLink>
 			<template v-if="showOtherOptions">
 				<ButtonLink
-						:href="getAuthUrl('github', redirectTarget)"
-						@click="onOAuthProviderClick('github')"
-					>
+					:href="getAuthUrl('github', redirectTarget)"
+					@click="onOAuthProviderClick('github')"
+				>
 					<GitHubColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
 				</ButtonLink>
 				<ButtonLink
-						:href="getAuthUrl('gitlab', redirectTarget)"
-						@click="onOAuthProviderClick('gitlab')"
-					>
+					:href="getAuthUrl('gitlab', redirectTarget)"
+					@click="onOAuthProviderClick('gitlab')"
+				>
 					<GitLabColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
 				</ButtonLink>
 				<ButtonLink
-						:href="getAuthUrl('steam', redirectTarget)"
-						@click="onOAuthProviderClick('steam')"
-					>
+					:href="getAuthUrl('steam', redirectTarget)"
+					@click="onOAuthProviderClick('steam')"
+				>
 					<SteamColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Steam' }) }}</span>
 				</ButtonLink>
@@ -87,11 +87,13 @@
 				wrapper-class="w-full"
 			/>
 
-			<Button type="colored" color="brand"
-					class="!w-full"
-					:disabled="!emailModel || !passwordModel"
-					@click="onContinueWithEmail()"
-				>
+			<Button
+				type="colored"
+				color="brand"
+				class="!w-full"
+				:disabled="!emailModel || !passwordModel"
+				@click="onContinueWithEmail()"
+			>
 				{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
 			</Button>
 
@@ -127,7 +129,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	DiscordColorIcon,
 	GitHubColorIcon,
@@ -140,6 +141,8 @@ import {
 	SteamColorIcon,
 } from '@modrinth/assets'
 import {
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,

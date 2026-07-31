@@ -39,7 +39,12 @@
 						</div>
 					</div>
 				</div>
-				<Button type="outlined" v-if="content" :disabled="!hasPermission" @click="handleSwitchCompatibility">
+				<Button
+					v-if="content"
+					type="outlined"
+					:disabled="!hasPermission"
+					@click="handleSwitchCompatibility"
+				>
 					<ArrowLeftRightIcon />
 					Switch type
 				</Button>
@@ -178,11 +183,12 @@
 					</div>
 				</div>
 
-				<Button v-if="content"
-						class="!w-full !max-w-[160px]"
-						:disabled="!hasPermission"
-						@click="handleUpdateContent"
-					>
+				<Button
+					v-if="content"
+					class="!w-full !max-w-[160px]"
+					:disabled="!hasPermission"
+					@click="handleUpdateContent"
+				>
 					<RefreshCwIcon />
 					Update
 				</Button>
@@ -193,7 +199,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
@@ -206,6 +211,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	FormattedTag,
 	injectModrinthClient,
 	injectProjectPageContext,

@@ -21,11 +21,13 @@
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="orange"
-						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
-						:disabled="props.actionDisabled"
-						@click="confirm"
-					>
+				<Button
+					v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+					type="colored"
+					color="orange"
+					:disabled="props.actionDisabled"
+					@click="confirm"
+				>
 					<SlashIcon />
 					{{ visibleWarning?.actionLabel }}
 				</Button>
@@ -35,11 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { SlashIcon, XIcon } from '@modrinth/assets'
 import { nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'

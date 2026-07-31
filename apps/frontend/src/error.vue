@@ -85,10 +85,11 @@
 </template>
 
 <script setup>
-import { Button, ButtonLink } from '@modrinth/ui'
 import { AnnoyedRinthbot, LogInIcon, SadRinthbot } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessage,
 	defineMessages,

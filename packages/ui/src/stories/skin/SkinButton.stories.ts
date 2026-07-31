@@ -1,7 +1,7 @@
-import { Button, IconButton } from '../../components/base/buttons'
 import { EditIcon, TrashIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
+import { Button, IconButton } from '../../components/base/buttons'
 import SkinButton from '../../components/skin/SkinButton.vue'
 
 const frontImage = `data:image/svg+xml,${encodeURIComponent(`

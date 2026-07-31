@@ -121,11 +121,13 @@
 			:description="formatMessage(messages.noFriendsInvitedDescription)"
 		>
 			<template #actions>
-				<Button type="colored" color="brand"
-						size="lg"
-						:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
-						@click="showInvitePlayers($event)"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					size="lg"
+					:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
+					@click="showInvitePlayers($event)"
+				>
 					<SpinnerIcon
 						v-if="inviteLink.pending.value"
 						class="animate-spin"
@@ -141,7 +143,17 @@
 
 <script setup lang="ts">
 import { LogInIcon, SpinnerIcon, UserPlusIcon } from '@modrinth/assets'
-import { Avatar, ConfirmUnlinkModal, defineMessages, injectAuth, type InvitePlayersInvitePayload, InvitePlayersModal, type InvitePlayersUser, useVIntl, Button } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	ConfirmUnlinkModal,
+	defineMessages,
+	injectAuth,
+	type InvitePlayersInvitePayload,
+	InvitePlayersModal,
+	type InvitePlayersUser,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, toRef, watch } from 'vue'
 

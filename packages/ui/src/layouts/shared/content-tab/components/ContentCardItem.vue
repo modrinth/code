@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
@@ -16,8 +15,9 @@ import type { RouteLocationRaw } from 'vue-router'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import Checkbox from '#ui/components/base/Checkbox.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -312,34 +312,42 @@ const deleteHovered = ref(false)
 				v-if="hasUpdateListener || hasSwitchVersionListener"
 				class="flex w-8 items-center justify-center"
 			>
-				<IconButton type="quiet" color="green" :label="
-							isDisabled && disabledTooltip
-								? disabledTooltip
-								: formatMessage(commonMessages.updateAvailableLabel)
-					" v-if="hasUpdate"
-						v-tooltip="
-							isDisabled && disabledTooltip
-								? disabledTooltip
-								: formatMessage(commonMessages.updateAvailableLabel)
-						"
-						:disabled="isDisabled"
-						@click="emit('update')"
-					 class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+				<IconButton
+					v-if="hasUpdate"
+					v-tooltip="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.updateAvailableLabel)
+					"
+					type="quiet"
+					color="green"
+					:label="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.updateAvailableLabel)
+					"
+					:disabled="isDisabled"
+					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="emit('update')"
+				>
 					<DownloadIcon class="size-5" />
 				</IconButton>
-				<IconButton type="quiet" :label="
-							isDisabled && disabledTooltip
-								? disabledTooltip
-								: formatMessage(commonMessages.switchVersionButton)
-						" v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
-						v-tooltip="
-							isDisabled && disabledTooltip
-								? disabledTooltip
-								: formatMessage(commonMessages.switchVersionButton)
-						"
-						:disabled="isDisabled"
-						@click="emit('switchVersion')"
-					>
+				<IconButton
+					v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
+					v-tooltip="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.switchVersionButton)
+					"
+					type="quiet"
+					:label="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.switchVersionButton)
+					"
+					:disabled="isDisabled"
+					@click="emit('switchVersion')"
+				>
 					<ArrowLeftRightIcon class="size-5" />
 				</IconButton>
 			</div>
@@ -358,29 +366,32 @@ const deleteHovered = ref(false)
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
-			<IconButton type="quiet" :label="
-						isDisabled && disabledTooltip
-							? disabledTooltip
-							: formatMessage(
-									shiftHeld && deleteHovered
-										? commonMessages.deleteImmediatelyLabel
-										: commonMessages.deleteLabel,
-								)
-					" v-if="hasDeleteListener && !props.hideDelete"
-					v-tooltip="
-						isDisabled && disabledTooltip
-							? disabledTooltip
-							: formatMessage(
-									shiftHeld && deleteHovered
-										? commonMessages.deleteImmediatelyLabel
-										: commonMessages.deleteLabel,
-								)
-					"
-					:disabled="isDisabled"
-					@click="emit('delete', $event)"
-					@mouseenter="deleteHovered = true"
-					@mouseleave="deleteHovered = false"
-				>
+			<IconButton
+				v-if="hasDeleteListener && !props.hideDelete"
+				v-tooltip="
+					isDisabled && disabledTooltip
+						? disabledTooltip
+						: formatMessage(
+								shiftHeld && deleteHovered
+									? commonMessages.deleteImmediatelyLabel
+									: commonMessages.deleteLabel,
+							)
+				"
+				type="quiet"
+				:label="
+					isDisabled && disabledTooltip
+						? disabledTooltip
+						: formatMessage(
+								shiftHeld && deleteHovered
+									? commonMessages.deleteImmediatelyLabel
+									: commonMessages.deleteLabel,
+							)
+				"
+				:disabled="isDisabled"
+				@click="emit('delete', $event)"
+				@mouseenter="deleteHovered = true"
+				@mouseleave="deleteHovered = false"
+			>
 				<span class="relative size-5">
 					<TrashIcon
 						class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
@@ -395,11 +406,13 @@ const deleteHovered = ref(false)
 
 			<slot name="additionalButtonsRight" />
 
-			<TeleportOverflowMenu type="quiet" label="More options"
-					v-if="overflowOptions?.length"
-					:options="overflowOptions"
-					:disabled="isDisabled"
-				>
+			<TeleportOverflowMenu
+				v-if="overflowOptions?.length"
+				type="quiet"
+				label="More options"
+				:options="overflowOptions"
+				:disabled="isDisabled"
+			>
 				<MoreVerticalIcon class="size-5" />
 			</TeleportOverflowMenu>
 		</div>

@@ -130,18 +130,20 @@
 			</span>
 		</span>
 		<div v-if="isStaff(auth.user) && message.author_id === auth.user.id" class="message__actions">
-			<TeleportOverflowMenu type="quiet" label="More options"
-					class="btn-dropdown-animation"
-					:options="[
-						{
-							id: 'delete',
-							label: 'Delete',
-							action: () => deleteMessage(),
-							tone: 'red',
-							hoverFilled: true,
-						},
-					]"
-				>
+			<TeleportOverflowMenu
+				type="quiet"
+				label="More options"
+				class="btn-dropdown-animation"
+				:options="[
+					{
+						id: 'delete',
+						label: 'Delete',
+						action: () => deleteMessage(),
+						tone: 'red',
+						hoverFilled: true,
+					},
+				]"
+			>
 				<MoreHorizontalIcon />
 				<template #delete> <TrashIcon /> Delete </template>
 			</TeleportOverflowMenu>
@@ -150,7 +152,6 @@
 </template>
 
 <script setup>
-import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	EyeOffIcon,
 	InfoIcon,
@@ -165,6 +166,7 @@ import {
 	AutoLink,
 	Avatar,
 	Badge,
+	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'

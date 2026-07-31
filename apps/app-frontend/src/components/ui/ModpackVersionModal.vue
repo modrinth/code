@@ -1,7 +1,6 @@
 <script setup>
-import { IconButton } from '@modrinth/ui'
 import { CheckIcon } from '@modrinth/assets'
-import { Badge } from '@modrinth/ui'
+import { Badge, IconButton } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { SwapIcon } from '@/assets/icons/index.js'
@@ -79,9 +78,9 @@ const onHide = () => {
 									:type="version.id === installedVersion ? 'base' : 'colored'"
 									:color="version.id === installedVersion ? undefined : 'brand'"
 									label="Switch version"
-										:disabled="inProgress || installing || version.id === installedVersion"
-										@click.stop="() => switchVersion(version.id)"
-									>
+									:disabled="inProgress || installing || version.id === installedVersion"
+									@click.stop="() => switchVersion(version.id)"
+								>
 									<SwapIcon v-if="version.id !== installedVersion" />
 									<CheckIcon v-else />
 								</IconButton>

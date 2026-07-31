@@ -102,13 +102,19 @@
 				</span>
 
 				<div class="flex items-center gap-2">
-					<IconButton :label="'Copy ID'" v-tooltip="'Copy ID'" @click="copyId">
+					<IconButton v-tooltip="'Copy ID'" :label="'Copy ID'" @click="copyId">
 						<ClipboardCopyIcon />
 					</IconButton>
-					<IconButton :label="'Copy link'" v-tooltip="'Copy link'" @click="copyLink">
+					<IconButton v-tooltip="'Copy link'" :label="'Copy link'" @click="copyLink">
 						<LinkIcon />
 					</IconButton>
-					<IconButton type="colored" color="orange" :label="'Begin review'" v-tooltip="'Begin review'" @click="openProjectForReview">
+					<IconButton
+						v-tooltip="'Begin review'"
+						type="colored"
+						color="orange"
+						:label="'Begin review'"
+						@click="openProjectForReview"
+					>
 						<ScaleIcon />
 					</IconButton>
 				</div>
@@ -118,12 +124,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton } from '@modrinth/ui'
 import { ClipboardCopyIcon, FileIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Badge,
 	getProjectTypeIcon,
+	IconButton,
 	injectNotificationManager,
 	useFormatDateTime,
 	useRelativeTime,

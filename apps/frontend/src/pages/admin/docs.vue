@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { Card, StyledInput } from '@modrinth/ui'
+import { Button, Card, StyledInput } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import docs from '~/templates/docs'
@@ -95,7 +94,12 @@ onMounted(() => {
 						</div>
 
 						<div class="mt-auto flex gap-2">
-							<Button type="colored" color="brand" class="w-full flex-1 justify-center" @click="openPreview(id)">
+							<Button
+								type="colored"
+								color="brand"
+								class="w-full flex-1 justify-center"
+								@click="openPreview(id)"
+							>
 								<PlayIcon class="h-4 w-4" aria-hidden="true" />
 								Preview
 							</Button>

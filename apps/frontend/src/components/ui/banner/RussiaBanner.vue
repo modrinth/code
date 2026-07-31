@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ButtonLink, IconButton } from '@modrinth/ui'
 import { BookTextIcon, XIcon } from '@modrinth/assets'
-import { commonMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { ButtonLink, commonMessages, IconButton, PagewideBanner, useVIntl } from '@modrinth/ui'
 
 const flags = useFeatureFlags()
 const { formatMessage } = useVIntl()
@@ -53,10 +52,12 @@ function hideRussiaCensorshipBanner() {
 			</div>
 		</template>
 		<template #actions_top_right>
-			<IconButton type="quiet" :label="formatMessage(commonMessages.closeButton)"
-					v-tooltip="formatMessage(commonMessages.closeButton)"
-					@click="hideRussiaCensorshipBanner"
-				>
+			<IconButton
+				v-tooltip="formatMessage(commonMessages.closeButton)"
+				type="quiet"
+				:label="formatMessage(commonMessages.closeButton)"
+				@click="hideRussiaCensorshipBanner"
+			>
 				<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
 			</IconButton>
 		</template>

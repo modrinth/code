@@ -71,12 +71,14 @@
 							: formatMessage(commonMessages.cancelButton)
 					}}
 				</Button>
-				<Button type="colored" color="brand"
-						v-tooltip="submitTooltip"
-						:disabled="submitDisabled"
-						native-type="submit"
-						@click="handleSubmit"
-					>
+				<Button
+					v-tooltip="submitTooltip"
+					type="colored"
+					color="brand"
+					:disabled="submitDisabled"
+					native-type="submit"
+					@click="handleSubmit"
+				>
 					<SpinnerIcon v-if="submitted" class="animate-spin" />
 					<DownloadIcon v-else />
 					{{
@@ -91,7 +93,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import {
 	DownloadIcon,
 	FileTextIcon,
@@ -102,6 +103,7 @@ import {
 } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

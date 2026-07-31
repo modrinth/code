@@ -50,18 +50,18 @@
 		</div>
 		<ButtonLink
 			v-if="primaryFile && showDownload"
+			v-tooltip="circular ? formatMessage(messages.download) : null"
 			:type="downloadButtonType"
 			:color="downloadButtonColor"
-				v-tooltip="circular ? formatMessage(messages.download) : null"
-				:href="primaryFileDownloadUrl"
-				:download="primaryFile.filename"
-				:aria-label="
-					formatMessage(messages.downloadVersion, {
-						version: version.version_number,
-					})
-				"
-				@click="emit('download')"
-			:class="circular ? '!w-9 !px-0 !rounded-full' : undefined"
+			:href="primaryFileDownloadUrl"
+			:download="primaryFile.filename"
+			:aria-label="
+				formatMessage(messages.downloadVersion, {
+					version: version.version_number,
+				})
+			"
+			:class="circular ? '!w-9 !rounded-full !px-0' : undefined"
+			@click="emit('download')"
 		>
 			<DownloadIcon aria-hidden="true" />
 			<template v-if="!circular">
@@ -72,9 +72,9 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
+import { ButtonLink } from '@modrinth/ui'
 import {
 	type CdnDownloadReason,
 	defineMessages,

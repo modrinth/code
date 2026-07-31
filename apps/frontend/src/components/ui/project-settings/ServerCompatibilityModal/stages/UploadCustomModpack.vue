@@ -27,11 +27,7 @@
 					</span>
 				</div>
 
-				<Button
-						v-tooltip="'Replace file'"
-						aria-label="Replace file"
-						@click="fileInput?.click()"
-					>
+				<Button v-tooltip="'Replace file'" aria-label="Replace file" @click="fileInput?.click()">
 					<ArrowLeftRightIcon aria-hidden="true" />
 					<input
 						ref="fileInput"
@@ -61,9 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { ArrowLeftRightIcon, FileIcon } from '@modrinth/assets'
-import { Checkbox, DropzoneFileInput } from '@modrinth/ui'
+import { Button, Checkbox, DropzoneFileInput } from '@modrinth/ui'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 

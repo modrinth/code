@@ -22,11 +22,13 @@
 						formatMessage(messages.resetServerTitle)
 					}}</span>
 					<div>
-						<Button type="colored" color="red"
-								v-tooltip="resetServerDisabledTooltip"
-								:disabled="resetServerDisabled"
-								@click="showResetServerModal"
-							>
+						<Button
+							v-tooltip="resetServerDisabledTooltip"
+							type="colored"
+							color="red"
+							:disabled="resetServerDisabled"
+							@click="showResetServerModal"
+						>
 							<RotateCounterClockwiseIcon class="size-5" />
 							{{ formatMessage(commonMessages.resetServerButton) }}
 						</Button>
@@ -56,11 +58,13 @@
 				{{ formatMessage(messages.supportOptionsTitle) }}
 			</span>
 			<div>
-			<Button type="colored" color="red"
+				<Button
 					v-tooltip="supportResetToOnboardingTooltip"
+					type="colored"
+					color="red"
 					:disabled="supportResetToOnboardingDisabled"
-						@click="showResetToOnboardingModal"
-					>
+					@click="showResetToOnboardingModal"
+				>
 					<RotateCounterClockwiseIcon class="size-5" />
 					{{ formatMessage(messages.resetToOnboardingButton) }}
 				</Button>
@@ -70,7 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
@@ -97,6 +100,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { injectFilePicker } from '#ui/providers/file-picker'
 
 const debug = useDebugLogger('LoaderPage')

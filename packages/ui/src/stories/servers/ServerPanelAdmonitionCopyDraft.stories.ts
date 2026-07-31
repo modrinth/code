@@ -1,8 +1,8 @@
-import { Button } from '../../components/base/buttons'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Admonition from '../../components/base/Admonition.vue'
+import { Button } from '../../components/base/buttons'
 
 type AdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 type ActionType = 'Cancel' | 'Retry' | 'Dismiss'

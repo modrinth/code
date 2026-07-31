@@ -139,7 +139,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import {
 	GlobeIcon,
 	LogInIcon,
@@ -150,6 +149,7 @@ import {
 } from '@modrinth/assets'
 import { AutoLink } from '@modrinth/ui'
 
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import imgAircraft from './grid-images/aircraft.png'

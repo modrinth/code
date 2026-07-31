@@ -30,11 +30,16 @@
 			</AutoLink>
 		</div>
 
-		<Button type="quiet" v-if="status === 'added'" disabled>
+		<Button v-if="status === 'added'" type="quiet" disabled>
 			<CheckIcon aria-hidden="true" />
 			{{ addedLabel }}
 		</Button>
-		<Button type="outlined" v-else-if="status === 'pending'" :disabled="disabled" @click="$emit('cancel', user)">
+		<Button
+			v-else-if="status === 'pending'"
+			type="outlined"
+			:disabled="disabled"
+			@click="$emit('cancel', user)"
+		>
 			{{ cancelLabel }}
 		</Button>
 		<span v-else-if="status === 'requested'" v-tooltip="requestedTooltip" class="inline-flex">
@@ -49,9 +54,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { CheckIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'

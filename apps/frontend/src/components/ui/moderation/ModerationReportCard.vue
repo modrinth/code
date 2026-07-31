@@ -38,14 +38,15 @@
 						{{ formatRelativeTime(report.created) }}
 					</span>
 					<div class="flex items-center gap-2">
-						<IconButton :label="'Copy ID'" v-tooltip="'Copy ID'" @click="copyId">
+						<IconButton v-tooltip="'Copy ID'" :label="'Copy ID'" @click="copyId">
 							<ClipboardCopyIcon />
 						</IconButton>
 						<ButtonLink
-								v-tooltip="'Open in new tab'"
-								:href="`/moderation/reports/${props.report.id}`"
-								target="_blank"
-							 class="!w-9 !px-0 !rounded-full">
+							v-tooltip="'Open in new tab'"
+							:href="`/moderation/reports/${props.report.id}`"
+							target="_blank"
+							class="!w-9 !rounded-full !px-0"
+						>
 							<ExternalIcon />
 						</ButtonLink>
 					</div>
@@ -221,18 +222,36 @@
 						</template>
 					</template>
 					<template #closedActions>
-						<Button type="colored" color="green" v-if="isStaff(auth.user)" class="mt-2 w-full gap-2 sm:w-auto" @click="reopenReport()">
+						<Button
+							v-if="isStaff(auth.user)"
+							type="colored"
+							color="green"
+							class="mt-2 w-full gap-2 sm:w-auto"
+							@click="reopenReport()"
+						>
 							<CheckCircleIcon class="size-4" />
 							Reopen Thread
 						</Button>
 					</template>
 					<template #additionalActions="{ hasReply }">
 						<template v-if="isStaff(auth.user)">
-							<Button type="colored" color="red" v-if="hasReply" class="w-full gap-2 sm:w-auto" @click="closeReport(true)">
+							<Button
+								v-if="hasReply"
+								type="colored"
+								color="red"
+								class="w-full gap-2 sm:w-auto"
+								@click="closeReport(true)"
+							>
 								<CheckCircleIcon class="size-4" />
 								Reply and close
 							</Button>
-							<Button type="colored" color="red" v-else class="w-full gap-2 sm:w-auto" @click="closeReport()">
+							<Button
+								v-else
+								type="colored"
+								color="red"
+								class="w-full gap-2 sm:w-auto"
+								@click="closeReport()"
+							>
 								<CheckCircleIcon class="size-4" />
 								Close report
 							</Button>
@@ -244,7 +263,6 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button, IconButton, ButtonLink } from '@modrinth/ui'
 import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
@@ -254,6 +272,7 @@ import {
 	LockIcon,
 } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
+import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
 	Avatar,
 	CollapsibleRegion,

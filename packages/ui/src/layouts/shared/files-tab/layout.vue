@@ -160,11 +160,13 @@
 				<Button type="quiet" @click="fileEditorRef?.revertChanges()">
 					<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
 				</Button>
-				<Button type="colored" color="brand"
-						v-tooltip="isBusy ? busyTooltip : undefined"
-						:disabled="isBusy"
-						@click="fileEditorRef?.saveFileContent(false)"
-					>
+				<Button
+					v-tooltip="isBusy ? busyTooltip : undefined"
+					type="colored"
+					color="brand"
+					:disabled="isBusy"
+					@click="fileEditorRef?.saveFileContent(false)"
+				>
 					<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
 				</Button>
 			</div>
@@ -181,7 +183,14 @@
 			</div>
 			<div class="ml-auto flex items-center gap-0.5">
 				<div class="mx-1 h-6 w-px bg-surface-5" />
-				<Button type="quiet" color="red" v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal" class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+				<Button
+					v-tooltip="busyTooltip"
+					type="quiet"
+					color="red"
+					:disabled="isBusy"
+					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="showBulkDeleteModal"
+				>
 					<TrashIcon />
 					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 				</Button>
@@ -191,7 +200,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import {
 	DownloadIcon,
 	EditIcon,
@@ -205,6 +213,7 @@ import {
 import type { Component } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'

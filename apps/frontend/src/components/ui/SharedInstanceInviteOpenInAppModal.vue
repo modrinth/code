@@ -106,12 +106,14 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.closeButton) }}
 					</Button>
-					<ButtonLink type="colored" color="brand"
-							class="flex-1"
-							href="https://modrinth.com/app"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
+					<ButtonLink
+						type="colored"
+						color="brand"
+						class="flex-1"
+						href="https://modrinth.com/app"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
 						<DownloadIcon />
 						{{ formatMessage(messages.getApp) }}
 					</ButtonLink>
@@ -122,9 +124,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import { CheckIcon, DownloadIcon, XIcon } from '@modrinth/assets'
-import { Avatar, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import { Avatar, Button, ButtonLink, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 const { formatMessage } = useVIntl()

@@ -31,9 +31,8 @@
 </template>
 
 <script lang="ts" setup>
-import { Button } from '@modrinth/ui'
 import { XIcon } from '@modrinth/assets'
-import { TagItem } from '@modrinth/ui'
+import { Button, TagItem } from '@modrinth/ui'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

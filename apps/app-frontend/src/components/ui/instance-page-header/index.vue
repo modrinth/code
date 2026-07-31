@@ -85,20 +85,50 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<Button type="colored" color="brand" size="xl" v-if="isInstalling" native-type="button" disabled>
+				<Button
+					v-if="isInstalling"
+					type="colored"
+					color="brand"
+					size="xl"
+					native-type="button"
+					disabled
+				>
 					{{ formatMessage(commonMessages.installingLabel) }}
 				</Button>
-				<Button type="colored" color="red" size="xl" v-else-if="playing" native-type="button" :disabled="stopping" @click="emit('stop')">
+				<Button
+					v-else-if="playing"
+					type="colored"
+					color="red"
+					size="xl"
+					native-type="button"
+					:disabled="stopping"
+					@click="emit('stop')"
+				>
 					<StopCircleIcon />
 					{{
 						stopping ? formatMessage(messages.stopping) : formatMessage(commonMessages.stopButton)
 					}}
 				</Button>
-				<Button type="colored" color="brand" size="xl" v-else-if="instance.quarantined" v-tooltip="formatMessage(messages.lockedPlayTooltip)" native-type="button" disabled>
+				<Button
+					v-else-if="instance.quarantined"
+					v-tooltip="formatMessage(messages.lockedPlayTooltip)"
+					type="colored"
+					color="brand"
+					size="xl"
+					native-type="button"
+					disabled
+				>
 					<PlayIcon />
 					{{ formatMessage(commonMessages.playButton) }}
 				</Button>
-				<Button type="colored" color="brand" size="xl" v-else-if="instance.install_stage !== 'installed'" native-type="button" @click="emit('repair')">
+				<Button
+					v-else-if="instance.install_stage !== 'installed'"
+					type="colored"
+					color="brand"
+					size="xl"
+					native-type="button"
+					@click="emit('repair')"
+				>
 					<DownloadIcon />
 					{{ formatMessage(messages.repair) }}
 				</Button>
@@ -114,23 +144,37 @@
 					<PlayIcon />
 					{{ formatMessage(commonMessages.playButton) }}
 				</SplitButton>
-				<Button type="colored" color="brand" size="xl" v-else-if="!loading" native-type="button" @click="emit('play')">
+				<Button
+					v-else-if="!loading"
+					type="colored"
+					color="brand"
+					size="xl"
+					native-type="button"
+					@click="emit('play')"
+				>
 					<PlayIcon />
 					{{ formatMessage(commonMessages.playButton) }}
 				</Button>
-				<Button type="colored" color="brand" size="xl" v-else native-type="button" disabled>{{ formatMessage(messages.starting) }}</Button>
+				<Button v-else type="colored" color="brand" size="xl" native-type="button" disabled>{{
+					formatMessage(messages.starting)
+				}}</Button>
 
-				<IconButton size="xl" :label="formatMessage(messages.instanceSettings)"
-						v-tooltip="formatMessage(messages.instanceSettings)"
-						native-type="button"
-						@click="emit('settings')"
-					>
+				<IconButton
+					v-tooltip="formatMessage(messages.instanceSettings)"
+					size="xl"
+					:label="formatMessage(messages.instanceSettings)"
+					native-type="button"
+					@click="emit('settings')"
+				>
 					<SettingsIcon />
 				</IconButton>
-				<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(messages.moreActions)"
-						:tooltip="formatMessage(messages.moreActions)"
-						:options="moreActions"
-					>
+				<TeleportOverflowMenu
+					type="quiet"
+					size="xl"
+					:label="formatMessage(messages.moreActions)"
+					:tooltip="formatMessage(messages.moreActions)"
+					:options="moreActions"
+				>
 					<MoreVerticalIcon />
 				</TeleportOverflowMenu>
 			</PageHeaderActions>
@@ -139,7 +183,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton, SplitButton, TeleportOverflowMenu } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	DownloadIcon,
@@ -156,19 +199,20 @@ import {
 	TimerIcon,
 	UnknownIcon,
 } from '@modrinth/assets'
+import { Button, IconButton, SplitButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
 	LoaderIcon as ServerLoaderIcon,
+	type OverflowMenuOption,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
 	type ServerLoader,
-	type OverflowMenuOption,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'

@@ -38,14 +38,17 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<ButtonLink size="xl" v-if="canManage" :to="`/organization/${organization.slug}/settings`">
+				<ButtonLink v-if="canManage" size="xl" :to="`/organization/${organization.slug}/settings`">
 					<SettingsIcon />
 					{{ formatMessage(messages.manage) }}
 				</ButtonLink>
-				<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(commonMessages.moreOptionsButton)"
-						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-						:options="moreActions"
-					>
+				<TeleportOverflowMenu
+					type="quiet"
+					size="xl"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+					:options="moreActions"
+				>
 					<MoreVerticalIcon />
 				</TeleportOverflowMenu>
 			</PageHeaderActions>
@@ -54,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	BoxIcon,
 	ClipboardCopyIcon,
@@ -64,16 +66,17 @@ import {
 	SettingsIcon,
 	UsersIcon,
 } from '@modrinth/assets'
+import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
 	commonMessages,
 	defineMessages,
+	type OverflowMenuOption,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataNumberItem,
-	type OverflowMenuOption,
 	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
@@ -137,8 +140,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		action: () => emit('manageProjects'),
 		shown: props.canManage,
 	},
-	{ type: 'divider', shown: props.canManage,
-	 },
+	{ type: 'divider', shown: props.canManage },
 	{
 		id: 'copy-id',
 		label: formatMessage(commonMessages.copyIdButton),

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
@@ -21,6 +20,7 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import { Collapsible, ConfirmModal } from '#ui/components'
 import type { OverflowMenuOption } from '#ui/components/base'
+import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { commonMessages } from '#ui/utils'
 
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
@@ -579,11 +579,15 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 							</span>
 						</div>
 						<div class="flex items-center gap-1 my-auto">
-							<IconButton class="m-1 !size-6" size="xs" :label="formatMessage(messages.splitFile)" v-if="group.files.length > 1"
-									v-tooltip="formatMessage(messages.splitFile)"
-									:disabled="splitFileMutation.isPending.value"
-									@click="handleSplitFile(file.sha1)"
-								>
+							<IconButton
+								v-if="group.files.length > 1"
+								v-tooltip="formatMessage(messages.splitFile)"
+								class="m-1 !size-6"
+								size="xs"
+								:label="formatMessage(messages.splitFile)"
+								:disabled="splitFileMutation.isPending.value"
+								@click="handleSplitFile(file.sha1)"
+							>
 								<SpinnerIcon
 									v-if="splitFileMutation.isPending.value && pendingSplitSha1 === file.sha1"
 									class="size-4 shrink-0 animate-spin"
@@ -709,14 +713,22 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 											class="mt-3"
 										/>
 										<div class="flex items-center gap-2 flex-wrap mt-3">
-											<TeleportOverflowMenu label="More options" v-if="visibleQuickReplies.length > 0" :options="visibleQuickReplies" class="!w-auto !px-2.5 !rounded-xl">
+											<TeleportOverflowMenu
+												v-if="visibleQuickReplies.length > 0"
+												label="More options"
+												:options="visibleQuickReplies"
+												class="!w-auto !px-2.5 !rounded-xl"
+											>
 												Reply presets
 												<ChevronDownIcon />
 											</TeleportOverflowMenu>
-											<Button type="quiet" color="green"
-													:disabled="setModerationStatusMutation.isPending.value"
-													@click="handleSetModerationStatus('approved')"
-												 class="!text-green [&>svg]:!text-green">
+											<Button
+												type="quiet"
+												color="green"
+												:disabled="setModerationStatusMutation.isPending.value"
+												class="!text-green [&>svg]:!text-green"
+												@click="handleSetModerationStatus('approved')"
+											>
 												<SpinnerIcon
 													v-if="
 														setModerationStatusMutation.isPending.value &&
@@ -727,10 +739,13 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 												<CheckCircleIcon v-else />
 												Approve
 											</Button>
-											<Button type="quiet" color="red"
-													:disabled="setModerationStatusMutation.isPending.value"
-													@click="handleSetModerationStatus('bad_proof')"
-												 class="!text-red [&>svg]:!text-red">
+											<Button
+												type="quiet"
+												color="red"
+												:disabled="setModerationStatusMutation.isPending.value"
+												class="!text-red [&>svg]:!text-red"
+												@click="handleSetModerationStatus('bad_proof')"
+											>
 												<SpinnerIcon
 													v-if="
 														setModerationStatusMutation.isPending.value &&
@@ -741,10 +756,13 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 												<XCircleIcon v-else />
 												Reject: Insufficient proof
 											</Button>
-											<Button type="quiet" color="red"
-													:disabled="setModerationStatusMutation.isPending.value"
-													@click="handleSetModerationStatus('not_allowed')"
-												 class="!text-red [&>svg]:!text-red">
+											<Button
+												type="quiet"
+												color="red"
+												:disabled="setModerationStatusMutation.isPending.value"
+												class="!text-red [&>svg]:!text-red"
+												@click="handleSetModerationStatus('not_allowed')"
+											>
 												<SpinnerIcon
 													v-if="
 														setModerationStatusMutation.isPending.value &&
@@ -755,10 +773,12 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 												<ReportIcon v-else />
 												Reject: Not allowed
 											</Button>
-											<Button type="outlined" v-if="isEditingModerationReview"
-													:disabled="setModerationStatusMutation.isPending.value"
-													@click="cancelModerationReviewEditing"
-												>
+											<Button
+												v-if="isEditingModerationReview"
+												type="outlined"
+												:disabled="setModerationStatusMutation.isPending.value"
+												@click="cancelModerationReviewEditing"
+											>
 												<XIcon />
 												{{ formatMessage(commonMessages.cancelButton) }}
 											</Button>
@@ -814,7 +834,12 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 					/>
 				</div>
 				<div v-if="isModerator" class="flex justify-end pt-2">
-					<Button type="outlined" :disabled="deleteGroupMutation.isPending.value" @click="handleDeleteGroup" class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]">
+					<Button
+						type="outlined"
+						:disabled="deleteGroupMutation.isPending.value"
+						class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+						@click="handleDeleteGroup"
+					>
 						<SpinnerIcon
 							v-if="deleteGroupMutation.isPending.value"
 							class="size-4 shrink-0 animate-spin"

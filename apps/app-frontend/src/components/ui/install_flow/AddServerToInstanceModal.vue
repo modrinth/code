@@ -1,12 +1,6 @@
 <script setup>
-import { Button } from '@modrinth/ui'
 import { CheckIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
-import {
-	Admonition,
-	Avatar,
-	injectNotificationManager,
-	StyledInput,
-} from '@modrinth/ui'
+import { Admonition, Avatar, Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'

@@ -38,11 +38,13 @@
 				<HCaptcha ref="captcha" v-model="token" />
 			</div>
 
-			<Button type="colored" color="brand"
-					class="!w-full"
-					:disabled="(globals?.captcha_enabled ? !token : false) || !email"
-					@click="recovery"
-				>
+			<Button
+				type="colored"
+				color="brand"
+				class="!w-full"
+				:disabled="(globals?.captcha_enabled ? !token : false) || !email"
+				@click="recovery"
+			>
 				<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
 			</Button>
 		</template>
@@ -90,10 +92,10 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

@@ -87,11 +87,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftIcon, HashIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Badge,
+	Button,
+	ButtonLink,
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,

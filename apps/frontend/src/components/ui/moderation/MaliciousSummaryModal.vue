@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, DownloadIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
-import { CopyCode, NewModal, useDebugLogger } from '@modrinth/ui'
+import { Button, ButtonLink, CopyCode, NewModal, useDebugLogger } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 export type UnsafeFile = {
@@ -135,7 +134,12 @@ defineExpose({ show, hide })
 								v-if="isHashLoading(item.file.version_id)"
 								class="size-4 animate-spin text-secondary"
 							/>
-							<Button class="!h-6" size="xs" v-else-if="getFileHash(item.file.version_id, item.file.file_id)" @click="copy(getFileHash(item.file.version_id, item.file.file_id)!)">
+							<Button
+								v-else-if="getFileHash(item.file.version_id, item.file.file_id)"
+								class="!h-6"
+								size="xs"
+								@click="copy(getFileHash(item.file.version_id, item.file.file_id)!)"
+							>
 								<ClipboardCopyIcon class="size-4" />
 								Copy
 							</Button>
@@ -154,7 +158,13 @@ defineExpose({ show, hide })
 							</Button>
 						</td>
 						<td class="py-1">
-							<ButtonLink size="xs" :href="item.file.download_url" :download="item.file.file_name" target="_blank" class="!h-6 !size-6 !px-0 !rounded-full">
+							<ButtonLink
+								size="xs"
+								:href="item.file.download_url"
+								:download="item.file.file_name"
+								target="_blank"
+								class="!size-6 !h-6 !rounded-full !px-0"
+							>
 								<DownloadIcon />
 							</ButtonLink>
 						</td>

@@ -26,11 +26,13 @@
 					<XIcon />
 					Cancel
 				</Button>
-				<Button type="colored" color="brand"
-						v-tooltip="renameDisabledTooltip"
-						:disabled="renameDisabled"
-						@click="renameBackup"
-					>
+				<Button
+					v-tooltip="renameDisabledTooltip"
+					type="colored"
+					color="brand"
+					:disabled="renameDisabled"
+					@click="renameBackup"
+				>
 					<template v-if="renameMutation.isPending.value">
 						<SpinnerIcon class="animate-spin" />
 						Renaming...
@@ -46,11 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useVIntl } from '../../../composables/i18n'
 import {

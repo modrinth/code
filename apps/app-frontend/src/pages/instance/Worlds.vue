@@ -39,12 +39,14 @@
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
 					</Button>
-					<Button type="colored" color="brand"
-							size="lg"
-							@click="
-								router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
-							"
-						>
+					<Button
+						type="colored"
+						color="brand"
+						size="lg"
+						@click="
+							router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
+						"
+					>
 						<CompassIcon class="size-5" />
 						<span>{{ formatMessage(messages.browseServers) }}</span>
 					</Button>
@@ -68,7 +70,12 @@
 						{{ option.label }}
 					</button>
 				</div>
-				<Button type="quiet" :disabled="refreshingAll" @click="refreshAllWorlds" class="hover:!bg-transparent focus-visible:!bg-transparent">
+				<Button
+					type="quiet"
+					:disabled="refreshingAll"
+					class="hover:!bg-transparent focus-visible:!bg-transparent"
+					@click="refreshAllWorlds"
+				>
 					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
 					{{ formatMessage(commonMessages.refreshButton) }}
 				</Button>
@@ -121,12 +128,14 @@
 					<PlusIcon class="size-5" />
 					{{ formatMessage(messages.addServer) }}
 				</Button>
-				<Button type="colored" color="brand"
-						size="lg"
-						@click="
-							router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
-						"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					size="lg"
+					@click="
+						router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
+					"
+				>
 					<CompassIcon class="size-5" />
 					<span>{{ formatMessage(messages.browseServers) }}</span>
 				</Button>
@@ -135,8 +144,8 @@
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,

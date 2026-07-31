@@ -44,7 +44,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { ClockIcon, RocketIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
@@ -52,6 +51,7 @@ import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import { type ComponentPublicInstance, computed, onMounted, onUnmounted, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import { injectModrinthClient } from '#ui/providers'
 

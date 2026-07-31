@@ -1,11 +1,5 @@
 <script setup lang="ts">
 import {
-	Button,
-	IconButton,
-	TeleportOverflowMenu,
-	type OverflowMenuOption,
-} from '#ui/components/base/buttons'
-import {
 	BoxesIcon,
 	ClockIcon,
 	DownloadIcon,
@@ -20,6 +14,12 @@ import type { RouteLocationRaw } from 'vue-router'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
+import {
+	Button,
+	IconButton,
+	type OverflowMenuOption,
+	TeleportOverflowMenu,
+} from '#ui/components/base/buttons'
 import TagTagItem from '#ui/components/base/TagTagItem.vue'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -204,7 +204,13 @@ onUnmounted(() => {
 				<template v-else>
 					<!-- Expanded actions visible at >= 700px -->
 					<div class="hidden @[700px]:flex items-center gap-2">
-						<Button type="quiet" color="green" v-if="hasUpdateListener && hasUpdate" class="flex items-center gap-2" @click="emit('update')">
+						<Button
+							v-if="hasUpdateListener && hasUpdate"
+							type="quiet"
+							color="green"
+							class="flex items-center gap-2"
+							@click="emit('update')"
+						>
 							<DownloadIcon class="!text-green" />
 							<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
 						</Button>
@@ -214,24 +220,36 @@ onUnmounted(() => {
 							{{ formatMessage(commonMessages.contentLabel) }}
 						</Button>
 
-						<IconButton type="outlined" :label="formatMessage(messages.installationSettingsTooltip)" v-if="hasSettingsListener"
-								v-tooltip="formatMessage(messages.installationSettingsTooltip)"
-								@click="emit('settings')"
-							>
+						<IconButton
+							v-if="hasSettingsListener"
+							v-tooltip="formatMessage(messages.installationSettingsTooltip)"
+							type="outlined"
+							:label="formatMessage(messages.installationSettingsTooltip)"
+							@click="emit('settings')"
+						>
 							<Settings2Icon />
 						</IconButton>
 					</div>
 
 					<!-- Collapsed actions visible at < 700px -->
 					<div v-if="hasUpdate && hasUpdateListener" class="flex @[700px]:hidden">
-						<IconButton type="quiet" color="green" :label="formatMessage(commonMessages.updateButton)"
-								v-tooltip="formatMessage(commonMessages.updateButton)"
-								@click="emit('update')"
-							>
+						<IconButton
+							v-tooltip="formatMessage(commonMessages.updateButton)"
+							type="quiet"
+							color="green"
+							:label="formatMessage(commonMessages.updateButton)"
+							@click="emit('update')"
+						>
 							<DownloadIcon class="size-5" />
 						</IconButton>
 					</div>
-					<TeleportOverflowMenu type="outlined" label="More options" v-if="collapsedOptions.length" :options="collapsedOptions" class="flex @[700px]:hidden">
+					<TeleportOverflowMenu
+						v-if="collapsedOptions.length"
+						type="outlined"
+						label="More options"
+						:options="collapsedOptions"
+						class="flex @[700px]:hidden"
+					>
 						<MoreVerticalIcon class="size-5" />
 						<template #content>
 							<BoxesIcon class="size-5" />
@@ -243,8 +261,13 @@ onUnmounted(() => {
 						</template>
 					</TeleportOverflowMenu>
 
-					<TeleportOverflowMenu type="quiet" label="More options" v-if="overflowOptions?.length"
-						class="hidden @[700px]:flex" :options="overflowOptions">
+					<TeleportOverflowMenu
+						v-if="overflowOptions?.length"
+						type="quiet"
+						label="More options"
+						class="hidden @[700px]:flex"
+						:options="overflowOptions"
+					>
 						<MoreVerticalIcon class="size-5" />
 					</TeleportOverflowMenu>
 				</template>

@@ -1,7 +1,7 @@
 <script setup>
-import { Button } from '@modrinth/ui'
 import { XIcon } from '@modrinth/assets'
 import {
+	Button,
 	commonMessages,
 	defineMessages,
 	FileTreeSelect,

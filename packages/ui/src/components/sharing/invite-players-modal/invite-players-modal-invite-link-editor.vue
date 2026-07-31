@@ -34,11 +34,13 @@
 								<Button type="outlined" native-type="button" @click="cancelCustomExpiry">
 									{{ formatMessage(messages.cancel) }}
 								</Button>
-								<Button type="colored" color="brand"
-										native-type="button"
-										:disabled="!canApplyCustomExpiry"
-										@click="applyCustomExpiry"
-									>
+								<Button
+									type="colored"
+									color="brand"
+									native-type="button"
+									:disabled="!canApplyCustomExpiry"
+									@click="applyCustomExpiry"
+								>
 									{{ formatMessage(messages.apply) }}
 								</Button>
 							</div>
@@ -84,9 +86,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'

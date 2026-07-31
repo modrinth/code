@@ -31,11 +31,12 @@
 							wrapper-class="w-full sm:w-64"
 							@focusin="selectSearchInputText"
 						/>
-						<TeleportOverflowMenu label="More options"
-								class="!w-auto !px-2.5 !rounded-xl"
-								:options="csvExportOptions"
-								:disabled="isDataLoading || filteredRows.length === 0"
-							>
+						<TeleportOverflowMenu
+							label="More options"
+							class="!w-auto !rounded-xl !px-2.5"
+							:options="csvExportOptions"
+							:disabled="isDataLoading || filteredRows.length === 0"
+						>
 							<DownloadIcon />
 							{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
 							<DropdownIcon />
@@ -188,8 +189,8 @@
 </template>
 
 <script setup lang="ts">
-import { TeleportOverflowMenu } from '@modrinth/ui'
 import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
+import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	type OverflowMenuOption,
 	Pagination,

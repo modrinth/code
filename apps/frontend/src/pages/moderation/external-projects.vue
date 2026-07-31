@@ -116,9 +116,9 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { BinaryIcon, EditIcon, HashIcon, SearchIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	Combobox,
 	type ComboboxOption,

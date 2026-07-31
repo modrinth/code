@@ -1,7 +1,7 @@
-import { Button } from '../../components/base/buttons'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import type { CreationFlowContextValue } from '../../components/flows/creation-flow-modal/creation-flow-context'
 import CreationFlowModal from '../../components/flows/creation-flow-modal/index.vue'
 

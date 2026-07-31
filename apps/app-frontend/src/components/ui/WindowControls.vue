@@ -4,23 +4,38 @@
 		class="flex items-center gap-2 mr-1.5"
 		data-tauri-drag-region-exclude
 	>
-		<IconButton type="quiet" label="Minimize window" class="relative expanded-button" @click="() => getCurrentWindow().minimize()">
+		<IconButton
+			type="quiet"
+			label="Minimize window"
+			class="relative expanded-button"
+			@click="() => getCurrentWindow().minimize()"
+		>
 			<MinimizeIcon />
 		</IconButton>
-		<IconButton type="quiet" label="Toggle maximize window" class="relative expanded-button" @click="() => getCurrentWindow().toggleMaximize()">
+		<IconButton
+			type="quiet"
+			label="Toggle maximize window"
+			class="relative expanded-button"
+			@click="() => getCurrentWindow().toggleMaximize()"
+		>
 			<RestoreIcon v-if="isMaximized" />
 			<MaximizeIcon v-else />
 		</IconButton>
-		<IconButton type="quiet" color="red" label="Close window" class="relative expanded-button close-button hover:!bg-red focus-visible:!bg-red" @click="handleClose">
+		<IconButton
+			type="quiet"
+			color="red"
+			label="Close window"
+			class="relative expanded-button close-button hover:!bg-red focus-visible:!bg-red"
+			@click="handleClose"
+		>
 			<XIcon />
 		</IconButton>
 	</section>
 </template>
 
 <script setup>
-import { IconButton } from '@modrinth/ui'
 import { MaximizeIcon, MinimizeIcon, RestoreIcon, XIcon } from '@modrinth/assets'
-
+import { IconButton } from '@modrinth/ui'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, onMounted, onUnmounted, ref } from 'vue'

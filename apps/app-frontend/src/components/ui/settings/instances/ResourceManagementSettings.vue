@@ -1,8 +1,9 @@
 <script setup>
-import { Button, IconButton } from '@modrinth/ui'
 import { BoxIcon, FolderOpenIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
 import {
+	Button,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	Slider,
 	StyledInput,
@@ -183,11 +184,12 @@ async function findLauncherDir() {
 				wrapper-class="w-full"
 			>
 				<template #right>
-					<IconButton :label="formatMessage(messages.browseAppDirectory)"
-							v-tooltip="formatMessage(messages.browseAppDirectory)"
-							class="ml-1.5"
-							@click="findLauncherDir"
-						>
+					<IconButton
+						v-tooltip="formatMessage(messages.browseAppDirectory)"
+						:label="formatMessage(messages.browseAppDirectory)"
+						class="ml-1.5"
+						@click="findLauncherDir"
+					>
 						<FolderSearchIcon aria-hidden="true" />
 					</IconButton>
 				</template>

@@ -33,14 +33,17 @@
 				<div class="flex items-center justify-between">
 					<span class="label__title font-semibold">Announcement link (optional)</span>
 
-					<ButtonLink type="quiet" size="xs" v-if="committedNormalizedAnnouncementUrl"
-							:href="committedNormalizedAnnouncementUrl"
-							target="_blank"
-							rel="noopener noreferrer"
-							aria-label="Check announcement link"
-							title="Check announcement link"
-							class="text-sm !h-6"
-						>
+					<ButtonLink
+						v-if="committedNormalizedAnnouncementUrl"
+						type="quiet"
+						size="xs"
+						:href="committedNormalizedAnnouncementUrl"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="Check announcement link"
+						title="Check announcement link"
+						class="!h-6 text-sm"
+					>
 						<ExternalIcon aria-hidden="true" />
 						Open link
 					</ButtonLink>
@@ -109,7 +112,12 @@
 		<template #actions>
 			<div class="flex justify-end gap-2">
 				<Button type="quiet" @click="eventModal?.hide()">Cancel</Button>
-				<Button type="colored" color="brand" :disabled="!canSaveEvent || isSaving" @click="saveEvent">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!canSaveEvent || isSaving"
+					@click="saveEvent"
+				>
 					<SaveIcon aria-hidden="true" />
 					{{ modalMode === 'create' ? 'Create event' : 'Save' }}
 				</Button>
@@ -188,13 +196,20 @@
 
 				<template #cell-actions="{ row }">
 					<div class="flex justify-end gap-2">
-						<IconButton type="outlined" :label="`Delete ${row.title}`"
-								:disabled="isDeletingEvent(row.id)"
-								@click="openDeleteEventModal(row)"
-							 class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]">
+						<IconButton
+							type="outlined"
+							:label="`Delete ${row.title}`"
+							:disabled="isDeletingEvent(row.id)"
+							class="!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
+							@click="openDeleteEventModal(row)"
+						>
 							<TrashIcon aria-hidden="true" />
 						</IconButton>
-						<Button type="outlined" :disabled="isSaving || isDeletingEvent(row.id)" @click="openEditModal(row)">
+						<Button
+							type="outlined"
+							:disabled="isSaving || isDeletingEvent(row.id)"
+							@click="openEditModal(row)"
+						>
 							Edit
 							<EditIcon aria-hidden="true" />
 						</Button>
@@ -216,7 +231,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	EditIcon,
@@ -227,6 +241,7 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
 	ConfirmModal,
 	DatePicker,

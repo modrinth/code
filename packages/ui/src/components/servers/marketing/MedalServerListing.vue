@@ -165,7 +165,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { LockIcon, RocketIcon, SparklesIcon, SpinnerIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
@@ -173,6 +172,8 @@ import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectModrinthClient } from '../../../providers/api-client'

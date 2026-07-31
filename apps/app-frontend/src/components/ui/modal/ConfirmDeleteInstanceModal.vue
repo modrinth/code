@@ -20,10 +20,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	commonMessages,
 	defineMessages,
 	NewModal,

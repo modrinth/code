@@ -23,7 +23,13 @@
 						<UserPlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createAccountButton) }}
 					</Button>
-					<Button type="colored" color="brand" class="w-full" native-type="button" @click="authenticate('sign-in')">
+					<Button
+						type="colored"
+						color="brand"
+						class="w-full"
+						native-type="button"
+						@click="authenticate('sign-in')"
+					>
 						<LogInIcon aria-hidden="true" />
 						{{ formatMessage(messages.signInButton) }}
 					</Button>
@@ -70,11 +76,11 @@
 						{{ formatMessage(messages.cancelButton) }}
 					</Button>
 					<Button
-							class="w-full"
-							native-type="button"
-							:disabled="reopeningBrowser"
-							@click="reopenBrowser"
-						>
+						class="w-full"
+						native-type="button"
+						:disabled="reopeningBrowser"
+						@click="reopenBrowser"
+					>
 						<RefreshCwIcon aria-hidden="true" />
 						{{ formatMessage(messages.openBrowserAgainButton) }}
 					</Button>
@@ -99,9 +105,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { LogInIcon, RefreshCwIcon, SpinnerIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
-import { defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
+import { Button, defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'
 

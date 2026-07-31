@@ -43,8 +43,8 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	provideUserProfile,
-	useVIntl,
 	UserProfilePageLayout,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref, watch } from 'vue'

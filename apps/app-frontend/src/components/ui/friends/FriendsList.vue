@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import { MailIcon, SearchIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
@@ -234,7 +235,12 @@ const messages = defineMessages({
 					wrapper-class="flex-1"
 					@keyup.enter="addFriendFromModal"
 				/>
-				<Button type="colored" color="brand" :disabled="username.length === 0" @click="addFriendFromModal">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="username.length === 0"
+					@click="addFriendFromModal"
+				>
 					<SendIcon />
 					{{ formatMessage(messages.sendFriendRequest) }}
 				</Button>
@@ -243,10 +249,12 @@ const messages = defineMessages({
 	</ModalWrapper>
 	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 -ml-1">
 		<template v-if="sortedFriends.length > 0">
-			<IconButton type="quiet" :label="formatMessage(messages.addFriend)"
-					v-tooltip="formatMessage(messages.addFriend)"
-					@click="addFriendModal.show"
-				>
+			<IconButton
+				v-tooltip="formatMessage(messages.addFriend)"
+				type="quiet"
+				:label="formatMessage(messages.addFriend)"
+				@click="addFriendModal.show"
+			>
 				<UserPlusIcon />
 			</IconButton>
 			<StyledInput
@@ -263,11 +271,14 @@ const messages = defineMessages({
 		<h3 v-else class="w-full text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
-		<IconButton type="quiet" :label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })" v-if="incomingRequests.length > 0"
-				v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
-				class="relative"
-				@click="friendInvitesModal.show"
-			>
+		<IconButton
+			v-if="incomingRequests.length > 0"
+			v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
+			type="quiet"
+			:label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
+			class="relative"
+			@click="friendInvitesModal.show"
+		>
 			<MailIcon />
 			<span
 				v-if="incomingRequests.length > 0"

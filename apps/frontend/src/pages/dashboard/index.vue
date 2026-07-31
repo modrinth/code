@@ -60,10 +60,10 @@
 	</div>
 </template>
 <script setup>
-import { ButtonLink } from '@modrinth/ui'
 import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

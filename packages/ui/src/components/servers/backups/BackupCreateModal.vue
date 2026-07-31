@@ -50,11 +50,13 @@
 					<XIcon />
 					Cancel
 				</Button>
-				<Button type="colored" color="brand"
-						v-tooltip="createDisabledTooltip"
-						:disabled="createDisabled"
-						@click="createBackup"
-					>
+				<Button
+					v-tooltip="createDisabledTooltip"
+					type="colored"
+					color="brand"
+					:disabled="createDisabled"
+					@click="createBackup"
+				>
 					<PlusIcon />
 					Create backup
 				</Button>
@@ -64,11 +66,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useVIntl } from '../../../composables/i18n'
 import {

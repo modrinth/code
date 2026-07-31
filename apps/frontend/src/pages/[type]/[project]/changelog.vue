@@ -53,12 +53,15 @@
 										{{ formatDate(version.date_published) }}</span
 									>
 								</div>
-								<ButtonLink type="quiet" color="brand" v-if="getPrimaryFile(version)"
-										class="ml-auto"
-										:href="createDownloadUrl(version)"
-										:download="getPrimaryFile(version)?.filename"
-										:title="`Download ${version.name}`"
-									>
+								<ButtonLink
+									v-if="getPrimaryFile(version)"
+									type="quiet"
+									color="brand"
+									class="ml-auto"
+									:href="createDownloadUrl(version)"
+									:download="getPrimaryFile(version)?.filename"
+									:title="`Download ${version.name}`"
+								>
 									<DownloadIcon aria-hidden="true" />
 									Download
 								</ButtonLink>
@@ -86,9 +89,9 @@
 	</div>
 </template>
 <script setup>
-import { ButtonLink } from '@modrinth/ui'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
+	ButtonLink,
 	injectModrinthClient,
 	injectProjectPageContext,
 	Pagination,

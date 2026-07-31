@@ -1,7 +1,7 @@
-import { Button } from '../../components/base/buttons'
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import ConfirmLeaveModal from '../../components/modal/ConfirmLeaveModal.vue'
 
 const meta = {

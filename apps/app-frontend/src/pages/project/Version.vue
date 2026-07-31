@@ -15,10 +15,12 @@
 			:dependency-link-creator="createDependencyLink"
 		>
 			<template #headerActions>
-				<Button type="colored" color="brand"
-						:disabled="installing || (installed && installedVersion === version.id)"
-						@click="() => version && install(version.id)"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="installing || (installed && installedVersion === version.id)"
+					@click="() => version && install(version.id)"
+				>
 					<DownloadIcon v-if="!installed" />
 					<SwapIcon v-else-if="installedVersion !== version.id" />
 					<CheckIcon v-else />
@@ -32,26 +34,28 @@
 									: formatMessage(commonMessages.installButton)
 					}}
 				</Button>
-				<TeleportOverflowMenu type="outlined" label="More options"
-						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-						:options="[
-							{
-								id: 'open-in-browser',
-								label: formatMessage(commonMessages.openInBrowserButton),
-								type: 'link',
-								href: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
-								target: '_blank',
-							},
-							{
-								id: 'report',
-								label: formatMessage(commonMessages.reportButton),
-								type: 'link',
-								tone: 'red',
-								href: `https://modrinth.com/report?item=version&itemID=${version.id}`,
-								target: '_blank',
-							},
-						]"
-					>
+				<TeleportOverflowMenu
+					type="outlined"
+					label="More options"
+					:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+					:options="[
+						{
+							id: 'open-in-browser',
+							label: formatMessage(commonMessages.openInBrowserButton),
+							type: 'link',
+							href: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
+							target: '_blank',
+						},
+						{
+							id: 'report',
+							label: formatMessage(commonMessages.reportButton),
+							type: 'link',
+							tone: 'red',
+							href: `https://modrinth.com/report?item=version&itemID=${version.id}`,
+							target: '_blank',
+						},
+					]"
+				>
 					<MoreVerticalIcon aria-hidden="true" />
 					<template #open-in-browser>
 						<ExternalIcon aria-hidden="true" />
@@ -73,7 +77,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
@@ -84,6 +87,7 @@ import {
 	ReportIcon,
 	VersionIcon,
 } from '@modrinth/assets'
+import { Button, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,

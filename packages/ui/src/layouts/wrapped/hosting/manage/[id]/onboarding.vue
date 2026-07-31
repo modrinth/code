@@ -42,16 +42,20 @@
 		</div>
 
 		<div class="w-full">
-			<Button size="xl" v-if="uploading" class="ml-auto" disabled>
+			<Button v-if="uploading" size="xl" class="ml-auto" disabled>
 				<SpinnerIcon class="animate-spin" />
 				{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
 			</Button>
-			<Button type="colored" color="brand" size="xl" v-else
-					v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
-					class="ml-auto"
-					:disabled="!canSetup"
-					@click="openModal"
-				>
+			<Button
+				v-else
+				v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
+				type="colored"
+				color="brand"
+				size="xl"
+				class="ml-auto"
+				:disabled="!canSetup"
+				@click="openModal"
+			>
 				{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
 			</Button>
 		</div>
@@ -73,7 +77,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
 import {
@@ -89,6 +92,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import type { CreationFlowContextValue } from '#ui/components'
 import { CreationFlowModal } from '#ui/components'
+import { Button } from '#ui/components/base/buttons'
 import { injectModrinthServerContext } from '#ui/providers'
 
 const client = injectModrinthClient()

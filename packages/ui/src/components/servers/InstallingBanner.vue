@@ -27,13 +27,14 @@
 			</div>
 		</div>
 		<template v-if="contentError" #top-right-actions>
-			<Button type="outlined"
-					v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
-					class="!border !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
-					native-type="button"
-					:disabled="retryDisabled"
-					@click="emit('retry')"
-				>
+			<Button
+				v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
+				type="outlined"
+				class="!border !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+				native-type="button"
+				:disabled="retryDisabled"
+				@click="emit('retry')"
+			>
 				<RotateCounterClockwiseIcon class="size-5" />
 				{{ formatMessage(commonMessages.retryButton) }}
 			</Button>
@@ -42,10 +43,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 

@@ -1,5 +1,4 @@
 <script setup>
-import { ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	AuthFeature,
 	ModrinthApiError,
@@ -30,12 +29,14 @@ import {
 import {
 	Admonition,
 	Avatar,
+	ButtonLink,
 	commonMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
+	IconButton,
 	IntlFormatted,
 	LoadingBar,
 	NewsArticleCard,
@@ -46,6 +47,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	TeleportOverflowMenu,
 	TextLogo,
 	useDebugLogger,
 	useFormatBytes,
@@ -1677,9 +1679,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
 				<IconButton
+					v-if="!forceSidebar && themeStore.toggleSidebar"
 					:type="sidebarToggled ? 'base' : 'quiet'"
 					label="Next image"
-					v-if="!forceSidebar && themeStore.toggleSidebar"
 					class="mr-3 transition-transform"
 					:class="{ 'rotate-180': !sidebarToggled }"
 					@click="sidebarToggled = !sidebarToggled"

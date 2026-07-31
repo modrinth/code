@@ -135,7 +135,12 @@
 					<Button class="w-full text-contrast" @click="handleClose">
 						{{ props.closeButtonText ?? formatMessage(messages.closeButton) }}
 					</Button>
-					<Button type="colored" color="green" class="w-full text-contrast" @click="downloadTaxForm">
+					<Button
+						type="colored"
+						color="green"
+						class="w-full text-contrast"
+						@click="downloadTaxForm"
+					>
 						<DownloadIcon />{{
 							formatMessage(messages.downloadButton, { formType: determinedFormType })
 						}}
@@ -147,7 +152,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import {
 	BrowserWindowSuccessIllustration,
 	DownloadIcon,
@@ -158,6 +162,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	Chips,
 	commonMessages,
 	defineMessages,

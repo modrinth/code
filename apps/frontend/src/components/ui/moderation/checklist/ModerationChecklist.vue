@@ -57,33 +57,53 @@
 						{{ checklistTitleText }}
 					</button>
 				</h1>
-				<ButtonLink v-if="!isPseudoStage && currentStageObj._guidanceUrl" v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj._guidanceUrl" class="!w-9 !px-0 !rounded-full">
+				<ButtonLink
+					v-if="!isPseudoStage && currentStageObj._guidanceUrl"
+					v-tooltip="`Stage guidance`"
+					target="_blank"
+					:href="currentStageObj._guidanceUrl"
+					class="!w-9 !rounded-full !px-0"
+				>
 					<FileTextIcon />
 				</ButtonLink>
-				<IconButton type="quiet" :color="!isPseudoStage && currentStageHasState ? 'orange' : 'red'" :label="
-							!isPseudoStage && currentStageHasState
-								? 'Reset Stage'
-								: !isPseudoStage && !checklistHasState
-									? 'Return to Start'
-									: 'Reset Checklist'
-						"
-						v-tooltip="
-							!isPseudoStage && currentStageHasState
-								? 'Reset Stage'
-								: !isPseudoStage && !checklistHasState
-									? 'Return to Start'
-									: 'Reset Checklist'
-						"
-						:disabled="!isPseudoStage && !checklistHasState && isOnFirstStage"
-						@click="resetProgress"
-					>
+				<IconButton
+					v-tooltip="
+						!isPseudoStage && currentStageHasState
+							? 'Reset Stage'
+							: !isPseudoStage && !checklistHasState
+								? 'Return to Start'
+								: 'Reset Checklist'
+					"
+					type="quiet"
+					:color="!isPseudoStage && currentStageHasState ? 'orange' : 'red'"
+					:label="
+						!isPseudoStage && currentStageHasState
+							? 'Reset Stage'
+							: !isPseudoStage && !checklistHasState
+								? 'Return to Start'
+								: 'Reset Checklist'
+					"
+					:disabled="!isPseudoStage && !checklistHasState && isOnFirstStage"
+					@click="resetProgress"
+				>
 					<UndoIcon v-if="!isPseudoStage && !checklistHasState" />
 					<BrushCleaningIcon v-else />
 				</IconButton>
-				<IconButton type="quiet" color="red" label="Exit moderation" v-tooltip="`Exit moderation`" @click="handleExit" class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+				<IconButton
+					v-tooltip="`Exit moderation`"
+					type="quiet"
+					color="red"
+					label="Exit moderation"
+					class="hover:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!bg-red focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="handleExit"
+				>
 					<XIcon />
 				</IconButton>
-				<IconButton :label="collapsed ? `Expand` : `Collapse`" v-tooltip="collapsed ? `Expand` : `Collapse`" @click="emit('toggleCollapsed')">
+				<IconButton
+					v-tooltip="collapsed ? `Expand` : `Collapse`"
+					:label="collapsed ? `Expand` : `Collapse`"
+					@click="emit('toggleCollapsed')"
+				>
 					<DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
 				</IconButton>
 			</div>
@@ -128,8 +148,12 @@
 							</Button>
 						</div>
 						<div class="flex items-center gap-2">
-							<Button type="colored" color="brand" v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
-								@click="skipToNextProject">
+							<Button
+								v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
+								type="colored"
+								color="brand"
+								@click="skipToNextProject"
+							>
 								<RightArrowIcon aria-hidden="true" />
 								Next project ({{ moderationQueue.queueLength }} left)
 							</Button>
@@ -154,8 +178,12 @@
 							</Button>
 						</div>
 						<div class="flex items-center gap-2">
-							<Button type="colored" color="brand" v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
-								@click="skipToNextProject">
+							<Button
+								v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
+								type="colored"
+								color="brand"
+								@click="skipToNextProject"
+							>
 								<RightArrowIcon aria-hidden="true" />
 								Next project ({{ moderationQueue.queueLength }} left)
 							</Button>
@@ -228,14 +256,22 @@
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
-							<Button v-if="!done && !generatedMessage && moderationQueue.hasItems" @click="skipCurrentProject">
+							<Button
+								v-if="!done && !generatedMessage && moderationQueue.hasItems"
+								@click="skipCurrentProject"
+							>
 								<XIcon aria-hidden="true" />
 								Skip ({{ moderationQueue.queueLength }} left)
 							</Button>
 						</div>
 
 						<div class="flex items-center gap-2">
-							<TeleportOverflowMenu label="More options" v-if="!done" :options="stageOptions" placement="bottom-end">
+							<TeleportOverflowMenu
+								v-if="!done"
+								label="More options"
+								:options="stageOptions"
+								placement="bottom-end"
+							>
 								<ListBulletedIcon />
 								<span class="sr-only">Stages</span>
 								<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
@@ -247,9 +283,7 @@
 									<span v-if="opt.messages" class="ml-auto pl-2 font-semibold opacity-75">{{
 										opt.messages
 									}}</span>
-									<span v-if="opt.fixes" class="pl-2 font-semibold text-blue">{{
-										opt.fixes
-									}}</span>
+									<span v-if="opt.fixes" class="pl-2 font-semibold text-blue">{{ opt.fixes }}</span>
 								</template>
 							</TeleportOverflowMenu>
 
@@ -271,7 +305,12 @@
 									<LeftArrowIcon aria-hidden="true" />
 									Edit
 								</Button>
-								<Button type="colored" color="red" :disabled="loadingModerationDecision" @click="sendMessage('rejected')">
+								<Button
+									type="colored"
+									color="red"
+									:disabled="loadingModerationDecision"
+									@click="sendMessage('rejected')"
+								>
 									<SpinnerIcon
 										v-if="moderationDecision === 'rejected'"
 										class="animate-spin"
@@ -280,7 +319,12 @@
 									<XIcon v-else aria-hidden="true" />
 									Reject
 								</Button>
-								<Button type="colored" color="orange" :disabled="loadingModerationDecision" @click="sendMessage('withheld')">
+								<Button
+									type="colored"
+									color="orange"
+									:disabled="loadingModerationDecision"
+									@click="sendMessage('withheld')"
+								>
 									<SpinnerIcon
 										v-if="moderationDecision === 'withheld'"
 										class="animate-spin"
@@ -289,10 +333,12 @@
 									<LinkIcon v-else aria-hidden="true" />
 									Withhold
 								</Button>
-								<Button type="colored" color="green"
-										:disabled="loadingModerationDecision"
-										@click="sendMessage(approveSendStatus)"
-									>
+								<Button
+									type="colored"
+									color="green"
+									:disabled="loadingModerationDecision"
+									@click="sendMessage(approveSendStatus)"
+								>
 									<SpinnerIcon
 										v-if="moderationDecision === approveSendStatus"
 										class="animate-spin"
@@ -307,7 +353,12 @@
 								<Button :disabled="!hasValidPreviousStage" @click="previousStage">
 									<LeftArrowIcon aria-hidden="true" /> Previous
 								</Button>
-								<Button type="colored" color="brand" :disabled="isLastVisibleStage && loadingMessage" @click="nextStage">
+								<Button
+									type="colored"
+									color="brand"
+									:disabled="isLastVisibleStage && loadingMessage"
+									@click="nextStage"
+								>
 									<template v-if="isLastVisibleStage">
 										<CheckIcon aria-hidden="true" />
 										{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
@@ -324,7 +375,6 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, IconButton, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	BrushCleaningIcon,
 	CheckIcon,
@@ -368,13 +418,17 @@ import {
 } from '@modrinth/moderation'
 import {
 	Avatar,
+	Button,
+	ButtonLink,
 	Collapsible,
 	ConfirmModal,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MarkdownEditor,
 	StyledInput,
+	TeleportOverflowMenu,
 	useDebugLogger,
 } from '@modrinth/ui'
 import type { ProjectStatus } from '@modrinth/utils'

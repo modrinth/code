@@ -439,7 +439,6 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CalendarIcon,
@@ -466,6 +465,8 @@ import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@mo
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'

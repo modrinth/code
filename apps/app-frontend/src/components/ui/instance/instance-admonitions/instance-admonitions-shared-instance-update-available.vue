@@ -15,9 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { DownloadIcon } from '@modrinth/assets'
-import { Admonition, useVIntl } from '@modrinth/ui'
+import { Admonition, Button, useVIntl } from '@modrinth/ui'
 
 import { instanceAdmonitionsMessages as messages } from './instance-admonitions-messages'
 

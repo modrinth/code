@@ -16,7 +16,8 @@
 			<div class="flex w-[30rem] flex-col gap-3">
 				<div class="flow-root">
 					<div class="group relative float-end ml-4">
-						<TeleportOverflowMenu :label="formatMessage(messages.editIconButton)"
+						<TeleportOverflowMenu
+							:label="formatMessage(messages.editIconButton)"
 							:tooltip="formatMessage(messages.editIconButton)"
 							class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
 							:options="[
@@ -207,16 +208,19 @@
 									<EditIcon aria-hidden="true" />
 									{{ formatMessage(commonMessages.editButton) }}
 								</Button>
-								<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(commonMessages.moreOptionsButton)"
-										:options="[
-											{
-												id: 'delete',
-												label: formatMessage(commonMessages.deleteLabel),
-												tone: 'red',
-												action: () => deleteModal?.show(),
-											},
-										]"
-									>
+								<TeleportOverflowMenu
+									type="quiet"
+									size="xl"
+									:label="formatMessage(commonMessages.moreOptionsButton)"
+									:options="[
+										{
+											id: 'delete',
+											label: formatMessage(commonMessages.deleteLabel),
+											tone: 'red',
+											action: () => deleteModal?.show(),
+										},
+									]"
+								>
 									<MoreVerticalIcon aria-hidden="true" />
 									<template #delete>
 										<TrashIcon aria-hidden="true" />
@@ -344,7 +348,12 @@
 					"
 				>
 					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<Button v-if="canEdit" class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
+						<Button
+							v-if="canEdit"
+							class="remove-btn"
+							:disabled="removing"
+							@click="() => removeProject(project)"
+						>
 							<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
 							<XIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.removeProjectButton) }}
@@ -358,7 +367,13 @@
 			</ProjectCardList>
 			<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
 				<template #actions>
-					<ButtonLink type="colored" color="brand" v-if="auth.user && auth.user.id === creator.id" class="mx-auto w-min" to="/discover/mods">
+					<ButtonLink
+						v-if="auth.user && auth.user.id === creator.id"
+						type="colored"
+						color="brand"
+						class="mx-auto w-min"
+						to="/discover/mods"
+					>
 						<CompassIcon class="size-5" />
 						{{ formatMessage(messages.discoverModsButton) }}
 					</ButtonLink>
@@ -369,7 +384,6 @@
 </template>
 
 <script setup>
-import { Button, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	CalendarIcon,
 	ChevronLeftIcon,
@@ -387,7 +401,38 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, commonMessages, commonProjectTypeCategoryMessages, commonProjectTypeSentenceMessages, ConfirmModal, defineMessage, defineMessages, EmptyState, FileInput, HorizontalRule, injectModrinthClient, injectNotificationManager, IntlFormatted, NavTabs, NewModal, normalizeChildren, NormalPage, ProjectCard, ProjectCardList, RadioButtons, SidebarCard, StyledInput, useCompactNumber, useFormatDateTime, useRelativeTime, useSavable, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	ButtonLink,
+	commonMessages,
+	commonProjectTypeCategoryMessages,
+	commonProjectTypeSentenceMessages,
+	ConfirmModal,
+	defineMessage,
+	defineMessages,
+	EmptyState,
+	FileInput,
+	HorizontalRule,
+	injectModrinthClient,
+	injectNotificationManager,
+	IntlFormatted,
+	NavTabs,
+	NewModal,
+	normalizeChildren,
+	NormalPage,
+	ProjectCard,
+	ProjectCardList,
+	RadioButtons,
+	SidebarCard,
+	StyledInput,
+	TeleportOverflowMenu,
+	useCompactNumber,
+	useFormatDateTime,
+	useRelativeTime,
+	useSavable,
+	useVIntl,
+} from '@modrinth/ui'
 import { isAdmin, renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
@@ -410,8 +455,6 @@ const router = useRouter()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
 const queryClient = useQueryClient()
-const baseId = useId()
-
 async function fetchProjectsByIds(projectIds) {
 	const segmentSize = 800
 	const segments = []

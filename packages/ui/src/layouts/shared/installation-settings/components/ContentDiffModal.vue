@@ -138,13 +138,23 @@
 				<p class="m-0 text-primary">{{ formatMessage(messages.reviewedFiles) }}</p>
 				<div class="flex justify-between gap-2">
 					<div>
-						<Button type="quiet" color="red" v-if="showReportButton" @click="emit('report', $event)">
+						<Button
+							v-if="showReportButton"
+							type="quiet"
+							color="red"
+							@click="emit('report', $event)"
+						>
 							<ReportIcon />
 							{{ formatMessage(commonMessages.reportButton) }}
 						</Button>
 					</div>
 					<div class="flex gap-2">
-						<Button type="quiet" color="orange" :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
+						<Button
+							type="quiet"
+							color="orange"
+							:disabled="buttonsDisabled || confirmDisabled"
+							@click="handleConfirm"
+						>
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
 						<Button type="colored" color="brand" @click="handleCancel">
@@ -160,7 +170,7 @@
 				:class="{ 'pt-4': !$slots['additional-content'] }"
 			>
 				<div>
-					<Button type="quiet" color="red" v-if="showReportButton" @click="emit('report', $event)">
+					<Button v-if="showReportButton" type="quiet" color="red" @click="emit('report', $event)">
 						<ReportIcon />
 						{{ formatMessage(commonMessages.reportButton) }}
 					</Button>
@@ -170,7 +180,12 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="buttonsDisabled || confirmDisabled"
+						@click="handleConfirm"
+					>
 						<component :is="confirmIcon" v-if="confirmIcon" />
 						{{ confirmLabel || formatMessage(commonMessages.confirmButton) }}
 					</Button>
@@ -181,7 +196,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import {
 	BanIcon,
 	CircleAlertIcon,
@@ -194,6 +208,7 @@ import {
 import { type Component, computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

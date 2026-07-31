@@ -10,32 +10,32 @@
 		>
 			<template #actions="{ version }">
 				<IconButton
+					v-tooltip="
+						!installed
+							? formatMessage(commonMessages.installButton)
+							: version.id !== installedVersion
+								? formatMessage(commonMessages.switchToVersionButton)
+								: formatMessage(messages.alreadyInstalled)
+					"
 					type="quiet"
 					:color="installed && version.id === installedVersion ? undefined : 'green'"
 					:label="
-							!installed
-								? formatMessage(commonMessages.installButton)
-								: version.id !== installedVersion
-									? formatMessage(commonMessages.switchToVersionButton)
-									: formatMessage(messages.alreadyInstalled)
-						"
-						v-tooltip="
-							!installed
-								? formatMessage(commonMessages.installButton)
-								: version.id !== installedVersion
-									? formatMessage(commonMessages.switchToVersionButton)
-									: formatMessage(messages.alreadyInstalled)
-						"
-						:disabled="installing || (installed && version.id === installedVersion)"
-						@click.stop="() => install(version.id)"
-					>
+						!installed
+							? formatMessage(commonMessages.installButton)
+							: version.id !== installedVersion
+								? formatMessage(commonMessages.switchToVersionButton)
+								: formatMessage(messages.alreadyInstalled)
+					"
+					:disabled="installing || (installed && version.id === installedVersion)"
+					@click.stop="() => install(version.id)"
+				>
 					<DownloadIcon v-if="!installed" />
 					<SwapIcon v-else-if="installed && version.id !== installedVersion" />
 					<CheckIcon v-else />
 				</IconButton>
 				<ButtonLink
-					type="quiet"
 					v-tooltip="formatMessage(commonMessages.openInBrowserButton)"
+					type="quiet"
 					:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
 					target="_blank"
 					:aria-label="formatMessage(commonMessages.openInBrowserButton)"
@@ -52,9 +52,9 @@
 import { CheckIcon, DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import {
 	ButtonLink,
-	IconButton,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	ProjectPageVersions,
 	useVIntl,

@@ -1,10 +1,10 @@
 <script setup>
-import { Button, FileButton } from '@modrinth/ui'
 import { TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	ConfirmModal,
-	FileInput,
+	FileButton,
 	injectNotificationManager,
 	StyledInput,
 	UnsavedChangesPopup,
@@ -163,17 +163,21 @@ const onDeleteOrganization = useClientTry(async () => {
 				/>
 				<div class="flex flex-col gap-2">
 					<FileButton
-							id="project-icon"
-							:max-size="262144"
-							accept="image/png,image/jpeg,image/gif,image/webp"
-							class="button-like"
-							prompt="Upload icon"
-							:disabled="!hasPermission"
-							@change="showPreviewImage"
-						>
+						id="project-icon"
+						:max-size="262144"
+						accept="image/png,image/jpeg,image/gif,image/webp"
+						class="button-like"
+						prompt="Upload icon"
+						:disabled="!hasPermission"
+						@change="showPreviewImage"
+					>
 						<UploadIcon />
 					</FileButton>
-					<Button v-if="!deletedIcon && (previewImage || organization.icon_url)" :disabled="!hasPermission" @click="markIconForDeletion">
+					<Button
+						v-if="!deletedIcon && (previewImage || organization.icon_url)"
+						:disabled="!hasPermission"
+						@click="markIconForDeletion"
+					>
 						<TrashIcon />
 						Remove icon
 					</Button>

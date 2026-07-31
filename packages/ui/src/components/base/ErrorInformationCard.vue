@@ -52,7 +52,9 @@
 				:color="action.color === 'standard' ? undefined : (action.color ?? 'brand')"
 				size="xl"
 				:disabled="action.disabled"
-				@click="action.onClick" class="!w-full">
+				class="!w-full"
+				@click="action.onClick"
+			>
 				<component :is="action.icon" v-if="action.icon && !action.showAltIcon" class="size-4" />
 				<component
 					:is="action.altIcon"
@@ -62,7 +64,7 @@
 				{{ action.label }}
 			</Button>
 
-			<Button size="xl" v-if="errorDetails" @click="copyErrorInformation" class="!w-full">
+			<Button v-if="errorDetails" size="xl" class="!w-full" @click="copyErrorInformation">
 				<CopyIcon v-if="!infoCopied" class="size-4" />
 				<CheckIcon v-else class="size-4" />
 				Copy Information
@@ -72,11 +74,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { CheckIcon, CopyIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 import { ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 
 const infoCopied = ref(false)
 

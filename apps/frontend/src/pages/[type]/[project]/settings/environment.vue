@@ -12,10 +12,12 @@
 				</div>
 				<div>Visit Project Settings to manage environments for each version.</div>
 			</div>
-			<ButtonLink type="colored" color="green"
-					:to="`/${projectV2.project_type}/${projectV2.id}/settings/versions`"
-					class="items flex"
-				>
+			<ButtonLink
+				type="colored"
+				color="green"
+				:to="`/${projectV2.project_type}/${projectV2.id}/settings/versions`"
+				class="items flex"
+			>
 				<SettingsIcon /> Edit versions
 			</ButtonLink>
 		</div>
@@ -23,9 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import { SettingsIcon } from '@modrinth/assets'
 import {
+	ButtonLink,
 	EnvironmentMigration,
 	injectProjectPageContext,
 	LoadingIndicator,

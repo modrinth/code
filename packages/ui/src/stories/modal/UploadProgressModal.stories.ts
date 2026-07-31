@@ -1,8 +1,8 @@
-import { Button } from '../../components/base/buttons'
 import type { UploadHandle, UploadProgress } from '@modrinth/api-client'
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import UploadProgressModal from '../../components/modal/UploadProgressModal.vue'
 
 const meta = {

@@ -192,7 +192,12 @@
 								item: formatReportItemType(formatMessage, reportItem),
 							})
 						}}
-						<ButtonLink type="colored" color="brand" :to="`/dashboard/report/${existingReport.id}`" class="w-fit">
+						<ButtonLink
+							type="colored"
+							color="brand"
+							:to="`/dashboard/report/${existingReport.id}`"
+							class="w-fit"
+						>
 							{{ formatMessage(messages.goToReport) }} <RightArrowIcon />
 						</ButtonLink>
 					</template>
@@ -246,11 +251,13 @@
 							/>
 						</div>
 						<div :class="{ hidden: !reportType }">
-							<Button type="colored" color="brand"
-									id="submit-button"
-									:disabled="submitLoading || !canSubmit"
-									@click="submitReport"
-								>
+							<Button
+								id="submit-button"
+								type="colored"
+								color="brand"
+								:disabled="submitLoading || !canSubmit"
+								@click="submitReport"
+							>
 								<SendIcon aria-hidden="true" />
 								{{ formatMessage(messages.submitReport) }}
 							</Button>
@@ -263,7 +270,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	CheckCircleIcon,
 	CheckIcon,
@@ -277,6 +283,7 @@ import {
 	VersionIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
+import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	AutoLink,
 	Avatar,

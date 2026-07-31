@@ -105,7 +105,12 @@
 				/>
 			</div>
 			<div class="button-group">
-				<Button type="colored" color="brand" :disabled="!hasServerChanges" @click="saveServerChanges()">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!hasServerChanges"
+					@click="saveServerChanges()"
+				>
 					<SaveIcon />
 					Save changes
 				</Button>

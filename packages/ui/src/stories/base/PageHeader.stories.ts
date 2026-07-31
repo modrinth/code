@@ -1,4 +1,3 @@
-import { Button, IconButton, SplitButton, TeleportOverflowMenu } from '../../components/base/buttons'
 import {
 	AffiliateIcon,
 	BoxIcon,
@@ -21,6 +20,12 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import AutoLink from '../../components/base/AutoLink.vue'
 import Avatar from '../../components/base/Avatar.vue'
+import {
+	Button,
+	IconButton,
+	SplitButton,
+	TeleportOverflowMenu,
+} from '../../components/base/buttons'
 import FormattedTag from '../../components/base/FormattedTag.vue'
 import PageHeader from '../../components/base/page-header/index.vue'
 import PageHeaderMetadata from '../../components/base/page-header/metadata/index.vue'
@@ -85,7 +90,9 @@ const pageHeaderIcons = {
 const pageHeaderComponents = {
 	AutoLink,
 	Avatar,
+	Button,
 	FormattedTag,
+	IconButton,
 	SplitButton,
 	PageHeader,
 	PageHeaderActions,

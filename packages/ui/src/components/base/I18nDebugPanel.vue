@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import {
 	EyeIcon,
 	EyeOffIcon,
@@ -10,6 +9,8 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+
+import { IconButton } from '#ui/components/base/buttons'
 
 import { injectI18nDebug } from '../../composables/i18n-debug'
 import StyledInput from './StyledInput.vue'
@@ -295,29 +296,39 @@ const listMaxHeight = computed(() => `${panelHeight.value - 120}px`)
 
 					<!-- Toolbar -->
 					<div class="ml-auto flex items-center gap-0.5">
-						<IconButton type="quiet" :label="
-									debugContext?.keyReveal.value ? 'Hide keys inline' : 'Reveal keys inline'
-								"
-								v-tooltip="
-									debugContext?.keyReveal.value ? 'Hide keys inline' : 'Reveal keys inline'
-								"
-								@click="toggleKeyReveal"
-							>
+						<IconButton
+							v-tooltip="debugContext?.keyReveal.value ? 'Hide keys inline' : 'Reveal keys inline'"
+							type="quiet"
+							:label="debugContext?.keyReveal.value ? 'Hide keys inline' : 'Reveal keys inline'"
+							@click="toggleKeyReveal"
+						>
 							<component :is="debugContext?.keyReveal.value ? EyeOffIcon : EyeIcon" />
 						</IconButton>
-						<IconButton type="quiet" :label="'Toggle CSS debug overlay'" v-tooltip="'Toggle CSS debug overlay'" @click="toggleOverlay">
+						<IconButton
+							v-tooltip="'Toggle CSS debug overlay'"
+							type="quiet"
+							:label="'Toggle CSS debug overlay'"
+							@click="toggleOverlay"
+						>
 							<ScanEyeIcon />
 						</IconButton>
 
 						<div class="mx-0.5 h-4 w-px bg-surface-5/60" />
 
-						<IconButton type="quiet" :label="minimized ? 'Expand panel' : 'Minimize panel'"
-								v-tooltip="minimized ? 'Expand panel' : 'Minimize panel'"
-								@click="minimized = !minimized"
-							>
+						<IconButton
+							v-tooltip="minimized ? 'Expand panel' : 'Minimize panel'"
+							type="quiet"
+							:label="minimized ? 'Expand panel' : 'Minimize panel'"
+							@click="minimized = !minimized"
+						>
 							<component :is="minimized ? MaximizeIcon : MinusIcon" />
 						</IconButton>
-						<IconButton type="quiet" :label="'Close inspector'" v-tooltip="'Close inspector'" @click="closePanel">
+						<IconButton
+							v-tooltip="'Close inspector'"
+							type="quiet"
+							:label="'Close inspector'"
+							@click="closePanel"
+						>
 							<XIcon />
 						</IconButton>
 					</div>

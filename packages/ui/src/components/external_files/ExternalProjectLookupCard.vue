@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import {
 	ClipboardCopyIcon,
 	CurseForgeIcon,
@@ -11,6 +10,7 @@ import { Menu } from 'floating-vue'
 import { computed } from 'vue'
 
 import { CopyCode } from '#ui/components'
+import { IconButton } from '#ui/components/base/buttons'
 
 import ExternalProjectLicenseStateTag from './ExternalProjectLicenseStateTag.vue'
 import type { ExternalLicenseStatus } from './types.ts'
@@ -59,7 +59,14 @@ async function copyProjectLink() {
 						</template>
 						<template v-else> <LinkIcon class="size-5 shrink-0" /> Project link </template>
 					</a>
-					<IconButton class="!size-6" type="quiet" size="xs" :label="'Copy link'" v-tooltip="'Copy link'" @click="copyProjectLink">
+					<IconButton
+						v-tooltip="'Copy link'"
+						class="!size-6"
+						type="quiet"
+						size="xs"
+						:label="'Copy link'"
+						@click="copyProjectLink"
+					>
 						<ClipboardCopyIcon />
 					</IconButton>
 				</div>

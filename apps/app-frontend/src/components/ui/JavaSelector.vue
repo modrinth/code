@@ -26,48 +26,49 @@
 							: 'red'
 						: undefined
 				"
-					:aria-label="formatMessage(messages.testJavaInstallation)"
-					class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
-					:disabled="testingJava || props.disabled"
-					@click="runTest(props.modelValue?.path)"
-					@mouseenter="!props.disabled && (hoveringTest = true)"
-					@mouseleave="hoveringTest = false"
-				 :style="{ '--legacy-button-color': (
-					!hoveringTest && !testingJava
-						? testingJavaSuccess === true
-							? 'green'
-							: 'red'
-						: 'standard'
-				) && (
-					!hoveringTest && !testingJava
-						? testingJavaSuccess === true
-							? 'green'
-							: 'red'
-						: 'standard'
-				) !== 'standard' ? `var(--color-${
-					!hoveringTest && !testingJava
-						? testingJavaSuccess === true
-							? 'green'
-							: 'red'
-						: 'standard'
-				})` : undefined }">
+				:aria-label="formatMessage(messages.testJavaInstallation)"
+				class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
+				:disabled="testingJava || props.disabled"
+				:style="{
+					'--legacy-button-color':
+						(!hoveringTest && !testingJava
+							? testingJavaSuccess === true
+								? 'green'
+								: 'red'
+							: 'standard') &&
+						(!hoveringTest && !testingJava
+							? testingJavaSuccess === true
+								? 'green'
+								: 'red'
+							: 'standard') !== 'standard'
+							? `var(--color-${
+									!hoveringTest && !testingJava
+										? testingJavaSuccess === true
+											? 'green'
+											: 'red'
+										: 'standard'
+								})`
+							: undefined,
+				}"
+				@click="runTest(props.modelValue?.path)"
+				@mouseenter="!props.disabled && (hoveringTest = true)"
+				@mouseleave="hoveringTest = false"
+			>
 				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-				<CheckCircleIcon
-					v-else-if="testingJavaSuccess === true && !hoveringTest"
-					class="h-4 w-4"
-				/>
+				<CheckCircleIcon v-else-if="testingJavaSuccess === true && !hoveringTest" class="h-4 w-4" />
 				<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
 				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
 			</Button>
 		</div>
 		<span class="installation-buttons">
-			<Button v-if="props.version"
-					v-tooltip="
-						testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
-					"
-					:disabled="props.disabled || installingJava || testingJavaSuccess === true"
-					@click="reinstallJava"
-				>
+			<Button
+				v-if="props.version"
+				v-tooltip="
+					testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
+				"
+				:disabled="props.disabled || installingJava || testingJavaSuccess === true"
+				@click="reinstallJava"
+			>
 				<DownloadIcon />
 				{{
 					installingJava
@@ -88,7 +89,6 @@
 </template>
 
 <script setup>
-import { Button } from '@modrinth/ui'
 import {
 	CheckCircleIcon,
 	DownloadIcon,
@@ -99,6 +99,7 @@ import {
 	XCircleIcon,
 } from '@modrinth/assets'
 import {
+	Button,
 	defineMessages,
 	injectNotificationManager,
 	StyledInput,

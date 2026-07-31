@@ -73,10 +73,12 @@
 					:placeholder="formatMessage(messages.searchPlaceholder)"
 					class="flex-1"
 				/>
-				<IconButton type="outlined" :label="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
-						v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
-						@click="hideUninstallable = !hideUninstallable"
-					>
+				<IconButton
+					v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
+					type="outlined"
+					:label="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
+					@click="hideUninstallable = !hideUninstallable"
+				>
 					<EyeOffIcon v-if="hideUninstallable" />
 					<EyeIcon v-else />
 				</IconButton>
@@ -114,16 +116,16 @@
 					</Button>
 					<Button
 						v-else
+						v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
 						:type="inst.compatible ? 'base' : 'outlined'"
 						:class="
 							inst.compatible
 								? undefined
 								: '!text-orange [&>svg]:!text-orange !shadow-[inset_0_0_0_1px_var(--color-orange)]'
 						"
-							v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
-							:disabled="inst.installing"
-							@click="emit('install', inst)"
-						>
+						:disabled="inst.installing"
+						@click="emit('install', inst)"
+					>
 						<TriangleAlertIcon v-if="!inst.compatible" />
 						{{
 							inst.installing
@@ -222,7 +224,12 @@
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" :disabled="!instanceName" @click="handleCreateAndInstall">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!instanceName"
+					@click="handleCreateAndInstall"
+				>
 					<DownloadIcon />
 					{{ formatMessage(messages.installButton) }}
 				</Button>
@@ -232,7 +239,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import {
 	BoxIcon,
 	CheckIcon,
@@ -248,6 +254,7 @@ import { computed, ref, watch } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'

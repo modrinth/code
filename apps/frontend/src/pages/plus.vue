@@ -38,12 +38,31 @@
 				{{ calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly) }}% with
 				annual billing!
 			</p>
-			<ButtonLink type="colored" color="purple" size="xl" v-if="auth.user && hasActiveMidas(auth.user)" to="/settings/billing">
+			<ButtonLink
+				v-if="auth.user && hasActiveMidas(auth.user)"
+				type="colored"
+				color="purple"
+				size="xl"
+				to="/settings/billing"
+			>
 				<SettingsIcon aria-hidden="true" />
 				Manage subscription
 			</ButtonLink>
-			<Button type="colored" color="purple" size="xl" v-else-if="auth.user" @click="purchaseModal.show()">Subscribe</Button>
-			<ButtonLink type="colored" color="purple" size="xl" v-else :to="`/auth/sign-in?redirect=${encodeURIComponent('/plus?showModal=true')}`">
+			<Button
+				v-else-if="auth.user"
+				type="colored"
+				color="purple"
+				size="xl"
+				@click="purchaseModal.show()"
+				>Subscribe</Button
+			>
+			<ButtonLink
+				v-else
+				type="colored"
+				color="purple"
+				size="xl"
+				:to="`/auth/sign-in?redirect=${encodeURIComponent('/plus?showModal=true')}`"
+			>
 				Subscribe
 			</ButtonLink>
 		</div>
@@ -75,9 +94,10 @@
 	</div>
 </template>
 <script setup>
-import { Button, ButtonLink } from '@modrinth/ui'
 import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } from '@modrinth/assets'
 import {
+	Button,
+	ButtonLink,
 	injectNotificationManager,
 	PurchaseModal,
 	useFormatPrice,

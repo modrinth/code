@@ -1,6 +1,19 @@
 <template>
 	<div>
-		<Button :type="(type) === 'transparent' ? 'quiet' : (type) === 'standard' ? 'base' : (type) === 'highlight' || (type) === 'highlight-colored-text' || (type) === 'chip' ? 'base' : (type)" v-if="!!slots.title" class="!w-full" @click="() => (isOpen ? close() : open())">
+		<Button
+			v-if="!!slots.title"
+			:type="
+				type === 'transparent'
+					? 'quiet'
+					: type === 'standard'
+						? 'base'
+						: type === 'highlight' || type === 'highlight-colored-text' || type === 'chip'
+							? 'base'
+							: type
+			"
+			class="!w-full"
+			@click="() => (isOpen ? close() : open())"
+		>
 			<slot name="title" /><DropdownIcon
 				class="ml-auto size-5 text-contrast transition-transform duration-300"
 				:class="{ 'rotate-180': isOpen }"
@@ -17,9 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { DropdownIcon } from '@modrinth/assets'
-
+import { Button } from '@modrinth/ui'
 
 const props = withDefaults(
 	defineProps<{

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import {
 	BanIcon,
 	BoxesIcon,
@@ -12,6 +11,7 @@ import {
 	UsersIcon,
 	VersionIcon,
 } from '@modrinth/assets'
+import { Button, IconButton } from '@modrinth/ui'
 import {
 	Avatar,
 	ConfirmLeaveModal,
@@ -322,7 +322,11 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 								</div>
 							</div>
 
-							<Button type="outlined" class="w-full sm:w-auto" @click="viewReportedInstanceVersion(version)">
+							<Button
+								type="outlined"
+								class="w-full sm:w-auto"
+								@click="viewReportedInstanceVersion(version)"
+							>
 								<EyeIcon class="size-4" />
 								View content
 							</Button>
@@ -361,10 +365,12 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 								{{ instance.member_count === 1 ? 'member' : 'members' }}
 							</span>
 						</div>
-						<IconButton type="quiet" :label="`View ${instance.name} version ${instance.latest_version} content`"
-								v-tooltip="`View ${instance.name} version ${instance.latest_version} content`"
-								@click="viewVersionContent(instance, instance.latest_version)"
-							>
+						<IconButton
+							v-tooltip="`View ${instance.name} version ${instance.latest_version} content`"
+							type="quiet"
+							:label="`View ${instance.name} version ${instance.latest_version} content`"
+							@click="viewVersionContent(instance, instance.latest_version)"
+						>
 							<EyeIcon class="size-4" />
 						</IconButton>
 					</div>
@@ -387,7 +393,13 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 						launching them.
 					</span>
 				</div>
-				<Button type="colored" color="red" :disabled="banDisabled" class="w-full gap-2 sm:w-auto" @click="promptBanOwner">
+				<Button
+					type="colored"
+					color="red"
+					:disabled="banDisabled"
+					class="w-full gap-2 sm:w-auto"
+					@click="promptBanOwner"
+				>
 					<BanIcon class="size-4" />
 					{{ banButtonLabel }}
 				</Button>

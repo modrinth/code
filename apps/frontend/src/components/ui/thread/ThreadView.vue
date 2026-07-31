@@ -41,18 +41,42 @@
 				class="mt-4 flex flex-col items-stretch justify-between gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:gap-2"
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-					<Button type="colored" color="brand" v-if="sortedMessages.length > 0" :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
+					<Button
+						v-if="sortedMessages.length > 0"
+						type="colored"
+						color="brand"
+						:disabled="!replyBody"
+						class="w-full gap-2 sm:w-auto"
+						@click="sendReply()"
+					>
 						<ReplyIcon class="size-4" />
 						Reply
 					</Button>
-					<Button type="colored" color="brand" v-else :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
+					<Button
+						v-else
+						type="colored"
+						color="brand"
+						:disabled="!replyBody"
+						class="w-full gap-2 sm:w-auto"
+						@click="sendReply()"
+					>
 						<SendIcon class="size-4" />
 						Send
 					</Button>
-					<Button v-if="isStaff(auth.user)" :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
+					<Button
+						v-if="isStaff(auth.user)"
+						:disabled="!replyBody"
+						class="w-full sm:w-auto"
+						@click="sendReply(true)"
+					>
 						Add note
 					</Button>
-					<TeleportOverflowMenu label="More options" v-if="visibleQuickReplies.length > 0" :options="visibleQuickReplies" class="!w-auto !px-2.5 !rounded-xl">
+					<TeleportOverflowMenu
+						v-if="visibleQuickReplies.length > 0"
+						label="More options"
+						:options="visibleQuickReplies"
+						class="!w-auto !rounded-xl !px-2.5"
+					>
 						Quick reply
 						<ChevronDownIcon />
 					</TeleportOverflowMenu>
@@ -67,9 +91,9 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
 import type { QuickReply } from '@modrinth/moderation'
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	CopyCode,
 	injectNotificationManager,

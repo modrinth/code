@@ -66,7 +66,13 @@
 					<XIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="orange" v-tooltip="removePermissionTooltip" :disabled="!canRemove" @click="confirm">
+				<Button
+					v-tooltip="removePermissionTooltip"
+					type="colored"
+					color="orange"
+					:disabled="!canRemove"
+					@click="confirm"
+				>
 					<TrashIcon v-if="modalState.shouldCancel" aria-hidden="true" />
 					<UserXIcon v-else aria-hidden="true" />
 					{{
@@ -79,9 +85,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { TrashIcon, UserXIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'

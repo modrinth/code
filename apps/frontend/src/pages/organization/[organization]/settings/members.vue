@@ -43,15 +43,17 @@
 					@keypress.enter="() => onInviteTeamMember(organization.team, currentUsername)"
 				/>
 				<label for="username" class="hidden">Username</label>
-				<Button type="colored" color="brand"
-						:disabled="
-							!isPermission(
-								currentMember.organization_permissions,
-								organizationPermissions.MANAGE_INVITES,
-							)
-						"
-						@click="() => onInviteTeamMember(organization.team_id, currentUsername)"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="
+						!isPermission(
+							currentMember.organization_permissions,
+							organizationPermissions.MANAGE_INVITES,
+						)
+					"
+					@click="() => onInviteTeamMember(organization.team_id, currentUsername)"
+				>
 					<UserPlusIcon />
 					Invite
 				</Button>
@@ -63,10 +65,12 @@
 						Remove yourself as a member of this organization.
 					</span>
 				</span>
-				<Button type="colored" color="red"
-						:disabled="currentMember.is_owner"
-						@click="() => onLeaveProject(organization.team_id, auth.user.id)"
-					>
+				<Button
+					type="colored"
+					color="red"
+					:disabled="currentMember.is_owner"
+					@click="() => onLeaveProject(organization.team_id, auth.user.id)"
+				>
 					<UserRemoveIcon />
 					Leave organization
 				</Button>
@@ -92,14 +96,16 @@
 				<div class="side-buttons">
 					<Badge v-if="member.accepted" type="accepted" />
 					<Badge v-else type="pending" />
-					<IconButton type="quiet" label="Toggle details"
-							class="dropdown-icon"
-							@click="
-								openTeamMembers.indexOf(member.user.id) === -1
-									? openTeamMembers.push(member.user.id)
-									: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
-							"
-						>
+					<IconButton
+						type="quiet"
+						label="Toggle details"
+						class="dropdown-icon"
+						@click="
+							openTeamMembers.indexOf(member.user.id) === -1
+								? openTeamMembers.push(member.user.id)
+								: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
+						"
+					>
 						<DropdownIcon />
 					</IconButton>
 				</div>
@@ -184,35 +190,43 @@
 					</div>
 				</template>
 				<div class="input-group">
-					<Button type="colored" color="brand"
-							:disabled="
-								!isPermission(
-									currentMember.organization_permissions,
-									organizationPermissions.EDIT_MEMBER,
-								)
-							"
-							@click="onUpdateTeamMember(organization.team_id, member)"
-						>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="
+							!isPermission(
+								currentMember.organization_permissions,
+								organizationPermissions.EDIT_MEMBER,
+							)
+						"
+						@click="onUpdateTeamMember(organization.team_id, member)"
+					>
 						<SaveIcon />
 						Save changes
 					</Button>
-					<Button type="colored" color="red" v-if="!member.is_owner"
-							:disabled="
-								!isPermission(
-									currentMember.organization_permissions,
-									organizationPermissions.EDIT_MEMBER,
-								) &&
-								!isPermission(
-									currentMember.organization_permissions,
-									organizationPermissions.REMOVE_MEMBER,
-								)
-							"
-							@click="onRemoveMember(organization.team_id, member)"
-						>
+					<Button
+						v-if="!member.is_owner"
+						type="colored"
+						color="red"
+						:disabled="
+							!isPermission(
+								currentMember.organization_permissions,
+								organizationPermissions.EDIT_MEMBER,
+							) &&
+							!isPermission(
+								currentMember.organization_permissions,
+								organizationPermissions.REMOVE_MEMBER,
+							)
+						"
+						@click="onRemoveMember(organization.team_id, member)"
+					>
 						<UserRemoveIcon />
 						Remove member
 					</Button>
-					<Button v-if="!member.is_owner && currentMember.is_owner && member.accepted" @click="(e) => openTransferModal(member, e)">
+					<Button
+						v-if="!member.is_owner && currentMember.is_owner && member.accepted"
+						@click="(e) => openTransferModal(member, e)"
+					>
 						<TransferIcon />
 						Transfer ownership
 					</Button>
@@ -223,7 +237,6 @@
 </template>
 
 <script setup>
-import { Button, IconButton } from '@modrinth/ui'
 import {
 	CrownIcon,
 	DropdownIcon,
@@ -235,7 +248,9 @@ import {
 import {
 	Avatar,
 	Badge,
+	Button,
 	Checkbox,
+	IconButton,
 	injectNotificationManager,
 	StyledInput,
 } from '@modrinth/ui'

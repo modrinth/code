@@ -1,9 +1,9 @@
-import { Button, TeleportOverflowMenu } from '../../components/base/buttons'
 import { EditIcon, MoreVerticalIcon, TrashIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
 import Badge from '../../components/base/Badge.vue'
+import { Button, TeleportOverflowMenu } from '../../components/base/buttons'
 import Table from '../../components/base/Table.vue'
 
 interface User {
@@ -695,7 +695,15 @@ export const VirtualizedLargeData: StoryObj = {
 export const WithOverflowMenu: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Badge, MoreVerticalIcon, EditIcon, TrashIcon, Button, TeleportOverflowMenu },
+		components: {
+			Table,
+			Badge,
+			MoreVerticalIcon,
+			EditIcon,
+			TrashIcon,
+			Button,
+			TeleportOverflowMenu,
+		},
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },

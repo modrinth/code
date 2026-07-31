@@ -5,7 +5,14 @@
 			<span class="font-semibold text-contrast">{{
 				formatMessage(messages.launcherInstancesTitle)
 			}}</span>
-			<Button type="quiet" size="xs" class="!h-6" :class="{ invisible: totalSelectedCount === 0 }" @click="clearAll">{{ formatMessage(messages.clearAll) }}</Button>
+			<Button
+				type="quiet"
+				size="xs"
+				class="!h-6"
+				:class="{ invisible: totalSelectedCount === 0 }"
+				@click="clearAll"
+				>{{ formatMessage(messages.clearAll) }}</Button
+			>
 		</div>
 
 		<template v-if="loading">
@@ -92,10 +99,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
+
+import { Button, IconButton } from '#ui/components/base/buttons'
 
 import { injectInstanceImport, injectNotificationManager } from '../../../../providers'
 import type { ImportableLauncher } from '../../../../providers/instance-import'

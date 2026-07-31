@@ -8,10 +8,20 @@
 		</div>
 		<template #actions>
 			<div v-if="canSave" class="flex justify-end gap-2 mt-2">
-				<Button type="quiet" v-if="canReset" :disabled="saving || !hasChanges" @click="resetEnvironment">
+				<Button
+					v-if="canReset"
+					type="quiet"
+					:disabled="saving || !hasChanges"
+					@click="resetEnvironment"
+				>
 					<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
 				</Button>
-				<Button type="colored" color="brand" :disabled="saving || !hasChanges" @click="saveEnvironment">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="saving || !hasChanges"
+					@click="saveEnvironment"
+				>
 					<SpinnerIcon v-if="saving" class="animate-spin" />
 					<CheckIcon v-else-if="needsToVerify" />
 					<SaveIcon v-else />
@@ -23,11 +33,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { CheckIcon, HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import { computed, onMounted, unref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { commonMessages } from '../../../../utils/common-messages'

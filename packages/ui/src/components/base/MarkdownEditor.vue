@@ -49,15 +49,17 @@
 				<Button type="outlined" @click="() => linkModal?.hide()">
 					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand"
-						:disabled="!!linkValidationErrorMessage || !linkUrl"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
-								linkModal?.hide()
-							}
-						"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
+							linkModal?.hide()
+						}
+					"
+				>
 					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
 				</Button>
 			</div>
@@ -143,15 +145,17 @@
 				<Button type="outlined" @click="() => imageModal?.hide()">
 					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand"
-						:disabled="!canInsertImage"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
-								imageModal?.hide()
-							}
-						"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!canInsertImage"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
+							imageModal?.hide()
+						}
+					"
+				>
 					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
 				</Button>
 			</div>
@@ -199,15 +203,17 @@
 				<Button type="outlined" @click="() => videoModal?.hide()">
 					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand"
-						:disabled="!!linkValidationErrorMessage || !linkUrl"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
-								videoModal?.hide()
-							}
-						"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
+							videoModal?.hide()
+						}
+					"
+				>
 					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
 				</Button>
 			</div>
@@ -223,12 +229,13 @@
 					>
 						<div class="divider"></div>
 						<template v-for="button in buttonGroup.buttons" :key="button.label.id">
-							<IconButton :label="formatMessage(button.label)"
-									v-tooltip="formatMessage(button.label)"
-									:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
-									:disabled="previewMode || disabled"
-									@click="() => button.action(editor)"
-								>
+							<IconButton
+								v-tooltip="formatMessage(button.label)"
+								:label="formatMessage(button.label)"
+								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
+								:disabled="previewMode || disabled"
+								@click="() => button.action(editor)"
+							>
 								<component :is="button.icon" />
 							</IconButton>
 						</template>
@@ -289,7 +296,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { Compartment, EditorState } from '@codemirror/state'
@@ -318,6 +324,8 @@ import {
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
+
+import { Button, IconButton } from '#ui/components/base/buttons'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'

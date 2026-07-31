@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
@@ -20,6 +19,7 @@ import { onBeforeRouteLeave } from 'vue-router'
 import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import { Button } from '#ui/components/base/buttons'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import PaperChannelBadge from '#ui/components/base/PaperChannelBadge.vue'
@@ -667,11 +667,12 @@ const messages = defineMessages({
 						</div>
 					</div>
 					<div class="flex flex-wrap gap-2">
-						<Button v-if="showModpackVersionActions || isLocalFile"
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								:disabled="ctx.isBusy.value"
-								@click="handleModpackPrimaryAction"
-							>
+						<Button
+							v-if="showModpackVersionActions || isLocalFile"
+							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+							:disabled="ctx.isBusy.value"
+							@click="handleModpackPrimaryAction"
+						>
 							<ArrowLeftRightIcon class="size-5" />
 							{{ formatMessage(commonMessages.changeVersionButton) }}
 						</Button>
@@ -697,11 +698,13 @@ const messages = defineMessages({
 						}}
 					</span>
 					<div>
-						<Button type="colored" color="orange"
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								:disabled="ctx.isBusy.value"
-								@click="handleShowUnlinkModal"
-							>
+						<Button
+							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+							type="colored"
+							color="orange"
+							:disabled="ctx.isBusy.value"
+							@click="handleShowUnlinkModal"
+						>
 							<UnlinkIcon class="size-5" />
 							{{
 								formatMessage(
@@ -728,11 +731,13 @@ const messages = defineMessages({
 						{{ formatMessage(messages.reinstallModpackTitle) }}
 					</span>
 					<div>
-						<Button type="colored" color="red"
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								:disabled="ctx.isBusy.value"
-								@click="handleShowReinstallModal"
-							>
+						<Button
+							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+							type="colored"
+							color="red"
+							:disabled="ctx.isBusy.value"
+							@click="handleShowReinstallModal"
+						>
 							<SpinnerIcon v-if="ctx.reinstalling?.value" class="animate-spin" />
 							<DownloadIcon v-else class="size-5" />
 							{{
@@ -764,10 +769,10 @@ const messages = defineMessages({
 					</span>
 					<div>
 						<Button
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								:disabled="ctx.isBusy.value"
-								@click="handleShowRepairModal"
-							>
+							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+							:disabled="ctx.isBusy.value"
+							@click="handleShowRepairModal"
+						>
 							<SpinnerIcon v-if="ctx.repairing?.value" class="animate-spin" />
 							<HammerIcon v-else class="size-5" />
 							{{
@@ -914,16 +919,18 @@ const messages = defineMessages({
 						</div>
 
 						<div class="flex flex-wrap gap-2">
-							<Button type="colored" color="brand"
-									v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-									:disabled="
-										!form.isValid.value ||
-										!form.hasChanges.value ||
-										form.isSaving.value ||
-										ctx.isBusy.value
-									"
-									@click="handleSave"
-								>
+							<Button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+								type="colored"
+								color="brand"
+								:disabled="
+									!form.isValid.value ||
+									!form.hasChanges.value ||
+									form.isSaving.value ||
+									ctx.isBusy.value
+								"
+								@click="handleSave"
+							>
 								<SpinnerIcon v-if="form.isSaving.value" class="animate-spin" />
 								<SaveIcon v-else />
 								{{
@@ -958,11 +965,13 @@ const messages = defineMessages({
 						</div>
 					</div>
 					<div class="flex flex-wrap gap-2">
-						<Button type="colored" color="orange"
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								:disabled="ctx.isBusy.value"
-								@click="handleStartEditing"
-							>
+						<Button
+							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+							type="colored"
+							color="orange"
+							:disabled="ctx.isBusy.value"
+							@click="handleStartEditing"
+						>
 							<PencilIcon class="size-5" />
 							{{ formatMessage(commonMessages.editButton) }}
 						</Button>
@@ -991,10 +1000,10 @@ const messages = defineMessages({
 					</span>
 					<div>
 						<Button
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								:disabled="ctx.isBusy.value"
-								@click="handleShowRepairModal"
-							>
+							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+							:disabled="ctx.isBusy.value"
+							@click="handleShowRepairModal"
+						>
 							<SpinnerIcon v-if="ctx.repairing?.value" class="animate-spin" />
 							<HammerIcon v-else class="size-5" />
 							{{

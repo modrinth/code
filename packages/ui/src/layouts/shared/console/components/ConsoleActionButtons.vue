@@ -1,26 +1,34 @@
 <template>
 	<div class="flex items-center gap-1">
-		<Button type="quiet" v-if="showClear && hasLogs"
-				v-tooltip="clearDisabled ? clearDisabledTooltip : undefined"
-				:disabled="clearDisabled"
-				@click="emit('clear')"
-			>
+		<Button
+			v-if="showClear && hasLogs"
+			v-tooltip="clearDisabled ? clearDisabledTooltip : undefined"
+			type="quiet"
+			:disabled="clearDisabled"
+			@click="emit('clear')"
+		>
 			<XIcon />
 			Clear
 		</Button>
-		<Button type="quiet" color="red" v-if="showDelete"
-				v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
-				:disabled="deleteDisabled"
-				@click="emit('delete')"
-			 class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+		<Button
+			v-if="showDelete"
+			v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
+			type="quiet"
+			color="red"
+			:disabled="deleteDisabled"
+			class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+			@click="emit('delete')"
+		>
 			<TrashIcon />
 			Delete
 		</Button>
-		<Button type="quiet" v-if="hasLogs"
-				v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
-				:disabled="shareDisabled || sharing"
-				@click="emit('share')"
-			>
+		<Button
+			v-if="hasLogs"
+			v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
+			type="quiet"
+			:disabled="shareDisabled || sharing"
+			@click="emit('share')"
+		>
 			<SpinnerIcon v-if="sharing" class="animate-spin" />
 			<ShareIcon v-else />
 			Share
@@ -34,7 +42,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import {
 	ContractIcon,
 	ExpandIcon,
@@ -44,6 +51,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 
+import { Button } from '#ui/components/base/buttons'
 
 defineProps<{
 	showClear?: boolean

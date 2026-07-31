@@ -64,11 +64,13 @@
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="red"
-						v-tooltip="deleteDisabledTooltip"
-						:disabled="!props.canDelete"
-						@click="confirmDelete"
-					>
+				<Button
+					v-tooltip="deleteDisabledTooltip"
+					type="colored"
+					color="red"
+					:disabled="!props.canDelete"
+					@click="confirmDelete"
+				>
 					<TrashIcon />
 					{{ formatMessage(messages.confirm, { count }) }}
 				</Button>
@@ -78,10 +80,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { useScrollIndicator } from '../../../composables/scroll-indicator'

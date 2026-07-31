@@ -65,7 +65,13 @@
 								<span class="text-sm text-secondary">
 									{{ batch.log_count }} transfer{{ batch.log_count === 1 ? '' : 's' }}
 								</span>
-								<Button type="quiet" color="red" v-if="canCancel(batch)" @click="showCancelModal(batch.id)" class="!text-red [&>svg]:!text-red">
+								<Button
+									v-if="canCancel(batch)"
+									type="quiet"
+									color="red"
+									class="!text-red [&>svg]:!text-red"
+									@click="showCancelModal(batch.id)"
+								>
 									<XCircleIcon />
 									Cancel
 								</Button>
@@ -104,11 +110,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,

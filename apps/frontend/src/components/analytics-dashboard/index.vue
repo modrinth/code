@@ -6,18 +6,20 @@
 					{{ formatMessage(analyticsMessages.title) }}
 				</span>
 				<div class="flex flex-wrap items-center justify-end gap-2">
-					<Button type="quiet"
-							native-type="button"
-							:disabled="isAnalyticsQueryBuilderDefault"
-							@click="resetAnalyticsQueryBuilder"
-						>
+					<Button
+						type="quiet"
+						native-type="button"
+						:disabled="isAnalyticsQueryBuilderDefault"
+						@click="resetAnalyticsQueryBuilder"
+					>
 						{{ formatMessage(analyticsMessages.resetButton) }}
 					</Button>
-					<Button type="outlined"
-							native-type="button"
-							:disabled="projects.length === 0 || !fetchRequest || isRefetching"
-							@click="refreshAnalyticsQuery"
-						>
+					<Button
+						type="outlined"
+						native-type="button"
+						:disabled="projects.length === 0 || !fetchRequest || isRefetching"
+						@click="refreshAnalyticsQuery"
+					>
 						<RefreshCwIcon :class="isRefetching ? 'animate-spin' : ''" />
 						{{ formatMessage(analyticsMessages.refreshButton) }}
 					</Button>
@@ -32,9 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { RefreshCwIcon } from '@modrinth/assets'
-import { injectProjectPageContext, useVIntl } from '@modrinth/ui'
+import { Button, injectProjectPageContext, useVIntl } from '@modrinth/ui'
 
 import {
 	createAnalyticsDashboardContext,

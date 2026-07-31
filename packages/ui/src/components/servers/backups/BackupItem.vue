@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
@@ -14,6 +12,9 @@ import {
 	UserRoundIcon,
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
+
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
@@ -268,12 +269,13 @@ const creatorAvatarSrc = computed(() =>
 
 		<!-- Right side actions -->
 		<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
-			<Button type="outlined"
-					v-tooltip="props.restoreDisabled"
-					class="!border !text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
-					:disabled="!!props.restoreDisabled"
-					@click="() => emit('restore')"
-				>
+			<Button
+				v-tooltip="props.restoreDisabled"
+				type="outlined"
+				class="!border !text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
+				:disabled="!!props.restoreDisabled"
+				@click="() => emit('restore')"
+			>
 				<RotateCounterClockwiseIcon class="size-5" />
 				{{ formatMessage(messages.restore) }}
 			</Button>

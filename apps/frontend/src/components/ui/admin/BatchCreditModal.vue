@@ -42,7 +42,12 @@
 							wrapper-class="w-32"
 							autocomplete="off"
 						/>
-						<Button type="quiet" color="blue" class="shrink-0 !text-blue [&>svg]:!text-blue" @click="addNode">
+						<Button
+							type="quiet"
+							color="blue"
+							class="shrink-0 !text-blue [&>svg]:!text-blue"
+							@click="addNode"
+						>
 							<PlusIcon />
 							Add
 						</Button>
@@ -123,9 +128,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,

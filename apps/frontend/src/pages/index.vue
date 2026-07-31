@@ -30,7 +30,13 @@
 					<CompassIcon aria-hidden="true" />
 					{{ formatMessage(messages.discoverMods) }}
 				</ButtonLink>
-				<ButtonLink type="outlined" size="xl" v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
+				<ButtonLink
+					v-if="!auth.user"
+					type="outlined"
+					size="xl"
+					to="/auth/sign-up"
+					rel="noopener nofollow"
+				>
 					<LogInIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.signUpButton) }}
 				</ButtonLink>
@@ -430,7 +436,6 @@
 	</div>
 </template>
 <script setup>
-import { ButtonLink } from '@modrinth/ui'
 import {
 	CalendarIcon,
 	CompassIcon,
@@ -441,6 +446,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,

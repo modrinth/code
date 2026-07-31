@@ -31,9 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { EyeIcon } from '@modrinth/assets'
-import { Avatar, defineMessages, formatLoader, useVIntl } from '@modrinth/ui'
+import { Avatar, Button, defineMessages, formatLoader, useVIntl } from '@modrinth/ui'
 import { computed, toRefs } from 'vue'
 
 import type { SharedInstanceInstallPreview } from '@/helpers/install'

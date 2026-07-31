@@ -56,7 +56,12 @@
 							placeholder="us-vin200, us-vin201"
 							@keydown.enter.prevent="addNodes"
 						/>
-						<Button type="quiet" color="blue" class="shrink-0 !text-blue [&>svg]:!text-blue" @click="addNodes">
+						<Button
+							type="quiet"
+							color="blue"
+							class="shrink-0 !text-blue [&>svg]:!text-blue"
+							@click="addNodes"
+						>
 							<PlusIcon />
 							Add
 						</Button>
@@ -120,7 +125,12 @@
 						placeholder="ovh-gen4"
 						@keydown.enter.prevent="addTag"
 					/>
-					<Button type="quiet" color="blue" class="shrink-0 !text-blue [&>svg]:!text-blue" @click="addTag">
+					<Button
+						type="quiet"
+						color="blue"
+						class="shrink-0 !text-blue [&>svg]:!text-blue"
+						@click="addTag"
+					>
 						<PlusIcon />
 						Add
 					</Button>
@@ -171,7 +181,12 @@
 			</div>
 
 			<div class="flex gap-2">
-				<Button type="colored" color="brand" :disabled="submitDisabled || submitting" @click="submit">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="submitDisabled || submitting"
+					@click="submit"
+				>
 					<SendIcon aria-hidden="true" />
 					{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
 				</Button>
@@ -185,9 +200,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { PlusIcon, SendIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	Chips,
 	Combobox,
 	injectModrinthClient,

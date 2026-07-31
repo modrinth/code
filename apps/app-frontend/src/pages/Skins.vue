@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import {
 	CheckIcon,
 	EditIcon,
@@ -11,6 +10,7 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
+	Button,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -1186,19 +1186,20 @@ await loadSkins()
 										>Ears</router-link
 									>
 								</div>
-								<Button type="outlined"
-										size="lg"
-										class="ears-feature-toggle-button shadow-md"
-										:aria-pressed="earsFeaturesEnabled"
-										:aria-label="
-											formatMessage(
-												earsFeaturesEnabled
-													? messages.toggleEarsFeaturesOff
-													: messages.toggleEarsFeaturesOn,
-											)
-										"
-										@click="earsFeaturesEnabled = !earsFeaturesEnabled"
-									>
+								<Button
+									type="outlined"
+									size="lg"
+									class="ears-feature-toggle-button shadow-md"
+									:aria-pressed="earsFeaturesEnabled"
+									:aria-label="
+										formatMessage(
+											earsFeaturesEnabled
+												? messages.toggleEarsFeaturesOff
+												: messages.toggleEarsFeaturesOn,
+										)
+									"
+									@click="earsFeaturesEnabled = !earsFeaturesEnabled"
+								>
 									{{
 										formatMessage(
 											earsFeaturesEnabled
@@ -1283,7 +1284,13 @@ await loadSkins()
 				<p class="text-lg m-0">
 					{{ formatMessage(messages.signInDescription) }}
 				</p>
-				<Button type="colored" color="brand" v-show="accountsCard" :disabled="accountsCard.loginDisabled" @click="login">
+				<Button
+					v-show="accountsCard"
+					type="colored"
+					color="brand"
+					:disabled="accountsCard.loginDisabled"
+					@click="login"
+				>
 					<LogInIcon v-if="!accountsCard.loginDisabled" />
 					<SpinnerIcon v-else class="animate-spin" />
 					{{ formatMessage(messages.signInButton) }}

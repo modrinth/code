@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import { ChevronRightIcon, GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { NewsArticleCard, useFormatDateTime } from '@modrinth/ui'
+import { ButtonLink, NewsArticleCard, useFormatDateTime } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
@@ -49,10 +48,21 @@ useSeoMeta({
 			</div>
 			<div class="flex gap-2">
 				<NewsletterButton />
-				<ButtonLink v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank" class="!w-9 !px-0 !rounded-full">
+				<ButtonLink
+					v-tooltip="`RSS feed`"
+					aria-label="RSS feed"
+					href="/news/feed/rss.xml"
+					target="_blank"
+					class="!w-9 !rounded-full !px-0"
+				>
 					<RssIcon />
 				</ButtonLink>
-				<ButtonLink v-tooltip="`Changelog`" href="/news/changelog" aria-label="Changelog" class="!w-9 !px-0 !rounded-full">
+				<ButtonLink
+					v-tooltip="`Changelog`"
+					href="/news/changelog"
+					aria-label="Changelog"
+					class="!w-9 !rounded-full !px-0"
+				>
 					<GitGraphIcon />
 				</ButtonLink>
 			</div>

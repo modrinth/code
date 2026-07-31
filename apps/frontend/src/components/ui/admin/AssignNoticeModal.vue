@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
+	Button,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
@@ -181,15 +181,30 @@ defineExpose({ show, hide })
 						wrapper-class="w-full"
 						autocomplete="off"
 					/>
-					<Button type="quiet" color="green" class="shrink-0 !text-green [&>svg]:!text-green" @click="() => assign(true)">
+					<Button
+						type="quiet"
+						color="green"
+						class="shrink-0 !text-green [&>svg]:!text-green"
+						@click="() => assign(true)"
+					>
 						<PlusIcon />
 						Add server
 					</Button>
-					<Button type="quiet" color="blue" class="shrink-0 !text-blue [&>svg]:!text-blue" @click="() => assign(false)">
+					<Button
+						type="quiet"
+						color="blue"
+						class="shrink-0 !text-blue [&>svg]:!text-blue"
+						@click="() => assign(false)"
+					>
 						<PlusIcon />
 						Add node
 					</Button>
-					<Button type="quiet" color="red" class="shrink-0 !text-red [&>svg]:!text-red" @click="() => unassignDetect()">
+					<Button
+						type="quiet"
+						color="red"
+						class="shrink-0 !text-red [&>svg]:!text-red"
+						@click="() => unassignDetect()"
+					>
 						<XIcon />
 						Remove
 					</Button>

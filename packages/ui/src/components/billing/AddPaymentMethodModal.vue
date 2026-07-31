@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import type Stripe from 'stripe'
 import { nextTick, ref, useTemplateRef } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'

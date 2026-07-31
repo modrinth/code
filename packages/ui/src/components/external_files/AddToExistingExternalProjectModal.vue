@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { Accordion, NewModal, StyledInput } from '#ui/components'
+import { Button } from '#ui/components/base/buttons'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import AttributionGroupFilePicker from './AttributionGroupFilePicker.vue'
@@ -229,7 +229,12 @@ defineExpose({ show, hide })
 							wrapper-class="flex-1 min-w-[12rem]"
 							:disabled="addFilesMutation.isPending.value"
 						/>
-						<Button type="colored" color="brand" native-type="submit" :disabled="addFilesMutation.isPending.value">
+						<Button
+							type="colored"
+							color="brand"
+							native-type="submit"
+							:disabled="addFilesMutation.isPending.value"
+						>
 							<SearchIcon aria-hidden="true" />
 							Search
 						</Button>
@@ -268,13 +273,13 @@ defineExpose({ show, hide })
 								class="mx-4 mt-3"
 							>
 								<template #actions>
-									<Button type="colored" color="brand"
-											native-type="button"
-											:disabled="
-												selectedProjectId === project.id || addFilesMutation.isPending.value
-											"
-											@click="selectProject(project.id)"
-										>
+									<Button
+										type="colored"
+										color="brand"
+										native-type="button"
+										:disabled="selectedProjectId === project.id || addFilesMutation.isPending.value"
+										@click="selectProject(project.id)"
+									>
 										{{ selectedProjectId === project.id ? 'Selected' : 'Select' }}
 									</Button>
 								</template>
@@ -303,11 +308,22 @@ defineExpose({ show, hide })
 				/>
 			</Accordion>
 			<div class="flex justify-end gap-2 w-full">
-				<Button type="outlined" native-type="button" :disabled="addFilesMutation.isPending.value" @click="hide">
+				<Button
+					type="outlined"
+					native-type="button"
+					:disabled="addFilesMutation.isPending.value"
+					@click="hide"
+				>
 					<XIcon class="size-4 shrink-0" />
 					Cancel
 				</Button>
-				<Button type="colored" color="brand" native-type="button" :disabled="!canSubmit" @click="handleSubmit">
+				<Button
+					type="colored"
+					color="brand"
+					native-type="button"
+					:disabled="!canSubmit"
+					@click="handleSubmit"
+				>
 					<SpinnerIcon
 						v-if="addFilesMutation.isPending.value"
 						class="size-4 shrink-0 animate-spin"

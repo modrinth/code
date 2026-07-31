@@ -40,9 +40,8 @@
 </template>
 
 <script lang="ts" setup>
-import { Button } from '@modrinth/ui'
 import { getLoaderIcon, XIcon } from '@modrinth/assets'
-import { FormattedTag, TagItem } from '@modrinth/ui'
+import { Button, FormattedTag, TagItem } from '@modrinth/ui'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

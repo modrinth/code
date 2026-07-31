@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
@@ -17,6 +16,7 @@ import { computed, ref, watch } from 'vue'
 
 import { Chips, Combobox, type ComboboxOption, StyledInput } from '#ui/components'
 import { FileInput } from '#ui/components/base'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { commonMessages } from '#ui/utils'
 
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
@@ -578,11 +578,12 @@ function cancelEditing() {
 									class="flex w-full object-contain bg-surface-3"
 								/>
 								<div class="absolute top-2 right-2">
-									<IconButton :label="formatMessage(messages.proofImageRemove)"
-											v-tooltip="formatMessage(messages.proofImageRemove)"
-											native-type="button"
-											@click="removeProofImage(idx)"
-										>
+									<IconButton
+										v-tooltip="formatMessage(messages.proofImageRemove)"
+										:label="formatMessage(messages.proofImageRemove)"
+										native-type="button"
+										@click="removeProofImage(idx)"
+									>
 										<TrashIcon />
 									</IconButton>
 								</div>
@@ -632,16 +633,20 @@ function cancelEditing() {
 
 		<hr class="mt-1 bg-surface-5 border-none h-[1px] w-full" />
 		<div class="flex items-center gap-2 justify-end">
-			<Button type="outlined" v-if="isAttributed"
-					:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
-					@click="cancelEditing"
-				>
+			<Button
+				v-if="isAttributed"
+				type="outlined"
+				:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
+				@click="cancelEditing"
+			>
 				<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
 			</Button>
-			<Button type="colored" color="brand"
-					:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
-					@click="handleSave"
-				>
+			<Button
+				type="colored"
+				color="brand"
+				:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
+				@click="handleSave"
+			>
 				<template v-if="saveMutation.isPending.value">
 					<SpinnerIcon class="animate-spin" />
 					{{ formatMessage(commonMessages.savingButton) }}

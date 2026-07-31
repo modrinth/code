@@ -1,8 +1,8 @@
-import { Button } from '../../components/base/buttons'
 import { DownloadIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import ContentDiffModal from '../../layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import type { ContentDiffItem } from '../../layouts/shared/installation-settings/types'
 

@@ -1,9 +1,9 @@
-import { Button } from '../../components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import ContentUpdaterModal from '../../layouts/shared/content-tab/components/modals/content-updater-modal/index.vue'
 
 // Real version data from Modrinth API - Sodium (mod)

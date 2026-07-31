@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
 	CheckIcon,
 	CopyIcon,
@@ -8,7 +7,7 @@ import {
 	MessagesSquareIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Admonition, Collapsible, NewModal } from '@modrinth/ui'
+import { Admonition, Button, ButtonLink, Collapsible, IconButton, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -141,7 +140,13 @@ async function copyToClipboard(text: string) {
 				<ButtonLink href="https://support.modrinth.com" class="!w-full" @click="modal?.hide()">
 					<MessagesSquareIcon /> Contact support
 				</ButtonLink>
-				<Button type="colored" color="brand" :disabled="loadingSignIn" class="!w-full" @click="signInAgain">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="loadingSignIn"
+					class="!w-full"
+					@click="signInAgain"
+				>
 					<LogInIcon /> Sign in again
 				</Button>
 			</div>
@@ -173,11 +178,12 @@ async function copyToClipboard(text: string) {
 							>
 								{{ debugInfo }}
 							</div>
-							<IconButton :label="'Copy debug info'"
-									v-tooltip="'Copy debug info'"
-									:disabled="copied"
-									@click="copyToClipboard(debugInfo)"
-								>
+							<IconButton
+								v-tooltip="'Copy debug info'"
+								:label="'Copy debug info'"
+								:disabled="copied"
+								@click="copyToClipboard(debugInfo)"
+							>
 								<template v-if="copied"> <CheckIcon class="text-green" /> </template>
 								<template v-else> <CopyIcon /> </template>
 							</IconButton>

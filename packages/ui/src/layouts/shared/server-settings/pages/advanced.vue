@@ -7,14 +7,14 @@
 					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
 						<span class="text-lg font-semibold text-contrast">SFTP</span>
 						<ButtonLink
-								v-tooltip="sftpActionTooltip"
-								class="!w-full sm:!w-auto"
-								:class="{ 'opacity-60': !canWriteFiles }"
-								:href="canWriteFiles ? sftpUrl : undefined"
-								:aria-disabled="!canWriteFiles"
-								target="_blank"
-								@click="handleSftpLaunchClick"
-							>
+							v-tooltip="sftpActionTooltip"
+							class="!w-full sm:!w-auto"
+							:class="{ 'opacity-60': !canWriteFiles }"
+							:href="canWriteFiles ? sftpUrl : undefined"
+							:aria-disabled="!canWriteFiles"
+							target="_blank"
+							@click="handleSftpLaunchClick"
+						>
 							<ExternalIcon class="h-5 w-5" />
 							Launch SFTP
 						</ButtonLink>
@@ -23,9 +23,9 @@
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
 						<Button
+							v-tooltip="sftpCopyTooltip('Copy SFTP server address')"
 							native-type="button"
 							size="lg"
-							v-tooltip="sftpCopyTooltip('Copy SFTP server address')"
 							class="w-full !justify-between text-left"
 							:disabled="!canWriteFiles"
 							@click="copyToClipboard('Server address', server?.sftp_host)"
@@ -39,9 +39,9 @@
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Username</span>
 								<Button
+									v-tooltip="sftpCopyTooltip('Copy SFTP username')"
 									native-type="button"
 									size="lg"
-									v-tooltip="sftpCopyTooltip('Copy SFTP username')"
 									class="w-full !justify-between text-left"
 									:disabled="!canWriteFiles"
 									@click="copyToClipboard('Username', server?.sftp_username)"
@@ -49,19 +49,16 @@
 									<span class="min-w-0 truncate text-base font-semibold text-primary">
 										{{ server?.sftp_username }}
 									</span>
-									<ClipboardCopyIcon
-										class="size-5 shrink-0 text-secondary"
-										aria-hidden="true"
-									/>
+									<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 								</Button>
 							</div>
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Password</span>
 								<div class="flex items-center gap-1.5">
 									<Button
+										v-tooltip="sftpCopyTooltip('Copy SFTP password')"
 										native-type="button"
 										size="lg"
-										v-tooltip="sftpCopyTooltip('Copy SFTP password')"
 										class="min-w-0 grow !justify-between text-left"
 										:disabled="!canWriteFiles"
 										@click="copyToClipboard('Password', server?.sftp_password)"
@@ -73,14 +70,11 @@
 													: '*'.repeat(server?.sftp_password?.length ?? 0)
 											}}
 										</span>
-										<ClipboardCopyIcon
-											class="size-5 shrink-0 text-secondary"
-											aria-hidden="true"
-										/>
+										<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 									</Button>
 									<IconButton
-										:label="passwordVisibilityTooltip"
 										v-tooltip="passwordVisibilityTooltip"
+										:label="passwordVisibilityTooltip"
 										size="lg"
 										:disabled="!canWriteFiles"
 										@click="togglePasswordVisibility"
@@ -100,16 +94,18 @@
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
 							<span class="text-lg font-semibold text-contrast">Startup command</span>
 						</label>
-						<Button type="quiet" v-if="startupCommand !== defaultStartupCommand"
-								v-tooltip="advancedActionTooltip"
-								:disabled="
-									isStartupLoading ||
-									startupCommand === defaultStartupCommand ||
-									!canUseAdvancedSettings
-								"
-								class="relative !w-full sm:!w-auto"
-								@click="resetToDefault"
-							>
+						<Button
+							v-if="startupCommand !== defaultStartupCommand"
+							v-tooltip="advancedActionTooltip"
+							type="quiet"
+							:disabled="
+								isStartupLoading ||
+								startupCommand === defaultStartupCommand ||
+								!canUseAdvancedSettings
+							"
+							class="relative !w-full sm:!w-auto"
+							@click="resetToDefault"
+						>
 							<UpdatedIcon class="h-5 w-5" />
 							Default
 						</Button>
@@ -210,7 +206,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
@@ -224,6 +219,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { Combobox, StyledInput } from '#ui/components'
+import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {

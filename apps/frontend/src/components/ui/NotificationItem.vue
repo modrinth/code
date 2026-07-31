@@ -46,7 +46,11 @@
 					class="flex flex-wrap items-center gap-3"
 					:class="{ 'gap-2': compact }"
 				>
-					<Button type="colored" color="brand" @click="performActionByTitle(notification, 'Accept')">
+					<Button
+						type="colored"
+						color="brand"
+						@click="performActionByTitle(notification, 'Accept')"
+					>
 						<CheckIcon />
 						Accept
 					</Button>
@@ -272,30 +276,42 @@
 			</span>
 			<div v-if="compact" class="notification__actions">
 				<template v-if="type === 'team_invite' || type === 'organization_invite'">
-					<IconButton type="quiet" color="brand" :label="`Accept`"
-							v-tooltip="`Accept`"
-							@click="
-								() => {
-									acceptTeamInvite(notification.body.team_id)
-									read()
-								}
-							"
-						>
+					<IconButton
+						v-tooltip="`Accept`"
+						type="quiet"
+						color="brand"
+						:label="`Accept`"
+						@click="
+							() => {
+								acceptTeamInvite(notification.body.team_id)
+								read()
+							}
+						"
+					>
 						<CheckIcon />
 					</IconButton>
-					<IconButton type="quiet" color="red" :label="`Decline`"
-							v-tooltip="`Decline`"
-							@click="
-								() => {
-									removeSelfFromTeam(notification.body.team_id)
-									read()
-								}
-							"
-						>
+					<IconButton
+						v-tooltip="`Decline`"
+						type="quiet"
+						color="red"
+						:label="`Decline`"
+						@click="
+							() => {
+								removeSelfFromTeam(notification.body.team_id)
+								read()
+							}
+						"
+					>
 						<XIcon />
 					</IconButton>
 				</template>
-				<IconButton type="quiet" :label="`Mark as read`" v-else-if="!notification.read" v-tooltip="`Mark as read`" @click="read()">
+				<IconButton
+					v-else-if="!notification.read"
+					v-tooltip="`Mark as read`"
+					type="quiet"
+					:label="`Mark as read`"
+					@click="read()"
+				>
 					<XIcon />
 				</IconButton>
 			</div>
@@ -304,25 +320,29 @@
 					<template
 						v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
 					>
-						<Button type="colored" color="brand"
-								@click="
-									() => {
-										acceptTeamInvite(notification.body.team_id)
-										read()
-									}
-								"
-							>
+						<Button
+							type="colored"
+							color="brand"
+							@click="
+								() => {
+									acceptTeamInvite(notification.body.team_id)
+									read()
+								}
+							"
+						>
 							<CheckIcon />
 							Accept
 						</Button>
-						<Button type="colored" color="red"
-								@click="
-									() => {
-										removeSelfFromTeam(notification.body.team_id)
-										read()
-									}
-								"
-							>
+						<Button
+							type="colored"
+							color="red"
+							@click="
+								() => {
+									removeSelfFromTeam(notification.body.team_id)
+									read()
+								}
+							"
+						>
 							<XIcon />
 							Decline
 						</Button>
@@ -334,16 +354,27 @@
 					<CopyCode v-if="flags.developerMode" :text="notification.id" />
 				</div>
 				<div v-else class="input-group">
-					<ButtonLink v-if="notification.link && notification.link !== '#'" :to="notification.link" target="_blank">
+					<ButtonLink
+						v-if="notification.link && notification.link !== '#'"
+						:to="notification.link"
+						target="_blank"
+					>
 						<ExternalIcon />
 						Open link
 					</ButtonLink>
-					<Button v-for="(action, actionIndex) in notification.actions" :key="actionIndex" @click="performAction(notification, actionIndex)">
+					<Button
+						v-for="(action, actionIndex) in notification.actions"
+						:key="actionIndex"
+						@click="performAction(notification, actionIndex)"
+					>
 						<CheckIcon v-if="action.title === 'Accept'" />
 						<XIcon v-else-if="action.title === 'Deny'" />
 						{{ action.title }}
 					</Button>
-					<Button v-if="notification.actions.length === 0 && !notification.read" @click="performAction(notification, null)">
+					<Button
+						v-if="notification.actions.length === 0 && !notification.read"
+						@click="performAction(notification, null)"
+					>
 						<CheckIcon />
 						Mark as read
 					</Button>
@@ -355,7 +386,6 @@
 </template>
 
 <script setup>
-import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
 	BellIcon,
 	CalendarIcon,
@@ -369,9 +399,12 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
+	ButtonLink,
 	Categories,
 	CopyCode,
 	DoubleIcon,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	ProjectStatusBadge,

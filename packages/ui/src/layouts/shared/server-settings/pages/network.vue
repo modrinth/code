@@ -17,11 +17,13 @@
 						/>
 						<div class="mb-1 mt-4 flex justify-end gap-2.5">
 							<Button @click="editAllocationModal?.hide()">Cancel</Button>
-							<Button type="colored" color="brand"
-									v-tooltip="advancedActionTooltip"
-									:disabled="!editAllocationName || creatingAllocation || !canUseAdvancedSettings"
-									native-type="submit"
-								>
+							<Button
+								v-tooltip="advancedActionTooltip"
+								type="colored"
+								color="brand"
+								:disabled="!editAllocationName || creatingAllocation || !canUseAdvancedSettings"
+								native-type="submit"
+							>
 								<SaveIcon /> Update allocation
 							</Button>
 						</div>
@@ -57,7 +59,14 @@
 								allocationsError?.message ?? 'Unknown error'
 							}}</span>
 						</p>
-						<Button type="colored" color="brand" size="xl" @click="() => refetchAllocations()" class="mt-6 !w-full">Retry</Button>
+						<Button
+							type="colored"
+							color="brand"
+							size="xl"
+							class="mt-6 !w-full"
+							@click="() => refetchAllocations()"
+							>Retry</Button
+						>
 					</div>
 				</div>
 			</div>
@@ -77,11 +86,13 @@
 								placeholder="e.g. Secondary allocation"
 							/>
 
-							<Button type="colored" color="brand"
-									v-tooltip="createAllocationTooltip"
-									:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
-									@click="addNewAllocation"
-								>
+							<Button
+								v-tooltip="createAllocationTooltip"
+								type="colored"
+								color="brand"
+								:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
+								@click="addNewAllocation"
+							>
 								<PlusIcon />
 								<span>Create allocation</span>
 							</Button>
@@ -97,22 +108,31 @@
 							</template>
 							<template #cell-actions="{ row }">
 								<div class="flex items-center justify-end gap-2">
-									<IconButton type="quiet" label="Copy" @click="copyText(`${serverIP}:${row.port}`)">
+									<IconButton
+										type="quiet"
+										label="Copy"
+										@click="copyText(`${serverIP}:${row.port}`)"
+									>
 										<CopyIcon />
 									</IconButton>
 									<template v-if="!row.primary">
-										<IconButton type="quiet" :label="advancedActionTooltip"
-												v-tooltip="advancedActionTooltip"
-												:disabled="!canUseAdvancedSettings"
-												@click="showEditAllocationModal(row.port)"
-											>
+										<IconButton
+											v-tooltip="advancedActionTooltip"
+											type="quiet"
+											:label="advancedActionTooltip"
+											:disabled="!canUseAdvancedSettings"
+											@click="showEditAllocationModal(row.port)"
+										>
 											<PencilIcon />
 										</IconButton>
-										<IconButton type="outlined" :label="advancedActionTooltip"
-												v-tooltip="advancedActionTooltip"
-												:disabled="!canUseAdvancedSettings"
-												@click="showConfirmDeleteModal(row.port)"
-											 class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]">
+										<IconButton
+											v-tooltip="advancedActionTooltip"
+											type="outlined"
+											:label="advancedActionTooltip"
+											:disabled="!canUseAdvancedSettings"
+											class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+											@click="showConfirmDeleteModal(row.port)"
+										>
 											<TrashIcon />
 										</IconButton>
 									</template>
@@ -140,10 +160,10 @@
 							/>
 
 							<Button
-									class="!w-full sm:!w-auto"
-									:disabled="userDomain == ''"
-									@click="exportDnsRecords"
-								>
+								class="!w-full sm:!w-auto"
+								:disabled="userDomain == ''"
+								@click="exportDnsRecords"
+							>
 								<UploadIcon />
 								<span>Export</span>
 							</Button>
@@ -195,7 +215,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import {
 	CopyIcon,
 	IssuesIcon,
@@ -210,6 +229,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import { ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,

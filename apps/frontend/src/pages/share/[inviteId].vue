@@ -122,7 +122,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import {
 	CircleAlertIcon,
 	InviteBackgroundIllustration,
@@ -132,6 +131,7 @@ import {
 import {
 	Admonition,
 	Avatar,
+	Button,
 	defineMessages,
 	injectModrinthClient,
 	useVIntl,

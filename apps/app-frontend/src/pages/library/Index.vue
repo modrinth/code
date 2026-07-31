@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { LibraryIcon, PlusIcon } from '@modrinth/assets'
-import { injectNotificationManager, NavTabs } from '@modrinth/ui'
+import { Button, injectNotificationManager, NavTabs } from '@modrinth/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 

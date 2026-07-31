@@ -7,11 +7,13 @@
 		>
 			<!-- Find row -->
 			<div class="flex items-center gap-1">
-				<IconButton type="quiet" :label="formatMessage(messages.toggleReplace)"
-						v-tooltip="formatMessage(messages.toggleReplace)"
-						:disabled="props.readonly"
-						@click="toggleReplace"
-					>
+				<IconButton
+					v-tooltip="formatMessage(messages.toggleReplace)"
+					type="quiet"
+					:label="formatMessage(messages.toggleReplace)"
+					:disabled="props.readonly"
+					@click="toggleReplace"
+				>
 					<ChevronRightIcon
 						class="transition-transform duration-150"
 						:class="{ 'rotate-90': isReplaceOpen }"
@@ -44,25 +46,31 @@
 								: ''
 					}}
 				</span>
-				<IconButton type="quiet" :label="formatMessage(messages.previousMatch)"
-						v-tooltip="formatMessage(messages.previousMatch)"
-						:disabled="findMatchCount === 0"
-						@click="emit('findPrevious')"
-					>
+				<IconButton
+					v-tooltip="formatMessage(messages.previousMatch)"
+					type="quiet"
+					:label="formatMessage(messages.previousMatch)"
+					:disabled="findMatchCount === 0"
+					@click="emit('findPrevious')"
+				>
 					<ChevronUpIcon />
 				</IconButton>
-				<IconButton type="quiet" :label="formatMessage(messages.nextMatch)"
-						v-tooltip="formatMessage(messages.nextMatch)"
-						:disabled="findMatchCount === 0"
-						@click="emit('findNext')"
-					>
+				<IconButton
+					v-tooltip="formatMessage(messages.nextMatch)"
+					type="quiet"
+					:label="formatMessage(messages.nextMatch)"
+					:disabled="findMatchCount === 0"
+					@click="emit('findNext')"
+				>
 					<ChevronDownIcon />
 				</IconButton>
 				<div class="mx-0.5 h-4 w-px bg-surface-5" />
-				<IconButton type="quiet" :label="formatMessage(messages.closeFind)"
-						v-tooltip="formatMessage(messages.closeFind)"
-						@click="close"
-					>
+				<IconButton
+					v-tooltip="formatMessage(messages.closeFind)"
+					type="quiet"
+					:label="formatMessage(messages.closeFind)"
+					@click="close"
+				>
 					<XIcon />
 				</IconButton>
 			</div>
@@ -82,18 +90,20 @@
 						wrapper-class="w-44"
 					/>
 				</div>
-				<Button type="outlined"
-						class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
-						:disabled="props.readonly || findMatchCount === 0"
-						@click="emit('replace', replaceQuery)"
-					>
+				<Button
+					type="outlined"
+					class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
+					:disabled="props.readonly || findMatchCount === 0"
+					@click="emit('replace', replaceQuery)"
+				>
 					{{ formatMessage(messages.replace) }}
 				</Button>
-				<Button type="outlined"
-						class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
-						:disabled="props.readonly || findMatchCount === 0"
-						@click="emit('replaceAll', replaceQuery)"
-					>
+				<Button
+					type="outlined"
+					class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
+					:disabled="props.readonly || findMatchCount === 0"
+					@click="emit('replaceAll', replaceQuery)"
+				>
 					{{ formatMessage(messages.replaceAll) }}
 				</Button>
 			</div>
@@ -102,10 +112,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, XIcon } from '@modrinth/assets'
 import { nextTick, ref, watch } from 'vue'
 
+import { Button, IconButton } from '#ui/components/base/buttons'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 

@@ -30,21 +30,24 @@
 			<div class="h-[1px] w-full flex-1 bg-surface-5" />
 		</div>
 		<div class="flex gap-3">
-			<Button type="outlined"
-					v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
-					class="flex-1"
-					:disabled="ctx.finishDisabled.value"
-					@click="triggerFileInput"
-				>
+			<Button
+				v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
+				type="outlined"
+				class="flex-1"
+				:disabled="ctx.finishDisabled.value"
+				@click="triggerFileInput"
+			>
 				<ImportIcon />
 				{{ formatMessage(messages.importModpack) }}
 			</Button>
-			<Button type="colored" color="brand"
-					v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
-					class="flex-1"
-					:disabled="ctx.finishDisabled.value"
-					@click="ctx.browseModpacks()"
-				>
+			<Button
+				v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
+				type="colored"
+				color="brand"
+				class="flex-1"
+				:disabled="ctx.finishDisabled.value"
+				@click="ctx.browseModpacks()"
+			>
 				<CompassIcon />
 				{{ formatMessage(messages.browseModpacks) }}
 			</Button>
@@ -53,11 +56,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { CompassIcon, ImportIcon, RightArrowIcon } from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { injectFilePicker } from '../../../../providers'

@@ -43,22 +43,26 @@
 						</div>
 						<div class="flex items-center gap-2">
 							<slot name="header-actions" />
-							<IconButton :label="closeLabel" v-if="closable"
-									v-tooltip="closeLabel"
-									:disabled="disableClose"
-									@click="hide"
-								>
+							<IconButton
+								v-if="closable"
+								v-tooltip="closeLabel"
+								:label="closeLabel"
+								:disabled="disableClose"
+								@click="hide"
+							>
 								<XIcon aria-hidden="true" />
 							</IconButton>
 						</div>
 					</div>
 
-					<IconButton :label="closeLabel" v-if="props.mergeHeader && closable"
+					<IconButton
+						v-if="props.mergeHeader && closable"
+						v-tooltip="closeLabel"
+						:label="closeLabel"
 						class="absolute top-4 right-4 z-10"
-							v-tooltip="closeLabel"
-							:disabled="disableClose"
-							@click="hide"
-						>
+						:disabled="disableClose"
+						@click="hide"
+					>
 						<XIcon aria-hidden="true" />
 					</IconButton>
 
@@ -132,9 +136,10 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import { XIcon } from '@modrinth/assets'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
+
+import { IconButton } from '#ui/components/base/buttons'
 
 import { useVIntl } from '../../composables/i18n'
 import { useModalStack } from '../../composables/modal-stack'

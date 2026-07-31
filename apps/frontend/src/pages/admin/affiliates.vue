@@ -80,7 +80,6 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
@@ -89,6 +88,7 @@ import {
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
 	Avatar,
+	Button,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,

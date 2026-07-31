@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { ChevronRightIcon, SaveIcon, UndoIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,

@@ -100,11 +100,17 @@
 				/>
 			</div>
 			<div class="flex gap-2">
-				<Button type="colored" color="brand" v-if="editingNotice" :disabled="!!noticeSubmitError" @click="() => saveChanges()">
+				<Button
+					v-if="editingNotice"
+					type="colored"
+					color="brand"
+					:disabled="!!noticeSubmitError"
+					@click="() => saveChanges()"
+				>
 					<SaveIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.saveChangesButton) }}
-				</button>
-				<button v-else :disabled="!!noticeSubmitError" @click="() => createNotice()">
+				</Button>
+				<Button v-else :disabled="!!noticeSubmitError" @click="() => createNotice()">
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.createNotice) }}
 				</Button>
@@ -250,10 +256,10 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Archon } from '@modrinth/api-client'
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	Combobox,
 	commonMessages,
 	CopyCode,

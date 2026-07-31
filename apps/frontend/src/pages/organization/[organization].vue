@@ -212,7 +212,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
@@ -226,6 +225,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

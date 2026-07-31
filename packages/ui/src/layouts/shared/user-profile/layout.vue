@@ -13,11 +13,22 @@
 
 			<template #actions>
 				<div class="flex justify-end gap-2">
-					<Button type="outlined" native-type="button" :disabled="isBlockingUser" @click="blockUserModal?.hide()">
+					<Button
+						type="outlined"
+						native-type="button"
+						:disabled="isBlockingUser"
+						@click="blockUserModal?.hide()"
+					>
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="red" native-type="button" :disabled="isBlockingUser" @click="confirmBlockUser">
+					<Button
+						type="colored"
+						color="red"
+						native-type="button"
+						:disabled="isBlockingUser"
+						@click="confirmBlockUser"
+					>
 						<SpinnerIcon v-if="isBlockingUser" class="animate-spin" />
 						<BanIcon v-else />
 						{{ formatMessage(messages.blockButton) }}
@@ -42,11 +53,13 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand"
-							native-type="button"
-							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
-							@click="saveRoleEdit"
-						>
+					<Button
+						type="colored"
+						color="brand"
+						native-type="button"
+						:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+						@click="saveRoleEdit"
+					>
 						<template v-if="isSavingRole">
 							<SpinnerIcon class="animate-spin" />
 							{{ formatMessage(messages.savingLabel) }}
@@ -412,7 +425,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BanIcon,
@@ -438,6 +450,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import { Button } from '#ui/components/base/buttons'
 import Combobox from '#ui/components/base/Combobox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'

@@ -2,7 +2,8 @@
 	<div class="flex flex-col gap-2.5">
 		<span class="text-lg font-semibold text-contrast">Icon</span>
 		<div class="group relative w-fit">
-			<TeleportOverflowMenu :label="editIconTooltip"
+			<TeleportOverflowMenu
+				:label="editIconTooltip"
 				:tooltip="editIconTooltip"
 				:icon-only="false"
 				type="quiet"

@@ -1,6 +1,6 @@
-import { Button } from '../../components/base/buttons'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
+import { Button } from '../../components/base/buttons'
 import NotificationPanel from '../../components/nav/NotificationPanel.vue'
 import { injectNotificationManager } from '../../providers'
 

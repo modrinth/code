@@ -55,13 +55,13 @@
 					{{ formatMessage(messages.lockedDescription) }}
 				</p>
 				<Button
-						class="w-fit"
-						@click="
-							() => {
-								overriddenProvidedFilterTypes.push(filterType.id)
-							}
-						"
-					>
+					class="w-fit"
+					@click="
+						() => {
+							overriddenProvidedFilterTypes.push(filterType.id)
+						}
+					"
+				>
 					<LockOpenIcon />
 					{{ formatMessage(messages.unlockFilterButton) }}
 				</Button>
@@ -156,17 +156,17 @@
 				/>
 				<div v-if="hasProvidedFilter" class="mt-2 mx-1">
 					<Button
-							class="w-fit"
-							@click="
-								() => {
-									overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
-										(id) => id !== filterType.id,
-									)
-									accordion?.close()
-									clearFilters()
-								}
-							"
-						>
+						class="w-fit"
+						@click="
+							() => {
+								overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
+									(id) => id !== filterType.id,
+								)
+								accordion?.close()
+								clearFilters()
+							}
+						"
+					>
 						<UpdatedIcon />
 						<slot name="sync-button">
 							{{ formatMessage(messages.syncFilterButton) }}
@@ -179,9 +179,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'

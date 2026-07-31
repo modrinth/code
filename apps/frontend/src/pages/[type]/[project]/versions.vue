@@ -41,37 +41,42 @@
 				:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 			>
 				<template #actions="{ version }">
-					<ButtonLink type="quiet" v-if="getPrimaryFile(version)"
-							v-tooltip="`Download`"
-							:href="createDownloadUrl(version)"
-							:download="getPrimaryFile(version)?.filename"
-							class="hover:!bg-button-bg [&>svg]:!text-green !w-9 !px-0 !rounded-full"
-							aria-label="Download"
-							@click="emit('onDownload')"
-						>
+					<ButtonLink
+						v-if="getPrimaryFile(version)"
+						v-tooltip="`Download`"
+						type="quiet"
+						:href="createDownloadUrl(version)"
+						:download="getPrimaryFile(version)?.filename"
+						class="!w-9 !rounded-full !px-0 hover:!bg-button-bg [&>svg]:!text-green"
+						aria-label="Download"
+						@click="emit('onDownload')"
+					>
 						<DownloadIcon aria-hidden="true" />
 					</ButtonLink>
-					<TeleportOverflowMenu type="quiet" label="Edit version" v-if="currentMember"
-							tooltip="Edit version"
-							class="hover:!bg-button-bg"
-							:options="[
-								{
-									id: 'edit-metadata',
-									label: 'Edit metadata',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
-								},
-								{
-									id: 'edit-details',
-									label: 'Edit details',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-								},
-								{
-									id: 'edit-files',
-									label: 'Edit files',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
-								},
-							]"
-						>
+					<TeleportOverflowMenu
+						v-if="currentMember"
+						type="quiet"
+						label="Edit version"
+						tooltip="Edit version"
+						class="hover:!bg-button-bg"
+						:options="[
+							{
+								id: 'edit-metadata',
+								label: 'Edit metadata',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+							},
+							{
+								id: 'edit-details',
+								label: 'Edit details',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+							},
+							{
+								id: 'edit-files',
+								label: 'Edit files',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+							},
+						]"
+					>
 						<EditIcon aria-hidden="true" />
 						<template #edit-files>
 							<FileIcon aria-hidden="true" />
@@ -86,104 +91,106 @@
 							Edit metadata
 						</template>
 					</TeleportOverflowMenu>
-					<TeleportOverflowMenu type="quiet" label="More options"
-							tooltip="More options"
-							class="hover:!bg-button-bg"
-							@select="$event.id === 'download' && emit('onDownload')"
-							:options="[
-								{
-									id: 'download',
-									label: 'Download',
-									type: 'link',
-									tone: 'brand',
-									hoverFilled: true,
-									href: createDownloadUrl(version),
-									download: getPrimaryFile(version)?.filename,
-									shown: !!getPrimaryFile(version),
+					<TeleportOverflowMenu
+						type="quiet"
+						label="More options"
+						tooltip="More options"
+						class="hover:!bg-button-bg"
+						:options="[
+							{
+								id: 'download',
+								label: 'Download',
+								type: 'link',
+								tone: 'brand',
+								hoverFilled: true,
+								href: createDownloadUrl(version),
+								download: getPrimaryFile(version)?.filename,
+								shown: !!getPrimaryFile(version),
+							},
+							{
+								id: 'new-tab',
+								label: 'Open in new tab',
+								type: 'link',
+								href: `/${project.project_type}/${
+									project.slug ? project.slug : project.id
+								}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
+								target: '_blank',
+							},
+							{
+								id: 'copy-link',
+								label: 'Copy link',
+								action: () =>
+									copyToClipboard(
+										`https://modrinth.com/${project.project_type}/${
+											project.slug ? project.slug : project.id
+										}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
+									),
+							},
+							{
+								id: 'share',
+								label: 'Share',
+								action: () => {},
+								shown: false,
+							},
+							{
+								id: 'report',
+								label: 'Report',
+								tone: 'red',
+								hoverFilled: true,
+								action: () =>
+									auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
+								shown: !currentMember,
+							},
+							{ type: 'divider', shown: currentMember || flags.developerMode },
+							{
+								id: 'copy-id',
+								label: 'Copy ID',
+								action: () => {
+									copyToClipboard(version.id)
 								},
-								{
-									id: 'new-tab',
-									label: 'Open in new tab',
-									type: 'link',
-									href: `/${project.project_type}/${
-										project.slug ? project.slug : project.id
-									}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
-									target: '_blank',
+								shown: currentMember || flags.developerMode,
+							},
+							{
+								id: 'copy-maven',
+								label: 'Copy Maven coordinates',
+								action: () => {
+									copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
 								},
-								{
-									id: 'copy-link',
-									label: 'Copy link',
-									action: () =>
-										copyToClipboard(
-											`https://modrinth.com/${project.project_type}/${
-												project.slug ? project.slug : project.id
-											}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
-										),
+								shown: flags.developerMode,
+							},
+							{ type: 'divider', shown: !!currentMember },
+							{
+								id: 'edit-metadata',
+								label: 'Edit metadata',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-details',
+								label: 'Edit details',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-files',
+								label: 'Edit files',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'delete',
+								label: 'Delete',
+								tone: 'red',
+								hoverFilled: true,
+								action: () => {
+									selectedVersion = version.id
+									deleteVersionModal?.show()
 								},
-								{
-									id: 'share',
-									label: 'Share',
-									action: () => {},
-									shown: false,
-								},
-								{
-									id: 'report',
-									label: 'Report',
-									tone: 'red',
-									hoverFilled: true,
-									action: () =>
-										auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
-									shown: !currentMember,
-								},
-								{ type: 'divider', shown: currentMember || flags.developerMode },
-								{
-									id: 'copy-id',
-									label: 'Copy ID',
-									action: () => {
-										copyToClipboard(version.id)
-									},
-									shown: currentMember || flags.developerMode,
-								},
-								{
-									id: 'copy-maven',
-									label: 'Copy Maven coordinates',
-									action: () => {
-										copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
-									},
-									shown: flags.developerMode,
-								},
-								{ type: 'divider', shown: !!currentMember },
-								{
-									id: 'edit-metadata',
-									label: 'Edit metadata',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
-									shown: !!currentMember,
-								},
-								{
-									id: 'edit-details',
-									label: 'Edit details',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-									shown: !!currentMember,
-								},
-								{
-									id: 'edit-files',
-									label: 'Edit files',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
-									shown: !!currentMember,
-								},
-								{
-									id: 'delete',
-									label: 'Delete',
-									tone: 'red',
-									hoverFilled: true,
-									action: () => {
-										selectedVersion = version.id
-										deleteVersionModal?.show()
-									},
-									shown: !!currentMember,
-								},
-							]"
-						>
+								shown: !!currentMember,
+							},
+						]"
+						@select="$event.id === 'download' && emit('onDownload')"
+					>
 						<MoreVerticalIcon aria-hidden="true" />
 						<template #download>
 							<DownloadIcon aria-hidden="true" />
@@ -246,7 +253,6 @@
 </template>
 
 <script setup>
-import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	BoxIcon,
 	ClipboardCopyIcon,
@@ -263,11 +269,13 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import {
+	ButtonLink,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectPageVersions,
+	TeleportOverflowMenu,
 } from '@modrinth/ui'
 import { onMounted, useTemplateRef, watch } from 'vue'
 

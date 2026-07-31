@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import {
 	CheckCircleIcon,
 	CoffeeIcon,
@@ -10,6 +9,7 @@ import {
 	XCircleIcon,
 } from '@modrinth/assets'
 import {
+	Button,
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
@@ -233,29 +233,33 @@ const messages = defineMessages({
 										: 'red'
 									: undefined
 							"
-								:disabled="!overrideJavaInstall || testingJava"
-								@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
-								@mouseenter="overrideJavaInstall && (hoveringTest = true)"
-								@mouseleave="hoveringTest = false"
-							 :style="{ '--legacy-button-color': (
-								!hoveringTest && !testingJava
-									? javaTestResult === true
-										? 'green'
-										: 'red'
-									: 'standard'
-							) && (
-								!hoveringTest && !testingJava
-									? javaTestResult === true
-										? 'green'
-										: 'red'
-									: 'standard'
-							) !== 'standard' ? `var(--color-${
-								!hoveringTest && !testingJava
-									? javaTestResult === true
-										? 'green'
-										: 'red'
-									: 'standard'
-							})` : undefined }" class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]">
+							:disabled="!overrideJavaInstall || testingJava"
+							:style="{
+								'--legacy-button-color':
+									(!hoveringTest && !testingJava
+										? javaTestResult === true
+											? 'green'
+											: 'red'
+										: 'standard') &&
+									(!hoveringTest && !testingJava
+										? javaTestResult === true
+											? 'green'
+											: 'red'
+										: 'standard') !== 'standard'
+										? `var(--color-${
+												!hoveringTest && !testingJava
+													? javaTestResult === true
+														? 'green'
+														: 'red'
+													: 'standard'
+											})`
+										: undefined,
+							}"
+							class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
+							@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
+							@mouseenter="overrideJavaInstall && (hoveringTest = true)"
+							@mouseleave="hoveringTest = false"
+						>
 							<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
 							<CheckCircleIcon
 								v-else-if="javaTestResult === true && !hoveringTest"

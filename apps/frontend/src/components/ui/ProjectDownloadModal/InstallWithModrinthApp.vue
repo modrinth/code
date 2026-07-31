@@ -7,11 +7,13 @@
 		class="modrinth-app-section contents"
 	>
 		<div class="flex flex-col items-center">
-			<ButtonLink type="colored" color="brand"
-					class="!min-h-10 w-fit no-underline"
-					:href="`modrinth://mod/${project.slug}`"
-					@click="installWithApp"
-				>
+			<ButtonLink
+				type="colored"
+				color="brand"
+				class="!min-h-10 w-fit no-underline"
+				:href="`modrinth://mod/${project.slug}`"
+				@click="installWithApp"
+			>
 				<ModrinthIcon aria-hidden="true" />
 				<span class="min-w-0 text-center">
 					{{ formatMessage(messages.installWithModrinthApp) }}
@@ -35,10 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { ModrinthIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { ButtonLink, defineMessages, useVIntl } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { ref } from 'vue'
 

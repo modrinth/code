@@ -36,8 +36,8 @@
 		<template #actions
 			><div class="flex justify-end gap-2">
 				<Button type="outlined" class="!border" @click="unpublishModal?.hide()">
-					<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-				</Button><Button type="colored" color="orange" :disabled="busy" @click="confirmUnpublish">
+					<XIcon />{{ formatMessage(commonMessages.cancelButton) }} </Button
+				><Button type="colored" color="orange" :disabled="busy" @click="confirmUnpublish">
 					<UnlinkIcon />{{ formatMessage(messages.unpublishButton) }}
 				</Button>
 			</div></template
@@ -63,8 +63,13 @@
 		<template #actions
 			><div class="flex justify-end gap-2">
 				<Button type="outlined" class="!border" @click="unlinkModal?.hide()">
-					<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-				</Button><Button type="colored" color="orange" :disabled="busy || backupBusy" @click="confirmUnlink">
+					<XIcon />{{ formatMessage(commonMessages.cancelButton) }} </Button
+				><Button
+					type="colored"
+					color="orange"
+					:disabled="busy || backupBusy"
+					@click="confirmUnlink"
+				>
 					<UnlinkIcon />{{ formatMessage(messages.unlinkButton) }}
 				</Button>
 			</div></template
@@ -73,9 +78,16 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { SpinnerIcon, UnlinkIcon, XIcon } from '@modrinth/assets'
-import { Admonition, commonMessages, defineMessages, InlineBackupCreator, NewModal, useVIntl } from '@modrinth/ui'
+import {
+	Admonition,
+	Button,
+	commonMessages,
+	defineMessages,
+	InlineBackupCreator,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref } from 'vue'
 
 const props = withDefaults(

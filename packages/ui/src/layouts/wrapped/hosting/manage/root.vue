@@ -181,11 +181,13 @@
 								:auto-hide="false"
 								placement="bottom-end"
 							>
-								<IconButton size="xl" label="Server settings"
-										v-tooltip="showSettingsHint ? undefined : 'Server settings'"
-										native-type="button"
-										@click="handleOpenServerSettings"
-									>
+								<IconButton
+									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
+									size="xl"
+									label="Server settings"
+									native-type="button"
+									@click="handleOpenServerSettings"
+								>
 									<SettingsIcon />
 								</IconButton>
 								<template #popper>
@@ -194,10 +196,13 @@
 											<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
 												{{ formatMessage(settingsHintMessages.title) }}
 											</h3>
-											<IconButton class="!size-6" size="xs" :label="formatMessage(settingsHintMessages.dismiss)"
-													native-type="button"
-													@click="dismissSettingsHint"
-												>
+											<IconButton
+												class="!size-6"
+												size="xs"
+												:label="formatMessage(settingsHintMessages.dismiss)"
+												native-type="button"
+												@click="dismissSettingsHint"
+											>
 												<XIcon aria-hidden="true" />
 											</IconButton>
 										</div>
@@ -207,10 +212,13 @@
 									</div>
 								</template>
 							</Tooltip>
-							<TeleportOverflowMenu type="quiet" size="xl" label="More server options"
-									:options="serverMenuOptions"
-									:disabled="!!installError"
-								>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								label="More server options"
+								:options="serverMenuOptions"
+								:disabled="!!installError"
+							>
 								<MoreVerticalIcon aria-hidden="true" />
 							</TeleportOverflowMenu>
 						</PageHeaderActions>
@@ -299,16 +307,20 @@
 										v-if="errorTitle === 'Installation error'"
 										class="mt-2 flex flex-col gap-4 sm:flex-row"
 									>
-										<Button v-if="errorLog" @click="openInstallLog"><FileIcon />Open Installation Log</Button>
+										<Button v-if="errorLog" @click="openInstallLog"
+											><FileIcon />Open Installation Log</Button
+										>
 										<Button @click="copyServerDebugInfo">
 											<CopyIcon v-if="!copied" />
 											<CheckIcon v-else />
 											Copy Debug Info
 										</Button>
-										<Button type="colored" color="red"
-												class="whitespace-pre"
-												@click="openServerSettingsModal('installation')"
-											>
+										<Button
+											type="colored"
+											color="red"
+											class="whitespace-pre"
+											@click="openServerSettingsModal('installation')"
+										>
 											<RightArrowIcon />
 											Change Loader
 										</Button>
@@ -381,7 +393,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { getNodeWebSocketUrl, ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
@@ -414,6 +425,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
+import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'

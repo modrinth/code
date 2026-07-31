@@ -54,12 +54,14 @@
 							</div>
 						</template>
 					</Combobox>
-					<Button type="colored" color="brand"
-							v-tooltip="searchInviteTooltip"
-							class="shrink-0"
-							:disabled="!canInviteSearchTarget"
-							@click="inviteSearchTarget"
-						>
+					<Button
+						v-tooltip="searchInviteTooltip"
+						type="colored"
+						color="brand"
+						class="shrink-0"
+						:disabled="!canInviteSearchTarget"
+						@click="inviteSearchTarget"
+					>
 						<PlusIcon aria-hidden="true" />
 						{{ addButtonLabel }}
 					</Button>
@@ -101,11 +103,11 @@
 						{{ inviteLinkHeading }}
 					</div>
 					<Button
-							native-type="button"
-							size="lg"
-							class="w-full !justify-between text-left"
-							@click="copyInviteLink"
-						>
+						native-type="button"
+						size="lg"
+						class="w-full !justify-between text-left"
+						@click="copyInviteLink"
+					>
 						<span class="min-w-0 truncate text-base font-semibold text-primary">
 							{{ link }}
 						</span>
@@ -138,9 +140,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { ClipboardCopyIcon, PlusIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'

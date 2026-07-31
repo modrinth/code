@@ -19,7 +19,9 @@
 					<p>
 						<span class="break-all font-mono">{{ error.message }}</span>
 					</p>
-					<Button type="colored" color="brand" size="xl" @click="refetch" class="mt-6 !w-full">Retry</Button>
+					<Button type="colored" color="brand" size="xl" class="mt-6 !w-full" @click="refetch"
+						>Retry</Button
+					>
 				</div>
 			</div>
 		</div>
@@ -69,11 +71,13 @@
 							<template #all>{{ formatMessage(commonMessages.allProjectType) }}</template>
 						</FilterPills>
 					</div>
-					<Button type="colored" color="brand"
-							v-tooltip="backupCreationDisabled"
-							:disabled="!!backupCreationDisabled"
-							@click="showCreateModel"
-						>
+					<Button
+						v-tooltip="backupCreationDisabled"
+						type="colored"
+						color="brand"
+						:disabled="!!backupCreationDisabled"
+						@click="showCreateModel"
+					>
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.createBackup) }}
 					</Button>
@@ -91,12 +95,14 @@
 							:description="formatMessage(messages.emptyDescription)"
 						>
 							<template #actions>
-								<Button type="colored" color="brand"
-										v-tooltip="backupCreationDisabled"
-										:disabled="!!backupCreationDisabled"
-										class="mx-auto w-min"
-										@click="showCreateModel"
-									>
+								<Button
+									v-tooltip="backupCreationDisabled"
+									type="colored"
+									color="brand"
+									:disabled="!!backupCreationDisabled"
+									class="mx-auto w-min"
+									@click="showCreateModel"
+								>
 									<PlusIcon class="size-5" />
 									{{ formatMessage(messages.createBackup) }}
 								</Button>
@@ -190,23 +196,27 @@
 							}}
 						</span>
 						<div class="mx-1 h-6 w-px bg-surface-5" />
-						<Button type="quiet"
-								native-type="button"
-								:disabled="isBulkOperating"
-								:class="{ 'pointer-events-none opacity-60': isBulkOperating }"
-								@click="deselectAll"
-							>
+						<Button
+							type="quiet"
+							native-type="button"
+							:disabled="isBulkOperating"
+							:class="{ 'pointer-events-none opacity-60': isBulkOperating }"
+							@click="deselectAll"
+						>
 							{{ formatMessage(commonMessages.clearButton) }}
 						</Button>
 					</div>
 
 					<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
-						<Button type="quiet" color="red"
-								v-tooltip="!canManageBackups ? permissionDeniedMessage : undefined"
-								native-type="button"
-								:disabled="!canManageBackups"
-								@click="confirmBulkDelete"
-							 class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+						<Button
+							v-tooltip="!canManageBackups ? permissionDeniedMessage : undefined"
+							type="quiet"
+							color="red"
+							native-type="button"
+							:disabled="!canManageBackups"
+							class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+							@click="confirmBulkDelete"
+						>
 							<TrashIcon />
 							<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 						</Button>
@@ -253,7 +263,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -262,6 +271,7 @@ import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { Button } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills, { type FilterPillOption } from '#ui/components/base/FilterPills.vue'

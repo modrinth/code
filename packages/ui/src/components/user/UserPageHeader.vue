@@ -57,14 +57,17 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<ButtonLink size="xl" v-if="isSelf" :to="editProfileLink">
+				<ButtonLink v-if="isSelf" size="xl" :to="editProfileLink">
 					<EditIcon />
 					{{ formatMessage(commonMessages.editButton) }}
 				</ButtonLink>
-				<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(commonMessages.moreOptionsButton)"
-						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-						:options="moreActions"
-					>
+				<TeleportOverflowMenu
+					type="quiet"
+					size="xl"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+					:options="moreActions"
+				>
 					<MoreVerticalIcon />
 				</TeleportOverflowMenu>
 			</PageHeaderActions>
@@ -73,7 +76,6 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonLink, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	AffiliateIcon,
@@ -92,15 +94,15 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import { ButtonLink, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataNumberItem from '#ui/components/base/page-header/metadata/page-header-metadata-number-item.vue'
 import PageHeaderMetadataTimeItem from '#ui/components/base/page-header/metadata/page-header-metadata-time-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { defineMessages, useFormatDateTime, useFormatNumber, useVIntl } from '#ui/composables'
 import type { AuthUser } from '#ui/providers/auth'
 import { commonMessages } from '#ui/utils'
@@ -230,8 +232,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		action: () => emit('manageProjects'),
 		shown: props.isSelf,
 	},
-	{ type: 'divider', shown: props.isSelf,
-	 },
+	{ type: 'divider', shown: props.isSelf },
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
@@ -260,8 +261,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyPermalink'),
 	},
-	{ type: 'divider', shown: props.showStaffActions && (props.isAdmin || props.isStaff),
-	 },
+	{ type: 'divider', shown: props.showStaffActions && (props.isAdmin || props.isStaff) },
 	{
 		id: 'open-billing',
 		label: formatMessage(messages.billingButton),

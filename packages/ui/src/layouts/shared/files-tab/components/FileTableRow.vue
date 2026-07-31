@@ -56,7 +56,11 @@
 					@keydown.stop
 					@pointerdown.stop
 				>
-					<TeleportOverflowMenu type="quiet" :label="formatMessage(commonMessages.actionsLabel)" :options="menuOptions">
+					<TeleportOverflowMenu
+						type="quiet"
+						:label="formatMessage(commonMessages.actionsLabel)"
+						:options="menuOptions"
+					>
 						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
 						<template #copy-filename
 							><ClipboardCopyIcon />
@@ -95,7 +99,6 @@
 </template>
 
 <script setup lang="ts">
-import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import {
 	BoxIcon,
 	BracesIcon,
@@ -114,6 +117,7 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
@@ -249,8 +253,7 @@ const menuOptions = computed(() => {
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('extract', item),
 		},
-		{ type: 'divider', shown: isZip.value,
-		 },
+		{ type: 'divider', shown: isZip.value },
 		{
 			id: 'rename',
 			label: formatMessage(commonMessages.renameButton),

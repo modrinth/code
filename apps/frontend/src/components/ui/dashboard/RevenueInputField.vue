@@ -48,13 +48,13 @@
 
 <script setup lang="ts">
 import {
+	Button,
 	Combobox,
 	commonMessages,
 	formFieldPlaceholders,
 	StyledInput,
 	useFormatMoney,
 	useVIntl,
-	Button,
 } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 

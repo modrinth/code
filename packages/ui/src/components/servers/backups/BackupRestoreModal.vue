@@ -21,11 +21,13 @@
 					<XIcon />
 					Cancel
 				</Button>
-				<Button type="colored" color="red"
-						v-tooltip="restoreDisabledTooltip"
-						:disabled="restoreDisabled"
-						@click="restoreBackup"
-					>
+				<Button
+					v-tooltip="restoreDisabledTooltip"
+					type="colored"
+					color="red"
+					:disabled="restoreDisabled"
+					@click="restoreBackup"
+				>
 					<SpinnerIcon v-if="isRestoring" class="animate-spin" />
 					<RotateCounterClockwiseIcon v-else />
 					{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
@@ -36,11 +38,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useVIntl } from '../../../composables/i18n'
 import {

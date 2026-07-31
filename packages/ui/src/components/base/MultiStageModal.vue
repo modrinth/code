@@ -72,24 +72,28 @@
 				class="flex flex-col justify-end gap-2 sm:flex-row"
 				:class="leftButtonConfig || rightButtonConfig ? 'mt-4' : ''"
 			>
-				<Button type="outlined" v-if="leftButtonConfig"
-						v-tooltip="leftButtonConfig.tooltip"
-						:class="leftButtonConfig.buttonClass"
-						:disabled="leftButtonConfig.disabled"
-						@click="leftButtonConfig.onClick"
-					>
+				<Button
+					v-if="leftButtonConfig"
+					v-tooltip="leftButtonConfig.tooltip"
+					type="outlined"
+					:class="leftButtonConfig.buttonClass"
+					:disabled="leftButtonConfig.disabled"
+					@click="leftButtonConfig.onClick"
+				>
 					<component :is="leftButtonConfig.icon" />
 					{{ leftButtonConfig.label }}
 				</Button>
 				<Button
 					v-if="rightButtonConfig"
-					:type="rightButtonConfig.color && rightButtonConfig.color !== 'standard' ? 'colored' : 'base'"
+					v-tooltip="rightButtonConfig.tooltip"
+					:type="
+						rightButtonConfig.color && rightButtonConfig.color !== 'standard' ? 'colored' : 'base'
+					"
 					:color="rightButtonConfig.color === 'standard' ? undefined : rightButtonConfig.color"
-						v-tooltip="rightButtonConfig.tooltip"
-						:class="rightButtonConfig.buttonClass"
-						:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
-						@click="rightButtonConfig.onClick"
-					>
+					:class="rightButtonConfig.buttonClass"
+					:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
+					@click="rightButtonConfig.onClick"
+				>
 					<SpinnerIcon
 						v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'before'"
 						class="animate-spin"
@@ -116,12 +120,13 @@
 </template>
 
 <script lang="ts">
-import { Button } from '#ui/components/base/buttons'
-import type { ButtonColor } from '#ui/components/base/buttons'
 import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
 import { NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+
+import type { ButtonColor } from '#ui/components/base/buttons'
+import { Button } from '#ui/components/base/buttons'
 
 export interface StageButtonConfig {
 	label?: string

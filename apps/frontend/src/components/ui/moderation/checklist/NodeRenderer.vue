@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { Button } from '@modrinth/ui'
 import type {
 	BooleanNodeBuilder,
 	ButtonNodeBuilder,
@@ -27,6 +26,7 @@ import {
 	setMessageProject,
 } from '@modrinth/moderation'
 import {
+	Button,
 	Checkbox,
 	Combobox,
 	injectProjectPageContext,
@@ -555,46 +555,49 @@ watchEffect(async () => {
 									v-for="child in visibleChildren(asIdentified(item))"
 									:key="asIdentified(child).id"
 								>
-									<Button :type="(
-											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
+									<Button
+										v-tooltip="getTooltipConfig(asIdentified(child))"
+										:type="
+											(getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
 												? hasActionableFixes(asIdentified(child))
 													? 'blue'
 													: 'brand'
-												: 'standard'
-										) && (
-											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
+												: 'standard') &&
+											(getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
 												? hasActionableFixes(asIdentified(child))
 													? 'blue'
 													: 'brand'
-												: 'standard'
-										) !== 'standard' ? 'colored' : 'base'" :color="(
-											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
+												: 'standard') !== 'standard'
+												? 'colored'
+												: 'base'
+										"
+										:color="
+											(getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
 												? hasActionableFixes(asIdentified(child))
 													? 'blue'
 													: 'brand'
-												: 'standard'
-										) && (
-											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
+												: 'standard') &&
+											(getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
 												? hasActionableFixes(asIdentified(child))
 													? 'blue'
 													: 'brand'
-												: 'standard'
-										) !== 'standard' ? ((
-											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
-												? hasActionableFixes(asIdentified(child))
-													? 'blue'
-													: 'brand'
-												: 'standard'
-										) === 'medal-promo' ? 'medal_promotion' : (
-											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
-												? hasActionableFixes(asIdentified(child))
-													? 'blue'
-													: 'brand'
-												: 'standard'
-										)) : undefined" @click="toggleChip(asIdentified(item), asIdentified(child))"
-											v-tooltip="getTooltipConfig(asIdentified(child))"
-											:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
-										>
+												: 'standard') !== 'standard'
+												? (getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
+														? hasActionableFixes(asIdentified(child))
+															? 'blue'
+															: 'brand'
+														: 'standard') === 'medal-promo'
+													? 'medal_promotion'
+													: getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
+														? hasActionableFixes(asIdentified(child))
+															? 'blue'
+															: 'brand'
+														: 'standard'
+												: undefined
+										"
+										:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
+										@click="toggleChip(asIdentified(item), asIdentified(child))"
+									>
 										<component :is="asIdentified(child)._icon" v-if="asIdentified(child)._icon" />
 										<template v-else>{{ asLabeled(child).label }}</template>
 									</Button>
@@ -625,34 +628,36 @@ watchEffect(async () => {
 									v-for="child in visibleChildren(asIdentified(item))"
 									:key="asIdentified(child).id"
 								>
-									<Button :type="(
-											getSelectState(asIdentified(item)) === asIdentified(child).id
+									<Button
+										:type="
+											(getSelectState(asIdentified(item)) === asIdentified(child).id
 												? 'brand'
-												: 'standard'
-										) && (
-											getSelectState(asIdentified(item)) === asIdentified(child).id
+												: 'standard') &&
+											(getSelectState(asIdentified(item)) === asIdentified(child).id
 												? 'brand'
-												: 'standard'
-										) !== 'standard' ? 'colored' : 'base'" :color="(
-											getSelectState(asIdentified(item)) === asIdentified(child).id
+												: 'standard') !== 'standard'
+												? 'colored'
+												: 'base'
+										"
+										:color="
+											(getSelectState(asIdentified(item)) === asIdentified(child).id
 												? 'brand'
-												: 'standard'
-										) && (
-											getSelectState(asIdentified(item)) === asIdentified(child).id
+												: 'standard') &&
+											(getSelectState(asIdentified(item)) === asIdentified(child).id
 												? 'brand'
-												: 'standard'
-										) !== 'standard' ? ((
-											getSelectState(asIdentified(item)) === asIdentified(child).id
-												? 'brand'
-												: 'standard'
-										) === 'medal-promo' ? 'medal_promotion' : (
-											getSelectState(asIdentified(item)) === asIdentified(child).id
-												? 'brand'
-												: 'standard'
-										)) : undefined"
-											:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
-											@click="toggleSelect(asIdentified(item), asIdentified(child))"
-										>
+												: 'standard') !== 'standard'
+												? (getSelectState(asIdentified(item)) === asIdentified(child).id
+														? 'brand'
+														: 'standard') === 'medal-promo'
+													? 'medal_promotion'
+													: getSelectState(asIdentified(item)) === asIdentified(child).id
+														? 'brand'
+														: 'standard'
+												: undefined
+										"
+										:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
+										@click="toggleSelect(asIdentified(item), asIdentified(child))"
+									>
 										<component :is="asIdentified(child)._icon" v-if="asIdentified(child)._icon" />
 										<template v-else>{{ asLabeled(child).label }}</template>
 									</Button>
@@ -720,11 +725,11 @@ watchEffect(async () => {
 					<!-- button -->
 					<template v-else-if="item.type === 'button'">
 						<Button
-								v-tooltip="getTooltipConfig(item, showContext)"
-								:disabled="!isButtonEnabled(asButton(item))"
-								:aria-label="item._icon && !asButton(item).label ? asButton(item).label : undefined"
-								@click="handleButtonClick(asButton(item))"
-							>
+							v-tooltip="getTooltipConfig(item, showContext)"
+							:disabled="!isButtonEnabled(asButton(item))"
+							:aria-label="item._icon && !asButton(item).label ? asButton(item).label : undefined"
+							@click="handleButtonClick(asButton(item))"
+						>
 							<component :is="item._icon" v-if="item._icon" />
 							{{ asButton(item).label }}
 						</Button>
@@ -733,17 +738,17 @@ watchEffect(async () => {
 					<!-- toggle -->
 					<template v-else-if="item.type === 'toggle'">
 						<Button
+							v-tooltip="getTooltipConfig(asBool(item))"
 							:type="getBooleanColor(asBool(item)) === 'standard' ? 'base' : 'colored'"
 							:color="
 								getBooleanColor(asBool(item)) === 'standard'
 									? undefined
 									: getBooleanColor(asBool(item))
 							"
-								v-tooltip="getTooltipConfig(asBool(item))"
-								:disabled="!isEnabled(asIdentified(item))"
-								:aria-label="item._icon ? asLabeled(item).label : undefined"
-								@click="toggleBoolean(asBool(item))"
-							>
+							:disabled="!isEnabled(asIdentified(item))"
+							:aria-label="item._icon ? asLabeled(item).label : undefined"
+							@click="toggleBoolean(asBool(item))"
+						>
 							<component :is="item._icon" v-if="item._icon" />
 							<template v-else>{{ asLabeled(item).label }}</template>
 						</Button>

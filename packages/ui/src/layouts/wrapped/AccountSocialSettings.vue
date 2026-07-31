@@ -141,16 +141,17 @@
 
 						<template #cell-actions="{ row }">
 							<div class="flex justify-end">
-								<Button type="outlined"
-										native-type="button"
-										:disabled="unblockingUserId !== null"
-										:aria-label="
-											formatMessage(messages.unblockUserAriaLabel, {
-												username: row.username,
-											})
-										"
-										@click="unblock(row)"
-									>
+								<Button
+									type="outlined"
+									native-type="button"
+									:disabled="unblockingUserId !== null"
+									:aria-label="
+										formatMessage(messages.unblockUserAriaLabel, {
+											username: row.username,
+										})
+									"
+									@click="unblock(row)"
+								>
 									<SpinnerIcon
 										v-if="unblockingUserId === row.id"
 										class="animate-spin"
@@ -183,13 +184,13 @@
 
 <script setup lang="ts">
 // TODO this will be moved in with the rest of the xplat settings.
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { LogInIcon, SpinnerIcon, ThinkingRinthbot } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
+import { Button } from '#ui/components/base/buttons'
 import Chips from '#ui/components/base/Chips.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import Table, { type TableColumn } from '#ui/components/base/Table.vue'

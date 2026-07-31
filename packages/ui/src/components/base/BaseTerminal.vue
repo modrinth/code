@@ -37,11 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import { ChevronDownIcon, TerminalSquareIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import { IconButton } from '#ui/components/base/buttons'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { useTerminal } from '#ui/composables/terminal'
 

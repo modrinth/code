@@ -51,9 +51,9 @@
 	</NewModal>
 </template>
 <script setup>
-import { Button } from '@modrinth/ui'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,

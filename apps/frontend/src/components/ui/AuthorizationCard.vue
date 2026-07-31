@@ -76,11 +76,11 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { BadgeCheckIcon, CheckIcon, IssuesIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,

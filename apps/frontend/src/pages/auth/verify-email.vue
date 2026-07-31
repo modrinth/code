@@ -42,7 +42,7 @@
 					</ButtonLink>
 				</div>
 			</template>
-			<ButtonLink type="colored" color="brand" v-else to="/auth/sign-in" class="!w-full">
+			<ButtonLink v-else type="colored" color="brand" to="/auth/sign-in" class="!w-full">
 				{{ formatMessage(commonMessages.signInButton) }}
 				<RightArrowIcon />
 			</ButtonLink>
@@ -60,11 +60,17 @@
 				{{ formatMessage(failedVerificationMessages.description) }}
 			</Admonition>
 
-			<Button type="colored" color="brand" v-if="auth.user" class="!w-full" @click="handleResendEmailVerification">
+			<Button
+				v-if="auth.user"
+				type="colored"
+				color="brand"
+				class="!w-full"
+				@click="handleResendEmailVerification"
+			>
 				{{ formatMessage(failedVerificationMessages.action) }}
 				<RightArrowIcon />
 			</Button>
-			<ButtonLink type="colored" color="brand" v-else to="/auth/sign-in" class="!w-full">
+			<ButtonLink v-else type="colored" color="brand" to="/auth/sign-in" class="!w-full">
 				{{ formatMessage(commonMessages.signInButton) }}
 				<RightArrowIcon />
 			</ButtonLink>
@@ -72,10 +78,11 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,

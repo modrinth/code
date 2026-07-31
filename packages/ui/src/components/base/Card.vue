@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import { DropdownIcon } from '@modrinth/assets'
 import { reactive } from 'vue'
 
+import { IconButton } from '#ui/components/base/buttons'
 
 const props = defineProps({
 	collapsible: {

@@ -59,18 +59,25 @@
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
 								x{{ item.count }}
 							</div>
-							<IconButton size="xs" :label="
-										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
-									" v-if="item.copyable !== false"
-									v-tooltip="
-										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
-									"
-									@click="copyToClipboard(item)"
-								>
+							<IconButton
+								v-if="item.copyable !== false"
+								v-tooltip="
+									item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
+								"
+								size="xs"
+								:label="item.supportData ? 'Copy error details for support' : 'Copy to clipboard'"
+								@click="copyToClipboard(item)"
+							>
 								<CheckIcon v-if="copied[getCopyKey(item)]" />
 								<CopyIcon v-else />
 							</IconButton>
-							<IconButton size="xs" :label="`Dismiss`" v-if="item.dismissible !== false" v-tooltip="`Dismiss`" @click="dismissNotification(index)">
+							<IconButton
+								v-if="item.dismissible !== false"
+								v-tooltip="`Dismiss`"
+								size="xs"
+								:label="`Dismiss`"
+								@click="dismissNotification(index)"
+							>
 								<XIcon />
 							</IconButton>
 						</div>
@@ -88,8 +95,19 @@
 						</template>
 						<template v-if="item.buttons?.length">
 							<div class="col-span-2 flex flex-wrap gap-1.5 pt-1">
-								<Button :type="(button.color) && (button.color) !== 'standard' ? 'colored' : 'base'" :color="(button.color) && (button.color) !== 'standard' ? ((button.color) === 'medal-promo' ? 'medal_promotion' : (button.color)) : undefined" v-for="(button, buttonIndex) in item.buttons"
-									:key="buttonIndex" @click="handleButtonClick(item, button)">
+								<Button
+									v-for="(button, buttonIndex) in item.buttons"
+									:key="buttonIndex"
+									:type="button.color && button.color !== 'standard' ? 'colored' : 'base'"
+									:color="
+										button.color && button.color !== 'standard'
+											? button.color === 'medal-promo'
+												? 'medal_promotion'
+												: button.color
+											: undefined
+									"
+									@click="handleButtonClick(item, button)"
+								>
 									<component :is="button.icon" v-if="button.icon" />
 									{{ button.label }}
 								</Button>
@@ -103,7 +121,6 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton, Button } from '#ui/components/base/buttons'
 import {
 	CheckCircleIcon,
 	CheckIcon,
@@ -115,6 +132,7 @@ import {
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { useModalStack } from '#ui/composables/modal-stack.ts'
 
 import {

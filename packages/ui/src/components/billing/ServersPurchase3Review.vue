@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
 	EditIcon,
@@ -15,6 +14,8 @@ import { getPingLevel } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useFormatPrice } from '../../composables'
 import { useVIntl } from '../../composables/i18n'

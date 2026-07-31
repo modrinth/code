@@ -1,8 +1,8 @@
-import { Button } from '../../components/base/buttons'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
+import { Button } from '../../components/base/buttons'
 
 const meta = {
 	title: 'Base/Admonition',

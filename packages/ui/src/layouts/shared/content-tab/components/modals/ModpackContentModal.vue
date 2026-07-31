@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ButtonLink } from '#ui/components/base/buttons'
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
@@ -15,8 +14,9 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import { ButtonLink } from '#ui/components/base/buttons'
+import Checkbox from '#ui/components/base/Checkbox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -611,13 +611,16 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 								</span>
 							</template>
 							<template #itemButtonsRight="{ item }">
-								<ButtonLink type="quiet" v-if="externalSlicerUrls[item.id]"
-										v-tooltip="formatMessage(messages.openInSlicer)"
-										:aria-label="formatMessage(messages.openInSlicer)"
-										:href="externalSlicerUrls[item.id]"
-										target="_blank"
-										rel="noopener noreferrer"
-									 class="!w-9 !px-0 !rounded-full">
+								<ButtonLink
+									v-if="externalSlicerUrls[item.id]"
+									v-tooltip="formatMessage(messages.openInSlicer)"
+									type="quiet"
+									:aria-label="formatMessage(messages.openInSlicer)"
+									:href="externalSlicerUrls[item.id]"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="!w-9 !px-0 !rounded-full"
+								>
 									<ExternalIcon class="size-4" />
 								</ButtonLink>
 							</template>

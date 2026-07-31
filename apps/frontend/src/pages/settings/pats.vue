@@ -76,11 +76,23 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" v-if="editPatId !== null" :disabled="loading || !name || !isExpiryInFuture" @click="editPat">
+					<Button
+						v-if="editPatId !== null"
+						type="colored"
+						color="brand"
+						:disabled="loading || !name || !isExpiryInFuture"
+						@click="editPat"
+					>
 						<SaveIcon />
 						{{ formatMessage(commonMessages.saveChangesButton) }}
 					</Button>
-					<Button type="colored" color="brand" v-else :disabled="loading || !name || !isExpiryInFuture" @click="createPat">
+					<Button
+						v-else
+						type="colored"
+						color="brand"
+						:disabled="loading || !name || !isExpiryInFuture"
+						@click="createPat"
+					>
 						<PlusIcon />
 						{{ formatMessage(createModalMessages.action) }}
 					</Button>
@@ -92,17 +104,19 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.pats) }}</h2>
 			</div>
-			<Button type="colored" color="brand"
-					@click="
-						() => {
-							name = null
-							scopesVal = 0
-							expires = null
-							editPatId = null
-							$refs.patModal.show()
-						}
-					"
-				>
+			<Button
+				type="colored"
+				color="brand"
+				@click="
+					() => {
+						name = null
+						scopesVal = 0
+						expires = null
+						editPatId = null
+						$refs.patModal.show()
+					}
+				"
+			>
 				<PlusIcon /> {{ formatMessage(messages.create) }}
 			</Button>
 		</div>
@@ -165,26 +179,26 @@
 			</div>
 			<div class="token-actions ml-auto flex flex-col gap-2">
 				<Button
-						@click="
-							() => {
-								editPatId = pat.id
-								name = pat.name
-								scopesVal = pat.scopes
-								expires = $dayjs(pat.expires).format('YYYY-MM-DD')
-								$refs.patModal.show()
-							}
-						"
-					>
+					@click="
+						() => {
+							editPatId = pat.id
+							name = pat.name
+							scopesVal = pat.scopes
+							expires = $dayjs(pat.expires).format('YYYY-MM-DD')
+							$refs.patModal.show()
+						}
+					"
+				>
 					<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
 				</Button>
 				<Button
-						@click="
-							() => {
-								deletePatIndex = pat.id
-								$refs.modal_confirm.show()
-							}
-						"
-					>
+					@click="
+						() => {
+							deletePatIndex = pat.id
+							$refs.modal_confirm.show()
+						}
+					"
+				>
 					<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
 				</Button>
 			</div>
@@ -192,9 +206,9 @@
 	</div>
 </template>
 <script setup>
-import { Button } from '@modrinth/ui'
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	Checkbox,
 	commonMessages,
 	commonSettingsMessages,

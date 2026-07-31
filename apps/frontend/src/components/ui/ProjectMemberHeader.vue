@@ -19,8 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { CheckIcon, XIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,

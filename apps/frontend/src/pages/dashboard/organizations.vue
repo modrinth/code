@@ -50,9 +50,8 @@
 </template>
 
 <script setup>
-import { Button } from '@modrinth/ui'
 import { PlusIcon, UsersIcon } from '@modrinth/assets'
-import { Avatar, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { Avatar, Button, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'

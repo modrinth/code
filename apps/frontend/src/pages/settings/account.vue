@@ -136,18 +136,25 @@
 						</Button>
 					</template>
 					<template v-else>
-						<Button type="colored" color="red" v-if="auth.user.has_password && auth.user.auth_providers.length > 0" @click="removePasswordMode = true">
+						<Button
+							v-if="auth.user.has_password && auth.user.auth_providers.length > 0"
+							type="colored"
+							color="red"
+							@click="removePasswordMode = true"
+						>
 							<TrashIcon />
 							{{ formatMessage(messages.removePasswordButton) }}
 						</Button>
-						<Button type="colored" color="brand"
-								:disabled="
-									newPassword.length == 0 ||
-									(auth.user.has_password && oldPassword.length == 0) ||
-									newPassword !== confirmNewPassword
-								"
-								@click="savePassword"
-							>
+						<Button
+							type="colored"
+							color="brand"
+							:disabled="
+								newPassword.length == 0 ||
+								(auth.user.has_password && oldPassword.length == 0) ||
+								newPassword !== confirmNewPassword
+							"
+							@click="savePassword"
+						>
 							<SaveIcon />
 							{{ formatMessage(messages.savePasswordButton) }}
 						</Button>
@@ -269,11 +276,21 @@
 							<XIcon />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</Button>
-						<Button type="colored" color="brand" v-if="twoFactorStep <= 1" @click="twoFactorStep === 1 ? verifyTwoFactorCode() : (twoFactorStep = 1)">
+						<Button
+							v-if="twoFactorStep <= 1"
+							type="colored"
+							color="brand"
+							@click="twoFactorStep === 1 ? verifyTwoFactorCode() : (twoFactorStep = 1)"
+						>
 							<RightArrowIcon />
 							{{ formatMessage(commonMessages.continueButton) }}
 						</Button>
-						<Button type="colored" color="brand" v-if="twoFactorStep === 2" @click="$refs.manageTwoFactorModal.hide()">
+						<Button
+							v-if="twoFactorStep === 2"
+							type="colored"
+							color="brand"
+							@click="$refs.manageTwoFactorModal.hide()"
+						>
 							<CheckIcon />
 							{{ formatMessage(messages.completeSetupButton) }}
 						</Button>
@@ -295,10 +312,17 @@
 						</span>
 					</template>
 					<template #cell-actions="{ row }">
-						<Button v-if="auth.user.auth_providers.includes(row.id)" class="!w-full" @click="handleRemoveAuthProvider(row.id)">
+						<Button
+							v-if="auth.user.auth_providers.includes(row.id)"
+							class="!w-full"
+							@click="handleRemoveAuthProvider(row.id)"
+						>
 							<TrashIcon /> {{ formatMessage(commonMessages.removeButton) }}
 						</Button>
-						<ButtonLink v-else :href="`${getAuthUrl(row.id, '/settings/account')}&token=${auth.token}`">
+						<ButtonLink
+							v-else
+							:href="`${getAuthUrl(row.id, '/settings/account')}&token=${auth.token}`"
+						>
 							<ExternalIcon /> {{ formatMessage(messages.providerAddButton) }}
 						</ButtonLink>
 					</template>
@@ -350,16 +374,16 @@
 				</label>
 				<div>
 					<Button
-							@click="
-								() => {
-									oldPassword = ''
-									newPassword = ''
-									confirmNewPassword = ''
-									removePasswordMode = false
-									$refs.managePasswordModal.show()
-								}
-							"
-						>
+						@click="
+							() => {
+								oldPassword = ''
+								newPassword = ''
+								confirmNewPassword = ''
+								removePasswordMode = false
+								$refs.managePasswordModal.show()
+							}
+						"
+					>
 						<KeyIcon />
 						<template v-if="auth.user.has_password">{{
 							formatMessage(messages.changePasswordButton)
@@ -431,7 +455,6 @@
 </template>
 
 <script setup>
-import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	CheckIcon,
 	DownloadIcon,
@@ -448,6 +471,8 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
+	ButtonLink,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,

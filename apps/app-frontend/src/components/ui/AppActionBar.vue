@@ -1,6 +1,13 @@
 <template>
 	<div class="flex gap-2 items-center">
-		<IconButton type="quiet" color="brand" :label="formatMessage(messages.viewActiveDownloads)" v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts" v-tooltip="formatMessage(messages.viewActiveDownloads)" @click="openDownloadToast()">
+		<IconButton
+			v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts"
+			v-tooltip="formatMessage(messages.viewActiveDownloads)"
+			type="quiet"
+			color="brand"
+			:label="formatMessage(messages.viewActiveDownloads)"
+			@click="openDownloadToast()"
+		>
 			<DownloadIcon />
 		</IconButton>
 		<div v-if="offline" class="flex items-center gap-1">
@@ -29,17 +36,21 @@
 						@show="showInstances = true"
 						@hide="showInstances = false"
 					>
-						<IconButton class="!size-6" type="quiet" size="xs" :label="
-									showInstances
-										? formatMessage(messages.hideMoreRunningInstances)
-										: formatMessage(messages.showMoreRunningInstances)
-								"
-								v-tooltip="
-									showInstances
-										? formatMessage(messages.hideMoreRunningInstances)
-										: formatMessage(messages.showMoreRunningInstances)
-								"
-							>
+						<IconButton
+							v-tooltip="
+								showInstances
+									? formatMessage(messages.hideMoreRunningInstances)
+									: formatMessage(messages.showMoreRunningInstances)
+							"
+							class="!size-6"
+							type="quiet"
+							size="xs"
+							:label="
+								showInstances
+									? formatMessage(messages.hideMoreRunningInstances)
+									: formatMessage(messages.showMoreRunningInstances)
+							"
+						>
 							<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
 						</IconButton>
 						<template #popper>
@@ -111,7 +122,6 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton } from '@modrinth/ui'
 import {
 	DownloadIcon,
 	DropdownIcon,
@@ -121,6 +131,7 @@ import {
 	TerminalSquareIcon,
 	UnplugIcon,
 } from '@modrinth/assets'
+import { IconButton } from '@modrinth/ui'
 import {
 	defineMessages,
 	injectNotificationManager,

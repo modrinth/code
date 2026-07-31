@@ -29,12 +29,12 @@
 				<div v-if="editingId" class="icon-submission">
 					<Avatar size="md" :src="icon" />
 					<FileButton
-							:max-size="262144"
-							class="button-like"
-							:prompt="formatMessage(messages.uploadIcon)"
-							accept="image/png,image/jpeg,image/gif,image/webp"
-							@change="onImageSelection"
-						>
+						:max-size="262144"
+						class="button-like"
+						:prompt="formatMessage(messages.uploadIcon)"
+						accept="image/png,image/jpeg,image/gif,image/webp"
+						@change="onImageSelection"
+					>
 						<UploadIcon />
 					</FileButton>
 				</div>
@@ -100,10 +100,19 @@
 								autocomplete="off"
 								:placeholder="formatMessage(messages.redirectUriPlaceholder)"
 							/>
-							<IconButton label="Delete" v-if="index !== 0" @click="() => redirectUris.splice(index, 1)">
+							<IconButton
+								v-if="index !== 0"
+								label="Delete"
+								@click="() => redirectUris.splice(index, 1)"
+							>
 								<TrashIcon />
 							</IconButton>
-							<Button type="colored" color="brand" v-if="index === 0" @click="() => redirectUris.push('')">
+							<Button
+								v-if="index === 0"
+								type="colored"
+								color="brand"
+								@click="() => redirectUris.push('')"
+							>
 								<PlusIcon /> {{ formatMessage(messages.addMore) }}
 							</Button>
 						</div>
@@ -122,11 +131,17 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" v-if="editingId" :disabled="!canSubmit" @click="editApp">
+					<Button
+						v-if="editingId"
+						type="colored"
+						color="brand"
+						:disabled="!canSubmit"
+						@click="editApp"
+					>
 						<SaveIcon />
 						{{ formatMessage(commonMessages.saveChangesButton) }}
 					</Button>
-					<Button type="colored" color="brand" v-else :disabled="!canSubmit" @click="createApp">
+					<Button v-else type="colored" color="brand" :disabled="!canSubmit" @click="createApp">
 						<PlusIcon />
 						{{ formatMessage(messages.createApp) }}
 					</Button>
@@ -138,18 +153,20 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.applications) }}</h2>
 			</div>
-			<Button type="colored" color="brand"
-					@click="
-						() => {
-							name = null
-							icon = null
-							scopesVal = 0
-							redirectUris = ['']
-							editingId = null
-							$refs.appModal.show()
-						}
-					"
-				>
+			<Button
+				type="colored"
+				color="brand"
+				@click="
+					() => {
+						name = null
+						icon = null
+						scopesVal = 0
+						redirectUris = ['']
+						editingId = null
+						$refs.appModal.show()
+					}
+				"
+			>
 				<PlusIcon /> {{ formatMessage(messages.newApplication) }}
 			</Button>
 		</div>
@@ -200,27 +217,29 @@
 			</div>
 			<div class="input-group">
 				<Button
-						@click="
-							() => {
-								setForm({
-									...app,
-									redirect_uris: app.redirect_uris.map((u) => u.uri) || [],
-								})
-								$refs.appModal.show()
-							}
-						"
-					>
+					@click="
+						() => {
+							setForm({
+								...app,
+								redirect_uris: app.redirect_uris.map((u) => u.uri) || [],
+							})
+							$refs.appModal.show()
+						}
+					"
+				>
 					<EditIcon />
 					{{ formatMessage(commonMessages.editButton) }}
 				</Button>
-				<Button type="colored" color="red"
-						@click="
-							() => {
-								editingId = app.id
-								$refs.modal_confirm.show()
-							}
-						"
-					>
+				<Button
+					type="colored"
+					color="red"
+					@click="
+						() => {
+							editingId = app.id
+							$refs.modal_confirm.show()
+						}
+					"
+				>
 					<TrashIcon />
 					{{ formatMessage(messages.delete) }}
 				</Button>
@@ -229,17 +248,18 @@
 	</div>
 </template>
 <script setup>
-import { Button, IconButton, FileButton } from '@modrinth/ui'
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	Checkbox,
 	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
 	defineMessages,
-	FileInput,
+	FileButton,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,

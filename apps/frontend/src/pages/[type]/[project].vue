@@ -22,7 +22,7 @@
 						}}</span>
 						<div class="flex gap-2">
 							<ButtonLink to="/dashboard/projects"
-									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
 							</ButtonLink>
 						</div>
 					</div>
@@ -240,12 +240,14 @@
 								:auto-hide="false"
 								placement="bottom-start"
 							>
-								<ButtonLink size="xl"
-										v-tooltip="formatMessage(messages.createServerTooltip)"
-										:to="projectHeaderCreateServerTo"
-										:aria-label="formatMessage(messages.serversPromoTitle)"
-										@click="dismissProjectHeaderCreateServerPrompt"
-									 class="!w-12 !px-0 !rounded-full">
+								<ButtonLink
+									v-tooltip="formatMessage(messages.createServerTooltip)"
+									size="xl"
+									:to="projectHeaderCreateServerTo"
+									:aria-label="formatMessage(messages.serversPromoTitle)"
+									class="!w-12 !rounded-full !px-0"
+									@click="dismissProjectHeaderCreateServerPrompt"
+								>
 									<ServerPlusIcon />
 								</ButtonLink>
 								<template #popper>
@@ -261,10 +263,13 @@
 													{{ formatMessage(commonMessages.newBadge) }}
 												</span>
 											</div>
-											<IconButton class="!size-6" size="xs" :label="formatMessage(messages.dontShowAgain)"
-													v-tooltip="formatMessage(messages.dontShowAgain)"
-													@click="dismissProjectHeaderCreateServerPrompt"
-												>
+											<IconButton
+												v-tooltip="formatMessage(messages.dontShowAgain)"
+												class="!size-6"
+												size="xs"
+												:label="formatMessage(messages.dontShowAgain)"
+												@click="dismissProjectHeaderCreateServerPrompt"
+											>
 												<XIcon aria-hidden="true" />
 											</IconButton>
 										</div>
@@ -284,54 +289,57 @@
 									</div>
 								</template>
 							</Tooltip>
-							<ButtonLink size="xl" v-else-if="showProjectHeaderCreateServerAction"
-									v-tooltip="formatMessage(messages.createServerTooltip)"
-									:to="projectHeaderCreateServerTo"
-									:aria-label="formatMessage(messages.serversPromoTitle)"
-									@click="dismissProjectHeaderCreateServerPrompt"
-								 class="!w-12 !px-0 !rounded-full">
+							<ButtonLink
+								v-else-if="showProjectHeaderCreateServerAction"
+								v-tooltip="formatMessage(messages.createServerTooltip)"
+								size="xl"
+								:to="projectHeaderCreateServerTo"
+								:aria-label="formatMessage(messages.serversPromoTitle)"
+								class="!w-12 !rounded-full !px-0"
+								@click="dismissProjectHeaderCreateServerPrompt"
+							>
 								<ServerPlusIcon />
 							</ButtonLink>
 
 							<ClientOnly>
-									<IconButton
-										v-if="auth.user"
-										size="xl"
-										v-tooltip="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										:label="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										@click="followProjectFromHeader"
-									>
-										<HeartIcon :fill="following ? 'currentColor' : 'none'" />
-									</IconButton>
+								<IconButton
+									v-if="auth.user"
+									v-tooltip="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									size="xl"
+									:label="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									@click="followProjectFromHeader"
+								>
+									<HeartIcon :fill="following ? 'currentColor' : 'none'" />
+								</IconButton>
+								<ButtonLink
+									v-else
+									v-tooltip="formatMessage(commonMessages.followButton)"
+									size="xl"
+									:to="signInRouteObj"
+									:aria-label="formatMessage(commonMessages.followButton)"
+									class="!w-12 !rounded-full !px-0"
+								>
+									<HeartIcon aria-hidden="true" />
+								</ButtonLink>
+								<template #fallback>
 									<ButtonLink
-										v-else
-										size="xl"
 										v-tooltip="formatMessage(commonMessages.followButton)"
+										size="xl"
 										:to="signInRouteObj"
 										:aria-label="formatMessage(commonMessages.followButton)"
-										class="!w-12 !px-0 !rounded-full"
+										class="!w-12 !rounded-full !px-0"
 									>
 										<HeartIcon aria-hidden="true" />
 									</ButtonLink>
-									<template #fallback>
-										<ButtonLink
-											size="xl"
-											v-tooltip="formatMessage(commonMessages.followButton)"
-											:to="signInRouteObj"
-											:aria-label="formatMessage(commonMessages.followButton)"
-											class="!w-12 !px-0 !rounded-full"
-										>
-											<HeartIcon aria-hidden="true" />
-										</ButtonLink>
-									</template>
+								</template>
 							</ClientOnly>
 
 							<ProjectCollectionSaveButton
@@ -347,10 +355,13 @@
 								:create-collection="(event) => modalCollection?.show(event)"
 							/>
 
-							<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(commonMessages.moreOptionsButton)"
-									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-									:options="projectHeaderMoreActions"
-								>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								:label="formatMessage(commonMessages.moreOptionsButton)"
+								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+								:options="projectHeaderMoreActions"
+							>
 								<MoreVerticalIcon />
 							</TeleportOverflowMenu>
 						</template>
@@ -401,7 +412,13 @@
 						>
 							{{ formatMessage(messages.environmentMigrationLink) }}
 						</nuxt-link>
-						<Button type="colored" color="orange" v-if="hasEditDetailsPermission" class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
+						<Button
+							v-if="hasEditDetailsPermission"
+							type="colored"
+							color="orange"
+							class="mt-3 w-fit"
+							@click="() => projectEnvironmentModal.show()"
+						>
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</Button>
 					</Admonition>
@@ -477,7 +494,6 @@
 </template>
 
 <script setup>
-import { Button, ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	ChartIcon,
 	ChevronRightIcon,
@@ -500,8 +516,11 @@ import {
 	Admonition,
 	Avatar,
 	BrowseInstallHeader,
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
@@ -519,6 +538,7 @@ import {
 	ProjectSidebarTags,
 	provideProjectPageContext,
 	SelectedProjectsFloatingBar,
+	TeleportOverflowMenu,
 	useDebugLogger,
 	useFormatPrice,
 	useStickyObserver,
@@ -1585,8 +1605,7 @@ const projectHeaderMoreActions = computed(() => {
 			to: `${projectPath.value}/settings/analytics`,
 			shown: !!auth.value.user && !!currentMember.value,
 		},
-		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value,
-		 },
+		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value },
 		{
 			id: 'moderation-checklist',
 			label: formatMessage(messages.reviewProject),
@@ -1612,8 +1631,7 @@ const projectHeaderMoreActions = computed(() => {
 			tone: 'orange',
 			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
 		},
-		{ type: 'divider', shown: !!auth.value.user && isStaff,
-		 },
+		{ type: 'divider', shown: !!auth.value.user && isStaff },
 		{
 			id: 'report',
 			label: formatMessage(commonMessages.reportButton),

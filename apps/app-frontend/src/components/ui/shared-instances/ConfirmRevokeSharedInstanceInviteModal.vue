@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { XIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,

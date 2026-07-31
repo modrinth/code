@@ -16,7 +16,13 @@
 			}}%)
 		</span>
 		<template v-if="cancelable" #top-right-actions>
-			<Button type="outlined" class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]" native-type="button" :disabled="cancelling" @click="$emit('cancel')">
+			<Button
+				type="outlined"
+				class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]"
+				native-type="button"
+				:disabled="cancelling"
+				@click="$emit('cancel')"
+			>
 				Cancel
 			</Button>
 		</template>
@@ -24,11 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { UploadIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
 import { useFormatBytes } from '#ui/composables'
 import { injectModrinthServerContext } from '#ui/providers'
 

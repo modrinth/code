@@ -183,30 +183,51 @@
 			</div>
 
 			<div v-if="noticeButtons" class="flex gap-2">
-				<IconButton type="outlined" :label="formatMessage(messages.downloadLatestBackupTooltip)" v-if="noticeButtons.downloadBackup && onDownloadBackup && isBackupDownloadEnabled"
-						v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
-						data-server-listing-button
-						@click="onDownloadBackup"
-					>
+				<IconButton
+					v-if="noticeButtons.downloadBackup && onDownloadBackup && isBackupDownloadEnabled"
+					v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
+					type="outlined"
+					:label="formatMessage(messages.downloadLatestBackupTooltip)"
+					data-server-listing-button
+					@click="onDownloadBackup"
+				>
 					<DownloadIcon />
 				</IconButton>
-				<Button type="outlined" v-if="noticeButtons.copyId"
-						v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
-						data-server-listing-button
-						@click="copyToClipboard(server_id)"
-					>
+				<Button
+					v-if="noticeButtons.copyId"
+					v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
+					type="outlined"
+					data-server-listing-button
+					@click="copyToClipboard(server_id)"
+				>
 					<template v-if="copied">
 						{{ formatMessage(messages.copiedLabel) }} <CheckIcon class="text-green" />
 					</template>
 					<template v-else> {{ formatMessage(messages.copyIdLabel) }} <CopyIcon /> </template>
 				</Button>
-				<ButtonLink v-if="noticeButtons.support" href="https://support.modrinth.com/en/" target="_blank" data-server-listing-button
-						><MessagesSquareIcon /> {{ formatMessage(messages.supportLabel) }}
+				<ButtonLink
+					v-if="noticeButtons.support"
+					href="https://support.modrinth.com/en/"
+					target="_blank"
+					data-server-listing-button
+					><MessagesSquareIcon /> {{ formatMessage(messages.supportLabel) }}
 				</ButtonLink>
-				<ButtonLink type="colored" color="brand" v-if="noticeButtons.manageBilling" :to="`/settings/billing#server-${server_id}`" data-server-listing-button>
+				<ButtonLink
+					v-if="noticeButtons.manageBilling"
+					type="colored"
+					color="brand"
+					:to="`/settings/billing#server-${server_id}`"
+					data-server-listing-button
+				>
 					<CardIcon /> {{ formatMessage(messages.manageBillingLabel) }}
 				</ButtonLink>
-				<Button type="colored" color="brand" v-if="noticeButtons.resubscribe && onResubscribe" data-server-listing-button @click="onResubscribe">
+				<Button
+					v-if="noticeButtons.resubscribe && onResubscribe"
+					type="colored"
+					color="brand"
+					data-server-listing-button
+					@click="onResubscribe"
+				>
 					<RotateCounterClockwiseIcon /> {{ formatMessage(messages.resubscribeLabel) }}
 				</Button>
 			</div>
@@ -239,7 +260,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import {
 	DownloadIcon,
@@ -248,10 +268,11 @@ import {
 	SparklesIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { AutoLink } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 
 import {
 	CardIcon,

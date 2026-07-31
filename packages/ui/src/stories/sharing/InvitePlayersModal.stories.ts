@@ -1,8 +1,8 @@
-import { Button } from '../../components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import InvitePlayersModal from '../../components/sharing/invite-players-modal/index.vue'
 import type {
 	InviteLinkSettings,

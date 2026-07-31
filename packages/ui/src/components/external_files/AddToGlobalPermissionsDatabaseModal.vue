@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import {
-	Accordion,
-	Combobox,
-	type ComboboxOption,
-	NewModal,
-	StyledInput,
-} from '#ui/components'
+import { Accordion, Combobox, type ComboboxOption, NewModal, StyledInput } from '#ui/components'
+import { Button } from '#ui/components/base/buttons'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import AttributionGroupFilePicker from './AttributionGroupFilePicker.vue'
@@ -223,15 +217,23 @@ defineExpose({ show, hide })
 				</div>
 			</Accordion>
 			<div class="flex justify-end gap-2 w-full">
-				<Button type="outlined" native-type="button" :disabled="createMutation.isPending.value" @click="hide">
+				<Button
+					type="outlined"
+					native-type="button"
+					:disabled="createMutation.isPending.value"
+					@click="hide"
+				>
 					<XIcon class="size-4 shrink-0" />
 					Cancel
 				</Button>
-				<Button type="colored" color="brand" native-type="button" :disabled="!canSubmit" @click="handleSubmit">
-					<SpinnerIcon
-						v-if="createMutation.isPending.value"
-						class="size-4 shrink-0 animate-spin"
-					/>
+				<Button
+					type="colored"
+					color="brand"
+					native-type="button"
+					:disabled="!canSubmit"
+					@click="handleSubmit"
+				>
+					<SpinnerIcon v-if="createMutation.isPending.value" class="size-4 shrink-0 animate-spin" />
 					<PlusIcon v-else class="size-4 shrink-0" />
 					Add to global database
 				</Button>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import { LeftArrowIcon, TagCategoryGamepad2Icon as Gamepad2Icon } from '@modrinth/assets'
 import type { Component } from 'vue'
 import { computed, ref } from 'vue'
@@ -7,6 +6,7 @@ import { useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import { IconButton } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
@@ -146,11 +146,13 @@ async function handleSelectedProjectsLeaveResult(
 			truncate-title
 		>
 			<template #leading>
-				<IconButton size="xl" :label="installContext.backLabel"
-						v-tooltip="installContext.backLabel"
-						native-type="button"
-						@click="handleBack"
-					>
+				<IconButton
+					v-tooltip="installContext.backLabel"
+					size="xl"
+					:label="installContext.backLabel"
+					native-type="button"
+					@click="handleBack"
+				>
 					<LeftArrowIcon />
 				</IconButton>
 				<Avatar

@@ -74,20 +74,25 @@
 
 		<template #cell-actions="{ row: member }">
 			<div v-if="!member.isOwner" class="flex items-center justify-end gap-1">
-				<IconButton type="quiet" :label="resendInviteLabel(member)" v-if="member.pending"
-						v-tooltip="resendInviteTooltip(member)"
-						:disabled="resendInviteDisabled(member)"
-						class="text-secondary hover:!filter-none hover:text-contrast focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
-						@click="handleResendInvite(member)"
-					>
+				<IconButton
+					v-if="member.pending"
+					v-tooltip="resendInviteTooltip(member)"
+					type="quiet"
+					:label="resendInviteLabel(member)"
+					:disabled="resendInviteDisabled(member)"
+					class="text-secondary hover:!filter-none hover:text-contrast focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
+					@click="handleResendInvite(member)"
+				>
 					<SendIcon aria-hidden="true" />
 				</IconButton>
-				<IconButton type="quiet" :label="memberAccessActionLabel(member)"
-						v-tooltip="memberAccessActionTooltip(member)"
-						:disabled="!canManageUsers"
-						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
-						@click="member.pending ? handleCancelInvite(member) : handleRemoveMember(member)"
-					>
+				<IconButton
+					v-tooltip="memberAccessActionTooltip(member)"
+					type="quiet"
+					:label="memberAccessActionLabel(member)"
+					:disabled="!canManageUsers"
+					class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
+					@click="member.pending ? handleCancelInvite(member) : handleRemoveMember(member)"
+				>
 					<XIcon v-if="member.pending" aria-hidden="true" />
 					<UserXIcon v-else aria-hidden="true" />
 				</IconButton>
@@ -217,10 +222,13 @@
 				<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
 			</div>
 			<div class="flex min-w-0 items-center justify-end pr-4">
-				<TeleportOverflowMenu type="quiet" :label="formatMessage(messages.memberActionsLabel, { username: member.user.username })" v-if="!member.isOwner"
-						:options="memberActionOptions(member)"
-						class="hover:!filter-none focus-visible:!filter-none active:!scale-100 active:!filter-none"
-					>
+				<TeleportOverflowMenu
+					v-if="!member.isOwner"
+					type="quiet"
+					:label="formatMessage(messages.memberActionsLabel, { username: member.user.username })"
+					:options="memberActionOptions(member)"
+					class="hover:!filter-none focus-visible:!filter-none active:!scale-100 active:!filter-none"
+				>
 					<MoreVerticalIcon aria-hidden="true" class="size-5" />
 					<span class="sr-only">
 						{{ formatMessage(messages.memberActionsLabel, { username: member.user.username }) }}
@@ -269,11 +277,6 @@
 
 <script setup lang="ts">
 import {
-	IconButton,
-	TeleportOverflowMenu,
-	type OverflowMenuOption,
-} from '#ui/components/base/buttons'
-import {
 	ChevronDownIcon,
 	ChevronUpIcon,
 	MoreVerticalIcon,
@@ -282,6 +285,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+
+import {
+	IconButton,
+	type OverflowMenuOption,
+	TeleportOverflowMenu,
+} from '#ui/components/base/buttons'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import { SettingsIcon } from '@modrinth/assets'
-import { defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { ButtonLink, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 

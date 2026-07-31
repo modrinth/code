@@ -75,10 +75,17 @@
 						</li>
 					</ul>
 				</div>
-				<ButtonLink type="colored" color="brand" size="xl" class="mt-6 !w-full" to="https://support.modrinth.com">{{
-					formatMessage(messages.contactSupportButton)
-				}}</ButtonLink>
-				<Button size="xl" @click="() => router.go(0)" class="mt-3 !w-full">{{ formatMessage(messages.reloadButton) }}</Button>
+				<ButtonLink
+					type="colored"
+					color="brand"
+					size="xl"
+					class="mt-6 !w-full"
+					to="https://support.modrinth.com"
+					>{{ formatMessage(messages.contactSupportButton) }}</ButtonLink
+				>
+				<Button size="xl" class="mt-3 !w-full" @click="() => router.go(0)">{{
+					formatMessage(messages.reloadButton)
+				}}</Button>
 			</div>
 		</div>
 
@@ -222,11 +229,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '#ui/components/base/buttons'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import {
-	AutoLink,
 	CopyCode,
 	defineMessages,
 	injectAuth,
@@ -249,6 +254,7 @@ import type Stripe from 'stripe'
 import { type ComponentPublicInstance, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { Button, ButtonLink } from '#ui/components/base/buttons'
 import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import type { ServerListingOwner } from '#ui/components/servers/access'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'

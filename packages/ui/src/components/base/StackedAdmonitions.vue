@@ -1,10 +1,11 @@
 <script lang="ts"></script>
 
 <script setup lang="ts" generic="ItemType extends StackedAdmonitionItem">
-import { Button } from '#ui/components/base/buttons'
 import { ChevronDownIcon, XIcon } from '@modrinth/assets'
 import { AnimatePresence, Motion } from 'motion-v'
 import { computed, onBeforeUnmount, onMounted, ref, useAttrs, useId, watch } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 export type StackedAdmonitionType = 'info' | 'warning' | 'critical' | 'success'
@@ -486,12 +487,13 @@ const messages = defineMessages({
 			>
 				<div v-if="hasActionBar" :ref="(el: unknown) => setActionBarRef(el)">
 					<div class="flex items-center justify-between pb-2">
-						<Button type="quiet"
-								native-type="button"
-								:aria-expanded="isExpanded"
-								:aria-controls="stackId"
-								@click="toggleExpanded"
-							>
+						<Button
+							type="quiet"
+							native-type="button"
+							:aria-expanded="isExpanded"
+							:aria-controls="stackId"
+							@click="toggleExpanded"
+						>
 							<Motion
 								as="span"
 								class="inline-flex"
@@ -504,7 +506,12 @@ const messages = defineMessages({
 								{{ formatMessage(messages.alertCount, { count: items.length }) }}
 							</slot>
 						</Button>
-						<Button type="quiet" v-if="dismissAllEnabled" native-type="button" @click="$emit('dismiss-all')">
+						<Button
+							v-if="dismissAllEnabled"
+							type="quiet"
+							native-type="button"
+							@click="$emit('dismiss-all')"
+						>
 							<XIcon class="h-4 w-4" />
 							{{ formatMessage(messages.dismissAll) }}
 						</Button>

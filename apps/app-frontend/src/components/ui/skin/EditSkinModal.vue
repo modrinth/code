@@ -113,7 +113,13 @@
 				<Button type="outlined" :disabled="isSaving" @click="hide">
 					<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
+				<Button
+					v-tooltip="saveTooltip"
+					type="colored"
+					color="brand"
+					:disabled="disableSave || isSaving"
+					@click="save"
+				>
 					<SpinnerIcon v-if="isSaving" class="animate-spin" />
 					<CheckIcon v-else-if="mode === 'new'" />
 					<SaveIcon v-else />
@@ -125,9 +131,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { CheckIcon, SaveIcon, SpinnerIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	CapeButton,
 	CapeLikeTextButton,
 	commonMessages,

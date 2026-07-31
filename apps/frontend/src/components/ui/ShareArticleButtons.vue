@@ -1,39 +1,44 @@
 <template>
 	<div class="flex gap-2">
 		<ButtonLink
-				v-tooltip="`Share on Bluesky`"
-				:href="`https://bsky.app/intent/compose?text=${encodedUrl}`"
-				target="_blank"
-			 class="!w-9 !px-0 !rounded-full">
+			v-tooltip="`Share on Bluesky`"
+			:href="`https://bsky.app/intent/compose?text=${encodedUrl}`"
+			target="_blank"
+			class="!w-9 !rounded-full !px-0"
+		>
 			<BlueskyIcon />
 		</ButtonLink>
 		<ButtonLink
-				v-tooltip="`Share on Mastodon`"
-				:href="`https://tootpick.org/#text=${encodedUrl}`"
-				target="_blank"
-			 class="!w-9 !px-0 !rounded-full">
+			v-tooltip="`Share on Mastodon`"
+			:href="`https://tootpick.org/#text=${encodedUrl}`"
+			target="_blank"
+			class="!w-9 !rounded-full !px-0"
+		>
 			<MastodonIcon />
 		</ButtonLink>
 		<ButtonLink
-				v-tooltip="`Share on X`"
-				:href="`https://www.x.com/intent/post?url=${encodedUrl}`"
-				target="_blank"
-			 class="!w-9 !px-0 !rounded-full">
+			v-tooltip="`Share on X`"
+			:href="`https://www.x.com/intent/post?url=${encodedUrl}`"
+			target="_blank"
+			class="!w-9 !rounded-full !px-0"
+		>
 			<TwitterIcon />
 		</ButtonLink>
 		<ButtonLink
-				v-tooltip="`Share via email`"
-				:href="`mailto:${encodedTitle ? `?subject=${encodedTitle}&` : `?`}body=${encodedUrl}`"
-				target="_blank"
-			 class="!w-9 !px-0 !rounded-full">
+			v-tooltip="`Share via email`"
+			:href="`mailto:${encodedTitle ? `?subject=${encodedTitle}&` : `?`}body=${encodedUrl}`"
+			target="_blank"
+			class="!w-9 !rounded-full !px-0"
+		>
 			<MailIcon />
 		</ButtonLink>
-		<IconButton :label="copied ? `Copied to clipboard` : `Copy link`"
-				v-tooltip="copied ? `Copied to clipboard` : `Copy link`"
-				:disabled="copied"
-				class="relative grid place-items-center overflow-hidden"
-				@click="copyToClipboard(url)"
-			>
+		<IconButton
+			v-tooltip="copied ? `Copied to clipboard` : `Copy link`"
+			:label="copied ? `Copied to clipboard` : `Copy link`"
+			:disabled="copied"
+			class="relative grid place-items-center overflow-hidden"
+			@click="copyToClipboard(url)"
+		>
 			<CheckIcon
 				class="absolute transition-all ease-in-out"
 				:class="copied ? 'translate-y-0' : 'translate-y-7'"
@@ -47,7 +52,6 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton, ButtonLink } from '@modrinth/ui'
 import {
 	BlueskyIcon,
 	CheckIcon,
@@ -56,7 +60,7 @@ import {
 	MastodonIcon,
 	TwitterIcon,
 } from '@modrinth/assets'
-
+import { ButtonLink, IconButton } from '@modrinth/ui'
 
 const props = defineProps<{
 	title?: string

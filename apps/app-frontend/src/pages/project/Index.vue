@@ -70,11 +70,26 @@
 				>
 					<template #actions>
 						<template v-if="isServerProject">
-							<Button type="colored" color="red" size="xl" v-if="serverPlaying" native-type="button" @click="handleStopServer">
+							<Button
+								v-if="serverPlaying"
+								type="colored"
+								color="red"
+								size="xl"
+								native-type="button"
+								@click="handleStopServer"
+							>
 								<StopCircleIcon />
 								{{ formatMessage(commonMessages.stopButton) }}
 							</Button>
-							<Button type="colored" color="brand" size="xl" v-else native-type="button" :disabled="serverInstallLoading" @click="handleClickPlay">
+							<Button
+								v-else
+								type="colored"
+								color="brand"
+								size="xl"
+								native-type="button"
+								:disabled="serverInstallLoading"
+								@click="handleClickPlay"
+							>
 								<PlayIcon />
 								{{
 									serverInstallLoading
@@ -82,36 +97,56 @@
 										: formatMessage(commonMessages.playButton)
 								}}
 							</Button>
-							<IconButton size="xl" :label="formatMessage(commonMessages.addServerToInstanceButton)"
-									v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
-									native-type="button"
-									@click="handleAddServerToInstance"
-								>
+							<IconButton
+								v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
+								size="xl"
+								:label="formatMessage(commonMessages.addServerToInstanceButton)"
+								native-type="button"
+								@click="handleAddServerToInstance"
+							>
 								<PlusIcon />
 							</IconButton>
-							<TeleportOverflowMenu type="quiet" size="xl" label="More options"
-									:options="serverProjectHeaderMoreActions"
-								>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								label="More options"
+								:options="serverProjectHeaderMoreActions"
+							>
 								<MoreVerticalIcon />
 							</TeleportOverflowMenu>
 						</template>
 						<template v-else>
-							<Button size="xl" v-if="showSwitchVersion && onVersionsPage" v-tooltip="formatMessage(messages.alreadyInstalled)" native-type="button" disabled>
+							<Button
+								v-if="showSwitchVersion && onVersionsPage"
+								v-tooltip="formatMessage(messages.alreadyInstalled)"
+								size="xl"
+								native-type="button"
+								disabled
+							>
 								<CheckIcon />
 								{{ formatMessage(commonMessages.installedLabel) }}
 							</Button>
-							<Button size="xl" v-else-if="showSwitchVersion" native-type="button" @click="goToVersions">
+							<Button
+								v-else-if="showSwitchVersion"
+								size="xl"
+								native-type="button"
+								@click="goToVersions"
+							>
 								<SwapIcon />
 								{{ formatMessage(messages.switchVersion) }}
 							</Button>
-							<Button type="colored" color="brand" size="xl" v-else
-									v-tooltip="
-										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
-									"
-									native-type="button"
-									:disabled="installButtonDisabled"
-									@click="install(null)"
-								>
+							<Button
+								v-else
+								v-tooltip="
+									installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
+								"
+								type="colored"
+								color="brand"
+								size="xl"
+								native-type="button"
+								:disabled="installButtonDisabled"
+								@click="install(null)"
+							>
 								<component :is="installButtonIcon" :class="installButtonIconClass" />
 								{{
 									installButtonInstalled
@@ -125,9 +160,12 @@
 													: formatMessage(commonMessages.installButton)
 								}}
 							</Button>
-							<TeleportOverflowMenu type="quiet" size="xl" label="More options"
-									:options="projectHeaderMoreActions"
-								>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								label="More options"
+								:options="projectHeaderMoreActions"
+							>
 								<MoreVerticalIcon />
 							</TeleportOverflowMenu>
 						</template>
@@ -203,7 +241,6 @@
 </template>
 
 <script setup>
-import { Button, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	BookmarkIcon,
 	CheckIcon,
@@ -221,10 +258,12 @@ import {
 } from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
+	Button,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	getTargetInstallPreferences,
+	IconButton,
 	injectNotificationManager,
 	NavTabs,
 	ProjectBackgroundGradient,
@@ -237,6 +276,7 @@ import {
 	ProjectSidebarTags,
 	requestInstall,
 	SelectedProjectsFloatingBar,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'

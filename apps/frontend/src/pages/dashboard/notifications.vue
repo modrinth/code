@@ -25,7 +25,7 @@
 						<HistoryIcon />
 						{{ formatMessage(messages.viewHistory) }}
 					</Button>
-					<Button type="colored" color="red" v-if="notifications.length > 0" @click="readAll()">
+					<Button v-if="notifications.length > 0" type="colored" color="red" @click="readAll()">
 						<CheckCheckIcon />
 						{{ formatMessage(messages.markAllAsRead) }}
 					</Button>
@@ -65,9 +65,9 @@
 	</div>
 </template>
 <script setup>
-import { Button } from '@modrinth/ui'
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
 import {
+	Button,
 	Chips,
 	commonMessages,
 	defineMessages,

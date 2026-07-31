@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import {
 	AppleIcon,
 	ArrowDownIcon,
@@ -18,9 +17,11 @@ import {
 	Accordion,
 	Avatar,
 	Badge,
+	Button,
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
@@ -546,7 +547,7 @@ useSeoMeta({
 				{{ formatMessage(messages.description) }}
 			</h2>
 			<div class="button-group">
-				<Button type="colored" color="brand" size="xl" v-if="os" @click="handleDownload">
+				<Button v-if="os" type="colored" color="brand" size="xl" @click="handleDownload">
 					<LinuxIcon v-if="os === 'Linux'" />
 					<WindowsIcon v-else-if="os === 'Windows'" />
 					<AppleIcon v-else-if="os === 'Mac'" />

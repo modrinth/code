@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { EditIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+
+import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { Avatar } from '../index'
@@ -44,7 +45,8 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<TeleportOverflowMenu :label="formatMessage(messages.editIcon)"
+	<TeleportOverflowMenu
+		:label="formatMessage(messages.editIcon)"
 		:tooltip="formatMessage(messages.editIcon)"
 		:icon-only="false"
 		type="quiet"

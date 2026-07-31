@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import {
 	BlueskyIcon,
 	DiscordIcon,
@@ -8,6 +7,7 @@ import {
 	ToggleRightIcon,
 	TwitterIcon,
 } from '@modrinth/assets'
+import { ButtonLink } from '@modrinth/ui'
 import {
 	AutoLink,
 	defineMessage,
@@ -271,21 +271,28 @@ function developerModeIncrement() {
 							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
 							@click="developerModeIncrement()"
 						/>
-						<ButtonLink type="quiet" color="brand" v-if="flags.developerMode"
-								v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
-								to="/settings/flags"
-							 class="!w-9 !px-0 !rounded-full">
+						<ButtonLink
+							v-if="flags.developerMode"
+							v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
+							type="quiet"
+							color="brand"
+							to="/settings/flags"
+							class="!w-9 !rounded-full !px-0"
+						>
 							<ToggleRightIcon />
 						</ButtonLink>
 					</div>
 					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-						<ButtonLink type="quiet" v-for="(social, index) in socialLinks"
+						<ButtonLink
+							v-for="(social, index) in socialLinks"
 							:key="`footer-social-${index}`"
-								v-tooltip="formatMessage(social.label)"
-								:href="social.href"
-								target="_blank"
-								:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-							 class="!w-9 !px-0 !rounded-full">
+							v-tooltip="formatMessage(social.label)"
+							type="quiet"
+							:href="social.href"
+							target="_blank"
+							:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
+							class="!w-9 !rounded-full !px-0"
+						>
 							<component :is="social.icon" class="h-5 w-5" />
 						</ButtonLink>
 					</div>

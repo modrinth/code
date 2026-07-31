@@ -1,19 +1,19 @@
 <template>
 	<TeleportPopoutMenu
-			v-if="options.length > 1 || showAlways"
-			v-bind="$attrs"
-			:disabled="disabled"
-			:label="tooltip || 'Select options'"
-			:tooltip="tooltip"
-			placement="bottom-start"
-			@open="searchQuery = ''"
-		>
-			<template #trigger>
+		v-if="options.length > 1 || showAlways"
+		v-bind="$attrs"
+		:disabled="disabled"
+		:label="tooltip || 'Select options'"
+		:tooltip="tooltip"
+		placement="bottom-start"
+		@open="searchQuery = ''"
+	>
+		<template #trigger>
 			<slot />
 			<DropdownIcon class="h-5 w-5 text-secondary" />
-			</template>
-			<template #panel>
-				<div :class="dropdownClass">
+		</template>
+		<template #panel>
+			<div :class="dropdownClass">
 				<StyledInput
 					v-if="search"
 					id="search-input"
@@ -60,8 +60,8 @@
 					</Button>
 				</div>
 				<slot name="footer" />
-				</div>
-			</template>
+			</div>
+		</template>
 	</TeleportPopoutMenu>
 </template>
 <script setup lang="ts">
@@ -69,8 +69,8 @@ import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { Button, TeleportPopoutMenu } from './buttons'
-import StyledInput from './StyledInput.vue'
 import ScrollablePanel from './ScrollablePanel.vue'
+import StyledInput from './StyledInput.vue'
 
 type Option = string | number | object
 

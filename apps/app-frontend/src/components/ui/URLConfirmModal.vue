@@ -1,5 +1,5 @@
 <script setup>
-import { injectNotificationManager, ProjectCard, Button } from '@modrinth/ui'
+import { Button, injectNotificationManager, ProjectCard } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

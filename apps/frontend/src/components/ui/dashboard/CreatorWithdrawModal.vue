@@ -66,7 +66,11 @@
 				</Button>
 			</div>
 			<div v-else class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
-				<Button type="outlined" :disabled="leftButtonConfig.disabled" @click="leftButtonConfig.handler">
+				<Button
+					type="outlined"
+					:disabled="leftButtonConfig.disabled"
+					@click="leftButtonConfig.handler"
+				>
 					<component :is="leftButtonConfig.icon" />
 					{{ leftButtonConfig.label }}
 				</Button>
@@ -100,7 +104,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
@@ -112,6 +115,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,

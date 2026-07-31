@@ -71,10 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { FileTextIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,

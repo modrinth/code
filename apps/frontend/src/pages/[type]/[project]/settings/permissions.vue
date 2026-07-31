@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowDown10Icon,
@@ -14,6 +13,7 @@ import {
 	UnfoldVerticalIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	Admonition,
 	Combobox,
@@ -606,12 +606,14 @@ function dismissInfoBanner() {
 					<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
 					{{ expandCollapseAllLabel }}
 				</Button>
-				<Button type="outlined" v-if="isModerator"
-						native-type="button"
-						class="!h-[40px] !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
-						:disabled="deleteAllGroupsMutation.isPending.value"
-						@click="showDeleteAllGroupsConfirmation"
-					>
+				<Button
+					v-if="isModerator"
+					type="outlined"
+					native-type="button"
+					class="!h-[40px] !text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
+					:disabled="deleteAllGroupsMutation.isPending.value"
+					@click="showDeleteAllGroupsConfirmation"
+				>
 					<SpinnerIcon
 						v-if="deleteAllGroupsMutation.isPending.value"
 						class="size-5 flex-shrink-0 animate-spin"

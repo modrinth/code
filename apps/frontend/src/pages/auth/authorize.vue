@@ -63,7 +63,14 @@
 					<XIcon />
 					{{ formatMessage(messages.decline) }}
 				</Button>
-				<Button type="colored" color="brand" size="xl" class="wide-button" :disabled="pending" @click="onAuthorize">
+				<Button
+					type="colored"
+					color="brand"
+					size="xl"
+					class="wide-button"
+					:disabled="pending"
+					@click="onAuthorize"
+				>
 					<CheckIcon />
 					{{ formatMessage(messages.authorize) }}
 				</Button>
@@ -84,10 +91,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

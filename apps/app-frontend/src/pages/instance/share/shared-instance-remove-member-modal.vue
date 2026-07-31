@@ -45,7 +45,15 @@
 
 <script setup lang="ts">
 import { UserXIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, commonMessages, defineMessages, NewModal, useVIntl, Button } from '@modrinth/ui'
+import {
+	Admonition,
+	Avatar,
+	Button,
+	commonMessages,
+	defineMessages,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { methodLabels, type ShareRow } from './shared-instance-share-types'

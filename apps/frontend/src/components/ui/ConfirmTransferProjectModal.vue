@@ -78,9 +78,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { RightArrowIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, NewModal, StyledInput } from '@modrinth/ui'
+import { Admonition, Avatar, Button, NewModal, StyledInput } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{

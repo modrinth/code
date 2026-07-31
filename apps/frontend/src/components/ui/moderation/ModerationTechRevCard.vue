@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button, ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BanIcon,
@@ -23,6 +22,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
+import { Button, ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
 	Collapsible,
@@ -1497,21 +1497,24 @@ function copyId() {
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
 					<div class="flex items-center gap-2">
-						<ButtonLink v-if="props.item.project.link_urls?.['source']?.url"
-								v-tooltip="'Open sources in new tab'"
-								:href="props.item.project.link_urls?.['source']?.url"
-								target="_blank"
-							 class="!w-9 !px-0 !rounded-full">
+						<ButtonLink
+							v-if="props.item.project.link_urls?.['source']?.url"
+							v-tooltip="'Open sources in new tab'"
+							:href="props.item.project.link_urls?.['source']?.url"
+							target="_blank"
+							class="!w-9 !rounded-full !px-0"
+						>
 							<CodeIcon />
 						</ButtonLink>
-						<IconButton :label="'Copy ID'" v-tooltip="'Copy ID'" @click="copyId">
+						<IconButton v-tooltip="'Copy ID'" :label="'Copy ID'" @click="copyId">
 							<ClipboardCopyIcon />
 						</IconButton>
 						<ButtonLink
-								v-tooltip="'Open in new tab'"
-								:href="`/moderation/technical-review/${props.item.project.id}`"
-								target="_blank"
-							 class="!w-9 !px-0 !rounded-full">
+							v-tooltip="'Open in new tab'"
+							:href="`/moderation/technical-review/${props.item.project.id}`"
+							target="_blank"
+							class="!w-9 !rounded-full !px-0"
+						>
 							<ExternalIcon />
 						</ButtonLink>
 					</div>
@@ -1548,25 +1551,30 @@ function copyId() {
 							@update-thread="handleThreadUpdate"
 						>
 							<template #additionalActions>
-								<Button type="colored" color="brand"
-										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
-										:disabled="!canSubmitReview"
-										@click="handleSubmitReview('safe')"
-									>
+								<Button
+									v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+									type="colored"
+									color="brand"
+									:disabled="!canSubmitReview"
+									@click="handleSubmitReview('safe')"
+								>
 									<ShieldCheckIcon /> Pass
 								</Button>
-								<Button type="colored" color="red"
-										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
-										:disabled="!canSubmitReview"
-										@click="handleSubmitReview('unsafe')"
-									>
+								<Button
+									v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+									type="colored"
+									color="red"
+									:disabled="!canSubmitReview"
+									@click="handleSubmitReview('unsafe')"
+								>
 									<BugIcon /> Fail
 								</Button>
-								<TeleportOverflowMenu label="More options"
-										class="btn-dropdown-animation !w-auto !px-2.5 !rounded-xl"
-										:disabled="isLoadingStatusAction"
-										:options="projectStatusActions"
-									>
+								<TeleportOverflowMenu
+									label="More options"
+									class="btn-dropdown-animation !w-auto !rounded-xl !px-2.5"
+									:disabled="isLoadingStatusAction"
+									:options="projectStatusActions"
+								>
 									<SpinnerIcon
 										v-if="isLoadingStatusAction"
 										class="animate-spin"
@@ -1591,7 +1599,12 @@ function copyId() {
 										Reject
 									</template>
 								</TeleportOverflowMenu>
-								<Button type="outlined" v-if="featureFlags.developerMode" @click="emit('showMaliciousSummary', unsafeFiles)">Debug</Button>
+								<Button
+									v-if="featureFlags.developerMode"
+									type="outlined"
+									@click="emit('showMaliciousSummary', unsafeFiles)"
+									>Debug</Button
+								>
 							</template>
 						</ThreadView>
 					</div>
@@ -1663,12 +1676,13 @@ function copyId() {
 
 					<div class="flex items-center gap-2">
 						<Button v-if="getFileDetailCount(file) > 0" @click="viewFileFlags(file)">Flags</Button>
-						<ButtonLink type="outlined"
-								:href="file.download_url"
-								:title="`Download ${file.file_name}`"
-								:download="file.file_name"
-								tabindex="0"
-							>
+						<ButtonLink
+							type="outlined"
+							:href="file.download_url"
+							:title="`Download ${file.file_name}`"
+							:download="file.file_name"
+							tabindex="0"
+						>
 							<DownloadIcon /> Download
 						</ButtonLink>
 					</div>
@@ -1840,10 +1854,12 @@ function copyId() {
 							@click="toggleClass(classItem)"
 						>
 							<div class="my-auto flex items-center gap-2">
-								<IconButton type="quiet" label="Toggle details"
-										class="transition-transform"
-										:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
-									>
+								<IconButton
+									type="quiet"
+									label="Toggle details"
+									class="transition-transform"
+									:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
+								>
 									<ChevronDownIcon class="h-5 w-5 text-contrast" />
 								</IconButton>
 
@@ -2043,11 +2059,13 @@ function copyId() {
 									v-if="getHighlightedClassSource(classItem).length > 0"
 									class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 								>
-									<IconButton type="quiet" :label="`Copy code`"
-											v-tooltip="`Copy code`"
-											class="absolute right-2 top-2 border-[1px]"
-											@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
-										>
+									<IconButton
+										v-tooltip="`Copy code`"
+										type="quiet"
+										:label="`Copy code`"
+										class="absolute right-2 top-2 border-[1px]"
+										@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
+									>
 										<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
 										<CheckIcon v-else />
 									</IconButton>

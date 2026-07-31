@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { type Archon, type Labrinth, pingWebSocketUrl } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
@@ -13,12 +12,12 @@ import { useQueryClient } from '@tanstack/vue-query'
 import type Stripe from 'stripe'
 import { computed, nextTick, onBeforeUnmount, ref, toRef, useTemplateRef, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
-
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import NewModal from '../modal/NewModal.vue'
 import PlanSelector from './ServersPurchase0Plan.vue'

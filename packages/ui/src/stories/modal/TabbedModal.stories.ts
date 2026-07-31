@@ -1,4 +1,3 @@
-import { Button } from '../../components/base/buttons'
 import {
 	CoffeeIcon,
 	GameIcon,
@@ -15,6 +14,7 @@ import {
 import type { StoryObj } from '@storybook/vue3-vite'
 import { defineComponent, h, ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
 import TabbedModal from '../../components/modal/TabbedModal.vue'
 

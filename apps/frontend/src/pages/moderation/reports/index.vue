@@ -124,11 +124,7 @@
 					</template>
 				</MultiSelect>
 
-				<TeleportPopoutMenu
-					label="Advanced filters"
-					size="lg"
-					:auto-focus="false"
-				>
+				<TeleportPopoutMenu label="Advanced filters" size="lg" :auto-focus="false">
 					<template #trigger>
 						<BlendIcon aria-hidden="true" />
 						Advanced filters

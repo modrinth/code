@@ -130,7 +130,13 @@
 					<XIcon aria-hidden="true" />
 					{{ formatMessage(messages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" v-tooltip="grantPermissionTooltip" :disabled="!canSubmit" @click="submit">
+				<Button
+					v-tooltip="grantPermissionTooltip"
+					type="colored"
+					color="brand"
+					:disabled="!canSubmit"
+					@click="submit"
+				>
 					<UserPlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.inviteButton) }}
 				</Button>
@@ -140,10 +146,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { EyeIcon, PencilIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'

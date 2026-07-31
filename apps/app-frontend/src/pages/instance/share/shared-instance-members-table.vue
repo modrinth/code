@@ -11,22 +11,25 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<Button type="outlined"
-							size="lg"
-							class="shrink-0 !border"
-							:disabled="pushUpdateDisabled"
-							@click="emit('push-update', $event)"
-						>
+					<Button
+						type="outlined"
+						size="lg"
+						class="shrink-0 !border"
+						:disabled="pushUpdateDisabled"
+						@click="emit('push-update', $event)"
+					>
 						<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
 						<UploadIcon v-else aria-hidden="true" />
 						{{ formatMessage(messages.pushUpdate) }}
 					</Button>
-					<Button type="colored" color="brand"
-							size="lg"
-							class="shrink-0"
-							:disabled="invitePending || inviteDisabled"
-							@click="emit('invite', $event)"
-						>
+					<Button
+						type="colored"
+						color="brand"
+						size="lg"
+						class="shrink-0"
+						:disabled="invitePending || inviteDisabled"
+						@click="emit('invite', $event)"
+					>
 						<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
 						<UserPlusIcon v-else aria-hidden="true" />
 						Invite friends
@@ -118,12 +121,15 @@
 			</template>
 			<template #cell-actions="{ row }">
 				<div v-if="!actionsLocked" class="flex items-center justify-end">
-					<IconButton type="quiet" :label="`Revoke access for ${row.username}`"
-							v-tooltip="'Revoke access'"
-							class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
-							@click="emit('remove', row)"
-						>
-						<XIcon aria-hidden="true" /></IconButton>
+					<IconButton
+						v-tooltip="'Revoke access'"
+						type="quiet"
+						:label="`Revoke access for ${row.username}`"
+						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
+						@click="emit('remove', row)"
+					>
+						<XIcon aria-hidden="true"
+					/></IconButton>
 				</div>
 			</template>
 		</Table>
@@ -131,7 +137,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import {
 	FilterIcon,
 	LinkIcon,
@@ -141,7 +146,20 @@ import {
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { AutoLink, Avatar, defineMessages, type SortDirection, StyledInput, Table, type TableColumn, truncatedTooltip, useFormatDateTime, useRelativeTime, useVIntl } from '@modrinth/ui'
+import { Button, IconButton } from '@modrinth/ui'
+import {
+	AutoLink,
+	Avatar,
+	defineMessages,
+	type SortDirection,
+	StyledInput,
+	Table,
+	type TableColumn,
+	truncatedTooltip,
+	useFormatDateTime,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import {

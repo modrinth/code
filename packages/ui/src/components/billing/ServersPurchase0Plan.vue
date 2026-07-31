@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { RightArrowIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -218,11 +219,13 @@ function selectCustom() {
 				</div>
 			</div>
 			<div class="w-full">
-				<Button type="colored" color="blue"
-						class="w-full"
-						:disabled="existingPlan?.id === plansByRam.small.id"
-						@click="selectPlan(plansByRam.small!)"
-					>
+				<Button
+					type="colored"
+					color="blue"
+					class="w-full"
+					:disabled="existingPlan?.id === plansByRam.small.id"
+					@click="selectPlan(plansByRam.small!)"
+				>
 					{{
 						existingPlan?.id === plansByRam.small.id
 							? formatMessage(messages.yourCurrentPlan)
@@ -279,10 +282,13 @@ function selectCustom() {
 					</div>
 				</div>
 				<div class="w-full">
-					<Button type="colored" color="brand" class="w-full"
-							:disabled="existingPlan?.id === plansByRam.medium.id"
-							@click="selectPlan(plansByRam.medium!)"
-						>
+					<Button
+						type="colored"
+						color="brand"
+						class="w-full"
+						:disabled="existingPlan?.id === plansByRam.medium.id"
+						@click="selectPlan(plansByRam.medium!)"
+					>
 						{{
 							existingPlan?.id === plansByRam.medium.id
 								? formatMessage(messages.yourCurrentPlan)
@@ -324,10 +330,13 @@ function selectCustom() {
 				</div>
 			</div>
 			<div class="w-full">
-				<Button type="colored" color="purple" class="w-full"
-						:disabled="existingPlan?.id === plansByRam.large.id"
-						@click="selectPlan(plansByRam.large!)"
-					>
+				<Button
+					type="colored"
+					color="purple"
+					class="w-full"
+					:disabled="existingPlan?.id === plansByRam.large.id"
+					@click="selectPlan(plansByRam.large!)"
+				>
 					{{
 						existingPlan?.id === plansByRam.large.id
 							? formatMessage(messages.yourCurrentPlan)

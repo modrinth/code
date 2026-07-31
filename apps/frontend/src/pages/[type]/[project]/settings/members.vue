@@ -41,10 +41,12 @@
 					@keypress.enter="inviteTeamMember()"
 				/>
 				<label for="username" class="hidden">Username</label>
-				<Button type="colored" color="brand"
-						:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
-						@click="inviteTeamMember()"
-					>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
+					@click="inviteTeamMember()"
+				>
 					<UserPlusIcon />
 					Invite
 				</Button>
@@ -54,13 +56,15 @@
 					<span class="label__title">Leave project</span>
 					<span class="label__description"> Remove yourself as a member of this project. </span>
 				</span>
-				<Button type="colored" color="red"
-						:disabled="currentMember?.is_owner"
-						:title="
-							currentMember?.is_owner ? 'You cannot leave the project if you are the owner!' : ''
-						"
-						@click="leaveProject()"
-					>
+				<Button
+					type="colored"
+					color="red"
+					:disabled="currentMember?.is_owner"
+					:title="
+						currentMember?.is_owner ? 'You cannot leave the project if you are the owner!' : ''
+					"
+					@click="leaveProject()"
+				>
 					<UserXIcon />
 					Leave project
 				</Button>
@@ -86,14 +90,15 @@
 				<div class="side-buttons">
 					<Badge v-if="member.accepted" type="accepted" />
 					<Badge v-else type="pending" />
-					<IconButton label="Toggle details"
-							class="dropdown-icon"
-							@click="
-								openTeamMembers.indexOf(member.user.id) === -1
-									? openTeamMembers.push(member.user.id)
-									: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
-							"
-						>
+					<IconButton
+						label="Toggle details"
+						class="dropdown-icon"
+						@click="
+							openTeamMembers.indexOf(member.user.id) === -1
+								? openTeamMembers.push(member.user.id)
+								: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
+						"
+					>
 						<DropdownIcon />
 					</IconButton>
 				</div>
@@ -223,21 +228,29 @@
 					</div>
 				</template>
 				<div class="input-group">
-					<Button type="colored" color="brand"
-							:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
-							@click="updateTeamMember(index)"
-						>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						@click="updateTeamMember(index)"
+					>
 						<SaveIcon />
 						Save changes
 					</Button>
-					<Button type="colored" color="red" v-if="!member.is_owner"
-							:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
-							@click="removeTeamMember(index)"
-						>
+					<Button
+						v-if="!member.is_owner"
+						type="colored"
+						color="red"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						@click="removeTeamMember(index)"
+					>
 						<UserXIcon />
 						Remove member
 					</Button>
-					<Button v-if="!member.is_owner && currentMember?.is_owner && member.accepted" @click="openTransferModal(index, $event)">
+					<Button
+						v-if="!member.is_owner && currentMember?.is_owner && member.accepted"
+						@click="openTransferModal(index, $event)"
+					>
 						<TransferIcon />
 						Transfer ownership
 					</Button>
@@ -296,7 +309,12 @@
 					force-direction="up"
 					:disabled="!currentMember?.is_owner || organizationOptions.length === 0"
 				/>
-				<Button type="colored" color="brand" :disabled="!selectedOrganization" @click="openTransferToOrgModal($event)">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!selectedOrganization"
+					@click="openTransferToOrgModal($event)"
+				>
 					<CheckIcon />
 					<span class="w-max"> Transfer management </span>
 				</Button>
@@ -326,14 +344,15 @@
 				<div class="side-buttons">
 					<Badge v-if="member.accepted" type="accepted" />
 					<Badge v-else type="pending" />
-					<IconButton label="Toggle details"
-							class="dropdown-icon"
-							@click="
-								openTeamMembers.indexOf(member.user.id) === -1
-									? openTeamMembers.push(member.user.id)
-									: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
-							"
-						>
+					<IconButton
+						label="Toggle details"
+						class="dropdown-icon"
+						@click="
+							openTeamMembers.indexOf(member.user.id) === -1
+								? openTeamMembers.push(member.user.id)
+								: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
+						"
+					>
 						<DropdownIcon />
 					</IconButton>
 				</div>
@@ -509,13 +528,15 @@
 
 					we don't allow clicking the button in that last case.
 					-->
-					<Button type="colored" color="brand"
-							:disabled="
-								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
-							"
-							@click="updateOrgMember(index)"
-						>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="
+							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+							(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
+						"
+						@click="updateOrgMember(index)"
+					>
 						<SaveIcon />
 						Save changes
 					</Button>
@@ -526,7 +547,6 @@
 </template>
 
 <script setup>
-import { Button, IconButton } from '@modrinth/ui'
 import {
 	CheckIcon,
 	CrownIcon,
@@ -541,10 +561,12 @@ import {
 import {
 	Avatar,
 	Badge,
+	Button,
 	Card,
 	Checkbox,
 	Combobox,
 	ConfirmModal,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,

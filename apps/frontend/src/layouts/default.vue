@@ -91,107 +91,174 @@
 				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
-					<ButtonLink type="quiet" to="/discover/mods" :class="(route.name === 'discover-mods' || route.path.startsWith('/mod/')) ? ((
-							route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+					<ButtonLink
+						type="quiet"
+						to="/discover/mods"
+						:class="
+							route.name === 'discover-mods' || route.path.startsWith('/mod/')
+								? (route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary') ===
+									'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<BoxIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
 					</ButtonLink>
-					<ButtonLink type="quiet" to="/discover/resourcepacks" :class="(
+					<ButtonLink
+						type="quiet"
+						to="/discover/resourcepacks"
+						:class="
 							route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
-						) ? ((
-							route.name === 'discover-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+								? (route.name === 'discover-resourcepacks'
+										? 'main-nav-primary'
+										: 'main-nav-secondary') === 'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<PaintbrushIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
 					</ButtonLink>
-					<ButtonLink type="quiet" to="/discover/datapacks" :class="(
+					<ButtonLink
+						type="quiet"
+						to="/discover/datapacks"
+						:class="
 							route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
-						) ? ((
-							route.name === 'discover-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+								? (route.name === 'discover-datapacks'
+										? 'main-nav-primary'
+										: 'main-nav-secondary') === 'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<BracesIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
 					</ButtonLink>
-					<ButtonLink type="quiet" to="/discover/modpacks" :class="(route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')) ? ((
-							route.name === 'discover-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+					<ButtonLink
+						type="quiet"
+						to="/discover/modpacks"
+						:class="
+							route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')
+								? (route.name === 'discover-modpacks'
+										? 'main-nav-primary'
+										: 'main-nav-secondary') === 'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<PackageOpenIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
 					</ButtonLink>
-					<ButtonLink type="quiet" to="/discover/shaders" :class="(route.name === 'discover-shaders' || route.path.startsWith('/shader/')) ? ((
-							route.name === 'discover-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+					<ButtonLink
+						type="quiet"
+						to="/discover/shaders"
+						:class="
+							route.name === 'discover-shaders' || route.path.startsWith('/shader/')
+								? (route.name === 'discover-shaders'
+										? 'main-nav-primary'
+										: 'main-nav-secondary') === 'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<GlassesIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
 					</ButtonLink>
-					<ButtonLink type="quiet" to="/discover/plugins" :class="(route.name === 'discover-plugins' || route.path.startsWith('/plugin/')) ? ((
-							route.name === 'discover-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+					<ButtonLink
+						type="quiet"
+						to="/discover/plugins"
+						:class="
+							route.name === 'discover-plugins' || route.path.startsWith('/plugin/')
+								? (route.name === 'discover-plugins'
+										? 'main-nav-primary'
+										: 'main-nav-secondary') === 'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<PlugIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
 					</ButtonLink>
-					<ButtonLink type="quiet" to="/discover/servers" :class="(route.name === 'discover-servers' || route.path.startsWith('/server/')) ? ((
-							route.name === 'discover-servers' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+					<ButtonLink
+						type="quiet"
+						to="/discover/servers"
+						:class="
+							route.name === 'discover-servers' || route.path.startsWith('/server/')
+								? (route.name === 'discover-servers'
+										? 'main-nav-primary'
+										: 'main-nav-secondary') === 'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<ServerIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
 					</ButtonLink>
 				</template>
 				<template v-else>
-					<TeleportOverflowMenu type="quiet" :label="formatMessage(commonMessages.moreOptionsButton)"
-							:options="[
-								{
-									id: 'mods',
-									label: formatMessage(commonProjectTypeCategoryMessages.mod),
-									type: 'link',
-									to: '/discover/mods',
-								},
-								{
-									id: 'resourcepacks',
-									label: formatMessage(commonProjectTypeCategoryMessages.resourcepack),
-									type: 'link',
-									to: '/discover/resourcepacks',
-								},
-								{
-									id: 'datapacks',
-									label: formatMessage(commonProjectTypeCategoryMessages.datapack),
-									type: 'link',
-									to: '/discover/datapacks',
-								},
-								{
-									id: 'shaders',
-									label: formatMessage(commonProjectTypeCategoryMessages.shader),
-									type: 'link',
-									to: '/discover/shaders',
-								},
-								{
-									id: 'modpacks',
-									label: formatMessage(commonProjectTypeCategoryMessages.modpack),
-									type: 'link',
-									to: '/discover/modpacks',
-								},
-								{
-									id: 'plugins',
-									label: formatMessage(commonProjectTypeCategoryMessages.plugin),
-									type: 'link',
-									to: '/discover/plugins',
-								},
-								{
-									id: 'servers',
-									label: formatMessage(commonProjectTypeCategoryMessages.server),
-									type: 'link',
-									to: '/discover/servers',
-								},
-							]"
-							:class="[
-								'!w-auto !rounded-xl !px-2.5',
-								isDiscovering
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: isDiscoveringSubpage
-										? '!bg-[var(--color-button-bg)] !text-contrast'
-										: '',
-							]"
+					<TeleportOverflowMenu
+						type="quiet"
+						:label="formatMessage(commonMessages.moreOptionsButton)"
+						:options="[
+							{
+								id: 'mods',
+								label: formatMessage(commonProjectTypeCategoryMessages.mod),
+								type: 'link',
+								to: '/discover/mods',
+							},
+							{
+								id: 'resourcepacks',
+								label: formatMessage(commonProjectTypeCategoryMessages.resourcepack),
+								type: 'link',
+								to: '/discover/resourcepacks',
+							},
+							{
+								id: 'datapacks',
+								label: formatMessage(commonProjectTypeCategoryMessages.datapack),
+								type: 'link',
+								to: '/discover/datapacks',
+							},
+							{
+								id: 'shaders',
+								label: formatMessage(commonProjectTypeCategoryMessages.shader),
+								type: 'link',
+								to: '/discover/shaders',
+							},
+							{
+								id: 'modpacks',
+								label: formatMessage(commonProjectTypeCategoryMessages.modpack),
+								type: 'link',
+								to: '/discover/modpacks',
+							},
+							{
+								id: 'plugins',
+								label: formatMessage(commonProjectTypeCategoryMessages.plugin),
+								type: 'link',
+								to: '/discover/plugins',
+							},
+							{
+								id: 'servers',
+								label: formatMessage(commonProjectTypeCategoryMessages.server),
+								type: 'link',
+								to: '/discover/servers',
+							},
+						]"
+						:class="[
+							'!w-auto !rounded-xl !px-2.5',
+							isDiscovering
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+								: isDiscoveringSubpage
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: '',
+						]"
 					>
 						<BoxIcon
 							v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
@@ -204,9 +271,7 @@
 							aria-hidden="true"
 						/>
 						<BracesIcon
-							v-else-if="
-								route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
-							"
+							v-else-if="route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')"
 							aria-hidden="true"
 						/>
 						<PackageOpenIcon
@@ -261,23 +326,38 @@
 							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
 						</template>
 					</TeleportOverflowMenu>
-					<ButtonLink type="quiet" to="/hosting" :class="(
+					<ButtonLink
+						type="quiet"
+						to="/hosting"
+						:class="
 							route.name?.startsWith('hosting') ||
 							(route.name?.startsWith('discover-') && !!route.query.sid)
-						) ? ((
-							route.name === 'hosting' ? 'main-nav-primary' : 'main-nav-secondary'
-						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+								? (route.name === 'hosting' ? 'main-nav-primary' : 'main-nav-secondary') ===
+									'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<ServerStackIcon aria-hidden="true" />
 						{{ formatMessage(navMenuMessages.hostAServer) }}
 					</ButtonLink>
-					<ButtonLink type="quiet" to="/app" :class="(route.name === 'app') ? (true ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+					<ButtonLink
+						type="quiet"
+						to="/app"
+						:class="
+							route.name === 'app'
+								? true
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+					>
 						<DownloadIcon aria-hidden="true" />
 						<span class="hidden md:contents">{{
 							formatMessage(navMenuMessages.getModrinthApp)
 						}}</span>
-						<span class="contents md:hidden">{{
-							formatMessage(navMenuMessages.modrinthApp)
-						}}</span>
+						<span class="contents md:hidden">{{ formatMessage(navMenuMessages.modrinthApp) }}</span>
 					</ButtonLink>
 				</template>
 			</div>
@@ -289,94 +369,94 @@
 					:label="formatMessage(messages.createNew)"
 					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
 					:options="[
-							{
-								id: 'review-projects',
-								label: formatMessage(messages.reviewProjects),
-								type: 'link',
-								to: '/moderation',
-								tone: 'orange',
-							},
-							{
-								id: 'tech-review',
-								label: formatMessage(messages.techReview),
-								type: 'link',
-								to: '/moderation/technical-review',
-								tone: 'orange',
-							},
-							{
-								id: 'review-reports',
-								label: formatMessage(messages.reports),
-								type: 'link',
-								to: '/moderation/reports',
-								tone: 'orange',
-							},
-							{
-								id: 'external-projects',
-								label: formatMessage(messages.externalProjects),
-								type: 'link',
-								to: '/moderation/external-projects',
-								tone: 'orange',
-							},
-							{
-								type: 'divider',
-							},
-							{
-								id: 'file-lookup',
-								label: formatMessage(messages.fileLookup),
-								type: 'link',
-								to: '/admin/file_lookup',
-							},
-							{
-								type: 'divider',
-								shown: isAdmin(auth.user),
-							},
-							{
-								id: 'user-lookup',
-								label: formatMessage(messages.lookupByEmail),
-								type: 'link',
-								to: '/admin/user_email',
-								tone: 'brand',
-								shown: isAdmin(auth.user),
-							},
-							{
-								id: 'affiliates',
-								label: formatMessage(messages.manageAffiliates),
-								type: 'link',
-								to: '/admin/affiliates',
-								tone: 'brand',
-								shown: isAdmin(auth.user),
-							},
-							{
-								id: 'servers-notices',
-								label: formatMessage(messages.manageServerNotices),
-								type: 'link',
-								to: '/admin/servers/notices',
-								tone: 'brand',
-								shown: isAdmin(auth.user),
-							},
-							{
-								id: 'servers-transfers',
-								label: 'Server transfers',
-								type: 'link',
-								to: '/admin/servers/transfers',
-								tone: 'brand',
-								shown: isAdmin(auth.user),
-							},
-							{
-								id: 'servers-nodes',
-								label: 'Credit server nodes',
-								action: (event) => $refs.modal_batch_credit.show(event),
-								tone: 'brand',
-								shown: isAdmin(auth.user),
-							},
-							{
-								id: 'analytics-events',
-								label: formatMessage(messages.analyticsEvents),
-								type: 'link',
-								to: '/admin/analytics/events',
-								tone: 'brand',
-								shown: isAdmin(auth.user),
-							},
+						{
+							id: 'review-projects',
+							label: formatMessage(messages.reviewProjects),
+							type: 'link',
+							to: '/moderation',
+							tone: 'orange',
+						},
+						{
+							id: 'tech-review',
+							label: formatMessage(messages.techReview),
+							type: 'link',
+							to: '/moderation/technical-review',
+							tone: 'orange',
+						},
+						{
+							id: 'review-reports',
+							label: formatMessage(messages.reports),
+							type: 'link',
+							to: '/moderation/reports',
+							tone: 'orange',
+						},
+						{
+							id: 'external-projects',
+							label: formatMessage(messages.externalProjects),
+							type: 'link',
+							to: '/moderation/external-projects',
+							tone: 'orange',
+						},
+						{
+							type: 'divider',
+						},
+						{
+							id: 'file-lookup',
+							label: formatMessage(messages.fileLookup),
+							type: 'link',
+							to: '/admin/file_lookup',
+						},
+						{
+							type: 'divider',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'user-lookup',
+							label: formatMessage(messages.lookupByEmail),
+							type: 'link',
+							to: '/admin/user_email',
+							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'affiliates',
+							label: formatMessage(messages.manageAffiliates),
+							type: 'link',
+							to: '/admin/affiliates',
+							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'servers-notices',
+							label: formatMessage(messages.manageServerNotices),
+							type: 'link',
+							to: '/admin/servers/notices',
+							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'servers-transfers',
+							label: 'Server transfers',
+							type: 'link',
+							to: '/admin/servers/transfers',
+							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'servers-nodes',
+							label: 'Credit server nodes',
+							action: (event) => $refs.modal_batch_credit.show(event),
+							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'analytics-events',
+							label: formatMessage(messages.analyticsEvents),
+							type: 'link',
+							to: '/admin/analytics/events',
+							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
 					]"
 				>
 					<ModrinthIcon aria-hidden="true" />
@@ -422,30 +502,30 @@
 					:label="formatMessage(messages.createNew)"
 					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
 					:options="[
-							{
-								id: 'new-project',
-								label: formatMessage(messages.newProject),
-								action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
-							},
-							{
-								id: 'new-server-project',
-								label: formatMessage(messages.newServerProject),
-								action: (event) =>
-									requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
-							},
-							{
-								id: 'new-collection',
-								label: formatMessage(messages.newCollection),
-								action: (event) =>
-									requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
-							},
-							{ type: 'divider' },
-							{
-								id: 'new-organization',
-								label: formatMessage(messages.newOrganization),
-								action: (event) =>
-									requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
-							},
+						{
+							id: 'new-project',
+							label: formatMessage(messages.newProject),
+							action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
+						},
+						{
+							id: 'new-server-project',
+							label: formatMessage(messages.newServerProject),
+							action: (event) =>
+								requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
+						},
+						{
+							id: 'new-collection',
+							label: formatMessage(messages.newCollection),
+							action: (event) =>
+								requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
+						},
+						{ type: 'divider' },
+						{
+							id: 'new-organization',
+							label: formatMessage(messages.newOrganization),
+							action: (event) =>
+								requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
+						},
 					]"
 				>
 					<PlusIcon aria-hidden="true" />
@@ -530,7 +610,11 @@
 						<LogInIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.signInButton) }}
 					</ButtonLink>
-					<ButtonLink v-tooltip="formatMessage(commonMessages.settingsLabel)" to="/settings" class="!w-9 !px-0 !rounded-full">
+					<ButtonLink
+						v-tooltip="formatMessage(commonMessages.settingsLabel)"
+						to="/settings"
+						class="!w-9 !rounded-full !px-0"
+					>
 						<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
 					</ButtonLink>
 				</template>
@@ -713,7 +797,6 @@
 	</div>
 </template>
 <script setup>
-import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
@@ -756,7 +839,22 @@ import {
 	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, commonMessages, commonProjectTypeCategoryMessages, commonSettingsMessages, createHostingIntercomIdentityKey, defineMessages, injectModrinthClient, injectNotificationManager, injectPageContext, providePageContext, useHostingIntercom, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	ButtonLink,
+	commonMessages,
+	commonProjectTypeCategoryMessages,
+	commonSettingsMessages,
+	createHostingIntercomIdentityKey,
+	defineMessages,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectPageContext,
+	providePageContext,
+	TeleportOverflowMenu,
+	useHostingIntercom,
+	useVIntl,
+} from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
@@ -871,8 +969,6 @@ const showPrideBackdrop = computed(() => {
 	}
 	return !!currentProjectId.value && prideProjectIds.value.has(currentProjectId.value)
 })
-
-const basePopoutId = useId()
 
 async function fetchIntercomToken() {
 	return $fetch('/api/intercom/messenger-jwt', {

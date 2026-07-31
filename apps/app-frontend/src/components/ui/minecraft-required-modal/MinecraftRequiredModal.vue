@@ -25,7 +25,13 @@
 					<MessagesSquareIcon />
 					{{ formatMessage(messages.getSupport) }}
 				</ButtonLink>
-				<Button type="colored" color="brand" class="w-full" :disabled="loadingSignIn" @click="signIn">
+				<Button
+					type="colored"
+					color="brand"
+					class="w-full"
+					:disabled="loadingSignIn"
+					@click="signIn"
+				>
 					<SpinnerIcon v-if="loadingSignIn" class="animate-spin" />
 					<svg
 						v-else
@@ -38,14 +44,7 @@
 						<rect width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
 						<rect x="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
 						<rect y="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
-						<rect
-							x="10.75"
-							y="10.75"
-							width="9.25"
-							height="9.25"
-							fill="black"
-							fill-opacity="0.9"
-						/>
+						<rect x="10.75" y="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
 					</svg>
 					{{ formatMessage(messages.signIn) }}
 				</Button>
@@ -64,9 +63,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import { MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
-import { defineMessages, NewModal, useVIntl } from '@modrinth/ui'
+import { Button, ButtonLink, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
 import { inject, type Ref, ref } from 'vue'
 
 import steveImage from '@/assets/steve-look-up-left.webp'

@@ -50,9 +50,9 @@
 		<template v-if="showDependencyDownloadActions" #actions>
 			<div class="flex flex-wrap justify-end gap-2 p-2">
 				<Button
-						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-						@click="downloadSelectedVersionZip"
-					>
+					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+					@click="downloadSelectedVersionZip"
+				>
 					<SpinnerIcon
 						v-if="downloadingActionType === 'zip'"
 						aria-hidden="true"
@@ -78,10 +78,13 @@
 					<DownloadIcon v-else aria-hidden="true" />
 					{{ formatMessage(messages.downloadWithDependencies) }}
 				</SplitButton>
-				<Button type="colored" color="brand" v-else
-						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-						@click="downloadFilesWithDependencies"
-					>
+				<Button
+					v-else
+					type="colored"
+					color="brand"
+					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+					@click="downloadFilesWithDependencies"
+				>
 					<SpinnerIcon
 						v-if="downloadingActionType === 'dependencies'"
 						aria-hidden="true"
@@ -96,17 +99,19 @@
 </template>
 
 <script setup lang="ts">
-import { Button, type OverflowMenuOption, SplitButton } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	type CdnDownloadReason,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
+	type OverflowMenuOption,
 	ServersPromo,
+	SplitButton,
 	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,

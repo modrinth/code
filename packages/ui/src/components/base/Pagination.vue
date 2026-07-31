@@ -11,12 +11,7 @@
 			>
 				<ChevronLeftIcon aria-hidden="true" />
 			</ButtonLink>
-			<IconButton
-				v-else
-				label="Previous Page"
-				type="quiet"
-				@click="switchPage(page - 1)"
-			>
+			<IconButton v-else label="Previous Page" type="quiet" @click="switchPage(page - 1)">
 				<ChevronLeftIcon aria-hidden="true" />
 			</IconButton>
 		</template>

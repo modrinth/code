@@ -55,26 +55,28 @@
 							</div>
 						</div>
 						<div class="flex gap-2">
-							<IconButton :label="formatMessage(commonMessages.renameButton)"
-									v-tooltip="formatMessage(commonMessages.renameButton)"
-									@click="
-										() => {
-											passkeyToRename = { ...passkey }
-											renamePasskeyModal?.show()
-										}
-									"
-								>
+							<IconButton
+								v-tooltip="formatMessage(commonMessages.renameButton)"
+								:label="formatMessage(commonMessages.renameButton)"
+								@click="
+									() => {
+										passkeyToRename = { ...passkey }
+										renamePasskeyModal?.show()
+									}
+								"
+							>
 								<EditIcon />
 							</IconButton>
-							<IconButton :label="formatMessage(messages.deletePasskeyButton)"
-									v-tooltip="formatMessage(messages.deletePasskeyButton)"
-									@click="
-										() => {
-											passkeyToRemove = passkey
-											removePasskeyModal?.show()
-										}
-									"
-								>
+							<IconButton
+								v-tooltip="formatMessage(messages.deletePasskeyButton)"
+								:label="formatMessage(messages.deletePasskeyButton)"
+								@click="
+									() => {
+										passkeyToRemove = passkey
+										removePasskeyModal?.show()
+									}
+								"
+							>
 								<TrashIcon />
 							</IconButton>
 						</div>
@@ -120,7 +122,12 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" :disabled="!pendingPasskeyName" @click="finishRegisterPasskey()">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="!pendingPasskeyName"
+						@click="finishRegisterPasskey()"
+					>
 						<PlusIcon />
 						{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
 					</Button>
@@ -155,7 +162,12 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" :disabled="!passkeyToRenameName" @click="renamePasskey()">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="!passkeyToRenameName"
+						@click="renamePasskey()"
+					>
 						<SaveIcon />
 						{{ formatMessage(commonMessages.saveButton) }}
 					</Button>
@@ -180,7 +192,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	EditIcon,
@@ -192,9 +203,11 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Button,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,

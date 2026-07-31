@@ -1,9 +1,9 @@
-import { Button, IconButton } from '../../components/base/buttons'
 import { DownloadIcon, EyeIcon, FolderOpenIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import { Button, IconButton } from '../../components/base/buttons'
 import ContentCardTable from '../../layouts/shared/content-tab/components/ContentCardTable.vue'
 import type { ContentCardTableItem } from '../../layouts/shared/content-tab/types'
 

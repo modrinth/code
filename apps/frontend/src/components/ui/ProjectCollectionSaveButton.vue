@@ -4,50 +4,50 @@
 		icon-only
 		size="xl"
 		:label="
-				saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
-			"
+			saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
+		"
 		:tooltip="
-				saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
-			"
+			saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
+		"
 		placement="top-end"
 	>
 		<template #trigger>
 			<BookmarkIcon aria-hidden="true" :fill="saved ? 'currentColor' : 'none'" />
 		</template>
 		<template #panel>
-				<StyledInput
-					v-model="displayCollectionsSearch"
-					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-					wrapper-class="menu-search"
-				/>
-				<div v-if="filteredCollections.length > 0" class="collections-list text-primary">
-					<Checkbox
-						v-for="option in filteredCollections"
-						:key="option.id"
-						:model-value="option.projects.includes(projectId)"
-						class="popout-checkbox"
-						@update:model-value="() => collectProject(option, projectId)"
-					>
-						{{ option.name }}
-					</Checkbox>
-				</div>
+			<StyledInput
+				v-model="displayCollectionsSearch"
+				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+				wrapper-class="menu-search"
+			/>
+			<div v-if="filteredCollections.length > 0" class="collections-list text-primary">
+				<Checkbox
+					v-for="option in filteredCollections"
+					:key="option.id"
+					:model-value="option.projects.includes(projectId)"
+					class="popout-checkbox"
+					@update:model-value="() => collectProject(option, projectId)"
+				>
+					{{ option.name }}
+				</Checkbox>
+			</div>
 
-				<div v-else class="menu-text">
-					<p class="popout-text">{{ noCollectionsLabel }}</p>
-				</div>
-				<Button class="mx-3 mb-3" @click="createCollection">
-						<PlusIcon aria-hidden="true" />
-						{{ createNewCollectionLabel }}
-				</Button>
+			<div v-else class="menu-text">
+				<p class="popout-text">{{ noCollectionsLabel }}</p>
+			</div>
+			<Button class="mx-3 mb-3" @click="createCollection">
+				<PlusIcon aria-hidden="true" />
+				{{ createNewCollectionLabel }}
+			</Button>
 		</template>
 	</TeleportPopoutMenu>
 	<ButtonLink
 		v-else
-		size="xl"
 		v-tooltip="formatMessage(commonMessages.saveButton)"
+		size="xl"
 		:to="signInRoute"
 		:aria-label="formatMessage(commonMessages.saveButton)"
-		class="!w-12 !px-0 !rounded-full"
+		class="!w-12 !rounded-full !px-0"
 	>
 		<BookmarkIcon aria-hidden="true" />
 	</ButtonLink>

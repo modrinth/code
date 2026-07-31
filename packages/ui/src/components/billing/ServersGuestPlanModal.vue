@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Button, IconButton } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { ChevronRightIcon, ExternalIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, useTemplateRef } from 'vue'
+
+import { Button, IconButton } from '#ui/components/base/buttons'
 
 import NewModal from '../modal/NewModal.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'

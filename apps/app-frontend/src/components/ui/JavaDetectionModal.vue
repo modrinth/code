@@ -31,10 +31,11 @@
 				</template>
 			</Table>
 			<div class="flex justify-end">
-				<Button type="outlined"
-						class="!border-surface-4 !border"
-						@click="$refs.detectJavaModal.hide()"
-					>
+				<Button
+					type="outlined"
+					class="!border-surface-4 !border"
+					@click="$refs.detectJavaModal.hide()"
+				>
 					<XIcon aria-hidden="true" />
 					{{ formatMessage(messages.cancel) }}
 				</Button>
@@ -43,14 +44,8 @@
 	</ModalWrapper>
 </template>
 <script setup>
-import { Button } from '@modrinth/ui'
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import {
-	defineMessages,
-	injectNotificationManager,
-	Table,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, defineMessages, injectNotificationManager, Table, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

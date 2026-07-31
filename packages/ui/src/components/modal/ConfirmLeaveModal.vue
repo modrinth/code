@@ -22,11 +22,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { RightArrowIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
 import { defineMessage, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 
 import NewModal from './NewModal.vue'

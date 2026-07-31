@@ -69,10 +69,12 @@
 					</div>
 					<div class="flex shrink-0 flex-nowrap items-center gap-2">
 						<Badge :type="trace.verdict" />
-						<Button type="colored" color="red"
-								:disabled="removingTraceKeys.has(trace.detail_key)"
-								@click="removeGlobalTrace(trace)"
-							>
+						<Button
+							type="colored"
+							color="red"
+							:disabled="removingTraceKeys.has(trace.detail_key)"
+							@click="removeGlobalTrace(trace)"
+						>
 							<TrashIcon aria-hidden="true" />
 							Remove
 						</Button>
@@ -85,7 +87,10 @@
 							Showing {{ getPreviewLocalTraces(trace).length }} of
 							{{ formatTraceCount(getVisibleLocalTraceTotal(trace)) }}
 						</p>
-						<ButtonLink v-if="getVisibleLocalTraceTotal(trace) > getPreviewLocalTraces(trace).length" :to="getGlobalTraceLink(trace)">
+						<ButtonLink
+							v-if="getVisibleLocalTraceTotal(trace) > getPreviewLocalTraces(trace).length"
+							:to="getGlobalTraceLink(trace)"
+						>
 							<ListIcon aria-hidden="true" />
 							View all
 						</ButtonLink>
@@ -112,11 +117,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { HashIcon, ListIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Badge,
+	Button,
+	ButtonLink,
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,

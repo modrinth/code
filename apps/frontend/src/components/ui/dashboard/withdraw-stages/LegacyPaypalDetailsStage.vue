@@ -8,7 +8,12 @@
 			</label>
 
 			<div class="flex flex-col gap-2">
-				<ButtonLink v-if="!isPayPalAuthenticated" :href="paypalAuthUrl" class="w-min" @click="handlePayPalAuth">
+				<ButtonLink
+					v-if="!isPayPalAuthenticated"
+					:href="paypalAuthUrl"
+					class="w-min"
+					@click="handlePayPalAuth"
+				>
 					<PayPalColorIcon class="size-5" />
 					{{ formatMessage(messages.signInWithPaypal) }}
 				</ButtonLink>
@@ -42,11 +47,13 @@
 					:placeholder="formatMessage(messages.venmoHandlePlaceholder)"
 					wrapper-class="w-full"
 				/>
-				<Button type="colored" color="brand"
-						v-tooltip="!hasVenmoChanged ? 'Change the venmo username to save.' : undefined"
-						:disabled="venmoSaving || !hasVenmoChanged"
-						@click="saveVenmoHandle"
-					>
+				<Button
+					v-tooltip="!hasVenmoChanged ? 'Change the venmo username to save.' : undefined"
+					type="colored"
+					color="brand"
+					:disabled="venmoSaving || !hasVenmoChanged"
+					@click="saveVenmoHandle"
+				>
 					<CheckIcon v-if="venmoSaveSuccess" />
 					<SaveIcon v-else />
 					{{
@@ -96,9 +103,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink } from '@modrinth/ui'
 import { CheckIcon, PayPalColorIcon, SaveIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
+	ButtonLink,
 	Checkbox,
 	commonMessages,
 	defineMessages,

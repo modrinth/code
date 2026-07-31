@@ -23,7 +23,11 @@
 				</div>
 			</div>
 			<div class="input-group">
-				<IconButton label="Toggle details" :class="{ '[&>svg]:rotate-180': !collapsed }" @click="$emit('toggleCollapsed')">
+				<IconButton
+					label="Toggle details"
+					:class="{ '[&>svg]:rotate-180': !collapsed }"
+					@click="$emit('toggleCollapsed')"
+				>
 					<DropdownIcon class="duration-250 transition-transform ease-in-out" />
 				</IconButton>
 			</div>
@@ -59,13 +63,16 @@
 					{{ getFormattedMessage(nag.link.title) }}
 					<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
 				</NuxtLink>
-				<Button type="colored" color="orange" v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+				<Button
+					v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+					v-tooltip="
+						!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
+					"
+					type="colored"
+					color="orange"
+					:disabled="!canSubmitForReview"
 					@click="submitForReview"
-						v-tooltip="
-							!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
-						"
-						:disabled="!canSubmitForReview"
-					>
+				>
 					<SendIcon />
 					{{ getFormattedMessage(messages.submitForReviewButton) }}
 				</Button>
@@ -75,7 +82,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	AsteriskIcon,
@@ -88,6 +94,7 @@ import {
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nags } from '@modrinth/moderation'
+import { Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed } from 'vue'

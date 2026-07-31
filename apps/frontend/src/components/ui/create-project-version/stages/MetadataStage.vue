@@ -48,17 +48,18 @@
 					}}
 				</span>
 
-				<Button type="quiet"
-						v-tooltip="
-							isModpack
-								? formatMessage(messages.modpackLoadersTooltip)
-								: isResourcePack
-									? formatMessage(messages.resourcePackLoadersTooltip)
-									: undefined
-						"
-						:disabled="isModpack || isResourcePack"
-						@click="editLoaders"
-					>
+				<Button
+					v-tooltip="
+						isModpack
+							? formatMessage(messages.modpackLoadersTooltip)
+							: isResourcePack
+								? formatMessage(messages.resourcePackLoadersTooltip)
+								: undefined
+					"
+					type="quiet"
+					:disabled="isModpack || isResourcePack"
+					@click="editLoaders"
+				>
 					<EditIcon />
 					{{ formatMessage(messages.editButton) }}
 				</Button>
@@ -107,11 +108,12 @@
 					}}
 				</span>
 
-				<Button type="quiet"
-						v-tooltip="isModpack ? formatMessage(messages.modpackVersionsTooltip) : undefined"
-						:disabled="isModpack"
-						@click="editVersions"
-					>
+				<Button
+					v-tooltip="isModpack ? formatMessage(messages.modpackVersionsTooltip) : undefined"
+					type="quiet"
+					:disabled="isModpack"
+					@click="editVersions"
+				>
 					<EditIcon />
 					{{ formatMessage(messages.editButton) }}
 				</Button>
@@ -203,9 +205,9 @@
 </template>
 
 <script lang="ts" setup>
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { EditIcon, getLoaderIcon, PlusIcon, UnknownIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	defineMessages,
 	ENVIRONMENTS_COPY,

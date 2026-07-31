@@ -115,7 +115,13 @@
 					<XIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" v-tooltip="missingFieldsTooltip" :disabled="disableCreate" @click="createProject">
+				<Button
+					v-tooltip="missingFieldsTooltip"
+					type="colored"
+					color="brand"
+					:disabled="disableCreate"
+					@click="createProject"
+				>
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.createProject) }}
 				</Button>
@@ -125,9 +131,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	Chips,
 	Combobox,

@@ -1,11 +1,6 @@
 <template>
 	<div>
-		<Admonition
-			v-if="flags.developerMode"
-			type="critical"
-			class="mb-4"
-			show-actions-underneath
-		>
+		<Admonition v-if="flags.developerMode" type="critical" class="mb-4" show-actions-underneath>
 			<template #icon="{ iconClass }">
 				<CodeIcon :class="iconClass" aria-hidden="true" />
 			</template>

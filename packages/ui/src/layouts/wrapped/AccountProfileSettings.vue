@@ -131,12 +131,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button, FileButton } from '#ui/components/base/buttons'
 import { LogInIcon, ThinkingRinthbot, TrashIcon, UndoIcon, UploadIcon } from '@modrinth/assets'
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
+import { Button, FileButton } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'

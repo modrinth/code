@@ -88,11 +88,19 @@
 			</div>
 			<div class="flex gap-2">
 				<Button v-if="isRefunded" disabled><CheckIcon /> Charge refunded</Button>
-				<Button v-else-if="charge.status === 'succeeded' && charge.type !== 'refund'" @click="emit('refund', charge)" class="!text-red [&>svg]:!text-red">
+				<Button
+					v-else-if="charge.status === 'succeeded' && charge.type !== 'refund'"
+					class="!text-red [&>svg]:!text-red"
+					@click="emit('refund', charge)"
+				>
 					<CurrencyIcon />
 					Refund options
 				</Button>
-				<Button v-else-if="charge.status === 'failed' || charge.status === 'open'" @click="emit('modify', charge, subscription)" class="!text-red [&>svg]:!text-red">
+				<Button
+					v-else-if="charge.status === 'failed' || charge.status === 'open'"
+					class="!text-red [&>svg]:!text-red"
+					@click="emit('modify', charge, subscription)"
+				>
 					<CurrencyIcon />
 					Modify charge
 				</Button>
@@ -101,10 +109,9 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, CurrencyIcon } from '@modrinth/assets'
-import { useFormatDateTime, useFormatPrice, useRelativeTime } from '@modrinth/ui'
+import { Button, useFormatDateTime, useFormatPrice, useRelativeTime } from '@modrinth/ui'
 import dayjs from 'dayjs'
 
 import { products } from '~/generated/state.json'

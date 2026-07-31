@@ -51,11 +51,21 @@
 					<SpinnerIcon class="size-8 animate-spin text-contrast" />
 				</div>
 				<template v-else>
-					<Button :type="withdrawData.selection.method === method.value ? 'colored' : 'base'" :color="withdrawData.selection.method === method.value ? 'green' : undefined" v-for="method in paymentOptions"
+					<Button
+						v-for="method in paymentOptions"
 						:key="method.value"
-							class="!justify-start !gap-2 !text-left sm:!h-10"
-							@click="handleMethodSelection(method)"
-						 :class="(withdrawData.selection.method === method.value) ? (true ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						:type="withdrawData.selection.method === method.value ? 'colored' : 'base'"
+						:color="withdrawData.selection.method === method.value ? 'green' : undefined"
+						class="!justify-start !gap-2 !text-left sm:!h-10"
+						:class="
+							withdrawData.selection.method === method.value
+								? true
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
+						"
+						@click="handleMethodSelection(method)"
+					>
 						<component :is="method.icon" class="shrink-0" />
 						<span class="flex-1 truncate text-sm sm:text-[1rem]">
 							{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
@@ -71,10 +81,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { SpinnerIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	Combobox,
 	defineMessages,
 	injectNotificationManager,

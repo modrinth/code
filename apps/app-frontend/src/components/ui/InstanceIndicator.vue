@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
-import { Avatar, FormattedTag } from '@modrinth/ui'
+import { Avatar, ButtonLink, FormattedTag } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed } from 'vue'
 

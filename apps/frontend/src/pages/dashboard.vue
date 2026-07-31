@@ -76,7 +76,6 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	AffiliateIcon,
@@ -92,6 +91,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import { InfoIcon, XIcon } from '@modrinth/assets'
 import { computed, toValue } from 'vue'
 
+import { IconButton } from '#ui/components/base/buttons'
 import Toggle from '#ui/components/base/Toggle.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 import { useVIntl } from '#ui/composables/i18n'

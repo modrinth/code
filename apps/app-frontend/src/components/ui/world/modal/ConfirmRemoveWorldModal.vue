@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	commonMessages,
 	defineMessages,
 	NewModal,
@@ -110,7 +110,12 @@ defineExpose({ show, hide })
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="red" :disabled="!isServer && !isSingleplayer" @click="confirm">
+				<Button
+					type="colored"
+					color="red"
+					:disabled="!isServer && !isSingleplayer"
+					@click="confirm"
+				>
 					<TrashIcon />
 					{{ formatMessage(actionMessage) }}
 				</Button>

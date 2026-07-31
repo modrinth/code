@@ -69,7 +69,12 @@
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" :disabled="selectedProjects.length === 0" @click="submitTransfer()">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="selectedProjects.length === 0"
+						@click="submitTransfer()"
+					>
 						<TransferIcon />
 						{{
 							formatMessage(messages.transferSelectedProjects, {
@@ -88,9 +93,9 @@
 </template>
 
 <script setup>
-import { Button } from '@modrinth/ui'
 import { BoxIcon, TransferIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	Checkbox,
 	commonMessages,
 	CopyCode,

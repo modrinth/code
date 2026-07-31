@@ -109,7 +109,13 @@
 							<Button type="outlined" native-type="button" @click="handleCustomRangeCancel">
 								{{ formatMessage(messages.cancel) }}
 							</Button>
-							<Button type="colored" color="brand" native-type="button" :disabled="!hasCompleteRange" @click="handleCustomRangeApply">
+							<Button
+								type="colored"
+								color="brand"
+								native-type="button"
+								:disabled="!hasCompleteRange"
+								@click="handleCustomRangeApply"
+							>
 								{{ formatMessage(messages.apply) }}
 							</Button>
 						</div>
@@ -192,14 +198,15 @@
 </template>
 
 <script setup lang="ts">
+import { MinusIcon, PlusIcon } from '@modrinth/assets'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
 import {
 	Button,
 	type ButtonInteraction,
 	type ButtonSize,
 	type ButtonType,
 } from '#ui/components/base/buttons'
-import { MinusIcon, PlusIcon } from '@modrinth/assets'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import Combobox, { type ComboboxOption } from './Combobox.vue'

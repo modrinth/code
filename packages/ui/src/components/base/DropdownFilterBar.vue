@@ -107,21 +107,24 @@
 	</MultiSelect>
 
 	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
-		<Button type="outlined"
-				ref="addMenuTrigger"
-				native-type="button"
-				:size="addButtonSize"
-				:class="addButtonClass ?? '!border'"
-				:aria-expanded="isAddMenuOpen"
-				aria-haspopup="menu"
-				@click="handleAddMenuTriggerClick"
-				@keydown="handleAddMenuTriggerKeydown"
-			>
+		<Button
+			ref="addMenuTrigger"
+			type="outlined"
+			native-type="button"
+			:size="addButtonSize"
+			:class="addButtonClass ?? '!border'"
+			:aria-expanded="isAddMenuOpen"
+			aria-haspopup="menu"
+			@click="handleAddMenuTriggerClick"
+			@keydown="handleAddMenuTriggerKeydown"
+		>
 			<PlusIcon />
 			{{ addLabel }}
 		</Button>
 
-		<Button type="quiet" v-if="shouldShowClear" native-type="button" @click="clearAllFilters">{{ clearLabel }}</Button>
+		<Button v-if="shouldShowClear" type="quiet" native-type="button" @click="clearAllFilters">{{
+			clearLabel
+		}}</Button>
 	</div>
 
 	<Teleport to="#teleports">
@@ -368,7 +371,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, type ButtonSize } from '#ui/components/base/buttons'
 import 'overlayscrollbars/overlayscrollbars.css'
 
 import {
@@ -384,6 +386,8 @@ import { onClickOutside } from '@vueuse/core'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+
+import { Button, type ButtonSize } from '#ui/components/base/buttons'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'

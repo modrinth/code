@@ -17,13 +17,24 @@
 					</span>
 				</div>
 				<div class="flex items-center gap-2">
-					<IconButton type="quiet" :color="buttonColors[type]" label="Toggle" @click.stop="expanded = !expanded">
+					<IconButton
+						type="quiet"
+						:color="buttonColors[type]"
+						label="Toggle"
+						@click.stop="expanded = !expanded"
+					>
 						<ChevronDownIcon
 							class="h-4 w-4 transition-transform duration-300"
 							:class="expanded && 'rotate-180'"
 						/>
 					</IconButton>
-					<IconButton type="quiet" :color="buttonColors[type]" label="Dismiss" v-if="dismissible" @click.stop="handleDismiss">
+					<IconButton
+						v-if="dismissible"
+						type="quiet"
+						:color="buttonColors[type]"
+						label="Dismiss"
+						@click.stop="handleDismiss"
+					>
 						<XIcon class="h-4 w-4" />
 					</IconButton>
 				</div>
@@ -60,10 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton } from '#ui/components/base/buttons'
 import { ChevronDownIcon, LightBulbIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
+import { IconButton } from '#ui/components/base/buttons'
 
 export interface CollapsibleAdmonitionItem {
 	title: string

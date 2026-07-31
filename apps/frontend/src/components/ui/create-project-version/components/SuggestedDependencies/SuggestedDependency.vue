@@ -34,10 +34,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon } from '@modrinth/assets'
-import { Avatar, TagItem } from '@modrinth/ui'
+import { Avatar, Button, TagItem } from '@modrinth/ui'
 
 const emit = defineEmits<{
 	(e: 'onAddSuggestion'): void

@@ -12,7 +12,13 @@
 				{{ formatMessage(analyticsStatCardMessages.monetizationBannerBody) }}
 			</div>
 			<template #actions>
-				<ButtonLink type="colored" color="blue" href="https://modrinth.com/legal/cmp-info" target="_blank" class="w-fit !px-4">
+				<ButtonLink
+					type="colored"
+					color="blue"
+					href="https://modrinth.com/legal/cmp-info"
+					target="_blank"
+					class="w-fit !px-4"
+				>
 					{{ formatMessage(analyticsStatCardMessages.monetizationBannerLearnMore) }}
 					<RightArrowIcon aria-hidden="true" />
 				</ButtonLink>
@@ -36,9 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonLink } from '@modrinth/ui'
 import { RightArrowIcon } from '@modrinth/assets'
-import { Admonition, useFormatNumber, useVIntl } from '@modrinth/ui'
+import { Admonition, ButtonLink, useFormatNumber, useVIntl } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
 
 import {

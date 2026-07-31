@@ -95,7 +95,13 @@
 									</div>
 								</template>
 							</div>
-							<IconButton type="quiet" label="Close" v-if="item.dismissible !== false" class="-m-1.5" @click="dismiss(item.id)">
+							<IconButton
+								v-if="item.dismissible !== false"
+								type="quiet"
+								label="Close"
+								class="-m-1.5"
+								@click="dismiss(item.id)"
+							>
 								<XIcon />
 							</IconButton>
 						</div>
@@ -140,8 +146,25 @@
 						full-width
 					/>
 					<div v-if="item.buttons?.length" class="flex gap-1.5">
-						<Button :type="(btn.color || (idx === 0 ? 'brand' : undefined)) && (btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard' ? 'colored' : 'base'" :color="(btn.color || (idx === 0 ? 'brand' : undefined)) && (btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard' ? ((btn.color || (idx === 0 ? 'brand' : undefined)) === 'medal-promo' ? 'medal_promotion' : (btn.color || (idx === 0 ? 'brand' : undefined))) : undefined" v-for="(btn, idx) in item.buttons"
-							:key="idx" @click="handleButtonClick(item.id, btn)">
+						<Button
+							v-for="(btn, idx) in item.buttons"
+							:key="idx"
+							:type="
+								(btn.color || (idx === 0 ? 'brand' : undefined)) &&
+								(btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard'
+									? 'colored'
+									: 'base'
+							"
+							:color="
+								(btn.color || (idx === 0 ? 'brand' : undefined)) &&
+								(btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard'
+									? (btn.color || (idx === 0 ? 'brand' : undefined)) === 'medal-promo'
+										? 'medal_promotion'
+										: btn.color || (idx === 0 ? 'brand' : undefined)
+									: undefined
+							"
+							@click="handleButtonClick(item.id, btn)"
+						>
 							<component :is="btn.icon" v-if="btn.icon" />
 							{{ btn.label }}
 						</Button>
@@ -153,7 +176,6 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton, Button } from '#ui/components/base/buttons'
 import {
 	CheckCircleIcon,
 	DownloadIcon,
@@ -164,6 +186,8 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
+
+import { Button, IconButton } from '#ui/components/base/buttons'
 
 import { useModalStack } from '../../composables/modal-stack'
 import {

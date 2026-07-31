@@ -42,9 +42,9 @@
 	</div>
 </template>
 <script setup>
-import { Button } from '@modrinth/ui'
 import { XIcon } from '@modrinth/assets'
 import {
+	Button,
 	commonMessages,
 	commonSettingsMessages,
 	defineMessages,

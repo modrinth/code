@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { NewModal, useVIntl, Button } from '@modrinth/ui'
+import { Button, NewModal, useVIntl } from '@modrinth/ui'
 
 import { analyticsChartMessages } from '../../analytics-messages'
 

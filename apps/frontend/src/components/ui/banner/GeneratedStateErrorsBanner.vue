@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { XCircleIcon, XIcon } from '@modrinth/assets'
-import { defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { Button, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
@@ -58,7 +57,12 @@ function alwaysIgnoreBanner() {
 			}}
 		</template>
 		<template #actions_right>
-			<Button type="quiet" color="red" @click="alwaysIgnoreBanner" class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+			<Button
+				type="quiet"
+				color="red"
+				class="hover:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!bg-red focus-visible:!text-[var(--color-accent-contrast)]"
+				@click="alwaysIgnoreBanner"
+			>
 				<XCircleIcon />
 				{{ formatMessage(messages.alwaysIgnore) }}
 			</Button>

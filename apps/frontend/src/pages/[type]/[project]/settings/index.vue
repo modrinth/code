@@ -83,18 +83,22 @@
 						/>
 						<div class="flex flex-col gap-2">
 							<FileButton
-									id="project-icon"
-									:max-size="262144000"
-									accept="image/png,image/jpeg,image/gif,image/webp"
-									class="button-like choose-image"
-									prompt="Upload icon"
-									aria-label="Upload icon"
-									:disabled="!hasPermission"
-									@change="showPreviewImage"
-								>
+								id="project-icon"
+								:max-size="262144000"
+								accept="image/png,image/jpeg,image/gif,image/webp"
+								class="button-like choose-image"
+								prompt="Upload icon"
+								aria-label="Upload icon"
+								:disabled="!hasPermission"
+								@change="showPreviewImage"
+							>
 								<UploadIcon aria-hidden="true" />
 							</FileButton>
-							<Button v-if="!deletedIcon && (previewImage || project.icon_url)" :disabled="!hasPermission" @click="markIconForDeletion">
+							<Button
+								v-if="!deletedIcon && (previewImage || project.icon_url)"
+								:disabled="!hasPermission"
+								@click="markIconForDeletion"
+							>
 								<TrashIcon aria-hidden="true" />
 								Remove icon
 							</Button>
@@ -156,16 +160,20 @@
 						</div>
 						<div class="mt-2 flex items-center gap-2">
 							<FileButton
-									:max-size="524288"
-									accept="image/png,image/jpeg,image/gif,image/webp"
-									class="button-like"
-									prompt="Upload banner"
-									:disabled="!hasPermission"
-									@change="showBannerPreview"
-								>
+								:max-size="524288"
+								accept="image/png,image/jpeg,image/gif,image/webp"
+								class="button-like"
+								prompt="Upload banner"
+								:disabled="!hasPermission"
+								@change="showBannerPreview"
+							>
 								<UploadIcon aria-hidden="true" />
 							</FileButton>
-							<Button v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)" :disabled="!hasPermission" @click="markBannerForDeletion">
+							<Button
+								v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
+								:disabled="!hasPermission"
+								@click="markBannerForDeletion"
+							>
 								<TrashIcon aria-hidden="true" />
 								Remove banner
 							</Button>
@@ -269,15 +277,17 @@
 					</span>
 				</div>
 				<div v-if="isStaff" class="mt-2">
-					<Button type="colored" color="orange"
-							v-if="!isForceDemonetized"
-							:disabled="loadingModeratorMonetization"
-							@click="updateMonetizationStatus('force-demonetized')"
-						>
+					<Button
+						v-if="!isForceDemonetized"
+						type="colored"
+						color="orange"
+						:disabled="loadingModeratorMonetization"
+						@click="updateMonetizationStatus('force-demonetized')"
+					>
 						<ScaleIcon aria-hidden="true" />
 						Disable monetization
-					</button>
-					<button
+					</Button>
+					<Button
 						v-else
 						:disabled="loadingModeratorMonetization"
 						@click="updateMonetizationStatus('monetized')"
@@ -299,7 +309,12 @@
 				Removes your project from Modrinth's servers and search. Clicking on this will delete your
 				project, so be extra careful!
 			</p>
-			<Button type="colored" color="red" :disabled="!hasDeletePermission" @click="$refs.modal_confirm.show()">
+			<Button
+				type="colored"
+				color="red"
+				:disabled="!hasDeletePermission"
+				@click="$refs.modal_confirm.show()"
+			>
 				<TrashIcon aria-hidden="true" />
 				Delete project
 			</Button>
@@ -316,14 +331,15 @@
 </template>
 
 <script setup>
-import { Button, FileButton } from '@modrinth/ui'
 import { ImageIcon, ScaleIcon, TrashIcon, TriangleAlertIcon, UploadIcon } from '@modrinth/assets'
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
+	Button,
 	Combobox,
 	ConfirmLeaveModal,
 	ConfirmModal,
+	FileButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -335,7 +351,6 @@ import {
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
-import FileInput from '~/components/ui/FileInput.vue'
 import { useAuth } from '~/composables/auth.js'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 

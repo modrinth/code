@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import { Settings2Icon } from '@modrinth/assets'
 import {
+	Button,
 	defineMessages,
 	injectNotificationManager,
 	injectPageContext,

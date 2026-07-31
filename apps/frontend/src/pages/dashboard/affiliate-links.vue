@@ -55,13 +55,13 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
+	Button,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,

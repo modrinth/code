@@ -58,17 +58,25 @@
 							{{ account.profile.name }}
 						</p>
 					</button>
-					<IconButton type="quiet" color="red" :label="formatMessage(messages.removeAccount)"
-							v-tooltip="formatMessage(messages.removeAccount)"
-							class="mr-2 hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-							@click="logout(account.profile.id)"
-						>
+					<IconButton
+						v-tooltip="formatMessage(messages.removeAccount)"
+						type="quiet"
+						color="red"
+						:label="formatMessage(messages.removeAccount)"
+						class="mr-2 hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+						@click="logout(account.profile.id)"
+					>
 						<TrashIcon />
 					</IconButton>
 				</div>
 			</template>
 			<div class="flex flex-col gap-2 px-2 pt-2">
-				<Button v-if="accounts.length > 0" class="w-full" :disabled="loginDisabled" @click="login()">
+				<Button
+					v-if="accounts.length > 0"
+					class="w-full"
+					:disabled="loginDisabled"
+					@click="login()"
+				>
 					<PlusIcon />
 					{{ formatMessage(messages.addAccount) }}
 				</Button>
@@ -78,7 +86,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import {
 	LogInIcon,
 	PlusIcon,
@@ -90,7 +97,9 @@ import {
 import {
 	Accordion,
 	Avatar,
+	Button,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'

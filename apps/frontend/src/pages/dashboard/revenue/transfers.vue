@@ -13,11 +13,12 @@
 					"
 					listbox
 				/>
-				<IconButton :label="formatMessage(messages.downloadCsv)"
-						v-tooltip="formatMessage(messages.downloadCsv)"
-						:disabled="buildingCsv"
-						@click="onDownloadCSV"
-					>
+				<IconButton
+					v-tooltip="formatMessage(messages.downloadCsv)"
+					:label="formatMessage(messages.downloadCsv)"
+					:disabled="buildingCsv"
+					@click="onDownloadCSV"
+				>
 					<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
 					<DownloadIcon v-else />
 				</IconButton>
@@ -80,7 +81,6 @@
 	</div>
 </template>
 <script setup>
-import { IconButton } from '@modrinth/ui'
 import {
 	ArrowDownLeftIcon,
 	ArrowUpRightIcon,
@@ -92,6 +92,7 @@ import {
 	Combobox,
 	defineMessages,
 	EmptyState,
+	IconButton,
 	injectModrinthClient,
 	useFormatDateTime,
 	useFormatMoney,

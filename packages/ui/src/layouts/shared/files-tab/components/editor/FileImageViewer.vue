@@ -24,14 +24,14 @@
 			v-if="isReady"
 			class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-2xl bg-surface-3/80 p-1.5 backdrop-blur-sm"
 		>
-			<Button type="quiet" v-tooltip="formatMessage(messages.zoomIn)" @click="zoomIn">
+			<Button v-tooltip="formatMessage(messages.zoomIn)" type="quiet" @click="zoomIn">
 				<ZoomInIcon />
 			</Button>
-			<Button type="quiet" v-tooltip="formatMessage(messages.zoomOut)" @click="zoomOut">
+			<Button v-tooltip="formatMessage(messages.zoomOut)" type="quiet" @click="zoomOut">
 				<ZoomOutIcon />
 			</Button>
 			<div class="mx-1 h-6 w-px bg-surface-5" />
-			<Button type="quiet" v-tooltip="formatMessage(messages.resetZoom)" @click="resetZoom">
+			<Button v-tooltip="formatMessage(messages.resetZoom)" type="quiet" @click="resetZoom">
 				<span class="px-1 text-sm tabular-nums">{{ Math.round(scale * 100) }}%</span>
 			</Button>
 		</div>
@@ -39,10 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
 import { TriangleAlertIcon, ZoomInIcon, ZoomOutIcon } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const { formatMessage } = useVIntl()

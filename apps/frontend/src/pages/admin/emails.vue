@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Button, IconButton } from '@modrinth/ui'
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { NewModal, StyledInput } from '@modrinth/ui'
+import { Button, IconButton, NewModal, StyledInput } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import emails from '~/templates/emails'

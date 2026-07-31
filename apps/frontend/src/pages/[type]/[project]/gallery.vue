@@ -10,19 +10,21 @@
 					<div class="file-header">
 						<ImageIcon aria-hidden="true" />
 						<strong>{{ editFile ? editFile.name : 'Current image' }}</strong>
-						<FileButton type="outlined" v-if="editIndex === -1"
-								class="button-like"
-								prompt="Replace"
-								:accept="acceptFileTypes"
-								:max-size="5242880"
-								aria-label="Replace image"
-								@change="
-									(x) => {
-										editFile = x[0]
-										showPreviewImage()
-									}
-								"
-							>
+						<FileButton
+							v-if="editIndex === -1"
+							type="outlined"
+							class="button-like"
+							prompt="Replace"
+							:accept="acceptFileTypes"
+							:max-size="5242880"
+							aria-label="Replace image"
+							@change="
+								(x) => {
+									editFile = x[0]
+									showPreviewImage()
+								}
+							"
+						>
 							<TransferIcon aria-hidden="true" />
 						</FileButton>
 					</div>
@@ -71,7 +73,12 @@
 						You can feature one image on your project to be used as a banner image.
 					</span>
 				</label>
-				<Button v-if="!editFeatured" id="gallery-image-featured" class="w-fit" @click="editFeatured = true">
+				<Button
+					v-if="!editFeatured"
+					id="gallery-image-featured"
+					class="w-fit"
+					@click="editFeatured = true"
+				>
 					<StarIcon aria-hidden="true" />
 					Set as banner
 				</Button>
@@ -84,11 +91,23 @@
 						<XIcon aria-hidden="true" />
 						Cancel
 					</Button>
-					<Button type="colored" color="brand" v-if="editIndex === -1" :disabled="shouldPreventActions" @click="createGalleryItem">
+					<Button
+						v-if="editIndex === -1"
+						type="colored"
+						color="brand"
+						:disabled="shouldPreventActions"
+						@click="createGalleryItem"
+					>
 						<PlusIcon aria-hidden="true" />
 						Add gallery image
 					</Button>
-					<Button type="colored" color="brand" v-else :disabled="shouldPreventActions" @click="editGalleryItem">
+					<Button
+						v-else
+						type="colored"
+						color="brand"
+						:disabled="shouldPreventActions"
+						@click="editGalleryItem"
+					>
 						<SaveIcon aria-hidden="true" />
 						Save changes
 					</Button>
@@ -137,24 +156,34 @@
 								<XIcon aria-hidden="true" />
 							</IconButton>
 							<ButtonLink
-									class="open !w-9 !px-0 !rounded-full"
-									target="_blank"
-									:href="
-										expandedGalleryItem?.raw_url
-											? expandedGalleryItem?.raw_url
-											: 'https://cdn.modrinth.com/placeholder-banner.svg'
-									"
-								>
+								class="open !w-9 !rounded-full !px-0"
+								target="_blank"
+								:href="
+									expandedGalleryItem?.raw_url
+										? expandedGalleryItem?.raw_url
+										: 'https://cdn.modrinth.com/placeholder-banner.svg'
+								"
+							>
 								<ExternalIcon aria-hidden="true" />
 							</ButtonLink>
 							<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
 								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
 								<ContractIcon v-else aria-hidden="true" />
 							</IconButton>
-							<IconButton label="Previous image" v-if="filteredGallery.length > 1" class="previous" @click="previousImage()">
+							<IconButton
+								v-if="filteredGallery.length > 1"
+								label="Previous image"
+								class="previous"
+								@click="previousImage()"
+							>
 								<LeftArrowIcon aria-hidden="true" />
 							</IconButton>
-							<IconButton label="Next image" v-if="filteredGallery.length > 1" class="next" @click="nextImage()">
+							<IconButton
+								v-if="filteredGallery.length > 1"
+								label="Next image"
+								class="next"
+								@click="nextImage()"
+							>
 								<RightArrowIcon aria-hidden="true" />
 							</IconButton>
 						</div>
@@ -164,15 +193,17 @@
 		</div>
 
 		<div v-if="currentMember && filteredGallery.length" class="card header-buttons">
-			<FileButton type="colored" color="brand"
-					:max-size="5242880"
-					:accept="acceptFileTypes"
-					prompt="Upload an image"
-					aria-label="Upload an image"
-					class="button-like"
-					:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
-					@change="handleFiles"
-				>
+			<FileButton
+				type="colored"
+				color="brand"
+				:max-size="5242880"
+				:accept="acceptFileTypes"
+				prompt="Upload an image"
+				aria-label="Upload an image"
+				class="button-like"
+				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+				@change="handleFiles"
+			>
 				<UploadIcon aria-hidden="true" />
 			</FileButton>
 			<span class="indicator">
@@ -209,29 +240,29 @@
 					</div>
 					<div v-if="currentMember" class="gallery-buttons input-group">
 						<Button
-								@click="
-									() => {
-										resetEdit()
-										editIndex = index
-										editTitle = item.title ?? ''
-										editDescription = item.description ?? ''
-										editFeatured = item.featured
-										editOrder = item.ordering
-										modalEditItem?.show()
-									}
-								"
-							>
+							@click="
+								() => {
+									resetEdit()
+									editIndex = index
+									editTitle = item.title ?? ''
+									editDescription = item.description ?? ''
+									editFeatured = item.featured
+									editOrder = item.ordering
+									modalEditItem?.show()
+								}
+							"
+						>
 							<EditIcon aria-hidden="true" />
 							Edit
 						</Button>
 						<Button
-								@click="
-									() => {
-										deleteIndex = index
-										modalConfirm?.show()
-									}
-								"
-							>
+							@click="
+								() => {
+									deleteIndex = index
+									modalConfirm?.show()
+								}
+							"
+						>
 							<TrashIcon aria-hidden="true" />
 							Remove
 						</Button>
@@ -252,7 +283,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonLink, IconButton, FileButton } from '@modrinth/ui'
 import {
 	CalendarIcon,
 	ContractIcon,
@@ -272,9 +302,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Button,
+	ButtonLink,
 	ConfirmModal,
 	DropArea,
-	FileInput,
+	FileButton,
+	IconButton,
 	injectProjectPageContext,
 	NewModal as Modal,
 	StyledInput,

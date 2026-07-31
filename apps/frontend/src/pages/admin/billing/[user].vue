@@ -162,13 +162,14 @@
 					</div>
 					<div v-if="subscription.metadata?.id" class="flex flex-col items-end gap-2">
 						<CopyCode :text="subscription.metadata.id" />
-						<ButtonLink v-if="
+						<ButtonLink
+							v-if="
 								subscription.metadata?.type === 'pyro' || subscription.metadata?.type === 'medal'
 							"
-								:to="`/hosting/manage/${subscription.metadata.id}`"
-								target="_blank"
-								class="w-fit"
-							>
+							:to="`/hosting/manage/${subscription.metadata.id}`"
+							target="_blank"
+							class="w-fit"
+						>
 							<ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
 						</ButtonLink>
 						<Button @click="showCreditModal(subscription)">
@@ -195,7 +196,6 @@
 	</div>
 </template>
 <script setup>
-import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	CheckIcon,
 	CurrencyIcon,
@@ -207,6 +207,8 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
+	ButtonLink,
 	CopyCode,
 	defineMessages,
 	DropdownSelect,

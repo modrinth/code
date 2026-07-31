@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
-import { Avatar, Checkbox, Chips, defineMessages, injectNotificationManager, StyledInput, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	Checkbox,
+	Chips,
+	defineMessages,
+	injectNotificationManager,
+	StyledInput,
+	TeleportOverflowMenu,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -289,7 +298,8 @@ const messages = defineMessages({
 			<div class="flex flex-col gap-1">
 				<span class="text-lg font-semibold text-contrast">Icon</span>
 				<div class="group relative w-fit">
-					<TeleportOverflowMenu :label="formatMessage(messages.editIcon)"
+					<TeleportOverflowMenu
+						:label="formatMessage(messages.editIcon)"
 						:tooltip="formatMessage(messages.editIcon)"
 						:icon-only="false"
 						type="quiet"
@@ -350,12 +360,12 @@ const messages = defineMessages({
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
 				<Button
-						v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
-						aria-labelledby="duplicate-instance-label"
-						:disabled="installing"
-						class="w-max"
-						@click="duplicateInstance"
-					>
+					v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
+					aria-labelledby="duplicate-instance-label"
+					:disabled="installing"
+					class="w-max"
+					@click="duplicateInstance"
+				>
 					<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
 				</Button>
 				<p class="m-0">
@@ -414,12 +424,14 @@ const messages = defineMessages({
 			<h2 id="delete-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.deleteInstance) }}
 			</h2>
-			<Button type="colored" color="red"
-					aria-labelledby="delete-instance-label"
-					:disabled="removing"
-					class="w-fit"
-					@click="deleteConfirmModal.show()"
-				>
+			<Button
+				type="colored"
+				color="red"
+				aria-labelledby="delete-instance-label"
+				:disabled="removing"
+				class="w-fit"
+				@click="deleteConfirmModal.show()"
+			>
 				<SpinnerIcon v-if="removing" class="animate-spin" />
 				<TrashIcon v-else />
 				{{

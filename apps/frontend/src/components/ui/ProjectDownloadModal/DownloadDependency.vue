@@ -56,19 +56,25 @@
 					{{ metadataLabel }}
 				</span>
 			</span>
-			<ButtonLink type="quiet" v-if="dependency.downloadHref"
-					v-tooltip="downloadTooltip"
-					:href="dependency.downloadHref"
-					:download="dependency.filename"
-					:aria-label="downloadTooltip"
-					@click="emit('download')"
-				 class="!w-9 !px-0 !rounded-full">
+			<ButtonLink
+				v-if="dependency.downloadHref"
+				v-tooltip="downloadTooltip"
+				type="quiet"
+				:href="dependency.downloadHref"
+				:download="dependency.filename"
+				:aria-label="downloadTooltip"
+				class="!w-9 !rounded-full !px-0"
+				@click="emit('download')"
+			>
 				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
 			</ButtonLink>
-			<IconButton type="quiet" :label="dependency.unavailableTooltip" v-else
-					v-tooltip="dependency.unavailableTooltip"
-					disabled
-				>
+			<IconButton
+				v-else
+				v-tooltip="dependency.unavailableTooltip"
+				type="quiet"
+				:label="dependency.unavailableTooltip"
+				disabled
+			>
 				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
 			</IconButton>
 		</div>
@@ -92,11 +98,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconButton, ButtonLink } from '@modrinth/ui'
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonLink,
 	defineMessages,
+	IconButton,
 	TagItem,
 	truncatedTooltip,
 	useFormatBytes,
