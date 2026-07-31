@@ -12,7 +12,8 @@
 				/>
 				<template v-if="!actionsLocked">
 					<Button type="outlined"
-							class="flex !h-10 shrink-0 items-center gap-2 !border"
+							size="lg"
+							class="shrink-0 !border"
 							:disabled="pushUpdateDisabled"
 							@click="emit('push-update', $event)"
 						>
@@ -21,7 +22,8 @@
 						{{ formatMessage(messages.pushUpdate) }}
 					</Button>
 					<Button type="colored" color="brand"
-							class="flex !h-10 shrink-0 items-center gap-2"
+							size="lg"
+							class="shrink-0"
 							:disabled="invitePending || inviteDisabled"
 							@click="emit('invite', $event)"
 						>

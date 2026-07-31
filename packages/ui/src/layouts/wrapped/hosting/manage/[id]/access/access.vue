@@ -14,15 +14,16 @@
 					v-model="roleFilter"
 					:options="roleFilterOptions"
 					:display-value="selectedRoleFilterLabel"
-					trigger-class="min-w-[225px] !h-10 !min-h-10 !py-0"
+					trigger-size="lg"
+					trigger-class="min-w-[225px]"
 				>
 					<template #prefix>
 						<FilterIcon class="size-5 text-secondary" aria-hidden="true" />
 					</template>
 				</Combobox>
-				<Button type="colored" color="brand"
+				<Button type="colored" color="brand" size="lg"
 						v-tooltip="manageUsersActionTooltip"
-						class="!h-10 w-full md:w-fit"
+						class="w-full md:w-fit"
 						:disabled="!canManageUsers"
 						@click="grantAccessModal?.show($event)"
 					>

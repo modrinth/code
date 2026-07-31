@@ -27,7 +27,7 @@
 						<IconButton :label="formatMessage(messages.backToHome)"
 								v-tooltip="formatMessage(messages.backToHome)"
 								native-type="button"
-								class="!size-10 bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								@click="$emit('navigateHome')"
 								@mouseenter="$emit('prefetchHome')"
 							>
@@ -109,7 +109,7 @@
 
 				<Button type="outlined" v-if="showRefreshButton"
 						native-type="button"
-						class="flex !h-10 items-center gap-2"
+						size="lg"
 						:disabled="refreshing"
 						@click="handleRefresh"
 					>
@@ -123,7 +123,8 @@
 
 				<TeleportOverflowMenu type="outlined" :label="formatMessage(messages.createNew)"
 						:disabled="disabled"
-						class="!h-10 justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
+						size="lg"
+						class="justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
 						:options="[
 							{ id: 'file', label: formatMessage(messages.newFile), action: () => $emit('create', 'file') },
 							{ id: 'directory', label: formatMessage(messages.newFolder), action: () => $emit('create', 'directory') },

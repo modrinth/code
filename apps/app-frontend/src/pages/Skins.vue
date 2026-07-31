@@ -1181,7 +1181,8 @@ await loadSkins()
 									>
 								</div>
 								<Button type="outlined"
-										class="ears-feature-toggle-button !h-10 !rounded-[14px] !px-4 shadow-md"
+										size="lg"
+										class="ears-feature-toggle-button shadow-md"
 										:aria-pressed="earsFeaturesEnabled"
 										:aria-label="
 											formatMessage(

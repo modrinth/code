@@ -194,6 +194,7 @@
 				show-preview-filter-icon
 				:show-clear-action="false"
 				:add-button-class="analyticsQueryAddFilterButtonClass"
+				add-button-size="lg"
 			/>
 		</div>
 
@@ -508,7 +509,7 @@ import TimeFramePicker from './TimeframePicker.vue'
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '14rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
-const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
+const analyticsQueryAddFilterButtonClass = 'max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 type ProjectSelectionPreset = 'user' | 'all'
 

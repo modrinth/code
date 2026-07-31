@@ -27,6 +27,7 @@
 				<Combobox
 					:model-value="ctx.activeLogSourceIndex.value"
 					:options="logSourceOptions"
+					trigger-size="lg"
 					@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
 				/>
 			</div>

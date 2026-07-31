@@ -1,14 +1,26 @@
 import type { CSSProperties, Ref } from 'vue'
 import { nextTick, onUnmounted, ref, watch } from 'vue'
 
-export type AnchoredTeleportPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end'
+export type AnchoredTeleportPlacement =
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'top-start'
+	| 'top-end'
+	| 'right-start'
+	| 'right-end'
+	| 'left-start'
+	| 'left-end'
+export type AnchoredTeleportSide = 'top' | 'right' | 'bottom' | 'left'
 
 const viewportPadding = 8
+const anchorPadding = 18
+const defaultDistance = ref(8)
 
 export function useAnchoredTeleport(
 	trigger: Readonly<Ref<HTMLElement | null>>,
 	panel: Readonly<Ref<HTMLElement | null>>,
 	placement: Readonly<Ref<AnchoredTeleportPlacement>>,
+	distance: Readonly<Ref<number>> = defaultDistance,
 ) {
 	const isOpen = ref(false)
 	const panelStyle = ref<CSSProperties>({
@@ -16,6 +28,8 @@ export function useAnchoredTeleport(
 		left: '0px',
 		visibility: 'hidden',
 	})
+	const anchorStyle = ref<CSSProperties>({})
+	const resolvedSide = ref<AnchoredTeleportSide>('bottom')
 
 	let resizeObserver: ResizeObserver | undefined
 
@@ -24,30 +38,67 @@ export function useAnchoredTeleport(
 
 		const triggerRect = trigger.value.getBoundingClientRect()
 		const panelRect = panel.value.getBoundingClientRect()
-		const offset = 8
-		const prefersTop = placement.value.startsWith('top')
+		const offset = distance.value
 		const alignsEnd = placement.value.endsWith('end')
-		const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding
-		const spaceAbove = triggerRect.top - viewportPadding
-		const opensAbove = prefersTop
-			? panelRect.height + offset <= spaceAbove || spaceAbove > spaceBelow
-			: panelRect.height + offset > spaceBelow && spaceAbove > spaceBelow
+		const isHorizontal =
+			placement.value.startsWith('right') || placement.value.startsWith('left')
+		let idealTop: number
+		let idealLeft: number
 
-		const idealTop = opensAbove
-			? triggerRect.top - panelRect.height - offset
-			: triggerRect.bottom + offset
-		const idealLeft = alignsEnd ? triggerRect.right - panelRect.width : triggerRect.left
+		if (isHorizontal) {
+			const prefersRight = placement.value.startsWith('right')
+			const spaceRight = window.innerWidth - triggerRect.right - viewportPadding
+			const spaceLeft = triggerRect.left - viewportPadding
+			const opensRight = prefersRight
+				? panelRect.width + offset <= spaceRight || spaceRight > spaceLeft
+				: panelRect.width + offset > spaceLeft && spaceRight > spaceLeft
+
+			resolvedSide.value = opensRight ? 'right' : 'left'
+			idealTop = alignsEnd ? triggerRect.bottom - panelRect.height : triggerRect.top
+			idealLeft = opensRight
+				? triggerRect.right + offset
+				: triggerRect.left - panelRect.width - offset
+		} else {
+			const prefersTop = placement.value.startsWith('top')
+			const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding
+			const spaceAbove = triggerRect.top - viewportPadding
+			const opensAbove = prefersTop
+				? panelRect.height + offset <= spaceAbove || spaceAbove > spaceBelow
+				: panelRect.height + offset > spaceBelow && spaceAbove > spaceBelow
+
+			resolvedSide.value = opensAbove ? 'top' : 'bottom'
+			idealTop = opensAbove
+				? triggerRect.top - panelRect.height - offset
+				: triggerRect.bottom + offset
+			idealLeft = alignsEnd ? triggerRect.right - panelRect.width : triggerRect.left
+		}
+
 		const maxTop = Math.max(
 			viewportPadding,
 			window.innerHeight - panelRect.height - viewportPadding,
 		)
 		const maxLeft = Math.max(viewportPadding, window.innerWidth - panelRect.width - viewportPadding)
+		const panelTop = Math.min(Math.max(idealTop, viewportPadding), maxTop)
+		const panelLeft = Math.min(Math.max(idealLeft, viewportPadding), maxLeft)
 
 		panelStyle.value = {
-			top: `${Math.min(Math.max(idealTop, viewportPadding), maxTop)}px`,
-			left: `${Math.min(Math.max(idealLeft, viewportPadding), maxLeft)}px`,
+			top: `${panelTop}px`,
+			left: `${panelLeft}px`,
 			visibility: 'visible',
 		}
+		anchorStyle.value = isHorizontal
+			? {
+					top: `${Math.min(
+						Math.max(triggerRect.top + triggerRect.height / 2 - panelTop, anchorPadding),
+						Math.max(anchorPadding, panelRect.height - anchorPadding),
+					)}px`,
+				}
+			: {
+					left: `${Math.min(
+						Math.max(triggerRect.left + triggerRect.width / 2 - panelLeft, anchorPadding),
+						Math.max(anchorPadding, panelRect.width - anchorPadding),
+					)}px`,
+				}
 	}
 
 	function handlePointerDown(event: PointerEvent) {
@@ -90,7 +141,7 @@ export function useAnchoredTeleport(
 		if (restoreFocus) nextTick(() => trigger.value?.focus())
 	}
 
-	watch(placement, updatePosition)
+	watch([placement, distance], updatePosition)
 	watch(panel, () => {
 		if (!isOpen.value) return
 		resizeObserver?.disconnect()
@@ -104,6 +155,8 @@ export function useAnchoredTeleport(
 	return {
 		isOpen,
 		panelStyle,
+		anchorStyle,
+		resolvedSide,
 		open,
 		close,
 	}

@@ -109,7 +109,7 @@
 				</span>
 			</template>
 			<template #actions>
-				<Button type="colored" color="brand" class="!h-10" @click="signInToShare">
+				<Button type="colored" color="brand" size="lg" @click="signInToShare">
 					<LogInIcon aria-hidden="true" />{{ formatMessage(lockedActionButton) }}
 				</Button>
 			</template>
@@ -122,7 +122,7 @@
 		>
 			<template #actions>
 				<Button type="colored" color="brand"
-						class="!h-10"
+						size="lg"
 						:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
 						@click="showInvitePlayers($event)"
 					>

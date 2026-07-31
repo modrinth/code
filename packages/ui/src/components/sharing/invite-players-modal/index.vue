@@ -102,7 +102,8 @@
 					</div>
 					<Button
 							native-type="button"
-							class="!h-10 w-full !justify-between !px-4 text-left"
+							size="lg"
+							class="w-full !justify-between text-left"
 							@click="copyInviteLink"
 						>
 						<span class="min-w-0 truncate text-base font-semibold text-primary">

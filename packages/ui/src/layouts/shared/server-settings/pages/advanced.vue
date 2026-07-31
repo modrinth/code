@@ -24,8 +24,9 @@
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
 						<Button
 							native-type="button"
+							size="lg"
 							v-tooltip="sftpCopyTooltip('Copy SFTP server address')"
-							class="!h-10 w-full !justify-between !px-4 text-left"
+							class="w-full !justify-between text-left"
 							:disabled="!canWriteFiles"
 							@click="copyToClipboard('Server address', server?.sftp_host)"
 						>
@@ -39,8 +40,9 @@
 								<span class="text-lg font-semibold text-contrast">Username</span>
 								<Button
 									native-type="button"
+									size="lg"
 									v-tooltip="sftpCopyTooltip('Copy SFTP username')"
-									class="!h-10 w-full !justify-between !px-4 text-left"
+									class="w-full !justify-between text-left"
 									:disabled="!canWriteFiles"
 									@click="copyToClipboard('Username', server?.sftp_username)"
 								>
@@ -57,8 +59,9 @@
 								<span class="text-lg font-semibold text-contrast">Password</span>
 								<Button
 									native-type="button"
+									size="lg"
 									v-tooltip="sftpCopyTooltip('Copy SFTP password')"
-									class="!h-10 w-full !justify-between !px-4 text-left"
+									class="w-full !justify-between text-left"
 									:disabled="!canWriteFiles"
 									@click="copyToClipboard('Password', server?.sftp_password)"
 								>

@@ -158,7 +158,7 @@
 			</div>
 		</NewModal>
 
-		<NormalPage :sidebar="sidebarPosition">
+		<NormalPage :sidebar="sidebarPosition" :full-width="variant === 'app'">
 			<template #header>
 				<UserPageHeader
 					:user="user"
@@ -250,7 +250,11 @@
 							}"
 							:layout="displayMode === 'list' ? 'list' : 'grid'"
 							:status="project.status"
-						/>
+						>
+							<template v-if="$slots['project-actions']" #actions>
+								<slot name="project-actions" :project="project" />
+							</template>
+						</ProjectCard>
 					</ProjectCardList>
 
 					<EmptyState

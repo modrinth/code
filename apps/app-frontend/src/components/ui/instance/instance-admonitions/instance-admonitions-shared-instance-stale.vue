@@ -6,7 +6,7 @@
 	>
 		{{ formatMessage(messages.sharedInstanceChangesBody) }}
 		<template #actions>
-			<Button type="colored" color="blue" class="!h-10" :disabled="isPublishButtonDisabled" @click="reviewChanges">
+			<Button type="colored" color="blue" size="lg" :disabled="isPublishButtonDisabled" @click="reviewChanges">
 				<SpinnerIcon
 					v-if="isReviewingPublish || isPublishing"
 					class="animate-spin"

@@ -110,6 +110,7 @@
 		<Button type="outlined"
 				ref="addMenuTrigger"
 				native-type="button"
+				:size="addButtonSize"
 				:class="addButtonClass ?? '!border'"
 				:aria-expanded="isAddMenuOpen"
 				aria-haspopup="menu"
@@ -367,7 +368,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
+import { Button, type ButtonSize } from '#ui/components/base/buttons'
 import 'overlayscrollbars/overlayscrollbars.css'
 
 import {
@@ -512,6 +513,7 @@ const props = withDefaults(
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
 		addButtonClass?: string
+		addButtonSize?: ButtonSize
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
@@ -523,6 +525,7 @@ const props = withDefaults(
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
+		addButtonSize: 'md',
 		applyImmediately: false,
 		showPreviewFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',

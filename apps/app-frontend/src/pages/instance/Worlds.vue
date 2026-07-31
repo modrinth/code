@@ -35,12 +35,12 @@
 					"
 				/>
 				<div class="flex gap-2">
-					<Button type="outlined" class="!h-10" @click="addServerModal?.show()">
+					<Button type="outlined" size="lg" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
 					</Button>
 					<Button type="colored" color="brand"
-							class="!h-10 flex items-center gap-2"
+							size="lg"
 							@click="
 								router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
 							"
@@ -117,12 +117,12 @@
 			:description="formatMessage(messages.noWorldsDescription)"
 		>
 			<template #actions>
-				<Button type="outlined" class="!h-10" @click="addServerModal?.show()">
+				<Button type="outlined" size="lg" @click="addServerModal?.show()">
 					<PlusIcon class="size-5" />
 					{{ formatMessage(messages.addServer) }}
 				</Button>
 				<Button type="colored" color="brand"
-						class="!h-10 flex items-center gap-2"
+						size="lg"
 						@click="
 							router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
 						"

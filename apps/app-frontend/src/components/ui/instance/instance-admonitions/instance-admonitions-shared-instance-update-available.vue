@@ -6,7 +6,7 @@
 	>
 		{{ formatMessage(messages.sharedInstanceUpdateAvailableBody, { name: instanceName }) }}
 		<template #actions>
-			<Button type="colored" color="blue" class="!h-10" @click="emit('review', $event)">
+			<Button type="colored" color="blue" size="lg" @click="emit('review', $event)">
 				<DownloadIcon aria-hidden="true" />
 				{{ formatMessage(messages.sharedInstanceReviewUpdateButton) }}
 			</Button>

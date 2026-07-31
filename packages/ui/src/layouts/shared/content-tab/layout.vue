@@ -815,25 +815,23 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							/>
 
 							<div class="flex gap-2">
-								<Button type="outlined"
+								<Button type="outlined" size="lg"
 										v-tooltip="
 											ctx.busyMessage?.value ??
 											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 										"
 										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10"
 										@click="ctx.uploadFiles"
 									>
 									<FolderOpenIcon class="size-5" />
 									{{ formatMessage(messages.uploadFiles) }}
 								</Button>
-								<Button type="colored" color="brand"
+								<Button type="colored" color="brand" size="lg"
 										v-tooltip="
 											ctx.busyMessage?.value ??
 											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 										"
 										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10 flex items-center gap-2"
 										@click="ctx.browse"
 									>
 									<CompassIcon class="size-5" />
@@ -960,25 +958,23 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						}}
 					</template>
 					<template #actions>
-						<Button type="outlined"
+						<Button type="outlined" size="lg"
 								v-tooltip="
 									ctx.busyMessage?.value ??
 									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 								"
 								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10"
 								@click="ctx.uploadFiles"
 							>
 							<FolderOpenIcon class="size-5" />
 							{{ formatMessage(messages.uploadFiles) }}
 						</Button>
-						<Button type="colored" color="brand"
+						<Button type="colored" color="brand" size="lg"
 								v-tooltip="
 									ctx.busyMessage?.value ??
 									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 								"
 								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10 flex items-center gap-2"
 								@click="ctx.browse"
 							>
 							<CompassIcon class="size-5" />

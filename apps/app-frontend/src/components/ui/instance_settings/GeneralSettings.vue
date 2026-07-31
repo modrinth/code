@@ -291,7 +291,10 @@ const messages = defineMessages({
 				<div class="group relative w-fit">
 					<TeleportOverflowMenu :label="formatMessage(messages.editIcon)"
 						v-tooltip="formatMessage(messages.editIcon)"
-						class="bg-transparent border-none appearance-none p-0 m-0 cursor-pointer group-active:scale-95 transition-transform"
+						:icon-only="false"
+						type="quiet"
+						interaction="none"
+						class="m-0 !h-auto cursor-pointer appearance-none border-none bg-transparent !p-0 transition-transform group-active:scale-95"
 						:options="[
 							{
 								id: 'select',

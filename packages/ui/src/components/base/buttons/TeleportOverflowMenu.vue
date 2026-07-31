@@ -31,6 +31,7 @@ const props = withDefaults(
 		disabled?: boolean
 		iconOnly?: boolean
 		placement?: TeleportPlacement
+		distance?: number
 	}>(),
 	{
 		type: 'base',
@@ -38,6 +39,7 @@ const props = withDefaults(
 		disabled: false,
 		iconOnly: true,
 		placement: 'bottom-end',
+		distance: 8,
 	},
 )
 
@@ -51,6 +53,7 @@ const triggerButton = ref<ButtonElementHandle | null>(null)
 const triggerElement = computed(() => triggerButton.value?.element ?? null)
 const panelElement = ref<HTMLElement | null>(null)
 const resolvedPlacement = computed(() => props.placement)
+const resolvedDistance = computed(() => props.distance)
 const menuId = `button-overflow-${useId()}`
 const selectedIndex = ref(-1)
 const typeahead = ref('')
@@ -64,10 +67,11 @@ const menuOptions = computed(() =>
 	),
 )
 
-const { isOpen, panelStyle, open, close } = useAnchoredTeleport(
+const { isOpen, panelStyle, anchorStyle, resolvedSide, open, close } = useAnchoredTeleport(
 	triggerElement,
 	panelElement,
 	resolvedPlacement,
+	resolvedDistance,
 )
 
 const menuItemClasses =
@@ -276,6 +280,12 @@ defineExpose({ open: openMenu, close: closeMenu })
 				:aria-label="props.label"
 				@keydown="handleMenuKeydown"
 			>
+				<span
+					aria-hidden="true"
+					class="overflow-menu-arrow"
+					:data-side="resolvedSide"
+					:style="anchorStyle"
+				/>
 				<template v-for="(option, index) in visibleOptions" :key="option.id ?? `divider-${index}`">
 					<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
 
@@ -352,6 +362,58 @@ defineExpose({ open: openMenu, close: closeMenu })
 </template>
 
 <style scoped>
+.overflow-menu-arrow {
+	position: absolute;
+	width: 0;
+	height: 0;
+	pointer-events: none;
+}
+
+.overflow-menu-arrow::before {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	content: '';
+	background-color: var(--surface-3);
+	transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.overflow-menu-arrow[data-side='bottom'] {
+	top: 0;
+}
+
+.overflow-menu-arrow[data-side='bottom']::before {
+	border-top: 1px solid var(--surface-5);
+	border-left: 1px solid var(--surface-5);
+}
+
+.overflow-menu-arrow[data-side='top'] {
+	bottom: 0;
+}
+
+.overflow-menu-arrow[data-side='top']::before {
+	border-right: 1px solid var(--surface-5);
+	border-bottom: 1px solid var(--surface-5);
+}
+
+.overflow-menu-arrow[data-side='right'] {
+	left: 0;
+}
+
+.overflow-menu-arrow[data-side='right']::before {
+	border-bottom: 1px solid var(--surface-5);
+	border-left: 1px solid var(--surface-5);
+}
+
+.overflow-menu-arrow[data-side='left'] {
+	right: 0;
+}
+
+.overflow-menu-arrow[data-side='left']::before {
+	border-top: 1px solid var(--surface-5);
+	border-right: 1px solid var(--surface-5);
+}
+
 .overflow-menu-item[data-tone]:not([data-hover-filled-only]) {
 	color: var(--overflow-menu-item-tone);
 }
