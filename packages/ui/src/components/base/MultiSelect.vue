@@ -420,7 +420,12 @@ import {
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import ButtonFrame from './buttons/ButtonFrame.vue'
-import type { ButtonElementHandle, ButtonSize, ButtonType } from './buttons/types'
+import type {
+	ButtonElementHandle,
+	ButtonInteraction,
+	ButtonSize,
+	ButtonType,
+} from './buttons/types'
 import StyledInput from './StyledInput.vue'
 
 export interface MultiSelectOption<T> {
@@ -501,6 +506,7 @@ const props = withDefaults(
 		/** Apply the shared button frame to compact, button-owned multiselect triggers. */
 		triggerType?: ButtonType
 		triggerSize?: ButtonSize
+		triggerInteraction?: ButtonInteraction
 		fitContent?: boolean
 		/** Width for the teleported dropdown; defaults to the trigger width */
 		dropdownWidth?: string | number
@@ -527,6 +533,7 @@ const props = withDefaults(
 		clearable: true,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		triggerSize: 'md',
+		triggerInteraction: 'surface',
 		fitContent: false,
 		noOptionsMessage: 'No options available',
 		noResultsMessage: 'No results found',
@@ -556,6 +563,7 @@ const triggerButtonProps = computed(() =>
 				nativeType: 'button' as const,
 				type: props.triggerType,
 				size: props.triggerSize,
+				interaction: props.triggerInteraction,
 				disabled: props.disabled,
 			}
 		: {},

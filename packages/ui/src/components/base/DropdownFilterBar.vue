@@ -20,6 +20,8 @@
 		:fit-content="true"
 		:searchable="preview.category.searchable"
 		:search-placeholder="preview.category.searchPlaceholder"
+		trigger-type="base"
+		trigger-size="lg"
 		:trigger-class="effectivePreviewTriggerClass"
 		:dropdown-width="getPreviewDropdownWidth(preview.category)"
 		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
@@ -748,8 +750,7 @@ const appliedFilterPreviews = computed(() =>
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
-const DEFAULT_PREVIEW_TRIGGER_CLASS =
-	'h-10 max-w-[16rem] bg-surface-4 px-4 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
+const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem]'
 const effectivePreviewTriggerClass = computed(
 	() => props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS,
 )

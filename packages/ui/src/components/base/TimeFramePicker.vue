@@ -5,6 +5,9 @@
 		:display-value="selectedTimeframeLabel"
 		:max-height="maxHeight"
 		:trigger-class="triggerClass"
+		:trigger-type="triggerType"
+		:trigger-size="triggerSize"
+		:trigger-interaction="triggerInteraction"
 		:dropdown-min-width="timeframeDropdownMinWidth"
 		:outside-click-ignore="timeframeDropdownOutsideClickIgnore"
 		:dropdown-class="
@@ -189,7 +192,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '#ui/components/base/buttons'
+import {
+	Button,
+	type ButtonInteraction,
+	type ButtonSize,
+	type ButtonType,
+} from '#ui/components/base/buttons'
 import { MinusIcon, PlusIcon } from '@modrinth/assets'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -387,11 +395,17 @@ const props = withDefaults(
 		nowTimestamp?: number
 		maxHeight?: number
 		triggerClass?: string
+		triggerType?: ButtonType
+		triggerSize?: ButtonSize
+		triggerInteraction?: ButtonInteraction
 		dropdownMinWidth?: string | number
 		customRangeDropdownMinWidth?: string | number
 	}>(),
 	{
 		maxHeight: TIMEFRAME_DROPDOWN_MAX_HEIGHT,
+		triggerType: 'base',
+		triggerSize: 'md',
+		triggerInteraction: 'surface',
 		dropdownMinWidth: TIMEFRAME_DROPDOWN_MIN_WIDTH,
 		customRangeDropdownMinWidth: CUSTOM_RANGE_DROPDOWN_MIN_WIDTH,
 	},

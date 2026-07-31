@@ -16,6 +16,7 @@
 				:max-tag-rows="1"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
+				trigger-type="base"
 				checkbox-position="right"
 				show-selection-actions
 				@open="handleProjectSelectOpen"
@@ -145,6 +146,7 @@
 				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 				:display-value="selectedGroupByLabel"
 				:trigger-class="analyticsQueryChipTriggerClass"
+				trigger-type="base"
 			>
 				<template #prefix>
 					<ClockIcon class="size-5 shrink-0 text-primary" />
@@ -160,6 +162,7 @@
 				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
+				trigger-type="base"
 				checkbox-position="right"
 				:placeholder="formatMessage(analyticsMessages.none)"
 				show-selection-actions
@@ -214,6 +217,7 @@
 						:searchable="projectOptions.length > 6"
 						fuzzy-search
 						:max-tag-rows="1"
+						trigger-type="base"
 						checkbox-position="right"
 						show-selection-actions
 						@open="handleProjectSelectOpen"
@@ -372,6 +376,7 @@
 							:options="groupByOptions"
 							:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 							:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+							trigger-type="base"
 						/>
 					</div>
 				</div>
@@ -401,6 +406,7 @@
 									:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 									:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+									trigger-type="base"
 									checkbox-position="right"
 									:placeholder="formatMessage(analyticsMessages.none)"
 									show-selection-actions

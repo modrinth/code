@@ -61,6 +61,7 @@
 					:searchable="reporterOrProjectOptions.length > 6"
 					:max-tag-rows="1"
 					fit-content
+					trigger-type="base"
 					checkbox-position="right"
 					show-selection-actions
 					should-show-select-all

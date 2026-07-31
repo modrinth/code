@@ -335,6 +335,7 @@
 								label: formatMessage(messages.lookupByEmail),
 								type: 'link',
 								to: '/admin/user_email',
+								tone: 'brand',
 								shown: isAdmin(auth.user),
 							},
 							{
@@ -342,6 +343,7 @@
 								label: formatMessage(messages.manageAffiliates),
 								type: 'link',
 								to: '/admin/affiliates',
+								tone: 'brand',
 								shown: isAdmin(auth.user),
 							},
 							{
@@ -349,6 +351,7 @@
 								label: formatMessage(messages.manageServerNotices),
 								type: 'link',
 								to: '/admin/servers/notices',
+								tone: 'brand',
 								shown: isAdmin(auth.user),
 							},
 							{
@@ -356,12 +359,14 @@
 								label: 'Server transfers',
 								type: 'link',
 								to: '/admin/servers/transfers',
+								tone: 'brand',
 								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'servers-nodes',
 								label: 'Credit server nodes',
 								action: (event) => $refs.modal_batch_credit.show(event),
+								tone: 'brand',
 								shown: isAdmin(auth.user),
 							},
 							{
@@ -369,6 +374,7 @@
 								label: formatMessage(messages.analyticsEvents),
 								type: 'link',
 								to: '/admin/analytics/events',
+								tone: 'brand',
 								shown: isAdmin(auth.user),
 							},
 					]"

@@ -266,6 +266,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		label: formatMessage(messages.billingButton),
 		icon: CurrencyIcon,
 		action: () => emit('openBilling'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isStaff,
 	},
 	{
@@ -284,6 +285,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		label: formatMessage(messages.infoButton),
 		icon: InfoIcon,
 		action: () => emit('openInfo'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isStaff,
 	},
 	{
@@ -291,6 +293,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		label: formatMessage(messages.analyticsButton),
 		icon: ChartIcon,
 		action: () => emit('openAnalytics'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
@@ -298,6 +301,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		label: formatMessage(messages.editRoleButton),
 		icon: EditIcon,
 		action: () => emit('editRole'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isAdmin,
 	},
 ])
