@@ -61,7 +61,7 @@
 						</span>
 					</ButtonLink>
 					<Button
-						class="relative w-full !justify-center overflow-visible sm:col-span-2"
+						class="relative !w-full !justify-center overflow-visible sm:col-span-2"
 						:class="{ '!border !border-[var(--color-green)]': lastSignInProvider === 'passkey' }"
 						role="button"
 						tabindex="0"
