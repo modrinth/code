@@ -5,6 +5,11 @@ import { onMounted, onUnmounted, watch } from 'vue'
 
 import { injectModrinthClient } from '#ui/providers'
 
+import {
+	retainServerContextRuntime,
+	type ServerContextRuntimeLease,
+} from './server-context-runtime'
+
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 type SyncUnsubscriber = () => void
 
@@ -20,6 +25,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	const queryClient = useQueryClient()
 
 	let activeServerId: string | null = null
+	let runtimeLease: ServerContextRuntimeLease | null = null
 	let unsubscribers: SyncUnsubscriber[] = []
 	let mounted = false
 	let actionLogInvalidateTimer: ReturnType<typeof setTimeout> | null = null
@@ -43,12 +49,9 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		unsubscribers = [
 			client.archon.sync.onAny(targetServerId, (event) => handleSyncEvent(targetServerId, event)),
 		]
-
-		void client.archon.sync.safeConnectServer(targetServerId, { intent: 'all' }).catch((error) => {
-			console.warn(
-				`[server-panel-sync] Failed to connect sync stream for ${targetServerId}:`,
-				error,
-			)
+		runtimeLease = retainServerContextRuntime(client, targetServerId, {
+			socket: false,
+			sync: true,
 		})
 	}
 
@@ -61,10 +64,9 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		for (const unsubscribe of unsubscribers) unsubscribe()
 		unsubscribers = []
 
-		if (activeServerId) {
-			client.archon.sync.disconnect(activeServerId)
-			activeServerId = null
-		}
+		runtimeLease?.release()
+		runtimeLease = null
+		activeServerId = null
 	}
 
 	function handleSyncEvent(serverId: string, event: Archon.Sync.v1.SyncEvent) {

@@ -1,6 +1,5 @@
-import type { AbstractModrinthClient, Archon, Labrinth } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
-	addPendingServerContentInstalls,
 	type BrowseInstallPlan,
 	type BrowseSelectedProject,
 	createContext,
@@ -10,12 +9,9 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	type ModpackSearchResult,
-	type PendingServerContentInstall,
-	type PendingServerContentInstallType,
-	readPendingServerContentInstalls,
 	readStoredServerInstallQueue,
-	removePendingServerContentInstall,
-	writePendingServerContentInstallBaseline,
+	useServerContextRuntime,
+	waitForServerContextRuntimeReady,
 	writeStoredServerInstallQueue,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -39,7 +35,6 @@ type InstallableSearchResult = Labrinth.Search.v3.ResultSearchProject & {
 	installing?: boolean
 	installed?: boolean
 }
-type PendingServerContentInstallInput = Omit<PendingServerContentInstall, 'createdAt'>
 
 export interface ServerModpackSelectionRequest {
 	projectId: string
@@ -105,114 +100,6 @@ function readQueryString(value: unknown): string | null {
 	return typeof value === 'string' && value.length > 0 ? value : null
 }
 
-function getQueuedInstallOwnerFallback(project: InstallableSearchResult) {
-	if (project.organization) {
-		const ownerId = project.organization_id ?? project.organization
-		return {
-			id: ownerId,
-			name: project.organization,
-			type: 'organization' as const,
-			link: `https://modrinth.com/organization/${ownerId}`,
-		}
-	}
-
-	if (!project.author) return null
-
-	const ownerId = project.author_id ?? project.author
-	return {
-		id: ownerId,
-		name: project.author,
-		type: 'user' as const,
-		link: `/user/${encodeURIComponent(ownerId)}`,
-	}
-}
-
-async function getQueuedInstallOwner(
-	client: AbstractModrinthClient,
-	project: InstallableSearchResult,
-) {
-	const fallback = getQueuedInstallOwnerFallback(project)
-
-	try {
-		if (project.organization) {
-			const organization = await client.labrinth.projects_v3.getOrganization(project.project_id)
-			if (organization) {
-				return {
-					id: organization.id,
-					name: organization.name,
-					type: 'organization' as const,
-					avatar_url: organization.icon_url ?? undefined,
-					link: `https://modrinth.com/organization/${organization.slug}`,
-				}
-			}
-		}
-
-		const members = await client.labrinth.projects_v3.getMembers(project.project_id)
-		const owner =
-			members.find((member) => member.user.id === project.author_id)?.user ??
-			members.find((member) => member.is_owner || member.role === 'Owner')?.user ??
-			members[0]?.user
-
-		if (owner) {
-			return {
-				id: owner.id,
-				name: owner.username,
-				type: 'user' as const,
-				avatar_url: owner.avatar_url,
-				link: `/user/${encodeURIComponent(owner.username)}`,
-			}
-		}
-	} catch {
-		return fallback
-	}
-
-	return fallback
-}
-
-function getQueuedAddonInstallPlans(
-	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
-) {
-	return Array.from(plans.values()).filter((plan) => plan.contentType !== 'modpack')
-}
-
-function getQueuedInstallPlaceholder(
-	plan: BrowseInstallPlan<InstallableSearchResult>,
-	owner: PendingServerContentInstallInput['owner'],
-): PendingServerContentInstallInput {
-	const project = plan.project as InstallableSearchResult & { slug?: string | null }
-	return {
-		projectId: plan.projectId,
-		versionId: plan.versionId,
-		contentType: plan.contentType as PendingServerContentInstallType,
-		title: project.name ?? 'Project',
-		versionName: plan.versionName ?? null,
-		versionNumber: plan.versionNumber ?? null,
-		fileName: plan.fileName ?? null,
-		owner,
-		slug: project.slug ?? plan.projectId,
-		iconUrl: project.icon_url ?? null,
-	}
-}
-
-function getQueuedInstallPlaceholderFallbacks(
-	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
-) {
-	return getQueuedAddonInstallPlans(plans).map((plan) =>
-		getQueuedInstallPlaceholder(plan, getQueuedInstallOwnerFallback(plan.project)),
-	)
-}
-
-async function getQueuedInstallPlaceholders(
-	client: AbstractModrinthClient,
-	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
-) {
-	return Promise.all(
-		getQueuedAddonInstallPlans(plans).map(async (plan) =>
-			getQueuedInstallPlaceholder(plan, await getQueuedInstallOwner(client, plan.project)),
-		),
-	)
-}
-
 export function createServerInstallContent(opts: {
 	serverSetupModalRef: Ref<ServerSetupModalHandle | null>
 	isRouteInContext?: (route: RouteLocationNormalizedLoaded) => boolean
@@ -249,12 +136,12 @@ export function createServerInstallContent(opts: {
 	const isFromWorlds = computed(() => browseFrom.value === 'worlds')
 	const isServerContext = computed(() => !!serverIdQuery.value)
 	const isSetupServerContext = computed(() => !!serverIdQuery.value && !!serverFlowFrom.value)
+	useServerContextRuntime(serverIdQuery)
 
 	const serverContextWorldId = ref<string | null>(worldIdQuery.value)
 	const serverContextServerData = ref<Archon.Servers.v0.Server | null>(null)
 	const serverContextServerFull = ref<Archon.Servers.v1.ServerFull | null>(null)
 	const serverContentProjectIds = ref<Set<string>>(new Set())
-	const serverContentInstallKeys = ref<Set<string>>(new Set())
 	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(
 		new Map(),
 	)
@@ -358,11 +245,7 @@ export function createServerInstallContent(opts: {
 					.map((addon) => addon.project_id)
 					.filter((projectId): projectId is string => !!projectId),
 			)
-			const keys = new Set(
-				(content.addons ?? []).map((addon) => addon.project_id ?? addon.filename),
-			)
 			serverContentProjectIds.value = ids
-			serverContentInstallKeys.value = keys
 		} catch (err) {
 			handleError(err as Error)
 		}
@@ -407,7 +290,6 @@ export function createServerInstallContent(opts: {
 					serverContextServerData.value = null
 					serverContextServerFull.value = null
 					serverContentProjectIds.value = new Set()
-					serverContentInstallKeys.value = new Set()
 					setQueuedServerInstallPlans(new Map())
 					return
 				}
@@ -431,7 +313,6 @@ export function createServerInstallContent(opts: {
 						serverContextServerFull.value = null
 					}
 					serverContentProjectIds.value = new Set()
-					serverContentInstallKeys.value = new Set()
 				}
 
 				if (!hasServerDataForRoute) {
@@ -559,6 +440,13 @@ export function createServerInstallContent(opts: {
 		const queuedPlans = getStoredServerAddonInstallQueue<InstallableSearchResult>(serverId, worldId)
 		if (queuedPlans.size === 0) return true
 
+		try {
+			await waitForServerContextRuntimeReady(client, serverId)
+		} catch (error) {
+			handleError(error as Error)
+			return false
+		}
+
 		isInstallingQueuedServerInstalls.value = true
 		queuedInstallProgress.value = {
 			completed: 0,
@@ -583,9 +471,6 @@ export function createServerInstallContent(opts: {
 			})
 
 			if (!result.ok) {
-				for (const plan of result.attemptedPlans) {
-					removePendingServerContentInstall(serverId, worldId, plan.projectId)
-				}
 				handleError(result.error as Error)
 				return false
 			}
@@ -596,10 +481,6 @@ export function createServerInstallContent(opts: {
 			}
 			serverContentProjectIds.value = new Set([
 				...serverContentProjectIds.value,
-				...result.flushedPlans.map((plan) => plan.projectId),
-			])
-			serverContentInstallKeys.value = new Set([
-				...serverContentInstallKeys.value,
 				...result.flushedPlans.map((plan) => plan.projectId),
 			])
 			if (result.flushedPlans.length > 0) {
@@ -626,20 +507,6 @@ export function createServerInstallContent(opts: {
 
 		if (sid && wid) {
 			writeStoredServerInstallQueue(sid, wid, plans)
-			writePendingServerContentInstallBaseline(sid, wid, serverContentInstallKeys.value)
-			addPendingServerContentInstalls(sid, wid, getQueuedInstallPlaceholderFallbacks(plans))
-			void getQueuedInstallPlaceholders(client, plans)
-				.then((items) => {
-					const pendingProjectIds = new Set(
-						readPendingServerContentInstalls(sid, wid).map((item) => item.projectId),
-					)
-					addPendingServerContentInstalls(
-						sid,
-						wid,
-						items.filter((item) => pendingProjectIds.has(item.projectId)),
-					)
-				})
-				.catch((err) => handleError(err as Error))
 		}
 		await router.push(backUrl)
 		void flushQueuedServerInstalls(sid, wid)
