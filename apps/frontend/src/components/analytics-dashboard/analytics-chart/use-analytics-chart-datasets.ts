@@ -32,6 +32,7 @@ import {
 	type ChartDataset,
 	getChartDatasetTotal,
 	getShortHourlyAxisTickLimit,
+	getSliceBucketRange,
 	getSliceCount,
 	shouldCapitalizeBreakdownLabel,
 } from './analytics-chart-utils'
@@ -161,8 +162,8 @@ export function useAnalyticsChartDatasets(
 				)
 			: undefined
 	})
-	const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() =>
-		buildDatasetsByStat(
+	const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() => {
+		const datasets = buildDatasetsByStat(
 			context.displayedTimeSlices.value,
 			selectedProjects.value,
 			legendPalette.value,
@@ -175,8 +176,20 @@ export function useAnalyticsChartDatasets(
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
 			sliceCount.value,
-		),
-	)
+		)
+		const nextFetchRequest = context.displayedFetchRequest.value
+		if (
+			nextFetchRequest &&
+			context.displayedSelectedGroupBy.value === 'day' &&
+			isLastBucketCurrentDay(nextFetchRequest.time_range, sliceCount.value)
+		) {
+			datasets.revenue = datasets.revenue.map((dataset) => ({
+				...dataset,
+				lastDataPointUnavailable: true,
+			}))
+		}
+		return datasets
+	})
 	const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() =>
 		buildDatasetsByStat(
 			context.displayedPreviousTimeSlices.value,
@@ -404,6 +417,16 @@ function buildDatasetsByStat(
 		)
 	}
 	return datasetsByStat
+}
+
+function isLastBucketCurrentDay(timeRange: Labrinth.Analytics.v3.TimeRange, sliceCount: number) {
+	const lastBucket = getSliceBucketRange(timeRange, sliceCount, sliceCount - 1)
+	const todayStart = new Date()
+	todayStart.setHours(0, 0, 0, 0)
+	const tomorrowStart = new Date(todayStart)
+	tomorrowStart.setDate(tomorrowStart.getDate() + 1)
+
+	return lastBucket.start < tomorrowStart && lastBucket.end > todayStart
 }
 
 function sortDatasetsByTotal(datasets: ChartDataset[]) {

@@ -281,6 +281,38 @@ async fn recover_interrupted_job(
     if job.state.display.is_none() {
         job.state.display = display_from_request(&job.state);
     }
+
+    if let Some(instance_id) = target_instance_id(&job.state.target)
+        && instance_rows::get_instance_by_id(instance_id, &state.pool)
+            .await?
+            .is_none()
+    {
+        let canceled_phase = job.state.progress.phase;
+        job.state.error = Some(InstallErrorView::from_message(
+            "canceled",
+            canceled_phase,
+            "Install canceled because the instance was deleted",
+        ));
+        job.state.record_event(InstallJobEventKind::JobCanceled {
+            phase: canceled_phase,
+        });
+
+        if let Some(record) = store::finish_active(
+            job.id,
+            InstallJobStatus::Canceled,
+            &job.state,
+            state,
+        )
+        .await?
+        {
+            store::dismiss(job.id, state).await?;
+            clear_staging_dir(&job.state).await;
+            emit_install_job(&record.snapshot()).await?;
+        }
+
+        return Ok(());
+    }
+
     let interrupted_phase = job.state.progress.phase;
     job.state.record_event(InstallJobEventKind::Interrupted {
         reason: InstallInterruptReason::AppClosed,
@@ -339,6 +371,13 @@ async fn recover_interrupted_job(
     }
 
     Ok(())
+}
+
+fn target_instance_id(target: &InstallTarget) -> Option<&str> {
+    match target {
+        InstallTarget::NewInstance { instance_id } => instance_id.as_deref(),
+        InstallTarget::ExistingInstance { instance_id } => Some(instance_id),
+    }
 }
 
 fn clear_deleted_new_instance_id(job_state: &mut InstallJobState) {

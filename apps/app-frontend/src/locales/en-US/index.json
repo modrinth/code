@@ -260,6 +260,9 @@
   "app.browse.hide-added-servers": {
     "message": "Hide servers already added"
   },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Hide already installed"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },

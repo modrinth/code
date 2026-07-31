@@ -17,6 +17,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	show_instance_play_time: true,
 	advanced_filters_collapsed: true,
 	always_show_copy_details: false,
+	hide_installed_modpacks: false,
 }
 
 export const THEME_OPTIONS = ['dark', 'light', 'oled', 'retro', 'system'] as const
