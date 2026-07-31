@@ -52,9 +52,10 @@
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
-				<StyledTextarea
+				<StyledInput
 					id="gallery-image-desc"
 					v-model="editDescription"
+					multiline
 					:maxlength="255"
 					placeholder="Enter description..."
 				/>
@@ -296,7 +297,6 @@ import {
 	injectProjectPageContext,
 	NewModal as Modal,
 	StyledInput,
-	StyledTextarea,
 	useFormatDateTime,
 } from '@modrinth/ui'
 

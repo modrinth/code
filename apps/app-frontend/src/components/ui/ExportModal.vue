@@ -8,7 +8,6 @@ import {
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
-	StyledTextarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { save } from '@tauri-apps/plugin-dialog'
@@ -270,8 +269,9 @@ function isExportCandidateDisabled(path) {
 				<p class="m-0 text-contrast font-semibold">
 					{{ formatMessage(commonMessages.descriptionLabel) }}
 				</p>
-				<StyledTextarea
+				<StyledInput
 					v-model="exportDescription"
+					multiline
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
 					wrapper-class="w-full"
 				/>

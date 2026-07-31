@@ -53,9 +53,10 @@
 					<label for="project-summary">
 						<span class="label__title">Summary</span>
 					</label>
-					<StyledTextarea
+					<StyledInput
 						id="project-summary"
 						v-model="summary"
+						multiline
 						:maxlength="256"
 						:disabled="!hasPermission"
 						resize="vertical"
@@ -341,7 +342,6 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
-	StyledTextarea,
 	Toggle,
 	UnsavedChangesPopup,
 	useFormatBytes,

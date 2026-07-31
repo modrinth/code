@@ -94,9 +94,10 @@
 					>
 						{{ formatMessage(commonMessages.descriptionLabel) }}
 					</label>
-					<StyledTextarea
+					<StyledInput
 						id="collection-description"
 						v-model="current.description"
+						multiline
 						:maxlength="255"
 						wrapper-class="h-24"
 					/>
@@ -422,7 +423,6 @@ import {
 	RadioButtons,
 	SidebarCard,
 	StyledInput,
-	StyledTextarea,
 	useCompactNumber,
 	useFormatDateTime,
 	useRelativeTime,

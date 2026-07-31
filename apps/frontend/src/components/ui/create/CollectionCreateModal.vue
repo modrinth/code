@@ -25,9 +25,10 @@
 					}}</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<StyledTextarea
+				<StyledInput
 					id="additional-information"
 					v-model="description"
+					multiline
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
@@ -62,7 +63,6 @@ import {
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
-	StyledTextarea,
 	useVIntl,
 } from '@modrinth/ui'
 

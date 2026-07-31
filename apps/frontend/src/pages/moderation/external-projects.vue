@@ -17,18 +17,22 @@
 				class="!w-full"
 			/>
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-proof">Proof</label>
-			<StyledTextarea
+			<StyledInput
 				id="edit-form-proof"
 				v-model="editForm.proof"
+				type="text"
+				multiline
 				resize="both"
 				class="w-[30rem]"
 			/>
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-exceptions">
 				Exceptions / notes
 			</label>
-			<StyledTextarea
+			<StyledInput
 				id="edit-form-exceptions"
 				v-model="editForm.exceptions"
+				type="text"
+				multiline
 				resize="both"
 				class="w-[30rem]"
 			/>
@@ -137,7 +141,6 @@ import {
 	injectModrinthClient,
 	NewModal,
 	StyledInput,
-	StyledTextarea,
 	useVIntl,
 } from '@modrinth/ui'
 

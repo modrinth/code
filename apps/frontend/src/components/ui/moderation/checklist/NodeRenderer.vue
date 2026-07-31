@@ -34,7 +34,7 @@ import {
 	StyledInput,
 } from '@modrinth/ui'
 import { renderHighlightedString, renderString } from '@modrinth/utils'
-import { inject, onMounted, reactive, watchEffect } from 'vue'
+import { inject, nextTick, onMounted, reactive, watchEffect } from 'vue'
 
 import { NODE_META_KEY, STATE_KEY } from './checklist-context'
 
@@ -266,6 +266,7 @@ function setTextState(node: IdentifiedNodeBuilder, v: string): void {
 		const def = resolveDefault(node as ValueNodeBuilder)
 		const defStr = typeof def === 'string' ? def : ''
 		setNodeState(node, ov === defStr ? undefined : ov || undefined)
+		nextTick(() => textInputRefs.get(node)?.setValue(ov))
 		return
 	}
 
@@ -276,7 +277,7 @@ function setTextState(node: IdentifiedNodeBuilder, v: string): void {
 
 function handleButtonClick(node: ButtonNodeBuilder): void {
 	const before = new Map<NodeBuilder, string>()
-	for (const inputNode of textInputNodes) {
+	for (const inputNode of textInputRefs.keys()) {
 		before.set(inputNode, getTextState(asIdentified(inputNode)))
 	}
 	node._onClick?.(props.showContext)
@@ -287,7 +288,7 @@ function handleButtonClick(node: ButtonNodeBuilder): void {
 }
 
 onMounted(() => {
-	for (const inputNode of textInputNodes) {
+	for (const inputNode of textInputRefs.keys()) {
 		setTextState(asIdentified(inputNode), getTextState(asIdentified(inputNode)))
 	}
 })
@@ -324,7 +325,7 @@ function toggleChip(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilder)
 	setNodeState(parent, selected.size > 0 ? selected : undefined)
 }
 
-const textInputNodes = new Set<NodeBuilder>()
+const textInputRefs = new Map<NodeBuilder, { setValue: (v: string) => void }>()
 const overrideHelpers = { override: (v: string): OverrideValue => ({ __override: v }) }
 
 function isOverrideValue(v: unknown): v is OverrideValue {
@@ -721,7 +722,7 @@ watchEffect(async () => {
 					<template v-else-if="item.type === 'text'">
 						<StyledInput
 							:id="`node-${asIdentified(item).id}`"
-							:ref="(el: any) => (el ? textInputNodes.add(item) : textInputNodes.delete(item))"
+							:ref="(el: any) => (el ? textInputRefs.set(item, el) : textInputRefs.delete(item))"
 							v-tooltip="getTooltipConfig(item, showContext)"
 							:model-value="getTextState(asIdentified(item))"
 							:placeholder="getPlaceholder(asInput(item))"
