@@ -148,8 +148,8 @@ import {
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,
-	Pagination,
 	Input,
+	Pagination,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'

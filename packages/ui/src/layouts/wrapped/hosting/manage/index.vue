@@ -238,12 +238,12 @@ import {
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
 	ServersGuestPlanModal,
-	Input,
 	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'

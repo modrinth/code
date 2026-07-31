@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-	Checkbox,
-	defineMessages,
-	injectNotificationManager,
-	Input,
-	useVIntl,
-} from '@modrinth/ui'
+import { Checkbox, defineMessages, injectNotificationManager, Input, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/instance'

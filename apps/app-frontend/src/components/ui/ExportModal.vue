@@ -6,8 +6,8 @@ import {
 	defineMessages,
 	FileTreeSelect,
 	injectNotificationManager,
-	NewModal,
 	Input,
+	NewModal,
 	Textarea,
 	useVIntl,
 } from '@modrinth/ui'

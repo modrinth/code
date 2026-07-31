@@ -365,10 +365,10 @@ import {
 	FloatingActionBar,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
 	ProjectStatusBadge,
-	Input,
 	Table,
 	useVIntl,
 } from '@modrinth/ui'

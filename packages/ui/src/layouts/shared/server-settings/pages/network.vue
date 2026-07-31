@@ -223,7 +223,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, ConfirmModal, NewModal, Input, Table, TagItem } from '#ui/components'
+import { ButtonStyled, ConfirmModal, Input, NewModal, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {

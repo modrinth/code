@@ -162,8 +162,8 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	IntlFormatted,
 	Input,
+	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'

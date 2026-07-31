@@ -66,8 +66,8 @@
 import {
 	Chips,
 	defineMessages,
-	MarkdownEditor,
 	Input,
+	MarkdownEditor,
 	Tabs,
 	type TabsTab,
 	useVIntl,

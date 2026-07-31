@@ -364,10 +364,10 @@ import {
 	defineMessages,
 	FloatingActionBar,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
 	ProjectStatusBadge,
-	Input,
 	Table,
 	useVIntl,
 } from '@modrinth/ui'

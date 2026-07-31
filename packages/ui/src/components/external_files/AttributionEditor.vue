@@ -14,14 +14,7 @@ import { builtinLicenses } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import {
-	ButtonStyled,
-	Chips,
-	Combobox,
-	type ComboboxOption,
-	Input,
-	Textarea,
-} from '#ui/components'
+import { ButtonStyled, Chips, Combobox, type ComboboxOption, Input, Textarea } from '#ui/components'
 import { FileInput } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
 

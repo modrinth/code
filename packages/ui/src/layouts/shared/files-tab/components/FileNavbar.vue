@@ -226,8 +226,8 @@ import {
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
+import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 

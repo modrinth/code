@@ -110,9 +110,9 @@ import {
 	defineMessages,
 	financialMessages,
 	formFieldLabels,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
-	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'

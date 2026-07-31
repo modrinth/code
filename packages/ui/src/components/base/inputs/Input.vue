@@ -59,14 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	type Component,
-	computed,
-	type InputHTMLAttributes,
-	mergeProps,
-	ref,
-	useAttrs,
-} from 'vue'
+import { type Component, computed, type InputHTMLAttributes, mergeProps, ref, useAttrs } from 'vue'
 
 import InputClearButton from './InputClearButton.vue'
 import InputFrame from './InputFrame.vue'

@@ -4,8 +4,8 @@ import {
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
-	Slider,
 	Input,
+	Slider,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'

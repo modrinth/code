@@ -210,10 +210,10 @@ import {
 	commonMessages,
 	FloatingPanel,
 	injectModrinthClient,
+	Input,
 	MultiSelect,
 	type MultiSelectItem,
 	Pagination,
-	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'

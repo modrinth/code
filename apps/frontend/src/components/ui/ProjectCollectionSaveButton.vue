@@ -52,14 +52,7 @@
 
 <script setup lang="ts">
 import { BookmarkIcon, PlusIcon } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	Checkbox,
-	commonMessages,
-	PopoutMenu,
-	Input,
-	useVIntl,
-} from '@modrinth/ui'
+import { ButtonStyled, Checkbox, commonMessages, Input, PopoutMenu, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 

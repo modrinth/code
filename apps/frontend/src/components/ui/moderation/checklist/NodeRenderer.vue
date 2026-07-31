@@ -30,8 +30,8 @@ import {
 	Checkbox,
 	Combobox,
 	injectProjectPageContext,
-	MarkdownEditor,
 	Input,
+	MarkdownEditor,
 } from '@modrinth/ui'
 import { renderHighlightedString, renderString } from '@modrinth/utils'
 import { inject, onMounted, reactive, watchEffect } from 'vue'

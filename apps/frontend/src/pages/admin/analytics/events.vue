@@ -245,11 +245,11 @@ import {
 	DatePicker,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	MultiSelect,
 	type MultiSelectOption,
 	NewModal,
 	type SortDirection,
-	Input,
 	Table,
 	type TableColumn,
 } from '@modrinth/ui'

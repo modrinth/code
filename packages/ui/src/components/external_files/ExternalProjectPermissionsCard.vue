@@ -30,7 +30,6 @@ import {
 	injectProjectPageContext,
 } from '../../providers'
 import type { QuickReply } from '../../providers/attribution-moderation'
-import Input from '../base/inputs/Input.vue'
 import Textarea from '../base/inputs/Textarea.vue'
 import AddFilesToAttributionGroupModal from './AddFilesToAttributionGroupModal.vue'
 import AddToExistingExternalProjectModal from './AddToExistingExternalProjectModal.vue'

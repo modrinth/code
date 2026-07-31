@@ -386,8 +386,8 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import ButtonStyled from './ButtonStyled.vue'
-import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 import Input from './inputs/Input.vue'
+import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 
 export type DropdownFilterBarOption = {
 	value: string

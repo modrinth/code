@@ -17,12 +17,7 @@
 				class="!w-full"
 			/>
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-proof">Proof</label>
-			<Textarea
-				id="edit-form-proof"
-				v-model="editForm.proof"
-				resize="both"
-				class="w-[30rem]"
-			/>
+			<Textarea id="edit-form-proof" v-model="editForm.proof" resize="both" class="w-[30rem]" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-exceptions">
 				Exceptions / notes
 			</label>
@@ -135,8 +130,8 @@ import {
 	externalProjectLicenseStatusMessages,
 	ExternalProjectLookupCard,
 	injectModrinthClient,
-	NewModal,
 	Input,
+	NewModal,
 	Textarea,
 	useVIntl,
 } from '@modrinth/ui'

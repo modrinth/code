@@ -238,9 +238,9 @@ import {
 	getBlockchainIcon,
 	getCurrencyColor,
 	getCurrencyIcon,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
-	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'

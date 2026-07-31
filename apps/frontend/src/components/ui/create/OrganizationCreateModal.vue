@@ -82,8 +82,8 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	NewModal,
 	Input,
+	NewModal,
 	Textarea,
 	useVIntl,
 } from '@modrinth/ui'

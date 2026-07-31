@@ -293,12 +293,12 @@ import {
 	defineMessages,
 	formatReportItemType,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	MarkdownEditor,
 	type MessageDescriptor,
 	RadialHeader,
 	RadioButtons,
-	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'

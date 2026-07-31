@@ -196,13 +196,13 @@ import {
 	ButtonStyled,
 	Chips,
 	Combobox,
+	DateInput,
 	injectModrinthClient,
 	injectNotificationManager,
-	DateInput,
-	NewModal,
 	Input,
-	Textarea,
+	NewModal,
 	TagItem,
+	Textarea,
 	Toggle,
 } from '@modrinth/ui'
 import dayjs from 'dayjs'

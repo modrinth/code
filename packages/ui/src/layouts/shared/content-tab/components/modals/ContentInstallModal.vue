@@ -162,10 +162,7 @@
 				<span class="font-semibold text-contrast">
 					{{ formatMessage(messages.nameLabel) }}
 				</span>
-				<Input
-					v-model="instanceName"
-					:placeholder="formatMessage(messages.namePlaceholder)"
-				/>
+				<Input v-model="instanceName" :placeholder="formatMessage(messages.namePlaceholder)" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -263,8 +260,8 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
-import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
+import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectFilePicker } from '#ui/providers'

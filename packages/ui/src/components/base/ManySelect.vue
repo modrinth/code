@@ -74,7 +74,7 @@
 import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Button, ButtonStyled, PopoutMenu, Input } from '../index'
+import { Button, ButtonStyled, Input, PopoutMenu } from '../index'
 import ScrollablePanel from './ScrollablePanel.vue'
 
 type Option = string | number | object

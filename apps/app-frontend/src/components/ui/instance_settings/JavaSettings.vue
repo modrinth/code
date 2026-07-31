@@ -13,8 +13,8 @@ import {
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
-	Slider,
 	Input,
+	Slider,
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'

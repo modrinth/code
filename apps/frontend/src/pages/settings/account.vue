@@ -499,9 +499,9 @@ import {
 	ConfirmModal,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
-	Input,
 	Table,
 	useVIntl,
 } from '@modrinth/ui'

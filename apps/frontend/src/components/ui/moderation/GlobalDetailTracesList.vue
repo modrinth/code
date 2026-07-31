@@ -128,8 +128,8 @@ import {
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,
-	Pagination,
 	Input,
+	Pagination,
 } from '@modrinth/ui'
 
 import GlobalDetailLocalTraceCard from '~/components/ui/moderation/GlobalDetailLocalTraceCard.vue'

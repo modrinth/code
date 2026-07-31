@@ -449,9 +449,9 @@ import {
 	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
+	Input,
 	IntlFormatted,
 	ProjectCard,
-	Input,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'

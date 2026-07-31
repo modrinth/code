@@ -5,8 +5,8 @@ import {
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
-	IntlFormatted,
 	Input,
+	IntlFormatted,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'

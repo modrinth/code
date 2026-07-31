@@ -193,10 +193,10 @@
 import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Input,
 	OverflowMenu,
 	type OverflowMenuOption,
 	Pagination,
-	Input,
 	Table,
 	useFormatNumber,
 	useVIntl,

@@ -162,7 +162,9 @@
 								:class="{ 'rotate-180': showMore }"
 							/>
 							<span class="truncate text-sm">
-								{{ showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore) }}
+								{{
+									showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore)
+								}}
 							</span>
 						</button>
 					</div>
@@ -211,7 +213,7 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
-import { Checkbox, ScrollablePanel, Input } from '../index'
+import { Checkbox, Input, ScrollablePanel, Toggle } from '../index'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'
 

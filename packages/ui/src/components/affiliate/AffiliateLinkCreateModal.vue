@@ -62,7 +62,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import { AutoBrandIcon, ButtonStyled, NewModal, Input } from '../index'
+import { AutoBrandIcon, ButtonStyled, Input, NewModal } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(

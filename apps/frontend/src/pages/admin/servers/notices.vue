@@ -45,12 +45,7 @@
 					placeholder="E.g. rXGtq2"
 					autocomplete="off"
 				/>
-				<Textarea
-					v-else
-					id="notice-message"
-					v-model="newNoticeMessage"
-					wrapper-class="h-32"
-				/>
+				<Textarea v-else id="notice-message" v-model="newNoticeMessage" wrapper-class="h-32" />
 			</div>
 			<div v-if="!newNoticeSurvey" class="flex items-center justify-between gap-2">
 				<label for="dismissable-toggle" class="flex flex-col gap-1">
@@ -266,15 +261,15 @@ import {
 	Combobox,
 	commonMessages,
 	CopyCode,
+	DateInput,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	DateInput,
+	Input,
 	NewModal,
 	ServerNotice,
-	Input,
-	Textarea,
 	TagItem,
+	Textarea,
 	Toggle,
 	useFormatDateTime,
 	useRelativeTime,

@@ -339,8 +339,8 @@ import NewModal from '../modal/NewModal.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
-import IntlFormatted from './IntlFormatted.vue'
 import Input from './inputs/Input.vue'
+import IntlFormatted from './IntlFormatted.vue'
 import Toggle from './Toggle.vue'
 
 const { formatMessage } = useVIntl()

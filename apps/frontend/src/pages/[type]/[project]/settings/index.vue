@@ -21,12 +21,7 @@
 					<label for="project-name">
 						<span class="label__title">Name</span>
 					</label>
-					<Input
-						id="project-name"
-						v-model="name"
-						:maxlength="2048"
-						:disabled="!hasPermission"
-					/>
+					<Input id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
 				</div>
 
 				<div>

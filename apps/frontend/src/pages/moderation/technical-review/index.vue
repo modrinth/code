@@ -14,8 +14,8 @@ import {
 	commonMessages,
 	FloatingPanel,
 	injectModrinthClient,
-	Pagination,
 	Input,
+	Pagination,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'

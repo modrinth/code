@@ -6,9 +6,9 @@ import {
 	ButtonStyled,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
 	ServerNotice,
-	Input,
 	TagItem,
 } from '@modrinth/ui'
 import { ref } from 'vue'

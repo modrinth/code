@@ -5,10 +5,7 @@
 			class="flex flex-col gap-2"
 		>
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.worldNameLabel) }}</span>
-			<Input
-				v-model="worldName"
-				:placeholder="formatMessage(messages.worldNamePlaceholder)"
-			/>
+			<Input v-model="worldName" :placeholder="formatMessage(messages.worldNamePlaceholder)" />
 		</div>
 
 		<div v-if="ctx.setupType.value === 'vanilla'" class="flex flex-col gap-2">
@@ -69,10 +66,7 @@
 					</template>
 				</IntlFormatted>
 			</span>
-			<Input
-				v-model="worldSeed"
-				:placeholder="formatMessage(messages.worldSeedPlaceholder)"
-			/>
+			<Input v-model="worldSeed" :placeholder="formatMessage(messages.worldSeedPlaceholder)" />
 			<span class="text-sm text-secondary">{{ formatMessage(messages.worldSeedDescription) }}</span>
 		</div>
 

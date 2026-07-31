@@ -154,8 +154,8 @@ import {
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
-	ReadyTransition,
 	Input,
+	ReadyTransition,
 	useReadyState,
 	useVIntl,
 } from '@modrinth/ui'

@@ -4,7 +4,7 @@ import { PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { Accordion, ButtonStyled, NewModal, Input } from '#ui/components'
+import { Accordion, ButtonStyled, Input, NewModal } from '#ui/components'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import AttributionGroupFilePicker from './AttributionGroupFilePicker.vue'

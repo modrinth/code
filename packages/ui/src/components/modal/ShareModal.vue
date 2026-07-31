@@ -167,12 +167,7 @@ defineExpose({
 						</button>
 					</ButtonStyled>
 				</div>
-				<Textarea
-					v-else
-					v-model="content"
-					resize="vertical"
-					wrapper-class="h-full w-[30rem]"
-				>
+				<Textarea v-else v-model="content" resize="vertical" wrapper-class="h-full w-[30rem]">
 					<template #trailing>
 						<ButtonStyled circular type="transparent">
 							<button

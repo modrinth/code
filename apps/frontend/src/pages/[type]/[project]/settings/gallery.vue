@@ -294,8 +294,8 @@ import {
 	DropArea,
 	FileInput,
 	injectProjectPageContext,
-	NewModal as Modal,
 	Input,
+	NewModal as Modal,
 	Textarea,
 	useFormatDateTime,
 } from '@modrinth/ui'

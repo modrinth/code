@@ -7,8 +7,8 @@ import {
 	Chips,
 	defineMessages,
 	injectNotificationManager,
-	OverflowMenu,
 	Input,
+	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'

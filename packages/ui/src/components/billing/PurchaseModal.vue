@@ -148,11 +148,7 @@
 									class="h-4 w-4text-secondary opacity-60"
 								/>
 							</div>
-							<Input
-								:model-value="mutatedProduct.metadata.cpu"
-								disabled
-								wrapper-class="w-full"
-							/>
+							<Input :model-value="mutatedProduct.metadata.cpu" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Storage</div>
@@ -476,8 +472,8 @@ import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Combobox from '../base/Combobox.vue'
-import Slider from '../base/Slider.vue'
 import Input from '../base/inputs/Input.vue'
+import Slider from '../base/Slider.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
 import LoaderIcon from '../servers/icons/LoaderIcon.vue'

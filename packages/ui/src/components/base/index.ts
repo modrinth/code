@@ -44,6 +44,8 @@ export { default as HeadingLink } from './HeadingLink.vue'
 export { default as HorizontalRule } from './HorizontalRule.vue'
 export { default as I18nDebugPanel } from './I18nDebugPanel.vue'
 export { default as IconSelect } from './IconSelect.vue'
+export type { InputAppearance, InputSize } from './inputs'
+export { DateInput, DatePicker, Input, InputClearButton, InputFrame, Textarea } from './inputs'
 export { default as IntlFormatted } from './IntlFormatted.vue'
 export type { JoinedButtonAction } from './JoinedButtons.vue'
 export { default as JoinedButtons } from './JoinedButtons.vue'
@@ -98,15 +100,6 @@ export { default as SmartClickable } from './SmartClickable.vue'
 export type { StackedAdmonitionItem, StackedAdmonitionType } from './StackedAdmonitions.vue'
 export { default as StackedAdmonitions } from './StackedAdmonitions.vue'
 export { default as StatItem } from './StatItem.vue'
-export {
-	DatePicker,
-	InputClearButton,
-	InputFrame,
-	DateInput,
-	Input,
-	Textarea,
-} from './inputs'
-export type { InputAppearance, InputSize } from './inputs'
 export type { SortDirection, TableColumn } from './Table.vue'
 export { default as Table } from './Table.vue'
 export type { TabsTab, TabsValue } from './Tabs.vue'

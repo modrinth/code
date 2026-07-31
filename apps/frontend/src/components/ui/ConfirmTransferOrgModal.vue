@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import { RightArrowIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, NewModal, Input } from '@modrinth/ui'
+import { Admonition, Avatar, ButtonStyled, Input, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
