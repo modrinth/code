@@ -52,8 +52,7 @@ let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
 const visibleOptions = computed(() => props.options.filter((option) => option.shown !== false))
 const menuOptions = computed(() =>
 	visibleOptions.value.filter(
-		(option): option is OverflowMenuAction | OverflowMenuLink =>
-			option.type !== 'divider',
+		(option): option is OverflowMenuAction | OverflowMenuLink => option.type !== 'divider',
 	),
 )
 
@@ -81,9 +80,7 @@ function isLink(option: OverflowMenuOption): option is OverflowMenuLink {
 
 function getMenuItems() {
 	if (!panelElement.value) return []
-	return Array.from(
-		panelElement.value.querySelectorAll<HTMLElement>('[role="menuitem"]'),
-	)
+	return Array.from(panelElement.value.querySelectorAll<HTMLElement>('[role="menuitem"]'))
 }
 
 function focusItem(index: number) {

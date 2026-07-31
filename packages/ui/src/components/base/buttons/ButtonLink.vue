@@ -3,12 +3,7 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import ButtonFrame from './ButtonFrame.vue'
-import type {
-	ButtonColor,
-	ButtonLinkDestination,
-	ButtonSize,
-	ButtonType,
-} from './types'
+import type { ButtonColor, ButtonLinkDestination, ButtonSize, ButtonType } from './types'
 
 type ButtonLinkProps = ButtonLinkDestination & {
 	type?: ButtonType
@@ -20,17 +15,14 @@ type ButtonLinkProps = ButtonLinkDestination & {
 	disabled?: boolean
 }
 
-const props = withDefaults(
-	defineProps<ButtonLinkProps>(),
-	{
-		type: 'base',
-		size: 'md',
-		target: undefined,
-		rel: undefined,
-		download: undefined,
-		disabled: false,
-	},
-)
+const props = withDefaults(defineProps<ButtonLinkProps>(), {
+	type: 'base',
+	size: 'md',
+	target: undefined,
+	rel: undefined,
+	download: undefined,
+	disabled: false,
+})
 
 const usesRouter = computed(() => props.to !== undefined && !props.disabled)
 const component = computed(() => (usesRouter.value ? RouterLink : 'a'))
