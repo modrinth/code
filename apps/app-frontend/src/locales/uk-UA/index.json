@@ -806,15 +806,6 @@
   "app.skins.sign-in.button": {
     "message": "Увійдіть"
   },
-  "app.skins.sign-in.description": {
-    "message": "Будь ласка, увійдіть у свій обліковий запис Minecraft, щоб використовувати особливості керування скінами в Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Схвильований бот Modrinth"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Увійдіть"
-  },
   "app.skins.title": {
     "message": "Вибір скіну"
   },

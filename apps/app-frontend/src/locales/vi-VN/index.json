@@ -590,15 +590,6 @@
   "app.skins.sign-in.button": {
     "message": "Đăng nhập"
   },
-  "app.skins.sign-in.description": {
-    "message": "Đặng nhập vào mội tài khoản Minecraft để đổi skin Skin trong ứng dụng này."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Bot phấn khích"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Đăng nhập đã"
-  },
   "app.skins.title": {
     "message": "Đổi skin"
   },

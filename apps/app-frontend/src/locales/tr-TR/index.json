@@ -734,15 +734,6 @@
   "app.skins.sign-in.button": {
     "message": "Giriş Yap"
   },
-  "app.skins.sign-in.description": {
-    "message": "Modrinth appdeki skin yönetim özelliklerini kullanmak için lütfen Minecraft hesabınıza giriş yapın."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Heyecanlı Modrinth Bot'u"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Lütfen giriş yapın"
-  },
   "app.skins.title": {
     "message": "Skin seçici"
   },

@@ -632,15 +632,6 @@
   "app.skins.sign-in.button": {
     "message": "تسجيل الدخول"
   },
-  "app.skins.sign-in.description": {
-    "message": "يرجى تسجيل الدخول إلى حسابك في Minecraft لاستخدام ميزات إدارة أشكال الشخصيات في تطبيق Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "روبوت Modrinth المتحمس"
-  },
-  "app.skins.sign-in.title": {
-    "message": "الرجاء تسجيل الدخول"
-  },
   "app.skins.title": {
     "message": "اختيار المظهر"
   },

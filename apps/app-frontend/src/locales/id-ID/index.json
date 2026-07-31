@@ -413,15 +413,6 @@
   "app.skins.sign-in.button": {
     "message": "Masuk"
   },
-  "app.skins.sign-in.description": {
-    "message": "Mohon masuk ke akun Minecraft Anda untuk menggunakan fitur pengelolaan rupa dari Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Bot Modrinth penuh antusias"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Silakan masuk"
-  },
   "app.skins.title": {
     "message": "Pemilih rupa"
   },

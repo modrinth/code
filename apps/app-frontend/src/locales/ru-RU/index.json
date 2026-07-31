@@ -797,15 +797,6 @@
   "app.skins.sign-in.button": {
     "message": "Войти"
   },
-  "app.skins.sign-in.description": {
-    "message": "Пожалуйста, войдите в свой аккаунт Minecraft, чтобы воспользоваться функциями управления скинами в приложении Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Восторженный Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Войдите"
-  },
   "app.skins.title": {
     "message": "Выбор скина"
   },

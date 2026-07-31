@@ -794,15 +794,6 @@
   "app.skins.sign-in.button": {
     "message": "Bejelentkezés"
   },
-  "app.skins.sign-in.description": {
-    "message": "Kérlek jelentkezz be a Minecraft-fiókodba, hogy használni tudd a Modrinth App kinézetkezelési funkcióit."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Izgatott Modrinth bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Kérlek jelentkezz be"
-  },
   "app.skins.title": {
     "message": "Kinézetváltó"
   },

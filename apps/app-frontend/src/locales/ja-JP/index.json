@@ -827,15 +827,6 @@
   "app.skins.sign-in.button": {
     "message": "サイン審"
   },
-  "app.skins.sign-in.description": {
-    "message": "Modrinthアプリのスキン管理機能を使用するには、マインクラフトアカウントにサインインしてください。"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "ワクワクしている Modrinth ボット"
-  },
-  "app.skins.sign-in.title": {
-    "message": "サインインしてください"
-  },
   "app.skins.title": {
     "message": "スキンセレクター"
   },

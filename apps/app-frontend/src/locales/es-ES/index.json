@@ -437,15 +437,6 @@
   "app.skins.sign-in.button": {
     "message": "Iniciar Sesión"
   },
-  "app.skins.sign-in.description": {
-    "message": "Por favor, inicia sesión con tu cuenta de Minecraft para usar las funciones del administrador de Skins de la app de Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Modrinth Bot emocionado"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Por favor, inicia sesión"
-  },
   "app.skins.title": {
     "message": "Selector de Skin"
   },

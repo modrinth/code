@@ -428,15 +428,6 @@
   "app.skins.sign-in.button": {
     "message": "ลงชื่อเข้าใช้"
   },
-  "app.skins.sign-in.description": {
-    "message": "โปรดลงชื่อเข้าใช้บัญชี Minecraft ของคุณเพื่อใช้งานฟีเจอร์จัดการสกินของแอป Modrinth"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "บอท Modrinth ที่กำลังตื่นเต้น"
-  },
-  "app.skins.sign-in.title": {
-    "message": "โปรดลงชื่อเข้าใช้"
-  },
   "app.update-popup.body.download-complete": {
     "message": "ดาวน์โหลด Modrinth v{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Modrinth"
   },

@@ -19,8 +19,8 @@ import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-gr
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
 import { getLibraryInstanceSelectionKey, provideLibrary } from '@/components/ui/library/use-library'
-import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
+import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
 const props = defineProps<{

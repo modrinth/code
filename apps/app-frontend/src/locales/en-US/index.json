@@ -566,6 +566,12 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
+  "app.library.context-menu.create-instance": {
+    "message": "New instance"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "Add to group"
+  },
   "app.library.group.delete": {
     "message": "Delete group"
   },
@@ -574,6 +580,27 @@
   },
   "app.library.group.edit-name": {
     "message": "Edit group name"
+  },
+  "app.library.group.empty": {
+    "message": "Drag and drop to add instances."
+  },
+  "app.library.group.favorites": {
+    "message": "Favorites"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Add"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Added"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "No instances found"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Search instance"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "Add instances to \"{groupName}\""
   },
   "app.library.group.name-empty": {
     "message": "Group names cannot be empty."
@@ -593,11 +620,11 @@
   "app.library.selection.aria-label": {
     "message": "Selected instances"
   },
-  "app.library.selection.create-group": {
-    "message": "Create group"
-  },
   "app.library.selection.deleting": {
     "message": "Deleting selected instances"
+  },
+  "app.library.selection.new-group": {
+    "message": "New group"
   },
   "app.library.selection.remove-from-group": {
     "message": "Remove from group"
@@ -788,6 +815,12 @@
   "app.skins.delete-modal.title": {
     "message": "Are you sure you want to delete this skin?"
   },
+  "app.skins.demo.description": {
+    "message": "Sign in to your Minecraft account to save and apply skins!"
+  },
+  "app.skins.demo.title": {
+    "message": "Editing with a demo account"
+  },
   "app.skins.dropped-file-error.text": {
     "message": "Failed to read the dropped file."
   },
@@ -820,6 +853,9 @@
   },
   "app.skins.modal.cape-section": {
     "message": "Cape"
+  },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "Sign in to save skins."
   },
   "app.skins.modal.edit-title": {
     "message": "Editing skin"
@@ -909,16 +945,7 @@
     "message": "Tiny Takeover"
   },
   "app.skins.sign-in.button": {
-    "message": "Sign In"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Please sign into your Minecraft account to use the skin management features of the Modrinth app."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Excited Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Please sign in"
+    "message": "Sign in to Microsoft"
   },
   "app.skins.title": {
     "message": "Skin selector"

@@ -90,9 +90,7 @@ function handlePageOption({ option }: { option: string }) {
 		<RecentWorldsList v-if="recentInstances?.length > 0" :recent-instances="recentInstances" />
 		<LibrarySection :instances="instances" />
 		<ContextMenu ref="pageOptions" @option-clicked="handlePageOption">
-			<template #new_instance>
-				<PlusIcon /> {{ formatMessage(messages.newInstance) }}
-			</template>
+			<template #new_instance> <PlusIcon /> {{ formatMessage(messages.newInstance) }} </template>
 		</ContextMenu>
 	</div>
 </template>

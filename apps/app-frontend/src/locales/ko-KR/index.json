@@ -803,15 +803,6 @@
   "app.skins.sign-in.button": {
     "message": "로그인"
   },
-  "app.skins.sign-in.description": {
-    "message": "Modrinth 앱의 스킨 관리 기능을 사용하려면 Minecraft 계정에 로그인하세요."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Excited Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "로그인하세요"
-  },
   "app.skins.title": {
     "message": "스킨 선택"
   },

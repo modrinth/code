@@ -386,15 +386,6 @@
   "app.skins.sign-in.button": {
     "message": "Daftar Masuk"
   },
-  "app.skins.sign-in.description": {
-    "message": "Sila daftar masuk ke akaun Minecraft anda untuk menggunakan ciri pengurusan kekulit milik Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Bot Modrinth yang Teruja"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Sila daftar masuk"
-  },
   "app.skins.title": {
     "message": "Pemilih kekulit"
   },

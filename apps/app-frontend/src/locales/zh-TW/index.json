@@ -857,15 +857,6 @@
   "app.skins.sign-in.button": {
     "message": "登入"
   },
-  "app.skins.sign-in.description": {
-    "message": "請登入你的 Minecraft 帳號以使用 Modrinth App 的外觀管理功能。"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "興奮的 Modrinth 機器人"
-  },
-  "app.skins.sign-in.title": {
-    "message": "請登入"
-  },
   "app.skins.title": {
     "message": "外觀選擇工具"
   },

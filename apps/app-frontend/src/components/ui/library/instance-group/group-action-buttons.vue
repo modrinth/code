@@ -33,8 +33,8 @@ const messages = defineMessages({
 	>
 		<ButtonStyled circular type="transparent" size="standard">
 			<button
-				class="!size-8 !min-w-8"
 				v-tooltip="formatMessage(messages.editGroupName)"
+				class="!size-8 !min-w-8"
 				type="button"
 				:aria-label="formatMessage(messages.editGroupName)"
 				@click.stop="onEditGroupName"
@@ -44,8 +44,8 @@ const messages = defineMessages({
 		</ButtonStyled>
 		<ButtonStyled circular type="transparent" size="standard">
 			<button
-				class="!size-8 !min-w-8"
 				v-tooltip="formatMessage(messages.addToGroup)"
+				class="!size-8 !min-w-8"
 				type="button"
 				:aria-label="formatMessage(messages.addToGroup)"
 				@click.stop="onAddToGroup"
@@ -55,8 +55,8 @@ const messages = defineMessages({
 		</ButtonStyled>
 		<ButtonStyled circular type="transparent" size="standard">
 			<button
-				class="!size-8 !min-w-8"
 				v-tooltip="formatMessage(messages.deleteGroup)"
+				class="!size-8 !min-w-8"
 				type="button"
 				:aria-label="formatMessage(messages.deleteGroup)"
 				:disabled="deleting"

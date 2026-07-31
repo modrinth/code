@@ -542,15 +542,6 @@
   "app.skins.sign-in.button": {
     "message": "Kirjaudu sisään"
   },
-  "app.skins.sign-in.description": {
-    "message": "Kirjaudu Minecraft-tilillesi käyttääksesi Modrinth-sovelluksen ulkoasujen hallintaominaisuuksia."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Innostunut Modrinth Botti"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Kirjaudu sisään"
-  },
   "app.skins.title": {
     "message": "Skinivalinta"
   },

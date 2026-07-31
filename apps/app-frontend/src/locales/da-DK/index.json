@@ -593,15 +593,6 @@
   "app.skins.sign-in.button": {
     "message": "Log Ind"
   },
-  "app.skins.sign-in.description": {
-    "message": "Venligst log ind til din Minecraft konto for at kunne funktionerne til at administrere dit skin i Modrinth appen."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Overrasket Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Venligst log ind"
-  },
   "app.skins.title": {
     "message": "Skin vælger"
   },

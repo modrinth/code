@@ -791,15 +791,6 @@
   "app.skins.sign-in.button": {
     "message": "Zaloguj się"
   },
-  "app.skins.sign-in.description": {
-    "message": "Zaloguj się na konto Minecraft, by móc zarządzać skórkami poprzez Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Podekscytowany Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Zaloguj się"
-  },
   "app.skins.title": {
     "message": "Wybór skórki"
   },

@@ -857,15 +857,6 @@
   "app.skins.sign-in.button": {
     "message": "Se connecter"
   },
-  "app.skins.sign-in.description": {
-    "message": "Veuillez vous connecter à votre compte Minecraft pour utiliser les fonctionnalités de gestion de skins de Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Bot Modrinth enthousiaste"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Veuillez vous connecter"
-  },
   "app.skins.title": {
     "message": "Sélecteur de skin"
   },

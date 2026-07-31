@@ -857,15 +857,6 @@
   "app.skins.sign-in.button": {
     "message": "登录"
   },
-  "app.skins.sign-in.description": {
-    "message": "请登录您的 Minecraft 账号，以便使用 Modrinth 应用的皮肤管理功能。"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "兴奋的 Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "请登录"
-  },
   "app.skins.title": {
     "message": "皮肤选择器"
   },

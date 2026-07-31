@@ -743,15 +743,6 @@
   "app.skins.sign-in.button": {
     "message": "Logga in"
   },
-  "app.skins.sign-in.description": {
-    "message": "Vänligen logga in på ditt Minecraft-konto för att använda utseendehanteringfunktioner i Modrinth appen."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Exalterad Modrinth bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Vänligen logga in"
-  },
   "app.skins.title": {
     "message": "Utseende väljare"
   },
