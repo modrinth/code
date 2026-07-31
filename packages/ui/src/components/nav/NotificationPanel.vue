@@ -59,7 +59,7 @@
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
 								x{{ item.count }}
 							</div>
-							<IconButton class="!size-6" size="xs" :label="
+							<IconButton size="xs" :label="
 										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
 									" v-if="item.copyable !== false"
 									v-tooltip="
@@ -70,7 +70,7 @@
 								<CheckIcon v-if="copied[getCopyKey(item)]" />
 								<CopyIcon v-else />
 							</IconButton>
-							<IconButton class="!size-6" size="xs" :label="`Dismiss`" v-if="item.dismissible !== false" v-tooltip="`Dismiss`" @click="dismissNotification(index)">
+							<IconButton size="xs" :label="`Dismiss`" v-if="item.dismissible !== false" v-tooltip="`Dismiss`" @click="dismissNotification(index)">
 								<XIcon />
 							</IconButton>
 						</div>
