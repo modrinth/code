@@ -6,8 +6,7 @@
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
 						<span class="text-lg font-semibold text-contrast">SFTP</span>
-						<ButtonStyled>
-							<a
+						<ButtonLink
 								v-tooltip="sftpActionTooltip"
 								class="!w-full sm:!w-auto"
 								:class="{ 'opacity-60': !canWriteFiles }"
@@ -16,10 +15,9 @@
 								target="_blank"
 								@click="handleSftpLaunchClick"
 							>
-								<ExternalIcon class="h-5 w-5" />
-								Launch SFTP
-							</a>
-						</ButtonStyled>
+							<ExternalIcon class="h-5 w-5" />
+							Launch SFTP
+						</ButtonLink>
 					</div>
 
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
@@ -76,8 +74,13 @@
 											<CopyIcon class="h-5 w-5" />
 										</div>
 
-										<ButtonStyled type="transparent" circular>
-											<button
+										<IconButton type="quiet" :label="
+													canWriteFiles
+														? showPassword
+															? 'Hide password'
+															: 'Show password'
+														: permissionDeniedMessage
+												"
 												v-tooltip="
 													canWriteFiles
 														? showPassword
@@ -89,11 +92,10 @@
 												:disabled="!canWriteFiles"
 												@click.stop="togglePasswordVisibility"
 											>
-												<!-- look into doing stop propagation here -->
-												<EyeIcon v-if="showPassword" class="h-5 w-5" />
-												<EyeOffIcon v-else class="h-5 w-5" />
-											</button>
-										</ButtonStyled>
+											<!-- look into doing stop propagation here -->
+											<EyeIcon v-if="showPassword" class="h-5 w-5" />
+											<EyeOffIcon v-else class="h-5 w-5" />
+										</IconButton>
 									</div>
 								</div>
 							</div>
@@ -107,8 +109,7 @@
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
 							<span class="text-lg font-semibold text-contrast">Startup command</span>
 						</label>
-						<ButtonStyled v-if="startupCommand !== defaultStartupCommand" type="transparent">
-							<button
+						<Button type="quiet" v-if="startupCommand !== defaultStartupCommand"
 								v-tooltip="advancedActionTooltip"
 								:disabled="
 									isStartupLoading ||
@@ -118,10 +119,9 @@
 								class="relative !w-full sm:!w-auto"
 								@click="resetToDefault"
 							>
-								<UpdatedIcon class="h-5 w-5" />
-								Default
-							</button>
-						</ButtonStyled>
+							<UpdatedIcon class="h-5 w-5" />
+							Default
+						</Button>
 					</div>
 					<div class="relative">
 						<StyledInput
@@ -217,6 +217,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import {
 	CopyIcon,
@@ -229,7 +230,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { ButtonStyled, Combobox, StyledInput } from '#ui/components'
+import { Combobox, StyledInput } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {

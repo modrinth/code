@@ -4,12 +4,10 @@
 			<span class="font-semibold text-contrast">{{
 				heading ?? formatMessage(messages.sharedInstance)
 			}}</span>
-			<ButtonStyled type="transparent">
-				<button @click="emit('viewContents')">
-					<EyeIcon />
-					{{ formatMessage(messages.viewContents) }}
-				</button>
-			</ButtonStyled>
+			<Button type="quiet" @click="emit('viewContents')">
+				<EyeIcon />
+				{{ formatMessage(messages.viewContents) }}
+			</Button>
 		</div>
 		<div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
 			<Avatar
@@ -33,8 +31,9 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { EyeIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, defineMessages, formatLoader, useVIntl } from '@modrinth/ui'
+import { Avatar, defineMessages, formatLoader, useVIntl } from '@modrinth/ui'
 import { computed, toRefs } from 'vue'
 
 import type { SharedInstanceInstallPreview } from '@/helpers/install'

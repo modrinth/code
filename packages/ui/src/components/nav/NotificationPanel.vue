@@ -59,22 +59,20 @@
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
 								x{{ item.count }}
 							</div>
-							<ButtonStyled v-if="item.copyable !== false" circular size="small">
-								<button
+							<IconButton class="!size-6" size="xs" :label="
+										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
+									" v-if="item.copyable !== false"
 									v-tooltip="
 										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
 									"
 									@click="copyToClipboard(item)"
 								>
-									<CheckIcon v-if="copied[getCopyKey(item)]" />
-									<CopyIcon v-else />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="item.dismissible !== false" circular size="small">
-								<button v-tooltip="`Dismiss`" @click="dismissNotification(index)">
-									<XIcon />
-								</button>
-							</ButtonStyled>
+								<CheckIcon v-if="copied[getCopyKey(item)]" />
+								<CopyIcon v-else />
+							</IconButton>
+							<IconButton class="!size-6" size="xs" :label="`Dismiss`" v-if="item.dismissible !== false" v-tooltip="`Dismiss`" @click="dismissNotification(index)">
+								<XIcon />
+							</IconButton>
 						</div>
 						<div v-if="item.type !== 'neutral'"></div>
 						<div
@@ -90,16 +88,11 @@
 						</template>
 						<template v-if="item.buttons?.length">
 							<div class="col-span-2 flex flex-wrap gap-1.5 pt-1">
-								<ButtonStyled
-									v-for="(button, buttonIndex) in item.buttons"
-									:key="buttonIndex"
-									:color="button.color"
-								>
-									<button class="!shadow-none" @click="handleButtonClick(item, button)">
-										<component :is="button.icon" v-if="button.icon" />
-										{{ button.label }}
-									</button>
-								</ButtonStyled>
+								<Button :type="(button.color) && (button.color) !== 'standard' ? 'colored' : 'base'" :color="(button.color) && (button.color) !== 'standard' ? ((button.color) === 'medal-promo' ? 'medal_promotion' : (button.color)) : undefined" v-for="(button, buttonIndex) in item.buttons"
+									:key="buttonIndex" class="!shadow-none" @click="handleButtonClick(item, button)">
+									<component :is="button.icon" v-if="button.icon" />
+									{{ button.label }}
+								</Button>
 							</div>
 						</template>
 					</div>
@@ -110,6 +103,7 @@
 </template>
 
 <script setup lang="ts">
+import { IconButton, Button } from '#ui/components/base/buttons'
 import {
 	CheckCircleIcon,
 	CheckIcon,
@@ -128,7 +122,6 @@ import {
 	type WebNotification,
 	type WebNotificationButton,
 } from '../../providers'
-import ButtonStyled from '../base/ButtonStyled.vue'
 
 const notificationManager = injectNotificationManager()
 const notifications = computed<WebNotification[]>(() => notificationManager.getNotifications())

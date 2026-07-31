@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ButtonLink } from '@modrinth/ui'
 import {
 	BlueskyIcon,
 	DiscordIcon,
@@ -9,7 +10,6 @@ import {
 } from '@modrinth/assets'
 import {
 	AutoLink,
-	ButtonStyled,
 	defineMessage,
 	defineMessages,
 	injectNotificationManager,
@@ -271,31 +271,23 @@ function developerModeIncrement() {
 							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
 							@click="developerModeIncrement()"
 						/>
-						<ButtonStyled v-if="flags.developerMode" circular type="transparent" color="brand">
-							<nuxt-link
+						<ButtonLink type="quiet" color="brand" v-if="flags.developerMode"
 								v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
 								to="/settings/flags"
-							>
-								<ToggleRightIcon />
-							</nuxt-link>
-						</ButtonStyled>
+							 class="!w-9 !px-0 !rounded-full">
+							<ToggleRightIcon />
+						</ButtonLink>
 					</div>
 					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-						<ButtonStyled
-							v-for="(social, index) in socialLinks"
+						<ButtonLink type="quiet" v-for="(social, index) in socialLinks"
 							:key="`footer-social-${index}`"
-							circular
-							type="transparent"
-						>
-							<a
 								v-tooltip="formatMessage(social.label)"
 								:href="social.href"
 								target="_blank"
 								:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-							>
-								<component :is="social.icon" class="h-5 w-5" />
-							</a>
-						</ButtonStyled>
+							 class="!w-9 !px-0 !rounded-full">
+							<component :is="social.icon" class="h-5 w-5" />
+						</ButtonLink>
 					</div>
 					<div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
 						<p class="m-0">

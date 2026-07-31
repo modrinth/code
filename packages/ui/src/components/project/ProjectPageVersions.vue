@@ -9,9 +9,14 @@
 				@update:query="updateQuery"
 			/>
 
-			<ButtonStyled v-if="openModal" :color="createVersionButtonSecondary ? 'standard' : 'green'">
-				<button @click="openModal"><PlusIcon /> Create version</button>
-			</ButtonStyled>
+			<Button
+				v-if="openModal"
+				:type="createVersionButtonSecondary ? 'base' : 'colored'"
+				:color="createVersionButtonSecondary ? undefined : 'green'"
+				@click="openModal"
+			>
+				<PlusIcon /> Create version
+			</Button>
 
 			<Pagination
 				v-if="!openModal"
@@ -434,6 +439,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CalendarIcon,
@@ -445,7 +451,6 @@ import {
 } from '@modrinth/assets'
 import {
 	AutoLink,
-	ButtonStyled,
 	Pagination,
 	SmartClickable,
 	Table,

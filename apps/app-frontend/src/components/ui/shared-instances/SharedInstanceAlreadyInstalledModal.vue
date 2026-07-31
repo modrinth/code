@@ -10,33 +10,27 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="handleCancel">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="handleGoToInstance">
-						{{ formatMessage(messages.instance) }}
-						<RightArrowIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="orange">
-					<button @click="handleInstallAnyway">
-						<DownloadIcon />
-						{{ formatMessage(messages.installAnyway) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="handleCancel">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button @click="handleGoToInstance">
+					{{ formatMessage(messages.instance) }}
+					<RightArrowIcon />
+				</Button>
+				<Button type="colored" color="orange" @click="handleInstallAnyway">
+					<DownloadIcon />
+					{{ formatMessage(messages.installAnyway) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { DownloadIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,

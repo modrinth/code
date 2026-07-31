@@ -27,12 +27,10 @@
 					placeholder="Search affiliates..."
 					clearable
 				/>
-				<ButtonStyled color="brand">
-					<button @click="createModal?.show">
-						<PlusIcon />
-						Create affiliate code
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="createModal?.show">
+					<PlusIcon />
+					Create affiliate code
+				</Button>
 			</div>
 		</div>
 		<Admonition v-if="error" type="critical">
@@ -82,6 +80,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
@@ -90,7 +89,6 @@ import {
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
 	Avatar,
-	ButtonStyled,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,

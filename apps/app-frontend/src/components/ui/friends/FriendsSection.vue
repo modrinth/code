@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import { IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	Avatar,
-	ButtonStyled,
 	defineMessages,
-	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
@@ -159,29 +158,26 @@ const messages = defineMessages({
 							<span v-else-if="friend.status" class="m-0 text-xs">{{ friend.status }}</span>
 						</div>
 					</RouterLink>
-					<ButtonStyled v-if="friend.accepted" circular type="transparent">
-						<OverflowMenu
+					<TeleportOverflowMenu type="quiet" label="More options" v-if="friend.accepted"
 							class="opacity-0 group-hover:opacity-100 transition-opacity"
 							:options="[
 								{
 									id: 'remove-friend',
+									label: formatMessage(messages.removeFriend),
 									action: () => removeFriend(friend),
-									color: 'red',
+									tone: 'red',
 								},
 							]"
 						>
-							<MoreVerticalIcon />
-							<template #remove-friend>
-								<TrashIcon />
-								{{ formatMessage(messages.removeFriend) }}
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-					<ButtonStyled v-else type="transparent" circular>
-						<button v-tooltip="formatMessage(messages.cancelRequest)" @click="removeFriend(friend)">
-							<XIcon />
-						</button>
-					</ButtonStyled>
+						<MoreVerticalIcon />
+						<template #remove-friend>
+							<TrashIcon />
+							{{ formatMessage(messages.removeFriend) }}
+						</template>
+					</TeleportOverflowMenu>
+					<IconButton type="quiet" :label="formatMessage(messages.cancelRequest)" v-else v-tooltip="formatMessage(messages.cancelRequest)" @click="removeFriend(friend)">
+						<XIcon />
+					</IconButton>
 				</div>
 			</div>
 		</template>

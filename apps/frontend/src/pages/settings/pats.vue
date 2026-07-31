@@ -72,24 +72,18 @@
 				</div>
 
 				<div class="ml-auto mt-4 flex gap-2">
-					<ButtonStyled type="outlined">
-						<button @click="$refs.patModal.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="editPatId !== null" color="brand">
-						<button :disabled="loading || !name || !isExpiryInFuture" @click="editPat">
-							<SaveIcon />
-							{{ formatMessage(commonMessages.saveChangesButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button :disabled="loading || !name || !isExpiryInFuture" @click="createPat">
-							<PlusIcon />
-							{{ formatMessage(createModalMessages.action) }}
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" @click="$refs.patModal.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" v-if="editPatId !== null" :disabled="loading || !name || !isExpiryInFuture" @click="editPat">
+						<SaveIcon />
+						{{ formatMessage(commonMessages.saveChangesButton) }}
+					</Button>
+					<Button type="colored" color="brand" v-else :disabled="loading || !name || !isExpiryInFuture" @click="createPat">
+						<PlusIcon />
+						{{ formatMessage(createModalMessages.action) }}
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -98,8 +92,7 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.pats) }}</h2>
 			</div>
-			<ButtonStyled color="brand">
-				<button
+			<Button type="colored" color="brand"
 					@click="
 						() => {
 							name = null
@@ -110,9 +103,8 @@
 						}
 					"
 				>
-					<PlusIcon /> {{ formatMessage(messages.create) }}
-				</button>
-			</ButtonStyled>
+				<PlusIcon /> {{ formatMessage(messages.create) }}
+			</Button>
 		</div>
 		<p>
 			<IntlFormatted :message-id="messages.description">
@@ -172,8 +164,7 @@
 				</div>
 			</div>
 			<div class="token-actions ml-auto flex flex-col gap-2">
-				<ButtonStyled>
-					<button
+				<Button
 						@click="
 							() => {
 								editPatId = pat.id
@@ -184,11 +175,9 @@
 							}
 						"
 					>
-						<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button
+					<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
+				</Button>
+				<Button
 						@click="
 							() => {
 								deletePatIndex = pat.id
@@ -196,17 +185,16 @@
 							}
 						"
 					>
-						<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
-					</button>
-				</ButtonStyled>
+					<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
+				</Button>
 			</div>
 		</div>
 	</div>
 </template>
 <script setup>
+import { Button } from '@modrinth/ui'
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	commonSettingsMessages,

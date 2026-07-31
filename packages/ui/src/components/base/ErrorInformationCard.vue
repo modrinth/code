@@ -46,41 +46,37 @@
 		</div>
 
 		<div class="mt-4 flex !w-full flex-row gap-4">
-			<ButtonStyled
+			<Button
 				v-if="action"
-				size="large"
-				:color="action.color || 'brand'"
+				:type="action.color === 'standard' ? 'base' : 'colored'"
+				:color="action.color === 'standard' ? undefined : (action.color ?? 'brand')"
+				size="xl"
 				:disabled="action.disabled"
-				@click="action.onClick"
-			>
-				<button class="!w-full">
-					<component :is="action.icon" v-if="action.icon && !action.showAltIcon" class="size-4" />
-					<component
-						:is="action.altIcon"
-						v-else-if="action.icon && action.showAltIcon"
-						class="size-4"
-					/>
-					{{ action.label }}
-				</button>
-			</ButtonStyled>
+				@click="action.onClick" class="!w-full">
+				<component :is="action.icon" v-if="action.icon && !action.showAltIcon" class="size-4" />
+				<component
+					:is="action.altIcon"
+					v-else-if="action.icon && action.showAltIcon"
+					class="size-4"
+				/>
+				{{ action.label }}
+			</Button>
 
-			<ButtonStyled v-if="errorDetails" size="large" color="standard" @click="copyErrorInformation">
-				<button class="!w-full">
-					<CopyIcon v-if="!infoCopied" class="size-4" />
-					<CheckIcon v-else class="size-4" />
-					Copy Information
-				</button>
-			</ButtonStyled>
+			<Button size="xl" v-if="errorDetails" @click="copyErrorInformation" class="!w-full">
+				<CopyIcon v-if="!infoCopied" class="size-4" />
+				<CheckIcon v-else class="size-4" />
+				Copy Information
+			</Button>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { CheckIcon, CopyIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 import { ref } from 'vue'
 
-import ButtonStyled from './ButtonStyled.vue'
 
 const infoCopied = ref(false)
 

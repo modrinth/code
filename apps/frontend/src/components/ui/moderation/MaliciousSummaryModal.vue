@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { Button, ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, DownloadIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, CopyCode, NewModal, useDebugLogger } from '@modrinth/ui'
+import { CopyCode, NewModal, useDebugLogger } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 export type UnsafeFile = {
@@ -134,16 +135,10 @@ defineExpose({ show, hide })
 								v-if="isHashLoading(item.file.version_id)"
 								class="size-4 animate-spin text-secondary"
 							/>
-							<ButtonStyled
-								v-else-if="getFileHash(item.file.version_id, item.file.file_id)"
-								size="small"
-								type="standard"
-							>
-								<button @click="copy(getFileHash(item.file.version_id, item.file.file_id)!)">
-									<ClipboardCopyIcon class="size-4" />
-									Copy
-								</button>
-							</ButtonStyled>
+							<Button class="!h-6" size="xs" v-else-if="getFileHash(item.file.version_id, item.file.file_id)" @click="copy(getFileHash(item.file.version_id, item.file.file_id)!)">
+								<ClipboardCopyIcon class="size-4" />
+								Copy
+							</Button>
 							<span v-else class="text-tertiary italic">N/A</span>
 						</td>
 						<td class="py-1 pr-2">
@@ -153,19 +148,15 @@ defineExpose({ show, hide })
 							<CopyCode :text="item.file.file_name" />
 						</td>
 						<td class="py-1 pr-2">
-							<ButtonStyled size="small" type="standard">
-								<button @click="copy(item.file.download_url)">
-									<ClipboardCopyIcon class="size-4" />
-									Copy
-								</button>
-							</ButtonStyled>
+							<Button class="!h-6" size="xs" @click="copy(item.file.download_url)">
+								<ClipboardCopyIcon class="size-4" />
+								Copy
+							</Button>
 						</td>
 						<td class="py-1">
-							<ButtonStyled circular size="small">
-								<a :href="item.file.download_url" :download="item.file.file_name" target="_blank">
-									<DownloadIcon />
-								</a>
-							</ButtonStyled>
+							<ButtonLink size="xs" :href="item.file.download_url" :download="item.file.file_name" target="_blank" class="!h-6 !size-6 !px-0 !rounded-full">
+								<DownloadIcon />
+							</ButtonLink>
 						</td>
 					</tr>
 				</tbody>
@@ -174,12 +165,10 @@ defineExpose({ show, hide })
 			<p v-else class="text-sm italic text-secondary">No files currently marked as malicious.</p>
 
 			<div class="flex justify-end">
-				<ButtonStyled>
-					<button @click="hide">
-						<XIcon class="size-4" />
-						Close
-					</button>
-				</ButtonStyled>
+				<Button @click="hide">
+					<XIcon class="size-4" />
+					Close
+				</Button>
 			</div>
 		</div>
 	</NewModal>

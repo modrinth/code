@@ -29,28 +29,24 @@
 		</form>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hide">
-						<XIcon class="h-5 w-5" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button @click="handleSubmit">
-						<RightArrowIcon class="h-5 w-5" />
-						{{ formatMessage(commonMessages.moveButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hide">
+					<XIcon class="h-5 w-5" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" @click="handleSubmit">
+					<RightArrowIcon class="h-5 w-5" />
+					{{ formatMessage(commonMessages.moveButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { RightArrowIcon, XIcon } from '@modrinth/assets'
 import { nextTick, ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

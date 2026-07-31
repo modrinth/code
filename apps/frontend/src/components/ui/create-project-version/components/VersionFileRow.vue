@@ -27,13 +27,10 @@
 				</div>
 			</template>
 
-			<ButtonStyled v-if="onRemove" size="standard" :circular="true">
-				<button aria-label="Remove file" class="!shadow-none" @click="onRemove">
-					<XIcon aria-hidden="true" />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-if="isPrimary" size="standard" :circular="true">
-				<button
+			<Button v-if="onRemove" aria-label="Remove file" class="!shadow-none" @click="onRemove">
+				<XIcon aria-hidden="true" />
+			</Button>
+			<Button v-if="isPrimary"
 					v-tooltip="
 						editingVersion
 							? 'Primary file cannot be changed after version is uploaded'
@@ -44,30 +41,30 @@
 					:disabled="editingVersion"
 					@click="primaryFileInput?.click()"
 				>
-					<ArrowLeftRightIcon aria-hidden="true" />
-					<input
-						ref="primaryFileInput"
-						class="hidden"
-						type="file"
-						:accept="acceptFileFromProjectType(projectV2.project_type)"
-						:disabled="editingVersion"
-						@change="
-							(e) => {
-								emit('setPrimaryFile', (e.target as HTMLInputElement)?.files?.[0])
-								;(e.target as HTMLInputElement).value = ''
-							}
-						"
-					/>
-				</button>
-			</ButtonStyled>
+				<ArrowLeftRightIcon aria-hidden="true" />
+				<input
+					ref="primaryFileInput"
+					class="hidden"
+					type="file"
+					:accept="acceptFileFromProjectType(projectV2.project_type)"
+					:disabled="editingVersion"
+					@change="
+						(e) => {
+							emit('setPrimaryFile', (e.target as HTMLInputElement)?.files?.[0])
+							;(e.target as HTMLInputElement).value = ''
+						}
+					"
+				/>
+			</Button>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
+import { Combobox, injectProjectPageContext } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 

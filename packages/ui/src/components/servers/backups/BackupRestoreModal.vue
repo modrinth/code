@@ -17,29 +17,26 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button type="colored" color="red"
 						v-tooltip="restoreDisabledTooltip"
 						:disabled="restoreDisabled"
 						@click="restoreBackup"
 					>
-						<SpinnerIcon v-if="isRestoring" class="animate-spin" />
-						<RotateCounterClockwiseIcon v-else />
-						{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
-					</button>
-				</ButtonStyled>
+					<SpinnerIcon v-if="isRestoring" class="animate-spin" />
+					<RotateCounterClockwiseIcon v-else />
+					{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -53,7 +50,6 @@ import {
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 

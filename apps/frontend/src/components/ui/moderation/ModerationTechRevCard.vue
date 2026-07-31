@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Button, ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BanIcon,
@@ -24,7 +25,6 @@ import {
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
-	ButtonStyled,
 	Collapsible,
 	CollapsibleRegion,
 	commonMessages,
@@ -32,7 +32,6 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	NavTabs,
-	OverflowMenu,
 	type OverflowMenuOption,
 	Toggle,
 	useFormatBytes,
@@ -120,29 +119,27 @@ const isLoadingStatusAction = ref(false)
 const projectStatusActions = computed<OverflowMenuOption[]>(() => [
 	{
 		id: 'approve',
-		color: 'green',
+		label: 'Approve',
 		action: () => setStatus('approved'),
-		hoverFilled: true,
 		disabled: isStatusActionDisabled('approved'),
 	},
 	{
 		id: 'withhold',
-		color: 'orange',
+		label: 'Withhold',
 		action: () => setStatus('withheld'),
-		hoverFilled: true,
 		disabled: isStatusActionDisabled('withheld'),
 	},
 	{
 		id: 'send-to-review',
+		label: 'Send to review',
 		action: () => setStatus('processing'),
-		hoverFilled: true,
 		disabled: isStatusActionDisabled('processing'),
 	},
 	{
 		id: 'reject',
-		color: 'red',
+		label: 'Reject',
+		tone: 'red',
 		action: () => setStatus('rejected'),
-		hoverFilled: true,
 		disabled: isStatusActionDisabled('rejected'),
 	},
 ])
@@ -1495,29 +1492,23 @@ function copyId() {
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
 					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="props.item.project.link_urls?.['source']?.url" circular>
-							<a
+						<ButtonLink v-if="props.item.project.link_urls?.['source']?.url"
 								v-tooltip="'Open sources in new tab'"
 								:href="props.item.project.link_urls?.['source']?.url"
 								target="_blank"
-							>
-								<CodeIcon />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<button v-tooltip="'Copy ID'" @click="copyId">
-								<ClipboardCopyIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
+							 class="!w-9 !px-0 !rounded-full">
+							<CodeIcon />
+						</ButtonLink>
+						<IconButton :label="'Copy ID'" v-tooltip="'Copy ID'" @click="copyId">
+							<ClipboardCopyIcon />
+						</IconButton>
+						<ButtonLink
 								v-tooltip="'Open in new tab'"
 								:href="`/moderation/technical-review/${props.item.project.id}`"
 								target="_blank"
-							>
-								<ExternalIcon />
-							</a>
-						</ButtonStyled>
+							 class="!w-9 !px-0 !rounded-full">
+							<ExternalIcon />
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -1552,58 +1543,50 @@ function copyId() {
 							@update-thread="handleThreadUpdate"
 						>
 							<template #additionalActions>
-								<ButtonStyled color="brand">
-									<button
+								<Button type="colored" color="brand"
 										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
 										:disabled="!canSubmitReview"
 										@click="handleSubmitReview('safe')"
 									>
-										<ShieldCheckIcon /> Pass
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="red">
-									<button
+									<ShieldCheckIcon /> Pass
+								</Button>
+								<Button type="colored" color="red"
 										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
 										:disabled="!canSubmitReview"
 										@click="handleSubmitReview('unsafe')"
 									>
-										<BugIcon /> Fail
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="standard">
-									<OverflowMenu
-										class="btn-dropdown-animation"
+									<BugIcon /> Fail
+								</Button>
+								<TeleportOverflowMenu label="More options"
+										class="btn-dropdown-animation !w-auto !px-2.5 !rounded-xl"
 										:disabled="isLoadingStatusAction"
 										:options="projectStatusActions"
 									>
-										<SpinnerIcon
-											v-if="isLoadingStatusAction"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<ScaleIcon v-else aria-hidden="true" />
-										Set Status
-										<template #approve>
-											<CheckIcon aria-hidden="true" />
-											Approve
-										</template>
-										<template #withhold>
-											<EyeOffIcon aria-hidden="true" />
-											Withhold
-										</template>
-										<template #send-to-review>
-											<ScaleIcon aria-hidden="true" />
-											Send to review
-										</template>
-										<template #reject>
-											<XIcon aria-hidden="true" />
-											Reject
-										</template>
-									</OverflowMenu>
-								</ButtonStyled>
-								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug</button>
-								</ButtonStyled>
+									<SpinnerIcon
+										v-if="isLoadingStatusAction"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<ScaleIcon v-else aria-hidden="true" />
+									Set Status
+									<template #approve>
+										<CheckIcon aria-hidden="true" />
+										Approve
+									</template>
+									<template #withhold>
+										<EyeOffIcon aria-hidden="true" />
+										Withhold
+									</template>
+									<template #send-to-review>
+										<ScaleIcon aria-hidden="true" />
+										Send to review
+									</template>
+									<template #reject>
+										<XIcon aria-hidden="true" />
+										Reject
+									</template>
+								</TeleportOverflowMenu>
+								<Button type="outlined" v-if="featureFlags.developerMode" @click="emit('showMaliciousSummary', unsafeFiles)">Debug</Button>
 							</template>
 						</ThreadView>
 					</div>
@@ -1674,19 +1657,15 @@ function copyId() {
 					</div>
 
 					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="getFileDetailCount(file) > 0">
-							<button @click="viewFileFlags(file)">Flags</button>
-						</ButtonStyled>
-						<ButtonStyled type="outlined">
-							<a
+						<Button v-if="getFileDetailCount(file) > 0" @click="viewFileFlags(file)">Flags</Button>
+						<ButtonLink type="outlined"
 								:href="file.download_url"
 								:title="`Download ${file.file_name}`"
 								:download="file.file_name"
 								tabindex="0"
 							>
-								<DownloadIcon /> Download
-							</a>
-						</ButtonStyled>
+							<DownloadIcon /> Download
+						</ButtonLink>
 					</div>
 				</div>
 			</template>
@@ -1856,14 +1835,12 @@ function copyId() {
 							@click="toggleClass(classItem)"
 						>
 							<div class="my-auto flex items-center gap-2">
-								<ButtonStyled type="transparent" circular>
-									<button
+								<IconButton type="quiet" label="Toggle details"
 										class="transition-transform"
 										:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
 									>
-										<ChevronDownIcon class="h-5 w-5 text-contrast" />
-									</button>
-								</ButtonStyled>
+									<ChevronDownIcon class="h-5 w-5 text-contrast" />
+								</IconButton>
 
 								<span v-tooltip="classItem.filePath" class="font-mono font-semibold">{{
 									truncateMiddle(classItem.filePath)
@@ -2061,16 +2038,14 @@ function copyId() {
 									v-if="getHighlightedClassSource(classItem).length > 0"
 									class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 								>
-									<ButtonStyled circular type="transparent">
-										<button
+									<IconButton type="quiet" :label="`Copy code`"
 											v-tooltip="`Copy code`"
 											class="absolute right-2 top-2 border-[1px]"
 											@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
 										>
-											<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
-											<CheckIcon v-else />
-										</button>
-									</ButtonStyled>
+										<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
+										<CheckIcon v-else />
+									</IconButton>
 
 									<div class="overflow-x-auto bg-surface-3 py-3">
 										<div

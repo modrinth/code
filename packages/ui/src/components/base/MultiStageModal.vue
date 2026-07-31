@@ -72,54 +72,55 @@
 				class="flex flex-col justify-end gap-2 sm:flex-row"
 				:class="leftButtonConfig || rightButtonConfig ? 'mt-4' : ''"
 			>
-				<ButtonStyled v-if="leftButtonConfig" type="outlined">
-					<button
+				<Button type="outlined" v-if="leftButtonConfig"
 						v-tooltip="leftButtonConfig.tooltip"
 						:class="leftButtonConfig.buttonClass"
 						:disabled="leftButtonConfig.disabled"
 						@click="leftButtonConfig.onClick"
 					>
-						<component :is="leftButtonConfig.icon" />
-						{{ leftButtonConfig.label }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
-					<button
+					<component :is="leftButtonConfig.icon" />
+					{{ leftButtonConfig.label }}
+				</Button>
+				<Button
+					v-if="rightButtonConfig"
+					:type="rightButtonConfig.color && rightButtonConfig.color !== 'standard' ? 'colored' : 'base'"
+					:color="rightButtonConfig.color === 'standard' ? undefined : rightButtonConfig.color"
 						v-tooltip="rightButtonConfig.tooltip"
 						class="!shadow-none"
 						:class="rightButtonConfig.buttonClass"
 						:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
 						@click="rightButtonConfig.onClick"
 					>
-						<SpinnerIcon
-							v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'before'"
-							class="animate-spin"
-						/>
-						<component
-							:is="rightButtonConfig.icon"
-							v-else-if="rightButtonConfig.iconPosition === 'before'"
-							:class="rightButtonConfig.iconClass"
-						/>
-						{{ rightButtonConfig.label }}
-						<SpinnerIcon
-							v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'after'"
-							class="animate-spin"
-						/>
-						<component
-							:is="rightButtonConfig.icon"
-							v-else-if="rightButtonConfig.iconPosition === 'after'"
-							:class="rightButtonConfig.iconClass"
-						/>
-					</button>
-				</ButtonStyled>
+					<SpinnerIcon
+						v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'before'"
+						class="animate-spin"
+					/>
+					<component
+						:is="rightButtonConfig.icon"
+						v-else-if="rightButtonConfig.iconPosition === 'before'"
+						:class="rightButtonConfig.iconClass"
+					/>
+					{{ rightButtonConfig.label }}
+					<SpinnerIcon
+						v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'after'"
+						class="animate-spin"
+					/>
+					<component
+						:is="rightButtonConfig.icon"
+						v-else-if="rightButtonConfig.iconPosition === 'after'"
+						:class="rightButtonConfig.iconClass"
+					/>
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script lang="ts">
+import { Button } from '#ui/components/base/buttons'
+import type { ButtonColor } from '#ui/components/base/buttons'
 import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
@@ -127,7 +128,7 @@ export interface StageButtonConfig {
 	label?: string
 	icon?: Component | null
 	iconPosition?: 'before' | 'after'
-	color?: InstanceType<typeof ButtonStyled>['$props']['color']
+	color?: ButtonColor | 'standard'
 	disabled?: boolean
 	loading?: boolean
 	tooltip?: string

@@ -41,29 +41,21 @@
 				class="mt-4 flex flex-col items-stretch justify-between gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:gap-2"
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-					<ButtonStyled v-if="sortedMessages.length > 0" color="brand">
-						<button :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
-							<ReplyIcon class="size-4" />
-							Reply
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
-							<SendIcon class="size-4" />
-							Send
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="isStaff(auth.user)">
-						<button :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
-							Add note
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="visibleQuickReplies.length > 0">
-						<OverflowMenu :options="visibleQuickReplies">
-							Quick reply
-							<ChevronDownIcon />
-						</OverflowMenu>
-					</ButtonStyled>
+					<Button type="colored" color="brand" v-if="sortedMessages.length > 0" :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
+						<ReplyIcon class="size-4" />
+						Reply
+					</Button>
+					<Button type="colored" color="brand" v-else :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
+						<SendIcon class="size-4" />
+						Send
+					</Button>
+					<Button v-if="isStaff(auth.user)" :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
+						Add note
+					</Button>
+					<TeleportOverflowMenu label="More options" v-if="visibleQuickReplies.length > 0" :options="visibleQuickReplies" class="!w-auto !px-2.5 !rounded-xl">
+						Quick reply
+						<ChevronDownIcon />
+					</TeleportOverflowMenu>
 				</div>
 
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
@@ -75,14 +67,13 @@
 </template>
 
 <script setup lang="ts" generic="T">
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
 import type { QuickReply } from '@modrinth/moderation'
 import {
-	ButtonStyled,
 	CopyCode,
 	injectNotificationManager,
 	MarkdownEditor,
-	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
 import type { Thread, User } from '@modrinth/utils'
@@ -110,6 +101,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 			(reply) =>
 				({
 					id: reply.label,
+					label: reply.label,
 					action: () => handleQuickReply(reply, context),
 				}) as OverflowMenuOption,
 		)

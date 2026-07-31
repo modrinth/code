@@ -70,87 +70,66 @@
 				>
 					<template #actions>
 						<template v-if="isServerProject">
-							<ButtonStyled v-if="serverPlaying" color="red" size="large">
-								<button type="button" @click="handleStopServer">
-									<StopCircleIcon />
-									{{ formatMessage(commonMessages.stopButton) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" size="large">
-								<button type="button" :disabled="serverInstallLoading" @click="handleClickPlay">
-									<PlayIcon />
-									{{
-										serverInstallLoading
-											? formatMessage(commonMessages.installingLabel)
-											: formatMessage(commonMessages.playButton)
-									}}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large">
-								<button
+							<Button type="colored" color="red" size="xl" v-if="serverPlaying" native-type="button" @click="handleStopServer">
+								<StopCircleIcon />
+								{{ formatMessage(commonMessages.stopButton) }}
+							</Button>
+							<Button type="colored" color="brand" size="xl" v-else native-type="button" :disabled="serverInstallLoading" @click="handleClickPlay">
+								<PlayIcon />
+								{{
+									serverInstallLoading
+										? formatMessage(commonMessages.installingLabel)
+										: formatMessage(commonMessages.playButton)
+								}}
+							</Button>
+							<IconButton size="xl" :label="formatMessage(commonMessages.addServerToInstanceButton)"
 									v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
-									type="button"
-									:aria-label="formatMessage(commonMessages.addServerToInstanceButton)"
+									native-type="button"
 									@click="handleAddServerToInstance"
 								>
-									<PlusIcon />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
+								<PlusIcon />
+							</IconButton>
+							<TeleportOverflowMenu type="quiet" size="xl" label="More options"
 									:options="serverProjectHeaderMoreActions"
-									tooltip="More options"
-									aria-label="More options"
 								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+								<MoreVerticalIcon />
+							</TeleportOverflowMenu>
 						</template>
 						<template v-else>
-							<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
-								<button v-tooltip="formatMessage(messages.alreadyInstalled)" type="button" disabled>
-									<CheckIcon />
-									{{ formatMessage(commonMessages.installedLabel) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else-if="showSwitchVersion" size="large">
-								<button type="button" @click="goToVersions">
-									<SwapIcon />
-									{{ formatMessage(messages.switchVersion) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" size="large">
-								<button
+							<Button size="xl" v-if="showSwitchVersion && onVersionsPage" v-tooltip="formatMessage(messages.alreadyInstalled)" native-type="button" disabled>
+								<CheckIcon />
+								{{ formatMessage(commonMessages.installedLabel) }}
+							</Button>
+							<Button size="xl" v-else-if="showSwitchVersion" native-type="button" @click="goToVersions">
+								<SwapIcon />
+								{{ formatMessage(messages.switchVersion) }}
+							</Button>
+							<Button type="colored" color="brand" size="xl" v-else
 									v-tooltip="
 										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
 									"
-									type="button"
+									native-type="button"
 									:disabled="installButtonDisabled"
 									@click="install(null)"
 								>
-									<component :is="installButtonIcon" :class="installButtonIconClass" />
-									{{
-										installButtonInstalled
-											? formatMessage(commonMessages.installedLabel)
-											: installButtonValidating
-												? formatMessage(commonMessages.validatingLabel)
-												: installButtonLoading
-													? formatMessage(commonMessages.installingLabel)
-													: serverProjectSelected
-														? formatMessage(commonMessages.selectedLabel)
-														: formatMessage(commonMessages.installButton)
-									}}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
+								<component :is="installButtonIcon" :class="installButtonIconClass" />
+								{{
+									installButtonInstalled
+										? formatMessage(commonMessages.installedLabel)
+										: installButtonValidating
+											? formatMessage(commonMessages.validatingLabel)
+											: installButtonLoading
+												? formatMessage(commonMessages.installingLabel)
+												: serverProjectSelected
+													? formatMessage(commonMessages.selectedLabel)
+													: formatMessage(commonMessages.installButton)
+								}}
+							</Button>
+							<TeleportOverflowMenu type="quiet" size="xl" label="More options"
 									:options="projectHeaderMoreActions"
-									tooltip="More options"
-									aria-label="More options"
 								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+								<MoreVerticalIcon />
+							</TeleportOverflowMenu>
 						</template>
 					</template>
 				</ProjectPageHeader>
@@ -224,6 +203,7 @@
 </template>
 
 <script setup>
+import { Button, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	BookmarkIcon,
 	CheckIcon,
@@ -241,7 +221,6 @@ import {
 } from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
-	ButtonStyled,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -258,7 +237,6 @@ import {
 	ProjectSidebarTags,
 	requestInstall,
 	SelectedProjectsFloatingBar,
-	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -571,13 +549,13 @@ const serverProjectHeaderMoreActions = computed(() => [
 		action: openProjectInBrowser,
 	},
 	{
-		divider: true,
+		type: 'divider',
 	},
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
-		color: 'red',
+		tone: 'red',
 		action: reportProject,
 	},
 ])
@@ -605,13 +583,13 @@ const projectHeaderMoreActions = computed(() => [
 		action: openProjectInBrowser,
 	},
 	{
-		divider: true,
+		type: 'divider',
 	},
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
-		color: 'red',
+		tone: 'red',
 		action: reportProject,
 	},
 ])

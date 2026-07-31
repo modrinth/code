@@ -56,26 +56,21 @@
 					{{ metadataLabel }}
 				</span>
 			</span>
-			<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
-				<a
+			<ButtonLink type="quiet" v-if="dependency.downloadHref"
 					v-tooltip="downloadTooltip"
 					:href="dependency.downloadHref"
 					:download="dependency.filename"
 					:aria-label="downloadTooltip"
 					@click="emit('download')"
-				>
-					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
-				</a>
-			</ButtonStyled>
-			<ButtonStyled v-else circular type="transparent">
-				<button
+				 class="!w-9 !px-0 !rounded-full">
+				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+			</ButtonLink>
+			<IconButton type="quiet" :label="dependency.unavailableTooltip" v-else
 					v-tooltip="dependency.unavailableTooltip"
 					disabled
-					:aria-label="dependency.unavailableTooltip"
 				>
-					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
-				</button>
-			</ButtonStyled>
+				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+			</IconButton>
 		</div>
 		<div
 			v-for="childDependency in dependency.dependencies"
@@ -97,10 +92,10 @@
 </template>
 
 <script setup lang="ts">
+import { IconButton, ButtonLink } from '@modrinth/ui'
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	defineMessages,
 	TagItem,
 	truncatedTooltip,

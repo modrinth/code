@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { ButtonLink } from '@modrinth/ui'
 import { GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
 import {
 	ArticleBody,
 	Avatar,
-	ButtonStyled,
 	injectModrinthClient,
 	useFormatDateTime,
 } from '@modrinth/ui'
@@ -123,16 +123,12 @@ onMounted(() => {
 			</nuxt-link>
 			<div class="flex gap-2">
 				<NewsletterButton />
-				<ButtonStyled circular>
-					<a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank">
-						<RssIcon />
-					</a>
-				</ButtonStyled>
-				<ButtonStyled circular>
-					<a v-tooltip="`Changelog`" href="/news/changelog" aria-label="Changelog">
-						<GitGraphIcon />
-					</a>
-				</ButtonStyled>
+				<ButtonLink v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank" class="!w-9 !px-0 !rounded-full">
+					<RssIcon />
+				</ButtonLink>
+				<ButtonLink v-tooltip="`Changelog`" href="/news/changelog" aria-label="Changelog" class="!w-9 !px-0 !rounded-full">
+					<GitGraphIcon />
+				</ButtonLink>
 			</div>
 		</div>
 		<article class="mt-6 flex flex-col gap-4 px-6">

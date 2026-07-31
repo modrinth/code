@@ -11,36 +11,32 @@
 				{{ version.name }}
 			</p>
 		</div>
-		<ButtonStyled color="brand">
-			<a
+		<ButtonLink type="colored" color="brand"
 				:href="downloadUrl"
 				:download="primaryFilename"
 				class="min-w-0"
 				@click="emit('onDownload')"
 			>
-				<DownloadIcon aria-hidden="true" /> Download
-			</a>
-		</ButtonStyled>
-		<ButtonStyled circular>
-			<button
+			<DownloadIcon aria-hidden="true" /> Download
+		</ButtonLink>
+		<IconButton label="View version"
 				class="min-w-0"
-				aria-label="View version"
 				@click="
 					emit('onNavigate', `/project/${props.version.project_id}/version/${props.version.id}`)
 				"
 			>
-				<ExternalIcon aria-hidden="true" />
-			</button>
-		</ButtonStyled>
+			<ExternalIcon aria-hidden="true" />
+		</IconButton>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { ButtonLink, IconButton } from '#ui/components/base/buttons'
 import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import type { Version, VersionFile } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import { ButtonStyled, VersionChannelIndicator } from '../index'
+import { VersionChannelIndicator } from '../index'
 
 const props = defineProps<{
 	version: Version

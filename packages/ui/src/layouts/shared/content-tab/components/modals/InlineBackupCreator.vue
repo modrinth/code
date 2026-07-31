@@ -10,8 +10,7 @@
 
 		<div v-if="backup.available" class="flex items-center gap-2">
 			<!-- Button / Loading state -->
-			<ButtonStyled v-if="!backup.backupComplete.value && !backup.backupFailed.value">
-				<button
+			<Button v-if="!backup.backupComplete.value && !backup.backupFailed.value"
 					v-tooltip="
 						!canManageBackups
 							? permissionDeniedMessage
@@ -25,11 +24,10 @@
 					"
 					@click="startBackup"
 				>
-					<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
-					<PlusIcon v-else class="size-5" />
-					{{ formatMessage(backup.isBackingUp.value ? messages.backingUp : messages.createBackup) }}
-				</button>
-			</ButtonStyled>
+				<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
+				<PlusIcon v-else class="size-5" />
+				{{ formatMessage(backup.isBackingUp.value ? messages.backingUp : messages.createBackup) }}
+			</Button>
 
 			<!-- Success -->
 			<div
@@ -58,10 +56,10 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { computed, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { hasServerPermission } from '#ui/composables/server-permissions'
 import { injectModrinthServerContext } from '#ui/providers'

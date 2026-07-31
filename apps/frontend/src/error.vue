@@ -37,20 +37,16 @@
 							<Avatar :src="auth.user.avatar_url" size="32px" />
 							<span class="font-medium text-contrast">{{ auth.user.username }}</span>
 
-							<ButtonStyled color="red" type="transparent">
-								<button type="button" class="ml-auto" @click="logout">
-									{{ formatMessage(commonMessages.signOutButton) }}
-								</button>
-							</ButtonStyled>
+							<Button type="quiet" color="red" native-type="button" class="ml-auto" @click="logout">
+								{{ formatMessage(commonMessages.signOutButton) }}
+							</Button>
 						</div>
 					</template>
 					<template v-else>
-						<ButtonStyled color="brand">
-							<nuxt-link class="button-like w-fit" :to="signInRoute">
-								<LogInIcon />
-								{{ formatMessage(commonMessages.signInButton) }}
-							</nuxt-link>
-						</ButtonStyled>
+						<ButtonLink type="colored" color="brand" class="button-like w-fit" :to="signInRoute">
+							<LogInIcon />
+							{{ formatMessage(commonMessages.signInButton) }}
+						</ButtonLink>
 					</template>
 				</div>
 				<div class="error-box__body">
@@ -89,10 +85,10 @@
 </template>
 
 <script setup>
+import { Button, ButtonLink } from '@modrinth/ui'
 import { AnnoyedRinthbot, LogInIcon, SadRinthbot } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	defineMessage,
 	defineMessages,

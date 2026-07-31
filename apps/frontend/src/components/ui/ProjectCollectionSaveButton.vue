@@ -1,16 +1,17 @@
 <template>
-	<ButtonStyled size="large" circular>
-		<PopoutMenu
-			v-if="authUser"
-			:tooltip="
+	<TeleportPopoutMenu
+		v-if="authUser"
+		icon-only
+		size="xl"
+		:label="
 				saved ? formatMessage(commonMessages.savedLabel) : formatMessage(commonMessages.saveButton)
 			"
-			from="top-right"
-			:aria-label="formatMessage(commonMessages.saveButton)"
-			:dropdown-id="`${baseId}-save`"
-		>
+		placement="top-end"
+	>
+		<template #trigger>
 			<BookmarkIcon aria-hidden="true" :fill="saved ? 'currentColor' : 'none'" />
-			<template #menu>
+		</template>
+		<template #panel>
 				<StyledInput
 					v-model="displayCollectionsSearch"
 					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
@@ -31,33 +32,33 @@
 				<div v-else class="menu-text">
 					<p class="popout-text">{{ noCollectionsLabel }}</p>
 				</div>
-				<ButtonStyled>
-					<button class="mx-3 mb-3" @click="createCollection">
+				<Button class="mx-3 mb-3" @click="createCollection">
 						<PlusIcon aria-hidden="true" />
 						{{ createNewCollectionLabel }}
-					</button>
-				</ButtonStyled>
-			</template>
-		</PopoutMenu>
-		<nuxt-link
-			v-else
-			v-tooltip="formatMessage(commonMessages.saveButton)"
-			:to="signInRoute"
-			:aria-label="formatMessage(commonMessages.saveButton)"
-		>
-			<BookmarkIcon aria-hidden="true" />
-		</nuxt-link>
-	</ButtonStyled>
+				</Button>
+		</template>
+	</TeleportPopoutMenu>
+	<ButtonLink
+		v-else
+		size="xl"
+		v-tooltip="formatMessage(commonMessages.saveButton)"
+		:to="signInRoute"
+		:aria-label="formatMessage(commonMessages.saveButton)"
+		class="!w-12 !px-0 !rounded-full"
+	>
+		<BookmarkIcon aria-hidden="true" />
+	</ButtonLink>
 </template>
 
 <script setup lang="ts">
 import { BookmarkIcon, PlusIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	Checkbox,
 	commonMessages,
-	PopoutMenu,
 	StyledInput,
+	TeleportPopoutMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'

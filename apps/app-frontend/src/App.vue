@@ -1,4 +1,5 @@
 <script setup>
+import { ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	AuthFeature,
 	ModrinthApiError,
@@ -26,33 +27,7 @@ import {
 	ShirtIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import {
-	Admonition,
-	Avatar,
-	ButtonStyled,
-	commonMessages,
-	ContentInstallModal,
-	ContentUpdaterModal,
-	CreationFlowModal,
-	defineMessages,
-	I18nDebugPanel,
-	IntlFormatted,
-	LoadingBar,
-	NewsArticleCard,
-	NotificationPanel,
-	OverflowMenu,
-	PopupNotificationPanel,
-	provideModalBehavior,
-	provideModrinthClient,
-	provideNotificationManager,
-	providePageContext,
-	providePopupNotificationManager,
-	TextLogo,
-	useDebugLogger,
-	useFormatBytes,
-	useHostingIntercom,
-	useVIntl,
-} from '@modrinth/ui'
+import { Admonition, Avatar, commonMessages, ContentInstallModal, ContentUpdaterModal, CreationFlowModal, defineMessages, I18nDebugPanel, IntlFormatted, LoadingBar, NewsArticleCard, NotificationPanel, PopupNotificationPanel, provideModalBehavior, provideModrinthClient, provideNotificationManager, providePageContext, providePopupNotificationManager, TextLogo, useDebugLogger, useFormatBytes, useHostingIntercom, useVIntl } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
@@ -1591,22 +1566,25 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<SettingsIcon />
 			</NavButton>
-			<OverflowMenu
+			<TeleportOverflowMenu label="More options"
 				v-if="credentials?.user"
 				v-tooltip.right="formatMessage(messages.modrinthAccount)"
 				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
 				:options="[
 					{
 						id: 'view-profile',
+						label: formatMessage(messages.signedInAs, {
+							username: credentials.user.username,
+						}),
 						action: () => router.push(`/user/${encodeURIComponent(credentials.user.username)}`),
 					},
 					{
 						id: 'sign-out',
+						label: formatMessage(commonMessages.signOutButton),
 						action: () => logOut(),
-						color: 'danger',
 					},
 				]"
-				placement="right-end"
+				placement="bottom-start"
 			>
 				<Avatar :src="credentials?.user?.avatar_url" alt="" size="32px" circle />
 				<template #view-profile>
@@ -1629,7 +1607,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					<LogOutIcon />
 					{{ formatMessage(commonMessages.signOutButton) }}
 				</template>
-			</OverflowMenu>
+			</TeleportOverflowMenu>
 			<NavButton
 				v-else
 				v-tooltip.right="formatMessage(messages.signInToModrinthAccount)"
@@ -1642,49 +1620,37 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
 				<TextLogo class="h-7 w-auto shrink-0 text-contrast pointer-events-none" />
 				<div data-tauri-drag-region class="ml-2 flex shrink-0 items-center gap-2">
-					<ButtonStyled type="outlined" circular>
-						<button
+					<IconButton type="outlined" label="Go back"
 							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 							:disabled="!canNavigateBack"
-							aria-label="Go back"
 							@click="router.back()"
 						>
-							<ChevronLeftIcon
-								class="!size-4 !text-primary"
-								:class="{ 'opacity-20': !canNavigateBack }"
-							/>
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined" circular>
-						<button
+						<ChevronLeftIcon
+							class="!size-4 !text-primary"
+							:class="{ 'opacity-20': !canNavigateBack }"
+						/>
+					</IconButton>
+					<IconButton type="outlined" label="Go forward"
 							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 							:disabled="!canNavigateForward"
-							aria-label="Go forward"
 							@click="router.forward()"
 						>
-							<ChevronRightIcon
-								class="!size-4 !text-primary"
-								:class="{ 'opacity-20': !canNavigateForward }"
-							/>
-						</button>
-					</ButtonStyled>
+						<ChevronRightIcon
+							class="!size-4 !text-primary"
+							:class="{ 'opacity-20': !canNavigateForward }"
+						/>
+					</IconButton>
 				</div>
 				<Breadcrumbs />
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
-				<ButtonStyled
-					v-if="!forceSidebar && themeStore.toggleSidebar"
-					:type="sidebarToggled ? 'standard' : 'transparent'"
-					circular
-				>
-					<button
+				<IconButton :type="sidebarToggled ? 'base' : 'quiet'" label="Next image" v-if="!forceSidebar && themeStore.toggleSidebar"
 						class="mr-3 transition-transform"
 						:class="{ 'rotate-180': !sidebarToggled }"
 						@click="sidebarToggled = !sidebarToggled"
 					>
-						<RightArrowIcon />
-					</button>
-				</ButtonStyled>
+					<RightArrowIcon />
+				</IconButton>
 				<div class="flex mr-3">
 					<Suspense>
 						<AppActionBar />
@@ -1793,12 +1759,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 								:key="`news-${index}`"
 								:article="item"
 							/>
-							<ButtonStyled color="brand" size="large">
-								<a href="https://modrinth.com/news" target="_blank" class="my-4">
-									<NewspaperIcon />
-									{{ formatMessage(messages.viewAllNews) }}
-								</a>
-							</ButtonStyled>
+							<ButtonLink type="colored" color="brand" size="xl" href="https://modrinth.com/news" target="_blank" class="my-4">
+								<NewspaperIcon />
+								{{ formatMessage(messages.viewAllNews) }}
+							</ButtonLink>
 						</div>
 					</div>
 				</div>

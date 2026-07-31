@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
@@ -15,10 +16,8 @@ import type { RouteLocationRaw } from 'vue-router'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
-import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -313,15 +312,11 @@ const deleteHovered = ref(false)
 				v-if="hasUpdateListener || hasSwitchVersionListener"
 				class="flex w-8 items-center justify-center"
 			>
-				<ButtonStyled
-					v-if="hasUpdate"
-					circular
-					type="transparent"
-					color="green"
-					color-fill="text"
-					hover-color-fill="background"
-				>
-					<button
+				<IconButton type="quiet" color="green" :label="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.updateAvailableLabel)
+					" v-if="hasUpdate"
 						v-tooltip="
 							isDisabled && disabledTooltip
 								? disabledTooltip
@@ -329,16 +324,14 @@ const deleteHovered = ref(false)
 						"
 						:disabled="isDisabled"
 						@click="emit('update')"
-					>
-						<DownloadIcon class="size-5" />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled
-					v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
-					circular
-					type="transparent"
-				>
-					<button
+					 class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+					<DownloadIcon class="size-5" />
+				</IconButton>
+				<IconButton type="quiet" :label="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.switchVersionButton)
+						" v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
 						v-tooltip="
 							isDisabled && disabledTooltip
 								? disabledTooltip
@@ -347,9 +340,8 @@ const deleteHovered = ref(false)
 						:disabled="isDisabled"
 						@click="emit('switchVersion')"
 					>
-						<ArrowLeftRightIcon class="size-5" />
-					</button>
-				</ButtonStyled>
+					<ArrowLeftRightIcon class="size-5" />
+				</IconButton>
 			</div>
 
 			<Toggle
@@ -366,8 +358,15 @@ const deleteHovered = ref(false)
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
-			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
-				<button
+			<IconButton type="quiet" :label="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(
+									shiftHeld && deleteHovered
+										? commonMessages.deleteImmediatelyLabel
+										: commonMessages.deleteLabel,
+								)
+					" v-if="hasDeleteListener && !props.hideDelete"
 					v-tooltip="
 						isDisabled && disabledTooltip
 							? disabledTooltip
@@ -382,30 +381,27 @@ const deleteHovered = ref(false)
 					@mouseenter="deleteHovered = true"
 					@mouseleave="deleteHovered = false"
 				>
-					<span class="relative size-5">
-						<TrashIcon
-							class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
-							:class="shiftHeld && deleteHovered ? 'opacity-0' : 'opacity-100'"
-						/>
-						<TrashExclamationIcon
-							class="absolute inset-0 size-5 text-red transition-opacity duration-200"
-							:class="shiftHeld && deleteHovered ? 'opacity-100' : 'opacity-0'"
-						/>
-					</span>
-				</button>
-			</ButtonStyled>
+				<span class="relative size-5">
+					<TrashIcon
+						class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
+						:class="shiftHeld && deleteHovered ? 'opacity-0' : 'opacity-100'"
+					/>
+					<TrashExclamationIcon
+						class="absolute inset-0 size-5 text-red transition-opacity duration-200"
+						:class="shiftHeld && deleteHovered ? 'opacity-100' : 'opacity-0'"
+					/>
+				</span>
+			</IconButton>
 
 			<slot name="additionalButtonsRight" />
 
-			<ButtonStyled circular type="transparent">
-				<TeleportOverflowMenu
+			<TeleportOverflowMenu type="quiet" label="More options"
 					v-if="overflowOptions?.length"
 					:options="overflowOptions"
 					:disabled="isDisabled"
 				>
-					<MoreVerticalIcon class="size-5" />
-				</TeleportOverflowMenu>
-			</ButtonStyled>
+				<MoreVerticalIcon class="size-5" />
+			</TeleportOverflowMenu>
 		</div>
 	</div>
 </template>

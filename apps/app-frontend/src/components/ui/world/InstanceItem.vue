@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	EyeIcon,
 	FolderOpenIcon,
@@ -9,10 +10,8 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	injectNotificationManager,
-	OverflowMenu,
 	SmartClickable,
 	useFormatDateTime,
 	useRelativeTime,
@@ -185,14 +184,11 @@ onUnmounted(() => {
 				</div>
 			</div>
 			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-				<ButtonStyled v-if="playing && !loading" color="red">
-					<button @click="stop">
-						<StopCircleIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.stopButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else>
-					<button
+				<Button type="colored" color="red" v-if="playing && !loading" @click="stop">
+					<StopCircleIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.stopButton) }}
+				</Button>
+				<Button v-else
 						v-tooltip="
 							instance.quarantined
 								? 'This instance has been locked'
@@ -203,36 +199,35 @@ onUnmounted(() => {
 						:disabled="instance.quarantined || playing || loading"
 						@click="play"
 					>
-						<SpinnerIcon v-if="loading" class="animate-spin" />
-						<PlayIcon v-else aria-hidden="true" />
-						{{ formatMessage(commonMessages.playButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
+					<SpinnerIcon v-if="loading" class="animate-spin" />
+					<PlayIcon v-else aria-hidden="true" />
+					{{ formatMessage(commonMessages.playButton) }}
+				</Button>
+				<TeleportOverflowMenu type="quiet" label="More options"
 						:options="[
 							{
 								id: 'open-instance',
+								label: 'View instance',
 								shown: !!instance.id,
 								action: () => router.push(encodeURI(`/instance/${instance.id}`)),
 							},
 							{
 								id: 'open-folder',
+								label: formatMessage(commonMessages.openFolderButton),
 								action: () => showInstanceInFolder(instance.id),
 							},
 						]"
 					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #open-instance>
-							<EyeIcon aria-hidden="true" />
-							View instance
-						</template>
-						<template #open-folder>
-							<FolderOpenIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.openFolderButton) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+					<MoreVerticalIcon aria-hidden="true" />
+					<template #open-instance>
+						<EyeIcon aria-hidden="true" />
+						View instance
+					</template>
+					<template #open-folder>
+						<FolderOpenIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.openFolderButton) }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 	</SmartClickable>

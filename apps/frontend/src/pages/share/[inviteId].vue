@@ -101,12 +101,10 @@
 				</div>
 			</div>
 
-			<ButtonStyled color="brand" size="large">
-				<button type="button" @click="acceptInvite">
-					<UserPlusIcon />
-					{{ formatMessage(messages.acceptInvite) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" size="xl" native-type="button" @click="acceptInvite">
+				<UserPlusIcon />
+				{{ formatMessage(messages.acceptInvite) }}
+			</Button>
 
 			<div class="flex w-full flex-col gap-2.5">
 				<span class="pl-3 font-medium text-primary">{{
@@ -124,6 +122,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import {
 	CircleAlertIcon,
 	InviteBackgroundIllustration,
@@ -133,7 +132,6 @@ import {
 import {
 	Admonition,
 	Avatar,
-	ButtonStyled,
 	defineMessages,
 	injectModrinthClient,
 	useVIntl,

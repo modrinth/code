@@ -30,9 +30,7 @@
 			</Transition>
 		</div>
 
-		<ButtonStyled color="medal-promo" type="outlined" size="large">
-			<button class="z-10 my-auto" @click="openUpgradeModal"><RocketIcon /> Upgrade</button>
-		</ButtonStyled>
+		<Button type="outlined" size="xl" class="z-10 my-auto !text-[var(--medal-promotion-text-orange)] [&>svg]:!text-[var(--medal-promotion-text-orange)] !shadow-[inset_0_0_0_1px_var(--color-orange)]" @click="openUpgradeModal"><RocketIcon /> Upgrade</Button>
 	</div>
 	<ServersUpgradeModalWrapper
 		ref="upgradeModal"
@@ -43,6 +41,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { ClockIcon, RocketIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
@@ -50,7 +49,6 @@ import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import { type ComponentPublicInstance, computed, onMounted, onUnmounted, ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import { injectModrinthClient } from '#ui/providers'
 

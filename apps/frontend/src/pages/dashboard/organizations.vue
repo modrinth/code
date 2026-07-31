@@ -5,12 +5,10 @@
 			<div class="header__row">
 				<h2 class="header__title text-2xl">{{ formatMessage(messages.organizationsTitle) }}</h2>
 				<div class="input-group">
-					<ButtonStyled color="brand">
-						<button @click="openCreateOrgModal">
-							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(messages.createOrganization) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="openCreateOrgModal">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createOrganization) }}
+					</Button>
 				</div>
 			</div>
 			<template v-if="orgs?.length > 0">
@@ -52,8 +50,9 @@
 </template>
 
 <script setup>
+import { Button } from '@modrinth/ui'
 import { PlusIcon, UsersIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { Avatar, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'

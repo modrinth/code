@@ -30,12 +30,10 @@
 					<span class="font-semibold text-secondary">{{ selected }}</span>
 				</DropdownSelect>
 
-				<ButtonStyled color="brand">
-					<button class="ml-auto" @click="(event) => $refs.modal_creation.show(event)">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createNewButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" class="ml-auto" @click="(event) => $refs.modal_creation.show(event)">
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createNewButton) }}
+				</Button>
 			</div>
 		</div>
 		<div class="collections-grid">
@@ -133,6 +131,7 @@
 	</div>
 </template>
 <script setup>
+import { Button } from '@modrinth/ui'
 import {
 	BoxIcon,
 	GlobeIcon,
@@ -144,7 +143,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,

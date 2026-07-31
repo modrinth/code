@@ -38,26 +38,22 @@
 				{{ formatMessage(messages.collectionInfo, { count: projectIds.length }) }}
 			</p>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="modal.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="hasHitLimit" @click="create">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createCollection) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal.hide()">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="hasHitLimit" @click="create">
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createCollection) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
 </template>
 <script setup>
+import { Button } from '@modrinth/ui'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,

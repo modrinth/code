@@ -1,15 +1,8 @@
 <template>
 	<div class="flex gap-2 items-center">
-		<ButtonStyled
-			v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts"
-			color="brand"
-			type="transparent"
-			circular
-		>
-			<button v-tooltip="formatMessage(messages.viewActiveDownloads)" @click="openDownloadToast()">
-				<DownloadIcon />
-			</button>
-		</ButtonStyled>
+		<IconButton type="quiet" color="brand" :label="formatMessage(messages.viewActiveDownloads)" v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts" v-tooltip="formatMessage(messages.viewActiveDownloads)" @click="openDownloadToast()">
+			<DownloadIcon />
+		</IconButton>
 		<div v-if="offline" class="flex items-center gap-1">
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
@@ -36,17 +29,19 @@
 						@show="showInstances = true"
 						@hide="showInstances = false"
 					>
-						<ButtonStyled type="transparent" circular size="small">
-							<button
+						<IconButton class="!size-6" type="quiet" size="xs" :label="
+									showInstances
+										? formatMessage(messages.hideMoreRunningInstances)
+										: formatMessage(messages.showMoreRunningInstances)
+								"
 								v-tooltip="
 									showInstances
 										? formatMessage(messages.hideMoreRunningInstances)
 										: formatMessage(messages.showMoreRunningInstances)
 								"
 							>
-								<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
-							</button>
-						</ButtonStyled>
+							<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
+						</IconButton>
 						<template #popper>
 							<div class="flex w-[20rem] max-h-[24rem] flex-col gap-2 overflow-auto">
 								<div
@@ -116,6 +111,7 @@
 </template>
 
 <script setup lang="ts">
+import { IconButton } from '@modrinth/ui'
 import {
 	DownloadIcon,
 	DropdownIcon,
@@ -126,7 +122,6 @@ import {
 	UnplugIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	injectPopupNotificationManager,

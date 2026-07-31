@@ -46,13 +46,10 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => linkModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
+				<Button type="outlined" @click="() => linkModal?.hide()">
+					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand"
 						:disabled="!!linkValidationErrorMessage || !linkUrl"
 						@click="
 							() => {
@@ -61,9 +58,8 @@
 							}
 						"
 					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -144,13 +140,10 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => imageModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
+				<Button type="outlined" @click="() => imageModal?.hide()">
+					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand"
 						:disabled="!canInsertImage"
 						@click="
 							() => {
@@ -159,9 +152,8 @@
 							}
 						"
 					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -204,13 +196,10 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => videoModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
+				<Button type="outlined" @click="() => videoModal?.hide()">
+					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand"
 						:disabled="!!linkValidationErrorMessage || !linkUrl"
 						@click="
 							() => {
@@ -219,9 +208,8 @@
 							}
 						"
 					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -235,17 +223,14 @@
 					>
 						<div class="divider"></div>
 						<template v-for="button in buttonGroup.buttons" :key="button.label.id">
-							<ButtonStyled circular>
-								<button
+							<IconButton :label="formatMessage(button.label)"
 									v-tooltip="formatMessage(button.label)"
-									:aria-label="formatMessage(button.label)"
 									:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
 									:disabled="previewMode || disabled"
 									@click="() => button.action(editor)"
 								>
-									<component :is="button.icon" />
-								</button>
-							</ButtonStyled>
+								<component :is="button.icon" />
+							</IconButton>
 						</template>
 					</template>
 				</div>
@@ -304,6 +289,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { Compartment, EditorState } from '@codemirror/state'
@@ -336,7 +322,6 @@ import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'
 import NewModal from '../modal/NewModal.vue'
-import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
 import IntlFormatted from './IntlFormatted.vue'

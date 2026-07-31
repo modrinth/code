@@ -23,11 +23,9 @@
 				</div>
 			</div>
 			<div class="input-group">
-				<ButtonStyled circular>
-					<button :class="{ '[&>svg]:rotate-180': !collapsed }" @click="$emit('toggleCollapsed')">
-						<DropdownIcon class="duration-250 transition-transform ease-in-out" />
-					</button>
-				</ButtonStyled>
+				<IconButton label="Toggle details" :class="{ '[&>svg]:rotate-180': !collapsed }" @click="$emit('toggleCollapsed')">
+					<DropdownIcon class="duration-250 transition-transform ease-in-out" />
+				</IconButton>
 			</div>
 		</div>
 		<div v-if="!collapsed" class="mt-4 grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-2">
@@ -61,27 +59,23 @@
 					{{ getFormattedMessage(nag.link.title) }}
 					<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
 				</NuxtLink>
-				<ButtonStyled
-					v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
-					color="orange"
+				<Button type="colored" color="orange" v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
 					@click="submitForReview"
-				>
-					<button
 						v-tooltip="
 							!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
 						"
 						:disabled="!canSubmitForReview"
 					>
-						<SendIcon />
-						{{ getFormattedMessage(messages.submitForReviewButton) }}
-					</button>
-				</ButtonStyled>
+					<SendIcon />
+					{{ getFormattedMessage(messages.submitForReviewButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Button, IconButton } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	AsteriskIcon,
@@ -94,7 +88,7 @@ import {
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nags } from '@modrinth/moderation'
-import { ButtonStyled, defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 

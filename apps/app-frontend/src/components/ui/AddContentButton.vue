@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import { DropdownIcon, FolderOpenIcon, PlusIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, OverflowMenu } from '@modrinth/ui'
+import { injectNotificationManager } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useRouter } from 'vue-router'
 
@@ -36,27 +37,24 @@ const handleSearchContent = async () => {
 
 <template>
 	<div class="joined-buttons">
-		<ButtonStyled>
-			<button @click="handleSearchContent">
-				<PlusIcon />
-				Install content
-			</button>
-		</ButtonStyled>
-		<ButtonStyled>
-			<OverflowMenu
+		<Button @click="handleSearchContent">
+			<PlusIcon />
+			Install content
+		</Button>
+		<TeleportOverflowMenu label="More options"
 				:options="[
 					{
 						id: 'from_file',
+						label: 'Add from file',
 						action: handleAddContentFromFile,
 					},
 				]"
-			>
-				<DropdownIcon />
-				<template #from_file>
-					<FolderOpenIcon />
-					<span class="no-wrap"> Add from file </span>
-				</template>
-			</OverflowMenu>
-		</ButtonStyled>
+			 class="!w-auto !px-2.5 !rounded-xl">
+			<DropdownIcon />
+			<template #from_file>
+				<FolderOpenIcon />
+				<span class="no-wrap"> Add from file </span>
+			</template>
+		</TeleportOverflowMenu>
 	</div>
 </template>

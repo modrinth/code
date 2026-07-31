@@ -105,12 +105,10 @@
 				/>
 			</div>
 			<div class="button-group">
-				<ButtonStyled color="brand">
-					<button :disabled="!hasServerChanges" @click="saveServerChanges()">
-						<SaveIcon />
-						Save changes
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="!hasServerChanges" @click="saveServerChanges()">
+					<SaveIcon />
+					Save changes
+				</Button>
 			</div>
 		</section>
 
@@ -272,22 +270,20 @@
 				/>
 			</div>
 			<div class="button-group">
-				<ButtonStyled color="brand">
-					<button :disabled="!hasChanges" @click="saveChanges()">
-						<SaveIcon />
-						Save changes
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="!hasChanges" @click="saveChanges()">
+					<SaveIcon />
+					Save changes
+				</Button>
 			</div>
 		</section>
 	</div>
 </template>
 
 <script setup>
+import { Button } from '@modrinth/ui'
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
 import {
-	ButtonStyled,
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,

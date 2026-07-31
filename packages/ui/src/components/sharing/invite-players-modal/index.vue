@@ -54,17 +54,15 @@
 							</div>
 						</template>
 					</Combobox>
-					<ButtonStyled color="brand">
-						<button
+					<Button type="colored" color="brand"
 							v-tooltip="searchInviteTooltip"
 							class="shrink-0"
 							:disabled="!canInviteSearchTarget"
 							@click="inviteSearchTarget"
 						>
-							<PlusIcon aria-hidden="true" />
-							{{ addButtonLabel }}
-						</button>
-					</ButtonStyled>
+						<PlusIcon aria-hidden="true" />
+						{{ addButtonLabel }}
+					</Button>
 				</div>
 			</div>
 
@@ -102,18 +100,16 @@
 					<div class="text-base font-semibold text-contrast">
 						{{ inviteLinkHeading }}
 					</div>
-					<ButtonStyled>
-						<button
-							type="button"
+					<Button
+							native-type="button"
 							class="!h-10 w-full !justify-between !px-4 text-left !shadow-none"
 							@click="copyInviteLink"
 						>
-							<span class="min-w-0 truncate text-base font-semibold text-primary">
-								{{ link }}
-							</span>
-							<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+						<span class="min-w-0 truncate text-base font-semibold text-primary">
+							{{ link }}
+						</span>
+						<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+					</Button>
 					<p v-if="link && linkExpiryDescription" class="m-0 text-base text-primary">
 						{{ linkExpiryDescription }}
 						<button
@@ -141,13 +137,13 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { ClipboardCopyIcon, PlusIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox from '../../base/Combobox.vue'
 import NewModal from '../../modal/NewModal.vue'
 import InvitePlayersModalInviteLinkEditor from './invite-players-modal-invite-link-editor.vue'

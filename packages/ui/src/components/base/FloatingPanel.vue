@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { onClickOutside } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
-import ButtonStyled from './ButtonStyled.vue'
 
 const PANEL_VIEWPORT_MARGIN = 8
 
@@ -249,8 +249,7 @@ defineExpose({
 
 <template>
 	<div class="relative inline-block">
-		<ButtonStyled v-bind="$attrs">
-			<button
+		<Button v-bind="$attrs"
 				ref="triggerRef"
 				:class="buttonClass"
 				:disabled="disabled"
@@ -259,9 +258,8 @@ defineExpose({
 				@click="toggle"
 				@keydown="handleTriggerKeydown"
 			>
-				<slot></slot>
-			</button>
-		</ButtonStyled>
+			<slot></slot>
+		</Button>
 
 		<Teleport to="body">
 			<Transition

@@ -20,17 +20,15 @@
 						<FilterIcon class="size-5 text-secondary" aria-hidden="true" />
 					</template>
 				</Combobox>
-				<ButtonStyled color="brand">
-					<button
+				<Button type="colored" color="brand"
 						v-tooltip="manageUsersActionTooltip"
 						class="!h-10 w-full md:w-fit"
 						:disabled="!canManageUsers"
 						@click="grantAccessModal?.show($event)"
 					>
-						<UserPlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.inviteFriends) }}
-					</button>
-				</ButtonStyled>
+					<UserPlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.inviteFriends) }}
+				</Button>
 			</div>
 		</div>
 
@@ -108,12 +106,12 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'

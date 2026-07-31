@@ -39,18 +39,14 @@
 						</div>
 					</div>
 				</div>
-				<ButtonStyled v-if="content" type="outlined">
-					<button :disabled="!hasPermission" @click="handleSwitchCompatibility">
-						<ArrowLeftRightIcon />
-						Switch type
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else>
-					<button :disabled="!hasPermission" @click="handleSetCompatibility">
-						<ComponentIcon />
-						Set compatibility
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" v-if="content" :disabled="!hasPermission" @click="handleSwitchCompatibility">
+					<ArrowLeftRightIcon />
+					Switch type
+				</Button>
+				<Button v-else :disabled="!hasPermission" @click="handleSetCompatibility">
+					<ComponentIcon />
+					Set compatibility
+				</Button>
 			</div>
 
 			<div
@@ -182,16 +178,14 @@
 					</div>
 				</div>
 
-				<ButtonStyled v-if="content">
-					<button
+				<Button v-if="content"
 						class="!w-full !max-w-[160px]"
 						:disabled="!hasPermission"
 						@click="handleUpdateContent"
 					>
-						<RefreshCwIcon />
-						Update
-					</button>
-				</ButtonStyled>
+					<RefreshCwIcon />
+					Update
+				</Button>
 			</div>
 		</div>
 		<ServerCompatibilityModal v-if="hasPermission" ref="serverCompatibilityModal" />
@@ -199,6 +193,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
@@ -211,7 +206,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	FormattedTag,
 	injectModrinthClient,
 	injectProjectPageContext,

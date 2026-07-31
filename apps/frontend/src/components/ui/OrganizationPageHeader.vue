@@ -38,27 +38,22 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<ButtonStyled v-if="canManage" size="large">
-					<nuxt-link :to="`/organization/${organization.slug}/settings`">
-						<SettingsIcon />
-						{{ formatMessage(messages.manage) }}
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled circular size="large" type="transparent">
-					<TeleportOverflowMenu
+				<ButtonLink size="xl" v-if="canManage" :to="`/organization/${organization.slug}/settings`">
+					<SettingsIcon />
+					{{ formatMessage(messages.manage) }}
+				</ButtonLink>
+				<TeleportOverflowMenu type="quiet" size="xl" :label="formatMessage(commonMessages.moreOptionsButton)"
 						:options="moreActions"
-						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
 					>
-						<MoreVerticalIcon />
-					</TeleportOverflowMenu>
-				</ButtonStyled>
+					<MoreVerticalIcon />
+				</TeleportOverflowMenu>
 			</PageHeaderActions>
 		</template>
 	</PageHeader>
 </template>
 
 <script setup lang="ts">
+import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	BoxIcon,
 	ClipboardCopyIcon,
@@ -70,7 +65,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	PageHeader,
@@ -78,8 +72,7 @@ import {
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataNumberItem,
-	TeleportOverflowMenu,
-	type TeleportOverflowMenuItem,
+	type OverflowMenuOption,
 	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
@@ -135,7 +128,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
 
-const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
+const moreActions = computed<OverflowMenuOption[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.manageProjects),
@@ -143,10 +136,8 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		action: () => emit('manageProjects'),
 		shown: props.canManage,
 	},
-	{
-		divider: true,
-		shown: props.canManage,
-	},
+	{ type: 'divider', shown: props.canManage,
+	 },
 	{
 		id: 'copy-id',
 		label: formatMessage(commonMessages.copyIdButton),

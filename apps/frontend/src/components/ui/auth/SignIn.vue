@@ -28,11 +28,9 @@
 						@keyup.enter="onTwoFactorSignIn()"
 					/>
 				</div>
-				<ButtonStyled color="brand">
-					<button @click="onTwoFactorSignIn()">
-						{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="onTwoFactorSignIn()">
+					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
+				</Button>
 			</div>
 		</template>
 		<template v-else>
@@ -42,8 +40,7 @@
 				</div>
 
 				<section class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-					<ButtonStyled v-for="provider in oauthProviders" :key="provider.id">
-						<a
+					<ButtonLink v-for="provider in oauthProviders" :key="provider.id"
 							class="relative w-full !justify-center overflow-visible !shadow-none"
 							:class="{
 								'!border !border-[var(--color-green)]': lastSignInProvider === provider.id,
@@ -54,18 +51,16 @@
 							"
 							@click="onOAuthProviderClick(provider.id)"
 						>
-							<component :is="provider.icon" />
-							<span>{{ provider.name }}</span>
-							<span
-								v-if="lastSignInProvider === provider.id"
-								class="oauth-provider-last-sign-in-badge"
-							>
-								{{ formatMessage(messages.lastSignInLabel) }}
-							</span>
-						</a>
-					</ButtonStyled>
-					<ButtonStyled>
-						<a
+						<component :is="provider.icon" />
+						<span>{{ provider.name }}</span>
+						<span
+							v-if="lastSignInProvider === provider.id"
+							class="oauth-provider-last-sign-in-badge"
+						>
+							{{ formatMessage(messages.lastSignInLabel) }}
+						</span>
+					</ButtonLink>
+					<Button
 							class="relative w-full !justify-center overflow-visible !shadow-none sm:col-span-2"
 							:class="{ '!border !border-[var(--color-green)]': lastSignInProvider === 'passkey' }"
 							role="button"
@@ -73,16 +68,15 @@
 							@click="onPasskeySignIn"
 							@keydown.enter="onPasskeySignIn"
 						>
-							<UserKeyIcon />
-							<span class="ml-1">{{ formatMessage(messages.continueWithPasskey) }}</span>
-							<span
-								v-if="lastSignInProvider === 'passkey'"
-								class="oauth-provider-last-sign-in-badge"
-							>
-								{{ formatMessage(messages.lastSignInLabel) }}
-							</span>
-						</a>
-					</ButtonStyled>
+						<UserKeyIcon />
+						<span class="ml-1">{{ formatMessage(messages.continueWithPasskey) }}</span>
+						<span
+							v-if="lastSignInProvider === 'passkey'"
+							class="oauth-provider-last-sign-in-badge"
+						>
+							{{ formatMessage(messages.lastSignInLabel) }}
+						</span>
+					</Button>
 				</section>
 
 				<div class="h-px w-full bg-surface-5"></div>
@@ -117,15 +111,13 @@
 						v-model="tokenModel"
 					/>
 
-					<ButtonStyled color="brand">
-						<button
+					<Button type="colored" color="brand"
 							class="!w-full"
 							:disabled="globals?.captcha_enabled ? !tokenModel : false"
 							@click="onPasswordSignIn()"
 						>
-							{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
-						</button>
-					</ButtonStyled>
+						{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
+					</Button>
 
 					<div class="flex flex-wrap items-center justify-center gap-2.5 !text-base">
 						<NuxtLink
@@ -155,6 +147,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	DiscordColorIcon,
 	GitHubColorIcon,
@@ -167,7 +160,7 @@ import {
 	SteamColorIcon,
 	UserKeyIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
+import { commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import type { LocationQuery } from 'vue-router'

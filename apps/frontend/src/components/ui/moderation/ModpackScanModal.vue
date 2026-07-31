@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { IconButton, Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	FolderSearchIcon,
@@ -8,7 +9,6 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	ConfirmModal,
@@ -405,26 +405,22 @@ defineExpose({ show, hide })
 							</span>
 						</template>
 					</Combobox>
-					<ButtonStyled circular color="red" color-fill="none">
-						<button
+					<IconButton type="quiet" color="red" :label="formatMessage(messages.deleteAllGroups)"
 							v-tooltip="formatMessage(messages.deleteAllGroups)"
 							:disabled="titleButtonsDisabled"
 							@click="showConfirmClearGroups"
 						>
-							<TrashIcon v-if="!isClearing" aria-hidden="true" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular>
-						<button
+						<TrashIcon v-if="!isClearing" aria-hidden="true" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</IconButton>
+					<IconButton :label="formatMessage(messages.scanAllFiles)"
 							v-tooltip="formatMessage(messages.scanAllFiles)"
 							:disabled="titleButtonsDisabled"
 							@click="fetchAllScans"
 						>
-							<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
+						<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</IconButton>
 				</div>
 			</div>
 		</template>
@@ -454,17 +450,10 @@ defineExpose({ show, hide })
 				<template #cell-newFiles="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<ButtonStyled
-							class="justify-self-center"
-							color="red"
-							type="outlined"
-							hover-color-fill="background"
-						>
-							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
-								<RotateCounterClockwiseIcon />
-								{{ formatMessage(messages.failed) }}
-							</button>
-						</ButtonStyled>
+						<Button type="outlined" :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)" class="justify-self-center !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+							<RotateCounterClockwiseIcon />
+							{{ formatMessage(messages.failed) }}
+						</Button>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_files }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>
@@ -472,17 +461,10 @@ defineExpose({ show, hide })
 				<template #cell-newGroups="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<ButtonStyled
-							class="justify-self-center"
-							color="red"
-							type="outlined"
-							hover-color-fill="background"
-						>
-							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
-								<RotateCounterClockwiseIcon />
-								{{ formatMessage(messages.failed) }}
-							</button>
-						</ButtonStyled>
+						<Button type="outlined" :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)" class="justify-self-center !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]">
+							<RotateCounterClockwiseIcon />
+							{{ formatMessage(messages.failed) }}
+						</Button>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_groups }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>

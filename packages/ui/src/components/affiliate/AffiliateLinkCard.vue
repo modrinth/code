@@ -18,12 +18,10 @@
 			</div>
 			<div class="ml-auto flex items-center gap-2">
 				<slot />
-				<ButtonStyled v-if="showRevoke" color="red" color-fill="text">
-					<button @click="emit('revoke', affiliate)">
-						<XCircleIcon />
-						{{ formatMessage(messages.revokeAffiliateLink) }}
-					</button>
-				</ButtonStyled>
+				<Button type="quiet" color="red" v-if="showRevoke" @click="emit('revoke', affiliate)" class="!text-red [&>svg]:!text-red">
+					<XCircleIcon />
+					{{ formatMessage(messages.revokeAffiliateLink) }}
+				</Button>
 			</div>
 		</div>
 		<CopyCode :text="`https://modrinth.gg?afl=${affiliate.id}`" />
@@ -31,11 +29,12 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { AffiliateIcon, XCircleIcon } from '@modrinth/assets'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import { AutoBrandIcon, ButtonStyled, CopyCode } from '../index'
+import { AutoBrandIcon, CopyCode } from '../index'
 
 type AffiliateCode = Labrinth.Affiliate.Internal.AffiliateCode
 

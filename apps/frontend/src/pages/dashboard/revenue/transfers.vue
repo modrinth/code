@@ -13,16 +13,14 @@
 					"
 					listbox
 				/>
-				<ButtonStyled circular>
-					<button
+				<IconButton :label="formatMessage(messages.downloadCsv)"
 						v-tooltip="formatMessage(messages.downloadCsv)"
 						:disabled="buildingCsv"
 						@click="onDownloadCSV"
 					>
-						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
-						<DownloadIcon v-else />
-					</button>
-				</ButtonStyled>
+					<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
+					<DownloadIcon v-else />
+				</IconButton>
 			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -82,6 +80,7 @@
 	</div>
 </template>
 <script setup>
+import { IconButton } from '@modrinth/ui'
 import {
 	ArrowDownLeftIcon,
 	ArrowUpRightIcon,
@@ -90,7 +89,6 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	defineMessages,
 	EmptyState,

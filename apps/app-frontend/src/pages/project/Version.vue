@@ -15,68 +15,65 @@
 			:dependency-link-creator="createDependencyLink"
 		>
 			<template #headerActions>
-				<ButtonStyled color="brand">
-					<button
+				<Button type="colored" color="brand"
 						:disabled="installing || (installed && installedVersion === version.id)"
 						@click="() => version && install(version.id)"
 					>
-						<DownloadIcon v-if="!installed" />
-						<SwapIcon v-else-if="installedVersion !== version.id" />
-						<CheckIcon v-else />
-						{{
-							installing
-								? formatMessage(messages.installing)
-								: installed && installedVersion === version.id
-									? formatMessage(commonMessages.installedLabel)
-									: installed
-										? formatMessage(commonMessages.switchToVersionButton)
-										: formatMessage(commonMessages.installButton)
-						}}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined" circular>
-					<OverflowMenu
+					<DownloadIcon v-if="!installed" />
+					<SwapIcon v-else-if="installedVersion !== version.id" />
+					<CheckIcon v-else />
+					{{
+						installing
+							? formatMessage(messages.installing)
+							: installed && installedVersion === version.id
+								? formatMessage(commonMessages.installedLabel)
+								: installed
+									? formatMessage(commonMessages.switchToVersionButton)
+									: formatMessage(commonMessages.installButton)
+					}}
+				</Button>
+				<TeleportOverflowMenu type="outlined" label="More options"
 						v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
 						:options="[
 							{
 								id: 'open-in-browser',
-								link: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
-								external: true,
+								label: formatMessage(commonMessages.openInBrowserButton),
+								type: 'link',
+								href: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
+								target: '_blank',
 							},
 							{
 								id: 'report',
-								color: 'red',
-								hoverFilled: true,
-								link: `https://modrinth.com/report?item=version&itemID=${version.id}`,
-								external: true,
+								label: formatMessage(commonMessages.reportButton),
+								type: 'link',
+								tone: 'red',
+								href: `https://modrinth.com/report?item=version&itemID=${version.id}`,
+								target: '_blank',
 							},
 						]"
-						aria-label="More options"
 					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #open-in-browser>
-							<ExternalIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.openInBrowserButton) }}
-						</template>
-						<template #report>
-							<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+					<MoreVerticalIcon aria-hidden="true" />
+					<template #open-in-browser>
+						<ExternalIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.openInBrowserButton) }}
+					</template>
+					<template #report>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
+					</template>
+				</TeleportOverflowMenu>
 			</template>
 			<template #supplementaryResourceActions="{ file }">
-				<ButtonStyled>
-					<a :href="file.url" :download="file.filename" target="_blank">
-						<DownloadIcon aria-hidden="true" />
-						{{ formatMessage(messages.downloadInBrowser) }}
-					</a>
-				</ButtonStyled>
+				<ButtonLink :href="file.url" :download="file.filename" target="_blank">
+					<DownloadIcon aria-hidden="true" />
+					{{ formatMessage(messages.downloadInBrowser) }}
+				</ButtonLink>
 			</template>
 		</VersionPage>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Button, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
@@ -88,11 +85,9 @@ import {
 	VersionIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	type DependencyContext,
-	OverflowMenu,
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'

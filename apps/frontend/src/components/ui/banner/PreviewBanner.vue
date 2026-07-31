@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { IconButton } from '@modrinth/ui'
 import { XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
@@ -70,11 +70,9 @@ const url = computed(() => `https://modrinth.com${route.fullPath}`)
 			</span>
 		</template>
 		<template #actions_top_right>
-			<ButtonStyled type="transparent" circular>
-				<button :aria-label="formatMessage(commonMessages.closeButton)" @click="hidePreviewBanner">
-					<XIcon aria-hidden="true" />
-				</button>
-			</ButtonStyled>
+			<IconButton type="quiet" :label="formatMessage(commonMessages.closeButton)" @click="hidePreviewBanner">
+				<XIcon aria-hidden="true" />
+			</IconButton>
 		</template>
 	</PagewideBanner>
 </template>

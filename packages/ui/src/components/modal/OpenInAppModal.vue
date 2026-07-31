@@ -88,23 +88,19 @@
 					formatMessage(messages.openingAutomatically)
 				}}</span>
 				<div v-else class="grid grid-cols-2 gap-2 w-full">
-					<ButtonStyled>
-						<button class="flex-1" @click="hide">
-							<XIcon />
-							{{ formatMessage(commonMessages.closeButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<a
+					<Button class="flex-1" @click="hide">
+						<XIcon />
+						{{ formatMessage(commonMessages.closeButton) }}
+					</Button>
+					<ButtonLink type="colored" color="brand"
 							class="flex-1"
 							href="https://modrinth.com/app"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<DownloadIcon />
-							{{ formatMessage(messages.getApp) }}
-						</a>
-					</ButtonStyled>
+						<DownloadIcon />
+						{{ formatMessage(messages.getApp) }}
+					</ButtonLink>
 				</div>
 			</div>
 		</div>
@@ -112,12 +108,13 @@
 </template>
 
 <script setup lang="ts">
+import { Button, ButtonLink } from '#ui/components/base/buttons'
 import { CheckIcon, DownloadIcon, XIcon } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import { Avatar, ButtonStyled } from '../base'
+import { Avatar } from '../base'
 import ServerOnlinePlayers from '../project/server/ServerOnlinePlayers.vue'
 import ServerRegion from '../project/server/ServerRegion.vue'
 

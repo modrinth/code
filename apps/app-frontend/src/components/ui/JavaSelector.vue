@@ -17,37 +17,51 @@
 					}
 				"
 			/>
-			<ButtonStyled
+			<Button
+				type="quiet"
 				:color="
 					!hoveringTest && !testingJava
 						? testingJavaSuccess === true
 							? 'green'
 							: 'red'
-						: 'standard'
+						: undefined
 				"
-				color-fill="text"
-			>
-				<button
 					:aria-label="formatMessage(messages.testJavaInstallation)"
-					class="!shadow-none"
+					class="!shadow-none !text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
 					:disabled="testingJava || props.disabled"
 					@click="runTest(props.modelValue?.path)"
 					@mouseenter="!props.disabled && (hoveringTest = true)"
 					@mouseleave="hoveringTest = false"
-				>
-					<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-					<CheckCircleIcon
-						v-else-if="testingJavaSuccess === true && !hoveringTest"
-						class="h-4 w-4"
-					/>
-					<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
-					<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
-				</button>
-			</ButtonStyled>
+				 :style="{ '--legacy-button-color': (
+					!hoveringTest && !testingJava
+						? testingJavaSuccess === true
+							? 'green'
+							: 'red'
+						: 'standard'
+				) && (
+					!hoveringTest && !testingJava
+						? testingJavaSuccess === true
+							? 'green'
+							: 'red'
+						: 'standard'
+				) !== 'standard' ? `var(--color-${
+					!hoveringTest && !testingJava
+						? testingJavaSuccess === true
+							? 'green'
+							: 'red'
+						: 'standard'
+				})` : undefined }">
+				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+				<CheckCircleIcon
+					v-else-if="testingJavaSuccess === true && !hoveringTest"
+					class="h-4 w-4"
+				/>
+				<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
+				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
+			</Button>
 		</div>
 		<span class="installation-buttons">
-			<ButtonStyled v-if="props.version">
-				<button
+			<Button v-if="props.version"
 					v-tooltip="
 						testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
 					"
@@ -55,31 +69,27 @@
 					:disabled="props.disabled || installingJava || testingJavaSuccess === true"
 					@click="reinstallJava"
 				>
-					<DownloadIcon />
-					{{
-						installingJava
-							? formatMessage(messages.installing)
-							: formatMessage(messages.installRecommended)
-					}}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
-					<SearchIcon />
-					{{ formatMessage(messages.detect) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
-					<FolderSearchIcon />
-					{{ formatMessage(messages.browse) }}
-				</button>
-			</ButtonStyled>
+				<DownloadIcon />
+				{{
+					installingJava
+						? formatMessage(messages.installing)
+						: formatMessage(messages.installRecommended)
+				}}
+			</Button>
+			<Button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
+				<SearchIcon />
+				{{ formatMessage(messages.detect) }}
+			</Button>
+			<Button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
+				<FolderSearchIcon />
+				{{ formatMessage(messages.browse) }}
+			</Button>
 		</span>
 	</div>
 </template>
 
 <script setup>
+import { Button } from '@modrinth/ui'
 import {
 	CheckCircleIcon,
 	DownloadIcon,
@@ -90,7 +100,6 @@ import {
 	XCircleIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	StyledInput,

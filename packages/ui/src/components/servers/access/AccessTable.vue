@@ -74,29 +74,23 @@
 
 		<template #cell-actions="{ row: member }">
 			<div v-if="!member.isOwner" class="flex items-center justify-end gap-1">
-				<ButtonStyled v-if="member.pending" circular type="transparent">
-					<button
+				<IconButton type="quiet" :label="resendInviteLabel(member)" v-if="member.pending"
 						v-tooltip="resendInviteTooltip(member)"
-						:aria-label="resendInviteLabel(member)"
 						:disabled="resendInviteDisabled(member)"
 						class="text-secondary hover:!filter-none hover:text-contrast focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
 						@click="handleResendInvite(member)"
 					>
-						<SendIcon aria-hidden="true" />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<button
+					<SendIcon aria-hidden="true" />
+				</IconButton>
+				<IconButton type="quiet" :label="memberAccessActionLabel(member)"
 						v-tooltip="memberAccessActionTooltip(member)"
-						:aria-label="memberAccessActionLabel(member)"
 						:disabled="!canManageUsers"
 						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
 						@click="member.pending ? handleCancelInvite(member) : handleRemoveMember(member)"
 					>
-						<XIcon v-if="member.pending" aria-hidden="true" />
-						<UserXIcon v-else aria-hidden="true" />
-					</button>
-				</ButtonStyled>
+					<XIcon v-if="member.pending" aria-hidden="true" />
+					<UserXIcon v-else aria-hidden="true" />
+				</IconButton>
 			</div>
 		</template>
 	</Table>
@@ -223,29 +217,27 @@
 				<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
 			</div>
 			<div class="flex min-w-0 items-center justify-end pr-4">
-				<ButtonStyled v-if="!member.isOwner" circular type="transparent">
-					<TeleportOverflowMenu
+				<TeleportOverflowMenu type="quiet" :label="formatMessage(messages.memberActionsLabel, { username: member.user.username })" v-if="!member.isOwner"
 						:options="memberActionOptions(member)"
-						btn-class="hover:!filter-none focus-visible:!filter-none active:!scale-100 active:!filter-none"
+						class="hover:!filter-none focus-visible:!filter-none active:!scale-100 active:!filter-none"
 					>
-						<MoreVerticalIcon aria-hidden="true" class="size-5" />
-						<span class="sr-only">
-							{{ formatMessage(messages.memberActionsLabel, { username: member.user.username }) }}
-						</span>
-						<template #resend-invite>
-							<SendIcon aria-hidden="true" />
-							{{ resendInviteLabel(member) }}
-						</template>
-						<template #cancel-invite>
-							<XIcon aria-hidden="true" />
-							{{ formatMessage(messages.cancelInvite) }}
-						</template>
-						<template #remove-user>
-							<UserXIcon aria-hidden="true" />
-							{{ formatMessage(messages.removeUser) }}
-						</template>
-					</TeleportOverflowMenu>
-				</ButtonStyled>
+					<MoreVerticalIcon aria-hidden="true" class="size-5" />
+					<span class="sr-only">
+						{{ formatMessage(messages.memberActionsLabel, { username: member.user.username }) }}
+					</span>
+					<template #resend-invite>
+						<SendIcon aria-hidden="true" />
+						{{ resendInviteLabel(member) }}
+					</template>
+					<template #cancel-invite>
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(messages.cancelInvite) }}
+					</template>
+					<template #remove-user>
+						<UserXIcon aria-hidden="true" />
+						{{ formatMessage(messages.removeUser) }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 	</div>
@@ -277,6 +269,11 @@
 
 <script setup lang="ts">
 import {
+	IconButton,
+	TeleportOverflowMenu,
+	type OverflowMenuOption,
+} from '#ui/components/base/buttons'
+import {
 	ChevronDownIcon,
 	ChevronUpIcon,
 	MoreVerticalIcon,
@@ -284,17 +281,15 @@ import {
 	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { type Component, computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import Table, { type SortDirection, type TableColumn } from '../../base/Table.vue'
-import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'
 import type {
 	ServerAccessMember,
 	ServerAccessRole,
@@ -396,16 +391,6 @@ const messages = defineMessages({
 type AccessTableColumn = 'user' | 'role' | 'joined' | 'actions'
 type AccessTableSortableColumn = Exclude<AccessTableColumn, 'actions'>
 type AccessTableRow = ServerAccessMember & Record<string, unknown>
-type OverflowMenuOption = {
-	id: string
-	icon?: Component
-	action: () => void
-	shown?: boolean
-	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
-	disabled?: boolean
-	tooltip?: string
-}
-
 const columns = computed<TableColumn<AccessTableColumn>[]>(() => [
 	{ key: 'user', label: formatMessage(messages.userColumn), width: '32%', enableSorting: true },
 	{ key: 'role', label: formatMessage(messages.roleColumn), width: '28%', enableSorting: true },
@@ -609,6 +594,7 @@ function memberActionOptions(member: ServerAccessMember): OverflowMenuOption[] {
 	return [
 		{
 			id: 'resend-invite',
+			label: resendInviteLabel(member),
 			icon: SendIcon,
 			action: () => handleResendInvite(member),
 			shown: member.pending,
@@ -617,18 +603,20 @@ function memberActionOptions(member: ServerAccessMember): OverflowMenuOption[] {
 		},
 		{
 			id: 'cancel-invite',
+			label: formatMessage(messages.cancelInvite),
 			icon: XIcon,
 			action: () => handleCancelInvite(member),
-			color: 'red',
+			tone: 'red',
 			shown: member.pending,
 			disabled: !canManageUsers.value,
 			tooltip: memberAccessActionTooltip(member),
 		},
 		{
 			id: 'remove-user',
+			label: formatMessage(messages.removeUser),
 			icon: UserXIcon,
 			action: () => handleRemoveMember(member),
-			color: 'red',
+			tone: 'red',
 			shown: !member.pending,
 			disabled: !canManageUsers.value,
 			tooltip: memberAccessActionTooltip(member),

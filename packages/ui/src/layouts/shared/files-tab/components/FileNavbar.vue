@@ -24,18 +24,16 @@
 			>
 				<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
 					<li class="mr-4 flex-shrink-0">
-						<ButtonStyled circular>
-							<button
+						<IconButton :label="formatMessage(messages.backToHome)"
 								v-tooltip="formatMessage(messages.backToHome)"
-								type="button"
+								native-type="button"
 								class="!size-10 bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								@click="$emit('navigateHome')"
 								@mouseenter="$emit('prefetchHome')"
 							>
-								<HomeIcon />
-								<span class="sr-only">{{ formatMessage(messages.home) }}</span>
-							</button>
-						</ButtonStyled>
+							<HomeIcon />
+							<span class="sr-only">{{ formatMessage(messages.home) }}</span>
+						</IconButton>
 					</li>
 					<li class="m-0 -ml-2 min-w-0 flex-shrink p-0">
 						<ol
@@ -64,8 +62,7 @@
 									class="relative flex shrink-0 items-center text-sm"
 								>
 									<div class="flex shrink-0 items-center">
-										<ButtonStyled type="transparent">
-											<button
+										<Button type="quiet"
 												class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 												:aria-current="
 													!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
@@ -75,9 +72,8 @@
 												}"
 												@click="$emit('navigate', index)"
 											>
-												{{ segment || '' }}
-											</button>
-										</ButtonStyled>
+											{{ segment || '' }}
+										</Button>
 										<ChevronRightIcon
 											v-if="index < breadcrumbs.length - 1 || isEditing"
 											class="size-4 flex-shrink-0 text-secondary"
@@ -111,104 +107,91 @@
 					@update:model-value="$emit('update:searchQuery', $event)"
 				/>
 
-				<ButtonStyled v-if="showRefreshButton" type="outlined">
-					<button
-						type="button"
+				<Button type="outlined" v-if="showRefreshButton"
+						native-type="button"
 						class="flex !h-10 items-center gap-2"
 						:disabled="refreshing"
 						@click="handleRefresh"
 					>
-						<RefreshCwIcon
-							aria-hidden="true"
-							class="h-5 w-5 transition-transform"
-							:class="refreshing ? 'animate-spin' : ''"
-						/>
-						{{ formatMessage(commonMessages.refreshButton) }}
-					</button>
-				</ButtonStyled>
+					<RefreshCwIcon
+						aria-hidden="true"
+						class="h-5 w-5 transition-transform"
+						:class="refreshing ? 'animate-spin' : ''"
+					/>
+					{{ formatMessage(commonMessages.refreshButton) }}
+				</Button>
 
-				<ButtonStyled type="outlined">
-					<OverflowMenu
-						:dropdown-id="`create-new-${baseId}`"
-						position="bottom"
-						direction="left"
-						:aria-label="formatMessage(messages.createNew)"
+				<TeleportOverflowMenu type="outlined" :label="formatMessage(messages.createNew)"
 						:disabled="disabled"
-						:tooltip="disabled ? disabledTooltip : undefined"
-						class="!h-10 justify-center gap-2"
+						class="!h-10 justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
 						:options="[
-							{ id: 'file', action: () => $emit('create', 'file') },
-							{ id: 'directory', action: () => $emit('create', 'directory') },
-							{ id: 'upload', action: () => $emit('upload') },
-							{ divider: true, shown: showInstallFromUrl ?? false },
-							{ id: 'upload-zip', shown: false, action: () => $emit('uploadZip') },
+							{ id: 'file', label: formatMessage(messages.newFile), action: () => $emit('create', 'file') },
+							{ id: 'directory', label: formatMessage(messages.newFolder), action: () => $emit('create', 'directory') },
+							{ id: 'upload', label: formatMessage(messages.uploadFile), action: () => $emit('upload') },
+							{ type: 'divider', shown: showInstallFromUrl ?? false },
+							{ id: 'upload-zip', label: formatMessage(messages.uploadFromZip), shown: false, action: () => $emit('uploadZip') },
 							{
 								id: 'install-from-url',
+								label: formatMessage(messages.uploadFromZipUrl),
 								shown: showInstallFromUrl ?? false,
 								action: () => $emit('unzipFromUrl', false),
 							},
 							{
 								id: 'install-cf-pack',
+								label: formatMessage(messages.installCurseForgePack),
 								shown: showInstallFromUrl ?? false,
 								action: () => $emit('unzipFromUrl', true),
 							},
 						]"
 					>
-						<PlusIcon aria-hidden="true" class="h-5 w-5" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5" />
-						<template #file>
-							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
-						</template>
-						<template #directory>
-							<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
-						</template>
-						<template #upload>
-							<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
-						</template>
-						<template #upload-zip>
-							<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
-						</template>
-						<template #install-from-url>
-							<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
-						</template>
-						<template #install-cf-pack>
-							<CurseForgeIcon aria-hidden="true" />
-							{{ formatMessage(messages.installCurseForgePack) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+					<PlusIcon aria-hidden="true" class="h-5 w-5" />
+					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
+					<template #file>
+						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
+					</template>
+					<template #directory>
+						<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
+					</template>
+					<template #upload>
+						<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
+					</template>
+					<template #upload-zip>
+						<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
+					</template>
+					<template #install-from-url>
+						<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
+					</template>
+					<template #install-cf-pack>
+						<CurseForgeIcon aria-hidden="true" />
+						{{ formatMessage(messages.installCurseForgePack) }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 
 			<div v-else-if="!isEditingImage" class="flex gap-2">
-				<ButtonStyled v-if="isLogFile" type="transparent" circular>
-					<button
+				<IconButton type="quiet" :label="formatMessage(messages.shareToMclogs)" v-if="isLogFile"
 						v-tooltip="formatMessage(messages.shareToMclogs)"
-						:aria-label="formatMessage(messages.shareToMclogs)"
 						@click="$emit('share')"
 					>
-						<ShareIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled
-					circular
-					:type="isEditorFindOpen ? 'standard' : 'transparent'"
-					:color="isEditorFindOpen ? 'brand' : 'standard'"
-				>
-					<button
+					<ShareIcon />
+				</IconButton>
+				<IconButton
+					:type="isEditorFindOpen ? 'colored' : 'quiet'"
+					:color="isEditorFindOpen ? 'brand' : undefined"
+					:label="formatMessage(messages.findInFile)"
 						v-tooltip="formatMessage(messages.findInFile)"
-						:aria-label="formatMessage(messages.findInFile)"
 						:aria-pressed="isEditorFindOpen"
 						@click="$emit('find')"
 					>
-						<SearchIcon />
-					</button>
-				</ButtonStyled>
+					<SearchIcon />
+				</IconButton>
 			</div>
 		</div>
 	</header>
 </template>
 
 <script setup lang="ts">
+import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import {
 	BoxIcon,
 	ChevronRightIcon,
@@ -226,8 +209,6 @@ import {
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

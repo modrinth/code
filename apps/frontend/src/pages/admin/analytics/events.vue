@@ -33,19 +33,17 @@
 				<div class="flex items-center justify-between">
 					<span class="label__title font-semibold">Announcement link (optional)</span>
 
-					<ButtonStyled v-if="committedNormalizedAnnouncementUrl" type="transparent" size="small">
-						<a
+					<ButtonLink type="quiet" size="xs" v-if="committedNormalizedAnnouncementUrl"
 							:href="committedNormalizedAnnouncementUrl"
 							target="_blank"
 							rel="noopener noreferrer"
 							aria-label="Check announcement link"
 							title="Check announcement link"
-							class="text-sm"
+							class="text-sm !h-6"
 						>
-							<ExternalIcon aria-hidden="true" />
-							Open link
-						</a>
-					</ButtonStyled>
+						<ExternalIcon aria-hidden="true" />
+						Open link
+					</ButtonLink>
 				</div>
 				<div class="flex items-center gap-2">
 					<StyledInput
@@ -110,15 +108,11 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="transparent">
-					<button @click="eventModal?.hide()">Cancel</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!canSaveEvent || isSaving" @click="saveEvent">
-						<SaveIcon aria-hidden="true" />
-						{{ modalMode === 'create' ? 'Create event' : 'Save' }}
-					</button>
-				</ButtonStyled>
+				<Button type="quiet" @click="eventModal?.hide()">Cancel</Button>
+				<Button type="colored" color="brand" :disabled="!canSaveEvent || isSaving" @click="saveEvent">
+					<SaveIcon aria-hidden="true" />
+					{{ modalMode === 'create' ? 'Create event' : 'Save' }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -137,12 +131,10 @@
 						clearable
 						wrapper-class="w-full sm:w-72"
 					/>
-					<ButtonStyled color="brand">
-						<button :disabled="isSaving" @click="openCreateModal">
-							<PlusIcon aria-hidden="true" />
-							New event
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" :disabled="isSaving" @click="openCreateModal">
+						<PlusIcon aria-hidden="true" />
+						New event
+					</Button>
 				</div>
 			</div>
 
@@ -196,21 +188,16 @@
 
 				<template #cell-actions="{ row }">
 					<div class="flex justify-end gap-2">
-						<ButtonStyled circular type="outlined" color="red">
-							<button
-								:aria-label="`Delete ${row.title}`"
+						<IconButton type="outlined" :label="`Delete ${row.title}`"
 								:disabled="isDeletingEvent(row.id)"
 								@click="openDeleteEventModal(row)"
-							>
-								<TrashIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled type="outlined">
-							<button :disabled="isSaving || isDeletingEvent(row.id)" @click="openEditModal(row)">
-								Edit
-								<EditIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
+							 class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]">
+							<TrashIcon aria-hidden="true" />
+						</IconButton>
+						<Button type="outlined" :disabled="isSaving || isDeletingEvent(row.id)" @click="openEditModal(row)">
+							Edit
+							<EditIcon aria-hidden="true" />
+						</Button>
 					</div>
 				</template>
 
@@ -229,6 +216,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	EditIcon,
@@ -240,7 +228,6 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	ConfirmModal,
 	DatePicker,
 	injectModrinthClient,

@@ -38,15 +38,13 @@
 				<HCaptcha ref="captcha" v-model="token" />
 			</div>
 
-			<ButtonStyled color="brand">
-				<button
+			<Button type="colored" color="brand"
 					class="!w-full"
 					:disabled="(globals?.captcha_enabled ? !token : false) || !email"
 					@click="recovery"
 				>
-					<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
-				</button>
-			</ButtonStyled>
+				<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
+			</Button>
 		</template>
 		<template v-else-if="step === 'passed_challenge'">
 			<Admonition :type="'info'">
@@ -84,20 +82,18 @@
 					wrapper-class="w-full"
 				/>
 
-				<ButtonStyled color="brand">
-					<button class="!w-full" @click="changePassword">
-						{{ formatMessage(postChallengeMessages.action) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" class="!w-full" @click="changePassword">
+					{{ formatMessage(postChallengeMessages.action) }}
+				</Button>
 			</div>
 		</template>
 	</div>
 </template>
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

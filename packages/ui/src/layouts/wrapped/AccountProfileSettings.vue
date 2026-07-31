@@ -15,12 +15,10 @@
 			</div>
 		</template>
 		<template #actions>
-			<ButtonStyled color="brand" size="large">
-				<button type="button" @click="requestSignIn">
-					<LogInIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.signInButton) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" size="xl" native-type="button" @click="requestSignIn">
+				<LogInIcon aria-hidden="true" />
+				{{ formatMessage(commonMessages.signInButton) }}
+			</Button>
 		</template>
 	</EmptyState>
 
@@ -56,30 +54,23 @@
 				<div class="flex items-center gap-4">
 					<Avatar :src="displayedAvatarUrl" size="md" circle :alt="auth.user.value.username" />
 					<div class="flex flex-col gap-2">
-						<ButtonStyled>
-							<FileInput
+						<FileButton
 								:max-size="262144"
-								:show-icon="true"
 								class="button-like !shadow-none"
 								:prompt="formatMessage(commonMessages.uploadImageButton)"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								@change="showPreviewImage"
 							>
-								<UploadIcon aria-hidden="true" />
-							</FileInput>
-						</ButtonStyled>
-						<ButtonStyled v-if="avatarUrl && !pendingAvatarDeletion">
-							<button type="button" class="!shadow-none" @click="removePreviewImage">
-								<TrashIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.removeImageButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="avatarFile || pendingAvatarDeletion">
-							<button type="button" class="!shadow-none" @click="resetAvatar">
-								<UndoIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.resetButton) }}
-							</button>
-						</ButtonStyled>
+							<UploadIcon aria-hidden="true" />
+						</FileButton>
+						<Button v-if="avatarUrl && !pendingAvatarDeletion" native-type="button" class="!shadow-none" @click="removePreviewImage">
+							<TrashIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.removeImageButton) }}
+						</Button>
+						<Button v-if="avatarFile || pendingAvatarDeletion" native-type="button" class="!shadow-none" @click="resetAvatar">
+							<UndoIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.resetButton) }}
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -130,12 +121,12 @@
 </template>
 
 <script setup lang="ts">
+import { Button, FileButton } from '#ui/components/base/buttons'
 import { LogInIcon, ThinkingRinthbot, TrashIcon, UndoIcon, UploadIcon } from '@modrinth/assets'
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FileInput from '#ui/components/base/FileInput.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'

@@ -42,22 +42,18 @@
 		</div>
 
 		<div class="w-full">
-			<ButtonStyled v-if="uploading" size="large">
-				<button class="ml-auto" disabled>
-					<SpinnerIcon class="animate-spin" />
-					{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-else color="brand" size="large">
-				<button
+			<Button size="xl" v-if="uploading" class="ml-auto" disabled>
+				<SpinnerIcon class="animate-spin" />
+				{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
+			</Button>
+			<Button type="colored" color="brand" size="xl" v-else
 					v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
 					class="ml-auto"
 					:disabled="!canSetup"
 					@click="openModal"
 				>
-					{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
-				</button>
-			</ButtonStyled>
+				{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
+			</Button>
 		</div>
 
 		<CreationFlowModal
@@ -77,10 +73,10 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,

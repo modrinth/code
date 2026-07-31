@@ -100,22 +100,18 @@
 				/>
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button v-if="editingNotice" :disabled="!!noticeSubmitError" @click="() => saveChanges()">
-						<SaveIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</button>
-					<button v-else :disabled="!!noticeSubmitError" @click="() => createNotice()">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createNotice) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="createNoticeModal?.hide">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" v-if="editingNotice" :disabled="!!noticeSubmitError" @click="() => saveChanges()">
+					<SaveIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.saveChangesButton) }}
+				</button>
+				<button v-else :disabled="!!noticeSubmitError" @click="() => createNotice()">
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createNotice) }}
+				</Button>
+				<Button @click="createNoticeModal?.hide">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -125,12 +121,10 @@
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>
 			<h1 class="m-0 text-2xl">Server notices</h1>
-			<ButtonStyled color="brand">
-				<button @click="openNewNoticeModal">
-					<PlusIcon />
-					{{ formatMessage(messages.createNotice) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" @click="openNewNoticeModal">
+				<PlusIcon />
+				{{ formatMessage(messages.createNotice) }}
+			</Button>
 		</div>
 		<div>
 			<div v-if="!notices || notices.length === 0">
@@ -201,16 +195,12 @@
 							</TagItem>
 						</div>
 						<div class="col-span-2 flex gap-2 md:col-span-1">
-							<ButtonStyled>
-								<button @click="() => startEditing(notice)">
-									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="red">
-								<button @click="() => deleteNotice(notice)">
-									<TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}
-								</button>
-							</ButtonStyled>
+							<Button @click="() => startEditing(notice)">
+								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+							</Button>
+							<Button type="colored" color="red" @click="() => deleteNotice(notice)">
+								<TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}
+							</Button>
 						</div>
 					</div>
 					<div class="col-span-full grid">
@@ -260,10 +250,10 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import type { Archon } from '@modrinth/api-client'
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	commonMessages,
 	CopyCode,

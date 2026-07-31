@@ -1,4 +1,5 @@
 <script setup>
+import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
 	CheckIcon,
 	CopyIcon,
@@ -9,7 +10,7 @@ import {
 	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Collapsible, injectNotificationManager } from '@modrinth/ui'
+import { Collapsible, injectNotificationManager } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { ChatIcon } from '@/assets/icons'
@@ -273,12 +274,8 @@ async function copyToClipboard(text) {
 				</template>
 			</div>
 			<div class="flex items-center gap-2">
-				<ButtonStyled>
-					<a :href="supportLink" @click="errorModal.hide()"><ChatIcon /> Get support</a>
-				</ButtonStyled>
-				<ButtonStyled v-if="closable">
-					<button @click="errorModal.hide()"><XIcon /> Close</button>
-				</ButtonStyled>
+				<ButtonLink :href="supportLink" @click="errorModal.hide()"><ChatIcon /> Get support</ButtonLink>
+				<Button v-if="closable" @click="errorModal.hide()"><XIcon /> Close</Button>
 			</div>
 			<template v-if="hasDebugInfo">
 				<div class="flex flex-col gap-2">
@@ -307,16 +304,14 @@ async function copyToClipboard(text) {
 								>
 									{{ debugInfo }}
 								</div>
-								<ButtonStyled circular>
-									<button
+								<IconButton :label="'Copy debug info'"
 										v-tooltip="'Copy debug info'"
 										:disabled="copied"
 										@click="copyToClipboard(debugInfo)"
 									>
-										<template v-if="copied"> <CheckIcon class="text-green" /> </template>
-										<template v-else> <CopyIcon /> </template>
-									</button>
-								</ButtonStyled>
+									<template v-if="copied"> <CheckIcon class="text-green" /> </template>
+									<template v-else> <CopyIcon /> </template>
+								</IconButton>
 							</div>
 						</Collapsible>
 					</div>

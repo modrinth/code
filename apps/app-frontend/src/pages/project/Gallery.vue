@@ -39,14 +39,11 @@
 				</div>
 				<div class="controls">
 					<div class="buttons">
-						<ButtonStyled circular>
-							<button class="close" @click="hideImage">
-								<XIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								class="open btn icon-only"
+						<IconButton label="Close" class="close" @click="hideImage">
+							<XIcon aria-hidden="true" />
+						</IconButton>
+						<ButtonLink
+								class="open btn icon-only !w-9 !px-0 !rounded-full"
 								target="_blank"
 								:href="
 									expandedGalleryItem.raw_url
@@ -54,25 +51,18 @@
 										: 'https://cdn.modrinth.com/placeholder-banner.svg'
 								"
 							>
-								<ExternalIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<button @click="zoomedIn = !zoomedIn">
-								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-								<ContractIcon v-else aria-hidden="true" />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="filteredGallery.length > 1" circular>
-							<button class="previous" @click="previousImage()">
-								<LeftArrowIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="filteredGallery.length > 1" circular>
-							<button class="next" @click="nextImage()">
-								<RightArrowIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
+							<ExternalIcon aria-hidden="true" />
+						</ButtonLink>
+						<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
+							<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+							<ContractIcon v-else aria-hidden="true" />
+						</IconButton>
+						<IconButton label="Previous image" v-if="filteredGallery.length > 1" class="previous" @click="previousImage()">
+							<LeftArrowIcon aria-hidden="true" />
+						</IconButton>
+						<IconButton label="Next image" v-if="filteredGallery.length > 1" class="next" @click="nextImage()">
+							<RightArrowIcon aria-hidden="true" />
+						</IconButton>
 					</div>
 				</div>
 			</div>
@@ -81,6 +71,7 @@
 </template>
 
 <script setup>
+import { ButtonLink, IconButton } from '@modrinth/ui'
 import {
 	CalendarIcon,
 	ContractIcon,
@@ -90,7 +81,7 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Card, useFormatDateTime } from '@modrinth/ui'
+import { Card, useFormatDateTime } from '@modrinth/ui'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'

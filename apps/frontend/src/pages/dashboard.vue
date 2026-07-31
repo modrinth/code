@@ -65,12 +65,10 @@
 					}}
 				</div>
 				<template #actions>
-					<ButtonStyled color="blue">
-						<NuxtLink to="/discord/link" class="w-fit !px-4">
-							<ExternalIcon />
-							{{ formatMessage(messages.discordRoleBannerCta) }}
-						</NuxtLink>
-					</ButtonStyled>
+					<ButtonLink type="colored" color="blue" to="/discord/link" class="w-fit !px-4">
+						<ExternalIcon />
+						{{ formatMessage(messages.discordRoleBannerCta) }}
+					</ButtonLink>
 				</template>
 			</Admonition>
 			<NuxtPage :route="route" />
@@ -78,6 +76,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	AffiliateIcon,
@@ -93,7 +92,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

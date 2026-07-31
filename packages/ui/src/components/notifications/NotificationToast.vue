@@ -49,31 +49,24 @@
 							</template>
 						</template>
 					</p>
-					<ButtonStyled v-if="dismissible" size="small" type="transparent" circular>
-						<button
-							type="button"
-							class="notification-toast-dismiss"
-							aria-label="Dismiss notification"
+					<IconButton type="quiet" size="xs" label="Dismiss notification" v-if="dismissible"
+							native-type="button"
+							class="notification-toast-dismiss !size-6"
 							@click="$emit('dismiss')"
 						>
-							<XIcon />
-						</button>
-					</ButtonStyled>
+						<XIcon />
+					</IconButton>
 				</div>
 				<div class="flex items-center gap-2">
-					<ButtonStyled color="brand">
-						<button :disabled="actionLoading != null" @click="$emit('accept')">
-							<SpinnerIcon v-if="actionLoading === 'accept'" class="animate-spin" />
-							<CheckIcon v-else />
-							Accept
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined">
-						<button :disabled="actionLoading != null" @click="$emit('decline')">
-							<XIcon />
-							Decline
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" :disabled="actionLoading != null" @click="$emit('accept')">
+						<SpinnerIcon v-if="actionLoading === 'accept'" class="animate-spin" />
+						<CheckIcon v-else />
+						Accept
+					</Button>
+					<Button type="outlined" :disabled="actionLoading != null" @click="$emit('decline')">
+						<XIcon />
+						Decline
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -96,16 +89,13 @@
 					{{ entityLabel }}
 				</p>
 				<div class="col-start-2 row-start-1 justify-self-end">
-					<ButtonStyled v-if="dismissible" size="small" type="transparent" circular>
-						<button
-							type="button"
-							class="notification-toast-dismiss"
-							aria-label="Dismiss notification"
+					<IconButton type="quiet" size="xs" label="Dismiss notification" v-if="dismissible"
+							native-type="button"
+							class="notification-toast-dismiss !size-6"
 							@click="$emit('dismiss')"
 						>
-							<XIcon />
-						</button>
-					</ButtonStyled>
+						<XIcon />
+					</IconButton>
 				</div>
 				<div
 					class="col-start-1 col-end-3 row-start-2 flex min-w-0 items-center justify-between gap-0.5"
@@ -130,12 +120,8 @@
 					class="col-start-1 col-end-3 row-start-3 mt-2 flex min-w-0 items-center justify-between gap-2"
 				>
 					<div class="flex min-w-0 items-center gap-2">
-						<ButtonStyled color="brand">
-							<button @click="$emit('launch')">Launch game</button>
-						</ButtonStyled>
-						<ButtonStyled type="outlined">
-							<button @click="$emit('open-instance')">Instance</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" @click="$emit('launch')">Launch game</Button>
+						<Button type="outlined" @click="$emit('open-instance')">Instance</Button>
 					</div>
 					<div v-if="progressLabel" class="notification-inline-progress-label flex-none">
 						{{ progressLabel }}
@@ -145,16 +131,11 @@
 					v-if="type === 'instance-download' && actions?.length"
 					class="col-start-1 col-end-3 row-start-3 mt-2 flex min-w-0 flex-wrap items-center gap-2"
 				>
-					<ButtonStyled
-						v-for="(action, index) in actions"
-						:key="index"
-						:color="action.color || (index === 0 ? 'brand' : undefined)"
-					>
-						<button class="!shadow-none" @click="$emit('action', index)">
-							<component :is="action.icon" v-if="action.icon" />
-							{{ action.label }}
-						</button>
-					</ButtonStyled>
+					<Button :type="(action.color || (index === 0 ? 'brand' : undefined)) && (action.color || (index === 0 ? 'brand' : undefined)) !== 'standard' ? 'colored' : 'base'" :color="(action.color || (index === 0 ? 'brand' : undefined)) && (action.color || (index === 0 ? 'brand' : undefined)) !== 'standard' ? ((action.color || (index === 0 ? 'brand' : undefined)) === 'medal-promo' ? 'medal_promotion' : (action.color || (index === 0 ? 'brand' : undefined))) : undefined" v-for="(action, index) in actions"
+						:key="index" class="!shadow-none" @click="$emit('action', index)">
+						<component :is="action.icon" v-if="action.icon" />
+						{{ action.label }}
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -179,6 +160,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { CheckIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
@@ -186,7 +168,6 @@ import { useFormatBytes, useFormatNumber } from '../../composables'
 import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'
 import { truncatedTooltip } from '../../utils/truncate'
 import Avatar from '../base/Avatar.vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
 
 type NotificationToastType =
 	| 'friend-request'

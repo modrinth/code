@@ -26,22 +26,18 @@
 				{{ formatMessage(messages.discoverHeading) }}
 			</h2>
 			<div class="button-group">
-				<ButtonStyled color="brand" size="large">
-					<nuxt-link to="/discover/mods">
-						<CompassIcon aria-hidden="true" />
-						{{ formatMessage(messages.discoverMods) }}
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled size="large" type="outlined">
-					<nuxt-link v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.signUpButton) }}
-					</nuxt-link>
-					<nuxt-link v-else to="/dashboard/projects">
-						<DashboardIcon aria-hidden="true" />
-						{{ formatMessage(messages.goToDashboard) }}
-					</nuxt-link>
-				</ButtonStyled>
+				<ButtonLink type="colored" color="brand" size="xl" to="/discover/mods">
+					<CompassIcon aria-hidden="true" />
+					{{ formatMessage(messages.discoverMods) }}
+				</ButtonLink>
+				<ButtonLink type="outlined" size="xl" v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
+					<LogInIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.signUpButton) }}
+				</ButtonLink>
+				<ButtonLink v-else type="outlined" size="xl" to="/dashboard/projects">
+					<DashboardIcon aria-hidden="true" />
+					{{ formatMessage(messages.goToDashboard) }}
+				</ButtonLink>
 			</div>
 		</div>
 		<div class="users-section-outer">
@@ -434,6 +430,7 @@
 	</div>
 </template>
 <script setup>
+import { ButtonLink } from '@modrinth/ui'
 import {
 	CalendarIcon,
 	CompassIcon,
@@ -444,7 +441,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,

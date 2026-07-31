@@ -375,15 +375,13 @@
 						/>
 					</div>
 				</div>
-				<ButtonStyled v-if="!isTimeframeAndGroupByDefault" type="transparent">
-					<button
-						type="button"
+				<Button type="quiet" v-if="!isTimeframeAndGroupByDefault"
+						native-type="button"
 						:disabled="isTimeframeAndGroupByDefault"
 						@click="resetTimeframeAndGroupBy"
 					>
-						{{ formatMessage(analyticsMessages.resetButton) }}
-					</button>
-				</ButtonStyled>
+					{{ formatMessage(analyticsMessages.resetButton) }}
+				</Button>
 			</div>
 
 			<div class="flex flex-wrap items-start gap-2">
@@ -441,6 +439,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BlocksIcon,
@@ -454,7 +453,6 @@ import {
 	UserIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	MultiSelect,

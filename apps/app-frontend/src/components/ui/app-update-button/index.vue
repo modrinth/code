@@ -1,9 +1,8 @@
 <template>
-	<ButtonStyled color="brand" type="outlined" hover-color-fill="background">
-		<button
+	<Button type="outlined"
 			v-if="showUpdatePill"
-			type="button"
-			class="!h-[34px] text-sm !transition-[opacity,transform,background-color,color,filter] !duration-200 ease-out"
+			native-type="button"
+			class="!h-[34px] text-sm !transition-[opacity,transform,background-color,color,filter] !duration-200 ease-out !text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)] hover:!bg-brand focus-visible:!bg-brand hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 			:class="{
 				'opacity-0 scale-[0.96]': finishedDownloading && !animateReadyPill,
 				'opacity-100 scale-100': finishedDownloading && animateReadyPill,
@@ -12,20 +11,20 @@
 			:aria-busy="isUpdateDownloading"
 			@click="handleUpdateClick"
 		>
-			<RefreshCwIcon v-if="finishedDownloading" :class="{ 'animate-spin': restarting }" />
-			<DownloadIcon v-else />
-			<span v-if="isUpdateDownloading">
-				{{ formatMessage(messages.downloadingUpdate) }}
-				<span class="inline-block w-[3ch] text-right tabular-nums">{{ downloadPercent }}%</span>
-			</span>
-			<span v-else>{{ updateLabel }}</span>
-		</button>
-	</ButtonStyled>
+		<RefreshCwIcon v-if="finishedDownloading" :class="{ 'animate-spin': restarting }" />
+		<DownloadIcon v-else />
+		<span v-if="isUpdateDownloading">
+			{{ formatMessage(messages.downloadingUpdate) }}
+			<span class="inline-block w-[3ch] text-right tabular-nums">{{ downloadPercent }}%</span>
+		</span>
+		<span v-else>{{ updateLabel }}</span>
+	</Button>
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { DownloadIcon, RefreshCwIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import {

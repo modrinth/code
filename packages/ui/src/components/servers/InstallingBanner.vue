@@ -27,23 +27,22 @@
 			</div>
 		</div>
 		<template v-if="contentError" #top-right-actions>
-			<ButtonStyled color="red" type="outlined">
-				<button
+			<Button type="outlined"
 					v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
-					class="!border"
-					type="button"
+					class="!border !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+					native-type="button"
 					:disabled="retryDisabled"
 					@click="emit('retry')"
 				>
-					<RotateCounterClockwiseIcon class="size-5" />
-					{{ formatMessage(commonMessages.retryButton) }}
-				</button>
-			</ButtonStyled>
+				<RotateCounterClockwiseIcon class="size-5" />
+				{{ formatMessage(commonMessages.retryButton) }}
+			</Button>
 		</template>
 	</Admonition>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
@@ -51,7 +50,6 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import Admonition from '../base/Admonition.vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
 
 export interface SyncProgress {
 	phase: 'Analyzing' | 'InstallingPack' | 'InstallingLoader' | 'Addons'

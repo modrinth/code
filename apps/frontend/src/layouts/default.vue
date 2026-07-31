@@ -91,398 +91,365 @@
 				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
-					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
-						:highlighted-style="
+					<ButtonLink type="quiet" to="/discover/mods" :class="(route.name === 'discover-mods' || route.path.startsWith('/mod/')) ? ((
 							route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/discover/mods">
-							<BoxIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<BoxIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
+					</ButtonLink>
+					<ButtonLink type="quiet" to="/discover/resourcepacks" :class="(
 							route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
-						"
-						:highlighted-style="
+						) ? ((
 							route.name === 'discover-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/discover/resourcepacks">
-							<PaintbrushIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<PaintbrushIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
+					</ButtonLink>
+					<ButtonLink type="quiet" to="/discover/datapacks" :class="(
 							route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
-						"
-						:highlighted-style="
+						) ? ((
 							route.name === 'discover-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/discover/datapacks">
-							<BracesIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
-						:highlighted-style="
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<BracesIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
+					</ButtonLink>
+					<ButtonLink type="quiet" to="/discover/modpacks" :class="(route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')) ? ((
 							route.name === 'discover-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/discover/modpacks">
-							<PackageOpenIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
-						:highlighted-style="
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<PackageOpenIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
+					</ButtonLink>
+					<ButtonLink type="quiet" to="/discover/shaders" :class="(route.name === 'discover-shaders' || route.path.startsWith('/shader/')) ? ((
 							route.name === 'discover-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/discover/shaders">
-							<GlassesIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
-						:highlighted-style="
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<GlassesIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
+					</ButtonLink>
+					<ButtonLink type="quiet" to="/discover/plugins" :class="(route.name === 'discover-plugins' || route.path.startsWith('/plugin/')) ? ((
 							route.name === 'discover-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/discover/plugins">
-							<PlugIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'discover-servers' || route.path.startsWith('/server/')"
-						:highlighted-style="
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<PlugIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
+					</ButtonLink>
+					<ButtonLink type="quiet" to="/discover/servers" :class="(route.name === 'discover-servers' || route.path.startsWith('/server/')) ? ((
 							route.name === 'discover-servers' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/discover/servers">
-							<ServerIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
-						</nuxt-link>
-					</ButtonStyled>
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<ServerIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+					</ButtonLink>
 				</template>
 				<template v-else>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="isDiscovering || isDiscoveringSubpage"
-						:highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"
-					>
-						<TeleportOverflowMenu
+					<TeleportOverflowMenu type="quiet" :label="formatMessage(commonMessages.moreOptionsButton)"
 							:options="[
 								{
 									id: 'mods',
-									action: '/discover/mods',
+									label: formatMessage(commonProjectTypeCategoryMessages.mod),
+									type: 'link',
+									to: '/discover/mods',
 								},
 								{
 									id: 'resourcepacks',
-									action: '/discover/resourcepacks',
+									label: formatMessage(commonProjectTypeCategoryMessages.resourcepack),
+									type: 'link',
+									to: '/discover/resourcepacks',
 								},
 								{
 									id: 'datapacks',
-									action: '/discover/datapacks',
+									label: formatMessage(commonProjectTypeCategoryMessages.datapack),
+									type: 'link',
+									to: '/discover/datapacks',
 								},
 								{
 									id: 'shaders',
-									action: '/discover/shaders',
+									label: formatMessage(commonProjectTypeCategoryMessages.shader),
+									type: 'link',
+									to: '/discover/shaders',
 								},
 								{
 									id: 'modpacks',
-									action: '/discover/modpacks',
+									label: formatMessage(commonProjectTypeCategoryMessages.modpack),
+									type: 'link',
+									to: '/discover/modpacks',
 								},
 								{
 									id: 'plugins',
-									action: '/discover/plugins',
+									label: formatMessage(commonProjectTypeCategoryMessages.plugin),
+									type: 'link',
+									to: '/discover/plugins',
 								},
 								{
 									id: 'servers',
-									action: '/discover/servers',
+									label: formatMessage(commonProjectTypeCategoryMessages.server),
+									type: 'link',
+									to: '/discover/servers',
 								},
 							]"
-							hoverable
-						>
-							<BoxIcon
-								v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
-								aria-hidden="true"
-							/>
-							<PaintbrushIcon
-								v-else-if="
-									route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
-								"
-								aria-hidden="true"
-							/>
-							<BracesIcon
-								v-else-if="
-									route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
-								"
-								aria-hidden="true"
-							/>
-							<PackageOpenIcon
-								v-else-if="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
-								aria-hidden="true"
-							/>
-							<GlassesIcon
-								v-else-if="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
-								aria-hidden="true"
-							/>
-							<PlugIcon
-								v-else-if="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
-								aria-hidden="true"
-							/>
-							<ServerIcon
-								v-else-if="route.name === 'discover-servers' || route.path.startsWith('/server/')"
-								aria-hidden="true"
-							/>
-							<CompassIcon v-else aria-hidden="true" />
-							<span class="hidden md:contents">{{
-								formatMessage(commonMessages.discoverContentLabel)
-							}}</span>
-							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
-							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
+							:class="[
+								'!w-auto !rounded-xl !px-2.5',
+								isDiscovering
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: isDiscoveringSubpage
+										? '!bg-[var(--color-button-bg)] !text-contrast'
+										: '',
+							]"
+					>
+						<BoxIcon
+							v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
+							aria-hidden="true"
+						/>
+						<PaintbrushIcon
+							v-else-if="
+								route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
+							"
+							aria-hidden="true"
+						/>
+						<BracesIcon
+							v-else-if="
+								route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
+							"
+							aria-hidden="true"
+						/>
+						<PackageOpenIcon
+							v-else-if="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
+							aria-hidden="true"
+						/>
+						<GlassesIcon
+							v-else-if="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
+							aria-hidden="true"
+						/>
+						<PlugIcon
+							v-else-if="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
+							aria-hidden="true"
+						/>
+						<ServerIcon
+							v-else-if="route.name === 'discover-servers' || route.path.startsWith('/server/')"
+							aria-hidden="true"
+						/>
+						<CompassIcon v-else aria-hidden="true" />
+						<span class="hidden md:contents">{{
+							formatMessage(commonMessages.discoverContentLabel)
+						}}</span>
+						<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
+						<DropdownIcon aria-hidden="true" class="h-5 w-5" />
 
-							<template #mods>
-								<BoxIcon aria-hidden="true" />
-								{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
-							</template>
-							<template #resourcepacks>
-								<PaintbrushIcon aria-hidden="true" />
-								{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
-							</template>
-							<template #datapacks>
-								<BracesIcon aria-hidden="true" />
-								{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
-							</template>
-							<template #plugins>
-								<PlugIcon aria-hidden="true" />
-								{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
-							</template>
-							<template #shaders>
-								<GlassesIcon aria-hidden="true" />
-								{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
-							</template>
-							<template #modpacks>
-								<PackageOpenIcon aria-hidden="true" />
-								{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
-							</template>
-							<template #servers>
-								<ServerIcon aria-hidden="true" />
-								{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
-							</template>
-						</TeleportOverflowMenu>
-					</ButtonStyled>
-					<ButtonStyled
-						type="transparent"
-						:highlighted="
+						<template #mods>
+							<BoxIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
+						</template>
+						<template #resourcepacks>
+							<PaintbrushIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
+						</template>
+						<template #datapacks>
+							<BracesIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
+						</template>
+						<template #plugins>
+							<PlugIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
+						</template>
+						<template #shaders>
+							<GlassesIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
+						</template>
+						<template #modpacks>
+							<PackageOpenIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
+						</template>
+						<template #servers>
+							<ServerIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+						</template>
+					</TeleportOverflowMenu>
+					<ButtonLink type="quiet" to="/hosting" :class="(
 							route.name?.startsWith('hosting') ||
 							(route.name?.startsWith('discover-') && !!route.query.sid)
-						"
-						:highlighted-style="
+						) ? ((
 							route.name === 'hosting' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
-						<nuxt-link to="/hosting">
-							<ServerStackIcon aria-hidden="true" />
-							{{ formatMessage(navMenuMessages.hostAServer) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled type="transparent" :highlighted="route.name === 'app'">
-						<nuxt-link to="/app">
-							<DownloadIcon aria-hidden="true" />
-							<span class="hidden md:contents">{{
-								formatMessage(navMenuMessages.getModrinthApp)
-							}}</span>
-							<span class="contents md:hidden">{{
-								formatMessage(navMenuMessages.modrinthApp)
-							}}</span>
-						</nuxt-link>
-					</ButtonStyled>
+						) === 'main-nav-primary' ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<ServerStackIcon aria-hidden="true" />
+						{{ formatMessage(navMenuMessages.hostAServer) }}
+					</ButtonLink>
+					<ButtonLink type="quiet" to="/app" :class="(route.name === 'app') ? (true ? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]' : '!bg-[var(--color-button-bg)] !text-contrast') : ''">
+						<DownloadIcon aria-hidden="true" />
+						<span class="hidden md:contents">{{
+							formatMessage(navMenuMessages.getModrinthApp)
+						}}</span>
+						<span class="contents md:hidden">{{
+							formatMessage(navMenuMessages.modrinthApp)
+						}}</span>
+					</ButtonLink>
 				</template>
 			</div>
 			<div class="flex items-center gap-1">
-				<ButtonStyled type="transparent">
-					<OverflowMenu
+				<TeleportOverflowMenu type="quiet" :label="formatMessage(messages.createNew)"
 						v-if="auth.user && isStaff(auth.user)"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-						position="bottom"
-						direction="left"
-						:dropdown-id="`${basePopoutId}-staff`"
-						:aria-label="formatMessage(messages.createNew)"
+						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 !w-auto !px-2.5 !rounded-xl"
 						:options="[
 							{
 								id: 'review-projects',
-								color: 'orange',
-								link: '/moderation',
+								label: formatMessage(messages.reviewProjects),
+								type: 'link',
+								to: '/moderation',
 							},
 							{
 								id: 'tech-review',
-								color: 'orange',
-								link: '/moderation/technical-review',
+								label: formatMessage(messages.techReview),
+								type: 'link',
+								to: '/moderation/technical-review',
 							},
 							{
 								id: 'review-reports',
-								color: 'orange',
-								link: '/moderation/reports',
+								label: formatMessage(messages.reports),
+								type: 'link',
+								to: '/moderation/reports',
 							},
 							{
 								id: 'external-projects',
-								color: 'orange',
-								link: '/moderation/external-projects',
+								label: formatMessage(messages.externalProjects),
+								type: 'link',
+								to: '/moderation/external-projects',
 							},
 							{
-								divider: true,
+								type: 'divider',
 							},
 							{
 								id: 'file-lookup',
-								link: '/admin/file_lookup',
+								label: formatMessage(messages.fileLookup),
+								type: 'link',
+								to: '/admin/file_lookup',
 							},
 							{
-								divider: true,
+								type: 'divider',
 								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'user-lookup',
-								color: 'primary',
-								link: '/admin/user_email',
+								label: formatMessage(messages.lookupByEmail),
+								type: 'link',
+								to: '/admin/user_email',
 								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'affiliates',
-								color: 'primary',
-								link: '/admin/affiliates',
+								label: formatMessage(messages.manageAffiliates),
+								type: 'link',
+								to: '/admin/affiliates',
 								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'servers-notices',
-								color: 'primary',
-								link: '/admin/servers/notices',
+								label: formatMessage(messages.manageServerNotices),
+								type: 'link',
+								to: '/admin/servers/notices',
 								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'servers-transfers',
-								color: 'primary',
-								link: '/admin/servers/transfers',
+								label: 'Server transfers',
+								type: 'link',
+								to: '/admin/servers/transfers',
 								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'servers-nodes',
-								color: 'primary',
+								label: 'Credit server nodes',
 								action: (event) => $refs.modal_batch_credit.show(event),
 								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'analytics-events',
-								color: 'primary',
-								link: '/admin/analytics/events',
+								label: formatMessage(messages.analyticsEvents),
+								type: 'link',
+								to: '/admin/analytics/events',
 								shown: isAdmin(auth.user),
 							},
 						]"
 					>
-						<ModrinthIcon aria-hidden="true" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-						<template #review-projects>
-							<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
-						</template>
-						<template #tech-review>
-							<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.techReview) }}
-						</template>
-						<template #review-reports>
-							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
-						</template>
-						<template #external-projects>
-							<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
-						</template>
-						<template #user-lookup>
-							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
-						</template>
-						<template #file-lookup>
-							<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
-						</template>
-						<template #servers-notices>
-							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
-						</template>
-						<template #servers-transfers>
-							<TransferIcon aria-hidden="true" /> Server transfers
-						</template>
-						<template #affiliates>
-							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
-						</template>
-						<template #servers-nodes>
-							<ServerIcon aria-hidden="true" /> Credit server nodes
-						</template>
-						<template #analytics-events>
-							<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
-				<ButtonStyled type="transparent">
-					<OverflowMenu
+					<ModrinthIcon aria-hidden="true" />
+					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+					<template #review-projects>
+						<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
+					</template>
+					<template #tech-review>
+						<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.techReview) }}
+					</template>
+					<template #review-reports>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
+					</template>
+					<template #external-projects>
+						<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
+					</template>
+					<template #user-lookup>
+						<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
+					</template>
+					<template #file-lookup>
+						<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
+					</template>
+					<template #servers-notices>
+						<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+					</template>
+					<template #servers-transfers>
+						<TransferIcon aria-hidden="true" /> Server transfers
+					</template>
+					<template #affiliates>
+						<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
+					</template>
+					<template #servers-nodes>
+						<ServerIcon aria-hidden="true" /> Credit server nodes
+					</template>
+					<template #analytics-events>
+						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
+					</template>
+				</TeleportOverflowMenu>
+				<TeleportOverflowMenu type="quiet" :label="formatMessage(messages.createNew)"
 						v-if="auth.user"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-						position="bottom"
-						direction="left"
-						:dropdown-id="`${basePopoutId}-create`"
-						:aria-label="formatMessage(messages.createNew)"
+						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 !w-auto !px-2.5 !rounded-xl"
 						:options="[
 							{
 								id: 'new-project',
+								label: formatMessage(messages.newProject),
 								action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
 							},
 							{
 								id: 'new-server-project',
+								label: formatMessage(messages.newServerProject),
 								action: (event) =>
 									requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
 							},
 							{
 								id: 'new-collection',
+								label: formatMessage(messages.newCollection),
 								action: (event) =>
 									requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
 							},
-							{ divider: true },
+							{ type: 'divider' },
 							{
 								id: 'new-organization',
+								label: formatMessage(messages.newOrganization),
 								action: (event) =>
 									requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 							},
 						]"
 					>
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.publish) }}
-						<template #new-project>
-							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
-						</template>
-						<template #new-server-project>
-							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
-						</template>
-						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
-						<template #new-collection>
-							<CollectionIcon aria-hidden="true" /> {{ formatMessage(messages.newCollection) }}
-						</template>
-						<template #new-organization>
-							<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
-				<OverflowMenu
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.publish) }}
+					<template #new-project>
+						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
+					</template>
+					<template #new-server-project>
+						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
+					</template>
+					<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
+					<template #new-collection>
+						<CollectionIcon aria-hidden="true" /> {{ formatMessage(messages.newCollection) }}
+					</template>
+					<template #new-organization>
+						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
+					</template>
+				</TeleportOverflowMenu>
+				<TeleportOverflowMenu :label="formatMessage(commonMessages.moreOptionsButton)"
 					v-if="auth.user"
-					:dropdown-id="`${basePopoutId}-user`"
 					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 pr-1"
 					:options="userMenuOptions"
 				>
@@ -536,19 +503,15 @@
 					<template #sign-out>
 						<LogOutIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signOutButton) }}
 					</template>
-				</OverflowMenu>
+				</TeleportOverflowMenu>
 				<template v-else>
-					<ButtonStyled color="brand">
-						<nuxt-link :to="signInRouteObj">
-							<LogInIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.signInButton) }}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled circular>
-						<nuxt-link :v-tooltip="formatMessage(commonMessages.settingsLabel)" to="/settings">
-							<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
-						</nuxt-link>
-					</ButtonStyled>
+					<ButtonLink type="colored" color="brand" :to="signInRouteObj">
+						<LogInIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.signInButton) }}
+					</ButtonLink>
+					<ButtonLink v-tooltip="formatMessage(commonMessages.settingsLabel)" to="/settings" class="!w-9 !px-0 !rounded-full">
+						<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
+					</ButtonLink>
 				</template>
 			</div>
 		</header>
@@ -729,6 +692,7 @@
 	</div>
 </template>
 <script setup>
+import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
@@ -771,23 +735,7 @@ import {
 	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	commonMessages,
-	commonProjectTypeCategoryMessages,
-	commonSettingsMessages,
-	createHostingIntercomIdentityKey,
-	defineMessages,
-	injectModrinthClient,
-	injectNotificationManager,
-	injectPageContext,
-	OverflowMenu,
-	providePageContext,
-	useHostingIntercom,
-	useVIntl,
-} from '@modrinth/ui'
-import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
+import { Avatar, commonMessages, commonProjectTypeCategoryMessages, commonSettingsMessages, createHostingIntercomIdentityKey, defineMessages, injectModrinthClient, injectNotificationManager, injectPageContext, providePageContext, useHostingIntercom, useVIntl } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
@@ -1157,26 +1105,35 @@ const userMenuOptions = computed(() => {
 	let options = [
 		{
 			id: 'profile',
-			link: `/user/${user.username}`,
+			label: formatMessage(messages.profile),
+			type: 'link',
+			to: `/user/${user.username}`,
 		},
 		{
 			id: 'plus',
-			link: '/plus',
-			color: 'purple',
+			label: formatMessage(messages.upgradeToModrinthPlus),
+			type: 'link',
+			to: '/plus',
 			shown: !flags.value.hidePlusPromoInUserMenu && !hasActiveMidas(user),
 		},
 		{
 			id: 'servers',
-			link: '/hosting/manage',
+			label: formatMessage(messages.myServers),
+			type: 'link',
+			to: '/hosting/manage',
 		},
 		{
 			id: 'flags',
-			link: '/settings/flags',
+			label: formatMessage(commonSettingsMessages.featureFlags),
+			type: 'link',
+			to: '/settings/flags',
 			shown: flags.value.developerMode,
 		},
 		{
 			id: 'settings',
-			link: '/settings',
+			label: formatMessage(commonMessages.settingsLabel),
+			type: 'link',
+			to: '/settings',
 		},
 	]
 
@@ -1184,56 +1141,72 @@ const userMenuOptions = computed(() => {
 	options = [
 		...options,
 		{
-			divider: true,
+			type: 'divider',
 		},
 		{
 			id: 'notifications',
-			link: '/dashboard/notifications',
+			label: formatMessage(commonMessages.notificationsLabel),
+			type: 'link',
+			to: '/dashboard/notifications',
 		},
 		{
 			id: 'reports',
-			link: '/dashboard/reports',
+			label: formatMessage(messages.activeReports),
+			type: 'link',
+			to: '/dashboard/reports',
 		},
 		{
 			id: 'saved',
-			link: '/dashboard/collections',
+			label: formatMessage(commonMessages.collectionsLabel),
+			type: 'link',
+			to: '/dashboard/collections',
 		},
 		{
-			divider: true,
+			type: 'divider',
 		},
 		{
 			id: 'projects',
-			link: '/dashboard/projects',
+			label: formatMessage(messages.projects),
+			type: 'link',
+			to: '/dashboard/projects',
 		},
 		{
 			id: 'organizations',
-			link: '/dashboard/organizations',
+			label: formatMessage(messages.organizations),
+			type: 'link',
+			to: '/dashboard/organizations',
 		},
 		{
 			id: 'analytics',
-			link: '/dashboard/analytics',
+			label: formatMessage(commonMessages.analyticsButton),
+			type: 'link',
+			to: '/dashboard/analytics',
 		},
 		{
 			id: 'affiliate-links',
-			link: '/dashboard/affiliate-links',
+			label: formatMessage(commonMessages.affiliateLinksButton),
+			type: 'link',
+			to: '/dashboard/affiliate-links',
 			shown: user.badges & UserBadge.AFFILIATE,
 		},
 		{
 			id: 'revenue',
-			link: '/dashboard/revenue',
+			label: formatMessage(messages.revenue),
+			type: 'link',
+			to: '/dashboard/revenue',
 		},
 	]
 
 	options = [
 		...options,
 		{
-			divider: true,
+			type: 'divider',
 		},
 		{
 			id: 'sign-out',
-			color: 'danger',
+			label: formatMessage(commonMessages.signOutButton),
+			tone: 'red',
 			action: () => logoutUser(),
-			hoverFilled: true,
 		},
 	]
 	return options

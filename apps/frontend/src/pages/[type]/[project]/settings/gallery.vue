@@ -10,13 +10,11 @@
 					<div class="file-header">
 						<ImageIcon aria-hidden="true" />
 						<strong>{{ editFile ? editFile.name : 'Current image' }}</strong>
-						<ButtonStyled v-if="editIndex === -1" type="outlined">
-							<FileInput
+						<FileButton type="outlined" v-if="editIndex === -1"
 								class="button-like"
 								prompt="Replace"
 								:accept="acceptFileTypes"
 								:max-size="5242880"
-								should-always-reset
 								aria-label="Replace image"
 								@change="
 									(x) => {
@@ -25,9 +23,8 @@
 									}
 								"
 							>
-								<TransferIcon aria-hidden="true" />
-							</FileInput>
-						</ButtonStyled>
+							<TransferIcon aria-hidden="true" />
+						</FileButton>
 					</div>
 					<img
 						:src="
@@ -74,37 +71,27 @@
 						You can feature one image on your project to be used as a banner image.
 					</span>
 				</label>
-				<ButtonStyled v-if="!editFeatured">
-					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = true">
-						<StarIcon aria-hidden="true" />
-						Set as banner
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else>
-					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = false">
-						<StarIcon fill="currentColor" aria-hidden="true" />
-						Unset as banner
-					</button>
-				</ButtonStyled>
+				<Button v-if="!editFeatured" id="gallery-image-featured" class="w-fit" @click="editFeatured = true">
+					<StarIcon aria-hidden="true" />
+					Set as banner
+				</Button>
+				<Button v-else id="gallery-image-featured" class="w-fit" @click="editFeatured = false">
+					<StarIcon fill="currentColor" aria-hidden="true" />
+					Unset as banner
+				</Button>
 				<div class="button-group">
-					<ButtonStyled type="outlined">
-						<button @click="modal_edit_item.hide()">
-							<XIcon aria-hidden="true" />
-							Cancel
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="editIndex === -1" color="brand">
-						<button :disabled="shouldPreventActions" @click="createGalleryItem">
-							<PlusIcon aria-hidden="true" />
-							Add gallery image
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button :disabled="shouldPreventActions" @click="editGalleryItem">
-							<SaveIcon aria-hidden="true" />
-							Save changes
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" @click="modal_edit_item.hide()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</Button>
+					<Button type="colored" color="brand" v-if="editIndex === -1" :disabled="shouldPreventActions" @click="createGalleryItem">
+						<PlusIcon aria-hidden="true" />
+						Add gallery image
+					</Button>
+					<Button type="colored" color="brand" v-else :disabled="shouldPreventActions" @click="editGalleryItem">
+						<SaveIcon aria-hidden="true" />
+						Save changes
+					</Button>
 				</div>
 			</div>
 		</Modal>
@@ -146,14 +133,11 @@
 					</div>
 					<div class="controls">
 						<div class="flex gap-2">
-							<ButtonStyled circular>
-								<button class="close" @click="expandedGalleryItem = null">
-									<XIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular>
-								<a
-									class="open"
+							<IconButton label="Close" class="close" @click="expandedGalleryItem = null">
+								<XIcon aria-hidden="true" />
+							</IconButton>
+							<ButtonLink
+									class="open !w-9 !px-0 !rounded-full"
 									target="_blank"
 									:href="
 										expandedGalleryItem.raw_url
@@ -161,33 +145,25 @@
 											: 'https://cdn.modrinth.com/placeholder-banner.svg'
 									"
 								>
-									<ExternalIcon aria-hidden="true" />
-								</a>
-							</ButtonStyled>
-							<ButtonStyled circular>
-								<button @click="zoomedIn = !zoomedIn">
-									<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-									<ContractIcon v-else aria-hidden="true" />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="filteredGallery.length > 1" circular>
-								<button class="previous" @click="previousImage()">
-									<LeftArrowIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="filteredGallery.length > 1" circular>
-								<button class="next" @click="nextImage()">
-									<RightArrowIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
+								<ExternalIcon aria-hidden="true" />
+							</ButtonLink>
+							<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
+								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+								<ContractIcon v-else aria-hidden="true" />
+							</IconButton>
+							<IconButton label="Previous image" v-if="filteredGallery.length > 1" class="previous" @click="previousImage()">
+								<LeftArrowIcon aria-hidden="true" />
+							</IconButton>
+							<IconButton label="Next image" v-if="filteredGallery.length > 1" class="next" @click="nextImage()">
+								<RightArrowIcon aria-hidden="true" />
+							</IconButton>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div v-if="currentMember" class="card header-buttons">
-			<ButtonStyled color="brand">
-				<FileInput
+			<FileButton type="colored" color="brand"
 					:max-size="5242880"
 					:accept="acceptFileTypes"
 					prompt="Upload an image"
@@ -196,9 +172,8 @@
 					:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
 					@change="handleFiles"
 				>
-					<UploadIcon aria-hidden="true" />
-				</FileInput>
-			</ButtonStyled>
+				<UploadIcon aria-hidden="true" />
+			</FileButton>
 			<span class="indicator">
 				<InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
 			</span>
@@ -232,8 +207,7 @@
 						{{ formatDate(item.created) }}
 					</div>
 					<div v-if="currentMember" class="gallery-buttons input-group">
-						<ButtonStyled>
-							<button
+						<Button
 								@click="
 									() => {
 										resetEdit()
@@ -246,12 +220,10 @@
 									}
 								"
 							>
-								<EditIcon aria-hidden="true" />
-								Edit
-							</button>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button
+							<EditIcon aria-hidden="true" />
+							Edit
+						</Button>
+						<Button
 								@click="
 									() => {
 										deleteIndex = index
@@ -259,10 +231,9 @@
 									}
 								"
 							>
-								<TrashIcon aria-hidden="true" />
-								Remove
-							</button>
-						</ButtonStyled>
+							<TrashIcon aria-hidden="true" />
+							Remove
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -271,6 +242,7 @@
 </template>
 
 <script setup>
+import { Button, ButtonLink, IconButton, FileButton } from '@modrinth/ui'
 import {
 	CalendarIcon,
 	ContractIcon,
@@ -290,7 +262,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	ConfirmModal,
 	DropArea,
 	FileInput,

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
@@ -18,8 +20,6 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages, truncatedTooltip } from '../../../utils'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
-import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 
 const { formatMessage } = useVIntl()
 const formatDateTime = useFormatDateTime({
@@ -93,38 +93,41 @@ const itemBorderClass = computed(() => {
 	return 'border-transparent'
 })
 
-const overflowMenuOptions = computed<OverflowOption[]>(() => {
-	const options: OverflowOption[] = []
+const overflowMenuOptions = computed<OverflowMenuOption[]>(() => {
+	const options: OverflowMenuOption[] = []
 
 	if (props.showCopyIdAction) {
 		options.push({
 			id: 'copy-id',
+			label: formatMessage(commonMessages.copyIdButton),
 			action: () => copyId(),
 		})
 	}
 
 	if (options.length > 0) {
-		options.push({ divider: true })
+		options.push({ type: 'divider' })
 	}
 
 	options.push({
 		id: 'download',
+		label: formatMessage(commonMessages.downloadButton),
 		action: () => emit('download'),
-		link: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
 		disabled: !props.kyrosUrl || !props.jwt,
 	})
 
 	options.push({
 		id: 'rename',
+		label: formatMessage(messages.rename),
 		action: () => emit('rename'),
 		disabled: props.writeDisabled,
 		tooltip: props.writeDisabled ? props.writeDisabledTooltip : undefined,
 	})
 
-	options.push({ divider: true })
+	options.push({ type: 'divider' })
 	options.push({
 		id: 'delete',
-		color: 'red',
+		label: formatMessage(commonMessages.deleteLabel),
+		tone: 'red',
 		action: () => emit('delete'),
 		disabled: props.writeDisabled,
 		tooltip: props.writeDisabled ? props.writeDisabledTooltip : undefined,
@@ -265,35 +268,31 @@ const creatorAvatarSrc = computed(() =>
 
 		<!-- Right side actions -->
 		<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
-			<ButtonStyled color="brand" type="outlined">
-				<button
+			<Button type="outlined"
 					v-tooltip="props.restoreDisabled"
-					class="!border"
+					class="!border !text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
 					:disabled="!!props.restoreDisabled"
 					@click="() => emit('restore')"
 				>
-					<RotateCounterClockwiseIcon class="size-5" />
-					{{ formatMessage(messages.restore) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled circular type="transparent">
-				<OverflowMenu :options="overflowMenuOptions">
-					<MoreVerticalIcon class="size-5" />
-					<template #copy-id>
-						<ClipboardCopyIcon class="size-5" />
-						{{ formatMessage(commonMessages.copyIdButton) }}
-					</template>
-					<template #download>
-						<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
-					</template>
-					<template #rename>
-						<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
-					</template>
-					<template #delete>
-						<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
-					</template>
-				</OverflowMenu>
-			</ButtonStyled>
+				<RotateCounterClockwiseIcon class="size-5" />
+				{{ formatMessage(messages.restore) }}
+			</Button>
+			<TeleportOverflowMenu type="quiet" label="More options" :options="overflowMenuOptions">
+				<MoreVerticalIcon class="size-5" />
+				<template #copy-id>
+					<ClipboardCopyIcon class="size-5" />
+					{{ formatMessage(commonMessages.copyIdButton) }}
+				</template>
+				<template #download>
+					<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
+				</template>
+				<template #rename>
+					<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+				</template>
+				<template #delete>
+					<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
+				</template>
+			</TeleportOverflowMenu>
 		</div>
 
 		<pre v-if="!preview && showDebugInfo" class="w-full rounded-xl bg-surface-4 p-2 text-xs">{{

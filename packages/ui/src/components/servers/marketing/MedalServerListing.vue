@@ -120,11 +120,9 @@
 			</div>
 
 			<div class="z-10 ml-auto">
-				<ButtonStyled color="medal-promo" type="outlined" size="large">
-					<button class="my-auto" data-server-listing-button @click="handleUpgrade">
-						<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" size="xl" class="my-auto !text-[var(--medal-promotion-text-orange)] [&>svg]:!text-[var(--medal-promotion-text-orange)] !shadow-[inset_0_0_0_1px_var(--color-orange)]" data-server-listing-button @click="handleUpgrade">
+					<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
+				</Button>
 			</div>
 		</div>
 
@@ -160,6 +158,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { LockIcon, RocketIcon, SparklesIcon, SpinnerIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
@@ -171,7 +170,6 @@ import { useRouter } from 'vue-router'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectModrinthClient } from '../../../providers/api-client'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import CopyCode from '../../base/CopyCode.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
 import type { ServerListingOwner } from '../access/types'

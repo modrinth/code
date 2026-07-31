@@ -48,13 +48,10 @@
 				</span>
 			</div>
 		</div>
-		<ButtonStyled
+		<ButtonLink
 			v-if="primaryFile && showDownload"
-			:color="color"
-			:type="type"
-			:circular="circular"
-		>
-			<a
+			:type="downloadButtonType"
+			:color="downloadButtonColor"
 				v-tooltip="circular ? formatMessage(messages.download) : null"
 				:href="primaryFileDownloadUrl"
 				:download="primaryFile.filename"
@@ -64,21 +61,21 @@
 					})
 				"
 				@click="emit('download')"
-			>
-				<DownloadIcon aria-hidden="true" />
-				<template v-if="!circular">
-					{{ formatMessage(messages.download) }}
-				</template>
-			</a>
-		</ButtonStyled>
+			:class="circular ? '!w-9 !px-0 !rounded-full' : undefined"
+		>
+			<DownloadIcon aria-hidden="true" />
+			<template v-if="!circular">
+				{{ formatMessage(messages.download) }}
+			</template>
+		</ButtonLink>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { ButtonLink } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
 	truncatedTooltip,
@@ -161,6 +158,17 @@ const publishedLabel = computed(() =>
 	capitalizeString(formatRelativeTime(props.version.date_published)),
 )
 const publishedTooltip = computed(() => formatDateTime(props.version.date_published))
+const downloadButtonType = computed(() => {
+	if (props.type === 'transparent') return 'quiet'
+	return props.color === 'brand' ? 'colored' : 'base'
+})
+const downloadButtonColor = computed(() =>
+	downloadButtonType.value === 'colored' || downloadButtonType.value === 'quiet'
+		? props.color === 'brand'
+			? 'brand'
+			: undefined
+		: undefined,
+)
 const primaryFileSizeLabel = computed(() => {
 	if (!primaryFile.value) return ''
 	return formatBytes(primaryFile.value.size)

@@ -22,34 +22,31 @@
 		</div>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hide">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
+				<Button type="outlined" @click="hide">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button type="colored" color="brand"
 						v-tooltip="renameDisabledTooltip"
 						:disabled="renameDisabled"
 						@click="renameBackup"
 					>
-						<template v-if="renameMutation.isPending.value">
-							<SpinnerIcon class="animate-spin" />
-							Renaming...
-						</template>
-						<template v-else>
-							<SaveIcon />
-							Save changes
-						</template>
-					</button>
-				</ButtonStyled>
+					<template v-if="renameMutation.isPending.value">
+						<SpinnerIcon class="animate-spin" />
+						Renaming...
+					</template>
+					<template v-else>
+						<SaveIcon />
+						Save changes
+					</template>
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -62,7 +59,6 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 

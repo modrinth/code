@@ -27,23 +27,21 @@
 					</span>
 				</div>
 
-				<ButtonStyled size="standard" :circular="true">
-					<button
+				<Button
 						v-tooltip="'Replace file'"
 						aria-label="Replace file"
 						class="!shadow-none"
 						@click="fileInput?.click()"
 					>
-						<ArrowLeftRightIcon aria-hidden="true" />
-						<input
-							ref="fileInput"
-							class="hidden"
-							type="file"
-							accept=".mrpack"
-							@change="handleFileInputChange"
-						/>
-					</button>
-				</ButtonStyled>
+					<ArrowLeftRightIcon aria-hidden="true" />
+					<input
+						ref="fileInput"
+						class="hidden"
+						type="file"
+						accept=".mrpack"
+						@change="handleFileInputChange"
+					/>
+				</Button>
 			</div>
 
 			<Checkbox v-model="ctx.hasLicensePermission.value">
@@ -64,8 +62,9 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { ArrowLeftRightIcon, FileIcon } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, DropzoneFileInput } from '@modrinth/ui'
+import { Checkbox, DropzoneFileInput } from '@modrinth/ui'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 

@@ -168,33 +168,29 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button class="!border !border-surface-5" @click="hide">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button
+				<Button type="outlined" class="!border !border-surface-5" @click="hide">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red"
 						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
 						:disabled="buttonsDisabled || props.actionDisabled"
 						@click="confirm"
 					>
-						<TrashIcon aria-hidden="true" />
-						{{ deleteButtonLabel }}
-					</button>
-				</ButtonStyled>
+					<TrashIcon aria-hidden="true" />
+					{{ deleteButtonLabel }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

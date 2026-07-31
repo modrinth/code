@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import {
+	Button,
+	IconButton,
+	TeleportOverflowMenu,
+	type OverflowMenuOption,
+} from '#ui/components/base/buttons'
+import {
 	BoxesIcon,
 	ClockIcon,
 	DownloadIcon,
@@ -14,12 +20,7 @@ import type { RouteLocationRaw } from 'vue-router'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import OverflowMenu, {
-	type Option as OverflowMenuOption,
-} from '#ui/components/base/OverflowMenu.vue'
 import TagTagItem from '#ui/components/base/TagTagItem.vue'
-import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -83,21 +84,19 @@ const formatCompact = (n: number | undefined) => {
 	return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 }).format(n)
 }
 
-const collapsedOptions = computed(() => {
-	const options: {
-		id: string
-		action: () => void
-		color?: 'standard' | 'red' | 'brand' | 'orange' | 'green' | 'blue' | 'purple'
-	}[] = []
+const collapsedOptions = computed<OverflowMenuOption[]>(() => {
+	const options: OverflowMenuOption[] = []
 	if (hasContentListener.value) {
 		options.push({
 			id: 'content',
+			label: formatMessage(commonMessages.contentLabel),
 			action: () => emit('content'),
 		})
 	}
 	if (hasSettingsListener.value) {
 		options.push({
 			id: 'settings',
+			label: formatMessage(messages.installationSettingsTooltip),
 			action: () => emit('settings'),
 		})
 	}
@@ -205,70 +204,49 @@ onUnmounted(() => {
 				<template v-else>
 					<!-- Expanded actions visible at >= 700px -->
 					<div class="hidden @[700px]:flex items-center gap-2">
-						<ButtonStyled
-							v-if="hasUpdateListener && hasUpdate"
-							type="transparent"
-							color="green"
-							color-fill="text"
-						>
-							<button class="flex items-center gap-2" @click="emit('update')">
-								<DownloadIcon class="!text-green" />
-								<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
-							</button>
-						</ButtonStyled>
+						<Button type="quiet" color="green" v-if="hasUpdateListener && hasUpdate" class="flex items-center gap-2" @click="emit('update')">
+							<DownloadIcon class="!text-green" />
+							<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
+						</Button>
 
-						<ButtonStyled v-if="hasContentListener">
-							<button class="!shadow-none" @click="emit('content')">
-								<BoxesIcon />
-								{{ formatMessage(commonMessages.contentLabel) }}
-							</button>
-						</ButtonStyled>
+						<Button v-if="hasContentListener" class="!shadow-none" @click="emit('content')">
+							<BoxesIcon />
+							{{ formatMessage(commonMessages.contentLabel) }}
+						</Button>
 
-						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
-							<button
+						<IconButton type="outlined" :label="formatMessage(messages.installationSettingsTooltip)" v-if="hasSettingsListener"
 								v-tooltip="formatMessage(messages.installationSettingsTooltip)"
 								@click="emit('settings')"
 							>
-								<Settings2Icon />
-							</button>
-						</ButtonStyled>
+							<Settings2Icon />
+						</IconButton>
 					</div>
 
 					<!-- Collapsed actions visible at < 700px -->
 					<div v-if="hasUpdate && hasUpdateListener" class="flex @[700px]:hidden">
-						<ButtonStyled circular type="transparent" color="green" color-fill="text">
-							<button
+						<IconButton type="quiet" color="green" :label="formatMessage(commonMessages.updateButton)"
 								v-tooltip="formatMessage(commonMessages.updateButton)"
 								@click="emit('update')"
 							>
-								<DownloadIcon class="size-5" />
-							</button>
-						</ButtonStyled>
+							<DownloadIcon class="size-5" />
+						</IconButton>
 					</div>
-					<ButtonStyled v-if="collapsedOptions.length" circular type="outlined">
-						<TeleportOverflowMenu :options="collapsedOptions" class="flex @[700px]:hidden">
-							<MoreVerticalIcon class="size-5" />
-							<template #content>
-								<BoxesIcon class="size-5" />
-								{{ formatMessage(commonMessages.contentLabel) }}
-							</template>
-							<template #settings>
-								<Settings2Icon class="size-5" />
-								{{ formatMessage(messages.installationSettingsTooltip) }}
-							</template>
-						</TeleportOverflowMenu>
-					</ButtonStyled>
+					<TeleportOverflowMenu type="outlined" label="More options" v-if="collapsedOptions.length" :options="collapsedOptions" class="flex @[700px]:hidden">
+						<MoreVerticalIcon class="size-5" />
+						<template #content>
+							<BoxesIcon class="size-5" />
+							{{ formatMessage(commonMessages.contentLabel) }}
+						</template>
+						<template #settings>
+							<Settings2Icon class="size-5" />
+							{{ formatMessage(messages.installationSettingsTooltip) }}
+						</template>
+					</TeleportOverflowMenu>
 
-					<ButtonStyled
-						v-if="overflowOptions?.length"
-						circular
-						type="transparent"
-						class="hidden @[700px]:flex"
-					>
-						<OverflowMenu :options="overflowOptions">
-							<MoreVerticalIcon class="size-5" />
-						</OverflowMenu>
-					</ButtonStyled>
+					<TeleportOverflowMenu type="quiet" label="More options" v-if="overflowOptions?.length"
+						class="hidden @[700px]:flex" :options="overflowOptions">
+						<MoreVerticalIcon class="size-5" />
+					</TeleportOverflowMenu>
 				</template>
 			</div>
 		</div>

@@ -31,35 +31,31 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="handleCancel">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="orange">
-					<button
+				<Button type="outlined" @click="handleCancel">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="orange"
 						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
 						:disabled="buttonsDisabled || props.actionDisabled"
 						@click="handleConfirm"
 					>
-						<DownloadIcon />
-						{{
-							formatMessage(messages.confirmButton, { action: downgrade ? 'downgrade' : 'update' })
-						}}
-					</button>
-				</ButtonStyled>
+					<DownloadIcon />
+					{{
+						formatMessage(messages.confirmButton, { action: downgrade ? 'downgrade' : 'update' })
+					}}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

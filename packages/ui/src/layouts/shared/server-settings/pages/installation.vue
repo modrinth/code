@@ -22,17 +22,15 @@
 						formatMessage(messages.resetServerTitle)
 					}}</span>
 					<div>
-						<ButtonStyled color="red">
-							<button
+						<Button type="colored" color="red"
 								v-tooltip="resetServerDisabledTooltip"
 								class="!shadow-none"
 								:disabled="resetServerDisabled"
 								@click="showResetServerModal"
 							>
-								<RotateCounterClockwiseIcon class="size-5" />
-								{{ formatMessage(commonMessages.resetServerButton) }}
-							</button>
-						</ButtonStyled>
+							<RotateCounterClockwiseIcon class="size-5" />
+							{{ formatMessage(commonMessages.resetServerButton) }}
+						</Button>
 					</div>
 					<span class="text-primary">
 						{{ formatMessage(messages.resetServerDescription) }}
@@ -59,27 +57,25 @@
 				{{ formatMessage(messages.supportOptionsTitle) }}
 			</span>
 			<div>
-				<ButtonStyled color="red">
-					<button
+				<Button type="colored" color="red"
 						v-tooltip="supportResetToOnboardingTooltip"
 						class="!shadow-none"
 						:disabled="supportResetToOnboardingDisabled"
 						@click="showResetToOnboardingModal"
 					>
-						<RotateCounterClockwiseIcon class="size-5" />
-						{{ formatMessage(messages.resetToOnboardingButton) }}
-					</button>
-				</ButtonStyled>
+					<RotateCounterClockwiseIcon class="size-5" />
+					{{ formatMessage(messages.resetToOnboardingButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,

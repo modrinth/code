@@ -46,28 +46,25 @@
 		</div>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hideModal">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
+				<Button type="outlined" @click="hideModal">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button type="colored" color="brand"
 						v-tooltip="createDisabledTooltip"
 						:disabled="createDisabled"
 						@click="createBackup"
 					>
-						<PlusIcon />
-						Create backup
-					</button>
-				</ButtonStyled>
+					<PlusIcon />
+					Create backup
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Archon } from '@modrinth/api-client'
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -80,7 +77,6 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 

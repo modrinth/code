@@ -38,20 +38,16 @@
 						{{ formatRelativeTime(report.created) }}
 					</span>
 					<div class="flex items-center gap-2">
-						<ButtonStyled circular>
-							<button v-tooltip="'Copy ID'" @click="copyId">
-								<ClipboardCopyIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
+						<IconButton :label="'Copy ID'" v-tooltip="'Copy ID'" @click="copyId">
+							<ClipboardCopyIcon />
+						</IconButton>
+						<ButtonLink
 								v-tooltip="'Open in new tab'"
 								:href="`/moderation/reports/${props.report.id}`"
 								target="_blank"
-							>
-								<ExternalIcon />
-							</a>
-						</ButtonStyled>
+							 class="!w-9 !px-0 !rounded-full">
+							<ExternalIcon />
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -212,9 +208,7 @@
 									</span>
 									<span class="text-sm text-secondary">{{ sharedInstanceError }}</span>
 								</div>
-								<ButtonStyled type="outlined">
-									<button @click="loadSharedInstanceDetails">Try again</button>
-								</ButtonStyled>
+								<Button type="outlined" @click="loadSharedInstanceDetails">Try again</Button>
 							</div>
 							<SharedInstanceReportContext
 								v-else-if="sharedInstanceDetails"
@@ -227,27 +221,21 @@
 						</template>
 					</template>
 					<template #closedActions>
-						<ButtonStyled v-if="isStaff(auth.user)" color="green">
-							<button class="mt-2 w-full gap-2 sm:w-auto" @click="reopenReport()">
-								<CheckCircleIcon class="size-4" />
-								Reopen Thread
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="green" v-if="isStaff(auth.user)" class="mt-2 w-full gap-2 sm:w-auto" @click="reopenReport()">
+							<CheckCircleIcon class="size-4" />
+							Reopen Thread
+						</Button>
 					</template>
 					<template #additionalActions="{ hasReply }">
 						<template v-if="isStaff(auth.user)">
-							<ButtonStyled v-if="hasReply" color="red">
-								<button class="w-full gap-2 sm:w-auto" @click="closeReport(true)">
-									<CheckCircleIcon class="size-4" />
-									Reply and close
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="red">
-								<button class="w-full gap-2 sm:w-auto" @click="closeReport()">
-									<CheckCircleIcon class="size-4" />
-									Close report
-								</button>
-							</ButtonStyled>
+							<Button type="colored" color="red" v-if="hasReply" class="w-full gap-2 sm:w-auto" @click="closeReport(true)">
+								<CheckCircleIcon class="size-4" />
+								Reply and close
+							</Button>
+							<Button type="colored" color="red" v-else class="w-full gap-2 sm:w-auto" @click="closeReport()">
+								<CheckCircleIcon class="size-4" />
+								Close report
+							</Button>
 						</template>
 					</template>
 				</ThreadView>
@@ -256,6 +244,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { Button, IconButton, ButtonLink } from '@modrinth/ui'
 import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
@@ -267,7 +256,6 @@ import {
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
-	ButtonStyled,
 	CollapsibleRegion,
 	type ContentItem,
 	CopyCode,

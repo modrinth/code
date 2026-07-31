@@ -21,18 +21,14 @@
 					</h2>
 				</div>
 				<template v-if="!history">
-					<ButtonStyled v-if="data.hasRead">
-						<button @click="updateRoute()">
-							<HistoryIcon />
-							{{ formatMessage(messages.viewHistory) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="notifications.length > 0" color="red">
-						<button @click="readAll()">
-							<CheckCheckIcon />
-							{{ formatMessage(messages.markAllAsRead) }}
-						</button>
-					</ButtonStyled>
+					<Button v-if="data.hasRead" @click="updateRoute()">
+						<HistoryIcon />
+						{{ formatMessage(messages.viewHistory) }}
+					</Button>
+					<Button type="colored" color="red" v-if="notifications.length > 0" @click="readAll()">
+						<CheckCheckIcon />
+						{{ formatMessage(messages.markAllAsRead) }}
+					</Button>
 				</template>
 			</div>
 			<Chips
@@ -69,9 +65,9 @@
 	</div>
 </template>
 <script setup>
+import { Button } from '@modrinth/ui'
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Chips,
 	commonMessages,
 	defineMessages,

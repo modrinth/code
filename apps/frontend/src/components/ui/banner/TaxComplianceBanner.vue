@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { FileTextIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	PagewideBanner,
 	useFormatMoney,
@@ -56,9 +56,7 @@ function openTaxForm(e: MouseEvent) {
 			}}</span>
 		</template>
 		<template #actions_right>
-			<ButtonStyled color="orange">
-				<button @click="openTaxForm"><FileTextIcon /> {{ formatMessage(messages.action) }}</button>
-			</ButtonStyled>
+			<Button type="colored" color="orange" @click="openTaxForm"><FileTextIcon /> {{ formatMessage(messages.action) }}</Button>
 		</template>
 	</PagewideBanner>
 </template>

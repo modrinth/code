@@ -165,24 +165,21 @@
 						v-if="midasCharge && midasCharge.status === 'failed'"
 						class="ml-auto flex flex-row-reverse items-center gap-2"
 					>
-						<ButtonStyled v-if="midasCharge && midasCharge.status === 'failed'">
-							<button
+						<Button v-if="midasCharge && midasCharge.status === 'failed'"
 								@click="
 									() => {
 										$refs.midasPurchaseModal.show()
 									}
 								"
 							>
-								<UpdatedIcon />
-								{{ formatMessage(messages.updateMethod) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled type="transparent" circular>
-							<OverflowMenu
-								:dropdown-id="`${baseId}-cancel-midas`"
+							<UpdatedIcon />
+							{{ formatMessage(messages.updateMethod) }}
+						</Button>
+						<TeleportOverflowMenu type="quiet" :label="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
 									{
 										id: 'cancel',
+									label: formatMessage(commonMessages.cancelButton),
 										action: () => {
 											cancelSubscriptionId = midasSubscription.id
 											$refs.modalCancel.show()
@@ -190,19 +187,17 @@
 									},
 								]"
 							>
-								<MoreVerticalIcon />
-								<template #cancel
-									><XIcon /> {{ formatMessage(commonMessages.cancelButton) }}</template
-								>
-							</OverflowMenu>
-						</ButtonStyled>
+							<MoreVerticalIcon />
+							<template #cancel
+								><XIcon /> {{ formatMessage(commonMessages.cancelButton) }}</template
+							>
+						</TeleportOverflowMenu>
 					</div>
 					<div
 						v-else-if="midasCharge && midasCharge.status !== 'cancelled'"
 						class="ml-auto flex gap-2"
 					>
-						<ButtonStyled>
-							<button
+						<Button
 								:disabled="changingInterval"
 								@click="
 									() => {
@@ -211,14 +206,11 @@
 									}
 								"
 							>
-								<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled
-							:color="midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple'"
-							color-fill="text"
-						>
-							<button
+							<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+						</Button>
+						<Button
+							type="quiet"
+							:color="midasCharge.subscription_interval === 'yearly' ? undefined : 'purple'"
 								v-tooltip="
 									midasCharge.subscription_interval === 'yearly'
 										? formatMessage(messages.monthlyBillingAdditionalPerYearTooltip, {
@@ -231,31 +223,24 @@
 								"
 								:disabled="changingInterval"
 								@click="switchMidasInterval(oppositeInterval)"
-							>
-								<SpinnerIcon v-if="changingInterval" class="animate-spin" />
-								<TransferIcon v-else />
-								{{
-									changingInterval
-										? formatMessage(messages.switchingToInterval, {
-												interval: oppositeInterval,
-											})
-										: formatMessage(messages.switchToInterval, {
-												interval: oppositeInterval,
-											})
-								}}
-							</button>
-						</ButtonStyled>
+							 :style="{ '--legacy-button-color': (midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple') && (midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple') !== 'standard' ? `var(--color-${midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple'})` : undefined }" class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]">
+							<SpinnerIcon v-if="changingInterval" class="animate-spin" />
+							<TransferIcon v-else />
+							{{
+								changingInterval
+									? formatMessage(messages.switchingToInterval, {
+											interval: oppositeInterval,
+										})
+									: formatMessage(messages.switchToInterval, {
+											interval: oppositeInterval,
+										})
+							}}
+						</Button>
 					</div>
-					<ButtonStyled
-						v-else-if="midasCharge && midasCharge.status === 'cancelled'"
-						color="purple"
-					>
-						<button class="ml-auto" @click="cancelSubscription(midasSubscription.id, false)">
-							{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="purple" size="large">
-						<button
+					<Button type="colored" color="purple" v-else-if="midasCharge && midasCharge.status === 'cancelled'" class="ml-auto" @click="cancelSubscription(midasSubscription.id, false)">
+						{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
+					</Button>
+					<Button type="colored" color="purple" size="xl" v-else
 							class="ml-auto"
 							@click="
 								() => {
@@ -263,9 +248,8 @@
 								}
 							"
 						>
-							{{ formatMessage(messages.subscribe) }} <RightArrowIcon />
-						</button>
-					</ButtonStyled>
+						{{ formatMessage(messages.subscribe) }} <RightArrowIcon />
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -477,44 +461,29 @@
 										</div>
 									</div>
 									<div class="flex gap-2">
-										<ButtonStyled
-											v-if="
+										<Button v-if="
 												getPyroCharge(subscription) &&
 												getPyroCharge(subscription).status !== 'cancelled'
-											"
-										>
-											<button @click="showCancellationSurvey(subscription)">
-												<XIcon />
-												{{ formatMessage(commonMessages.cancelButton) }}
-											</button>
-										</ButtonStyled>
-										<ButtonStyled
-											v-if="
+											" @click="showCancellationSurvey(subscription)">
+											<XIcon />
+											{{ formatMessage(commonMessages.cancelButton) }}
+										</Button>
+										<Button type="quiet" color="green" v-if="
 												getPyroCharge(subscription) &&
 												getPyroCharge(subscription).status !== 'cancelled' &&
 												getPyroCharge(subscription).status !== 'failed'
-											"
-											color="green"
-											color-fill="text"
-										>
-											<button @click="showPyroUpgradeModal(subscription)">
-												<ArrowBigUpDashIcon />
-												{{ formatMessage(messages.upgrade) }}
-											</button>
-										</ButtonStyled>
-										<ButtonStyled
-											v-else-if="
+											" @click="showPyroUpgradeModal(subscription)" class="!text-green [&>svg]:!text-green">
+											<ArrowBigUpDashIcon />
+											{{ formatMessage(messages.upgrade) }}
+										</Button>
+										<Button type="colored" color="green" v-else-if="
 												getPyroCharge(subscription) &&
 												(getPyroCharge(subscription).status === 'cancelled' ||
 													getPyroCharge(subscription).status === 'failed')
-											"
-											color="green"
-										>
-											<button @click="openPyroResubscribeModal(subscription)">
-												{{ formatMessage(messages.resubscribe) }}
-												<RightArrowIcon />
-											</button>
-										</ButtonStyled>
+											" @click="openPyroResubscribeModal(subscription)">
+											{{ formatMessage(messages.resubscribe) }}
+											<RightArrowIcon />
+										</Button>
 									</div>
 								</div>
 							</div>
@@ -565,16 +534,12 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(messages.paymentMethodTitle) }}</h2>
 			</div>
-			<ButtonStyled>
-				<nuxt-link to="/settings/billing/charges">
-					<HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
-				</nuxt-link>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="addPaymentMethod">
-					<PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
-				</button>
-			</ButtonStyled>
+			<ButtonLink to="/settings/billing/charges">
+				<HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
+			</ButtonLink>
+			<Button @click="addPaymentMethod">
+				<PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
+			</Button>
 		</div>
 		<div
 			v-if="!paymentMethods || paymentMethods.length === 0"
@@ -633,49 +598,48 @@
 						</div>
 					</div>
 				</div>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						:dropdown-id="`${baseId}-payment-method-overflow-${index}`"
+				<TeleportOverflowMenu type="quiet" :label="formatMessage(commonMessages.moreOptionsButton)"
 						class="btn-dropdown-animation !w-10"
 						:options="
 							[
 								{
 									id: 'primary',
+									label: formatMessage(messages.paymentMethodMakePrimary),
 									action: () => editPaymentMethod(index, true),
 								},
 								{
 									id: 'remove',
+									label: formatMessage(commonMessages.deleteLabel),
 									action: () => {
 										removePaymentMethodIndex = index
 										$refs.modal_confirm.show()
 									},
-									color: 'red',
-									hoverOnly: true,
+									tone: 'red',
 								},
 							].slice(primaryPaymentMethodId === method.id ? 1 : 0, 2)
 						"
 					>
-						<MoreVerticalIcon />
-						<template #primary>
-							<StarIcon />
-							{{ formatMessage(messages.paymentMethodMakePrimary) }}
-						</template>
-						<template #edit>
-							<EditIcon />
-							{{ formatMessage(commonMessages.editButton) }}
-						</template>
-						<template #remove>
-							<TrashIcon />
-							{{ formatMessage(commonMessages.deleteLabel) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+					<MoreVerticalIcon />
+					<template #primary>
+						<StarIcon />
+						{{ formatMessage(messages.paymentMethodMakePrimary) }}
+					</template>
+					<template #edit>
+						<EditIcon />
+						{{ formatMessage(commonMessages.editButton) }}
+					</template>
+					<template #remove>
+						<TrashIcon />
+						{{ formatMessage(commonMessages.deleteLabel) }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 	</section>
 </template>
 
 <script setup>
+import { Button, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	ArrowBigUpDashIcon,
 	CheckCircleIcon,
@@ -694,7 +658,6 @@ import {
 } from '@modrinth/assets'
 import {
 	AddPaymentMethodModal,
-	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	CopyCode,
@@ -702,7 +665,6 @@ import {
 	getPaymentMethodIcon,
 	injectModrinthClient,
 	injectNotificationManager,
-	OverflowMenu,
 	paymentMethodMessages,
 	PurchaseModal,
 	ResubscribeModal,

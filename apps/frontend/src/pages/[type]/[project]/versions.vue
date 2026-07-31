@@ -41,81 +41,76 @@
 				:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 			>
 				<template #actions="{ version }">
-					<ButtonStyled v-if="getPrimaryFile(version)" circular type="transparent">
-						<a
+					<ButtonLink type="quiet" v-if="getPrimaryFile(version)"
 							v-tooltip="`Download`"
 							:href="createDownloadUrl(version)"
 							:download="getPrimaryFile(version)?.filename"
-							class="hover:!bg-button-bg [&>svg]:!text-green"
+							class="hover:!bg-button-bg [&>svg]:!text-green !w-9 !px-0 !rounded-full"
 							aria-label="Download"
 							@click="emit('onDownload')"
 						>
-							<DownloadIcon aria-hidden="true" />
-						</a>
-					</ButtonStyled>
-					<ButtonStyled v-if="currentMember" circular type="transparent">
-						<OverflowMenu
+						<DownloadIcon aria-hidden="true" />
+					</ButtonLink>
+					<TeleportOverflowMenu type="quiet" label="Edit version" v-if="currentMember"
 							v-tooltip="'Edit version'"
 							class="hover:!bg-button-bg"
-							:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 							:options="[
 								{
 									id: 'edit-metadata',
+									label: 'Edit metadata',
 									action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
 								},
 								{
 									id: 'edit-details',
+									label: 'Edit details',
 									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
 								},
 								{
 									id: 'edit-files',
+									label: 'Edit files',
 									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
 								},
 							]"
-							aria-label="Edit version"
 						>
-							<EditIcon aria-hidden="true" />
-							<template #edit-files>
-								<FileIcon aria-hidden="true" />
-								Edit files
-							</template>
-							<template #edit-details>
-								<InfoIcon aria-hidden="true" />
-								Edit details
-							</template>
-							<template #edit-metadata>
-								<BoxIcon aria-hidden="true" />
-								Edit metadata
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-					<ButtonStyled circular type="transparent">
-						<OverflowMenu
+						<EditIcon aria-hidden="true" />
+						<template #edit-files>
+							<FileIcon aria-hidden="true" />
+							Edit files
+						</template>
+						<template #edit-details>
+							<InfoIcon aria-hidden="true" />
+							Edit details
+						</template>
+						<template #edit-metadata>
+							<BoxIcon aria-hidden="true" />
+							Edit metadata
+						</template>
+					</TeleportOverflowMenu>
+					<TeleportOverflowMenu type="quiet" label="More options"
 							v-tooltip="'More options'"
 							class="hover:!bg-button-bg"
-							:dropdown-id="`${baseDropdownId}-${version.id}`"
+							@select="$event.id === 'download' && emit('onDownload')"
 							:options="[
 								{
 									id: 'download',
-									color: 'primary',
-									hoverFilled: true,
-									link: createDownloadUrl(version),
+									label: 'Download',
+									type: 'link',
+									href: createDownloadUrl(version),
 									download: getPrimaryFile(version)?.filename,
-									action: () => {
-										emit('onDownload')
-									},
 									shown: !!getPrimaryFile(version),
 								},
 								{
 									id: 'new-tab',
-									action: () => {},
-									link: `/${project.project_type}/${
+									label: 'Open in new tab',
+									type: 'link',
+									href: `/${project.project_type}/${
 										project.slug ? project.slug : project.id
 									}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
-									external: true,
+									target: '_blank',
 								},
 								{
 									id: 'copy-link',
+									label: 'Copy link',
 									action: () =>
 										copyToClipboard(
 											`https://modrinth.com/${project.project_type}/${
@@ -125,20 +120,22 @@
 								},
 								{
 									id: 'share',
+									label: 'Share',
 									action: () => {},
 									shown: false,
 								},
 								{
 									id: 'report',
-									color: 'red',
-									hoverFilled: true,
+									label: 'Report',
+									tone: 'red',
 									action: () =>
 										auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
 									shown: !currentMember,
 								},
-								{ divider: true, shown: currentMember || flags.developerMode },
+								{ type: 'divider', shown: currentMember || flags.developerMode },
 								{
 									id: 'copy-id',
+									label: 'Copy ID',
 									action: () => {
 										copyToClipboard(version.id)
 									},
@@ -146,31 +143,35 @@
 								},
 								{
 									id: 'copy-maven',
+									label: 'Copy Maven coordinates',
 									action: () => {
 										copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
 									},
 									shown: flags.developerMode,
 								},
-								{ divider: true, shown: !!currentMember },
+								{ type: 'divider', shown: !!currentMember },
 								{
 									id: 'edit-metadata',
+									label: 'Edit metadata',
 									action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
 									shown: !!currentMember,
 								},
 								{
 									id: 'edit-details',
+									label: 'Edit details',
 									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
 									shown: !!currentMember,
 								},
 								{
 									id: 'edit-files',
+									label: 'Edit files',
 									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
 									shown: !!currentMember,
 								},
 								{
 									id: 'delete',
-									color: 'red',
-									hoverFilled: true,
+									label: 'Delete',
+									tone: 'red',
 									action: () => {
 										selectedVersion = version.id
 										deleteVersionModal?.show()
@@ -178,55 +179,53 @@
 									shown: !!currentMember,
 								},
 							]"
-							aria-label="More options"
 						>
-							<MoreVerticalIcon aria-hidden="true" />
-							<template #download>
-								<DownloadIcon aria-hidden="true" />
-								Download
-							</template>
-							<template #new-tab>
-								<ExternalIcon aria-hidden="true" />
-								Open in new tab
-							</template>
-							<template #copy-link>
-								<LinkIcon aria-hidden="true" />
-								Copy link
-							</template>
-							<template #share>
-								<ShareIcon aria-hidden="true" />
-								Share
-							</template>
-							<template #report>
-								<ReportIcon aria-hidden="true" />
-								Report
-							</template>
-							<template #edit-files>
-								<FileIcon aria-hidden="true" />
-								Edit files
-							</template>
-							<template #edit-details>
-								<InfoIcon aria-hidden="true" />
-								Edit details
-							</template>
-							<template #edit-metadata>
-								<BoxIcon aria-hidden="true" />
-								Edit metadata
-							</template>
-							<template #delete>
-								<TrashIcon aria-hidden="true" />
-								Delete
-							</template>
-							<template #copy-id>
-								<ClipboardCopyIcon aria-hidden="true" />
-								Copy ID
-							</template>
-							<template #copy-maven>
-								<ClipboardCopyIcon aria-hidden="true" />
-								Copy Maven coordinates
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
+						<MoreVerticalIcon aria-hidden="true" />
+						<template #download>
+							<DownloadIcon aria-hidden="true" />
+							Download
+						</template>
+						<template #new-tab>
+							<ExternalIcon aria-hidden="true" />
+							Open in new tab
+						</template>
+						<template #copy-link>
+							<LinkIcon aria-hidden="true" />
+							Copy link
+						</template>
+						<template #share>
+							<ShareIcon aria-hidden="true" />
+							Share
+						</template>
+						<template #report>
+							<ReportIcon aria-hidden="true" />
+							Report
+						</template>
+						<template #edit-files>
+							<FileIcon aria-hidden="true" />
+							Edit files
+						</template>
+						<template #edit-details>
+							<InfoIcon aria-hidden="true" />
+							Edit details
+						</template>
+						<template #edit-metadata>
+							<BoxIcon aria-hidden="true" />
+							Edit metadata
+						</template>
+						<template #delete>
+							<TrashIcon aria-hidden="true" />
+							Delete
+						</template>
+						<template #copy-id>
+							<ClipboardCopyIcon aria-hidden="true" />
+							Copy ID
+						</template>
+						<template #copy-maven>
+							<ClipboardCopyIcon aria-hidden="true" />
+							Copy Maven coordinates
+						</template>
+					</TeleportOverflowMenu>
 				</template>
 			</ProjectPageVersions>
 			<template v-else>
@@ -243,6 +242,7 @@
 </template>
 
 <script setup>
+import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	BoxIcon,
 	ClipboardCopyIcon,
@@ -259,12 +259,10 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
 import { onMounted, useTemplateRef, watch } from 'vue'

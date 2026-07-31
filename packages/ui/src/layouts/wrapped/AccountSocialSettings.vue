@@ -15,12 +15,10 @@
 			</div>
 		</template>
 		<template #actions>
-			<ButtonStyled color="brand" size="large">
-				<button type="button" @click="requestSignIn">
-					<LogInIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.signInButton) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" size="xl" native-type="button" @click="requestSignIn">
+				<LogInIcon aria-hidden="true" />
+				{{ formatMessage(commonMessages.signInButton) }}
+			</Button>
 		</template>
 	</EmptyState>
 
@@ -112,11 +110,9 @@
 								</div>
 								<div v-else-if="loadError" class="flex flex-col items-center gap-3">
 									<span>{{ formatMessage(messages.loadError) }}</span>
-									<ButtonStyled type="outlined">
-										<button type="button" @click="retry">
-											{{ formatMessage(commonMessages.retryButton) }}
-										</button>
-									</ButtonStyled>
+									<Button type="outlined" native-type="button" @click="retry">
+										{{ formatMessage(commonMessages.retryButton) }}
+									</Button>
 								</div>
 								<span v-else>{{ formatMessage(messages.noBlockedUsers) }}</span>
 							</div>
@@ -145,9 +141,8 @@
 
 						<template #cell-actions="{ row }">
 							<div class="flex justify-end">
-								<ButtonStyled type="outlined">
-									<button
-										type="button"
+								<Button type="outlined"
+										native-type="button"
 										:disabled="unblockingUserId !== null"
 										:aria-label="
 											formatMessage(messages.unblockUserAriaLabel, {
@@ -156,14 +151,13 @@
 										"
 										@click="unblock(row)"
 									>
-										<SpinnerIcon
-											v-if="unblockingUserId === row.id"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										{{ formatMessage(messages.unblockButton) }}
-									</button>
-								</ButtonStyled>
+									<SpinnerIcon
+										v-if="unblockingUserId === row.id"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									{{ formatMessage(messages.unblockButton) }}
+								</Button>
 							</div>
 						</template>
 					</Table>
@@ -189,13 +183,13 @@
 
 <script setup lang="ts">
 // TODO this will be moved in with the rest of the xplat settings.
+import { Button } from '#ui/components/base/buttons'
 import type { Labrinth } from '@modrinth/api-client'
 import { LogInIcon, SpinnerIcon, ThinkingRinthbot } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import Table, { type TableColumn } from '#ui/components/base/Table.vue'

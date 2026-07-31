@@ -4,18 +4,14 @@
 		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-4">
 			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" />
 			<div class="flex flex-col gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="triggerIconInput">
-						<UploadIcon />
-						{{ formatMessage(messages.selectIcon) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined">
-					<button :disabled="!ctx.instanceIcon.value" @click="removeIcon">
-						<XIcon />
-						{{ formatMessage(messages.removeIcon) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="triggerIconInput">
+					<UploadIcon />
+					{{ formatMessage(messages.selectIcon) }}
+				</Button>
+				<Button type="outlined" :disabled="!ctx.instanceIcon.value" @click="removeIcon">
+					<XIcon />
+					{{ formatMessage(messages.removeIcon) }}
+				</Button>
 			</div>
 		</div>
 
@@ -148,6 +144,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import type { Paper } from '@modrinth/api-client'
 import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
@@ -157,7 +154,6 @@ import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
-import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'

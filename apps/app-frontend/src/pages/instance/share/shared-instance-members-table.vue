@@ -11,28 +11,24 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<ButtonStyled type="outlined">
-						<button
+					<Button type="outlined"
 							class="flex !h-10 shrink-0 items-center gap-2 !border"
 							:disabled="pushUpdateDisabled"
 							@click="emit('push-update', $event)"
 						>
-							<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
-							<UploadIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.pushUpdate) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button
+						<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
+						<UploadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.pushUpdate) }}
+					</Button>
+					<Button type="colored" color="brand"
 							class="flex !h-10 shrink-0 items-center gap-2"
 							:disabled="invitePending || inviteDisabled"
 							@click="emit('invite', $event)"
 						>
-							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
-							<UserPlusIcon v-else aria-hidden="true" />
-							Invite friends
-						</button>
-					</ButtonStyled>
+						<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
+						<UserPlusIcon v-else aria-hidden="true" />
+						Invite friends
+					</Button>
 				</template>
 			</div>
 			<div v-if="hasMultipleMethods" class="flex flex-wrap items-center gap-1.5">
@@ -120,15 +116,12 @@
 			</template>
 			<template #cell-actions="{ row }">
 				<div v-if="!actionsLocked" class="flex items-center justify-end">
-					<ButtonStyled circular type="transparent"
-						><button
+					<IconButton type="quiet" :label="`Revoke access for ${row.username}`"
 							v-tooltip="'Revoke access'"
-							:aria-label="`Revoke access for ${row.username}`"
 							class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
 							@click="emit('remove', row)"
 						>
-							<XIcon aria-hidden="true" /></button
-					></ButtonStyled>
+						<XIcon aria-hidden="true" /></IconButton>
 				</div>
 			</template>
 		</Table>
@@ -136,6 +129,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button, IconButton } from '@modrinth/ui'
 import {
 	FilterIcon,
 	LinkIcon,
@@ -145,20 +139,7 @@ import {
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	AutoLink,
-	Avatar,
-	ButtonStyled,
-	defineMessages,
-	type SortDirection,
-	StyledInput,
-	Table,
-	type TableColumn,
-	truncatedTooltip,
-	useFormatDateTime,
-	useRelativeTime,
-	useVIntl,
-} from '@modrinth/ui'
+import { AutoLink, Avatar, defineMessages, type SortDirection, StyledInput, Table, type TableColumn, truncatedTooltip, useFormatDateTime, useRelativeTime, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import {

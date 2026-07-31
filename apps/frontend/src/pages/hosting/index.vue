@@ -50,21 +50,17 @@
 					<div
 						class="flex w-full flex-col items-center gap-5 text-center align-middle sm:w-fit sm:flex-row"
 					>
-						<ButtonStyled color="brand" size="large">
-							<nuxt-link class="w-fit" to="#plan">
-								<GameIcon aria-hidden="true" />
-								{{
-									hasServers
-										? formatMessage(messages.startANewServer)
-										: formatMessage(messages.startYourServer)
-								}}
-							</nuxt-link>
-						</ButtonStyled>
-						<ButtonStyled v-if="hasServers" type="outlined" size="large">
-							<nuxt-link class="w-fit" to="/hosting/manage">
-								<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
-							</nuxt-link>
-						</ButtonStyled>
+						<ButtonLink type="colored" color="brand" size="xl" class="w-fit" to="#plan">
+							<GameIcon aria-hidden="true" />
+							{{
+								hasServers
+									? formatMessage(messages.startANewServer)
+									: formatMessage(messages.startYourServer)
+							}}
+						</ButtonLink>
+						<ButtonLink type="outlined" size="xl" v-if="hasServers" class="w-fit" to="/hosting/manage">
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -603,12 +599,10 @@
 					</div>
 
 					<div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
-						<ButtonStyled color="standard" size="large">
-							<button class="w-full md:w-fit" @click="selectProduct('custom')">
-								{{ formatMessage(messages.getStartedButton) }}
-								<RightArrowIcon class="shrink-0" />
-							</button>
-						</ButtonStyled>
+						<Button size="xl" class="w-full md:w-fit" @click="selectProduct('custom')">
+							{{ formatMessage(messages.getStartedButton) }}
+							<RightArrowIcon class="shrink-0" />
+						</Button>
 						<p v-if="lowestPrice" class="m-0 text-sm">
 							{{
 								formatMessage(messages.startingAtPrice, {
@@ -624,6 +618,7 @@
 </template>
 
 <script setup>
+import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	BoxIcon,
 	GameIcon,
@@ -634,7 +629,6 @@ import {
 	VersionIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

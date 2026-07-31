@@ -109,11 +109,9 @@
 				</span>
 			</template>
 			<template #actions>
-				<ButtonStyled color="brand"
-					><button class="!h-10" @click="signInToShare">
-						<LogInIcon aria-hidden="true" />{{ formatMessage(lockedActionButton) }}
-					</button></ButtonStyled
-				>
+				<Button type="colored" color="brand" class="!h-10" @click="signInToShare">
+					<LogInIcon aria-hidden="true" />{{ formatMessage(lockedActionButton) }}
+				</Button>
 			</template>
 		</SharedInstanceShareEmptyState>
 
@@ -123,21 +121,19 @@
 			:description="formatMessage(messages.noFriendsInvitedDescription)"
 		>
 			<template #actions>
-				<ButtonStyled color="brand"
-					><button
+				<Button type="colored" color="brand"
 						class="!h-10"
 						:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
 						@click="showInvitePlayers($event)"
 					>
-						<SpinnerIcon
-							v-if="inviteLink.pending.value"
-							class="animate-spin"
-							aria-hidden="true"
-						/><UserPlusIcon v-else aria-hidden="true" />{{
-							formatMessage(messages.inviteFriendsButton)
-						}}
-					</button></ButtonStyled
-				>
+					<SpinnerIcon
+						v-if="inviteLink.pending.value"
+						class="animate-spin"
+						aria-hidden="true"
+					/><UserPlusIcon v-else aria-hidden="true" />{{
+						formatMessage(messages.inviteFriendsButton)
+					}}
+				</Button>
 			</template>
 		</SharedInstanceShareEmptyState>
 	</div>
@@ -145,17 +141,7 @@
 
 <script setup lang="ts">
 import { LogInIcon, SpinnerIcon, UserPlusIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	ConfirmUnlinkModal,
-	defineMessages,
-	injectAuth,
-	type InvitePlayersInvitePayload,
-	InvitePlayersModal,
-	type InvitePlayersUser,
-	useVIntl,
-} from '@modrinth/ui'
+import { Avatar, ConfirmUnlinkModal, defineMessages, injectAuth, type InvitePlayersInvitePayload, InvitePlayersModal, type InvitePlayersUser, useVIntl, Button } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, toRef, watch } from 'vue'
 

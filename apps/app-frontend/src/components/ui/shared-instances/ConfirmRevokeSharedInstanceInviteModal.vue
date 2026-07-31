@@ -10,28 +10,24 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button @click="confirm">
-						<XIcon />
-						{{ formatMessage(messages.revokeButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red" @click="confirm">
+					<XIcon />
+					{{ formatMessage(messages.revokeButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { XIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,

@@ -40,35 +40,31 @@
 				{{ selectedCountText }}
 			</span>
 			<div class="mx-0.5 h-6 w-px bg-surface-5" />
-			<ButtonStyled type="transparent">
-				<button
-					type="button"
+			<Button type="quiet"
+					native-type="button"
 					class="!text-primary"
 					:disabled="isInstallingSelected"
 					@click="clearSelected"
 				>
-					<span>{{ formatMessage(commonMessages.clearButton) }}</span>
-				</button>
-			</ButtonStyled>
+				<span>{{ formatMessage(commonMessages.clearButton) }}</span>
+			</Button>
 		</div>
 
 		<div class="ml-auto shrink-0">
-			<ButtonStyled color="green">
-				<button type="button" :disabled="isInstallingSelected" @click="installSelected">
-					<PlusIcon />
-					{{ installButtonText }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="green" native-type="button" :disabled="isInstallingSelected" @click="installSelected">
+				<PlusIcon />
+				{{ installButtonText }}
+			</Button>
 		</div>
 	</FloatingActionBar>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { PlusIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

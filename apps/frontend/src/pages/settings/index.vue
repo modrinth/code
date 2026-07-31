@@ -9,11 +9,9 @@
 					</strong>
 				</template>
 			</IntlFormatted>
-			<ButtonStyled color="red" type="highlight">
-				<button class="mt-3" @click="disableDeveloperMode()">
-					{{ formatMessage(developerModeBanner.deactivate) }}
-				</button>
-			</ButtonStyled>
+			<Button class="mt-3 !bg-red-highlight" @click="disableDeveloperMode()">
+				{{ formatMessage(developerModeBanner.deactivate) }}
+			</Button>
 		</MessageBanner>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
@@ -178,9 +176,9 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,

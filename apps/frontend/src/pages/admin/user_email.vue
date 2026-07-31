@@ -20,20 +20,19 @@
 					/>
 				</div>
 				<div class="flex gap-2">
-					<ButtonStyled color="brand">
-						<button @click="getUserFromEmail">
-							<MailIcon aria-hidden="true" />
-							Get user account
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="getUserFromEmail">
+						<MailIcon aria-hidden="true" />
+						Get user account
+					</Button>
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { MailIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import { injectNotificationManager, StyledInput } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 

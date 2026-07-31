@@ -46,18 +46,14 @@
 					class="flex flex-wrap items-center gap-3"
 					:class="{ 'gap-2': compact }"
 				>
-					<ButtonStyled color="brand">
-						<button @click="performActionByTitle(notification, 'Accept')">
-							<CheckIcon />
-							Accept
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="performActionByTitle(notification, 'Deny')">
-							<XIcon />
-							Decline
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="performActionByTitle(notification, 'Accept')">
+						<CheckIcon />
+						Accept
+					</Button>
+					<Button type="colored" color="red" @click="performActionByTitle(notification, 'Deny')">
+						<XIcon />
+						Decline
+					</Button>
 				</div>
 				<div
 					class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[var(--color-text-secondary)]"
@@ -276,8 +272,7 @@
 			</span>
 			<div v-if="compact" class="notification__actions">
 				<template v-if="type === 'team_invite' || type === 'organization_invite'">
-					<ButtonStyled circular color="brand" type="transparent">
-						<button
+					<IconButton type="quiet" color="brand" :label="`Accept`"
 							v-tooltip="`Accept`"
 							@click="
 								() => {
@@ -286,11 +281,9 @@
 								}
 							"
 						>
-							<CheckIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular color="red" type="transparent">
-						<button
+						<CheckIcon />
+					</IconButton>
+					<IconButton type="quiet" color="red" :label="`Decline`"
 							v-tooltip="`Decline`"
 							@click="
 								() => {
@@ -299,23 +292,19 @@
 								}
 							"
 						>
-							<XIcon />
-						</button>
-					</ButtonStyled>
-				</template>
-				<ButtonStyled v-else-if="!notification.read" circular type="transparent">
-					<button v-tooltip="`Mark as read`" @click="read()">
 						<XIcon />
-					</button>
-				</ButtonStyled>
+					</IconButton>
+				</template>
+				<IconButton type="quiet" :label="`Mark as read`" v-else-if="!notification.read" v-tooltip="`Mark as read`" @click="read()">
+					<XIcon />
+				</IconButton>
 			</div>
 			<div v-else class="notification__actions">
 				<div v-if="type !== null" class="input-group">
 					<template
 						v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
 					>
-						<ButtonStyled color="brand">
-							<button
+						<Button type="colored" color="brand"
 								@click="
 									() => {
 										acceptTeamInvite(notification.body.team_id)
@@ -323,12 +312,10 @@
 									}
 								"
 							>
-								<CheckIcon />
-								Accept
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button
+							<CheckIcon />
+							Accept
+						</Button>
+						<Button type="colored" color="red"
 								@click="
 									() => {
 										removeSelfFromTeam(notification.body.team_id)
@@ -336,39 +323,30 @@
 									}
 								"
 							>
-								<XIcon />
-								Decline
-							</button>
-						</ButtonStyled>
+							<XIcon />
+							Decline
+						</Button>
 					</template>
-					<ButtonStyled v-else-if="!notification.read">
-						<button @click="read()">
-							<CheckIcon />
-							Mark as read
-						</button>
-					</ButtonStyled>
+					<Button v-else-if="!notification.read" @click="read()">
+						<CheckIcon />
+						Mark as read
+					</Button>
 					<CopyCode v-if="flags.developerMode" :text="notification.id" />
 				</div>
 				<div v-else class="input-group">
-					<ButtonStyled v-if="notification.link && notification.link !== '#'">
-						<nuxt-link :to="notification.link" target="_blank">
-							<ExternalIcon />
-							Open link
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled v-for="(action, actionIndex) in notification.actions" :key="actionIndex">
-						<button @click="performAction(notification, actionIndex)">
-							<CheckIcon v-if="action.title === 'Accept'" />
-							<XIcon v-else-if="action.title === 'Deny'" />
-							{{ action.title }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="notification.actions.length === 0 && !notification.read">
-						<button @click="performAction(notification, null)">
-							<CheckIcon />
-							Mark as read
-						</button>
-					</ButtonStyled>
+					<ButtonLink v-if="notification.link && notification.link !== '#'" :to="notification.link" target="_blank">
+						<ExternalIcon />
+						Open link
+					</ButtonLink>
+					<Button v-for="(action, actionIndex) in notification.actions" :key="actionIndex" @click="performAction(notification, actionIndex)">
+						<CheckIcon v-if="action.title === 'Accept'" />
+						<XIcon v-else-if="action.title === 'Deny'" />
+						{{ action.title }}
+					</Button>
+					<Button v-if="notification.actions.length === 0 && !notification.read" @click="performAction(notification, null)">
+						<CheckIcon />
+						Mark as read
+					</Button>
 					<CopyCode v-if="flags.developerMode" :text="notification.id" />
 				</div>
 			</div>
@@ -377,6 +355,7 @@
 </template>
 
 <script setup>
+import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
 	BellIcon,
 	CalendarIcon,
@@ -390,7 +369,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	Categories,
 	CopyCode,
 	DoubleIcon,

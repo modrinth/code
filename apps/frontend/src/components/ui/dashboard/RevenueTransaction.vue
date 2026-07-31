@@ -55,11 +55,9 @@
 						no-auto-focus
 					>
 						<span class="my-auto align-middle"
-							><ButtonStyled circular type="outlined" size="small">
-								<button class="align-middle" @click="cancelPayout">
-									<XIcon />
-								</button> </ButtonStyled
-						></span>
+							><IconButton type="outlined" size="xs" label="Button" class="align-middle !size-6" @click="cancelPayout">
+								<XIcon />
+							</IconButton></span>
 						<template #popper>
 							<div class="font-semibold text-contrast">Cancel transaction</div>
 						</template>
@@ -80,15 +78,7 @@ import {
 	VenmoColorIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	BulletDivider,
-	ButtonStyled,
-	getCurrencyIcon,
-	injectNotificationManager,
-	useFormatDateTime,
-	useFormatMoney,
-	useVIntl,
-} from '@modrinth/ui'
+import { BulletDivider, getCurrencyIcon, injectNotificationManager, useFormatDateTime, useFormatMoney, useVIntl, IconButton } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { Tooltip } from 'floating-vue'
 

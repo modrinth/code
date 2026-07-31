@@ -95,11 +95,9 @@
 									</div>
 								</template>
 							</div>
-							<ButtonStyled v-if="item.dismissible !== false" type="transparent" circular>
-								<button class="-m-1.5" @click="dismiss(item.id)">
-									<XIcon />
-								</button>
-							</ButtonStyled>
+							<IconButton type="quiet" label="Close" v-if="item.dismissible !== false" class="-m-1.5" @click="dismiss(item.id)">
+								<XIcon />
+							</IconButton>
 						</div>
 						<span v-if="item.text" class="text-primary">
 							{{ item.text }}
@@ -142,16 +140,11 @@
 						full-width
 					/>
 					<div v-if="item.buttons?.length" class="flex gap-1.5">
-						<ButtonStyled
-							v-for="(btn, idx) in item.buttons"
-							:key="idx"
-							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
-						>
-							<button class="!shadow-none" @click="handleButtonClick(item.id, btn)">
-								<component :is="btn.icon" v-if="btn.icon" />
-								{{ btn.label }}
-							</button>
-						</ButtonStyled>
+						<Button :type="(btn.color || (idx === 0 ? 'brand' : undefined)) && (btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard' ? 'colored' : 'base'" :color="(btn.color || (idx === 0 ? 'brand' : undefined)) && (btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard' ? ((btn.color || (idx === 0 ? 'brand' : undefined)) === 'medal-promo' ? 'medal_promotion' : (btn.color || (idx === 0 ? 'brand' : undefined))) : undefined" v-for="(btn, idx) in item.buttons"
+							:key="idx" class="!shadow-none" @click="handleButtonClick(item.id, btn)">
+							<component :is="btn.icon" v-if="btn.icon" />
+							{{ btn.label }}
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -160,6 +153,7 @@
 </template>
 
 <script setup lang="ts">
+import { IconButton, Button } from '#ui/components/base/buttons'
 import {
 	CheckCircleIcon,
 	DownloadIcon,
@@ -178,7 +172,6 @@ import {
 	type PopupNotificationButton,
 	type PopupNotificationProgressItem,
 } from '../../providers'
-import ButtonStyled from '../base/ButtonStyled.vue'
 import ProgressBar from '../base/ProgressBar.vue'
 import NotificationToast from '../notifications/NotificationToast.vue'
 

@@ -58,17 +58,9 @@
 			class="col-start-3 row-start-1 flex shrink-0 items-center gap-2 self-start"
 		>
 			<slot name="top-right-actions" />
-			<ButtonStyled
-				v-if="dismissible"
-				circular
-				type="transparent"
-				:color="buttonColors[type]"
-				hover-color-fill="background"
-			>
-				<button type="button" aria-label="Dismiss" @click="$emit('dismiss')">
-					<XIcon />
-				</button>
-			</ButtonStyled>
+			<IconButton type="quiet" :color="(buttonColors[type]) && (buttonColors[type]) !== 'standard' ? ((buttonColors[type]) === 'medal-promo' ? 'medal_promotion' : (buttonColors[type])) : undefined" label="Dismiss" v-if="dismissible" native-type="button" @click="$emit('dismiss')">
+				<XIcon />
+			</IconButton>
 		</div>
 		<div
 			v-if="progress != null"
@@ -92,13 +84,13 @@
 </template>
 
 <script setup lang="ts">
+import { IconButton } from '#ui/components/base/buttons'
 import { ClockIcon, XIcon } from '@modrinth/assets'
 import { useNow } from '@vueuse/core'
 import { computed } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { getSeverityIcon } from '../../utils'
-import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { Button, IconButton } from '@modrinth/ui'
 import { DropdownIcon, EditIcon, PlusIcon, TrashIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	Accordion,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	SkinButton,
@@ -463,25 +463,20 @@ defineExpose({ getAddSkinButtonElement })
 								@select="emit('select', skin)"
 							>
 								<template v-if="!readOnly" #overlay-buttons>
-									<ButtonStyled color="brand">
-										<button
+									<Button type="colored" color="brand"
 											:aria-label="formatMessage(messages.editSkinButton)"
 											class="pointer-events-auto"
 											@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
 										>
-											<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
-										</button>
-									</ButtonStyled>
-									<ButtonStyled v-show="!skin.is_equipped" circular color="red">
-										<button
+										<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+									</Button>
+									<IconButton type="colored" color="red" :label="formatMessage(messages.deleteSkinButton)" v-show="!skin.is_equipped"
 											v-tooltip="formatMessage(messages.deleteSkinButton)"
-											:aria-label="formatMessage(messages.deleteSkinButton)"
 											class="!rounded-[100%] pointer-events-auto"
 											@click.stop="emit('delete', skin)"
 										>
-											<TrashIcon />
-										</button>
-									</ButtonStyled>
+										<TrashIcon />
+									</IconButton>
 								</template>
 							</SkinButton>
 						</div>
@@ -503,25 +498,20 @@ defineExpose({ getAddSkinButtonElement })
 								@select="emit('select', skin)"
 							>
 								<template v-if="!readOnly" #overlay-buttons>
-									<ButtonStyled color="brand">
-										<button
+									<Button type="colored" color="brand"
 											:aria-label="formatMessage(messages.editSkinButton)"
 											class="pointer-events-auto"
 											@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
 										>
-											<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
-										</button>
-									</ButtonStyled>
-									<ButtonStyled v-show="!skin.is_equipped" circular color="red">
-										<button
+										<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+									</Button>
+									<IconButton type="colored" color="red" :label="formatMessage(messages.deleteSkinButton)" v-show="!skin.is_equipped"
 											v-tooltip="formatMessage(messages.deleteSkinButton)"
-											:aria-label="formatMessage(messages.deleteSkinButton)"
 											class="!rounded-[100%] pointer-events-auto"
 											@click.stop="emit('delete', skin)"
 										>
-											<TrashIcon />
-										</button>
-									</ButtonStyled>
+										<TrashIcon />
+									</IconButton>
 								</template>
 							</SkinButton>
 						</div>
@@ -545,15 +535,13 @@ defineExpose({ getAddSkinButtonElement })
 						@select="emit('select', skin)"
 					>
 						<template #overlay-buttons>
-							<ButtonStyled color="brand">
-								<button
+							<Button type="colored" color="brand"
 									:aria-label="formatMessage(messages.editSkinButton)"
 									class="pointer-events-auto"
 									@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
 								>
-									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
-								</button>
-							</ButtonStyled>
+								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+							</Button>
 						</template>
 					</SkinButton>
 				</div>

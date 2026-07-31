@@ -62,27 +62,24 @@
 			</div>
 
 			<div class="flex justify-end gap-2 pt-1">
-				<ButtonStyled type="outlined">
-					<button class="!border !border-surface-5" @click="hide">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="orange">
-					<button v-tooltip="removePermissionTooltip" :disabled="!canRemove" @click="confirm">
-						<TrashIcon v-if="modalState.shouldCancel" aria-hidden="true" />
-						<UserXIcon v-else aria-hidden="true" />
-						{{
-							formatMessage(modalState.shouldCancel ? messages.cancelButton : messages.removeButton)
-						}}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" class="!border !border-surface-5" @click="hide">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="orange" v-tooltip="removePermissionTooltip" :disabled="!canRemove" @click="confirm">
+					<TrashIcon v-if="modalState.shouldCancel" aria-hidden="true" />
+					<UserXIcon v-else aria-hidden="true" />
+					{{
+						formatMessage(modalState.shouldCancel ? messages.cancelButton : messages.removeButton)
+					}}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { TrashIcon, UserXIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
@@ -91,7 +88,6 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import Admonition from '../../base/Admonition.vue'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 import type { ServerAccessRole } from './types'
 

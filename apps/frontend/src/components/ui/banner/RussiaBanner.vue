@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { ButtonLink, IconButton } from '@modrinth/ui'
 import { BookTextIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { commonMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
 
 const flags = useFeatureFlags()
 const { formatMessage } = useVIntl()
@@ -41,29 +42,23 @@ function hideRussiaCensorshipBanner() {
 		</template>
 		<template #actions>
 			<div class="mt-2 flex w-fit gap-2">
-				<ButtonStyled color="brand">
-					<nuxt-link to="/news/article/standing-by-our-values-russian">
-						<BookTextIcon /> Прочесть наше полное заявление
-						<span class="text-xs font-medium">(Перевод на русский)</span>
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled type="transparent" hover-color-fill="background">
-					<nuxt-link to="/news/article/standing-by-our-values">
-						<BookTextIcon /> Read our full statement
-						<span class="text-xs font-medium">(English)</span>
-					</nuxt-link>
-				</ButtonStyled>
+				<ButtonLink type="colored" color="brand" to="/news/article/standing-by-our-values-russian">
+					<BookTextIcon /> Прочесть наше полное заявление
+					<span class="text-xs font-medium">(Перевод на русский)</span>
+				</ButtonLink>
+				<ButtonLink type="quiet" to="/news/article/standing-by-our-values">
+					<BookTextIcon /> Read our full statement
+					<span class="text-xs font-medium">(English)</span>
+				</ButtonLink>
 			</div>
 		</template>
 		<template #actions_top_right>
-			<ButtonStyled circular type="transparent">
-				<button
+			<IconButton type="quiet" :label="formatMessage(commonMessages.closeButton)"
 					v-tooltip="formatMessage(commonMessages.closeButton)"
 					@click="hideRussiaCensorshipBanner"
 				>
-					<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
-				</button>
-			</ButtonStyled>
+				<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
+			</IconButton>
 		</template>
 	</PagewideBanner>
 </template>

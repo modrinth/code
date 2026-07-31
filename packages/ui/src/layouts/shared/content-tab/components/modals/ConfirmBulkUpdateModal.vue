@@ -22,33 +22,29 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="orange">
-					<button
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="orange"
 						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
 						:disabled="buttonsDisabled || props.actionDisabled"
 						@click="confirm"
 					>
-						<DownloadIcon />
-						{{ formatMessage(messages.updateButton, { count: visibleCount }) }}
-					</button>
-				</ButtonStyled>
+					<DownloadIcon />
+					{{ formatMessage(messages.updateButton, { count: visibleCount }) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

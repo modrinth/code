@@ -6,28 +6,24 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button @click="confirm">
-						<TrashIcon />
-						{{ formatMessage(messages.deleteButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red" @click="confirm">
+					<TrashIcon />
+					{{ formatMessage(messages.deleteButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	NewModal,

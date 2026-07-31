@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import {
 	CheckIcon,
 	EditIcon,
@@ -10,7 +11,6 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -1180,8 +1180,7 @@ await loadSkins()
 										>Ears</router-link
 									>
 								</div>
-								<ButtonStyled type="outlined">
-									<button
+								<Button type="outlined"
 										class="ears-feature-toggle-button !h-10 !rounded-[14px] !px-4 shadow-md"
 										:aria-pressed="earsFeaturesEnabled"
 										:aria-label="
@@ -1193,15 +1192,14 @@ await loadSkins()
 										"
 										@click="earsFeaturesEnabled = !earsFeaturesEnabled"
 									>
-										{{
-											formatMessage(
-												earsFeaturesEnabled
-													? messages.toggleEarsFeaturesOff
-													: messages.toggleEarsFeaturesOn,
-											)
-										}}
-									</button>
-								</ButtonStyled>
+									{{
+										formatMessage(
+											earsFeaturesEnabled
+												? messages.toggleEarsFeaturesOff
+												: messages.toggleEarsFeaturesOn,
+										)
+									}}
+								</Button>
 								<Toggle
 									v-model="earsFeaturesEnabled"
 									v-tooltip="
@@ -1278,13 +1276,11 @@ await loadSkins()
 				<p class="text-lg m-0">
 					{{ formatMessage(messages.signInDescription) }}
 				</p>
-				<ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
-					<button :disabled="accountsCard.loginDisabled" @click="login">
-						<LogInIcon v-if="!accountsCard.loginDisabled" />
-						<SpinnerIcon v-else class="animate-spin" />
-						{{ formatMessage(messages.signInButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" v-show="accountsCard" :disabled="accountsCard.loginDisabled" @click="login">
+					<LogInIcon v-if="!accountsCard.loginDisabled" />
+					<SpinnerIcon v-else class="animate-spin" />
+					{{ formatMessage(messages.signInButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>

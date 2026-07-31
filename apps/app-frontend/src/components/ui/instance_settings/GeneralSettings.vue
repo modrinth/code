@@ -1,16 +1,7 @@
 <script setup lang="ts">
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	Checkbox,
-	Chips,
-	defineMessages,
-	injectNotificationManager,
-	OverflowMenu,
-	StyledInput,
-	useVIntl,
-} from '@modrinth/ui'
+import { Avatar, Checkbox, Chips, defineMessages, injectNotificationManager, StyledInput, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -298,17 +289,20 @@ const messages = defineMessages({
 			<div class="flex flex-col gap-1">
 				<span class="text-lg font-semibold text-contrast">Icon</span>
 				<div class="group relative w-fit">
-					<OverflowMenu
+					<TeleportOverflowMenu :label="formatMessage(messages.editIcon)"
 						v-tooltip="formatMessage(messages.editIcon)"
 						class="bg-transparent border-none appearance-none p-0 m-0 cursor-pointer group-active:scale-95 transition-transform"
 						:options="[
 							{
 								id: 'select',
+								label: icon
+									? formatMessage(messages.replaceIcon)
+									: formatMessage(messages.selectIcon),
 								action: () => setIcon(),
 							},
 							{
 								id: 'remove',
-								color: 'danger',
+								label: formatMessage(messages.removeIcon),
 								action: () => resetIcon(),
 								shown: !!icon,
 							},
@@ -331,7 +325,7 @@ const messages = defineMessages({
 							{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
 						</template>
 						<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
-					</OverflowMenu>
+					</TeleportOverflowMenu>
 				</div>
 			</div>
 		</div>
@@ -352,17 +346,15 @@ const messages = defineMessages({
 				<h2 id="duplicate-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
-				<ButtonStyled>
-					<button
+				<Button
 						v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
 						aria-labelledby="duplicate-instance-label"
 						:disabled="installing"
 						class="w-max !shadow-none"
 						@click="duplicateInstance"
 					>
-						<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
-					</button>
-				</ButtonStyled>
+					<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
+				</Button>
 				<p class="m-0">
 					{{ formatMessage(messages.duplicateInstanceDescription) }}
 				</p>
@@ -388,11 +380,9 @@ const messages = defineMessages({
 						class="w-full max-w-[300px]"
 						@submit="() => addCategory"
 					/>
-					<ButtonStyled>
-						<button class="w-fit !shadow-none" @click="() => addCategory()">
-							<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
-						</button>
-					</ButtonStyled>
+					<Button class="w-fit !shadow-none" @click="() => addCategory()">
+						<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
+					</Button>
 				</div>
 			</div>
 			<p class="m-0">
@@ -421,22 +411,20 @@ const messages = defineMessages({
 			<h2 id="delete-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.deleteInstance) }}
 			</h2>
-			<ButtonStyled color="red">
-				<button
+			<Button type="colored" color="red"
 					aria-labelledby="delete-instance-label"
 					:disabled="removing"
 					class="w-fit !shadow-none"
 					@click="deleteConfirmModal.show()"
 				>
-					<SpinnerIcon v-if="removing" class="animate-spin" />
-					<TrashIcon v-else />
-					{{
-						removing
-							? formatMessage(messages.deletingInstanceButton)
-							: formatMessage(messages.deleteInstanceButton)
-					}}
-				</button>
-			</ButtonStyled>
+				<SpinnerIcon v-if="removing" class="animate-spin" />
+				<TrashIcon v-else />
+				{{
+					removing
+						? formatMessage(messages.deletingInstanceButton)
+						: formatMessage(messages.deleteInstanceButton)
+				}}
+			</Button>
 			<p class="m-0">
 				{{ formatMessage(messages.deleteInstanceDescription) }}
 			</p>

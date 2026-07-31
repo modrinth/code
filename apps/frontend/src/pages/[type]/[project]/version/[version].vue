@@ -65,18 +65,14 @@
 				</div>
 
 				<div class="ml-auto mt-4 flex items-center gap-2">
-					<ButtonStyled type="outlined">
-						<button @click="packageModal?.hide()">
-							<XIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="packageLoaders.length === 0" @click="createDataPackVersionHandler">
-							{{ formatMessage(messages.packageDataPack) }}
-							<RightArrowIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" @click="packageModal?.hide()">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" :disabled="packageLoaders.length === 0" @click="createDataPackVersionHandler">
+						{{ formatMessage(messages.packageDataPack) }}
+						<RightArrowIcon aria-hidden="true" />
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -104,16 +100,14 @@
 				>
 					<template #actions>
 						<div class="flex">
-							<ButtonStyled color="orange">
-								<nuxt-link
+							<ButtonLink type="colored" color="orange"
 									:to="`/${project.project_type}/${
 										project.slug ? project.slug : project.id
 									}/settings/permissions`"
 								>
-									{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
-									<RightArrowIcon />
-								</nuxt-link>
-							</ButtonStyled>
+								{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
+								<RightArrowIcon />
+							</ButtonLink>
 						</div>
 					</template>
 				</Admonition>
@@ -127,8 +121,7 @@
 					class="mb-4"
 				>
 					<template #headerActions="{ primaryFile, promotedFiles }">
-						<ButtonStyled color="brand">
-							<a
+						<ButtonLink type="colored" color="brand"
 								v-tooltip="
 									primaryFile?.url
 										? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
@@ -139,20 +132,16 @@
 								:disabled="primaryFile?.url === undefined"
 								@click="emit('onDownload')"
 							>
-								<DownloadIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.downloadButton) }}
-							</a>
-						</ButtonStyled>
-						<ButtonStyled
-							v-for="file in promotedFiles.filter(
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadButton) }}
+						</ButtonLink>
+						<ButtonLink v-for="file in promotedFiles.filter(
 								(x) =>
 									!!x &&
 									(x.file_type === 'required-resource-pack' ||
 										x.file_type === 'optional-resource-pack'),
 							)"
 							:key="`promoted-file-${file.hashes.sha1}`"
-						>
-							<a
 								v-tooltip="file.filename + ' (' + formatBytes(file.size) + ')'"
 								:href="
 									createProjectDownloadUrl(file.url, {
@@ -163,91 +152,89 @@
 								:disabled="primaryFile?.url === undefined"
 								@click="emit('onDownload')"
 							>
-								<DownloadIcon aria-hidden="true" />
-								<template v-if="file.file_type === 'required-resource-pack'">
-									{{ formatMessage(messages.requiredResourcePack) }}
-								</template>
-								<template v-else-if="file.file_type === 'optional-resource-pack'">
-									{{ formatMessage(messages.optionalResourcePack) }}
-								</template>
-							</a>
-						</ButtonStyled>
+							<DownloadIcon aria-hidden="true" />
+							<template v-if="file.file_type === 'required-resource-pack'">
+								{{ formatMessage(messages.requiredResourcePack) }}
+							</template>
+							<template v-else-if="file.file_type === 'optional-resource-pack'">
+								{{ formatMessage(messages.optionalResourcePack) }}
+							</template>
+						</ButtonLink>
 						<template v-if="currentMember">
-							<ButtonStyled
-								v-if="
+							<Button v-if="
 									version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
-								"
-							>
-								<button @click="packageModal?.show()">
-									<PackageClosedIcon aria-hidden="true" />
-									{{ formatMessage(messages.packageAsMod) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled>
-								<OverflowMenu
-									:dropdown-id="`${baseId}-edit-overflow`"
-									class="btn-dropdown-animation"
+								" @click="packageModal?.show()">
+								<PackageClosedIcon aria-hidden="true" />
+								{{ formatMessage(messages.packageAsMod) }}
+							</Button>
+							<TeleportOverflowMenu :label="formatMessage(commonMessages.moreOptionsButton)"
+									class="btn-dropdown-animation !w-auto !px-2.5 !rounded-xl"
 									:options="[
 										{
 											id: 'edit-metadata',
+											label: formatMessage(messages.editMetadata),
 											action: () => handleOpenEditVersionModal(version!.id, project.id, 'metadata'),
 										},
 										{
 											id: 'edit-details',
+											label: formatMessage(messages.editDetails),
 											action: () =>
 												handleOpenEditVersionModal(version!.id, project.id, 'add-details'),
 										},
 										{
 											id: 'edit-files',
+											label: formatMessage(messages.editFiles),
 											action: () =>
 												handleOpenEditVersionModal(version!.id, project.id, 'add-files'),
 										},
 										{
 											id: 'delete',
-											color: 'red',
+											label: formatMessage(commonMessages.deleteLabel),
+											tone: 'red',
 											action: () => confirmModal?.show(),
 										},
 									]"
 								>
-									<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.edit) }}
-									<DropdownIcon class="h-5 w-5 text-secondary" />
-									<template #edit-metadata>
-										<BoxIcon aria-hidden="true" />
-										{{ formatMessage(messages.editMetadata) }}
-									</template>
-									<template #edit-details>
-										<InfoIcon aria-hidden="true" />
-										{{ formatMessage(messages.editDetails) }}
-									</template>
-									<template #edit-files>
-										<FileIcon aria-hidden="true" />
-										{{ formatMessage(messages.editFiles) }}
-									</template>
-									<template #delete>
-										<TrashIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.deleteLabel) }}
-									</template>
-								</OverflowMenu>
-							</ButtonStyled>
+								<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.edit) }}
+								<DropdownIcon class="h-5 w-5 text-secondary" />
+								<template #edit-metadata>
+									<BoxIcon aria-hidden="true" />
+									{{ formatMessage(messages.editMetadata) }}
+								</template>
+								<template #edit-details>
+									<InfoIcon aria-hidden="true" />
+									{{ formatMessage(messages.editDetails) }}
+								</template>
+								<template #edit-files>
+									<FileIcon aria-hidden="true" />
+									{{ formatMessage(messages.editFiles) }}
+								</template>
+								<template #delete>
+									<TrashIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.deleteLabel) }}
+								</template>
+							</TeleportOverflowMenu>
 						</template>
-						<ButtonStyled type="outlined" circular>
-							<OverflowMenu
+						<TeleportOverflowMenu type="outlined" :label="formatMessage(commonMessages.moreOptionsButton)"
 								v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
 									{
 										id: 'report',
-										color: 'red',
+									label: formatMessage(commonMessages.reportButton),
+										tone: 'red',
 										action: () =>
 											auth.user ? reportVersion(version!.id) : navigateTo(signInRouteObj),
 									},
-									{ divider: true, shown: flags.developerMode },
+									{ type: 'divider', shown: flags.developerMode },
 									{
 										id: 'copy-id',
+									label: formatMessage(commonMessages.copyIdButton),
 										action: () => copyToClipboard(version!.id),
 										shown: flags.developerMode,
 									},
 									{
 										id: 'copy-permalink',
+									label: formatMessage(commonMessages.copyPermalinkButton),
 										action: () =>
 											copyToClipboard(
 												`https://modrinth.com/project/${project.id}/version/${version!.id}`,
@@ -256,68 +243,62 @@
 									},
 								]"
 							>
-								<MoreVerticalIcon />
-								<template #report>
-									<ReportIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.reportButton) }}
-								</template>
-								<template #copy-link>
-									<ReportIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.reportButton) }}
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyIdButton) }}
-								</template>
-								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyPermalinkButton) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
+							<MoreVerticalIcon />
+							<template #report>
+								<ReportIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.reportButton) }}
+							</template>
+							<template #copy-link>
+								<ReportIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.reportButton) }}
+							</template>
+							<template #copy-id>
+								<ClipboardCopyIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.copyIdButton) }}
+							</template>
+							<template #copy-permalink>
+								<ClipboardCopyIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.copyPermalinkButton) }}
+							</template>
+						</TeleportOverflowMenu>
 					</template>
 					<template #supplementaryResourceActions="{ file }">
-						<ButtonStyled>
-							<a
+						<ButtonLink
 								:href="decorateDownloadUrl(file.url)"
 								:title="`Download ${file.filename}`"
 								:download="file.filename"
 								tabindex="0"
 							>
-								<DownloadIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.downloadButton) }}
-							</a>
-						</ButtonStyled>
-						<ButtonStyled type="outlined" circular>
-							<OverflowMenu
-								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadButton) }}
+						</ButtonLink>
+						<TeleportOverflowMenu type="outlined" :label="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
 									{
 										id: 'copy-sha1',
+										label: formatMessage(messages.copySha1),
 										action: () => copyFileHash(file, 'sha1'),
 									},
 									{
 										id: 'copy-sha512',
+										label: formatMessage(messages.copySha512),
 										action: () => copyFileHash(file, 'sha512'),
 									},
 								]"
-								:dropdown-id="`${baseId}-supplementary-resource-actions`"
 							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #copy-sha1>
-									<CopyIcon aria-hidden="true" />
-									{{ formatMessage(messages.copySha1) }}
-								</template>
-								<template #copy-sha512>
-									<CopyIcon aria-hidden="true" />
-									{{ formatMessage(messages.copySha512) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
+							<MoreVerticalIcon aria-hidden="true" />
+							<template #copy-sha1>
+								<CopyIcon aria-hidden="true" />
+								{{ formatMessage(messages.copySha1) }}
+							</template>
+							<template #copy-sha512>
+								<CopyIcon aria-hidden="true" />
+								{{ formatMessage(messages.copySha512) }}
+							</template>
+						</TeleportOverflowMenu>
 					</template>
 					<template #dependencyActions="{ dependency }">
-						<ButtonStyled circular>
-							<nuxt-link
+						<ButtonLink
 								v-if="
 									createDependencyLink({
 										project: dependency.project,
@@ -338,12 +319,10 @@
 									})
 								"
 								target="_blank"
-							>
-								<ExternalIcon />
-							</nuxt-link>
-						</ButtonStyled>
-						<ButtonStyled circular color="brand" color-fill="text">
-							<a
+							 class="!w-9 !px-0 !rounded-full">
+							<ExternalIcon />
+						</ButtonLink>
+						<ButtonLink
 								v-if="
 									(dependency.version ?? getDependencyVersion(dependency.dependency)) &&
 									dependency.dependency.dependency_type !== 'incompatible'
@@ -368,18 +347,24 @@
 										dependency.version ?? getDependencyVersion(dependency.dependency),
 									)?.url
 								"
+								:aria-label="
+									getDependencyPrimaryFileTooltip(
+										dependency.version ?? getDependencyVersion(dependency.dependency),
+									)
+								"
+								class="!w-9 !px-0 !rounded-full !text-brand [&>svg]:!text-brand"
 							>
 								<DownloadIcon />
-							</a>
-							<button
+						</ButtonLink>
+						<IconButton
 								v-else-if="dependency.project"
 								v-tooltip="formatMessage(messages.downloadProject)"
-								:aria-label="formatMessage(messages.downloadProject)"
+								:label="formatMessage(messages.downloadProject)"
+								class="!text-brand [&>svg]:!text-brand"
 								@click="openDependencyDownloadModal(dependency.project, $event)"
 							>
 								<DownloadIcon />
-							</button>
-						</ButtonStyled>
+						</IconButton>
 					</template>
 				</VersionPage>
 				<section
@@ -479,6 +464,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { Button, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
@@ -501,7 +487,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	Collapsible,
 	commonMessages,
 	commonProjectSettingsMessages,
@@ -515,11 +500,11 @@ import {
 	IntlFormatted,
 	MultiSelect,
 	NewModal,
-	OverflowMenu,
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
 	VersionPage,
+	IconButton,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'

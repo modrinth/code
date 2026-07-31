@@ -55,8 +55,7 @@
 							</div>
 						</div>
 						<div class="flex gap-2">
-							<ButtonStyled circular>
-								<button
+							<IconButton :label="formatMessage(commonMessages.renameButton)"
 									v-tooltip="formatMessage(commonMessages.renameButton)"
 									@click="
 										() => {
@@ -65,11 +64,9 @@
 										}
 									"
 								>
-									<EditIcon />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular>
-								<button
+								<EditIcon />
+							</IconButton>
+							<IconButton :label="formatMessage(messages.deletePasskeyButton)"
 									v-tooltip="formatMessage(messages.deletePasskeyButton)"
 									@click="
 										() => {
@@ -78,25 +75,20 @@
 										}
 									"
 								>
-									<TrashIcon />
-								</button>
-							</ButtonStyled>
+								<TrashIcon />
+							</IconButton>
 						</div>
 					</div>
 				</template>
 				<div class="input-group self-end">
-					<ButtonStyled>
-						<button @click="registerPasskey()">
-							<PlusIcon />
-							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="managePasskeyModal?.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.closeButton) }}
-						</button>
-					</ButtonStyled>
+					<Button @click="registerPasskey()">
+						<PlusIcon />
+						{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
+					</Button>
+					<Button @click="managePasskeyModal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.closeButton) }}
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -124,18 +116,14 @@
 					</div>
 				</div>
 				<div class="flex justify-end gap-2.5">
-					<ButtonStyled>
-						<button @click="addPasskeyModal?.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="!pendingPasskeyName" @click="finishRegisterPasskey()">
-							<PlusIcon />
-							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
-						</button>
-					</ButtonStyled>
+					<Button @click="addPasskeyModal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" :disabled="!pendingPasskeyName" @click="finishRegisterPasskey()">
+						<PlusIcon />
+						{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -163,18 +151,14 @@
 					</div>
 				</div>
 				<div class="flex justify-end gap-2.5">
-					<ButtonStyled>
-						<button @click="renamePasskeyModal?.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="!passkeyToRenameName" @click="renamePasskey()">
-							<SaveIcon />
-							{{ formatMessage(commonMessages.saveButton) }}
-						</button>
-					</ButtonStyled>
+					<Button @click="renamePasskeyModal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" :disabled="!passkeyToRenameName" @click="renamePasskey()">
+						<SaveIcon />
+						{{ formatMessage(commonMessages.saveButton) }}
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -187,17 +171,16 @@
 				}}</span>
 			</label>
 			<div>
-				<ButtonStyled>
-					<button id="manage-passkeys" @click="showPasskeyModal">
-						<UserKeyIcon /> {{ formatMessage(messages.managePasskeyButton) }}
-					</button>
-				</ButtonStyled>
+				<Button id="manage-passkeys" @click="showPasskeyModal">
+					<UserKeyIcon /> {{ formatMessage(messages.managePasskeyButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Button, IconButton } from '@modrinth/ui'
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	EditIcon,
@@ -209,7 +192,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,

@@ -82,11 +82,9 @@
 							class="project__icon"
 						/>
 						<div class="flex flex-col gap-2">
-							<ButtonStyled>
-								<FileInput
+							<FileButton
 									id="project-icon"
 									:max-size="262144000"
-									:show-icon="true"
 									accept="image/png,image/jpeg,image/gif,image/webp"
 									class="button-like choose-image"
 									prompt="Upload icon"
@@ -94,15 +92,12 @@
 									:disabled="!hasPermission"
 									@change="showPreviewImage"
 								>
-									<UploadIcon aria-hidden="true" />
-								</FileInput>
-							</ButtonStyled>
-							<ButtonStyled v-if="!deletedIcon && (previewImage || project.icon_url)">
-								<button :disabled="!hasPermission" @click="markIconForDeletion">
-									<TrashIcon aria-hidden="true" />
-									Remove icon
-								</button>
-							</ButtonStyled>
+								<UploadIcon aria-hidden="true" />
+							</FileButton>
+							<Button v-if="!deletedIcon && (previewImage || project.icon_url)" :disabled="!hasPermission" @click="markIconForDeletion">
+								<TrashIcon aria-hidden="true" />
+								Remove icon
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -160,25 +155,20 @@
 							</label>
 						</div>
 						<div class="mt-2 flex items-center gap-2">
-							<ButtonStyled>
-								<FileInput
+							<FileButton
 									:max-size="524288"
-									:show-icon="true"
 									accept="image/png,image/jpeg,image/gif,image/webp"
 									class="button-like"
 									prompt="Upload banner"
 									:disabled="!hasPermission"
 									@change="showBannerPreview"
 								>
-									<UploadIcon aria-hidden="true" />
-								</FileInput>
-							</ButtonStyled>
-							<ButtonStyled v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)">
-								<button :disabled="!hasPermission" @click="markBannerForDeletion">
-									<TrashIcon aria-hidden="true" />
-									Remove banner
-								</button>
-							</ButtonStyled>
+								<UploadIcon aria-hidden="true" />
+							</FileButton>
+							<Button v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)" :disabled="!hasPermission" @click="markBannerForDeletion">
+								<TrashIcon aria-hidden="true" />
+								Remove banner
+							</Button>
 						</div>
 						<div class="mt-2 text-secondary">Gif, 468×60px recommended.</div>
 					</div>
@@ -279,24 +269,22 @@
 					</span>
 				</div>
 				<div v-if="isStaff" class="mt-2">
-					<ButtonStyled color="orange">
-						<button
+					<Button type="colored" color="orange"
 							v-if="!isForceDemonetized"
 							:disabled="loadingModeratorMonetization"
 							@click="updateMonetizationStatus('force-demonetized')"
 						>
-							<ScaleIcon aria-hidden="true" />
-							Disable monetization
-						</button>
-						<button
-							v-else
-							:disabled="loadingModeratorMonetization"
-							@click="updateMonetizationStatus('monetized')"
-						>
-							<ScaleIcon aria-hidden="true" />
-							Allow monetization
-						</button>
-					</ButtonStyled>
+						<ScaleIcon aria-hidden="true" />
+						Disable monetization
+					</button>
+					<button
+						v-else
+						:disabled="loadingModeratorMonetization"
+						@click="updateMonetizationStatus('monetized')"
+					>
+						<ScaleIcon aria-hidden="true" />
+						Allow monetization
+					</Button>
 				</div>
 			</div>
 		</section>
@@ -311,12 +299,10 @@
 				Removes your project from Modrinth's servers and search. Clicking on this will delete your
 				project, so be extra careful!
 			</p>
-			<ButtonStyled color="red">
-				<button :disabled="!hasDeletePermission" @click="$refs.modal_confirm.show()">
-					<TrashIcon aria-hidden="true" />
-					Delete project
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="red" :disabled="!hasDeletePermission" @click="$refs.modal_confirm.show()">
+				<TrashIcon aria-hidden="true" />
+				Delete project
+			</Button>
 		</section>
 		<UnsavedChangesPopup
 			:original="original"
@@ -330,11 +316,11 @@
 </template>
 
 <script setup>
+import { Button, FileButton } from '@modrinth/ui'
 import { ImageIcon, ScaleIcon, TrashIcon, TriangleAlertIcon, UploadIcon } from '@modrinth/assets'
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
-	ButtonStyled,
 	Combobox,
 	ConfirmLeaveModal,
 	ConfirmModal,

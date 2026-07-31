@@ -13,11 +13,8 @@
 			<template v-if="hasHitLimit">
 				{{ formatMessage(messages.limitReachedDescription, { type: typeName.singular, max }) }}
 				<div class="w-min">
-					<ButtonStyled color="red">
-						<NuxtLink to="https://support.modrinth.com" target="_blank">
-							<MessageIcon />{{ formatMessage(messages.contactSupport) }}</NuxtLink
-						>
-					</ButtonStyled>
+					<ButtonLink type="colored" color="red" to="https://support.modrinth.com" target="_blank">
+						<MessageIcon />{{ formatMessage(messages.contactSupport) }}</ButtonLink>
 				</div>
 			</template>
 			<template v-else>
@@ -29,11 +26,8 @@
 					})
 				}}
 				<div class="w-min">
-					<ButtonStyled color="orange">
-						<NuxtLink to="https://support.modrinth.com" target="_blank">
-							<MessageIcon />{{ formatMessage(messages.contactSupport) }}</NuxtLink
-						>
-					</ButtonStyled>
+					<ButtonLink type="colored" color="orange" to="https://support.modrinth.com" target="_blank">
+						<MessageIcon />{{ formatMessage(messages.contactSupport) }}</ButtonLink>
 				</div>
 			</template>
 		</div>
@@ -42,13 +36,7 @@
 
 <script setup lang="ts">
 import { MessageIcon } from '@modrinth/assets'
-import {
-	Admonition,
-	ButtonStyled,
-	defineMessages,
-	injectModrinthClient,
-	useVIntl,
-} from '@modrinth/ui'
+import { Admonition, defineMessages, injectModrinthClient, useVIntl, ButtonLink } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'

@@ -66,12 +66,10 @@
 			<!-- CTA section -->
 			<div class="flex flex-col gap-6 items-start">
 				<div class="flex flex-col gap-3 items-start">
-					<ButtonStyled color="brand">
-						<button @click="onClickNewServer?.()">
-							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(messages.newServerButton) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="onClickNewServer?.()">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.newServerButton) }}
+					</Button>
 
 					<AutoLink
 						to="https://modrinth.com/hosting"
@@ -90,12 +88,10 @@
 						<p class="text-base font-normal text-primary">
 							{{ formatMessage(messages.alreadyHaveServerLabel) }}
 						</p>
-						<ButtonStyled>
-							<button @click="onClickSignIn?.()">
-								<LogInIcon aria-hidden="true" />
-								{{ formatMessage(messages.signInButton) }}
-							</button>
-						</ButtonStyled>
+						<Button @click="onClickSignIn?.()">
+							<LogInIcon aria-hidden="true" />
+							{{ formatMessage(messages.signInButton) }}
+						</Button>
 					</div>
 				</template>
 			</div>
@@ -143,6 +139,7 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from '#ui/components/base/buttons'
 import {
 	GlobeIcon,
 	LogInIcon,
@@ -153,7 +150,6 @@ import {
 } from '@modrinth/assets'
 import { AutoLink } from '@modrinth/ui'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import imgAircraft from './grid-images/aircraft.png'

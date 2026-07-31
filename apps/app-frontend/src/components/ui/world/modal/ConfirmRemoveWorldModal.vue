@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	NewModal,
@@ -106,18 +106,14 @@ defineExpose({ show, hide })
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hide">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button :disabled="!isServer && !isSingleplayer" @click="confirm">
-						<TrashIcon />
-						{{ formatMessage(actionMessage) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hide">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red" :disabled="!isServer && !isSingleplayer" @click="confirm">
+					<TrashIcon />
+					{{ formatMessage(actionMessage) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>

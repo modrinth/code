@@ -84,24 +84,22 @@
 			<label for="create-account-consent">I agree to receive account updates by email</label>
 		</div>
 
-		<ButtonStyled color="brand">
-			<button
+		<Button type="colored" color="brand"
 				class="!w-full font-bold"
 				:disabled="globals?.captcha_enabled ? !tokenModel : false"
 				@click="onCompleteSignUpClick"
 			>
-				{{ formatMessage(messages.completeSignUpButton) }}
-				<RightArrowIcon />
-			</button>
-		</ButtonStyled>
+			{{ formatMessage(messages.completeSignUpButton) }}
+			<RightArrowIcon />
+		</Button>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Button } from '@modrinth/ui'
 import { RightArrowIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
 	Checkbox,
 	DatePicker,
 	defineMessages,

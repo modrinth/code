@@ -130,27 +130,26 @@
 			</span>
 		</span>
 		<div v-if="isStaff(auth.user) && message.author_id === auth.user.id" class="message__actions">
-			<ButtonStyled circular type="transparent">
-				<OverflowMenu
+			<TeleportOverflowMenu type="quiet" label="More options"
 					class="btn-dropdown-animation"
 					:options="[
 						{
 							id: 'delete',
+							label: 'Delete',
 							action: () => deleteMessage(),
-							color: 'red',
-							hoverFilled: true,
+							tone: 'red',
 						},
 					]"
 				>
-					<MoreHorizontalIcon />
-					<template #delete> <TrashIcon /> Delete </template>
-				</OverflowMenu>
-			</ButtonStyled>
+				<MoreHorizontalIcon />
+				<template #delete> <TrashIcon /> Delete </template>
+			</TeleportOverflowMenu>
 		</div>
 	</div>
 </template>
 
 <script setup>
+import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	EyeOffIcon,
 	InfoIcon,
@@ -165,8 +164,6 @@ import {
 	AutoLink,
 	Avatar,
 	Badge,
-	ButtonStyled,
-	OverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'

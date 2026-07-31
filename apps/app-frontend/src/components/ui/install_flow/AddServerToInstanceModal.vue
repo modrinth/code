@@ -1,9 +1,9 @@
 <script setup>
+import { Button } from '@modrinth/ui'
 import { CheckIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
-	ButtonStyled,
 	injectNotificationManager,
 	StyledInput,
 } from '@modrinth/ui'
@@ -109,19 +109,15 @@ async function addServer(instance) {
 						/>
 						{{ instance.name }}
 					</router-link>
-					<ButtonStyled>
-						<button :disabled="instance.added || instance.adding" @click="addServer(instance)">
-							<PlusIcon v-if="!instance.added && !instance.adding" />
-							<CheckIcon v-else-if="instance.added" />
-							{{ instance.adding ? 'Adding...' : instance.added ? 'Added' : 'Add' }}
-						</button>
-					</ButtonStyled>
+					<Button :disabled="instance.added || instance.adding" @click="addServer(instance)">
+						<PlusIcon v-if="!instance.added && !instance.adding" />
+						<CheckIcon v-else-if="instance.added" />
+						{{ instance.adding ? 'Adding...' : instance.added ? 'Added' : 'Add' }}
+					</Button>
 				</div>
 			</div>
 			<div class="input-group push-right">
-				<ButtonStyled>
-					<button @click="modal.hide()">Cancel</button>
-				</ButtonStyled>
+				<Button @click="modal.hide()">Cancel</Button>
 			</div>
 		</div>
 	</ModalWrapper>

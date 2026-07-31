@@ -21,20 +21,18 @@
 				</span>
 			</div>
 		</div>
-		<ButtonStyled color="medal-promo" type="outlined" size="large">
-			<nuxt-link
+		<ButtonLink type="outlined" size="xl"
 				to="https://medal.tv/modrinth"
-				class="z-10 my-auto mt-2 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto"
+				class="z-10 my-auto mt-2 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto !text-[var(--medal-promotion-text-orange)] [&>svg]:!text-[var(--medal-promotion-text-orange)] !shadow-[inset_0_0_0_1px_var(--color-orange)]"
 				>{{ formatMessage(messages.learnMoreButton) }} <ExternalIcon
-			/></nuxt-link>
-		</ButtonStyled>
+		/></ButtonLink>
 	</div>
 </template>
 
 <script lang="ts" setup>
+import { ButtonLink } from '@modrinth/ui'
 import { ExternalIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	IntlFormatted,
 	MedalBackgroundImage,

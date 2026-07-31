@@ -40,29 +40,26 @@
 				</template>
 				<template #cell-actions="{ row }">
 					<div class="flex justify-end">
-						<ButtonStyled circular type="transparent">
-							<button
-								v-tooltip="formatMessage(messages.revokeInvite)"
-								:aria-label="
+						<IconButton type="quiet" :label="
 									formatMessage(messages.revokeInviteWithCode, {
 										code: row.id,
 									})
 								"
+								v-tooltip="formatMessage(messages.revokeInvite)"
 								:disabled="revokeInviteMutation.isPending.value || isBusy"
 								class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
 								@click="revokeInviteModal?.show(row.id)"
 							>
-								<SpinnerIcon
-									v-if="
-										revokeInviteMutation.isPending.value &&
-										revokeInviteMutation.variables.value?.inviteId === row.id
-									"
-									class="animate-spin"
-									aria-hidden="true"
-								/>
-								<XIcon v-else aria-hidden="true" />
-							</button>
-						</ButtonStyled>
+							<SpinnerIcon
+								v-if="
+									revokeInviteMutation.isPending.value &&
+									revokeInviteMutation.variables.value?.inviteId === row.id
+								"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<XIcon v-else aria-hidden="true" />
+						</IconButton>
 					</div>
 				</template>
 			</Table>
@@ -80,9 +77,9 @@
 </template>
 
 <script setup lang="ts">
+import { IconButton } from '@modrinth/ui'
 import { SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	CopyCode,
 	defineMessages,
 	Table,
