@@ -59,7 +59,7 @@
 			:interaction="triggerInteraction"
 			:disabled="disabled"
 			:class="[
-				'w-full !justify-between overflow-hidden text-left',
+				'min-w-full w-full !justify-between overflow-hidden text-left',
 				props.triggerClass,
 				{ 'z-[9999]': isOpen },
 			]"
