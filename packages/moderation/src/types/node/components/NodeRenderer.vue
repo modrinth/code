@@ -5,7 +5,14 @@ import { computed, inject, watchEffect } from 'vue'
 import type { Component } from 'vue'
 
 import type { AnyNode, ChildNode, HasChildren } from '../builder'
-import type { ComponentNodePropsContext, Enableable, HasValue, Identified, OnChangeFn } from '../capabilities'
+import type {
+	ComponentNodePropsContext,
+	Enableable,
+	HasValue,
+	Identified,
+	OnChangeFn,
+	TweakDef,
+} from '../capabilities'
 import { CHECKLIST_META_KEY } from '../context'
 import ActionButton from './ActionButton.vue'
 import { childWriter, originScope, writeNodeValue } from '../mutate'
@@ -48,6 +55,7 @@ type RenderableValueNode = AnyNode &
 		_modelProp: string
 		_componentProps?: (ctx: ComponentNodePropsContext) => Record<string, unknown>
 		_extraProps?: (ctx: ComponentNodePropsContext) => Record<string, unknown>
+		_tweaks?: TweakDef[]
 	}
 
 function resolveComponent(node: RenderableValueNode): Component | undefined {
@@ -185,6 +193,32 @@ function clickButton(node: object): void {
 	;(node._onClick as (state: Record<string, NodeState>) => void)?.(wrappedState.value)
 }
 
+function tweakCurrent(node: RenderableValueNode): unknown {
+	return getEffectiveValue(node, props.state[node.id], wrappedState.value)
+}
+
+function tweakResult(tweak: TweakDef, node: RenderableValueNode): unknown {
+	return tweak.compute(tweakCurrent(node), wrappedState.value)
+}
+
+function tweakEnabled(tweak: TweakDef, node: RenderableValueNode): boolean {
+	const result = tweakResult(tweak, node)
+	return result !== null && result !== undefined && result !== tweakCurrent(node)
+}
+
+function tweakTooltip(tweak: TweakDef, node: RenderableValueNode): Record<string, unknown> | undefined {
+	if (!tweakEnabled(tweak, node)) return undefined
+	const content = tweakResult(tweak, node)
+	return content ? { ...TOOLTIP_BASE, content: String(content) } : undefined
+}
+
+function applyTweak(tweak: TweakDef, node: RenderableValueNode): void {
+	const result = tweakResult(tweak, node)
+	if (result !== null && result !== undefined) {
+		updateValue(node, result)
+	}
+}
+
 function nodeKey(item: ChildNode, idx: number): string {
 	return typeof item === 'object' && item !== null && hasIdCap(item) ? item.id : `n-${idx}`
 }
@@ -271,6 +305,20 @@ watchEffect(() => {
 							:[modelProp(item)]="getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)"
 							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
 						/>
+						<template
+							v-for="(tweak, tIdx) in (item as RenderableValueNode)._tweaks ?? []"
+							:key="`tweak-${tIdx}`"
+						>
+							<ButtonStyled circular>
+								<button
+									v-tooltip="tweakTooltip(tweak, item as RenderableValueNode)"
+									:disabled="!tweakEnabled(tweak, item as RenderableValueNode)"
+									@click="applyTweak(tweak, item as RenderableValueNode)"
+								>
+									<component :is="tweak.icon" />
+								</button>
+							</ButtonStyled>
+						</template>
 					</template>
 
 					<template v-else-if="hasCap(item, '_onClick')">

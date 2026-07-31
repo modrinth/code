@@ -21,6 +21,7 @@ import {
   withStateOrigin,
   withTitle,
   withTooltip,
+  withTweak,
   withShown,
 } from "./capabilities"
 import type {ComponentNodePropsContext} from "./capabilities"
@@ -279,6 +280,7 @@ export function text(id: string) {
       withEditable,
       (n) => Object.assign(n, {_showTooltip: true, _imperativeSync: true}),
       (n) => withValue(n, stringValue),
+      withTweak,
       (n) =>
         withComponent(n, {
           component: markRaw(StyledInput),

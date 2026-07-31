@@ -406,6 +406,26 @@ export function withEditable<T extends object>(node: T): T & Editable {
 	})
 }
 
+export interface TweakDef<V = unknown> {
+	icon: FunctionalComponent<SVGAttributes>
+	compute: (current: V, state: Record<string, NodeState>) => V | null | undefined
+}
+
+export interface Tweakable<V = unknown> {
+	_tweaks: TweakDef<V>[]
+	tweak(this: this, icon: FunctionalComponent<SVGAttributes>, compute: TweakDef<V>['compute']): this
+}
+
+export function withTweak<T extends HasValue<V>, V>(node: T): T & Tweakable<V> {
+	return Object.assign(node, {
+		_tweaks: [] as TweakDef<V>[],
+		tweak(this: any, icon: FunctionalComponent<SVGAttributes>, compute: TweakDef<V>['compute']) {
+			this._tweaks.push({ icon, compute })
+			return this
+		},
+	})
+}
+
 export interface StateOrigin {
 	_stateOrigin: string[] | undefined
 	stateOrigin(this: this, path: string[]): this
