@@ -764,11 +764,17 @@ function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): bool
 	return !result.locked || !!result.expired || !!result.isOwnLock
 }
 
+function isNotFoundError(error: unknown): boolean {
+	if (!error || typeof error !== 'object') return false
+	const fetchError = error as { statusCode?: number; response?: { status?: number } }
+	return fetchError.statusCode === 404 || fetchError.response?.status === 404
+}
+
 function notifySkippedQueueProjects(count: number) {
 	if (count <= 0) return
 	addNotification({
 		title: 'Skipped projects',
-		text: `Skipped ${count} project(s) already moderated or locked by others.`,
+		text: `Skipped ${count} project(s) already moderated, deleted, or locked by others.`,
 		type: 'info',
 		autoCloseMs: 2000,
 	})
@@ -799,10 +805,10 @@ async function batchCheckQueueCandidates(
 		projectIds.map(async (id) => {
 			const [lockResponse, projectData] = await Promise.all([
 				moderationQueue.checkLock(id),
-				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
+				useBaseFetch(`project/${id}`, { method: 'GET' }),
 			])
 
-			const status = (projectData as { status?: string } | null)?.status
+			const status = (projectData as { status?: string }).status
 
 			return {
 				id,
@@ -812,7 +818,7 @@ async function batchCheckQueueCandidates(
 				slug: (projectData as { slug?: string } | null)?.slug,
 				projectType: (projectData as { project_type?: string } | null)?.project_type,
 				status,
-				isProcessing: projectData === null ? true : status === 'processing',
+				isProcessing: status === 'processing',
 			}
 		}),
 	)
@@ -820,6 +826,8 @@ async function batchCheckQueueCandidates(
 	checks.forEach((result, index) => {
 		if (result.status === 'fulfilled') {
 			results.set(result.value.id, result.value)
+		} else if (isNotFoundError(result.reason)) {
+			results.set(projectIds[index], { locked: false, isProcessing: false })
 		} else {
 			results.set(projectIds[index], { locked: false, isProcessing: true })
 		}
@@ -966,7 +974,7 @@ async function skipToNextProject() {
 		debug('[skipToNextProject] No eligible projects in queue')
 		addNotification({
 			title: 'No projects available',
-			text: 'All remaining projects are already moderated or locked by others.',
+			text: 'All remaining projects are already moderated, deleted, or locked by others.',
 			type: 'warning',
 		})
 	}
@@ -1720,7 +1728,7 @@ async function endChecklist(status?: string) {
 					)
 					addNotification({
 						title: 'No projects available',
-						text: 'All remaining projects are already moderated or locked by others.',
+						text: 'All remaining projects are already moderated, deleted, or locked by others.',
 						type: 'warning',
 					})
 				}
