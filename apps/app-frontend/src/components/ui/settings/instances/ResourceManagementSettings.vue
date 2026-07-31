@@ -1,5 +1,5 @@
 <script setup>
-import { IconButton } from '@modrinth/ui'
+import { Button, IconButton } from '@modrinth/ui'
 import { BoxIcon, FolderOpenIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
 import {
 	defineMessages,
@@ -232,10 +232,10 @@ async function findLauncherDir() {
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.appCacheTitle) }}
 			</h2>
-			<button id="purge-cache" class="btn min-w-max" @click="handlePurgeCacheClick">
+			<Button id="purge-cache" class="w-fit" @click="handlePurgeCacheClick">
 				<TrashIcon aria-hidden="true" />
 				{{ formatMessage(messages.purgeCache) }}
-			</button>
+			</Button>
 			<p class="m-0 leading-tight text-secondary">
 				{{ formatMessage(messages.appCacheDescription) }}
 			</p>
@@ -277,10 +277,10 @@ async function findLauncherDir() {
 			<h2 class="mt-0 m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.appDatabaseBackupsTitle) }}
 			</h2>
-			<button id="open-db-backups-folder" class="btn min-w-max" @click="openDbBackupsFolder">
+			<Button id="open-db-backups-folder" class="w-fit" @click="openDbBackupsFolder">
 				<FolderOpenIcon aria-hidden="true" />
 				{{ formatMessage(messages.openBackupsFolder) }}
-			</button>
+			</Button>
 			<p class="m-0 leading-tight text-secondary">
 				{{ formatMessage(messages.appDatabaseBackupsDescription) }}
 			</p>
