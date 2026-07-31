@@ -24,6 +24,7 @@ import {
 	type InstanceGroupDefinition,
 	list_groups as listInstanceGroups,
 	rename_group as renameInstanceGroup,
+	set_group_memberships as setInstanceGroupMemberships,
 } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
@@ -619,45 +620,45 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		}
 		pendingInstanceGroupIds.value = nextPendingInstanceGroupIds
 
-		const results = await Promise.allSettled(
-			operations.map((operation) =>
-				edit(operation.instanceId, { group_ids: operation.nextGroupIds }),
-			),
-		)
-		let movedInstanceCount = 0
-		const nextSelectedInstances = new Map(selectedLibraryInstances.value)
-		const pendingInstanceGroupIdsAfterFailures = new Map(pendingInstanceGroupIds.value)
-
-		for (const [index, result] of results.entries()) {
-			if (result.status === 'rejected') {
-				handleError(toError(result.reason))
-				const operation = operations[index]
-				const pendingGroupIds = pendingInstanceGroupIdsAfterFailures.get(operation.instanceId)
+		try {
+			await setInstanceGroupMemberships(
+				operations.map((operation) => ({
+					instance_id: operation.instanceId,
+					group_ids: operation.nextGroupIds,
+				})),
+			)
+		} catch (error) {
+			const pendingInstanceGroupIdsAfterFailure = new Map(pendingInstanceGroupIds.value)
+			for (const operation of operations) {
+				const pendingGroupIds = pendingInstanceGroupIdsAfterFailure.get(operation.instanceId)
 				if (pendingGroupIds && haveSameGroupIds(pendingGroupIds, operation.nextGroupIds)) {
-					pendingInstanceGroupIdsAfterFailures.delete(operation.instanceId)
-				}
-			} else {
-				movedInstanceCount++
-				const operation = operations[index]
-				const selectedMovedSelections = operation.selections.filter((selection) =>
-					nextSelectedInstances.has(getLibraryInstanceSelectionKey(selection)),
-				)
-				for (const selection of selectedMovedSelections) {
-					nextSelectedInstances.delete(getLibraryInstanceSelectionKey(selection))
-				}
-				if (selectedMovedSelections.length > 0 && operation.destinationSelectionGroupId !== null) {
-					const movedSelection = {
-						instanceId: operation.instanceId,
-						groupId: operation.destinationSelectionGroupId,
-					}
-					nextSelectedInstances.set(getLibraryInstanceSelectionKey(movedSelection), movedSelection)
+					pendingInstanceGroupIdsAfterFailure.delete(operation.instanceId)
 				}
 			}
+			pendingInstanceGroupIds.value = pendingInstanceGroupIdsAfterFailure
+			handleError(toError(error))
+			return false
 		}
-		pendingInstanceGroupIds.value = pendingInstanceGroupIdsAfterFailures
+
+		const nextSelectedInstances = new Map(selectedLibraryInstances.value)
+		for (const operation of operations) {
+			const selectedMovedSelections = operation.selections.filter((selection) =>
+				nextSelectedInstances.has(getLibraryInstanceSelectionKey(selection)),
+			)
+			for (const selection of selectedMovedSelections) {
+				nextSelectedInstances.delete(getLibraryInstanceSelectionKey(selection))
+			}
+			if (selectedMovedSelections.length > 0 && operation.destinationSelectionGroupId !== null) {
+				const movedSelection = {
+					instanceId: operation.instanceId,
+					groupId: operation.destinationSelectionGroupId,
+				}
+				nextSelectedInstances.set(getLibraryInstanceSelectionKey(movedSelection), movedSelection)
+			}
+		}
 		selectedLibraryInstances.value = nextSelectedInstances
 
-		return movedInstanceCount > 0
+		return operations.length > 0
 	}
 
 	useEventListener(window, 'keydown', (event) => {
@@ -748,10 +749,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		savingGroupInstances.value = true
 
 		try {
-			await Promise.all(
-				operations.map(({ instance, nextGroupIds }) =>
-					edit(instance.id, { group_ids: nextGroupIds }),
-				),
+			await setInstanceGroupMemberships(
+				operations.map(({ instance, nextGroupIds }) => ({
+					instance_id: instance.id,
+					group_ids: nextGroupIds,
+				})),
 			)
 
 			const nextSelectedInstances = new Map(selectedLibraryInstances.value)
@@ -867,14 +869,13 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				group,
 			]
 
-			await Promise.all(
+			await setInstanceGroupMemberships(
 				instances.value
 					.filter((instance) => selectedNewGroupInstanceIds.value.has(instance.id))
-					.map((instance) =>
-						edit(instance.id, {
-							group_ids: [...instance.group_ids, group.id],
-						}),
-					),
+					.map((instance) => ({
+						instance_id: instance.id,
+						group_ids: [...instance.group_ids, group.id],
+					})),
 			)
 			return true
 		} catch (error) {
@@ -897,12 +898,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			const instancesToAdd = instances.value.filter((instance) =>
 				selectedInstanceIds.has(instance.id),
 			)
-			await Promise.all(
-				instancesToAdd.map((instance) =>
-					edit(instance.id, {
-						group_ids: [...instance.group_ids, group.id],
-					}),
-				),
+			await setInstanceGroupMemberships(
+				instancesToAdd.map((instance) => ({
+					instance_id: instance.id,
+					group_ids: [...instance.group_ids, group.id],
+				})),
 			)
 
 			libraryGroups.value = [

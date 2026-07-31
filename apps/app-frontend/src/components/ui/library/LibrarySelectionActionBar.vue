@@ -69,7 +69,8 @@ import { computed, ref } from 'vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { toError } from '@/helpers/errors'
-import { edit, remove } from '@/helpers/instance'
+import { remove } from '@/helpers/instance'
+import { set_group_memberships as setInstanceGroupMemberships } from '@/helpers/instance-groups'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
@@ -144,32 +145,32 @@ async function removeSelectedInstancesFromGroups() {
 		const instance = instances.value.find((candidate) => candidate.id === instanceId)
 		return instance ? [{ instance, groupIds }] : []
 	})
-	const results = await Promise.allSettled(
-		operations.map(({ instance, groupIds }) => {
-			return edit(instance.id, {
+	try {
+		await setInstanceGroupMemberships(
+			operations.map(({ instance, groupIds }) => ({
+				instance_id: instance.id,
 				group_ids: instance.group_ids.filter((groupId) => !groupIds.has(groupId)),
-			})
-		}),
-	)
+			})),
+		)
 
-	const nextSelectedInstances = new Map(selectedLibraryInstances.value)
-	for (const [index, result] of results.entries()) {
-		if (result.status === 'rejected') {
-			handleError(toError(result.reason))
-		} else {
-			for (const groupId of operations[index].groupIds) {
+		const nextSelectedInstances = new Map(selectedLibraryInstances.value)
+		for (const { instance, groupIds } of operations) {
+			for (const groupId of groupIds) {
 				nextSelectedInstances.delete(
 					getLibraryInstanceSelectionKey({
-						instanceId: operations[index].instance.id,
+						instanceId: instance.id,
 						groupId,
 					}),
 				)
 			}
 		}
-	}
 
-	setSelectedLibraryInstances(nextSelectedInstances.values())
-	removingFromGroup.value = false
+		setSelectedLibraryInstances(nextSelectedInstances.values())
+	} catch (error) {
+		handleError(toError(error))
+	} finally {
+		removingFromGroup.value = false
+	}
 }
 
 async function deleteSelectedInstances() {

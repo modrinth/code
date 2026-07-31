@@ -9,7 +9,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import LibrarySection from '@/components/ui/library/index.vue'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
-import { instance_listener } from '@/helpers/events'
+import { instance_groups_listener, instance_listener } from '@/helpers/events'
 import { list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
@@ -60,10 +60,14 @@ if (hasCreatedInstance.value) {
 	await fetchInstances()
 }
 
-const unlistenInstance = await instance_listener(fetchInstances)
+const [unlistenInstance, unlistenInstanceGroups] = await Promise.all([
+	instance_listener(fetchInstances),
+	instance_groups_listener(fetchInstances),
+])
 
 onUnmounted(() => {
 	unlistenInstance()
+	unlistenInstanceGroups()
 })
 
 function openPageContextMenu(event: MouseEvent) {

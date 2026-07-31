@@ -268,6 +268,12 @@ pub struct InstancePayload {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg(feature = "tauri")]
+pub struct InstanceGroupsChangedPayload {
+    pub instance_ids: Vec<String>,
+}
+
+#[derive(Serialize, Clone)]
 #[serde(tag = "event", rename_all = "snake_case")]
 pub enum InstancePayloadType {
     Created,

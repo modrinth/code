@@ -7,6 +7,11 @@ export type InstanceGroupDefinition = {
 	name: string
 }
 
+export type InstanceGroupMembershipUpdate = {
+	instance_id: string
+	group_ids: string[]
+}
+
 export async function list_groups(): Promise<InstanceGroupDefinition[]> {
 	return await invoke('plugin:instance|instance_list_groups')
 }
@@ -21,4 +26,10 @@ export async function rename_group(id: string, newName: string): Promise<Instanc
 
 export async function delete_group(id: string): Promise<void> {
 	return await invoke('plugin:instance|instance_delete_group', { id })
+}
+
+export async function set_group_memberships(
+	updates: InstanceGroupMembershipUpdate[],
+): Promise<void> {
+	return await invoke('plugin:instance|instance_set_group_memberships', { updates })
 }

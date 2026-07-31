@@ -1,8 +1,8 @@
-use crate::event::InstancePayloadType;
-use crate::event::emit::emit_instance;
+use crate::event::emit::emit_instance_groups_changed;
 use crate::state::State;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use uuid::Uuid;
 
 const MAX_GROUP_NAME_LENGTH: usize = 128;
@@ -12,6 +12,12 @@ pub const FAVORITES_GROUP_ID: &str = "group:favorites";
 pub struct InstanceGroup {
     pub id: String,
     pub name: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct InstanceGroupMembershipUpdate {
+    pub instance_id: String,
+    pub group_ids: Vec<String>,
 }
 
 fn validate_group_name(name: &str) -> crate::Result<&str> {
@@ -41,6 +47,28 @@ fn validate_group_name(name: &str) -> crate::Result<&str> {
     Ok(name)
 }
 
+fn normalize_membership_updates(
+    mut updates: Vec<InstanceGroupMembershipUpdate>,
+) -> crate::Result<Vec<InstanceGroupMembershipUpdate>> {
+    let mut instance_ids = HashSet::new();
+    for update in &mut updates {
+        if !instance_ids.insert(update.instance_id.clone()) {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Duplicate instance {} in group membership update",
+                update.instance_id
+            ))
+            .into());
+        }
+
+        let mut group_ids = HashSet::new();
+        update
+            .group_ids
+            .retain(|group_id| group_ids.insert(group_id.clone()));
+    }
+
+    Ok(updates)
+}
+
 pub async fn list_groups() -> crate::Result<Vec<InstanceGroup>> {
     let state = State::get().await?;
     Ok(instance_rows::list_instance_groups(&state.pool)
@@ -60,6 +88,71 @@ pub async fn create_group(name: String) -> crate::Result<InstanceGroup> {
         id,
         name: name.to_string(),
     })
+}
+
+pub async fn set_group_memberships(
+    updates: Vec<InstanceGroupMembershipUpdate>,
+) -> crate::Result<()> {
+    if updates.is_empty() {
+        return Ok(());
+    }
+
+    let updates = normalize_membership_updates(updates)?;
+
+    let state = State::get().await?;
+    let mut tx = state.pool.begin().await?;
+    let unique_group_ids = updates
+        .iter()
+        .flat_map(|update| update.group_ids.iter())
+        .collect::<HashSet<_>>();
+
+    for group_id in unique_group_ids {
+        let exists = sqlx::query_scalar::<_, bool>(
+            "SELECT EXISTS(SELECT 1 FROM instance_groups WHERE id = ?)",
+        )
+        .bind(group_id)
+        .fetch_one(&mut *tx)
+        .await?;
+        if !exists {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Unknown instance group {group_id}"
+            ))
+            .into());
+        }
+    }
+
+    for update in &updates {
+        let result = sqlx::query(
+            "UPDATE instances SET modified = unixepoch() WHERE id = ?",
+        )
+        .bind(&update.instance_id)
+        .execute(&mut *tx)
+        .await?;
+        if result.rows_affected() == 0 {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Unknown instance {}",
+                update.instance_id
+            ))
+            .into());
+        }
+
+        instance_rows::replace_instance_groups(
+            &update.instance_id,
+            &update.group_ids,
+            &mut tx,
+        )
+        .await?;
+    }
+
+    tx.commit().await?;
+
+    let instance_ids = updates
+        .into_iter()
+        .map(|update| update.instance_id)
+        .collect::<Vec<_>>();
+    emit_instance_groups_changed(&instance_ids).await?;
+
+    Ok(())
 }
 
 pub async fn rename_group(
@@ -109,9 +202,7 @@ pub async fn rename_group(
 
     tx.commit().await?;
 
-    for instance_id in instance_ids {
-        emit_instance(&instance_id, InstancePayloadType::Edited).await?;
-    }
+    emit_instance_groups_changed(&instance_ids).await?;
 
     Ok(InstanceGroup {
         id,
@@ -159,9 +250,7 @@ pub async fn delete_group(id: String) -> crate::Result<()> {
 
     tx.commit().await?;
 
-    for instance_id in instance_ids {
-        emit_instance(&instance_id, InstancePayloadType::Edited).await?;
-    }
+    emit_instance_groups_changed(&instance_ids).await?;
 
     Ok(())
 }
@@ -169,7 +258,9 @@ pub async fn delete_group(id: String) -> crate::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::{
-        FAVORITES_GROUP_ID, MAX_GROUP_NAME_LENGTH, validate_group_name,
+        FAVORITES_GROUP_ID, InstanceGroupMembershipUpdate,
+        MAX_GROUP_NAME_LENGTH, normalize_membership_updates,
+        validate_group_name,
     };
 
     #[test]
@@ -203,5 +294,40 @@ mod tests {
     #[test]
     fn favorites_group_id_is_stable() {
         assert_eq!(FAVORITES_GROUP_ID, "group:favorites");
+    }
+
+    #[test]
+    fn membership_updates_reject_duplicate_instances() {
+        let updates = vec![
+            InstanceGroupMembershipUpdate {
+                instance_id: "instance".to_string(),
+                group_ids: vec!["first".to_string()],
+            },
+            InstanceGroupMembershipUpdate {
+                instance_id: "instance".to_string(),
+                group_ids: vec!["second".to_string()],
+            },
+        ];
+
+        assert!(normalize_membership_updates(updates).is_err());
+    }
+
+    #[test]
+    fn membership_updates_deduplicate_groups() {
+        let updates =
+            normalize_membership_updates(vec![InstanceGroupMembershipUpdate {
+                instance_id: "instance".to_string(),
+                group_ids: vec![
+                    "first".to_string(),
+                    "second".to_string(),
+                    "first".to_string(),
+                ],
+            }])
+            .unwrap();
+
+        assert_eq!(
+            updates[0].group_ids,
+            vec!["first".to_string(), "second".to_string()]
+        );
     }
 }

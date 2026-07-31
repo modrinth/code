@@ -219,6 +219,7 @@ fn main() {
                         "instance_create_group",
                         "instance_rename_group",
                         "instance_delete_group",
+                        "instance_set_group_memberships",
                         "instance_check_installed",
                         "instance_update_all",
                         "instance_update_project",

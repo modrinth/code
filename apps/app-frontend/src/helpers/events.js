@@ -68,6 +68,10 @@ export async function instance_listener(callback) {
 	return await listen('instance', (event) => callback(event.payload))
 }
 
+export async function instance_groups_listener(callback) {
+	return await listen('instance_groups_changed', (event) => callback(event.payload))
+}
+
 /// Payload for the 'instance_bulk_update_progress' event
 /*
     InstanceBulkUpdateProgress {
