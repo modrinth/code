@@ -13,7 +13,7 @@ pub enum ProjectDisclosure {
         note: Option<String>,
         code: bool,
         assets: bool,
-        test: bool,
+        text: bool,
     },
     Advertisements {
         note: Option<String>,
