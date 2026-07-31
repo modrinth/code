@@ -6,7 +6,6 @@ import { useEventListener, useMagicKeys } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import InstanceFileIcon from '@/assets/icons/instance-file.svg'
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import { trackEvent } from '@/helpers/analytics'
@@ -242,26 +241,12 @@ onUnmounted(() => unlisten())
 		@mouseenter="checkProcess"
 		@pointerdown="handlePointerDown"
 	>
-		<template #leading="{ instanceType }">
-			<div class="relative flex size-10 shrink-0 items-center justify-center">
-				<div
-					v-if="!playing && !modLoading && !installing"
-					class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-opacity"
-					:class="{
-						'group-hover/card:scale-75 group-hover/card:opacity-0':
-							!instance.quarantined && !isLibraryInstanceSelectionActive,
-					}"
-				>
-					<InstanceFileIcon class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current" />
-					<span class="h-3.5 text-sm font-extrabold leading-[13px]">
-						{{ instanceType }}
-					</span>
-				</div>
+		<template #leading>
+			<div class="relative flex size-12 shrink-0 items-center justify-center">
 				<div class="absolute inset-0 flex items-center justify-center">
-					<ButtonStyled v-if="playing" color="red" circular>
+					<ButtonStyled v-if="playing" color="red" size="large" circular>
 						<button
 							v-tooltip="'Stop'"
-							class="card-shadow"
 							@click="(e) => stop(e, 'InstanceCard')"
 							@mouseenter="checkProcess"
 						>
@@ -277,11 +262,12 @@ onUnmounted(() => unlisten())
 					<ButtonStyled
 						v-else-if="!isLibraryInstanceSelectionActive && !installed && !instance.quarantined"
 						color="brand"
+						size="large"
 						circular
 					>
 						<button
 							v-tooltip="'Repair'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+							class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
 							@click="(e) => repair(e)"
 						>
 							<DownloadIcon />
@@ -290,11 +276,12 @@ onUnmounted(() => unlisten())
 					<ButtonStyled
 						v-else-if="!isLibraryInstanceSelectionActive && !instance.quarantined"
 						color="brand"
+						size="large"
 						circular
 					>
 						<button
 							v-tooltip="'Play'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+							class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
 							@click="(e) => play(e, 'InstanceCard')"
 							@mouseenter="checkProcess"
 						>
@@ -307,7 +294,7 @@ onUnmounted(() => unlisten())
 		<template #overlay>
 			<button
 				type="button"
-				class="selection-button group/selection absolute right-0 top-0 z-[2] flex size-[50px] h-full cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
+				class="selection-button group/selection absolute right-[4px] top-[2px] z-[2] flex size-[50px] cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
 				:aria-label="selected ? 'Deselect instance' : 'Select instance'"
 				:aria-pressed="selected"
 				@click.stop="toggleSelection"
@@ -317,13 +304,13 @@ onUnmounted(() => unlisten())
 					class="relative flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
 					:class="{
 						'border-0 !opacity-100': selected,
-						'border-2 border-solid border-primary bg-transparent': !selected,
+						'border-2 border-solid border-contrast bg-transparent': !selected,
 						'[outline:3px_solid_var(--color-purple)] outline-offset-1':
 							holdingShift && isSelectionAnchor,
 					}"
 				>
-					<span v-if="selected" class="absolute inset-0 rounded-full bg-primary" />
-					<CheckIcon v-if="selected" class="relative size-4 invert [stroke-width:3] top-px" />
+					<span v-if="selected" class="absolute inset-0 rounded-full bg-contrast" />
+					<CheckIcon v-if="selected" class="relative size-4 invert [stroke-width:3]" />
 				</span>
 			</button>
 		</template>
