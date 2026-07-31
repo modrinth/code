@@ -11,7 +11,7 @@
 		>
 			<BookmarkIcon aria-hidden="true" :fill="saved ? 'currentColor' : 'none'" />
 			<template #menu>
-				<StyledInput
+				<Input
 					v-model="displayCollectionsSearch"
 					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 					wrapper-class="menu-search"
@@ -57,7 +57,7 @@ import {
 	Checkbox,
 	commonMessages,
 	PopoutMenu,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'

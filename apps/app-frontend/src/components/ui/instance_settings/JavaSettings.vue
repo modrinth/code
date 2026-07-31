@@ -14,7 +14,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	Slider,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -216,7 +216,7 @@ const messages = defineMessages({
 						>Java {{ optimalJava?.parsed_version }}</span
 					>
 					<div class="flex gap-2 items-center">
-						<StyledInput
+						<Input
 							:model-value="activePath"
 							:disabled="!overrideJavaInstall"
 							autocomplete="off"
@@ -294,7 +294,7 @@ const messages = defineMessages({
 			:label="formatMessage(messages.customJavaArguments)"
 			class="my-2"
 		/>
-		<StyledInput
+		<Input
 			id="java-args"
 			v-model="javaArgs"
 			autocomplete="off"
@@ -310,7 +310,7 @@ const messages = defineMessages({
 			:label="formatMessage(messages.customEnvironmentVariables)"
 			class="mb-2"
 		/>
-		<StyledInput
+		<Input
 			id="env-vars"
 			v-model="envVars"
 			autocomplete="off"

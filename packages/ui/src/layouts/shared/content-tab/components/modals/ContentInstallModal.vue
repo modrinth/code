@@ -67,7 +67,7 @@
 			style="height: 400px; overflow-y: auto"
 		>
 			<div class="flex items-start gap-3 px-6">
-				<StyledInput
+				<Input
 					v-model="searchFilter"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchPlaceholder)"
@@ -162,7 +162,7 @@
 				<span class="font-semibold text-contrast">
 					{{ formatMessage(messages.nameLabel) }}
 				</span>
-				<StyledInput
+				<Input
 					v-model="instanceName"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 				/>
@@ -264,7 +264,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
-import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectFilePicker } from '#ui/providers'

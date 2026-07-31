@@ -21,7 +21,7 @@
 					<label for="project-name">
 						<span class="label__title">Name</span>
 					</label>
-					<StyledInput
+					<Input
 						id="project-name"
 						v-model="name"
 						:maxlength="2048"
@@ -39,7 +39,7 @@
 								$getProjectTypeForUrl(project.project_type, project.loaders)
 							}}/
 						</div>
-						<StyledInput
+						<Input
 							id="project-slug"
 							v-model="slug"
 							:maxlength="64"
@@ -53,10 +53,9 @@
 					<label for="project-summary">
 						<span class="label__title">Summary</span>
 					</label>
-					<StyledInput
+					<Textarea
 						id="project-summary"
 						v-model="summary"
-						multiline
 						:maxlength="256"
 						:disabled="!hasPermission"
 						resize="vertical"
@@ -341,7 +340,8 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	StyledInput,
+	Input,
+	Textarea,
 	Toggle,
 	UnsavedChangesPopup,
 	useFormatBytes,

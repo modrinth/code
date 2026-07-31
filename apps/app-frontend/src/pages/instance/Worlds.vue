@@ -21,7 +21,7 @@
 	<ReadyTransition :pending="worldsReadyPending">
 		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
 			<div class="flex flex-wrap items-center gap-2">
-				<StyledInput
+				<Input
 					v-model="searchFilter"
 					:icon="SearchIcon"
 					type="text"
@@ -155,7 +155,7 @@ import {
 	type GameVersion,
 	injectNotificationManager,
 	ReadyTransition,
-	StyledInput,
+	Input,
 	useReadyState,
 	useVIntl,
 } from '@modrinth/ui'

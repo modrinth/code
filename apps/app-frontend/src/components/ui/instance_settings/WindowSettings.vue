@@ -3,7 +3,7 @@ import {
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -129,7 +129,7 @@ const messages = defineMessages({
 					{{ formatMessage(messages.widthDescription) }}
 				</p>
 			</div>
-			<StyledInput
+			<Input
 				id="width"
 				v-model="resolution[0]"
 				autocomplete="off"
@@ -148,7 +148,7 @@ const messages = defineMessages({
 					{{ formatMessage(messages.heightDescription) }}
 				</p>
 			</div>
-			<StyledInput
+			<Input
 				id="height"
 				v-model="resolution[1]"
 				autocomplete="off"

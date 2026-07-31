@@ -3,7 +3,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	Slider,
-	StyledInput,
+	Input,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -187,7 +187,7 @@ watch(
 					</p>
 				</div>
 
-				<StyledInput
+				<Input
 					id="width"
 					v-model="settings.game_resolution[0]"
 					:disabled="settings.force_fullscreen"
@@ -207,7 +207,7 @@ watch(
 					</p>
 				</div>
 
-				<StyledInput
+				<Input
 					id="height"
 					v-model="settings.game_resolution[1]"
 					:disabled="settings.force_fullscreen"
@@ -244,7 +244,7 @@ watch(
 				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.javaArgumentsTitle) }}
 				</h2>
-				<StyledInput
+				<Input
 					id="java-args"
 					v-model="settings.launchArgs"
 					autocomplete="off"
@@ -261,7 +261,7 @@ watch(
 				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.environmentVariablesTitle) }}
 				</h2>
-				<StyledInput
+				<Input
 					id="env-vars"
 					v-model="settings.envVars"
 					autocomplete="off"
@@ -282,7 +282,7 @@ watch(
 				<h3 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.preLaunchHookTitle) }}
 				</h3>
-				<StyledInput
+				<Input
 					id="pre-launch"
 					v-model="settings.hooks.pre_launch"
 					autocomplete="off"
@@ -299,7 +299,7 @@ watch(
 				<h3 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.wrapperHookTitle) }}
 				</h3>
-				<StyledInput
+				<Input
 					id="wrapper"
 					v-model="settings.hooks.wrapper"
 					autocomplete="off"
@@ -316,7 +316,7 @@ watch(
 				<h3 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.postExitHookTitle) }}
 				</h3>
-				<StyledInput
+				<Input
 					id="post-exit"
 					v-model="settings.hooks.post_exit"
 					autocomplete="off"

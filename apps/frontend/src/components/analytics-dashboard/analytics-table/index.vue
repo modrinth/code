@@ -23,7 +23,7 @@
 					</div>
 
 					<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
-						<StyledInput
+						<Input
 							v-model="searchQuery"
 							:icon="SearchIcon"
 							:placeholder="formatMessage(analyticsTableMessages.searchPlaceholder)"
@@ -196,7 +196,7 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 	Pagination,
-	StyledInput,
+	Input,
 	Table,
 	useFormatNumber,
 	useVIntl,

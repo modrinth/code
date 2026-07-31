@@ -23,7 +23,7 @@
 					<span class="italic font-bold">{{ confirmationText }}</span> below:
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				v-if="hasToType"
 				id="confirmation"
 				v-model="confirmation_typed"
@@ -54,7 +54,7 @@ import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import ButtonStyled from '../base/ButtonStyled.vue'
-import StyledInput from '../base/inputs/StyledInput.vue'
+import Input from '../base/inputs/Input.vue'
 import NewModal from './NewModal.vue'
 
 const props = defineProps({

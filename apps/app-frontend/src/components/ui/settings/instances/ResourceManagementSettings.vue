@@ -5,7 +5,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	Slider,
-	StyledInput,
+	Input,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -175,7 +175,7 @@ async function findLauncherDir() {
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.appDirectoryTitle) }}
 			</h2>
-			<StyledInput
+			<Input
 				id="appDir"
 				v-model="settings.custom_dir"
 				:icon="BoxIcon"
@@ -194,7 +194,7 @@ async function findLauncherDir() {
 						</button>
 					</ButtonStyled>
 				</template>
-			</StyledInput>
+			</Input>
 			<p class="m-0 leading-tight text-secondary">
 				{{ formatMessage(messages.appDirectoryDescription) }}
 			</p>

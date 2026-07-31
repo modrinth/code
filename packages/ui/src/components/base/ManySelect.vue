@@ -18,7 +18,7 @@
 			<slot />
 			<DropdownIcon class="h-5 w-5 text-secondary" />
 			<template #menu>
-				<StyledInput
+				<Input
 					v-if="search"
 					id="search-input"
 					ref="searchInput"
@@ -74,7 +74,7 @@
 import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Button, ButtonStyled, PopoutMenu, StyledInput } from '../index'
+import { Button, ButtonStyled, PopoutMenu, Input } from '../index'
 import ScrollablePanel from './ScrollablePanel.vue'
 
 type Option = string | number | object

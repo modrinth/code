@@ -111,7 +111,7 @@
 					<div class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.passkeyNameLabel) }}
 					</div>
-					<StyledInput
+					<Input
 						id="passkey-name"
 						v-model="pendingPasskeyName"
 						:maxlength="255"
@@ -150,7 +150,7 @@
 					<div class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.passkeyNameLabel) }}
 					</div>
-					<StyledInput
+					<Input
 						id="passkey-rename"
 						v-model="passkeyToRenameName"
 						:maxlength="255"
@@ -216,7 +216,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
-	StyledInput,
+	Input,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,

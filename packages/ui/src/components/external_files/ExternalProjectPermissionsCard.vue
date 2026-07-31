@@ -30,8 +30,8 @@ import {
 	injectProjectPageContext,
 } from '../../providers'
 import type { QuickReply } from '../../providers/attribution-moderation'
-import StyledInput from '../base/inputs/StyledInput.vue'
-import StyledTextarea from '../base/inputs/StyledTextarea.vue'
+import Input from '../base/inputs/Input.vue'
+import Textarea from '../base/inputs/Textarea.vue'
 import AddFilesToAttributionGroupModal from './AddFilesToAttributionGroupModal.vue'
 import AddToExistingExternalProjectModal from './AddToExistingExternalProjectModal.vue'
 import AddToGlobalPermissionsDatabaseModal from './AddToGlobalPermissionsDatabaseModal.vue'
@@ -708,7 +708,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 										</div>
 									</template>
 									<template v-else>
-										<StyledTextarea
+										<Textarea
 											v-model="reviewReasonInput"
 											placeholder="Explanation of review (optional)"
 											class="mt-3"

@@ -124,7 +124,7 @@
 						</ButtonStyled>
 					</div>
 					<div class="relative">
-						<StyledTextarea
+						<Textarea
 							id="startup-command-field"
 							v-model="startupCommand"
 							v-tooltip="advancedActionTooltip"
@@ -228,7 +228,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { ButtonStyled, Combobox, StyledTextarea } from '#ui/components'
+import { ButtonStyled, Combobox, Textarea } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {

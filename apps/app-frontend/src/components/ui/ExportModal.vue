@@ -7,7 +7,8 @@ import {
 	FileTreeSelect,
 	injectNotificationManager,
 	NewModal,
-	StyledInput,
+	Input,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { save } from '@tauri-apps/plugin-dialog'
@@ -244,7 +245,7 @@ function isExportCandidateDisabled(path) {
 			<div class="grid grid-cols-2 gap-4">
 				<div class="labeled_input w-full">
 					<p class="text-contrast font-semibold">{{ formatMessage(messages.modpackNameLabel) }}</p>
-					<StyledInput
+					<Input
 						v-model="nameInput"
 						type="text"
 						:placeholder="formatMessage(messages.modpackNamePlaceholder)"
@@ -256,7 +257,7 @@ function isExportCandidateDisabled(path) {
 					<p class="text-contrast font-semibold">
 						{{ formatMessage(messages.versionNumberLabel) }}
 					</p>
-					<StyledInput
+					<Input
 						v-model="versionInput"
 						type="text"
 						:placeholder="formatMessage(messages.versionNumberPlaceholder)"
@@ -269,9 +270,8 @@ function isExportCandidateDisabled(path) {
 				<p class="m-0 text-contrast font-semibold">
 					{{ formatMessage(commonMessages.descriptionLabel) }}
 				</p>
-				<StyledInput
+				<Textarea
 					v-model="exportDescription"
-					multiline
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
 					wrapper-class="w-full"
 				/>

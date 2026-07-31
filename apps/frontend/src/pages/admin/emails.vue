@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, NewModal, Input } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import emails from '~/templates/emails'
@@ -153,7 +153,7 @@ onMounted(() => {
 							class="flex flex-col"
 						>
 							<span class="label__title">{{ variable }}</span>
-							<StyledInput
+							<Input
 								:id="`preview-${variable}`"
 								v-model="variableValues[variable]"
 								type="text"
@@ -191,7 +191,7 @@ onMounted(() => {
 		</NewModal>
 		<div class="normal-page__content">
 			<div class="flex flex-wrap items-center gap-3">
-				<StyledInput
+				<Input
 					id="email-search"
 					v-model="query"
 					type="search"

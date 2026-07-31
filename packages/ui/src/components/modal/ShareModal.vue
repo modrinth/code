@@ -14,7 +14,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import { injectNotificationManager } from '#ui/providers'
 
-import { ButtonStyled, NewModal, StyledTextarea } from '../index'
+import { ButtonStyled, NewModal, Textarea } from '../index'
 
 const props = defineProps({
 	header: {
@@ -167,7 +167,7 @@ defineExpose({
 						</button>
 					</ButtonStyled>
 				</div>
-				<StyledTextarea
+				<Textarea
 					v-else
 					v-model="content"
 					resize="vertical"
@@ -185,7 +185,7 @@ defineExpose({
 							</button>
 						</ButtonStyled>
 					</template>
-				</StyledTextarea>
+				</Textarea>
 				<div
 					v-if="link || socialButtons"
 					:class="['flex flex-col justify-center gap-2', link ? 'w-64 max-w-full' : 'flex-grow']"

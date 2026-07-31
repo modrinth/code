@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col gap-4">
 			<div class="flex items-center gap-2">
-				<StyledInput
+				<Input
 					v-model="search"
 					:icon="SearchIcon"
 					:placeholder="`Search ${rows.length} users...`"
@@ -151,7 +151,7 @@ import {
 	ButtonStyled,
 	defineMessages,
 	type SortDirection,
-	StyledInput,
+	Input,
 	Table,
 	type TableColumn,
 	truncatedTooltip,

@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import NativeDateInput from '../../components/base/inputs/NativeDateInput.vue'
+import DateInput from '../../components/base/inputs/DateInput.vue'
 
 const meta = {
-	title: 'Base/NativeDateInput',
-	component: NativeDateInput,
-} satisfies Meta<typeof NativeDateInput>
+	title: 'Base/DateInput',
+	component: DateInput,
+} satisfies Meta<typeof DateInput>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -25,12 +25,12 @@ export const DatetimeLocal: Story = {
 
 export const Clearable: Story = {
 	render: () => ({
-		components: { NativeDateInput },
+		components: { DateInput },
 		setup() {
 			const value = ref('2026-07-15')
 			return { value }
 		},
-		template: '<NativeDateInput v-model="value" clearable />',
+		template: '<DateInput v-model="value" clearable />',
 	}),
 }
 

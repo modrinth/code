@@ -2,7 +2,7 @@
 	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
 	<div :id="props.id" class="toggle-setting" :class="{ compact }">
 		<div class="input-with-status">
-			<StyledInput
+			<Input
 				autocomplete="off"
 				:disabled="props.disabled"
 				:model-value="props.modelValue ? props.modelValue.path : ''"
@@ -93,7 +93,7 @@ import {
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'

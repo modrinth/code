@@ -102,9 +102,9 @@ export {
 	DatePicker,
 	InputClearButton,
 	InputFrame,
-	NativeDateInput,
-	StyledInput,
-	StyledTextarea,
+	DateInput,
+	Input,
+	Textarea,
 } from './inputs'
 export type { InputAppearance, InputSize } from './inputs'
 export type { SortDirection, TableColumn } from './Table.vue'

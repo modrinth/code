@@ -13,7 +13,7 @@
 				size="small"
 			/>
 		</div>
-		<StyledInput
+		<Input
 			v-model="searchQuery"
 			:icon="SearchIcon"
 			type="text"
@@ -68,7 +68,7 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, Chips, Input } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 

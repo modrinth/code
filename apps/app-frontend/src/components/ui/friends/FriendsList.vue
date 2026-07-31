@@ -6,7 +6,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
-	StyledInput,
+	Input,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -232,7 +232,7 @@ const messages = defineMessages({
 				{{ formatMessage(messages.usernameDescription) }}
 			</p>
 			<div class="flex items-center gap-2 mt-4">
-				<StyledInput
+				<Input
 					v-model="username"
 					:icon="UserIcon"
 					type="text"
@@ -260,7 +260,7 @@ const messages = defineMessages({
 					<UserPlusIcon />
 				</button>
 			</ButtonStyled>
-			<StyledInput
+			<Input
 				v-model="search"
 				:icon="SearchIcon"
 				type="text"

@@ -3,7 +3,7 @@ import {
 	Combobox,
 	defineMessages,
 	type MessageDescriptor,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -65,7 +65,7 @@ defineExpose({ resourcePackOptions })
 	<div class="space-y-4 w-full">
 		<label class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.name) }}</span>
-			<StyledInput
+			<Input
 				v-model="name"
 				:placeholder="formatMessage(messages.placeholderName)"
 				autocomplete="off"
@@ -74,7 +74,7 @@ defineExpose({ resourcePackOptions })
 		</label>
 		<label class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.address) }}</span>
-			<StyledInput
+			<Input
 				v-model="address"
 				:placeholder="formatMessage(messages.placeholderAddress)"
 				autocomplete="off"

@@ -2,11 +2,11 @@ import { KeyIcon, LinkIcon, MailIcon, SearchIcon, UserIcon } from '@modrinth/ass
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import StyledInput from '../../components/base/inputs/StyledInput.vue'
+import Input from '../../components/base/inputs/Input.vue'
 
 const meta = {
-	title: 'Base/StyledInput',
-	component: StyledInput,
+	title: 'Base/Input',
+	component: Input,
 	argTypes: {
 		size: {
 			control: 'select',
@@ -17,7 +17,7 @@ const meta = {
 			options: ['text', 'email', 'password', 'number', 'url', 'search'],
 		},
 	},
-} satisfies Meta<typeof StyledInput>
+} satisfies Meta<typeof Input>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -37,13 +37,13 @@ export const WithIcon: Story = {
 
 export const Clearable: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('Some text to clear')
 			return { value, SearchIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="SearchIcon"
 				placeholder="Search..."
@@ -55,13 +55,13 @@ export const Clearable: Story = {
 
 export const WithIconAndClearable: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('Search query')
 			return { value, SearchIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="SearchIcon"
 				placeholder="Search..."
@@ -116,13 +116,13 @@ export const Disabled: Story = {
 
 export const Readonly: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('This is readonly')
 			return { value, UserIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="UserIcon"
 				placeholder="Readonly input"
@@ -134,13 +134,13 @@ export const Readonly: Story = {
 
 export const Error: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('invalid-url')
 			return { value, LinkIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="LinkIcon"
 				type="url"
@@ -153,7 +153,7 @@ export const Error: Story = {
 
 export const AllSizes: StoryObj = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			return { SearchIcon }
 		},
@@ -161,7 +161,7 @@ export const AllSizes: StoryObj = {
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Standard (36px)</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Standard size..."
 						size="standard"
@@ -169,7 +169,7 @@ export const AllSizes: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Small (32px)</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Small size..."
 						size="small"
@@ -177,7 +177,7 @@ export const AllSizes: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Medium (40px)</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Medium size..."
 						size="medium"
@@ -185,7 +185,7 @@ export const AllSizes: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Large (48px)</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Large size..."
 						size="large"
@@ -198,7 +198,7 @@ export const AllSizes: StoryObj = {
 
 export const AllStates: StoryObj = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const normalValue = ref('')
 			const filledValue = ref('With content')
@@ -210,7 +210,7 @@ export const AllStates: StoryObj = {
 			<div style="display: flex; flex-direction: column; gap: 1rem; max-width: 300px;">
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Default</p>
-					<StyledInput
+					<Input
 						v-model="normalValue"
 						:icon="SearchIcon"
 						placeholder="Enter text..."
@@ -218,7 +218,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">With Value + Clearable</p>
-					<StyledInput
+					<Input
 						v-model="filledValue"
 						:icon="SearchIcon"
 						placeholder="Enter text..."
@@ -227,7 +227,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Error State</p>
-					<StyledInput
+					<Input
 						v-model="errorValue"
 						:icon="LinkIcon"
 						placeholder="Enter URL..."
@@ -236,7 +236,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Disabled</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Disabled..."
 						disabled
@@ -244,7 +244,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Readonly</p>
-					<StyledInput
+					<Input
 						v-model="readonlyValue"
 						:icon="SearchIcon"
 						placeholder="Readonly..."

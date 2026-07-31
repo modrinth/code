@@ -19,7 +19,7 @@
 				<span class="font-semibold text-contrast">{{
 					formatMessage(messages.destinationPath)
 				}}</span>
-				<StyledInput
+				<Input
 					ref="destinationInput"
 					v-model="destination"
 					:placeholder="formatMessage(messages.destinationPlaceholder)"
@@ -51,7 +51,7 @@ import { RightArrowIcon, XIcon } from '@modrinth/assets'
 import { nextTick, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatFileItemType } from '#ui/utils/common-messages'

@@ -8,7 +8,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
-	StyledInput,
+	Input,
 	TagItem,
 } from '@modrinth/ui'
 import { ref } from 'vue'
@@ -175,7 +175,7 @@ defineExpose({ show, hide })
 					<span v-else class="mb-2"> No nodes assigned yet </span>
 				</div>
 				<div class="flex w-[45rem] items-center gap-2">
-					<StyledInput
+					<Input
 						id="server-assign-field"
 						v-model="inputField"
 						wrapper-class="w-full"

@@ -60,7 +60,7 @@
 			<div v-if="!existingSubscription">
 				<p class="my-2 text-lg font-bold">Configure your server</p>
 				<div class="flex flex-col gap-4">
-					<StyledInput v-model="serverName" placeholder="Server name" :maxlength="48" />
+					<Input v-model="serverName" placeholder="Server name" :maxlength="48" />
 					<!-- <DropdownSelect
             v-model="serverLoader"
             v-tooltip="'Select the mod loader for your server'"
@@ -136,7 +136,7 @@
 					>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Shared CPUs</div>
-							<StyledInput :model-value="sharedCpus" disabled wrapper-class="w-full" />
+							<Input :model-value="sharedCpus" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold flex items-center gap-1">
@@ -148,7 +148,7 @@
 									class="h-4 w-4text-secondary opacity-60"
 								/>
 							</div>
-							<StyledInput
+							<Input
 								:model-value="mutatedProduct.metadata.cpu"
 								disabled
 								wrapper-class="w-full"
@@ -156,7 +156,7 @@
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Storage</div>
-							<StyledInput
+							<Input
 								v-model="customServerConfig.storageGbFormatted"
 								disabled
 								wrapper-class="w-full"
@@ -477,7 +477,7 @@ import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Combobox from '../base/Combobox.vue'
 import Slider from '../base/Slider.vue'
-import StyledInput from '../base/inputs/StyledInput.vue'
+import Input from '../base/inputs/Input.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
 import LoaderIcon from '../servers/icons/LoaderIcon.vue'

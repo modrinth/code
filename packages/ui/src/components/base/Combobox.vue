@@ -12,7 +12,7 @@
 				<span class="min-w-0 truncate">{{ searchQuery }}</span>
 				<slot name="search-selection-affix" :option="selectedOption" />
 			</div>
-			<StyledInput
+			<Input
 				ref="searchTriggerRef"
 				v-model="searchQuery"
 				:icon="showSearchIcon ? SearchIcon : undefined"
@@ -41,7 +41,7 @@
 						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
 					/>
 				</template>
-			</StyledInput>
+			</Input>
 		</div>
 
 		<!-- Standard mode: button trigger -->
@@ -213,7 +213,7 @@ import {
 	watch,
 } from 'vue'
 
-import StyledInput from './inputs/StyledInput.vue'
+import Input from './inputs/Input.vue'
 
 export interface ComboboxOption<T> {
 	value: T
@@ -340,7 +340,7 @@ const userHasTyped = ref(false)
 const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
 const triggerRef = ref<HTMLElement>()
-const searchTriggerRef = ref<InstanceType<typeof StyledInput>>()
+const searchTriggerRef = ref<InstanceType<typeof Input>>()
 const dropdownRef = ref<HTMLElement>()
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()

@@ -94,7 +94,7 @@
 								<label class="hidden" for="search">{{
 									formatMessage(commonMessages.searchLabel)
 								}}</label>
-								<StyledInput
+								<Input
 									id="search"
 									v-model="searchQuery"
 									:icon="SearchIcon"
@@ -451,7 +451,7 @@ import {
 	injectModrinthClient,
 	IntlFormatted,
 	ProjectCard,
-	StyledInput,
+	Input,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'

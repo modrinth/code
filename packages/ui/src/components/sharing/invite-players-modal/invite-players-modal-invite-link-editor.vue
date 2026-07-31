@@ -60,7 +60,7 @@
 			</div>
 			<div class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.maxUsesLabel) }}</span>
-				<StyledInput
+				<Input
 					v-model="maxUses"
 					type="number"
 					:min="1"
@@ -101,7 +101,7 @@ import { injectNotificationManager } from '../../../providers'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import DatePicker from '../../base/inputs/DatePicker.vue'
-import StyledInput from '../../base/inputs/StyledInput.vue'
+import Input from '../../base/inputs/Input.vue'
 import NewModal from '../../modal/NewModal.vue'
 import type { InviteLinkSettings } from './types'
 

@@ -19,8 +19,8 @@ import {
 	Chips,
 	Combobox,
 	type ComboboxOption,
-	StyledInput,
-	StyledTextarea,
+	Input,
+	Textarea,
 } from '#ui/components'
 import { FileInput } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
@@ -481,7 +481,7 @@ function cancelEditing() {
 			<span class="text-contrast font-semibold mt-1">
 				{{ formatMessage(messages.linkLabel) }}
 			</span>
-			<StyledInput
+			<Input
 				v-model="linkInput"
 				type="text"
 				class="max-w-[40rem]"
@@ -522,7 +522,7 @@ function cancelEditing() {
 					)
 				}}
 			</span>
-			<StyledInput
+			<Input
 				v-model="customLicenseInput"
 				type="text"
 				class="max-w-[40rem]"
@@ -549,7 +549,7 @@ function cancelEditing() {
 							formatMessage(selectedPermissionReason.notesDescription)
 						}}</span>
 					</div>
-					<StyledTextarea
+					<Textarea
 						v-model="notesInput"
 						resize="both"
 						:rows="notesInputRows"

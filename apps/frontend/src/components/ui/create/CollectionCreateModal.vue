@@ -9,7 +9,7 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="name"
 					v-model="name"
 					:maxlength="64"
@@ -25,10 +25,9 @@
 					}}</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="additional-information"
 					v-model="description"
-					multiline
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
@@ -62,7 +61,8 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
-	StyledInput,
+	Input,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 

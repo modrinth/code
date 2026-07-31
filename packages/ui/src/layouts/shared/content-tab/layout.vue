@@ -23,7 +23,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
-import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -796,7 +796,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						</span>
 
 						<div class="flex flex-wrap items-center gap-2">
-							<StyledInput
+							<Input
 								v-model="searchQuery"
 								:icon="SearchIcon"
 								type="text"

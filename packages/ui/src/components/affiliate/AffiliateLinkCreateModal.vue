@@ -7,7 +7,7 @@
 				</span>
 				<span class="text-secondary mb-2">{{ formatMessage(messages.createUserDescription) }}</span>
 			</label>
-			<StyledInput
+			<Input
 				v-if="showUserField"
 				id="create-affiliate-user-input"
 				v-model="affiliateUsername"
@@ -28,7 +28,7 @@
 			</label>
 			<div class="flex items-center gap-2">
 				<div class="relative inline-flex items-center flex-1">
-					<StyledInput
+					<Input
 						id="create-affiliate-title-input"
 						v-model="affiliateLinkTitle"
 						autocomplete="off"
@@ -42,7 +42,7 @@
 								<AffiliateIcon />
 							</AutoBrandIcon>
 						</template>
-					</StyledInput>
+					</Input>
 				</div>
 				<ButtonStyled color="brand">
 					<button :disabled="creatingLink || !canCreate" @click="createAffiliateLink">
@@ -62,7 +62,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import { AutoBrandIcon, ButtonStyled, NewModal, StyledInput } from '../index'
+import { AutoBrandIcon, ButtonStyled, NewModal, Input } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(

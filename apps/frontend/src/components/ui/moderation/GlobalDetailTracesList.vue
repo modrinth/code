@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="executeSearch">
-			<StyledInput
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"
@@ -129,7 +129,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	Pagination,
-	StyledInput,
+	Input,
 } from '@modrinth/ui'
 
 import GlobalDetailLocalTraceCard from '~/components/ui/moderation/GlobalDetailLocalTraceCard.vue'

@@ -4,7 +4,7 @@
 		:aria-label="formatMessage(messages.fileNavigation)"
 	>
 		<div v-if="!isEditing" class="flex items-center gap-2 @[800px]:hidden">
-			<StyledInput
+			<Input
 				:model-value="searchQuery"
 				:icon="SearchIcon"
 				type="search"
@@ -96,7 +96,7 @@
 			</nav>
 
 			<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
-				<StyledInput
+				<Input
 					id="search-folder"
 					:model-value="searchQuery"
 					:icon="SearchIcon"
@@ -227,7 +227,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
-import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 

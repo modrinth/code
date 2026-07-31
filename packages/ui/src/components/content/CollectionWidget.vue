@@ -10,7 +10,7 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers/api-client'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
-import StyledInput from '../base/inputs/StyledInput.vue'
+import Input from '../base/inputs/Input.vue'
 
 const { formatMessage } = useVIntl()
 const { formatCompactNumber } = useCompactNumber()
@@ -105,7 +105,7 @@ const messages = defineMessages({
 		<div
 			class="flex flex-col bg-surface-2 border-0 border-l border-solid border-surface-4 overflow-hidden"
 		>
-			<StyledInput
+			<Input
 				v-if="(projects?.length ?? 0) > 5"
 				v-model="query"
 				:placeholder="formatMessage(messages.searchPlaceholder)"

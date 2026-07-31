@@ -5,7 +5,7 @@
 			class="flex flex-col gap-2"
 		>
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.worldNameLabel) }}</span>
-			<StyledInput
+			<Input
 				v-model="worldName"
 				:placeholder="formatMessage(messages.worldNamePlaceholder)"
 			/>
@@ -69,7 +69,7 @@
 					</template>
 				</IntlFormatted>
 			</span>
-			<StyledInput
+			<Input
 				v-model="worldSeed"
 				:placeholder="formatMessage(messages.worldSeedPlaceholder)"
 			/>
@@ -107,7 +107,7 @@
 						:options="generatorSettingsOptions"
 						:placeholder="formatMessage(messages.generatorSettingsPlaceholder)"
 					/>
-					<StyledTextarea
+					<Textarea
 						v-if="generatorSettingsMode === 'custom'"
 						v-model="generatorSettingsCustom"
 						:rows="4"
@@ -143,8 +143,8 @@ import { injectTags } from '../../../../providers'
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
-import StyledInput from '../../../base/inputs/StyledInput.vue'
-import StyledTextarea from '../../../base/inputs/StyledTextarea.vue'
+import Input from '../../../base/inputs/Input.vue'
+import Textarea from '../../../base/inputs/Textarea.vue'
 import Toggle from '../../../base/Toggle.vue'
 import type { Difficulty, Gamemode, GeneratorSettingsMode } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
