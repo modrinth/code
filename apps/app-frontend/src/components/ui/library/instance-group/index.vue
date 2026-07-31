@@ -19,7 +19,7 @@ import {
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, inject, nextTick, ref, watch } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
@@ -67,6 +67,8 @@ const groupAccordion = ref<InstanceType<typeof Accordion>>()
 const groupOptions = ref<InstanceType<typeof ContextMenu>>()
 const groupNameInput = ref<InstanceType<typeof InlineEditableText>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
+const instanceGridContent = ref<HTMLElement>()
+const instanceGridHeight = ref<number>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
 const isUngrouped = computed(() => props.instanceGroup.id === 'group:none')
@@ -80,6 +82,7 @@ const isGroupToggleBlocked = computed(
 )
 let shouldSkipGroupToggle = false
 let groupToggleEventToSkip: MouseEvent | undefined
+let instanceGridResizeObserver: ResizeObserver | undefined
 
 const emit = defineEmits<{
 	(e: 'toggle-selection', instanceId: string, shiftKey: boolean): void
@@ -312,6 +315,21 @@ watch(
 	},
 	{ flush: 'post' },
 )
+
+onMounted(() => {
+	const gridContent = instanceGridContent.value
+	if (!gridContent) return
+
+	instanceGridHeight.value = gridContent.getBoundingClientRect().height
+	instanceGridResizeObserver = new ResizeObserver(() => {
+		instanceGridHeight.value = gridContent.getBoundingClientRect().height
+	})
+	instanceGridResizeObserver.observe(gridContent)
+})
+
+onBeforeUnmount(() => {
+	instanceGridResizeObserver?.disconnect()
+})
 </script>
 
 <template>
@@ -409,30 +427,53 @@ watch(
 			@on-open="setSectionCollapsed(instanceGroup.id, false)"
 			@on-close="setSectionCollapsed(instanceGroup.id, true)"
 		>
-			<section
-				class="grid min-h-[45px] mt-2.5 w-full grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
+			<div
+				class="mt-2.5 overflow-hidden transition-[height] duration-200 ease-out motion-reduce:transition-none"
+				:style="{
+					height: instanceGridHeight === undefined ? undefined : `${instanceGridHeight}px`,
+				}"
 			>
-				<div v-for="instance in instanceGroup.instances" :key="instance.id" class="min-w-0 w-full">
-					<InstanceCard
-						:ref="(component: unknown) => setInstanceComponent(instance.id, component)"
-						:instance="instance"
-						:instance-group-id="instanceGroup.id"
-						:is-selection-anchor="selectionAnchorInstanceId === instance.id"
-						@toggle-selection="
-							(shiftKey: boolean) => emit('toggle-selection', instance.id, shiftKey)
-						"
-						@contextmenu.prevent.stop="
-							(event: MouseEvent) => openInstanceContextMenu(event, instance.id, instanceGroup.id)
-						"
-					/>
+				<div ref="instanceGridContent">
+					<TransitionGroup
+						tag="section"
+						class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
+						move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
+						enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
+						enter-from-class="opacity-0 scale-[0.98]"
+						enter-to-class="opacity-100 scale-100"
+						leave-active-class="transition-[opacity,transform] duration-[150ms] ease-in motion-reduce:transition-none"
+						leave-from-class="opacity-100 scale-100"
+						leave-to-class="opacity-0 scale-[0.98]"
+					>
+						<div
+							v-for="instance in instanceGroup.instances"
+							:key="instance.id"
+							class="min-w-0 w-full"
+						>
+							<InstanceCard
+								:ref="(component: unknown) => setInstanceComponent(instance.id, component)"
+								:instance="instance"
+								:instance-group-id="instanceGroup.id"
+								:is-selection-anchor="selectionAnchorInstanceId === instance.id"
+								@toggle-selection="
+									(shiftKey: boolean) => emit('toggle-selection', instance.id, shiftKey)
+								"
+								@contextmenu.prevent.stop="
+									(event: MouseEvent) =>
+										openInstanceContextMenu(event, instance.id, instanceGroup.id)
+								"
+							/>
+						</div>
+						<p
+							v-if="instanceGroup.instances.length === 0"
+							key="empty-group"
+							class="col-span-full m-0 pt-1 pl-0.5 text-base font-base text-secondary opacity-80"
+						>
+							{{ formatMessage(messages.emptyGroup) }}
+						</p>
+					</TransitionGroup>
 				</div>
-				<p
-					v-if="instanceGroup.instances.length === 0"
-					class="col-span-full m-0 pt-1 pl-0.5 text-base font-base text-secondary opacity-80"
-				>
-					{{ formatMessage(messages.emptyGroup) }}
-				</p>
-			</section>
+			</div>
 		</Accordion>
 	</div>
 

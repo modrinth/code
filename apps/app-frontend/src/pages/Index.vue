@@ -33,6 +33,7 @@ const messages = defineMessages({
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
 const instances = ref<GameInstance[]>([])
+let latestInstanceFetch = 0
 
 const recentInstances = computed(() =>
 	instances.value
@@ -42,10 +43,16 @@ const recentInstances = computed(() =>
 )
 
 async function fetchInstances() {
+	const fetchId = ++latestInstanceFetch
 	try {
-		instances.value = await list()
+		const nextInstances = await list()
+		if (fetchId === latestInstanceFetch) {
+			instances.value = nextInstances
+		}
 	} catch (error: unknown) {
-		handleError(error)
+		if (fetchId === latestInstanceFetch) {
+			handleError(error)
+		}
 	}
 }
 

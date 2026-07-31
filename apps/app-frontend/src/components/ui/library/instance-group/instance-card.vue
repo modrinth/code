@@ -199,7 +199,9 @@ defineExpose({
 	instance: props.instance,
 })
 
-const unlisten = await process_listener((event: ProcessEventPayload) => {
+let unlisten: (() => void) | undefined
+let isUnmounted = false
+void process_listener((event: ProcessEventPayload) => {
 	if (event.instance_id === props.instance.id) {
 		currentEvent.value = event.event
 		if (event.event === 'finished') {
@@ -207,11 +209,22 @@ const unlisten = await process_listener((event: ProcessEventPayload) => {
 		}
 	}
 })
+	.then((listener) => {
+		if (isUnmounted) {
+			listener()
+		} else {
+			unlisten = listener
+		}
+	})
+	.catch(handleError)
 
 onMounted(() => {
-	checkProcess()
+	void checkProcess()
 })
-onUnmounted(() => unlisten())
+onUnmounted(() => {
+	isUnmounted = true
+	unlisten?.()
+})
 </script>
 
 <template>

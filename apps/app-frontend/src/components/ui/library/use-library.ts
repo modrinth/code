@@ -133,6 +133,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const creatingGroup = ref(false)
 	const groupIdPendingNameEdit = ref<string | null>(null)
 	const activeInstanceGroupDrag = ref<ActiveInstanceGroupDrag | null>(null)
+	const pendingInstanceGroupIds = ref(new Map<string, string[]>())
 	const activeDraggedInstanceKeys = computed(
 		() =>
 			new Set(activeInstanceGroupDrag.value?.instances.map(getLibraryInstanceSelectionKey) ?? []),
@@ -259,6 +260,30 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		if (serverProjectIds.value.has(instance.link.project_id ?? '')) return 'server'
 		return 'modpack'
 	}
+	const getEffectiveInstanceGroupIds = (instance: GameInstance) =>
+		pendingInstanceGroupIds.value.get(instance.id) ?? instance.group_ids
+	const haveSameGroupIds = (first: string[], second: string[]) =>
+		first.length === second.length && first.every((groupId) => second.includes(groupId))
+
+	watch(
+		instances,
+		(currentInstances) => {
+			if (pendingInstanceGroupIds.value.size === 0) return
+
+			const nextPendingInstanceGroupIds = new Map(pendingInstanceGroupIds.value)
+			for (const instance of currentInstances) {
+				const pendingGroupIds = nextPendingInstanceGroupIds.get(instance.id)
+				if (pendingGroupIds && haveSameGroupIds(pendingGroupIds, instance.group_ids)) {
+					nextPendingInstanceGroupIds.delete(instance.id)
+				}
+			}
+
+			if (nextPendingInstanceGroupIds.size !== pendingInstanceGroupIds.value.size) {
+				pendingInstanceGroupIds.value = nextPendingInstanceGroupIds
+			}
+		},
+		{ flush: 'sync' },
+	)
 
 	const filteredInstances = computed(() =>
 		instances.value.filter((instance) => {
@@ -312,6 +337,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		const groupsById = new Map(libraryGroups.value.map((group) => [group.id, group]))
 
 		for (const instance of visibleInstances) {
+			const instanceGroupIds = getEffectiveInstanceGroupIds(instance)
 			switch (displayState.value.group) {
 				case 'Instance type':
 					{
@@ -333,10 +359,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 					addToGroup(`Game version:${instance.game_version}`, instance.game_version, instance)
 					break
 				case 'Group':
-					if (instance.group_ids.length === 0) {
+					if (instanceGroupIds.length === 0) {
 						addToGroup('group:none', 'None', instance)
 					} else {
-						for (const groupId of instance.group_ids) {
+						for (const groupId of instanceGroupIds) {
 							const group = groupsById.get(groupId)
 							addToGroup(groupId, group?.name ?? groupId, instance)
 						}
@@ -491,12 +517,13 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		const operation = isAddingInstanceToGroup.value ? 'add' : 'move'
 		const canAddToGroup = operation !== 'add' || toGroup !== null
 		const hasChanges = draggedInstances.some((instance) => {
+			const instanceGroupIds = getEffectiveInstanceGroupIds(instance)
 			if (operation === 'add') {
-				return toGroup !== null && !instance.group_ids.includes(toGroup)
+				return toGroup !== null && !instanceGroupIds.includes(toGroup)
 			}
 
 			if (toGroup !== null) {
-				return !instance.group_ids.includes(toGroup)
+				return !instanceGroupIds.includes(toGroup)
 			}
 
 			const sourceGroupIds = new Set(
@@ -504,7 +531,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 					.map((selection) => normalizeInstanceGroupId(selection.groupId))
 					.filter((sourceGroupId): sourceGroupId is string => sourceGroupId !== null),
 			)
-			return instance.group_ids.some((sourceGroupId) => sourceGroupIds.has(sourceGroupId))
+			return instanceGroupIds.some((sourceGroupId) => sourceGroupIds.has(sourceGroupId))
 		})
 
 		return {
@@ -555,12 +582,13 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			draggedInstanceIds.has(instance.id),
 		)
 		const operations = draggedInstances.flatMap((instance) => {
-			if (toGroup && instance.group_ids.includes(toGroup)) {
+			const instanceGroupIds = getEffectiveInstanceGroupIds(instance)
+			if (toGroup && instanceGroupIds.includes(toGroup)) {
 				return []
 			}
 
 			const selections = draggedSelectionsByInstanceId.get(instance.id) ?? []
-			let nextGroupIds = [...instance.group_ids]
+			let nextGroupIds = [...instanceGroupIds]
 			if (shouldAdd && toGroup) {
 				nextGroupIds.push(toGroup)
 			} else {
@@ -579,19 +607,35 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				{
 					instanceId: instance.id,
 					selections,
+					nextGroupIds,
 					destinationSelectionGroupId:
 						toGroup !== null || nextGroupIds.length === 0 ? groupId : null,
-					promise: edit(instance.id, { group_ids: nextGroupIds }),
 				},
 			]
 		})
-		const results = await Promise.allSettled(operations.map((operation) => operation.promise))
+		const nextPendingInstanceGroupIds = new Map(pendingInstanceGroupIds.value)
+		for (const operation of operations) {
+			nextPendingInstanceGroupIds.set(operation.instanceId, operation.nextGroupIds)
+		}
+		pendingInstanceGroupIds.value = nextPendingInstanceGroupIds
+
+		const results = await Promise.allSettled(
+			operations.map((operation) =>
+				edit(operation.instanceId, { group_ids: operation.nextGroupIds }),
+			),
+		)
 		let movedInstanceCount = 0
 		const nextSelectedInstances = new Map(selectedLibraryInstances.value)
+		const pendingInstanceGroupIdsAfterFailures = new Map(pendingInstanceGroupIds.value)
 
 		for (const [index, result] of results.entries()) {
 			if (result.status === 'rejected') {
 				handleError(toError(result.reason))
+				const operation = operations[index]
+				const pendingGroupIds = pendingInstanceGroupIdsAfterFailures.get(operation.instanceId)
+				if (pendingGroupIds && haveSameGroupIds(pendingGroupIds, operation.nextGroupIds)) {
+					pendingInstanceGroupIdsAfterFailures.delete(operation.instanceId)
+				}
 			} else {
 				movedInstanceCount++
 				const operation = operations[index]
@@ -610,6 +654,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				}
 			}
 		}
+		pendingInstanceGroupIds.value = pendingInstanceGroupIdsAfterFailures
 		selectedLibraryInstances.value = nextSelectedInstances
 
 		return movedInstanceCount > 0

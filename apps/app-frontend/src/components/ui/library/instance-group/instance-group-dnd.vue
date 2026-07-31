@@ -7,7 +7,7 @@ import {
 	DragOverlay,
 	type DragStartEvent,
 } from '@dnd-kit/vue'
-import { computed, onBeforeUnmount, ref, toRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue'
 
 import DragGather from '@/components/ui/library/instance-group/drag-gather.vue'
 import DragPreview from '@/components/ui/library/instance-group/drag-preview.vue'
@@ -135,13 +135,18 @@ function handleDragOver(event: DragOverEvent) {
 	setInstanceGroupDragTarget(targetData?.groupId ?? null)
 }
 
-function handleDragEnd(event: DragEndEvent) {
+async function handleDragEnd(event: DragEndEvent) {
 	const targetData = event.operation.target?.data as InstanceGroupDndDropData | undefined
+	let isMovingInstances = false
 	if (!event.canceled && targetData) {
 		const dropState = getInstanceGroupDropState(targetData.groupId)
 		if (dropState.canDrop) {
 			void moveDraggedInstancesToGroup(targetData.groupId, dropState.operation === 'add')
+			isMovingInstances = true
 		}
+	}
+	if (isMovingInstances) {
+		await nextTick()
 	}
 
 	clearGather()
