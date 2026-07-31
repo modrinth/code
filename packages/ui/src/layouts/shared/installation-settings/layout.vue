@@ -669,7 +669,6 @@ const messages = defineMessages({
 					<div class="flex flex-wrap gap-2">
 						<Button v-if="showModpackVersionActions || isLocalFile"
 								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="handleModpackPrimaryAction"
 							>
@@ -768,7 +767,6 @@ const messages = defineMessages({
 					<div>
 						<Button
 								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="handleShowRepairModal"
 							>
@@ -998,7 +996,6 @@ const messages = defineMessages({
 					<div>
 						<Button
 								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
-								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="handleShowRepairModal"
 							>
