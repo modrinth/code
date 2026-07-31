@@ -157,6 +157,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		<Combobox
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
+			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
 					? '!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0'
@@ -174,6 +175,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		<Combobox
 			:model-value="ctx.maxResults.value"
 			:options="maxResultsOptions"
+			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
 					? '!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0'

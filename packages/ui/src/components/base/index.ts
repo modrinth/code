@@ -19,6 +19,7 @@ export { default as TeleportOverflowMenu } from './buttons/TeleportOverflowMenu.
 export { default as TeleportPopoutMenu } from './buttons/TeleportPopoutMenu.vue'
 export type {
 	ButtonColor,
+	ButtonInteraction,
 	ButtonNativeType,
 	ButtonSize,
 	ButtonType,

@@ -167,36 +167,36 @@
 								<PackageClosedIcon aria-hidden="true" />
 								{{ formatMessage(messages.packageAsMod) }}
 							</Button>
-							<TeleportOverflowMenu :label="formatMessage(commonMessages.moreOptionsButton)"
-									class="btn-dropdown-animation !w-auto !px-2.5 !rounded-xl"
-									:options="[
-										{
-											id: 'edit-metadata',
-											label: formatMessage(messages.editMetadata),
-											action: () => handleOpenEditVersionModal(version!.id, project.id, 'metadata'),
-										},
-										{
-											id: 'edit-details',
-											label: formatMessage(messages.editDetails),
-											action: () =>
-												handleOpenEditVersionModal(version!.id, project.id, 'add-details'),
-										},
-										{
-											id: 'edit-files',
-											label: formatMessage(messages.editFiles),
-											action: () =>
-												handleOpenEditVersionModal(version!.id, project.id, 'add-files'),
-										},
-										{
-											id: 'delete',
-											label: formatMessage(commonMessages.deleteLabel),
-											tone: 'red',
-											action: () => confirmModal?.show(),
-										},
-									]"
-								>
-								<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.edit) }}
-								<DropdownIcon class="h-5 w-5 text-secondary" />
+							<TeleportOverflowMenu
+								v-tooltip="formatMessage(messages.edit)"
+								:label="formatMessage(messages.edit)"
+								:options="[
+									{
+										id: 'edit-metadata',
+										label: formatMessage(messages.editMetadata),
+										action: () => handleOpenEditVersionModal(version!.id, project.id, 'metadata'),
+									},
+									{
+										id: 'edit-details',
+										label: formatMessage(messages.editDetails),
+										action: () =>
+											handleOpenEditVersionModal(version!.id, project.id, 'add-details'),
+									},
+									{
+										id: 'edit-files',
+										label: formatMessage(messages.editFiles),
+										action: () =>
+											handleOpenEditVersionModal(version!.id, project.id, 'add-files'),
+									},
+									{
+										id: 'delete',
+										label: formatMessage(commonMessages.deleteLabel),
+										tone: 'red',
+										action: () => confirmModal?.show(),
+									},
+								]"
+							>
+								<SettingsIcon aria-hidden="true" />
 								<template #edit-metadata>
 									<BoxIcon aria-hidden="true" />
 									{{ formatMessage(messages.editMetadata) }}

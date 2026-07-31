@@ -7,6 +7,7 @@ import ButtonGroup from './ButtonGroup.vue'
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 import type {
 	ButtonColor,
+	ButtonInteraction,
 	ButtonNativeType,
 	ButtonSize,
 	ButtonType,
@@ -24,6 +25,7 @@ const props = withDefaults(
 		type?: ButtonType
 		color?: ButtonColor
 		size?: ButtonSize
+		interaction?: ButtonInteraction
 		nativeType?: ButtonNativeType
 		disabled?: boolean
 		primaryDisabled?: boolean
@@ -57,6 +59,7 @@ const forwardedSlots = computed(() => Object.keys(slots).filter((name) => name !
 			:type="props.type"
 			:color="props.color"
 			:size="props.size"
+			:interaction="props.interaction"
 			:native-type="props.nativeType"
 			:disabled="props.disabled || props.primaryDisabled"
 			@click="emit('click', $event)"
@@ -70,6 +73,7 @@ const forwardedSlots = computed(() => Object.keys(slots).filter((name) => name !
 			:type="props.type"
 			:color="props.color"
 			:size="props.size"
+			:interaction="props.interaction"
 			:disabled="props.disabled || props.menuDisabled"
 			:placement="props.placement"
 			@select="emit('select', $event)"

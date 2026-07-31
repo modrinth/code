@@ -237,7 +237,7 @@
 							}}
 						</Button>
 					</div>
-					<Button type="colored" color="purple" v-else-if="midasCharge && midasCharge.status === 'cancelled'" class="ml-auto" @click="cancelSubscription(midasSubscription.id, false)">
+					<Button type="colored" color="purple" size="xl" v-else-if="midasCharge && midasCharge.status === 'cancelled'" class="ml-auto" @click="cancelSubscription(midasSubscription.id, false)">
 						{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
 					</Button>
 					<Button type="colored" color="purple" size="xl" v-else
@@ -476,7 +476,7 @@
 											<ArrowBigUpDashIcon />
 											{{ formatMessage(messages.upgrade) }}
 										</Button>
-										<Button type="colored" color="green" v-else-if="
+										<Button type="colored" color="green" size="xl" v-else-if="
 												getPyroCharge(subscription) &&
 												(getPyroCharge(subscription).status === 'cancelled' ||
 													getPyroCharge(subscription).status === 'failed')

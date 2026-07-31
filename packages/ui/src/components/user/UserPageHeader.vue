@@ -277,7 +277,7 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		action: () => emit('toggleAffiliate'),
 		shown: props.showStaffActions && props.isAdmin,
 		remainOpen: true,
-		tone: props.isAffiliate ? 'red' : 'default',
+		tone: props.isAffiliate ? 'red' : 'orange',
 	},
 	{
 		id: 'open-info',

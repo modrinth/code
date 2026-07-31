@@ -109,6 +109,8 @@
 								id: 'download',
 								label: formatMessage(commonMessages.downloadButton),
 								type: 'link',
+								tone: 'brand',
+								hoverFilled: true,
 								href: createDownloadUrl(version),
 								download: getPrimaryFile(version)?.filename,
 								shown: !!getPrimaryFile(version),
@@ -142,6 +144,7 @@
 								id: 'report',
 								label: formatMessage(commonMessages.reportButton),
 								tone: 'red',
+								hoverFilled: true,
 								action: () =>
 									auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
 								shown: !currentMember,
@@ -186,6 +189,7 @@
 								id: 'delete',
 								label: formatMessage(commonMessages.deleteLabel),
 								tone: 'red',
+								hoverFilled: true,
 								action: () => {
 									selectedVersion = version.id
 									deleteVersionModal?.show()

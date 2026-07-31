@@ -3,7 +3,7 @@ import { fileIsValid } from '@modrinth/utils'
 
 import { useFormatBytes } from '../../../composables'
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonColor, ButtonSize, ButtonType } from './types'
+import type { ButtonColor, ButtonInteraction, ButtonSize, ButtonType } from './types'
 
 const props = withDefaults(
 	defineProps<{
@@ -16,6 +16,7 @@ const props = withDefaults(
 		type?: ButtonType
 		color?: ButtonColor
 		size?: ButtonSize
+		interaction?: ButtonInteraction
 	}>(),
 	{
 		prompt: 'Select file',
@@ -64,6 +65,7 @@ function handleDrop(event: DragEvent) {
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
+		:interaction="props.interaction"
 		:aria-disabled="props.disabled || undefined"
 		class="focus-within:outline-none focus-within:ring-4 focus-within:ring-brand-shadow"
 		@drop.prevent="handleDrop"

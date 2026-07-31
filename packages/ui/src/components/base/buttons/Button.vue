@@ -28,6 +28,7 @@ defineExpose({ element })
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
+		:interaction="props.interaction"
 		:native-type="props.nativeType"
 		:disabled="props.disabled || props.loading"
 		:aria-busy="props.loading || undefined"

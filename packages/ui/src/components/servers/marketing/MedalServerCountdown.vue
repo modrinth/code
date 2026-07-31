@@ -30,7 +30,10 @@
 			</Transition>
 		</div>
 
-		<Button type="outlined" size="xl" class="z-10 my-auto !text-[var(--medal-promotion-text-orange)] [&>svg]:!text-[var(--medal-promotion-text-orange)] !shadow-[inset_0_0_0_1px_var(--color-orange)]" @click="openUpgradeModal"><RocketIcon /> Upgrade</Button>
+		<Button type="outlined" size="xl" class="z-10 my-auto" @click="openUpgradeModal">
+			<RocketIcon aria-hidden="true" />
+			Upgrade
+		</Button>
 	</div>
 	<ServersUpgradeModalWrapper
 		ref="upgradeModal"

@@ -2,7 +2,13 @@
 import type { Component, CSSProperties } from 'vue'
 import { computed, ref } from 'vue'
 
-import type { ButtonColor, ButtonNativeType, ButtonSize, ButtonType } from './types'
+import type {
+	ButtonColor,
+	ButtonInteraction,
+	ButtonNativeType,
+	ButtonSize,
+	ButtonType,
+} from './types'
 
 const baseClasses = [
 	// Base
@@ -28,19 +34,25 @@ const sizeClasses: Record<ButtonSize, string> = {
 }
 
 const iconOnlySizeClasses: Record<ButtonSize, string> = {
-	xs: 'w-7 px-0',
-	sm: 'w-8 px-0',
-	md: 'w-9 px-0',
-	lg: 'w-10 px-0',
-	xl: 'w-12 px-0',
+	xs: '!w-7 !px-0',
+	sm: '!w-8 !px-0',
+	md: '!w-9 !px-0',
+	lg: '!w-10 !px-0',
+	xl: '!w-12 !px-0',
 }
 
 const typeClasses: Record<ButtonType, string> = {
 	base: 'button-frame--base bg-surface-4 text-contrast [&>svg]:text-primary',
 	colored: 'button-frame--colored bg-[--button-color] text-[rgba(0,0,0,0.9)] [&>svg]:text-inherit',
 	outlined: 'button-frame--outlined bg-transparent text-contrast [&>svg]:text-primary',
-	quiet:
-		'button-frame--quiet bg-transparent hover:bg-surface-4 focus-visible:bg-surface-4 [&>svg]:text-inherit',
+	quiet: 'button-frame--quiet bg-transparent [&>svg]:text-inherit',
+}
+
+const interactionClasses: Record<ButtonInteraction, string> = {
+	surface: 'hover:bg-surface-4 focus-visible:bg-surface-4',
+	filled:
+		'hover:!bg-[--button-color] focus-visible:!bg-[--button-color] hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]',
+	none: 'hover:!brightness-100 focus-visible:!brightness-100',
 }
 
 const colorVariables: Record<ButtonColor, string> = {
@@ -59,6 +71,7 @@ const props = withDefaults(
 		type?: ButtonType
 		color?: ButtonColor
 		size?: ButtonSize
+		interaction?: ButtonInteraction
 		iconOnly?: boolean
 		circular?: boolean
 		nativeType?: ButtonNativeType
@@ -66,6 +79,7 @@ const props = withDefaults(
 	{
 		type: 'base',
 		size: 'md',
+		interaction: 'surface',
 		iconOnly: false,
 		circular: false,
 		nativeType: undefined,
@@ -76,6 +90,7 @@ const element = ref<HTMLElement | null>(null)
 const classes = computed(() => [
 	baseClasses,
 	typeClasses[props.type],
+	props.type === 'quiet' ? interactionClasses[props.interaction] : '',
 	sizeClasses[props.size],
 	props.iconOnly ? iconOnlySizeClasses[props.size] : '',
 	props.circular ? '!rounded-full' : '',

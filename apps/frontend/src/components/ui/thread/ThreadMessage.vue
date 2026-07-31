@@ -138,6 +138,7 @@
 							label: 'Delete',
 							action: () => deleteMessage(),
 							tone: 'red',
+							hoverFilled: true,
 						},
 					]"
 				>

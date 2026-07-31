@@ -12,10 +12,10 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
-	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
 	StyledInput,
+	TeleportPopoutMenu,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -638,8 +638,11 @@ watch(totalPages, (pages) => {
 					</template>
 				</Combobox>
 
-				<FloatingPanel button-class="!h-10 !shadow-none !text-contrast">
-					<BlendIcon class="size-5" /> Advanced filters
+				<TeleportPopoutMenu label="Advanced filters" size="lg">
+					<template #trigger>
+						<BlendIcon aria-hidden="true" />
+						Advanced filters
+					</template>
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
@@ -684,7 +687,7 @@ watch(totalPages, (pages) => {
 							</div>
 						</div>
 					</template>
-				</FloatingPanel>
+				</TeleportPopoutMenu>
 			</div>
 		</div>
 

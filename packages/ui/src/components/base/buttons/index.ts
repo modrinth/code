@@ -9,6 +9,7 @@ export { default as TeleportPopoutMenu } from './TeleportPopoutMenu.vue'
 export type {
 	ButtonColor,
 	ButtonElementHandle,
+	ButtonInteraction,
 	ButtonLinkDestination,
 	ButtonNativeType,
 	ButtonSize,

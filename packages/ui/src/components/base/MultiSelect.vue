@@ -1,17 +1,21 @@
 <template>
 	<div ref="containerRef" class="relative inline-block" :class="fitContent ? 'w-auto' : 'w-full'">
-		<span
+		<component
+			:is="triggerComponent"
 			ref="triggerRef"
-			role="button"
-			tabindex="0"
-			class="relative flex items-center overflow-hidden rounded-xl bg-surface-4 px-4 py-1 text-left transition-all duration-200"
+			v-bind="triggerButtonProps"
+			:role="triggerType ? undefined : 'button'"
+			:tabindex="triggerType ? undefined : 0"
 			:class="[
+				triggerType
+					? 'overflow-hidden text-left'
+					: 'relative flex items-center overflow-hidden rounded-xl bg-surface-4 px-4 py-1 text-left transition-all duration-200',
 				fitContent ? 'w-auto max-w-full' : 'w-full',
 				triggerClass,
 				{
 					'z-[9999]': isOpen,
-					'cursor-not-allowed opacity-50': disabled,
-					'cursor-pointer hover:brightness-125 active:brightness-125': !disabled,
+					'cursor-not-allowed opacity-50': disabled && !triggerType,
+					'cursor-pointer hover:brightness-125 active:brightness-125': !disabled && !triggerType,
 				},
 			]"
 			:aria-expanded="isOpen"
@@ -100,7 +104,7 @@
 					/>
 				</div>
 			</template>
-		</span>
+		</component>
 
 		<Teleport to="#teleports">
 			<Transition
@@ -415,6 +419,8 @@ import {
 } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
+import ButtonFrame from './buttons/ButtonFrame.vue'
+import type { ButtonElementHandle, ButtonSize, ButtonType } from './buttons/types'
 import StyledInput from './StyledInput.vue'
 
 export interface MultiSelectOption<T> {
@@ -492,6 +498,9 @@ const props = withDefaults(
 		clearable?: boolean
 		maxHeight?: number
 		triggerClass?: string
+		/** Apply the shared button frame to compact, button-owned multiselect triggers. */
+		triggerType?: ButtonType
+		triggerSize?: ButtonSize
 		fitContent?: boolean
 		/** Width for the teleported dropdown; defaults to the trigger width */
 		dropdownWidth?: string | number
@@ -517,6 +526,7 @@ const props = withDefaults(
 		showChevron: true,
 		clearable: true,
 		maxHeight: DEFAULT_MAX_HEIGHT,
+		triggerSize: 'md',
 		fitContent: false,
 		noOptionsMessage: 'No options available',
 		noResultsMessage: 'No results found',
@@ -538,11 +548,28 @@ const emit = defineEmits<{
 }>()
 
 const slots = useSlots()
+const triggerComponent = computed(() => (props.triggerType ? ButtonFrame : 'span'))
+const triggerButtonProps = computed(() =>
+	props.triggerType
+		? {
+				as: 'button' as const,
+				nativeType: 'button' as const,
+				type: props.triggerType,
+				size: props.triggerSize,
+				disabled: props.disabled,
+			}
+		: {},
+)
 const isOpen = ref(false)
 const searchQuery = ref('')
 const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
-const triggerRef = ref<HTMLElement>()
+const triggerRef = ref<HTMLElement | ButtonElementHandle>()
+const triggerElement = computed<HTMLElement | undefined>(() => {
+	const trigger = triggerRef.value
+	if (!trigger) return undefined
+	return 'element' in trigger ? (trigger.element ?? undefined) : trigger
+})
 const dropdownRef = ref<HTMLElement>()
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
@@ -944,11 +971,13 @@ function resolveCssSize(size: string | number | undefined): string | undefined {
 }
 
 async function updateDropdownPosition() {
-	if (!triggerRef.value || !dropdownRef.value) return
-
 	await nextTick()
 
-	const triggerRect = triggerRef.value.getBoundingClientRect()
+	const trigger = triggerElement.value
+	const dropdown = dropdownRef.value
+	if (!trigger || !dropdown) return
+
+	const triggerRect = trigger.getBoundingClientRect()
 	const width = resolveDropdownWidth(triggerRect.width)
 	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
 
@@ -960,7 +989,7 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const dropdownRect = dropdownRef.value.getBoundingClientRect()
+	const dropdownRect = dropdown.getBoundingClientRect()
 	const viewport = getViewportRect()
 
 	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
@@ -1064,7 +1093,7 @@ function closeDropdown() {
 	emit('close')
 
 	nextTick(() => {
-		triggerRef.value?.focus()
+		triggerElement.value?.focus()
 	})
 }
 
@@ -1355,7 +1384,7 @@ onClickOutside(
 	() => {
 		closeDropdown()
 	},
-	{ ignore: [triggerRef, containerRef, '.v-popper__popper'] },
+	{ ignore: [triggerElement, containerRef, '.v-popper__popper'] },
 )
 
 onMounted(() => {

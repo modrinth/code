@@ -15,7 +15,11 @@
 			}"
 			@click="toggleItem(item)"
 		>
-			<CheckIcon v-if="selected === item && !hideCheckmarkIcon" />
+			<CheckIcon
+				v-if="selected === item && !hideCheckmarkIcon"
+				class="!text-brand"
+				aria-hidden="true"
+			/>
 			<span>{{ formatLabel(item) }}</span>
 		</Button>
 	</div>

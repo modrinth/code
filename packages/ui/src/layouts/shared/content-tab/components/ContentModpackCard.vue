@@ -209,7 +209,7 @@ onUnmounted(() => {
 							<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
 						</Button>
 
-						<Button v-if="hasContentListener" class="!shadow-none" @click="emit('content')">
+						<Button v-if="hasContentListener" type="base" @click="emit('content')">
 							<BoxesIcon />
 							{{ formatMessage(commonMessages.contentLabel) }}
 						</Button>

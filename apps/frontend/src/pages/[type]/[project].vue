@@ -136,54 +136,71 @@
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					>
 						<template #actions>
-							<ButtonLink type="colored" color="brand" size="xl" v-if="auth.user && currentMember"
-									v-tooltip="formatMessage(messages.editProject)"
-									:to="`${projectPath}/settings`"
-									class="!font-bold lg:!hidden !w-12 !px-0 !rounded-full"
-								>
+							<ButtonLink
+								v-if="auth.user && currentMember"
+								v-tooltip="formatMessage(messages.editProject)"
+								type="colored"
+								color="brand"
+								size="xl"
+								:to="`${projectPath}/settings`"
+								class="!w-12 !rounded-full !px-0 !font-bold lg:!hidden"
+							>
 								<SettingsIcon />
 							</ButtonLink>
-							<ButtonLink type="colored" color="brand" size="xl" v-if="auth.user && currentMember" :to="`${projectPath}/settings`" class="!font-bold max-lg:!hidden">
+							<ButtonLink
+								v-if="auth.user && currentMember"
+								type="colored"
+								color="brand"
+								size="xl"
+								:to="`${projectPath}/settings`"
+								class="!font-bold max-lg:!hidden"
+							>
 								<SettingsIcon />
 								{{ formatMessage(messages.editProject) }}
 							</ButtonLink>
 
 							<div class="hidden sm:contents">
-								<Button
-									v-if="!isServerProject"
+								<IconButton
+									v-if="!isServerProject && auth.user && currentMember"
+									v-tooltip="formatMessage(commonMessages.downloadButton)"
 									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
 									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
 									size="xl"
-										v-tooltip="
-											auth.user && currentMember
-												? formatMessage(commonMessages.downloadButton)
-												: undefined
-										"
-										native-type="button"
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										@click="handleProjectHeaderPrimary"
-									>
+									:label="formatMessage(commonMessages.downloadButton)"
+									@click="handleProjectHeaderPrimary"
+								>
 									<DownloadIcon />
-									{{
-										auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
-									}}
-								</Button>
+								</IconButton>
 								<Button
-									v-else
+									v-else-if="!isServerProject"
 									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
 									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
 									size="xl"
-										v-tooltip="
-											auth.user && currentMember
-												? formatMessage(commonMessages.playButton)
-												: undefined
-										"
-										native-type="button"
-										:aria-label="formatMessage(commonMessages.playButton)"
-										@click="handleProjectHeaderPrimary"
-									>
+									@click="handleProjectHeaderPrimary"
+								>
+									<DownloadIcon />
+									{{ formatMessage(commonMessages.downloadButton) }}
+								</Button>
+								<IconButton
+									v-if="isServerProject && auth.user && currentMember"
+									v-tooltip="formatMessage(commonMessages.playButton)"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.playButton)"
+									@click="handleProjectHeaderPrimary"
+								>
 									<PlayIcon />
-									{{ auth.user && currentMember ? '' : formatMessage(commonMessages.playButton) }}
+								</IconButton>
+								<Button
+									v-else-if="isServerProject"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon />
+									{{ formatMessage(commonMessages.playButton) }}
 								</Button>
 							</div>
 
@@ -194,10 +211,9 @@
 									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
 									size="xl"
 									:label="formatMessage(commonMessages.downloadButton)"
-										native-type="button"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
+								>
 									<DownloadIcon />
 								</IconButton>
 								<IconButton
@@ -206,10 +222,9 @@
 									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
 									size="xl"
 									:label="formatMessage(commonMessages.playButton)"
-										native-type="button"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
+								>
 									<PlayIcon />
 								</IconButton>
 							</div>
@@ -1576,6 +1591,7 @@ const projectHeaderMoreActions = computed(() => {
 			label: formatMessage(messages.reviewProject),
 			icon: ScaleIcon,
 			action: openModerationChecklistFromMenu,
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff && !showModerationChecklist.value,
 		},
 		{
@@ -1584,6 +1600,7 @@ const projectHeaderMoreActions = computed(() => {
 			icon: ScanEyeIcon,
 			type: 'link',
 			to: `/moderation/technical-review/${project.value?.id}`,
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff,
 		},
 		{
@@ -1591,6 +1608,7 @@ const projectHeaderMoreActions = computed(() => {
 			label: formatMessage(messages.rescanModpack),
 			icon: FolderSearchIcon,
 			action: () => scanModal.value?.show(),
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
 		},
 		{ type: 'divider', shown: !!auth.value.user && isStaff,

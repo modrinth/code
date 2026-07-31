@@ -7,6 +7,8 @@ export type ButtonType = 'base' | 'colored' | 'outlined' | 'quiet'
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
+export type ButtonInteraction = 'surface' | 'filled' | 'none'
+
 // TODO: Standardized color string enum props across @modrinth/ui
 export type ButtonColor =
 	| 'brand'
@@ -19,6 +21,7 @@ export type ButtonColor =
 
 export type ButtonVisualProps = {
 	size?: ButtonSize
+	interaction?: ButtonInteraction
 } & (
 	| {
 			type?: 'base'
@@ -44,6 +47,7 @@ export interface ButtonProps {
 	type?: ButtonType
 	color?: ButtonColor
 	size?: ButtonSize
+	interaction?: ButtonInteraction
 	nativeType?: ButtonNativeType
 	disabled?: boolean
 	loading?: boolean
@@ -69,7 +73,9 @@ export interface OverflowMenuItemBase {
 	disabled?: boolean
 	tooltip?: string
 	remainOpen?: boolean
-	tone?: 'default' | 'red'
+	tone?: 'default' | ButtonColor
+	hoverFilled?: boolean
+	hoverFilledOnly?: boolean
 }
 
 export interface OverflowMenuAction extends OverflowMenuItemBase {

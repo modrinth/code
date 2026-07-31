@@ -55,19 +55,29 @@
 					<Avatar :src="displayedAvatarUrl" size="md" circle :alt="auth.user.value.username" />
 					<div class="flex flex-col gap-2">
 						<FileButton
-								:max-size="262144"
-								class="button-like !shadow-none"
-								:prompt="formatMessage(commonMessages.uploadImageButton)"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								@change="showPreviewImage"
-							>
+							:max-size="262144"
+							:prompt="formatMessage(commonMessages.uploadImageButton)"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							size="md"
+							@change="showPreviewImage"
+						>
 							<UploadIcon aria-hidden="true" />
 						</FileButton>
-						<Button v-if="avatarUrl && !pendingAvatarDeletion" native-type="button" class="!shadow-none" @click="removePreviewImage">
+						<Button
+							v-if="avatarUrl && !pendingAvatarDeletion"
+							native-type="button"
+							size="md"
+							@click="removePreviewImage"
+						>
 							<TrashIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.removeImageButton) }}
 						</Button>
-						<Button v-if="avatarFile || pendingAvatarDeletion" native-type="button" class="!shadow-none" @click="resetAvatar">
+						<Button
+							v-if="avatarFile || pendingAvatarDeletion"
+							native-type="button"
+							size="md"
+							@click="resetAvatar"
+						>
 							<UndoIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.resetButton) }}
 						</Button>
@@ -128,7 +138,6 @@ import { RouterLink } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
-import FileInput from '#ui/components/base/FileInput.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables'

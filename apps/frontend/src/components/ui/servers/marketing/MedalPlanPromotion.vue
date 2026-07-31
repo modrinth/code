@@ -21,18 +21,22 @@
 				</span>
 			</div>
 		</div>
-		<ButtonLink type="outlined" size="xl"
-				to="https://medal.tv/modrinth"
-				class="z-10 my-auto mt-2 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto !text-[var(--medal-promotion-text-orange)] [&>svg]:!text-[var(--medal-promotion-text-orange)] !shadow-[inset_0_0_0_1px_var(--color-orange)]"
-				>{{ formatMessage(messages.learnMoreButton) }} <ExternalIcon
-		/></ButtonLink>
+		<ButtonLink
+			type="outlined"
+			size="xl"
+			href="https://medal.tv/modrinth"
+			class="z-10 my-auto mt-2 w-full md:mt-0 md:w-auto"
+		>
+			{{ formatMessage(messages.learnMoreButton) }}
+			<ExternalIcon aria-hidden="true" />
+		</ButtonLink>
 	</div>
 </template>
 
 <script lang="ts" setup>
-import { ButtonLink } from '@modrinth/ui'
 import { ExternalIcon } from '@modrinth/assets'
 import {
+	ButtonLink,
 	defineMessages,
 	IntlFormatted,
 	MedalBackgroundImage,

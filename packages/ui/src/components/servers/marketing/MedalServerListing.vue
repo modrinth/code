@@ -120,8 +120,15 @@
 			</div>
 
 			<div class="z-10 ml-auto">
-				<Button type="outlined" size="xl" class="my-auto !text-[var(--medal-promotion-text-orange)] [&>svg]:!text-[var(--medal-promotion-text-orange)] !shadow-[inset_0_0_0_1px_var(--color-orange)]" data-server-listing-button @click="handleUpgrade">
-					<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
+				<Button
+					type="outlined"
+					size="xl"
+					class="my-auto"
+					data-server-listing-button
+					@click="handleUpgrade"
+				>
+					<RocketIcon aria-hidden="true" />
+					{{ formatMessage(messages.upgradeButton) }}
 				</Button>
 			</div>
 		</div>

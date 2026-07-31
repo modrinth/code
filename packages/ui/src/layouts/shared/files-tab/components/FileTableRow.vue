@@ -49,7 +49,13 @@
 				>
 					{{ formatMessage(commonMessages.actionsLabel) }}
 				</span>
-				<div class="col-start-1 row-start-1 flex justify-end">
+				<div
+					class="col-start-1 row-start-1 flex justify-end"
+					@click.stop
+					@contextmenu.stop
+					@keydown.stop
+					@pointerdown.stop
+				>
 					<TeleportOverflowMenu type="quiet" :label="formatMessage(commonMessages.actionsLabel)" :options="menuOptions">
 						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
 						<template #copy-filename

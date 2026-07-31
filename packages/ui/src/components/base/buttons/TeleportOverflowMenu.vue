@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import type { CSSProperties } from 'vue'
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
+import Button from './Button.vue'
 import IconButton from './IconButton.vue'
 import type {
 	ButtonColor,
+	ButtonElementHandle,
+	ButtonInteraction,
 	ButtonSize,
 	ButtonType,
 	OverflowMenuAction,
@@ -23,13 +27,16 @@ const props = withDefaults(
 		type?: ButtonType
 		color?: ButtonColor
 		size?: ButtonSize
+		interaction?: ButtonInteraction
 		disabled?: boolean
+		iconOnly?: boolean
 		placement?: TeleportPlacement
 	}>(),
 	{
 		type: 'base',
 		size: 'md',
 		disabled: false,
+		iconOnly: true,
 		placement: 'bottom-end',
 	},
 )
@@ -40,7 +47,7 @@ const emit = defineEmits<{
 	close: []
 }>()
 
-const triggerButton = ref<InstanceType<typeof IconButton> | null>(null)
+const triggerButton = ref<ButtonElementHandle | null>(null)
 const triggerElement = computed(() => triggerButton.value?.element ?? null)
 const panelElement = ref<HTMLElement | null>(null)
 const resolvedPlacement = computed(() => props.placement)
@@ -48,6 +55,7 @@ const menuId = `button-overflow-${useId()}`
 const selectedIndex = ref(-1)
 const typeahead = ref('')
 let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
+const triggerComponent = computed(() => (props.iconOnly ? IconButton : Button))
 
 const visibleOptions = computed(() => props.options.filter((option) => option.shown !== false))
 const menuOptions = computed(() =>
@@ -63,10 +71,28 @@ const { isOpen, panelStyle, open, close } = useAnchoredTeleport(
 )
 
 const menuItemClasses =
-	'flex min-h-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
+	'overflow-menu-item flex min-h-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
 	'cursor-pointer whitespace-nowrap hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:outline-none ' +
 	'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&[aria-disabled=true]]:pointer-events-none [&[aria-disabled=true]]:opacity-50 ' +
 	'[&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:text-primary'
+
+const toneVariables: Record<ButtonColor, string> = {
+	brand: 'var(--color-brand)',
+	red: 'var(--color-red)',
+	orange: 'var(--color-orange)',
+	green: 'var(--color-green)',
+	blue: 'var(--color-blue)',
+	purple: 'var(--color-purple)',
+	medal_promotion: 'var(--medal-promotion-text-orange, var(--color-orange))',
+}
+
+function getMenuItemStyle(option: OverflowMenuAction | OverflowMenuLink) {
+	if (!option.tone || option.tone === 'default') return undefined
+
+	return {
+		'--overflow-menu-item-tone': toneVariables[option.tone],
+	} as CSSProperties
+}
 
 function isDivider(
 	option: OverflowMenuOption,
@@ -211,13 +237,16 @@ defineExpose({ open: openMenu, close: closeMenu })
 </script>
 
 <template>
-	<IconButton
+	<component
+		:is="triggerComponent"
 		ref="triggerButton"
 		v-bind="$attrs"
-		:label="props.label"
+		:label="props.iconOnly ? props.label : undefined"
+		:aria-label="props.iconOnly ? undefined : props.label"
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
+		:interaction="props.interaction"
 		:disabled="props.disabled"
 		:aria-expanded="isOpen"
 		:aria-controls="menuId"
@@ -226,7 +255,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 		@keydown="handleTriggerKeydown"
 	>
 		<slot />
-	</IconButton>
+	</component>
 
 	<Teleport to="body">
 		<Transition
@@ -254,7 +283,11 @@ defineExpose({ open: openMenu, close: closeMenu })
 						v-else-if="isLink(option) && option.to !== undefined && !option.disabled"
 						v-tooltip="option.tooltip"
 						:to="option.to"
-						:class="[menuItemClasses, option.tone === 'red' ? 'text-red [&>svg]:text-red' : '']"
+						:class="menuItemClasses"
+						:style="getMenuItemStyle(option)"
+						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+						:data-hover-filled-only="option.hoverFilledOnly || undefined"
 						role="menuitem"
 						tabindex="-1"
 						@click="handleLink(option, $event)"
@@ -275,7 +308,11 @@ defineExpose({ open: openMenu, close: closeMenu })
 						:rel="option.rel ?? (option.target === '_blank' ? 'noopener noreferrer' : undefined)"
 						:download="option.download"
 						:aria-disabled="option.disabled || undefined"
-						:class="[menuItemClasses, option.tone === 'red' ? 'text-red [&>svg]:text-red' : '']"
+						:class="menuItemClasses"
+						:style="getMenuItemStyle(option)"
+						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+						:data-hover-filled-only="option.hoverFilledOnly || undefined"
 						role="menuitem"
 						tabindex="-1"
 						@click="handleLink(option, $event)"
@@ -293,7 +330,11 @@ defineExpose({ open: openMenu, close: closeMenu })
 						v-tooltip="option.tooltip"
 						type="button"
 						:aria-disabled="option.disabled || undefined"
-						:class="[menuItemClasses, option.tone === 'red' ? 'text-red [&>svg]:text-red' : '']"
+						:class="menuItemClasses"
+						:style="getMenuItemStyle(option)"
+						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+						:data-hover-filled-only="option.hoverFilledOnly || undefined"
 						role="menuitem"
 						tabindex="-1"
 						@click="handleAction(option, $event)"
@@ -309,3 +350,24 @@ defineExpose({ open: openMenu, close: closeMenu })
 		</Transition>
 	</Teleport>
 </template>
+
+<style scoped>
+.overflow-menu-item[data-tone]:not([data-hover-filled-only]) {
+	color: var(--overflow-menu-item-tone);
+}
+
+.overflow-menu-item[data-tone]:not([data-hover-filled-only]) :deep(svg) {
+	color: var(--overflow-menu-item-tone);
+}
+
+.overflow-menu-item[data-tone][data-hover-filled]:hover,
+.overflow-menu-item[data-tone][data-hover-filled]:focus-visible {
+	color: var(--color-accent-contrast);
+	background-color: var(--overflow-menu-item-tone);
+}
+
+.overflow-menu-item[data-tone][data-hover-filled]:hover :deep(svg),
+.overflow-menu-item[data-tone][data-hover-filled]:focus-visible :deep(svg) {
+	color: inherit;
+}
+</style>

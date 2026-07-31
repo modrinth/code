@@ -7,6 +7,7 @@ import IconButton from './IconButton.vue'
 import type {
 	ButtonColor,
 	ButtonElementHandle,
+	ButtonInteraction,
 	ButtonSize,
 	ButtonType,
 	TeleportPlacement,
@@ -20,8 +21,10 @@ const props = withDefaults(
 		type?: ButtonType
 		color?: ButtonColor
 		size?: ButtonSize
+		interaction?: ButtonInteraction
 		disabled?: boolean
 		iconOnly?: boolean
+		autoFocus?: boolean
 		placement?: TeleportPlacement
 		panelRole?: 'dialog' | 'region'
 	}>(),
@@ -30,6 +33,7 @@ const props = withDefaults(
 		size: 'md',
 		disabled: false,
 		iconOnly: false,
+		autoFocus: true,
 		placement: 'bottom-end',
 		panelRole: 'dialog',
 	},
@@ -64,7 +68,7 @@ async function openMenu() {
 	if (props.disabled || isOpen.value) return
 	await open()
 	emit('open')
-	await nextTick(focusPanel)
+	if (props.autoFocus) await nextTick(focusPanel)
 }
 
 function closeMenu(restoreFocus = true) {
@@ -105,6 +109,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
+		:interaction="props.interaction"
 		:disabled="props.disabled"
 		:aria-expanded="isOpen"
 		:aria-controls="panelId"

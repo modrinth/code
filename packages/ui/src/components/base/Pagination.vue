@@ -9,7 +9,7 @@
 				class="!w-9 !px-0 !rounded-full"
 				@click.prevent="switchPage(page - 1)"
 			>
-				<ChevronLeftIcon />
+				<ChevronLeftIcon aria-hidden="true" />
 			</ButtonLink>
 			<IconButton
 				v-else
@@ -17,7 +17,7 @@
 				type="quiet"
 				@click="switchPage(page - 1)"
 			>
-				<ChevronLeftIcon />
+				<ChevronLeftIcon aria-hidden="true" />
 			</IconButton>
 		</template>
 		<div
@@ -36,16 +36,22 @@
 				<ButtonLink
 					v-if="linkFunction"
 					:href="linkFunction(item)"
-					:type="page === item ? 'base' : 'quiet'"
-					:class="['!w-9 !px-0 !rounded-full', page === item ? '!text-brand' : '']"
+					type="quiet"
+					:color="page === item ? 'brand' : undefined"
+					:interaction="page === item ? 'filled' : undefined"
+					:aria-current="page === item ? 'page' : undefined"
+					:class="['!min-w-9 !rounded-full', page === item ? '!bg-brand-highlight' : '']"
 					@click.prevent="page !== item ? switchPage(item) : null"
 				>
 					{{ item }}
 				</ButtonLink>
 				<Button
 					v-else
-					:type="page === item ? 'base' : 'quiet'"
-					:class="['!w-9 !px-0 !rounded-full', page === item ? '!text-brand' : '']"
+					type="quiet"
+					:color="page === item ? 'brand' : undefined"
+					:interaction="page === item ? 'filled' : undefined"
+					:aria-current="page === item ? 'page' : undefined"
+					:class="['!min-w-9 !rounded-full', page === item ? '!bg-brand-highlight' : '']"
 					@click="page !== item ? switchPage(item) : null"
 				>
 					{{ item }}
@@ -62,10 +68,10 @@
 				class="!w-9 !px-0 !rounded-full"
 				@click.prevent="switchPage(page + 1)"
 			>
-				<ChevronRightIcon />
+				<ChevronRightIcon aria-hidden="true" />
 			</ButtonLink>
 			<IconButton v-else label="Next Page" type="quiet" @click="switchPage(page + 1)">
-				<ChevronRightIcon />
+				<ChevronRightIcon aria-hidden="true" />
 			</IconButton>
 		</template>
 	</div>

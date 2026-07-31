@@ -558,33 +558,36 @@ function goToBreadcrumbStep(id: string) {
 		<div class="flex gap-2 justify-between mt-4">
 			<Button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
 				<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
-			</button>
-			<button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
+			</Button>
+			<Button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
 				<XIcon />
 				{{ formatMessage(commonMessages.cancelButton) }}
 			</Button>
-			<Button type="colored" color="brand" v-if="currentStep !== 'plan'"
-					v-tooltip="
-						currentStep === 'review' && !acceptedEula && !noPaymentRequired
-							? 'You must accept the Minecraft EULA to proceed.'
-							: undefined
-					"
-					:disabled="!canProceed"
-					@click="
-						noPaymentRequired && currentStep === 'review'
-							? (async () => {
-									if (props.onFinalizeNoPaymentChange) {
-										try {
-											await props.onFinalizeNoPaymentChange()
-										} catch (e) {
-											return
-										}
+			<Button
+				v-if="currentStep !== 'plan'"
+				v-tooltip="
+					currentStep === 'review' && !acceptedEula && !noPaymentRequired
+						? 'You must accept the Minecraft EULA to proceed.'
+						: undefined
+				"
+				type="colored"
+				color="brand"
+				:disabled="!canProceed"
+				@click="
+					noPaymentRequired && currentStep === 'review'
+						? (async () => {
+								if (props.onFinalizeNoPaymentChange) {
+									try {
+										await props.onFinalizeNoPaymentChange()
+									} catch (e) {
+										return
 									}
-									modal?.hide()
-								})()
-							: setStep(nextStep)
-					"
-				>
+								}
+								modal?.hide()
+							})()
+						: setStep(nextStep)
+				"
+			>
 				<template v-if="currentStep === 'review'">
 					<template v-if="noPaymentRequired"><CheckCircleIcon /> Confirm Change</template>
 					<template v-else>

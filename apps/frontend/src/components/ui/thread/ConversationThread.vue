@@ -290,6 +290,7 @@
 																id: 'withhold-reply',
 																label: formatMessage(messages.actionWithholdWithReply),
 																tone: 'red',
+																hoverFilled: true,
 																action: () =>
 																	runBlockingAction('withhold-reply', () => sendReply('withheld')),
 																disabled: project.status === 'withheld' || isLoading,
@@ -316,6 +317,7 @@
 																id: 'withhold',
 																label: formatMessage(messages.actionWithhold),
 																tone: 'red',
+																hoverFilled: true,
 																action: () =>
 																	runBlockingAction('withhold', () => setStatus('withheld')),
 																disabled: project.status === 'withheld' || isLoading,

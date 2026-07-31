@@ -95,6 +95,8 @@
 									id: 'download',
 									label: 'Download',
 									type: 'link',
+									tone: 'brand',
+									hoverFilled: true,
 									href: createDownloadUrl(version),
 									download: getPrimaryFile(version)?.filename,
 									shown: !!getPrimaryFile(version),
@@ -128,6 +130,7 @@
 									id: 'report',
 									label: 'Report',
 									tone: 'red',
+									hoverFilled: true,
 									action: () =>
 										auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
 									shown: !currentMember,
@@ -172,6 +175,7 @@
 									id: 'delete',
 									label: 'Delete',
 									tone: 'red',
+									hoverFilled: true,
 									action: () => {
 										selectedVersion = version.id
 										deleteVersionModal?.show()

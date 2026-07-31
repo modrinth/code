@@ -102,6 +102,26 @@ use their standard neutral treatment.
 <Button type="quiet" color="red">Remove</Button>
 ```
 
+Quiet buttons support an `interaction` prop when their hover and keyboard-focus
+treatment needs to differ from the default surface fill:
+
+| Interaction | Treatment |
+| ----------- | --------- |
+| `surface` | Uses the standard neutral hover/focus surface. This is the default. |
+| `filled` | Fills with the button's `color` and uses contrast text. |
+| `none` | Keeps the background transparent while retaining the focus ring. |
+
+```vue
+<Button type="quiet" color="brand" interaction="filled">Current page</Button>
+<IconButton type="quiet" interaction="none" label="Open account menu">
+	<AvatarIcon aria-hidden="true" />
+</IconButton>
+```
+
+Use `interaction` to describe behavior rather than passing arbitrary hover colors.
+Resting selected-state backgrounds, such as a current pagination page, remain the
+responsibility of the owning component.
+
 Use red only for destructive or dangerous actions. Do not use color as the only way to
 communicate an action's meaning.
 
@@ -286,11 +306,19 @@ const options: OverflowMenuOption[] = [
 
 Each non-divider option needs a stable, unique `id` and a localized `label`.
 
+The trigger is an `IconButton` by default. Set `icon-only="false"` when the trigger has
+visible text or composite content, such as an avatar and chevron; it will use a normal
+`Button` so intrinsic width, padding, and gaps are preserved.
+
 - Use an action option for behaviour and a link option for navigation.
 - Use `shown: false` to remove an option conditionally.
 - Use `disabled` with a `tooltip` when the user needs to understand why an option is
   unavailable.
 - Use `remainOpen` only when selecting the option should not dismiss the menu.
+- Use `tone` for semantically colored options. The available tones are `brand`, `red`,
+  `orange`, `green`, `blue`, `purple`, and `medal_promotion`.
+- Use `hoverFilled: true` when a toned option should fill with its tone on hover and
+  focus. Use `hoverFilledOnly: true` to keep the default text color until that state.
 - Use `tone: 'red'` for destructive options.
 - Use dividers sparingly to separate meaningful groups.
 

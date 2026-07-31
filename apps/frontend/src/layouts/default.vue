@@ -282,33 +282,40 @@
 				</template>
 			</div>
 			<div class="flex items-center gap-1">
-				<TeleportOverflowMenu type="quiet" :label="formatMessage(messages.createNew)"
-						v-if="auth.user && isStaff(auth.user)"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 !w-auto !px-2.5 !rounded-xl"
-						:options="[
+				<TeleportOverflowMenu
+					v-if="auth.user && isStaff(auth.user)"
+					type="quiet"
+					:icon-only="false"
+					:label="formatMessage(messages.createNew)"
+					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
+					:options="[
 							{
 								id: 'review-projects',
 								label: formatMessage(messages.reviewProjects),
 								type: 'link',
 								to: '/moderation',
+								tone: 'orange',
 							},
 							{
 								id: 'tech-review',
 								label: formatMessage(messages.techReview),
 								type: 'link',
 								to: '/moderation/technical-review',
+								tone: 'orange',
 							},
 							{
 								id: 'review-reports',
 								label: formatMessage(messages.reports),
 								type: 'link',
 								to: '/moderation/reports',
+								tone: 'orange',
 							},
 							{
 								id: 'external-projects',
 								label: formatMessage(messages.externalProjects),
 								type: 'link',
 								to: '/moderation/external-projects',
+								tone: 'orange',
 							},
 							{
 								type: 'divider',
@@ -364,8 +371,8 @@
 								to: '/admin/analytics/events',
 								shown: isAdmin(auth.user),
 							},
-						]"
-					>
+					]"
+				>
 					<ModrinthIcon aria-hidden="true" />
 					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 					<template #review-projects>
@@ -402,10 +409,13 @@
 						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
 					</template>
 				</TeleportOverflowMenu>
-				<TeleportOverflowMenu type="quiet" :label="formatMessage(messages.createNew)"
-						v-if="auth.user"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 !w-auto !px-2.5 !rounded-xl"
-						:options="[
+				<TeleportOverflowMenu
+					v-if="auth.user"
+					type="quiet"
+					:icon-only="false"
+					:label="formatMessage(messages.createNew)"
+					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
+					:options="[
 							{
 								id: 'new-project',
 								label: formatMessage(messages.newProject),
@@ -430,8 +440,8 @@
 								action: (event) =>
 									requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 							},
-						]"
-					>
+					]"
+				>
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.publish) }}
 					<template #new-project>
@@ -448,9 +458,14 @@
 						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
 					</template>
 				</TeleportOverflowMenu>
-				<TeleportOverflowMenu :label="formatMessage(commonMessages.moreOptionsButton)"
+				<TeleportOverflowMenu
 					v-if="auth.user"
-					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 pr-1"
+					type="quiet"
+					size="lg"
+					interaction="none"
+					:icon-only="false"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2 !pr-1"
 					:options="userMenuOptions"
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
@@ -1114,6 +1129,7 @@ const userMenuOptions = computed(() => {
 			label: formatMessage(messages.upgradeToModrinthPlus),
 			type: 'link',
 			to: '/plus',
+			tone: 'purple',
 			shown: !flags.value.hidePlusPromoInUserMenu && !hasActiveMidas(user),
 		},
 		{
@@ -1206,6 +1222,7 @@ const userMenuOptions = computed(() => {
 			id: 'sign-out',
 			label: formatMessage(commonMessages.signOutButton),
 			tone: 'red',
+			hoverFilled: true,
 			action: () => logoutUser(),
 		},
 	]

@@ -49,18 +49,23 @@
 		</div>
 
 		<!-- Standard mode: button trigger -->
-		<span
+		<component
+			:is="triggerComponent"
 			v-else
 			ref="triggerRef"
-			role="button"
-			tabindex="0"
-			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2 text-left transition-all duration-200 text-button-text gap-2.5"
+			v-bind="triggerButtonProps"
+			:role="triggerType ? undefined : 'button'"
+			:tabindex="triggerType ? undefined : 0"
 			:class="[
+				triggerType
+					? 'w-full !justify-between overflow-hidden text-left'
+					: 'relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2 text-left transition-all duration-200 text-button-text gap-2.5',
 				props.triggerClass,
 				{
 					'z-[9999]': isOpen,
-					'cursor-not-allowed opacity-50': disabled,
-					'cursor-pointer hover:brightness-[115%] active:brightness-[115%]': !disabled,
+					'cursor-not-allowed opacity-50': disabled && !triggerType,
+					'cursor-pointer hover:brightness-[115%] active:brightness-[115%]':
+						!disabled && !triggerType,
 				},
 			]"
 			:aria-expanded="isOpen"
@@ -94,7 +99,7 @@
 					:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
 				/>
 			</div>
-		</span>
+		</component>
 
 		<Teleport to="#teleports">
 			<Transition
@@ -217,6 +222,13 @@ import {
 	watch,
 } from 'vue'
 
+import ButtonFrame from './buttons/ButtonFrame.vue'
+import type {
+	ButtonElementHandle,
+	ButtonInteraction,
+	ButtonSize,
+	ButtonType,
+} from './buttons/types'
 import StyledInput from './StyledInput.vue'
 
 export interface ComboboxOption<T> {
@@ -281,6 +293,10 @@ const props = withDefaults(
 		displayValue?: string
 		searchValue?: string
 		triggerClass?: string
+		/** Apply the shared button frame to compact, button-owned combobox triggers. */
+		triggerType?: ButtonType
+		triggerSize?: ButtonSize
+		triggerInteraction?: ButtonInteraction
 		dropdownClass?: string
 		/** Additional selectors to ignore when detecting outside clicks */
 		outsideClickIgnore?: string[]
@@ -322,6 +338,8 @@ const props = withDefaults(
 		selectSearchTextOnFocus: false,
 		showSearchIcon: false,
 		searchType: 'text',
+		triggerSize: 'md',
+		triggerInteraction: 'surface',
 		outsideClickIgnore: () => [],
 	},
 )
@@ -337,13 +355,26 @@ const emit = defineEmits<{
 }>()
 
 const slots = useSlots()
+const triggerComponent = computed(() => (props.triggerType ? ButtonFrame : 'span'))
+const triggerButtonProps = computed(() =>
+	props.triggerType
+		? {
+				as: 'button' as const,
+				nativeType: 'button' as const,
+				type: props.triggerType,
+				size: props.triggerSize,
+				interaction: props.triggerInteraction,
+				disabled: props.disabled,
+			}
+		: {},
+)
 
 const isOpen = ref(false)
 const searchQuery = ref('')
 const userHasTyped = ref(false)
 const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
-const triggerRef = ref<HTMLElement>()
+const triggerRef = ref<HTMLElement | ButtonElementHandle>()
 const searchTriggerRef = ref<InstanceType<typeof StyledInput>>()
 const dropdownRef = ref<HTMLElement>()
 const optionsScrollbarRef = ref<HTMLElement>()
@@ -357,10 +388,13 @@ const effectiveTriggerEl = computed(() => {
 	if (props.searchable && searchTriggerRef.value) {
 		return (searchTriggerRef.value as unknown as { $el: HTMLElement }).$el as HTMLElement
 	}
-	return triggerRef.value
+
+	const trigger = triggerRef.value
+	if (!trigger) return undefined
+	return 'element' in trigger ? (trigger.element ?? undefined) : trigger
 })
 const outsideClickIgnoreTargets = computed(() => [
-	triggerRef,
+	effectiveTriggerEl,
 	containerRef,
 	...props.outsideClickIgnore,
 ])
@@ -642,7 +676,7 @@ function closeDropdown() {
 
 	if (!props.searchable) {
 		nextTick(() => {
-			triggerRef.value?.focus()
+			effectiveTriggerEl.value?.focus()
 		})
 	}
 }

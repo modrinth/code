@@ -7,7 +7,7 @@
 				:options="platformOptions"
 				fit-content
 				:dropdown-min-width="180"
-				trigger-class="!min-h-9 !px-3 !py-0"
+				trigger-type="base"
 				@update:model-value="updateSelectedPlatforms"
 			>
 				<template #input-content="{ isOpen, openDirection }">
@@ -31,7 +31,7 @@
 				search-placeholder="Search..."
 				fit-content
 				:dropdown-min-width="240"
-				trigger-class="!min-h-9 !px-3 !py-0"
+				trigger-type="base"
 				@update:model-value="updateSelectedGameVersions"
 			>
 				<template #input-content="{ isOpen, openDirection }">
@@ -63,7 +63,7 @@
 				:options="channelOptions"
 				fit-content
 				:dropdown-min-width="180"
-				trigger-class="!min-h-9 !px-3 !py-0"
+				trigger-type="base"
 				@update:model-value="updateSelectedChannels"
 			>
 				<template #input-content="{ isOpen, openDirection }">

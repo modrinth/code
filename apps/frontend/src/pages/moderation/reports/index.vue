@@ -118,8 +118,15 @@
 					</template>
 				</MultiSelect>
 
-				<FloatingPanel button-class="!h-10 !shadow-none !text-contrast" :auto-focus="false">
-					<BlendIcon class="size-5" /> Advanced filters
+				<TeleportPopoutMenu
+					label="Advanced filters"
+					size="lg"
+					:auto-focus="false"
+				>
+					<template #trigger>
+						<BlendIcon aria-hidden="true" />
+						Advanced filters
+					</template>
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<div class="flex flex-col gap-2">
@@ -156,7 +163,7 @@
 							</div>
 						</div>
 					</template>
-				</FloatingPanel>
+				</TeleportPopoutMenu>
 			</div>
 		</div>
 
@@ -208,12 +215,12 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
-	FloatingPanel,
 	injectModrinthClient,
 	MultiSelect,
 	type MultiSelectItem,
 	Pagination,
 	StyledInput,
+	TeleportPopoutMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'

@@ -3,12 +3,19 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonColor, ButtonLinkDestination, ButtonSize, ButtonType } from './types'
+import type {
+	ButtonColor,
+	ButtonInteraction,
+	ButtonLinkDestination,
+	ButtonSize,
+	ButtonType,
+} from './types'
 
 type ButtonLinkProps = ButtonLinkDestination & {
 	type?: ButtonType
 	color?: ButtonColor
 	size?: ButtonSize
+	interaction?: ButtonInteraction
 	target?: string
 	rel?: string
 	download?: string | boolean
@@ -44,6 +51,7 @@ function handleClick(event: MouseEvent) {
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
+		:interaction="props.interaction"
 		:to="usesRouter ? props.to : undefined"
 		:href="!usesRouter && !props.disabled ? props.href : undefined"
 		:target="props.target"

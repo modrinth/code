@@ -2,7 +2,13 @@
 import { computed, ref } from 'vue'
 
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonColor, ButtonNativeType, ButtonSize, ButtonType } from './types'
+import type {
+	ButtonColor,
+	ButtonInteraction,
+	ButtonNativeType,
+	ButtonSize,
+	ButtonType,
+} from './types'
 
 const props = withDefaults(
 	defineProps<{
@@ -10,6 +16,7 @@ const props = withDefaults(
 		type?: ButtonType
 		color?: ButtonColor
 		size?: ButtonSize
+		interaction?: ButtonInteraction
 		nativeType?: ButtonNativeType
 		disabled?: boolean
 		loading?: boolean
@@ -38,6 +45,7 @@ defineExpose({ element })
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"
+		:interaction="props.interaction"
 		:native-type="props.nativeType"
 		:disabled="props.disabled || props.loading"
 		:aria-label="props.label"
