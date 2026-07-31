@@ -21,6 +21,8 @@
 					class="!w-full flex-grow sm:!w-[200px] sm:flex-grow-0"
 					:options="messageFilterTypes"
 					:placeholder="formatMessage(commonMessages.filterByLabel)"
+					trigger-type="base"
+					trigger-size="lg"
 					@select="goToPage(1)"
 				>
 					<template #selected="{ label: messageLabel }">
@@ -38,6 +40,8 @@
 					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
 					:options="sortTypes"
 					:placeholder="formatMessage(commonMessages.sortByLabel)"
+					trigger-type="base"
+					trigger-size="lg"
 					@select="goToPage(1)"
 				>
 					<template #selected="{ label: sortingLabel }">
@@ -62,6 +66,7 @@
 					:max-tag-rows="1"
 					fit-content
 					trigger-type="base"
+					trigger-size="lg"
 					checkbox-position="right"
 					show-selection-actions
 					should-show-select-all
@@ -70,7 +75,7 @@
 					<template #input-content="{ isOpen, openDirection }">
 						<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-1.5 pr-1">
 							<LayersIcon class="size-5 shrink-0 text-primary" />
-							<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary">
+							<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit">
 								{{
 									currentReporterOrProject.length === 0
 										? 'All Reports'

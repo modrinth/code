@@ -611,6 +611,8 @@ watch(totalPages, (pages) => {
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
 					:options="responseFilterTypes"
+					trigger-type="base"
+					trigger-size="lg"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -625,6 +627,8 @@ watch(totalPages, (pages) => {
 					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
 					:placeholder="formatMessage(commonMessages.sortByLabel)"
+					trigger-type="base"
+					trigger-size="lg"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">

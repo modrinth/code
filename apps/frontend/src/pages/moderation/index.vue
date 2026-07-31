@@ -18,7 +18,8 @@
 					<Combobox
 						v-model="currentFilterType"
 						class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="filterTypes"
 						:placeholder="formatMessage(commonMessages.filterByLabel)"
 						@select="goToPage(1)"
@@ -36,7 +37,8 @@
 					<Combobox
 						v-model="currentSortType"
 						class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="sortTypes"
 						:placeholder="formatMessage(commonMessages.sortByLabel)"
 						@select="goToPage(1)"
@@ -56,7 +58,8 @@
 					<Combobox
 						v-model="itemsPerPage"
 						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="itemsPerPageOptions"
 						placeholder="Items per page"
 						@select="goToPage(1)"

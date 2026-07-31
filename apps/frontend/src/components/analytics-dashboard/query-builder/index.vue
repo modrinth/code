@@ -33,7 +33,7 @@
 							decoding="async"
 						/>
 						<LayersIcon v-else class="size-5 shrink-0 text-primary" />
-						<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary">
+						<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit">
 							{{ selectedProjectLabel }}
 						</span>
 						<ChevronLeftIcon
@@ -173,7 +173,7 @@
 					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-1.5 pr-1">
 						<BlocksIcon class="size-5 shrink-0 text-primary" />
 						<span
-							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary"
+							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit"
 							:title="mobileSelectedBreakdownLabel"
 						>
 							{{ mobileSelectedBreakdownLabel }}
@@ -247,7 +247,7 @@
 										class="size-5 shrink-0 text-primary"
 									/>
 									<BoxIcon v-else class="size-5 shrink-0 text-primary" />
-									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary">
+									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-inherit">
 										{{ selectedProjectLabel }}
 									</span>
 								</div>
@@ -416,7 +416,7 @@
 									<template #input-content="{ isOpen, openDirection }">
 										<div class="flex min-h-7 min-w-0 flex-1 items-center gap-1.5 pr-1">
 											<span
-												class="min-w-0 flex-1 truncate font-semibold text-primary"
+												class="min-w-0 flex-1 truncate font-semibold text-inherit"
 												:title="selectedBreakdownLabel"
 											>
 												{{ selectedBreakdownLabel }}

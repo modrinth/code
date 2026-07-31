@@ -13,7 +13,7 @@
 				<template #input-content="{ isOpen, openDirection }">
 					<div class="flex items-center gap-2">
 						<FilterIcon class="h-5 w-5 text-secondary" />
-						<span class="font-semibold text-primary">Platforms</span>
+						<span class="font-semibold text-inherit">Platforms</span>
 						<ChevronLeftIcon
 							class="h-5 w-5 text-secondary transition-transform duration-150"
 							:class="
@@ -37,7 +37,7 @@
 				<template #input-content="{ isOpen, openDirection }">
 					<div class="flex items-center gap-2">
 						<FilterIcon class="h-5 w-5 text-secondary" />
-						<span class="font-semibold text-primary">Game versions</span>
+						<span class="font-semibold text-inherit">Game versions</span>
 						<ChevronLeftIcon
 							class="h-5 w-5 text-secondary transition-transform duration-150"
 							:class="
@@ -69,7 +69,7 @@
 				<template #input-content="{ isOpen, openDirection }">
 					<div class="flex items-center gap-2">
 						<FilterIcon class="h-5 w-5 text-secondary" />
-						<span class="font-semibold text-primary">Channels</span>
+						<span class="font-semibold text-inherit">Channels</span>
 						<ChevronLeftIcon
 							class="h-5 w-5 text-secondary transition-transform duration-150"
 							:class="

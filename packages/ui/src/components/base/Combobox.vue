@@ -83,7 +83,8 @@
 				/>
 				<span
 					v-if="selectedOption"
-					class="min-w-0 truncate text-primary font-semibold leading-tight"
+					class="min-w-0 truncate font-semibold leading-tight"
+					:class="triggerType ? 'text-inherit' : 'text-primary'"
 				>
 					<slot name="selected" :label="selectedTriggerText">{{ selectedTriggerText }}</slot>
 				</span>
