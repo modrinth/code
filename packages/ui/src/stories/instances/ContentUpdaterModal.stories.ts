@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import ContentUpdaterModal from '../../layouts/shared/content-tab/components/modals/content-updater-modal/index.vue'
 
 // Real version data from Modrinth API - Sodium (mod)
@@ -265,7 +265,7 @@ type Story = StoryObj<typeof meta>
 
 export const ModExample: Story = {
 	render: (args) => ({
-		components: { ContentUpdaterModal, ButtonStyled },
+		components: { Button, ContentUpdaterModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentUpdaterModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -304,7 +304,7 @@ export const ModExample: Story = {
 
 export const ModpackExample: Story = {
 	render: (args) => ({
-		components: { ContentUpdaterModal, ButtonStyled },
+		components: { Button, ContentUpdaterModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentUpdaterModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -343,7 +343,7 @@ export const ModpackExample: Story = {
 
 export const WithIncompatibleVersions: Story = {
 	render: (args) => ({
-		components: { ContentUpdaterModal, ButtonStyled },
+		components: { Button, ContentUpdaterModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentUpdaterModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -375,7 +375,7 @@ export const WithIncompatibleVersions: Story = {
 
 export const AllVersionTypes: Story = {
 	render: (args) => ({
-		components: { ContentUpdaterModal, ButtonStyled },
+		components: { Button, ContentUpdaterModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentUpdaterModal> | null>(null)
 			const openModal = () => modalRef.value?.show()

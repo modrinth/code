@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import type { CreationFlowContextValue } from '../../components/flows/creation-flow-modal/creation-flow-context'
 import CreationFlowModal from '../../components/flows/creation-flow-modal/index.vue'
 
@@ -23,7 +23,7 @@ type Story = StoryObj<typeof meta>
 export const CreateWorld: Story = {
 	name: 'Create World (Hosting)',
 	render: () => ({
-		components: { CreationFlowModal, ButtonStyled },
+		components: { Button, CreationFlowModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 			const lastEvent = ref('')
@@ -58,7 +58,7 @@ export const CreateWorld: Story = {
 export const ServerOnboarding: Story = {
 	name: 'Server Setup (Legacy) (Hosting)',
 	render: () => ({
-		components: { CreationFlowModal, ButtonStyled },
+		components: { Button, CreationFlowModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 			const lastEvent = ref('')
@@ -93,7 +93,7 @@ export const ServerOnboarding: Story = {
 export const Instance: Story = {
 	name: 'Create Instance (App)',
 	render: () => ({
-		components: { CreationFlowModal, ButtonStyled },
+		components: { Button, CreationFlowModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 			const lastEvent = ref('')

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import PopupNotificationPanel from '../../components/nav/PopupNotificationPanel.vue'
 import { injectPopupNotificationManager } from '../../providers'
 
@@ -13,7 +13,7 @@ export default meta
 
 export const Default: StoryObj = {
 	render: () => ({
-		components: { PopupNotificationPanel, ButtonStyled },
+		components: { Button, PopupNotificationPanel },
 		setup() {
 			const popupManager = injectPopupNotificationManager()
 

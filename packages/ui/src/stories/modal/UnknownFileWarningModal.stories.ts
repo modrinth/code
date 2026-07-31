@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import UnknownFileWarningModal from '../../components/modal/UnknownFileWarningModal.vue'
 
 const meta = {
@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>
 
 export const Modpack: Story = {
 	render: () => ({
-		components: { ButtonStyled, UnknownFileWarningModal },
+		components: { Button, UnknownFileWarningModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UnknownFileWarningModal> | null>(null)
 			return { modalRef }
@@ -43,7 +43,7 @@ export const Modpack: Story = {
 
 export const Mod: Story = {
 	render: () => ({
-		components: { ButtonStyled, UnknownFileWarningModal },
+		components: { Button, UnknownFileWarningModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UnknownFileWarningModal> | null>(null)
 			return { modalRef }

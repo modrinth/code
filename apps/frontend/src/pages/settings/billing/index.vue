@@ -165,18 +165,17 @@
 						v-if="midasCharge && midasCharge.status === 'failed'"
 						class="ml-auto flex flex-row-reverse items-center gap-2"
 					>
-						<ButtonStyled v-if="midasCharge && midasCharge.status === 'failed'">
-							<button
-								@click="
-									() => {
-										$refs.midasPurchaseModal.show()
-									}
-								"
-							>
-								<UpdatedIcon />
-								{{ formatMessage(messages.updateMethod) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							v-if="midasCharge && midasCharge.status === 'failed'"
+							@click="
+							() => {
+							$refs.midasPurchaseModal.show()
+							}
+							"
+						>
+							<UpdatedIcon aria-hidden="true" />
+							{{ formatMessage(messages.updateMethod) }}
+						</Button>
 						<ButtonStyled type="transparent" circular>
 							<OverflowMenu
 								:dropdown-id="`${baseId}-cancel-midas`"
@@ -201,71 +200,69 @@
 						v-else-if="midasCharge && midasCharge.status !== 'cancelled'"
 						class="ml-auto flex gap-2"
 					>
-						<ButtonStyled>
-							<button
-								:disabled="changingInterval"
-								@click="
-									() => {
-										cancelSubscriptionId = midasSubscription.id
-										$refs.modalCancel.show()
-									}
-								"
-							>
-								<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled
-							:color="midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple'"
-							color-fill="text"
-						>
-							<button
-								v-tooltip="
-									midasCharge.subscription_interval === 'yearly'
-										? formatMessage(messages.monthlyBillingAdditionalPerYearTooltip, {
-												amount: formatPrice(
-													oppositePrice * 12 - midasCharge.amount,
-													midasCharge.currency_code,
-												),
-											})
-										: undefined
-								"
-								:disabled="changingInterval"
-								@click="switchMidasInterval(oppositeInterval)"
-							>
-								<SpinnerIcon v-if="changingInterval" class="animate-spin" />
-								<TransferIcon v-else />
-								{{
-									changingInterval
-										? formatMessage(messages.switchingToInterval, {
-												interval: oppositeInterval,
-											})
-										: formatMessage(messages.switchToInterval, {
-												interval: oppositeInterval,
-											})
-								}}
-							</button>
-						</ButtonStyled>
-					</div>
-					<ButtonStyled
-						v-else-if="midasCharge && midasCharge.status === 'cancelled'"
-						color="purple"
-					>
-						<button class="ml-auto" @click="cancelSubscription(midasSubscription.id, false)">
-							{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="purple" size="large">
-						<button
-							class="ml-auto"
+						<Button
+							:disabled="changingInterval"
 							@click="
-								() => {
-									$refs.midasPurchaseModal.show()
-								}
+							() => {
+							cancelSubscriptionId = midasSubscription.id
+							$refs.modalCancel.show()
+							}
 							"
 						>
-							{{ formatMessage(messages.subscribe) }} <RightArrowIcon />
-						</button>
-					</ButtonStyled>
+							<XIcon aria-hidden="true" /> {{ formatMessage(commonMessages.cancelButton) }}
+						</Button>
+						<Button
+							type="quiet"
+							:color="midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple' === 'standard' ? undefined : midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple' === 'medal-promo' ? 'medal_promotion' : midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple'"
+							v-tooltip="
+							midasCharge.subscription_interval === 'yearly'
+							? formatMessage(messages.monthlyBillingAdditionalPerYearTooltip, {
+							amount: formatPrice(
+							oppositePrice * 12 - midasCharge.amount,
+							midasCharge.currency_code,
+							),
+							})
+							: undefined
+							"
+							:disabled="changingInterval"
+							@click="switchMidasInterval(oppositeInterval)"
+						>
+							<SpinnerIcon aria-hidden="true" v-if="changingInterval" class="animate-spin" />
+							<TransferIcon aria-hidden="true" v-else />
+							{{
+								changingInterval
+									? formatMessage(messages.switchingToInterval, {
+											interval: oppositeInterval,
+										})
+									: formatMessage(messages.switchToInterval, {
+											interval: oppositeInterval,
+										})
+							}}
+						</Button>
+					</div>
+					<Button
+						v-else-if="midasCharge && midasCharge.status === 'cancelled'"
+						type="colored"
+						color="purple"
+						class="ml-auto"
+						@click="cancelSubscription(midasSubscription.id, false)"
+					>
+						{{ formatMessage(messages.resubscribe) }} <RightArrowIcon aria-hidden="true" />
+					</Button>
+					<Button
+						v-else
+						type="colored"
+						color="purple"
+						size="xl"
+						class="ml-auto"
+						@click="
+						() => {
+						$refs.midasPurchaseModal.show()
+						}
+						"
+					>
+						{{ formatMessage(messages.subscribe) }} <RightArrowIcon aria-hidden="true" />
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -477,44 +474,42 @@
 										</div>
 									</div>
 									<div class="flex gap-2">
-										<ButtonStyled
+										<Button
 											v-if="
-												getPyroCharge(subscription) &&
-												getPyroCharge(subscription).status !== 'cancelled'
+											getPyroCharge(subscription) &&
+											getPyroCharge(subscription).status !== 'cancelled'
 											"
+											@click="showCancellationSurvey(subscription)"
 										>
-											<button @click="showCancellationSurvey(subscription)">
-												<XIcon />
-												{{ formatMessage(commonMessages.cancelButton) }}
-											</button>
-										</ButtonStyled>
-										<ButtonStyled
+											<XIcon aria-hidden="true" />
+											{{ formatMessage(commonMessages.cancelButton) }}
+										</Button>
+										<Button
 											v-if="
-												getPyroCharge(subscription) &&
-												getPyroCharge(subscription).status !== 'cancelled' &&
-												getPyroCharge(subscription).status !== 'failed'
+											getPyroCharge(subscription) &&
+											getPyroCharge(subscription).status !== 'cancelled' &&
+											getPyroCharge(subscription).status !== 'failed'
 											"
+											type="quiet"
 											color="green"
-											color-fill="text"
+											@click="showPyroUpgradeModal(subscription)"
 										>
-											<button @click="showPyroUpgradeModal(subscription)">
-												<ArrowBigUpDashIcon />
-												{{ formatMessage(messages.upgrade) }}
-											</button>
-										</ButtonStyled>
-										<ButtonStyled
+											<ArrowBigUpDashIcon aria-hidden="true" />
+											{{ formatMessage(messages.upgrade) }}
+										</Button>
+										<Button
 											v-else-if="
-												getPyroCharge(subscription) &&
-												(getPyroCharge(subscription).status === 'cancelled' ||
-													getPyroCharge(subscription).status === 'failed')
+											getPyroCharge(subscription) &&
+											(getPyroCharge(subscription).status === 'cancelled' ||
+											getPyroCharge(subscription).status === 'failed')
 											"
+											type="colored"
 											color="green"
+											@click="openPyroResubscribeModal(subscription)"
 										>
-											<button @click="openPyroResubscribeModal(subscription)">
-												{{ formatMessage(messages.resubscribe) }}
-												<RightArrowIcon />
-											</button>
-										</ButtonStyled>
+											{{ formatMessage(messages.resubscribe) }}
+											<RightArrowIcon aria-hidden="true" />
+										</Button>
 									</div>
 								</div>
 							</div>
@@ -565,16 +560,12 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(messages.paymentMethodTitle) }}</h2>
 			</div>
-			<ButtonStyled>
-				<nuxt-link to="/settings/billing/charges">
-					<HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
-				</nuxt-link>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="addPaymentMethod">
-					<PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
-				</button>
-			</ButtonStyled>
+			<ButtonLink to="/settings/billing/charges">
+				<HistoryIcon aria-hidden="true" /> {{ formatMessage(messages.paymentMethodHistory) }}
+			</ButtonLink>
+			<Button @click="addPaymentMethod">
+				<PlusIcon aria-hidden="true" /> {{ formatMessage(messages.paymentMethodAdd) }}
+			</Button>
 		</div>
 		<div
 			v-if="!paymentMethods || paymentMethods.length === 0"
@@ -711,6 +702,7 @@ import {
 	useFormatPrice,
 	useServerBackupDownload,
 	useVIntl,
+	ButtonLink,
 } from '@modrinth/ui'
 import { calculateSavings, getCurrency } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -720,6 +712,7 @@ import { computed, ref, watch } from 'vue'
 import ModrinthServersIcon from '~/components/brand/ModrinthServersIcon.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { products } from '~/generated/state.json'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 const { addNotification, handleError } = injectNotificationManager()
 const client = injectModrinthClient()

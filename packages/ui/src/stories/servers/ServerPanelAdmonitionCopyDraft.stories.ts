@@ -2,7 +2,7 @@ import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Admonition from '../../components/base/Admonition.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 
 type AdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 type ActionType = 'Cancel' | 'Retry' | 'Dismiss'
@@ -191,7 +191,7 @@ const sections: CopySection[] = [
 
 export const AllCopy: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled, RotateCounterClockwiseIcon },
+		components: { Admonition, Button, RotateCounterClockwiseIcon },
 		setup() {
 			return { sections }
 		},
@@ -241,7 +241,7 @@ export const AllCopy: Story = {
 
 export const TitleTreatmentExperiment: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled, RotateCounterClockwiseIcon },
+		components: { Admonition, Button, RotateCounterClockwiseIcon },
 		template: /* html */ `
 			<div style="max-width: 840px;">
 				<Admonition

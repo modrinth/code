@@ -64,7 +64,7 @@
 								:label="
 									item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
 								"
-								size="sm"
+								size="xs"
 								@click="copyToClipboard(item)"
 							>
 								<CheckIcon v-if="copied[getCopyKey(item)]" aria-hidden="true" />
@@ -73,7 +73,7 @@
 							<IconButton
 								v-if="item.dismissible !== false"
 								label="Dismiss"
-								size="sm"
+								size="xs"
 								@click="dismissNotification(index)"
 							>
 								<XIcon aria-hidden="true" />
@@ -96,6 +96,7 @@
 								<Button
 									v-for="(button, buttonIndex) in item.buttons"
 									:key="buttonIndex"
+									size="xs"
 									:type="button.color && button.color !== 'standard' ? 'colored' : 'base'"
 									:color="button.color === 'standard' ? undefined : button.color"
 									@click="handleButtonClick(item, button)"

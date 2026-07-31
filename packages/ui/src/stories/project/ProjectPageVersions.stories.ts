@@ -3,8 +3,9 @@ import { DownloadIcon, MoreVerticalIcon } from '@modrinth/assets'
 import type { GameVersionTag, Version } from '@modrinth/utils'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import ProjectPageVersions from '../../components/project/ProjectPageVersions.vue'
+import IconButton from '../../components/base/buttons/IconButton.vue'
+import ButtonLink from '../../components/base/buttons/ButtonLink.vue'
 
 type StoryVersion = Version & {
 	displayUrlEnding: string
@@ -148,28 +149,25 @@ const meta = {
 		versionLink: (version: Version) => `https://modrinth.com/mod/sodium/version/${version.id}`,
 	},
 	render: (args) => ({
-		components: { ButtonStyled, DownloadIcon, MoreVerticalIcon, ProjectPageVersions },
+		components: { IconButton, ButtonLink, DownloadIcon, MoreVerticalIcon, ProjectPageVersions },
 		setup() {
 			return { args }
 		},
 		template: /* html */ `
 			<ProjectPageVersions v-bind="args">
 				<template #actions="{ version }">
-					<ButtonStyled circular type="transparent">
-						<a
-							v-tooltip="'Download'"
-							:href="version.files[0]?.url"
-							:download="version.files[0]?.filename"
-							aria-label="Download"
-						>
-							<DownloadIcon aria-hidden="true" />
-						</a>
-					</ButtonStyled>
-					<ButtonStyled circular type="transparent">
-						<button v-tooltip="'More options'" aria-label="More options">
-							<MoreVerticalIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+					<ButtonLink
+						type="quiet"
+						v-tooltip="'Download'"
+						:href="version.files[0]?.url"
+						:download="version.files[0]?.filename"
+						aria-label="Download"
+					>
+						<DownloadIcon aria-hidden="true" />
+					</ButtonLink>
+					<IconButton type="quiet" label="More options" v-tooltip="'More options'">
+						<MoreVerticalIcon aria-hidden="true" />
+					</IconButton>
 				</template>
 			</ProjectPageVersions>
 		`,

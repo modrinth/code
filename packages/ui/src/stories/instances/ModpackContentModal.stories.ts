@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import ModpackContentModal from '../../layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
 import type { ContentItem } from '../../layouts/shared/content-tab/types'
 
@@ -409,7 +409,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
@@ -430,7 +430,7 @@ export const Default: Story = {
 
 export const ModsOnly: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(modsOnlyContent)
@@ -451,7 +451,7 @@ export const ModsOnly: Story = {
 
 export const LoadingState: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => {
@@ -482,7 +482,7 @@ export const LoadingState: Story = {
 
 export const EmptyContent: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show([])
@@ -503,7 +503,7 @@ export const EmptyContent: Story = {
 
 export const LargeModpack: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(largeModpackContent)
@@ -528,7 +528,7 @@ export const LargeModpack: Story = {
 
 export const SearchDemo: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
@@ -552,7 +552,7 @@ export const SearchDemo: Story = {
 
 export const FilterDemo: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
@@ -576,7 +576,7 @@ export const FilterDemo: Story = {
 
 export const MixedOwnerTypes: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { Button, ModpackContentModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			// Mix of user and organization owners

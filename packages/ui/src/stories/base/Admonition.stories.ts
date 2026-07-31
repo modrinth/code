@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 
 const meta = {
 	title: 'Base/Admonition',
@@ -78,7 +78,7 @@ export const HeaderWithTimestamp: Story = {
 
 export const WithTopRightActions: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled },
+		components: { Admonition, Button },
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
 				<Admonition
@@ -111,7 +111,7 @@ export const WithTopRightActions: Story = {
 
 export const WithProgressBar: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled },
+		components: { Admonition, Button },
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
 				<Admonition

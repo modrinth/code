@@ -11,7 +11,6 @@ import {
 	MoreVerticalIcon,
 	PlayIcon,
 	SettingsIcon,
-	SlashIcon,
 	StopCircleIcon,
 	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TimerIcon,
@@ -20,9 +19,9 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import AutoLink from '../../components/base/AutoLink.vue'
 import Avatar from '../../components/base/Avatar.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
+import IconButton from '../../components/base/buttons/IconButton.vue'
 import FormattedTag from '../../components/base/FormattedTag.vue'
-import JoinedButtons from '../../components/base/JoinedButtons.vue'
 import PageHeader from '../../components/base/page-header/index.vue'
 import PageHeaderMetadata from '../../components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '../../components/base/page-header/metadata/page-header-metadata-item.vue'
@@ -53,21 +52,6 @@ const menuActions = [
 		action: noop,
 	},
 ]
-const joinedActions = [
-	{
-		id: 'stop',
-		label: 'Stop',
-		icon: StopCircleIcon,
-		action: noop,
-	},
-	{
-		id: 'kill_server',
-		label: 'Kill server',
-		icon: SlashIcon,
-		action: noop,
-	},
-]
-
 const pageHeaderIcons = {
 	AffiliateIcon,
 	BoxIcon,
@@ -81,15 +65,16 @@ const pageHeaderIcons = {
 	MoreVerticalIcon,
 	PlayIcon,
 	SettingsIcon,
+	StopCircleIcon,
 	TimerIcon,
 }
 
 const pageHeaderComponents = {
 	AutoLink,
 	Avatar,
-	ButtonStyled,
+	Button,
 	FormattedTag,
-	JoinedButtons,
+	IconButton,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
@@ -157,17 +142,17 @@ export const ProjectHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<DownloadIcon />
-								Download
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large" type="transparent">
-							<TeleportOverflowMenu :options="menuActions" aria-label="More actions">
-								<MoreVerticalIcon />
-							</TeleportOverflowMenu>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" @click="noop">
+							<DownloadIcon aria-hidden="true" />
+							Download
+						</Button>
+						<TeleportOverflowMenu
+							:options="menuActions"
+							aria-label="More actions"
+							btn-class="flex size-12 items-center justify-center rounded-2xl hover:bg-surface-4"
+						>
+							<MoreVerticalIcon aria-hidden="true" />
+						</TeleportOverflowMenu>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -207,12 +192,10 @@ export const CreatorHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<HeartIcon />
-								Follow
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" @click="noop">
+							<HeartIcon aria-hidden="true" />
+							Follow
+						</Button>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -252,22 +235,20 @@ export const AppInstanceHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<PlayIcon />
-								Play
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large">
-							<button type="button" aria-label="Instance settings" @click="noop">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large" type="transparent">
-							<TeleportOverflowMenu :options="menuActions" aria-label="More actions">
-								<MoreVerticalIcon />
-							</TeleportOverflowMenu>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" @click="noop">
+							<PlayIcon aria-hidden="true" />
+							Play
+						</Button>
+						<IconButton size="xl" label="Instance settings" @click="noop">
+							<SettingsIcon aria-hidden="true" />
+						</IconButton>
+						<TeleportOverflowMenu
+							:options="menuActions"
+							aria-label="More actions"
+							btn-class="flex size-12 items-center justify-center rounded-2xl hover:bg-surface-4"
+						>
+							<MoreVerticalIcon aria-hidden="true" />
+						</TeleportOverflowMenu>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -291,11 +272,9 @@ export const BrowseHeader: Story = {
 		template: `
 			<PageHeader title="Survival SMP" :divider="false" :bottom-padding="false" main-class="items-center" title-class="leading-8" truncate-title>
 				<template #leading>
-					<ButtonStyled circular size="large">
-						<button type="button" aria-label="Back to instance" @click="noop">
-							<LeftArrowIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton size="xl" label="Back to instance" @click="noop">
+						<LeftArrowIcon aria-hidden="true" />
+					</IconButton>
 					<Avatar src="" alt="Survival SMP" size="48px" tint-by="survival-smp" />
 				</template>
 
@@ -346,17 +325,13 @@ export const ServerPanelRootHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<PlayIcon />
-								Start server
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large">
-							<button type="button" aria-label="Server settings" @click="noop">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" @click="noop">
+							<PlayIcon aria-hidden="true" />
+							Start server
+						</Button>
+						<IconButton size="xl" label="Server settings" @click="noop">
+							<SettingsIcon aria-hidden="true" />
+						</IconButton>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -373,7 +348,6 @@ export const ServerPanelInstanceHeader: Story = {
 		setup() {
 			return {
 				...pageHeaderIcons,
-				joinedActions,
 				LoaderIcon,
 				noop,
 			}
@@ -381,11 +355,9 @@ export const ServerPanelInstanceHeader: Story = {
 		template: `
 			<PageHeader title="My World">
 				<template #leading>
-					<ButtonStyled circular size="large">
-						<button type="button" aria-label="All instances" @click="noop">
-							<LeftArrowIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton size="xl" label="All instances" @click="noop">
+						<LeftArrowIcon aria-hidden="true" />
+					</IconButton>
 				</template>
 
 				<template #metadata>
@@ -400,18 +372,17 @@ export const ServerPanelInstanceHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<PlayIcon />
-								Start instance
-							</button>
-						</ButtonStyled>
-						<JoinedButtons :actions="joinedActions" color="red" size="large" />
-						<ButtonStyled circular size="large">
-							<button type="button" aria-label="Instance settings" @click="noop">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" @click="noop">
+							<PlayIcon aria-hidden="true" />
+							Start instance
+						</Button>
+						<Button type="colored" color="red" size="xl" @click="noop">
+							<StopCircleIcon aria-hidden="true" />
+							Stop
+						</Button>
+						<IconButton size="xl" label="Instance settings" @click="noop">
+							<SettingsIcon aria-hidden="true" />
+						</IconButton>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>

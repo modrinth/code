@@ -1,7 +1,7 @@
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import ConfirmLeaveModal from '../../components/modal/ConfirmLeaveModal.vue'
 
 const meta = {
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof ConfirmLeaveModal>
 
 export const Default: Story = {
 	render: () => ({
-		components: { ConfirmLeaveModal, ButtonStyled },
+		components: { Button, ConfirmLeaveModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 			const result = ref<string>('')
@@ -37,7 +37,7 @@ export const Default: Story = {
 
 export const CustomMessages: Story = {
 	render: () => ({
-		components: { ConfirmLeaveModal, ButtonStyled },
+		components: { Button, ConfirmLeaveModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 			const openModal = () => modalRef.value?.prompt()
@@ -61,7 +61,7 @@ export const CustomMessages: Story = {
 
 export const WarningAdmonition: Story = {
 	render: () => ({
-		components: { ConfirmLeaveModal, ButtonStyled },
+		components: { Button, ConfirmLeaveModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 			const openModal = () => modalRef.value?.prompt()

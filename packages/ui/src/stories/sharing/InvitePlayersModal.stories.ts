@@ -2,7 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import InvitePlayersModal from '../../components/sharing/invite-players-modal/index.vue'
 import type {
 	InviteLinkSettings,
@@ -98,7 +98,7 @@ function createSearchUsers() {
 
 function createRender(args: Record<string, unknown>) {
 	return {
-		components: { ButtonStyled, InvitePlayersModal },
+		components: { Button, InvitePlayersModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
 			const friends = ref<InvitePlayersUser[]>(createFriends())

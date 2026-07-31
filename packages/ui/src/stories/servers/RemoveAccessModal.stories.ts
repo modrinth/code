@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import RemoveAccessModal from '../../components/servers/access/RemoveAccessModal.vue'
 
 const meta = {
@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	render: () => ({
-		components: { ButtonStyled, RemoveAccessModal },
+		components: { Button, RemoveAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 			const removed = ref(false)
@@ -44,7 +44,7 @@ export const Default: Story = {
 
 export const CancelInvite: Story = {
 	render: () => ({
-		components: { ButtonStyled, RemoveAccessModal },
+		components: { Button, RemoveAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 			const cancelled = ref(false)

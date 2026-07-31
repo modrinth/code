@@ -17,7 +17,6 @@ import {
 import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 import {
 	Admonition,
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -33,6 +32,7 @@ import {
 	IntlFormatted,
 	StyledInput,
 	useVIntl,
+	ButtonLink,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -498,9 +498,7 @@ function dismissInfoBanner() {
 		</IntlFormatted>
 		<template v-if="false" #actions>
 			<div class="flex">
-				<ButtonStyled color="blue">
-					<a> {{ formatMessage(messages.learnMore) }} <RightArrowIcon /> </a>
-				</ButtonStyled>
+				<ButtonLink type="colored" color="blue"> {{ formatMessage(messages.learnMore) }} <RightArrowIcon aria-hidden="true" /> </ButtonLink>
 			</div>
 		</template>
 	</Admonition>

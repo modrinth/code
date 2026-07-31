@@ -21,11 +21,10 @@
 							formatMessage(messages.settingsTitle)
 						}}</span>
 						<div class="flex gap-2">
-							<ButtonStyled>
-								<nuxt-link to="/dashboard/projects"
-									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								to="/dashboard/projects"
+							><ListIcon aria-hidden="true" /> {{ formatMessage(messages.visitProjectsDashboard) }}
+							</ButtonLink>
 						</div>
 					</div>
 					<ProjectMemberHeader
@@ -138,21 +137,22 @@
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					>
 						<template #actions>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand" circular>
-								<nuxt-link
-									v-tooltip="formatMessage(messages.editProject)"
-									:to="`${projectPath}/settings`"
-									class="!font-bold lg:!hidden"
-								>
-									<SettingsIcon />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
-								<nuxt-link :to="`${projectPath}/settings`" class="!font-bold max-lg:!hidden">
-									<SettingsIcon />
-									{{ formatMessage(messages.editProject) }}
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								v-if="auth.user && currentMember"
+								type="colored"
+								color="brand"
+								size="xl"
+								:aria-label="formatMessage(messages.editProject)"
+								v-tooltip="formatMessage(messages.editProject)"
+								:to="`${projectPath}/settings`"
+								class="!font-bold lg:!hidden"
+							>
+								<SettingsIcon aria-hidden="true" />
+							</ButtonLink>
+							<ButtonLink v-if="auth.user && currentMember" type="colored" color="brand" size="xl" :to="`${projectPath}/settings`" class="!font-bold max-lg:!hidden">
+								<SettingsIcon aria-hidden="true" />
+								{{ formatMessage(messages.editProject) }}
+							</ButtonLink>
 
 							<div class="hidden sm:contents">
 								<ButtonStyled
@@ -200,31 +200,28 @@
 							</div>
 
 							<div class="contents sm:hidden">
-								<ButtonStyled
+								<IconButton
 									v-if="!isServerProject"
-									size="large"
-									circular
-									:color="projectHeaderPrimaryColor"
+									type="colored"
+									:color="projectHeaderPrimaryColor === 'standard' ? undefined : projectHeaderPrimaryColor === 'medal-promo' ? 'medal_promotion' : projectHeaderPrimaryColor"
+									size="xl"
+									:label="formatMessage(commonMessages.downloadButton)"
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
 								>
-									<button
-										type="button"
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
-										<DownloadIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled v-else size="large" circular :color="projectHeaderPrimaryColor">
-									<button
-										type="button"
-										:aria-label="formatMessage(commonMessages.playButton)"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
-										<PlayIcon />
-									</button>
-								</ButtonStyled>
+									<DownloadIcon aria-hidden="true" />
+								</IconButton>
+								<IconButton
+									v-else
+									type="colored"
+									:color="projectHeaderPrimaryColor === 'standard' ? undefined : projectHeaderPrimaryColor === 'medal-promo' ? 'medal_promotion' : projectHeaderPrimaryColor"
+									size="xl"
+									:label="formatMessage(commonMessages.playButton)"
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon aria-hidden="true" />
+								</IconButton>
 							</div>
 
 							<Tooltip
@@ -238,16 +235,15 @@
 								:auto-hide="false"
 								placement="bottom-start"
 							>
-								<ButtonStyled circular size="large">
-									<nuxt-link
-										v-tooltip="formatMessage(messages.createServerTooltip)"
-										:to="projectHeaderCreateServerTo"
-										:aria-label="formatMessage(messages.serversPromoTitle)"
-										@click="dismissProjectHeaderCreateServerPrompt"
-									>
-										<ServerPlusIcon />
-									</nuxt-link>
-								</ButtonStyled>
+								<ButtonLink
+									size="xl"
+									v-tooltip="formatMessage(messages.createServerTooltip)"
+									:to="projectHeaderCreateServerTo"
+									:aria-label="formatMessage(messages.serversPromoTitle)"
+									@click="dismissProjectHeaderCreateServerPrompt"
+								>
+									<ServerPlusIcon aria-hidden="true" />
+								</ButtonLink>
 								<template #popper>
 									<div class="grid max-w-[18rem] gap-2">
 										<div class="flex items-center justify-between gap-4">
@@ -261,14 +257,14 @@
 													{{ formatMessage(commonMessages.newBadge) }}
 												</span>
 											</div>
-											<ButtonStyled size="small" circular>
-												<button
-													v-tooltip="formatMessage(messages.dontShowAgain)"
-													@click="dismissProjectHeaderCreateServerPrompt"
-												>
-													<XIcon aria-hidden="true" />
-												</button>
-											</ButtonStyled>
+											<IconButton
+												size="sm"
+												:label="formatMessage(messages.dontShowAgain)"
+												v-tooltip="formatMessage(messages.dontShowAgain)"
+												@click="dismissProjectHeaderCreateServerPrompt"
+											>
+												<XIcon aria-hidden="true" />
+											</IconButton>
 										</div>
 										<p class="m-0 text-sm font-medium leading-tight text-secondary">
 											{{ formatMessage(messages.serversPromoDescription) }}
@@ -286,16 +282,16 @@
 									</div>
 								</template>
 							</Tooltip>
-							<ButtonStyled v-else-if="showProjectHeaderCreateServerAction" circular size="large">
-								<nuxt-link
-									v-tooltip="formatMessage(messages.createServerTooltip)"
-									:to="projectHeaderCreateServerTo"
-									:aria-label="formatMessage(messages.serversPromoTitle)"
-									@click="dismissProjectHeaderCreateServerPrompt"
-								>
-									<ServerPlusIcon />
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								v-else-if="showProjectHeaderCreateServerAction"
+								size="xl"
+								v-tooltip="formatMessage(messages.createServerTooltip)"
+								:to="projectHeaderCreateServerTo"
+								:aria-label="formatMessage(messages.serversPromoTitle)"
+								@click="dismissProjectHeaderCreateServerPrompt"
+							>
+								<ServerPlusIcon aria-hidden="true" />
+							</ButtonLink>
 
 							<ButtonStyled circular size="large">
 								<ClientOnly>
@@ -406,11 +402,9 @@
 						>
 							{{ formatMessage(messages.environmentMigrationLink) }}
 						</nuxt-link>
-						<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
-							<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
-								<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
-							</button>
-						</ButtonStyled>
+						<Button v-if="hasEditDetailsPermission" type="colored" color="orange" class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
+							<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
+						</Button>
 					</Admonition>
 					<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
 						{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
@@ -531,6 +525,8 @@ import {
 	useFormatPrice,
 	useStickyObserver,
 	useVIntl,
+	ButtonLink,
+	IconButton,
 } from '@modrinth/ui'
 import { formatProjectType, isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -558,6 +554,7 @@ import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import { loadChecklistState } from '~/services/moderation-checklist-storage.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 definePageMeta({
 	key: (route) => `${route.params.project}`,

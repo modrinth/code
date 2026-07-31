@@ -538,12 +538,10 @@
 					</template>
 				</OverflowMenu>
 				<template v-else>
-					<ButtonStyled color="brand">
-						<nuxt-link :to="signInRouteObj">
-							<LogInIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.signInButton) }}
-						</nuxt-link>
-					</ButtonStyled>
+					<ButtonLink type="colored" color="brand" :to="signInRouteObj">
+						<LogInIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.signInButton) }}
+					</ButtonLink>
 					<ButtonStyled circular>
 						<nuxt-link :v-tooltip="formatMessage(commonMessages.settingsLabel)" to="/settings">
 							<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
@@ -786,6 +784,7 @@ import {
 	providePageContext,
 	useHostingIntercom,
 	useVIntl,
+	ButtonLink,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'

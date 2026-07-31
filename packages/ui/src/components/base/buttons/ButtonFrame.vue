@@ -20,6 +20,7 @@ const baseClasses = [
 ].join(' ')
 
 const sizeClasses: Record<ButtonSize, string> = {
+	xs: 'h-7 gap-1 rounded-lg px-1.5 text-sm font-semibold leading-5 [&>svg]:size-4 [&>svg]:min-h-4 [&>svg]:min-w-4 [&>svg]:shrink-0',
 	sm: 'h-8 gap-1 rounded-lg px-1.5 text-sm font-semibold leading-5 [&>svg]:size-4 [&>svg]:min-h-4 [&>svg]:min-w-4 [&>svg]:shrink-0',
 	md: 'h-9 gap-1.5 rounded-xl px-2.5 text-base font-semibold leading-5 [&>svg]:size-5 [&>svg]:min-h-5 [&>svg]:min-w-5 [&>svg]:shrink-0',
 	lg: 'h-10 gap-2 rounded-[14px] px-4 text-base font-semibold leading-5 [&>svg]:size-5 [&>svg]:min-h-5 [&>svg]:min-w-5 [&>svg]:shrink-0',
@@ -27,6 +28,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 }
 
 const iconOnlySizeClasses: Record<ButtonSize, string> = {
+	xs: 'w-7 px-0',
 	sm: 'w-8 px-0',
 	md: 'w-9 px-0',
 	lg: 'w-10 px-0',
@@ -58,12 +60,14 @@ const props = withDefaults(
 		color?: ButtonColor
 		size?: ButtonSize
 		iconOnly?: boolean
+		circular?: boolean
 		nativeType?: ButtonNativeType
 	}>(),
 	{
 		type: 'base',
 		size: 'md',
 		iconOnly: false,
+		circular: false,
 		nativeType: undefined,
 	},
 )
@@ -74,6 +78,7 @@ const classes = computed(() => [
 	typeClasses[props.type],
 	sizeClasses[props.size],
 	props.iconOnly ? iconOnlySizeClasses[props.size] : '',
+	props.circular ? '!rounded-full' : '',
 ])
 const style = computed((): CSSProperties | undefined => {
 	if (props.type === 'quiet' && !props.color) return undefined

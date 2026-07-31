@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import StackedAdmonitionsRaw, {
 	type StackedAdmonitionItem,
 } from '../../components/base/StackedAdmonitions.vue'
+import Button from '../../components/base/buttons/Button.vue'
 
 // The generic type signature of StackedAdmonitions breaks Storybook's Meta
 // inference and Vue's components record type. Cast to `any` for story wiring;
@@ -383,7 +383,7 @@ interface RichItem extends StackedAdmonitionItem {
 
 export const RichContent: Story = {
 	render: () => ({
-		components: { StackedAdmonitions, Admonition, ButtonStyled },
+		components: { StackedAdmonitions, Admonition, Button },
 		setup() {
 			const items = ref<RichItem[]>([
 				{

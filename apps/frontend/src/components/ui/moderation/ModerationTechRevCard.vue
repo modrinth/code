@@ -24,7 +24,6 @@ import {
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
-	ButtonStyled,
 	Collapsible,
 	CollapsibleRegion,
 	commonMessages,
@@ -38,6 +37,8 @@ import {
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
+	IconButton,
+	ButtonLink,
 } from '@modrinth/ui'
 import {
 	capitalizeString,
@@ -51,6 +52,7 @@ import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 const auth = await useAuth()
 const featureFlags = useFeatureFlags()
@@ -1495,29 +1497,26 @@ function copyId() {
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
 					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="props.item.project.link_urls?.['source']?.url" circular>
-							<a
-								v-tooltip="'Open sources in new tab'"
-								:href="props.item.project.link_urls?.['source']?.url"
-								target="_blank"
-							>
-								<CodeIcon />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<button v-tooltip="'Copy ID'" @click="copyId">
-								<ClipboardCopyIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								v-tooltip="'Open in new tab'"
-								:href="`/moderation/technical-review/${props.item.project.id}`"
-								target="_blank"
-							>
-								<ExternalIcon />
-							</a>
-						</ButtonStyled>
+						<ButtonLink
+							v-if="props.item.project.link_urls?.['source']?.url"
+							:aria-label="'Open sources in new tab'"
+							v-tooltip="'Open sources in new tab'"
+							:href="props.item.project.link_urls?.['source']?.url"
+							target="_blank"
+						>
+							<CodeIcon aria-hidden="true" />
+						</ButtonLink>
+						<IconButton :label="'Copy ID'" v-tooltip="'Copy ID'" @click="copyId">
+							<ClipboardCopyIcon aria-hidden="true" />
+						</IconButton>
+						<ButtonLink
+							:aria-label="'Open in new tab'"
+							v-tooltip="'Open in new tab'"
+							:href="`/moderation/technical-review/${props.item.project.id}`"
+							target="_blank"
+						>
+							<ExternalIcon aria-hidden="true" />
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -1552,26 +1551,25 @@ function copyId() {
 							@update-thread="handleThreadUpdate"
 						>
 							<template #additionalActions>
-								<ButtonStyled color="brand">
-									<button
-										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
-										:disabled="!canSubmitReview"
-										@click="handleSubmitReview('safe')"
-									>
-										<ShieldCheckIcon /> Pass
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="red">
-									<button
-										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
-										:disabled="!canSubmitReview"
-										@click="handleSubmitReview('unsafe')"
-									>
-										<BugIcon /> Fail
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="standard">
-									<OverflowMenu
+								<Button
+									type="colored"
+									color="brand"
+									v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+									:disabled="!canSubmitReview"
+									@click="handleSubmitReview('safe')"
+								>
+									<ShieldCheckIcon aria-hidden="true" /> Pass
+								</Button>
+								<Button
+									type="colored"
+									color="red"
+									v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+									:disabled="!canSubmitReview"
+									@click="handleSubmitReview('unsafe')"
+								>
+									<BugIcon aria-hidden="true" /> Fail
+								</Button>
+								<OverflowMenu
 										class="btn-dropdown-animation"
 										:disabled="isLoadingStatusAction"
 										:options="projectStatusActions"
@@ -1599,11 +1597,8 @@ function copyId() {
 											<XIcon aria-hidden="true" />
 											Reject
 										</template>
-									</OverflowMenu>
-								</ButtonStyled>
-								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug</button>
-								</ButtonStyled>
+								</OverflowMenu>
+								<Button v-if="featureFlags.developerMode" type="outlined" @click="emit('showMaliciousSummary', unsafeFiles)">Debug</Button>
 							</template>
 						</ThreadView>
 					</div>
@@ -1674,19 +1669,16 @@ function copyId() {
 					</div>
 
 					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="getFileDetailCount(file) > 0">
-							<button @click="viewFileFlags(file)">Flags</button>
-						</ButtonStyled>
-						<ButtonStyled type="outlined">
-							<a
-								:href="file.download_url"
-								:title="`Download ${file.file_name}`"
-								:download="file.file_name"
-								tabindex="0"
-							>
-								<DownloadIcon /> Download
-							</a>
-						</ButtonStyled>
+						<Button v-if="getFileDetailCount(file) > 0" @click="viewFileFlags(file)">Flags</Button>
+						<ButtonLink
+							type="outlined"
+							:href="file.download_url"
+							:title="`Download ${file.file_name}`"
+							:download="file.file_name"
+							tabindex="0"
+						>
+							<DownloadIcon aria-hidden="true" /> Download
+						</ButtonLink>
 					</div>
 				</div>
 			</template>
@@ -1856,14 +1848,12 @@ function copyId() {
 							@click="toggleClass(classItem)"
 						>
 							<div class="my-auto flex items-center gap-2">
-								<ButtonStyled type="transparent" circular>
-									<button
+								<IconButton label="Toggle class details" type="quiet">
 										class="transition-transform"
 										:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
 									>
 										<ChevronDownIcon class="h-5 w-5 text-contrast" />
-									</button>
-								</ButtonStyled>
+								</IconButton>
 
 								<span v-tooltip="classItem.filePath" class="font-mono font-semibold">{{
 									truncateMiddle(classItem.filePath)
@@ -2061,16 +2051,16 @@ function copyId() {
 									v-if="getHighlightedClassSource(classItem).length > 0"
 									class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 								>
-									<ButtonStyled circular type="transparent">
-										<button
-											v-tooltip="`Copy code`"
-											class="absolute right-2 top-2 border-[1px]"
-											@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
-										>
-											<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
-											<CheckIcon v-else />
-										</button>
-									</ButtonStyled>
+									<IconButton
+										type="quiet"
+										:label="`Copy code`"
+										v-tooltip="`Copy code`"
+										class="absolute right-2 top-2 border-[1px]"
+										@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
+									>
+										<CopyIcon aria-hidden="true" v-if="!showCopyFeedback.get(classItem.key)" />
+										<CheckIcon aria-hidden="true" v-else />
+									</IconButton>
 
 									<div class="overflow-x-auto bg-surface-3 py-3">
 										<div

@@ -65,18 +65,14 @@
 				</div>
 
 				<div class="ml-auto mt-4 flex items-center gap-2">
-					<ButtonStyled type="outlined">
-						<button @click="packageModal?.hide()">
-							<XIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="packageLoaders.length === 0" @click="createDataPackVersionHandler">
-							{{ formatMessage(messages.packageDataPack) }}
-							<RightArrowIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" @click="packageModal?.hide()">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" :disabled="packageLoaders.length === 0" @click="createDataPackVersionHandler">
+						{{ formatMessage(messages.packageDataPack) }}
+						<RightArrowIcon aria-hidden="true" />
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -104,16 +100,16 @@
 				>
 					<template #actions>
 						<div class="flex">
-							<ButtonStyled color="orange">
-								<nuxt-link
-									:to="`/${project.project_type}/${
-										project.slug ? project.slug : project.id
-									}/settings/permissions`"
-								>
-									{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
-									<RightArrowIcon />
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								type="colored"
+								color="orange"
+								:to="`/${project.project_type}/${
+								project.slug ? project.slug : project.id
+								}/settings/permissions`"
+							>
+								{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
+								<RightArrowIcon aria-hidden="true" />
+							</ButtonLink>
 						</div>
 					</template>
 				</Admonition>
@@ -127,62 +123,58 @@
 					class="mb-4"
 				>
 					<template #headerActions="{ primaryFile, promotedFiles }">
-						<ButtonStyled color="brand">
-							<a
-								v-tooltip="
-									primaryFile?.url
-										? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
-										: formatMessage(messages.noPrimaryFile)
-								"
-								:href="decoratedPrimaryFileUrl"
-								:download="primaryFile?.filename"
-								:disabled="primaryFile?.url === undefined"
-								@click="emit('onDownload')"
-							>
-								<DownloadIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.downloadButton) }}
-							</a>
-						</ButtonStyled>
-						<ButtonStyled
+						<ButtonLink
+							type="colored"
+							color="brand"
+							v-tooltip="
+							primaryFile?.url
+							? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
+							: formatMessage(messages.noPrimaryFile)
+							"
+							:href="decoratedPrimaryFileUrl"
+							:download="primaryFile?.filename"
+							:disabled="primaryFile?.url === undefined"
+							@click="emit('onDownload')"
+						>
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadButton) }}
+						</ButtonLink>
+						<ButtonLink
 							v-for="file in promotedFiles.filter(
-								(x) =>
-									!!x &&
-									(x.file_type === 'required-resource-pack' ||
-										x.file_type === 'optional-resource-pack'),
+							(x) =>
+							!!x &&
+							(x.file_type === 'required-resource-pack' ||
+							x.file_type === 'optional-resource-pack'),
 							)"
 							:key="`promoted-file-${file.hashes.sha1}`"
+							v-tooltip="file.filename + ' (' + formatBytes(file.size) + ')'"
+							:href="
+							createProjectDownloadUrl(file.url, {
+							reason: 'dependency',
+							})
+							"
+							:download="primaryFile?.filename"
+							:disabled="primaryFile?.url === undefined"
+							@click="emit('onDownload')"
 						>
-							<a
-								v-tooltip="file.filename + ' (' + formatBytes(file.size) + ')'"
-								:href="
-									createProjectDownloadUrl(file.url, {
-										reason: 'dependency',
-									})
-								"
-								:download="primaryFile?.filename"
-								:disabled="primaryFile?.url === undefined"
-								@click="emit('onDownload')"
-							>
-								<DownloadIcon aria-hidden="true" />
-								<template v-if="file.file_type === 'required-resource-pack'">
-									{{ formatMessage(messages.requiredResourcePack) }}
-								</template>
-								<template v-else-if="file.file_type === 'optional-resource-pack'">
-									{{ formatMessage(messages.optionalResourcePack) }}
-								</template>
-							</a>
-						</ButtonStyled>
+							<DownloadIcon aria-hidden="true" />
+							<template v-if="file.file_type === 'required-resource-pack'">
+								{{ formatMessage(messages.requiredResourcePack) }}
+							</template>
+							<template v-else-if="file.file_type === 'optional-resource-pack'">
+								{{ formatMessage(messages.optionalResourcePack) }}
+							</template>
+						</ButtonLink>
 						<template v-if="currentMember">
-							<ButtonStyled
+							<Button
 								v-if="
-									version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
+								version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
 								"
+								@click="packageModal?.show()"
 							>
-								<button @click="packageModal?.show()">
-									<PackageClosedIcon aria-hidden="true" />
-									{{ formatMessage(messages.packageAsMod) }}
-								</button>
-							</ButtonStyled>
+								<PackageClosedIcon aria-hidden="true" />
+								{{ formatMessage(messages.packageAsMod) }}
+							</Button>
 							<ButtonStyled>
 								<OverflowMenu
 									:dropdown-id="`${baseId}-edit-overflow`"
@@ -277,17 +269,15 @@
 						</ButtonStyled>
 					</template>
 					<template #supplementaryResourceActions="{ file }">
-						<ButtonStyled>
-							<a
-								:href="decorateDownloadUrl(file.url)"
-								:title="`Download ${file.filename}`"
-								:download="file.filename"
-								tabindex="0"
-							>
-								<DownloadIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.downloadButton) }}
-							</a>
-						</ButtonStyled>
+						<ButtonLink
+							:href="decorateDownloadUrl(file.url)"
+							:title="`Download ${file.filename}`"
+							:download="file.filename"
+							tabindex="0"
+						>
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadButton) }}
+						</ButtonLink>
 						<ButtonStyled type="outlined" circular>
 							<OverflowMenu
 								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
@@ -316,32 +306,35 @@
 						</ButtonStyled>
 					</template>
 					<template #dependencyActions="{ dependency }">
-						<ButtonStyled circular>
-							<nuxt-link
-								v-if="
-									createDependencyLink({
-										project: dependency.project,
-										version: dependency.version ?? getDependencyVersion(dependency.dependency),
-									})
-								"
-								v-tooltip="
-									formatMessage(
-										(dependency.version ?? getDependencyVersion(dependency.dependency))
-											? messages.viewVersion
-											: messages.viewProject,
-									)
-								"
-								:to="
-									createDependencyLink({
-										project: dependency.project,
-										version: dependency.version ?? getDependencyVersion(dependency.dependency),
-									})
-								"
-								target="_blank"
-							>
-								<ExternalIcon />
-							</nuxt-link>
-						</ButtonStyled>
+						<ButtonLink
+							:aria-label="formatMessage(
+							(dependency.version ?? getDependencyVersion(dependency.dependency))
+							? messages.viewVersion
+							: messages.viewProject,
+							)"
+							v-if="
+							createDependencyLink({
+							project: dependency.project,
+							version: dependency.version ?? getDependencyVersion(dependency.dependency),
+							})
+							"
+							v-tooltip="
+							formatMessage(
+							(dependency.version ?? getDependencyVersion(dependency.dependency))
+							? messages.viewVersion
+							: messages.viewProject,
+							)
+							"
+							:to="
+							createDependencyLink({
+							project: dependency.project,
+							version: dependency.version ?? getDependencyVersion(dependency.dependency),
+							})
+							"
+							target="_blank"
+						>
+							<ExternalIcon aria-hidden="true" />
+						</ButtonLink>
 						<ButtonStyled circular color="brand" color-fill="text">
 							<a
 								v-if="
@@ -520,6 +513,7 @@ import {
 	useFormatDateTime,
 	useVIntl,
 	VersionPage,
+	ButtonLink,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -532,6 +526,7 @@ import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 const emit = defineEmits<{
 	onDownload: []

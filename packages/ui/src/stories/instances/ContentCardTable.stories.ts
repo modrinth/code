@@ -3,7 +3,8 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { onMounted, onUnmounted, ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
+import IconButton from '../../components/base/buttons/IconButton.vue'
 import ContentCardTable from '../../layouts/shared/content-tab/components/ContentCardTable.vue'
 import type { ContentCardTableItem } from '../../layouts/shared/content-tab/types'
 
@@ -539,7 +540,7 @@ export const InteractiveActions: Story = {
 
 export const WithCustomItemButtons: Story = {
 	render: () => ({
-		components: { ContentCardTable, ButtonStyled, EyeIcon, FolderOpenIcon, DownloadIcon },
+		components: { ContentCardTable, IconButton, EyeIcon, FolderOpenIcon, DownloadIcon },
 		setup() {
 			return { items: sampleItems }
 		},
@@ -551,23 +552,17 @@ export const WithCustomItemButtons: Story = {
 				@delete="(id) => console.log('Delete', id)"
 			>
 				<template #itemButtonsLeft="{ item }">
-					<ButtonStyled v-tooltip="'Download'" circular type="transparent" color="green" color-fill="text">
-						<button @click="console.log('Download', item.id)">
-							<DownloadIcon class="size-5" />
-						</button>
-					</ButtonStyled>
+					<IconButton v-tooltip="'Download'" type="quiet" color="green" :label="'Download'" @click="console.log('Download', item.id)">
+						<DownloadIcon aria-hidden="true" class="size-5" />
+					</IconButton>
 				</template>
 				<template #itemButtonsRight="{ item }">
-					<ButtonStyled v-tooltip="'View on Modrinth'" circular type="transparent">
-						<button @click="console.log('View', item.id)">
-							<EyeIcon class="size-5 text-secondary" />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-tooltip="'Open folder'" circular type="transparent">
-						<button @click="console.log('Open folder', item.id)">
-							<FolderOpenIcon class="size-5 text-secondary" />
-						</button>
-					</ButtonStyled>
+					<IconButton v-tooltip="'View on Modrinth'" type="quiet" :label="'View on Modrinth'" @click="console.log('View', item.id)">
+						<EyeIcon aria-hidden="true" class="size-5 text-secondary" />
+					</IconButton>
+					<IconButton v-tooltip="'Open folder'" type="quiet" :label="'Open folder'" @click="console.log('Open folder', item.id)">
+						<FolderOpenIcon aria-hidden="true" class="size-5 text-secondary" />
+					</IconButton>
 				</template>
 			</ContentCardTable>
 		`,
@@ -582,7 +577,7 @@ export const WithEmptyState: Story = {
 
 export const WithCustomEmptyState: Story = {
 	render: () => ({
-		components: { ContentCardTable, ButtonStyled },
+		components: { Button, ContentCardTable },
 		template: /*html*/ `
 			<ContentCardTable :items="[]">
 				<template #empty>
@@ -779,7 +774,7 @@ export const WithOverflowMenu: Story = {
 
 export const BulkActionsDemo: Story = {
 	render: () => ({
-		components: { ContentCardTable, ButtonStyled },
+		components: { Button, ContentCardTable },
 		setup() {
 			const items = ref<ContentCardTableItem[]>([
 				{ ...sodiumItem, enabled: true },

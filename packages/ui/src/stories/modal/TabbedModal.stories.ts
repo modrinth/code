@@ -14,8 +14,8 @@ import {
 import type { StoryObj } from '@storybook/vue3-vite'
 import { defineComponent, h, ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import TabbedModal from '../../components/modal/TabbedModal.vue'
 
 function makeTabContent(label: string, lines = 3) {
@@ -42,7 +42,7 @@ export default meta
 
 export const Default: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { Button, TabbedModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -75,7 +75,7 @@ export const Default: StoryObj = {
 
 export const WithTitleSlot: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled, SettingsIcon },
+		components: { Button, SettingsIcon, TabbedModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -109,7 +109,7 @@ export const WithTitleSlot: StoryObj = {
 
 export const WithFooter: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { Button, TabbedModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -149,7 +149,7 @@ export const WithFooter: StoryObj = {
 
 export const WithFloatingActionBar: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled, UnsavedChangesPopup },
+		components: { Button, TabbedModal, UnsavedChangesPopup },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const dirty = ref(true)
@@ -188,7 +188,7 @@ export const WithFloatingActionBar: StoryObj = {
 
 export const WithBadge: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { Button, TabbedModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -222,7 +222,7 @@ export const WithBadge: StoryObj = {
 
 export const HiddenTabs: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { Button, TabbedModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -256,7 +256,7 @@ export const HiddenTabs: StoryObj = {
 
 export const ManyTabs: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { Button, TabbedModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -328,7 +328,7 @@ export const ManyTabs: StoryObj = {
 
 export const ScrollableContent: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { Button, TabbedModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [

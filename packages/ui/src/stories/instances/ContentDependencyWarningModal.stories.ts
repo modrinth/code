@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import ContentDependencyWarningModal from '../../layouts/shared/content-tab/components/modals/ContentDependencyWarningModal.vue'
 import type { ContentCardTableItem } from '../../layouts/shared/content-tab/types'
 
@@ -165,7 +165,7 @@ type Story = StoryObj<typeof meta>
 
 export const InstanceDependency: Story = {
 	render: () => ({
-		components: { ButtonStyled, ContentDependencyWarningModal },
+		components: { Button, ContentDependencyWarningModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDependencyWarningModal> | null>(null)
 			const deleted = ref(false)
@@ -208,7 +208,7 @@ export const InstanceDependency: Story = {
 
 export const ServerDependency: Story = {
 	render: () => ({
-		components: { ButtonStyled, ContentDependencyWarningModal },
+		components: { Button, ContentDependencyWarningModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDependencyWarningModal> | null>(null)
 			const deleted = ref(false)
@@ -242,7 +242,7 @@ export const ServerDependency: Story = {
 
 export const BulkDependencies: Story = {
 	render: () => ({
-		components: { ButtonStyled, ContentDependencyWarningModal },
+		components: { Button, ContentDependencyWarningModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDependencyWarningModal> | null>(null)
 			const deleted = ref(false)

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import NotificationPanel from '../../components/nav/NotificationPanel.vue'
 import { injectNotificationManager } from '../../providers'
 
@@ -13,7 +13,7 @@ export default meta
 
 export const Default: StoryObj = {
 	render: () => ({
-		components: { NotificationPanel, ButtonStyled },
+		components: { Button, NotificationPanel },
 		setup() {
 			const notificationManager = injectNotificationManager()
 
@@ -102,7 +102,7 @@ export const Default: StoryObj = {
 
 export const LeftSide: StoryObj = {
 	render: () => ({
-		components: { NotificationPanel, ButtonStyled },
+		components: { Button, NotificationPanel },
 		setup() {
 			const notificationManager = injectNotificationManager()
 			notificationManager.setNotificationLocation('left')

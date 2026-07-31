@@ -2,7 +2,7 @@ import { DownloadIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import ContentDiffModal from '../../layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import type { ContentDiffItem } from '../../layouts/shared/installation-settings/types'
 
@@ -66,7 +66,7 @@ const diffs: ContentDiffItem[] = [
 
 export const ExternalFiles: Story = {
 	render: () => ({
-		components: { ButtonStyled, ContentDiffModal },
+		components: { Button, ContentDiffModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDiffModal> | null>(null)
 			return { diffs, DownloadIcon, modalRef }

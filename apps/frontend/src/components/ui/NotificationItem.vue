@@ -46,18 +46,14 @@
 					class="flex flex-wrap items-center gap-3"
 					:class="{ 'gap-2': compact }"
 				>
-					<ButtonStyled color="brand">
-						<button @click="performActionByTitle(notification, 'Accept')">
-							<CheckIcon />
-							Accept
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="performActionByTitle(notification, 'Deny')">
-							<XIcon />
-							Decline
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="performActionByTitle(notification, 'Accept')">
+						<CheckIcon aria-hidden="true" />
+						Accept
+					</Button>
+					<Button type="colored" color="red" @click="performActionByTitle(notification, 'Deny')">
+						<XIcon aria-hidden="true" />
+						Decline
+					</Button>
 				</div>
 				<div
 					class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[var(--color-text-secondary)]"
@@ -276,99 +272,91 @@
 			</span>
 			<div v-if="compact" class="notification__actions">
 				<template v-if="type === 'team_invite' || type === 'organization_invite'">
-					<ButtonStyled circular color="brand" type="transparent">
-						<button
-							v-tooltip="`Accept`"
-							@click="
-								() => {
-									acceptTeamInvite(notification.body.team_id)
-									read()
-								}
-							"
-						>
-							<CheckIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular color="red" type="transparent">
-						<button
-							v-tooltip="`Decline`"
-							@click="
-								() => {
-									removeSelfFromTeam(notification.body.team_id)
-									read()
-								}
-							"
-						>
-							<XIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						type="quiet"
+						color="brand"
+						:label="`Accept`"
+						v-tooltip="`Accept`"
+						@click="
+						() => {
+						acceptTeamInvite(notification.body.team_id)
+						read()
+						}
+						"
+					>
+						<CheckIcon aria-hidden="true" />
+					</IconButton>
+					<IconButton
+						type="quiet"
+						color="red"
+						:label="`Decline`"
+						v-tooltip="`Decline`"
+						@click="
+						() => {
+						removeSelfFromTeam(notification.body.team_id)
+						read()
+						}
+						"
+					>
+						<XIcon aria-hidden="true" />
+					</IconButton>
 				</template>
-				<ButtonStyled v-else-if="!notification.read" circular type="transparent">
-					<button v-tooltip="`Mark as read`" @click="read()">
-						<XIcon />
-					</button>
-				</ButtonStyled>
+				<IconButton v-else-if="!notification.read" type="quiet" :label="`Mark as read`" v-tooltip="`Mark as read`" @click="read()">
+					<XIcon aria-hidden="true" />
+				</IconButton>
 			</div>
 			<div v-else class="notification__actions">
 				<div v-if="type !== null" class="input-group">
 					<template
 						v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
 					>
-						<ButtonStyled color="brand">
-							<button
-								@click="
-									() => {
-										acceptTeamInvite(notification.body.team_id)
-										read()
-									}
-								"
-							>
-								<CheckIcon />
-								Accept
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button
-								@click="
-									() => {
-										removeSelfFromTeam(notification.body.team_id)
-										read()
-									}
-								"
-							>
-								<XIcon />
-								Decline
-							</button>
-						</ButtonStyled>
+						<Button
+							type="colored"
+							color="brand"
+							@click="
+							() => {
+							acceptTeamInvite(notification.body.team_id)
+							read()
+							}
+							"
+						>
+							<CheckIcon aria-hidden="true" />
+							Accept
+						</Button>
+						<Button
+							type="colored"
+							color="red"
+							@click="
+							() => {
+							removeSelfFromTeam(notification.body.team_id)
+							read()
+							}
+							"
+						>
+							<XIcon aria-hidden="true" />
+							Decline
+						</Button>
 					</template>
-					<ButtonStyled v-else-if="!notification.read">
-						<button @click="read()">
-							<CheckIcon />
-							Mark as read
-						</button>
-					</ButtonStyled>
+					<Button v-else-if="!notification.read" @click="read()">
+						<CheckIcon aria-hidden="true" />
+						Mark as read
+					</Button>
 					<CopyCode v-if="flags.developerMode" :text="notification.id" />
 				</div>
 				<div v-else class="input-group">
-					<ButtonStyled v-if="notification.link && notification.link !== '#'">
-						<nuxt-link :to="notification.link" target="_blank">
-							<ExternalIcon />
-							Open link
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled v-for="(action, actionIndex) in notification.actions" :key="actionIndex">
-						<button @click="performAction(notification, actionIndex)">
-							<CheckIcon v-if="action.title === 'Accept'" />
-							<XIcon v-else-if="action.title === 'Deny'" />
-							{{ action.title }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="notification.actions.length === 0 && !notification.read">
-						<button @click="performAction(notification, null)">
-							<CheckIcon />
-							Mark as read
-						</button>
-					</ButtonStyled>
+					<ButtonLink v-if="notification.link && notification.link !== '#'" :to="notification.link" target="_blank">
+						<ExternalIcon aria-hidden="true" />
+						Open link
+					</ButtonLink>
+					<Button v-for="(action, actionIndex) in notification.actions" :key="actionIndex" @click="performAction(notification, actionIndex)">
+						<CheckIcon aria-hidden="true" v-if="action.title === 'Accept'" />
+						<XIcon aria-hidden="true" v-else-if="action.title === 'Deny'" />
+						{{ action.title }}
+					</Button>
+					<Button v-if="notification.actions.length === 0 && !notification.read" @click="performAction(notification, null)">
+						<CheckIcon aria-hidden="true" />
+						Mark as read
+					</Button>
 					<CopyCode v-if="flags.developerMode" :text="notification.id" />
 				</div>
 			</div>
@@ -390,7 +378,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	Categories,
 	CopyCode,
 	DoubleIcon,
@@ -399,6 +386,8 @@ import {
 	ProjectStatusBadge,
 	useFormatDateTime,
 	useRelativeTime,
+	ButtonLink,
+	IconButton,
 } from '@modrinth/ui'
 import { getUserLink, renderString } from '@modrinth/utils'
 
@@ -408,6 +397,7 @@ import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
 import ModrinthServersIcon from '../brand/ModrinthServersIcon.vue'
 import ThreadSummary from './thread/ThreadSummary.vue'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()

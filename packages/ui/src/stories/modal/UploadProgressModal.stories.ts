@@ -2,7 +2,7 @@ import type { UploadHandle, UploadProgress } from '@modrinth/api-client'
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import UploadProgressModal from '../../components/modal/UploadProgressModal.vue'
 
 const meta = {
@@ -52,7 +52,7 @@ function createMockUploadHandle(totalBytes: number, durationMs: number): UploadH
 
 export const Default: Story = {
 	render: () => ({
-		components: { UploadProgressModal, ButtonStyled },
+		components: { Button, UploadProgressModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UploadProgressModal> | null>(null)
 			const startUpload = () => {
@@ -72,7 +72,7 @@ export const Default: Story = {
 
 export const LargeFile: Story = {
 	render: () => ({
-		components: { UploadProgressModal, ButtonStyled },
+		components: { Button, UploadProgressModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UploadProgressModal> | null>(null)
 			const startUpload = () => {

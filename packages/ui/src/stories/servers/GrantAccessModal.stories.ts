@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import GrantAccessModal from '../../components/servers/access/GrantAccessModal.vue'
 import type {
 	GrantServerAccessPayload,
@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	render: () => ({
-		components: { ButtonStyled, GrantAccessModal },
+		components: { Button, GrantAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 			const lastAddedUser = ref('')
@@ -59,7 +59,7 @@ export const Default: Story = {
 
 export const ExistingMember: Story = {
 	render: () => ({
-		components: { ButtonStyled, GrantAccessModal },
+		components: { Button, GrantAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 			const users = [

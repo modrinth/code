@@ -1,7 +1,7 @@
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import Button from '../../components/base/buttons/Button.vue'
 import NewModal from '../../components/modal/NewModal.vue'
 
 const meta = {
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof NewModal>
 
 export const Default: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -34,7 +34,7 @@ export const Default: Story = {
 
 export const WithActions: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -59,7 +59,7 @@ export const WithActions: Story = {
 
 export const DangerFade: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -84,7 +84,7 @@ export const DangerFade: Story = {
 
 export const WarningFade: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -109,7 +109,7 @@ export const WarningFade: Story = {
 
 export const Scrollable: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -137,7 +137,7 @@ export const Scrollable: Story = {
 
 export const MergedHeader: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -159,7 +159,7 @@ export const MergedHeader: Story = {
 
 export const NotClosable: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()
@@ -184,7 +184,7 @@ export const NotClosable: Story = {
 
 export const NoPadding: Story = {
 	render: () => ({
-		components: { NewModal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const openModal = () => modalRef.value?.show()

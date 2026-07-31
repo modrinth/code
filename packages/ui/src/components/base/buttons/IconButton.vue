@@ -34,6 +34,7 @@ defineExpose({ element })
 		ref="frame"
 		as="button"
 		icon-only
+		circular
 		:type="props.type"
 		:color="props.color"
 		:size="props.size"

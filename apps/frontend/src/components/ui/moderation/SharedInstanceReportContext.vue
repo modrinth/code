@@ -13,7 +13,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	ConfirmLeaveModal,
 	type ContentItem,
 	injectModrinthClient,
@@ -22,9 +21,11 @@ import {
 	type TableColumn,
 	useFormatDateTime,
 	useRelativeTime,
+	IconButton,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
+import Button from '@modrinth/ui/src/components/base/buttons/Button.vue'
 
 export interface SharedInstanceReportUser {
 	id: string
@@ -322,12 +323,10 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 								</div>
 							</div>
 
-							<ButtonStyled type="outlined">
-								<button class="w-full sm:w-auto" @click="viewReportedInstanceVersion(version)">
-									<EyeIcon class="size-4" />
-									View content
-								</button>
-							</ButtonStyled>
+							<Button type="outlined" class="w-full sm:w-auto" @click="viewReportedInstanceVersion(version)">
+								<EyeIcon aria-hidden="true" class="size-4" />
+								View content
+							</Button>
 						</div>
 					</div>
 					<span v-else class="text-sm text-secondary">
@@ -363,15 +362,14 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 								{{ instance.member_count === 1 ? 'member' : 'members' }}
 							</span>
 						</div>
-						<ButtonStyled circular type="transparent">
-							<button
-								v-tooltip="`View ${instance.name} version ${instance.latest_version} content`"
-								:aria-label="`View ${instance.name} version ${instance.latest_version} content`"
-								@click="viewVersionContent(instance, instance.latest_version)"
-							>
-								<EyeIcon class="size-4" />
-							</button>
-						</ButtonStyled>
+						<IconButton
+							type="quiet"
+							:label="`View ${instance.name} version ${instance.latest_version} content`"
+							v-tooltip="`View ${instance.name} version ${instance.latest_version} content`"
+							@click="viewVersionContent(instance, instance.latest_version)"
+						>
+							<EyeIcon aria-hidden="true" class="size-4" />
+						</IconButton>
 					</div>
 				</div>
 				<span v-else-if="details.other_instances_loaded" class="text-sm text-secondary">
@@ -392,12 +390,10 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 						launching them.
 					</span>
 				</div>
-				<ButtonStyled color="red">
-					<button :disabled="banDisabled" class="w-full gap-2 sm:w-auto" @click="promptBanOwner">
-						<BanIcon class="size-4" />
-						{{ banButtonLabel }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="red" :disabled="banDisabled" class="w-full gap-2 sm:w-auto" @click="promptBanOwner">
+					<BanIcon aria-hidden="true" class="size-4" />
+					{{ banButtonLabel }}
+				</Button>
 			</footer>
 		</div>
 

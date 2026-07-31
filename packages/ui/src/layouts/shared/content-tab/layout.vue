@@ -52,6 +52,7 @@ import type {
 	ContentCardTableItem,
 	ContentItem,
 } from './types'
+import Button from '#ui/components/base/buttons/Button.vue'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
@@ -763,9 +764,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="universal-card flex flex-col items-center gap-4 p-6">
 					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
 					<p class="text-secondary">{{ ctx.error.value.message }}</p>
-					<ButtonStyled color="brand">
-						<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</Button>
 				</div>
 			</div>
 
@@ -818,34 +817,33 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							/>
 
 							<div class="flex gap-2">
-								<ButtonStyled type="outlined">
-									<button
-										v-tooltip="
-											ctx.busyMessage?.value ??
-											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-										"
-										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10"
-										@click="ctx.uploadFiles"
-									>
-										<FolderOpenIcon class="size-5" />
-										{{ formatMessage(messages.uploadFiles) }}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="brand">
-									<button
-										v-tooltip="
-											ctx.busyMessage?.value ??
-											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-										"
-										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10 flex items-center gap-2"
-										@click="ctx.browse"
-									>
-										<CompassIcon class="size-5" />
-										<span>{{ formatMessage(messages.browseContent) }}</span>
-									</button>
-								</ButtonStyled>
+								<Button
+									type="outlined"
+									v-tooltip="
+									ctx.busyMessage?.value ??
+									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+									"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+									class="!h-10"
+									@click="ctx.uploadFiles"
+								>
+									<FolderOpenIcon aria-hidden="true" class="size-5" />
+									{{ formatMessage(messages.uploadFiles) }}
+								</Button>
+								<Button
+									type="colored"
+									color="brand"
+									v-tooltip="
+									ctx.busyMessage?.value ??
+									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+									"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+									class="!h-10 flex items-center gap-2"
+									@click="ctx.browse"
+								>
+									<CompassIcon aria-hidden="true" class="size-5" />
+									<span>{{ formatMessage(messages.browseContent) }}</span>
+								</Button>
 							</div>
 						</div>
 
@@ -879,66 +877,57 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									{{ option.label }}
 								</button>
 								<div class="hidden @[900px]:block">
-									<ButtonStyled type="transparent">
-										<button
-											:aria-label="
-												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-											"
-											@click="cycleSortMode"
-										>
-											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-												v-else-if="sortMode === 'date-added-newest'"
-											/><ClockArrowUpIcon
-												v-else-if="sortMode === 'date-added-oldest'"
-											/><ArrowDownAZIcon v-else />
-											{{ sortLabels[sortMode]() }}
-										</button>
-									</ButtonStyled>
+									<Button
+										type="quiet"
+										:aria-label="
+										formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+										"
+										@click="cycleSortMode"
+									>
+										<ArrowUpZAIcon aria-hidden="true" v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon aria-hidden="true"
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon aria-hidden="true"
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon aria-hidden="true" v-else />
+										{{ sortLabels[sortMode]() }}
+									</Button>
 								</div>
 							</div>
 
 							<div class="flex items-center gap-2">
 								<div class="@[900px]:hidden">
-									<ButtonStyled type="transparent">
-										<button
-											:aria-label="
-												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-											"
-											@click="cycleSortMode"
-										>
-											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-												v-else-if="sortMode === 'date-added-newest'"
-											/><ClockArrowUpIcon
-												v-else-if="sortMode === 'date-added-oldest'"
-											/><ArrowDownAZIcon v-else />
-											{{ sortLabels[sortMode]() }}
-										</button>
-									</ButtonStyled>
+									<Button
+										type="quiet"
+										:aria-label="
+										formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+										"
+										@click="cycleSortMode"
+									>
+										<ArrowUpZAIcon aria-hidden="true" v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon aria-hidden="true"
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon aria-hidden="true"
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon aria-hidden="true" v-else />
+										{{ sortLabels[sortMode]() }}
+									</Button>
 								</div>
 
-								<ButtonStyled
+								<Button
 									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
+									type="quiet"
 									color="green"
-									type="transparent"
-									color-fill="text"
-									hover-color-fill="background"
+									v-tooltip="formatMessage(messages.updateAll)"
+									:disabled="isBulkOperating"
+									@click="promptUpdateAll"
 								>
-									<button
-										v-tooltip="formatMessage(messages.updateAll)"
-										:disabled="isBulkOperating"
-										@click="promptUpdateAll"
-									>
-										<DownloadIcon />
-										{{ formatMessage(messages.updateAll) }}
-									</button>
-								</ButtonStyled>
+									<DownloadIcon aria-hidden="true" />
+									{{ formatMessage(messages.updateAll) }}
+								</Button>
 
-								<ButtonStyled type="transparent">
-									<button :disabled="refreshing" @click="handleRefresh">
-										<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-										{{ formatMessage(commonMessages.refreshButton) }}
-									</button>
-								</ButtonStyled>
+								<Button type="quiet" :disabled="refreshing" @click="handleRefresh">
+									<RefreshCwIcon aria-hidden="true" :class="refreshing ? 'animate-spin' : ''" />
+									{{ formatMessage(commonMessages.refreshButton) }}
+								</Button>
 							</div>
 						</div>
 
@@ -981,34 +970,33 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						}}
 					</template>
 					<template #actions>
-						<ButtonStyled type="outlined">
-							<button
-								v-tooltip="
-									ctx.busyMessage?.value ??
-									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-								"
-								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10"
-								@click="ctx.uploadFiles"
-							>
-								<FolderOpenIcon class="size-5" />
-								{{ formatMessage(messages.uploadFiles) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button
-								v-tooltip="
-									ctx.busyMessage?.value ??
-									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-								"
-								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10 flex items-center gap-2"
-								@click="ctx.browse"
-							>
-								<CompassIcon class="size-5" />
-								<span>{{ formatMessage(messages.browseContent) }}</span>
-							</button>
-						</ButtonStyled>
+						<Button
+							type="outlined"
+							v-tooltip="
+							ctx.busyMessage?.value ??
+							(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+							class="!h-10"
+							@click="ctx.uploadFiles"
+						>
+							<FolderOpenIcon aria-hidden="true" class="size-5" />
+							{{ formatMessage(messages.uploadFiles) }}
+						</Button>
+						<Button
+							type="colored"
+							color="brand"
+							v-tooltip="
+							ctx.busyMessage?.value ??
+							(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+							class="!h-10 flex items-center gap-2"
+							@click="ctx.browse"
+						>
+							<CompassIcon aria-hidden="true" class="size-5" />
+							<span>{{ formatMessage(messages.browseContent) }}</span>
+						</Button>
 					</template>
 				</EmptyState>
 			</template>
@@ -1034,21 +1022,16 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			@disable="bulkDisable"
 		>
 			<template #actions>
-				<ButtonStyled
+				<Button
 					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
-					type="transparent"
+					type="quiet"
 					color="green"
-					color-fill="text"
-					hover-color-fill="background"
+					v-tooltip="formatMessage(commonMessages.updateButton)"
+					@click="promptUpdateSelected"
 				>
-					<button
-						v-tooltip="formatMessage(commonMessages.updateButton)"
-						@click="promptUpdateSelected"
-					>
-						<DownloadIcon />
-						<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
-					</button>
-				</ButtonStyled>
+					<DownloadIcon aria-hidden="true" />
+					<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
+				</Button>
 
 				<ButtonStyled v-if="ctx.shareItems" type="transparent">
 					<OverflowMenu
@@ -1097,21 +1080,16 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			<template #actions-end>
 				<div v-if="deletableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
 
-				<ButtonStyled
+				<Button
 					v-if="deletableSelectedItems.length > 0"
-					type="transparent"
+					type="quiet"
 					color="red"
-					color-fill="text"
-					hover-color-fill="background"
+					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					@click="showBulkDeleteModal"
 				>
-					<button
-						v-tooltip="formatMessage(commonMessages.deleteLabel)"
-						@click="showBulkDeleteModal"
-					>
-						<TrashIcon />
-						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-					</button>
-				</ButtonStyled>
+					<TrashIcon aria-hidden="true" />
+					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+				</Button>
 			</template>
 		</ContentSelectionBar>
 
