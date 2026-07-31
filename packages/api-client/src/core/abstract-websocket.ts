@@ -9,6 +9,7 @@ export type WebSocketEventHandler<
 export interface WebSocketConnection {
 	serverId: string
 	socket: WebSocket
+	authenticated: boolean
 	reconnectAttempts: number
 	reconnectTimer?: ReturnType<typeof setTimeout>
 	isReconnecting: boolean
@@ -31,6 +32,7 @@ export abstract class AbstractWebSocketClient {
 	protected readonly MAX_RECONNECT_ATTEMPTS = 10
 	protected readonly RECONNECT_BASE_DELAY = 1000
 	protected readonly RECONNECT_MAX_DELAY = 30000
+	protected readonly AUTHENTICATION_TIMEOUT = 30000
 
 	constructor(
 		protected client: {
@@ -58,6 +60,7 @@ export abstract class AbstractWebSocketClient {
 		}
 
 		if (status && !status.connected && !options?.force) {
+			await this.waitForAuthentication(serverId)
 			return
 		}
 
@@ -67,6 +70,28 @@ export abstract class AbstractWebSocketClient {
 
 		const auth = await this.client.archon.servers_v0.getWebSocketAuth(serverId)
 		await this.connect(serverId, auth)
+	}
+
+	protected async waitForAuthentication(serverId: string): Promise<void> {
+		await new Promise<void>((resolve, reject) => {
+			let unsubscribe = () => {}
+			const timeout = setTimeout(() => {
+				unsubscribe()
+				reject(new Error(`WebSocket authentication timed out for server ${serverId}`))
+			}, this.AUTHENTICATION_TIMEOUT)
+
+			unsubscribe = this.on(serverId, 'auth-ok', () => {
+				clearTimeout(timeout)
+				unsubscribe()
+				resolve()
+			})
+
+			if (this.getStatus(serverId)?.connected) {
+				clearTimeout(timeout)
+				unsubscribe()
+				resolve()
+			}
+		})
 	}
 
 	on<E extends Archon.Websocket.v0.WSEventType>(
@@ -88,7 +113,7 @@ export abstract class AbstractWebSocketClient {
 		if (!connection) return null
 
 		return {
-			connected: connection.socket.readyState === WebSocket.OPEN,
+			connected: connection.socket.readyState === WebSocket.OPEN && connection.authenticated,
 			reconnecting: connection.isReconnecting,
 			reconnectAttempts: connection.reconnectAttempts,
 		}

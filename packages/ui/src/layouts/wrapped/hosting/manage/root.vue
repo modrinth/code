@@ -303,7 +303,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { getNodeWebSocketUrl, ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
+import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CopyIcon,
@@ -1150,7 +1150,7 @@ const nodeUnavailableDetails = computed(() => [
 		label: 'Error message',
 		value: nodeAccessible.value
 			? (serverError.value?.message ?? 'Unknown')
-			: 'Unable to reach node. Ping test failed.',
+			: 'Unable to establish the node WebSocket connection.',
 		type: 'block' as const,
 	},
 ])
@@ -1268,48 +1268,6 @@ function safeStringify(obj: unknown, indent = ' '): string {
 	)
 }
 
-async function testNodeReachability(): Promise<boolean> {
-	const nodeInstance = serverData.value?.node?.instance
-	if (!nodeInstance) return false
-
-	try {
-		const auth = await client.archon.servers_v0.getWebSocketAuth(props.serverId)
-		const authUrl = getNodeWebSocketUrl(auth.url)
-		const protocol = authUrl.toLowerCase().startsWith('ws://') ? 'ws' : 'wss'
-		const wsUrl = getNodeWebSocketUrl(`${nodeInstance}/pingtest`).replace(
-			/^wss?:\/\//i,
-			`${protocol}://`,
-		)
-
-		return await new Promise((resolve) => {
-			const socket = new WebSocket(wsUrl)
-			const timeout = setTimeout(() => {
-				socket.close()
-				resolve(false)
-			}, 5000)
-
-			socket.onopen = () => {
-				clearTimeout(timeout)
-				socket.send(performance.now().toString())
-			}
-
-			socket.onmessage = () => {
-				clearTimeout(timeout)
-				socket.close()
-				resolve(true)
-			}
-
-			socket.onerror = () => {
-				clearTimeout(timeout)
-				resolve(false)
-			}
-		})
-	} catch (error) {
-		console.error(`Failed to ping node ${nodeInstance}:`, error)
-		return false
-	}
-}
-
 function initializeServer() {
 	if (serverData.value?.status === 'suspended') {
 		isLoading.value = false
@@ -1320,19 +1278,6 @@ function initializeServer() {
 		isLoading.value = false
 		return
 	}
-
-	testNodeReachability()
-		.then((result) => {
-			nodeAccessible.value = result
-			if (!nodeAccessible.value) {
-				isLoading.value = false
-			}
-		})
-		.catch((err) => {
-			console.error('Error testing node reachability:', err)
-			nodeAccessible.value = false
-			isLoading.value = false
-		})
 
 	if (serverError.value) {
 		isLoading.value = false
@@ -1345,6 +1290,7 @@ function initializeServer() {
 			],
 		})
 			.then((connected) => {
+				nodeAccessible.value = connected
 				if (connected && cachedWsState?.consoleLines?.length) {
 					modrinthServersConsole.clear()
 					modrinthServersConsole.addLines(cachedWsState.consoleLines)

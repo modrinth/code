@@ -2,14 +2,14 @@
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useIntervalFn } from '@vueuse/core'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
@@ -18,13 +18,6 @@ import {
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-import {
-	type PendingServerContentInstall,
-	pendingServerContentInstallsEvent,
-	readPendingServerContentInstallBaseline,
-	readPendingServerContentInstalls,
-	removePendingServerContentInstall,
-} from '#ui/utils/server-content-installing'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
@@ -193,16 +186,6 @@ const setupActionBusyMessage = computed(() => {
 const currentWorldInstallProgressItems = computed(() =>
 	installProgressItems.value.filter((item) => item.world_id === worldId.value),
 )
-const hasActiveFileInstallProgress = computed(() =>
-	currentWorldInstallProgressItems.value.some(
-		(item) =>
-			item.key.type === 'file' &&
-			item.error == null &&
-			item.progress != null &&
-			item.progress < 100,
-	),
-)
-
 const contentActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
 const contentActionBusyMessage = computed(() => {
 	if (!canSetup.value) return permissionDeniedMessage.value
@@ -342,44 +325,217 @@ const addonLookup = computed(() => {
 })
 
 function normalizeInstallFilename(filename: string) {
-	return filename.endsWith('.disabled') ? filename.slice(0, -'.disabled'.length) : filename
+	const normalized = filename.endsWith('.disabled')
+		? filename.slice(0, -'.disabled'.length)
+		: filename
+	return normalized.toLowerCase()
 }
 
-const fileInstallProgressByFilename = computed(() => {
-	const progressByFilename = new Map<string, Archon.Websocket.v0.InstallProgressItem>()
-	for (const item of currentWorldInstallProgressItems.value) {
-		if (item.key.type === 'file') {
-			progressByFilename.set(normalizeInstallFilename(item.key.filename), item)
+type FileInstallProgressItem = Archon.Websocket.v0.InstallProgressItem & {
+	key: Archon.Websocket.v0.InstallProgressFileKey
+}
+type ServerContentItem = ContentItem & {
+	installIdentityFilenames?: string[]
+}
+
+const fileInstallProgressItems = computed<FileInstallProgressItem[]>(() =>
+	currentWorldInstallProgressItems.value.filter(
+		(item): item is FileInstallProgressItem => item.key.type === 'file',
+	),
+)
+
+function getFileInstallTargetFilename(key: Archon.Websocket.v0.InstallProgressFileKey) {
+	return key.target_filename ?? key.source_filename ?? key.project_id
+}
+
+function getFileInstallFilenames(key: Archon.Websocket.v0.InstallProgressFileKey) {
+	return [key.source_filename, key.target_filename]
+		.filter((filename): filename is string => !!filename)
+		.map(normalizeInstallFilename)
+}
+
+function isFileInstallActive(item: FileInstallProgressItem) {
+	return item.error == null && item.progress !== 100
+}
+
+const completedInstallIds = ref<Set<string>>(new Set())
+const settlingFileInstallProgressItems = ref<Map<string, FileInstallProgressItem>>(new Map())
+const displayedFileInstallProgressItems = computed(() => {
+	const displayed = new Map(settlingFileInstallProgressItems.value)
+	for (const item of fileInstallProgressItems.value) {
+		if (isFileInstallActive(item)) {
+			displayed.set(item.id, item)
 		}
 	}
-	return progressByFilename
+	return Array.from(displayed.values())
 })
-const completedInstallFilenames = ref<Set<string>>(new Set())
+const isContentInstallActive = computed(
+	() =>
+		fileInstallProgressItems.value.some(isFileInstallActive) ||
+		settlingFileInstallProgressItems.value.size > 0,
+)
+
+function sortedUnique(values: Array<string | null | undefined>) {
+	return Array.from(new Set(values.filter((value): value is string => !!value))).sort()
+}
+
+const installProgressProjectIds = computed(() =>
+	sortedUnique(displayedFileInstallProgressItems.value.map((item) => item.key.project_id)),
+)
+const installProgressVersionIds = computed(() =>
+	sortedUnique(displayedFileInstallProgressItems.value.map((item) => item.key.version_id)),
+)
+
+const installProgressProjectsQuery = useQuery({
+	queryKey: computed(
+		() => ['labrinth', 'projects', 'v3', 'multiple', installProgressProjectIds.value] as const,
+	),
+	queryFn: () => client.labrinth.projects_v3.getMultiple(installProgressProjectIds.value),
+	enabled: computed(() => installProgressProjectIds.value.length > 0),
+	placeholderData: (previousData) => previousData,
+	staleTime: 5 * 60 * 1000,
+})
+
+const installProgressVersionsQuery = useQuery({
+	queryKey: computed(
+		() => ['labrinth', 'versions', 'v2', 'multiple', installProgressVersionIds.value] as const,
+	),
+	queryFn: () => client.labrinth.versions_v2.getVersions(installProgressVersionIds.value),
+	enabled: computed(() => installProgressVersionIds.value.length > 0),
+	placeholderData: (previousData) => previousData,
+	staleTime: 5 * 60 * 1000,
+})
+
+const installProgressTeamIds = computed(() =>
+	sortedUnique(
+		(installProgressProjectsQuery.data.value ?? [])
+			.filter(
+				(project) => installProgressProjectIds.value.includes(project.id) && !project.organization,
+			)
+			.map((project) => project.team_id),
+	),
+)
+const installProgressOrganizationIds = computed(() =>
+	sortedUnique(
+		(installProgressProjectsQuery.data.value ?? [])
+			.filter((project) => installProgressProjectIds.value.includes(project.id))
+			.map((project) => project.organization),
+	),
+)
+
+const installProgressTeamsQuery = useQuery({
+	queryKey: computed(
+		() => ['labrinth', 'teams', 'v3', 'multiple', installProgressTeamIds.value] as const,
+	),
+	queryFn: async () => {
+		const teamIds = installProgressTeamIds.value
+		const teams = await client.labrinth.teams_v3.getMultiple(teamIds)
+		return teamIds.map((teamId, index) => ({
+			teamId,
+			members: teams[index] ?? [],
+		}))
+	},
+	enabled: computed(() => installProgressTeamIds.value.length > 0),
+	placeholderData: (previousData) => previousData,
+	staleTime: 5 * 60 * 1000,
+})
+
+const installProgressOrganizationsQuery = useQuery({
+	queryKey: computed(
+		() =>
+			[
+				'labrinth',
+				'organizations',
+				'v3',
+				'multiple',
+				installProgressOrganizationIds.value,
+			] as const,
+	),
+	queryFn: () => client.labrinth.organizations_v3.getMultiple(installProgressOrganizationIds.value),
+	enabled: computed(() => installProgressOrganizationIds.value.length > 0),
+	placeholderData: (previousData) => previousData,
+	staleTime: 5 * 60 * 1000,
+})
+
+const installProgressProjectsById = computed(
+	() =>
+		new Map(
+			(installProgressProjectsQuery.data.value ?? []).map((project) => [project.id, project]),
+		),
+)
+const installProgressVersionsById = computed(
+	() =>
+		new Map(
+			(installProgressVersionsQuery.data.value ?? []).map((version) => [version.id, version]),
+		),
+)
+const installProgressTeamsById = computed(() => {
+	const teams = installProgressTeamsQuery.data.value ?? []
+	return new Map(teams.map((team) => [team.teamId, team.members]))
+})
+const installProgressOrganizationsById = computed(
+	() =>
+		new Map(
+			(installProgressOrganizationsQuery.data.value ?? []).map((organization) => [
+				organization.id,
+				organization,
+			]),
+		),
+)
+
+async function settleCompletedFileInstalls(items: FileInstallProgressItem[]) {
+	try {
+		await contentQuery.refetch()
+	} catch {
+		return
+	} finally {
+		const activeIds = new Set(
+			fileInstallProgressItems.value.filter(isFileInstallActive).map((item) => item.id),
+		)
+		const nextSettlingItems = new Map(settlingFileInstallProgressItems.value)
+		for (const item of items) {
+			if (!activeIds.has(item.id)) nextSettlingItems.delete(item.id)
+		}
+		settlingFileInstallProgressItems.value = nextSettlingItems
+	}
+}
 
 watch(
-	fileInstallProgressByFilename,
-	(progressByFilename, previousProgressByFilename) => {
-		const completed = new Set(completedInstallFilenames.value)
-		let shouldRefreshContent = false
-		if (previousProgressByFilename) {
-			for (const filename of previousProgressByFilename.keys()) {
-				if (!progressByFilename.has(filename)) {
-					if (!completed.has(filename)) shouldRefreshContent = true
-					completed.add(filename)
+	fileInstallProgressItems,
+	(progressItems, previousProgressItems) => {
+		const completed = new Set(completedInstallIds.value)
+		const settlingItems = new Map(settlingFileInstallProgressItems.value)
+		const itemsToSettle = new Map<string, FileInstallProgressItem>()
+		const progressIds = new Set(progressItems.map((item) => item.id))
+
+		if (previousProgressItems) {
+			for (const item of previousProgressItems) {
+				if (!progressIds.has(item.id) && isFileInstallActive(item)) {
+					settlingItems.set(item.id, item)
+					itemsToSettle.set(item.id, item)
+					completed.add(item.id)
 				}
 			}
 		}
-		for (const [filename, item] of progressByFilename) {
-			if (item.error != null || item.progress === 100) {
-				if (item.error == null && !completed.has(filename)) shouldRefreshContent = true
-				completed.add(filename)
-			} else {
-				completed.delete(filename)
+
+		for (const item of progressItems) {
+			if (isFileInstallActive(item)) {
+				completed.delete(item.id)
+				settlingItems.delete(item.id)
+			} else if (item.error != null) {
+				completed.add(item.id)
+				settlingItems.delete(item.id)
+			} else if (!completed.has(item.id)) {
+				completed.add(item.id)
+				settlingItems.set(item.id, item)
+				itemsToSettle.set(item.id, item)
 			}
 		}
-		completedInstallFilenames.value = completed
-		if (shouldRefreshContent && !contentQuery.isFetching.value) {
-			void contentQuery.refetch()
+
+		completedInstallIds.value = completed
+		settlingFileInstallProgressItems.value = settlingItems
+		if (itemsToSettle.size > 0) {
+			void settleCompletedFileInstalls(Array.from(itemsToSettle.values()))
 		}
 	},
 	{ immediate: true },
@@ -390,17 +546,58 @@ function getContentItemInstallFilename(item: ContentItem) {
 	return normalizeInstallFilename(filename)
 }
 
-function getContentItemInstallProgress(item: ContentItem) {
-	return fileInstallProgressByFilename.value.get(getContentItemInstallFilename(item))
+function getContentItemInstallProgress(item: ContentItem): FileInstallProgressItem | undefined {
+	const projectId = item.project?.id
+	const versionId = item.version?.id
+	const filename = getContentItemInstallFilename(item)
+
+	return fileInstallProgressItems.value.find((progressItem) => {
+		const key = progressItem.key
+		if (key.project_id === projectId) return true
+		if (key.version_id === versionId) return true
+		return getFileInstallFilenames(key).includes(filename)
+	})
+}
+
+function getInstallProgressOwner(project: Labrinth.Projects.v3.Project | undefined) {
+	if (!project) return undefined
+
+	if (project.organization) {
+		const organization = installProgressOrganizationsById.value.get(project.organization)
+		if (!organization) return undefined
+		return {
+			id: organization.id,
+			name: organization.name,
+			type: 'organization' as const,
+			avatar_url: organization.icon_url ?? undefined,
+			link: `/organization/${organization.slug}`,
+		}
+	}
+
+	const members = installProgressTeamsById.value.get(project.team_id)
+	const owner =
+		members?.find((member) => member.is_owner) ??
+		members?.find((member) => member.role.toLowerCase() === 'owner')
+	if (!owner) return undefined
+
+	return {
+		id: owner.user.id,
+		name: owner.user.username,
+		type: 'user' as const,
+		avatar_url: owner.user.avatar_url,
+		link: `/user/${owner.user.username}`,
+	}
 }
 
 function fileInstallProgressToContentItem(
 	item: Archon.Websocket.v0.InstallProgressItem,
 	key: Archon.Websocket.v0.InstallProgressFileKey,
-): ContentItem {
-	const filename = key.filename
+): ServerContentItem {
+	const filename = getFileInstallTargetFilename(key)
 	const extensionIndex = filename.lastIndexOf('.')
-	const title = extensionIndex > 0 ? filename.slice(0, extensionIndex) : filename
+	const fallbackTitle = extensionIndex > 0 ? filename.slice(0, extensionIndex) : filename
+	const project = installProgressProjectsById.value.get(key.project_id)
+	const version = installProgressVersionsById.value.get(key.version_id)
 	const projectType =
 		key.parent_directory === 'plugins'
 			? 'plugin'
@@ -411,76 +608,48 @@ function fileInstallProgressToContentItem(
 		id: `installing:${item.id}`,
 		file_name: filename,
 		project: {
-			id: item.id,
-			slug: filename,
-			title,
+			id: key.project_id,
+			slug: project?.slug ?? key.project_id,
+			title: project?.name ?? fallbackTitle ?? key.project_id,
+			icon_url: project?.icon_url,
 		},
 		version: {
-			id: item.id,
-			version_number: formatMessage(commonMessages.installingLabel),
+			id: key.version_id,
+			version_number: version?.name || version?.version_number || key.version_id,
 			file_name: filename,
 		},
+		owner: getInstallProgressOwner(project),
 		enabled: true,
 		project_type: projectType,
 		has_update: false,
 		update_version_id: null,
 		installing: true,
 		installProgress: item.progress,
+		installIdentityFilenames: getFileInstallFilenames(key),
 	}
 }
 
-const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
-const isContentInstallActive = computed(
-	() => hasActiveFileInstallProgress.value || pendingServerContentInstalls.value.length > 0,
-)
-const lastStableContentKeys = ref<Set<string>>(new Set())
-const contentInstallBaselineKeys = ref<Set<string> | null>(null)
-const contentInstallAddedKeys = ref<Set<string>>(new Set())
+function decorateContentItemWithInstallProgress(
+	contentItem: ContentItem,
+	installProgress: FileInstallProgressItem,
+): ServerContentItem {
+	const progressItem = fileInstallProgressToContentItem(installProgress, installProgress.key)
+	const hasHydratedProject = installProgressProjectsById.value.has(installProgress.key.project_id)
+	const hasHydratedVersion = installProgressVersionsById.value.has(installProgress.key.version_id)
+	const installing = isFileInstallActive(installProgress)
+
+	return {
+		...contentItem,
+		project: hasHydratedProject ? progressItem.project : contentItem.project,
+		version: hasHydratedVersion ? progressItem.version : contentItem.version,
+		owner: progressItem.owner ?? contentItem.owner,
+		installing,
+		installProgress: installing ? installProgress.progress : undefined,
+		installIdentityFilenames: progressItem.installIdentityFilenames,
+	}
+}
+
 const isFlushingStoredServerInstalls = ref(false)
-const { pause: pausePendingInstallPoll, resume: resumePendingInstallPoll } = useIntervalFn(
-	() => {
-		if (pendingServerContentInstalls.value.length === 0 || contentQuery.isFetching.value) return
-		void contentQuery.refetch()
-	},
-	5000,
-	{ immediate: false },
-)
-
-function syncPendingServerContentInstalls() {
-	const pendingInstalls = readPendingServerContentInstalls(serverId, worldId.value)
-	pendingServerContentInstalls.value = pendingInstalls
-
-	const completed = new Set(completedInstallFilenames.value)
-	let changed = false
-	for (const item of pendingInstalls) {
-		if (item.fileName) {
-			changed = completed.delete(normalizeInstallFilename(item.fileName)) || changed
-		}
-	}
-	if (changed) {
-		completedInstallFilenames.value = completed
-	}
-}
-
-function handlePendingServerContentInstallsChanged(event: Event) {
-	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>)
-		.detail
-	if (detail?.serverId !== serverId || detail?.worldId !== worldId.value) return
-	syncPendingServerContentInstalls()
-	void flushStoredServerInstalls()
-}
-
-function getAddonInstallKey(addon: Archon.Content.v1.Addon) {
-	return addon.project_id ?? addon.filename
-}
-
-function getAddonInstallKeys(addons: Archon.Content.v1.Addon[]) {
-	const keys = new Set<string>()
-	for (const addon of addons) {
-		keys.add(getAddonInstallKey(addon))
-	}
-	return keys
-}
 
 function getInstalledProjectIds() {
 	return new Set(
@@ -533,59 +702,23 @@ async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
 	return resolvedAddons
 }
 
-function addonMatchesPendingInstall(
-	addon: Archon.Content.v1.Addon,
-	pendingInstall: PendingServerContentInstall,
-) {
-	return (
-		addon.project_id === pendingInstall.projectId ||
-		addon.version?.id === pendingInstall.versionId ||
-		(!!pendingInstall.fileName && addon.filename === pendingInstall.fileName)
-	)
-}
-
-function removeResolvedPendingServerContentInstalls(addons: Archon.Content.v1.Addon[]) {
-	if (addons.length === 0 || pendingServerContentInstalls.value.length === 0) return
-
-	for (const pendingInstall of pendingServerContentInstalls.value) {
-		if (addons.some((addon) => addonMatchesPendingInstall(addon, pendingInstall))) {
-			removePendingServerContentInstall(serverId, worldId.value, pendingInstall.projectId)
-		}
-	}
-}
-
-function syncContentInstallKeys(
-	addons: Archon.Content.v1.Addon[] = contentQuery.data.value?.addons ?? [],
-) {
-	const currentKeys = getAddonInstallKeys(addons)
-	if (isContentInstallActive.value) {
-		if (!contentInstallBaselineKeys.value) {
-			contentInstallBaselineKeys.value =
-				readPendingServerContentInstallBaseline(serverId, worldId.value) ??
-				new Set(lastStableContentKeys.value)
-		}
-
-		const nextAddedKeys = new Set(contentInstallAddedKeys.value)
-		for (const key of currentKeys) {
-			if (!contentInstallBaselineKeys.value.has(key)) {
-				nextAddedKeys.add(key)
-			}
-		}
-		contentInstallAddedKeys.value = nextAddedKeys
-		return
-	}
-
-	lastStableContentKeys.value = currentKeys
-	contentInstallBaselineKeys.value = null
-	contentInstallAddedKeys.value = new Set()
-}
-
 async function flushStoredServerInstalls() {
 	const wid = worldId.value
 	if (!wid || isFlushingStoredServerInstalls.value) return
 
 	const queuedPlans = getStoredServerAddonInstallQueue(serverId, wid)
 	if (queuedPlans.size === 0) return
+
+	try {
+		await waitForServerContextRuntimeReady(client, serverId)
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToInstallContent),
+			text: error instanceof Error ? error.message : undefined,
+		})
+		return
+	}
 
 	isFlushingStoredServerInstalls.value = true
 	try {
@@ -601,9 +734,6 @@ async function flushStoredServerInstalls() {
 		})
 
 		if (!result.ok) {
-			for (const plan of result.attemptedPlans) {
-				removePendingServerContentInstall(serverId, wid, plan.projectId)
-			}
 			addNotification({
 				type: 'error',
 				title: formatMessage(messages.failedToInstallContent),
@@ -617,146 +747,39 @@ async function flushStoredServerInstalls() {
 		}
 	} finally {
 		isFlushingStoredServerInstalls.value = false
-		syncPendingServerContentInstalls()
-	}
-}
-
-function pendingInstallToContentItem(item: PendingServerContentInstall): ContentItem {
-	return {
-		project: {
-			id: item.projectId,
-			slug: item.slug ?? item.projectId,
-			title: item.title,
-			icon_url: item.iconUrl ?? undefined,
-		},
-		version: {
-			id: item.versionId,
-			version_number:
-				item.versionName ?? item.versionNumber ?? formatMessage(commonMessages.installingLabel),
-			file_name: item.fileName ?? formatMessage(commonMessages.installingLabel),
-		},
-		owner: item.owner
-			? {
-					id: item.owner.id,
-					name: item.owner.name,
-					type: item.owner.type,
-					avatar_url: getContentOwnerAvatarUrl(item.owner),
-					link: item.owner.link,
-				}
-			: undefined,
-		id: `installing:${item.projectId}`,
-		enabled: true,
-		file_name: `installing:${item.projectId}`,
-		project_type: item.contentType,
-		has_update: false,
-		update_version_id: null,
-		installing: true,
 	}
 }
 
 const rawContentItems = computed<ContentItem[]>(() => {
 	const addons = contentQuery.data.value?.addons ?? []
-	const pendingProjectIds = new Set(
-		pendingServerContentInstalls.value.map((item) => item.projectId),
-	)
-	const pendingInstallByProjectId = new Map(
-		pendingServerContentInstalls.value.map((item) => [item.projectId, item]),
-	)
-	const pendingInstallByVersionId = new Map(
-		pendingServerContentInstalls.value.map((item) => [item.versionId, item]),
-	)
-	const pendingInstallByFileName = new Map<string, PendingServerContentInstall>()
-	for (const item of pendingServerContentInstalls.value) {
-		if (item.fileName) {
-			pendingInstallByFileName.set(item.fileName, item)
-		}
-	}
-	const installingContentKeys = new Set([...pendingProjectIds, ...contentInstallAddedKeys.value])
-	const resolvedPendingProjectIds = new Set(
-		pendingServerContentInstalls.value
-			.filter((item) => addons.some((addon) => addonMatchesPendingInstall(addon, item)))
-			.map((item) => item.projectId),
-	)
-	const pendingItems = pendingServerContentInstalls.value
-		.filter((item) => !resolvedPendingProjectIds.has(item.projectId))
-		.map(pendingInstallToContentItem)
 	const addonItems = addons.map((addon) => {
 		const contentItem = addonToContentItem(addon)
-		const pendingItem =
-			(addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null) ??
-			(addon.version?.id ? pendingInstallByVersionId.get(addon.version.id) : null) ??
-			pendingInstallByFileName.get(addon.filename) ??
-			null
 		const installProgress = getContentItemInstallProgress(contentItem)
-		const installFilename = getContentItemInstallFilename(contentItem)
-		const installing =
-			installProgress != null
-				? installProgress.error == null && installProgress.progress !== 100
-				: !completedInstallFilenames.value.has(installFilename) &&
-					(!!pendingItem || installingContentKeys.has(getAddonInstallKey(addon)))
-
-		if (!installing || !pendingItem) {
-			return {
-				...contentItem,
-				installing,
-				installProgress: installing ? installProgress?.progress : undefined,
-			}
-		}
-
-		const pendingContentItem = pendingInstallToContentItem(pendingItem)
-		return {
-			...contentItem,
-			project: {
-				...contentItem.project,
-				slug: pendingContentItem.project.slug,
-				title: pendingContentItem.project.title,
-				icon_url: contentItem.project.icon_url ?? pendingContentItem.project.icon_url,
-			},
-			version: {
-				id: pendingContentItem.version?.id ?? contentItem.version?.id ?? contentItem.file_name,
-				version_number:
-					pendingContentItem.version?.version_number ??
-					contentItem.version?.version_number ??
-					formatMessage(commonMessages.installingLabel),
-				file_name:
-					pendingContentItem.version?.file_name ??
-					contentItem.version?.file_name ??
-					contentItem.file_name,
-			},
-			owner: pendingContentItem.owner ?? contentItem.owner,
-			installing,
-			installProgress: installProgress?.progress,
-		}
+		return installProgress
+			? decorateContentItemWithInstallProgress(contentItem, installProgress)
+			: contentItem
 	})
 
-	const pendingDisplayItems = pendingItems.map((item) => {
-		const installProgress = getContentItemInstallProgress(item)
-		const installing =
-			installProgress != null
-				? installProgress.error == null && installProgress.progress !== 100
-				: !completedInstallFilenames.value.has(getContentItemInstallFilename(item))
-		return {
-			...item,
-			installing,
-			installProgress: installing ? installProgress?.progress : undefined,
-		}
-	})
-	const displayedInstallFilenames = new Set(
-		[...addonItems, ...pendingDisplayItems].map(getContentItemInstallFilename),
-	)
-	const progressOnlyItems = currentWorldInstallProgressItems.value.flatMap((item) => {
+	const displayedInstallFilenames = new Set(addonItems.map(getContentItemInstallFilename))
+	const progressOnlyItems = displayedFileInstallProgressItems.value.flatMap((item) => {
+		if (item.error != null) return []
+		const matchingAddon = addons.find((addon) => {
+			if (addon.project_id === item.key.project_id) return true
+			if (addon.version?.id === item.key.version_id) return true
+			return getFileInstallFilenames(item.key).includes(normalizeInstallFilename(addon.filename))
+		})
 		if (
-			item.key.type !== 'file' ||
-			item.error != null ||
-			item.progress === 100 ||
-			displayedInstallFilenames.has(normalizeInstallFilename(item.key.filename))
+			matchingAddon ||
+			displayedInstallFilenames.has(
+				normalizeInstallFilename(getFileInstallTargetFilename(item.key)),
+			)
 		) {
 			return []
 		}
 		return [fileInstallProgressToContentItem(item, item.key)]
 	})
 
-	return [...addonItems, ...pendingDisplayItems, ...progressOnlyItems]
+	return [...addonItems, ...progressOnlyItems]
 })
 
 const displayedContentItems = ref<ContentItem[]>([])
@@ -765,48 +788,51 @@ const contentReadyPending = computed(
 	() =>
 		contentQuery.isLoading.value &&
 		contentQuery.data.value === undefined &&
-		pendingServerContentInstalls.value.length === 0 &&
 		displayedContentItems.value.length === 0,
 )
-
-function getContentItemDisplayKey(item: ContentItem) {
-	return item.project?.id ?? item.file_name ?? item.id
-}
 
 function getContentItemId(item: ContentItem) {
 	return item.file_name ?? item.id
 }
 
-function mergeFragileContentItems(items: ContentItem[]) {
-	const nextItems = new Map(items.map((item) => [getContentItemDisplayKey(item), item]))
-	const mergedItems = displayedContentItems.value.flatMap((item) => {
-		let nextKey = getContentItemDisplayKey(item)
-		let nextItem = nextItems.get(nextKey)
-		if (!nextItem && item.installing) {
-			const installFilename = getContentItemInstallFilename(item)
-			const matchingEntry = Array.from(nextItems.entries()).find(
-				([, candidate]) => getContentItemInstallFilename(candidate) === installFilename,
-			)
-			if (matchingEntry) {
-				nextKey = matchingEntry[0]
-				nextItem = matchingEntry[1]
-			}
-		}
-		if (!nextItem) {
-			if (
-				item.installing &&
-				completedInstallFilenames.value.has(getContentItemInstallFilename(item))
-			) {
-				return []
-			}
-			return [item]
-		}
+function getContentItemIdentityFilenames(item: ContentItem) {
+	const identityFilenames = (item as ServerContentItem).installIdentityFilenames ?? []
+	return new Set([
+		...identityFilenames,
+		normalizeInstallFilename(item.version?.file_name || item.file_name),
+	])
+}
 
-		nextItems.delete(nextKey)
-		return [nextItem]
+function findMatchingContentItemIndex(item: ContentItem, candidates: ContentItem[]) {
+	const projectId = item.project?.id
+	if (projectId) {
+		const projectIndex = candidates.findIndex((candidate) => candidate.project?.id === projectId)
+		if (projectIndex !== -1) return projectIndex
+	}
+
+	const versionId = item.version?.id
+	if (versionId) {
+		const versionIndex = candidates.findIndex((candidate) => candidate.version?.id === versionId)
+		if (versionIndex !== -1) return versionIndex
+	}
+
+	const filenames = getContentItemIdentityFilenames(item)
+	return candidates.findIndex((candidate) =>
+		Array.from(getContentItemIdentityFilenames(candidate)).some((filename) =>
+			filenames.has(filename),
+		),
+	)
+}
+
+function mergeFragileContentItems(items: ContentItem[]) {
+	const remainingItems = [...items]
+	const mergedItems = displayedContentItems.value.flatMap((item) => {
+		const matchingIndex = findMatchingContentItemIndex(item, remainingItems)
+		if (matchingIndex === -1) return [item]
+		return remainingItems.splice(matchingIndex, 1)
 	})
 
-	return [...mergedItems, ...nextItems.values()]
+	return [...mergedItems, ...remainingItems]
 }
 
 watch(
@@ -830,60 +856,14 @@ watch(
 )
 
 watch(
-	[isContentInstallActive, () => contentQuery.data.value?.addons],
-	([, addons]) => {
-		syncContentInstallKeys(addons ?? [])
-	},
-	{ deep: true, immediate: true },
-)
-
-watch(
-	[() => contentQuery.data.value?.addons, pendingServerContentInstalls],
-	([addons]) => {
-		removeResolvedPendingServerContentInstalls(addons ?? [])
-	},
-	{ deep: true, immediate: true },
-)
-
-watch(
-	() => pendingServerContentInstalls.value.length > 0,
-	(hasPendingInstalls) => {
-		if (hasPendingInstalls) {
-			resumePendingInstallPoll()
-		} else {
-			pausePendingInstallPoll()
-		}
-	},
-	{ immediate: true },
-)
-
-watch(
 	worldId,
 	() => {
-		completedInstallFilenames.value = new Set()
-		syncPendingServerContentInstalls()
-		syncContentInstallKeys()
+		completedInstallIds.value = new Set()
+		settlingFileInstallProgressItems.value = new Map()
 		void flushStoredServerInstalls()
 	},
 	{ immediate: true },
 )
-
-onMounted(() => {
-	syncPendingServerContentInstalls()
-	void flushStoredServerInstalls()
-	window.addEventListener(
-		pendingServerContentInstallsEvent,
-		handlePendingServerContentInstallsChanged,
-	)
-})
-
-onUnmounted(() => {
-	pausePendingInstallPoll()
-	window.removeEventListener(
-		pendingServerContentInstallsEvent,
-		handlePendingServerContentInstallsChanged,
-	)
-})
 
 const deleteMutation = useMutation({
 	mutationFn: ({ addon }: { addon: Archon.Content.v1.Addon }) =>

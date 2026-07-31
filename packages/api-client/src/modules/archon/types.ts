@@ -1113,9 +1113,12 @@ export namespace Archon {
 
 			export type InstallProgressFileKey = {
 				type: 'file'
-				parent_directory: string
-				filename: string
 				install_type: 'install' | 'update'
+				project_id: string
+				version_id: string
+				parent_directory: string
+				source_filename: string | null
+				target_filename?: string | null
 			}
 
 			export type InstallProgressModrinthModpackKey = {
