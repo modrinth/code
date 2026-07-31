@@ -56,7 +56,7 @@ const meta = {
 		label: 'More actions',
 		options,
 		type: 'base',
-		size: 'default',
+		size: 'md',
 		placement: 'bottom-end',
 		disabled: false,
 	},

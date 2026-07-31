@@ -13,7 +13,7 @@ const meta = {
 		},
 		size: {
 			control: 'select',
-			options: ['sm', 'default', 'md', 'lg'],
+			options: ['sm', 'md', 'lg', 'xl'],
 		},
 		color: {
 			control: 'select',
@@ -23,7 +23,7 @@ const meta = {
 	args: {
 		prompt: 'Select file',
 		type: 'base',
-		size: 'default',
+		size: 'md',
 		multiple: false,
 		disabled: false,
 	},

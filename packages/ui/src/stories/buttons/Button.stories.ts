@@ -6,13 +6,13 @@ import ButtonLink from '../../components/base/buttons/ButtonLink.vue'
 import IconButton from '../../components/base/buttons/IconButton.vue'
 
 const types = ['base', 'colored', 'outlined', 'quiet'] as const
-const sizes = ['sm', 'default', 'md', 'lg'] as const
+const sizes = ['sm', 'md', 'lg', 'xl'] as const
 const colors = ['brand', 'red', 'orange', 'green', 'blue', 'purple', 'medal_promotion'] as const
 const sizeColumns = [
 	{ value: 'sm', label: 'Small' },
-	{ value: 'default', label: 'Default' },
 	{ value: 'md', label: 'Medium' },
 	{ value: 'lg', label: 'Large' },
+	{ value: 'xl', label: 'Extra large' },
 ] as const
 const typeRows = [
 	{ label: 'Base', type: 'base' },
@@ -55,7 +55,7 @@ const meta = {
 	},
 	args: {
 		type: 'base',
-		size: 'default',
+		size: 'md',
 		color: 'brand',
 		nativeType: 'button',
 		disabled: false,

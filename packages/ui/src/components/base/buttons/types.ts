@@ -5,7 +5,7 @@ import type { AnchoredTeleportPlacement } from '../../../utils/use-anchored-tele
 
 export type ButtonType = 'base' | 'colored' | 'outlined' | 'quiet'
 
-export type ButtonSize = 'sm' | 'default' | 'md' | 'lg'
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 
 // TODO: Standardized color string enum props across @modrinth/ui
 export type ButtonColor =

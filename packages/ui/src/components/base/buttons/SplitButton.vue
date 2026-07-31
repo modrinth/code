@@ -33,7 +33,7 @@ const props = withDefaults(
 	{
 		groupLabel: undefined,
 		type: 'base',
-		size: 'default',
+		size: 'md',
 		nativeType: 'button',
 		disabled: false,
 		primaryDisabled: false,

@@ -24,7 +24,7 @@ const props = withDefaults(
 	defineProps<ButtonLinkProps>(),
 	{
 		type: 'base',
-		size: 'default',
+		size: 'md',
 		target: undefined,
 		rel: undefined,
 		download: undefined,

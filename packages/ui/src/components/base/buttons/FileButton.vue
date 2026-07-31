@@ -25,7 +25,7 @@ const props = withDefaults(
 		disabled: false,
 		allowDrop: true,
 		type: 'base',
-		size: 'default',
+		size: 'md',
 	},
 )
 

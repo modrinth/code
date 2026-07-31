@@ -27,7 +27,7 @@ const props = withDefaults(
 	}>(),
 	{
 		type: 'base',
-		size: 'default',
+		size: 'md',
 		disabled: false,
 		iconOnly: false,
 		placement: 'bottom-end',

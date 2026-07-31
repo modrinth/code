@@ -16,7 +16,7 @@ const props = withDefaults(
 	}>(),
 	{
 		type: 'base',
-		size: 'default',
+		size: 'md',
 		nativeType: 'button',
 		disabled: false,
 		loading: false,
