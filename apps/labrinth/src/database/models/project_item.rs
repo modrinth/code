@@ -23,9 +23,9 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v3";
-pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v3";
-const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v3";
+pub const PROJECTS_NAMESPACE: &str = "projects:v4";
+pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v4";
+const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {

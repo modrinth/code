@@ -9,7 +9,7 @@ use std::convert::TryFrom;
 use std::convert::TryInto;
 use xredis::RedisPool;
 
-const PRODUCTS_NAMESPACE: &str = "products:v3";
+const PRODUCTS_NAMESPACE: &str = "products:v4";
 
 pub struct DBProduct {
     pub id: DBProductId,

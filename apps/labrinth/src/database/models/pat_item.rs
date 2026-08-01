@@ -11,9 +11,9 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-const PATS_NAMESPACE: &str = "pats:v3";
-const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v3";
-const PATS_USERS_NAMESPACE: &str = "pats_users:v3";
+const PATS_NAMESPACE: &str = "pats:v4";
+const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v4";
+const PATS_USERS_NAMESPACE: &str = "pats_users:v4";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBPersonalAccessToken {

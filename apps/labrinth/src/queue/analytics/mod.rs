@@ -12,9 +12,9 @@ use xredis::RedisPool;
 
 pub mod cache;
 
-const DOWNLOADS_NAMESPACE: &str = "downloads:v3";
-const VIEWS_NAMESPACE: &str = "views:v3";
-const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays:v3";
+const DOWNLOADS_NAMESPACE: &str = "downloads:v4";
+const VIEWS_NAMESPACE: &str = "views:v4";
+const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays:v4";
 const MINECRAFT_SERVER_PLAYS_EXPIRY: u64 = 86_400; // 24 hours
 const MINECRAFT_SERVER_PLAYS_LIMIT: u32 = 5;
 

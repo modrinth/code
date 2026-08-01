@@ -751,6 +751,15 @@ pub struct RedisValue<T, K, S> {
 }
 
 impl<T, K, S> RedisValue<T, K, S> {
+    pub fn new(key: K, alias: Option<S>, iat: i64, val: T) -> Self {
+        Self {
+            key,
+            alias,
+            iat,
+            val,
+        }
+    }
+
     pub fn value(&self) -> &T {
         &self.val
     }

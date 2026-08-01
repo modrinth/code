@@ -13,7 +13,7 @@ use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 use xredis::RedisPool;
 
-const FLOWS_NAMESPACE: &str = "flows:v3";
+const FLOWS_NAMESPACE: &str = "flows:v4";
 
 #[derive(Deserialize, Serialize)]
 pub enum DBFlow {
