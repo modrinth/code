@@ -315,7 +315,7 @@ onUnmounted(() => {
 		<template #overlay>
 			<button
 				type="button"
-				class="selection-button group/selection absolute right-[4px] top-[2px] z-[2] flex size-[50px] cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
+				class="selection-button group/selection absolute right-0.5 top-0 z-[2] flex size-[50px] cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
 				:aria-label="selected ? 'Deselect instance' : 'Select instance'"
 				:aria-pressed="selected"
 				@click.stop="toggleSelection"
@@ -325,7 +325,7 @@ onUnmounted(() => {
 					class="relative flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
 					:class="{
 						'border-0 !opacity-100': selected,
-						'border-2 border-solid border-contrast bg-transparent': !selected,
+						'border-2 border-solid border-primary bg-transparent': !selected,
 						'[outline:3px_solid_var(--color-purple)] outline-offset-1':
 							holdingShift && isSelectionAnchor,
 					}"
