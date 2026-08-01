@@ -151,8 +151,7 @@ impl NotificationType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-#[serde(tag = "type", rename_all = "snake_case")]
+#[derive(Clone)]
 pub enum NotificationBody {
     ProjectUpdate {
         project_id: ProjectId,
@@ -283,6 +282,157 @@ pub enum NotificationBody {
     },
     Unknown,
 }
+
+const _: () = {
+    macro_rules! define_proxy {
+        ($name:ident, $($attributes:meta),+ $(,)?) => {
+            #[derive(Deserialize, Serialize)]
+            $(#[$attributes])+
+            enum $name {
+                ProjectUpdate {
+                    project_id: ProjectId,
+                    version_id: VersionId,
+                },
+                TeamInvite {
+                    project_id: ProjectId,
+                    team_id: TeamId,
+                    invited_by: UserId,
+                    role: String,
+                },
+                OrganizationInvite {
+                    organization_id: OrganizationId,
+                    invited_by: UserId,
+                    team_id: TeamId,
+                    role: String,
+                },
+                ServerInvite {
+                    server_id: Uuid,
+                    server_name: String,
+                    invited_by: UserId,
+                    role: String,
+                },
+                SharedInstanceInvite {
+                    shared_instance_id: String,
+                    shared_instance_name: String,
+                    shared_instance_icon: Option<String>,
+                    invited_by: UserId,
+                },
+                StatusChange {
+                    project_id: ProjectId,
+                    old_status: ProjectStatus,
+                    new_status: ProjectStatus,
+                },
+                ModeratorMessage {
+                    thread_id: ThreadId,
+                    message_id: ThreadMessageId,
+                    project_id: Option<ProjectId>,
+                    report_id: Option<ReportId>,
+                },
+                PatCreated {
+                    token_name: String,
+                },
+                ModerationMessageReceived {
+                    project_id: ProjectId,
+                },
+                ReportStatusUpdated {
+                    report_id: ReportId,
+                },
+                ReportSubmitted {
+                    report_id: ReportId,
+                },
+                ProjectStatusApproved {
+                    project_id: ProjectId,
+                },
+                ProjectStatusNeutral {
+                    project_id: ProjectId,
+                    old_status: ProjectStatus,
+                    new_status: ProjectStatus,
+                },
+                ProjectTransferred {
+                    project_id: ProjectId,
+                    new_owner_user_id: Option<UserId>,
+                    new_owner_organization_id: Option<OrganizationId>,
+                },
+                LegacyMarkdown {
+                    notification_type: Option<String>,
+                    name: String,
+                    text: String,
+                    link: String,
+                    actions: Vec<NotificationAction>,
+                },
+                ResetPassword {
+                    flow: String,
+                },
+                VerifyEmail {
+                    flow: String,
+                },
+                AuthProviderAdded {
+                    provider: String,
+                },
+                AuthProviderRemoved {
+                    provider: String,
+                },
+                TwoFactorEnabled,
+                TwoFactorRemoved,
+                PasswordChanged,
+                PasswordRemoved,
+                EmailChanged {
+                    new_email: String,
+                    to_email: String,
+                },
+                SubscriptionCredited {
+                    subscription_id: UserSubscriptionId,
+                    days: i32,
+                    previous_due: DateTime<Utc>,
+                    next_due: DateTime<Utc>,
+                    header_message: Option<String>,
+                },
+                PaymentFailed {
+                    amount: String,
+                    service: String,
+                },
+                TaxNotification {
+                    subscription_id: UserSubscriptionId,
+                    new_amount: i64,
+                    new_tax_amount: i64,
+                    old_amount: i64,
+                    old_tax_amount: i64,
+                    billing_interval: PriceDuration,
+                    currency: String,
+                    due: DateTime<Utc>,
+                    service: String,
+                },
+                PayoutAvailable {
+                    date_available: DateTime<Utc>,
+                    amount: u64,
+                },
+                DiscordRoleCreatorClub,
+                Custom {
+                    key: String,
+                    title: String,
+                    body_md: String,
+                },
+                Unknown,
+            }
+        };
+    }
+
+    define_proxy!(
+        HumanReadableProxy,
+        serde(
+            remote = "NotificationBody",
+            tag = "type",
+            rename_all = "snake_case"
+        ),
+    );
+    define_proxy!(BinaryProxy, serde(remote = "NotificationBody"));
+
+    crate::database::redis::serde::impl_redis_serde!(
+        NotificationBody,
+        human = HumanReadableProxy,
+        binary = BinaryProxy,
+    );
+};
 
 impl NotificationBody {
     pub fn notification_type(&self) -> NotificationType {

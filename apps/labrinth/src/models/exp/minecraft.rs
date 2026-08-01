@@ -324,8 +324,7 @@ impl ComponentEdit for JavaServerProjectEdit {
 }
 
 /// What game content a [`JavaServerProject`] is using.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-#[serde(tag = "kind", rename_all = "snake_case")]
+#[derive(Debug, Clone)]
 pub enum ServerContent {
     /// Server runs modded content with a modpack found on the Modrinth platform.
     Modpack {
@@ -345,9 +344,41 @@ pub enum ServerContent {
     },
 }
 
+const _: () = {
+    #[derive(Deserialize, Serialize, utoipa::ToSchema)]
+    #[serde(remote = "ServerContent", tag = "kind", rename_all = "snake_case")]
+    enum HumanReadableProxy {
+        Modpack {
+            version_id: VersionId,
+        },
+        Vanilla {
+            supported_game_versions: Vec<String>,
+            recommended_game_version: Option<String>,
+        },
+    }
+
+    #[derive(Deserialize, Serialize)]
+    #[serde(remote = "ServerContent")]
+    enum BinaryProxy {
+        Modpack {
+            version_id: VersionId,
+        },
+        Vanilla {
+            supported_game_versions: Vec<String>,
+            recommended_game_version: Option<String>,
+        },
+    }
+
+    crate::database::redis::serde::impl_redis_serde!(
+        ServerContent,
+        human = HumanReadableProxy,
+        binary = BinaryProxy,
+        schema,
+    );
+};
+
 /// What game content a [`JavaServerProject`] is using.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-#[serde(tag = "kind", rename_all = "snake_case")]
+#[derive(Debug, Clone)]
 pub enum ServerContentQuery {
     /// Server runs modded content with a modpack found on the Modrinth platform.
     Modpack {
@@ -365,6 +396,49 @@ pub enum ServerContentQuery {
         recommended_game_version: Option<String>,
     },
 }
+
+const _: () = {
+    #[derive(Deserialize, Serialize, utoipa::ToSchema)]
+    #[serde(
+        remote = "ServerContentQuery",
+        tag = "kind",
+        rename_all = "snake_case"
+    )]
+    enum HumanReadableProxy {
+        Modpack {
+            version_id: VersionId,
+            project_id: ProjectId,
+            project_name: String,
+            project_icon: String,
+        },
+        Vanilla {
+            supported_game_versions: Vec<String>,
+            recommended_game_version: Option<String>,
+        },
+    }
+
+    #[derive(Deserialize, Serialize)]
+    #[serde(remote = "ServerContentQuery")]
+    enum BinaryProxy {
+        Modpack {
+            version_id: VersionId,
+            project_id: ProjectId,
+            project_name: String,
+            project_icon: String,
+        },
+        Vanilla {
+            supported_game_versions: Vec<String>,
+            recommended_game_version: Option<String>,
+        },
+    }
+
+    crate::database::redis::serde::impl_redis_serde!(
+        ServerContentQuery,
+        human = HumanReadableProxy,
+        binary = BinaryProxy,
+        schema,
+    );
+};
 
 impl Default for ServerContent {
     fn default() -> Self {

@@ -1,3 +1,5 @@
+pub(crate) mod serde;
+
 use std::sync::Arc;
 
 use crate::env::ENV;
@@ -61,8 +63,8 @@ pub async fn from_env(
 mod tests {
     use std::collections::HashMap;
 
+    use ::serde::{Serialize, de::DeserializeOwned};
     use chrono::Utc;
-    use serde::{Serialize, de::DeserializeOwned};
     use url::Url;
     use uuid::Uuid;
     use webauthn_rs::WebauthnBuilder;
