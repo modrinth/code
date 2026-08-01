@@ -3971,12 +3971,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "请先上传一个版本再选择标签！"
   },
-  "project.settings.title": {
-    "message": "设置"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "访问项目的控制面板"
-  },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
   },

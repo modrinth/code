@@ -3497,12 +3497,6 @@
   "project.settings.permissions.sort.status": {
     "message": "Estado"
   },
-  "project.settings.title": {
-    "message": "Configuración"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Ver el panel de control de proyectos"
-  },
   "project.status.archived.message": {
     "message": "{title} se ha archivado. {title} no recibirá más actualizaciones hasta que el autor decida desarchivar el proyecto."
   },

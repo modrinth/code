@@ -3458,6 +3458,12 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "Back to all projects"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "Back to project page"
+  },
   "project.actions.create-server": {
     "message": "Create a server"
   },
@@ -3469,6 +3475,9 @@
   },
   "project.actions.edit-project": {
     "message": "Edit project"
+  },
+  "project.actions.project-page": {
+    "message": "Project page"
   },
   "project.actions.rescan-modpack": {
     "message": "Rescan modpack"
@@ -3746,6 +3755,15 @@
   "project.notification.updated.title": {
     "message": "Project updated"
   },
+  "project.settings.back-to-all-projects": {
+    "message": "Back to all projects"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Back to project page"
+  },
+  "project.settings.editing-project": {
+    "message": "Editing {projectType} project"
+  },
   "project.settings.general.name.description": {
     "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."
   },
@@ -3973,12 +3991,6 @@
   },
   "project.settings.tags.upload-version-first": {
     "message": "Please upload a version first in order to select tags!"
-  },
-  "project.settings.title": {
-    "message": "Settings"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Visit projects dashboard"
   },
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."

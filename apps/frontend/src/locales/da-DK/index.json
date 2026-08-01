@@ -2486,12 +2486,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "Upload venligst en version først for at kunne vælge tags!"
   },
-  "project.settings.title": {
-    "message": "Indstillinger"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Gå til projekt kontrolpanel"
-  },
   "project.status.archived.message": {
     "message": "{title} er blevet arkiveret. {title} vil ikke modtage flere opdateringer medmindre forfatteren beslutter sig for at fjerne projektet fra arkivet."
   },

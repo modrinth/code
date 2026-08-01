@@ -3968,12 +3968,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "Upload eerst een versie om tags te kunnen selecteren!"
   },
-  "project.settings.title": {
-    "message": "Instellingen"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Bezoek het project dashboard"
-  },
   "project.status.archived.message": {
     "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
   },

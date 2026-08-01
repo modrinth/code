@@ -3158,9 +3158,6 @@
   "project.settings.server.server-online": {
     "message": "Servern är online!"
   },
-  "project.settings.title": {
-    "message": "Inställningar"
-  },
   "project.status.archived.message": {
     "message": "{title} har arkiverats. {title} kommer inte få några ytterligare uppdateringar såvida inte författaren bestämmer sig för att avarkivera projektet."
   },

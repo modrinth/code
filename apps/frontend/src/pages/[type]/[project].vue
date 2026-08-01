@@ -5,29 +5,49 @@
 		</Teleport>
 		<template v-if="isSettings">
 			<div v-if="canAccessSettings" class="normal-page no-sidebar">
-				<div class="normal-page__header">
-					<div
-						class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
-					>
-						<nuxt-link
-							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
-							class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
-						>
-							<Avatar :src="project.icon_url" size="32px" />
-							{{ project.title }}
-						</nuxt-link>
-						<ChevronRightIcon />
-						<span class="flex grow font-extrabold text-contrast">{{
-							formatMessage(messages.settingsTitle)
-						}}</span>
-						<div class="flex gap-2">
-							<ButtonStyled>
-								<nuxt-link to="/dashboard/projects"
-									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-								</nuxt-link>
+				<div class="normal-page__header mb-6">
+					<PageHeader :title="project.title" :row-class="'items-center'">
+						<template #leading>
+							<ButtonStyled v-if="settingsBackDestination" circular size="large">
+								<NuxtLink
+									v-tooltip="settingsBackDestination.label"
+									:to="settingsBackDestination.to"
+									:aria-label="settingsBackDestination.label"
+								>
+									<LeftArrowIcon />
+								</NuxtLink>
 							</ButtonStyled>
-						</div>
-					</div>
+							<Avatar :src="project.icon_url" :tint-by="project.id" size="64px" />
+						</template>
+						<template #metadata>
+							<PageHeaderMetadata>
+								<PageHeaderMetadataItem>
+									{{
+										formatMessage(messages.editingProject, {
+											projectType: projectTypeDisplay.toLowerCase(),
+										})
+									}}
+								</PageHeaderMetadataItem>
+								<PageHeaderMetadataItem>
+									{{
+										formatMessage(commonMessages.projectCreated, {
+											date: formatRelativeTime(project.published),
+										})
+									}}
+								</PageHeaderMetadataItem>
+							</PageHeaderMetadata>
+						</template>
+						<template #actions>
+							<PageHeaderActions>
+								<ButtonStyled>
+									<NuxtLink :to="`${projectPath}`">
+										<CompassIcon />
+										{{ formatMessage(messages.projectPage) }}
+									</NuxtLink>
+								</ButtonStyled>
+							</PageHeaderActions>
+						</template>
+					</PageHeader>
 					<ProjectMemberHeader
 						v-if="currentMember && false"
 						:project="project"
@@ -486,12 +506,12 @@
 <script setup>
 import {
 	ChartIcon,
-	ChevronRightIcon,
 	ClipboardCopyIcon,
+	CompassIcon,
 	DownloadIcon,
 	FolderSearchIcon,
 	HeartIcon,
-	ListIcon,
+	LeftArrowIcon,
 	MoreVerticalIcon,
 	PlayIcon,
 	ReportIcon,
@@ -514,6 +534,10 @@ import {
 	IntlFormatted,
 	NavTabs,
 	OpenInAppModal,
+	PageHeader,
+	PageHeaderActions,
+	PageHeaderMetadata,
+	PageHeaderMetadataItem,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
@@ -529,6 +553,7 @@ import {
 	TeleportOverflowMenu,
 	useDebugLogger,
 	useFormatPrice,
+	useRelativeTime,
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
@@ -600,6 +625,7 @@ watch(() => route.query.dep, absorbDepQuery, { immediate: true })
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
+const formatRelativeTime = useRelativeTime()
 
 const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
@@ -644,9 +670,17 @@ const messages = defineMessages({
 		defaultMessage:
 			'{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project.',
 	},
+	backToAllProjects: {
+		id: 'project.settings.back-to-all-projects',
+		defaultMessage: 'Back to all projects',
+	},
 	backToDiscover: {
 		id: 'project.install-context.back-to-discover',
 		defaultMessage: 'Back to discover',
+	},
+	backToProjectPage: {
+		id: 'project.settings.back-to-project-page',
+		defaultMessage: 'Back to project page',
 	},
 	changelogTab: {
 		id: 'project.navigation.changelog',
@@ -742,6 +776,18 @@ const messages = defineMessages({
 		id: 'project.environment.migration.review-button',
 		defaultMessage: 'Review environment settings',
 	},
+	projectPage: {
+		id: 'project.actions.project-page',
+		defaultMessage: 'Project page',
+	},
+	backToProjectPage: {
+		id: 'project.actions.back-to-project-page',
+		defaultMessage: 'Back to project page',
+	},
+	backToAllProjects: {
+		id: 'project.actions.back-to-all-projects',
+		defaultMessage: 'Back to all projects',
+	},
 	reviewProject: {
 		id: 'project.actions.review-project',
 		defaultMessage: 'Review project',
@@ -762,17 +808,13 @@ const messages = defineMessages({
 		id: 'project.actions.servers-promo.title',
 		defaultMessage: 'Create a server',
 	},
-	settingsTitle: {
-		id: 'project.settings.title',
-		defaultMessage: 'Settings',
-	},
 	versionsTab: {
 		id: 'project.versions.title',
 		defaultMessage: 'Versions',
 	},
-	visitProjectsDashboard: {
-		id: 'project.settings.visit-dashboard',
-		defaultMessage: 'Visit projects dashboard',
+	editingProject: {
+		id: 'project.settings.editing-project',
+		defaultMessage: 'Editing {projectType} project',
 	},
 })
 
@@ -1572,6 +1614,38 @@ const projectPath = computed(() =>
 		? `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
 		: '',
 )
+
+const settingsEntryRouteName = ref()
+
+function setSettingsEntryRoute() {
+	const backPath = window.history.state?.back
+	if (!isSettings.value || typeof backPath !== 'string') {
+		settingsEntryRouteName.value = undefined
+		return
+	}
+	settingsEntryRouteName.value = router.resolve(backPath).name?.toString()
+}
+
+onMounted(setSettingsEntryRoute)
+watch(isSettings, setSettingsEntryRoute)
+
+const settingsBackDestination = computed(() => {
+	switch (settingsEntryRouteName.value) {
+		case 'dashboard-projects':
+			return {
+				label: formatMessage(messages.backToAllProjects),
+				to: '/dashboard/projects',
+			}
+		case 'type-project':
+			return {
+				label: formatMessage(messages.backToProjectPage),
+				to: projectPath.value,
+			}
+		default:
+			return undefined
+	}
+})
+
 const projectHeaderPrimaryColor = computed(() =>
 	currentMember.value || route.name === 'type-project-version-version' ? 'standard' : 'brand',
 )

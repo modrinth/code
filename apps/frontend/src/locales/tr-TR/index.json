@@ -3443,12 +3443,6 @@
   "project.settings.permissions.sort.status": {
     "message": "Durum"
   },
-  "project.settings.title": {
-    "message": "Ayarlar"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Projeler panelini ziyaret et"
-  },
   "project.status.archived.message": {
     "message": "{title} arşivlenmiş. {title}, yapımcı fikrini değiştirmediği sürece daha fazla güncelleme almayacak."
   },
