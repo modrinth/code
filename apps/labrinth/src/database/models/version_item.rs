@@ -3,8 +3,7 @@ use super::ids::*;
 use super::loader_fields::VersionField;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
-    LoaderFieldEnumValueMetadata, QueryLoaderField, QueryLoaderFieldEnumValue,
-    QueryVersionField,
+    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::file_hosting::FileHost;
 use crate::models::exp;
@@ -707,7 +706,8 @@ impl DBVersion {
                 let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
                     r#"
                     SELECT DISTINCT id, enum_id, value, ordering, created,
-                    metadata AS "metadata?: sqlx::types::Json<LoaderFieldEnumValueMetadata>"
+                    metadata->>'type' AS "ty?",
+                    (metadata->>'major')::boolean AS "major?"
                     FROM loader_field_enum_values lfev
                     WHERE id = ANY($1)
                     ORDER BY enum_id, ordering, created ASC
@@ -724,7 +724,8 @@ impl DBVersion {
                         value: m.value,
                         ordering: m.ordering,
                         created: m.created,
-                        metadata: m.metadata.map(|metadata| metadata.0),
+                        ty: m.ty,
+                        major: m.major,
                     })
                     .try_collect()
                     .await?;
@@ -1092,7 +1093,6 @@ pub struct VersionQueryResult {
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub dependencies: Vec<DependencyQueryResult>,
-    #[serde(flatten)]
     pub components: exp::VersionQuery,
 }
 

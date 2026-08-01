@@ -69,18 +69,15 @@ mod tests {
 
     use crate::database::models::flow_item::DBFlow;
     use crate::database::models::ids::{
-        DBNotificationId, DBProductId, DBProductPriceId, DBProjectId, DBTeamId,
-        DBThreadId, DBUserId, DBVersionId, LoaderFieldEnumId,
-        LoaderFieldEnumValueId, LoaderFieldId, LoaderId,
+        DBNotificationId, DBProjectId, DBTeamId, DBThreadId, DBUserId,
+        DBVersionId, LoaderFieldEnumId, LoaderFieldEnumValueId, LoaderFieldId,
+        LoaderId,
     };
     use crate::database::models::loader_fields::{
-        Loader, LoaderFieldEnumValue, LoaderFieldEnumValueMetadata,
-        LoaderMetadata, VersionField, VersionFieldValue,
+        Loader, LoaderFieldEnumValue, LoaderMetadata, VersionField,
+        VersionFieldValue,
     };
     use crate::database::models::notification_item::DBNotification;
-    use crate::database::models::product_item::{
-        DBProductPrice, QueryProductWithPrices,
-    };
     use crate::database::models::project_item::{
         DBProject, ProjectQueryResult,
     };
@@ -104,20 +101,15 @@ mod tests {
         postcard::from_bytes(&serialized).expect("deserializing with postcard")
     }
 
-    fn loader_field_enum_value(
-        type_: &str,
-        major: bool,
-    ) -> LoaderFieldEnumValue {
+    fn loader_field_enum_value(ty: &str, major: bool) -> LoaderFieldEnumValue {
         LoaderFieldEnumValue {
             id: LoaderFieldEnumValueId(1),
             enum_id: LoaderFieldEnumId(2),
             value: "1.21.8".to_string(),
             ordering: None,
             created: Utc::now(),
-            metadata: Some(LoaderFieldEnumValueMetadata {
-                type_: type_.to_string(),
-                major,
-            }),
+            ty: Some(ty.to_string()),
+            major: Some(major),
         }
     }
 
@@ -211,29 +203,46 @@ mod tests {
     }
 
     #[test]
-    fn loader_field_enum_value_metadata_round_trips_with_postcard() {
+    fn loader_field_enum_values_round_trip_with_postcard() {
         let metadata_values = [
-            ("snapshot", false),
-            ("alpha", false),
-            ("beta", true),
-            ("release", true),
-            ("beta", false),
-            ("release", false),
+            (None, None),
+            (Some("snapshot"), Some(false)),
+            (Some("alpha"), Some(false)),
+            (Some("beta"), Some(true)),
+            (Some("release"), Some(true)),
+            (Some("beta"), Some(false)),
+            (Some("release"), Some(false)),
         ];
 
-        assert_eq!(
-            postcard_round_trip(&None::<LoaderFieldEnumValueMetadata>),
-            None
-        );
-
-        for (type_, major) in metadata_values {
-            let metadata = Some(LoaderFieldEnumValueMetadata {
-                type_: type_.to_string(),
+        for (ty, major) in metadata_values {
+            let enum_value = LoaderFieldEnumValue {
+                id: LoaderFieldEnumValueId(1),
+                enum_id: LoaderFieldEnumId(2),
+                value: "1.21.8".to_string(),
+                ordering: None,
+                created: Utc::now(),
+                ty: ty.map(str::to_string),
                 major,
-            });
+            };
 
-            assert_eq!(postcard_round_trip(&metadata), metadata);
+            assert_eq!(postcard_round_trip(&enum_value), enum_value);
         }
+    }
+
+    #[test]
+    fn loader_field_enum_value_keeps_flattened_json_layout() {
+        let enum_value = loader_field_enum_value("release", true);
+        let json = serde_json::to_value(&enum_value)
+            .expect("serializing loader field enum value as JSON");
+
+        assert_eq!(json.get("type"), Some(&serde_json::json!("release")));
+        assert_eq!(json.get("major"), Some(&serde_json::json!(true)));
+        assert!(json.get("metadata").is_none());
+        assert_eq!(
+            serde_json::from_value::<LoaderFieldEnumValue>(json)
+                .expect("deserializing loader field enum value from JSON"),
+            enum_value
+        );
     }
 
     #[test]
@@ -305,20 +314,6 @@ mod tests {
         postcard_round_trip(&exp::ProjectSerial::default());
         postcard_round_trip(&exp::ProjectQuery::default());
         postcard_round_trip(&db_project());
-
-        let product = QueryProductWithPrices {
-            id: DBProductId(1),
-            metadata: ProductMetadata::Midas,
-            unitary: false,
-            name: None,
-            prices: vec![DBProductPrice {
-                id: DBProductPriceId(2),
-                product_id: DBProductId(1),
-                prices: Price::OneTime { price: 500 },
-                currency_code: "USD".to_string(),
-            }],
-        };
-        postcard_round_trip(&product);
     }
 
     #[test]

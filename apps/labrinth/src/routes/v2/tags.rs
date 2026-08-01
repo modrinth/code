@@ -210,18 +210,9 @@ pub async fn game_version_list(
                     .into_iter()
                     .map(|f| GameVersionQueryData {
                         version: f.value,
-                        version_type: f
-                            .metadata
-                            .as_ref()
-                            .map(|metadata| metadata.type_.as_str())
-                            .unwrap_or_default()
-                            .to_string(),
+                        version_type: f.ty.unwrap_or_default(),
                         date: f.created,
-                        major: f
-                            .metadata
-                            .as_ref()
-                            .map(|metadata| metadata.major)
-                            .unwrap_or_default(),
+                        major: f.major.unwrap_or_default(),
                     })
                     .collect::<Vec<_>>();
                 HttpResponse::Ok().json(fields)

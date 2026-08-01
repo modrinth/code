@@ -279,21 +279,15 @@ pub struct LoaderFieldEnum {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct LoaderFieldEnumValueMetadata {
-    #[serde(rename = "type")]
-    pub type_: String,
-    pub major: bool,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct LoaderFieldEnumValue {
     pub id: LoaderFieldEnumValueId,
     pub enum_id: LoaderFieldEnumId,
     pub value: String,
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
-    #[serde(flatten)]
-    pub metadata: Option<LoaderFieldEnumValueMetadata>,
+    #[serde(rename = "type")]
+    pub ty: Option<String>,
+    pub major: Option<bool>,
 }
 
 impl std::hash::Hash for LoaderFieldEnumValue {
@@ -372,7 +366,8 @@ pub struct QueryLoaderFieldEnumValue {
     pub value: String,
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
-    pub metadata: Option<LoaderFieldEnumValueMetadata>,
+    pub ty: Option<String>,
+    pub major: Option<bool>,
 }
 
 impl LoaderField {
@@ -627,44 +622,50 @@ impl LoaderFieldEnumValue {
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let val = redis.get_cached_keys_raw(
-            LOADER_FIELD_ENUM_VALUES_NAMESPACE,
-            &loader_field_enum_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
-            |loader_field_enum_ids| async move {
-                let values = sqlx::query!(
-                    r#"
+        let val = redis
+            .get_cached_keys_raw(
+                LOADER_FIELD_ENUM_VALUES_NAMESPACE,
+                &loader_field_enum_ids
+                    .iter()
+                    .map(|x| x.0)
+                    .collect::<Vec<_>>(),
+                |loader_field_enum_ids| async move {
+                    let values = sqlx::query!(
+                        r#"
                     SELECT id, enum_id, value, ordering,
-                    metadata AS "metadata?: sqlx::types::Json<LoaderFieldEnumValueMetadata>",
+                    metadata->>'type' AS "ty?",
+                    (metadata->>'major')::boolean AS "major?",
                     created FROM loader_field_enum_values
                     WHERE enum_id = ANY($1)
                     ORDER BY enum_id, ordering, created DESC
                     "#,
-                    &loader_field_enum_ids
-                )
+                        &loader_field_enum_ids
+                    )
                     .fetch(exec)
-                    .try_fold(DashMap::new(), |acc: DashMap<i32, Vec<LoaderFieldEnumValue>>, c| {
-                        let value = LoaderFieldEnumValue {
-                            id: LoaderFieldEnumValueId(c.id),
-                            enum_id: LoaderFieldEnumId(c.enum_id),
-                            value: c.value,
-                            ordering: c.ordering,
-                            created: c.created,
-                            metadata: c.metadata.map(|metadata| metadata.0),
-                        };
+                    .try_fold(
+                        DashMap::new(),
+                        |acc: DashMap<i32, Vec<LoaderFieldEnumValue>>, c| {
+                            let value = LoaderFieldEnumValue {
+                                id: LoaderFieldEnumValueId(c.id),
+                                enum_id: LoaderFieldEnumId(c.enum_id),
+                                value: c.value,
+                                ordering: c.ordering,
+                                created: c.created,
+                                ty: c.ty,
+                                major: c.major,
+                            };
 
-                        acc.entry(c.enum_id)
-                            .or_default()
-                            .push(value);
+                            acc.entry(c.enum_id).or_default().push(value);
 
-                        async move {
-                            Ok(acc)
-                        }
-                    })
+                            async move { Ok(acc) }
+                        },
+                    )
                     .await?;
 
-                Ok::<_, DatabaseError>(values)
-            },
-        ).await?;
+                    Ok::<_, DatabaseError>(values)
+                },
+            )
+            .await?;
 
         Ok(val
             .into_iter()
@@ -687,12 +688,13 @@ impl LoaderFieldEnumValue {
             .into_iter()
             .filter(|x| {
                 filter.iter().all(|(key, value)| match key.as_str() {
-                    "type" => x.metadata.as_ref().is_some_and(|metadata| {
-                        value.as_str() == Some(metadata.type_.as_str())
-                    }),
-                    "major" => x.metadata.as_ref().is_some_and(|metadata| {
-                        value.as_bool() == Some(metadata.major)
-                    }),
+                    "type" => {
+                        x.ty.as_deref()
+                            .is_some_and(|type_| value.as_str() == Some(type_))
+                    }
+                    "major" => x
+                        .major
+                        .is_some_and(|major| value.as_bool() == Some(major)),
                     _ => false,
                 })
             })
@@ -1187,7 +1189,8 @@ impl VersionFieldValue {
                                     value: lfev.value.clone(),
                                     ordering: lfev.ordering,
                                     created: lfev.created,
-                                    metadata: lfev.metadata.clone(),
+                                    ty: lfev.ty.clone(),
+                                    major: lfev.major,
                                 }
                             }),
                         ))
@@ -1263,7 +1266,8 @@ impl VersionFieldValue {
                                 value: lfev.value.clone(),
                                 ordering: lfev.ordering,
                                 created: lfev.created,
-                                metadata: lfev.metadata.clone(),
+                                ty: lfev.ty.clone(),
+                                major: lfev.major,
                             })
                         })
                         .collect::<Result<_, _>>()?,

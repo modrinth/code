@@ -136,7 +136,7 @@ pub struct QueryProductWithPrices {
     pub id: DBProductId,
     pub metadata: ProductMetadata,
     pub unitary: bool,
-    #[serde(skip_serializing_if = "Option::is_none", default)]
+    #[serde(default)]
     pub name: Option<String>,
     pub prices: Vec<DBProductPrice>,
 }
