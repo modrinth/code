@@ -56,3 +56,361 @@ pub async fn from_env(
         .await
         .expect("failed to initialize Redis connections")
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use chrono::Utc;
+    use serde::{Serialize, de::DeserializeOwned};
+    use url::Url;
+    use uuid::Uuid;
+    use webauthn_rs::WebauthnBuilder;
+
+    use crate::database::models::flow_item::DBFlow;
+    use crate::database::models::ids::{
+        DBNotificationId, DBProductId, DBProductPriceId, DBProjectId, DBTeamId,
+        DBThreadId, DBUserId, DBVersionId, LoaderFieldEnumId,
+        LoaderFieldEnumValueId, LoaderFieldId, LoaderId,
+    };
+    use crate::database::models::loader_fields::{
+        Loader, LoaderFieldEnumValue, LoaderFieldEnumValueMetadata,
+        LoaderMetadata, VersionField, VersionFieldValue,
+    };
+    use crate::database::models::notification_item::DBNotification;
+    use crate::database::models::product_item::{
+        DBProductPrice, QueryProductWithPrices,
+    };
+    use crate::database::models::project_item::{
+        DBProject, ProjectQueryResult,
+    };
+    use crate::database::models::version_item::{
+        DBVersion, VersionQueryResult,
+    };
+    use crate::models::billing::{Price, ProductMetadata};
+    use crate::models::exp::{self, minecraft};
+    use crate::models::notifications::NotificationBody;
+    use crate::models::projects::{
+        MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
+        VersionStatus,
+    };
+
+    fn postcard_round_trip<T>(value: &T) -> T
+    where
+        T: Serialize + DeserializeOwned,
+    {
+        let serialized =
+            postcard::to_allocvec(value).expect("serializing with postcard");
+        postcard::from_bytes(&serialized).expect("deserializing with postcard")
+    }
+
+    fn loader_field_enum_value(
+        type_: &str,
+        major: bool,
+    ) -> LoaderFieldEnumValue {
+        LoaderFieldEnumValue {
+            id: LoaderFieldEnumValueId(1),
+            enum_id: LoaderFieldEnumId(2),
+            value: "1.21.8".to_string(),
+            ordering: None,
+            created: Utc::now(),
+            metadata: Some(LoaderFieldEnumValueMetadata {
+                type_: type_.to_string(),
+                major,
+            }),
+        }
+    }
+
+    fn db_project() -> DBProject {
+        let now = Utc::now();
+
+        DBProject {
+            id: DBProjectId(1),
+            team_id: DBTeamId(2),
+            organization_id: None,
+            name: "project".to_string(),
+            summary: "summary".to_string(),
+            description: "description".to_string(),
+            published: now,
+            updated: now,
+            approved: Some(now),
+            queued: None,
+            status: ProjectStatus::Approved,
+            requested_status: None,
+            downloads: 3,
+            follows: 4,
+            icon_url: None,
+            raw_icon_url: None,
+            license_url: None,
+            license: "MIT".to_string(),
+            slug: Some("project".to_string()),
+            moderation_message: None,
+            moderation_message_body: None,
+            webhook_sent: false,
+            color: None,
+            monetization_status: MonetizationStatus::Monetized,
+            side_types_migration_review_status:
+                SideTypesMigrationReviewStatus::Reviewed,
+            loaders: vec!["fabric".to_string()],
+            components: exp::ProjectSerial::default(),
+        }
+    }
+
+    fn db_version() -> DBVersion {
+        DBVersion {
+            id: DBVersionId(1),
+            project_id: DBProjectId(2),
+            author_id: DBUserId(3),
+            name: "version".to_string(),
+            version_number: "1.0.0".to_string(),
+            changelog: "changelog".to_string(),
+            date_published: Utc::now(),
+            downloads: 4,
+            version_type: "release".to_string(),
+            featured: true,
+            status: VersionStatus::Listed,
+            requested_status: None,
+            ordering: None,
+            components: exp::VersionSerial::default(),
+        }
+    }
+
+    #[test]
+    fn loader_metadata_round_trips_with_postcard() {
+        for platform in [None, Some(false), Some(true)] {
+            let metadata = LoaderMetadata { platform };
+            let round_tripped = postcard_round_trip(&metadata);
+
+            assert_eq!(round_tripped.platform, platform);
+        }
+    }
+
+    #[test]
+    fn loader_round_trips_with_postcard() {
+        for platform in [None, Some(false), Some(true)] {
+            let loader = Loader {
+                id: LoaderId(1),
+                loader: "paper".to_string(),
+                icon: "icon".to_string(),
+                supported_project_types: vec!["plugin".to_string()],
+                supported_games: vec!["minecraft-java".to_string()],
+                metadata: LoaderMetadata { platform },
+            };
+            let round_tripped = postcard_round_trip(&loader);
+
+            assert_eq!(round_tripped.id, loader.id);
+            assert_eq!(round_tripped.loader, loader.loader);
+            assert_eq!(round_tripped.icon, loader.icon);
+            assert_eq!(
+                round_tripped.supported_project_types,
+                loader.supported_project_types
+            );
+            assert_eq!(round_tripped.supported_games, loader.supported_games);
+            assert_eq!(round_tripped.metadata.platform, platform);
+        }
+    }
+
+    #[test]
+    fn loader_field_enum_value_metadata_round_trips_with_postcard() {
+        let metadata_values = [
+            ("snapshot", false),
+            ("alpha", false),
+            ("beta", true),
+            ("release", true),
+            ("beta", false),
+            ("release", false),
+        ];
+
+        assert_eq!(
+            postcard_round_trip(&None::<LoaderFieldEnumValueMetadata>),
+            None
+        );
+
+        for (type_, major) in metadata_values {
+            let metadata = Some(LoaderFieldEnumValueMetadata {
+                type_: type_.to_string(),
+                major,
+            });
+
+            assert_eq!(postcard_round_trip(&metadata), metadata);
+        }
+    }
+
+    #[test]
+    fn non_enum_version_fields_round_trip_with_postcard() {
+        let values = [
+            VersionFieldValue::Integer(5),
+            VersionFieldValue::Text("value".to_string()),
+            VersionFieldValue::Boolean(true),
+            VersionFieldValue::ArrayInteger(vec![1, 2]),
+            VersionFieldValue::ArrayText(vec!["one".to_string()]),
+            VersionFieldValue::ArrayBoolean(vec![true, false]),
+        ];
+
+        for value in values {
+            let field = VersionField {
+                version_id: DBVersionId(1),
+                field_id: LoaderFieldId(2),
+                field_name: "field".to_string(),
+                value,
+            };
+
+            assert_eq!(postcard_round_trip(&field), field);
+        }
+    }
+
+    #[test]
+    fn flattened_cache_values_round_trip_with_postcard() {
+        let enum_value = loader_field_enum_value("release", true);
+        postcard_round_trip(&enum_value);
+
+        let version = VersionQueryResult {
+            inner: db_version(),
+            files: Vec::new(),
+            version_fields: vec![VersionField {
+                version_id: DBVersionId(1),
+                field_id: LoaderFieldId(2),
+                field_name: "game_versions".to_string(),
+                value: VersionFieldValue::Enum(
+                    LoaderFieldEnumId(2),
+                    enum_value.clone(),
+                ),
+            }],
+            loaders: vec!["fabric".to_string()],
+            project_types: vec!["mod".to_string()],
+            games: vec!["minecraft-java".to_string()],
+            dependencies: Vec::new(),
+            components: exp::VersionQuery::default(),
+        };
+        postcard_round_trip(&version);
+
+        let project = ProjectQueryResult {
+            inner: db_project(),
+            categories: Vec::new(),
+            additional_categories: Vec::new(),
+            versions: vec![DBVersionId(1)],
+            project_types: vec!["mod".to_string()],
+            games: vec!["minecraft-java".to_string()],
+            urls: Vec::new(),
+            gallery_items: Vec::new(),
+            thread_id: DBThreadId(1),
+            aggregate_version_fields: Vec::new(),
+            components: exp::ProjectQuery::default(),
+        };
+        postcard_round_trip(&project);
+    }
+
+    #[test]
+    fn skipped_cache_fields_round_trip_with_postcard() {
+        postcard_round_trip(&exp::ProjectSerial::default());
+        postcard_round_trip(&exp::ProjectQuery::default());
+        postcard_round_trip(&db_project());
+
+        let product = QueryProductWithPrices {
+            id: DBProductId(1),
+            metadata: ProductMetadata::Midas,
+            unitary: false,
+            name: None,
+            prices: vec![DBProductPrice {
+                id: DBProductPriceId(2),
+                product_id: DBProductId(1),
+                prices: Price::OneTime { price: 500 },
+                currency_code: "USD".to_string(),
+            }],
+        };
+        postcard_round_trip(&product);
+    }
+
+    #[test]
+    fn internally_tagged_cache_values_round_trip_with_postcard() {
+        for metadata in [
+            ProductMetadata::Midas,
+            ProductMetadata::Pyro {
+                cpu: 1,
+                ram: 2,
+                swap: 3,
+                storage: 4,
+            },
+            ProductMetadata::Medal {
+                cpu: 1,
+                ram: 2,
+                swap: 3,
+                storage: 4,
+                region: "us-east".to_string(),
+            },
+        ] {
+            postcard_round_trip(&metadata);
+        }
+
+        for price in [
+            Price::OneTime { price: 500 },
+            Price::Recurring {
+                intervals: HashMap::new(),
+            },
+        ] {
+            postcard_round_trip(&price);
+        }
+
+        postcard_round_trip(&NotificationBody::TwoFactorEnabled);
+        postcard_round_trip(&DBNotification {
+            id: DBNotificationId(1),
+            user_id: DBUserId(2),
+            body: NotificationBody::TwoFactorEnabled,
+            read: false,
+            created: Utc::now(),
+        });
+        postcard_round_trip(&minecraft::ServerContent::Vanilla {
+            supported_game_versions: vec!["1.21.8".to_string()],
+            recommended_game_version: Some("1.21.8".to_string()),
+        });
+        postcard_round_trip(&minecraft::ServerContentQuery::Vanilla {
+            supported_game_versions: vec!["1.21.8".to_string()],
+            recommended_game_version: Some("1.21.8".to_string()),
+        });
+    }
+
+    #[test]
+    fn simple_flow_variants_round_trip_with_postcard() {
+        assert!(matches!(
+            postcard_round_trip(&DBFlow::MinecraftAuth),
+            DBFlow::MinecraftAuth
+        ));
+
+        let flow = postcard_round_trip(&DBFlow::Login2FA {
+            user_id: DBUserId(1),
+        });
+        assert!(matches!(
+            flow,
+            DBFlow::Login2FA {
+                user_id: DBUserId(1)
+            }
+        ));
+    }
+
+    #[test]
+    fn passkey_flow_variants_round_trip_with_postcard() {
+        let origin = Url::parse("https://example.com").unwrap();
+        let webauthn = WebauthnBuilder::new("example.com", &origin)
+            .unwrap()
+            .build()
+            .unwrap();
+        let (_, registration) = webauthn
+            .start_passkey_registration(
+                Uuid::from_u128(1),
+                "user@example.com",
+                "user",
+                None,
+            )
+            .unwrap();
+        postcard_round_trip(&DBFlow::RegisterPasskey {
+            user_id: DBUserId(1),
+            state: registration,
+        });
+
+        let (_, authentication) =
+            webauthn.start_discoverable_authentication().unwrap();
+        postcard_round_trip(&DBFlow::AuthenticatePasskey {
+            state: authentication,
+        });
+    }
+}
