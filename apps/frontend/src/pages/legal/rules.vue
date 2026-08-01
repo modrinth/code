@@ -1,6 +1,7 @@
 <template>
 	<div class="markdown-body">
 		<h1>Content Rules</h1>
+		<p><em>Last modified: TODO</em></p>
 
 		<p>
 			These Content Rules are to be considered part of our
@@ -72,8 +73,12 @@
 
 		<p>
 			Projects, a form of Content, must make a clear and honest attempt to describe their purpose in
-			designated areas on the project page. Necessary information must not be obscured in any way.
-			Using confusing language or technical jargon when it is not necessary constitutes a violation.
+			designated areas on the project page. Necessary information must not be obscured in any way or
+			use confusing language or technical jargon when it is unnecessary.
+		</p>
+		<p>
+			Important information like content disclosures must always be described accurately and
+			appropriately.
 		</p>
 
 		<h3 id="general-expectations">2.1. General Expectations</h3>
@@ -153,8 +158,8 @@
 		</p>
 		<ol>
 			<li>
-				All metadata, including license, client/server-side information, tags, etc. are filled out
-				correctly and are consistent with information found elsewhere.
+				All metadata, including license, environment information, tags, content disclosures, etc.
+				are filled out correctly and are consistent with information found elsewhere.
 			</li>
 			<li>
 				Project titles are only the name of the project, without any other unnecessary filler data.
@@ -164,12 +169,50 @@
 				repeating the project title.
 			</li>
 			<li>All external links lead to public resources that are relevant.</li>
-			<li>Gallery images are relevant to the project and each contain a title.</li>
+			<li>
+				Gallery images are relevant to the project and do not give a false impression of the
+				project's contents.
+			</li>
 			<li>All dependencies must be specified in the Dependencies section of each version.</li>
 			<li>
 				"Additional files" are only used for special designated purposes, such as source JAR files.
 				In other words, separate versions and/or projects are used where appropriate instead of
 				additional files.
+			</li>
+			<li>
+				All applicable content disclosures are filled out accurately and maintained with up-to-date
+				information.
+			</li>
+		</ol>
+
+		<h2 id="generative-ai">6. Usage of Generative "AI"</h2>
+
+		<p>
+			Projects must be forthright and honest about the usage of generative AI when producing
+			projects or any other posted content and cannot be entirely or primarily comprised of content
+			created or derived from generative AI output.
+		</p>
+		<p>Projects must abide by all of the following requirements:</p>
+		<ol>
+			<li>Apply the “AI-assisted” content disclosure when:</li>
+			<ol type="a">
+				<li>a substantial portion of the project's code is a product of AI output.</li>
+				<li>
+					the project includes any assets that are primarily or entirely a product of AI output.
+				</li>
+				<li>the project's design or functionality relies on the use of generative AI.</li>
+				<li>
+					any element of the project's page such as description or publishing relies on generative
+					AI.
+				</li>
+			</ol>
+			<li>
+				No images uploaded to a gallery, icon, description, or any other part of a project page may
+				be created or derived from generative AI output. Any such images will be removed.
+			</li>
+			<li>
+				Projects may not be published publicly if the contents are primarily or entirely a product
+				of AI output.
 			</li>
 		</ol>
 	</div>
@@ -186,3 +229,32 @@ useSeoMeta({
 	ogDescription: description,
 })
 </script>
+
+<style scoped>
+.markdown-body h2 {
+	@apply mb-3 mt-5 pb-1 pt-0 text-xl font-semibold text-contrast;
+}
+.markdown-body h3 {
+	@apply mb-1 mt-5 p-0 text-lg font-semibold text-contrast;
+}
+
+.markdown-body a {
+	@apply font-semibold text-brand no-underline hover:text-brand hover:underline;
+}
+
+.markdown-body p {
+	@apply leading-normal;
+}
+
+.markdown-body ol {
+	@apply mb-3;
+}
+
+.markdown-body ol ol {
+	@apply mb-2;
+}
+
+.markdown-body li {
+	@apply mb-1;
+}
+</style>
