@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDraggable } from '@dnd-kit/vue'
+import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { useEventListener, useMagicKeys } from '@vueuse/core'
@@ -23,6 +23,13 @@ type ProcessEventPayload = {
 	instance_id: string
 	event: ProcessEvent
 }
+
+const instanceCardSensors = [
+	PointerSensor.configure({
+		preventActivation: () => false,
+	}),
+	KeyboardSensor,
+]
 
 const { handleError } = injectNotificationManager()
 const {
@@ -69,6 +76,7 @@ const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupId}:${props.instance.id}`),
 	element: instanceCardElement,
 	disabled: computed(() => displayState.value.group !== 'Group'),
+	sensors: instanceCardSensors,
 	data: computed(() => ({
 		instanceId: props.instance.id,
 		fromGroup: props.instanceGroupId,
