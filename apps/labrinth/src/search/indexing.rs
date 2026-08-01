@@ -11,8 +11,8 @@ use tracing::{info, warn};
 
 use crate::database::PgPool;
 use crate::database::models::loader_fields::{
-    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
-    VersionField,
+    LoaderFieldEnumValueMetadata, QueryLoaderField, QueryLoaderFieldEnumValue,
+    QueryVersionField, VersionField,
 };
 use crate::database::models::{
     DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
@@ -394,11 +394,12 @@ async fn build_search_documents(
 
     let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> =
         sqlx::query!(
-            "
-        SELECT DISTINCT id, enum_id, value, ordering, created, metadata
+            r#"
+        SELECT DISTINCT id, enum_id, value, ordering, created,
+        metadata AS "metadata?: sqlx::types::Json<LoaderFieldEnumValueMetadata>"
         FROM loader_field_enum_values lfev
         ORDER BY enum_id, ordering, created DESC
-        "
+        "#
         )
         .fetch(pool)
         .map_ok(|m| QueryLoaderFieldEnumValue {
@@ -407,7 +408,7 @@ async fn build_search_documents(
             value: m.value,
             ordering: m.ordering,
             created: m.created,
-            metadata: m.metadata,
+            metadata: m.metadata.map(|metadata| metadata.0),
         })
         .try_collect()
         .await?;

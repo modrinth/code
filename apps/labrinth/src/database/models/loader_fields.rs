@@ -87,6 +87,11 @@ impl Game {
     }
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+pub struct LoaderMetadata {
+    pub platform: Option<bool>,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Loader {
     pub id: LoaderId,
@@ -94,7 +99,7 @@ pub struct Loader {
     pub icon: String,
     pub supported_project_types: Vec<String>,
     pub supported_games: Vec<String>, // slugs
-    pub metadata: serde_json::Value,
+    pub metadata: LoaderMetadata,
 }
 
 impl Loader {
@@ -154,7 +159,8 @@ impl Loader {
 
         let result = sqlx::query!(
             "
-            SELECT l.id id, l.loader loader, l.icon icon, l.metadata metadata,
+            SELECT l.id id, l.loader loader, l.icon icon,
+            (l.metadata->>'platform')::boolean AS platform,
             ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
             ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
             FROM loaders l
@@ -179,7 +185,9 @@ impl Loader {
             supported_games: x
                 .games
                 .unwrap_or_default(),
-            metadata: x.metadata
+            metadata: LoaderMetadata {
+                platform: x.platform,
+            },
         })
         .try_collect::<Vec<_>>()
         .await?;
@@ -271,6 +279,13 @@ pub struct LoaderFieldEnum {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct LoaderFieldEnumValueMetadata {
+    #[serde(rename = "type")]
+    pub type_: String,
+    pub major: bool,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct LoaderFieldEnumValue {
     pub id: LoaderFieldEnumValueId,
     pub enum_id: LoaderFieldEnumId,
@@ -278,7 +293,7 @@ pub struct LoaderFieldEnumValue {
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
     #[serde(flatten)]
-    pub metadata: serde_json::Value,
+    pub metadata: Option<LoaderFieldEnumValueMetadata>,
 }
 
 impl std::hash::Hash for LoaderFieldEnumValue {
@@ -357,7 +372,7 @@ pub struct QueryLoaderFieldEnumValue {
     pub value: String,
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
-    pub metadata: Option<serde_json::Value>,
+    pub metadata: Option<LoaderFieldEnumValueMetadata>,
 }
 
 impl LoaderField {
@@ -617,11 +632,13 @@ impl LoaderFieldEnumValue {
             &loader_field_enum_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
             |loader_field_enum_ids| async move {
                 let values = sqlx::query!(
-                    "
-                    SELECT id, enum_id, value, ordering, metadata, created FROM loader_field_enum_values
+                    r#"
+                    SELECT id, enum_id, value, ordering,
+                    metadata AS "metadata?: sqlx::types::Json<LoaderFieldEnumValueMetadata>",
+                    created FROM loader_field_enum_values
                     WHERE enum_id = ANY($1)
                     ORDER BY enum_id, ordering, created DESC
-                    ",
+                    "#,
                     &loader_field_enum_ids
                 )
                     .fetch(exec)
@@ -632,7 +649,7 @@ impl LoaderFieldEnumValue {
                             value: c.value,
                             ordering: c.ordering,
                             created: c.created,
-                            metadata: c.metadata.unwrap_or_default(),
+                            metadata: c.metadata.map(|metadata| metadata.0),
                         };
 
                         acc.entry(c.enum_id)
@@ -669,15 +686,15 @@ impl LoaderFieldEnumValue {
             .await?
             .into_iter()
             .filter(|x| {
-                let mut bool = true;
-                for (key, value) in &filter {
-                    if let Some(metadata_value) = x.metadata.get(key) {
-                        bool &= metadata_value == value;
-                    } else {
-                        bool = false;
-                    }
-                }
-                bool
+                filter.iter().all(|(key, value)| match key.as_str() {
+                    "type" => x.metadata.as_ref().is_some_and(|metadata| {
+                        value.as_str() == Some(metadata.type_.as_str())
+                    }),
+                    "major" => x.metadata.as_ref().is_some_and(|metadata| {
+                        value.as_bool() == Some(metadata.major)
+                    }),
+                    _ => false,
+                })
             })
             .collect();
 
@@ -1170,10 +1187,7 @@ impl VersionFieldValue {
                                     value: lfev.value.clone(),
                                     ordering: lfev.ordering,
                                     created: lfev.created,
-                                    metadata: lfev
-                                        .metadata
-                                        .clone()
-                                        .unwrap_or_default(),
+                                    metadata: lfev.metadata.clone(),
                                 }
                             }),
                         ))
@@ -1249,10 +1263,7 @@ impl VersionFieldValue {
                                 value: lfev.value.clone(),
                                 ordering: lfev.ordering,
                                 created: lfev.created,
-                                metadata: lfev
-                                    .metadata
-                                    .clone()
-                                    .unwrap_or_default(),
+                                metadata: lfev.metadata.clone(),
                             })
                         })
                         .collect::<Result<_, _>>()?,

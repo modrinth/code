@@ -119,14 +119,13 @@ impl MinecraftGameVersion {
             created: loader_field_enum_value.created,
             type_: loader_field_enum_value
                 .metadata
-                .get("type")
-                .and_then(|x| x.as_str())
-                .map(|x| x.to_string())
+                .as_ref()
+                .map(|metadata| metadata.type_.clone())
                 .unwrap_or_default(),
             major: loader_field_enum_value
                 .metadata
-                .get("major")
-                .and_then(|x| x.as_bool())
+                .as_ref()
+                .map(|metadata| metadata.major)
                 .unwrap_or_default(),
         }
     }

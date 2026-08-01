@@ -1,6 +1,6 @@
 use super::loader_fields::{
-    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
-    VersionField,
+    LoaderFieldEnumValueMetadata, QueryLoaderField, QueryLoaderFieldEnumValue,
+    QueryVersionField, VersionField,
 };
 use super::{DBUser, ids::*};
 use crate::database::models::DatabaseError;
@@ -657,12 +657,13 @@ impl DBProject {
                     .await?;
 
                 let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
-                    "
-                    SELECT DISTINCT id, enum_id, value, ordering, created, metadata
+                    r#"
+                    SELECT DISTINCT id, enum_id, value, ordering, created,
+                    metadata AS "metadata?: sqlx::types::Json<LoaderFieldEnumValueMetadata>"
                     FROM loader_field_enum_values lfev
                     WHERE id = ANY($1)
                     ORDER BY enum_id, ordering, created DESC
-                    ",
+                    "#,
                     &loader_field_enum_value_ids
                         .iter()
                         .map(|x| x.0)
@@ -675,7 +676,7 @@ impl DBProject {
                         value: m.value,
                         ordering: m.ordering,
                         created: m.created,
-                        metadata: m.metadata,
+                        metadata: m.metadata.map(|metadata| metadata.0),
                     })
                     .try_collect()
                     .await?;

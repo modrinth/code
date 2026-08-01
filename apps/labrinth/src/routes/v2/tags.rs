@@ -212,15 +212,15 @@ pub async fn game_version_list(
                         version: f.value,
                         version_type: f
                             .metadata
-                            .get("type")
-                            .and_then(|m| m.as_str())
+                            .as_ref()
+                            .map(|metadata| metadata.type_.as_str())
                             .unwrap_or_default()
                             .to_string(),
                         date: f.created,
                         major: f
                             .metadata
-                            .get("major")
-                            .and_then(|m| m.as_bool())
+                            .as_ref()
+                            .map(|metadata| metadata.major)
                             .unwrap_or_default(),
                     })
                     .collect::<Vec<_>>();
