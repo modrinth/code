@@ -6,6 +6,7 @@ import {
 	GlobeIcon,
 	ImageIcon,
 	InfoIcon,
+	IssuesIcon,
 	LinkIcon,
 	ServerIcon,
 	SignatureIcon,
@@ -70,6 +71,11 @@ const navItems = computed(() => {
 			link: `/${base}/settings/server`,
 			label: formatMessage(commonProjectSettingsMessages.server),
 			icon: ServerIcon,
+		},
+		{
+			link: `/${base}/settings/disclosures`,
+			label: formatMessage(commonProjectSettingsMessages.disclosures),
+			icon: IssuesIcon,
 		},
 		{
 			link: `/${base}/settings/tags`,

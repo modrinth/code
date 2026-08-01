@@ -1094,6 +1094,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.content.title',
 		defaultMessage: 'Content',
 	},
+	disclosures: {
+		id: 'project.settings.disclosures.title',
+		defaultMessage: 'Disclosures',
+	},
 	description: {
 		id: 'project.settings.description.title',
 		defaultMessage: 'Description',

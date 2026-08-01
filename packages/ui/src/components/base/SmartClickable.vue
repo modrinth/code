@@ -49,8 +49,7 @@ defineOptions({
 	// When clickable is being hovered or focus-visible, give contents an effect
 	:first-child:hover + .smart-clickable__contents,
 	:first-child:focus-visible + .smart-clickable__contents,
-	.smart-clickable__contents:hover,
-	.smart-clickable__contents:focus-within {
+	.smart-clickable__contents:hover {
 		// Utility classes for contents
 		:deep(.smart-clickable\:underline-on-hover) {
 			text-decoration: underline;
@@ -79,7 +78,7 @@ defineOptions({
 
 	// When clickable is being clicked, give contents an effect
 	:first-child:active + .smart-clickable__contents {
-		scale: 0.97;
+		scale: 0.98;
 	}
 }
 </style>
