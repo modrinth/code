@@ -120,6 +120,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	)
 	const serverProjectIds = ref(new Set<string>())
 	const libraryGroups = ref<InstanceGroupDefinition[]>([])
+	const libraryGroupsLoaded = ref(false)
 	const isNewGroupModalOpen = ref(false)
 	const newGroupName = ref('')
 	const newGroupSearch = ref('')
@@ -220,6 +221,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			libraryGroups.value = await listInstanceGroups()
 		} catch (error) {
 			handleError(toError(error))
+		} finally {
+			libraryGroupsLoaded.value = true
 		}
 	}
 
@@ -1071,6 +1074,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	return {
 		instances,
 		libraryGroups,
+		libraryGroupsLoaded,
 		search,
 		filters,
 		displayState,

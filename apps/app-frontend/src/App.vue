@@ -1829,7 +1829,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
-						<component :is="Component"></component>
+						<KeepAlive include="LibraryPage">
+							<component :is="Component"></component>
+						</KeepAlive>
 					</Suspense>
 				</template>
 			</RouterView>

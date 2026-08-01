@@ -15,6 +15,10 @@ import type { GameInstance } from '@/helpers/types'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
+defineOptions({
+	name: 'LibraryPage',
+})
+
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { hasCreatedInstance, isReady } = injectOnboardingChecklist()

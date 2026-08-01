@@ -19,7 +19,7 @@ import {
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
@@ -30,6 +30,8 @@ import type {
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
+
+const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500
 
 const props = withDefaults(
 	defineProps<{
@@ -83,6 +85,7 @@ const isGroupToggleBlocked = computed(
 let shouldSkipGroupToggle = false
 let groupToggleEventToSkip: MouseEvent | undefined
 let instanceGridResizeObserver: ResizeObserver | undefined
+let instanceGridObserverActivationTimeout: ReturnType<typeof setTimeout> | undefined
 
 const emit = defineEmits<{
 	(e: 'toggle-selection', instanceId: string, shiftKey: boolean): void
@@ -316,20 +319,32 @@ watch(
 	{ flush: 'post' },
 )
 
-onMounted(() => {
-	const gridContent = instanceGridContent.value
-	if (!gridContent) return
-
-	instanceGridHeight.value = gridContent.getBoundingClientRect().height
-	instanceGridResizeObserver = new ResizeObserver(() => {
-		instanceGridHeight.value = gridContent.getBoundingClientRect().height
-	})
-	instanceGridResizeObserver.observe(gridContent)
-})
-
-onBeforeUnmount(() => {
+function stopInstanceGridResizeObserver() {
+	clearTimeout(instanceGridObserverActivationTimeout)
 	instanceGridResizeObserver?.disconnect()
-})
+}
+
+function startInstanceGridResizeObserver() {
+	stopInstanceGridResizeObserver()
+	instanceGridHeight.value = undefined
+	instanceGridObserverActivationTimeout = setTimeout(() => {
+		instanceGridObserverActivationTimeout = undefined
+
+		const gridContent = instanceGridContent.value
+		if (!gridContent?.isConnected) return
+
+		instanceGridHeight.value = gridContent.getBoundingClientRect().height
+		instanceGridResizeObserver = new ResizeObserver(() => {
+			if (!gridContent.isConnected) return
+			instanceGridHeight.value = gridContent.getBoundingClientRect().height
+		})
+		instanceGridResizeObserver.observe(gridContent)
+	}, INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY)
+}
+
+onActivated(startInstanceGridResizeObserver)
+onDeactivated(stopInstanceGridResizeObserver)
+onMounted(startInstanceGridResizeObserver)
 </script>
 
 <template>

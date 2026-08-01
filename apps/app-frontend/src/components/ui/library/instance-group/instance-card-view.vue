@@ -32,7 +32,9 @@ const versionRef = ref<HTMLElement | null>(null)
 			'border-surface-4': !selected,
 		}"
 	>
-		<div class="relative flex aspect-square w-full shrink-0 items-center overflow-clip rounded-2xl">
+		<div
+			class="relative flex aspect-square min-w-full shrink-0 items-center overflow-clip rounded-2xl"
+		>
 			<Avatar
 				class="pointer-events-none !rounded-2xl !border-none outline-none !p-0 !bg-transparent"
 				size="100%"
