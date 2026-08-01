@@ -946,7 +946,7 @@ impl DBProject {
             },
         )
         .await
-        .wrap_internal_err("failed to fetch cached projects")?;
+        .wrap_internal_err("fetching cached projects")?;
 
         Ok(val)
     }

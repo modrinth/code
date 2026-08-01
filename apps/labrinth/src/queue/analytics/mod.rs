@@ -4,6 +4,7 @@ use crate::models::analytics::{
 };
 use crate::routes::ApiError;
 use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
+use crate::util::error::Context;
 use dashmap::{DashMap, DashSet};
 use std::collections::HashMap;
 use tracing::trace;
@@ -142,10 +143,15 @@ impl AnalyticsQueue {
                     )
                 })
                 .collect::<Vec<_>>();
-            let mut redis_connection = redis.connect().await?;
+            let mut redis_connection =
+                redis.connect().await.wrap_internal_err(
+                    "connecting to redis for server play counts",
+                )?;
 
-            let results =
-                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
+            let results = redis_connection
+                .get_many_typed::<u32>(&redis_keys)
+                .await
+                .wrap_internal_err("fetching server play counts from redis")?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count = if let Some(count) = count {
                     if count >= MINECRAFT_SERVER_PLAYS_LIMIT {
@@ -164,7 +170,8 @@ impl AnalyticsQueue {
                         new_count,
                         Some(MINECRAFT_SERVER_PLAYS_EXPIRY as i64),
                     )
-                    .await?;
+                    .await
+                    .wrap_internal_err("writing server play count to redis")?;
             }
 
             let mut plays = client
@@ -198,10 +205,15 @@ impl AnalyticsQueue {
                     )
                 })
                 .collect::<Vec<_>>();
-            let mut redis_connection = redis.connect().await?;
+            let mut redis_connection = redis
+                .connect()
+                .await
+                .wrap_internal_err("connecting to redis for view counts")?;
 
-            let results =
-                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
+            let results = redis_connection
+                .get_many_typed::<u32>(&redis_keys)
+                .await
+                .wrap_internal_err("fetching view counts from redis")?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count =
                     if let Some((views, monetized)) = raw_views.get_mut(idx) {
@@ -226,7 +238,8 @@ impl AnalyticsQueue {
                 let key = &redis_keys[idx];
                 redis_connection
                     .set(key, new_count, Some(6 * 60 * 60))
-                    .await?;
+                    .await
+                    .wrap_internal_err("writing view count to redis")?;
             }
 
             let mut views = client.insert::<PageView>("views").await?;
@@ -267,10 +280,15 @@ impl AnalyticsQueue {
                     )
                 })
                 .collect::<Vec<_>>();
-            let mut redis_connection = redis.connect().await?;
+            let mut redis_connection = redis
+                .connect()
+                .await
+                .wrap_internal_err("connecting to redis for download counts")?;
 
-            let results =
-                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
+            let results = redis_connection
+                .get_many_typed::<u32>(&redis_keys)
+                .await
+                .wrap_internal_err("fetching download counts from redis")?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count = if let Some(count) = count {
                     if count > 5 {
@@ -286,7 +304,8 @@ impl AnalyticsQueue {
                 let key = &redis_keys[idx];
                 redis_connection
                     .set(key, new_count, Some(6 * 60 * 60))
-                    .await?;
+                    .await
+                    .wrap_internal_err("writing download count to redis")?;
             }
 
             let mut transaction = pool.begin().await?;
