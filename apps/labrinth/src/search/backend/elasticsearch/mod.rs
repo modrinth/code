@@ -4,8 +4,6 @@
 //! This keeps version filters correlated without duplicating every version
 //! into its project document.
 
-use std::collections::{HashMap, HashSet};
-
 use async_trait::async_trait;
 use eyre::{Result, eyre};
 use itertools::Itertools;
@@ -35,7 +33,6 @@ use crate::util::error::Context;
 use self::filter::{ElasticsearchFilter, serialize_filter};
 
 mod filter;
-mod typesense_parity;
 
 const DELETE_FILTER_ID_BATCH_SIZE: usize = 1024;
 const MAX_RESULT_WINDOW: usize = 10_000;
@@ -50,8 +47,6 @@ pub struct ElasticsearchConfig {
 	pub meta_namespace: String,
 	pub index_chunk_size: i64,
 	pub bulk_batch_size: usize,
-	pub project_import_batch_size: usize,
-	pub typesense_parity: bool,
 }
 
 impl ElasticsearchConfig {
@@ -64,9 +59,6 @@ impl ElasticsearchConfig {
 			meta_namespace: meta_namespace.unwrap_or_default(),
 			index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
 			bulk_batch_size: ENV.ELASTICSEARCH_BULK_BATCH_SIZE,
-			project_import_batch_size:
-				typesense_parity::project_import_batch_size(),
-			typesense_parity: ENV.ELASTICSEARCH_TYPESENSE_PARITY,
 		}
 	}
 
@@ -634,44 +626,7 @@ impl Elasticsearch {
 		Ok(body)
 	}
 
-	async fn has_matches(
-		&self,
-		alias: &str,
-		query: &Value,
-	) -> Result<bool, ApiError> {
-		let body = json!({
-			"_source": false,
-			"size": 1,
-			"terminate_after": 1,
-			"track_total_hits": false,
-			"query": query
-		});
-		let response = self.execute_search(alias, &body, false).await?;
-		Ok(response["hits"]["hits"]
-			.as_array()
-			.is_some_and(|hits| !hits.is_empty()))
-	}
-
-	async fn count_matches(
-		&self,
-		alias: &str,
-		query: &Value,
-	) -> Result<usize, ApiError> {
-		let response = self
-			.client
-			.request(Method::POST, &format!("/{alias}/_count"))
-			.json(&json!({"query": query}))
-			.send()
-			.await
-			.wrap_internal_err("failed to count Elasticsearch matches")?;
-		let body = response_json(response, "count Elasticsearch matches")
-			.await
-			.map_err(ApiError::Internal)?;
-		Ok(body["count"].as_u64().unwrap_or_default() as usize)
-	}
-
 	#[allow(clippy::too_many_arguments)]
-
 	fn search_body(
 		query: &Value,
 		sort: &[Value],
@@ -720,14 +675,6 @@ impl Elasticsearch {
 	}
 
 	fn index_schema(&self) -> Value {
-		if self.config.typesense_parity {
-			Self::typesense_parity_index_schema()
-		} else {
-			Self::native_index_schema()
-		}
-	}
-
-	fn native_index_schema() -> Value {
 		json!({
 			"mappings": {
 				"properties": {
@@ -739,12 +686,12 @@ impl Elasticsearch {
 					"project_id": {"type": "keyword"},
 					"project_types": {"type": "keyword"},
 					"all_project_types": {"type": "keyword"},
-					"slug": Self::native_text_field_schema(),
-					"author": Self::native_text_field_schema(),
-					"indexed_author": Self::native_text_field_schema(),
-					"name": Self::native_text_field_schema(),
-					"indexed_name": Self::native_text_field_schema(),
-					"summary": Self::native_text_field_schema(),
+					"slug": Self::text_field_schema(),
+					"author": Self::text_field_schema(),
+					"indexed_author": Self::text_field_schema(),
+					"name": Self::text_field_schema(),
+					"indexed_name": Self::text_field_schema(),
+					"summary": Self::text_field_schema(),
 					"categories": {"type": "keyword"},
 					"project_categories": {"type": "keyword"},
 					"display_categories": {"type": "keyword"},
@@ -785,7 +732,7 @@ impl Elasticsearch {
 		})
 	}
 
-	fn native_text_field_schema() -> Value {
+	fn text_field_schema() -> Value {
 		json!({
 			"type": "text",
 			"index_prefixes": {
@@ -806,22 +753,9 @@ impl Elasticsearch {
 		indices: &[String],
 		documents: &[UploadSearchProject],
 	) -> Result<()> {
-		if self.config.typesense_parity {
-			self.import_projects_typesense_parity(indices, documents)
-				.await
-		} else {
-			self.import_projects_native(indices, documents).await
-		}
-	}
-
-	async fn import_projects_native(
-		&self,
-		indices: &[String],
-		documents: &[UploadSearchProject],
-	) -> Result<()> {
 		let batch_size = self.config.bulk_batch_size.max(1);
 		for documents in documents.chunks(batch_size) {
-			let body = projects_to_bulk_native(documents)?;
+			let body = projects_to_bulk(documents)?;
 			for index in indices {
 				info!(
 					index,
@@ -878,7 +812,7 @@ impl Elasticsearch {
 		Ok(())
 	}
 
-	fn native_text_query(query: &str) -> Value {
+	fn text_query(query: &str) -> Value {
 		if query.is_empty() || query.trim() == "*" {
 			return json!({"match_all": {}});
 		}
@@ -886,24 +820,24 @@ impl Elasticsearch {
 		json!({
 			"dis_max": {
 				"queries": [
-					Self::native_prefix_tier(query, &["name"], 4),
-					Self::native_prefix_tier(
+					Self::prefix_tier(query, &["name"], 4),
+					Self::prefix_tier(
 						query,
 						&["indexed_name", "slug"],
 						3,
 					),
-					Self::native_prefix_tier(
+					Self::prefix_tier(
 						query,
 						&["author", "indexed_author"],
 						2,
 					),
-					Self::native_prefix_tier(query, &["summary"], 1),
+					Self::prefix_tier(query, &["summary"], 1),
 				]
 			}
 		})
 	}
 
-	fn native_prefix_tier(
+	fn prefix_tier(
 		query: &str,
 		fields: &[&str],
 		boost: u8,
@@ -923,7 +857,7 @@ impl Elasticsearch {
 		})
 	}
 
-	async fn search_for_project_raw_native(
+	async fn execute_project_search(
 		&self,
 		info: &SearchRequest,
 	) -> Result<SearchResults, ApiError> {
@@ -938,7 +872,7 @@ impl Elasticsearch {
 		}
 		let query = json!({
 			"bool": {
-				"must": [Self::native_text_query(parsed.query)],
+				"must": [Self::text_query(parsed.query)],
 				"filter": filters
 			}
 		});
@@ -980,7 +914,6 @@ impl Elasticsearch {
 				let mut document = hit["_source"].clone();
 				let object = document.as_object_mut()?;
 				object.remove("document_type");
-				object.remove("_search_tokens");
 				if filter
 					.as_ref()
 					.is_some_and(|filter| filter.has_version_filter)
@@ -1022,11 +955,7 @@ impl SearchBackend for Elasticsearch {
 		&self,
 		info: &SearchRequest,
 	) -> Result<SearchResults, ApiError> {
-		if self.config.typesense_parity {
-			self.search_for_project_raw_typesense_parity(info).await
-		} else {
-			self.search_for_project_raw_native(info).await
-		}
+		self.execute_project_search(info).await
 	}
 
 	async fn rebuild_index(
@@ -1229,9 +1158,7 @@ fn matching_version_id(hit: &Value) -> Option<String> {
 		.map(|(_, version_id)| version_id)
 }
 
-fn projects_to_bulk_native(
-	documents: &[UploadSearchProject],
-) -> Result<String> {
+fn projects_to_bulk(documents: &[UploadSearchProject]) -> Result<String> {
 	let mut output = String::new();
 	for document in documents {
 		let id = format!("project:{}", document.project_id);

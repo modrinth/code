@@ -242,7 +242,6 @@ vars! {
     ELASTICSEARCH_USERNAME: String = "";
     ELASTICSEARCH_PASSWORD: String = "";
     ELASTICSEARCH_BULK_BATCH_SIZE: usize = 1000usize;
-	ELASTICSEARCH_TYPESENSE_PARITY: bool = true;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;
