@@ -42,6 +42,7 @@ const aiDisclosureTypes = ref({
 	code: false,
 	assets: false,
 	text: false,
+	functionality: false,
 })
 const aiDisclosureMessages = defineMessages({
 	title: {
@@ -51,7 +52,7 @@ const aiDisclosureMessages = defineMessages({
 	description: {
 		id: 'project.settings.disclosures.ai.description',
 		defaultMessage: `You must enable this if this project contains a substantial amount of AI-generated code, any
-				assets that are substantially AI-generated, the project's design relies on the use of
+				assets that are substantially AI-generated, the project's functionality relies on the use of
 				generative AI, or if any element of your project's page such as description or publishing
 				relies on generative AI.`,
 	},
@@ -75,6 +76,10 @@ const aiDisclosureMessages = defineMessages({
 	typeText: {
 		id: 'project.settings.disclosures.ai.types-text',
 		defaultMessage: 'Text',
+	},
+	typeFunctionality: {
+		id: 'project.settings.disclosures.ai.types-functionality',
+		defaultMessage: 'Functionality',
 	},
 	noteDescription: {
 		id: 'project.settings.disclosures.ai.note-description',
@@ -165,18 +170,6 @@ const telemetryDisclosureMessages = defineMessages({
 		id: 'project.settings.disclosures.telemetry.consent-description',
 		defaultMessage: 'What is the consent model of your telemetry?',
 	},
-	consentOptIn: {
-		id: 'project.settings.disclosures.telemetry.consent-opt-in',
-		defaultMessage: 'Opt-in',
-	},
-	consentOptOut: {
-		id: 'project.settings.disclosures.telemetry.consent-opt-out',
-		defaultMessage: 'Opt-out',
-	},
-	consentAlwaysActive: {
-		id: 'project.settings.disclosures.telemetry.consent-always-active',
-		defaultMessage: 'Always active',
-	},
 	dataLabel: {
 		id: 'project.settings.disclosures.telemetry.data-label',
 		defaultMessage: 'What data is being collected?',
@@ -252,6 +245,9 @@ const telemetryDisclosureMessages = defineMessages({
 							</Checkbox>
 							<Checkbox v-model="aiDisclosureTypes.text">
 								{{ formatMessage(aiDisclosureMessages.typeText) }}
+							</Checkbox>
+							<Checkbox v-model="aiDisclosureTypes.functionality">
+								{{ formatMessage(aiDisclosureMessages.typeFunctionality) }}
 							</Checkbox>
 						</div>
 					</div>

@@ -46,7 +46,7 @@ const toggleId = computed(() => `toggle-card-toggle-${baseId}`)
 .toggle-card-content-leave-active {
 	display: grid;
 	grid-template-rows: 1fr;
-	transition: grid-template-rows 0.25s ease-in-out;
+	transition: grid-template-rows 0.25s var(--ease-out-expo);
 
 	& > div {
 		grid-row: 1 / span 2;
