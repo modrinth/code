@@ -2,10 +2,19 @@
 import { SmartClickable, Toggle } from '@modrinth/ui'
 import { computed, useId } from 'vue'
 
+const props = defineProps<{
+	disabled?: boolean
+}>()
+
 const value = defineModel<boolean>({ required: true })
 
 const baseId = useId()
 const toggleId = computed(() => `toggle-card-toggle-${baseId}`)
+
+function toggle() {
+	if (props.disabled) return
+	value.value = !value.value
+}
 </script>
 
 <template>
@@ -16,8 +25,10 @@ const toggleId = computed(() => `toggle-card-toggle-${baseId}`)
 			<button
 				aria-hidden="true"
 				tabindex="-1"
-				class="flex h-full w-full cursor-pointer"
-				@click="value = !value"
+				:disabled="disabled"
+				class="flex h-full w-full"
+				:class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
+				@click="toggle"
 			/>
 		</template>
 		<div class="grid w-full grid-cols-[1fr_auto] items-center gap-6 p-4">
@@ -25,8 +36,13 @@ const toggleId = computed(() => `toggle-card-toggle-${baseId}`)
 				<slot :toggle-id="toggleId" />
 			</div>
 			<div>
-				<slot name="toggle">
-					<Toggle :id="toggleId" v-model="value" class="smart-clickable:allow-pointer-events" />
+				<slot name="toggle" :disabled="disabled">
+					<Toggle
+						:id="toggleId"
+						v-model="value"
+						:disabled="disabled"
+						class="smart-clickable:allow-pointer-events"
+					/>
 				</slot>
 			</div>
 		</div>

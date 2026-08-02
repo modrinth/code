@@ -222,4 +222,52 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 			method: 'DELETE',
 		})
 	}
+
+	/**
+	 * Get content disclosures for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @returns Promise resolving to the project's disclosures
+	 *
+	 * @example
+	 * ```typescript
+	 * const { disclosures } = await client.labrinth.projects_v3.getDisclosures('sodium')
+	 * ```
+	 */
+	public async getDisclosures(id: string): Promise<Labrinth.Projects.v3.GetProjectDisclosures> {
+		return this.client.request<Labrinth.Projects.v3.GetProjectDisclosures>(
+			`/project/${id}/disclosures`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Modify content disclosures for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param data - Disclosures to set and types to remove
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v3.modifyDisclosures('sodium', {
+	 *   set: [{ type: 'ai_content', uses: ['text'], note: 'Translations are AI-generated.' }],
+	 *   remove: ['advertisements'],
+	 * })
+	 * ```
+	 */
+	public async modifyDisclosures(
+		id: string,
+		data: Labrinth.Projects.v3.ModifyProjectDisclosures,
+	): Promise<void> {
+		return this.client.request(`/project/${id}/disclosures`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PATCH',
+			body: data,
+		})
+	}
 }

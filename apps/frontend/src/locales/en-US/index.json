@@ -3761,9 +3761,6 @@
   "project.settings.back-to-project-page": {
     "message": "Back to project page"
   },
-  "project.settings.disclosures.add-another": {
-    "message": "Add another"
-  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "You must enable this if your project contains advertisements, sponsorships, or promotions of other works."
   },
@@ -3774,7 +3771,7 @@
     "message": "Please explain how your project utilizes advertising so that users can know what to expect."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
-    "message": "e.g. \"Adds the Modrinth SMP server to your server list automatically.\""
+    "message": "e.g. Adds the Modrinth SMP server to your server list automatically."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Contains advertisements"
@@ -3812,6 +3809,27 @@
   "project.settings.disclosures.content-disclosures": {
     "message": "Content disclosures"
   },
+  "project.settings.disclosures.derivative.description": {
+    "message": "You must enable this if your project is derivative of another project, such as being a fork or containing a substantial amount of someone else’s work."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Link to original work"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Name of original work"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Example project"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Please explain how your project is based on the original work"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Contains derivative content"
+  },
   "project.settings.disclosures.description": {
     "message": "You must add any applicable content disclosures to your project in compliance with Modrinth's <rules>Content Rules</rules>."
   },
@@ -3819,7 +3837,7 @@
     "message": "You must enable this if your project contains features that can be obtained by spending real-world money."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
-    "message": "e.g. “Cosmetics available as Patreon reward.”"
+    "message": "e.g. Cosmetics available as Patreon reward"
   },
   "project.settings.disclosures.paid-features.features-description": {
     "message": "What kinds of paid features does it add?"
@@ -3827,11 +3845,53 @@
   "project.settings.disclosures.paid-features.title": {
     "message": "Contains paid features"
   },
-  "project.settings.disclosures.telemetry.add-data-type": {
-    "message": "Add type of data"
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Enable this if your project contains anything that you think may be dangerous to certain people who are sensitive to flashing lights or patterns."
   },
-  "project.settings.disclosures.telemetry.add-privacy-policy": {
-    "message": "Add privacy policy"
+  "project.settings.disclosures.photosensitivity.note-label": {
+    "message": "Please briefly describe why your project has a photosensitivity warning."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "e.g. It adds a flashlight item that has a strobe mode. It can be disabled in Accessibility settings in-game."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Photosensitivity warning"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "Advertising disclosure requires explanation."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "Derivative works disclosure must list at least one source work."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "Derivative work sources must have a name."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "You don't have permission to edit this project's disclosures."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "Paid features disclosure must list at least one paid feature."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "Photosensitivity warning disclosure must include a description."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "External system interactions disclosure must include a description."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "Telemetry disclosure must list at least one type of data collected."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "You must enable this if your project reads or edits things on the user's system outside of the game."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Please describe the external system interactions in the mod so users can know what to expect."
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "e.g. It adds a file to the desktop called wake_up.txt"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "External system interactions"
   },
   "project.settings.disclosures.telemetry.consent-always-active": {
     "message": "Always active"
@@ -3852,7 +3912,7 @@
     "message": "What data is being collected?"
   },
   "project.settings.disclosures.telemetry.data-placeholder": {
-    "message": "e.g. “Anonymous launch analytics to track Minecraft version and mod loader usage.”"
+    "message": "e.g. Anonymous launch analytics to track Minecraft version and mod loader usage."
   },
   "project.settings.disclosures.telemetry.description": {
     "message": "You must enable this if your project sends usage data back to yourself or a third party."

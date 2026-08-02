@@ -82,6 +82,7 @@ import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleDashedIcon from './icons/circle-dashed.svg?component'
 import _CircleDollarSignIcon from './icons/circle-dollar-sign.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
+import _CircuitBoardIcon from './icons/circuit-board.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
@@ -519,6 +520,7 @@ export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleDashedIcon = _CircleDashedIcon
 export const CircleDollarSignIcon = _CircleDollarSignIcon
 export const CircleUserIcon = _CircleUserIcon
+export const CircuitBoardIcon = _CircuitBoardIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon

@@ -16,46 +16,85 @@
 		<div
 			class="flex flex-col gap-3 [&>div>svg]:shrink-0 [&>div>svg]:mt-[1px] [&>div]:flex [&>div]:gap-2 [&>div]:items-start"
 		>
-			<div>
-				<SparklesIcon aria-hidden="true" />
+			<div v-if="photosensitivityDisclosure" class="text-orange">
+				<EyeIcon aria-hidden="true" />
 				<div class="flex flex-col gap-1">
 					<span>
-						{{ capitalizeString(formatMessage(messages.aiGeneratedContent, { type: 'code' })) }}
+						{{ capitalizeString(formatMessage(messages.photosensitivityTitle)) }}
 					</span>
-					<span class="text-sm text-secondary">
-						The Chinese and Arabic translations are AI-generated
+					<span v-if="photosensitivityDisclosure.note" class="text-sm text-secondary">
+						{{ photosensitivityDisclosure.note }}
 					</span>
 				</div>
 			</div>
-			<div>
+			<div v-if="aiDisclosure">
+				<SparklesIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{
+							capitalizeString(formatMessage(messages.aiGeneratedContent, { type: aiContentType }))
+						}}
+					</span>
+					<span v-if="aiDisclosure.note" class="text-sm text-secondary">
+						{{ aiDisclosure.note }}
+					</span>
+				</div>
+			</div>
+			<div v-if="advertisingDisclosure">
 				<MegaphoneIcon aria-hidden="true" />
 				<div class="flex flex-col gap-1">
 					<span>
 						{{ capitalizeString(formatMessage(messages.advertisingTitle)) }}
 					</span>
-					<span class="text-sm text-secondary"> Title screen has Essential promotion </span>
+					<span v-if="advertisingDisclosure.note" class="text-sm text-secondary">
+						{{ advertisingDisclosure.note }}
+					</span>
 				</div>
 			</div>
-			<div>
+			<div v-if="paidFeaturesDisclosure">
 				<CircleDollarSignIcon aria-hidden="true" />
 				<div class="flex flex-col gap-1">
 					<span>
 						{{ capitalizeString(formatMessage(messages.paidFeatures)) }}
 					</span>
-					<span class="text-sm text-secondary"> Cosmetics available as Patreon reward </span>
+					<span
+						v-for="(feature, index) in paidFeaturesDisclosure.features"
+						:key="`${feature}-${index}`"
+						class="text-sm text-secondary"
+					>
+						{{ feature }}
+					</span>
 				</div>
 			</div>
-			<div>
+			<div v-if="telemetryDisclosure">
 				<RadioTowerIcon aria-hidden="true" />
 				<div class="flex flex-col gap-1">
 					<span>
-						{{ capitalizeString(formatMessage(messages.telemetryTitle, { consent: 'opt_out' })) }}
+						{{
+							capitalizeString(
+								formatMessage(messages.telemetryTitle, {
+									consent: telemetryDisclosure.consent,
+								}),
+							)
+						}}
 					</span>
-					<span class="text-sm text-secondary">
-						Update checker provides anonymous launch analytics to Modrinth
+					<span
+						v-for="(entry, index) in telemetryDisclosure.data_collected"
+						:key="`${entry}-${index}`"
+						class="text-sm text-secondary"
+					>
+						{{ entry }}
 					</span>
-					<span class="text-sm text-blue flex items-center gap-1">
-						View privacy policy <ExternalIcon />
+				</div>
+			</div>
+			<div v-if="systemInteractionsDisclosure">
+				<CircuitBoardIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.systemInteractionsTitle)) }}
+					</span>
+					<span v-if="systemInteractionsDisclosure.note" class="text-sm text-secondary">
+						{{ systemInteractionsDisclosure.note }}
 					</span>
 				</div>
 			</div>
@@ -86,17 +125,29 @@
 					</IntlFormatted>
 				</div>
 			</div>
-			<div>
+			<div v-if="derivativeWorkDisclosure">
 				<GitForkIcon aria-hidden="true" />
 				<div class="flex flex-col gap-2">
 					<span>
 						{{ capitalizeString(formatMessage(messages.derivativeWork)) }}
 					</span>
-					<div class="flex flex-col gap-1">
-						<span class="text-blue text-sm flex items-center gap-1">
-							Modification Menu <ExternalIcon />
-						</span>
-						<span class="text-sm text-secondary"> Forked to add Fun Mode </span>
+					<div
+						v-for="(source, index) in derivativeWorkDisclosure.sources"
+						:key="`${source.label}-${index}`"
+						class="flex flex-col gap-1"
+					>
+						<a
+							v-if="source.link"
+							:href="source.link"
+							:target="linkTarget"
+							rel="noopener nofollow ugc"
+							class="text-blue text-sm flex items-center gap-1 hover:underline"
+						>
+							{{ source.label }}
+							<ExternalIcon />
+						</a>
+						<span v-else class="text-sm">{{ source.label }}</span>
+						<span v-if="source.note" class="text-sm text-secondary">{{ source.note }}</span>
 					</div>
 				</div>
 			</div>
@@ -157,7 +208,9 @@ import {
 	BookTextIcon,
 	CalendarIcon,
 	CircleDollarSignIcon,
+	CircuitBoardIcon,
 	ExternalIcon,
+	EyeIcon,
 	GitForkIcon,
 	HeartIcon,
 	MegaphoneIcon,
@@ -178,6 +231,7 @@ import { Avatar, IntlFormatted } from '../base'
 import { NewModal } from '../modal'
 
 const LICENSE_STALE_TIME = 1000 * 60 * 10
+const DISCLOSURE_STALE_TIME = 1000 * 60 * 5
 
 const { formatMessage } = useVIntl()
 const { labrinth } = injectModrinthClient()
@@ -225,7 +279,7 @@ const messages = defineMessages({
 	aiGeneratedContent: {
 		id: 'project.disclosure.ai-generated-content.title',
 		defaultMessage:
-			'Contains AI-generated {type, select, code {code} assets {assets} code_assets {code and assets} text {text} other {content}}',
+			'Contains AI-generated {type, select, code {code} assets {assets} code_assets {code and assets} text {text} functionality {functionality} other {content}}',
 	},
 	derivativeWork: {
 		id: 'project.disclosure.derivative-work.title',
@@ -234,8 +288,54 @@ const messages = defineMessages({
 	telemetryTitle: {
 		id: 'project.disclosure.telemetry.title',
 		defaultMessage:
-			'Contains {consent, select, opt_in {opt-in telemetry} opt_out {opt-out telemetry} other {telemetry}}',
+			'Contains {consent, select, opt_in {opt-in telemetry} opt_out {opt-out telemetry} always_active {always-active telemetry} other {telemetry}}',
 	},
+	photosensitivityTitle: {
+		id: 'project.disclosure.photosensitivity.title',
+		defaultMessage: 'Photosensitivity warning',
+	},
+	systemInteractionsTitle: {
+		id: 'project.disclosure.system-interactions.title',
+		defaultMessage: 'Contains external system interactions',
+	},
+})
+
+const { data: disclosuresResponse } = useQuery({
+	queryKey: computed(() => ['project', 'disclosures', 'v3', props.project.id] as const),
+	queryFn: () => labrinth.projects_v3.getDisclosures(props.project.id),
+	staleTime: DISCLOSURE_STALE_TIME,
+})
+
+const disclosures = computed(() => disclosuresResponse.value?.disclosures ?? [])
+
+function findDisclosure<T extends Labrinth.Projects.v3.ProjectDisclosureType>(type: T) {
+	return disclosures.value.find(
+		(d): d is Labrinth.Projects.v3.ProjectDisclosureOf<T> => d.type === type,
+	)
+}
+
+const aiDisclosure = computed(() => findDisclosure('ai_content'))
+const advertisingDisclosure = computed(() => findDisclosure('advertisements'))
+const paidFeaturesDisclosure = computed(() => findDisclosure('paid_features'))
+const telemetryDisclosure = computed(() => findDisclosure('telemetry'))
+const derivativeWorkDisclosure = computed(() => findDisclosure('derivative_work'))
+const photosensitivityDisclosure = computed(() => findDisclosure('epilepsy_triggers'))
+const systemInteractionsDisclosure = computed(() => findDisclosure('system_interactions'))
+
+const aiContentType = computed(() => {
+	const disclosure = aiDisclosure.value
+	if (!disclosure) {
+		return 'other'
+	}
+
+	const uses = new Set(disclosure.uses)
+	if (uses.size === 2 && uses.has('code') && uses.has('assets')) {
+		return 'code_assets'
+	}
+	if (uses.size === 1) {
+		return uses.values().next().value
+	}
+	return 'other'
 })
 
 const createdDate = computed(() =>

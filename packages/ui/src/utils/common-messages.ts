@@ -35,6 +35,10 @@ export const commonMessages = defineMessages({
 		id: 'project-type.all',
 		defaultMessage: 'All',
 	},
+	addAnotherButton: {
+		id: 'button.add-another',
+		defaultMessage: 'Add another',
+	},
 	addServerToInstanceButton: {
 		id: 'button.add-server-to-instance',
 		defaultMessage: 'Add server to instance',

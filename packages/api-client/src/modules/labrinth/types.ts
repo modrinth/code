@@ -1300,6 +1300,70 @@ export namespace Labrinth {
 				projects: Project[]
 				versions: Labrinth.Versions.v3.Version[]
 			}
+
+			export type TelemetryConsent = 'opt_in' | 'opt_out' | 'always_active'
+
+			export type AiUsage = 'code' | 'assets' | 'text' | 'functionality'
+
+			export type DerivativeSource = {
+				label: string
+				link?: string | null
+				note?: string | null
+			}
+
+			export type ProjectDisclosure =
+				| {
+						type: 'ai_content'
+						uses: AiUsage[]
+						note?: string | null
+				  }
+				| {
+						type: 'advertisements'
+						note?: string | null
+				  }
+				| {
+						type: 'epilepsy_triggers'
+						note?: string | null
+				  }
+				| {
+						type: 'system_interactions'
+						note?: string | null
+				  }
+				| {
+						type: 'telemetry'
+						consent: TelemetryConsent
+						data_collected: string[]
+				  }
+				| {
+						type: 'derivative_work'
+						sources: DerivativeSource[]
+				  }
+				| {
+						type: 'paid_features'
+						features: string[]
+				  }
+
+			export type ProjectDisclosureData = ProjectDisclosure & {
+				set_by_moderator: boolean
+				updated_at: string
+				updated_by?: string | null
+			}
+
+			export type ProjectDisclosureType = ProjectDisclosure['type']
+
+			export type ProjectDisclosureOf<T extends ProjectDisclosureType> = Extract<
+				ProjectDisclosureData,
+				{ type: T }
+			>
+
+			export type GetProjectDisclosures = {
+				disclosures: ProjectDisclosureData[]
+			}
+
+			export type ModifyProjectDisclosures = {
+				set: ProjectDisclosure[]
+				remove: ProjectDisclosureType[]
+			}
 		}
 	}
 
