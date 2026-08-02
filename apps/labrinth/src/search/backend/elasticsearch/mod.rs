@@ -692,6 +692,12 @@ impl Elasticsearch {
 					"name": Self::text_field_schema(),
 					"indexed_name": Self::text_field_schema(),
 					"summary": Self::text_field_schema(),
+					"downloads": {"type": "integer"},
+					"log_downloads": {"type": "double"},
+					"follows": {"type": "integer"},
+					"created_timestamp": {"type": "long"},
+					"modified_timestamp": {"type": "long"},
+					"version_published_timestamp": {"type": "long"},
 					"categories": {"type": "keyword"},
 					"project_categories": {"type": "keyword"},
 					"display_categories": {"type": "keyword"},
@@ -717,6 +723,19 @@ impl Elasticsearch {
 					},
 					"minecraft_java_server": {
 						"properties": {
+							"verified_plays_2w": {"type": "long"},
+							"is_online": {"type": "boolean"},
+							"ping": {
+								"properties": {
+									"data": {
+										"properties": {
+											"players_online": {
+												"type": "integer"
+											}
+										}
+									}
+								}
+							},
 							"content": {
 								"properties": {
 									"kind": {"type": "keyword"},
