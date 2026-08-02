@@ -140,12 +140,15 @@ const latestLocalTrace = computed(() => trace.value?.local_traces.at(-1))
 
 function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
 	switch (severity) {
+		case 'malware':
 		case 'severe':
 			return 'border-red/60 bg-highlight-red text-red'
 		case 'high':
 			return 'border-orange/60 bg-highlight-orange text-orange'
 		case 'medium':
 			return 'border-green/60 bg-highlight-green text-green'
+		case 'hidden':
+			return 'border-divider bg-surface-2 text-secondary'
 		case 'low':
 		default:
 			return 'border-blue/60 bg-highlight-blue text-blue'

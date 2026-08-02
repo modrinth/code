@@ -2292,8 +2292,7 @@ export namespace Labrinth {
 				jar: string | null
 				file_path: string
 				original_severity: DelphiSeverity
-				severity: DelphiSeverity | null
-				hidden: boolean
+				severity: DelphiSeverity
 			}
 
 			export type WriteDelphiRule = {
@@ -2308,8 +2307,7 @@ export namespace Labrinth {
 			}
 
 			export type DelphiRuleEffect = {
-				severity: DelphiSeverity | null
-				hidden: boolean
+				severity: DelphiSeverity
 			}
 
 			export type DelphiRuleSchema = Record<string, unknown>
@@ -2607,7 +2605,7 @@ export namespace Labrinth {
 
 			export type FlagReason = 'delphi'
 
-			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
+			export type DelphiSeverity = 'hidden' | 'low' | 'medium' | 'high' | 'severe' | 'malware'
 
 			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
 

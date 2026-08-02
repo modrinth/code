@@ -55,7 +55,7 @@ impl DBDelphiReport {
     }
 }
 
-/// A severity level reported by Delphi.
+/// A severity level for a Delphi report or transformed issue detail.
 #[derive(
     Deserialize,
     Serialize,
@@ -76,6 +76,8 @@ impl DBDelphiReport {
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "delphi_severity", rename_all = "snake_case")]
 pub enum DelphiSeverity {
+    #[serde(alias = "HIDDEN")]
+    Hidden,
     #[serde(alias = "LOW")]
     Low,
     #[serde(alias = "MEDIUM")]
@@ -84,6 +86,8 @@ pub enum DelphiSeverity {
     High,
     #[serde(alias = "SEVERE")]
     Severe,
+    #[serde(alias = "MALWARE")]
+    Malware,
 }
 
 /// An issue found in a Delphi report. Every issue belongs to a report,

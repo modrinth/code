@@ -1,3 +1,6 @@
+ALTER TYPE delphi_severity ADD VALUE IF NOT EXISTS 'hidden' BEFORE 'low';
+ALTER TYPE delphi_severity ADD VALUE IF NOT EXISTS 'malware' AFTER 'severe';
+
 CREATE TABLE delphi_rules (
 	id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -27,8 +30,7 @@ CREATE TABLE delphi_rule_effects (
 		ON UPDATE CASCADE,
 	rule_id BIGINT NOT NULL REFERENCES delphi_rules(id)
 		ON UPDATE CASCADE,
-	severity delphi_severity,
-	hidden BOOLEAN NOT NULL DEFAULT FALSE,
+	severity delphi_severity NOT NULL,
 	PRIMARY KEY (revision, detail_id)
 );
 
@@ -47,7 +49,6 @@ SELECT
 	drid.data,
 	drid.severity AS original_severity,
 	COALESCE(dre.severity, drid.severity) AS severity,
-	COALESCE(dre.hidden, FALSE) AS hidden,
 	m.id AS project_id,
 	didv.verdict AS local_status,
 	dgdv.verdict AS global_status,
@@ -89,7 +90,7 @@ WHERE
 	OR (
 		dri.issue_type != '__dummy'
 		AND didws.status IN ('pending', 'unsafe')
-		AND NOT didws.hidden
+		AND didws.severity::text != 'hidden'
 	);
 
 DELETE FROM delphi_report_issue_details detail

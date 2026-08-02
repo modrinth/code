@@ -225,7 +225,10 @@ async function updateGlobalIssueDetail(
 	])
 }
 
-const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
+const severityOrder = { malware: 4, severe: 3, high: 2, medium: 1, low: 0, hidden: -1 } as Record<
+	string,
+	number
+>
 
 type DetailDecision = 'safe' | 'malware' | 'pending'
 type DetailDecisionScope = 'local' | 'global'
@@ -489,12 +492,15 @@ function handleTabClick(index: number) {
 
 function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
 	switch (severity) {
+		case 'malware':
 		case 'severe':
 			return 'border-red/60 border bg-highlight-red text-red'
 		case 'high':
 			return 'border-orange/60 border bg-highlight-orange text-orange'
 		case 'medium':
 			return 'border-green/60 border bg-highlight-green text-green'
+		case 'hidden':
+			return 'border-divider border bg-surface-2 text-secondary'
 		case 'low':
 		default:
 			return 'border-blue/60 border bg-highlight-blue text-blue'
@@ -513,12 +519,15 @@ function truncateMiddle(str: string, maxLength: number = 120): string {
 
 const severityColor = computed(() => {
 	switch (highestSeverity.value) {
+		case 'malware':
 		case 'severe':
 			return 'text-red bg-highlight-red border-solid border-[1px] border-red'
 		case 'high':
 			return 'text-orange bg-highlight-orange border-solid border-[1px] border-orange'
 		case 'medium':
 			return 'text-green bg-highlight-green border-solid border-[1px] border-green'
+		case 'hidden':
+			return 'text-secondary bg-surface-2 border-solid border-[1px] border-divider'
 		case 'low':
 		default:
 			return 'text-blue bg-highlight-blue border-solid border-[1px] border-blue'

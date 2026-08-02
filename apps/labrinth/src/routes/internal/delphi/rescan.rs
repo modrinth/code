@@ -105,7 +105,7 @@ async fn fetch_unreviewed_tech_review_project_ids(
                 WHERE
                     didws.project_id = m.id
                     AND didws.status = 'pending'
-                    AND NOT didws.hidden
+                    AND didws.severity != 'hidden'
             )
             AND NOT EXISTS(
                 SELECT 1
@@ -113,7 +113,7 @@ async fn fetch_unreviewed_tech_review_project_ids(
                 WHERE
                     didws.project_id = m.id
                     AND didws.status IN ('safe', 'unsafe')
-                    AND NOT didws.hidden
+                    AND didws.severity != 'hidden'
             )
         "#,
     )

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            didws.id AS \"id!: DelphiReportIssueDetailsId\",\n            didws.issue_id AS \"issue_id!: DelphiReportIssueId\",\n            didws.key AS \"key!: String\",\n            didws.jar AS \"jar?: String\",\n            didws.file_path AS \"file_path!: String\",\n            didws.data AS \"data!: sqlx::types::Json<HashMap<String, serde_json::Value>>\",\n            didws.severity AS \"severity!: DelphiSeverity\",\n            didws.local_status AS \"local_status?: DelphiStatus\",\n            didws.global_status AS \"global_status?: DelphiStatus\",\n            didws.status AS \"status!: DelphiStatus\"\n        FROM delphi_issue_details_with_statuses didws\n        WHERE\n            didws.issue_id = ANY($1::bigint[])\n            AND NOT didws.hidden\n        ORDER BY didws.issue_id, didws.id\n        ",
+  "query": "\n        SELECT\n            didws.id AS \"id!: DelphiReportIssueDetailsId\",\n            didws.issue_id AS \"issue_id!: DelphiReportIssueId\",\n            didws.key AS \"key!: String\",\n            didws.jar AS \"jar?: String\",\n            didws.file_path AS \"file_path!: String\",\n            didws.data AS \"data!: sqlx::types::Json<HashMap<String, serde_json::Value>>\",\n            didws.severity AS \"severity!: DelphiSeverity\",\n            didws.local_status AS \"local_status?: DelphiStatus\",\n            didws.global_status AS \"global_status?: DelphiStatus\",\n            didws.status AS \"status!: DelphiStatus\"\n        FROM delphi_issue_details_with_statuses didws\n        WHERE\n            didws.issue_id = ANY($1::bigint[])\n            AND didws.severity != 'hidden'\n        ORDER BY didws.issue_id, didws.id\n        ",
   "describe": {
     "columns": [
       {
@@ -41,10 +41,12 @@
             "name": "delphi_severity",
             "kind": {
               "Enum": [
+                "hidden",
                 "low",
                 "medium",
                 "high",
-                "severe"
+                "severe",
+                "malware"
               ]
             }
           }
@@ -117,5 +119,5 @@
       true
     ]
   },
-  "hash": "63c94bea3d26a55b5eab89f2f6fac0eef45ebaa301f2ae14de4d5f3dcbd65cbb"
+  "hash": "15d8434ef325e21959ef8ab0541f78f647125717e2d157e0769e80aeae2cdc90"
 }

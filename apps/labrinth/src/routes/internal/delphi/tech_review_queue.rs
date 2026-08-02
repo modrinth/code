@@ -145,7 +145,7 @@ pub async fn add_projects_with_review_details(
         WHERE
             detail.project_id = ANY($1::bigint[])
             AND detail.status IN ('pending', 'unsafe')
-            AND NOT detail.hidden
+            AND detail.severity != 'hidden'
         "#,
         &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
     )

@@ -253,7 +253,7 @@ pub async fn get_issue(
                     FROM delphi_issue_details_with_statuses didws
                     WHERE
                         didws.issue_id = dri.id
-                        AND NOT didws.hidden
+                        AND didws.severity != 'hidden'
                 )
             ) AS "data!: sqlx::types::Json<FileIssue>"
         FROM delphi_report_issues dri
@@ -315,7 +315,7 @@ pub async fn get_report(
                         ON didws.issue_id = severity_issue.id
                     WHERE
                         severity_issue.report_id = dr.id
-                        AND NOT didws.hidden
+                        AND didws.severity != 'hidden'
                 ), 'low'::delphi_severity),
                 -- TODO: replace with `json_array` in Postgres 16
 				'issues', (
@@ -341,7 +341,7 @@ pub async fn get_report(
                                 FROM delphi_issue_details_with_statuses didws
                                 WHERE
                                     didws.issue_id = dri.id
-                                    AND NOT didws.hidden
+                                    AND didws.severity != 'hidden'
                             )
 						)
 					), '[]'::json)
@@ -353,7 +353,7 @@ pub async fn get_report(
                             FROM delphi_issue_details_with_statuses visible_detail
                             WHERE
                                 visible_detail.issue_id = dri.id
-                                AND NOT visible_detail.hidden
+                                AND visible_detail.severity != 'hidden'
                         )
                 )
             ) AS "data!: sqlx::types::Json<FileReport>"
@@ -551,7 +551,7 @@ async fn fetch_project_reports(
         FROM delphi_issue_details_with_statuses didws
         WHERE
             didws.issue_id = ANY($1::bigint[])
-            AND NOT didws.hidden
+            AND didws.severity != 'hidden'
         ORDER BY didws.issue_id, didws.id
         "#,
         &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
@@ -768,7 +768,7 @@ pub async fn search_projects(
         LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id
         LEFT JOIN delphi_issue_details_with_statuses didws
             ON didws.issue_id = dri.id
-            AND NOT didws.hidden
+            AND didws.severity != 'hidden'
         LEFT JOIN threads_messages tm_last
             ON tm_last.thread_id = t.id
             AND tm_last.id = (
@@ -828,7 +828,7 @@ pub async fn search_projects(
                     WHERE
                         issue_version.mod_id = m.id
                         AND issue.issue_type = ANY($7::text[])
-                        AND NOT detail.hidden
+                        AND detail.severity != 'hidden'
                 )
             )
             AND (
@@ -1086,7 +1086,7 @@ pub async fn submit_report(
         WHERE
             m.id = $1
             AND didws.status = 'pending'
-            AND NOT didws.hidden
+            AND didws.severity != 'hidden'
         "#,
         project_id as _,
     )

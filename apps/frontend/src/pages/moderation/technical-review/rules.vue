@@ -47,7 +47,7 @@
 			</div>
 			<p class="m-0 text-sm text-secondary">
 				Return <code>null</code> when the rule does not match, or a map containing
-				<code>severity</code> and/or <code>hidden</code> when it does.
+				<code>severity</code> when it does.
 			</p>
 
 			<details class="rounded-xl border border-divider bg-bg-raised p-3">
@@ -136,7 +136,10 @@
 						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
 							New state
 						</p>
-						<div v-if="example.effect?.hidden" class="flex items-center gap-2 text-secondary">
+						<div
+							v-if="example.effectiveSeverity === 'hidden'"
+							class="flex items-center gap-2 text-secondary"
+						>
 							<EyeOffIcon class="size-5" />
 							<strong class="text-contrast">Hidden from reports</strong>
 						</div>
@@ -327,11 +330,11 @@
 								</div>
 								<div class="flex min-w-0 flex-wrap items-center gap-2">
 									<span
-										v-if="!detail.hidden"
+										v-if="detail.severity !== 'hidden'"
 										class="rounded-full border px-2 py-0.5 text-xs font-semibold capitalize"
-										:class="getSeverityBadgeColor(detail.severity ?? detail.original_severity)"
+										:class="getSeverityBadgeColor(detail.severity)"
 									>
-										{{ detail.severity ?? detail.original_severity }}
+										{{ detail.severity }}
 									</span>
 									<span v-else class="flex items-center gap-1 text-xs font-semibold text-secondary">
 										<EyeOffIcon class="size-4" />
@@ -426,7 +429,7 @@ import type { Component } from 'vue'
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 const DEFAULT_RULE = `input.trace.issue_type == "OBFUSCATED_NAMES"
-	? {"severity": "low", "hidden": false}
+	? {"severity": "low"}
 	: null`
 const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
 	useWorker: false,
@@ -575,12 +578,15 @@ const previewExamples = computed(() =>
 
 function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
 	switch (severity) {
+		case 'malware':
 		case 'severe':
 			return 'border-red/60 bg-highlight-red text-red'
 		case 'high':
 			return 'border-orange/60 bg-highlight-orange text-orange'
 		case 'medium':
 			return 'border-green/60 bg-highlight-green text-green'
+		case 'hidden':
+			return 'border-divider bg-surface-2 text-secondary'
 		case 'low':
 		default:
 			return 'border-blue/60 bg-highlight-blue text-blue'

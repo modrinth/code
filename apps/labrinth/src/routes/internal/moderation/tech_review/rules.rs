@@ -64,8 +64,7 @@ pub struct DelphiRuleAffectedDetail {
     pub jar: Option<String>,
     pub file_path: String,
     pub original_severity: DelphiSeverity,
-    pub severity: Option<DelphiSeverity>,
-    pub hidden: bool,
+    pub severity: DelphiSeverity,
 }
 
 #[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
@@ -94,10 +93,7 @@ pub struct TestDelphiRuleResponse {
 #[derive(Debug, Deserialize, Serialize, utoipa::ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct DelphiRuleEffect {
-    #[serde(default)]
-    pub severity: Option<DelphiSeverity>,
-    #[serde(default)]
-    pub hidden: bool,
+    pub severity: DelphiSeverity,
 }
 
 struct ValidatedRule {
@@ -235,8 +231,7 @@ pub async fn get_rules(
 			preview.jar AS "jar?",
 			preview.file_path AS "file_path?",
 			preview.original_severity AS "original_severity?: DelphiSeverity",
-			preview.severity AS "effect_severity?: DelphiSeverity",
-			preview.hidden AS "hidden?"
+			preview.severity AS "effect_severity?: DelphiSeverity"
 		FROM delphi_rules delphi_rule
 		LEFT JOIN LATERAL (
 			SELECT
@@ -254,7 +249,6 @@ pub async fn get_rules(
 				detail.file_path,
 				detail.severity AS original_severity,
 				effect.severity,
-				effect.hidden,
 				COUNT(*) OVER () AS affected_details_count
 			FROM delphi_rule_effects effect
 			INNER JOIN delphi_rule_revisions published
@@ -292,7 +286,7 @@ pub async fn get_rules(
             Some(key),
             Some(file_path),
             Some(original_severity),
-            Some(hidden),
+            Some(severity),
         ) = (
             rule.detail_id,
             rule.issue_id,
@@ -300,7 +294,7 @@ pub async fn get_rules(
             rule.key,
             rule.file_path,
             rule.original_severity,
-            rule.hidden,
+            rule.effect_severity,
         ) {
             Some(DelphiRuleAffectedDetail {
                 detail_id,
@@ -316,8 +310,7 @@ pub async fn get_rules(
                 jar: rule.jar,
                 file_path,
                 original_severity,
-                severity: rule.effect_severity,
-                hidden,
+                severity,
             })
         } else {
             None
@@ -392,8 +385,7 @@ pub async fn get_rule_affected_details(
 			detail.jar,
 			detail.file_path,
 			detail.severity AS "original_severity!: DelphiSeverity",
-			effect.severity AS "effect_severity: DelphiSeverity",
-			effect.hidden
+			effect.severity AS "effect_severity!: DelphiSeverity"
 		FROM delphi_rule_effects effect
 		INNER JOIN delphi_rule_revisions published
 			ON published.revision = effect.revision
@@ -431,7 +423,6 @@ pub async fn get_rule_affected_details(
                 file_path: detail.file_path,
                 original_severity: detail.original_severity,
                 severity: detail.effect_severity,
-                hidden: detail.hidden,
             })
             .collect(),
     ))

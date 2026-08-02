@@ -9,8 +9,7 @@ const EFFECT_RULE: &str = r#"
 		&& "confidence" in input.trace.data
 		&& input.trace.data.confidence >= 0.9
 	? {
-		"severity": "low",
-		"hidden": false
+		"severity": "low"
 	}
 	: null
 "#;
@@ -55,19 +54,18 @@ struct ScopeInput {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 enum DelphiSeverity {
+    Hidden,
     Low,
     Medium,
     High,
     Severe,
+    Malware,
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct RuleEffect {
-    #[serde(default)]
-    severity: Option<DelphiSeverity>,
-    #[serde(default)]
-    hidden: bool,
+    severity: DelphiSeverity,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -146,8 +144,7 @@ mod tests {
         assert_eq!(
             effect,
             Some(RuleEffect {
-                severity: Some(DelphiSeverity::Low),
-                hidden: false,
+                severity: DelphiSeverity::Low,
             })
         );
     }

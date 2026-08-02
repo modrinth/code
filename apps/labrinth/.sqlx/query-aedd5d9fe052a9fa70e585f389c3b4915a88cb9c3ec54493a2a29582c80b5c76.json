@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            dgdv.detail_key,\n            dgdv.verdict AS \"verdict!: DelphiStatus\",\n            COUNT(dri.id) AS \"local_trace_count!\"\n        FROM delphi_global_detail_verdicts dgdv\n        LEFT JOIN delphi_issue_details_with_statuses didws\n            ON didws.key = dgdv.detail_key\n            AND NOT didws.hidden\n        LEFT JOIN delphi_report_issues dri\n            ON dri.id = didws.issue_id\n        WHERE (\n            $1::text IS NULL\n            OR dgdv.detail_key ILIKE '%' || $1 || '%'\n        )\n        GROUP BY dgdv.detail_key, dgdv.verdict\n        ORDER BY dgdv.detail_key\n        LIMIT $2 OFFSET $3\n        ",
+  "query": "\n        SELECT\n            dgdv.detail_key,\n            dgdv.verdict AS \"verdict!: DelphiStatus\",\n            COUNT(dri.id) AS \"local_trace_count!\"\n        FROM delphi_global_detail_verdicts dgdv\n        LEFT JOIN delphi_issue_details_with_statuses didws\n            ON didws.key = dgdv.detail_key\n            AND didws.severity != 'hidden'\n        LEFT JOIN delphi_report_issues dri\n            ON dri.id = didws.issue_id\n        WHERE (\n            $1::text IS NULL\n            OR dgdv.detail_key ILIKE '%' || $1 || '%'\n        )\n        GROUP BY dgdv.detail_key, dgdv.verdict\n        ORDER BY dgdv.detail_key\n        LIMIT $2 OFFSET $3\n        ",
   "describe": {
     "columns": [
       {
@@ -43,5 +43,5 @@
       null
     ]
   },
-  "hash": "e38dc9448a56b2dc0e99661775f488c8f1ad2f0fca12655a3cc257a8cb5a784d"
+  "hash": "aedd5d9fe052a9fa70e585f389c3b4915a88cb9c3ec54493a2a29582c80b5c76"
 }

@@ -523,11 +523,14 @@ async fn run_scan(
                 detail.project_id,
                 BOOL_OR(
                     detail.status IN ('pending', 'unsafe')
-                    AND NOT detail.hidden
+                    AND detail.severity != 'hidden'
                 ) AS old_needs_review,
                 BOOL_OR(
                     detail.status IN ('pending', 'unsafe')
-                    AND NOT COALESCE(new_effect.hidden, FALSE)
+                    AND COALESCE(
+                        new_effect.severity,
+                        detail.original_severity
+                    ) != 'hidden'
                 ) AS new_needs_review
             FROM delphi_issue_details_with_statuses detail
             LEFT JOIN delphi_rule_effects new_effect
@@ -767,10 +770,6 @@ async fn insert_materialized_effects(
         .iter()
         .map(|effect| effect.effect.severity)
         .collect::<Vec<_>>();
-    let hidden = effects
-        .iter()
-        .map(|effect| effect.effect.hidden)
-        .collect::<Vec<_>>();
 
     sqlx::query!(
         r#"
@@ -778,22 +777,19 @@ async fn insert_materialized_effects(
             revision,
             detail_id,
             rule_id,
-            severity,
-            hidden
+            severity
         )
         SELECT $1, effect.*
         FROM UNNEST(
             $2::BIGINT[],
             $3::BIGINT[],
-            $4::delphi_severity[],
-            $5::BOOLEAN[]
-        ) AS effect(detail_id, rule_id, severity, hidden)
+            $4::delphi_severity[]
+        ) AS effect(detail_id, rule_id, severity)
         "#,
         revision,
         &detail_ids,
         &rule_ids,
-        &severities as &[Option<DelphiSeverity>],
-        &hidden,
+        &severities as &[DelphiSeverity],
     )
     .execute(&mut *transaction)
     .await
