@@ -20,6 +20,7 @@ const props = withDefaults(
 		original: T
 		modified: Partial<T>
 		saving?: boolean
+		disableSave?: boolean
 		text?: MessageDescriptor | string
 		saveLabel?: MessageDescriptor | string
 		savingLabel?: MessageDescriptor | string
@@ -29,6 +30,7 @@ const props = withDefaults(
 	{
 		canReset: true,
 		saving: false,
+		disableSave: false,
 		text: () =>
 			defineMessage({
 				id: 'ui.component.unsaved-changes-popup.body',
@@ -68,7 +70,7 @@ defineExpose({ nudge })
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
-				<button :disabled="saving" @click="(e) => emit('save', e)">
+				<button :disabled="saving || disableSave" @click="(e) => emit('save', e)">
 					<SpinnerIcon v-if="saving" class="animate-spin" />
 					<component :is="saveIcon" v-else />
 					{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
