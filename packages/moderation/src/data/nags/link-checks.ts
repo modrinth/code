@@ -164,7 +164,7 @@ const httpsRequiredMessage = defineMessage({
   defaultMessage: "Links must start with https://",
 })
 
-const checks = check(/^https:\/\/(?:www\.)?/i, "Links").otherwise(httpsRequiredMessage).transparent()
+const checks = check(/^https:\/\/(?:www\.)?/i).otherwise(httpsRequiredMessage).transparent()
 
 const rootNode = checks as unknown as LinkCheckNode
 
@@ -187,14 +187,14 @@ function checkLink(field: LinkField, url: string | null | undefined) {
 
   if (entry === undefined) {
     const build = matched.unrecognizedSeverity === "warn" ? warn : error
-
-    if (matched.unrecognizedMessage) {
-      cache.set(key, build(matched.unrecognizedMessage, {label: matched.label}))
-      return
-    }
-
     const expectedChild = matched.childNodes?.find((child) => child.for && field in child.for)
+
     if (expectedChild) {
+      if (matched.unrecognizedMessage) {
+        cache.set(key, build(matched.unrecognizedMessage, {label: matched.label}))
+        return
+      }
+
       cache.set(key, build(engineMessages.expectedType, {label: expectedChild.label}))
       return
     }
