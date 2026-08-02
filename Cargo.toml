@@ -8,7 +8,6 @@ members = [
   "packages/app-lib",
   "packages/ariadne",
   "packages/daedalus",
-  "packages/delphi-cel-experiment",
   "packages/labrinth-derive",
   "packages/modrinth-content-management",
   "packages/modrinth-log",

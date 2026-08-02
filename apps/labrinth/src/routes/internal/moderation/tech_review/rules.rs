@@ -158,8 +158,9 @@ pub async fn test_rule(
     })?;
 
     let rule = request.rule;
+    let expression = rule.clone();
     let program =
-        tokio::task::spawn_blocking(move || cel::Program::compile(&rule))
+        tokio::task::spawn_blocking(move || cel::Program::compile(&expression))
             .await
             .wrap_internal_err("failed to join cel compilation task")?
             .map_err(|error| {
@@ -168,12 +169,11 @@ pub async fn test_rule(
     let mut effects = Vec::with_capacity(request.inputs.len());
 
     for (index, input) in request.inputs.iter().enumerate() {
-        let effect = super::rules_scan::evaluate_rule(&program, input)
-            .map_err(|error| {
-                ApiError::Request(eyre!(
-                    "failed to evaluate test input {index}: {error}"
-                ))
-            })?;
+        let evaluation =
+            super::rules_scan::evaluate_rule(&program, &rule, input);
+        let effect = evaluation.wrap_request_err(format!(
+            "failed to evaluate test input {index}"
+        ))?;
         effects.push(effect);
     }
 

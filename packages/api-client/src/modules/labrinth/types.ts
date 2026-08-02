@@ -2335,10 +2335,16 @@ export namespace Labrinth {
 					size: number | null
 					hashes: Record<string, string>
 				}
-				scope: {
-					project_id: string | null
-					version_id: string | null
-					file_id: string | null
+				project: {
+					id: string | null
+					types: string[]
+				}
+				version: {
+					id: string | null
+					loaders: string[]
+				}
+				file: {
+					id: string | null
 				}
 			}
 

@@ -58,7 +58,9 @@ pub struct RuleInput {
     pub trace: RuleTrace,
     pub scan: RuleScan,
     pub artifact: RuleArtifact,
-    pub scope: RuleScope,
+    pub project: RuleProject,
+    pub version: RuleVersion,
+    pub file: RuleFile,
 }
 
 #[derive(Deserialize, Serialize, utoipa::ToSchema)]
@@ -83,14 +85,26 @@ pub struct RuleArtifact {
 }
 
 #[derive(Deserialize, Serialize, utoipa::ToSchema)]
-pub struct RuleScope {
-    pub project_id: Option<String>,
-    pub version_id: Option<String>,
-    pub file_id: Option<String>,
+pub struct RuleProject {
+    pub id: Option<String>,
+    pub types: Vec<String>,
+}
+
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
+pub struct RuleVersion {
+    pub id: Option<String>,
+    pub loaders: Vec<String>,
+}
+
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
+pub struct RuleFile {
+    pub id: Option<String>,
 }
 
 struct CompiledRule {
     id: DelphiRuleId,
+    name: String,
+    expression: String,
     program: cel::Program,
 }
 
@@ -197,6 +211,10 @@ pub async fn get_detail_rule_input(
             file.id AS "file_id?",
             version.id AS "version_id?",
             version.mod_id AS "project_id?",
+            COALESCE(version_metadata.project_types, ARRAY[]::text[])
+                AS "project_types!: Vec<String>",
+            COALESCE(version_metadata.loaders, ARRAY[]::text[])
+                AS "loaders!: Vec<String>",
             COALESCE(file_hashes.hashes, '{}'::jsonb)
                 AS "hashes!: Json<BTreeMap<String, String>>"
         FROM delphi_report_issue_details detail
@@ -204,6 +222,26 @@ pub async fn get_detail_rule_input(
         INNER JOIN delphi_reports report ON report.id = issue.report_id
         LEFT JOIN files file ON file.id = report.file_id
         LEFT JOIN versions version ON version.id = file.version_id
+        LEFT JOIN LATERAL (
+            SELECT
+                ARRAY_AGG(
+                    DISTINCT project_type.name::text
+                    ORDER BY project_type.name::text
+                ) FILTER (WHERE project_type.name IS NOT NULL)
+                    AS project_types,
+                ARRAY_AGG(
+                    DISTINCT loader.loader
+                    ORDER BY loader.loader
+                ) AS loaders
+            FROM loaders_versions loader_version
+            INNER JOIN loaders loader
+                ON loader.id = loader_version.loader_id
+            LEFT JOIN loaders_project_types loader_project_type
+                ON loader_project_type.joining_loader_id = loader_version.loader_id
+            LEFT JOIN project_types project_type
+                ON project_type.id = loader_project_type.joining_project_type_id
+            WHERE loader_version.version_id = version.id
+        ) version_metadata ON TRUE
         LEFT JOIN LATERAL (
             SELECT
                 jsonb_object_agg(algorithm, encode(hash, 'hex')) AS hashes
@@ -237,10 +275,16 @@ pub async fn get_detail_rule_input(
             size: detail.size,
             hashes: detail.hashes.0,
         },
-        scope: RuleScope {
-            project_id: detail.project_id.map(|id| to_base62(id as u64)),
-            version_id: detail.version_id.map(|id| to_base62(id as u64)),
-            file_id: detail.file_id.map(|id| to_base62(id as u64)),
+        project: RuleProject {
+            id: detail.project_id.map(|id| to_base62(id as u64)),
+            types: detail.project_types,
+        },
+        version: RuleVersion {
+            id: detail.version_id.map(|id| to_base62(id as u64)),
+            loaders: detail.loaders,
+        },
+        file: RuleFile {
+            id: detail.file_id.map(|id| to_base62(id as u64)),
         },
     }))
 }
@@ -331,7 +375,7 @@ pub async fn scan_rules(
             }
             Err(error) => {
                 tracing::error!(error = ?error, "delphi rule scan failed");
-                let message = error.to_string();
+                let message = format!("{error:#}");
                 let event = RuleScanErrorEvent { message: &message };
                 if let Ok(data) = serde_json::to_string(&event) {
                     let _ = sender.send(Bytes::from(format!(
@@ -402,6 +446,10 @@ async fn run_scan(
             file.id AS "file_id?",
             version.id AS "version_id?",
             version.mod_id AS "project_id?",
+            COALESCE(version_metadata.project_types, ARRAY[]::text[])
+                AS "project_types!: Vec<String>",
+            COALESCE(version_metadata.loaders, ARRAY[]::text[])
+                AS "loaders!: Vec<String>",
             COALESCE(file_hashes.hashes, '{}'::jsonb)
                 AS "hashes!: Json<BTreeMap<String, String>>"
         FROM delphi_report_issue_details detail
@@ -409,6 +457,28 @@ async fn run_scan(
         INNER JOIN delphi_reports report ON report.id = issue.report_id
         LEFT JOIN files file ON file.id = report.file_id
         LEFT JOIN versions version ON version.id = file.version_id
+        LEFT JOIN (
+            SELECT
+                loader_version.version_id,
+                ARRAY_AGG(
+                    DISTINCT project_type.name::text
+                    ORDER BY project_type.name::text
+                ) FILTER (WHERE project_type.name IS NOT NULL)
+                    AS project_types,
+                ARRAY_AGG(
+                    DISTINCT loader.loader
+                    ORDER BY loader.loader
+                ) AS loaders
+            FROM loaders_versions loader_version
+            INNER JOIN loaders loader
+                ON loader.id = loader_version.loader_id
+            LEFT JOIN loaders_project_types loader_project_type
+                ON loader_project_type.joining_loader_id = loader_version.loader_id
+            LEFT JOIN project_types project_type
+                ON project_type.id = loader_project_type.joining_project_type_id
+            GROUP BY loader_version.version_id
+        ) version_metadata
+            ON version_metadata.version_id = version.id
         LEFT JOIN (
             SELECT
                 file_id,
@@ -458,19 +528,29 @@ async fn run_scan(
                 size: detail.size,
                 hashes: detail.hashes.0,
             },
-            scope: RuleScope {
-                project_id: detail.project_id.map(|id| to_base62(id as u64)),
-                version_id: detail.version_id.map(|id| to_base62(id as u64)),
-                file_id: detail.file_id.map(|id| to_base62(id as u64)),
+            project: RuleProject {
+                id: detail.project_id.map(|id| to_base62(id as u64)),
+                types: detail.project_types,
+            },
+            version: RuleVersion {
+                id: detail.version_id.map(|id| to_base62(id as u64)),
+                loaders: detail.loaders,
+            },
+            file: RuleFile {
+                id: detail.file_id.map(|id| to_base62(id as u64)),
             },
         };
 
         for rule in &rules {
-            let effect = evaluate_rule(&rule.program, &input)
+            let effect = evaluate_rule(
+                &rule.program,
+                &rule.expression,
+                &input,
+            )
                 .wrap_err_with(|| {
                     format!(
-                        "failed to evaluate delphi rule {} for detail {detail_id}",
-                        rule.id.0
+                        "failed to evaluate delphi rule '{}' for detail {detail_id}",
+                        rule.name
                     )
                 })?;
             if let Some(effect) = effect {
@@ -642,6 +722,10 @@ pub(crate) async fn materialize_current_rule_effects(
             file.id AS "file_id?",
             version.id AS "version_id?",
             version.mod_id AS "project_id?",
+            COALESCE(version_metadata.project_types, ARRAY[]::text[])
+                AS "project_types!: Vec<String>",
+            COALESCE(version_metadata.loaders, ARRAY[]::text[])
+                AS "loaders!: Vec<String>",
             COALESCE(file_hashes.hashes, '{}'::jsonb)
                 AS "hashes!: Json<BTreeMap<String, String>>"
         FROM delphi_report_issue_details detail
@@ -649,6 +733,26 @@ pub(crate) async fn materialize_current_rule_effects(
         INNER JOIN delphi_reports report ON report.id = issue.report_id
         LEFT JOIN files file ON file.id = report.file_id
         LEFT JOIN versions version ON version.id = file.version_id
+        LEFT JOIN LATERAL (
+            SELECT
+                ARRAY_AGG(
+                    DISTINCT project_type.name::text
+                    ORDER BY project_type.name::text
+                ) FILTER (WHERE project_type.name IS NOT NULL)
+                    AS project_types,
+                ARRAY_AGG(
+                    DISTINCT loader.loader
+                    ORDER BY loader.loader
+                ) AS loaders
+            FROM loaders_versions loader_version
+            INNER JOIN loaders loader
+                ON loader.id = loader_version.loader_id
+            LEFT JOIN loaders_project_types loader_project_type
+                ON loader_project_type.joining_loader_id = loader_version.loader_id
+            LEFT JOIN project_types project_type
+                ON project_type.id = loader_project_type.joining_project_type_id
+            WHERE loader_version.version_id = version.id
+        ) version_metadata ON TRUE
         LEFT JOIN LATERAL (
             SELECT
                 jsonb_object_agg(algorithm, encode(hash, 'hex')) AS hashes
@@ -683,19 +787,25 @@ pub(crate) async fn materialize_current_rule_effects(
                 size: detail.size,
                 hashes: detail.hashes.0,
             },
-            scope: RuleScope {
-                project_id: detail.project_id.map(|id| to_base62(id as u64)),
-                version_id: detail.version_id.map(|id| to_base62(id as u64)),
-                file_id: detail.file_id.map(|id| to_base62(id as u64)),
+            project: RuleProject {
+                id: detail.project_id.map(|id| to_base62(id as u64)),
+                types: detail.project_types,
+            },
+            version: RuleVersion {
+                id: detail.version_id.map(|id| to_base62(id as u64)),
+                loaders: detail.loaders,
+            },
+            file: RuleFile {
+                id: detail.file_id.map(|id| to_base62(id as u64)),
             },
         };
 
         for rule in &rules {
-            let effect =
-                evaluate_rule(&rule.program, &input).wrap_err_with(|| {
+            let effect = evaluate_rule(&rule.program, &rule.expression, &input)
+                .wrap_err_with(|| {
                     format!(
-                        "failed to evaluate delphi rule {} for detail {}",
-                        rule.id.0, detail.id
+                        "failed to evaluate delphi rule '{}' for detail {}",
+                        rule.name, detail.id
                     )
                 })?;
             if let Some(effect) = effect {
@@ -717,7 +827,7 @@ async fn fetch_compiled_rules(
 ) -> Result<Vec<CompiledRule>> {
     let rules = sqlx::query!(
         r#"
-        SELECT id AS "id!: DelphiRuleId", rule
+        SELECT id AS "id!: DelphiRuleId", name, rule
         FROM delphi_rules
         WHERE NOT delete_on_next_revision
         ORDER BY priority DESC, id
@@ -734,12 +844,14 @@ async fn fetch_compiled_rules(
                 let program =
                     cel::Program::compile(&rule.rule).map_err(|error| {
                         eyre!(
-                            "failed to compile delphi rule {}: {error}",
-                            rule.id.0
+                            "failed to compile delphi rule '{}': {error}",
+                            rule.name
                         )
                     })?;
                 Ok(CompiledRule {
                     id: rule.id,
+                    name: rule.name,
+                    expression: rule.rule,
                     program,
                 })
             })
@@ -800,6 +912,21 @@ async fn insert_materialized_effects(
 
 pub(super) fn evaluate_rule(
     program: &cel::Program,
+    expression: &str,
+    input: &RuleInput,
+) -> Result<Option<DelphiRuleEffect>> {
+    evaluate_rule_inner(program, input)
+        .wrap_err_with(|| {
+            let input = serde_json::to_string(input).unwrap_or_else(|error| {
+                format!("<failed to serialize CEL input: {error}>")
+            });
+            format!("CEL input: {input}")
+        })
+        .wrap_err_with(|| format!("CEL expression: {expression}"))
+}
+
+fn evaluate_rule_inner(
+    program: &cel::Program,
     input: &RuleInput,
 ) -> Result<Option<DelphiRuleEffect>> {
     let mut context = cel::Context::default();
@@ -816,8 +943,14 @@ pub(super) fn evaluate_rule(
         .add_variable("artifact", &input.artifact)
         .wrap_err("failed to add `artifact` to cel context")?;
     context
-        .add_variable("scope", &input.scope)
-        .wrap_err("failed to add `scope` to cel context")?;
+        .add_variable("project", &input.project)
+        .wrap_err("failed to add `project` to cel context")?;
+    context
+        .add_variable("version", &input.version)
+        .wrap_err("failed to add `version` to cel context")?;
+    context
+        .add_variable("file", &input.file)
+        .wrap_err("failed to add `file` to cel context")?;
 
     let value = program
         .execute(&context)

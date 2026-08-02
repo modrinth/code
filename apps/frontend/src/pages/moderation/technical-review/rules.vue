@@ -461,10 +461,16 @@ const TEST_INPUTS: Labrinth.TechReview.Internal.RuleInput[] = [
 				sha512: 'fedcba9876543210',
 			},
 		},
-		scope: {
-			project_id: 'example-project',
-			version_id: 'example-version',
-			file_id: 'example-file',
+		project: {
+			id: 'example-project',
+			types: ['mod'],
+		},
+		version: {
+			id: 'example-version',
+			loaders: ['fabric'],
+		},
+		file: {
+			id: 'example-file',
 		},
 	},
 	{
@@ -489,10 +495,16 @@ const TEST_INPUTS: Labrinth.TechReview.Internal.RuleInput[] = [
 				sha512: '0123456789abcdef',
 			},
 		},
-		scope: {
-			project_id: 'telemetry-project',
-			version_id: 'telemetry-version',
-			file_id: 'telemetry-file',
+		project: {
+			id: 'telemetry-project',
+			types: ['mod'],
+		},
+		version: {
+			id: 'telemetry-version',
+			loaders: ['neoforge'],
+		},
+		file: {
+			id: 'telemetry-file',
 		},
 	},
 ]
