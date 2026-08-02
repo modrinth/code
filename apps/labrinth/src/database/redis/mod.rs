@@ -1,5 +1,3 @@
-pub(crate) mod serde;
-
 use std::sync::Arc;
 
 use crate::env::ENV;

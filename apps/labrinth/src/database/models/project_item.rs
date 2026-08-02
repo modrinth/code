@@ -19,6 +19,7 @@ use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
@@ -1044,8 +1045,10 @@ impl DBProject {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde_binhum]
+#[derive(Clone, Debug)]
 pub struct ProjectQueryResult {
+    #[serde(flatten)]
     pub inner: DBProject,
     pub categories: Vec<String>,
     pub additional_categories: Vec<String>,

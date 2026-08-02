@@ -4,6 +4,7 @@ use crate::models::ids::{
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
@@ -14,6 +15,8 @@ pub struct Product {
     pub unitary: bool,
 }
 
+#[serde_binhum]
+#[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ProductMetadata {
     Midas,
     Pyro {
@@ -30,56 +33,6 @@ pub enum ProductMetadata {
         region: String,
     },
 }
-
-const _: () = {
-    #[derive(Deserialize, Serialize)]
-    #[serde(
-        remote = "ProductMetadata",
-        tag = "type",
-        rename_all = "kebab-case"
-    )]
-    enum HumanReadableProxy {
-        Midas,
-        Pyro {
-            cpu: u32,
-            ram: u32,
-            swap: u32,
-            storage: u32,
-        },
-        Medal {
-            cpu: u32,
-            ram: u32,
-            swap: u32,
-            storage: u32,
-            region: String,
-        },
-    }
-
-    #[derive(Deserialize, Serialize)]
-    #[serde(remote = "ProductMetadata")]
-    enum BinaryProxy {
-        Midas,
-        Pyro {
-            cpu: u32,
-            ram: u32,
-            swap: u32,
-            storage: u32,
-        },
-        Medal {
-            cpu: u32,
-            ram: u32,
-            swap: u32,
-            storage: u32,
-            region: String,
-        },
-    }
-
-    crate::database::redis::serde::impl_redis_serde!(
-        ProductMetadata,
-        human = HumanReadableProxy,
-        binary = BinaryProxy,
-    );
-};
 
 impl ProductMetadata {
     pub fn is_pyro(&self) -> bool {
@@ -103,6 +56,8 @@ pub struct ProductPrice {
     pub currency_code: String,
 }
 
+#[serde_binhum]
+#[serde(tag = "type", rename_all = "kebab-case")]
 pub enum Price {
     OneTime {
         price: i32,
@@ -111,36 +66,6 @@ pub enum Price {
         intervals: HashMap<PriceDuration, i32>,
     },
 }
-
-const _: () = {
-    #[derive(Deserialize, Serialize)]
-    #[serde(remote = "Price", tag = "type", rename_all = "kebab-case")]
-    enum HumanReadableProxy {
-        OneTime {
-            price: i32,
-        },
-        Recurring {
-            intervals: HashMap<PriceDuration, i32>,
-        },
-    }
-
-    #[derive(Deserialize, Serialize)]
-    #[serde(remote = "Price")]
-    enum BinaryProxy {
-        OneTime {
-            price: i32,
-        },
-        Recurring {
-            intervals: HashMap<PriceDuration, i32>,
-        },
-    }
-
-    crate::database::redis::serde::impl_redis_serde!(
-        Price,
-        human = HumanReadableProxy,
-        binary = BinaryProxy,
-    );
-};
 
 impl Price {
     pub fn get_interval(&self, interval: PriceDuration) -> Option<i32> {

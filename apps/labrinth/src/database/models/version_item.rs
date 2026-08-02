@@ -17,6 +17,7 @@ use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use tracing::error;
@@ -1083,8 +1084,10 @@ impl DBVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[serde_binhum]
+#[derive(Clone)]
 pub struct VersionQueryResult {
+    #[serde(flatten)]
     pub inner: DBVersion,
 
     pub files: Vec<FileQueryResult>,
