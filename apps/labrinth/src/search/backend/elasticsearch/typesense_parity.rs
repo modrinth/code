@@ -1849,7 +1849,7 @@ impl Elasticsearch {
 }
 
 impl Elasticsearch {
-	pub(super) fn index_schema() -> Value {
+	pub(super) fn typesense_parity_index_schema() -> Value {
 		json!({
 			"settings": {
 				"number_of_shards": 3,
@@ -2131,7 +2131,7 @@ impl Elasticsearch {
 }
 
 impl Elasticsearch {
-	pub(super) async fn import_projects(
+	pub(super) async fn import_projects_typesense_parity(
 		&self,
 		indices: &[String],
 		documents: &[UploadSearchProject],

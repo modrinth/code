@@ -719,6 +719,99 @@ impl Elasticsearch {
 		Ok(indices)
 	}
 
+	fn index_schema(&self) -> Value {
+		if self.config.typesense_parity {
+			Self::typesense_parity_index_schema()
+		} else {
+			Self::native_index_schema()
+		}
+	}
+
+	fn native_index_schema() -> Value {
+		json!({
+			"mappings": {
+				"properties": {
+					"document_type": {
+						"type": "join",
+						"relations": {"project": "version"}
+					},
+					"version_id": {"type": "keyword"},
+					"project_id": {"type": "keyword"},
+					"project_types": {"type": "keyword"},
+					"all_project_types": {"type": "keyword"},
+					"categories": {"type": "keyword"},
+					"project_categories": {"type": "keyword"},
+					"display_categories": {"type": "keyword"},
+					"loaders": {"type": "keyword"},
+					"license": {"type": "keyword"},
+					"environment": {"type": "keyword"},
+					"game_versions": {"type": "keyword"},
+					"client_side": {"type": "keyword"},
+					"server_side": {"type": "keyword"},
+					"dependency_project_ids": {"type": "keyword"},
+					"compatible_dependency_project_ids": {
+						"type": "keyword"
+					},
+					"project_loader_fields": {
+						"type": "object",
+						"enabled": false
+					},
+					"minecraft_server": {
+						"properties": {
+							"region": {"type": "keyword"},
+							"languages": {"type": "keyword"}
+						}
+					},
+					"minecraft_java_server": {
+						"properties": {
+							"content": {
+								"properties": {
+									"kind": {"type": "keyword"},
+									"supported_game_versions": {
+										"type": "keyword"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		})
+	}
+
+	async fn import_projects(
+		&self,
+		indices: &[String],
+		documents: &[UploadSearchProject],
+	) -> Result<()> {
+		if self.config.typesense_parity {
+			self.import_projects_typesense_parity(indices, documents)
+				.await
+		} else {
+			self.import_projects_native(indices, documents).await
+		}
+	}
+
+	async fn import_projects_native(
+		&self,
+		indices: &[String],
+		documents: &[UploadSearchProject],
+	) -> Result<()> {
+		let batch_size = self.config.bulk_batch_size.max(1);
+		for documents in documents.chunks(batch_size) {
+			let body = projects_to_bulk_native(documents)?;
+			for index in indices {
+				info!(
+					index,
+					document_count = documents.len(),
+					content_length_bytes = body.len(),
+					"sending Elasticsearch project bulk request"
+				);
+				self.client.bulk(index, body.clone()).await?;
+			}
+		}
+		Ok(())
+	}
 
 	async fn import_versions(
 		&self,
@@ -772,16 +865,13 @@ impl Elasticsearch {
 			"multi_match": {
 				"query": query,
 				"fields": [
-					"name^15",
-					"indexed_name^15",
-					"slug^10",
-					"author^3",
-					"indexed_author^3",
+					"name",
+					"indexed_name",
+					"slug",
+					"author",
+					"indexed_author",
 					"summary"
-				],
-				"type": "best_fields",
-				"operator": "and",
-				"fuzziness": "AUTO"
+				]
 			}
 		})
 	}
@@ -906,9 +996,7 @@ impl SearchBackend for Elasticsearch {
 
 		info!(index = next, "creating Elasticsearch shadow index");
 		self.client.delete_index_if_exists(&next).await?;
-		self.client
-			.create_index(&next, &Self::index_schema())
-			.await?;
+		self.client.create_index(&next, &self.index_schema()).await?;
 
 		let mut cursor = 0_i64;
 		let mut chunk_index = 0_usize;
@@ -1092,6 +1180,37 @@ fn matching_version_id(hit: &Value) -> Option<String> {
 		})
 		.max_by_key(|(published, _)| *published)
 		.map(|(_, version_id)| version_id)
+}
+
+fn projects_to_bulk_native(
+	documents: &[UploadSearchProject],
+) -> Result<String> {
+	let mut output = String::new();
+	for document in documents {
+		let id = format!("project:{}", document.project_id);
+		push_json_line(
+			&mut output,
+			&json!({
+				"index": {
+					"_id": id,
+					"routing": document.project_id
+				}
+			}),
+		)?;
+
+		let mut source = serde_json::to_value(document)
+			.wrap_err("failed to serialize `UploadSearchProject`")?;
+		let object = source
+			.as_object_mut()
+			.ok_or_else(|| eyre!("project search document is not an object"))?;
+		object.insert(
+			"document_type".to_string(),
+			Value::String("project".to_string()),
+		);
+		add_server_online_field(object);
+		push_json_line(&mut output, &source)?;
+	}
+	Ok(output)
 }
 
 fn versions_to_bulk(documents: &[UploadSearchVersion]) -> Result<String> {
