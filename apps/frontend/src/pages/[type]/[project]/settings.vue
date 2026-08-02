@@ -179,7 +179,7 @@ const moderatorSeeUserUi = computed<boolean>({
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"
 		/>
-		<div class="grid gap-4 lg:grid-cols-[1fr_3fr]">
+		<div class="grid gap-6 lg:grid-cols-[1fr_3fr]">
 			<div>
 				<NavStack :items="navItems" />
 				<div v-if="isStaff(currentMember?.user)" class="mt-4 flex items-center gap-2">

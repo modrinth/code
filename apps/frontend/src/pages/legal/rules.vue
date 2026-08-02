@@ -239,7 +239,7 @@ useSeoMeta({
 }
 
 .markdown-body a {
-	@apply font-semibold text-brand no-underline hover:text-brand hover:underline;
+	@apply !font-semibold !text-brand !no-underline hover:!text-brand hover:!underline;
 }
 
 .markdown-body p {

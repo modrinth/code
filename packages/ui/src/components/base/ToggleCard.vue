@@ -2,7 +2,7 @@
 import { SmartClickable, Toggle } from '@modrinth/ui'
 import { computed, useId } from 'vue'
 
-const value = defineModel<boolean>('value', { required: true })
+const value = defineModel<boolean>({ required: true })
 
 const baseId = useId()
 const toggleId = computed(() => `toggle-card-toggle-${baseId}`)

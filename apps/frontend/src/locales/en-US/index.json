@@ -3761,6 +3761,102 @@
   "project.settings.back-to-project-page": {
     "message": "Back to project page"
   },
+  "project.settings.disclosures.add-another": {
+    "message": "Add another"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "You must enable this if your project contains advertisements, sponsorships, or promotions of other works."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "If the promotion has no direct monetary value <emphasis>and</emphasis> it is for something that the average person would consider <italic>relevant</italic> and <italic>unobtrusive</italic> (such as a link to your Modrinth profile in the corner of the settings page for your own mod), we would not consider that an advertisement."
+  },
+  "project.settings.disclosures.advertising.note-description": {
+    "message": "Please explain how your project utilizes advertising so that users can know what to expect."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "e.g. \"Adds the Modrinth SMP server to your server list automatically.\""
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Contains advertisements"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "Please refer to Section 6 of Modrinth's <rules>Content Rules</rules> for more information."
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "You must enable this if this project contains a substantial amount of AI-generated code, any\n\t\t\t\tassets that are substantially AI-generated, the project's design relies on the use of\n\t\t\t\tgenerative AI, or if any element of your project's page such as description or publishing\n\t\t\t\trelies on generative AI."
+  },
+  "project.settings.disclosures.ai.note-description": {
+    "message": "You may optionally provide a note to explain how you use generative AI in this project."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "e.g. The Chinese and Arabic translations are AI-generated."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Contains AI-generated content"
+  },
+  "project.settings.disclosures.ai.types-assets": {
+    "message": "Assets"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "message": "Code"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "Select what this project uses generative AI for."
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "message": "Text"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "Content disclosures"
+  },
+  "project.settings.disclosures.description": {
+    "message": "You must add any applicable content disclosures to your project in compliance with Modrinth's <rules>Content Rules</rules>."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "You must enable this if your project contains features that can be obtained by spending real-world money."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "e.g. “Cosmetics available as Patreon reward.”"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "What kinds of paid features does it add?"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Contains paid features"
+  },
+  "project.settings.disclosures.telemetry.add-data-type": {
+    "message": "Add type of data"
+  },
+  "project.settings.disclosures.telemetry.add-privacy-policy": {
+    "message": "Add privacy policy"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "message": "Always active"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "What is the consent model of your telemetry?"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-in": {
+    "message": "Opt-in"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-out": {
+    "message": "Opt-out"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "You can either add a privacy policy, or a list of types of data that are collected. Remember to mention if it is anonymous or contains personally identifiable information (PII)."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "What data is being collected?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "e.g. “Anonymous launch analytics to track Minecraft version and mod loader usage.”"
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "You must enable this if your project sends usage data back to yourself or a third party."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Contains telemetry"
+  },
   "project.settings.editing-project": {
     "message": "Editing {projectType} project"
   },
