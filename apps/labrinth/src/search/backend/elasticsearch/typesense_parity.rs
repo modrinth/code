@@ -2008,6 +2008,10 @@ impl Elasticsearch {
 							"max_chars": 10
 						},
 						"fields": {
+							"keyword": {
+								"type": "keyword",
+								"ignore_above": 8191
+							},
 							"prefix": {
 								"type": "text",
 								"analyzer": "typesense_plain_prefix_text",

@@ -45,7 +45,7 @@ struct PartialProject {
     components: exp::ProjectSerial,
 }
 
-fn normalize_for_search(s: &str) -> String {
+pub(crate) fn normalize_for_search(s: &str) -> String {
     static SPECIAL_CHARS_RE: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r"[^a-zA-Z0-9-.\s]").expect("valid regex"));
 

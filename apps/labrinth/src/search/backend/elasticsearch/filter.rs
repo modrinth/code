@@ -5,6 +5,7 @@ use crate::search::filter::{
 	FilterComparison, FilterCondition, FilterExpr, FilterLiteral,
 	FilterPredicate,
 };
+use crate::search::indexing::normalize_for_search;
 
 const MAX_DNF_CLAUSES: usize = 64;
 const MAX_FILTER_DEPTH: usize = 64;
@@ -146,10 +147,11 @@ fn lower(filter: &FilterExpr) -> Result<Value> {
 }
 
 fn predicate_query(predicate: &FilterPredicate) -> Result<Value> {
-	let field = exact_field(predicate.field.as_str());
+	let source_field = predicate.field.as_str();
+	let field = exact_field(source_field);
 	match &predicate.condition {
 		FilterCondition::Compare { comparison, value } => {
-			let value = literal_value(value)?;
+			let value = literal_value(source_field, value)?;
 			Ok(match comparison {
 				FilterComparison::Equal => {
 					json!({"term": {(field): {"value": value}}})
@@ -174,7 +176,7 @@ fn predicate_query(predicate: &FilterPredicate) -> Result<Value> {
 		FilterCondition::In { values, negated } => {
 			let values = values
 				.iter()
-				.map(literal_value)
+				.map(|value| literal_value(source_field, value))
 				.collect::<Result<Vec<_>>>()?;
 			let query = json!({"terms": {(field): values}});
 			Ok(if *negated { not_query(query) } else { query })
@@ -186,8 +188,11 @@ fn predicate_query(predicate: &FilterPredicate) -> Result<Value> {
 	}
 }
 
-fn literal_value(literal: &FilterLiteral) -> Result<Value> {
+fn literal_value(field: &str, literal: &FilterLiteral) -> Result<Value> {
 	match literal {
+		FilterLiteral::String(value) if field == "author" => {
+			Ok(Value::String(normalize_for_search(value)))
+		}
 		FilterLiteral::String(value) => Ok(Value::String(value.clone())),
 		FilterLiteral::Number(value) => serde_json::from_str(value)
 			.map_err(|error| eyre!("invalid numeric filter literal: {error}")),
@@ -198,7 +203,7 @@ fn literal_value(literal: &FilterLiteral) -> Result<Value> {
 fn exact_field(field: &str) -> &str {
 	match field {
 		"name" => "name.keyword",
-		"author" => "author.keyword",
+		"author" => "indexed_author.keyword",
 		"summary" => "summary.keyword",
 		"slug" => "slug.keyword",
 		_ => field,
@@ -382,6 +387,12 @@ mod tests {
 		let query = serialize("license = MIT");
 		assert_eq!(query.to_string().matches("has_child").count(), 0);
 		assert_eq!(query["term"]["license"]["value"], "MIT");
+	}
+
+	#[test]
+	fn author_filters_use_the_normalized_exact_field() {
+		let query = serialize("author = User");
+		assert_eq!(query["term"]["indexed_author.keyword"]["value"], "user");
 	}
 
 	#[test]
