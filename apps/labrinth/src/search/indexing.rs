@@ -316,6 +316,29 @@ async fn build_search_documents(
     )
     .await?;
 
+    info!("Indexing local disclosures!");
+
+    let disclosure_types: DashMap<DBProjectId, Vec<String>> = sqlx::query!(
+        "
+        SELECT project_id, type
+        FROM project_disclosures
+        WHERE project_id = ANY($1)
+        ",
+        &*project_ids,
+    )
+    .fetch(pool)
+    .try_fold(
+        DashMap::new(),
+        |acc: DashMap<DBProjectId, Vec<String>>, m| {
+            acc.entry(DBProjectId(m.project_id))
+                .or_default()
+                .push(m.r#type);
+            async move { Ok(acc) }
+        },
+    )
+    .await
+    .wrap_err("failed to fetch project disclosures")?;
+
     info!("Indexing local versions!");
     let mut versions = load_project_versions(pool, project_ids.clone()).await?;
 
@@ -497,6 +520,11 @@ async fn build_search_documents(
         let mut project_categories = categories;
         project_categories.sort();
         project_categories.dedup();
+
+        let disclosure_types = disclosure_types
+            .remove(&project.id)
+            .map(|(_, types)| types)
+            .unwrap_or_default();
         let dependencies = dependencies
             .get(&project.id)
             .map(|x| x.clone())
@@ -732,6 +760,7 @@ async fn build_search_documents(
                 dependency_project_ids,
                 compatible_dependency_project_ids,
                 dependencies,
+                disclosure_types,
                 project_loader_fields,
                 loader_fields,
                 loaders: project_loaders,
