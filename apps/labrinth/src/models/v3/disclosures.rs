@@ -11,9 +11,7 @@ use utoipa::ToSchema;
 pub enum ProjectDisclosure {
     AiContent {
         note: Option<String>,
-        code: bool,
-        assets: bool,
-        text: bool,
+        uses: Vec<AiUsages>,
     },
     Advertisements {
         note: Option<String>,
@@ -92,6 +90,15 @@ impl ProjectDisclosureData {
             updated_by,
         }
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum AiUsages {
+    Code,
+    Assets,
+    Text,
+    Functionality,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
