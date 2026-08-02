@@ -64,7 +64,7 @@
 				<div v-else class="mt-3 grid gap-3 md:grid-cols-2">
 					<div class="min-w-0">
 						<p class="m-0 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
-							Input (<code>input</code>)
+							Context
 						</p>
 						<pre
 							class="m-0 overflow-x-auto rounded-lg bg-surface-1 p-3 text-xs leading-relaxed text-contrast"
@@ -428,7 +428,7 @@ import type { Component } from 'vue'
 
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
-const DEFAULT_RULE = `input.trace.issue_type == "OBFUSCATED_NAMES"
+const DEFAULT_RULE = `trace.issue_type == "OBFUSCATED_NAMES"
 	? {"severity": "low"}
 	: null`
 const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {

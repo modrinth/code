@@ -4,10 +4,10 @@ use cel::{Context, Program};
 use serde::{Deserialize, Serialize};
 
 const EFFECT_RULE: &str = r#"
-	input.trace.issue_type == "OBFUSCATED_NAMES"
-		&& input.trace.severity == "high"
-		&& "confidence" in input.trace.data
-		&& input.trace.data.confidence >= 0.9
+	trace.issue_type == "OBFUSCATED_NAMES"
+		&& trace.severity == "high"
+		&& "confidence" in trace.data
+		&& trace.data.confidence >= 0.9
 	? {
 		"severity": "low"
 	}
@@ -116,7 +116,11 @@ fn evaluate_rule(
     input: &RuleInput,
 ) -> Result<Option<RuleEffect>, Box<dyn Error>> {
     let mut context = Context::default();
-    context.add_variable("input", input)?;
+    context.add_variable("schema_version", input.schema_version)?;
+    context.add_variable("trace", &input.trace)?;
+    context.add_variable("scan", &input.scan)?;
+    context.add_variable("artifact", &input.artifact)?;
+    context.add_variable("scope", &input.scope)?;
 
     let value = Program::compile(expression)?.execute(&context)?;
     let json = value

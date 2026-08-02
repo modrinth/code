@@ -114,7 +114,7 @@ pub struct DelphiRuleSchemaResponse {
     pub components: BTreeMap<String, serde_json::Value>,
 }
 
-/// Get the schemas for the CEL input and output values.
+/// Get the schemas for the CEL context and output values.
 #[utoipa::path(
     context_path = "/moderation/tech-review",
     tag = "moderation",
@@ -800,12 +800,24 @@ async fn insert_materialized_effects(
 
 pub(super) fn evaluate_rule(
     program: &cel::Program,
-    input: impl Serialize,
+    input: &RuleInput,
 ) -> Result<Option<DelphiRuleEffect>> {
     let mut context = cel::Context::default();
     context
-        .add_variable("input", input)
-        .wrap_err("failed to build cel input")?;
+        .add_variable("schema_version", input.schema_version)
+        .wrap_err("failed to add `schema_version` to cel context")?;
+    context
+        .add_variable("trace", &input.trace)
+        .wrap_err("failed to add `trace` to cel context")?;
+    context
+        .add_variable("scan", &input.scan)
+        .wrap_err("failed to add `scan` to cel context")?;
+    context
+        .add_variable("artifact", &input.artifact)
+        .wrap_err("failed to add `artifact` to cel context")?;
+    context
+        .add_variable("scope", &input.scope)
+        .wrap_err("failed to add `scope` to cel context")?;
 
     let value = program
         .execute(&context)
