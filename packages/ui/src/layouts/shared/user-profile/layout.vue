@@ -111,7 +111,33 @@
 					<span class="text-lg font-bold text-primary">
 						{{ formatMessage(messages.authProvidersLabel) }}
 					</span>
-					<span>{{ user.auth_providers?.join(', ') || '—' }}</span>
+					<ul class="flex flex-col gap-1 pl-4 leading-normal m-0">
+						<li v-for="provider in user.auth_providers ?? []" :key="provider">
+							<span>{{ authProviderNames[provider] ?? provider }}</span>
+							<span v-if="provider === 'discord' && user.discord_id" class="ml-1">
+								({{ user.discord_id }})
+							</span>
+							<template v-else-if="provider === 'github' && user.github_id">
+								<span class="ml-1">(</span>
+								<button
+									type="button"
+									class="m-0 appearance-none border-0 bg-transparent p-0 font-[inherit] text-link disabled:cursor-wait disabled:opacity-70"
+									:disabled="isLoadingGithubProfile"
+									@click="openGithubProfile"
+								>
+									{{
+										isLoadingGithubProfile
+											? formatMessage(messages.loadingGithubProfileLabel)
+											: formatMessage(messages.viewGithubProfileLabel)
+									}}
+								</button>
+								<span>)</span>
+							</template>
+							<span v-else-if="provider === 'steam' && user.steam_id" class="ml-1">
+								({{ user.steam_id }})
+							</span>
+						</li>
+					</ul>
 				</div>
 
 				<div v-if="isAdminViewing" class="flex flex-col gap-1">
@@ -460,7 +486,13 @@ import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import UserBadges from '#ui/components/user/UserBadges.vue'
 import UserPageHeader from '#ui/components/user/UserPageHeader.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
-import { injectAuth, injectNotificationManager, injectPageContext, injectTags } from '#ui/providers'
+import {
+	injectAuth,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectPageContext,
+	injectTags,
+} from '#ui/providers'
 import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils'
 
 import { blockedUsersQueryKey, injectUserProfile } from './providers'
@@ -520,6 +552,7 @@ const auth = injectAuth()
 const tags = injectTags(null)
 const pageContext = injectPageContext()
 const notificationManager = injectNotificationManager()
+const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -566,6 +599,26 @@ const messages = defineMessages({
 	authProvidersLabel: {
 		id: 'profile.details.label.auth-providers',
 		defaultMessage: 'Auth providers',
+	},
+	viewGithubProfileLabel: {
+		id: 'profile.details.label.view-github-profile',
+		defaultMessage: 'View profile',
+	},
+	loadingGithubProfileLabel: {
+		id: 'profile.details.label.loading-github-profile',
+		defaultMessage: 'Loading...',
+	},
+	githubProfileErrorTitle: {
+		id: 'profile.details.error.github-profile-title',
+		defaultMessage: 'Unable to open GitHub profile',
+	},
+	githubProfileErrorMessage: {
+		id: 'profile.details.error.github-profile-message',
+		defaultMessage: 'The GitHub profile could not be retrieved. Please try again.',
+	},
+	githubPopupBlockedMessage: {
+		id: 'profile.details.error.github-popup-blocked',
+		defaultMessage: 'Allow pop-ups for Modrinth, then try again.',
 	},
 	paymentMethodsLabel: {
 		id: 'profile.details.label.payment-methods',
@@ -853,6 +906,17 @@ const showCollectionsEmptyState = computed(
 const normalizedSiteUrl = computed(() => props.siteUrl.replace(/\/$/, ''))
 const editProfileLink = computed(() => props.editProfileLink ?? linkTarget('/settings/profile'))
 
+const authProviderNames = {
+	github: 'GitHub',
+	discord: 'Discord',
+	microsoft: 'Microsoft',
+	gitlab: 'GitLab',
+	google: 'Google',
+	steam: 'Steam',
+	paypal: 'PayPal',
+}
+const isLoadingGithubProfile = ref(false)
+
 function externalUrl(path: string): string {
 	return `${normalizedSiteUrl.value}${path.startsWith('/') ? path : `/${path}`}`
 }
@@ -893,6 +957,50 @@ async function copyId(): Promise<void> {
 async function copyPermalink(): Promise<void> {
 	if (user.value) {
 		await navigator.clipboard.writeText(externalUrl(`/user/${user.value.id}`))
+	}
+}
+
+async function openGithubProfile() {
+	const githubId = user.value?.github_id
+	if (!githubId || isLoadingGithubProfile.value) return
+
+	const profileWindow = window.open('about:blank', '_blank')
+	if (!profileWindow) {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.githubProfileErrorTitle),
+			text: formatMessage(messages.githubPopupBlockedMessage),
+		})
+		return
+	}
+
+	profileWindow.opener = null
+	isLoadingGithubProfile.value = true
+
+	try {
+		const githubUser = await client.request<{ login?: string }>(`/${githubId}`, {
+			api: 'https://api.github.com',
+			version: 'user',
+			method: 'GET',
+			headers: { 'Content-Type': '' },
+			skipAuth: true,
+		})
+
+		if (!githubUser?.login) {
+			throw new Error('GitHub user response did not include a login')
+		}
+
+		profileWindow.location.replace(`https://github.com/${encodeURIComponent(githubUser.login)}`)
+	} catch (error) {
+		profileWindow.close()
+		console.error('Failed to retrieve GitHub profile:', error)
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.githubProfileErrorTitle),
+			text: formatMessage(messages.githubProfileErrorMessage),
+		})
+	} finally {
+		isLoadingGithubProfile.value = false
 	}
 }
 
