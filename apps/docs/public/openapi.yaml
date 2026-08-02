@@ -563,12 +563,18 @@ components:
           type: array
           items:
             type: string
-            example: [fabric]
+          example: [fabric]
         game_versions:
           type: array
           items:
             type: string
           example: ['1.18', 1.18.1]
+        version_types:
+          type: array
+          items:
+            type: string
+          enum: [release, alpha, beta]
+          example: [release]
       required:
         - loaders
         - game_versions
@@ -612,6 +618,12 @@ components:
               items:
                 type: string
               example: ['1.18', 1.18.1]
+            version_types:
+              type: array
+              items:
+                type: string
+              enum: [release, alpha, beta]
+              example: [release]
           required:
             - loaders
             - game_versions
@@ -2865,7 +2877,7 @@ paths:
               $ref: '#/components/schemas/HashList'
   /version_files/update:
     post:
-      summary: Latest versions of multiple project from hashes, loader(s), and game version(s)
+      summary: Latest versions of multiple projects from hashes, loader(s), and game version(s)
       description: This is the same as [`/version_file/{hash}/update`](#operation/getLatestVersionFromHash) except it accepts multiple hashes.
       operationId: getLatestVersionsFromHashes
       tags:
