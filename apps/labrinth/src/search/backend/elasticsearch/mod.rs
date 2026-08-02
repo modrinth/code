@@ -739,6 +739,12 @@ impl Elasticsearch {
 					"project_id": {"type": "keyword"},
 					"project_types": {"type": "keyword"},
 					"all_project_types": {"type": "keyword"},
+					"slug": Self::native_text_field_schema(),
+					"author": Self::native_text_field_schema(),
+					"indexed_author": Self::native_text_field_schema(),
+					"name": Self::native_text_field_schema(),
+					"indexed_name": Self::native_text_field_schema(),
+					"summary": Self::native_text_field_schema(),
 					"categories": {"type": "keyword"},
 					"project_categories": {"type": "keyword"},
 					"display_categories": {"type": "keyword"},
@@ -774,6 +780,22 @@ impl Elasticsearch {
 							}
 						}
 					}
+				}
+			}
+		})
+	}
+
+	fn native_text_field_schema() -> Value {
+		json!({
+			"type": "text",
+			"index_prefixes": {
+				"min_chars": 1,
+				"max_chars": 10
+			},
+			"fields": {
+				"keyword": {
+					"type": "keyword",
+					"ignore_above": 256
 				}
 			}
 		})
@@ -862,16 +884,41 @@ impl Elasticsearch {
 		}
 
 		json!({
-			"multi_match": {
-				"query": query,
-				"fields": [
-					"name",
-					"indexed_name",
-					"slug",
-					"author",
-					"indexed_author",
-					"summary"
+			"dis_max": {
+				"queries": [
+					Self::native_prefix_tier(query, &["name"], 4),
+					Self::native_prefix_tier(
+						query,
+						&["indexed_name", "slug"],
+						3,
+					),
+					Self::native_prefix_tier(
+						query,
+						&["author", "indexed_author"],
+						2,
+					),
+					Self::native_prefix_tier(query, &["summary"], 1),
 				]
+			}
+		})
+	}
+
+	fn native_prefix_tier(
+		query: &str,
+		fields: &[&str],
+		boost: u8,
+	) -> Value {
+		json!({
+			"constant_score": {
+				"filter": {
+					"multi_match": {
+						"query": query,
+						"type": "bool_prefix",
+						"operator": "and",
+						"fields": fields
+					}
+				},
+				"boost": boost
 			}
 		})
 	}

@@ -1852,8 +1852,6 @@ impl Elasticsearch {
 	pub(super) fn typesense_parity_index_schema() -> Value {
 		json!({
 			"settings": {
-				"number_of_shards": 3,
-				"number_of_replicas": 1,
 				"refresh_interval": "30s",
 				"index.mapping.total_fields.limit": 5000,
 				"analysis": {
