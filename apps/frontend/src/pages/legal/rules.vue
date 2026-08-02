@@ -188,13 +188,13 @@
 		<h2 id="generative-ai">6. Usage of Generative "AI"</h2>
 
 		<p>
-			Projects must be forthright and honest about the usage of generative AI when producing
-			projects or any other posted content and cannot be entirely or primarily comprised of content
-			created or derived from generative AI output.
+			Projects must be forthright and honest about the usage of generative AI in their production,
+			publication, and within the project itself. Projects cannot be entirely or primarily comprised
+			of content created or derived from generative AI output.
 		</p>
 		<p>Projects must abide by all of the following requirements:</p>
 		<ol>
-			<li>Apply the “AI-assisted” content disclosure when:</li>
+			<li>Apply the “Contains AI-generated content” content disclosure when:</li>
 			<ol type="a">
 				<li>a substantial portion of the project's code is a product of AI output.</li>
 				<li>

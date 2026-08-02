@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SmartClickable, Toggle } from '@modrinth/ui'
-import { useId, computed } from 'vue'
+import { computed, useId } from 'vue'
 
 const value = defineModel<boolean>('value', { required: true })
 
