@@ -1,4 +1,6 @@
 use crate::database::PgPool;
+use crate::database::models::notification_item::DBNotification;
+use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::statuses::{
@@ -8,15 +10,13 @@ use actix_web::web::Data;
 use ariadne::ids::UserId;
 use ariadne::networking::message::ServerToClientMessage;
 use ariadne::users::UserStatus;
-use redis::aio::PubSub;
-use redis::{RedisWrite, ToRedisArgs};
+use redis::{RedisWrite, ToRedisArgs, ToSingleRedisArg};
 use serde::{Deserialize, Serialize};
-use tokio_stream::StreamExt;
+use tokio::sync::mpsc;
 
-pub const FRIENDS_CHANNEL_NAME: &str = "friends";
+pub const FRIENDS_CHANNEL_NAME: &str = "friends:v3";
 
 #[derive(Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
 pub enum RedisFriendsMessage {
     StatusUpdate {
         status: UserStatus,
@@ -30,7 +30,7 @@ pub enum RedisFriendsMessage {
     },
     Notification {
         to_user: UserId,
-        notification: Notification,
+        notification_id: NotificationId,
     },
 }
 
@@ -39,22 +39,19 @@ impl ToRedisArgs for RedisFriendsMessage {
     where
         W: ?Sized + RedisWrite,
     {
-        out.write_arg(&serde_json::to_vec(&self).unwrap())
+        out.write_arg(&postcard::to_allocvec(&self).unwrap())
     }
 }
 
+impl ToSingleRedisArg for RedisFriendsMessage {}
+
 pub async fn handle_pubsub(
-    mut pubsub: PubSub,
+    mut messages: mpsc::Receiver<Vec<u8>>,
     pool: PgPool,
     sockets: Data<ActiveSockets>,
 ) {
-    pubsub.subscribe(FRIENDS_CHANNEL_NAME).await.unwrap();
-    let mut stream = pubsub.into_on_message();
-    while let Some(message) = stream.next().await {
-        if message.get_channel_name() != FRIENDS_CHANNEL_NAME {
-            continue;
-        }
-        let payload = serde_json::from_slice(message.get_payload_bytes());
+    while let Some(message) = messages.recv().await {
+        let payload = postcard::from_bytes::<RedisFriendsMessage>(&message);
 
         let pool = pool.clone();
         let sockets = sockets.clone();
@@ -94,14 +91,18 @@ pub async fn handle_pubsub(
 
                 Ok(RedisFriendsMessage::Notification {
                     to_user,
-                    notification,
+                    notification_id,
                 }) => {
-                    let _ = send_notification_to_user(
-                        &sockets,
-                        to_user,
-                        &notification,
-                    )
-                    .await;
+                    if let Ok(Some(notification)) =
+                        DBNotification::get(notification_id.into(), &pool).await
+                    {
+                        let _ = send_notification_to_user(
+                            &sockets,
+                            to_user,
+                            &Notification::from(notification),
+                        )
+                        .await;
+                    }
                 }
 
                 Err(_) => {}

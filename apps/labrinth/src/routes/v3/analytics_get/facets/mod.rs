@@ -1,3 +1,4 @@
+use xredis::RedisPool;
 mod fixed;
 
 use actix_web::{HttpRequest, post, web};
@@ -8,13 +9,11 @@ use crate::models::{
     ids::VersionId, pats::Scopes, v3::analytics::DownloadReason,
 };
 use crate::{
-    auth::get_user_from_headers,
-    database::{PgPool, redis::RedisPool},
-    queue::session::AuthQueue,
+    auth::get_user_from_headers, database::PgPool, queue::session::AuthQueue,
     routes::ApiError,
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(fetch_facets);
 }
 
@@ -58,7 +57,10 @@ pub struct ProjectPlaytimeFacets {
     pub country: Vec<String>,
 }
 
+/// Get analytics facets.  
 #[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
 	responses((status = OK, body = inline(FacetsResponse))),
 )]
 #[post("/facets")]

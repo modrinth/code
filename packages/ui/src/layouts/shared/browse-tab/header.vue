@@ -4,9 +4,14 @@ import type { Component } from 'vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import PageHeader from '#ui/components/base/PageHeader.vue'
+import Admonition from '#ui/components/base/Admonition.vue'
+import Avatar from '#ui/components/base/Avatar.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import PageHeader from '#ui/components/base/page-header/index.vue'
+import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
+import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
-import { useServerImage } from '#ui/composables/servers/use-server-image.ts'
+import { useServerImage } from '#ui/composables/use-server-image'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import SelectedProjectsLeaveModal from './components/SelectedProjectsLeaveModal.vue'
@@ -46,34 +51,6 @@ const iconSrc = computed(() => {
 	return fetchedIcon.value ?? installContext.value?.iconSrc ?? null
 })
 
-const leadingItems = computed(() => {
-	const context = installContext.value
-	if (!context) return []
-
-	return [
-		{
-			id: 'back',
-			type: 'button' as const,
-			icon: LeftArrowIcon,
-			ariaLabel: context.backLabel,
-			tooltip: context.backLabel,
-			onClick: handleBack,
-		},
-		...(iconSrc.value
-			? [
-					{
-						id: 'icon',
-						type: 'avatar' as const,
-						src: iconSrc.value,
-						alt: context.name,
-						avatarSize: '48px',
-						class: 'shrink-0',
-					},
-				]
-			: []),
-	]
-})
-
 const metadataItems = computed(() => {
 	const context = installContext.value
 	if (!context) return []
@@ -89,7 +66,7 @@ const metadataItems = computed(() => {
 	if (context.gameVersion) {
 		items.push({
 			id: 'game-version',
-			label: context.gameVersion,
+			label: `Minecraft ${context.gameVersion}`,
 			icon: Gamepad2Icon,
 			class: '!text-primary',
 		})
@@ -161,14 +138,49 @@ async function handleSelectedProjectsLeaveResult(
 			:installing="isInstallingSelected"
 		/>
 		<PageHeader
-			:header="installContext.name"
-			:leading="leadingItems"
-			:metadata="metadataItems"
+			:title="installContext.name"
 			:divider="props.divider ?? false"
 			:bottom-padding="props.bottomPadding ?? false"
 			main-class="items-center"
 			title-class="leading-8"
 			truncate-title
-		/>
+		>
+			<template #leading>
+				<ButtonStyled circular size="large">
+					<button
+						v-tooltip="installContext.backLabel"
+						type="button"
+						:aria-label="installContext.backLabel"
+						@click="handleBack"
+					>
+						<LeftArrowIcon />
+					</button>
+				</ButtonStyled>
+				<Avatar
+					v-if="iconSrc"
+					:src="iconSrc"
+					:alt="installContext.name"
+					size="48px"
+					class="shrink-0"
+				/>
+			</template>
+
+			<template v-if="metadataItems.length" #metadata>
+				<PageHeaderMetadata>
+					<PageHeaderMetadataItem
+						v-for="item in metadataItems"
+						:key="item.id"
+						:icon="item.icon"
+						:icon-props="item.iconProps"
+						:class="item.class"
+					>
+						{{ item.label }}
+					</PageHeaderMetadataItem>
+				</PageHeaderMetadata>
+			</template>
+		</PageHeader>
+		<Admonition v-if="installContext.warning" type="warning" class="mb-1">
+			{{ installContext.warning }}
+		</Admonition>
 	</template>
 </template>

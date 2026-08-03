@@ -515,7 +515,7 @@ function getDependentProjectTooltip(row: AnalyticsTableRow) {
 		return formatMessage(analyticsMessages.noDependentTooltip)
 	}
 	if (isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
-		return formatMessage(analyticsMessages.unknown)
+		return formatMessage(analyticsMessages.unknownDependentTooltip)
 	}
 
 	const dependencyProjectIds = new Set(row.dependentOnProjectIds)

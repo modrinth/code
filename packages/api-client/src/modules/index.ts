@@ -19,11 +19,14 @@ import { KyrosLogsV1Module } from './kyros/logs/v1'
 import { KyrosUploadSessionsV1Module } from './kyros/upload-sessions/v1'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
+import { LabrinthAnalyticsInternalModule } from './labrinth/analytics/internal'
 import { LabrinthAnalyticsV3Module } from './labrinth/analytics/v3'
 import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
 import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
 import { LabrinthAuthV2Module } from './labrinth/auth/v2'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
+import { LabrinthBlockedUsersInternalModule } from './labrinth/blocked-users/internal'
+import { LabrinthBlockedUsersV3Module } from './labrinth/blocked-users/v3'
 import { LabrinthCampaignInternalModule } from './labrinth/campaign/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthContentV3Module } from './labrinth/content/v3'
@@ -57,6 +60,10 @@ import { MclogsInsightsV1Module } from './mclogs/insights/v1'
 import { MclogsLogsV1Module } from './mclogs/logs/v1'
 import { PaperVersionsV3Module } from './paper/v3'
 import { PurpurVersionsV2Module } from './purpur/v2'
+import { SharedInstancesInstancesV1Module } from './shared-instances/instances/v1'
+import { SharedInstancesInvitesV1Module } from './shared-instances/invites/v1'
+import { SharedInstancesModerationV1Module } from './shared-instances/moderation/v1'
+import { SharedInstancesUsersV1Module } from './shared-instances/users/v1'
 
 type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 
@@ -91,11 +98,14 @@ export const MODULE_REGISTRY = {
 	kyros_logs_v1: KyrosLogsV1Module,
 	kyros_upload_sessions_v1: KyrosUploadSessionsV1Module,
 	labrinth_affiliate_internal: LabrinthAffiliateInternalModule,
+	labrinth_analytics_internal: LabrinthAnalyticsInternalModule,
 	labrinth_analytics_v3: LabrinthAnalyticsV3Module,
 	labrinth_auth_internal: LabrinthAuthInternalModule,
 	labrinth_auth_v2: LabrinthAuthV2Module,
 	labrinth_attribution_internal: LabrinthAttributionInternalModule,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
+	labrinth_blocked_users_internal: LabrinthBlockedUsersInternalModule,
+	labrinth_blocked_users_v3: LabrinthBlockedUsersV3Module,
 	labrinth_campaign_internal: LabrinthCampaignInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_content_v3: LabrinthContentV3Module,
@@ -128,6 +138,10 @@ export const MODULE_REGISTRY = {
 	labrinth_versions_v3: LabrinthVersionsV3Module,
 	paper_versions_v3: PaperVersionsV3Module,
 	purpur_versions_v2: PurpurVersionsV2Module,
+	sharedinstances_invites_v1: SharedInstancesInvitesV1Module,
+	sharedinstances_instances_v1: SharedInstancesInstancesV1Module,
+	sharedinstances_moderation_v1: SharedInstancesModerationV1Module,
+	sharedinstances_users_v1: SharedInstancesUsersV1Module,
 } as const satisfies Record<string, ModuleConstructor>
 
 export type ModuleID = keyof typeof MODULE_REGISTRY

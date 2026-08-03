@@ -1,9 +1,9 @@
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationType;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types";
+const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types:v3";
 
 #[derive(Serialize, Deserialize)]
 pub struct NotificationTypeItem {
@@ -41,10 +41,9 @@ impl NotificationTypeItem {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
-            let cached_types = redis
-                .get_deserialized_from_json(NOTIFICATION_TYPES_NAMESPACE, "all")
-                .await?;
+            let cached_types = redis.get_deserialized(&key).await?;
 
             if let Some(types) = cached_types {
                 return Ok(types);
@@ -61,15 +60,9 @@ impl NotificationTypeItem {
         let types = results.into_iter().map(Into::into).collect();
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
-        redis
-            .set_serialized_to_json(
-                NOTIFICATION_TYPES_NAMESPACE,
-                "all",
-                &types,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &types, None).await?;
 
         Ok(types)
     }

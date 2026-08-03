@@ -5,7 +5,8 @@
 			'has-body': message.body.type === 'text' && !forceCompact,
 			'no-actions': noLinks,
 			private: isPrivateMessage,
-			'show-private-bg': flags.showModeratorPrivateMessageHighlight,
+			'show-private-bg': settings.get(moderationSettings.General.PrivateMessageHighlight),
+			'show-info-bg mb-2 !flex-nowrap py-6': message.body.type === 'legacy_project_message',
 		}"
 	>
 		<template v-if="members[message.author_id]">
@@ -51,18 +52,29 @@
 		</template>
 		<template v-else>
 			<div
-				class="message__icon backed-svg circle moderation-color"
+				class="message__icon backed-svg circle moderation-color shrink-0"
 				:class="{
 					raised: raised,
-					'system-message-icon': ['tech_review_entered', 'tech_review_exit_file_deleted'].includes(
-						message.body.type,
-					),
+					'system-message-icon': [
+						'legacy_project_message',
+						'tech_review_entered',
+						'tech_review_exited',
+						'tech_review_exit_file_deleted',
+					].includes(message.body.type),
 				}"
 			>
-				<ScaleIcon />
+				<InfoIcon v-if="message.body.type === 'legacy_project_message'" class="text-blue" />
+				<ScaleIcon v-else />
 			</div>
 			<span
-				v-if="!['tech_review_entered', 'tech_review_exit_file_deleted'].includes(message.body.type)"
+				v-if="
+					![
+						'legacy_project_message',
+						'tech_review_entered',
+						'tech_review_exited',
+						'tech_review_exit_file_deleted',
+					].includes(message.body.type)
+				"
 				class="message__author moderation-color"
 			>
 				Moderator
@@ -75,6 +87,10 @@
 			v-html="formattedMessage"
 		/>
 		<div v-else class="message__body status-message">
+			<span v-if="message.body.type === 'legacy_project_message'">
+				This project was published on Modrinth before moderation threads existed and may be missing
+				moderation history.
+			</span>
 			<span v-if="message.body.type === 'deleted'"> posted a message that has been deleted. </span>
 			<template v-else-if="message.body.type === 'status_change'">
 				<span v-if="message.body.new_status === 'processing'">
@@ -100,12 +116,15 @@
 			<span v-else-if="message.body.type === 'tech_review_entered'">
 				The project has entered the technical review queue.
 			</span>
+			<span v-else-if="message.body.type === 'tech_review_exited'">
+				The project has left the technical review queue as all pending traces have been resolved.
+			</span>
 			<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
 				The project has left the technical review queue as all files pending review were deleted by
 				the user.
 			</span>
 		</div>
-		<span class="message__date">
+		<span class="message__date shrink-0">
 			<span v-tooltip="formatDateTime(message.created)">
 				{{ timeSincePosted }}
 			</span>
@@ -134,12 +153,14 @@
 <script setup>
 import {
 	EyeOffIcon,
+	InfoIcon,
 	MicrophoneIcon,
 	ModrinthIcon,
 	MoreHorizontalIcon,
 	ScaleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	AutoLink,
 	Avatar,
@@ -185,7 +206,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update-thread'])
-const flags = useFeatureFlags()
+const settings = useModerationSettings()
 
 const formattedMessage = computed(() => {
 	const body = renderString(props.message.body.body)
@@ -214,9 +235,12 @@ const timeSincePosted = ref(formatRelativeTime(props.message.created))
 const isPrivateMessage = computed(() => {
 	return (
 		props.message.body.private ||
-		['tech_review', 'tech_review_entered', 'tech_review_exit_file_deleted'].includes(
-			props.message.body.type,
-		)
+		[
+			'tech_review',
+			'tech_review_entered',
+			'tech_review_exited',
+			'tech_review_exit_file_deleted',
+		].includes(props.message.body.type)
 	)
 })
 
@@ -276,6 +300,15 @@ async function deleteMessage() {
 		inset: 0;
 		position: absolute;
 		background-color: var(--color-orange);
+		opacity: 0.05;
+		pointer-events: none;
+	}
+
+	&.show-info-bg::before {
+		content: '';
+		inset: 0;
+		position: absolute;
+		background-color: var(--color-blue);
 		opacity: 0.05;
 		pointer-events: none;
 	}

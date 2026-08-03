@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "新功能"
   },
+  "badge.release": {
+    "defaultMessage": "正式版"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "取消"
   },
@@ -123,7 +126,7 @@
     "defaultMessage": "你選取的專案尚未安裝"
   },
   "browse.view-prefix": {
-    "defaultMessage": "檢視模式："
+    "defaultMessage": "顯示數量："
   },
   "button.accept": {
     "defaultMessage": "接受"
@@ -218,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "開啟資料夾"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "在瀏覽器中開啟"
+  },
   "button.open-in-folder": {
     "defaultMessage": "在資料夾中開啟"
   },
@@ -287,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "停止"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "切換到這個版本"
+  },
   "button.switch-version": {
     "defaultMessage": "切換版本"
   },
@@ -313,6 +322,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "平臺"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "這個收藏是空的。"
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "正在載入專案..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "沒有專案符合你的搜尋字詞。"
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, other {# 個專案}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "搜尋專案"
   },
   "collections.label.private": {
     "defaultMessage": "私人"
@@ -352,6 +376,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "刪除{itemType}"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "停用{itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {降級} other {更新}}可能會導致相容性問題。你額外新增至模組包的模組或內容將保留，但可能與新版本不相容。"
@@ -422,17 +449,77 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "已新增 {count} 個"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "已變更設定檔"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "已停用"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "已移除（停用）"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "不要安裝"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "已新增"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "已移除"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "已更新"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, other {# 個檔案}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "遊戲版本"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "仍要安裝"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "載入器"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "已連結模組包"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "已取消連結模組包"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "已更新模組包"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "內容無變更"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "已移除 {count} 個"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "已移除 {count} 個（停用）"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "你伺服器上的部分內容無法進行分析，且可能會受到這項變更的影響。"
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "這個更新包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "未知檔案警告"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "未知"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "已更新 {count} 個"
@@ -461,20 +548,23 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "備份正在進行中，建議等候完成後再執行此動作。"
   },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "建立備份可能需耗時數分鐘，視伺服器大小而定。"
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "建立備份"
+  },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "實例"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "按住 Shift 鍵並點選以跳過確認。"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "你模組包的內容現在可以在這裡找到了！"
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "我們建議您在繼續操作之前建立備份，以便在出現任何問題時可以還原您的{type}。"
   },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "模組包內容已移動"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "不再顯示"
+  "content.inline-backup.world-label": {
+    "defaultMessage": "世界"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
@@ -554,11 +644,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "正在刪除 {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "正在刪除 {count, number} 個{contentType}"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "正在刪除{contentType}..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "正在停用 {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "正在停用 {count, number} 個{contentType}"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "正在停用{contentType}..."
@@ -566,11 +662,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "正在啟用 {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "正在啟用 {count, number} 個{contentType}"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "正在啟用{contentType}..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "正在更新 {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "正在更新 {count, number} 個{contentType}"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "正在更新{contentType}..."
@@ -851,6 +953,273 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "設定伺服器"
   },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, other {新增檔案}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "選取應移動到這個群組的檔案。"
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "其他群組中沒有可移動到此處的檔案。"
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "無法載入檔案"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "沒有檔案符合你的搜尋字詞。"
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "搜尋檔案..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, other {已選取 # 個檔案}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "將檔案加入到這個群組"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "新增檔案..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "無法新增檔案"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "內容不被允許"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "已通過"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "證明被拒絕"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "完成"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "沒有授權"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "不允許"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "待處理"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "資訊被拒絕"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "其他"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "新增引用標註"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "版權所有／無授權條款"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "授權條款連結"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "授權條款名稱，建議使用 SPDX 識別碼"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "請選擇授權條款。"
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "連結必須是有效的網址。"
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "例如：MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "（可選）"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "授權條款"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "作品連結"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "授權條款連結"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "作品連結"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "這似乎是 Modrinth 連結。如果這個內容可在 Modrinth 上取得，那麼你的模組包很可能在匯出時出了問題。如果你是從其他網站下載的，建議改為下載 Modrinth 版本；有時這兩者的檔案並不完全相同。"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "備註"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "寫點什麼..."
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "證明擷圖 {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "移除圖片"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "證明圖片"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "拖曳圖片檔案以上傳或點擊選擇圖片檔案"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "如果你提供不實資訊或篡改上傳的圖片，你的專案及帳號可能會被終止。"
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth 工作人員將會核實你提交的證明"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "儲存引用標註"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "選擇授權條款..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "授權類型"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "請提供授權條款連結。如果沒有，建議選擇「版權所有／無授權條款」"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "請提供說明或上傳至少一張證明圖片。"
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "請提供連結。"
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "請提供備註或上傳至少一張證明圖片。"
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "請上傳 PNG、JPEG、GIF、WebP 或 BMP 格式的圖片。"
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "請上傳至少一張證明圖片。"
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "請提供簡短說明或證明圖片。"
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "說明"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "引用標註群組 {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, other {# 個檔案}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "包含的檔案："
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "包含於 {count, plural, other {# 個版本}}中："
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "最後於{date}由 {user} 更新"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "未知"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "授權條款："
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "作品連結："
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "原因"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "無法儲存審查結果"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "這些檔案目前沒有被任何版本使用。"
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "附註："
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "無"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "原始專案"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "擷圖證明 {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "證明圖片："
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "已自動完成引用標註"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "我們之前看過這個檔案，並已為你準備好引用標註。如有任何問題，請透過說明中心聯絡 Modrinth 客服"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "授權條款"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "這個作品的授權條款允許你在模組包中重新發布這個作品。"
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "請上傳跟這個授權條款相關的證明文件。"
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "我的專案"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "由你創作的原創作品。"
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "請上傳有助於驗證你是這個作品的創作者的檔案。"
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "沒有授權"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "我們之前看過這個檔案，其授權條款通常不允許重新發布。"
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "你無權使用這個作品。"
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "特別授權"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "你取得了特別授權，允許你在模組包中重新發布這個作品。"
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "刪除群組"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "這會永久刪除這個引用標註群組及其中的所有檔案，這項動作無法復原。"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "刪除 {title}？"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "無法刪除群組"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "按住 Shift 鍵並點選以跳過確認。"
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "從群組中移除"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "無法分割檔案"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + 另外 {count} 個"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "管理員"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "否"
   },
@@ -903,7 +1272,7 @@
     "defaultMessage": "例如：config.yml"
   },
   "files.delete-modal.deleting-name": {
-    "defaultMessage": "正在刪除「{name}」"
+    "defaultMessage": "即將刪除「{name}」"
   },
   "files.delete-modal.header": {
     "defaultMessage": "刪除檔案"
@@ -1026,7 +1395,7 @@
     "defaultMessage": "沒有任何檔案或資料夾"
   },
   "files.layout.empty-folder-title": {
-    "defaultMessage": "此資料夾是空的"
+    "defaultMessage": "這個資料夾是空的"
   },
   "files.layout.error-message": {
     "defaultMessage": "該資料夾可能不存在"
@@ -1124,6 +1493,9 @@
   "files.row.item-count": {
     "defaultMessage": "{count, plural, other {# 個項目}}"
   },
+  "files.row.parent-folder": {
+    "defaultMessage": "父資料夾"
+  },
   "files.table-header.created": {
     "defaultMessage": "建立時間"
   },
@@ -1195,6 +1567,12 @@
   },
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "安裝 CurseForge 整合包"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "在該網址找不到 CurseForge 整合包"
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "找不到 CurseForge 整合包"
   },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "輸入連結"
@@ -1406,6 +1784,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "無法修復伺服器"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "無法將伺服器重設為初始設定狀態"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "無法儲存安裝設定"
   },
@@ -1421,11 +1802,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "修復完成"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "重設伺服器"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "重設為初始設定"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "此操作將使伺服器回到初始設定流程，以便重新完成設定。您確定要繼續嗎？"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "重設為初始設定"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "伺服器已回到初始設定流程。"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "伺服器已重設為初始設定狀態"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "支援選項"
   },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
@@ -1484,6 +1883,9 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "確定"
   },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "變更為 {gameVersion} 將會修改你伺服器上的下列內容。"
+  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "檢視內容變更"
   },
@@ -1514,6 +1916,9 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "安裝了不相容的內容"
   },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "變更載入器時，所有已安裝的內容都將被停用。我們建議改為重設你的伺服器。"
+  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "變更載入器具有破壞性"
   },
@@ -1528,6 +1933,12 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} 版本"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "你需要重設伺服器才能切換載入器。"
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "重新安裝模組包會將{type}內容重設為原始狀態，你新增的所有模組或內容都將被移除。"
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "重新安裝模組包"
@@ -1570,6 +1981,9 @@
   },
   "installation-settings.unlink": {
     "defaultMessage": "取消連結"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "取消連結將會永久中斷這個{type}與{projectType}的連結。這讓你可以變更載入器與 Minecraft 版本，但你將無法收到未來的更新。"
   },
   "installation-settings.verifying": {
     "defaultMessage": "驗證中..."
@@ -1673,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "找不到內容"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "外部"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "這個檔案未在 Modrinth 上發布。"
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "模組包內容"
   },
@@ -1681,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "沒有專案符合你的搜尋字詞。"
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "在 Slicer 中開啟"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
@@ -1750,6 +2173,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "更新到 {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "更新可能會導致實例損壞。請先查看版本更新日誌並備份。"
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "更新可能會導致世界損壞。請先查看版本更新日誌並備份。"
   },
   "label.actions": {
     "defaultMessage": "動作"
@@ -1946,6 +2375,9 @@
   "label.server": {
     "defaultMessage": "伺服器"
   },
+  "label.server-only": {
+    "defaultMessage": "只顯示伺服器"
+  },
   "label.servers": {
     "defaultMessage": "伺服器"
   },
@@ -2073,7 +2505,7 @@
     "defaultMessage": "俄文"
   },
   "locale.sr-CS": {
-    "defaultMessage": "塞爾維亞文（拉丁）"
+    "defaultMessage": "塞爾維亞文（拉丁字母）"
   },
   "locale.sv-SE": {
     "defaultMessage": "瑞典文"
@@ -2155,6 +2587,9 @@
   },
   "markdown-editor.max-length.value": {
     "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "寫點什麼..."
   },
   "markdown-editor.preview-label": {
     "defaultMessage": "預覽"
@@ -2432,8 +2867,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "用戶端或伺服器端"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "專用伺服器"
+  },
   "project-card.environment.server": {
     "defaultMessage": "伺服器"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "單人遊戲"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -2536,6 +2977,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "平臺"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, other {平臺}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "相容性"
@@ -2704,6 +3148,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} 位{count, plural, other {追蹤者}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "取得授權條款文字內容時發生錯誤。"
+  },
+  "project.license.loading": {
+    "defaultMessage": "正在載入授權條款文字..."
+  },
+  "project.license.title": {
+    "defaultMessage": "授權條款"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 人在線上"
@@ -3110,6 +3563,12 @@
   "project.settings.view.title": {
     "defaultMessage": "檢視"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, other {次下載}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, other {位追蹤者}}"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3118,6 +3577,21 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "切換篩選 {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "保留"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "版本由於缺少授權資訊而被保留"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "解決"
   },
   "project.visibility.archived": {
     "defaultMessage": "已封存"
@@ -3194,6 +3668,18 @@
   "search.filter.option.show_more": {
     "defaultMessage": "顯示更多內容"
   },
+  "search.filter_type.advanced": {
+    "defaultMessage": "進階篩選"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "排除資料包"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "排除模組"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "排除插件"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "環境"
   },
@@ -3246,7 +3732,7 @@
     "defaultMessage": "載入器"
   },
   "search.server_content_type.modpack": {
-    "defaultMessage": "模組支援"
+    "defaultMessage": "含模組"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "原版"
@@ -3428,6 +3914,9 @@
   "servers.access-page.activity-log-filter.users": {
     "defaultMessage": "使用者"
   },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "活動紀錄"
+  },
   "servers.access-page.invite-friends": {
     "defaultMessage": "新增使用者"
   },
@@ -3457,6 +3946,9 @@
   },
   "servers.access-page.notification.load-failed.text": {
     "defaultMessage": "請重新整理頁面後再試一次。"
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "無法載入存取資訊"
   },
   "servers.access-page.notification.member-removed.text": {
     "defaultMessage": "已撤銷 {target} 的存取權。"
@@ -3562,6 +4054,18 @@
   },
   "servers.audit-log.column.world": {
     "defaultMessage": "實例"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "伺服器實例是包含各自安裝內容和世界檔案的獨立環境。"
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "即將推出！"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "沒有符合篩選條件的活動紀錄。"
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "在你的伺服器上執行任意操作後，相關內容便會顯示於此！"
   },
   "servers.audit-log.event.addon-added": {
     "defaultMessage": "已新增內容 <content></content>"
@@ -3996,7 +4500,7 @@
     "defaultMessage": "輸入 Modrinth 使用者名稱"
   },
   "servers.grant-access-modal.target.searching": {
-    "defaultMessage": "搜尋中..."
+    "defaultMessage": "正在搜尋..."
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "無法安裝"
@@ -4009,6 +4513,9 @@
   },
   "servers.installing-banner.error.modpack-install-failed": {
     "defaultMessage": "無法安裝模組包。該模組包可能已損毀或不相容。"
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "這個模組包版本不包含可下載檔案。可能是打包時出了問題。"
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "安裝時發生非預期的錯誤。"
@@ -4235,6 +4742,15 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "現在可以在這裡找到伺服器設定！"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "不再顯示"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "你的伺服器設定已移動位置"
+  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享伺服器"
   },
@@ -4311,7 +4827,7 @@
     "defaultMessage": "你暫時還不會被收取費用。"
   },
   "servers.purchase.step.payment.prompt": {
-    "defaultMessage": "選擇一個付款方式"
+    "defaultMessage": "選擇付款方式"
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "付款方式"
@@ -4469,6 +4985,12 @@
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "選擇你想玩的內容"
   },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "你可以像在單人遊戲中一樣設定世界。選擇遊戲模式與世界種子碼。"
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "設定你的世界"
+  },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "複製位址並告訴好友加入時需要哪些模組，即可將你的伺服器分享給他們。"
   },
@@ -4548,7 +5070,7 @@
     "defaultMessage": "色彩主題"
   },
   "settings.feature-flags.title": {
-    "defaultMessage": "功能標記"
+    "defaultMessage": "功能旗標"
   },
   "settings.language.categories.default": {
     "defaultMessage": "標準語言"
@@ -4583,11 +5105,83 @@
   "settings.pats.title": {
     "defaultMessage": "個人存取權杖"
   },
-  "settings.profile.title": {
-    "defaultMessage": "公開個人檔案"
-  },
   "settings.sessions.title": {
     "defaultMessage": "工作階段"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "新增"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "已加入"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "這個使用者已經被邀請。"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "編輯邀請連結。"
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "編輯邀請連結"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "有效期限"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "你的好友 - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "邀請"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "你的邀請連結會在 {duration} 後過期。"
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "或者，使用邀請連結"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "邀請連結已複製到剪貼簿。"
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "連結已複製"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "無法複製連結"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "使用次數上限"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "沒有找到好友。"
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "沒有找到使用者。"
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "已送出邀請"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} 需要先接受你的好友邀請"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "儲存"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "輸入 Modrinth 使用者名稱"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "正在搜尋..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "無法更新邀請連結"
   },
   "tag.category.128x": {
     "defaultMessage": "128×"
@@ -4782,7 +5376,7 @@
     "defaultMessage": "生物"
   },
   "tag.category.modded": {
-    "defaultMessage": "模組支援"
+    "defaultMessage": "含模組"
   },
   "tag.category.models": {
     "defaultMessage": "模型"
@@ -5123,6 +5717,39 @@
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "忽略全部"
   },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "不要安裝"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "不要再顯示這則警告"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "確認安裝"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "仍要安裝"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "惡意軟體經常透過 Discord 等平臺分享模組檔案來進行傳播。"
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " 未在 Modrinth 上發布。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "未知檔案警告"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " 包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "未知檔案警告"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "無法辨識的檔案"
+  },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "這個使用者自 Modrinth Alpha 時期便已加入，早在該版本於2020年11月結束之前。"
   },
@@ -5218,6 +5845,95 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth 團隊"
+  },
+  "version.content.name": {
+    "defaultMessage": "名稱"
+  },
+  "version.content.version": {
+    "defaultMessage": "版本"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "開發用 jar"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadoc jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "可選資源包"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "主要"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "所需資源包"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "簽署檔案"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "原始碼 jar"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "其他"
+  },
+  "version.section.changes": {
+    "defaultMessage": "變更"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "相容性"
+  },
+  "version.section.content": {
+    "defaultMessage": "內容"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "搜尋內容..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "任何相容的版本"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "任何版本"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "不可用版本"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "這個版本可能已被刪除，或正在由管理員審查。"
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "所需版本可能已被刪除，或正在由管理員審查。"
+  },
+  "version.section.files": {
+    "defaultMessage": "檔案"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "包含的內容"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "已知不相容"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "未提供變更日誌。"
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "無模組載入器"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "可選相依項"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "所需內容"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "補充資源"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "檔案"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "檔案大小"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "類型"
   }
 }
-

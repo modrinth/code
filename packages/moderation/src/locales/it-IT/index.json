@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Aggiungi un indirizzo Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Aggiungi un URL e un nome o un'identificatore SPDX validi per la tua licenza."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Aggiungi info sulla licenza"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Aggiungi link rilevanti che portino fuori da Modrinth, come un sito web, un negozio, o un invito a un server Discord."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Aggiungi link esterni"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Hai selezionato tutte le lingue. Seleziona solo quelle che il server usa attivamente."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Seleziona le lingue pertinenti"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Hai selezionato {totalAvailableTags, plural, one {l'unico tag disponibile} =8 {tutti gli # tag disponibili} =11 {tutti gli # tag disponibili} other {tutti i # tag disponibili}}. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
@@ -137,11 +149,17 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona la risoluzione corretta"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Assicurati di aver fornito la prova del permesso di distribuzione dei contenuti esterni del tuo pacchetto di mod."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Ricontrolla i permessi esterni"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Seleziona le versioni supportate dal tuo server, scegli un pacchetto di mod, o caricane il tuo."
   },
   "nags.select-compatibility.title": {
-    "defaultMessage": "Seleziona la compatibilità"
+    "defaultMessage": "Seleziona le compatibilità"
   },
   "nags.select-country.description": {
     "defaultMessage": "Fai sapere ai giocatori in che regione si trova il tuo server."
@@ -176,6 +194,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "Vedi impostazioni dei collegamenti"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visita bacheca dei permessi"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Vedi impostazioni dei tag"
   },
@@ -205,6 +226,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rivedi il nome"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Hai selezionato {languageCount, plural, one {# lingua} other {# lingue}}. Seleziona solo {languageCount, plural, one {quella} other {quelle}} che il server usa attivamente."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Seleziona le lingue pertinenti"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Hai selezionato {tagCount} tag. Scegline al massimo {maxTagCount} cosicché il tuo server appaia in ricerche rilevanti."

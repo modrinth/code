@@ -1,10 +1,12 @@
 <template>
 	<div>
-		<div class="normal-page no-sidebar">
-			<h1>{{ formatMessage(commonMessages.settingsLabel) }}</h1>
-		</div>
-		<div class="normal-page">
-			<div class="normal-page__sidebar">
+		<NormalPage sidebar="left">
+			<template #header>
+				<h1 class="m-0 text-3xl font-semibold">
+					{{ formatMessage(commonMessages.settingsLabel) }}
+				</h1>
+			</template>
+			<template #sidebar>
 				<NavStack
 					:items="
 						[
@@ -18,7 +20,6 @@
 								link: '/settings/language',
 								label: formatMessage(commonSettingsMessages.language),
 								icon: LanguagesIcon,
-								badge: `${formatMessage(commonMessages.beta)}`,
 							},
 							flags.developerMode
 								? {
@@ -33,6 +34,13 @@
 										link: '/settings/profile',
 										label: formatMessage(commonSettingsMessages.profile),
 										icon: UserIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/social',
+										label: formatMessage(commonSettingsMessages.social),
+										icon: HeartHandshakeIcon,
 									}
 								: null,
 							auth.user
@@ -78,30 +86,45 @@
 										icon: ServerIcon,
 									}
 								: null,
+							isStaff(auth.user) ? { type: 'heading', label: 'Staff' } : null,
+							isStaff(auth.user)
+								? {
+										link: '/settings/moderation',
+										label: 'Moderation',
+										icon: ScaleIcon,
+									}
+								: null,
 						].filter(Boolean)
 					"
 				/>
-			</div>
-			<div class="normal-page__content mt-3 lg:mt-0">
-				<NuxtPage :route="route" />
-			</div>
-		</div>
+			</template>
+			<NuxtPage :route="route" />
+		</NormalPage>
 	</div>
 </template>
 <script setup>
 import {
 	CardIcon,
 	GridIcon,
+	HeartHandshakeIcon,
 	KeyIcon,
 	LanguagesIcon,
 	MonitorSmartphoneIcon,
 	PaintbrushIcon,
+	ScaleIcon,
 	ServerIcon,
 	ShieldIcon,
 	ToggleRightIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { commonMessages, commonSettingsMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import {
+	commonMessages,
+	commonSettingsMessages,
+	defineMessages,
+	NormalPage,
+	useVIntl,
+} from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
 

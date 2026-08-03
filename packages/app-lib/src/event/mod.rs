@@ -234,6 +234,9 @@ pub enum CommandPayload {
         server: Option<String>,
         singleplayer_world: Option<String>,
     },
+    InstallSharedInstanceInvite {
+        invite_id: String,
+    },
     RunMRPack {
         // run or install .mrpack
         path: PathBuf,

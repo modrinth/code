@@ -1,9 +1,14 @@
 <template>
-	<div class="h-full w-full pt-6">
+	<div
+		class="h-full w-full pt-6"
+		:class="isContainedServerRoute ? 'box-border min-h-0 overflow-hidden' : ''"
+	>
 		<ServersManageRootLayout
 			:server-id="serverId"
+			:layout-mode="isContainedServerRoute ? 'contained' : 'page'"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
+			:show-copy-id-action="themeStore.devMode"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
@@ -43,7 +48,14 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { injectAuth, injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
+import { ServerStackIcon } from '@modrinth/assets'
+import {
+	commonMessages,
+	injectAuth,
+	injectModrinthClient,
+	ServersManageRootLayout,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref, shallowRef, watch } from 'vue'
@@ -51,17 +63,20 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
+import { useTheming } from '@/store/theme'
 
 const route = useRoute()
 const router = useRouter()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const breadcrumbs = useBreadcrumbs()
+const themeStore = useTheming()
+const { formatMessage } = useVIntl()
 
 const managedRoute = shallowRef(router.currentRoute.value)
 const serverId = ref(getRouteParam(managedRoute.value.params.id) ?? '')
+const isContainedServerRoute = computed(() => managedRoute.value.name === 'ServerManageOverview')
 
 watch(
 	router.currentRoute,
@@ -78,37 +93,53 @@ function getRouteParam(param: string | string[] | undefined): string | null {
 	return param ?? null
 }
 
-if (serverId.value) {
-	try {
-		await queryClient.ensureQueryData({
-			queryKey: ['servers', 'detail', serverId.value],
-			queryFn: () => client.archon.servers_v0.get(serverId.value)!,
-			staleTime: 30_000,
-		})
-	} catch {
-		// Let mounted layouts' useQuery surface errors; do not fail route setup.
-	}
+function getCachedServerName(id: string): string | undefined {
+	return queryClient
+		.getQueryData<Archon.Servers.v0.ServerGetResponse>(['servers'])
+		?.servers.find((server) => server.server_id === id)?.name
 }
 
 const { data: serverData } = useQuery({
 	queryKey: computed(() => ['servers', 'detail', serverId.value]),
-	queryFn: () => null as unknown as Archon.Servers.v0.Server,
-	enabled: false,
+	queryFn: () => client.archon.servers_v0.get(serverId.value),
+	enabled: computed(() => Boolean(serverId.value)),
+	placeholderData: () =>
+		queryClient
+			.getQueryData<Archon.Servers.v0.ServerGetResponse>(['servers'])
+			?.servers.find((server) => server.server_id === serverId.value),
+	staleTime: 30_000,
 })
 
+const breadcrumbServerId = ref(serverId.value)
+const breadcrumbLabel = ref(
+	getCachedServerName(serverId.value) ?? formatMessage(commonMessages.loadingLabel),
+)
+watch(
+	serverId,
+	(value) => {
+		if (!route.path.startsWith('/hosting/manage/') || route.name === 'Servers') return
+		breadcrumbServerId.value = value
+		breadcrumbLabel.value = getCachedServerName(value) ?? formatMessage(commonMessages.loadingLabel)
+	},
+	{ flush: 'sync' },
+)
 watch(
 	serverData,
 	(server) => {
-		if (server?.name) {
-			breadcrumbs.setName('Server', server.name)
-			breadcrumbs.setContext({
-				name: server.name,
-				link: `/hosting/manage/${serverId.value}/instances`,
-			})
-		}
+		if (!route.path.startsWith('/hosting/manage/') || !server?.name) return
+		breadcrumbLabel.value = server.name
 	},
 	{ immediate: true },
 )
+
+const serverBreadcrumb = useBreadcrumb({
+	slot: 'server',
+	id: () => `server:${breadcrumbServerId.value}`,
+	label: breadcrumbLabel,
+	visual: { type: 'icon', component: ServerStackIcon },
+	to: () => `/hosting/manage/${encodeURIComponent(breadcrumbServerId.value)}`,
+})
+provideBreadcrumbParent(serverBreadcrumb)
 
 watch(
 	() => auth.user.value,

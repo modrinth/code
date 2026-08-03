@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT status AS \"status: PayoutStatus\" FROM payouts WHERE id = 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "status: PayoutStatus",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b92b5bb7d179c4fcdbc45600ccfd2402f52fea71e27b08e7926fcc2a9e62c0f3"
+}

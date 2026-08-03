@@ -11,8 +11,8 @@
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-				{{ formatMessage(messages.admonitionBody) }}
+			<Admonition type="warning" :header="admonitionHeader">
+				{{ admonitionBody }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
@@ -37,12 +37,7 @@
 						@click="confirm"
 					>
 						<TrashIcon />
-						{{
-							formatMessage(messages.deleteButton, {
-								count: visibleCount,
-								itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
-							})
-						}}
+						{{ deleteButtonLabel }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -52,7 +47,7 @@
 
 <script setup lang="ts">
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { nextTick, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -60,6 +55,7 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
+import type { ContentActionWarning } from '../../types'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const { formatMessage } = useVIntl()
@@ -88,6 +84,7 @@ const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
+		warning?: ContentActionWarning | null
 		variant?: 'instance' | 'server'
 		backupTip?: string
 		actionDisabled?: boolean
@@ -95,6 +92,7 @@ const props = withDefaults(
 		targetType?: 'server' | 'instance'
 	}>(),
 	{
+		warning: null,
 		variant: 'instance',
 		backupTip: undefined,
 		actionDisabled: false,
@@ -112,11 +110,35 @@ const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 const visibleCount = ref(props.count)
 const visibleItemType = ref(props.itemType)
+const visibleWarning = ref(props.warning)
+
+const formattedItemType = computed(() =>
+	formatContentTypeSentence(formatMessage, visibleItemType.value, visibleCount.value),
+)
+
+const admonitionHeader = computed(
+	() => visibleWarning.value?.admonitionHeader ?? formatMessage(messages.admonitionHeader),
+)
+
+const admonitionBody = computed(() => {
+	return visibleWarning.value?.admonitionBody ?? formatMessage(messages.admonitionBody)
+})
+
+const deleteButtonLabel = computed(() => {
+	return (
+		visibleWarning.value?.actionLabel ??
+		formatMessage(messages.deleteButton, {
+			count: visibleCount.value,
+			itemType: formattedItemType.value,
+		})
+	)
+})
 
 async function show() {
 	await nextTick()
 	visibleCount.value = props.count
 	visibleItemType.value = props.itemType
+	visibleWarning.value = props.warning
 	modal.value?.show()
 }
 

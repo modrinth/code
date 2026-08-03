@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "Baharu"
   },
+  "badge.release": {
+    "defaultMessage": "Terbitan"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Batal"
   },
@@ -230,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Pasang semula pek mod"
   },
-  "button.remove": {
-    "defaultMessage": "Alih keluar"
-  },
   "button.remove-image": {
     "defaultMessage": "Alih keluar gambar"
   },
@@ -365,6 +365,15 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Nyahpaut"
   },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "pemasangan"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "pelayan"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Memadam"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} ditambah"
   },
@@ -379,6 +388,9 @@
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} dialih keluar"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Sesetengah kandungan pada pelayan anda tidak dapat dianalisis dan mungkin terjejas oleh perubahan ini."
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} dikemas kini"
@@ -407,20 +419,23 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Sandaran sedang dijalankan, disyorkan untuk menunggu sehingga penyandaran selesai sebelum melakukan tindakan ini."
   },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Penciptaan sandaran mungkin mengambil masa beberapa minit bergantung pada saiz pelayan anda."
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Cipta sandaran"
+  },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "pemasangan"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Tahan Shift sambil mengklik untuk melangkau pengesahan."
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Kandungan pek mod anda kini boleh didapati di sini!"
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Kami mengesyorkan agar anda membuat sandaran sebelum meneruskan supaya anda boleh memulihkan {type} anda sekiranya terdapat sebarang kerosakan."
   },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Kandungan pek mod telah berpindah"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Jangan tunjukkan lagi"
+  "content.inline-backup.world-label": {
+    "defaultMessage": "dunia"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Kandungan tambahan"
@@ -770,6 +785,51 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Sediakan pelayan"
   },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Lulus"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Selesai"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Menunggu"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Lain-lain"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(pilihan)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Lesen"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Nampaknya ini pautan Modrinth. Jika kandungan ini tersedia di Modrinth, pek anda mungkin telah dieksport secara salah. Jika anda memuat turunnya dari tapak lain, cuba muat turun versi Modrinth; kadangkala ia bukan fail yang sama."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Catatan"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Tidak diketahui"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Berlesen:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Sebab"
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Catatan:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Tiada"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Lesen"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Penyederhana"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Tidak"
   },
@@ -1112,6 +1172,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Pasang pek mod CurseForge"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Tidak dapat menemui pek mod CurseForge pada URL tersebut."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Pek mod CurseForge tidak ditemui"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Masukkan pautan"
   },
@@ -1322,6 +1388,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Gagal membaiki pelayan"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Gagal menetapkan semula pelayan kepada proses penetapan awal"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Gagal menyimpan tetapan pemasangan"
   },
@@ -1337,11 +1406,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Pembaikan selesai"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Tetap semula pelayan"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal dan boleh dipulihkan."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Pilihan ini akan mengembalikan pelayan ke proses penetapan awal supaya penetapan boleh diselesaikan semula. Adakah anda pasti mahu meneruskan?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Pelayan telah dikembalikan ke aliran penetapan awal."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Pilihan sokongan"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
@@ -1400,6 +1487,9 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Pastikan"
   },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Menukar kepada {gameVersion} akan mengubah suai kandungan berikut pada pelayan anda."
+  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Semak perubahan kandungan"
   },
@@ -1430,6 +1520,9 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Kandungan yang tidak serasi dipasang"
   },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Apabila menukar pemuat, semua kandungan yang telah dipasang akan dinyahdayakan. Kami mengesyorkan supaya anda menetapkan semula pelayan anda."
+  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Menukar pemuat boleh menyebabkan kerosakan"
   },
@@ -1438,6 +1531,9 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Versi {loader}"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "Anda perlu menetap semula pelayan anda untuk menukar pemuat."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Pemasangan semula pek mod akan menetapkan semula kandungan {type} kepada keadaan asalnya yang akan mengalih keluar sebarang mod atau kandungan yang telah anda tambahkan."
@@ -1657,6 +1753,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Kemas kini ke {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Pengemaskinian boleh merosakkan pemasangan anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Pengemaskinian boleh merosakkan dunia anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
   },
   "label.actions": {
     "defaultMessage": "Tindakan"
@@ -3005,6 +3107,15 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "T"
   },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "Ditahan"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Selesaikan"
+  },
   "project.visibility.archived": {
     "defaultMessage": "Diarkibkan"
   },
@@ -3392,20 +3503,158 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Pemasangan"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Pemasangan pelayan ialah persekitaran yang terkandung dengan kandungan dan fail dunia yang dipasang sendiri."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Akan datang!"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "Tiada aktiviti yang sepadan dengan penapis anda."
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "Lakukan tindakan pada pelayan anda dan anda akan melihatnya di sini!"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "Kandungan <content></content> telah ditambah"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "Kandungan <content></content> telah diubah"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "Kandungan <content></content> telah dipadamkan"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "Kandungan telah dipadamkan"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "Kandungan <content></content> telah dinyahdayakan"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "Kandungan <content></content> telah didayakan"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Kandungan <content></content> telah dikemas kini"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "<files></files> telah dimuat naik"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "Sandaran <backup></backup> telah diubah"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "Sandaran telah diubah"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "Sandaran <backup></backup> telah dicipta"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "Sandaran telah dicipta"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "Sandaran <backup></backup> telah dipadamkan"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "Sandaran telah dipadam"
+  },
   "servers.audit-log.event.backup-renamed": {
     "defaultMessage": "Sandaran <from></from> telah dinamakan semula kepada <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "Sandaran telah dinamakan semula"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "Sandaran <backup></backup> telah dipulihkan"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "Sandaran telah dipulihkan"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "Konfigurasi pelayan telah diubah"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "Konsol telah dikosongkan"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "Perintah konsol <command></command> telah dijalankan"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "Fail <file></file> telah diubah"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "Fail <file></file> telah dipadamkan"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Fail <file></file> telah disunting"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "<from></from> telah dinamakan semula kepada <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "Fail <file></file> telah dimuat naik"
   },
   "servers.audit-log.event.game-version-changed": {
     "defaultMessage": "Versi Minecraft telah diubah kepada <version></version>"
   },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Masa jalan Java telah diubah kepada <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Versi Java telah diubah kepada <java-version></java-version>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Pemuat telah diubah kepada <loader></loader> <version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Pemuat telah diubah kepada <loader></loader>"
+  },
   "servers.audit-log.event.loader-version-changed": {
     "defaultMessage": "Versi pemuat telah diubah kepada <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "Versi pemuat telah dikosongkan"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Pek mod telah diubah"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Pek mod telah diubah kepada <modpack></modpack>"
   },
   "servers.audit-log.event.modpack-changed-to-version": {
     "defaultMessage": "Versi pek mod telah diubah kepada versi <version></version>"
   },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Pek mod telah dinyahpautkan"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Pek mod <modpack></modpack> telah dinyahpautkan"
+  },
   "servers.audit-log.event.modpack-unlinked-version": {
     "defaultMessage": "Pek mod versi <version></version> telah dinyahpautkan"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "Peruntukan port <port></port> telah ditambah"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Peruntukan port <port></port> telah dialih keluar"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "Pelayan dicipta"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "Pelayan telah dimatikan"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "Metadata pelayan telah diubah"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "Nama pelayan telah diubah kepada <name></name>"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "Pelan telah diubah kepada <specs></specs>"
   },
   "servers.audit-log.event.server-plan.cpu": {
     "defaultMessage": "{count, number} CPU"
@@ -3413,11 +3662,62 @@
   "servers.audit-log.event.server-plan.new-plan": {
     "defaultMessage": "pelan baharu"
   },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "RAM {amount, number} GB"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "RAM {amount, number} MB"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "Storan {amount, number} GB"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "Storan {amount, number} MB"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Sifat pelayan <properties></properties> telah diubah suai"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Sifat pelayan telah diubah suai"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Pelayan telah diperuntukkan semula"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Pelayan telah dibaiki"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Pelayan ditetapkan semula"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Pelayan telah dimulakan semula"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Pelayan telah dimulakan"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Pelayan telah dihentikan"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Subdomain pelayan telah diubah kepada <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "Telah log masuk melalui SFTP"
+  },
   "servers.audit-log.event.startup-command-modified": {
     "defaultMessage": "Perintah permulaan telah diubah kepada <command></command>"
   },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Peristiwa tidak diketahui"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Aktiviti pelayan telah dirakam"
+  },
   "servers.audit-log.event.user-invite-revoked": {
     "defaultMessage": "Jemputan untuk <target-user></target-user> telah dibatalkan"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "<target-user></target-user> telah dijemput"
   },
   "servers.audit-log.event.user-invited-with-permissions": {
     "defaultMessage": "<target-user></target-user> telah dijemput dengan keizinan <permission-label>{permissions}</permission-label>"
@@ -3827,6 +4127,15 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Mereka kini boleh ditemui di sini!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Jangan tunjukkan lagi"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Tetapan pelayan anda telah dipindahkan"
+  },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Pelayan anda"
   },
@@ -4016,6 +4325,12 @@
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Pilih apa yang hendak dimainkan"
   },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Sediakan dunia anda seperti dunia ekapemain. Pilih mod permainan dan benih dunia."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Konfigurasikan dunia anda"
+  },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Kongsikan pelayan anda dengan rakan-rakan anda dengan menyalin alamat dan memberitahu mereka mod yang mereka perlukan untuk sertai."
   },
@@ -4126,9 +4441,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Token akses peribadi"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Profil awam"
   },
   "settings.sessions.title": {
     "defaultMessage": "Sesi"
@@ -4687,6 +4999,38 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Pasukan Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Nama"
+  },
+  "version.content.version": {
+    "defaultMessage": "Versi"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "Jar pembangunan"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Utama"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Lain-lain"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Perubahan"
+  },
+  "version.section.content": {
+    "defaultMessage": "Kandungan"
+  },
+  "version.section.files": {
+    "defaultMessage": "Fail"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Fail"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Saiz"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Jenis"
   }
 }
-

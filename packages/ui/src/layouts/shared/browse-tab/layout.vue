@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
-import { computed, toValue } from 'vue'
+import { computed, ref, toValue } from 'vue'
 
-import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
@@ -14,15 +13,22 @@ import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { commonMessages, formatProjectTypeSentence } from '#ui/utils/common-messages'
 import type { SortType } from '#ui/utils/search'
 
+import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
+import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
-const installWarning = computed(() => ctx.installContext?.value?.warning)
+const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'BrowseInstallHeader',
+)
 
 const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
 	ctx.effectiveSortTypes.value.map((st) => ({
@@ -60,14 +66,52 @@ const messages = defineMessages({
 		defaultMessage: 'No results found for your query!',
 	},
 })
+
+function getLoaderFieldValues(
+	result: Labrinth.Search.v3.ResultSearchProject,
+	field: string,
+): string[] {
+	return (result.project_loader_fields?.[field] ?? []).filter(
+		(value): value is string => typeof value === 'string',
+	)
+}
+
+function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, displayOnly: boolean) {
+	const tags = new Set(displayOnly ? result.display_categories : result.categories)
+
+	for (const loader of result.loaders) {
+		if (loader !== 'mrpack') {
+			tags.add(loader)
+		}
+	}
+
+	if (result.loaders.includes('mrpack')) {
+		for (const loader of getLoaderFieldValues(result, 'mrpack_loaders')) {
+			tags.add(loader)
+		}
+	}
+
+	return Array.from(tags)
+}
 </script>
 
 <template>
-	<Admonition v-if="installWarning" type="warning">
-		{{ installWarning }}
-	</Admonition>
+	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
+		<div
+			ref="stickyInstallHeaderRef"
+			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-3 py-4 border-surface-5"
+			:class="[isInstallHeaderStuck ? 'border-t' : '']"
+		>
+			<BrowseInstallHeader />
+		</div>
+	</template>
+	<SelectedProjectsFloatingBar v-if="ctx.installContext?.value && ctx.variant !== 'web'" />
 
-	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
+	<NavTabs
+		v-if="ctx.showProjectTypeTabs.value"
+		:links="ctx.selectableProjectTypes.value"
+		:replace="ctx.variant === 'app'"
+	/>
 
 	<StyledInput
 		v-model="ctx.query.value"
@@ -151,7 +195,11 @@ const messages = defineMessages({
 	<SearchFilterControl
 		v-else
 		v-model:selected-filters="ctx.currentFilters.value"
-		:filters="ctx.filters.value.filter((f) => f.display !== 'none')"
+		:filters="
+			ctx.filters.value.filter(
+				(f) => f.display !== 'none' && !(ctx.hiddenFilterTypes?.value ?? []).includes(f.id),
+			)
+		"
 		:provided-filters="ctx.providedFilters?.value ?? []"
 		:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
 		:provided-message="lockedMessages?.providedBy"
@@ -230,15 +278,13 @@ const messages = defineMessages({
 					v-for="result in ctx.projectHits.value"
 					:key="result.project_id"
 					:link="ctx.getProjectLink(result)"
-					:title="result.title"
-					:icon-url="result.icon_url"
+					:title="result.name"
+					:icon-url="result.icon_url ?? undefined"
 					:author="{
 						name: result.organization == null ? result.author : result.organization,
 						link:
 							result.organization_id == null
-								? ctx.variant === 'web'
-									? `/user/${result.author_id ?? result.author}`
-									: `https://modrinth.com/user/${result.author_id ?? result.author}`
+								? `/user/${encodeURIComponent(result.author_id ?? result.author)}`
 								: ctx.variant === 'web'
 									? `/organization/${result.organization_id}`
 									: `https://modrinth.com/organization/${result.organization_id}`,
@@ -249,9 +295,9 @@ const messages = defineMessages({
 						ctx.effectiveCurrentSortType.value.name === 'newest' ? 'published' : 'updated'
 					"
 					:downloads="result.downloads"
-					:summary="result.description"
-					:tags="result.display_categories"
-					:all-tags="result.categories"
+					:summary="result.summary"
+					:tags="getProjectCardTags(result, true)"
+					:all-tags="getProjectCardTags(result, false)"
 					:deprioritized-tags="ctx.deprioritizedTags.value"
 					:exclude-loaders="ctx.excludeLoaders.value"
 					:followers="result.follows"
@@ -259,10 +305,7 @@ const messages = defineMessages({
 					:color="result.color ?? undefined"
 					:environment="
 						['mod', 'modpack'].includes(ctx.projectType.value)
-							? {
-									clientSide: result.client_side as Labrinth.Projects.v2.Environment,
-									serverSide: result.server_side as Labrinth.Projects.v2.Environment,
-								}
+							? result.project_loader_fields?.environment?.[0]
 							: undefined
 					"
 					:layout="ctx.effectiveLayout.value"

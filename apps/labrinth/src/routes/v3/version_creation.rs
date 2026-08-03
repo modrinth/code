@@ -10,7 +10,6 @@ use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
 use crate::database::models::{self, DBOrganization, image_item};
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::exp;
@@ -23,9 +22,8 @@ use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
     VersionType,
 };
-use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
+use crate::models::projects::{DependencyType, skip_nulls};
 use crate::models::teams::ProjectPermissions;
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
 use crate::util::http::HttpClient;
@@ -34,7 +32,7 @@ use crate::util::validate::validation_errors_to_string;
 use crate::validate::{ValidationResult, validate_file};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use hex::ToHex;
@@ -43,6 +41,7 @@ use serde::{Deserialize, Serialize};
 use sha1::Digest;
 use std::collections::{HashMap, HashSet};
 use validator::Validate;
+use xredis::RedisPool;
 
 fn default_requested_status() -> VersionStatus {
     VersionStatus::Listed
@@ -105,6 +104,48 @@ struct InitialFileData {
 }
 
 // under `/api/v1/version`
+/// Create a version on an existing project.
+#[utoipa::path(
+	tag = "versions",
+	post,
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing `data` and uploaded files"
+	),
+	responses(
+		(status = 200, description = "Expected response to a valid request", body = Version),
+		(status = 400, description = "Request was invalid, see given error"),
+		(
+			status = 401,
+			description = "Incorrect token scopes or no authorization to access the requested item(s)"
+		)
+	),
+	security(("bearer_auth" = ["VERSION_CREATE"]))
+)]
+#[post("/version")]
+pub async fn version_create_route(
+    req: HttpRequest,
+    payload: Multipart,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<dyn FileHost>,
+    session_queue: Data<AuthQueue>,
+    http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
+) -> Result<HttpResponse, CreateError> {
+    version_create(
+        req,
+        payload,
+        client,
+        redis,
+        file_host,
+        session_queue,
+        http,
+        search_state,
+    )
+    .await
+}
+
 pub async fn version_create(
     req: HttpRequest,
     mut payload: Multipart,
@@ -112,7 +153,6 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     http: web::Data<HttpClient>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
@@ -128,7 +168,6 @@ pub async fn version_create(
         &mut uploaded_files,
         &client,
         &session_queue,
-        &moderation_queue,
         &http,
     )
     .await;
@@ -145,19 +184,20 @@ pub async fn version_create(
         if let Err(e) = rollback_result {
             return Err(e.into());
         }
-    } else if let Ok((_, project_id)) = &result {
+    } else if let Ok((_, project_id, version_id)) = &result {
         transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            *project_id,
-            None,
-            Some(true),
-        )
-        .await?;
+        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
+            .await?;
+        search_state
+            .queue
+            .push_version_changes(
+                (*project_id).into(),
+                [VersionId::from(*version_id)],
+            )
+            .await;
     }
 
-    result.map(|(response, _)| response)
+    result.map(|(response, _, _)| response)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -170,9 +210,9 @@ async fn version_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     session_queue: &AuthQueue,
-    moderation_queue: &AutomatedModerationQueue,
     http: &reqwest::Client,
-) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
+) -> Result<(HttpResponse, models::DBProjectId, models::DBVersionId), CreateError>
+{
     let mut initial_version_data = None;
     let mut version_builder = None;
     let mut selected_loaders = None;
@@ -530,20 +570,61 @@ async fn version_create_inner(
         }
     }
 
-    let project_status = sqlx::query!(
-        "SELECT status FROM mods WHERE id = $1",
-        project_id as models::DBProjectId,
+    Ok((
+        HttpResponse::Ok().json(response),
+        project_id,
+        models::DBVersionId::from(version_id),
+    ))
+}
+
+/// Add files to an existing version.
+#[utoipa::path(
+	tag = "versions",
+	post,
+	params(
+		("version_id" = VersionId, Path, description = "The ID of the version")
+	),
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing files to upload"
+	),
+	responses(
+		(status = NO_CONTENT, description = "Expected response to a valid request"),
+		(
+			status = 401,
+			description = "Incorrect token scopes or no authorization to access the requested item(s)"
+		),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	),
+	security(("bearer_auth" = ["VERSION_WRITE"]))
+)]
+#[post("/version/{version_id}/file")]
+pub async fn upload_file_to_version_route(
+    req: HttpRequest,
+    url_data: web::Path<(VersionId,)>,
+    payload: Multipart,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<dyn FileHost>,
+    session_queue: web::Data<AuthQueue>,
+    http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
+) -> Result<HttpResponse, CreateError> {
+    upload_file_to_version(
+        req,
+        url_data,
+        payload,
+        client,
+        redis,
+        file_host,
+        session_queue,
+        http,
+        search_state,
     )
-    .fetch_optional(pool)
-    .await?;
-
-    if let Some(project_status) = project_status
-        && project_status.status == ProjectStatus::Processing.as_str()
-    {
-        moderation_queue.projects.insert(project_id.into());
-    }
-
-    Ok((HttpResponse::Ok().json(response), project_id))
+    .await
 }
 
 pub async fn upload_file_to_version(
@@ -560,17 +641,18 @@ pub async fn upload_file_to_version(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let version_id = models::DBVersionId::from(url_data.into_inner().0);
+    let version_id = url_data.into_inner().0;
+    let db_version_id = models::DBVersionId::from(version_id);
 
     let result = upload_file_to_version_inner(
         req,
         &mut payload,
-        client,
+        client.clone(),
         &mut transaction,
         redis.clone(),
         &**file_host,
         &mut uploaded_files,
-        version_id,
+        db_version_id,
         &session_queue,
         &http,
     )
@@ -590,14 +672,12 @@ pub async fn upload_file_to_version(
         }
     } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            *project_id,
-            None,
-            Some(true),
-        )
-        .await?;
+        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
+            .await?;
+        search_state
+            .queue
+            .push_version_changes((*project_id).into(), [version_id])
+            .await;
     }
 
     result.map(|(response, _)| response)
@@ -850,9 +930,9 @@ pub async fn upload_file(
         ));
     }
 
-    if file_name.contains('/') {
+    if !path_util::is_safe_file_name(file_name) {
         return Err(CreateError::InvalidInput(
-            "File names must not contain slashes!".to_string(),
+            "file names must be a single safe path component".to_string(),
         ));
     }
 

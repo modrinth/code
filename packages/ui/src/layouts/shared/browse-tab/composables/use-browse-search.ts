@@ -3,7 +3,14 @@ import type { ComputedRef, Ref, ShallowRef } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import type { FilterType, FilterValue, ProjectType, SortType } from '#ui/utils/search'
+import { useDebugLogger } from '#ui/composables/debug-logger'
+import type {
+	EnvironmentSearchOverride,
+	FilterType,
+	FilterValue,
+	ProjectType,
+	SortType,
+} from '#ui/utils/search'
 import { LOADER_FILTER_TYPES, useSearch } from '#ui/utils/search'
 import { useServerSearch } from '#ui/utils/server-search'
 
@@ -17,6 +24,7 @@ export interface UseBrowseSearchOptions {
 		categories: Labrinth.Tags.v2.Category[]
 	}>
 	providedFilters?: ComputedRef<FilterValue[]>
+	environmentOverride?: ComputedRef<EnvironmentSearchOverride | undefined>
 	active?: ComputedRef<boolean>
 	search: (params: string) => Promise<BrowseSearchResponse>
 	persistentQueryParams: string[]
@@ -61,8 +69,11 @@ export interface BrowseSearchState {
 }
 
 export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchState {
+	const debug = useDebugLogger('BrowseSearch')
 	const route = useRoute()
 	const router = useRouter()
+
+	debug('init, projectType:', options.projectType.value)
 
 	const active = computed(() => options.active?.value ?? true)
 	const projectTypes = computed(() => [options.projectType.value] as ProjectType[])
@@ -80,7 +91,12 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		sortTypes,
 		requestParams,
 		createPageParams,
-	} = useSearch(projectTypes, options.tags, options.providedFilters ?? computed(() => []))
+	} = useSearch(
+		projectTypes,
+		options.tags,
+		options.providedFilters ?? computed(() => []),
+		options.environmentOverride ?? computed(() => undefined),
+	)
 
 	const {
 		serverCurrentSortType,
@@ -178,16 +194,17 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	}
 
 	const providedFiltersOrEmpty = computed(() => options.providedFilters?.value ?? [])
+	const effectiveCurrentFilters = computed(() =>
+		isServerType.value ? serverCurrentFilters.value : currentFilters.value,
+	)
 
 	watch(
 		[
 			query,
 			maxResults,
 			options.projectType,
-			currentSortType,
-			serverCurrentSortType,
-			currentFilters,
-			serverCurrentFilters,
+			effectiveCurrentSortType,
+			effectiveCurrentFilters,
 			overriddenProvidedFilterTypes,
 			providedFiltersOrEmpty,
 		],
@@ -197,7 +214,11 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		{ deep: true },
 	)
 
-	watch(effectiveRequestParams, () => {
+	watch(effectiveRequestParams, (newVal, oldVal) => {
+		debug('effectiveRequestParams changed', {
+			from: oldVal?.substring(0, 80),
+			to: newVal?.substring(0, 80),
+		})
 		clearSearchDebounce()
 		if (!active.value) {
 			return
@@ -220,6 +241,11 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		}
 
 		const version = ++searchVersion
+		debug('refreshSearch start', {
+			version,
+			projectType: options.projectType.value,
+			params: effectiveRequestParams.value.substring(0, 100),
+		})
 
 		const currentHitsEmpty = isServerType.value
 			? serverHits.value.length === 0
@@ -236,6 +262,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 			}
 
 			if (version !== searchVersion) {
+				debug('refreshSearch stale, discarding', { version, current: searchVersion })
 				return
 			}
 
@@ -245,10 +272,17 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 				projectHits.value = response.projectHits
 			}
 			totalHits.value = response.total_hits
+			debug('refreshSearch complete', {
+				version,
+				hits: response.total_hits,
+				projectHits: response.projectHits.length,
+				serverHits: response.serverHits.length,
+			})
 
 			updateUrlParams()
 			loading.value = false
 		} catch (err) {
+			debug('refreshSearch error', err)
 			console.error('Browse search error:', err)
 			if (version === searchVersion) {
 				loading.value = false
@@ -260,6 +294,8 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		if (!active.value) {
 			return
 		}
+
+		debug('updateUrlParams', { path: route.path })
 		const persistentParams: Record<string, string | (string | null)[] | null | undefined> = {}
 
 		for (const [key, value] of Object.entries(route.query)) {
@@ -270,9 +306,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 		const extraParams = options.getExtraQueryParams?.() ?? {}
 		for (const [key, value] of Object.entries(extraParams)) {
-			if (value !== undefined) {
-				persistentParams[key] = value
-			}
+			persistentParams[key] = value
 		}
 
 		const params = {
@@ -300,7 +334,8 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 	watch(
 		() => options.projectType.value,
-		() => {
+		(newType, oldType) => {
+			debug('projectType changed', { from: oldType, to: newType })
 			effectiveCurrentSortType.value =
 				effectiveSortTypes.value.find((sortType) => sortType.name === 'relevance') ??
 				effectiveSortTypes.value[0]

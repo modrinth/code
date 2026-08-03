@@ -77,6 +77,7 @@ export namespace Labrinth {
 				status: SubscriptionStatus
 				created: string
 				metadata?: SubscriptionMetadata
+				next_charge_tax_amount?: number | null
 			}
 
 			export type SubscriptionMetadata =
@@ -373,6 +374,14 @@ export namespace Labrinth {
 				date_created: string
 			}
 
+			export type OverrideFileOnPlatform = {
+				file_path: string
+				sha1: string
+				version_id: string
+				platform_version_id: string
+				platform_project_id: string
+			}
+
 			export type AttributionGroup = {
 				id: string
 				flame_project: FlameProject | null
@@ -381,10 +390,19 @@ export namespace Labrinth {
 				attributed_by: string | null
 				files: AttributionFile[]
 				versions: AttributionVersionInfo[]
+				override_files_on_platform: OverrideFileOnPlatform[]
 			}
 
 			export type UpdateGroupRequest = {
 				attribution: AttributionResolution
+			}
+
+			export type DeleteGroupsRequest = {
+				groups: string[]
+			}
+
+			export type DeleteAllGroupsRequest = {
+				project_id: string
 			}
 
 			export type AssignRequest = {
@@ -396,6 +414,12 @@ export namespace Labrinth {
 			export type SplitRequest = {
 				sha1: string
 				project_id: string
+			}
+
+			export type FileScanResponse = {
+				new_attribution_groups: number
+				new_attribution_files: number
+				scanned_file_names: string[]
 			}
 		}
 	}
@@ -418,7 +442,7 @@ export namespace Labrinth {
 				| { context: 'project'; project_id: string }
 				| { context: 'version'; version_id: string }
 				| { context: 'thread_message'; thread_message_id: string }
-				| { context: 'report'; report_id: string }
+				| { context: 'report'; report_id: string | null }
 			)
 
 			export type UploadedImageFor<C extends ImageUploadContext> = Extract<
@@ -434,11 +458,21 @@ export namespace Labrinth {
 				| { context: 'project'; project_id: string }
 				| { context: 'version'; version_id: string }
 				| { context: 'thread_message'; thread_message_id: string }
-				| { context: 'report'; report_id: string }
+				| { context: 'report'; report_id?: string }
 		}
 	}
 
 	export namespace Analytics {
+		export namespace Internal {
+			export type AnalyticsEventUpsert = {
+				announcement_url: string | null
+				for_metric_kind: v3.AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				starts: string
+			}
+		}
+
 		export namespace v3 {
 			export type AnalyticsEventId = number
 			export type AnalyticsEventMetricKind = 'views' | 'revenue' | 'downloads' | 'playtime'
@@ -449,14 +483,6 @@ export namespace Labrinth {
 				title: string
 				ends: string
 				id: AnalyticsEventId
-				starts: string
-			}
-
-			export type AnalyticsEventUpsert = {
-				announcement_url: string | null
-				for_metric_kind: AnalyticsEventMetricKind[] | null
-				title: string
-				ends: string
 				starts: string
 			}
 
@@ -740,6 +766,7 @@ export namespace Labrinth {
 				email: string
 				challenge: string
 				sign_up_newsletter?: boolean
+				account_consent?: boolean
 			}
 
 			export type CreateAccountResponse = {
@@ -757,6 +784,7 @@ export namespace Labrinth {
 				state: string
 				challenge: string
 				sign_up_newsletter: boolean
+				account_consent?: boolean
 			}
 
 			export type CreateOAuthAccountResponse = {
@@ -1333,6 +1361,7 @@ export namespace Labrinth {
 			}
 
 			export type VersionFile = {
+				id?: string
 				hashes: VersionFileHash
 				url: string
 				filename: string
@@ -1454,6 +1483,7 @@ export namespace Labrinth {
 			}
 
 			export interface VersionFile {
+				id?: string
 				hashes: VersionFileHash
 				url: string
 				filename: string
@@ -1635,6 +1665,8 @@ export namespace Labrinth {
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
 				github_id?: number
+				discord_id?: string
+				steam_id?: string
 			}
 
 			export type SearchUser = {
@@ -1658,6 +1690,18 @@ export namespace Labrinth {
 				accepted: boolean
 				created: string
 			}
+		}
+	}
+
+	export namespace BlockedUsers {
+		export namespace Internal {
+			export type BlockStatus = {
+				blocked: boolean
+			}
+		}
+
+		export namespace v3 {
+			export type BlockedUserId = string
 		}
 	}
 
@@ -1730,10 +1774,22 @@ export namespace Labrinth {
 	}
 
 	export namespace Search {
+		export type SearchParams = {
+			query?: string
+			offset?: string | number
+			index?: string
+			limit?: string | number
+			new_filters?: string
+			facets?: string[][]
+			filters?: string
+			version?: string
+		}
+
 		export namespace v2 {
 			export interface ResultSearchProject {
 				project_id: string
 				project_type: string
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
@@ -1771,6 +1827,7 @@ export namespace Labrinth {
 				version_id: string
 				project_id: string
 				project_types: string[]
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
@@ -1790,7 +1847,9 @@ export namespace Labrinth {
 				featured_gallery: string | null
 				color: number | null
 				loaders: string[]
-				project_loader_fields?: Record<string, unknown[]>
+				project_loader_fields?: Record<string, unknown[]> & {
+					environment?: Projects.v3.Environment[]
+				}
 				minecraft_server?: Projects.v3.MinecraftServer | null
 				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
 				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
@@ -1822,6 +1881,19 @@ export namespace Labrinth {
 						type: 'status_change'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
 				  }
 				| {
 						type: 'thread_closure'
@@ -1869,13 +1941,14 @@ export namespace Labrinth {
 
 	export namespace Reports {
 		export namespace v3 {
-			export type ItemType = 'project' | 'version' | 'user' | 'unknown'
+			export type ItemType = 'project' | 'version' | 'user' | 'shared-instance' | 'unknown'
 
 			export type Report = {
 				id: string
 				report_type: string
 				item_id: string
 				item_type: ItemType
+				shared_instance_version_id?: number
 				reporter: string
 				body: string
 				created: string
@@ -1906,6 +1979,57 @@ export namespace Labrinth {
 
 	export namespace Moderation {
 		export namespace Internal {
+			export type Ownership =
+				| {
+						kind: 'user'
+						id: string
+						name: string
+						icon_url: string | null
+				  }
+				| {
+						kind: 'organization'
+						id: string
+						name: string
+						icon_url: string | null
+				  }
+
+			export type ProjectsSort = 'oldest' | 'newest' | 'most_external_deps' | 'least_external_deps'
+
+			export type ProjectsRequest = {
+				count?: number
+				offset?: number
+				has_external_dependencies?: boolean
+				exclude_technical_review?: boolean
+				query?: string
+				project_type?: string
+				sort?: ProjectsSort
+			}
+
+			export type QueueProject = {
+				id: string
+				slug: string | null
+				name: string
+				summary: string
+				icon_url: string | null
+				status: Projects.v2.ProjectStatus
+				requested_status: Projects.v2.ProjectStatus | null
+				queued: string | null
+				published: string
+				updated: string
+				project_types: string[]
+				ownership: Ownership
+				external_dependencies_count: number
+			}
+
+			export type ProjectsResponse = {
+				total: number
+				projects: QueueProject[]
+			}
+
+			export type ProjectIdsResponse = {
+				ids: string[]
+			}
+
 			export type LockedByUser = {
 				id: string
 				username: string
@@ -2163,7 +2287,64 @@ export namespace Labrinth {
 				| 'severity_desc'
 
 			export type UpdateIssueRequest = {
-				verdict: 'safe' | 'unsafe'
+				detail_id: string
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateIssueDetailRequest = {
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateGlobalIssueRequest = {
+				detail_key: string
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type SearchGlobalIssueDetailsRequest = {
+				limit?: number
+				page?: number
+				query?: string | null
+			}
+
+			export type SearchGlobalIssueDetailsResponse = {
+				total: number
+				traces: GlobalIssueDetail[]
+			}
+
+			export type GetGlobalIssueDetailRequest = {
+				detail_key: string
+				limit?: number
+				after_detail_id?: string | null
+			}
+
+			export type GetGlobalIssueDetailResponse = {
+				trace: GlobalIssueDetail
+				next_after_detail_id: string | null
+			}
+
+			export type GlobalIssueDetail = {
+				detail_key: string
+				verdict: DelphiReportIssueStatus
+				local_trace_count: number
+				local_traces: GlobalIssueDetailTrace[]
+			}
+
+			export type GlobalIssueDetailTrace = {
+				detail_id: string
+				issue_id: string
+				issue_type: string
+				project_id: string
+				project_slug: string | null
+				project_name: string
+				version_id: string
+				version_number: string
+				file_id: string
+				file_name: string
+				jar: string | null
+				file_path: string
+				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus
+				effective_status: DelphiReportIssueStatus
 			}
 
 			export type SubmitProjectRequest = {
@@ -2225,6 +2406,8 @@ export namespace Labrinth {
 				decompiled_source: string | null
 				data: Record<string, unknown>
 				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus | null
+				global_status: DelphiReportIssueStatus | null
 				status: DelphiReportIssueStatus
 			}
 
@@ -2272,6 +2455,19 @@ export namespace Labrinth {
 						type: 'status_change'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
 				  }
 				| {
 						type: 'thread_closure'

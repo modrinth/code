@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Tambah alamat Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Tambah URL dan nama yang sah atau pengenal SPDX untuk lisensi tersuai Anda."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Tambah perincian lisensi"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Tambah tautan relevan yang disasarkan di luar Modrinth, seperti situs web, toko, atau undangan Discord."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Tambah tautan eksternal"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Anda telah memilih semua opsi bahasa yang tersedia. Mohon hanya memilih bahasa yang benar-benar didukung oleh server Anda."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Pilih bahasa yang tepat"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Anda memilih semua {totalAvailableTags, plural, other {(#) tag yang tersedia}}. Ini bertentangan dengan tujuan tag, yang bertujuan membantu pengguna mencari proyek yang relevan. Mohon hanya pilih tag yang relevan dengan proyek Anda."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang benar"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Pastikan Anda telah menyediakan bukti izin pengedaran konten eksternal pada paket mod Anda."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Tinjau izin eksternal"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Pilih versi apa saja yang didukung oleh server Anda, pilih paket mod, atau unggah milik Anda sendiri."
   },
@@ -182,6 +200,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "Kunjungi pengaturan tautan"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Kunjungi dasbor perizinan"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Kunjungi pengaturan tag"
   },
@@ -211,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Bersihkan nama"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Anda telah memilih {languageCount, plural, other {# bahasa}}. Mohon hanya memilih bahasa yang benar-benar didukung oleh server Anda."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Pilih bahasa yang tepat"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Anda memilih {tagCount, plural, other {# tag}}. Mohon pertimbangkan untuk menguranginya menjadi sebanyak-banyaknya {maxTagCount} untuk memastikan server Anda muncul pada hasil pencarian yang relevan."

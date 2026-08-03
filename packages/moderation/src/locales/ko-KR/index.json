@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Java 주소 추가"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "유효한 URL과 이름 혹은 SPDX 식별자로 사용자 지정 라이선스를 추가하세요."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "라이선스 세부 정보 추가"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "웹사이트, 스토어, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "외부 링크 추가"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "있는 언어 설정을 전부 선택했습니다. 서버가 실제로 지원하는 언어만 선택해 주세요."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "올바른 언어 선택"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "사용 가능한 모든 {totalAvailableTags, plural, other {#개의 태그}}를 선택하셨습니다. 이는 사용자가 관련 프로젝트를 찾는 데 도움을 주기 위한 태그의 목적에 어긋납니다. 프로젝트와 관련된 태그만 선택해 주세요."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "올바른 해상도 선택"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "자신의 모드팩에 외부 콘텐츠를 배포할 수 있는 권한을 증명할 수 있는 자료를 만드시 제공해 주세요."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "외부 권한 검토"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "서버가 지원하는 버전을 선택하거나, 모드팩을 고르거나, 직접 업로드하세요."
   },
@@ -182,6 +200,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "링크 설정 방문"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "권한 대시보드 방문"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "태그 설정 방문"
   },
@@ -211,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "이름 정리"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "언어 {languageCount, plural, other {#}}개를 선택했습니다. 서버가 실제로 지원하는 언어만 선택해 주세요."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "올바른 언어 선택"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "{tagCount, plural, other {#}}개의 태그를 선택했습니다. 서버가 관련 검색 결과에 표시될 수 있도록 {maxTagCount}개 이하로 줄여주세요."

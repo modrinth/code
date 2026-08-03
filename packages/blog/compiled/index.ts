@@ -30,9 +30,11 @@ import { article as new_site_beta } from "./new_site_beta";
 import { article as plugins_resource_packs } from "./plugins_resource_packs";
 import { article as pride_campaign_2025 } from "./pride_campaign_2025";
 import { article as pride_campaign_2026 } from "./pride_campaign_2026";
+import { article as proud_of_you_2026 } from "./proud_of_you_2026";
 import { article as redesign } from "./redesign";
 import { article as russian_censorship } from "./russian_censorship";
 import { article as server_access } from "./server_access";
+import { article as shared_instances } from "./shared_instances";
 import { article as skins_now_in_modrinth_app } from "./skins_now_in_modrinth_app";
 import { article as standing_by_our_values } from "./standing_by_our_values";
 import { article as standing_by_our_values_russian } from "./standing_by_our_values_russian";
@@ -74,9 +76,11 @@ export const articles = [
   plugins_resource_packs,
   pride_campaign_2025,
   pride_campaign_2026,
+  proud_of_you_2026,
   redesign,
   russian_censorship,
   server_access,
+  shared_instances,
   skins_now_in_modrinth_app,
   standing_by_our_values,
   standing_by_our_values_russian,

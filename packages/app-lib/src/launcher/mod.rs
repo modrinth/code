@@ -24,7 +24,7 @@ use crate::{State, get_resource_file, process};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
-use daedalus::modded::LoaderVersion;
+use daedalus::modded::{LoaderVersion, Manifest};
 use regex::Regex;
 use serde::Deserialize;
 use std::fmt::Write;
@@ -175,23 +175,42 @@ pub async fn get_loader_version_from_profile(
     let versions =
         crate::api::metadata::get_loader_versions(loader.as_meta_str()).await?;
 
-    let loaders = versions.game_versions.into_iter().find(|x| {
-        x.id.replace(daedalus::modded::DUMMY_REPLACE_STRING, game_version)
-            == game_version
-    });
-
-    if let Some(loaders) = loaders {
-        let loader_version = loaders.loaders.iter().find(|x| filter(x)).or(
-            if version == "stable" {
-                loaders.loaders.first()
-            } else {
-                None
-            },
-        );
+    if let Some(loaders) =
+        loader_versions_for_game_version(&versions, game_version)
+    {
+        let loader_version =
+            loaders
+                .iter()
+                .find(|x| filter(x))
+                .or(if version == "stable" {
+                    loaders.first()
+                } else {
+                    None
+                });
 
         Ok(loader_version.cloned())
     } else {
         Ok(None)
+    }
+}
+
+fn loader_versions_for_game_version<'a>(
+    manifest: &'a Manifest,
+    game_version: &str,
+) -> Option<&'a [LoaderVersion]> {
+    let version = manifest.game_versions.iter().find(|x| {
+        x.id.replace(daedalus::modded::DUMMY_REPLACE_STRING, game_version)
+            == game_version
+    })?;
+
+    if let Some(version_group) = &version.version_group {
+        manifest
+            .version_groups
+            .iter()
+            .find(|group| group.id == *version_group)
+            .map(|group| group.loaders.as_slice())
+    } else {
+        Some(version.loaders.as_slice())
     }
 }
 
@@ -271,6 +290,7 @@ pub async fn install_minecraft_with_reporter(
     };
 
     let state = State::get().await?;
+    let previous_install_stage = instance.install_stage;
 
     crate::state::instances::commands::set_instance_install_stage(
         &instance.id,
@@ -280,6 +300,7 @@ pub async fn install_minecraft_with_reporter(
     .await?;
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
+    let result = async {
     let instance_path = get_instance_full_path(&instance.path).await?;
     if let Some(reporter) = &reporter {
         reporter
@@ -348,6 +369,7 @@ pub async fn install_minecraft_with_reporter(
         loader_version.as_ref(),
         Some(repairing),
         loading_bar.as_ref(),
+        reporter.as_ref(),
     )
     .await?;
 
@@ -581,24 +603,53 @@ pub async fn install_minecraft_with_reporter(
 
     let protocol_version = read_protocol_version_from_jar(client_path).await?;
 
-    crate::state::instances::commands::set_instance_install_stage(
-        &instance.id,
-        InstanceInstallStage::Installed,
-        &state.pool,
-    )
-    .await?;
-    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
     crate::state::instances::commands::set_applied_content_set_protocol_version(
         &instance.id,
         protocol_version,
         &state.pool,
     )
     .await?;
+	if reporter.is_none() {
+		crate::state::instances::commands::set_instance_install_stage(
+			&instance.id,
+			InstanceInstallStage::Installed,
+			&state.pool,
+		)
+		.await?;
+		emit_instance(&instance.id, InstancePayloadType::Edited).await?;
+	}
     if let Some(loading_bar) = &loading_bar {
         emit_loading(loading_bar, 1.0, Some("Finished installing"))?;
     }
 
-    Ok(())
+    Ok::<(), crate::Error>(())
+    }
+    .await;
+
+    if result.is_err() {
+        if let Err(error) =
+            crate::state::instances::commands::set_instance_install_stage(
+                &instance.id,
+                previous_install_stage,
+                &state.pool,
+            )
+            .await
+        {
+            tracing::error!(
+                "Failed to restore install stage for instance {}: {error}",
+                instance.id
+            );
+        } else if let Err(error) =
+            emit_instance(&instance.id, InstancePayloadType::Edited).await
+        {
+            tracing::error!(
+                "Failed to emit restored install stage for instance {}: {error}",
+                instance.id
+            );
+        }
+    }
+
+    result
 }
 
 pub async fn install_minecraft_for_instance_id_with_reporter(
@@ -748,6 +799,7 @@ pub async fn launch_minecraft(
         loader_version.as_ref(),
         None,
         None,
+        None,
     )
     .await?;
     if version_info.logging.is_none() {
@@ -763,6 +815,7 @@ pub async fn launch_minecraft(
                 version,
                 loader_version.as_ref(),
                 Some(true),
+                None,
                 None,
             )
             .await?;

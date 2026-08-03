@@ -1,3 +1,4 @@
+use super::ContentSourceKind;
 use crate::state::{Project, ProjectType, Version};
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +16,7 @@ pub struct ContentItem {
     pub has_update: bool,
     pub update_version_id: Option<String>,
     pub date_added: Option<String>,
+    pub source_kind: Option<ContentSourceKind>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

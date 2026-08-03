@@ -168,13 +168,43 @@ export class LabrinthUsersV2Module extends AbstractModule {
 	 */
 	public async patch(
 		idOrUsername: string,
-		data: Partial<Pick<Labrinth.Users.v2.User, 'badges' | 'role'>>,
+		data: Partial<Pick<Labrinth.Users.v2.User, 'badges' | 'bio' | 'role' | 'username'>>,
 	): Promise<void> {
 		return this.client.request(`/user/${idOrUsername}`, {
 			api: 'labrinth',
 			version: 2,
 			method: 'PATCH',
 			body: data,
+		})
+	}
+
+	/**
+	 * Change a user's avatar.
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 * @param file - Image file to upload
+	 * @param ext - File extension (e.g., 'png', 'jpeg', 'gif', 'webp')
+	 */
+	public async changeIcon(idOrUsername: string, file: Blob, ext: string): Promise<void> {
+		return this.client.request(`/user/${idOrUsername}/icon`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'PATCH',
+			params: { ext },
+			body: file,
+		})
+	}
+
+	/**
+	 * Delete a user's avatar.
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 */
+	public async deleteIcon(idOrUsername: string): Promise<void> {
+		return this.client.request(`/user/${idOrUsername}/icon`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'DELETE',
 		})
 	}
 }

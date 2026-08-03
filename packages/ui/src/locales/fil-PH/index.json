@@ -137,9 +137,6 @@
   "button.refresh": {
     "defaultMessage": "I-refresh"
   },
-  "button.remove": {
-    "defaultMessage": "Tanggalin"
-  },
   "button.remove-image": {
     "defaultMessage": "Tanggalin ang imahe"
   },
@@ -224,6 +221,9 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "I-unlink"
   },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "server"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dinagdag (dependency)"
   },
@@ -244,6 +244,9 @@
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Idiin ang Shift habang pumipindot upang laktawan ang kumpirmasyon."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Karagdagang kontento"
@@ -284,8 +287,17 @@
   "creation-flow.button.import": {
     "defaultMessage": "I-angkat"
   },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Bago"
+  },
   "creation-flow.modal.custom-setup.loader-version-type.other": {
     "defaultMessage": "Iba pa"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Matatag"
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Loader"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Pangalan"
@@ -316,6 +328,12 @@
   },
   "creation-flow.modal.import-instance.launcher-path.add": {
     "defaultMessage": "Magdagdag ng launcher path"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Iba pa"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Wala"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Hindi"
@@ -598,6 +616,9 @@
   },
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Di-magkatugmang kontentong ininstall"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Sa pagpapalit ng loader, ang lahat ng na-install na kontento ay mapapatay. Sa halip, inimumungkahi namin na i-reset ang iyong server."
   },
   "installation-settings.removed-incompatible": {
     "defaultMessage": "Tinanggal (di-magkatugma)"
@@ -2127,7 +2148,7 @@
     "defaultMessage": "Paraan ng pagbabayad"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "Pumili ng pinasadyang plan sa specs na kailangan mo."
+    "defaultMessage": "Pumili ng pasadya na plan na may specs na kailangan mo."
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Magsimula"
@@ -2272,9 +2293,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Mga personal na access token"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Pampublikong profile"
   },
   "settings.sessions.title": {
     "defaultMessage": "Mga sesyon"
@@ -2734,5 +2752,17 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Koponan ng Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Pangalan"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Iba pa"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Talaksan"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Uri"
   }
 }

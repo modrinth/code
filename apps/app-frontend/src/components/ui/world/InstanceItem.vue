@@ -80,6 +80,7 @@ const playing = ref(false)
 
 const play = async (event: MouseEvent) => {
 	event?.stopPropagation()
+	if (props.instance.quarantined) return
 	loading.value = true
 	await run(props.instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
@@ -192,8 +193,14 @@ onUnmounted(() => {
 				</ButtonStyled>
 				<ButtonStyled v-else>
 					<button
-						v-tooltip="playing ? 'Instance is already open' : null"
-						:disabled="playing || loading"
+						v-tooltip="
+							instance.quarantined
+								? 'This instance has been locked'
+								: playing
+									? 'Instance is already open'
+									: null
+						"
+						:disabled="instance.quarantined || playing || loading"
 						@click="play"
 					>
 						<SpinnerIcon v-if="loading" class="animate-spin" />

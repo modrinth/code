@@ -184,10 +184,22 @@ pub(crate) async fn fetch(
     let uses = |field| metrics.bucket_by.contains(&field);
     let use_columns = &[
         ("use_project_id", uses(F::ProjectId)),
-        ("use_version_id", uses(F::VersionId)),
-        ("use_loader", uses(F::Loader)),
-        ("use_game_version", uses(F::GameVersion)),
-        ("use_country", uses(F::Country)),
+        (
+            "use_version_id",
+            uses(F::VersionId) || !metrics.filter_by.version_id.is_empty(),
+        ),
+        (
+            "use_loader",
+            uses(F::Loader) || !metrics.filter_by.loader.is_empty(),
+        ),
+        (
+            "use_game_version",
+            uses(F::GameVersion) || !metrics.filter_by.game_version.is_empty(),
+        ),
+        (
+            "use_country",
+            uses(F::Country) || !metrics.filter_by.country.is_empty(),
+        ),
     ];
     let uses_column = |name| {
         use_columns
@@ -264,6 +276,18 @@ pub(crate) async fn fetch(
             COUNTRY_PLAYTIME_PRIVACY_FLOOR_SECONDS,
         ) {
             continue;
+        }
+        if !uses(F::VersionId) {
+            key.version_id = None;
+        }
+        if !uses(F::Loader) {
+            key.loader = None;
+        }
+        if !uses(F::GameVersion) {
+            key.game_version = None;
+        }
+        if !uses(F::Country) {
+            key.country = None;
         }
         *output_buckets.entry(key).or_default() += seconds;
     }

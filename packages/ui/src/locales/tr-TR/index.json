@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "Yeni"
   },
+  "badge.release": {
+    "defaultMessage": "Sürüm"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "İptal"
   },
@@ -218,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Klasörü aç"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Tarayıcıda aç"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Klasörde aç"
   },
@@ -287,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "Durdur"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Versiyona değiştir"
+  },
   "button.switch-version": {
     "defaultMessage": "Sürüm değiştir"
   },
@@ -313,6 +322,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Platform"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Bu koleksiyon boş."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Projeler yükleniyor..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Aramanızla eşleşen proje yok."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural,one {# proje}other {# projeler}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Projeleri ara"
   },
   "collections.label.private": {
     "defaultMessage": "Gizli"
@@ -353,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} öğesini sil"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType} öğesini sil"
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
   },
@@ -377,11 +404,44 @@
   "content.dependency-warning.admonition-header": {
     "defaultMessage": "Bu içerik diğer içerikler için gereklidir"
   },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "Etkilenen {count, plural,one {proje} other {projeler}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Seçilen bazı projeler bağımlılık olarak kurulu. Silinmeleri durumunda {context} düzgün çalışmayabilir veya bağımlı içerikler doğru şekilde yüklenmeyebilir."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "oturum"
+  },
   "content.dependency-warning.context.server": {
     "defaultMessage": "sunucu"
   },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Yinede Sil"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "yine de {count, number}{itemType} sil"
+  },
   "content.dependency-warning.deleting-label": {
     "defaultMessage": "Siliniyor"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Sildikten sonra gerekli modları devre dışı bırak"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Bağlam içeriği yüklenmekte sorun çıkarabilir veya kendini devre dışı bırakabilir"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "{context} çökebilir, açılmayabilir veya farklı davranabilir"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Gerekli mod uyarısı"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} gerekli mod olarak indirildi. Bunu silmek {context} bozabilir veya gerekli mod içeriklerin yüklemesini engelleyebilir."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Ne olur?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
@@ -395,8 +455,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Güncellendi"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "İndirme"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Eklendi"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Kaldırıldı"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Güncellendi"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Yine de indir"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} kaldırıldı"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Sunucundaki bazı içerikler analiz edilemedi ve bu değişiklikten etkilenebilir."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Bu güncelleme Modrinth'te yayınlanmamış doysalar barındırıyor. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Bilinmeyen dosya uyarısı"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Bilinmeyen"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} güncellendi"
@@ -425,20 +515,23 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Bunu yapmadan önce yedek alma işleminin bitmesini beklemeniz önerilir."
   },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Sunucunuzun boyutuna göre yedek oluşturmak bir kaç dakika alabilir."
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Yedek oluştur"
+  },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "oturum"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Doğrulamayı atlamak için tıklarken Shift basılı tutun."
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Mod paketinizin içeriği artık burada bulunabilir!"
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Herhangi bir sorun durumunda {type} inizi geri yükleyebilmeniz için, devam etmeden önce mutlaka bir yedekleme oluşturmanızı öneririz."
   },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Mod paketi içeriği taşındı"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Bir daha gösterme"
+  "content.inline-backup.world-label": {
+    "defaultMessage": "dünya"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Fazladan içerik"
@@ -518,11 +611,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "{progress}/{total} {contentType} siliniyor..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "{count, number} {contentType} siliniyor"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "{contentType} siliniyor..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "{progress}/{total} {contentType} devre dışı bırakılıyor..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "{count, number} {contentType} devre dışı bıraklıyor"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "{contentType} devre dışı bırakılıyor..."
@@ -530,11 +629,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "{progress}/{total} {contentType} aktive ediliyor..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "{count, number} {contentType} aktif ediliyor"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "{contentType} aktive ediliyor..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "{progress}/{total} {contentType} güncelleniyor..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "{count, number} {contentType} güncelleniyor"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType} güncelleniyor..."
@@ -815,6 +920,258 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Sunucu kurun"
   },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural,one {Dosya ekle}other {Dosya ekle}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Bu gruba taşınması gereken dosyaları seçin."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "Diğer gruplardan buraya taşınabilir hiç bir dosya yok."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Dosyalar yüklenemedi"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "Aradığın sonuçla ilgili bir dosya yok."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Dosyaları ara..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural,one {# dosya seçildi}other {# dosya seçildi}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Bu gruba dosyalar ekle"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Dosya ekle..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Dosyalar eklenemedi"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "İçerik izin verilmedi"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Kabul edildi"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Kanıt reddedildi"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Tamamlananlar"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "İzin yok"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "İzin verilmedi"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Beklenenler"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Bilgi reddedildi"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Diğer"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "Atıf ekle"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Tüm hakları saklıdır/Lisans verilmemiştir"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Lisans linki"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "Lisans ismi, tercihen SPDX kimliği"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Lütfen lisans seçin."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "Geçerli bir URL linki olmalı."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "örnek MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(İsteğe bağlı)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Lisans"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "Çalışma linki"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "lisans-linki"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "çalışma-linki"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Bu görünüşe göre bir Modrinth linkine benziyor. Eğer bu içerik Modrinth'te varsa, paketin muhtemelen hatalı aktarılmıştır. Eğer farklı bir siteden indirdiyseniz, Modrinth versiyonunu indirmeyi deneyin; bazen iki dosya aynı olmayabiliyor."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Notlar"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Buraya bir şey yaz..."
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "Ekran görüntüsü göster {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Resmi kaldır"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "Kanıt görselleri"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "Yüklemek için sürükle ve bırak veya resim seçmek için tıkla "
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Eğer ki yüklediğin fotoğraflarla yalan söylediğin veya manipüle edildiğin tespit edilirse, projen veya hesabın devre dışı bırakılabilir."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth çalışanları senin kanıtını doğrulayabilir"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Kaynak gösterme bilgisini sakla"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Lisans Seçiniz..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "İzin sebebi"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Lütfen lisansınızda bir linke yer verin. Eğer yoksa, Tüm haklar saklıdır/Lisans yoktur seçeneğini seçmelisiniz"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Lütfen bir açıklama sağlayın veya bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Lütfen bir bağlantı sağlayın."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Lütfen bir not sağlayın veya bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Lütfen bir PNG, JPEG, GIF, WebP, or BMP fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Lütfen en az bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Kısa bir açıklama veya kanıt fotoğrafları gerekli."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Açıklama"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Kaynak gösterme grubu {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural,one {# dosya}other {# dosya}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Dahil edilen dosyalar:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "{count, plural,one {# versiyonda}other {# versiyonda}} dahil:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "En son {date} {user} tarafından güncellendi"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Bilinmeyen"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Lisanslı:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Çalışması için bağlantı:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Sebep"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Moderasyon incelemesi kaydedilemedi"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Bu dosyalar şuanda hiçbir versiyon tarafından kullanılmıyor."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Notlar:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Hiçbiri"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Orijinal proje"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Kanıt ekran görüntüsü {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Kanıt fotoğrafları:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Otomatik olarak kaynak gösterildi"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Bu dosyayı daha önce gördük ve sizin için bir kaynak gösterdik. Bir şey yanlış görünürse, lütfen Modrinth Desteğinden üzerinden Yardım Merkezine ulaşın"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Lisans"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "Bu çalışmanın lisansı, mod paketinizde yeniden dağıtılmasına izin veriyor."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Lisansla alakalı destekleyici döküman yükleyin."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Projem"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Orijinal iş senin tarafından yapıldı."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Çalışmayı sizin oluşturduğunuzu doğrulamaya yardımcı olacak dosyaları yükleyin."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Yetki yok"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Bu dosyayı daha önce gördük ve lisansı normal olarak yeniden dağıtıma izin vermez."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "Senin bu işi kullanmaya yetkin yok."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Özel yetki"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "Bu çalışmayı mod paketinizde yeniden dağıtmak için özel izin alınmıştır."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Gruptan kaldır"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Dosya bölünemedi"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + {count} daha "
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Moderatör"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Hayır"
   },
@@ -1088,6 +1445,9 @@
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# öğe} other {# öğe}}"
   },
+  "files.row.parent-folder": {
+    "defaultMessage": "Üst klasör"
+  },
   "files.table-header.created": {
     "defaultMessage": "Oluşturuldu"
   },
@@ -1159,6 +1519,12 @@
   },
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Install a CurseForge modpack"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Belirtilen URL'de CurseForge mod paketi bulunamadı."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge mod paketi bulunamadı"
   },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Bağlantıyı girin"
@@ -1370,6 +1736,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Sunucu tamir edilemedi"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Sunucu başlangıç ayarlarına sıfırlanamadı"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Kurulum ayarları kaydedilemedi"
   },
@@ -1385,11 +1754,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Tamir tamamlandı"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Sunucuyu sıfırla"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Bu sunucuyu kurulum aşamasına geri gönderecek. Devam etmek istediğinizden emin misiniz?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Sunucu ilk katılım akışına geri döndürüldü."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Destek seçenekleri"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -1448,6 +1835,9 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Onayla"
   },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "{gameVersion} sürümüne geçmek sunucundaki şu içeriği değiştirecek."
+  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "İçerik değişikliklerini güncelleyin"
   },
@@ -1478,6 +1868,9 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Uyumsuz içerik yüklü"
   },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Yükleyiciyi değiştirdiğinizde tüm yüklü içerik kapatılacak. Onun yerine sunucunuzu sıfırlamanızı öneririz."
+  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Yükleyici değiştirmek tehlikelidir"
   },
@@ -1492,6 +1885,9 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} sürümü"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "Yükleyici değiştirmek için sunucunuzu sıfırlamalısınız."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Mod pakını yeniden yüklemek, {type} içeriğini orijinal haline döndürür ve eklediğiniz tüm modları veya içeriği kaldırır."
@@ -1721,6 +2117,12 @@
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}'e güncelle"
   },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Güncellemek kurulumunuzu bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Güncellemek dünyanızı bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
+  },
   "label.actions": {
     "defaultMessage": "Eylemler"
   },
@@ -1812,7 +2214,7 @@
     "defaultMessage": "Oyun sürümü"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Zaten Yüklenmiş İçerikleri gizle"
+    "defaultMessage": "Daha önce indirilmiş dosyaları sakla"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Seçilmiş İçerikleri Gizle"
@@ -1915,6 +2317,9 @@
   },
   "label.server": {
     "defaultMessage": "Sunucu"
+  },
+  "label.server-only": {
+    "defaultMessage": "Yalnızca sunucu"
   },
   "label.servers": {
     "defaultMessage": "Sunucular"
@@ -2510,6 +2915,9 @@
   "project.about.compatibility.platforms": {
     "defaultMessage": "Platformlar"
   },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural,one {Platform}other {Platform}}"
+  },
   "project.about.compatibility.title": {
     "defaultMessage": "Uyumluluk"
   },
@@ -3092,6 +3500,21 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "{filter} olarak filtrele"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "Gizlendi"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "Eksik izinler sebebiyle sürüm gizlendi"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Çöz"
+  },
   "project.visibility.archived": {
     "defaultMessage": "Arşivlenmiş"
   },
@@ -3166,6 +3589,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Daha fazla göster"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Gelişmiş"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Veri paketlerini hariç tut"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Modları hariç tut"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Eklentileri hariç tut"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ortam"
@@ -3541,6 +3976,12 @@
   },
   "servers.audit-log.column.world": {
     "defaultMessage": "Örnek"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Sunucu örnekleri, kendi yüklü içeriğine ve dünya dosyalarına sahip, bağımsız ortamlardır."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Yakında!"
   },
   "servers.audit-log.empty": {
     "defaultMessage": "Belirtilen filtrelerle eşleşen herhangi bir aktivite bulunamadı."
@@ -4211,6 +4652,15 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Artık burada bulunabilirler!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Bir daha gösterme"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Sunucu ayarlarınız taşındı"
+  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Paylaşımlı sunucular"
   },
@@ -4445,6 +4895,12 @@
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Ne oynayacağınızı seçin"
   },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Dünyanızı tıpkı tek oyunculu modda olduğu gibi kurun. Oyun modunuzu ve dünya seed'inizi seçin."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Dünyanızı yapılandırın"
+  },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Adresi kopyalayarak ve katılmak için hangi modlara ihtiyaç duyacaklarını bildirerek sunucunuzu arkadaşlarınızla paylaşın."
   },
@@ -4558,9 +5014,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Kişisel erişim tokenleri"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Herkese açık profil"
   },
   "settings.sessions.title": {
     "defaultMessage": "Oturumlar"
@@ -5096,6 +5549,39 @@
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Tümünü görmezden gel"
   },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "İndirme"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Bu uyarıyı tekrar gösterme"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "İndirmeyi onayla"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Yine de indir"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Kötü amaçlı yazılımlar, genellikle Discord gibi platformlarda paylaşılan mod dosyaları aracılığıyla yayılmaktadır."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " Modrinth'te paylaşılmamış. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi önemle tavsiye ederiz."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Bilinmeyen dosya uyarısı"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " Modrinth'te yayınlanmamış doysalar barındırıyor. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Bilinmeyen dosya uyarısı"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Tanımlanamayan dosyalar"
+  },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Bu kullanıcı, Modrinth Alpha'nın başladığı tarihten beri aktif durumda; bu dönem Kasım 2020 itibarıyla sona ermiştir."
   },
@@ -5191,5 +5677,95 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth Ekibi"
+  },
+  "version.content.name": {
+    "defaultMessage": "İsim"
+  },
+  "version.content.version": {
+    "defaultMessage": "Sürüm"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "Geliştirici jar"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadoc jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "İsteğe bağlı kaynak paketi"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Birincil"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Gerekli kaynak paketi"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "İmzalı dosya"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "Kaynak kod jar"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Diğer"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Değişiklikler"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Uyumluluk"
+  },
+  "version.section.content": {
+    "defaultMessage": "İçerik"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "İçerik ara..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Uyumlu olan herhangi bir sürüm"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Herhangi bir sürüm"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Sürüm mevcut değil"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "Bu sürüm kaldırılmış veya moderatörler tarafından inceleniyor olabilir."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "Gerekli sürüm kaldırılmış veya moderatörler tarafından inceleniyor olabilir."
+  },
+  "version.section.files": {
+    "defaultMessage": "Dosyalar"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Dahil edilen içerik"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Bilinen uyumsuzluklar"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "Herhangi bir güncelleme notu paylaşılmadı."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Mod yükleyici gerekmez"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "İsteğe bağlı bağımlılıklar"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Gerekli içerik"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Ek kaynaklar"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Dosya"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Boyut"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Tür"
   }
 }

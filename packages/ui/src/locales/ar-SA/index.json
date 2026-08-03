@@ -164,9 +164,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "إعادة تثبيت حزمة التعديل"
   },
-  "button.remove": {
-    "defaultMessage": "إزالة"
-  },
   "button.remove-image": {
     "defaultMessage": "إزالة الصورة"
   },
@@ -268,9 +265,6 @@
   },
   "content.confirm-modpack-update.header": {
     "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": ""
   },
   "form.label.address-line": {
     "defaultMessage": "خط عنوان"

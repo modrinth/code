@@ -18,16 +18,23 @@ pub struct InstallJobState {
     pub cleanup: InstallCleanup,
     pub progress: InstallProgressState,
     pub paths: InstallJobPaths,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<InstallErrorContext>,
+    #[serde(default)]
+    pub events: Vec<InstallJobEvent>,
     #[serde(default)]
     pub display: Option<InstallJobDisplay>,
     pub rollback: Option<InstallRollbackState>,
     pub error: Option<InstallErrorView>,
+    #[serde(default)]
+    pub rollback_error: Option<InstallErrorView>,
 }
 
 impl InstallJobState {
     pub fn new(request: InstallRequest) -> Self {
         let target = request.target();
         let cleanup = request.cleanup();
+        let kind = request.kind();
         let phase = InstallPhaseId::PreparingInstance;
 
         Self {
@@ -41,11 +48,109 @@ impl InstallJobState {
                 details: InstallPhaseDetails::Empty,
             },
             paths: InstallJobPaths::default(),
+            context: None,
+            events: vec![InstallJobEvent {
+                at: Utc::now(),
+                kind: InstallJobEventKind::JobQueued { kind },
+            }],
             display: None,
             rollback: None,
             error: None,
+            rollback_error: None,
         }
     }
+
+    pub fn record_event(&mut self, kind: InstallJobEventKind) {
+        self.events.push(InstallJobEvent {
+            at: Utc::now(),
+            kind,
+        });
+    }
+
+    pub fn set_context(&mut self, context: Option<InstallErrorContext>) {
+        self.context = context;
+    }
+
+    pub fn set_progress(
+        &mut self,
+        phase: InstallPhaseId,
+        progress: Option<InstallProgress>,
+        details: InstallPhaseDetails,
+    ) {
+        if self.progress.phase != phase
+            || matches!(&self.progress.details, InstallPhaseDetails::Empty)
+                && !matches!(&details, InstallPhaseDetails::Empty)
+        {
+            self.record_event(InstallJobEventKind::PhaseStarted {
+                phase,
+                details: details.clone(),
+            });
+        }
+
+        self.progress.phase = phase;
+        self.progress.progress = progress;
+        self.progress.details = details;
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InstallJobEvent {
+    pub at: DateTime<Utc>,
+    pub kind: InstallJobEventKind,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum InstallInterruptReason {
+    AppClosed,
+    Unknown,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum InstallJobEventKind {
+    JobQueued {
+        kind: InstallJobKind,
+    },
+    JobStarted,
+    JobSucceeded {
+        instance_id: Option<String>,
+    },
+    JobCanceled {
+        phase: InstallPhaseId,
+    },
+    PhaseStarted {
+        phase: InstallPhaseId,
+        details: InstallPhaseDetails,
+    },
+    ContentDownloadStarted {
+        files: u64,
+        bytes: Option<u64>,
+    },
+    ContentFileSkipped {
+        path: String,
+        reason: String,
+    },
+    ContentFileCompleted {
+        path: String,
+        bytes: u64,
+    },
+    Interrupted {
+        reason: InstallInterruptReason,
+        phase: InstallPhaseId,
+    },
+    Failed {
+        phase: InstallPhaseId,
+        code: String,
+        message: String,
+    },
+    RollbackStarted {
+        cleanup: InstallCleanup,
+    },
+    RollbackCompleted,
+    RollbackFailed {
+        message: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -63,6 +168,9 @@ pub enum InstallRequest {
         location: CreatePackLocation,
         #[serde(default)]
         post_install_edit: Option<InstallPostInstallEdit>,
+    },
+    CreateSharedInstance {
+        data: SharedInstanceInstallData,
     },
     ImportInstance {
         launcher_type: ImportLauncherType,
@@ -82,6 +190,10 @@ pub enum InstallRequest {
         #[serde(default)]
         post_install_edit: Option<InstallPostInstallEdit>,
     },
+    UpdateSharedInstance {
+        instance_id: String,
+        data: SharedInstanceInstallData,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -96,12 +208,55 @@ pub struct InstallPostInstallEdit {
     pub link: Option<InstanceLink>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SharedInstanceInstallData {
+    pub shared_instance_id: String,
+    pub manager_id: Option<String>,
+    #[serde(default)]
+    pub server_manager_name: Option<String>,
+    #[serde(default)]
+    pub server_manager_icon_url: Option<String>,
+    #[serde(default)]
+    pub instance_icon_url: Option<String>,
+    #[serde(default)]
+    pub linked_user_id: Option<String>,
+    pub name: String,
+    pub version: i32,
+    pub modrinth_ids: Vec<String>,
+    #[serde(default)]
+    pub external_files: Vec<SharedInstanceExternalFileData>,
+    pub modpack: Option<SharedInstanceInstallModpack>,
+    pub game_version: String,
+    pub loader: ModLoader,
+    pub loader_version: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SharedInstanceExternalFileData {
+    pub file_name: String,
+    pub file_type: String,
+    pub url: String,
+    pub file_size: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SharedInstanceInstallModpack {
+    pub project_id: String,
+    pub version_id: String,
+    pub title: String,
+    pub icon_url: Option<String>,
+    pub dependency_count: usize,
+}
+
 impl InstallRequest {
     pub fn kind(&self) -> InstallJobKind {
         match self {
             Self::CreateInstance { .. } => InstallJobKind::CreateInstance,
             Self::CreateModpackInstance { .. } => {
                 InstallJobKind::CreateModpackInstance
+            }
+            Self::CreateSharedInstance { .. } => {
+                InstallJobKind::CreateSharedInstance
             }
             Self::ImportInstance { .. } => InstallJobKind::ImportInstance,
             Self::DuplicateInstance { .. } => InstallJobKind::DuplicateInstance,
@@ -111,13 +266,17 @@ impl InstallRequest {
             Self::InstallPackToExistingInstance { .. } => {
                 InstallJobKind::InstallPackToExistingInstance
             }
+            Self::UpdateSharedInstance { .. } => {
+                InstallJobKind::UpdateSharedInstance
+            }
         }
     }
 
     pub fn target(&self) -> InstallTarget {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
-            | Self::InstallPackToExistingInstance { instance_id, .. } => {
+            | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallTarget::ExistingInstance {
                     instance_id: instance_id.clone(),
                 }
@@ -129,7 +288,8 @@ impl InstallRequest {
     pub fn cleanup(&self) -> InstallCleanup {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
-            | Self::InstallPackToExistingInstance { instance_id, .. } => {
+            | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallCleanup::RestoreExistingInstance {
                     instance_id: instance_id.clone(),
                 }
@@ -144,10 +304,12 @@ impl InstallRequest {
 pub enum InstallJobKind {
     CreateInstance,
     CreateModpackInstance,
+    CreateSharedInstance,
     ImportInstance,
     DuplicateInstance,
     InstallExistingInstance,
     InstallPackToExistingInstance,
+    UpdateSharedInstance,
 }
 
 impl InstallJobKind {
@@ -155,24 +317,28 @@ impl InstallJobKind {
         match self {
             Self::CreateInstance => "create_instance",
             Self::CreateModpackInstance => "create_modpack_instance",
+            Self::CreateSharedInstance => "create_shared_instance",
             Self::ImportInstance => "import_instance",
             Self::DuplicateInstance => "duplicate_instance",
             Self::InstallExistingInstance => "install_existing_instance",
             Self::InstallPackToExistingInstance => {
                 "install_pack_to_existing_instance"
             }
+            Self::UpdateSharedInstance => "update_shared_instance",
         }
     }
 
     pub fn from_stored_str(value: &str) -> Self {
         match value {
             "create_modpack_instance" => Self::CreateModpackInstance,
+            "create_shared_instance" => Self::CreateSharedInstance,
             "import_instance" => Self::ImportInstance,
             "duplicate_instance" => Self::DuplicateInstance,
             "install_existing_instance" => Self::InstallExistingInstance,
             "install_pack_to_existing_instance" => {
                 Self::InstallPackToExistingInstance
             }
+            "update_shared_instance" => Self::UpdateSharedInstance,
             _ => Self::CreateInstance,
         }
     }
@@ -315,6 +481,51 @@ pub struct InstallJobPaths {
     pub final_instance_path: Option<PathBuf>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, bon::Builder)]
+#[builder(start_fn = new)]
+pub struct InstallErrorContext {
+    #[builder(start_fn, into)]
+    pub operation: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub source_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub target_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub file_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub entry_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[builder(default)]
+    pub urls: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub expected_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expected_size: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub version_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub minecraft_version: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub loader: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub java_version: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub os: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub arch: Option<String>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallJobDisplay {
     pub title: String,
@@ -330,14 +541,70 @@ pub struct InstallRollbackState {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallErrorView {
     pub code: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phase: Option<InstallPhaseId>,
     pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<crate::SharedInstanceUnavailableReason>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api: Option<InstallApiErrorDetails>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<InstallErrorContext>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InstallApiErrorDetails {
+    pub error: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub route: Option<String>,
 }
 
 impl InstallErrorView {
-    pub fn from_error(code: &str, error: impl ToString) -> Self {
+    pub fn from_error(
+        code: &str,
+        phase: InstallPhaseId,
+        error: &crate::Error,
+        context: Option<InstallErrorContext>,
+    ) -> Self {
         Self {
             code: code.to_string(),
+            phase: Some(phase),
             message: error.to_string(),
+            reason: None,
+            api: match error.raw.as_ref() {
+                crate::ErrorKind::LabrinthError(error) => {
+                    Some(InstallApiErrorDetails {
+                        error: error.error.clone(),
+                        status: error.status,
+                        method: error.method.clone(),
+                        url: error.url.clone(),
+                        route: error.route.clone(),
+                    })
+                }
+                _ => None,
+            },
+            context,
+        }
+    }
+
+    pub fn from_message(
+        code: &str,
+        phase: InstallPhaseId,
+        message: impl Into<String>,
+    ) -> Self {
+        Self {
+            code: code.to_string(),
+            phase: Some(phase),
+            message: message.into(),
+            reason: None,
+            api: None,
+            context: None,
         }
     }
 }
@@ -354,6 +621,7 @@ pub struct InstallJobSnapshot {
     pub details: InstallPhaseDetails,
     pub display: Option<InstallJobDisplay>,
     pub error: Option<InstallErrorView>,
+    pub rollback_error: Option<InstallErrorView>,
     pub created: DateTime<Utc>,
     pub modified: DateTime<Utc>,
     pub finished: Option<DateTime<Utc>>,

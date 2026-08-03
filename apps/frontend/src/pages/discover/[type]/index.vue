@@ -56,7 +56,6 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
-
 const route = useRoute()
 
 const cosmetics = useCosmetics()
@@ -67,7 +66,7 @@ const auth = await useAuth()
 let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
 const HOVER_DURATION_TO_PREFETCH_MS = 500
 
-const handleProjectMouseEnter = (result: Labrinth.Search.v2.ResultSearchProject) => {
+const handleProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
 	const slug = result.slug || result.project_id
 	prefetchTimeout = useTimeoutFn(
 		() => {
@@ -115,7 +114,6 @@ debug('initial route.params.type:', route.params.type, '→ currentType:', curre
 const isServerType = computed(() => currentType.value === 'server')
 
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
-const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 watch(
 	() => projectType.value?.id,
@@ -157,6 +155,9 @@ const {
 	serverContentData,
 	serverFilters,
 	serverHideInstalled,
+	serverContentServerOnly,
+	showServerOnlyToggle,
+	serverEnvironmentOverride,
 	hideSelectedServerInstalls,
 	installingProjectIds,
 	optimisticallyInstalledProjectIds,
@@ -198,12 +199,6 @@ watch(
 	{ immediate: true },
 )
 
-const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
-const { isStuck: isInstallHeaderStuck } = useStickyObserver(
-	stickyInstallHeaderRef,
-	'DiscoverInstallHeader',
-)
-
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
 	const content = project.minecraft_java_server?.content
 	if (content?.kind === 'modpack') {
@@ -226,37 +221,14 @@ function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject
 	return undefined
 }
 
-type DiscoverProjectSearchHit = Labrinth.Search.v2.ResultSearchProject & {
-	version_id?: string | null
-}
-
-function mapV3ProjectHit(hit: Labrinth.Search.v3.ResultSearchProject): DiscoverProjectSearchHit {
-	return {
-		...hit,
-		project_type: hit.project_types[0] ?? projectTypeId.value,
-		title: hit.name,
-		description: hit.summary,
-		versions: hit.version_id ? [hit.version_id] : [],
-		latest_version: hit.version_id,
-		icon_url: hit.icon_url ?? '',
-		client_side: 'unknown',
-		server_side: 'unknown',
-	}
-}
-
 const hostingContextQuery = computed(() => {
 	const query: LocationQueryRaw = {}
-	const hasHostingContext = route.query.sid != null
 
 	for (const key of ['sid', 'wid', 'from', 'shi']) {
 		const value = route.query[key]
 		if (value != null) {
 			query[key] = value
 		}
-	}
-
-	if (hasHostingContext) {
-		query.b = route.fullPath
 	}
 
 	return Object.keys(query).length > 0 ? query : undefined
@@ -266,6 +238,18 @@ function withHostingContext(path: string) {
 	return hostingContextQuery.value ? { path, query: hostingContextQuery.value } : path
 }
 
+function parseSearchParams(requestParams: string): Labrinth.Search.SearchParams {
+	const params = new URLSearchParams(requestParams.replace(/^\?/, ''))
+
+	return {
+		query: params.get('query') ?? undefined,
+		offset: params.get('offset') ?? undefined,
+		index: params.get('index') ?? undefined,
+		limit: params.get('limit') ?? undefined,
+		new_filters: params.get('new_filters') ?? undefined,
+	}
+}
+
 async function fetchSearch(requestParams: string) {
 	debug('search() called', {
 		requestParams: requestParams.substring(0, 100),
@@ -273,11 +257,7 @@ async function fetchSearch(requestParams: string) {
 		projectTypeId: projectTypeId.value,
 	})
 
-	const raw = await client.request<Labrinth.Search.v3.SearchResults>('/search', {
-		api: 'labrinth',
-		version: 3,
-		method: 'GET',
-		params: Object.fromEntries(new URLSearchParams(requestParams.replace(/^\?/, ''))),
+	const raw = await client.labrinth.projects_v3.search(parseSearchParams(requestParams), {
 		headers: withLabrinthCanaryHeader(),
 	})
 
@@ -293,7 +273,7 @@ async function fetchSearch(requestParams: string) {
 	}
 
 	return {
-		projectHits: raw.hits.map(mapV3ProjectHit),
+		projectHits: raw.hits,
 		serverHits: [],
 		total_hits: raw.total_hits,
 		per_page: raw.hits_per_page,
@@ -309,7 +289,7 @@ async function search(requestParams: string) {
 }
 
 function getCardActions(
-	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+	result: Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
 ): CardAction[] {
 	if (currentProjectType === 'server') return []
@@ -435,6 +415,16 @@ const messages = defineMessages({
 	},
 })
 
+const advancedFiltersCollapsed = computed({
+	get: () => flags.value.advancedFiltersCollapsed,
+	set: (value) => {
+		flags.value.advancedFiltersCollapsed = value
+		saveFeatureFlags()
+	},
+})
+
+const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
+
 debug('projectTypeId:', projectTypeId.value)
 watch(projectTypeId, (val) => debug('projectTypeId changed:', val))
 
@@ -442,10 +432,12 @@ const searchState = useBrowseSearch({
 	projectType: projectTypeId,
 	tags,
 	providedFilters: serverFilters,
+	environmentOverride: serverEnvironmentOverride,
 	search,
-	persistentQueryParams: ['sid', 'wid', 'shi', 'from'],
+	persistentQueryParams: ['sid', 'wid', 'shi', 'so', 'from'],
 	getExtraQueryParams: () => ({
 		shi: serverHideInstalled.value ? 'true' : undefined,
+		so: showServerOnlyToggle.value && serverContentServerOnly.value ? 'true' : undefined,
 	}),
 	maxResultsOptions: currentMaxResultsOptions,
 	displayMode: resultsDisplayMode,
@@ -512,7 +504,7 @@ provideBrowseManager({
 	tags,
 	projectType: projectTypeId,
 	...searchState,
-	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) =>
+	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
 		withHostingContext(
 			`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
 		),
@@ -535,6 +527,11 @@ provideBrowseManager({
 			queuedServerInstallCount.value > 0,
 	),
 	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
+	serverOnly: serverContentServerOnly,
+	showServerOnly: showServerOnlyToggle,
+	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
+	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
+	advancedFiltersCollapsed,
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,
@@ -552,6 +549,12 @@ provideBrowseManager({
 	},
 	loadingComponent: LogoAnimated,
 })
+
+const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'DiscoverInstallHeader',
+)
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
@@ -606,13 +609,7 @@ provideBrowseManager({
 	<CreationFlowModal
 		v-if="currentServerId && projectType?.id === 'modpack'"
 		ref="onboardingModalRef"
-		:type="
-			fromContext === 'reset-server'
-				? 'reset-server'
-				: fromContext === 'create-instance' || fromContext === 'onboarding'
-					? 'world'
-					: 'server-onboarding'
-		"
+		:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
 		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 		:show-snapshot-toggle="true"
 		:on-back="onOnboardingBack"

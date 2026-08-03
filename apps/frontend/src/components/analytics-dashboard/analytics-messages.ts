@@ -92,6 +92,11 @@ export const analyticsMessages = defineMessages({
 		id: 'analytics.value.no-dependent-tooltip',
 		defaultMessage: 'Downloaded for reasons other than being a dependency',
 	},
+	unknownDependentTooltip: {
+		id: 'analytics.value.unknown-dependent-tooltip',
+		defaultMessage:
+			"There's no metadata to determine which dependent project this download attributes to.",
+	},
 	other: {
 		id: 'analytics.value.other',
 		defaultMessage: 'Other',
@@ -207,6 +212,10 @@ export const analyticsMessages = defineMessages({
 	allTab: {
 		id: 'analytics.filter.game-version-type.all',
 		defaultMessage: 'All',
+	},
+	dependentProjectSearchFailedTitle: {
+		id: 'analytics.filter.dependent-project-search-failed-title',
+		defaultMessage: 'Dependent projects failed to load',
 	},
 })
 
@@ -678,6 +687,10 @@ export const analyticsChartMessages = defineMessages({
 	hideEntryInGraph: {
 		id: 'analytics.chart.tooltip.hide-entry',
 		defaultMessage: 'Hide {name} in graph',
+	},
+	noData: {
+		id: 'analytics.chart.tooltip.no-data',
+		defaultMessage: 'No data',
 	},
 	durationDays: {
 		id: 'analytics.chart.tooltip.duration.days',

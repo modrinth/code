@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "أضف عنوان جافا"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "أضف رابط URL صالحًا واسمًا أو معرّف SPDX للترخيص المخصص الخاص بك."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "أضف معلومات ترخيص"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "أضف أي روابط ذات صلة خارج Modrinth، مثل موقع إلكتروني، متجر، أو دعوة Discord."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "إضافة روابط خارجية"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "لقد حددت جميع خيارات اللغات المتاحة. يُرجى إدراج اللغات التي يدعمها خادمك بشكل فعلي فقط."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "اختر اللغات الدقيقة"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "لقد قمت باختيار جميع {totalAvailableTags, plural, one {# وسم متاح} other {# وسوم متاحة}}. هذا يُفقد الأوسمة غايتها، حيث أن هدفها هو مساعدة المستخدمين في العثور على المشاريع ذات الصلة. يرجى اختيار الأوسمة ذات الصلة بمشروعك فقط."
@@ -140,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "أختر قرار صحيح"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "الرجاء التأكد من توفير إثبات لحصولك على أُذون لنشر أي محتوى خارجي في حزمة التعديلات الخاصة بك."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "مراجعة الأُذون الخارجية"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "ماهي الإصدارات التي يدعمها خادمك. اختر مودباك, أو اضف من عندك."
   },
@@ -182,6 +200,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "زيارة إعدادات الروابط"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "انتقل إلى لوحة التحكم بالأذونات"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "زيارة إعدادات العلامة"
   },
@@ -211,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "عدل اسم"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "لقد حددت {languageCount, plural, one {# لغة} other {# لغات}}. يُرجى إدراج اللغات التي يدعمها خادمك بشكل فعلي فقط."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "اختر اللغات الدقيقة"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "لقد اخترت{tagCount, plural, one {# tag} other {# tags}}. \nفكر في تقليلها الى {maxTagCount} او اقل من اجل عرض خادمك في بحوثات متعلقة."

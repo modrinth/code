@@ -89,9 +89,6 @@
   "button.refresh": {
     "defaultMessage": "Päivitä"
   },
-  "button.remove": {
-    "defaultMessage": "Poista"
-  },
   "button.remove-image": {
     "defaultMessage": "Poista kuva"
   },
@@ -563,9 +560,6 @@
   "settings.language.title": {
     "defaultMessage": "Kieli"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Julkinen profiili"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Istunnot"
   },
@@ -573,4 +567,3 @@
     "defaultMessage": "Sinulla on tallentamattomia muutoksia."
   }
 }
-

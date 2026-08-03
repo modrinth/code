@@ -13,8 +13,7 @@ use crate::util::io::{self, IOError};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
 use path_util::SafeRelativeUtf8UnixPathBuf;
-use std::collections::{HashMap, HashSet};
-use std::iter::FromIterator;
+use std::collections::HashMap;
 use std::path::PathBuf;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
@@ -56,12 +55,12 @@ pub async fn export_mrpack(
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
         create_mrpack_json(&metadata, version_id, description).await?;
-    let included_candidates_set = HashSet::<_>::from_iter(
-        included_export_candidates.iter().map(|x| x.as_str()),
-    );
-    packfile
-        .files
-        .retain(|f| included_candidates_set.contains(f.path.as_str()));
+    packfile.files.retain(|f| {
+        is_export_candidate_included(
+            f.path.as_str(),
+            &included_export_candidates,
+        )
+    });
 
     let mut path_list = Vec::new();
     add_all_recursive_folder_paths(&instance_base_path, &mut path_list).await?;
@@ -80,9 +79,10 @@ pub async fn export_mrpack(
         let relative_path = pack_get_relative_path(&instance_base_path, &path)?;
 
         if packfile.files.iter().any(|f| f.path == relative_path)
-            || !included_candidates_set
-                .iter()
-                .any(|x| relative_path.starts_with(&**x))
+            || !is_export_candidate_included(
+                relative_path.as_str(),
+                &included_export_candidates,
+            )
         {
             continue;
         }
@@ -110,6 +110,18 @@ pub async fn export_mrpack(
     writer.close().await?;
 
     Ok(())
+}
+
+fn is_export_candidate_included(
+    path: &str,
+    included_export_candidates: &[String],
+) -> bool {
+    included_export_candidates.iter().any(|candidate| {
+        path == candidate
+            || path
+                .strip_prefix(candidate)
+                .is_some_and(|suffix| suffix.starts_with('/'))
+    })
 }
 
 #[tracing::instrument]

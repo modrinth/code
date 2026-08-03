@@ -1,3 +1,5 @@
+export { default as AccountProfileSettings } from './AccountProfileSettings.vue'
+export { default as AccountSocialSettings } from './AccountSocialSettings.vue'
 export { default as ServersManageAccessPage } from './hosting/manage/[id]/access/access.vue'
 export { default as ServersManageRootLayout } from './hosting/manage/[id]/index.vue'
 export { default as ServersManageBackupsPage } from './hosting/manage/[id]/instances/[instance-id]/backups.vue'

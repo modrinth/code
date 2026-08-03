@@ -1,2 +1,282 @@
-{}
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Potreban je opis koji tačno opiše svrhu projekta i funkciju."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Dodaj opis"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Dodavanje jedinstvene, relevantne i zanimljive ikone čini tvoj projekat prepoznatljivim i pomaže mu da se istakne."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Dodaj ikonu"
+  },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Dodaj IP adresu i port koju Java igrači mogu koristiti da se pridruže tvome serveru."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Dodaj Java adresu"
+  },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Dodaj važeći URL i ime ili SPDX identifikator za tvoju prilagođenu licencu."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Dodaj detalje licence"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Dodaj sve relevantne linkove usmerene izvan Modrintha, kao što su veb lokacija, veb prodavnica ili pozivnica na Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Dodaj spoljne linkove"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Dodaj sve relevantne linkove usmerene izvan Modrintha, kao što su izvorni kod, praćenje problema ili pozivnica na Discord."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Dodaj spoljne linkove"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Izabrao si sve dostupne jezičke opcije. Molimo ti da navedeš samo one jezike koje tvoj server aktivno podržava."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Izaberi tačne jezike"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Izabrao si sve {totalAvailableTags, plural, one {# dostupnu oznaku} few {# dostupne oznake} other {# dostupnih oznaki}}. Ovo poništava svrhu oznaka, koje su namenjene da pomognu korisnicima da pronađu relevantne projekte. Izaberi samo oznake koje su relevantne za tvoj projekat."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Izaberi tačne oznake"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Tvoj opis je {length, plural, one {# čitljiv karakter} few {# čitljiva karaktera} other {# čitljivih karaktera}}. Barem {minChars, plural, one {# karakter} other {# karaktera}} je preporučeno kreiranje jasnog i informativnog opisa."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Proširi opis"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Promeni opis"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Promeni licencu"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Promeni rezime"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Promeni oznake"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Promeni naslov"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Istaknuta slika iz galerije je često način na koji tvoj projekat ostavlja prvi utisak."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Istakni sliku iz galerije"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Posjeti stranicu galerije"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Tvoj {type} koristi licencu koja zahteva da izvorni kod bude dostupan. Molimo te da navedeš vezu izvornog koda ili datoteku sa izvornim kodom za svaku dodatnu verziju ili razmisli o korišćenju druge licence."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Navedi izvorni kod"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Neki od tvojih spoljnih linkova izgledaju identično. Svaki link treba uneti samo jednom i sa odgovarajućim tipom linka."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Počisti identične linkove"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Tvoj opis treba da sadrži dovoljno običnog teksta ili alternativnog teksta slike, kako bi bio pristupačan onima koji koriste čitače ekrana ili imaju spore internet veze."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Obezbedi pristupačnost"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "URL adresa licence je nevažeća."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "URL adresa tvoje licence vodi do {domain}, koja nije prikladna za informacije o licenci. URL adrese licence treba da vode direktno do tvoje datoteke licence, a ne do društvenih medija, platformi za igre itd."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Izgleda da je URL adresa tvoje licence pogrešno formatirana. Molimo te da navedeš važeću URL adresu teksta tvoje licence."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Dodaj važeći link licence"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Upotreba skraćivača linkova ili drugih metoda za prikrivanje mesta gde link može voditi u tvojim spoljnim linkovima ili licencnim linkovima je zabranjena, koristi samo odgovarajuće linkove pune dužine."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Ne koristi skraćivače linkova"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# zaglavlje} other {# zaglavlja}} u tvojem opisu {count, plural, one {# je predugo} other {# su preduga}}. Zaglavlja treba da budu sažeti i da služe kao naslovi odeljaka, a ne kao cele rečenice."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Skrati zaglavlja"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Projekti ne smeju koristiti brendiranje Minecrafta niti uključivati „Minecraft“ kao značajan deo imena."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Izbegavaj kršenje brenda"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Nekim tvojim slikama nedostaje alternativni tekst, što je važno za pristupačnost, posebno za slabovide korisnike."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Dodajte alternativni tekst slike"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Discord pozivnice se ne mogu koristiti za druge tipove linkova. Molimo te da svoj Discord link uneseš samo u polje za Discord pozivnicu."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Premesti Discord pozivnicu"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Posjeti temu za moderaciju"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Pregledaj i reši sve nedoumice moderatorskog tima pre nego što ponovo pošalješ."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Pregledajte povratne informacije"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Izabrano je {count, plural, one {# oznaka rezolucije} few {# oznake rezolucije} other {# oznaka rezolucije}} ({tags}). Resurs paketi bi samo trebali imati jednu ozkanu rezolucije."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Izaberi ispravnu rezoluciju"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Uveri se da si dao dokaz o tvojoj dozvoli za distribuciju bilo kog eksternog sadržaja u tvojem Modpaku."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Pregledaj spoljne dozvole"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Izaberi koje verzije vaš server podržava, izaberi Modpak ili otpremi svoj."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Izaberi kompatibilnosti"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Obavesti igrače u kom regionu se nalazi tvoj server."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Izaberi region"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Navedi list jezika koje tvoj server podržava."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Izaberi jezik"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Ozaberi licencu pod kojem je tvoj {type} distribuiran."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Izaberi licencu"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Izaberi ispravne oznake tako da se može tvoj projekat lako naći."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Izaberi oznake"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Posjeti podešavanja servera"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Posjeti podešavanja opisa"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Posjeti podešavanja licenca"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Posjeti podešavanja linkova"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Posjeti podešavanja dozvola"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Posjeti podešavanja oznaka"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Posjeti generalna podešavanja"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Tvog rezime ne može biti isti kao naziv tvog projekta. Važno je da napraviš informativan i privlačan rezime."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Napravi rezime jedinstvenim"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Tvoj rezime ne bi trebalo da sadrži formatiranje, prelome redova, specijalne znakove ili linkove, jer će rezime prikazivati samo običan tekst."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Razjasni rezime"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Tvoj rezime je {length, plural, one {# slovo} other {# slova}}. Najmanje {minChars, plural, one {# slovo} other {# slova}} je preporučeno da bi se kreirao informativan i privlačan rezime."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Proširi rezime"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Održavanje čistog imena vašeg projekta ga čini lakšim za pamćenje i pronalaženje. Informacije o verziji i programu za učitavanje se automatski prikazuju pored vašeg projekta."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Počisti Ime"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Izabrao si {languageCount, plural, one {# jezik} other {# jezika}}. Navedi samo jezike koje tvoj server aktivno podržava."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Izaberi tačne jezike"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Izabrao si {tagCount, plural, one {# oznaku} few {# oznake} other {# oznaka}}. Molimo smanji broj na {maxTagCount} ili manje kako bi bio siguran da se tvoj server pojavljuje u relevantnim rezultatima pretrage."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Izaberi tačne oznake"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Izabrani su {tagCount, plural, one {# oznaku} few {# oznake} other {# oznaka}}. Smanji broj oznaka na {maxTagCount} ili manje kako bi se tvoj projekat pokazao na relevantinim rezultatima potrage."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Izaberi tačne oznake"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Barem jedna slika u geliriji je potrebna da bi se predstavio sadržaj tvog {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resurs paket, osim za audio ili paket za lokalizacije. Ako to opisuje tvoj paket, molimo izaberi tačnu oznaku"
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Postavi sliku za geleriju"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "Barem jedna verzija je potrebna da bi projekat bio podnet na pregled."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Postavi verziju"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Neki tvojih spoljne linkova imaju neprimerne domene za tip linka."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Proveri spoljne linkove"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Posjeti stranu verzija"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Posjeti podešavanja linkova"
+  }
+}
 

@@ -1,6 +1,5 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::models::analytics::{Download, DownloadReason};
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
@@ -8,7 +7,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchBackend;
-use crate::search::incremental::consume::reindex_project;
+use crate::search::incremental::consume::reindex_project_document;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
@@ -22,10 +21,11 @@ use std::net::Ipv4Addr;
 use std::str::FromStr;
 use std::sync::Arc;
 use tracing::trace;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/admin")
+        web::scope("/admin")
             .service(count_download)
             .service(force_reindex)
             .service(force_reindex_project),
@@ -130,7 +130,10 @@ async fn resolve_download_attribution_version(
 }
 
 // This is an internal route, cannot be used without key
+/// Count a download.  
 #[utoipa::path(
+	context_path = "/admin",
+	tag = "v2 admin",
     patch,
     operation_id = "countDownload",
     responses(
@@ -308,7 +311,10 @@ pub async fn count_download(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+/// Reindex all projects.  
 #[utoipa::path(
+	context_path = "/admin",
+	tag = "v2 admin",
     post,
     operation_id = "forceReindex",
     responses(
@@ -324,13 +330,16 @@ pub async fn force_reindex(
 ) -> Result<HttpResponse, ApiError> {
     let redis = redis.get_ref();
     search_backend
-        .index_projects(pool.as_ref().clone(), redis.clone())
+        .rebuild_index(pool.as_ref().clone(), redis.clone())
         .await
         .wrap_internal_err("failed to index projects")?;
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Reindex a project.  
 #[utoipa::path(
+	context_path = "/admin",
+	tag = "v2 admin",
     post,
     operation_id = "forceReindexProject",
     responses(
@@ -346,7 +355,7 @@ pub async fn force_reindex_project(
     search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id,) = path.into_inner();
-    reindex_project(
+    reindex_project_document(
         pool.as_ref(),
         redis.as_ref(),
         search_backend.as_ref(),

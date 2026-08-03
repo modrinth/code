@@ -195,6 +195,10 @@ pub const fn get_login_url() -> &'static str {
     concat!(env!("MODRINTH_URL"), "auth/sign-in")
 }
 
+pub const fn get_signup_url() -> &'static str {
+    concat!(env!("MODRINTH_URL"), "auth/sign-up")
+}
+
 pub async fn finish_login_flow(
     code: &str,
     semaphore: &FetchSemaphore,

@@ -137,13 +137,13 @@ onUnmounted(() => {
 <template>
 	<div
 		ref="containerRef"
-		class="@container flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md"
+		class="@container flex flex-col gap-4 rounded-[20px] border border-solid border-surface-4 bg-bg-raised p-6 shadow-md"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div class="flex flex-wrap items-start justify-between gap-4">
 			<div class="flex min-w-0 flex-1 items-center gap-4">
 				<AutoLink :to="projectLink" class="shrink-0">
-					<Avatar :src="project.icon_url" :alt="project.title" size="5rem" no-shadow raised />
+					<Avatar :src="project.icon_url" :alt="project.title" size="5rem" no-shadow />
 				</AutoLink>
 				<div class="flex min-w-0 flex-col gap-1.5">
 					<div class="flex min-w-0 flex-col">

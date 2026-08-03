@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_files (\n\t\t\tid,\n\t\t\tinstance_id,\n\t\t\trelative_path,\n\t\t\tfile_name,\n\t\t\tenabled,\n\t\t\tsha1,\n\t\t\tsize,\n\t\t\tmissing,\n\t\t\tadded_at,\n\t\t\tmodified_at\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\tON CONFLICT (instance_id, relative_path) DO UPDATE SET\n\t\t\tfile_name = excluded.file_name,\n\t\t\tenabled = excluded.enabled,\n\t\t\tsha1 = excluded.sha1,\n\t\t\tsize = excluded.size,\n\t\t\tmissing = excluded.missing,\n\t\t\tmodified_at = excluded.modified_at\n\t\tRETURNING\n\t\t\tid,\n\t\t\tinstance_id,\n\t\t\trelative_path,\n\t\t\tfile_name,\n\t\t\tenabled,\n\t\t\tsha1,\n\t\t\tsize,\n\t\t\tmissing,\n\t\t\tadded_at,\n\t\t\tmodified_at\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "relative_path",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "enabled",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "sha1",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "size",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "missing",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "added_at",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified_at",
+        "ordinal": 9,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "59a314ee065e24af6d7138fcf11eed0eafc29732a15f25d051964660941c8d33"
+}

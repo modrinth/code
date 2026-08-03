@@ -22,6 +22,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 #[tauri::command]
 pub async fn modrinth_login<R: Runtime>(
     app: tauri::AppHandle<R>,
+    flow: mr_auth::ModrinthAuthFlow,
 ) -> Result<ModrinthCredentials> {
     let (auth_code_recv_socket_tx, auth_code_recv_socket) = oneshot::channel();
     let auth_code = tokio::spawn(oauth_utils::auth_code_reply::listen(
@@ -32,7 +33,7 @@ pub async fn modrinth_login<R: Runtime>(
 
     let auth_request_uri = format!(
         "{}?launcher=true&ipver={}&port={}",
-        mr_auth::authenticate_begin_flow(),
+        mr_auth::authenticate_begin_flow(flow),
         if auth_code_recv_socket.is_ipv4() {
             "4"
         } else {

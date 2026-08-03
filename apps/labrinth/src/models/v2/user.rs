@@ -6,7 +6,7 @@ use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, utoipa::ToSchema)]
 pub struct LegacyUser {
     pub id: UserId,
     pub username: String,
@@ -24,7 +24,6 @@ pub struct LegacyUser {
     pub has_totp: Option<bool>,
     pub payout_data: Option<UserPayoutData>, // this was changed in v3, but not ones we want to keep out of v2
 
-    // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
 }
 

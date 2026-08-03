@@ -18,7 +18,7 @@
 							<Avatar size="sm" :src="organization.icon_url" />
 							<div class="flex flex-col justify-center gap-1">
 								<h2 class="m-0 text-base">
-									<nuxt-link :to="`/organization/${organization.slug}/settings`">
+									<nuxt-link :to="`/organization/${organization.slug}`">
 										{{ organization.name }}
 									</nuxt-link>
 								</h2>
@@ -62,13 +62,15 @@
 		</template>
 		<template v-else>
 			<div class="normal-page__header py-4">
-				<PageHeader
-					:header="organization.name"
-					:summary="organization.description"
-					:leading="organizationHeaderLeading"
-					:badges="organizationHeaderBadges"
-					:metadata="organizationHeaderMetadata"
-					:actions="organizationHeaderActions"
+				<OrganizationPageHeader
+					:organization="organization"
+					:members-count="acceptedMembers?.length || 0"
+					:projects-count="projects?.length || 0"
+					:downloads="sumDownloads"
+					:can-manage="!!(auth.user && currentMember)"
+					@manage-projects="router.push(`/organization/${organization.slug}/settings/projects`)"
+					@copy-id="copyId"
+					@copy-permalink="copyPermalink"
 				/>
 			</div>
 			<div class="normal-page__sidebar">
@@ -181,14 +183,7 @@
 							:downloads="project.downloads"
 							:followers="project.followers"
 							:tags="project.categories"
-							:environment="
-								project.client_side && project.server_side
-									? {
-											clientSide: project.client_side,
-											serverSide: project.server_side,
-										}
-									: undefined
-							"
+							:environment="project.environment?.[0]"
 							:status="
 								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
 									? (project.status as ProjectStatus)
@@ -203,11 +198,16 @@
 					<UpToDate class="icon" />
 					<br />
 					<span class="preserve-lines text">
-						This organization doesn't have any projects yet.
 						<template v-if="isPermission(currentMember?.permissions, 1 << 4)">
-							Would you like to
-							<a class="link" @click="modal_creation?.show()">create one</a>?
+							<IntlFormatted :message-id="messages.noProjectsWithCreatePrompt">
+								<template #create-link="{ children }">
+									<a class="link" @click="modal_creation?.show()"
+										><component :is="() => normalizeChildren(children)"
+									/></a>
+								</template>
+							</IntlFormatted>
 						</template>
+						<template v-else>{{ formatMessage(messages.noProjects) }}</template>
 					</span>
 				</div>
 			</div>
@@ -221,11 +221,7 @@ import {
 	BoxIcon,
 	ChartIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
 	CrownIcon,
-	DownloadIcon,
-	MoreVerticalIcon,
-	OrganizationIcon,
 	SettingsIcon,
 	SpinnerIcon,
 	UsersIcon,
@@ -235,15 +231,16 @@ import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	injectModrinthClient,
+	IntlFormatted,
 	NavTabs,
-	PageHeader,
+	normalizeChildren,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectCard,
 	ProjectCardList,
 	SidebarCard,
 	useCompactNumber,
-	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
@@ -253,6 +250,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
+import OrganizationPageHeader from '~/components/ui/OrganizationPageHeader.vue'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,
@@ -261,15 +259,23 @@ import {
 import { isPermission } from '~/utils/permissions.ts'
 import { projectUserSorting } from '~/utils/projects.ts'
 
-type ProjectV3 = Labrinth.Projects.v3.Project & {
-	client_side: 'required' | 'optional' | 'unsupported'
-	server_side: 'required' | 'optional' | 'unsupported'
-}
+type ProjectV3 = Labrinth.Projects.v3.Project
 
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
-const formatNumber = useFormatNumber()
+const messages = defineMessages({
+	noProjects: {
+		id: 'organization.projects.none',
+		defaultMessage: "This organization doesn't have any projects yet.",
+	},
+	noProjectsWithCreatePrompt: {
+		id: 'organization.projects.none-with-create-prompt',
+		defaultMessage:
+			"This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?",
+	},
+})
+
 const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
@@ -337,31 +343,7 @@ const {
 				categories = categories.concat(project.mrpack_loaders as string[])
 			}
 
-			const singleplayer = project.singleplayer && (project.singleplayer as string[])[0]
-			const clientAndServer =
-				project.client_and_server && (project.client_and_server as string[])[0]
-			const clientOnly = project.client_only && (project.client_only as string[])[0]
-			const serverOnly = project.server_only && (project.server_only as string[])[0]
-
-			let client_side: ProjectV3['client_side'] | undefined
-			let server_side: ProjectV3['server_side'] | undefined
-
-			// quick and dirty hack to show envs as legacy
-			if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-				client_side = 'required'
-				server_side = 'required'
-			} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-				client_side = 'required'
-				server_side = 'unsupported'
-			} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-				client_side = 'unsupported'
-				server_side = 'required'
-			} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-				client_side = 'optional'
-				server_side = 'optional'
-			}
-
-			return { ...project, categories, client_side, server_side }
+			return { ...project, categories }
 		})
 	},
 	placeholderData: [],
@@ -467,93 +449,6 @@ const { currentMember } = organizationContext
 provideOrganizationContext(organizationContext)
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
-
-const organizationHeaderLeading = computed(() => ({
-	type: 'avatar' as const,
-	src: organization.value?.icon_url,
-	alt: organization.value?.name,
-	avatarSize: '96px',
-}))
-
-const organizationHeaderBadges = computed(() => [
-	{
-		id: 'organization',
-		label: 'Organization',
-		icon: OrganizationIcon,
-		class: 'px-0 text-primary',
-	},
-])
-
-const organizationHeaderMetadata = computed(() => [
-	{
-		id: 'members',
-		label: `${formatCompactNumber(acceptedMembers.value?.length || 0)} members`,
-		icon: UsersIcon,
-	},
-	{
-		id: 'projects',
-		label: `${formatCompactNumber(projects.value?.length || 0)} projects`,
-		icon: BoxIcon,
-	},
-	{
-		id: 'downloads',
-		label: `${formatCompactNumber(sumDownloads.value)} downloads`,
-		icon: DownloadIcon,
-		tooltip: formatNumber(sumDownloads.value),
-	},
-])
-
-const organizationHeaderActions = computed(() => [
-	...(auth.value.user && currentMember.value
-		? [
-				{
-					id: 'manage',
-					label: 'Manage',
-					icon: SettingsIcon,
-					to: `/organization/${organization.value?.slug}/settings`,
-				},
-			]
-		: []),
-	{
-		id: 'more',
-		label: 'More options',
-		icon: MoreVerticalIcon,
-		labelHidden: true,
-		type: 'transparent' as const,
-		tooltip: 'More options',
-		menuActions: [
-			{
-				id: 'manage-projects',
-				label: 'Manage projects',
-				icon: BoxIcon,
-				action: () => {
-					void router.push(`/organization/${organization.value?.slug}/settings/projects`)
-				},
-				shown: !!(auth.value.user && currentMember.value),
-			},
-			{
-				divider: true,
-				shown: !!(auth.value.user && currentMember.value),
-			},
-			{
-				id: 'copy-id',
-				label: formatMessage(commonMessages.copyIdButton),
-				icon: ClipboardCopyIcon,
-				action: () => {
-					void copyId()
-				},
-			},
-			{
-				id: 'copy-permalink',
-				label: formatMessage(commonMessages.copyPermalinkButton),
-				icon: ClipboardCopyIcon,
-				action: () => {
-					void copyPermalink()
-				},
-			},
-		],
-	},
-])
 
 watch(
 	[routeHasSettings, acceptedMembers, currentMember],

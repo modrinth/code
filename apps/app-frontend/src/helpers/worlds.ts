@@ -404,35 +404,43 @@ export async function refreshServerData(
 ): Promise<void> {
 	const refreshTime = Date.now()
 	serverData.refreshing = true
-	await get_server_status(address, protocolVersion)
-		.then((status) => {
-			if (serverData.lastSuccessfulRefresh && serverData.lastSuccessfulRefresh > refreshTime) {
-				// Don't update if there was a more recent successful refresh
-				return
-			}
-			serverData.lastSuccessfulRefresh = Date.now()
-			serverData.status = status
-			if (status.description) {
-				serverData.rawMotd = status.description
-				serverData.renderedMotd = autoToHTML(status.description)
-			}
-		})
-		.finally(() => {
-			serverData.refreshing = false
-		})
-		.catch((err) => {
-			console.error(`Refreshing addr ${address}`, protocolVersion, err)
-			if (!protocolVersion?.legacy) {
-				refreshServerData(serverData, { version: 74, legacy: true }, address)
-			}
-		})
+	try {
+		const status = await get_server_status(address, protocolVersion)
+		if (serverData.lastSuccessfulRefresh && serverData.lastSuccessfulRefresh > refreshTime) {
+			// Don't update if there was a more recent successful refresh
+			return
+		}
+		serverData.lastSuccessfulRefresh = Date.now()
+		serverData.status = status
+		if (status.description) {
+			serverData.rawMotd = status.description
+			serverData.renderedMotd = autoToHTML(status.description)
+		} else {
+			delete serverData.rawMotd
+			delete serverData.renderedMotd
+		}
+	} catch (err) {
+		console.error(`Refreshing addr ${address}`, protocolVersion, err)
+		if (!protocolVersion?.legacy) {
+			await refreshServerData(serverData, { version: 74, legacy: true }, address)
+			return
+		}
+		if (!serverData.lastSuccessfulRefresh || serverData.lastSuccessfulRefresh <= refreshTime) {
+			delete serverData.status
+			delete serverData.rawMotd
+			delete serverData.renderedMotd
+		}
+	} finally {
+		serverData.refreshing = false
+	}
 }
 
-export function refreshServers(
+export async function refreshServers(
 	worlds: World[],
 	serverData: Record<string, ServerData>,
 	protocolVersion: ProtocolVersion | null,
-) {
+	ping = true,
+): Promise<void> {
 	const servers = worlds.filter(isServerWorld)
 	servers.forEach((server) => {
 		if (!serverData[server.address]) {
@@ -444,9 +452,14 @@ export function refreshServers(
 		}
 	})
 
-	// noinspection ES6MissingAwait - handled with .then by refreshServerData already
-	Object.keys(serverData).forEach((address) =>
-		refreshServerData(serverData[address], protocolVersion, address),
+	if (!ping) {
+		return
+	}
+
+	await Promise.all(
+		Object.keys(serverData).map((address) =>
+			refreshServerData(serverData[address], protocolVersion, address),
+		),
 	)
 }
 

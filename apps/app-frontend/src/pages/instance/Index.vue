@@ -4,7 +4,8 @@
 			:class="['p-6 pr-2 pb-4', { 'shrink-0': isFixedRender }]"
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
-			<ExportModal ref="exportModal" :instance="instance" />
+			<ExportModal v-if="!instance.quarantined" ref="exportModal" :instance="instance" />
+			<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="deleteSelectedInstance" />
 			<InstanceSettingsModal
 				:key="instance.id"
 				ref="settingsModal"
@@ -13,60 +14,61 @@
 				@unlinked="fetchInstance"
 			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<PageHeader
-				:header="instance.name"
-				:leading="instanceHeaderLeading"
-				:metadata="instanceHeaderMetadata"
-				:actions="instanceHeaderActions"
-			>
-				<template #metadata-server-details>
-					<div class="flex items-center flex-wrap gap-2">
-						<template v-if="loadingServerPing">
-							<ServerOnlinePlayers
-								v-if="playersOnline !== undefined"
-								:online="playersOnline"
-								:status-online="statusOnline"
-								hide-label
-							/>
-							<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
-							<div
-								v-if="
-									(playersOnline !== undefined || recentPlays !== undefined) &&
-									(minecraftServer?.region || ping)
-								"
-								class="w-1.5 h-1.5 rounded-full bg-surface-5"
-							></div>
-							<ServerPing v-if="ping" :ping="ping" />
-						</template>
-
-						<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
-
-						<div
-							v-if="minecraftServer?.region || ping"
-							class="w-1.5 h-1.5 rounded-full bg-surface-5"
-						></div>
-
-						<div v-if="linkedProjectV3" class="flex gap-1.5 items-center font-medium text-primary">
-							Linked to
-							<Avatar
-								:src="linkedProjectV3.icon_url"
-								:alt="linkedProjectV3.name"
-								:tint-by="instance.id"
-								size="24px"
-							/>
-							<router-link
-								:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-								class="hover:underline text-primary truncate"
-							>
-								{{ linkedProjectV3.name }}
-							</router-link>
-						</div>
-					</div>
-				</template>
-			</PageHeader>
+			<SharedInstanceUpdateModal
+				ref="sharedInstanceUpdateModal"
+				@accepted="hideAcceptedSharedInstanceUpdate"
+				@complete="handleSharedInstanceUpdateComplete"
+				@shared-instance-unavailable="handleSharedInstanceUnavailable"
+				@report="(event) => reportSharedInstance(event, true)"
+			/>
+			<SharedInstanceInstallModal
+				ref="sharedInstanceReportModal"
+				@reported="handleSharedInstanceReported"
+			/>
+			<InstancePageHeader
+				:instance="instance"
+				:icon-src="icon"
+				:is-server-instance="isServerInstance"
+				:show-instance-play-time="showInstancePlayTime"
+				:time-played="timePlayed"
+				:playing="playing"
+				:loading="loading"
+				:stopping="stopping"
+				:loading-server-ping="loadingServerPing"
+				:players-online="playersOnline"
+				:status-online="statusOnline"
+				:recent-plays="recentPlays"
+				:ping="ping"
+				:minecraft-server="minecraftServer"
+				:linked-project-v3="linkedProjectV3"
+				:shared-instance-manager="sharedInstanceManager"
+				@repair="() => repairInstance()"
+				@stop="() => stopInstance('InstancePage')"
+				@play="() => startInstance('InstancePage')"
+				@play-server="() => handlePlayServer()"
+				@settings="() => settingsModal?.show()"
+				@open-folder="() => instance && showInstanceInFolder(instance.id)"
+				@export="() => !instance.quarantined && exportModal?.show()"
+				@create-shortcut="() => createShortcut()"
+				@report="reportSharedInstance"
+			/>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
+			<InstanceAdmonitions
+				class="mt-4"
+				:instance="instance"
+				:shared-instance-unavailable-reason="sharedInstanceUnavailableReason"
+				:shared-instance-unavailable-manager="sharedInstanceUnavailableManager"
+				:shared-instance-wrong-account="sharedInstanceWrongAccount"
+				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
+				:shared-instance-role="instance.shared_instance?.role"
+				:shared-instance-signed-out="sharedInstanceSignedOut"
+				:shared-instance-update-available="showSharedInstanceUpdateAdmonition"
+				@published="fetchInstance"
+				@delete="requestInstanceDeletion"
+				@review-update="reviewSharedInstanceUpdate"
+			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
 			<RouterView v-slot="{ Component }" :key="instance.id" :route="displayedInstanceRoute">
@@ -122,51 +124,44 @@ import {
 	BoxesIcon,
 	CheckCircleIcon,
 	ClipboardCopyIcon,
-	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
 	GlobeIcon,
 	HashIcon,
-	MoreVerticalIcon,
-	PackageIcon,
 	PlayIcon,
 	PlusIcon,
-	SettingsIcon,
 	StopCircleIcon,
-	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TerminalSquareIcon,
-	TimerIcon,
 	UpdatedIcon,
+	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Avatar,
-	formatLoaderLabel,
+	commonMessages,
+	injectAuth,
 	injectNotificationManager,
-	LoaderIcon as ServerLoaderIcon,
 	NavTabs,
-	PageHeader,
-	ServerOnlinePlayers,
-	ServerPing,
-	ServerRecentPlays,
-	ServerRegion,
 	useLoadingBarToken,
+	useVIntl,
 } from '@modrinth/ui'
-import type { Loaders } from '@modrinth/utils'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
-import { onBeforeRouteUpdate, useRoute, useRouter, type LocationQuery } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import InstanceAdmonitions from '@/components/ui/instance/instance-admonitions/index.vue'
+import InstancePageHeader from '@/components/ui/instance-page-header/index.vue'
+import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
+import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
@@ -175,28 +170,46 @@ import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
-import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
-import { get, get_full_path, kill, run } from '@/helpers/instance'
+import {
+	getSharedInstanceUnavailableReason,
+	install_existing_instance,
+	install_get_shared_instance_preview,
+	install_pack_to_existing_instance,
+	isSharedInstanceUnavailableError,
+	type SharedInstanceUnavailableReason,
+} from '@/helpers/install'
+import {
+	can_current_user_use_shared_instances,
+	get,
+	get_full_path,
+	kill,
+	remove,
+	run,
+} from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useTheming } from '@/store/state'
+import { useTheming } from '@/store/state'
 
-dayjs.extend(duration)
+import { provideSharedInstanceState, useSharedInstanceState } from './use-shared-instance-state'
+
 dayjs.extend(relativeTime)
 
 const { addNotification, handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
+const auth = injectAuth()
 const queryClient = useQueryClient()
 const route = useRoute()
+const { formatMessage } = useVIntl()
 
 const router = useRouter()
 const displayedInstanceRoute = shallowRef(router.currentRoute.value)
-const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_instance_play_time'))
 const contentSubpageRouteNames = new Set(['Mods', 'ModsFilter'])
@@ -209,21 +222,44 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const instance = ref<GameInstance>()
+const initialInstanceId = String(displayedInstanceRoute.value.params.id ?? '')
+const instance = ref<GameInstance | undefined>(
+	queryClient.getQueryData<GameInstance>(['instances', 'summary', initialInstanceId]),
+)
+useRootBreadcrumb({
+	slot: 'instance',
+	id: () => `instance:${String(displayedInstanceRoute.value.params.id ?? '')}`,
+	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: () => ({
+		type: 'image',
+		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		alt: instance.value?.name,
+		tintBy: instance.value?.id ?? String(displayedInstanceRoute.value.params.id ?? ''),
+	}),
+	to: () => `/instance/${encodeURIComponent(String(displayedInstanceRoute.value.params.id ?? ''))}`,
+})
+
 const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)
 const loading = ref(false)
+const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
+const sharedInstanceReportModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
+const deleteConfirmModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
+const selectedInstanceToDelete = ref<GameInstance | null>(null)
+const hiddenSharedInstanceUpdateKey = ref<string | null>(null)
+
+const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 
 useLoadingBarToken(subpagePending)
 
 const isServerInstance = ref(false)
 const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
 const selected = ref<unknown[]>([])
-
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
 const liveServerStatusOnline = ref(false)
@@ -235,41 +271,49 @@ const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
 const activeInstanceId = ref<string>()
-let fetchInstanceRequestId = 0
+const sharedInstanceState = useSharedInstanceState(instance, offline, notifySharedInstanceError)
+provideSharedInstanceState(sharedInstanceState)
+const {
+	actionsLocked: sharedInstanceActionsLocked,
+	expectedUserId: sharedInstanceExpectedUserId,
+	manager: sharedInstanceManager,
+	refreshUpdatePreview: refreshSharedInstanceUpdatePreview,
+	setUnavailable: setSharedInstanceUnavailable,
+	signedOut: sharedInstanceSignedOut,
+	unavailableManager: sharedInstanceUnavailableManager,
+	unavailableReason: sharedInstanceUnavailableReason,
+	updatePreview: sharedInstanceUpdatePreview,
+	wrongAccount: sharedInstanceWrongAccount,
+} = sharedInstanceState
+const sharedInstanceUpdateKey = computed(() => {
+	const instanceId = instance.value?.id
+	const latestVersion = sharedInstanceUpdatePreview.value?.latestVersion
+	return instanceId && latestVersion !== undefined ? `${instanceId}:${latestVersion}` : null
+})
+const showSharedInstanceUpdateAdmonition = computed(
+	() =>
+		sharedInstanceUpdatePreview.value?.updateAvailable === true &&
+		sharedInstanceUpdateKey.value !== hiddenSharedInstanceUpdateKey.value,
+)
 
 watch(
 	() => router.currentRoute.value,
 	(nextRoute) => {
-		if (nextRoute.path.startsWith('/instance')) {
+		if (
+			nextRoute.path.startsWith('/instance') &&
+			(!instance.value || nextRoute.params.id === instance.value.id)
+		) {
 			displayedInstanceRoute.value = nextRoute
 		}
 	},
 	{ immediate: true },
 )
 
-type InstanceRouteContext = {
-	name: unknown
-	path: string
-	query: LocationQuery
-}
-
-type InstancePageData = {
-	instanceId: string
-	instance?: GameInstance
-	linkedProjectV3?: Labrinth.Projects.v3.Project
-	isServerInstance: boolean
-	preloadedContent: InstanceContentData | null
-}
-
 function applyServerStatus(status: ServerStatus) {
 	playersOnline.value = status.players?.online
 	ping.value = status.ping
 	liveServerStatusOnline.value = true
 	loadingServerPing.value = true
-}
-
-function isContentSubpageRoute(routeName: unknown = displayedInstanceRoute.value.name) {
-	return typeof routeName === 'string' && contentSubpageRouteNames.has(routeName)
 }
 
 function resetServerStatus() {
@@ -279,36 +323,20 @@ function resetServerStatus() {
 	loadingServerPing.value = false
 }
 
-function isCurrentInstanceRequest(requestId: number, instanceId: string) {
-	return (
-		requestId === fetchInstanceRequestId &&
-		route.path.startsWith('/instance') &&
-		route.params.id === instanceId
-	)
+function isContentSubpageRoute(routeName = displayedInstanceRoute.value.name) {
+	return typeof routeName === 'string' && contentSubpageRouteNames.has(routeName)
 }
 
-function setInstanceBreadcrumbs(nextInstance: GameInstance, routeContext: InstanceRouteContext) {
-	breadcrumbs.setName(
-		'Instance',
-		nextInstance.name.length > 40 ? nextInstance.name.substring(0, 40) + '...' : nextInstance.name,
-	)
-	breadcrumbs.setContext({
-		name: nextInstance.name,
-		link: routeContext.path,
-		query: routeContext.query,
-	})
-}
+async function fetchInstance() {
+	const requestedInstanceId = route.params.id as string
+	const requestedRouteName = route.name
 
-async function loadInstancePageData(
-	instanceId: string,
-	routeName: unknown = displayedInstanceRoute.value.name,
-): Promise<InstancePageData> {
-	const nextInstance = await get(instanceId).catch(handleError)
+	const nextInstance = await get(requestedInstanceId).catch(handleError)
 	let nextLinkedProjectV3: Labrinth.Projects.v3.Project | undefined
 	let nextIsServerInstance = false
 
 	const contentPreloadPromise =
-		nextInstance && isContentSubpageRoute(routeName)
+		nextInstance && isContentSubpageRoute(requestedRouteName)
 			? loadInstanceContentData(nextInstance.id, undefined, handleError)
 			: Promise.resolve(null)
 
@@ -324,55 +352,41 @@ async function loadInstancePageData(
 		}
 	}
 
-	const nextPreloadedContent = await contentPreloadPromise
+	let nextPreloadedContent = await contentPreloadPromise
+	let nextRoute = router.currentRoute.value
+	if (nextRoute.params.id !== requestedInstanceId) return
 
-	return {
-		instanceId,
-		instance: nextInstance ?? undefined,
-		linkedProjectV3: nextLinkedProjectV3,
-		isServerInstance: nextIsServerInstance,
-		preloadedContent: nextPreloadedContent,
+	if (nextInstance && isContentSubpageRoute(nextRoute.name) && !nextPreloadedContent) {
+		nextPreloadedContent = await loadInstanceContentData(nextInstance.id, undefined, handleError)
+		nextRoute = router.currentRoute.value
+		if (nextRoute.params.id !== requestedInstanceId) return
 	}
-}
 
-function applyInstancePageData(data: InstancePageData, routeContext: InstanceRouteContext) {
-	activeInstanceId.value = data.instanceId
+	instance.value = nextInstance ?? undefined
+	if (nextInstance) {
+		queryClient.setQueryData(['instances', 'summary', nextInstance.id], nextInstance)
+	}
+	displayedInstanceRoute.value = nextRoute
+	sharedInstanceState.reset()
+	sharedInstanceState.refreshAvailability()
+	linkedProjectV3.value = nextLinkedProjectV3
+	isServerInstance.value = nextIsServerInstance
+	preloadedContent.value = nextPreloadedContent
+	activeInstanceId.value = nextInstance?.id
 	resetServerStatus()
-	playing.value = false
 
-	instance.value = data.instance
-	linkedProjectV3.value = data.linkedProjectV3
-	isServerInstance.value = data.isServerInstance
-	preloadedContent.value = data.preloadedContent
+	fetchDeferredData(nextInstance?.id)
 
-	if (data.instance) {
-		setInstanceBreadcrumbs(data.instance, routeContext)
-	}
-
-	fetchDeferredData(data.instanceId)
-
-	if (data.instance) {
+	if (nextInstance) {
 		queryClient.prefetchQuery({
-			queryKey: ['worlds', data.instance.id],
-			queryFn: () => refreshWorlds(data.instance!.id),
+			queryKey: ['worlds', nextInstance.id],
+			queryFn: () => refreshWorlds(nextInstance.id),
 			staleTime: 30_000,
 		})
 	}
 }
 
-async function fetchInstance(instanceId = route.params.id as string) {
-	const requestId = ++fetchInstanceRequestId
-	const data = await loadInstancePageData(instanceId)
-	if (!isCurrentInstanceRequest(requestId, instanceId)) return
-
-	applyInstancePageData(data, {
-		name: route.name,
-		path: route.path,
-		query: route.query,
-	})
-}
-
-function fetchDeferredData(instanceId: string) {
+function fetchDeferredData(instanceId?: string) {
 	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
 	if (isServerInstance.value && serverAddress) {
 		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
@@ -404,35 +418,25 @@ function fetchDeferredData(instanceId: string) {
 		loadingServerPing.value = true
 	}
 
-	updatePlayState(instanceId)
+	updatePlayState()
 }
 
-async function updatePlayState(instanceId = route.params.id as string) {
-	if (!instanceId) return
-	const runningProcesses = await get_by_instance_id(instanceId).catch(handleError)
-	if (activeInstanceId.value !== instanceId) return
+async function updatePlayState() {
+	if (!route.params.id) return
+	const runningProcesses = await get_by_instance_id(route.params.id as string).catch(handleError)
 
 	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
 }
 
-await fetchInstance(route.params.id as string)
-
-onBeforeRouteUpdate(async (to) => {
-	if (!to.path.startsWith('/instance')) return
-	const instanceId = Array.isArray(to.params.id) ? to.params.id[0] : to.params.id
-	if (typeof instanceId !== 'string') return false
-
-	const requestId = ++fetchInstanceRequestId
-	const data = await loadInstancePageData(instanceId, to.name)
-	if (requestId !== fetchInstanceRequestId) return false
-
-	displayedInstanceRoute.value = to
-	applyInstancePageData(data, {
-		name: to.name,
-		path: to.path,
-		query: to.query,
-	})
-})
+await fetchInstance()
+watch(
+	() => route.params.id,
+	async () => {
+		if (route.params.id && route.path.startsWith('/instance')) {
+			await fetchInstance()
+		}
+	},
+)
 
 const basePath = computed(
 	() => `/instance/${encodeURIComponent(displayedInstanceRoute.value.params.id as string)}`,
@@ -453,39 +457,83 @@ const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
 	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
 )
+const { data: canCurrentUserUseSharedInstances } = useQuery({
+	queryKey: computed(() => ['shared-instance-eligibility', auth.user.value?.id]),
+	queryFn: can_current_user_use_shared_instances,
+	enabled: () => !!auth.session_token.value && !!auth.user.value?.id,
+	retry: false,
+	staleTime: Infinity,
+	refetchOnMount: 'always',
+	refetchOnWindowFocus: false,
+	refetchOnReconnect: false,
+})
+const currentUserCanUseSharedInstances = computed(
+	() => !auth.session_token.value || canCurrentUserUseSharedInstances.value !== false,
+)
+const showShareTab = computed(() => {
+	const linkType = instance.value?.link?.type
 
-const tabs = computed(() => [
-	{
-		label: 'Content',
-		href: `${basePath.value}`,
-		icon: BoxesIcon,
+	return (
+		currentUserCanUseSharedInstances.value &&
+		!instance.value?.quarantined &&
+		instance.value?.shared_instance?.role !== 'member' &&
+		linkType !== 'server_project' &&
+		linkType !== 'server_project_modpack'
+	)
+})
+
+const tabs = computed(() => {
+	const instanceTabs = [
+		{
+			label: 'Content',
+			href: `${basePath.value}`,
+			icon: BoxesIcon,
+		},
+		{
+			label: 'Files',
+			href: `${basePath.value}/files`,
+			icon: FolderOpenIcon,
+		},
+		{
+			label: 'Worlds',
+			href: `${basePath.value}/worlds`,
+			icon: GlobeIcon,
+		},
+		{
+			label: 'Logs',
+			href: `${basePath.value}/logs`,
+			icon: TerminalSquareIcon,
+		},
+	]
+
+	if (showShareTab.value) {
+		instanceTabs.push({
+			label: 'Share',
+			href: `${basePath.value}/share`,
+			icon: UserPlusIcon,
+		})
+	}
+
+	return instanceTabs
+})
+
+watch(
+	() => ({
+		quarantined: instance.value?.quarantined ?? false,
+		routeName: router.currentRoute.value.name,
+	}),
+	({ quarantined, routeName }) => {
+		if (quarantined && routeName === 'InstanceShare') {
+			void router.replace(basePath.value)
+		}
 	},
-	{
-		label: 'Files',
-		href: `${basePath.value}/files`,
-		icon: FolderOpenIcon,
-	},
-	{
-		label: 'Worlds',
-		href: `${basePath.value}/worlds`,
-		icon: GlobeIcon,
-	},
-	{
-		label: 'Logs',
-		href: `${basePath.value}/logs`,
-		icon: TerminalSquareIcon,
-	},
-])
+	{ immediate: true },
+)
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const startInstance = async (context: string) => {
-	if (!instance.value) return
-	if (updateToPlayModal.value?.hasUpdate) {
-		updateToPlayModal.value.show(instance.value)
-		return
-	}
-
+const launchInstance = async (context: string) => {
+	if (!instance.value || instance.value.quarantined) return
 	loading.value = true
 	try {
 		await run(route.params.id as string)
@@ -495,11 +543,101 @@ const startInstance = async (context: string) => {
 	}
 	loading.value = false
 
+	if (!instance.value) return
 	trackEvent('InstanceStart', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 		source: context,
 	})
+}
+
+async function handleSharedInstanceUnavailable(
+	reason: SharedInstanceUnavailableReason | null = null,
+) {
+	notifySharedInstanceUnavailable(reason, sharedInstanceUnavailableManager.value)
+	await fetchInstance()
+	setSharedInstanceUnavailable(reason)
+}
+
+function reviewSharedInstanceUpdate(event: MouseEvent) {
+	const currentInstance = instance.value
+	const preview = sharedInstanceUpdatePreview.value
+	if (
+		!currentInstance ||
+		currentInstance.shared_instance?.role !== 'member' ||
+		!preview?.updateAvailable
+	) {
+		return
+	}
+
+	sharedInstanceUpdateModal.value?.show(
+		currentInstance,
+		preview,
+		async () => {
+			await fetchInstance()
+		},
+		event,
+	)
+}
+
+function hideAcceptedSharedInstanceUpdate() {
+	hiddenSharedInstanceUpdateKey.value = sharedInstanceUpdateKey.value
+}
+
+function handleSharedInstanceUpdateComplete(successful: boolean) {
+	if (!successful && hiddenSharedInstanceUpdateKey.value === sharedInstanceUpdateKey.value) {
+		hiddenSharedInstanceUpdateKey.value = null
+	}
+}
+
+const startInstance = async (context: string) => {
+	if (!instance.value || instance.value.quarantined) return
+	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
+
+	const instanceId = instance.value.id
+	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
+	const canCheckSharedInstanceUpdate =
+		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value
+
+	if (canCheckSharedInstanceUpdate) {
+		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>> = null
+		checkingSharedInstanceLaunch.value = true
+		try {
+			preview = await refreshSharedInstanceUpdatePreview()
+		} catch (error) {
+			if (isSharedInstanceUnavailableError(error)) {
+				await handleSharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
+				return
+			}
+			notifySharedInstanceError(error)
+		} finally {
+			checkingSharedInstanceLaunch.value = false
+		}
+
+		if (instance.value?.id !== instanceId) return
+
+		if (preview?.updateAvailable && sharedInstanceUpdateModal.value) {
+			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {
+				await fetchInstance()
+				await launchInstance(context)
+			})
+			return
+		}
+	}
+
+	if (updateToPlayModal.value?.hasUpdate) {
+		if (isSharedInstanceMember) {
+			updateToPlayModal.value.show(instance.value, null, async () => {
+				await fetchInstance()
+				await launchInstance(context)
+			})
+		} else {
+			updateToPlayModal.value.show(instance.value)
+		}
+		return
+	}
+
+	await launchInstance(context)
 }
 
 const stopInstance = async (context: string) => {
@@ -517,7 +655,7 @@ const stopInstance = async (context: string) => {
 }
 
 const handlePlayServer = async () => {
-	if (!instance.value?.link?.project_id) return
+	if (!instance.value?.link?.project_id || instance.value.quarantined) return
 	loading.value = true
 	try {
 		await playServerProject(instance.value.link.project_id)
@@ -528,6 +666,7 @@ const handlePlayServer = async () => {
 }
 
 const repairInstance = async () => {
+	if (instance.value.quarantined) return
 	if (
 		instance.value.install_stage !== 'pack_installed' &&
 		(instance.value.link?.type === 'modrinth_modpack' ||
@@ -545,7 +684,7 @@ const repairInstance = async () => {
 }
 
 const createShortcut = async () => {
-	if (!instance.value) return
+	if (!instance.value || instance.value.quarantined) return
 	try {
 		const shortcutPath = await createInstanceShortcut(instance.value.name, instance.value.id)
 		if (!shortcutPath) return
@@ -563,10 +702,51 @@ const createShortcut = async () => {
 	}
 }
 
+async function reportSharedInstance(event?: MouseEvent, closeUpdateModal = false) {
+	const reportInstance = instance.value
+	const sharedInstance = reportInstance?.shared_instance
+	if (!reportInstance || sharedInstance?.role !== 'member') return
+
+	try {
+		const preview = await install_get_shared_instance_preview(
+			sharedInstance.id,
+			reportInstance.name,
+		)
+		if (instance.value?.id !== reportInstance.id) return
+		if (closeUpdateModal) sharedInstanceUpdateModal.value?.hide()
+		sharedInstanceReportModal.value?.showReport(preview, sharedInstance.manager_id, event)
+	} catch (error) {
+		notifySharedInstanceError(error)
+	}
+}
+
+function handleSharedInstanceReported(deleteInstance: boolean) {
+	if (!deleteInstance || !instance.value) return
+	requestInstanceDeletion()
+}
+
+function requestInstanceDeletion() {
+	if (!instance.value) return
+	selectedInstanceToDelete.value = instance.value
+	deleteConfirmModal.value?.show()
+}
+
+async function deleteSelectedInstance() {
+	const selectedInstance = selectedInstanceToDelete.value
+	selectedInstanceToDelete.value = null
+	if (!selectedInstance) return
+
+	trackEvent('InstanceRemove', {
+		loader: selectedInstance.loader,
+		game_version: selectedInstance.game_version,
+	})
+	await router.push({ path: '/' })
+	await remove(selectedInstance.id).catch(handleError)
+}
+
 const handleRightClick = (event: MouseEvent) => {
 	const baseOptions = [
-		{ name: 'add_content' },
-		{ type: 'divider' },
+		...(instance.value?.quarantined ? [] : [{ name: 'add_content' }, { type: 'divider' }]),
 		{ name: 'edit' },
 		{ name: 'open_folder' },
 		{ name: 'copy_path' },
@@ -584,10 +764,14 @@ const handleRightClick = (event: MouseEvent) => {
 					...baseOptions,
 				]
 			: [
-					{
-						name: 'play',
-						color: 'primary',
-					},
+					...(instance.value?.quarantined
+						? []
+						: [
+								{
+									name: 'play',
+									color: 'primary',
+								},
+							]),
 					...baseOptions,
 				],
 	)
@@ -617,7 +801,7 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 			break
 		case 'copy_path': {
 			if (instance.value) {
-				const fullPath = await get_full_path(instance.value?.path)
+				const fullPath = await get_full_path(instance.value.id)
 				await navigator.clipboard.writeText(fullPath)
 			}
 			break
@@ -665,221 +849,6 @@ const timePlayed = computed(() => {
 		? instance.value.recent_time_played + instance.value.submitted_time_played
 		: 0
 })
-
-const loaderDisplayName = computed(() =>
-	instance.value ? (formatLoaderLabel(instance.value.loader) as Loaders) : null,
-)
-
-const loaderLabel = computed(() =>
-	instance.value && loaderDisplayName.value
-		? [loaderDisplayName.value, instance.value.loader_version].filter(Boolean).join(' ')
-		: '',
-)
-
-const timePlayedHumanized = computed(() => {
-	const duration = dayjs.duration(timePlayed.value, 'seconds')
-	const hours = Math.floor(duration.asHours())
-	if (hours >= 1) {
-		return hours + ' hour' + (hours > 1 ? 's' : '')
-	}
-
-	const minutes = Math.floor(duration.asMinutes())
-	if (minutes >= 1) {
-		return minutes + ' minute' + (minutes > 1 ? 's' : '')
-	}
-
-	const seconds = Math.floor(duration.asSeconds())
-	return seconds + ' second' + (seconds > 1 ? 's' : '')
-})
-
-const playtimeLabel = computed(() =>
-	timePlayed.value > 0 ? timePlayedHumanized.value : 'Never played',
-)
-
-const instanceHeaderLeading = computed(() => ({
-	type: 'avatar' as const,
-	src: icon.value ? icon.value : undefined,
-	alt: instance.value?.name,
-	avatarSize: '64px',
-	tintBy: instance.value?.id,
-}))
-
-const instanceHeaderMetadata = computed(() => {
-	if (!instance.value) return []
-	if (isServerInstance.value) {
-		return [
-			{
-				id: 'server-details',
-				type: 'custom' as const,
-				class: 'contents',
-			},
-		]
-	}
-
-	return [
-		{
-			id: 'game-version',
-			label: instance.value.game_version,
-			icon: Gamepad2Icon,
-		},
-		{
-			id: 'loader',
-			label: loaderLabel.value,
-			icon: ServerLoaderIcon,
-			iconProps: {
-				loader: loaderDisplayName.value,
-			},
-		},
-		...(showInstancePlayTime.value
-			? [
-					{
-						id: 'playtime',
-						label: playtimeLabel.value,
-						icon: TimerIcon,
-					},
-				]
-			: []),
-	]
-})
-
-const installingStages = [
-	'installing',
-	'pack_installing',
-	'pack_installed',
-	'not_installed',
-	'minecraft_installing',
-]
-
-const primaryInstanceAction = computed(() => {
-	if (!instance.value) return null
-
-	if (installingStages.includes(instance.value.install_stage)) {
-		return {
-			id: 'installing',
-			label: 'Installing...',
-			color: 'brand' as const,
-			disabled: true,
-		}
-	}
-
-	if (instance.value.install_stage !== 'installed') {
-		return {
-			id: 'repair',
-			label: 'Repair',
-			icon: DownloadIcon,
-			color: 'brand' as const,
-			onClick: () => {
-				void repairInstance()
-			},
-		}
-	}
-
-	if (playing.value === true) {
-		return {
-			id: 'stop',
-			label: stopping.value ? 'Stopping...' : 'Stop',
-			icon: StopCircleIcon,
-			color: 'red' as const,
-			disabled: stopping.value,
-			onClick: () => {
-				void stopInstance('InstancePage')
-			},
-		}
-	}
-
-	if (playing.value === false && loading.value === false && !isServerInstance.value) {
-		return {
-			id: 'play',
-			label: 'Play',
-			icon: PlayIcon,
-			color: 'brand' as const,
-			onClick: () => {
-				void startInstance('InstancePage')
-			},
-		}
-	}
-
-	if (playing.value === false && loading.value === false && isServerInstance.value) {
-		return {
-			id: 'play',
-			label: 'Play',
-			color: 'brand' as const,
-			joinedActions: [
-				{
-					id: 'join_server',
-					label: 'Play',
-					icon: PlayIcon,
-					action: () => {
-						void handlePlayServer()
-					},
-				},
-				{
-					id: 'launch_instance',
-					label: 'Launch instance',
-					icon: PlayIcon,
-					action: () => {
-						void startInstance('InstancePage')
-					},
-				},
-			],
-		}
-	}
-
-	if (loading.value === true && playing.value === false) {
-		return {
-			id: 'starting',
-			label: 'Starting...',
-			color: 'brand' as const,
-			disabled: true,
-		}
-	}
-
-	return null
-})
-
-const instanceHeaderActions = computed(() => [
-	...(primaryInstanceAction.value ? [primaryInstanceAction.value] : []),
-	{
-		id: 'settings',
-		label: 'Instance settings',
-		icon: SettingsIcon,
-		labelHidden: true,
-		tooltip: 'Instance settings',
-		onClick: () => settingsModal.value?.show(),
-	},
-	{
-		id: 'more',
-		label: 'More actions',
-		icon: MoreVerticalIcon,
-		labelHidden: true,
-		type: 'transparent' as const,
-		tooltip: 'More actions',
-		menuActions: [
-			{
-				id: 'open-folder',
-				label: 'Open folder',
-				icon: FolderOpenIcon,
-				action: () => {
-					if (instance.value) void showInstanceInFolder(instance.value.id)
-				},
-			},
-			{
-				id: 'export-mrpack',
-				label: 'Export modpack',
-				icon: PackageIcon,
-				action: () => exportModal.value?.show(),
-			},
-			{
-				id: 'create-shortcut',
-				label: 'Create shortcut',
-				icon: ExternalIcon,
-				action: () => {
-					void createShortcut()
-				},
-			},
-		],
-	},
-])
 
 onUnmounted(() => {
 	unlistenProcesses()

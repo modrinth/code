@@ -34,6 +34,7 @@ pub async fn get_optimal_jre_key(
         loader_version.as_ref(),
         None,
         None,
+        None,
     )
     .await?;
 

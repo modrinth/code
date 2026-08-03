@@ -5,7 +5,7 @@ use crate::routes::{
 };
 use actix_web::{HttpResponse, get, web};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_stats);
 }
 
@@ -17,8 +17,9 @@ pub struct V2Stats {
     pub files: Option<i64>,
 }
 
-/// Get aggregate instance statistics.
+/// Get aggregate instance statistics.  
 #[utoipa::path(
+	tag = "statistics",
     get,
     operation_id = "statistics",
     responses(

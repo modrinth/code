@@ -101,6 +101,9 @@ impl CacheValueType {
             // ModpackFiles never expire - version_id is immutable so hashes never change
             // TODO: There has to be a way to exclude this from the "Purge cache" stuff?
             CacheValueType::ModpackFiles => 100 * 365 * 24 * 60 * 60, // 100 years (effectively never)
+            CacheValueType::SearchResults | CacheValueType::SearchResultsV3 => {
+                10 * 60 // 10 minutes
+            }
             _ => 30 * 60, // 30 minutes
         }
     }
@@ -247,9 +250,9 @@ pub struct SearchResultsV3 {
 pub struct SearchResultV3 {
     pub hits: Vec<serde_json::Value>,
     #[serde(default)]
-    pub offset: u32,
-    #[serde(default)]
-    pub limit: u32,
+    pub page: u32,
+    #[serde(default, alias = "limit")]
+    pub hits_per_page: u32,
     #[serde(default)]
     pub total_hits: u32,
 }
@@ -370,6 +373,8 @@ impl<'de> serde::Deserialize<'de> for CachedFileUpdate {
 pub struct CachedFileHash {
     pub path: String,
     pub size: u64,
+    #[serde(default)]
+    pub modified_at_ns: u64,
     pub hash: String,
     pub project_type: Option<ProjectType>,
     #[serde(default)]
@@ -382,6 +387,37 @@ pub struct CachedFileHash {
 pub struct KnownModrinthFile<'a> {
     pub project_id: &'a str,
     pub version_id: &'a str,
+}
+
+pub(crate) fn file_modified_at_ns(
+    metadata: &std::fs::Metadata,
+) -> std::io::Result<u64> {
+    let elapsed = metadata
+        .modified()?
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(std::io::Error::other)?;
+
+    Ok(elapsed
+        .as_secs()
+        .saturating_mul(1_000_000_000)
+        .saturating_add(u64::from(elapsed.subsec_nanos())))
+}
+
+pub(crate) fn file_hash_cache_key(
+    size: u64,
+    modified_at_ns: u64,
+    path: &str,
+) -> String {
+    format!("v2-{size}-{modified_at_ns}-{path}")
+}
+
+fn file_hash_path_from_cache_key(key: &str) -> Option<&str> {
+    let mut parts = key.splitn(4, '-');
+    (parts.next()? == "v2").then_some(())?;
+    parts.next()?.parse::<u64>().ok()?;
+    parts.next()?.parse::<u64>().ok()?;
+    let path = parts.next()?;
+    (!path.is_empty()).then_some(path)
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -671,13 +707,11 @@ impl CacheValue {
             | CacheValue::GameVersions(_)
             | CacheValue::DonationPlatforms(_) => DEFAULT_ID.to_string(),
 
-            CacheValue::FileHash(hash) => {
-                format!(
-                    "{}-{}",
-                    hash.size,
-                    hash.path.trim_end_matches(".disabled")
-                )
-            }
+            CacheValue::FileHash(hash) => file_hash_cache_key(
+                hash.size,
+                hash.modified_at_ns,
+                hash.path.trim_end_matches(".disabled"),
+            ),
             CacheValue::FileUpdate(hash) => {
                 format!(
                     "{}-{}-{}-{}",
@@ -1102,8 +1136,15 @@ impl CachedEntry {
                 .collect::<Vec<_>>()
                 .chunks(MAX_REQUEST_SIZE)
                 .map(|chunk| {
-                    serde_json::to_string(&chunk)
-                        .map(|keys| format!("{api_url}{url}{keys}"))
+                    serde_json::to_string(&chunk).map(|keys| {
+                        format!(
+                            "{api_url}{url}{}",
+                            url::form_urlencoded::byte_serialize(
+                                keys.as_bytes()
+                            )
+                            .collect::<String>()
+                        )
+                    })
                 })
                 .collect::<Result<Vec<_>, _>>()?;
 
@@ -1396,19 +1437,25 @@ impl CachedEntry {
                 let fetch_urls = keys
                     .iter()
                     .map(|x| {
+                        let metadata =
+                            daedalus::modded::loader_manifest_metadata_from_cache_key(
+                                &x.key().to_string(),
+                            );
+
                         (
-                            x.key().to_string(),
+                            metadata.cache_key,
+                            metadata.loader,
                             format!(
-                                "{}{}/v0/manifest.json",
+                                "{}{}",
                                 env!("MODRINTH_LAUNCHER_META_URL"),
-                                x.key()
+                                metadata.path,
                             ),
                         )
                     })
                     .collect::<Vec<_>>();
 
                 futures::future::try_join_all(fetch_urls.iter().map(
-                    |(_, url)| {
+                    |(_, _, url)| {
                         fetch_json(
                             Method::GET,
                             url,
@@ -1424,14 +1471,15 @@ impl CachedEntry {
                 .into_iter()
                 .enumerate()
                 .map(|(index, metadata)| {
-                    (
+                    let mut entry =
                         CacheValue::LoaderManifest(CachedLoaderManifest {
-                            loader: fetch_urls[index].0.to_string(),
+                            loader: fetch_urls[index].1.to_string(),
                             manifest: metadata,
                         })
-                        .get_entry(),
-                        true,
-                    )
+                        .get_entry();
+                    entry.id.clone_from(&fetch_urls[index].0);
+
+                    (entry, true)
                 })
                 .collect()
             }
@@ -1501,13 +1549,20 @@ impl CachedEntry {
                     instances_dir: &Path,
                     key: String,
                 ) -> crate::Result<(CachedEntry, bool)> {
-                    let path =
-                        key.split_once('-').map(|x| x.1).unwrap_or_default();
+                    let path = file_hash_path_from_cache_key(&key).ok_or_else(
+                        || {
+                            crate::ErrorKind::InputError(format!(
+                                "Invalid file hash cache key: {key}",
+                            ))
+                        },
+                    )?;
 
                     let full_path = instances_dir.join(path);
 
                     let mut file = tokio::fs::File::open(&full_path).await?;
-                    let size = file.metadata().await?.len();
+                    let metadata = file.metadata().await?;
+                    let size = metadata.len();
+                    let modified_at_ns = file_modified_at_ns(&metadata)?;
 
                     let mut hasher = sha1_smol::Sha1::new();
 
@@ -1527,6 +1582,7 @@ impl CachedEntry {
                         CacheValue::FileHash(CachedFileHash {
                             path: path.to_string(),
                             size,
+                            modified_at_ns,
                             hash,
                             project_type: ProjectType::get_from_parent_folder(
                                 &full_path,
@@ -2122,6 +2178,7 @@ pub async fn cache_file_hash(
     bytes: bytes::Bytes,
     instance_id: &str,
     path: &str,
+    modified_at_ns: u64,
     known_hash: Option<&str>,
     project_type: Option<ProjectType>,
     known_modrinth_file: Option<KnownModrinthFile<'_>>,
@@ -2139,6 +2196,7 @@ pub async fn cache_file_hash(
         instance_id,
         path,
         size as u64,
+        modified_at_ns,
         hash,
         project_type,
         known_modrinth_file,
@@ -2151,6 +2209,7 @@ pub async fn cache_file_hash_metadata(
     instance_id: &str,
     path: &str,
     size: u64,
+    modified_at_ns: u64,
     hash: String,
     project_type: Option<ProjectType>,
     known_modrinth_file: Option<KnownModrinthFile<'_>>,
@@ -2169,6 +2228,7 @@ pub async fn cache_file_hash_metadata(
         &[CacheValue::FileHash(CachedFileHash {
             path: format!("{instance_id}/{path}"),
             size,
+            modified_at_ns,
             hash,
             project_type,
             project_id,

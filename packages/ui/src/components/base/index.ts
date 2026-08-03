@@ -1,5 +1,6 @@
 export { default as Accordion } from './Accordion.vue'
 export { default as Admonition } from './Admonition.vue'
+export { default as Alert } from './Alert.vue'
 export { default as AppearingProgressBar } from './AppearingProgressBar.vue'
 export { default as AutoBrandIcon } from './AutoBrandIcon.vue'
 export { default as AutoLink } from './AutoLink.vue'
@@ -31,6 +32,8 @@ export { default as EmptyState } from './EmptyState.vue'
 export { default as EnvironmentIndicator } from './EnvironmentIndicator.vue'
 export { default as ErrorInformationCard } from './ErrorInformationCard.vue'
 export { default as FileInput } from './FileInput.vue'
+export type { FileTreeSelectItem } from './FileTreeSelect.vue'
+export { default as FileTreeSelect } from './FileTreeSelect.vue'
 export type { FilterBarOption } from './FilterBar.vue'
 export { default as FilterBar } from './FilterBar.vue'
 export type { FilterPillOption } from './FilterPills.vue'
@@ -62,7 +65,23 @@ export { default as OptionGroup } from './OptionGroup.vue'
 export type { Option as OverflowMenuOption } from './OverflowMenu.vue'
 export { default as OverflowMenu } from './OverflowMenu.vue'
 export { default as Page } from './Page.vue'
-export { default as PageHeader } from './PageHeader.vue'
+export { default as PageHeader } from './page-header/index.vue'
+export { default as PageHeaderMetadata } from './page-header/metadata/index.vue'
+export { default as PageHeaderMetadataItem } from './page-header/metadata/page-header-metadata-item.vue'
+export { default as PageHeaderMetadataNumberItem } from './page-header/metadata/page-header-metadata-number-item.vue'
+export { default as PageHeaderMetadataTagsItem } from './page-header/metadata/page-header-metadata-tags-item.vue'
+export { default as PageHeaderMetadataTimeItem } from './page-header/metadata/page-header-metadata-time-item.vue'
+export { default as PageHeaderActions } from './page-header/page-header-actions.vue'
+export { default as PageHeaderBadgeItem } from './page-header/page-header-badge-item.vue'
+export type {
+	PageHeaderClass,
+	PageHeaderClickHandler,
+	PageHeaderIconProps,
+	PageHeaderInteractiveProps,
+	PageHeaderMetadataItemProps,
+	PageHeaderProps,
+	PageHeaderTarget,
+} from './page-header/types'
 export { default as Pagination } from './Pagination.vue'
 export { default as PopoutMenu } from './PopoutMenu.vue'
 export { default as PreviewSelectButton } from './PreviewSelectButton.vue'

@@ -100,6 +100,32 @@ export const HorizontalOverflow: StoryObj = {
 	}),
 }
 
+export const CustomClasses: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name', cellClass: '!overflow-visible py-3' },
+				{ key: 'email', label: 'Email' },
+				{
+					key: 'status',
+					label: 'Status',
+					headerClass: 'text-center',
+					cellClass: 'text-center',
+				},
+				{ key: 'role', label: 'Role' },
+			]
+			const data = sampleUsers
+			const rowClass = (_row: User, index: number) => (index === 0 ? 'font-semibold' : '')
+			return { columns, data, rowClass }
+		},
+		template: /* html */ `
+			<Table :columns="columns" :data="data" :row-class="rowClass" />
+		`,
+	}),
+}
+
 export const WithSelection: StoryObj = {
 	args: {},
 	render: () => ({

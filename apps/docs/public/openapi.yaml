@@ -414,7 +414,7 @@ components:
         - unknown
         - signature
       example: required-resource-pack
-    # https://github.com/modrinth/labrinth/blob/master/src/routes/version_creation.rs#L27-L57
+    # https://github.com/modrinth/code/blob/main/apps/labrinth/src/routes/v2/version_creation.rs#L32-L76
     CreatableVersion:
       allOf:
         - $ref: '#/components/schemas/BaseVersion'
@@ -446,6 +446,11 @@ components:
                 - client_or_server_prefers_both
                 - unknown
               description: The environment that this version is for.
+            file_types:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/FileTypeEnum'
+              description: A map of file parts to their associated file type, a file type is used for additional files such as sources jars.
           required:
             - file_parts
             - project_id
@@ -558,12 +563,18 @@ components:
           type: array
           items:
             type: string
-            example: [fabric]
+          example: [fabric]
         game_versions:
           type: array
           items:
             type: string
           example: ['1.18', 1.18.1]
+        version_types:
+          type: array
+          items:
+            type: string
+          enum: [release, alpha, beta]
+          example: [release]
       required:
         - loaders
         - game_versions
@@ -607,6 +618,12 @@ components:
               items:
                 type: string
               example: ['1.18', 1.18.1]
+            version_types:
+              type: array
+              items:
+                type: string
+              enum: [release, alpha, beta]
+              example: [release]
           required:
             - loaders
             - game_versions
@@ -687,6 +704,12 @@ components:
               type: string
               description: The ID of the project
               example: AABBCCDD
+            all_project_types:
+              type: array
+              items:
+                type: string
+              description: All project types across every version of the project, unlike `project_type` which only reflects a version-specific type
+              example: [mod, plugin, datapack]
             author:
               type: string
               description: The username of the project's author
@@ -743,6 +766,7 @@ components:
             - client_side
             - server_side
             - project_id
+            - all_project_types
             - author
             - versions
             - follows
@@ -1943,6 +1967,7 @@ paths:
 
             These are the most commonly used facet types:
             - `project_type`
+            - `all_project_types` (matches against every project type across all of the project's versions, not just the primary/version-specific type)
             - `categories` (loaders are lumped in with categories in search)
             - `versions`
             - `client_side`
@@ -1956,11 +1981,8 @@ paths:
             - `project_id`
             - `license`
             - `downloads`
-            - `color`
             - `created_timestamp` (uses Unix timestamp)
             - `modified_timestamp` (uses Unix timestamp)
-            - `date_created` (uses ISO-8601 timestamp)
-            - `date_modified` (uses ISO-8601 timestamp)
 
             In order to then use these facets, you need a value to filter by, as well as an operation to perform on this value.
             The most common operation is `:` (same as `=`), though you can also use `!=`, `>=`, `>`, `<=`, and `<`.
@@ -2855,7 +2877,7 @@ paths:
               $ref: '#/components/schemas/HashList'
   /version_files/update:
     post:
-      summary: Latest versions of multiple project from hashes, loader(s), and game version(s)
+      summary: Latest versions of multiple projects from hashes, loader(s), and game version(s)
       description: This is the same as [`/version_file/{hash}/update`](#operation/getLatestVersionFromHash) except it accepts multiple hashes.
       operationId: getLatestVersionsFromHashes
       tags:

@@ -10,7 +10,6 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
     DBModerationLock, DBProjectId, DBTeamMember, ids as db_ids, image_item,
 };
-use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction, ReadOnlyPgPool};
 use crate::env::ENV;
@@ -25,7 +24,6 @@ use crate::models::projects::{
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
 use crate::models::{self, exp};
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
@@ -43,20 +41,18 @@ use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use validator::Validate;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("search", web::get().to(project_search));
-    cfg.service(project_search_post);
-    cfg.route("projects", web::get().to(projects_get));
-    cfg.route("projects", web::patch().to(projects_edit));
-    cfg.route("projects_random", web::get().to(random_projects_get));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(project_search)
+        .service(project_search_post)
+        .service(projects_get_route)
+        .service(projects_edit_route)
+        .service(random_projects_get_route);
 }
 
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_get)
         .service(project_get_check)
         .service(project_delete)
@@ -89,7 +85,11 @@ pub async fn clear_project_cache_and_queue_search(
         redis,
     )
     .await?;
-    search_state.queue.push(project_id.into()).await;
+
+    search_state
+        .queue
+        .push_project_change(project_id.into())
+        .await;
 
     Ok(())
 }
@@ -98,6 +98,20 @@ pub async fn clear_project_cache_and_queue_search(
 pub struct RandomProjects {
     #[validate(range(min = 1, max = 100))]
     pub count: u32,
+}
+
+#[utoipa::path(
+	tag = "projects",
+	params(("count" = u32, Query)),
+	responses((status = OK))
+)]
+#[get("/projects_random")]
+pub async fn random_projects_get_route(
+    count: web::Query<RandomProjects>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    random_projects_get(count, pool, redis).await
 }
 
 pub async fn random_projects_get(
@@ -141,9 +155,30 @@ pub async fn random_projects_get(
     Ok(HttpResponse::Ok().json(projects_data))
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectIds {
     pub ids: String,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct ProjectCheckResponse {
+    pub id: ProjectId,
+}
+
+#[utoipa::path(
+	tag = "projects",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
+#[get("/projects")]
+pub async fn projects_get_route(
+    req: HttpRequest,
+    ids: web::Query<ProjectIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    projects_get(req, ids, pool, redis, session_queue).await
 }
 
 pub async fn projects_get(
@@ -175,9 +210,13 @@ pub async fn projects_get(
     Ok(HttpResponse::Ok().json(projects))
 }
 
-#[utoipa::path]
+/// Get a project.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = Project))
+)]
 #[get("/{id}")]
-async fn project_get(
+pub async fn project_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -306,16 +345,19 @@ pub struct EditProject {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[utoipa::path]
+/// Update a project.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[patch("/{id}")]
-async fn project_edit(
+pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     project_edit_internal(
@@ -325,7 +367,6 @@ async fn project_edit(
         web::Json(new_project),
         redis,
         session_queue,
-        moderation_queue,
         search_state,
     )
     .await
@@ -338,7 +379,6 @@ pub async fn project_edit_internal(
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -480,10 +520,6 @@ pub async fn project_edit_internal(
             )
             .execute(&mut transaction)
             .await?;
-
-            moderation_queue
-                .projects
-                .insert(project_item.inner.id.into());
         }
 
         if status.is_approved() && !project_item.inner.status.is_approved() {
@@ -1021,10 +1057,10 @@ pub async fn project_edit_internal(
         edit: Option<Option<E>>,
         mut component: &mut Option<E::Component>,
         perms: ProjectPermissions,
-    ) -> Result<(), ApiError> {
+    ) -> Result<bool, ApiError> {
         let Some(edit) = edit else {
             // component is not specified in the input JSON - leave alone
-            return Ok(());
+            return Ok(false);
         };
 
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
@@ -1063,10 +1099,13 @@ pub async fn project_edit_internal(
             }
         }
 
-        Ok(())
+        Ok(true)
     }
 
-    update(
+    let mut reindex_versions = new_project.categories.is_some()
+        || new_project.additional_categories.is_some();
+
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_server,
@@ -1074,7 +1113,7 @@ pub async fn project_edit_internal(
         perms,
     )
     .await?;
-    update(
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_java_server,
@@ -1082,7 +1121,7 @@ pub async fn project_edit_internal(
         perms,
     )
     .await?;
-    update(
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_bedrock_server,
@@ -1135,14 +1174,31 @@ pub async fn project_edit_internal(
 
     transaction.commit().await?;
 
-    clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await?;
+    if reindex_versions {
+        db_models::DBProject::clear_cache(
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+            &redis,
+        )
+        .await?;
+        search_state
+            .queue
+            .push_version_changes(
+                project_item.inner.id.into(),
+                project_item.versions.iter().copied().map(VersionId::from),
+            )
+            .await;
+    } else {
+        clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+        )
+        .await?;
+    }
 
     // Remove no longer searchable projects from search index
     if let (true, Some(false)) = (
@@ -1150,16 +1206,9 @@ pub async fn project_edit_internal(
         new_project.status.map(|status| status.is_searchable()),
     ) {
         search_state
-            .backend
-            .remove_documents(
-                &project_item
-                    .versions
-                    .into_iter()
-                    .map(|x| x.into())
-                    .collect::<Vec<_>>(),
-            )
-            .await
-            .wrap_internal_err("failed to remove documents")?;
+            .queue
+            .push_project_removal(project_item.inner.id.into())
+            .await;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1213,6 +1262,27 @@ pub async fn edit_project_categories(
 //     pub total_hits: usize,
 // }
 
+/// Search projects.  
+#[utoipa::path(
+	tag = "search",
+    get,
+    operation_id = "v3SearchProjects",
+    params(
+        ("query" = Option<String>, Query, description = "The query to search for"),
+        ("facets" = Option<String>, Query, description = "Search facets JSON"),
+        ("filters" = Option<String>, Query, description = "Search filters JSON"),
+        ("new_filters" = Option<String>, Query, description = "Search filters JSON"),
+        ("index" = Option<String>, Query, description = "Search index to use"),
+        ("offset" = Option<String>, Query, description = "Search result offset"),
+        ("limit" = Option<String>, Query, description = "Maximum number of search results"),
+        ("version" = Option<String>, Query, description = "Game version to filter for")
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = SearchResults),
+        (status = 400, description = "Request was invalid, see given error")
+    )
+)]
+#[get("/search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchQuery>,
     search_backend: web::Data<dyn SearchBackend>,
@@ -1238,6 +1308,12 @@ pub async fn project_search(
 }
 
 // for more complicated search queries
+/// Search projects.  
+#[utoipa::path(
+	tag = "search",
+	request_body = serde_json::Value,
+	responses((status = OK, body = SearchResults))
+)]
 #[post("/search")]
 pub async fn project_search_post(
     web::Json(info): web::Json<SearchRequest>,
@@ -1249,9 +1325,13 @@ pub async fn project_search_post(
 }
 
 //checks the validity of a project id or slug
-#[utoipa::path]
+/// Check project availability.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = ProjectCheckResponse))
+)]
 #[get("/{id}/check")]
-async fn project_get_check(
+pub async fn project_get_check(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1270,21 +1350,25 @@ pub async fn project_get_check_internal(
         db_models::DBProject::get(&slug, &**pool, &redis).await?;
 
     if let Some(project) = project_data {
-        Ok(HttpResponse::Ok().json(json! ({
-            "id": models::ids::ProjectId::from(project.inner.id)
-        })))
+        Ok(HttpResponse::Ok().json(ProjectCheckResponse {
+            id: models::ids::ProjectId::from(project.inner.id),
+        }))
     } else {
         Err(ApiError::NotFound)
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DependencyInfo {
     pub projects: Vec<Project>,
     pub versions: Vec<models::projects::Version>,
 }
 
-#[utoipa::path]
+/// List project dependencies.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = DependencyInfo))
+)]
 #[get("/{project_id}/dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
@@ -1408,7 +1492,7 @@ pub struct CategoryChanges<'a> {
     pub remove_categories: &'a Option<Vec<String>>,
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct BulkEditProject {
     #[validate(length(max = 3))]
     pub categories: Option<Vec<String>>,
@@ -1426,6 +1510,33 @@ pub struct BulkEditProject {
         function = " crate::util::validate::validate_url_hashmap_optional_values"
     ))]
     pub link_urls: Option<HashMap<String, Option<String>>>,
+}
+
+#[utoipa::path(
+	tag = "projects",
+	params(("ids" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
+#[patch("/projects")]
+pub async fn projects_edit_route(
+    req: HttpRequest,
+    ids: web::Query<ProjectIds>,
+    pool: web::Data<PgPool>,
+    bulk_edit_project: web::Json<BulkEditProject>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
+) -> Result<HttpResponse, ApiError> {
+    projects_edit(
+        req,
+        ids,
+        pool,
+        bulk_edit_project,
+        redis,
+        session_queue,
+        search_state,
+    )
+    .await
 }
 
 pub async fn projects_edit(
@@ -1560,7 +1671,7 @@ pub async fn projects_edit(
             };
         }
 
-        bulk_edit_project_categories(
+        let mut reindex_versions = bulk_edit_project_categories(
             &categories,
             &project.categories,
             project.inner.id as db_ids::DBProjectId,
@@ -1575,7 +1686,7 @@ pub async fn projects_edit(
         )
         .await?;
 
-        bulk_edit_project_categories(
+        reindex_versions |= bulk_edit_project_categories(
             &categories,
             &project.additional_categories,
             project.inner.id as db_ids::DBProjectId,
@@ -1634,20 +1745,37 @@ pub async fn projects_edit(
             }
         }
 
-        changed_projects.push((project.inner.id, project.inner.slug));
+        changed_projects.push((
+            project.inner.id,
+            project.inner.slug,
+            project.versions,
+            reindex_versions,
+        ));
     }
 
     transaction.commit().await?;
 
-    for (project_id, slug) in changed_projects {
-        clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_id,
-            slug,
-            None,
-        )
-        .await?;
+    for (project_id, slug, versions, reindex_versions) in changed_projects {
+        if reindex_versions {
+            db_models::DBProject::clear_cache(project_id, slug, None, &redis)
+                .await?;
+            search_state
+                .queue
+                .push_version_changes(
+                    project_id.into(),
+                    versions.into_iter().map(VersionId::from),
+                )
+                .await;
+        } else {
+            clear_project_cache_and_queue_search(
+                &redis,
+                &search_state,
+                project_id,
+                slug,
+                None,
+            )
+            .await?;
+        }
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1661,7 +1789,7 @@ pub async fn bulk_edit_project_categories(
     max_num_categories: usize,
     is_additional: bool,
     transaction: &mut PgTransaction<'_>,
-) -> Result<(), ApiError> {
+) -> Result<bool, ApiError> {
     let mut set_categories =
         if let Some(categories) = bulk_changes.categories.clone() {
             categories
@@ -1688,7 +1816,8 @@ pub async fn bulk_edit_project_categories(
         }
     }
 
-    if &set_categories != project_categories {
+    let changed = &set_categories != project_categories;
+    if changed {
         sqlx::query!(
             "
             DELETE FROM mods_categories
@@ -1721,7 +1850,7 @@ pub async fn bulk_edit_project_categories(
         DBModCategory::insert_many(mod_categories, &mut *transaction).await?;
     }
 
-    Ok(())
+    Ok(changed)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -1730,9 +1859,18 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[utoipa::path]
+/// Update a project icon.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	params(
+		("ext" = String, Query)
+	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}/icon")]
-async fn project_icon_edit(
+pub async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1874,9 +2012,13 @@ pub async fn project_icon_edit_internal(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[utoipa::path]
+/// Delete a project icon.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}/icon")]
-async fn delete_project_icon(
+pub async fn delete_project_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2000,7 +2142,20 @@ pub struct GalleryCreateQuery {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[utoipa::path]
+/// Add a gallery item.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	params(
+		("ext" = String, Query),
+		("featured" = bool, Query),
+		("name" = Option<String>, Query),
+		("description" = Option<String>, Query),
+		("ordering" = Option<i64>, Query)
+	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
+	responses((status = NO_CONTENT))
+)]
 #[post("/{id}/gallery")]
 pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
@@ -2198,9 +2353,21 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
-#[utoipa::path]
+/// Update a gallery item.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	params(
+		("url" = String, Query),
+		("featured" = Option<bool>, Query),
+		("name" = Option<String>, Query),
+		("description" = Option<String>, Query),
+		("ordering" = Option<i64>, Query)
+	),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}/gallery")]
-async fn edit_gallery_item(
+pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
     pool: web::Data<PgPool>,
@@ -2387,9 +2554,17 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
-#[utoipa::path]
+/// Delete a gallery item.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	params(
+		("url" = String, Query)
+	),
+	responses((status = NO_CONTENT))
+)]
 #[delete("/{id}/gallery")]
-async fn delete_gallery_item(
+pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
@@ -2522,9 +2697,13 @@ pub async fn delete_gallery_item_internal(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[utoipa::path]
+/// Delete a project.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
-async fn project_delete(
+pub async fn project_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2602,17 +2781,11 @@ pub async fn project_delete_internal(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
-    let was_in_tech_review =
-        delphi::is_project_in_tech_review(project.inner.id, &mut transaction)
-            .await?;
-
-    if was_in_tech_review {
-        delphi::send_tech_review_exit_file_deleted_message(
-            project.inner.id,
-            &mut transaction,
-        )
-        .await?;
-    }
+    delphi::tech_review_sync::sync_deleted_project_tech_review_exit(
+        project.inner.id,
+        &mut transaction,
+    )
+    .await?;
 
     let context = ImageContext::Project {
         project_id: Some(project.inner.id.into()),
@@ -2653,36 +2826,31 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
-    search_state
-        .backend
-        .remove_documents(
-            &project
-                .versions
-                .into_iter()
-                .map(|x| x.into())
-                .collect::<Vec<_>>(),
-        )
-        .await
-        .wrap_internal_err("failed to remove project version documents")?;
-
     if result.is_some() {
-        clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        db_models::DBProject::clear_cache(
             project.inner.id,
             project.inner.slug,
             None,
+            &redis,
         )
         .await?;
+        search_state
+            .queue
+            .push_project_removal(project.inner.id.into())
+            .await;
         Ok(())
     } else {
         Err(ApiError::NotFound)
     }
 }
 
-#[utoipa::path]
+/// Follow a project.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[post("/{id}/follow")]
-async fn project_follow(
+pub async fn project_follow(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2772,9 +2940,13 @@ pub async fn project_follow_internal(
     }
 }
 
-#[utoipa::path]
+/// Unfollow a project.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}/follow")]
-async fn project_unfollow(
+pub async fn project_unfollow(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2860,7 +3032,11 @@ pub async fn project_unfollow_internal(
     }
 }
 
-#[utoipa::path]
+/// Get a project's organization.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = models::organizations::Organization))
+)]
 #[get("/{id}/organization")]
 pub async fn project_get_organization(
     req: HttpRequest,

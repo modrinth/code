@@ -4,7 +4,6 @@ use std::collections::HashMap;
 
 use super::super::ids::OrganizationId;
 use crate::database::models::{DatabaseError, version_item};
-use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
@@ -16,6 +15,7 @@ use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]

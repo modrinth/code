@@ -9,25 +9,47 @@
 		<slot name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
 			<component :is="getSeverityIcon(type)" :class="['h-6 w-6 flex-none', iconClasses[type]]" />
 		</slot>
-		<div class="col-start-2 flex min-w-0 flex-1 flex-col gap-2">
+		<div
+			class="col-start-2 min-w-0"
+			:class="
+				inlineActions && !showActionsUnderneath && $slots.actions
+					? 'flex flex-wrap items-start gap-x-4 gap-y-3'
+					: 'flex flex-1 flex-col gap-2'
+			"
+		>
 			<div
-				v-if="header || $slots.header || normalizedTimestamp"
-				class="flex flex-wrap items-center gap-2 text-lg font-semibold leading-6"
+				class="flex min-w-0 flex-1 flex-col gap-2"
+				:class="
+					inlineActions && !showActionsUnderneath && $slots.actions
+						? 'admonition-inline-content'
+						: ''
+				"
 			>
-				<slot name="header">{{ header }}</slot>
-				<span
-					v-if="normalizedTimestamp"
-					v-tooltip="timestampTooltip"
-					class="flex items-center gap-1.5 text-base font-medium leading-normal text-secondary"
+				<div
+					v-if="header || $slots.header || normalizedTimestamp"
+					class="flex flex-wrap items-center gap-2 text-lg font-semibold leading-6"
 				>
-					<ClockIcon class="size-4" />
-					{{ relativeTimeLabel }}
-				</span>
+					<slot name="header">{{ header }}</slot>
+					<span
+						v-if="normalizedTimestamp"
+						v-tooltip="timestampTooltip"
+						class="flex items-center gap-1.5 text-base font-medium leading-normal text-secondary"
+					>
+						<ClockIcon class="size-4" />
+						{{ relativeTimeLabel }}
+					</span>
+				</div>
+				<div class="font-normal text-contrast/85 leading-tight">
+					<slot>{{ body }}</slot>
+				</div>
 			</div>
-			<div class="font-normal text-contrast/85 leading-tight">
-				<slot>{{ body }}</slot>
+			<div
+				v-if="inlineActions && !showActionsUnderneath && $slots.actions"
+				class="ml-auto flex shrink-0 items-center justify-end self-center"
+			>
+				<slot name="actions" />
 			</div>
-			<div v-if="showActionsUnderneath || $slots.actions" class="mt-2">
+			<div v-else-if="showActionsUnderneath || $slots.actions" class="mt-2">
 				<slot name="actions" />
 			</div>
 		</div>
@@ -80,9 +102,10 @@ import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{
-		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation' | 'circle-warning'
+		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation' | 'circle-warning' | 'neutral'
 		header?: string
 		body?: string
+		inlineActions?: boolean
 		showActionsUnderneath?: boolean
 		dismissible?: boolean
 		progress?: number
@@ -95,6 +118,7 @@ const props = withDefaults(
 		type: 'info',
 		header: '',
 		body: '',
+		inlineActions: false,
 		showActionsUnderneath: false,
 		dismissible: false,
 		progress: undefined,
@@ -143,6 +167,7 @@ const typeClasses = {
 	critical: 'border-brand-red bg-bg-red',
 	success: 'border-brand-green bg-bg-green',
 	moderation: 'border-brand-orange bg-bg-orange',
+	neutral: 'border-surface-4 bg-surface-3',
 }
 
 const iconClasses = {
@@ -152,6 +177,7 @@ const iconClasses = {
 	critical: 'text-brand-red',
 	success: 'text-brand-green',
 	moderation: 'text-brand-orange',
+	neutral: 'text-secondary',
 }
 
 const buttonColors = {
@@ -161,6 +187,7 @@ const buttonColors = {
 	critical: 'red',
 	success: 'green',
 	moderation: 'orange',
+	neutral: 'standard',
 } as const
 
 const progressTrackClasses = {
@@ -170,6 +197,7 @@ const progressTrackClasses = {
 	critical: 'bg-brand-red/20',
 	success: 'bg-brand-green/20',
 	moderation: 'bg-brand-orange/20',
+	neutral: 'bg-surface-4',
 }
 
 const progressFillClasses = {
@@ -181,10 +209,15 @@ const progressFillClasses = {
 	blue: 'bg-brand-blue',
 	green: 'bg-brand-green',
 	red: 'bg-brand-red',
+	neutral: 'bg-surface-5',
 }
 </script>
 
 <style scoped>
+.admonition-inline-content {
+	min-width: min(100%, 16rem);
+}
+
 .admonition-progress--waiting {
 	animation: admonition-progress-waiting 1s linear infinite;
 	position: relative;

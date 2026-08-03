@@ -44,6 +44,7 @@ const { addNotification } = injectNotificationManager()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const searchAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('searchAccordionRef')
 const filesAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('filesAccordionRef')
+const searchInputRef = useTemplateRef<InstanceType<typeof StyledInput>>('searchInputRef')
 
 const query = ref('')
 const isLoading = ref(false)
@@ -169,6 +170,11 @@ async function handleSubmit() {
 function show(event?: MouseEvent) {
 	resetForm()
 	modalRef.value?.show(event)
+
+	// delay so input has time to actually be mounted
+	setTimeout(() => {
+		searchInputRef.value?.focus()
+	}, 100)
 }
 
 function hide() {
@@ -212,11 +218,12 @@ defineExpose({ show, hide })
 						@submit.prevent="executeSearch"
 					>
 						<StyledInput
+							ref="searchInputRef"
 							v-model="query"
 							:icon="SearchIcon"
 							type="text"
 							autocomplete="off"
-							placeholder="Search external projects…"
+							placeholder="Search external projects..."
 							clearable
 							wrapper-class="flex-1 min-w-[12rem]"
 							:disabled="addFilesMutation.isPending.value"
@@ -237,14 +244,14 @@ defineExpose({ show, hide })
 						>
 							<span class="text-contrast font-semibold">
 								<template v-if="searchNeedsInput"> Enter a search term to get started </template>
-								<template v-else-if="isLoading"> Loading external projects… </template>
+								<template v-else-if="isLoading"> Loading external projects...</template>
 								<template v-else> No projects matched that search </template>
 							</span>
 							<span class="text-secondary text-sm">
 								<template v-if="searchNeedsInput">
 									Type at least 3 characters of a project's title to begin browsing.
 								</template>
-								<template v-else-if="isLoading"> Loading external projects… </template>
+								<template v-else-if="isLoading"> Loading external projects...</template>
 								<template v-else> No projects matched that search </template>
 							</span>
 						</div>

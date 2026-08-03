@@ -50,11 +50,39 @@ export const Default: StoryObj = {
 				})
 			}
 
+			const showActions = () => {
+				notificationManager.addNotification({
+					title: 'Your privacy and how ads support Modrinth',
+					text: 'Choose how our advertising partners may use your data.',
+					type: 'neutral',
+					autoCloseMs: null,
+					dismissible: false,
+					copyable: false,
+					noIcon: true,
+					buttons: [
+						{
+							label: 'Manage preferences',
+							action: () => console.log('Manage preferences clicked'),
+						},
+						{
+							label: 'Reject all',
+							action: () => console.log('Reject all clicked'),
+							color: 'brand',
+						},
+						{
+							label: 'Accept all',
+							action: () => console.log('Accept all clicked'),
+							color: 'brand',
+						},
+					],
+				})
+			}
+
 			const clearAll = () => {
 				notificationManager.clearAllNotifications()
 			}
 
-			return { showSuccess, showError, showWarning, showInfo, clearAll }
+			return { showSuccess, showError, showWarning, showInfo, showActions, clearAll }
 		},
 		template: /* html */ `
 			<div>
@@ -70,6 +98,9 @@ export const Default: StoryObj = {
 					</ButtonStyled>
 					<ButtonStyled color="blue">
 						<button @click="showInfo">Info</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="showActions">Actions</button>
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="clearAll">Clear All</button>

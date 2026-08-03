@@ -182,9 +182,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Reinstalar modpack"
   },
-  "button.remove": {
-    "defaultMessage": "Remover"
-  },
   "button.remove-image": {
     "defaultMessage": "Remover imagem"
   },
@@ -326,6 +323,9 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removidos"
   },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Parte do conteúdo no seu servidor não pôde ser analisada e pode ser afetada por essa alteração."
+  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} atualizados"
   },
@@ -341,20 +341,14 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Um backup está a decorrer, recomenda-se esperar que ele termine antes de realizar esta ação."
   },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "A criação do backup pode levar vários minutos, dependendo do tamanho do teu servidor."
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Pressiona Shift enquanto clicas para saltar a confirmação."
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "O conteúdo do teu modpack agora pode ser encontrado aqui!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Conteúdo do modpack foi movido"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Não mostrar novamente"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Conteúdo adicional"
@@ -2131,9 +2125,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Tokens de acesso pessoal"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Perfil público"
   },
   "settings.sessions.title": {
     "defaultMessage": "Sessões"

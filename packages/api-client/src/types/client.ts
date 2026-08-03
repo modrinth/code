@@ -51,6 +51,12 @@ export interface ClientConfig {
 	archonBaseUrl?: BaseUrlConfig
 
 	/**
+	 * Base URL for the Shared Instances API
+	 * @default 'https://shared-instances.modrinth.com'
+	 */
+	sharedInstancesBaseUrl?: BaseUrlConfig
+
+	/**
 	 * Default request timeout in milliseconds
 	 * @default 10000
 	 */

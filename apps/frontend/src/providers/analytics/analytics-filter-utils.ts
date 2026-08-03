@@ -430,13 +430,16 @@ function getCountryFilterValue(
 		return undefined
 	}
 
-	return dataPoint.country ?? null
+	return 'country' in dataPoint ? (dataPoint.country ?? null) : undefined
 }
 
 function getMonetizationFilterValue(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 ): string | null | undefined {
 	if (dataPoint.metric_kind !== 'views' && dataPoint.metric_kind !== 'downloads') {
+		return undefined
+	}
+	if (!('monetized' in dataPoint)) {
 		return undefined
 	}
 	if (typeof dataPoint.monetized !== 'boolean') {
@@ -463,7 +466,7 @@ function getDownloadSourceFilterValue(
 		return undefined
 	}
 
-	return dataPoint.user_agent ?? null
+	return 'user_agent' in dataPoint ? (dataPoint.user_agent ?? null) : undefined
 }
 
 function getDownloadReasonFilterValue(
@@ -473,7 +476,7 @@ function getDownloadReasonFilterValue(
 		return undefined
 	}
 
-	return dataPoint.reason ?? null
+	return 'reason' in dataPoint ? (dataPoint.reason ?? null) : undefined
 }
 
 function getUserIdFilterValue(
@@ -483,7 +486,7 @@ function getUserIdFilterValue(
 		return undefined
 	}
 
-	return dataPoint.user_id ?? null
+	return 'user_id' in dataPoint ? (dataPoint.user_id ?? null) : undefined
 }
 
 function getVersionFilterValue(
@@ -493,7 +496,7 @@ function getVersionFilterValue(
 		return undefined
 	}
 
-	return dataPoint.version_id ?? null
+	return 'version_id' in dataPoint ? (dataPoint.version_id ?? null) : undefined
 }
 
 function getGameVersionFilterValue(
@@ -503,7 +506,7 @@ function getGameVersionFilterValue(
 		return undefined
 	}
 
-	return dataPoint.game_version ?? null
+	return 'game_version' in dataPoint ? (dataPoint.game_version ?? null) : undefined
 }
 
 function getLoaderFilterValue(
@@ -513,5 +516,5 @@ function getLoaderFilterValue(
 		return undefined
 	}
 
-	return dataPoint.loader ?? null
+	return 'loader' in dataPoint ? (dataPoint.loader ?? null) : undefined
 }

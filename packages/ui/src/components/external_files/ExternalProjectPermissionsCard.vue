@@ -9,6 +9,7 @@ import {
 	ReportIcon,
 	ScaleIcon,
 	SpinnerIcon,
+	TrashIcon,
 	VersionIcon,
 	XCircleIcon,
 	XIcon,
@@ -17,7 +18,7 @@ import { renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
-import { ButtonStyled, Collapsible, OverflowMenu } from '#ui/components'
+import { ButtonStyled, Collapsible, ConfirmModal, OverflowMenu } from '#ui/components'
 import type { OverflowMenuOption } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
 
@@ -78,6 +79,7 @@ const addToGlobalModalRef =
 	useTemplateRef<typeof AddToGlobalPermissionsDatabaseModal>('addToGlobalModalRef')
 const addToExistingModalRef =
 	useTemplateRef<typeof AddToExistingExternalProjectModal>('addToExistingModalRef')
+const deleteGroupModalRef = useTemplateRef<InstanceType<typeof ConfirmModal>>('deleteGroupModalRef')
 
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
@@ -134,6 +136,23 @@ const messages = defineMessages({
 	addFilesToGroup: {
 		id: 'external-files.permissions-card.add-files-to-group',
 		defaultMessage: 'Add files...',
+	},
+	removeGroup: {
+		id: 'external-files.permissions-card.remove-group',
+		defaultMessage: 'Delete group',
+	},
+	removeGroupConfirmationTitle: {
+		id: 'external-files.permissions-card.remove-group-confirmation.title',
+		defaultMessage: 'Delete {title}?',
+	},
+	removeGroupConfirmationDescription: {
+		id: 'external-files.permissions-card.remove-group-confirmation.description',
+		defaultMessage:
+			'This will permanently delete this attribution group and all files inside it. This action cannot be undone.',
+	},
+	removeGroupShiftHint: {
+		id: 'external-files.permissions-card.remove-group-shift-hint',
+		defaultMessage: 'Hold Shift while clicking to skip confirmation.',
 	},
 	moderationReasonLabel: {
 		id: 'external-files.permissions-card.moderation-reason',
@@ -248,6 +267,26 @@ const splitFileMutation = useMutation({
 	},
 })
 
+const deleteGroupMutation = useMutation({
+	mutationFn: () => client.labrinth.attribution_internal.deleteGroups([props.group.id]),
+	onSuccess: async () => {
+		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.projectId] })
+		emit('updated')
+	},
+	onError: (error: Error) => {
+		addNotification({
+			type: 'error',
+			title: formatMessage(
+				defineMessage({
+					id: 'external-files.permissions-card.remove-group-error.title',
+					defaultMessage: 'Could not delete group',
+				}),
+			),
+			text: error.message,
+		})
+	},
+})
+
 function startEditingAttribution() {
 	editingMode.value = 'attribution'
 	collapsed.value = false
@@ -278,6 +317,19 @@ function handleSplitFile(sha1: string) {
 
 function handleConfirmAddFiles(sha1s: string[]) {
 	assignFilesMutation.mutate(sha1s)
+}
+
+function deleteGroup() {
+	deleteGroupMutation.mutate()
+}
+
+function handleDeleteGroup(event: MouseEvent) {
+	if (event.shiftKey) {
+		deleteGroup()
+		return
+	}
+
+	deleteGroupModalRef.value?.show()
 }
 
 async function handleAddFilesToGroup(event: MouseEvent) {
@@ -782,8 +834,32 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 						@cancel="stopEditing"
 					/>
 				</div>
+				<div v-if="isModerator" class="flex justify-end pt-2">
+					<ButtonStyled color="red" type="outlined">
+						<button :disabled="deleteGroupMutation.isPending.value" @click="handleDeleteGroup">
+							<SpinnerIcon
+								v-if="deleteGroupMutation.isPending.value"
+								class="size-4 shrink-0 animate-spin"
+							/>
+							<TrashIcon v-else class="size-4 shrink-0" />
+							{{ formatMessage(messages.removeGroup) }}
+						</button>
+					</ButtonStyled>
+				</div>
 			</div>
 		</Collapsible>
+		<ConfirmModal
+			v-if="isModerator"
+			ref="deleteGroupModalRef"
+			:title="formatMessage(messages.removeGroupConfirmationTitle, { title })"
+			:description="formatMessage(messages.removeGroupConfirmationDescription)"
+			:proceed-label="formatMessage(messages.removeGroup)"
+			@proceed="deleteGroup"
+		>
+			<p class="m-0 text-xs text-secondary">
+				{{ formatMessage(messages.removeGroupShiftHint) }}
+			</p>
+		</ConfirmModal>
 		<AddFilesToAttributionGroupModal
 			ref="addFilesModalRef"
 			:group-id="group.id"

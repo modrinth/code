@@ -13,3 +13,17 @@ export const isAdmin = (user) => {
 }
 
 export const STAFF_ROLES = ['moderator', 'admin']
+
+export const MODRINTH_USER_ID = '2REoufqX'
+export const AUTOMOD_USER_ID = ''
+export const MODRINTH_ARCHIVES_USER_ID = 'GVFjtWTf'
+
+export const OFFICIAL_ACCOUNT_IDS = [MODRINTH_USER_ID, AUTOMOD_USER_ID, MODRINTH_ARCHIVES_USER_ID]
+
+export const isModrinthUser = (userId) => {
+	return userId === MODRINTH_USER_ID
+}
+
+export const isOfficialAccount = (userId) => {
+	return OFFICIAL_ACCOUNT_IDS.includes(userId)
+}

@@ -9,7 +9,6 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { useMagicKeys } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -30,6 +29,7 @@ import type {
 	ContentCardProject,
 	ContentCardVersion,
 	ContentOwner,
+	ContentSource,
 } from '../types'
 
 const { formatMessage } = useVIntl()
@@ -47,6 +47,7 @@ interface Props {
 	version?: ContentCardVersion
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
+	source?: ContentSource
 	enabled?: boolean
 	installing?: boolean
 	hasUpdate?: boolean
@@ -69,6 +70,7 @@ const props = withDefaults(defineProps<Props>(), {
 	version: undefined,
 	versionLink: undefined,
 	owner: undefined,
+	source: undefined,
 	enabled: undefined,
 	installing: false,
 	hasUpdate: false,
@@ -186,30 +188,43 @@ const deleteHovered = ref(false)
 							{{ project.title }}
 						</AutoLink>
 						<slot name="title-badges" />
-						<Tooltip
+						<span
 							v-if="isClientOnly"
-							theme="dismissable-prompt"
-							class="inline-flex shrink-0"
-							:triggers="['hover', 'focus']"
-							no-auto-focus
+							v-tooltip="formatMessage(clientWarningMessage)"
+							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
+							tabindex="0"
 						>
-							<span
-								class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
-								tabindex="0"
-							>
-								<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
-							</span>
-							<template #popper>
-								<div class="max-w-[18rem] text-sm">
-									{{ formatMessage(clientWarningMessage) }}
-								</div>
-							</template>
-						</Tooltip>
+							<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
+						</span>
 					</div>
 
 					<div class="flex min-w-0 items-center gap-1">
+						<template v-if="source">
+							<AutoLink
+								:target="
+									typeof source.link === 'string' && source.link.startsWith('http')
+										? '_blank'
+										: undefined
+								"
+								:to="source.link"
+								class="flex min-w-0 items-center gap-1 !decoration-secondary"
+								:class="{ 'hover:underline': source.link }"
+							>
+								<Avatar
+									:src="source.project.icon_url"
+									:alt="source.project.title"
+									:tint-by="source.project.id"
+									size="1.25rem"
+									no-shadow
+									class="shrink-0 rounded-md"
+								/>
+								<span class="truncate text-sm leading-5 text-secondary">
+									{{ source.project.title }}
+								</span>
+							</AutoLink>
+						</template>
 						<AutoLink
-							v-if="owner"
+							v-else-if="owner"
 							:target="
 								typeof owner.link === 'string' && owner.link.startsWith('http')
 									? '_blank'

@@ -22,7 +22,7 @@ async fn set_project_processing(
     project_id: i64,
     project_slug: &str,
     pool: &labrinth::database::PgPool,
-    redis: &labrinth::database::redis::RedisPool,
+    redis: &xredis::RedisPool,
 ) {
     sqlx::query!(
         "UPDATE mods SET status = 'processing' WHERE id = $1",

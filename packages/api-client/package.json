@@ -34,7 +34,7 @@
 	},
 	"scripts": {
 		"clean": "node --eval \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-		"build": "pnpm run clean && esbuild src/index.ts --bundle --format=esm --platform=neutral --target=es2020 --minify --legal-comments=none --outfile=dist/index.js --external:ofetch --external:mitt --external:@tauri-apps/plugin-http && tsc -p tsconfig.build.json",
+		"build": "pnpm run clean && node esbuild.config.mjs",
 		"prepare": "pnpm run build",
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write ."
@@ -44,10 +44,12 @@
 		"ofetch": "^1.4.1"
 	},
 	"devDependencies": {
+		"@microsoft/api-extractor": "^7.58.9",
 		"@modrinth/tooling-config": "workspace:*",
 		"@tauri-apps/plugin-http": "^2.0.0",
 		"esbuild": "0.27.2",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"unplugin-dts": "^1.0.3"
 	},
 	"peerDependencies": {
 		"@tauri-apps/plugin-http": "^2.0.0"

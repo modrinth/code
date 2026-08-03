@@ -10,7 +10,6 @@ use crate::database::models::{DatabaseError, ids::*};
 use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::billing::{
@@ -35,6 +34,7 @@ use std::str::FromStr;
 use std::time::Instant;
 use stripe::{self, Currency};
 use tracing::{debug, error, info, warn};
+use xredis::RedisPool;
 
 /// Updates charges which need to have their tax amount updated. This is done within a timer to avoid reaching
 /// Anrok API limits.

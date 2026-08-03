@@ -1,14 +1,14 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header)"
+		:header="props.header ?? formatMessage(messages.header)"
 		fade="warning"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-				{{ formatMessage(messages.admonitionBody) }}
+			<Admonition type="warning" :header="admonitionHeader">
+				{{ admonitionBody }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
@@ -33,7 +33,7 @@
 						@click="confirm"
 					>
 						<UnlinkIcon />
-						{{ formatMessage(props.server ? messages.header : messages.unlinkButton) }}
+						{{ formatMessage(actionMessage) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import { UnlinkIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -55,6 +55,8 @@ import { commonMessages } from '#ui/utils/common-messages'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const props = defineProps<{
+	header?: string
+	warning?: { header: string; body: string } | null
 	server?: boolean
 	backupTip?: string
 	actionDisabled?: boolean
@@ -92,6 +94,15 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
+const admonitionHeader = computed(() => {
+	if (props.warning) return props.warning.header
+	return formatMessage(messages.admonitionHeader)
+})
+const admonitionBody = computed(() => {
+	if (props.warning) return props.warning.body
+	return formatMessage(messages.admonitionBody)
+})
+const actionMessage = computed(() => (props.server ? messages.header : messages.unlinkButton))
 
 function show() {
 	debug('show: called', {

@@ -38,7 +38,7 @@ const baseId = useId()
 		<template #popper>
 			<div class="flex flex-col max-w-[22rem] leading-tight gap-0.5">
 				<span class="text-contrast mb-1">{{ formatMessage(name, values) }}</span>
-				<span v-for="message of about" :key="message.id" class="text-primary">
+				<span v-for="message in about" :key="message.id" class="text-primary">
 					{{ formatMessage(message, values) }}
 				</span>
 				<span v-if="link" class="text-secondary text-xs opacity-80">

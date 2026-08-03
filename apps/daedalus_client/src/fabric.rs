@@ -1,3 +1,19 @@
+//! Fetches Fabric-compatible loader metadata.
+//!
+//! Fabric and Quilt both expose loader profiles for a concrete Minecraft
+//! version, but Daedalus publishes templated profiles using
+//! `${modrinth.gameVersion}`. A group is a set of Minecraft versions whose
+//! upstream loader profiles have the same structure after the concrete
+//! Minecraft version is replaced with `${modrinth.gameVersion}`. Fabric uses
+//! one universal group, so its public profile paths stay as
+//! `versions/{loader}.json`. Quilt has more than one group: versions before
+//! 26.x include hashed/intermediary libraries, while 26.x versions do not. For
+//! Quilt, Daedalus writes one templated profile per group at
+//! `version-group/{group}/loader-version/{loader}`.
+
+use crate::metadata_groups::{
+    UNIVERSAL_METADATA_GROUP, metadata_group_for_game_version, metadata_groups,
+};
 use crate::util::{download_file, fetch_json, format_url};
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
@@ -64,7 +80,112 @@ async fn fetch(
         &semaphore,
     )
     .await?;
+    let all_loader_versions = fabric_manifest.loader.clone();
+    let all_game_versions = fabric_manifest.game.clone();
+    let metadata_groups = metadata_groups(
+        mod_loader,
+        all_game_versions.iter().map(|x| x.version.as_str()),
+    );
 
+    if metadata_groups
+        .iter()
+        .any(|group| group.id != UNIVERSAL_METADATA_GROUP)
+    {
+        let loaders = all_loader_versions
+            .iter()
+            .filter(|x| !skip_versions.contains(&&*x.version))
+            .collect::<Vec<_>>();
+
+        let profile_requests = metadata_groups
+            .iter()
+            .flat_map(|group| {
+                loaders.iter().map(move |loader| ProfileRequest {
+                    group: group.id.to_string(),
+                    loader_profile_template_game_version: group
+                        .loader_profile_template_game_version
+                        .clone(),
+                    game_versions: group.game_versions.clone(),
+                    loader_version: loader.version.clone(),
+                    url: format!(
+                        "{}/versions/loader/{}/{}/profile/json",
+                        meta_url,
+                        group.loader_profile_template_game_version,
+                        loader.version
+                    ),
+                })
+            })
+            .collect::<Vec<_>>();
+
+        fetch_metadata_profiles(
+            mod_loader,
+            format_version,
+            maven_url,
+            profile_requests,
+            &upload_files,
+            &mirror_artifacts,
+            &semaphore,
+        )
+        .await?;
+
+        let version_groups = metadata_groups
+            .iter()
+            .map(|group| daedalus::modded::VersionGroup {
+                id: group.id.to_string(),
+                loaders: loaders
+                    .iter()
+                    .map(|loader| {
+                        let version_path = metadata_version_path(
+                            mod_loader,
+                            format_version,
+                            &loader.version,
+                            group.id,
+                        );
+
+                        daedalus::modded::LoaderVersion {
+                            id: loader.version.clone(),
+                            url: format_url(&version_path),
+                            stable: loader.stable,
+                        }
+                    })
+                    .collect(),
+            })
+            .collect();
+
+        let manifest = daedalus::modded::Manifest {
+            game_versions: all_game_versions
+                .into_iter()
+                .map(|game_version| {
+                    let group = metadata_group_for_game_version(
+                        &metadata_groups,
+                        mod_loader,
+                        &game_version.version,
+                    )
+                    .expect("game version should have a metadata group");
+
+                    daedalus::modded::Version {
+                        id: game_version.version.clone(),
+                        stable: game_version.stable,
+                        version_group: Some(group.id.to_string()),
+                        loaders: Vec::new(),
+                    }
+                })
+                .collect(),
+            version_groups,
+        };
+
+        upload_files.insert(
+            format!("{mod_loader}/v{format_version}/manifest.json"),
+            UploadFile {
+                file: bytes::Bytes::from(serde_json::to_vec(&manifest)?),
+                content_type: Some("application/json".to_string()),
+            },
+        );
+
+        return Ok(FetchResult {
+            upload_files,
+            mirror_artifacts,
+        });
+    }
     // We check Modrinth's manifest to find newly added loader versions,
     // intermediary/mapping artifacts, and game versions.
     let (
@@ -125,8 +246,6 @@ async fn fetch(
         )
     };
 
-    const DUMMY_GAME_VERSION: &str = "1.21";
-
     if !fetch_intermediary_versions.is_empty() {
         for x in &fetch_intermediary_versions {
             insert_mirrored_artifact(
@@ -140,94 +259,38 @@ async fn fetch(
     }
 
     if !fetch_fabric_versions.is_empty() {
-        let fabric_version_manifest_urls = fetch_fabric_versions
+        let universal_group = metadata_groups
             .iter()
-            .map(|x| {
-                format!(
+            .find(|group| group.id == UNIVERSAL_METADATA_GROUP)
+            .expect("fabric metadata should have a universal group");
+        let profile_requests = fetch_fabric_versions
+            .iter()
+            .map(|loader| ProfileRequest {
+                group: universal_group.id.to_string(),
+                loader_profile_template_game_version: universal_group
+                    .loader_profile_template_game_version
+                    .clone(),
+                game_versions: universal_group.game_versions.clone(),
+                loader_version: loader.version.clone(),
+                url: format!(
                     "{}/versions/loader/{}/{}/profile/json",
-                    meta_url, DUMMY_GAME_VERSION, x.version
-                )
+                    meta_url,
+                    universal_group.loader_profile_template_game_version,
+                    loader.version
+                ),
             })
             .collect::<Vec<_>>();
-        let fabric_version_manifests = futures::future::try_join_all(
-            fabric_version_manifest_urls
-                .iter()
-                .map(|x| download_file(x, None, &semaphore)),
+
+        fetch_metadata_profiles(
+            mod_loader,
+            format_version,
+            maven_url,
+            profile_requests,
+            &upload_files,
+            &mirror_artifacts,
+            &semaphore,
         )
-        .await?
-        .into_iter()
-        .map(|x| serde_json::from_slice(&x))
-        .collect::<Result<Vec<PartialVersionInfo>, serde_json::Error>>()?;
-
-        let patched_version_manifests = fabric_version_manifests
-            .into_iter()
-            .map(|mut version_info| {
-                for lib in &mut version_info.libraries {
-                    let new_name = lib
-                        .name
-                        .replace(DUMMY_GAME_VERSION, DUMMY_REPLACE_STRING);
-
-                    // Hard-code: This library is not present on fabric's maven, so we fetch it from MC libraries
-                    if &*lib.name == "net.minecraft:launchwrapper:1.12" {
-                        lib.url = Some(
-                            "https://libraries.minecraft.net/".to_string(),
-                        );
-                    }
-
-                    // If a library is not intermediary, we add it to mirror artifacts to be mirrored
-                    if lib.name == new_name {
-                        insert_mirrored_artifact(
-                            &new_name,
-                            None,
-                            vec![
-                                lib.url
-                                    .clone()
-                                    .unwrap_or_else(|| maven_url.to_string()),
-                            ],
-                            false,
-                            &mirror_artifacts,
-                        )?;
-                    } else {
-                        lib.name = new_name;
-                    }
-
-                    lib.url = Some(format_url("maven/"));
-                }
-
-                version_info.id = version_info
-                    .id
-                    .replace(DUMMY_GAME_VERSION, DUMMY_REPLACE_STRING);
-                version_info.inherits_from = version_info
-                    .inherits_from
-                    .replace(DUMMY_GAME_VERSION, DUMMY_REPLACE_STRING);
-
-                Ok(version_info)
-            })
-            .collect::<Result<Vec<_>, Error>>()?;
-        let serialized_version_manifests = patched_version_manifests
-            .iter()
-            .map(|x| serde_json::to_vec(x).map(bytes::Bytes::from))
-            .collect::<Result<Vec<_>, serde_json::Error>>()?;
-
-        serialized_version_manifests
-            .into_iter()
-            .enumerate()
-            .for_each(|(index, bytes)| {
-                let loader = fetch_fabric_versions[index];
-
-                let version_path = format!(
-                    "{mod_loader}/v{format_version}/versions/{}.json",
-                    loader.version
-                );
-
-                upload_files.insert(
-                    version_path,
-                    UploadFile {
-                        file: bytes,
-                        content_type: Some("application/json".to_string()),
-                    },
-                );
-            });
+        .await?;
     }
 
     if !fetch_fabric_versions.is_empty()
@@ -240,17 +303,20 @@ async fn fetch(
         let loader_versions = daedalus::modded::Version {
             id: DUMMY_REPLACE_STRING.to_string(),
             stable: true,
-            loaders: fabric_manifest
-                .loader
-                .into_iter()
+            version_group: None,
+            loaders: all_loader_versions
+                .iter()
+                .filter(|x| !skip_versions.contains(&&*x.version))
                 .map(|x| {
-                    let version_path = format!(
-                        "{mod_loader}/v{format_version}/versions/{}.json",
-                        x.version,
+                    let version_path = metadata_version_path(
+                        mod_loader,
+                        format_version,
+                        &x.version,
+                        UNIVERSAL_METADATA_GROUP,
                     );
 
                     daedalus::modded::LoaderVersion {
-                        id: x.version,
+                        id: x.version.clone(),
                         url: format_url(&version_path),
                         stable: x.stable,
                     }
@@ -260,14 +326,16 @@ async fn fetch(
 
         let manifest = daedalus::modded::Manifest {
             game_versions: std::iter::once(loader_versions)
-                .chain(fabric_manifest.game.into_iter().map(|x| {
+                .chain(all_game_versions.into_iter().map(|x| {
                     daedalus::modded::Version {
                         id: x.version,
                         stable: x.stable,
+                        version_group: None,
                         loaders: vec![],
                     }
                 }))
                 .collect(),
+            version_groups: Vec::new(),
         };
 
         upload_files.insert(
@@ -283,6 +351,145 @@ async fn fetch(
         upload_files,
         mirror_artifacts,
     })
+}
+
+struct ProfileRequest {
+    group: String,
+    loader_profile_template_game_version: String,
+    game_versions: Vec<String>,
+    loader_version: String,
+    url: String,
+}
+
+fn metadata_version_path(
+    mod_loader: &str,
+    format_version: usize,
+    loader_version: &str,
+    group: &str,
+) -> String {
+    if group == UNIVERSAL_METADATA_GROUP {
+        format!("{mod_loader}/v{format_version}/versions/{loader_version}.json")
+    } else {
+        format!(
+            "{mod_loader}/v{format_version}/version-group/{group}/loader-version/{loader_version}"
+        )
+    }
+}
+
+async fn fetch_metadata_profiles(
+    mod_loader: &str,
+    format_version: usize,
+    maven_url: &str,
+    profile_requests: Vec<ProfileRequest>,
+    upload_files: &DashMap<String, UploadFile>,
+    mirror_artifacts: &DashMap<String, MirrorArtifact>,
+    semaphore: &Arc<Semaphore>,
+) -> Result<(), Error> {
+    let version_manifests = futures::future::try_join_all(
+        profile_requests
+            .iter()
+            .map(|x| download_file(&x.url, None, semaphore)),
+    )
+    .await?
+    .into_iter()
+    .map(|x| serde_json::from_slice(&x))
+    .collect::<Result<Vec<PartialVersionInfo>, serde_json::Error>>()?;
+
+    let patched_version_manifests = version_manifests
+        .into_iter()
+        .zip(profile_requests.iter())
+        .map(|(mut version_info, request)| {
+            patch_version_info(
+                &mut version_info,
+                &request.loader_profile_template_game_version,
+                &request.game_versions,
+                maven_url,
+                mirror_artifacts,
+            )?;
+
+            Ok(version_info)
+        })
+        .collect::<Result<Vec<_>, Error>>()?;
+    let serialized_version_manifests = patched_version_manifests
+        .iter()
+        .map(|x| serde_json::to_vec(x).map(bytes::Bytes::from))
+        .collect::<Result<Vec<_>, serde_json::Error>>()?;
+
+    serialized_version_manifests
+        .into_iter()
+        .zip(profile_requests)
+        .for_each(|(bytes, request)| {
+            let version_path = metadata_version_path(
+                mod_loader,
+                format_version,
+                &request.loader_version,
+                &request.group,
+            );
+
+            upload_files.insert(
+                version_path,
+                UploadFile {
+                    file: bytes,
+                    content_type: Some("application/json".to_string()),
+                },
+            );
+        });
+
+    Ok(())
+}
+
+fn patch_version_info(
+    version_info: &mut PartialVersionInfo,
+    game_version: &str,
+    game_versions: &[String],
+    maven_url: &str,
+    mirror_artifacts: &DashMap<String, MirrorArtifact>,
+) -> Result<(), Error> {
+    for lib in &mut version_info.libraries {
+        let new_name = lib.name.replace(game_version, DUMMY_REPLACE_STRING);
+
+        // Hard-code: This library is not present on fabric's maven, so we fetch it from MC libraries
+        if &*lib.name == "net.minecraft:launchwrapper:1.12" {
+            lib.url = Some("https://libraries.minecraft.net/".to_string());
+        }
+        let source_url =
+            lib.url.clone().unwrap_or_else(|| maven_url.to_string());
+
+        if lib.name == new_name {
+            insert_mirrored_artifact(
+                &new_name,
+                None,
+                vec![source_url],
+                false,
+                mirror_artifacts,
+            )?;
+        } else {
+            for concrete_game_version in game_versions {
+                let concrete_name =
+                    lib.name.replace(game_version, concrete_game_version);
+
+                insert_mirrored_artifact(
+                    &concrete_name,
+                    None,
+                    vec![source_url.clone()],
+                    false,
+                    mirror_artifacts,
+                )?;
+            }
+
+            lib.name = new_name;
+        }
+
+        lib.url = Some(format_url("maven/"));
+    }
+
+    version_info.id =
+        version_info.id.replace(game_version, DUMMY_REPLACE_STRING);
+    version_info.inherits_from = version_info
+        .inherits_from
+        .replace(game_version, DUMMY_REPLACE_STRING);
+
+    Ok(())
 }
 
 #[derive(Deserialize, Debug, Clone)]

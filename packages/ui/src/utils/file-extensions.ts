@@ -90,11 +90,11 @@ export function isEditableFile(ext: string): boolean {
 }
 
 /**
- * Check if a file can be opened in the file editor.
+ * Check if a file can be opened in the file editor
  */
 export function canOpenInFileEditor(filename: string): boolean {
-	const extension = getFileExtension(filename)
-	return !filename.includes('.') || isEditableFile(extension) || isImageFile(extension)
+	const ext = getFileExtension(filename)
+	return !filename.includes('.') || isEditableFile(ext) || isImageFile(ext)
 }
 
 /**

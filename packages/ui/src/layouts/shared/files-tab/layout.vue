@@ -653,7 +653,7 @@ function handleItemHover(item: { type: string; path: string; name: string }) {
 				: `${currentPath}/${item.name}`
 			ctx.prefetchDirectory?.(navPath)
 		}, 150)
-	} else {
+	} else if (canOpenInFileEditor(item.name)) {
 		prefetchTimeout = setTimeout(() => {
 			if (canOpenInFileEditor(item.name)) {
 				ctx.prefetchFile?.(item.path)

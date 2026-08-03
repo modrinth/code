@@ -38,6 +38,9 @@
   "analytics.breakdown.loader": {
     "message": "Loader"
   },
+  "analytics.breakdown.members": {
+    "message": "Miyembro"
+  },
   "analytics.breakdown.monetization": {
     "message": "Monetisasyon"
   },
@@ -133,6 +136,9 @@
   },
   "analytics.stat.views": {
     "message": "Pagtingin"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Wala"
   },
   "analytics.value.none": {
     "message": "Wala"
@@ -386,17 +392,8 @@
   "auth.reset-password.title.long": {
     "message": "Baguhin ang iyong password"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Pakilagay ng two-factor code upang makapagpatuloy."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Ilagay ang two-factor code"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Ilagay ang code..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Mag-sign in gamit ang"
   },
   "auth.sign-in.title": {
     "message": "Mag-sign In"
@@ -409,9 +406,6 @@
   },
   "auth.sign-up.title": {
     "message": "Mag-sign Up"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Mag-sign up gamit ang"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
@@ -1010,18 +1004,6 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Pakisuri sa metadata sa environment"
   },
-  "dashboard.projects.sort.option.name": {
-    "message": "Pangalan"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Estado"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Uri"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikono"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
@@ -1452,7 +1434,7 @@
     "message": "Alok sa limitadong oras. Walang kakailanganing credit card. Magagamit para sa mga server sa US."
   },
   "hosting-marketing.pick-customized-plan": {
-    "message": "Pumili ng sinadyang plan na may specs na kakailanganin mo."
+    "message": "Pumili ng pasadya na plan na may specs na kailangan mo."
   },
   "hosting-marketing.server-for-everyone": {
     "message": "May server para sa lahat"
@@ -1847,9 +1829,6 @@
   "layout.nav.discover": {
     "message": "Tumuklas"
   },
-  "layout.nav.discover-content": {
-    "message": "Tumuklas ng kontento"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Kunin ang Modrinth App"
   },
@@ -1900,6 +1879,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Tech review"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Nabigo"
   },
   "muralpay.account-type.checking": {
     "message": "Sinusuri"
@@ -2168,105 +2150,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Pakisuri muli ng iyong wallet address. Ang mga pundong nahatid sa maling address ay hindi na mababawi."
   },
-  "profile.bio.fallback.creator": {
-    "message": "Isang tagagawa sa Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Isang tagagamit sa Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Pamahalaan ang billing ng tagagamit"
-  },
-  "profile.button.edit-role": {
-    "message": "Baguhin ang tungkulin"
-  },
-  "profile.button.info": {
-    "message": "Tingang ang mga detalye ng tagagamit"
-  },
-  "profile.button.manage-projects": {
-    "message": "Pamahalaan ang mga proyekto"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Tanggalin bilang affiliate"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Itakda bilang affiliate"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Mga auth provider"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Napatunayan na email"
-  },
-  "profile.details.label.has-password": {
-    "message": "May password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "May TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Mga paraan ng pagbabayad"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Hindi napatunayang email"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Napatunayan na email"
-  },
-  "profile.error.not-found": {
-    "message": "Hindi mahanap na tagagamit"
-  },
-  "profile.label.affiliate": {
-    "message": "Affiliate"
-  },
-  "profile.label.badges": {
-    "message": "Tsapa"
-  },
-  "profile.label.collection": {
-    "message": "Koleksiyon"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {na download}}"
-  },
-  "profile.label.joined": {
-    "message": "Sumali"
-  },
-  "profile.label.no-collections": {
-    "message": "Walang mga koleksiyon ang tagagamit na ito!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Wala kang koleksiyon.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Walang mga proyekto ang tagagmit na ito!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Wala kang proyekto.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Mga organisasyon"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
-  },
-  "profile.label.saving": {
-    "message": "Sine-save..."
-  },
-  "profile.meta.description": {
-    "message": "Magdownload ng mga proyekto ni {username} sa Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Magdownload ng mga proyekto ni {username} sa Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> follower ng proyekto} other {<stat>{count}</stat> na follower ng proyekto}}"
-  },
-  "profile.user-id": {
-    "message": "User ID: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Bigong matanggihan ang anyaya sa koponan"
   },
@@ -2381,24 +2264,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Linikha {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Linisensiya {license}"
-  },
-  "project.about.details.published": {
-    "message": "Inilathala {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Isinumite {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalye"
-  },
-  "project.about.details.updated": {
-    "message": "In-update {date}"
-  },
   "project.actions.create-server": {
     "message": "Lumikha ng server"
   },
@@ -2429,47 +2294,14 @@
   "project.description.title": {
     "message": "Paglalarawan"
   },
-  "project.details.licensed": {
-    "message": "Lisensiyang"
-  },
-  "project.download.game-version": {
-    "message": "Bersiyon ng laro: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Error: walang mahanap na mga bersiyon ng laro"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "Ang {title} ay magagamit lamang sa {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "Hindi masuporta ng {title} ang {gameVersion} para sa {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "I-install gamit ang Modrinth App"
   },
   "project.download.no-app": {
     "message": "Wala kang Modrinth App?"
   },
-  "project.download.no-versions-available": {
-    "message": "Walang bersiyong magagamit para sa {gameVersion} at {platform}."
-  },
-  "project.download.platform": {
-    "message": "Plataporma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: walang mahanap na platform"
-  },
-  "project.download.platform-tooltip": {
-    "message": "Ang {title} ay magagamit lamang sa {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "Hindi masuport ng {title} ang {platform} para sa {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Maghanap ng mga bersiyon ng laro..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "Maghanap ng mga bersiyon ng laro..."
   },
   "project.download.select-game-version": {
     "message": "Piliin ang lahat ng bersiyon ng laro"
@@ -2512,15 +2344,6 @@
   },
   "project.gallery.title": {
     "message": "Galeriya"
-  },
-  "project.license.error": {
-    "message": "Hindi makuha ang teksto ng lisensiya."
-  },
-  "project.license.loading": {
-    "message": "Nag-load sa teksto ng lisensiya..."
-  },
-  "project.license.title": {
-    "message": "Lisensiya"
   },
   "project.moderation.title": {
     "message": "Moderation"
@@ -2585,8 +2408,8 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Kung magsasama ka ng mga kontentong hindi naka-host sa Modrinth, kailangan niyong ipaalam sa amin sa pinanggalingan nito at matiyak na pinahintulutang mapakalat ang mga file. Tingnan ang <link>aming gabay</link> upang matuto kung papaano ito magawa nang maayos!"
+  "project.settings.permissions.sort.status": {
+    "message": "Estado"
   },
   "project.settings.title": {
     "message": "Mga Setting"
@@ -2996,6 +2819,9 @@
   "settings.account.security.email.title": {
     "message": "Email"
   },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Pangalan"
+  },
   "settings.account.security.password.action.add": {
     "message": "Magdagdag ng password"
   },
@@ -3014,23 +2840,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Magdagdag ng redirect URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Kanselahin"
-  },
   "settings.applications.button.create": {
     "message": "Lumikha ng app"
   },
   "settings.applications.button.delete": {
     "message": "Tanggalin"
   },
-  "settings.applications.button.edit": {
-    "message": "Baguhin"
-  },
   "settings.applications.button.new": {
     "message": "Bagong aplikasyon"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "I-save ang mga pagbabago"
   },
   "settings.applications.button.upload-icon": {
     "message": "I-upload ang ikono"
@@ -3103,12 +2920,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "Tungkol sa app"
-  },
-  "settings.authorizations.by": {
-    "message": "ni/ng"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Kasalukuyang hindi namin mapapakita ang mga pinahintulutang app, kinukumpuni pa namin ito. Mangyaring bisitahin ang pahinang ito sa ibang pagkataon!"
   },
   "settings.authorizations.head-title": {
     "message": "Mga pagpapahintulot"
@@ -3347,27 +3158,6 @@
   "settings.pats.token.never-used": {
     "message": "Hindi ginamit"
   },
-  "settings.profile.bio.description": {
-    "message": "Isang maikling paglalarawan upang maipaalam sa lahat ang maliit na sipi ukol sa iyo."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biyograpiya"
-  },
-  "settings.profile.description": {
-    "message": "Makikita ng publiko ang impormasyon ng iyong profile at sa <docs-link>API ng Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Settings ng profile"
-  },
-  "settings.profile.profile-info": {
-    "message": "Impormasyon ng profile"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profile picture"
-  },
-  "settings.profile.username.description": {
-    "message": "Isang natatanging case-insensitive na pangalan upang matukoy ang iyong profile."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Bawiin ang sesyon"
   },
@@ -3409,6 +3199,9 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Mag-subscribe sa Modrinth newsletter"
+  },
+  "version.edit.button": {
+    "message": "Baguhin"
   },
   "version.environment.none.description": {
     "message": "Wala pang itinakdang environment para sa bersiyong ito."

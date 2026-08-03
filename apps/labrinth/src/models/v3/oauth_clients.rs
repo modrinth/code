@@ -10,14 +10,14 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct OAuthRedirectUri {
     pub id: OAuthRedirectUriId,
     pub client_id: OAuthClientId,
     pub uri: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct OAuthClientCreationResult {
     #[serde(flatten)]
     pub client: OAuthClient,
@@ -25,7 +25,7 @@ pub struct OAuthClientCreationResult {
     pub client_secret: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct OAuthClient {
     pub id: OAuthClientId,
     pub name: String,
@@ -48,7 +48,7 @@ pub struct OAuthClient {
     pub description: Option<String>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct OAuthClientAuthorization {
     pub id: OAuthClientAuthorizationId,
     pub app_id: OAuthClientId,

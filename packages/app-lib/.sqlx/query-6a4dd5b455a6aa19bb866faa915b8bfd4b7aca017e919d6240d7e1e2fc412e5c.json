@@ -1,0 +1,92 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tINSERT INTO instance_content_entries (\n\t\t\t\tid,\n\t\t\t\tinstance_id,\n\t\t\t\tcontent_set_id,\n\t\t\t\tfile_id,\n\t\t\t\tproject_type,\n\t\t\t\tproject_id,\n\t\t\t\tversion_id,\n\t\t\t\tsource_kind,\n\t\t\t\tserver_requirement,\n\t\t\t\tclient_requirement,\n\t\t\t\tenabled,\n\t\t\t\tadded_at,\n\t\t\t\tmodified_at\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\t\tRETURNING\n\t\t\t\tid,\n\t\t\t\tinstance_id,\n\t\t\t\tcontent_set_id,\n\t\t\t\tfile_id,\n\t\t\t\tproject_type,\n\t\t\t\tproject_id,\n\t\t\t\tversion_id,\n\t\t\t\tsource_kind,\n\t\t\t\tserver_requirement,\n\t\t\t\tclient_requirement,\n\t\t\t\tenabled,\n\t\t\t\tadded_at,\n\t\t\t\tmodified_at\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_set_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_id",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "project_type",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "project_id",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "version_id",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "source_kind",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "server_requirement",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "client_requirement",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "enabled",
+        "ordinal": 10,
+        "type_info": "Integer"
+      },
+      {
+        "name": "added_at",
+        "ordinal": 11,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified_at",
+        "ordinal": 12,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 12
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6a4dd5b455a6aa19bb866faa915b8bfd4b7aca017e919d6240d7e1e2fc412e5c"
+}

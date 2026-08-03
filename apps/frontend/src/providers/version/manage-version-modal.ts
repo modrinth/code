@@ -313,6 +313,12 @@ export function createManageVersionContext(
 		// detect primary file if no primary file is set
 		const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
 
+		if (hasSupplementaryMrpackFile(newFiles, primaryFileIndex)) {
+			notifyInvalidSupplementaryMrpack()
+			handlingNewFiles.value = false
+			return
+		}
+
 		newFiles.forEach((file) => filesToAdd.value.push({ file }))
 
 		if (primaryFileIndex !== null) {
@@ -567,6 +573,29 @@ export function createManageVersionContext(
 	})
 
 	// File handling helpers
+	function isMrpackFile(file: File): boolean {
+		const name = file.name.toLowerCase()
+		return name.endsWith('.mrpack') || name.endsWith('.mrpack-primary')
+	}
+
+	function hasSupplementaryMrpackFile(
+		files: File[] | Labrinth.Versions.v3.DraftVersionFile[],
+		primaryFileIndex: number | null = 0,
+	): boolean {
+		return files.some((file, index) => {
+			const rawFile = 'file' in file ? file.file : file
+			return index !== primaryFileIndex && isMrpackFile(rawFile)
+		})
+	}
+
+	function notifyInvalidSupplementaryMrpack() {
+		addNotification({
+			title: 'Invalid supplementary file',
+			text: 'mrpacks cannot be uploaded as supplementary files, only as the primary file',
+			type: 'error',
+		})
+	}
+
 	function detectPrimaryFileIndex(files: File[]): number {
 		const extensionPriority = ['.jar', '.zip', '.litemod', '.mrpack', '.mrpack-primary']
 
@@ -738,6 +767,12 @@ export function createManageVersionContext(
 	async function handleCreateVersion() {
 		const version = toRaw(draftVersion.value)
 		const files = toRaw(filesToAdd.value)
+
+		if (hasSupplementaryMrpackFile(files)) {
+			notifyInvalidSupplementaryMrpack()
+			return
+		}
+
 		isSubmitting.value = true
 		isUploading.value = true
 

@@ -27,6 +27,8 @@ pub enum ErrorKind {
         inner: Box<s3::error::S3Error>,
         file: String,
     },
+    #[error("I/O error: {0}")]
+    Io(#[from] std::io::Error),
     #[error("Error acquiring semaphore: {0}")]
     Acquire(#[from] tokio::sync::AcquireError),
     #[error("Tracing error: {0}")]

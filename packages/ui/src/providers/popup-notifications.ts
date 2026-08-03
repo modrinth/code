@@ -4,7 +4,7 @@ import { createContext } from '.'
 
 export interface PopupNotificationButton {
 	label: string
-	action: () => void
+	action: () => void | Promise<void>
 	icon?: Component
 	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
 	keepOpen?: boolean
@@ -24,6 +24,7 @@ export interface PopupNotificationProgressItem {
 	progressType?: PopupNotificationProgressType
 	progressCurrent?: number
 	progressTotal?: number
+	dismissible?: boolean
 	onDismiss?: () => void | Promise<void>
 	buttons?: PopupNotificationButton[]
 }
@@ -64,12 +65,14 @@ export interface PopupNotification {
 	bodyProps?: Record<string, unknown>
 	text?: string
 	iconUrl?: string | null
+	hideIcon?: boolean
 	type?: 'error' | 'warning' | 'success' | 'info' | 'download'
 	progress?: number
 	waiting?: boolean
 	progressItems?: PopupNotificationProgressItem[]
 	buttons?: PopupNotificationButton[]
 	toast?: PopupNotificationToast
+	dismissible?: boolean
 	autoCloseMs?: number | null
 	timer?: NodeJS.Timeout
 }

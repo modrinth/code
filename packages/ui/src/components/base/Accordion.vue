@@ -1,6 +1,6 @@
 <template>
 	<div v-bind="$attrs">
-		<div v-if="divider && !!slots.title" class="flex items-center gap-4 mb-4">
+		<div v-if="divider && (!!slots.title || !!slots.button)" class="flex items-center gap-4 mb-4">
 			<button
 				:class="
 					buttonClass ??
@@ -24,7 +24,7 @@
 			<hr class="h-px w-full border-none bg-divider" aria-hidden="true" />
 		</div>
 		<button
-			v-else-if="!!slots.title"
+			v-else-if="!!slots.title || !!slots.button"
 			:class="buttonClass ?? 'flex flex-col gap-2 bg-transparent m-0 p-0 border-none'"
 			@click="() => (forceOpen ? undefined : toggledOpen ? close() : open())"
 		>

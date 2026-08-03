@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "คุณไม่มีสิทธิ์"
+  },
   "affiliate.create.title.placeholder": {
     "defaultMessage": "เช่น YouTube"
   },
@@ -23,11 +26,17 @@
   "billing.resubscribe-modal.storage": {
     "defaultMessage": "{storageGb} กิกะไบต์ พื้นที่จัดเก็บ"
   },
+  "button.accept": {
+    "defaultMessage": "ยอมรับ"
+  },
   "button.back": {
     "defaultMessage": "กลับ"
   },
   "button.cancel": {
     "defaultMessage": "ยกเลิก"
+  },
+  "button.clear": {
+    "defaultMessage": "ล้าง"
   },
   "button.close": {
     "defaultMessage": "ปิด"
@@ -44,6 +53,9 @@
   "button.create-a-project": {
     "defaultMessage": "สร้างโปรเจกต์"
   },
+  "button.disable": {
+    "defaultMessage": "ปิด"
+  },
   "button.download": {
     "defaultMessage": "ดาวน์โหลด"
   },
@@ -53,8 +65,14 @@
   "button.edit": {
     "defaultMessage": "แก้ไข"
   },
+  "button.enable": {
+    "defaultMessage": "เปิด"
+  },
   "button.follow": {
     "defaultMessage": "ติดตาม"
+  },
+  "button.install": {
+    "defaultMessage": "ติดตั้ง"
   },
   "button.more-options": {
     "defaultMessage": "ตัวเลือกเพิ่มเติม"
@@ -70,9 +88,6 @@
   },
   "button.refresh": {
     "defaultMessage": "รีเฟรช"
-  },
-  "button.remove": {
-    "defaultMessage": "ลบ"
   },
   "button.remove-image": {
     "defaultMessage": "ลบรูป"
@@ -646,9 +661,5 @@
   },
   "settings.language.title": {
     "defaultMessage": "ภาษา"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "โปรไฟล์สาธารณะ"
   }
 }
-

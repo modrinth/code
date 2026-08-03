@@ -9,6 +9,7 @@ import {
 	getStoredServerAddonInstallQueue,
 	injectModrinthClient,
 	injectNotificationManager,
+	type ModpackSearchResult,
 	type PendingServerContentInstall,
 	type PendingServerContentInstallType,
 	readPendingServerContentInstalls,
@@ -35,7 +36,6 @@ import { useRoute, useRouter } from 'vue-router'
 type ServerFlowFrom = 'onboarding' | 'reset-server'
 
 type InstallableSearchResult = Labrinth.Search.v3.ResultSearchProject & {
-	title?: string
 	installing?: boolean
 	installed?: boolean
 }
@@ -84,10 +84,7 @@ export interface ServerInstallContentContext {
 	installQueuedServerInstallsAndBack: () => Promise<boolean>
 	initServerContext: () => Promise<void>
 	watchServerContextChanges: () => void
-	searchServerModpacks: (
-		query: string,
-		limit?: number,
-	) => Promise<Labrinth.Projects.v2.SearchResult>
+	searchServerModpacks: (query: string, limit?: number) => Promise<ModpackSearchResult>
 	getServerProjectVersions: (projectId: string) => Promise<{ id: string }[]>
 	enforceSetupModpackRoute: (currentProjectType: string | undefined) => void
 	getQueuedServerInstallPlans: () => Map<string, BrowseInstallPlan<InstallableSearchResult>>
@@ -126,7 +123,7 @@ function getQueuedInstallOwnerFallback(project: InstallableSearchResult) {
 		id: ownerId,
 		name: project.author,
 		type: 'user' as const,
-		link: `https://modrinth.com/user/${ownerId}`,
+		link: `/user/${encodeURIComponent(ownerId)}`,
 	}
 }
 
@@ -162,7 +159,7 @@ async function getQueuedInstallOwner(
 				name: owner.username,
 				type: 'user' as const,
 				avatar_url: owner.avatar_url,
-				link: `https://modrinth.com/user/${owner.username}`,
+				link: `/user/${encodeURIComponent(owner.username)}`,
 			}
 		}
 	} catch {
@@ -187,7 +184,7 @@ function getQueuedInstallPlaceholder(
 		projectId: plan.projectId,
 		versionId: plan.versionId,
 		contentType: plan.contentType as PendingServerContentInstallType,
-		title: project.title ?? project.name ?? 'Project',
+		title: project.name ?? 'Project',
 		versionName: plan.versionName ?? null,
 		versionNumber: plan.versionNumber ?? null,
 		fileName: plan.fileName ?? null,
@@ -267,7 +264,7 @@ export function createServerInstallContent(opts: {
 	const selectedServerInstallProjects = computed<BrowseSelectedProject[]>(() =>
 		Array.from(queuedServerInstalls.value.values()).map((plan) => ({
 			id: plan.projectId,
-			name: plan.project.title ?? plan.project.name ?? 'Project',
+			name: plan.project.name ?? 'Project',
 			iconUrl: plan.project.icon_url ?? null,
 		})),
 	)
@@ -478,12 +475,24 @@ export function createServerInstallContent(opts: {
 	}
 
 	async function searchServerModpacks(query: string, limit: number = 10) {
-		return client.labrinth.projects_v2.search({
+		const results = await client.labrinth.projects_v3.search({
 			query: query || undefined,
 			new_filters:
-				'project_types = "modpack" AND (client_side = "optional" OR client_side = "required") AND server_side = "required"',
+				'project_types = "modpack" AND environment IN ["client_and_server", "server_only_client_optional"]',
 			limit,
 		})
+
+		return {
+			hits: results.hits.map((hit) => ({
+				project_id: hit.project_id,
+				title: hit.name,
+				icon_url: hit.icon_url ?? '',
+				latest_version: hit.version_id,
+			})),
+			total_hits: results.total_hits,
+			offset: (results.page - 1) * results.hits_per_page,
+			limit: results.hits_per_page,
+		}
 	}
 
 	async function getServerProjectVersions(projectId: string) {

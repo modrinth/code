@@ -140,9 +140,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "התקן מחדש חבילת מודים"
   },
-  "button.remove": {
-    "defaultMessage": "מחק"
-  },
   "button.remove-image": {
     "defaultMessage": "מחק תמונה"
   },
@@ -259,9 +256,6 @@
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "צור גיבוי"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "אל תציג שוב"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "תוכן נוסף"
@@ -1132,9 +1126,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "מפתחות גישה אישיים"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "פרופיל ציבורי"
   },
   "settings.sessions.title": {
     "defaultMessage": "חיבורים פעילים"

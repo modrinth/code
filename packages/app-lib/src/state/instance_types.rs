@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
+use super::instances::ContentSourceKind;
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum InstanceInstallStage {
@@ -122,6 +124,7 @@ pub struct ContentFile {
     pub metadata: Option<FileMetadata>,
     pub update_version_id: Option<String>,
     pub project_type: ProjectType,
+    pub source_kind: Option<ContentSourceKind>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -130,7 +133,7 @@ pub struct FileMetadata {
     pub version_id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq, Hash)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
     Mod,
@@ -183,6 +186,18 @@ impl ProjectType {
             ProjectType::DataPack => "datapack",
             ProjectType::ResourcePack => "resourcepack",
             ProjectType::ShaderPack => "shader",
+        }
+    }
+
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "mod" | "mods" => Some(ProjectType::Mod),
+            "datapack" | "datapacks" => Some(ProjectType::DataPack),
+            "resourcepack" | "resourcepacks" => Some(ProjectType::ResourcePack),
+            "shader" | "shaderpack" | "shaderpacks" => {
+                Some(ProjectType::ShaderPack)
+            }
+            _ => None,
         }
     }
 

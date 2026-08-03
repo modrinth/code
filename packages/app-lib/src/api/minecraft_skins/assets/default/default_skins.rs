@@ -16,14 +16,11 @@ const CHASE_THE_SKIES_SKIN_PACK_SECTION: &str = "Chase the Skies";
 const THE_COPPER_AGE_SKIN_PACK_SECTION: &str = "The Copper Age";
 const MOUNTS_OF_MAYHEM_SKIN_PACK_SECTION: &str = "Mounts of Mayhem";
 const TINY_TAKEOVER_SKIN_PACK_SECTION: &str = "Tiny Takeover";
+const CHAOS_CUBED_SKIN_PACK_SECTION: &str = "Chaos Cubed";
 
 /// A list of bundled Minecraft skins to make available to the user.
 pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
-    //
-    // The Mojang skins below are available in the vanilla Minecraft launcher, and were found
-    // by reverse engineering the behavior of the Minecraft launcher. The textures are
-    // publicly available at `https://textures.minecraft.net/texture/<texture_key>`.
-    //
+    // These skins have `local-` prefix in their texture_key as they dont exist on Mojang's API.
     vec![Skin {
         texture_key: Arc::from("local-cb3974d16e88a6bd1fe91b0bd58aa5a89abc01f66aed0efc732b84091a523fc9"),
         name: Some(Arc::from("Mr. Pack - Asexual")),
@@ -132,6 +129,11 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
         source: SkinSource::Default,
         is_equipped: false,
     },
+		//
+    // The Mojang skins below are available in the vanilla Minecraft launcher, and were found
+    // by reverse engineering the behavior of the Minecraft launcher. The textures are
+    // publicly available at `https://textures.minecraft.net/texture/<texture_key>`.
+    //
     Skin {
         texture_key: Arc::from("46acd06e8483b176e8ea39fc12fe105eb3a2a4970f5100057e9d84d4b60bdfa7"),
         name: Some(Arc::from("Alex")),
@@ -782,5 +784,43 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
         ).unwrap()),
         source: SkinSource::Default,
         is_equipped: false,
-    }]
+    },
+    // Chaos Cubed skin pack
+    Skin {
+        texture_key: Arc::from("fa4d0a00cfabcad04659b991176e2b7872c661d54e85808bc12aa59e10dde326"),
+        name: Some(Arc::from("Brawler")),
+        section: Some(Arc::from(CHAOS_CUBED_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAbFBMVEUAAADOzs7///+FKypkHSGmPDl0JCXCWlPbxZ7t3rs3Nlbz7nhZFhbd3WW7h0txIyXYqE7TvExwIiWWNDLWlnxmaFqPZU/MsIv5/eFAOzDWb1Ls85Dw96zPhFz0+8Pm5ua/v78pKEkbGjwTECkB9t8tAAAAAXRSTlMAQObYZgAAA2JJREFUeNrtluGaoiAUhkHAUtOsZptxKii9/3vc73Agjdqyp7/7jgd0itcjAiEifWTgP5Gw3iqwXYuUVDAwdwIVmCFYgoeCtt59Itg1TdOa14Jl4E5gTN2ajwQtUpghKAKPMqjN7gPBzgB1L+hfsFYRFgTW6/WWhsV6lqCpiLpp6opovEBriigol1fKW4HWaC9A7SUCwKCJzQaFCO2LwjvKokgMSLSpxQ114zOgt6K3gttDkJmiMBkEtwatyZC25wzakEHph15ZgBIDkQ0Dx6CBqsSESmlPA7xgWIICfH1RuQT4ZxRs6jo8eoSu681m07btpt0IHvzFBBIMgLMQc+iBlPIsAnmuFAcjAicgz849FGTZ+IEK3Av+nBy++CoDCApwL0B7ZJCd/5FBJkVAsyC/EwCXOfl0LmildBAoOs/z1Yri9HtifvlERC4JucGdtSJMjgOXVOUnGKYxFUyW0h4CfBuF1maBig4f9iezNvuxsZ48AhTRABULFgvEjYBv/BsTSDKIAshSQRwRY8Fl2oksiJ2IgiIcHLSakJT1SkSGhNWtgC4RK51JmSHOHpxPHuEmgwt9ezUR5LhUeI3LyDdAJSJKG6A0o9SdAI1JMs40LyhuO1HrawY6vEYKHFGlXUa48AjOTTqRuocyiK8R/aQWC3SYwUGDSMOTnyVBpQPns4jITGaAPvPmHG0VBBSG36QP5yiBJIN3ORyOVszCGNzeiJSjEHMFXKRYOD4THA+HtwTp81PgQG3tK8NisUg6EAmEOFIt3mUvRIc4Hjk68S4dDgS9x4N9IuCBxcHzL5xb9KA9IlCnnVlZW42CXsq+zMpelnR2PX8yZlS1tx3PGWOMlLGdr6/n4glV1VV3c4NBHc7Ff96jB7T2pPuCmZOKBbQCTX/WcelmT2vOAIwbC94XzFtYWECjId0XzFra+gTeDxBc01zgFYFrkXJJoHbT4NnI8bAvrr+yF9APw7gnCDWvB/uOwz4WhOZgwG1xjClQByK6DvFMAAWnwPuBseB1kcL6GFeEVMAMcT8Q9wcixa8Dnd1XyhBqSIj7gbg/EA/BgpBmEPdOvBu48i1eoQllADJDer59EZgjGAit43vgRwibA+fkeYZA8+qouBOd420BIJMTr6Ae41Uxk3RHD28OHmbwF7FfmVsbvSBAAAAAAElFTkSuQmCC"
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    Skin {
+        texture_key: Arc::from("bfa251327ce1fc617dc90879dbfb77dabf151381d5d40f261c7f16e2d147d942"),
+        name: Some(Arc::from("Builder")),
+        section: Some(Arc::from(CHAOS_CUBED_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAnFBMVEUAAAC7h0vDlUzTvEzYqE7w96rq6ZH8/cj0+8NmP0RxTE7Zp0JAJCQzGhp/VFTo4pL09Z7GlC/z1oDCrFrXvWbd3WVAOzDcyoyPZU/e4JDs85CXYhXYv2CoeWX///+FKypkHSGWS0Lz7ngrtXoqpnIol2koYEckeVcmiGDGb2+qVVPCWlNWMiaASiEnExIaCwpeOyxNKR+RXiynczg4pncGAAAAAXRSTlMAQObYZgAAA6JJREFUeNrNlu16oyoQgEGDmNo9bb5Me7ofbaqimBiB+7+3M4NgXE1Omic/dl8KjLbzOnloEOI5OpSDjOCcLZeMczLi6wLDVitm7hAkUMF9Ag6C5A6B+aqgtUwFbyDg9wgMf3vj5rpgv2+B/X4i4DxZwDBNvAJfr9br9Yrz73yRsO+c28s1Y2u2SGC4KmDL1XK5XjG2YIxzGFbrJdxi0ZJzxpZWoBR2j70+ESWLJFkxwhkHGCdslcCtKMIxSSIv2Csn2o8FEWMsikiPu4ETzr3g+DNo2+DncSwgDQFgQFzYNDjjhBfHplXNUfnlw7g9Nn0jjwSAAXHh4zc7f3vEC/ibVh0bXLwfP3ABj41qm5OB4B/D4MAQMnEGD17AA/G5yq+/Ung9rGD6EYiroK/MAGVZCuKQsgCkDBzEUQP6oDUZYwylQhTFQKDUGUFV1bXRFwT5oIK6E9RTQYUVmPOCPC9PpYr9XtRnBcYczCgZoYhGpJR1LVEgawgAAcDNqq4Aewt/MxIECMwgQD5LIcpPaSmzT2iQUwGY/vHxcUZgEBR8Zn3LB3FWW5xAyrMCreHH5Ya7XY6GPn6Y//Ng2/zBtpGA9gL/9CzcnSqB+CmOn7E/x/HT0/Pz03kBDHnWtfd8l/VxtstUGAS2B0GInXgCGgAo0CAIgi6n/FXmoc//leVh2apQYVeuDyugFLIdRmTQMB+agIYxjm2rWugdEBMPpVgA1RZwlQW0d4GjbeLdjoUaQTwt4tUQFOJ8Oxy054AQD/4LdwghyjyfWx4AmAaxcbh8TTylyBHIL4QADbPMIYexYawNrhGMAEZkSByR+7hfwP6kIEb+JQ4Wk1t52b6mL70gSsmtpNttmt4j2CInwe3rEaVphGm94K9lNuo3Qymhw357BeFmttnMgmAGPQxvL6Lb+Sj1LyIyIIOtl/xponj8vsTN5bdzgT7oLwvwkxaFECdBVeE+RC7DxgKsICcOyK8MVHCToMzz3wUH8/8VxNFrHDNMRgygLVL6N3tVA/KS4CV93b6kIAgsXmAMvstlZ0A+Ln8ncV+ICNEGmAgcUl4UbC1TgZ6PDgaXBJHdF7yAngT+TNCfC66htRV49OBIoDD+miBAKGC0Ow60riu3HWyghxhPBYgxbi217l/bXVejbYGeF1AswFUwwu4HsDHMNuFsFoYBGeMe6FHDYwHSFdd/REMssCFkTiBE2ZEjpT1YGAc6yDVEIVyyNQkNGFR04+QL9R9m6Quz/GRY4QAAAABJRU5ErkJggg=="
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    Skin {
+        texture_key: Arc::from("2d89c01ed54a6fa08d534c07200ccddda426183e642d17cef648d90716f4aa92"),
+        name: Some(Arc::from("Rancher")),
+        section: Some(Arc::from(CHAOS_CUBED_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAw1BMVEUAAADs85Dcyoze4JDt+sbz97b3+tDq6ZFAOzBSRDdkTj6PZU/n26Xizpnk16TZt4TQoXDXtILIjl69gli2d1DHmGzMpXnSsIHQrX7BjmXOqXzaxJPi1KHdyZfZtIvs5rPewZXgwJbu6rbizZ/jz6Hs4rDjy57n1abWs4np3azl1qXLm3bPo3zdxJfcwpVqt4b7/uzn1qfSmn/TrIT6/eTgtJAmiGAqpnLWpIG+eVrMknFjuIEol2kkeVf09Z7w96z0+8MoxpQlAAAAAXRSTlMAQObYZgAABHJJREFUeNqllgt7mkoQhlkuahJE5KIiqLGxibm1pz3nKKC4+/9/Vb+BhZDNQ63pJ8ss6LzOzl61WrY9nI6Gtu0k8XQeO46mSEgxdmKnE2OaKmfshp47tpNZFE7CSfIBII30/AgYhn7gee5wET5D0aILcKosjKKR6wHgj17/JcC318sBYy/wfXf0+kzaXg4YIgJqwtP25fn5Zft4McCZIXfhzFl9275st3eri5OIbpxTN65Wj5vN42r1m26EGGs7jkZDxybAlKyDZ4DoPT2LM9Lsseu57sy2J9Et+t+2Z64XYjzY49D18VyH3mW1hev5vhcN49vlerm8HQ4jzwuQzKGL1360qH/IFcdTDZh7fhD40WgaBet1MJmOArxAd05dn8bFXHHg8vlUW23uBsvlcjKd//N9vf7+33Qa4TEYj+YzjAsvnNfddlK68WZABvc4DBB7tIhv11AcL6L1ehmEizj0EUkYNwDFDq7J4J5MtrcP93dJ8nD/8+f9Q5Lc3d/fbSeOMwlnYTRzpAPrslqSPG02X7+sVl++/vhR2c3mKUkcJ55P48RBpwsh0PEwJ7LyGe8Hg3o8XEE6pA4azssb06RMKE+LTFP0EVCUElzXDUPXeQPomWaWFbmm6hoyjDYggwohDB0IvRVBDxF0AN5HkEOIAG3ggrUAZQSpEv611FUpAdWAtkySJQvU/vebm6uB1NW16PVETxTHI/xRh2ePJMjTMEwU6z2gCkASKAITAIjyL3omACDgnWFRlqpCkHYPIIIWwDLBIJlcmJYQlkXJF0hmI4I0gGOlohQqcBAWCJZpMWH2AQABIF3RG+BQA1AI0LcEIxcLAKsE9HHR0Njtijc1gMPxAO3hCvf9/iAMAPp9Cx8m+oYA0ECd05dH/Ha32++pdDaBG30ADHzgbBiA9A1cnNz3iJbcqd4ATOoceSMjcLEq2YyhAEZ553ma/g+laZ5nGUZJA6Dfwg/CHXWkW/BqCAOkMybrR9KhzlgrgqpTyrtO4rhkyhmrCokXpQ4oVb7fAIp4KSEYZ1LllOZ5lmdpWpQtyAo0QRWHg3ZGAtK6hEl/HkBXlxgYfwdg/CyAUxM+qyqVotHlAFycOLJ8CoDCqLB3CdeVSodYBwBuBqvGK8YUKt1JFhDdGW5nxkyzcX5Wzcb5J6rC4qwO7zPZZRxF2ssBXDoyVKnUrWgn4Gz3kKO0ojsvHTkpW87rDHxyrKuTSd3uTSjDWqKsC13TWQKwzr3b1rHlN4Bej3cvKM12/waAPwBp/nsAZ+8AahPSdgSCq4Du84KpSJTiUMe6MCiFM4Pc9dWNR05rLm0H4KoJYaBuPDSVa2eqK+uBBFRnhhKgbjzkVK8NVIcbfcdoJSCjy022VqErosUARXSuC8WxBhxKgNQOKkjaOZEXnRMq7Y+73eEAWLOxd88FOR/UJtTuYJWIc7ORq8e5LJcnA3k20FSJypkxadXjnDwWHOqDQdeK1BT1OCePBVLHJolYHgbNmtguuqKM2lCkaZajkn886v8CMs39Yh2w0KoAAAAASUVORK5CYII="
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    ]
 });

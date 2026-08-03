@@ -143,7 +143,7 @@ onMounted(() => {
 					{{ previewError }}
 				</div>
 
-				<div v-if="previewLoading" class="my-4 text-sm text-secondary">Loading preview…</div>
+				<div v-if="previewLoading" class="my-4 text-sm text-secondary">Loading preview...</div>
 				<div v-else>
 					<div v-if="previewVariables.length" class="mt-2 grid gap-3 md:grid-cols-2">
 						<label
