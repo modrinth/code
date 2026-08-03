@@ -32,6 +32,9 @@ pub enum ProjectDisclosure {
     PaidFeatures {
         features: Vec<String>,
     },
+    Archived {
+        note: Option<String>,
+    },
 }
 
 impl ProjectDisclosure {
