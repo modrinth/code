@@ -288,6 +288,7 @@ import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
 import {
 	ButtonStyled,
+	commonProjectSettingsMessages,
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -306,6 +307,8 @@ const {
 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.links)
 
 const issuesUrl = ref(project.value.issues_url)
 const sourceUrl = ref(project.value.source_url)

@@ -336,6 +336,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	Combobox,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	ConfirmModal,
 	injectModrinthClient,
@@ -365,6 +366,8 @@ const {
 	invalidate,
 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
 const flags = useFeatureFlags()
 

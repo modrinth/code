@@ -84,6 +84,8 @@ const issueMessages = defineMessages({
 	},
 }) satisfies Record<DisclosureFormIssue, MessageDescriptor>
 
+useProjectSettingsHeadTitle(messages.title)
+
 const disclosuresQueryKey = computed(
 	() => ['project', 'disclosures', 'v3', project.value.id] as const,
 )

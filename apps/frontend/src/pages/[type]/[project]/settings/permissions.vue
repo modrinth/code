@@ -20,6 +20,7 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	createAttributionGroupTitle,
 	defineMessage,
@@ -55,6 +56,8 @@ const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const deleteAllGroupsModalRef =
 	useTemplateRef<InstanceType<typeof ConfirmModal>>('deleteAllGroupsModalRef')
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.permissions)
 
 type SortType = 'status' | 'most_files' | 'recently_edited' | 'rejected'
 

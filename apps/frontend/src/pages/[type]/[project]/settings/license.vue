@@ -155,6 +155,7 @@
 <script setup lang="ts">
 import {
 	Checkbox,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	DropdownSelect,
 	injectProjectPageContext,
@@ -172,6 +173,8 @@ import {
 import { computed } from 'vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.license)
 
 function getInitialLicense() {
 	const oldLicenseId = project.value.license.id

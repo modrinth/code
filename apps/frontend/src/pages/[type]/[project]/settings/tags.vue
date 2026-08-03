@@ -254,6 +254,8 @@ const messages = defineMessages({
 
 const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
 
+useProjectSettingsHeadTitle(messages.tagsTitle)
+
 const formatCategoryName = (categoryName: string) => {
 	return formatCategory(formatMessage, categoryName)
 }

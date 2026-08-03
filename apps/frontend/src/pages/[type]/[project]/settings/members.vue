@@ -564,6 +564,7 @@ import {
 	Card,
 	Checkbox,
 	Combobox,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -586,6 +587,8 @@ const {
 	currentMember,
 	invalidate,
 } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.members)
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 

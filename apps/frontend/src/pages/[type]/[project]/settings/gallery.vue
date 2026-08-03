@@ -291,6 +291,7 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	DropArea,
 	FileInput,
@@ -316,15 +317,7 @@ const {
 	deleteGalleryItem: deleteGalleryItemMutation,
 } = injectProjectPageContext()
 
-const title = `${project.value.title} - Gallery`
-const description = `View ${project.value.gallery?.length ?? 0} images of ${project.value.title} on Modrinth.`
-
-useSeoMeta({
-	title,
-	description,
-	ogTitle: title,
-	ogDescription: description,
-})
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.gallery)
 
 const modal_edit_item = ref(null)
 const modal_confirm = ref(null)

@@ -42,6 +42,7 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
 import {
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	injectProjectPageContext,
 	MarkdownEditor,
@@ -55,6 +56,8 @@ import { computed } from 'vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.description)
 
 const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({ description: project.value.body }),

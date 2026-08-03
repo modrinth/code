@@ -3968,6 +3968,9 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.head-title": {
+    "message": "⚙️{section} - {project}"
+  },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Please provide proof that you have permission to redistribute all of the following files. Once completed, withheld versions will be automatically published."
   },
