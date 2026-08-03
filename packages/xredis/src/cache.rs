@@ -143,9 +143,7 @@ impl CacheSettings {
     where
         T: for<'a> Deserialize<'a>,
     {
-        let Some((codec, value)) = value.split_first() else {
-            return None;
-        };
+        let (codec, value) = value.split_first()?;
         let Ok(codec) = Codec::try_from(*codec) else {
             return None;
         };
