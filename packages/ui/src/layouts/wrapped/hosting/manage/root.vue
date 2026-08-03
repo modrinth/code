@@ -351,6 +351,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	PlayIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -432,6 +433,7 @@ const props = withDefaults(
 		showCopyIdAction?: boolean
 		showAdvancedDebugInfo?: boolean
 		showUptime?: boolean
+		showPlayTab?: boolean
 		additionalTabs?: Tab[]
 		stripePublishableKey?: string
 		siteUrl?: string
@@ -456,6 +458,7 @@ const props = withDefaults(
 		showCopyIdAction: false,
 		showAdvancedDebugInfo: false,
 		showUptime: true,
+		showPlayTab: false,
 		additionalTabs: () => [],
 		stripePublishableKey: undefined,
 		siteUrl: undefined,
@@ -834,6 +837,16 @@ watch(serverData, (data) => {
 })
 
 const navLinks = computed<Tab[]>(() => [
+	...(props.showPlayTab
+		? [
+				{
+					label: 'Play',
+					href: `/hosting/manage/${props.serverId}/play`,
+					icon: PlayIcon,
+					subpages: [],
+				},
+			]
+		: []),
 	{
 		label: 'Overview',
 		href: `/hosting/manage/${props.serverId}`,
