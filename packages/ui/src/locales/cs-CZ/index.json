@@ -485,11 +485,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Vytvořit zálohu"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instance"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Podrž Shift a klikni, jestli chceš přeskočit potvrzení."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Doporučujeme vytvoření zálohy před pokračováním dále. V případě nějaké chyby můžeš obnovit {type} pokud se něco rozbije."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "svět"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatečný obsah"
@@ -1385,6 +1391,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instalace CurseForge modpacku"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Nepodařilo se najít CurseForge modpack na tomto URL."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge modpack nebyl nalezen"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Zadejte odkaz"
   },
@@ -1595,6 +1607,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Server se nepodařilo opravit"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Nepodařilo se resetovat server do úvodního nastavení"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Nepodařilo se uložit nastavení instalace"
   },
@@ -1606,6 +1621,9 @@
   },
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Oprava dokončena"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Resetovat server"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Vylítne až na {cpus} CPUs"
@@ -3437,6 +3455,9 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instance"
   },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Již brzy!"
+  },
   "servers.audit-log.event.addon-added": {
     "defaultMessage": "Přidal obsah <content></content>"
   },
@@ -3967,6 +3988,9 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Vyberte si co chcete hrát"
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Nastavte si svůj svět"
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Pozvat přátele"

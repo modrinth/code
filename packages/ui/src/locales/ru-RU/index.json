@@ -527,8 +527,14 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Создать резервную копию"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "сборка"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Удерживайте Shift при нажатии, чтобы пропустить подтверждение."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "мир"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Дополнительный контент"
@@ -1481,6 +1487,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Установить сборку из CurseForge"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Не удалось найти сборку модов на CurseForge по этому URL."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Сборка модов CurseForge не найдена"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Вставьте ссылку"
   },
@@ -1691,6 +1703,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Не удалось исправить сервер"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Не удалось сбросить сервер до первого запуска"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Не удалось сохранить параметры установки"
   },
@@ -1706,11 +1721,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Исправление завершено"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Переустановка сервера"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Это действие удалит все данные на сервере, включая ваши миры, моды и конфигурационные файлы. Резервные копии останутся нетронутыми, вы сможете их восстановить."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Сбросить до первого запуска"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Это вернёт сервер к этапу первоначальной настройки, чтобы вы могли пройти её заново. Вы уверены, что хотите продолжить?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Сброс до первого запуска"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Сервер возвращён к процессу настройки до первого запуска."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Сервер сброшен до первого запуска"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Настройки поддержки"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Рост до {cpus} CPU"
@@ -2056,6 +2089,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Обновить до {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Обновление может повредить вашу сборку. Сперва ознакомьтесь со списком изменений версии и создайте резервную копию."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Обновление может повредить ваш мир. Сперва ознакомьтесь со списком изменений версии и создайте резервную копию."
   },
   "label.actions": {
     "defaultMessage": "Действия"
@@ -3929,6 +3968,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Экземпляр"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Экземпляры сервера — это изолированные среды со своим установленным контентом и файлами мира."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Скоро будет доступно!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "Нет событий, соответствующих фильтрам."
   },
@@ -4852,6 +4897,12 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Выберите во что поиграть"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Настройте ваш мир прямо как в одиночной игре. Выберите режим игры и ключ для генерации мира."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Настройте ваш мир"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Поделитесь сервером со своими друзьями, копируя адрес сервер и дайте им знать какие моды нужны."

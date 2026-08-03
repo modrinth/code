@@ -425,11 +425,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Cipta sandaran"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "pemasangan"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Tahan Shift sambil mengklik untuk melangkau pengesahan."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Kami mengesyorkan agar anda membuat sandaran sebelum meneruskan supaya anda boleh memulihkan {type} anda sekiranya terdapat sebarang kerosakan."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "dunia"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Kandungan tambahan"
@@ -1166,6 +1172,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Pasang pek mod CurseForge"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Tidak dapat menemui pek mod CurseForge pada URL tersebut."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Pek mod CurseForge tidak ditemui"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Masukkan pautan"
   },
@@ -1376,6 +1388,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Gagal membaiki pelayan"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Gagal menetapkan semula pelayan kepada proses penetapan awal"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Gagal menyimpan tetapan pemasangan"
   },
@@ -1391,11 +1406,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Pembaikan selesai"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Tetap semula pelayan"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal dan boleh dipulihkan."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Pilihan ini akan mengembalikan pelayan ke proses penetapan awal supaya penetapan boleh diselesaikan semula. Adakah anda pasti mahu meneruskan?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Pelayan telah dikembalikan ke aliran penetapan awal."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Pilihan sokongan"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
@@ -1720,6 +1753,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Kemas kini ke {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Pengemaskinian boleh merosakkan pemasangan anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Pengemaskinian boleh merosakkan dunia anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
   },
   "label.actions": {
     "defaultMessage": "Tindakan"
@@ -3464,6 +3503,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Pemasangan"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Pemasangan pelayan ialah persekitaran yang terkandung dengan kandungan dan fail dunia yang dipasang sendiri."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Akan datang!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "Tiada aktiviti yang sepadan dengan penapis anda."
   },
@@ -4279,6 +4324,12 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Pilih apa yang hendak dimainkan"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Sediakan dunia anda seperti dunia ekapemain. Pilih mod permainan dan benih dunia."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Konfigurasikan dunia anda"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Kongsikan pelayan anda dengan rakan-rakan anda dengan menyalin alamat dan memberitahu mereka mod yang mereka perlukan untuk sertai."

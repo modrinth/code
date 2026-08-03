@@ -521,11 +521,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Napravi backup"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instanca"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Drži Shift dok klikneš da preskočis potvrdu."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Preporučujemo da napraviš backup pre nego što nastaviš, kako bi mogao da vratiš svoj {type} ukoliko dođe do nekog problema."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "svet"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatni sadržaj"
@@ -1514,6 +1520,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instaliraj modpack od CurseForge"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Nismo mogli da pronađemo CurseForge modpack na toj URL adresi."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Modpack od CurseForge nije pronađen"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Ubaci link"
   },
@@ -1724,6 +1736,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Popravka servera nije uspela"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Resetovanje servera na početno podešavanje nije uspelo"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Čuvanje podešavanja instalacije nije uspelo"
   },
@@ -1739,11 +1754,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Popravka gotova"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Resetuj server"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Briše sve podatke sa tvoga servera, uključujući svetove, modove i konfiguracione fajlove. Backupi ostaju sačuvani i mogu se vratiti."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Vrati na početno podešavanje"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Ovo će vratiti server u fazu uvođenja u rad kako bi se podešavanje moglo ponovo obaviti. Da li si siguran da želiš da nastaviš?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Vrati na početno podešavanje"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Server je vraćen u proces uvođenja u rad."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Server vraćen na početno podešavanje"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Opcije podrške"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Preopterećuje do {cpus} procesora"
@@ -2083,6 +2116,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Ažuiraj na {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Ažuriranje može da pokvari tvoju instancu. Prvo pregledaj spisak promena verzije i napravi rezervnu kopiju."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Ažuriranje može da pokvari tvoj svet. Prvo pregledaj spisak promena verzije i napravi rezervnu kopiju."
   },
   "label.actions": {
     "defaultMessage": "Radnje"
@@ -3938,6 +3977,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instanca"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Instance servera su izolovana okruženja sa sopstvenim instaliranim sadržajem i datotekama sveta."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Uskoro!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "Nijedna aktivnost ne odgovara tvojim filterima."
   },
@@ -4861,6 +4906,12 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Izaberi što igrati"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Podesi svoj svet kao u samostalni igri. Izaberi svoj režim igre i seed sveta."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Podesi svoj svet"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Podeli svoj server sa prijateljima tako što kopirate adresu i ih obavestiš koje modove trebaju da se pridruže."

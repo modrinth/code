@@ -554,11 +554,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Back-up maken"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instantie"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Houd Shift ingedrukt tijdens het klikken om de bevestiging over te slaan."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "We raden je aan om eerst een back-up te maken voordat je verdergaat, zodat je je {type} kunt herstellen als er iets misgaat."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "wereld"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
@@ -1559,6 +1565,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Installeer een CurseForge modpack"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "De modpack van CurseForge kon op die URL niet worden gevonden."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge modpack niet gevonden"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Link invoeren"
   },
@@ -1769,6 +1781,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Herstellen van server is mislukt"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Server resetten naar onboarding is mislukt"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Het opslaan van de installatie-instellingen is mislukt"
   },
@@ -1784,11 +1799,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Herstellen voltooid"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Server resetten"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Hiermee worden alle gegevens op je server verwijderd, inclusief je werelden, mods en configuratiebestanden. Back-ups blijven behouden en kunnen worden hersteld."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Terug naar de onboarding"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Hierdoor wordt de server opnieuw in de onboarding-fase gezet, zodat de installatie opnieuw kan worden voltooid. Weet je zeker dat je door wilt gaan?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Terug naar de onboarding"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "De server is teruggezet naar het onboardingproces."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Server teruggezet naar onboarding"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Ondersteuningsmogelijkheden"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
@@ -2131,6 +2164,12 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Toon compatibele"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Een update kan je instantie onbruikbaar maken. Bekijk eerst de wijzigingen van de versie en maak een back-up."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Een update kan je wereld verstoren. Bekijk eerst de wijzigingen van de versie en maak een back-up."
   },
   "label.actions": {
     "defaultMessage": "Acties"
@@ -4007,6 +4046,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instantie"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Serverinstanties zijn afgeschermde omgevingen met hun eigen geïnstalleerde inhoud en wereldbestanden."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Binnenkort beschikbaar!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "Er zijn geen activiteiten die aan je filters voldoen."
   },
@@ -4930,6 +4975,12 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Kies wat je wilt spelen"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Stel je wereld in, net zoals in alleen spelen. Kies je spelmodus en je startwaarde."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Stel je wereld in"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Deel je server met vrienden door het adres te kopiëren en hen te laten weten welke mods ze nodig hebben om mee te kunnen doen."

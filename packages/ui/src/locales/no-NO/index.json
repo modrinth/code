@@ -371,11 +371,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Opprett sikkerhetskopi"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instans"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Hold inne Skift mens du klikker for å hoppe over bekreftelse."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Vi anbefaler at du lager ei sikkerhetskopiering før du fortsetter, sånn at du kan få tilbake {type}-en din viss noe går galt."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "verden"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Yttligere innhold"

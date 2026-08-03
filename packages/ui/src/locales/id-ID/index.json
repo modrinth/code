@@ -440,11 +440,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Buat cadangan"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instans"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Tahan tombol Shift saat mengeklik untuk melewati pesan konfirmasi."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Kami menyarankan Anda membuat cadangan terlebih dahulu sebelum melanjutkan, sehingga Anda dapat memulihkan {type} Anda bila terjadi masalah."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "dunia"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Konten tambahan"

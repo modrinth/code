@@ -521,11 +521,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Yedek oluştur"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "oturum"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Doğrulamayı atlamak için tıklarken Shift basılı tutun."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Herhangi bir sorun durumunda {type} inizi geri yükleyebilmeniz için, devam etmeden önce mutlaka bir yedekleme oluşturmanızı öneririz."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "dünya"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Fazladan içerik"
@@ -1514,6 +1520,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Install a CurseForge modpack"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Belirtilen URL'de CurseForge mod paketi bulunamadı."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge mod paketi bulunamadı"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Bağlantıyı girin"
   },
@@ -1724,6 +1736,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Sunucu tamir edilemedi"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Sunucu başlangıç ayarlarına sıfırlanamadı"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Kurulum ayarları kaydedilemedi"
   },
@@ -1739,11 +1754,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Tamir tamamlandı"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Sunucuyu sıfırla"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Bu sunucuyu kurulum aşamasına geri gönderecek. Devam etmek istediğinizden emin misiniz?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Sunucu ilk katılım akışına geri döndürüldü."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Destek seçenekleri"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -2083,6 +2116,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}'e güncelle"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Güncellemek kurulumunuzu bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Güncellemek dünyanızı bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
   },
   "label.actions": {
     "defaultMessage": "Eylemler"
@@ -3938,6 +3977,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Örnek"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Sunucu örnekleri, kendi yüklü içeriğine ve dünya dosyalarına sahip, bağımsız ortamlardır."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Yakında!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "Belirtilen filtrelerle eşleşen herhangi bir aktivite bulunamadı."
   },
@@ -4849,6 +4894,12 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Ne oynayacağınızı seçin"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Dünyanızı tıpkı tek oyunculu modda olduğu gibi kurun. Oyun modunuzu ve dünya seed'inizi seçin."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Dünyanızı yapılandırın"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Adresi kopyalayarak ve katılmak için hangi modlara ihtiyaç duyacaklarını bildirerek sunucunuzu arkadaşlarınızla paylaşın."

@@ -521,11 +521,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Crear respaldo"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instancia"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Mantén pulsada la tecla Shift mientras haces clic para omitir la confirmación."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Recomendamos crear un backup antes de proceder, para que puedas restaurar tu {type} si algo male sal."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenido adicional"
@@ -1514,6 +1520,12 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instalar un modpack de CurseForge"
   },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "No se pudo encontrar un modpack de CurseForge con ese URL."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Modpack de CurseForge no encontrado"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Introduce el enlace"
   },
@@ -1724,6 +1736,9 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Error al reparar el servidor"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Error al volver a la configuración inicial"
+  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Error al guardar la configuración de la instalación"
   },
@@ -1739,11 +1754,29 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Reparación completada"
   },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Restablecer servidor"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Elimina todos los datos de tu servidor, incluidos tus mundos, mods y archivos de configuración. Los respaldos se mantendrán y se pueden restaurar."
+  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Restablecer a la configuración inicial"
   },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Esto hará que el servidor vuelva al proceso de configuración inicial para que se pueda completar de nuevo. ¿Estás seguro de que quieres continuar?"
+  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Restablecer a la configuración inicial"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "El servidor volvió a la configuración inicial."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Servidor restablecido a la configuración inicial"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Opciones de soporte"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Aumenta hasta {cpus} CPUs"
@@ -2083,6 +2116,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Actualizar a {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Actualizar puede dañar tu instancia. Revisa los registros de cambios de la versión y haz una copia de seguridad primero."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Actualizar puede dañar tu mundo. Revisa los registros de cambios de la versión y haz una copia de seguridad primero."
   },
   "label.actions": {
     "defaultMessage": "Acciones"
@@ -3938,6 +3977,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instancia"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Las instancias de servidor son entornos cerrados con su propio contenido instalado y archivos de mundo."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "¡Próximamente!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "No se encontró actividad que coincida con tus filtros."
   },
@@ -4861,6 +4906,12 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Elige a qué jugar"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Configura tu mundo igual que en el modo para un solo jugador. Elige el modo de juego y la semilla del mundo."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Configura tu mundo"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Comparte tu servidor con tus amigos copiando la dirección y diciéndoles qué mods necesitarán para unirse."

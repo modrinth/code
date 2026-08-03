@@ -527,11 +527,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Skapa säkerhetskopia"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instans"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Håll Skift medan du klickar för att hoppa över bekräftelsen."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Vi rekommenderar att du skapar en säkerhetskopia innan du fortsätter så att du kan återställa din {type} om något går sönder."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "värld"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Ytterligare innehåll"
@@ -1783,6 +1789,12 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Uppdatera till {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Att uppdatera kan förstöra din instans. Kontrollera versionernas ändringsloggar och säkerhetskopiera först."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Att uppdatera kan förstöra din värld. Kontrollera versionernas ändringsloggar och säkerhetskopiera först."
   },
   "label.actions": {
     "defaultMessage": "Åtgärder"
@@ -3533,6 +3545,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instans"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Serverinstanser är inneslutna miljöer med sitt eget installerat innehåll och världfiler."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Kommer snart!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "Ingen aktivitet matchade dina filter."
   },
@@ -4216,6 +4234,9 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Välj vad du vill spela"
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Konfigurera dina världar"
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Bjud in dina vänner"

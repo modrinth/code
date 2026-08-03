@@ -245,6 +245,9 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Idiin ang Shift habang pumipindot upang laktawan ang kumpirmasyon."
   },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Karagdagang kontento"
   },
