@@ -5,6 +5,7 @@
 		:resolve-viewer="resolveViewer"
 		:show-copy-id-action="flags.developerMode"
 		:show-advanced-debug-info="flags.advancedDebugInfo"
+		:show-play-tab="flags.ServerPlayFrontend"
 		:stripe-publishable-key="config.public.stripePublishableKey as string"
 		:site-url="config.public.siteUrl as string"
 		:products="products"
