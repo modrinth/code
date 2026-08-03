@@ -2,21 +2,19 @@
 	<div class="w-full flex flex-col gap-4" :class="{ 'mt-4': isNuxt }">
 		<PageHeader :title="props.name || props.fallbackName" :header-class="props.headerClass">
 			<template #leading>
-				<div class="flex size-16 shrink-0 items-center justify-center">
-					<ButtonStyled circular size="large">
-						<button
-							v-tooltip="props.backLabel"
-							type="button"
-							:aria-label="props.backLabel"
-							@click="router.push(props.backHref)"
-						>
-							<LeftArrowIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
-				</div>
+				<ButtonStyled circular size="large">
+					<button
+						v-tooltip="props.backLabel"
+						type="button"
+						:aria-label="props.backLabel"
+						@click="router.push(props.backHref)"
+					>
+						<LeftArrowIcon aria-hidden="true" />
+					</button>
+				</ButtonStyled>
 			</template>
 
-			<template #metadata>
+			<template v-if="headerMetadata.length" #metadata>
 				<PageHeaderMetadata>
 					<PageHeaderMetadataItem
 						v-for="item in headerMetadata"
@@ -29,7 +27,7 @@
 				</PageHeaderMetadata>
 			</template>
 
-			<template #actions>
+			<template v-if="props.actions.length" #actions>
 				<PageHeaderActions>
 					<template v-for="action in props.actions" :key="action.id">
 						<JoinedButtons
