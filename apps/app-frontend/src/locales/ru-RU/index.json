@@ -15,7 +15,7 @@
     "message": "Скопировано"
   },
   "app.action-bar.install.copy-details": {
-    "message": "Копировать"
+    "message": "Получить отчёт"
   },
   "app.action-bar.install.dismiss": {
     "message": "Закрыть"
@@ -132,19 +132,19 @@
     "message": "Принять всё"
   },
   "app.ads-consent.body": {
-    "message": "Реклама обеспечивает работу Modrinth и финансирует выплаты авторам. Наши партнёры могут хранить или получать доступ к файлам cookie в приложении для персонализации рекламы и измерения производительности."
+    "message": "Реклама обеспечивает работу Modrinth и выплаты авторам. Для персонализации и анализа рекламы наши партнёры могут использовать куки."
   },
   "app.ads-consent.manage": {
-    "message": "Настроить предпочтения"
+    "message": "Настроить"
   },
   "app.ads-consent.reject": {
     "message": "Отклонить всё"
   },
   "app.ads-consent.title": {
-    "message": "Конфиденциальность и как реклама помогает Modrinth"
+    "message": "Конфиденциальность и реклама на Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Включает продвинутые эффекты вроде размытия, но может снизить производительность на устройствах без аппаратного ускорения."
+    "message": "Использовать эффекты вроде размытия фона. Без аппаратного ускорения возможна потеря производительности."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Расширенные эффекты"
@@ -156,7 +156,7 @@
     "message": "Тема"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Страница, которая открывается при запуске лаунчера."
+    "message": "Выберите страницу для показа при запуске Modrinth App."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Главная"
@@ -168,49 +168,49 @@
     "message": "Стартовая страница"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Скрывать имя над игроком на странице скинов."
+    "message": "Скрывать имя над игроком на странице выбора скина."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Без имени над скином"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Показывать недавние миры в разделе «Jump back in» на главной."
+    "message": "Показывать миры в разделе «Jump back in» на главной."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Миры на главной"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Сворачивать окно лаунчера при запуске Minecraft."
+    "message": "Сворачивать окно Modrinth App при запуске Minecraft."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Сворачивание лаунчера"
+    "message": "Сворачивание приложения"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Использовать системную рамку окна (требуется перезапуск)."
+    "message": "Использовать системное оформление заголовка и кнопок окна. Требуется перезапуск."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Системное оформление"
+    "message": "Системная рамка окна"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Показывать время, проведённое в сборке."
+    "message": "Показывать проведённое время в сборке."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Время игры"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Скрывать малозначимые подтверждения: установку копий сборок, обычное удаление контента, массовые обновления, отвязку и исправление сборок. Критические предупреждения останутся."
+    "message": "Скрывать малозначимые подтверждения: установку копий, обычное удаление контента, массовые обновления, отвязку и исправление. Критические предупреждения останутся."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Только опасные предупреждения"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Показывать кнопку скрытия боковой панели."
+    "message": "Скрывать панель справа при запуске и переключать кнопкой."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Переключатель боковой панели"
+    "message": "Скрытие панели справа"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Предупреждать о рисках перед установкой файлов .mrpack, не размещённых на Modrinth."
+    "message": "Предупреждать о рисках перед установкой файлов .mrpack, не размещённых на Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Предупреждение о сторонних сборках"
@@ -220,6 +220,15 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Нет связи с серверами аутентификации"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Подтверждения"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Главная и контент"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Запуск и навигация"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Добавление серверов в сборку"
@@ -242,11 +251,17 @@
   "app.browse.back-to-instance": {
     "message": "Вернуться к сборке"
   },
+  "app.browse.discover-project-type": {
+    "message": "Поиск проектов"
+  },
   "app.browse.discover-servers": {
     "message": "Поиск серверов"
   },
   "app.browse.hide-added-servers": {
     "message": "Скрывать добавленные"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Скрывать установленные"
   },
   "app.browse.project-type.modpacks": {
     "message": "Сборки"
@@ -356,11 +371,23 @@
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Отправка изменений"
   },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Ознакомьтесь с изменениями содержимого, которые будут доступны всем пользователям этого экземпляра."
+  },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Проверьте изменения"
   },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Обзор обновления"
+  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Проверка..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "Необходимо обновление для игры в {name}. Обновитесь до последней версии и запустите игру."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "Доступно обновление"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Все данные сборки будут удалены навсегда, в том числе миры, настройки и весь установленный контент."
@@ -399,7 +426,7 @@
     "message": "проект"
   },
   "app.instance.mods.locked-content": {
-    "message": "Содержимое заблокированных экземпляров нельзя изменить."
+    "message": "Содержимое заблокированных сборок нельзя изменить."
   },
   "app.instance.mods.project-was-added": {
     "message": "«{name}» добавлен"
@@ -443,6 +470,24 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Неверный аккаунт"
   },
+  "app.instance.share.members.empty": {
+    "message": "Ни один пользователь ещё не присоединился"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "По заданным фильтрам пользователи не найдены."
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "Они больше не будут получать обновления для этого общего экземпляра"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Любая уже установленная копия останется на их устройстве"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Вы можете пригласить их снова позже"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "Это последний пользователь, в этом случае функция общего доступа будет отключена"
+  },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Что произойдёт?"
   },
@@ -455,8 +500,26 @@
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "Аватар {username}"
   },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "Если вы отзовете доступ пользователя {username} к этому общему экземпляру, вам потребуется снова пригласить его, прежде чем он сможет получать обновления."
+  },
   "app.instance.share.sign-in.button": {
     "message": "Войти"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "Сервис сборок недоступен, попробуйте позже"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Не удалось подключиться"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Для предоставления доступа к вашему экземпляру игры необходимо отменить привязку этого модпака"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "Для обмена необходимо отменить связь"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "Этот общий экземпляр уже установлен как <bold>{instanceName}</bold>. Вы уверены, что хотите установить еще одну копию?"
   },
   "app.instance.shared-instance-already-installed.header": {
     "message": "Сборка уже установлена"
@@ -467,6 +530,12 @@
   "app.instance.shared-instance-already-installed.instance": {
     "message": "Сборка"
   },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "привязанный аккаунт"
+  },
+  "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
+    "message": "для управления этим общим экземпляром. Вы не сможете отправлять обновления пользователям."
+  },
   "app.instance.shared-instance-wrong-account.sign-in-as-label": {
     "message": "Войти как"
   },
@@ -475,6 +544,9 @@
   },
   "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
     "message": "для получения обновлений сборки."
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "Вы используете неправильную учетную запись Modrinth"
   },
   "app.instance.worlds.add-server": {
     "message": "Добавить сервер"
@@ -512,6 +584,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Нет серверов и миров"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Перезагрузка..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Удалить сервер"
   },
@@ -524,11 +599,62 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Удаление {name}"
   },
+  "app.java-detection.cancel": {
+    "message": "Отмена"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Действия"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Путь"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Версия"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Установки Java не найдены."
+  },
+  "app.java-detection.select": {
+    "message": "Выбрать"
+  },
+  "app.java-detection.selected": {
+    "message": "Выбрано"
+  },
+  "app.java-detection.title": {
+    "message": "Выбор расположения Java"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Уже установлена"
+  },
+  "app.java-selector.browse": {
+    "message": "Обзор"
+  },
+  "app.java-selector.detect": {
+    "message": "Обнаружить"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Установить рекомендуемую"
+  },
+  "app.java-selector.installing": {
+    "message": "Установка..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/путь/к/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Проверить установку Java"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Дополнительный контекст"
   },
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "При желании прикрепите ссылки и изображения"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Заблокировать"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Экземпляр, о котором вы сообщаете"
   },
   "app.modal.install-to-play.delete-instance": {
     "message": "Удалить сборку"
@@ -548,14 +674,23 @@
   "app.modal.install-to-play.invite-warning": {
     "message": "Это приглашение создано другим пользователем Modrinth. Принимайте приглашения только от тех, кому доверяете."
   },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "Это приглашение создано <creator>{username}</creator>. Принимайте приглашения только от тех, кому доверяете."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
   "app.modal.install-to-play.report-description": {
     "message": "Используйте эту форму, чтобы отправить жалобу на сборки, которые могут нарушать наши <rules-link>Правила</rules-link> или <terms-link>Условия использования</terms-link>."
   },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "Тип изображения не принимается"
+  },
   "app.modal.install-to-play.report-image-too-large": {
     "message": "Размер файла превышает лимит в 1 МиБ"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "По вопросам, касающимся уведомлений DMCA или других юридических претензий, ознакомьтесь с нашей <copyright-link>Политикой в ​​отношении авторских прав</copyright-link>."
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Какое правило нарушает данная сборка?"
@@ -569,8 +704,14 @@
   "app.modal.install-to-play.report-reason.spam": {
     "message": "Спам"
   },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "Сообщить об общем экземпляре"
+  },
   "app.modal.install-to-play.report-submitted": {
     "message": "Жалоба отправлена"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "Для запросов в поддержку обращайтесь в нашу <support-link>службу поддержки</support-link>. Для сообщений об ошибках открывайте запросы в <github-link>GitHub </github-link>."
   },
   "app.modal.install-to-play.reviewed-files": {
     "message": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
@@ -593,6 +734,9 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Нераспознанные файлы"
   },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Пользователь заблокирован"
+  },
   "app.modal.install-to-play.view-contents": {
     "message": "Посмотреть содержимое"
   },
@@ -611,11 +755,44 @@
   "app.modal.update-to-play.shared-instance-removed-label": {
     "message": "Удалён"
   },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "Это обновление для общего экземпляра содержит файлы, которые не опубликованные на Modrinth. Мы настоятельно рекомендуем устанавливать файлы только из источников, которым вы доверяете."
+  },
   "app.modal.update-to-play.update-required": {
     "message": "Требуется обновление"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Обновите {name} до последней версии, чтобы запустить игру."
+  },
+  "app.nav.create-new-instance": {
+    "message": "Создать новую сборку"
+  },
+  "app.nav.home": {
+    "message": "Главная"
+  },
+  "app.nav.library": {
+    "message": "Библиотека"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Аккаунт Modrinth"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Войти в аккаунт Modrinth"
+  },
+  "app.nav.signed-in-as": {
+    "message": "Текущий аккаунт: <user>{username}</user>"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Перейти на Modrinth+"
+  },
+  "app.news.title": {
+    "message": "Новости"
+  },
+  "app.news.view-all": {
+    "message": "Посмотреть все новости"
   },
   "app.project.install-button.already-installed": {
     "message": "Этот проект уже установлен"
@@ -625,6 +802,9 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Вернуться к поиску"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "Вернуться к сборке"
   },
   "app.project.version.all-versions": {
     "message": "Все версии"
@@ -638,23 +818,191 @@
   "app.project.versions.already-installed": {
     "message": "Уже установлено"
   },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Потяните для показа недавних сборок"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Потяните для изменения размера"
+  },
+  "app.restarting": {
+    "message": "Перезапуск..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Переменные среды при запуске игры."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Введите переменные среды..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Переменные среды"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Запускать игру в полноэкранном режиме через options.txt."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Полноэкранный режим"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "Высота окна игры при запуске."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Введите высоту..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Высота"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Аргументы, передаваемые Java при запуске игры."
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Введите аргументы Java..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Аргументы Java"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Максимальный объём памяти, выделяемый игре."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Выделенная память"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Выполняется после выхода из игры."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Введите команду после выхода..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Команда после выхода"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Выполняется перед запуском игры."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Введите команду перед запуском..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Команда перед запуском"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "Ширина окна игры при запуске."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Введите ширину..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Ширина"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Команда, оборачивающая процесс запуска Minecraft."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Введите команду-обёртку..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Команда-обёртка"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Переключить режим разработчика"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
   },
   "app.settings.downloading": {
     "message": "Скачивание версии {version}"
   },
+  "app.settings.java-installations.location.title": {
+    "message": "Расположение Java {version}"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "Реклама обеспечивает работу Modrinth и финансирует выплаты авторам. Наши партнёры могут хранить или получать доступ к файлам cookie в приложении для персонализации рекламы и измерения производительности. Вы можете отказаться или настроить предпочтения ниже."
+    "message": "Реклама обеспечивает работу Modrinth и выплаты авторам. Для персонализации и анализа рекламы наши партнёры могут использовать куки. Отказаться и настроить куки можно ниже."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Показывать Modrinth App в текущей активности Discord. Не влияет на Rich Presence модов. Требуется перезапуск."
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth собирает анонимные данные об использовании для персонализации и улучшения сервиса. Отключите этот параметр, чтобы отказаться от сбора данных."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Телеметрия"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Показывать кнопку «Получить отчёт» во время установки. Для прерванных установок кнопка видна всегда."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Всегда показывать «Получить отчёт»"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "Приложение может замедлиться, пока кеш не восстановится."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Очистить кеш приложения?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Удаляет кешированные данные и повторно скачивает их с Modrinth. Приложение может замедлиться, пока кеш не восстановится."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Очистить кеш"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "Кеш приложения"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Здесь хранятся резервные копии важных данных приложения на случай их утери."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Открыть папку резервных копий"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Резервные копии базы данных"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Выбрать каталог приложения"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Здесь Modrinth App хранит сборки и другие файлы. Изменения вступят в силу после перезапуска."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Выбор нового каталога приложения"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "Каталог приложения"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Количество одновременно скачиваемых файлов. Уменьшите, если скачивание работает нестабильно. Требуется перезапуск."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Лимит одновременных скачиваний"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Количество одновременно записываемых на диск файлов. Уменьшите, если возникают ошибки ввода-вывода. Требуется перезапуск."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Лимит одновременных записей"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Сборки"
   },
   "app.settings.tabs.appearance": {
     "message": "Внешний вид"
   },
+  "app.settings.tabs.behavior": {
+    "message": "Поведение"
+  },
   "app.settings.tabs.default-instance-options": {
-    "message": "Предустановки"
+    "message": "Предустановки игры"
   },
   "app.settings.tabs.java-installations": {
-    "message": "Установки Java"
+    "message": "Расположение Java"
   },
   "app.settings.tabs.language": {
     "message": "Язык"
@@ -664,6 +1012,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Управление ресурсами"
+  },
+  "app.sidebar.playing-as": {
+    "message": "Текущий аккаунт"
   },
   "app.skins.add-button": {
     "message": "Добавить скин"
@@ -824,6 +1175,21 @@
   "app.skins.toggle-ears-features-on": {
     "message": "Включить"
   },
+  "app.survey.body": {
+    "message": "Не хотите ответить на несколько вопросов о вашем опыте с Modrinth App?"
+  },
+  "app.survey.footer": {
+    "message": "Этот отзыв будет доставлен напрямую команде Modrinth и поможет разрабатывать будущие обновления!"
+  },
+  "app.survey.no-thanks": {
+    "message": "Нет, спасибо"
+  },
+  "app.survey.take-survey": {
+    "message": "Пройти опрос"
+  },
+  "app.survey.title": {
+    "message": "Привет, пользователь Modrinth!"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
@@ -872,17 +1238,35 @@
   "app.world.world-item.players-online": {
     "message": "{count} в игре"
   },
+  "content.shared-instance.change-version-body": {
+    "message": "Изменение версии затрагивает только локальную копию. В будущих обновлениях общего экземпляра она может быть восстановлена ​​или изменена снова."
+  },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "Некоторые выбранные проекты являются частью общего экземпляра. Удаление этих проектов затрагивает только вашу локальную копию, и будущие обновления общего экземпляра могут восстановить или изменить их снова."
+  },
   "content.shared-instance.delete-button": {
     "message": "Всё равно удалить"
   },
   "content.shared-instance.delete-many-button": {
     "message": "Всё равно удалить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
   },
+  "content.shared-instance.delete-single-body": {
+    "message": "Удаление затрагивает только локальную копию. В будущих обновлениях общего экземпляра он может быть восстановлен или изменен снова."
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "Некоторые выбранные проекты являются частью общего экземпляра. Отключение этих проектов затрагивает только вашу локальную копию, и будущие обновления общего экземпляра могут снова включить, восстановить или изменить их."
+  },
   "content.shared-instance.disable-button": {
     "message": "Всё равно отключить"
   },
   "content.shared-instance.disable-many-button": {
     "message": "Всё равно отключить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "content.shared-instance.disable-single-body": {
+    "message": "Отключение этой функции затрагивает только локальную копию. В будущих обновлениях общего экземпляра она может быть повторно включена, восстановлена ​​или изменена."
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "Удаление привязки затрагивает только локальную копию. В будущих обновлениях общего экземпляра она может быть восстановлена ​​или изменена снова."
   },
   "content.shared-instance.warning-header": {
     "message": "Это часть сборки"
@@ -921,7 +1305,7 @@
     "message": "Отправлен запрос дружбы"
   },
   "friends.friend.view-profile": {
-    "message": "Открыть профиль"
+    "message": "Посмотреть профиль"
   },
   "friends.heading": {
     "message": "Друзья"
@@ -953,17 +1337,44 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Связанная сборка"
   },
+  "installation-settings.shared-instance.title": {
+    "message": "Отменить публикацию экземпляра"
+  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Отвязать сборку"
   },
+  "installation-settings.shared-instance.unlink-description": {
+    "message": "Отключите этот локальный экземпляр от будущих общих обновлений."
+  },
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Отвязка..."
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Отменить публикацию общего экземпляра"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Удалите этот общий экземпляр из Modrinth и прекратите отправлять обновления всем, кто его использует. Ваш локальный экземпляр останется без изменений."
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "Снятие с публикации..."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "message": "Это повлияет только на ваш локальный экземпляр. Установленный контент останется на этом устройстве, и это никак не отразится на общем экземпляре и других пользователях."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
     "message": "Отвязка сборки"
   },
   "installation-settings.unlink-shared-instance.modal.header": {
     "message": "Отвязка сборки"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "Это удалит общий экземпляр с серверов Modrinth. Пользователи, использующие его в приложении Modrinth, перестанут получать обновления, но ваш локальный экземпляр и его содержимое останутся на этом устройстве."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Отмена публикации общего экземпляра"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Отменить публикацию общего экземпляра"
   },
   "instance.action.create-shortcut": {
     "message": "Создать ярлык"
@@ -1034,6 +1445,9 @@
   "instance.locked.delete-button": {
     "message": "Удалить сборку"
   },
+  "instance.locked.play-tooltip": {
+    "message": "Сборка заблокирована"
+  },
   "instance.playtime.never-played": {
     "message": "Не запускалась"
   },
@@ -1048,6 +1462,45 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Набор ресурсов"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Действия"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Ссылка"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Любой, у кого есть одна из этих ссылок, может присоединиться, пока она активна."
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "Нет действующих приглашений."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Истекает"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Отозвать приглашение"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Отозвать приглашение {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Действующие приглашения"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Использований"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "Ссылка <monospace>{code}</monospace> сразу перестанет работать. Уже присоединившиеся пользователи сохранят доступ."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "Это действие необратимо"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Отозвать приглашение"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Отзыв приглашения"
   },
   "instance.settings.tabs.general": {
     "message": "Основные"
@@ -1149,7 +1602,7 @@
     "message": "Перед запуском"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Выполняется перед запуском сборки."
+    "message": "Выполняется перед запуском игры."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Введите команду перед запуском..."
@@ -1171,6 +1624,9 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Версия {loader}"
+  },
+  "instance.settings.tabs.installation.locked": {
+    "message": "Параметры установки недоступны, пока сборка заблокирована."
   },
   "instance.settings.tabs.java": {
     "message": "Java и память"
@@ -1247,6 +1703,15 @@
   "instance.shared-instance.error.title": {
     "message": "Произошла ошибка"
   },
+  "instance.shared-instance.network-error.text": {
+    "message": "Не удалось подключиться к API сборок"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Ошибка сети"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "Контент сборки доступен другим пользователям."
+  },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Добавлен"
   },
@@ -1255,6 +1720,9 @@
   },
   "instance.shared-instance.publish-review.config-title-v2": {
     "message": "Выберите файлы настройки"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "Ознакомьтесь с изменениями в содержимом и выберите файлы конфигурации, которые следует включить в это обновление."
   },
   "instance.shared-instance.publish-review.header": {
     "message": "Проверьте изменения"
@@ -1265,8 +1733,29 @@
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Удалён"
   },
+  "instance.shared-instance.tooltip": {
+    "message": "Содержимое данного экземпляра управляется другим пользователем."
+  },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Доступ к сборке отозван. Сборка всё ещё доступна, но она не будет связана и не будет обновляться."
+  },
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "Основной экземпляр был удален. Этот экземпляр по-прежнему доступен, но он больше не связан с предыдущим и не будет получать обновления."
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "Этот общий экземпляр был заблокирован командой модерации контента. Он больше не будет получать обновления от основного экземпляра и недоступен для игры."
+  },
   "instance.shared-instance.unavailable.locked-title": {
     "message": "Сборка заблокирована"
+  },
+  "instance.shared-instance.unavailable.manager-fallback": {
+    "message": "менеджер сборки"
+  },
+  "instance.shared-instance.unavailable.text": {
+    "message": "Ваш локальный экземпляр по-прежнему доступен, но он больше не связан с системой и не будет получать обновления."
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "Сборка больше недоступна"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"
@@ -1411,5 +1900,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Загрузчик управляется сервером"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Аккаунт"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Отображение"
   }
 }

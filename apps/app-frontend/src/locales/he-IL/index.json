@@ -20,9 +20,6 @@
   "app.action-bar.stop-instance": {
     "message": ""
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "מאפשר עיבוד מתקדם כגון אפקטים טשטוש העלולים לגרום לבעיות ביצועים ללא עיבוד מואץ לחומרה."
-  },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "חזרה לעולמות"
   },
@@ -160,9 +157,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "מראה"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "אפשרויות ברירת מחדל של התקנה"
   },
   "app.settings.tabs.java-installations": {
     "message": "התקנות ג'אווה"
