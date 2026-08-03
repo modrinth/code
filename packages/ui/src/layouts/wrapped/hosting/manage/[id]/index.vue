@@ -427,10 +427,12 @@ import {
 	TransferIcon,
 	TriangleAlertIcon,
 	UsersIcon,
+	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
+import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
@@ -450,8 +452,8 @@ import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPan
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
-import ServerInstanceSettingsModal from '#ui/components/servers/ServerInstanceSettingsModal.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
+import ServerInstanceSettingsModal from '#ui/components/servers/ServerInstanceSettingsModal.vue'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	hasServerPermission,
@@ -507,6 +509,7 @@ const props = withDefaults(
 		serverId: string
 		reloadPage: () => void
 		resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
+		showCopyIdAction?: boolean
 		showAdvancedDebugInfo?: boolean
 		showUptime?: boolean
 		additionalTabs?: Tab[]
@@ -530,6 +533,7 @@ const props = withDefaults(
 		layoutMode?: 'page' | 'contained'
 	}>(),
 	{
+		showCopyIdAction: false,
 		showAdvancedDebugInfo: false,
 		showUptime: true,
 		additionalTabs: () => [],
@@ -556,6 +560,21 @@ const leaveMessages = defineMessages({
 	leavePageBody: {
 		id: 'servers.manage.confirm-leave.body',
 		defaultMessage: 'A file upload is in progress. Leaving this page will cancel the upload.',
+	},
+})
+
+const settingsHintMessages = defineMessages({
+	title: {
+		id: 'servers.manage.settings-hint.title',
+		defaultMessage: 'Your server settings have moved',
+	},
+	description: {
+		id: 'servers.manage.settings-hint.description',
+		defaultMessage: 'They can now be found here!',
+	},
+	dismiss: {
+		id: 'servers.manage.settings-hint.dismiss',
+		defaultMessage: "Don't show again",
 	},
 })
 
