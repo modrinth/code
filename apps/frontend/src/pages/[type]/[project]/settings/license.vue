@@ -71,7 +71,7 @@
 					</span>
 				</label>
 
-				<div class="w-1/2">
+				<div class="flex w-1/2 items-center gap-2">
 					<StyledInput
 						id="license-url"
 						v-model="current.licenseUrl"
@@ -83,6 +83,7 @@
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
+					<LinkWarningIcon :check="effectiveLicenseCheck" />
 				</div>
 			</div>
 
@@ -144,7 +145,8 @@
 				!(
 					current.license.friendly === 'Custom' &&
 					(current.license.short === '' || current.licenseUrl === '')
-				)
+				) &&
+				effectiveLicenseCheck?.severity !== 'error'
 			"
 			@reset="reset"
 			@save="save"
@@ -153,6 +155,7 @@
 </template>
 
 <script setup lang="ts">
+import { useLicenseUrlCheck } from '@modrinth/moderation'
 import {
 	Checkbox,
 	ConfirmLeaveModal,
@@ -170,6 +173,8 @@ import {
 	TeamMemberPermission,
 } from '@modrinth/utils'
 import { computed } from 'vue'
+
+import LinkWarningIcon from '@/components/LinkWarningIcon.vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
@@ -220,6 +225,12 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 
 		await patchProject(payload)
 	},
+)
+
+const licenseUrl = computed(() => current.value.licenseUrl)
+const effectiveLicenseCheck = useLicenseUrlCheck(
+	licenseUrl,
+	computed(() => current.value.license),
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)

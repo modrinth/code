@@ -187,7 +187,7 @@
 			:original="original"
 			:modified="modified"
 			:saving="saving"
-			:disable-save="hasConfirmedInvalidLinks"
+			:can-save="!hasConfirmedInvalidLinks"
 			@reset="reset"
 			@save="save"
 		/>
