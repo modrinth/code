@@ -2,7 +2,8 @@ use std::time::Instant;
 
 use eyre::{WrapErr, eyre};
 use neverbounce::{
-    ResponseStatus, SingleCheckParams, SingleCheckResponse, VerificationResult,
+    ReqwestErrorReason, ResponseStatus, SingleCheckParams, SingleCheckResponse,
+    VerificationResult,
 };
 use tracing::{debug, error};
 
@@ -27,11 +28,21 @@ pub async fn check_email(email: &str) -> eyre::Result<VerificationResult> {
     {
         Ok(response) => response,
         Err(source) => {
+            let reason = ReqwestErrorReason::from(&source);
+            let is_transient = reason.is_transient();
+
             error!(
                 result = "unknown",
+                request.error_reason = ?reason,
+                request.time_ms = check_time_start.elapsed().as_millis(),
                 error = ?source,
                 "NeverBounce email check failed",
             );
+
+            if is_transient {
+                return Ok(VerificationResult::Unknown);
+            }
+
             return Err(eyre!(source)).wrap_err("failed to check email");
         }
     };
@@ -65,13 +76,19 @@ pub async fn check_email(email: &str) -> eyre::Result<VerificationResult> {
         }
         failure_type => {
             let result = result.unwrap_or(VerificationResult::Unknown);
+            let is_transient = failure_type.is_transient();
             error!(
                 failure_type = response_failure_type(&failure_type),
                 result = result.as_str(),
                 request.time_ms = check_time.as_millis(),
                 "NeverBounce email check failed",
             );
-            Err(email_check_error_generic())
+
+            if is_transient {
+                Ok(VerificationResult::Unknown)
+            } else {
+                Err(email_check_error_generic())
+            }
         }
     }
 }

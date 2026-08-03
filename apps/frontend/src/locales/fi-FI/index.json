@@ -908,15 +908,6 @@
   "moderation.page.reports": {
     "message": "Raportit"
   },
-  "profile.label.badges": {
-    "message": "Arvomerkit"
-  },
-  "profile.label.organizations": {
-    "message": "Organisaatiot"
-  },
-  "profile.user-id": {
-    "message": "Käyttäjätunnus: {id}"
-  },
   "project-moderation-nags.required": {
     "message": "Vaadittu"
   },
@@ -1063,9 +1054,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Ei koskaan käytetty"
-  },
-  "settings.profile.bio.title": {
-    "message": "Kuvaus"
   },
   "settings.sessions.unknown-os": {
     "message": "Tuntematon käyttöjärjestelmä"

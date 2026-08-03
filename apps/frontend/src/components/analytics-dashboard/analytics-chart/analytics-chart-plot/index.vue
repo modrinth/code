@@ -64,6 +64,7 @@
 					:chart-start="chartRangeBounds?.start ?? null"
 					:chart-end="chartRangeBounds?.end ?? null"
 					:formatted-total="hoverFormattedTotal"
+					:total-has-data="hoverHasData"
 					:entries="hoverEntries"
 					:container-width="containerSize.width"
 					:container-height="containerSize.height"
@@ -89,6 +90,7 @@ import type {
 	AnalyticsGroupByPreset,
 } from '~/providers/analytics/analytics'
 
+import { analyticsChartMessages } from '../../analytics-messages.ts'
 import type {
 	AnalyticsChartLegendEntry,
 	AnalyticsChartRangeBounds,
@@ -188,7 +190,26 @@ const hoverTotalValue = computed(() => {
 	}, 0)
 })
 
+function hasDatasetDataAtSlice(dataset: ChartDataset | undefined, sliceIndex: number) {
+	if (!dataset) return false
+	return !dataset.lastDataPointUnavailable || sliceIndex !== dataset.data.length - 1
+}
+
+const hoverHasData = computed(() => {
+	if (hoverState.sliceIndex === null) return false
+	const sliceIndex = hoverState.sliceIndex
+
+	return props.currentLegendEntries.some((legendEntry) => {
+		if (legendEntry.hidden) return false
+		const dataset = props.chartDatasetById.get(legendEntry.id)
+		return hasDatasetDataAtSlice(dataset, sliceIndex)
+	})
+})
+
 const hoverFormattedTotal = computed(() => {
+	if (!hoverHasData.value) {
+		return formatMessage(analyticsChartMessages.noData)
+	}
 	if (props.isRatioMode) {
 		return hoverTotalValue.value > 0 ? '100%' : '0%'
 	}
@@ -203,6 +224,7 @@ const hoverEntries = computed(() => {
 	return props.legendEntries.map((legendEntry) => {
 		const dataset = props.chartDatasetById.get(legendEntry.id)
 		const value = dataset?.data[sliceIndex] ?? 0
+		const hasData = hasDatasetDataAtSlice(dataset, sliceIndex)
 		const ratioValue = legendEntry.hidden || totalValue === 0 ? 0 : (value / totalValue) * 100
 		return {
 			projectId: legendEntry.id,
@@ -210,9 +232,12 @@ const hoverEntries = computed(() => {
 			projectName: legendEntry.projectName,
 			tooltip: legendEntry.tooltip,
 			color: legendEntry.color,
-			formattedValue: props.isRatioMode
-				? `${ratioValue.toFixed(1)}%`
-				: formatMetricValue(value, props.activeStat, formatNumber, formatMessage),
+			formattedValue: hasData
+				? props.isRatioMode
+					? `${ratioValue.toFixed(1)}%`
+					: formatMetricValue(value, props.activeStat, formatNumber, formatMessage)
+				: formatMessage(analyticsChartMessages.noData),
+			noData: !hasData,
 			hidden: legendEntry.hidden,
 			toggleDisabled: !legendEntry.hidden && isLegendEntryToggleDisabled(legendEntry),
 			isPreviousPeriod: legendEntry.isPreviousPeriod,

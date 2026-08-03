@@ -49,7 +49,7 @@
 							</template>
 						</template>
 					</p>
-					<ButtonStyled size="small" type="transparent" circular>
+					<ButtonStyled v-if="dismissible" size="small" type="transparent" circular>
 						<button
 							type="button"
 							class="notification-toast-dismiss"
@@ -96,7 +96,7 @@
 					{{ entityLabel }}
 				</p>
 				<div class="col-start-2 row-start-1 justify-self-end">
-					<ButtonStyled size="small" type="transparent" circular>
+					<ButtonStyled v-if="dismissible" size="small" type="transparent" circular>
 						<button
 							type="button"
 							class="notification-toast-dismiss"
@@ -213,6 +213,7 @@ const props = withDefaults(
 		progressCurrent?: number
 		progressTotal?: number
 		actions?: PopupNotificationButton[]
+		dismissible?: boolean
 	}>(),
 	{
 		actionLoading: null,
@@ -224,6 +225,7 @@ const props = withDefaults(
 		showProgress: true,
 		wrapText: false,
 		progressType: 'percentage',
+		dismissible: true,
 	},
 )
 

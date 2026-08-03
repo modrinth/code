@@ -305,6 +305,7 @@ function refetch() {
 			:focused-detail-id="focusedDetailId"
 			:loading-issues="loadingIssues"
 			:decompiled-sources="decompiledSources"
+			:collapsed="false"
 			@refetch="refetch"
 			@load-issue-sources="handleLoadIssueSources"
 			@mark-complete="handleMarkComplete"

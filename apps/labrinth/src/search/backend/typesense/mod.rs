@@ -191,8 +191,9 @@ pub enum Bucketing {
     BucketSize(u64),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, strum::EnumString)]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum TextMatchType {
     MaxScore,
     #[default]
@@ -232,9 +233,9 @@ pub struct RequestConfig {
     pub prioritize_token_positions: bool,
     #[serde(default = "default_drop_tokens_threshold")]
     pub drop_tokens_threshold: usize,
-    #[serde(default)]
+    #[serde(default = "default_text_match_type")]
     pub text_match_type: TextMatchType,
-    #[serde(default)]
+    #[serde(default = "default_bucketing")]
     pub bucketing: Bucketing,
     #[serde(default = "default_max_candidates")]
     pub max_candidates: usize,
@@ -251,55 +252,51 @@ impl Default for RequestConfig {
                 default_prioritize_num_matching_fields(),
             prioritize_token_positions: default_prioritize_token_positions(),
             drop_tokens_threshold: default_drop_tokens_threshold(),
-            text_match_type: TextMatchType::default(),
-            bucketing: Bucketing::default(),
+            text_match_type: default_text_match_type(),
+            bucketing: default_bucketing(),
             max_candidates: default_max_candidates(),
         }
     }
 }
 
 fn default_query_by() -> Vec<String> {
-    [
-        "name",
-        "indexed_name",
-        "slug",
-        "author",
-        "indexed_author",
-        "summary",
-    ]
-    .into_iter()
-    .map(str::to_string)
-    .collect()
+    ENV.SEARCH_TYPESENSE_DEFAULT_QUERY_BY.0.clone()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    vec![15, 15, 10, 3, 3, 1]
+    ENV.SEARCH_TYPESENSE_DEFAULT_QUERY_BY_WEIGHTS.0.clone()
 }
 
 fn default_prefix() -> Vec<bool> {
-    vec![true, true, true, true, true, true]
+    ENV.SEARCH_TYPESENSE_DEFAULT_PREFIX.0.clone()
 }
 
-const fn default_prioritize_exact_match() -> bool {
-    true
+fn default_prioritize_exact_match() -> bool {
+    ENV.SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_EXACT_MATCH
 }
 
-const fn default_prioritize_num_matching_fields() -> bool {
-    false
+fn default_prioritize_num_matching_fields() -> bool {
+    ENV.SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_NUM_MATCHING_FIELDS
 }
 
-const fn default_prioritize_token_positions() -> bool {
-    true
-    // false
+fn default_prioritize_token_positions() -> bool {
+    ENV.SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_TOKEN_POSITIONS
 }
 
-const fn default_drop_tokens_threshold() -> usize {
-    0
-    // 1
+fn default_drop_tokens_threshold() -> usize {
+    ENV.SEARCH_TYPESENSE_DEFAULT_DROP_TOKENS_THRESHOLD
 }
 
-const fn default_max_candidates() -> usize {
-    8
+fn default_text_match_type() -> TextMatchType {
+    ENV.SEARCH_TYPESENSE_DEFAULT_TEXT_MATCH_TYPE.clone()
+}
+
+fn default_bucketing() -> Bucketing {
+    ENV.SEARCH_TYPESENSE_DEFAULT_BUCKETING.0.clone()
+}
+
+fn default_max_candidates() -> usize {
+    ENV.SEARCH_TYPESENSE_DEFAULT_MAX_CANDIDATES
 }
 
 impl TypesenseConfig {

@@ -182,9 +182,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Giao diện cửa sổ hệ thống"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Chọn một tuỳ chọn"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Hiển thị thời gian bạn đã dành để chơi bằng một cấu hình."
   },
@@ -235,9 +232,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Quay lại phiên bản"
-  },
-  "app.browse.discover-content": {
-    "message": "Khám phá nội dung"
   },
   "app.browse.discover-servers": {
     "message": "Khám phá máy chủ"

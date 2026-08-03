@@ -142,6 +142,7 @@ const props = withDefaults(
 		min?: number
 		max?: number
 		step?: number
+		clamp?: boolean
 		disabled?: boolean
 		readonly?: boolean
 		error?: boolean
@@ -159,6 +160,7 @@ const props = withDefaults(
 		type: 'text',
 		size: 'standard',
 		variant: 'filled',
+		clamp: false,
 		disabled: false,
 		readonly: false,
 		error: false,
@@ -189,12 +191,22 @@ defineExpose({
 
 function onInput(event: Event) {
 	const target = event.target as HTMLInputElement | HTMLTextAreaElement
-	model.value =
-		props.type === 'number' && !props.multiline
-			? target.value === ''
-				? undefined
-				: Number(target.value)
-			: target.value
+	if (props.type !== 'number' || props.multiline) {
+		model.value = target.value
+		return
+	}
+	if (target.value === '') {
+		model.value = undefined
+		return
+	}
+
+	let value = Number(target.value)
+	if (props.clamp) {
+		if (props.min !== undefined) value = Math.max(props.min, value)
+		if (props.max !== undefined) value = Math.min(props.max, value)
+		target.value = String(value)
+	}
+	model.value = value
 }
 
 function clear() {

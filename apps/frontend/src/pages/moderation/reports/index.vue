@@ -177,7 +177,12 @@
 
 		<div class="flex flex-col gap-4">
 			<div v-if="paginatedReports.length === 0" class="universal-card h-24 animate-pulse"></div>
-			<ReportCard v-for="report in paginatedReports" :key="report.id" :report="report" />
+			<ReportCard
+				v-for="report in paginatedReports"
+				:key="report.id"
+				:report="report"
+				:collapsed="true"
+			/>
 		</div>
 
 		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
@@ -235,9 +240,12 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 	let reports: Labrinth.Reports.v3.Report[]
 	let hasMoreReports = true
 	while (hasMoreReports) {
-		reports = (await useBaseFetch(`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}`, {
-			apiVersion: 3,
-		})) as Labrinth.Reports.v3.Report[]
+		reports = (await useBaseFetch(
+			`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}&all=true`,
+			{
+				apiVersion: 3,
+			},
+		)) as Labrinth.Reports.v3.Report[]
 
 		hasMoreReports = reports.length > 0
 		if (!hasMoreReports) {

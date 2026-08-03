@@ -194,16 +194,17 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	}
 
 	const providedFiltersOrEmpty = computed(() => options.providedFilters?.value ?? [])
+	const effectiveCurrentFilters = computed(() =>
+		isServerType.value ? serverCurrentFilters.value : currentFilters.value,
+	)
 
 	watch(
 		[
 			query,
 			maxResults,
 			options.projectType,
-			currentSortType,
-			serverCurrentSortType,
-			currentFilters,
-			serverCurrentFilters,
+			effectiveCurrentSortType,
+			effectiveCurrentFilters,
 			overriddenProvidedFilterTypes,
 			providedFiltersOrEmpty,
 		],

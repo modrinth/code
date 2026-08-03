@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "Không tìm thấy người dùng"
   },
+  "ads-consent.accept": {
+    "message": "Chấp nhận tất cả"
+  },
+  "ads-consent.body": {
+    "message": "Quảng cáo giúp Modrinth hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
+  },
+  "ads-consent.manage": {
+    "message": "Quản lý tuỳ chọn"
+  },
+  "ads-consent.reject": {
+    "message": "Từ chối tất cả"
+  },
+  "ads-consent.title": {
+    "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
+  },
   "analytics.action.add": {
     "message": "Thêm"
   },
@@ -23,6 +38,12 @@
   "analytics.breakdown.country": {
     "message": "Quốc gia"
   },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Dự án phụ thuộc"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Loại dự án phụ thuộc"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Lý do tải"
   },
@@ -37,6 +58,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Thành viên"
   },
   "analytics.breakdown.monetization": {
     "message": "Lợi nhuận"
@@ -140,6 +164,18 @@
   "analytics.chart.table-selection.count": {
     "message": "Đang hiện {count} {itemType, select, project {{count, plural, other {dự án}}} country {{count, plural, other {quốc gia}}} monetization {{count, plural, other {giá trị doanh thu}}} downloadSource {{count, plural, other {nguồn tải}}} downloadReason {{count, plural, other {lý do tải}}} member {{count, plural, other {thành viên}}} projectVersion {{count, plural, other {phiên bản dự án}}} loader {{count, plural, other {mod loader}}} gameVersion {{count, plural, other {phiên bản trò chơi}}} other {{count, plural, other {vật phẩm}}}} từ bảng"
   },
+  "analytics.chart.table-selection.limited": {
+    "message": "Đang hiện {limit} {itemType, select, project {{limit, plural, one {dự án} other {dự án}}} country {{limit, plural, one {quốc gia} other {quốc gia}}} monetization {{limit, plural, one {doanh thu} other {doanh thu}}} downloadSource {{limit, plural, one {nguồn tải} other {nguồn tải}}} downloadReason {{limit, plural, one {lý do tải} other {lý do tải}}} member {{limit, plural, one {thành viên} other {thành viên}}} projectVersion {{limit, plural, one {phiên bản dự án} other {phiên bản dự án}}} loader {{limit, plural, one {trình chạy} other {trình chạy}}} gameVersion {{limit, plural, one {phiên bản game} other {phiên bản game}}} other {{limit, plural, one {mục} other {mục}}}} từ bảng"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Đang hiện top {count} {itemType, select, project {{count, plural, one {dự án} other {dự án}}} country {{count, plural, one {quốc gia} other {quốc gia}}} monetization {{count, plural, one {doanh thu} other {doanh thu}}} downloadSource {{count, plural, one {nguồn tải} other {nguồn tải}}} downloadReason {{count, plural, one {lý do tải} other {lý do tải}}} member {{count, plural, one {thành viên} other {thành viên}}} projectVersion {{count, plural, one {phiên bản dự án} other {phiên bản dự án}}} loader {{count, plural, one {trình chạy} other {trình chạy}}} gameVersion {{count, plural, one {phiên bản game} other {phiên bản game}}} other {{count, plural, one {mục} other {mục}}}} từ bảng"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Phụ thuộc vào {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} phụ thuộc vào {dependencyProject}, {version}"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, other {# ngày}}"
   },
@@ -212,6 +248,9 @@
   "analytics.empty.select-project": {
     "message": "Sử dụng ít nhất một dự án để xem dữ liệu"
   },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Không thể tải dự án phụ thuộc"
+  },
   "analytics.filter.game-version-type": {
     "message": "Loại phiên bản game"
   },
@@ -224,8 +263,14 @@
   "analytics.filter.search.countries": {
     "message": "Tìm quốc gia..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Tìm dự án..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Tìm nguồn tải..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Tìm thành viên..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Tìm phiên bản dự án..."
@@ -472,6 +517,12 @@
   },
   "analytics.value.monetized": {
     "message": "Kiếm tiền"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Không có"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Lượt tải xuống cho những lý do khác ngoài phụ thuộc"
   },
   "analytics.value.none": {
     "message": "Không có"
@@ -2468,9 +2519,6 @@
   "layout.nav.discover": {
     "message": "Khám phá"
   },
-  "layout.nav.discover-content": {
-    "message": "Khám phá nội dung"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Tải ứng dụng Modrinth"
   },
@@ -2792,111 +2840,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
   },
-  "profile.bio.fallback.creator": {
-    "message": "Một nhà sáng tạo trên Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Một người dùng Modrinth."
-  },
-  "profile.button.analytics": {
-    "message": "Xem phân tích người dùng"
-  },
-  "profile.button.billing": {
-    "message": "Quản lý thanh toán người dùng"
-  },
-  "profile.button.edit-role": {
-    "message": "Chỉnh sửa vai trò"
-  },
-  "profile.button.info": {
-    "message": "Xem chi tiết người dùng"
-  },
-  "profile.button.manage-projects": {
-    "message": "Quản lý dự án"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Xóa affiliate"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Đặt làm affiliate"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, other {# dự án}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Nhà cung cấp xác thực"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Email đã được xác minh"
-  },
-  "profile.details.label.has-password": {
-    "message": "Có mật khẩu"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Có TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Phương thức thanh toán"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Email chưa được xác minh"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Email đã được xác minh"
-  },
-  "profile.error.not-found": {
-    "message": "Không tìm thấy người dùng"
-  },
-  "profile.label.affiliate": {
-    "message": "Affiliate"
-  },
-  "profile.label.badges": {
-    "message": "Huy hiệu"
-  },
-  "profile.label.collection": {
-    "message": "Bộ sưu tập"
-  },
-  "profile.label.joined": {
-    "message": "Đã tham gia"
-  },
-  "profile.label.no-collections": {
-    "message": "Người dùng này chưa có bộ sưu tập nào!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Bạn chưa có bộ sưu tập nào.\nBạn có muốn <create-link>tạo một bộ sưu tập</create-link> không?"
-  },
-  "profile.label.no-projects": {
-    "message": "Người dùng này chưa có dự án nào!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Bạn chưa có dự án nào.\nBạn có muốn <create-link>tạo một dự án</create-link> không?"
-  },
-  "profile.label.organizations": {
-    "message": "Tổ chức"
-  },
-  "profile.label.saving": {
-    "message": "Đang lưu..."
-  },
-  "profile.meta.description": {
-    "message": "Tải xuống các dự án của {username} trên Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Tải xuống các dự án của {username} trên Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Tài khoản chính thúc bởi Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Tài khoản chính thức của Modrinth. Nhận hỗ trợ từ <support-link></support-link> hoặc qua email tại <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> người theo dõi dự án}}"
-  },
-  "profile.user-id": {
-    "message": "ID người dùng: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Không thể từ chối lời mời vào nhóm"
   },
@@ -3133,9 +3076,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Bạn có thể thay đổi dự án mà không làm ảnh hưởng đến thứ tự trong hàng của bạn."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Chúng tôi hướng tới việc kiểm duyệt trong vòng 24-48 giờ, nhưng một số dự án có thể bị trì hoãn. Điều này không có nghĩa là có vấn đề trong dự án bạn gửi."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Chúng tôi rất cảm ơn sự kiên nhẫn của bạn trong khi đội ngũ kiểm duyệt chúng tôi đang nỗ lực giữ cho Modrinth an toàn, và mong được hỗ trợ bạn để chia sẻ nội dung của mình!💚</emphasis>"
@@ -3878,23 +3818,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Thêm URI chuyển hướng"
   },
-  "settings.applications.button.cancel": {
-    "message": "Huỷ"
-  },
   "settings.applications.button.create": {
     "message": "Tạo ứng dụng"
   },
   "settings.applications.button.delete": {
     "message": "Xoá"
   },
-  "settings.applications.button.edit": {
-    "message": "Chỉnh sửa"
-  },
   "settings.applications.button.new": {
     "message": "Ứng dụng mới"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Lưu thay đổi"
   },
   "settings.applications.button.upload-icon": {
     "message": "Tải lên biểu tượng"
@@ -3968,14 +3899,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Về ứng dụng này"
   },
-  "settings.authorizations.by": {
-    "message": "bởi"
-  },
   "settings.authorizations.description": {
     "message": "Khi bạn ủy quyền cho một ứng dụng bằng tài khoản Modrinth của mình, bạn đã cấp cho ứng dụng đó quyền truy cập vào tài khoản của bạn. Bạn có thể quản lý và xem lại quyền truy cập vào tài khoản của mình tại đây bất cứ lúc nào."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Hiện tại chúng tôi không thể hiển thị các ứng dụng đã ủy quyền của bạn, chúng tôi đang nỗ lực khắc phục sự cố này. Vui lòng quay lại trang này sau!"
   },
   "settings.authorizations.head-title": {
     "message": "Quyền hạn"
@@ -4333,27 +4258,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Chưa từng sử dụng"
-  },
-  "settings.profile.bio.description": {
-    "message": "Mô tả ngắn để giới thiệu đôi chút về bạn."
-  },
-  "settings.profile.bio.title": {
-    "message": "Tiểu sử"
-  },
-  "settings.profile.description": {
-    "message": "Thông tin hồ sơ của bạn được hiển thị công khai trên Modrinth và thông qua <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Cài đặt hồ sơ"
-  },
-  "settings.profile.profile-info": {
-    "message": "Thông tin hồ sơ"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Ảnh hồ sơ"
-  },
-  "settings.profile.username.description": {
-    "message": "Tên duy nhất (không phân biệt chữ hoa/thường) dùng để nhận diện hồ sơ của bạn."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Thu hồi phiên"

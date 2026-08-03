@@ -4,7 +4,65 @@ use std::time::Duration;
 
 pub const DEFAULT_API_URL: &str = "https://api.neverbounce.com";
 pub const SINGLE_CHECK_PATH: &str = "/v4/single/check";
-pub const TIMEOUT: Duration = Duration::from_secs(10);
+pub const TIMEOUT: Duration = Duration::from_secs(5);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum ReqwestErrorReason {
+    Builder,
+    Redirect,
+    Status(reqwest::StatusCode),
+    Timeout,
+    Request,
+    Connect,
+    Body,
+    Decode,
+    Unknown,
+}
+
+impl ReqwestErrorReason {
+    #[must_use]
+    pub fn is_transient(&self) -> bool {
+        match self {
+            Self::Status(status) => {
+                status.is_server_error()
+                    || matches!(
+                        *status,
+                        reqwest::StatusCode::REQUEST_TIMEOUT
+                            | reqwest::StatusCode::TOO_MANY_REQUESTS
+                    )
+            }
+            Self::Timeout | Self::Request | Self::Connect | Self::Body => true,
+            Self::Builder | Self::Redirect | Self::Decode | Self::Unknown => {
+                false
+            }
+        }
+    }
+}
+
+impl From<&reqwest::Error> for ReqwestErrorReason {
+    fn from(error: &reqwest::Error) -> Self {
+        if error.is_timeout() {
+            Self::Timeout
+        } else if error.is_connect() {
+            Self::Connect
+        } else if error.is_builder() {
+            Self::Builder
+        } else if error.is_redirect() {
+            Self::Redirect
+        } else if error.is_status() {
+            error.status().map_or(Self::Unknown, Self::Status)
+        } else if error.is_request() {
+            Self::Request
+        } else if error.is_body() {
+            Self::Body
+        } else if error.is_decode() {
+            Self::Decode
+        } else {
+            Self::Unknown
+        }
+    }
+}
 
 /// Authentication and email parameters for a single verification.
 ///
@@ -69,6 +127,13 @@ pub enum ResponseStatus {
     ThrottleTriggered,
     BadReferrer,
     Unrecognized(String),
+}
+
+impl ResponseStatus {
+    #[must_use]
+    pub fn is_transient(&self) -> bool {
+        matches!(self, Self::TemporarilyUnavailable | Self::ThrottleTriggered)
+    }
 }
 
 impl<'de> Deserialize<'de> for ResponseStatus {
@@ -201,7 +266,7 @@ struct SingleCheckRequest<'a> {
 /// This endpoint should only be called in response to an action such as a form
 /// submission. Existing lists and databases must use NeverBounce's bulk API.
 /// Both the server verification timeout and the complete HTTP request timeout
-/// are ten seconds.
+/// are five seconds.
 pub async fn single_check(
     client: &Client,
     params: &SingleCheckParams<'_>,

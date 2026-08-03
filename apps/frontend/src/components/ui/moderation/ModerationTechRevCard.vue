@@ -94,6 +94,7 @@ const props = defineProps<{
 	focusedDetailId?: string | null
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
+	collapsed: boolean
 }>()
 
 const { addNotification } = injectNotificationManager()
@@ -173,7 +174,7 @@ type Tab = 'Thread' | 'Files' | 'File'
 const tabs: readonly ('Thread' | 'Files')[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
 
-const isThreadCollapsed = ref(true)
+const isThreadCollapsed = ref(props.collapsed)
 
 const remainingMessageCount = computed(() => {
 	if (!props.item.thread?.messages) return 0

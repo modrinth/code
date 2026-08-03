@@ -261,7 +261,7 @@
     "defaultMessage": "Ladda upp en galleribild"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "Åt minstone en version krävs för att ett projekt ska kunna skickas in för granskning."
+    "defaultMessage": "Åtminstone en version krävs för att ett projekt ska kunna skickas in för granskning."
   },
   "nags.upload-version.title": {
     "defaultMessage": "Ladda upp en version"

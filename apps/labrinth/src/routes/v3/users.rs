@@ -481,7 +481,15 @@ pub async fn user_get(
         let user_id = data.id;
 
         let mut response: crate::models::users::User = if is_admin {
-            crate::models::users::User::from_full(data)
+            let github_id =
+                data.github_id.and_then(|id| u64::try_from(id).ok());
+            let discord_id = data.discord_id.map(|id| id.to_string());
+            let steam_id = data.steam_id.map(|id| id.to_string());
+            let mut user = crate::models::users::User::from_full(data);
+            user.github_id = github_id;
+            user.discord_id = discord_id;
+            user.steam_id = steam_id;
+            user
         } else {
             data.into()
         };

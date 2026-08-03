@@ -6,6 +6,7 @@ use serde_json::json;
 
 pub mod analytics_event;
 pub mod analytics_get;
+pub mod blocked_users;
 pub mod collections;
 pub mod content;
 pub mod friends;
@@ -48,6 +49,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/v3")
             .wrap(default_cors())
+            .configure(analytics_event::config)
             .configure(limits::config)
             .configure(collections::config)
             .configure(images::config)
@@ -66,6 +68,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(version_file::config)
             .configure(versions::config)
             .configure(friends::config)
+            .configure(blocked_users::config)
             .configure(content::config),
     );
 }
@@ -78,6 +81,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		description = include_str!("../../api_v3_description.md"),
 	),
 	paths(
+		analytics_event::analytics_events_get,
 		analytics_get::fetch_analytics,
 		analytics_get::facets::fetch_facets,
 		analytics_get::old::playtimes_get,
@@ -227,6 +231,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		friends::add_friend,
 		friends::remove_friend,
 		friends::friends,
+		blocked_users::block_user,
+		blocked_users::unblock_user,
+		blocked_users::get_blocked_users,
 		content::resolve_content,
 	),
 	modifiers(&V3PathModifier, &SecurityAddon)

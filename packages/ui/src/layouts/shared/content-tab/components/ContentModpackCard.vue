@@ -21,7 +21,7 @@ import OverflowMenu, {
 import TagTagItem from '#ui/components/base/TagTagItem.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useRelativeTime } from '#ui/composables/how-ago'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import type {
@@ -32,6 +32,13 @@ import type {
 } from '../types'
 
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	installationSettingsTooltip: {
+		id: 'content.modpack-card.installation-settings',
+		defaultMessage: 'Installation settings',
+	},
+})
 
 interface Props {
 	project: ContentModpackCardProject
@@ -117,7 +124,7 @@ onUnmounted(() => {
 <template>
 	<div
 		ref="containerRef"
-		class="@container flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md"
+		class="@container flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md border border-solid border-surface-4"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div class="flex flex-wrap items-start justify-between gap-4">
@@ -218,7 +225,10 @@ onUnmounted(() => {
 						</ButtonStyled>
 
 						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
-							<button @click="emit('settings')">
+							<button
+								v-tooltip="formatMessage(messages.installationSettingsTooltip)"
+								@click="emit('settings')"
+							>
 								<Settings2Icon />
 							</button>
 						</ButtonStyled>
@@ -244,7 +254,7 @@ onUnmounted(() => {
 							</template>
 							<template #settings>
 								<Settings2Icon class="size-5" />
-								{{ formatMessage(commonMessages.settingsLabel) }}
+								{{ formatMessage(messages.installationSettingsTooltip) }}
 							</template>
 						</TeleportOverflowMenu>
 					</ButtonStyled>

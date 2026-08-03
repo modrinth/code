@@ -30,6 +30,29 @@ const normalizeAuthToken = (value: unknown) => {
 	return ''
 }
 
+const getErrorStatus = (error: unknown): number | undefined => {
+	if (!error || typeof error !== 'object') {
+		return undefined
+	}
+
+	const typedError = error as { statusCode?: unknown; status?: unknown }
+	const status = typedError.statusCode ?? typedError.status
+
+	return typeof status === 'number' ? status : undefined
+}
+
+// only when labrinth actually gives us an auth error
+const isAuthFailure = (error: unknown): boolean => {
+	const status = getErrorStatus(error)
+	return status === 401 || status === 403
+}
+
+const clearAuthCookie = (auth: AuthState, authCookie: { value: string | null }) => {
+	authCookie.value = null
+	auth.token = ''
+	auth.user = null
+}
+
 const getQueryString = (value: QueryValue) => {
 	if (Array.isArray(value)) {
 		return value[0] ?? null
@@ -90,6 +113,7 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 	}
 
 	const tokenStr = normalizeAuthToken(authCookie.value)
+	let shouldRefresh = false
 
 	if (authCookie.value != null && tokenStr === '') {
 		authCookie.value = null
@@ -111,12 +135,13 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 				},
 				true,
 			)) as Labrinth.Users.v2.User
-		} catch {
-			/* empty */
+		} catch (error) {
+			// only refresh when the token was rejected. not on timeouts or other errors (think this was the cause of random logouts)
+			shouldRefresh = isAuthFailure(error)
 		}
 	}
 
-	if (!auth.user && auth.token) {
+	if (!auth.user && auth.token && shouldRefresh) {
 		try {
 			const session = (await useBaseFetch(
 				'session/refresh',
@@ -132,22 +157,29 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 			auth.token = normalizeAuthToken(session.session)
 			if (auth.token) {
 				authCookie.value = auth.token
-				auth.user = (await useBaseFetch(
-					'user',
-					{
-						apiVersion: 3,
-						headers: {
-							Authorization: auth.token,
+				try {
+					auth.user = (await useBaseFetch(
+						'user',
+						{
+							apiVersion: 3,
+							headers: {
+								Authorization: auth.token,
+							},
 						},
-					},
-					true,
-				)) as Labrinth.Users.v2.User
+						true,
+					)) as Labrinth.Users.v2.User
+				} catch (error) {
+					if (isAuthFailure(error)) {
+						clearAuthCookie(auth, authCookie)
+					}
+				}
 			} else {
-				authCookie.value = null
-				auth.token = ''
+				clearAuthCookie(auth, authCookie)
 			}
-		} catch {
-			authCookie.value = null
+		} catch (error) {
+			if (isAuthFailure(error)) {
+				clearAuthCookie(auth, authCookie)
+			}
 		}
 	}
 

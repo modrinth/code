@@ -17,16 +17,39 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { useFriends } from '@/composables/use-friends'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import { useTheming } from '@/store/state'
 
 const { formatMessage } = useVIntl()
 
 const { handleError } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
+const themeStore = useTheming()
 
 const props = defineProps<{
 	credentials: ModrinthCredentials | null
 	signIn: () => void
 }>()
+
+type FriendsSectionCollapsedFlag =
+	| 'friends_active_collapsed'
+	| 'friends_online_collapsed'
+	| 'friends_offline_collapsed'
+	| 'friends_pending_collapsed'
+
+function isFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag) {
+	return themeStore.getFeatureFlag(flag)
+}
+
+function setFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag, collapsed: boolean) {
+	themeStore.featureFlags[flag] = collapsed
+	getSettings()
+		.then((settings) => {
+			settings.feature_flags[flag] = collapsed
+			return setSettings(settings)
+		})
+		.catch(handleError)
+}
 
 const userCredentials = computed(() => props.credentials)
 const {
@@ -331,33 +354,42 @@ const messages = defineMessages({
 			<FriendsSection
 				v-if="activeFriends.length > 0"
 				:is-searching="!!search"
-				open-by-default
+				:open-by-default="!isFriendsSectionCollapsed('friends_active_collapsed')"
 				:friends="activeFriends"
 				:heading="formatMessage(messages.active)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_active_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_active_collapsed', true)"
 			/>
 			<FriendsSection
 				v-if="onlineFriends.length > 0"
 				:is-searching="!!search"
-				open-by-default
+				:open-by-default="!isFriendsSectionCollapsed('friends_online_collapsed')"
 				:friends="onlineFriends"
 				:heading="formatMessage(messages.online)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_online_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_online_collapsed', true)"
 			/>
 			<FriendsSection
 				v-if="offlineFriends.length > 0"
 				:is-searching="!!search"
-				:open-by-default="activeFriends.length + onlineFriends.length < 3"
+				:open-by-default="!isFriendsSectionCollapsed('friends_offline_collapsed')"
 				:friends="offlineFriends"
 				:heading="formatMessage(messages.offline)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_offline_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_offline_collapsed', true)"
 			/>
 			<FriendsSection
 				v-if="pendingFriends.length > 0"
 				:is-searching="!!search"
+				:open-by-default="!isFriendsSectionCollapsed('friends_pending_collapsed')"
 				:friends="pendingFriends"
 				:heading="formatMessage(messages.pending)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_pending_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_pending_collapsed', true)"
 			/>
 			<p v-if="filteredFriends.length === 0 && search" class="text-sm text-secondary my-1 mx-4">
 				{{ formatMessage(messages.noFriendsMatch, { query: search }) }}

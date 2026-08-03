@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem } from '@modrinth/ui'
 
-import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
 
 type VersionDependency = Labrinth.Versions.v2.Dependency & { version_id?: string }
@@ -20,7 +20,18 @@ export function useSharedInstancePreviewContent() {
 	async function modpackContentItems(preview: SharedInstanceInstallPreview) {
 		if (!preview.modpackVersionId) return []
 		const version = await get_version(preview.modpackVersionId, 'must_revalidate')
-		return await contentItemsFromDependencies(version?.dependencies ?? [])
+		if (!version) return []
+
+		const [project, contentItems] = await Promise.all([
+			get_project(version.project_id, 'must_revalidate'),
+			contentItemsFromDependencies(version.dependencies ?? []),
+		])
+		if (!project) return contentItems
+
+		return contentItems.map((item) => ({
+			...item,
+			source: { project },
+		}))
 	}
 
 	async function contentItemsFromDependencies(dependencies: Labrinth.Versions.v2.Dependency[]) {

@@ -24,6 +24,7 @@ export interface PopupNotificationProgressItem {
 	progressType?: PopupNotificationProgressType
 	progressCurrent?: number
 	progressTotal?: number
+	dismissible?: boolean
 	onDismiss?: () => void | Promise<void>
 	buttons?: PopupNotificationButton[]
 }

@@ -1580,9 +1580,6 @@
   "layout.nav.discover": {
     "message": "גלה"
   },
-  "layout.nav.discover-content": {
-    "message": "גלה תוכן"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "להוריד אפליקציאת Modrinth"
   },
@@ -1777,99 +1774,6 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "בדוק היטב את כתובת הארנק שלך. לא ניתן לשחזר כספים שנשלחו לכתובת שגויה."
-  },
-  "profile.bio.fallback.creator": {
-    "message": "יוצר ב-Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "משתמש ב-Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "נהל את חיוב המשתמש"
-  },
-  "profile.button.edit-role": {
-    "message": "עריכת תפקיד"
-  },
-  "profile.button.info": {
-    "message": "הצג את הפרטים של המשתמש"
-  },
-  "profile.button.manage-projects": {
-    "message": "ניהול פרויקטים"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "הסרה מתוכנית השותפים"
-  },
-  "profile.button.set-affiliate": {
-    "message": "הגדר כשותף"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "ספקי אימות זהות"
-  },
-  "profile.details.label.email": {
-    "message": "אימייל"
-  },
-  "profile.details.label.email-verified": {
-    "message": "כתובת האימייל אומתה"
-  },
-  "profile.details.label.has-password": {
-    "message": "יש סיסמה"
-  },
-  "profile.details.label.has-totp": {
-    "message": "אימות דו-שלבי פעיל"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "שיטת תשלום"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "כתובת האימייל טרם אומתה"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "כתובת האימייל אומתה"
-  },
-  "profile.error.not-found": {
-    "message": "המשתמש לא נמצא"
-  },
-  "profile.label.affiliate": {
-    "message": "שותף או משתמש שותף"
-  },
-  "profile.label.badges": {
-    "message": "תגים"
-  },
-  "profile.label.collection": {
-    "message": "אוסף"
-  },
-  "profile.label.joined": {
-    "message": "הצטרף ב-"
-  },
-  "profile.label.no-collections": {
-    "message": "למשתמש זה אין אוספים!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "אין לך אוספים.\nהאם תרצה <create-link>ליצור אחד</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "למשתמש זה אין פרויקטים!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "אין לך פרויקטים.\nהאם תרצה <create-link>ליצור אחד</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "ארגונים"
-  },
-  "profile.label.saving": {
-    "message": "שומר..."
-  },
-  "profile.meta.description": {
-    "message": "הורד את הפרויקטים של {username} ב-Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - הורד את הפרויקטים של {username} ב-Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
-  },
-  "profile.user-id": {
-    "message": "מזהה משתמש: {id}"
   },
   "project-member-header.error-decline": {
     "message": "הפעולה לדחיית ההזמנה לצוות נכשלה"
@@ -2378,9 +2282,6 @@
   "settings.account.data-export.description": {
     "message": "תבקש עותק של כל הדאטה האישי שהעלית ל-Modrinth. זה יכול לקחת כמה דקות."
   },
-  "settings.applications.button.edit": {
-    "message": "ערוך"
-  },
   "settings.applications.field.name": {
     "message": "שם"
   },
@@ -2401,11 +2302,5 @@
   },
   "settings.pats.modal.create.name.label": {
     "message": "שם"
-  },
-  "settings.profile.bio.title": {
-    "message": "תיאור"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "תמונת פרופיל"
   }
 }

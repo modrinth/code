@@ -463,6 +463,16 @@ export namespace Labrinth {
 	}
 
 	export namespace Analytics {
+		export namespace Internal {
+			export type AnalyticsEventUpsert = {
+				announcement_url: string | null
+				for_metric_kind: v3.AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				starts: string
+			}
+		}
+
 		export namespace v3 {
 			export type AnalyticsEventId = number
 			export type AnalyticsEventMetricKind = 'views' | 'revenue' | 'downloads' | 'playtime'
@@ -473,14 +483,6 @@ export namespace Labrinth {
 				title: string
 				ends: string
 				id: AnalyticsEventId
-				starts: string
-			}
-
-			export type AnalyticsEventUpsert = {
-				announcement_url: string | null
-				for_metric_kind: AnalyticsEventMetricKind[] | null
-				title: string
-				ends: string
 				starts: string
 			}
 
@@ -1663,6 +1665,8 @@ export namespace Labrinth {
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
 				github_id?: number
+				discord_id?: string
+				steam_id?: string
 			}
 
 			export type SearchUser = {
@@ -1686,6 +1690,18 @@ export namespace Labrinth {
 				accepted: boolean
 				created: string
 			}
+		}
+	}
+
+	export namespace BlockedUsers {
+		export namespace Internal {
+			export type BlockStatus = {
+				blocked: boolean
+			}
+		}
+
+		export namespace v3 {
+			export type BlockedUserId = string
 		}
 	}
 

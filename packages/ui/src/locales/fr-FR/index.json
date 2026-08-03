@@ -5057,9 +5057,6 @@
   "settings.pats.title": {
     "defaultMessage": "Jetons d'accès personnel"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Profil public"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessions"
   },

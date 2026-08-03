@@ -30,6 +30,7 @@ import type {
 	ContentCardProject,
 	ContentCardVersion,
 	ContentOwner,
+	ContentSource,
 } from '../types'
 
 const { formatMessage } = useVIntl()
@@ -47,6 +48,7 @@ interface Props {
 	version?: ContentCardVersion
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
+	source?: ContentSource
 	enabled?: boolean
 	installing?: boolean
 	installProgress?: number | null
@@ -70,6 +72,7 @@ const props = withDefaults(defineProps<Props>(), {
 	version: undefined,
 	versionLink: undefined,
 	owner: undefined,
+	source: undefined,
 	enabled: undefined,
 	installing: false,
 	installProgress: undefined,
@@ -208,8 +211,32 @@ const installTooltip = computed(() => {
 					</div>
 
 					<div class="flex min-w-0 items-center gap-1">
+						<template v-if="source">
+							<AutoLink
+								:target="
+									typeof source.link === 'string' && source.link.startsWith('http')
+										? '_blank'
+										: undefined
+								"
+								:to="source.link"
+								class="flex min-w-0 items-center gap-1 !decoration-secondary"
+								:class="{ 'hover:underline': source.link }"
+							>
+								<Avatar
+									:src="source.project.icon_url"
+									:alt="source.project.title"
+									:tint-by="source.project.id"
+									size="1.25rem"
+									no-shadow
+									class="shrink-0 rounded-md"
+								/>
+								<span class="truncate text-sm leading-5 text-secondary">
+									{{ source.project.title }}
+								</span>
+							</AutoLink>
+						</template>
 						<AutoLink
-							v-if="owner"
+							v-else-if="owner"
 							:target="
 								typeof owner.link === 'string' && owner.link.startsWith('http')
 									? '_blank'

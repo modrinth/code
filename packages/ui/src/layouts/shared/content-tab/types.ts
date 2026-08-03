@@ -21,6 +21,11 @@ export interface ContentOwner {
 	link?: string | RouteLocationRaw | (() => void)
 }
 
+export interface ContentSource {
+	project: ContentCardProject
+	link?: string | RouteLocationRaw | (() => void)
+}
+
 export type ClientWarningType = 'retained' | 'depends' | 'environment'
 
 export type ContentSourceKind =
@@ -44,6 +49,7 @@ export interface ContentCardTableItem {
 	version?: ContentCardVersion
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
+	source?: ContentSource
 	enabled?: boolean
 	disabled?: boolean
 	disabledTooltip?: string | null
