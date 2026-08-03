@@ -476,6 +476,7 @@ checks.children(
     }
   })
     // Github sponsor is here
+    //TODO: we can't actually check if sponsors is setup with auth or cuz of cors im not really sure but regardless it doesn't works from browser
     .children(check(/^\/sponsors\/[^/]+/i, "sponsors").for("github")),
 
   gitHost("Codeberg", "codeberg\\.org", async (path) => {
