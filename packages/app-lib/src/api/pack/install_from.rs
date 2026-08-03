@@ -1,5 +1,7 @@
 use crate::State;
 use crate::data::ModLoader;
+use crate::event::LoadingBarType;
+use crate::event::emit::{emit_loading, init_loading};
 use crate::install::{
     InstallErrorContext, InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter,
@@ -18,7 +20,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::Future;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
@@ -153,6 +155,17 @@ pub struct CreatePack {
 
 const MAX_LOCAL_FILE_HASH_LOOKUP_SIZE: u64 = 1024 * 1024 * 1024;
 
+pub(crate) fn get_local_pack_instance(path: &Path) -> CreatePackInstance {
+    CreatePackInstance {
+        name: path
+            .file_stem()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string(),
+        ..Default::default()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct CreatePackDescription {
     pub icon: Option<PathBuf>,
@@ -182,11 +195,23 @@ pub async fn get_instance_from_pack(
             ..Default::default()
         }),
         CreatePackLocation::FromFile { path } => {
-            let file_name = path
-                .file_stem()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_string();
+            let mut instance = get_local_pack_instance(&path);
+            let inspection = init_loading(
+                LoadingBarType::PackImport {
+                    pack_name: instance.name.clone(),
+                },
+                100.0,
+                "Inspecting modpack",
+            )
+            .await
+            .ok();
+            if let Some(inspection) = &inspection {
+                let _ = emit_loading(
+                    inspection,
+                    1.0,
+                    Some("Reading local modpack"),
+                );
+            }
 
             let is_known_file = if tokio::fs::metadata(&path).await?.len()
                 <= MAX_LOCAL_FILE_HASH_LOOKUP_SIZE
@@ -214,6 +239,13 @@ pub async fn get_instance_from_pack(
             } else {
                 false
             };
+            if let Some(inspection) = &inspection {
+                let _ = emit_loading(
+                    inspection,
+                    39.0,
+                    Some("Inspecting modpack files"),
+                );
+            }
 
             let external_files_in_modpack =
                 super::install_mrpack::get_external_files_from_mrpack(
@@ -221,12 +253,9 @@ pub async fn get_instance_from_pack(
                 )
                 .await?;
 
-            Ok(CreatePackInstance {
-                name: file_name,
-                unknown_file: !is_known_file,
-                external_files_in_modpack,
-                ..Default::default()
-            })
+            instance.unknown_file = !is_known_file;
+            instance.external_files_in_modpack = external_files_in_modpack;
+            Ok(instance)
         }
     }
 }
