@@ -18,6 +18,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	advanced_filters_collapsed: true,
 	always_show_copy_details: false,
 	hide_installed_modpacks: false,
+	ServerPlayFrontend: false,
 }
 
 export const THEME_OPTIONS = ['dark', 'light', 'oled', 'retro', 'system'] as const

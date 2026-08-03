@@ -9,6 +9,7 @@
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="themeStore.devMode"
+			:show-play-tab="themeStore.getFeatureFlag('ServerPlayFrontend')"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
