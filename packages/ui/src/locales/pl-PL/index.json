@@ -554,17 +554,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Utwórz kopię zapasową"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "Twoją instancję"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Przytrzymaj Shift podczas klikania, aby pominąć potwierdzenie."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Zalecamy utworzenie kopii zapasowej, by można było przywrócić {type} w wypadku problemów."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "Twój świat"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatkowa zawartość"
@@ -1556,12 +1550,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instaluj paczkę modów CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Nie znaleziono paczki modów CurseForge pod tym adresem."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Nie znaleziono paczki modów CurseForge"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Wprowadź link"
   },
@@ -1772,9 +1760,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Nie udało się naprawić serwera"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Nie udało się zresetować serwera do trybu onboardingu"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Nie udało się zapisać ustawień instalacji"
   },
@@ -1790,29 +1775,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Naprawa ukończona"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Zresetuj serwer"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Usuwa wszystkie dane na twoim serwerze, wliczając w to światy, modyfikacje i pliki konfiguracyjne. Kopie zapasowe zostaną nieruszone i będzie możliwość ich przywrócenia."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Resetuj do trybu onboardingu"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "To przywróci serwer do trybu onboardingu, skąd będzie można ustawić go od nowa. Czy na pewno chesz kontynuować?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Resetuj do trybu onboardingu"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Serwer został przywrócony do trybu onboardingu."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Serwer zresetowany do trybu onboardingu"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opcje pomocy"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"
@@ -2158,12 +2125,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Zaktualizuj do {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Aktualizowanie może uszkodzić twoją instalację. Zrób kopię zapasową i przejrzyj dzienniki zmian."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Aktualizowanie może uszkodzić twój świat. Zrób kopię zapasową i przejrzyj dzienniki zmian."
   },
   "label.actions": {
     "defaultMessage": "Akcje"
@@ -4037,12 +3998,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instancja"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Instancje serwerów to odosobnione środowiska z własną zainstalowaną zawartością i plikami światów."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Już wkrótce!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Nie znaleziono akcji pasujących do tych filtrów."
   },
@@ -4966,12 +4921,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Wybierz w co grać"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Ustaw swój świat tak, jak w trybie jednoosobowym. Wybierz tryb gry i ziarno świata."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Skonfiguruj swój świat"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Udostępnij swój serwer znajomym kopiując adres i uzgadniając z nimi jakie mody muszą zainstalować, by się połączyć."

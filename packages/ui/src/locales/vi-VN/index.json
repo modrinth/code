@@ -467,17 +467,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Tạo bản sao lưu"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "cấu hình"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Giữ nút Shift khi click để bỏ qua xác nhận."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Chúng tôi khuyên bạn nên tạo bản dự phòng trước để khi có gì hỏng thì bạn có thể hoàn tác lại."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "thế giới"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Mod bổ sung"
@@ -1199,12 +1193,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Cài đặt một modpack của CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Không thể tìm modpack của CurseForge từ đường dẫn đó."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Không thể tìm thấy modpack từ CurseForge"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Nhập đường dẫn"
   },
@@ -1415,9 +1403,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Không thể khắc phục máy chủ"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Không thể tải lại máy chủ vào trạng thái khởi đầu"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Không thể lưu cài đặt"
   },
@@ -1433,29 +1418,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Đã khắc phục"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Cài lại máy chủ"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Xóa tất cả dữ liệu trong máy chủ, bao gồm thế giới, mod, và tệp cấu hình. Các bản sao lưu vẫn sẽ được giữ nguyên và có thể dùng khôi phục lại."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Cài lại về sự khởi đầu"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Điều này sẽ đưa máy chủ trở lại từ đầu để quá trình cài đặt sẽ được thực hiên lần nữa. Bạn chắc chắn sẽ tiếp tục chứ?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Cài lại từ đầu"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Máy chủ này đã được đưa về trạng thái khởi đầu."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Đã cài lại máy chủ"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Cài đặt hỗ trợ"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"
@@ -1795,12 +1762,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Cập nhật lên {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Việc cập nhật có thể gây lỗi cho phiên chơi của bạn. Hãy kiểm tra nhật ký thay đổi và sao lưu dữ liệu trước khi thực hiện."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Việc cập nhật có thể gây lỗi cho thế giới của bạn. Hãy kiểm tra nhật ký thay đổi và sao lưu dữ liệu trước khi thực hiện."
   },
   "label.actions": {
     "defaultMessage": "Hành động"
@@ -3620,12 +3581,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Cấu hình"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Các cấu hình của máy chủ là các môi trường độc lập, chứa nội dung cài đặt và các tệp thế giới riêng."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Sắp có!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Không hành động nào thoả bộ lọc."
   },
@@ -4327,12 +4282,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Chọn thứ để chơi"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Thiết lập thế giới của bạn y hệt chơi đơn. Chọn Chế độ và hạt giống thế giới."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Chỉnh sửa thế giới"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Chia sẻ máy chủ của bạn với bạn bè bằng cách sao chép địa chỉ và cho họ biết họ sẽ cần dùng bản mod nào để vào."

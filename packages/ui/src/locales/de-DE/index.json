@@ -554,17 +554,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Sicherung erstellen"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "Instanz"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Halte während du klickst die Umschalttaste gedrückt, um die Bestätigung zu überspringen."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Wir empfehlen, bevor du fortfährst eine Sicherung zu erstellen, damit du deine {type} wiederherstellen kannst, falls etwas schiefgeht."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "Welt"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Zusätzliche Inhalte"
@@ -1568,12 +1562,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Installiere ein CurseForge-Modpack"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Konnte kein CurseForge-Modpack unter dieser URL finden."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge-Modpack nicht gefunden"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Link eingeben"
   },
@@ -1784,9 +1772,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Server konnte nicht repariert werden"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Server konnte nicht in den Onboarding-Zustand zurückgesetzt werden"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Installationseinstellungen konnten nicht gespeichert werden"
   },
@@ -1802,29 +1787,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Reparatur abgeschlossen"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Server zurücksetzen"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Löscht alle Daten auf deinem Server, einschließlich deiner Welten, Mods und Konfigurationsdateien. Die Sicherungen bleiben erhalten und können wiederhergestellt werden."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Auf Onboarding zurücksetzen"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Dadurch wird der Server in den Onboarding-Zustand zurückgesetzt, sodass die Einrichtung erneut abgeschlossen werden kann. Möchtest du wirklich fortfahren?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Auf Onboarding zurücksetzen"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Der Server wurde in den Onboarding-Ablauf zurückgesetzt."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Server auf Onboarding zurückgesetzt"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Supportoptionen"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Spitzenlasten von bis zu {cpus} CPUs"
@@ -2173,12 +2140,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Auf {version} aktualisieren"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Das Aktualisieren kann deine Instanz beschädigen. Schau dir zuerst die Änderungen an und erstelle eine Sicherung."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Das Aktualisieren kann deine Welt beschädigen. Schau dir zuerst die Änderungen an und erstelle eine Sicherung."
   },
   "label.actions": {
     "defaultMessage": "Aktionen"
@@ -4055,12 +4016,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instanz"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Serverinstanzen sind abgeschlossene Umgebungen mit eigenen installierten Inhalten und Weltdateien."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Kommt bald!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Keine Aktivitäten entsprechen deinen Filtern."
   },
@@ -4984,12 +4939,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Wähle, was du spielen möchtest"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Konfiguriere deine Welt genau wie im Einzelspielermodus. Wähle deinen Spielmodus und den Startwert der Welt aus."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Konfiguriere deine Welt"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Teile deinen Server mit Freunden, indem du die Adresse kopierst und ihnen mitteilst, welche Mods sie zum Beitreten benötigen."

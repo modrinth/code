@@ -554,17 +554,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "建立備份"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "實例"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "按住 Shift 鍵並點選以跳過確認。"
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "我們建議您在繼續操作之前建立備份，以便在出現任何問題時可以還原您的{type}。"
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "世界"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
@@ -1568,12 +1562,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "安裝 CurseForge 整合包"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "在該網址找不到 CurseForge 整合包"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "找不到 CurseForge 整合包"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "輸入連結"
   },
@@ -1784,9 +1772,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "無法修復伺服器"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "無法將伺服器重設為初始設定狀態"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "無法儲存安裝設定"
   },
@@ -1802,29 +1787,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "修復完成"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "重設伺服器"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "重設為初始設定"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "此操作將使伺服器回到初始設定流程，以便重新完成設定。您確定要繼續嗎？"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "重設為初始設定"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "伺服器已回到初始設定流程。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "伺服器已重設為初始設定狀態"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "支援選項"
   },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
@@ -2173,12 +2140,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "更新到 {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "更新可能會導致實例損壞。請先查看版本更新日誌並備份。"
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "更新可能會導致世界損壞。請先查看版本更新日誌並備份。"
   },
   "label.actions": {
     "defaultMessage": "動作"
@@ -4055,12 +4016,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "實例"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "伺服器實例是包含各自安裝內容和世界檔案的獨立環境。"
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "即將推出！"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "沒有符合篩選條件的活動紀錄。"
   },
@@ -4984,12 +4939,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "選擇你想玩的內容"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "你可以像在單人遊戲中一樣設定世界。選擇遊戲模式與世界種子碼。"
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "設定你的世界"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "複製位址並告訴好友加入時需要哪些模組，即可將你的伺服器分享給他們。"

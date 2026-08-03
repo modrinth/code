@@ -473,17 +473,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "játékpéldány"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Javasoljuk, hogy a továbbhaladás előtt készíts biztonsági mentést, hogy ha valami nem működne, visszaállíthasd a {type}odat."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "világ"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "További tartalom"
@@ -1229,12 +1223,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "CurseForge modcsomag telepítése"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "A CurseForge modcsomag nem található az adott URL-címen."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Nem található a CurseForge modpack"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Link beírása"
   },
@@ -1453,12 +1441,6 @@
   },
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Javítás befejezve"
-  },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Szerver javítása"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "A szerverről minden adatot eltávolít, beleértve a világokat, a modokat és a konfigurációs fájlokat is. A biztonsági mentések megmaradnak, és visszaállíthatók."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
@@ -1786,12 +1768,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Frissítés a(z) {version} verzióra"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "A frissítés meghibásodást okozhat a játékpéldányban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "A frissítés meghibásodást okozhat a világban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
   },
   "label.actions": {
     "defaultMessage": "Műveletek"
@@ -3500,9 +3476,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Játékpéldány"
   },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Hamarosan érkezik!"
-  },
   "servers.audit-log.event.addon-updated": {
     "defaultMessage": "Frissített tartalom <content></content>"
   },
@@ -4081,12 +4054,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Válaszd ki, mit szeretnél játszani"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Állítsd be a világodat, akárcsak az egyjátékos módban. Válaszd ki a játékmódot és a világ kezdőértékét."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Állítsd be a világodat"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Oszd meg a szerveredet a barátaiddal úgy, hogy kimásolod a címet, és megmondod nekik, melyik modokra lesz szükségük a csatlakozáshoz."

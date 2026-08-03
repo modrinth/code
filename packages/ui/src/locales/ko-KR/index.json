@@ -521,17 +521,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "백업 생성"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "인스턴스"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Shift 키를 누른 상태로 클릭해서 확인을 건너뛸 수 있습니다."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "문제가 발생할 경우 {type}을(를) 복원할 수 있도록 진행하기 전에 백업을 생성하는 것이 좋습니다."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "세계"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "추가 콘텐츠"
@@ -1520,12 +1514,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "CurseForge 모드팩 설치"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "해당 URL에서 CurseForge 모드팩을 찾을 수 없습니다."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge 모드팩을 찾을 수 없음"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "링크 입력"
   },
@@ -1736,9 +1724,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "서버 복구 실패"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "서버 온보딩 상태로 재설정 실패"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "설치 설정 저장 실패"
   },
@@ -1754,29 +1739,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "복구 완료"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "서버 초기화"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "서버에 저장된 세계, 모드, 설정 파일 등의 모든 데이터가 삭제됩니다. 백업 파일은 그대로 유지되며, 필요 시 복원할 수 있습니다."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "온보딩 상태로 재설정"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "서버가 다시 온보딩 단계로 돌아가 설정을 다시 완료할 수 있습니다. 계속하시겠습니까?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "온보딩 상태로 재설정"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "서버가 온보딩 상태로 되돌아갔습니다."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "온보딩 상태로 서버 재설정"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "지원 옵션"
   },
   "hosting.specs.burst": {
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
@@ -2116,12 +2083,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}으로 업데이트"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "업데이트로 인해 인스턴스에 문제가 발생할 수 있습니다. 버전 변경 내역을 확인하고 먼저 백업을 진행하세요."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "업데이트로 인해 세계가 손상될 수 있습니다. 버전 변경 내역을 확인하고 먼저 백업을 진행하세요."
   },
   "label.actions": {
     "defaultMessage": "작업"
@@ -3992,12 +3953,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "인스턴스"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "서버 인스턴스는 자체적으로 설치된 콘텐츠와 세계 파일을 갖춘 독립된 환경입니다."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "공개 예정!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "조건에 일치하는 활동이 없습니다."
   },
@@ -4918,12 +4873,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "플레이할 콘텐츠 선택"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "싱글플레이와 똑같이 세계를 설정합니다. 게임 모드와 세계 생성 시드를 선택합니다."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "세계 구성하기"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "서버 주소를 복사해서 친구들과 공유하고, 접속에 필요한 모드를 알려주세요."

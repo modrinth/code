@@ -365,12 +365,6 @@
   "content.filter.warnings": {
     "defaultMessage": "Advarsler"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "instans"
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "verden"
-  },
   "content.page-layout.please-wait": {
     "defaultMessage": "Vent venligst"
   },
@@ -1924,9 +1918,6 @@
   },
   "servers.audit-log.column.world": {
     "defaultMessage": "Instans"
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Kommer snart!"
   },
   "servers.audit-log.scope.server": {
     "defaultMessage": "Server"
