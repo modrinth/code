@@ -7,15 +7,18 @@ use xredis::RedisPool;
 
 use crate::auth::checks::is_visible_project;
 use crate::auth::get_user_from_headers;
-use crate::database::models as db_models;
+use crate::database::{DBProject, models as db_models};
 use crate::database::{PgPool, ReadOnlyPgPool};
-use crate::models::disclosures::{ProjectDisclosure, ProjectDisclosureData};
+use crate::models::disclosures::{
+    ProjectDisclosure, ProjectDisclosureData, ProjectDisclosureType,
+};
 use crate::models::pats::Scopes;
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchState;
 use crate::util::error::Context;
+use std::str::FromStr;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get_project_disclosures)
@@ -158,7 +161,10 @@ pub async fn modify_project_disclosures(
         let modified_types = body
             .set
             .iter()
-            .map(|disclosure| <&'static str>::from(disclosure).to_owned())
+            .map(|disclosure| {
+                <&'static str>::from(ProjectDisclosureType::from(disclosure))
+                    .to_owned()
+            })
             .chain(body.remove.iter().cloned())
             .collect::<Vec<_>>();
 
@@ -192,6 +198,12 @@ pub async fn modify_project_disclosures(
     }
 
     for disclosure_type in &body.remove {
+        let disclosure_type = ProjectDisclosureType::from_str(disclosure_type)
+            .map_err(|_| {
+                ApiError::Request(eyre!(
+                    "unknown disclosure type `{disclosure_type}`"
+                ))
+            })?;
         db_models::DBProjectDisclosure::remove(
             project.inner.id,
             disclosure_type,
@@ -205,6 +217,9 @@ pub async fn modify_project_disclosures(
         .commit()
         .await
         .wrap_internal_err("failed to commit project disclosure changes")?;
+
+    DBProject::clear_cache(project.inner.id, project.inner.slug, None, &redis)
+        .await?;
 
     search_state
         .queue

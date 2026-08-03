@@ -2,12 +2,16 @@ use crate::database::models::DBProjectDisclosure;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use strum::IntoStaticStr;
+use strum::{EnumDiscriminants, EnumString, IntoStaticStr};
 use utoipa::ToSchema;
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, IntoStaticStr)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, EnumDiscriminants)]
 #[serde(rename_all = "snake_case", tag = "type")]
-#[strum(serialize_all = "snake_case")]
+#[strum_discriminants(
+    name(ProjectDisclosureType),
+    derive(IntoStaticStr, EnumString),
+    strum(serialize_all = "snake_case")
+)]
 pub enum ProjectDisclosure {
     AiContent {
         note: Option<String>,
@@ -48,7 +52,10 @@ impl ProjectDisclosure {
             ));
         };
         object.remove("type");
-        Ok((self.into(), serde_json::Value::Object(object)))
+        Ok((
+            ProjectDisclosureType::from(self).into(),
+            serde_json::Value::Object(object),
+        ))
     }
 
     pub fn from_parts(

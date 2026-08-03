@@ -1,7 +1,9 @@
+use crate::database::models as db_models;
 use crate::database::models::categories::LinkPlatform;
 use crate::database::models::{project_item, version_item};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
+use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, Version,
 };
@@ -199,7 +201,7 @@ pub async fn random_projects_get(
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &pool, &redis).await?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -240,7 +242,7 @@ pub async fn projects_get(
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &pool, &redis).await?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -295,7 +297,18 @@ pub async fn project_get(
         }
         None => None,
     };
-    let project = LegacyProject::from(project, version_item);
+    let has_archived_disclosure =
+        db_models::DBProjectDisclosure::projects_with_type(
+            ProjectDisclosureType::Archived,
+            &[project.id.into()],
+            &**pool,
+        )
+        .await?
+        .contains(&project.id.into());
+    let mut project = LegacyProject::from(project, version_item);
+    if has_archived_disclosure && project.status == ProjectStatus::Approved {
+        project.status = ProjectStatus::Archived;
+    }
     Ok(HttpResponse::Ok().json(project))
 }
 
@@ -381,7 +394,7 @@ pub async fn dependency_list(
         Ok(dependency_info) => {
             let converted_projects = LegacyProject::from_many(
                 dependency_info.projects,
-                &**pool,
+                &pool,
                 &redis,
             )
             .await?;

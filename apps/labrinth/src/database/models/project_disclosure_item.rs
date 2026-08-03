@@ -1,9 +1,11 @@
+use std::collections::HashSet;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     database::models::{DBProjectId, DBUserId, DatabaseError},
-    models::v3::disclosures::ProjectDisclosure,
+    models::v3::disclosures::{ProjectDisclosure, ProjectDisclosureType},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -86,6 +88,28 @@ impl DBProjectDisclosure {
             .collect()
     }
 
+    /// Returns the subset of `project_ids` that carry a disclosure of the given type.
+    pub async fn projects_with_type(
+        disclosure_type: ProjectDisclosureType,
+        project_ids: &[DBProjectId],
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<HashSet<DBProjectId>, DatabaseError> {
+        let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
+        let rows = sqlx::query_scalar!(
+            r#"
+			SELECT project_id
+			FROM project_disclosures
+			WHERE type = $1 AND project_id = ANY($2)
+			"#,
+            <&'static str>::from(disclosure_type),
+            &ids,
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(rows.into_iter().map(DBProjectId).collect())
+    }
+
     pub async fn any_set_by_moderator(
         project_id: DBProjectId,
         types: &[String],
@@ -108,7 +132,7 @@ impl DBProjectDisclosure {
 
     pub async fn remove(
         project_id: DBProjectId,
-        disclosure_type: &str,
+        disclosure_type: ProjectDisclosureType,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<bool, DatabaseError> {
         let result = sqlx::query!(
@@ -117,7 +141,7 @@ impl DBProjectDisclosure {
 			WHERE project_id = $1 AND type = $2
 			"#,
             project_id as DBProjectId,
-            disclosure_type,
+            <&'static str>::from(disclosure_type),
         )
         .execute(exec)
         .await?;
