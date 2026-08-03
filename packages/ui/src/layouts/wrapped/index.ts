@@ -7,4 +7,5 @@ export { default as ServersManageContentPage } from './hosting/manage/content.vu
 export { default as ServersManageFilesPage } from './hosting/manage/files.vue'
 export { default as ServersManagePageIndex } from './hosting/manage/index.vue'
 export { default as ServersManageOverviewPage } from './hosting/manage/overview.vue'
+export { default as ServersManagePlayPage } from './hosting/manage/[id]/play/play.vue'
 export { default as ServersManageRootLayout } from './hosting/manage/root.vue'

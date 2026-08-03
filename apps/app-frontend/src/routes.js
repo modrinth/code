@@ -28,6 +28,11 @@ export default new createRouter({
 			component: Hosting.Index,
 			children: [
 				{
+					path: 'play',
+					name: 'ServerManagePlay',
+					component: Hosting.Play,
+				},
+				{
 					path: '',
 					name: 'ServerManageOverview',
 					component: Hosting.Overview,
