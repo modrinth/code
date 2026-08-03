@@ -15,7 +15,14 @@
 </template>
 
 <script setup lang="ts">
-import { FolderIcon, GlobeIcon, HashIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
+import {
+	FolderIcon,
+	GlobeIcon,
+	HashIcon,
+	ReportIcon,
+	SettingsIcon,
+	ShieldCheckIcon,
+} from '@modrinth/assets'
 import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 definePageMeta({
@@ -51,6 +58,10 @@ const messages = defineMessages({
 		id: 'moderation.page.global-detail-traces',
 		defaultMessage: 'Global traces',
 	},
+	delphiRulesTitle: {
+		id: 'moderation.page.delphi-rules',
+		defaultMessage: 'Delphi rules',
+	},
 })
 
 const moderationLinks = [
@@ -71,6 +82,11 @@ const moderationLinks = [
 		href: '/moderation/global-traces',
 		icon: HashIcon,
 	},
+	{
+		label: formatMessage(messages.delphiRulesTitle),
+		href: '/moderation/technical-review/rules',
+		icon: SettingsIcon,
+	},
 ]
 
 const mobileNavOptions = [
@@ -79,12 +95,15 @@ const mobileNavOptions = [
 	formatMessage(messages.reportsTitle),
 	formatMessage(messages.externalFilesTitle),
 	formatMessage(messages.globalDetailTracesTitle),
+	formatMessage(messages.delphiRulesTitle),
 ]
 
 const selectedChip = computed({
 	get() {
 		const path = route.path
-		if (path.startsWith('/moderation/technical-review')) {
+		if (path.startsWith('/moderation/technical-review/rules')) {
+			return formatMessage(messages.delphiRulesTitle)
+		} else if (path.startsWith('/moderation/technical-review')) {
 			return formatMessage(messages.technicalReviewTitle)
 		} else if (path.startsWith('/moderation/reports')) {
 			return formatMessage(messages.reportsTitle)
@@ -110,6 +129,8 @@ function navigateToPage(selectedOption: string) {
 		router.push('/moderation/external-projects')
 	} else if (selectedOption === formatMessage(messages.globalDetailTracesTitle)) {
 		router.push('/moderation/global-traces')
+	} else if (selectedOption === formatMessage(messages.delphiRulesTitle)) {
+		router.push('/moderation/technical-review/rules')
 	} else {
 		router.push('/moderation')
 	}

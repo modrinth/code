@@ -1231,9 +1231,9 @@ pub async fn version_delete(
     )
     .await?;
 
-    delphi::tech_review_sync::sync_project_tech_review_state(
+    delphi::tech_review_queue::remove_projects_without_details(
         &[version.inner.project_id],
-        delphi::tech_review_sync::TechReviewExitReason::FileDeleted,
+        delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
         &mut transaction,
     )
     .await?;

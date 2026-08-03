@@ -6,6 +6,114 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		return 'labrinth_tech_review_internal'
 	}
 
+	public async getRules(): Promise<Labrinth.TechReview.Internal.DelphiRule[]> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRule[]>(
+			'/moderation/tech-review/rules',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	public async getRuleSchema(): Promise<Labrinth.TechReview.Internal.DelphiRuleSchemaResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRuleSchemaResponse>(
+			'/moderation/tech-review/rules/schema',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	public async getDetailRuleInput(
+		detailId: string,
+	): Promise<Labrinth.TechReview.Internal.RuleInput> {
+		return this.client.request<Labrinth.TechReview.Internal.RuleInput>(
+			`/moderation/tech-review/rules/details/${detailId}/input`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	public async getRuleAffectedDetails(
+		id: number,
+	): Promise<Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]>(
+			`/moderation/tech-review/rules/${id}/effects`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	public async testRule(
+		request: Labrinth.TechReview.Internal.TestDelphiRuleRequest,
+	): Promise<Labrinth.TechReview.Internal.TestDelphiRuleResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.TestDelphiRuleResponse>(
+			'/moderation/tech-review/rules/test',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	public async createRule(
+		rule: Labrinth.TechReview.Internal.WriteDelphiRule,
+	): Promise<Labrinth.TechReview.Internal.DelphiRule> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRule>(
+			'/moderation/tech-review/rules',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: rule,
+			},
+		)
+	}
+
+	public async updateRule(
+		id: number,
+		rule: Labrinth.TechReview.Internal.WriteDelphiRule,
+	): Promise<Labrinth.TechReview.Internal.DelphiRule> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRule>(
+			`/moderation/tech-review/rules/${id}`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'PUT',
+				body: rule,
+			},
+		)
+	}
+
+	public async deleteRule(id: number): Promise<void> {
+		return this.client.request<void>(`/moderation/tech-review/rules/${id}`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
+		})
+	}
+
+	public async scanRules(signal?: AbortSignal): Promise<ReadableStream<Uint8Array>> {
+		return this.client.stream('/moderation/tech-review/rules/scan', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			signal,
+		})
+	}
+
 	/**
 	 * Search for projects awaiting technical review.
 	 *

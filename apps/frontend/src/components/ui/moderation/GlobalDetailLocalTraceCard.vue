@@ -5,14 +5,8 @@
 				<p class="m-0 break-words font-semibold text-contrast">
 					{{ trace.project_name }}
 				</p>
-				<p class="m-0 mt-1 flex flex-wrap items-center gap-1 text-sm text-secondary">
-					<span class="break-all">{{ trace.version_number }}</span>
-					<ChevronRightIcon class="size-4 shrink-0" aria-hidden="true" />
-					<span class="break-all">{{ decodeTracePath(trace.file_name) }}</span>
-					<template v-if="trace.jar">
-						<ChevronRightIcon class="size-4 shrink-0" aria-hidden="true" />
-						<span class="break-all">{{ decodeTracePath(trace.jar) }}</span>
-					</template>
+				<p class="m-0 mt-1 text-sm text-secondary">
+					<IssueDetailPath :segments="[trace.version_number, trace.file_name, trace.jar]" />
 				</p>
 			</div>
 			<div class="flex flex-wrap items-center gap-2">
@@ -33,8 +27,10 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon, ExternalIcon } from '@modrinth/assets'
+import { ExternalIcon } from '@modrinth/assets'
 import { Badge, ButtonStyled } from '@modrinth/ui'
+
+import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 const props = defineProps<{
 	trace: Labrinth.TechReview.Internal.GlobalIssueDetailTrace
@@ -46,12 +42,4 @@ const localTraceLink = computed(
 			props.trace.detail_id,
 		)}`,
 )
-
-function decodeTracePath(path: string): string {
-	try {
-		return decodeURIComponent(path)
-	} catch {
-		return path
-	}
-}
 </script>
