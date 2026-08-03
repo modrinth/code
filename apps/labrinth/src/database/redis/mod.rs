@@ -282,7 +282,7 @@ mod tests {
                 field_name: "game_versions".to_string(),
                 value: VersionFieldValue::Enum(
                     LoaderFieldEnumId(2),
-                    enum_value.clone(),
+                    enum_value,
                 ),
             }],
             loaders: vec!["fabric".to_string()],
