@@ -1,5 +1,6 @@
 use actix_web::{HttpRequest, get, patch, web};
 use chrono::Utc;
+use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use xredis::RedisPool;
@@ -13,6 +14,7 @@ use crate::models::pats::Scopes;
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::search::SearchState;
 use crate::util::error::Context;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -28,7 +30,7 @@ pub struct GetProjectDisclosures {
 #[utoipa::path(
 	context_path = "/project",
 	tag = "project_disclosures",
-	responses((status = OK, body = GetProjectDisclosures))
+	responses((status = OK, body = GetProjectDisclosures), (status = BAD_REQUEST, description = "Invalid request input"))
 )]
 #[get("/{project_id}/disclosures")]
 pub async fn get_project_disclosures(
@@ -102,11 +104,18 @@ pub async fn modify_project_disclosures(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    search_state: web::Data<SearchState>,
     session_queue: web::Data<AuthQueue>,
     body: web::Json<ModifyProjectDisclosures>,
 ) -> Result<(), ApiError> {
     let (string,) = info.into_inner();
     let body = body.into_inner();
+
+    if body.set.is_empty() && body.remove.is_empty() {
+        return Err(ApiError::Request(eyre!(
+            "must provide at least one disclosure to set or remove"
+        )));
+    }
 
     let user = get_user_from_headers(
         &req,
@@ -196,6 +205,11 @@ pub async fn modify_project_disclosures(
         .commit()
         .await
         .wrap_internal_err("failed to commit project disclosure changes")?;
+
+    search_state
+        .queue
+        .push_project_change(project.inner.id.into())
+        .await;
 
     Ok(())
 }
