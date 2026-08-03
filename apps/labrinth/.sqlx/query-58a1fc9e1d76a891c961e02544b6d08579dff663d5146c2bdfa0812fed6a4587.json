@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COUNT(*) AS \"total!\"\n        FROM delphi_global_detail_verdicts dgdv\n        WHERE (\n            $1::text IS NULL\n            OR dgdv.detail_key ILIKE '%' || $1 || '%'\n            OR EXISTS (\n                SELECT 1\n                FROM delphi_issue_details_with_statuses matching_didws\n                INNER JOIN delphi_report_issues matching_dri\n                    ON matching_dri.id = matching_didws.issue_id\n                WHERE\n                    matching_didws.key = dgdv.detail_key\n                    AND matching_dri.issue_type != '__dummy'\n                    AND matching_didws.file_path ILIKE '%' || $1 || '%'\n            )\n        )\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "58a1fc9e1d76a891c961e02544b6d08579dff663d5146c2bdfa0812fed6a4587"
+}

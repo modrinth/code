@@ -1297,7 +1297,9 @@ pub async fn update_issue_details(
             FROM latest
             WHERE verdict != 'pending'
             ON CONFLICT (project_id, detail_key)
-            DO UPDATE SET verdict = EXCLUDED.verdict
+            DO UPDATE SET
+                verdict = EXCLUDED.verdict,
+                updated_at = NOW()
             RETURNING 1
         )
         SELECT
@@ -1439,7 +1441,9 @@ pub async fn update_global_issue_details(
         FROM latest
         WHERE verdict != 'pending'
         ON CONFLICT (detail_key)
-        DO UPDATE SET verdict = EXCLUDED.verdict
+        DO UPDATE SET
+            verdict = EXCLUDED.verdict,
+            updated_at = NOW()
         "#,
         &detail_keys,
         &verdicts,
