@@ -243,31 +243,35 @@ if (selectedGameVersions.value.some((version) => !isReleaseGameVersion(version))
 	showSnapshots.value = true
 }
 
-async function toggleFilters(type: FilterType, filters: Filter[]) {
-	for (const filter of filters) {
-		await toggleFilter(type, filter, true)
+function selectedFiltersOfType(type: FilterType) {
+	if (type === 'channel') {
+		return selectedChannels
+	} else if (type === 'gameVersion') {
+		return selectedGameVersions
+	} else {
+		return selectedPlatforms
 	}
+}
+
+function toggleFilters(type: FilterType, filters: Filter[]) {
+	const selected = selectedFiltersOfType(type)
+	const allSelected = filters.every((filter) => selected.value.includes(filter))
+
+	selected.value = allSelected
+		? selected.value.filter((x) => !filters.includes(x))
+		: [...selected.value, ...filters.filter((filter) => !selected.value.includes(filter))]
 
 	updateFilters()
 }
 
-async function toggleFilter(type: FilterType, filter: Filter, bulk = false) {
-	if (type === 'channel') {
-		selectedChannels.value = selectedChannels.value.includes(filter)
-			? selectedChannels.value.filter((x) => x !== filter)
-			: [...selectedChannels.value, filter]
-	} else if (type === 'gameVersion') {
-		selectedGameVersions.value = selectedGameVersions.value.includes(filter)
-			? selectedGameVersions.value.filter((x) => x !== filter)
-			: [...selectedGameVersions.value, filter]
-	} else if (type === 'platform') {
-		selectedPlatforms.value = selectedPlatforms.value.includes(filter)
-			? selectedPlatforms.value.filter((x) => x !== filter)
-			: [...selectedPlatforms.value, filter]
-	}
-	if (!bulk) {
-		updateFilters()
-	}
+function toggleFilter(type: FilterType, filter: Filter) {
+	const selected = selectedFiltersOfType(type)
+
+	selected.value = selected.value.includes(filter)
+		? selected.value.filter((x) => x !== filter)
+		: [...selected.value, filter]
+
+	updateFilters()
 }
 
 function updateSelectedGameVersions(versions: string[]) {
@@ -302,7 +306,7 @@ function updateShowSnapshots(value: boolean, _event?: MouseEvent) {
 	}
 }
 
-async function clearFilters() {
+function clearFilters() {
 	selectedChannels.value = []
 	selectedGameVersions.value = []
 	selectedPlatforms.value = []
