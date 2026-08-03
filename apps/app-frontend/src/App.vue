@@ -1545,8 +1545,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.discoverContentLabel)"
 				to="/browse/modpack"
-				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
-				:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
+				:is-primary="() => route.path.startsWith('/browse') && !route.query.i && !route.query.sid"
+				:is-subpage="
+					(route) => route.path.startsWith('/project') && !route.query.i && !route.query.sid
+				"
 			>
 				<CompassIcon />
 			</NavButton>
@@ -1570,7 +1572,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(messages.modrinthHosting)"
 				to="/hosting/manage"
 				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
-				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
+				:is-subpage="
+					(r) =>
+						(r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/') ||
+						((r.path.startsWith('/browse') || r.path.startsWith('/project')) && r.query.sid)
+				"
 			>
 				<ServerStackIcon />
 			</NavButton>
