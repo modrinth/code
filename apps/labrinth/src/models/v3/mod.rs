@@ -18,4 +18,5 @@ pub mod sessions;
 pub mod teams;
 pub mod threads;
 pub mod user_limits;
+pub mod user_preferences;
 pub mod users;

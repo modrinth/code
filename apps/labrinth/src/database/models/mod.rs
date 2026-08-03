@@ -37,6 +37,7 @@ pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
 pub mod user_limits;
+pub mod user_preferences_item;
 pub mod user_subscription_item;
 pub mod users_compliance;
 pub mod users_notifications_preferences_item;
@@ -58,6 +59,7 @@ pub use team_item::DBTeam;
 pub use team_item::DBTeamMember;
 pub use thread_item::{DBThread, DBThreadMessage};
 pub use user_item::DBUser;
+pub use user_preferences_item::DBUserPreferences;
 pub use version_item::DBVersion;
 
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};

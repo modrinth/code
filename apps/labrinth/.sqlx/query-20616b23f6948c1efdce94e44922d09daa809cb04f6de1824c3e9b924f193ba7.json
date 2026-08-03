@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tINSERT INTO user_preferences (user_id, preferences)\n\t\t\tVALUES ($1, $2)\n\t\t\tON CONFLICT (user_id) DO NOTHING\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "20616b23f6948c1efdce94e44922d09daa809cb04f6de1824c3e9b924f193ba7"
+}

@@ -5490,6 +5490,7 @@ dependencies = [
  "jemalloc_pprof",
  "json-patch 4.1.0",
  "labrinth",
+ "language-tags",
  "lettre",
  "meilisearch-sdk",
  "modrinth-content-management",

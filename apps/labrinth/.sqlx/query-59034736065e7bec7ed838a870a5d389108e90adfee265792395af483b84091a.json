@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT preferences AS \"preferences: Json<UserPreferences>\"\n\t\t\tFROM user_preferences\n\t\t\tWHERE user_id = $1\n\t\t\tFOR UPDATE\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "preferences: Json<UserPreferences>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "59034736065e7bec7ed838a870a5d389108e90adfee265792395af483b84091a"
+}

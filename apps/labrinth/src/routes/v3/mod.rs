@@ -22,6 +22,7 @@ pub mod statistics;
 pub mod tags;
 pub mod teams;
 pub mod threads;
+pub mod user_preferences;
 pub mod users;
 pub mod version_creation;
 pub mod version_file;
@@ -64,6 +65,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(tags::config)
             .configure(teams::config)
             .configure(threads::config)
+            .configure(user_preferences::config)
             .configure(users::config)
             .configure(version_file::config)
             .configure(versions::config)
@@ -197,6 +199,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		threads::threads_get_route,
 		threads::thread_send_message_route,
 		threads::message_delete_route,
+		user_preferences::get_user_preferences,
+		user_preferences::put_user_preferences,
+		user_preferences::patch_user_preferences,
 		users::all_projects,
 		users::admin_user_email,
 		users::projects_list_route,
