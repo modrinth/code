@@ -39,12 +39,7 @@
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
 					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						size="lg"
-						@click="instancePage.browseServers"
-					>
+					<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
 						<CompassIcon class="size-5" />
 						<span>{{ formatMessage(messages.browseServers) }}</span>
 					</Button>
@@ -128,12 +123,7 @@
 					<PlusIcon class="size-5" />
 					{{ formatMessage(messages.addServer) }}
 				</Button>
-				<Button
-					type="colored"
-					color="brand"
-					size="lg"
-					@click="instancePage.browseServers"
-				>
+				<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
 					<CompassIcon class="size-5" />
 					<span>{{ formatMessage(messages.browseServers) }}</span>
 				</Button>
