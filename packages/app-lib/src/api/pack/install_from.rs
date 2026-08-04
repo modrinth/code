@@ -12,7 +12,7 @@ use crate::state::{
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch,
-    fetch_advanced_with_progress, sha1_file_async,
+    fetch_advanced_with_progress, sha1_file_async_with_progress,
 };
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use reqwest::Method;
@@ -196,28 +196,59 @@ pub async fn get_instance_from_pack(
         }),
         CreatePackLocation::FromFile { path } => {
             let mut instance = get_local_pack_instance(&path);
+            let file_size = tokio::fs::metadata(&path).await?.len();
+            let hashes_archive = file_size <= MAX_LOCAL_FILE_HASH_LOOKUP_SIZE;
+            let archive_hashing_bytes =
+                if hashes_archive { file_size } else { 0 };
+            let pack_file = CreatePackFile::Path(path.clone());
+            let external_file_hashing_bytes =
+                super::install_mrpack::get_external_file_hashing_size_from_mrpack(
+                    &pack_file,
+                )
+                .await?;
+            let inspection_total_bytes = archive_hashing_bytes
+                .saturating_add(external_file_hashing_bytes)
+                .max(1);
             let inspection = init_loading(
                 LoadingBarType::PackImport {
                     pack_name: instance.name.clone(),
                 },
-                100.0,
+                inspection_total_bytes as f64,
                 "Inspecting modpack",
             )
             .await
             .ok();
-            if let Some(inspection) = &inspection {
-                let _ = emit_loading(
-                    inspection,
-                    1.0,
-                    Some("Reading local modpack"),
-                );
-            }
+            let min_delta = (inspection_total_bytes / 200).max(256 * 1024);
+            let mut reported_bytes = 0_u64;
+            let mut report_progress =
+                |current: u64, offset: u64, message: &str| {
+                    let target = offset
+                        .saturating_add(current)
+                        .min(inspection_total_bytes);
+                    let increment = target.saturating_sub(reported_bytes);
+                    if target < inspection_total_bytes && increment < min_delta
+                    {
+                        return;
+                    }
 
-            let is_known_file = if tokio::fs::metadata(&path).await?.len()
-                <= MAX_LOCAL_FILE_HASH_LOOKUP_SIZE
-            {
+                    if let Some(inspection) = &inspection {
+                        let _ = emit_loading(
+                            inspection,
+                            increment as f64,
+                            Some(message),
+                        );
+                    }
+                    reported_bytes = target;
+                };
+
+            let is_known_file = if hashes_archive {
                 let state = State::get().await?;
-                let (_, hash) = sha1_file_async(&path).await?;
+                let (_, hash) =
+                    sha1_file_async_with_progress(&path, |current, _| {
+                        report_progress(current, 0, "Hashing local modpack");
+                        Ok(())
+                    })
+                    .await?;
                 match CachedEntry::get_file_many(
                     &[&hash],
                     Some(CacheBehaviour::StaleWhileRevalidateSkipOffline),
@@ -239,19 +270,25 @@ pub async fn get_instance_from_pack(
             } else {
                 false
             };
-            if let Some(inspection) = &inspection {
-                let _ = emit_loading(
-                    inspection,
-                    39.0,
-                    Some("Inspecting modpack files"),
-                );
-            }
 
             let external_files_in_modpack =
                 super::install_mrpack::get_external_files_from_mrpack(
-                    &CreatePackFile::Path(path),
+                    &pack_file,
+                    |current, _| {
+                        report_progress(
+                            current,
+                            archive_hashing_bytes,
+                            "Inspecting modpack files",
+                        );
+                        Ok(())
+                    },
                 )
                 .await?;
+            report_progress(
+                inspection_total_bytes,
+                0,
+                "Finished inspecting modpack",
+            );
 
             instance.unknown_file = !is_known_file;
             instance.external_files_in_modpack = external_files_in_modpack;
