@@ -161,6 +161,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
+import { injectSharedInstanceManagement } from './shared-instance-management-context'
 import {
 	type MethodFilter,
 	methodLabels,
@@ -168,11 +169,16 @@ import {
 	type ShareRow,
 	type ShareTableColumn,
 } from './shared-instance-share-types'
-import { injectSharedInstanceManagement } from './shared-instance-management-context'
 
 const management = injectSharedInstanceManagement()
-const { rows, actionsLocked, inviteDisabled, invitePending, pushUpdateDisabled, pushUpdatePending } =
-	management
+const {
+	rows,
+	actionsLocked,
+	inviteDisabled,
+	invitePending,
+	pushUpdateDisabled,
+	pushUpdatePending,
+} = management
 const search = ref('')
 const methodFilter = ref<MethodFilter>('all')
 const sortColumn = ref<string | undefined>('joined')

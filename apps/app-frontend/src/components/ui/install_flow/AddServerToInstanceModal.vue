@@ -12,10 +12,10 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { instanceKeys } from '@/pages/instance/query-options'
 import { trackEvent } from '@/helpers/analytics'
 import { list } from '@/helpers/instance'
 import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 const { handleError } = injectNotificationManager()
 const queryClient = useQueryClient()

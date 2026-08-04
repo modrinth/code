@@ -8,7 +8,6 @@ import type { ComputedRef, Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
-import { instanceKeys } from '@/pages/instance/query-options'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
@@ -18,6 +17,7 @@ import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { add_server_to_instance, getServerAddress } from '@/helpers/worlds'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 interface BrowseServerInstance {
 	id: string

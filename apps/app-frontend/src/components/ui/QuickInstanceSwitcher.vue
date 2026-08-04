@@ -7,9 +7,9 @@ import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
-import { instanceKeys } from '@/pages/instance/query-options'
 import { instance_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
 const APPROX_USED_VERTICAL_SPACE = 513 // doesn't need to be exact lol just close enough so there's a little gap and no overflow

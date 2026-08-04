@@ -162,11 +162,11 @@ import {
 
 import { injectInstancePage } from '../instance-context'
 import { injectSharedInstance } from '../shared-instance-context'
+import { provideSharedInstanceManagement } from './shared-instance-management-context'
 import SharedInstanceMembersTable from './shared-instance-members-table.vue'
 import SharedInstanceRemoveMemberModal from './shared-instance-remove-member-modal.vue'
 import SharedInstanceShareEmptyState from './shared-instance-share-empty-state.vue'
 import { SHARED_INSTANCE_USER_LIMIT, type ShareRow } from './shared-instance-share-types'
-import { provideSharedInstanceManagement } from './shared-instance-management-context'
 import { useSharedInstanceInviteCandidates } from './use-shared-instance-invite-candidates'
 import { useSharedInstanceInviteLink } from './use-shared-instance-invite-link'
 import { useSharedInstanceMembers } from './use-shared-instance-members'
@@ -448,5 +448,4 @@ watch(
 	},
 	{ immediate: true, flush: 'post' },
 )
-
 </script>

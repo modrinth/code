@@ -42,10 +42,7 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button
-							class="!h-10 flex items-center gap-2"
-							@click="instancePage.browseServers"
-						>
+						<button class="!h-10 flex items-center gap-2" @click="instancePage.browseServers">
 							<CompassIcon class="size-5" />
 							<span>{{ formatMessage(messages.browseServers) }}</span>
 						</button>
@@ -132,10 +129,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
-					<button
-						class="!h-10 flex items-center gap-2"
-						@click="instancePage.browseServers"
-					>
+					<button class="!h-10 flex items-center gap-2" @click="instancePage.browseServers">
 						<CompassIcon class="size-5" />
 						<span>{{ formatMessage(messages.browseServers) }}</span>
 					</button>
@@ -264,7 +258,7 @@ const worldToRemove = ref<World | null>(null)
 const instance = computed(() => instancePage.instance.value!)
 const playing = instancePage.playing
 
-function play(world: World) {
+function play() {
 	if (instance.value.quarantined) return
 	void instancePage.refreshPlayState()
 }
@@ -576,7 +570,7 @@ async function joinWorld(world: World) {
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(instance.value.id, world.path).catch(handleJoinError)
 	}
-	play(world)
+	play()
 	startingInstance.value = false
 }
 

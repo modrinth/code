@@ -23,9 +23,7 @@
 					:busy="isBulkOperating"
 					:get-overflow-options="getOverflowOptions"
 					:switch-version="
-						isServerInstance || isSharedMember || isQuarantined
-							? undefined
-							: handleSwitchVersion
+						isServerInstance || isSharedMember || isQuarantined ? undefined : handleSwitchVersion
 					"
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
@@ -526,9 +524,7 @@ async function getUpdaterProjectVersions(projectId: string, pinnedVersionId?: st
 
 async function handleBrowseContent() {
 	if (!instance.value || instance.value.quarantined) return
-	await instancePage.browseContent(
-		instance.value.loader === 'vanilla' ? 'resourcepack' : 'mod',
-	)
+	await instancePage.browseContent(instance.value.loader === 'vanilla' ? 'resourcepack' : 'mod')
 }
 
 async function handleUploadFiles() {

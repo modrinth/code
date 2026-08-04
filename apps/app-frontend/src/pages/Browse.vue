@@ -41,16 +41,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
-import {
-	instanceDetailQueryOptions,
-	instanceKeys,
-	instanceLinkedProjectQueryOptions,
-} from '@/pages/instance/query-options'
-import {
-	get_project,
-	get_search_results_v3,
-	get_version_many,
-} from '@/helpers/cache.js'
+import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
 import { instance_listener } from '@/helpers/events.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
@@ -60,6 +51,11 @@ import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_instance_worlds } from '@/helpers/worlds'
+import {
+	instanceDetailQueryOptions,
+	instanceKeys,
+	instanceLinkedProjectQueryOptions,
+} from '@/pages/instance/query-options'
 import {
 	type BreadcrumbDefinition,
 	useBreadcrumb,
@@ -632,10 +628,7 @@ watch(
 
 		installedProjectIds.value = null
 		hiddenInstanceProjectIdsInitialized.value = false
-		await Promise.all([
-			instanceQuery.suspense().catch(handleError),
-			refreshInstalledProjectIds(),
-		])
+		await Promise.all([instanceQuery.suspense().catch(handleError), refreshInstalledProjectIds()])
 		if (instance.value?.link?.project_id) {
 			await linkedInstanceProjectQuery.suspense().catch(handleError)
 		}

@@ -154,8 +154,9 @@ import { handleSevereError } from '@/store/error.js'
 import { useTheming } from '@/store/state'
 
 import InstanceAdmonitions from './components/admonitions/index.vue'
-import { provideInstancePage } from './instance-context'
 import InstancePageHeader from './components/page-header/index.vue'
+import InstanceSettingsModal from './components/settings-modal/index.vue'
+import { provideInstancePage } from './instance-context'
 import {
 	instanceContentQueryOptions,
 	instanceDetailQueryOptions,
@@ -163,7 +164,6 @@ import {
 	instanceLinkedProjectQueryOptions,
 	instanceProcessesQueryOptions,
 } from './query-options'
-import InstanceSettingsModal from './components/settings-modal/index.vue'
 import { createSharedInstanceContext, provideSharedInstance } from './shared-instance-context'
 
 dayjs.extend(relativeTime)
@@ -187,7 +187,7 @@ const instanceQuery = useQuery(
 		enabled: !!instanceId.value,
 	})),
 )
-const criticalContentQuery = useQuery(
+useQuery(
 	computed(() => ({
 		...instanceContentQueryOptions(instanceId.value, (error) => handleError(error)),
 		enabled: !!instanceId.value,

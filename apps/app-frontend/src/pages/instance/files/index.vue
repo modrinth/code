@@ -323,16 +323,13 @@ onUnmounted(() => {
 	unlistenInstances()
 })
 
-watch(
-	instanceId,
-	async () => {
-		debug('watch instance.id: changed to', instanceId.value)
-		firstPaintPending.value = true
-		currentPath.value = ''
-		await instanceRootQuery.refetch()
-		await refresh()
-	},
-)
+watch(instanceId, async () => {
+	debug('watch instance.id: changed to', instanceId.value)
+	firstPaintPending.value = true
+	currentPath.value = ''
+	await instanceRootQuery.refetch()
+	await refresh()
+})
 
 provideFileManager({
 	items,

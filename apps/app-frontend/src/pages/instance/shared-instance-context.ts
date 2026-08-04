@@ -124,9 +124,7 @@ export function createSharedInstanceContext(
 	})
 
 	const unavailableReason = computed(() => forcedUnavailableReason.value)
-	const shareActionsLocked = computed(
-		() => actionsLocked.value || unavailableReason.value !== null,
-	)
+	const shareActionsLocked = computed(() => actionsLocked.value || unavailableReason.value !== null)
 	const updatePreview = computed(() =>
 		unavailableReason.value ? null : (updatePreviewQuery.data.value ?? null),
 	)
@@ -177,5 +175,7 @@ export function createSharedInstanceContext(
 
 export type SharedInstanceContext = ReturnType<typeof createSharedInstanceContext>
 
-export const [injectSharedInstance, provideSharedInstance] =
-	createContext<SharedInstanceContext>('InstancePage', 'sharedInstance')
+export const [injectSharedInstance, provideSharedInstance] = createContext<SharedInstanceContext>(
+	'InstancePage',
+	'sharedInstance',
+)
