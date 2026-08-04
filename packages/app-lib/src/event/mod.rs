@@ -3,7 +3,9 @@ use dashmap::DashMap;
 #[cfg(feature = "tauri")]
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
-use std::{path::PathBuf, sync::Arc};
+#[cfg(feature = "export-ts")]
+use std::path::PathBuf;
+use std::sync::Arc;
 #[cfg(feature = "tauri")]
 use tauri::ipc::{Channel, InvokeResponseBody};
 use tokio::sync::OnceCell;
