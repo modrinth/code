@@ -10,7 +10,7 @@ import {
 	StopCircleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, nextTick, onUnmounted, ref, toRef, watch } from 'vue'
+import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -41,6 +41,7 @@ const {
 	reorderGroups,
 	instanceOptions,
 	confirmDeleteModal,
+	clearLibraryInstanceSelection,
 	deleteInstance,
 	handleInstanceOption,
 	selectedLibraryInstances,
@@ -159,6 +160,8 @@ function onGroupDragEnd() {
 onUnmounted(() => {
 	document.documentElement.classList.remove(GROUP_REORDERING_CLASS)
 })
+
+onDeactivated(clearLibraryInstanceSelection)
 
 const anchorInstance = ref<{ groupId: string; instanceId: string } | null>(null)
 
