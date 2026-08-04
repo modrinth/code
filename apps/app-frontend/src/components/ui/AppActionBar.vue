@@ -141,8 +141,8 @@ import { useRouter } from 'vue-router'
 
 import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
 import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { loading_listener, process_listener } from '@/helpers/events'
 import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import type { LoadingBar } from '@/helpers/state'
@@ -260,7 +260,7 @@ onMounted(() => {
 	window.addEventListener('online', handleOnline)
 })
 
-const unlistenProcess = await process_listener(async () => {
+useAppEvent('process', async () => {
 	await refresh()
 })
 
@@ -482,7 +482,7 @@ const installJobNotifications = await useInstallJobNotifications({
 
 await refreshLoadingBars()
 
-const unlistenLoading = await loading_listener(async () => {
+useAppEvent('loading', async () => {
 	await refreshLoadingBars()
 })
 
@@ -499,8 +499,6 @@ onBeforeUnmount(() => {
 	dismissed.value = false
 	window.removeEventListener('offline', handleOffline)
 	window.removeEventListener('online', handleOnline)
-	unlistenProcess()
-	unlistenLoading()
 	installJobNotifications.dispose()
 })
 </script>

@@ -21,12 +21,12 @@ import {
 import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project } from '@/helpers/cache'
-import { process_listener } from '@/helpers/events'
 import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
@@ -108,7 +108,7 @@ const stop = async (event: MouseEvent) => {
 	loading.value = false
 }
 
-const unlistenProcesses = await process_listener(async () => {
+useAppEvent('process', async () => {
 	await checkProcess()
 })
 
@@ -120,10 +120,6 @@ const checkProcess = async () => {
 
 onMounted(() => {
 	checkProcess()
-})
-
-onUnmounted(() => {
-	unlistenProcesses()
 })
 </script>
 <template>

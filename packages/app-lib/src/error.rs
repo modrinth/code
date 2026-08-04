@@ -23,6 +23,7 @@ pub struct LabrinthError {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 pub enum SharedInstanceUnavailableReason {
     Deleted,

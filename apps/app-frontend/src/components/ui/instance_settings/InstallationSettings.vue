@@ -33,6 +33,7 @@ import {
 } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { injectAppEvents } from '@/providers/app-events'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 import { useTheming } from '@/store/state'
@@ -40,6 +41,7 @@ import { useTheming } from '@/store/state'
 import type { Manifest } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
+const appEvents = injectAppEvents()
 const filePicker = injectFilePicker()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
@@ -195,7 +197,7 @@ async function installLocalModpackFromPicker() {
 	}).catch(handleError)
 	if (!job) return false
 
-	const completed = await wait_for_install_job(job.job_id).catch(handleError)
+	const completed = await wait_for_install_job(appEvents, job.job_id).catch(handleError)
 	return !!completed
 }
 

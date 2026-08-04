@@ -200,14 +200,10 @@ pub async fn emit_install_job(
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        use tauri::Emitter;
-
         let result: crate::Result<()> = (|| {
             let event_state = crate::EventState::get()?;
             event_state
-                .app
-                .emit("install_job", snapshot)
-                .map_err(crate::event::EventError::from)?;
+                .send(crate::event::AppEvent::InstallJob(snapshot.clone()))?;
             Ok(())
         })();
         if let Err(error) = result {

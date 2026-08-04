@@ -166,10 +166,10 @@ import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
+import { useAppEvent } from '@/composables/use-app-event'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
-import { instance_listener, process_listener } from '@/helpers/events'
 import {
 	getSharedInstanceUnavailableReason,
 	install_existing_instance,
@@ -809,30 +809,28 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 	}
 }
 
-const unlistenInstances = await instance_listener(
-	async (event: { instance_id: string; event: string }) => {
-		if (event.instance_id !== route.params.id) return
-		if (event.event === 'removed' || route.path === '/') {
-			if (route.path !== '/') {
-				await router.push({ path: '/' })
-			}
-			return
+useAppEvent('instance', async (event) => {
+	if (event.instance_id !== route.params.id) return
+	if (event.event === 'removed' || route.path === '/') {
+		if (route.path !== '/') {
+			await router.push({ path: '/' })
 		}
-		instance.value = await get(route.params.id as string).catch((err) => {
-			if (String(err).includes('not managed')) {
-				router.push({ path: '/' })
-				return undefined
-			}
-			return handleError(err)
-		})
-		if (!instance.value?.link?.project_id) {
-			linkedProjectV3.value = undefined
-			isServerInstance.value = false
+		return
+	}
+	instance.value = await get(route.params.id as string).catch((err) => {
+		if (String(err).includes('not managed')) {
+			router.push({ path: '/' })
+			return undefined
 		}
-	},
-)
+		return handleError(err)
+	})
+	if (!instance.value?.link?.project_id) {
+		linkedProjectV3.value = undefined
+		isServerInstance.value = false
+	}
+})
 
-const unlistenProcesses = await process_listener((e: { event: string; instance_id: string }) => {
+useAppEvent('process', (e) => {
 	if (e.event === 'finished' && e.instance_id === route.params.id) {
 		playing.value = false
 	}
@@ -851,8 +849,6 @@ const timePlayed = computed(() => {
 })
 
 onUnmounted(() => {
-	unlistenProcesses()
-	unlistenInstances()
 	const instanceId = displayedInstanceRoute.value.params.id
 	if (instanceId) {
 		const { destroy } = useInstanceConsole(instanceId)

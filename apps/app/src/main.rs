@@ -9,6 +9,7 @@ use std::env;
 use std::sync::atomic::Ordering;
 use tauri::{Listener, Manager};
 use tauri_plugin_fs::FsExt;
+use theseus::AppEvent;
 use theseus::prelude::*;
 
 mod api;
@@ -25,9 +26,12 @@ mod updater_impl_noop;
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
-async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
+async fn initialize_state(
+    app: tauri::AppHandle,
+    events: tauri::ipc::Channel<AppEvent>,
+) -> api::Result<()> {
     tracing::info!("Initializing app event state...");
-    theseus::EventState::init(app.clone()).await?;
+    theseus::EventState::init(app.clone(), events).await?;
 
     tracing::info!("Initializing app state...");
     State::init(app.config().identifier.clone()).await?;
