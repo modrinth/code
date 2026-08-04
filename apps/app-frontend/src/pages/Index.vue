@@ -41,9 +41,8 @@ let latestInstanceFetch = 0
 
 const recentInstances = computed(() =>
 	instances.value
-		.filter((x) => x.last_played)
 		.slice()
-		.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played))),
+		.sort((a, b) => dayjs(b.last_played ?? b.created).diff(dayjs(a.last_played ?? a.created))),
 )
 
 async function fetchInstances() {

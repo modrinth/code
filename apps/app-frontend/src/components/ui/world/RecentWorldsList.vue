@@ -44,11 +44,10 @@ const jumpBackInItems = ref<JumpBackInItem[]>([])
 const loading = ref(true)
 const serverData = ref<Record<string, ServerData>>({})
 const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
+const locallyPlayedInstances = ref<Record<string, Dayjs>>({})
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
 
-const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6
-const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
 const MAX_LINUX_POPULATES = 3
 
 // Track populate calls on Linux to prevent server ping spam
@@ -56,8 +55,9 @@ const isLinux = platform() === 'linux'
 const linuxPopulateCount = ref(0)
 
 type BaseJumpBackInItem = {
-	last_played: Dayjs
+	sort_time: Dayjs
 	instance: GameInstance
+	newly_added?: boolean
 }
 
 type InstanceJumpBackInItem = BaseJumpBackInItem & {
@@ -108,7 +108,7 @@ async function populateJumpBackIn() {
 
 			worldItems.push({
 				type: 'world',
-				last_played: dayjs(world.last_played ?? 0),
+				sort_time: dayjs(world.last_played ?? 0),
 				world: world,
 				instance: instance,
 			})
@@ -153,22 +153,34 @@ async function populateJumpBackIn() {
 	const instanceItems: InstanceJumpBackInItem[] = []
 	for (const instance of props.recentInstances) {
 		const worldItem = worldItems.find((item) => item.instance.id === instance.id)
-		if ((worldItem && worldItem.last_played.isAfter(TWO_WEEKS_AGO)) || !instance.last_played) {
-			continue
-		}
+		const lastPlayed = instance.last_played
+			? dayjs(instance.last_played)
+			: locallyPlayedInstances.value[instance.id]
+		const newlyAdded = !lastPlayed
+		if (worldItem && (!lastPlayed || !lastPlayed.isAfter(worldItem.sort_time))) continue
+		if (worldItem) worldItems.splice(worldItems.indexOf(worldItem), 1)
 
 		instanceItems.push({
 			type: 'instance',
-			last_played: dayjs(instance.last_played ?? 0),
+			sort_time: lastPlayed ?? dayjs(instance.created),
 			instance: instance,
+			newly_added: newlyAdded,
 		})
 	}
 
 	const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
-	items.sort((a, b) => dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0)))
-	jumpBackInItems.value = items
-		.filter((item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO))
-		.slice(0, MAX_JUMP_BACK_IN)
+	items.sort((a, b) => b.sort_time.diff(a.sort_time))
+	jumpBackInItems.value = items.slice(0, MAX_JUMP_BACK_IN)
+}
+
+function markInstancePlayed(item: InstanceJumpBackInItem) {
+	const lastPlayed = dayjs()
+	locallyPlayedInstances.value = {
+		...locallyPlayedInstances.value,
+		[item.instance.id]: lastPlayed,
+	}
+	item.sort_time = lastPlayed
+	item.newly_added = false
 }
 
 function refreshServer(address: string, instanceId: string) {
@@ -279,7 +291,7 @@ onUnmounted(() => {
 		>
 			Jump in
 		</span>
-		<div class="grid-when-huge flex flex-col w-full gap-4">
+		<div class="grid-when-huge flex flex-col w-full gap-3">
 			<template
 				v-for="item in jumpBackInItems"
 				:key="`${item.instance.id}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
@@ -340,7 +352,13 @@ onUnmounted(() => {
 					"
 					@stop="() => stopInstance(item.instance.id)"
 				/>
-				<InstanceItem v-else :instance="item.instance" :last_played="item.last_played" />
+				<InstanceItem
+					v-else
+					:instance="item.instance"
+					:last_played="item.sort_time"
+					:newly-added="item.newly_added"
+					@play="() => markInstancePlayed(item)"
+				/>
 			</template>
 		</div>
 	</div>

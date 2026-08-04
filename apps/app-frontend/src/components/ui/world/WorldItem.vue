@@ -270,7 +270,7 @@ const messages = defineMessages({
 				no-shadow
 				class="!border-none !rounded-[14px]"
 			/>
-			<div class="flex flex-col justify-between h-full">
+			<div class="flex flex-col justify-center gap-0.5 h-full">
 				<div class="flex items-center gap-2">
 					<div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
 						{{ world.name }}
@@ -359,6 +359,7 @@ const messages = defineMessages({
 								size="16px"
 								:tint-by="instanceId"
 								class="shrink-0"
+								no-shadow
 							/>
 							<span class="truncate">{{ instanceName }}</span>
 						</router-link>

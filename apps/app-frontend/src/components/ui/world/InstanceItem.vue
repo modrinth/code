@@ -4,6 +4,7 @@ import {
 	FolderOpenIcon,
 	MoreVerticalIcon,
 	PlayIcon,
+	SparklesIcon,
 	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
@@ -12,9 +13,11 @@ import {
 	BulletDivider,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	SmartClickable,
+	TagItem,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
@@ -51,7 +54,19 @@ const emit = defineEmits<{
 const props = defineProps<{
 	instance: GameInstance
 	last_played: Dayjs
+	newlyAdded?: boolean
 }>()
+
+const messages = defineMessages({
+	newInstance: {
+		id: 'app.home.jump-back-in.new-instance',
+		defaultMessage: 'New instance',
+	},
+	neverPlayed: {
+		id: 'app.home.jump-back-in.never-played',
+		defaultMessage: 'Never played',
+	},
+})
 
 const loadingModpack = ref(!!props.instance.link)
 
@@ -83,8 +98,12 @@ const play = async (event: MouseEvent) => {
 	event?.stopPropagation()
 	if (props.instance.quarantined) return
 	loading.value = true
-	await run(props.instance.id)
-		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
+	const launched = await run(props.instance.id)
+		.then(() => true)
+		.catch((err) => {
+			handleSevereError(err, { instanceId: props.instance.id })
+			return false
+		})
 		.finally(() => {
 			trackEvent('InstanceStart', {
 				loader: props.instance.loader,
@@ -92,7 +111,7 @@ const play = async (event: MouseEvent) => {
 				source: 'InstanceItem',
 			})
 		})
-	emit('play')
+	if (launched) emit('play')
 	loading.value = false
 }
 
@@ -136,7 +155,8 @@ onUnmounted(() => {
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover min-h-20"
+			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 border border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover min-h-20 p-3"
+			:class="newlyAdded ? 'border-dashed bg-surface-2' : 'bg-bg-raised border-solid'"
 		>
 			<Avatar
 				:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
@@ -145,11 +165,21 @@ onUnmounted(() => {
 				class="!border-none !rounded-[14px]"
 				size="48px"
 			/>
-			<div class="flex flex-col col-span-2 justify-between h-full">
+			<div class="flex flex-col col-span-2 justify-center gap-1 h-full">
 				<div class="flex items-center gap-2">
-					<div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
+					<div
+						class="text-contrast truncate smart-clickable:underline-on-hover"
+						:class="newlyAdded ? 'text-base font-semibold' : 'text-lg font-bold'"
+					>
 						{{ instance.name }}
 					</div>
+					<TagItem
+						v-if="newlyAdded"
+						class="!border-green !bg-bg-green !px-2 !font-medium !text-green"
+					>
+						<SparklesIcon aria-hidden="true" />
+						{{ formatMessage(messages.newInstance) }}
+					</TagItem>
 				</div>
 				<div class="flex items-center gap-1.5 text-sm text-secondary">
 					<span v-if="modpack" class="flex items-center gap-1 truncate text-secondary">
@@ -157,7 +187,7 @@ onUnmounted(() => {
 							class="inline-flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
 							:to="`/project/${modpack.id}`"
 						>
-							<Avatar :src="modpack.icon_url" size="16px" class="shrink-0" />
+							<Avatar :src="modpack.icon_url" size="16px" class="shrink-0" no-shadow />
 							<span class="truncate">{{ modpack.title }}</span>
 						</router-link>
 						({{ loader }} {{ instance.game_version }})
@@ -172,14 +202,19 @@ onUnmounted(() => {
 					</span>
 					<BulletDivider class="shrink-0" />
 					<div
-						v-tooltip="instance.last_played ? formatDateTime(instance.last_played) : null"
+						v-tooltip="!newlyAdded ? formatDateTime(last_played.toDate()) : null"
 						class="w-fit shrink-0"
-						:class="{ 'cursor-help smart-clickable:allow-pointer-events': last_played }"
+						:class="{
+							'cursor-help smart-clickable:allow-pointer-events': !newlyAdded,
+						}"
 					>
-						<template v-if="last_played">
+						<template v-if="newlyAdded">
+							{{ formatMessage(messages.neverPlayed) }}
+						</template>
+						<template v-else-if="last_played">
 							{{ formatRelativeTime(last_played.toISOString?.()) }}
 						</template>
-						<template v-else> Not played yet </template>
+						<template v-else>{{ formatMessage(messages.neverPlayed) }}</template>
 					</div>
 				</div>
 			</div>
