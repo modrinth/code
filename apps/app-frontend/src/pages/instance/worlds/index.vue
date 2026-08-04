@@ -43,9 +43,7 @@
 						type="colored"
 						color="brand"
 						size="lg"
-						@click="
-							router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
-						"
+						@click="instancePage.browseServers"
 					>
 						<CompassIcon class="size-5" />
 						<span>{{ formatMessage(messages.browseServers) }}</span>
@@ -104,7 +102,7 @@
 					:game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
 					:shortcut-instance-id="instance.id"
 					@play="() => joinWorld(world)"
-					@stop="() => emit('stop')"
+					@stop="() => instancePage.stop('InstanceWorlds')"
 					@refresh="() => refreshServer((world as ServerWorld).address)"
 					@edit="
 						() =>
@@ -134,9 +132,7 @@
 					type="colored"
 					color="brand"
 					size="lg"
-					@click="
-						router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
-					"
+					@click="instancePage.browseServers"
 				>
 					<CompassIcon class="size-5" />
 					<span>{{ formatMessage(messages.browseServers) }}</span>
@@ -163,9 +159,8 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { platform } from '@tauri-apps/plugin-os'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
-import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWorldModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
@@ -175,7 +170,6 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
-import type { GameInstance } from '@/helpers/types'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import {
 	delete_world,
@@ -191,7 +185,6 @@ import {
 	refreshServerData,
 	refreshServers,
 	refreshWorld,
-	refreshWorlds,
 	remove_server_from_instance,
 	resolveManagedServerWorld,
 	type ServerData,
@@ -205,6 +198,9 @@ import {
 } from '@/helpers/worlds.ts'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
+
+import { injectInstancePage } from '../instance-context'
+import { instanceKeys, instanceWorldsQueryOptions } from '../query-options'
 
 const messages = defineMessages({
 	searchWorldsPlaceholder: {
@@ -253,7 +249,7 @@ const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
 const route = useRoute()
-const router = useRouter()
+const instancePage = injectInstancePage()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()
 const editServerModal = ref<InstanceType<typeof EditServerModal>>()
@@ -262,25 +258,12 @@ const removeWorldModal = ref<InstanceType<typeof ConfirmRemoveWorldModal>>()
 
 const worldToRemove = ref<World | null>(null)
 
-const emit = defineEmits<{
-	(event: 'play', world: World): void
-	(event: 'stop'): void
-}>()
+const instance = computed(() => instancePage.instance.value!)
+const playing = instancePage.playing
 
-const props = defineProps<{
-	instance: GameInstance
-	options: InstanceType<typeof ContextMenu> | null
-	offline: boolean
-	playing: boolean
-	installed: boolean
-}>()
-
-const instance = computed(() => props.instance)
-const playing = computed(() => props.playing)
-
-function play(world: World) {
-	if (props.instance.quarantined) return
-	emit('play', world)
+function play() {
+	if (instance.value.quarantined) return
+	void instancePage.refreshPlayState()
 }
 
 const selectedFilters = ref<string[]>([])
@@ -316,11 +299,12 @@ const hadNoWorlds = ref(true)
 const startingInstance = ref(false)
 const worldPlaying = ref<World>()
 
-const worldsQuery = useQuery({
-	queryKey: computed(() => ['worlds', instance.value.id]),
-	queryFn: () => refreshWorlds(instance.value.id),
-	staleTime: 30_000,
-})
+const worldsQuery = useQuery(
+	computed(() => ({
+		...instanceWorldsQueryOptions(instancePage.instanceId.value),
+		enabled: !!instancePage.instanceId.value,
+	})),
+)
 
 const worldsReadyPending = useReadyState(worldsQuery)
 
@@ -494,7 +478,7 @@ async function refreshAllWorlds() {
 			}
 		}
 
-		await queryClient.invalidateQueries({ queryKey: ['worlds', instance.value.id] })
+		await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instance.value.id) })
 		await refreshServers(
 			worlds.value,
 			serverData.value,
@@ -589,7 +573,7 @@ async function joinWorld(world: World) {
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(instance.value.id, world.path).catch(handleJoinError)
 	}
-	play(world)
+	play()
 	startingInstance.value = false
 }
 

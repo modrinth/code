@@ -93,8 +93,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import ConfirmRevokeSharedInstanceInviteModal from '@/components/ui/shared-instances/ConfirmRevokeSharedInstanceInviteModal.vue'
-import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
 import { config } from '@/config'
 import {
 	get_shared_instance_invites,
@@ -103,7 +101,11 @@ import {
 	unpublish_shared_instance,
 } from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
-import { injectInstanceSettings } from '@/providers/instance-settings'
+
+import { instanceKeys } from '../../query-options.ts'
+import ConfirmRevokeSharedInstanceInviteModal from './confirm-revoke-shared-instance-invite-modal.vue'
+import { injectInstanceSettings } from './instance-settings-context.ts'
+import SharedInstanceInstallationSettingsControls from './shared-instance-installation-settings-controls.vue'
 
 const { instance, offline, onUnlinked } = injectInstanceSettings()
 const { notifySharedInstanceError } = useSharedInstanceErrors()
@@ -192,7 +194,7 @@ async function unpublishSharedInstance() {
 	unpublishing.value = true
 	try {
 		await unpublish_shared_instance(instance.value.id)
-		queryClient.setQueryData(['sharedInstanceUsers', instance.value.id], [])
+		queryClient.setQueryData(instanceKeys.sharedMembers(instance.value.id), [])
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
 		onUnlinked()
 	} catch (error) {

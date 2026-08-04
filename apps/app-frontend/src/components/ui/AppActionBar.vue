@@ -351,7 +351,7 @@ function buildDownloadItems(): PopupNotificationProgressItem[] {
 			iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
 			progress: getLoadingProgress(bar),
 			waiting: !bar.total || bar.total <= 0,
-			progressType: 'percentage',
+			progressType: bar.bar_type?.type === 'pack_import' ? 'bytes' : 'percentage',
 			progressCurrent: bar.current,
 			progressTotal: bar.total,
 		})),

@@ -51,7 +51,8 @@ export async function loadInstanceContentData(
 }
 
 function handleLoadError(error: unknown, onError?: (error: Error) => unknown) {
-	onError?.(error as Error)
+	if (!onError) throw error
+	onError(error as Error)
 	return null
 }
 

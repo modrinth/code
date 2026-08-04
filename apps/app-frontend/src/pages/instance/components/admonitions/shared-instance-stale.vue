@@ -46,7 +46,7 @@ import { computed, ref } from 'vue'
 import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
 import type { GameInstance } from '@/helpers/types'
 
-import { instanceAdmonitionsMessages as messages } from './instance-admonitions-messages'
+import { instanceAdmonitionsMessages as messages } from './messages'
 
 defineProps<{
 	instance: GameInstance

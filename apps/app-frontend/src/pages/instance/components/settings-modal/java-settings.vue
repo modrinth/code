@@ -25,9 +25,9 @@ import useJavaTest from '@/composables/useJavaTest'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
-import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { AppSettings } from '../../../helpers/types'
+import type { AppSettings } from '../../../../helpers/types'
+import { injectInstanceSettings } from './instance-settings-context'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
