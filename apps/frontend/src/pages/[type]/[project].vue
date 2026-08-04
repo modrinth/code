@@ -2006,9 +2006,7 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.changelogTab),
 			href: withInstallContextQuery(`${projectUrl}/changelog`),
 			shown:
-				hasVersions.value &&
-				projectV3Loaded.value &&
-				projectV3.value?.minecraft_server == null,
+				hasVersions.value && projectV3Loaded.value && projectV3.value?.minecraft_server == null,
 			onHover: loadVersions,
 		},
 		{
