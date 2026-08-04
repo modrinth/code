@@ -296,8 +296,11 @@ struct Process {
     rpc_server: RpcServer,
 }
 
-#[derive(Debug, Default, Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 pub struct Log4jEvent {
     pub timestamp_millis: Option<i64>,
     pub logger_name: Option<String>,
@@ -730,7 +733,7 @@ impl Process {
                     InstancePayloadType::ServerJoined {
                         host,
                         port,
-                        timestamp,
+                        timestamp: timestamp.to_rfc3339(),
                     },
                 )
                 .await;

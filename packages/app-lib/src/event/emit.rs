@@ -140,7 +140,7 @@ pub fn emit_loading(
             },
             message: message.unwrap_or(&loading_bar.message).to_string(),
             event: loading_bar.bar_type.clone(),
-            loader_uuid: loading_bar.loading_bar_uuid,
+            loader_uuid: loading_bar.loading_bar_uuid.to_string(),
         }))?;
 
         #[cfg(not(any(feature = "cli", feature = "tauri")))]
@@ -207,7 +207,7 @@ pub async fn emit_process(
         let event_state = crate::EventState::get()?;
         event_state.send(AppEvent::Process(ProcessPayload {
             instance_id: instance_id.to_string(),
-            uuid,
+            uuid: uuid.to_string(),
             event,
             message: message.to_string(),
         }))?;
@@ -248,7 +248,9 @@ pub async fn emit_notification(payload: Value) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
         let event_state = crate::EventState::get()?;
-        event_state.send(AppEvent::Notification(payload))?;
+        event_state.send(AppEvent::Notification(serde_json::to_string(
+            &payload,
+        )?))?;
     }
 
     Ok(())

@@ -1,10 +1,8 @@
 //! Theseus state management system
-use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 #[cfg(feature = "tauri")]
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::{path::PathBuf, sync::Arc};
 #[cfg(feature = "tauri")]
 use tauri::ipc::{Channel, InvokeResponseBody};
@@ -66,8 +64,7 @@ impl EventState {
 
     #[cfg(feature = "tauri")]
     pub fn send(&self, event: AppEvent) -> crate::Result<()> {
-        let payload = rmp_serde::to_vec_named(&event)
-            .map_err(EventError::from)?;
+        let payload = postcard::to_allocvec(&event).map_err(EventError::from)?;
         self.event_channel
             .read()
             .send(InvokeResponseBody::Raw(payload))
@@ -91,10 +88,22 @@ impl EventState {
     }
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
 #[serde(tag = "type", content = "payload", rename_all = "snake_case")]
-#[cfg_attr(feature = "export-ts", ts(export_to = "AppEvent.ts"))]
+#[cfg_attr(
+    feature = "export-ts",
+    ts(
+        tag = "type",
+        content = "payload",
+        rename_all = "snake_case",
+        export_to = "AppEvent.ts"
+    )
+)]
 pub enum AppEvent {
     Loading(LoadingPayload),
     Process(ProcessPayload),
@@ -105,7 +114,7 @@ pub enum AppEvent {
     Warning(WarningPayload),
     Friend(FriendPayload),
     Notification(
-        #[cfg_attr(feature = "export-ts", ts(type = "unknown"))] Value,
+        #[cfg_attr(feature = "export-ts", ts(type = "unknown"))] String,
     ),
     Log(LogPayload),
     AdsConsentRequired(bool),
@@ -115,12 +124,76 @@ pub enum AppEvent {
 pub fn export_app_event_bindings(
     output: impl Into<PathBuf>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    use postcard_bindgen::{PackageInfo, generate_bindings, javascript};
     use ts_rs::{Config, TS};
 
+    let output = output.into();
     let config = Config::default()
-        .with_out_dir(output)
+        .with_out_dir(output.clone())
         .with_large_int("number");
     AppEvent::export_all(&config)?;
+
+    javascript::build_package(
+        &output,
+        PackageInfo {
+            name: "postcard".into(),
+            version: "0.0.0".try_into()?,
+        },
+        javascript::GenerationSettings::default()
+            .type_script_types(true)
+            .module_structure(false)
+            .esm_module(true),
+        generate_bindings!(
+            AppEvent,
+            LoadingBarType,
+            LoadingPayload,
+            WarningPayload,
+            InstanceBulkUpdateProgressPayload,
+            InstanceBulkUpdateProgressStage,
+            CommandPayload,
+            ProcessPayload,
+            ProcessPayloadType,
+            InstancePayload,
+            InstancePayloadType,
+            FriendPayload,
+            FriendStatusPayload,
+            LogEvent,
+            LogPayload,
+            crate::state::Log4jEvent,
+            crate::install::InstallJobSnapshot,
+            crate::install::InstallJobKind,
+            crate::install::InstallJobStatus,
+            crate::install::model::InstallTarget,
+            crate::install::InstallPhaseId,
+            crate::install::InstallProgress,
+            crate::install::InstallProgressSecondary,
+            crate::install::InstallPhaseDetails,
+            crate::install::InstallJavaStep,
+            crate::install::model::InstallJobDisplay,
+            crate::install::InstallErrorView,
+            crate::install::model::InstallApiErrorDetails,
+            crate::install::InstallErrorContext,
+            crate::api::pack::import::ImportLauncherType,
+            crate::state::ModLoader,
+            crate::SharedInstanceUnavailableReason
+        ),
+    )?;
+    fix_postcard_javascript_utf8(&output.join("postcard/index.js"))?;
+    Ok(())
+}
+
+#[cfg(feature = "export-ts")]
+fn fix_postcard_javascript_utf8(
+    output: &std::path::Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    const GENERATED: &str = "deserialize_string = () => { const str = this.pop_n(Number(this.try_take(U32_BYTES))); return String.fromCharCode(...str) }";
+    const UTF8: &str = "deserialize_string = () => new TextDecoder().decode(new Uint8Array(this.pop_n(Number(this.try_take(U32_BYTES)))))";
+
+    let javascript = std::fs::read_to_string(output)?;
+    if !javascript.contains(GENERATED) {
+        return Err("postcard-bindgen's generated string decoder changed".into());
+    }
+    std::fs::write(output, javascript.replace(GENERATED, UTF8))?;
     Ok(())
 }
 
@@ -163,7 +236,7 @@ impl Drop for LoadingBarId {
                                 fraction: None,
                                 message: "Completed".to_string(),
                                 event,
-                                loader_uuid,
+                                loader_uuid: loader_uuid.to_string(),
                             },
                         ));
                         tracing::trace!(
@@ -187,15 +260,20 @@ impl Drop for LoadingBarId {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
+#[cfg_attr(feature = "export-ts", ts(tag = "type", rename_all = "snake_case"))]
 pub enum LoadingBarType {
     LegacyDataMigration,
     DirectoryMove {
-        old: PathBuf,
-        new: PathBuf,
+        old: String,
+        new: String,
     },
     JavaDownload {
         version: u32,
@@ -209,7 +287,7 @@ pub enum LoadingBarType {
     PackDownload {
         instance_id: String,
         pack_name: String,
-        icon: Option<PathBuf>,
+        icon: Option<String>,
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
@@ -229,10 +307,10 @@ pub enum LoadingBarType {
         instance_name: String,
     },
     ConfigChange {
-        new_path: PathBuf,
+        new_path: String,
     },
     CopyInstance {
-        import_location: PathBuf,
+        import_location: String,
         instance_name: String,
     },
     LauncherUpdate {
@@ -241,23 +319,32 @@ pub enum LoadingBarType {
     },
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 pub struct LoadingPayload {
     pub event: LoadingBarType,
-    pub loader_uuid: Uuid,
+    pub loader_uuid: String,
     pub fraction: Option<f64>, // by convention, if optional, it means the loading is done
     pub message: String,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 pub struct WarningPayload {
     pub message: String,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 #[serde(rename_all = "camelCase")]
 pub struct InstanceBulkUpdateProgressPayload {
     pub instance_id: String,
@@ -266,8 +353,11 @@ pub struct InstanceBulkUpdateProgressPayload {
     pub total: usize,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 #[serde(rename_all = "snake_case")]
 pub enum InstanceBulkUpdateProgressStage {
     ResolvingVersions,
@@ -275,9 +365,14 @@ pub enum InstanceBulkUpdateProgressStage {
     Finishing,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
 #[serde(tag = "event")]
+#[cfg_attr(feature = "export-ts", ts(tag = "event"))]
 pub enum CommandPayload {
     InstallMod {
         id: String,
@@ -301,38 +396,54 @@ pub enum CommandPayload {
     },
     RunMRPack {
         // run or install .mrpack
-        path: PathBuf,
+        path: String,
     },
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 pub struct ProcessPayload {
     pub instance_id: String,
-    pub uuid: Uuid,
+    pub uuid: String,
     pub event: ProcessPayloadType,
     pub message: String,
 }
 
-#[derive(Serialize, Clone, Debug)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
     Launched,
     Finished,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
 pub struct InstancePayload {
     pub instance_id: String,
     #[serde(flatten)]
+    #[cfg_attr(feature = "export-ts", ts(flatten))]
     pub event: InstancePayloadType,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
 #[serde(tag = "event", rename_all = "snake_case")]
+#[cfg_attr(feature = "export-ts", ts(tag = "event", rename_all = "snake_case"))]
 pub enum InstancePayloadType {
     Created,
     Synced,
@@ -343,7 +454,7 @@ pub enum InstancePayloadType {
     ServerJoined {
         host: String,
         port: u16,
-        timestamp: DateTime<Utc>,
+        timestamp: String,
     },
     Edited,
     ContentInstallFinished {
@@ -356,10 +467,15 @@ pub enum InstancePayloadType {
     Removed,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "event")]
+#[cfg_attr(feature = "export-ts", ts(tag = "event", rename_all = "snake_case"))]
 pub enum FriendPayload {
     FriendRequest { from: String },
     UserOffline { id: String },
@@ -367,12 +483,15 @@ pub enum FriendPayload {
     StatusSync,
 }
 
-#[derive(Serialize, Clone)]
-#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[derive(Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 pub struct FriendStatusPayload {
     pub user_id: String,
     pub profile_name: Option<String>,
-    pub last_update: DateTime<Utc>,
+    pub last_update: String,
 }
 
 impl From<ariadne::users::UserStatus> for FriendStatusPayload {
@@ -380,7 +499,7 @@ impl From<ariadne::users::UserStatus> for FriendStatusPayload {
         Self {
             user_id: status.user_id.to_string(),
             profile_name: status.profile_name,
-            last_update: status.last_update,
+            last_update: status.last_update.to_rfc3339(),
         }
     }
 }
@@ -389,21 +508,30 @@ pub use self::log_types::*;
 
 mod log_types {
     use crate::state::Log4jEvent;
-    use serde::Serialize;
 
-    #[derive(Serialize, Clone)]
-    #[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+    #[derive(Clone)]
+    #[cfg_attr(
+        feature = "export-ts",
+        derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+    )]
+    #[serde_binhum::serde_binhum]
     #[serde(tag = "type", rename_all = "snake_case")]
+    #[cfg_attr(feature = "export-ts", ts(tag = "type", rename_all = "snake_case"))]
     pub enum LogEvent {
         Log4j(Log4jEvent),
         Legacy { message: String },
     }
 
-    #[derive(Serialize, Clone)]
-    #[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+    #[derive(Clone)]
+    #[cfg_attr(
+        feature = "export-ts",
+        derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+    )]
+    #[serde_binhum::serde_binhum]
     pub struct LogPayload {
         pub instance_id: String,
         #[serde(flatten)]
+        #[cfg_attr(feature = "export-ts", ts(flatten))]
         pub event: LogEvent,
     }
 }
@@ -417,8 +545,8 @@ pub enum EventError {
     NoLoadingBar(Uuid),
 
     #[cfg(feature = "tauri")]
-    #[error("MessagePack encoding error: {0}")]
-    MessagePackEncode(#[from] rmp_serde::encode::Error),
+    #[error("Postcard encoding error: {0}")]
+    PostcardEncode(#[from] postcard::Error),
 
     #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]

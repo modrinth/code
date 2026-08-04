@@ -1,7 +1,7 @@
 # App event bindings
 
 > [!WARNING]
-> Do not edit the generated TypeScript files in this directory manually.
+> Do not edit the generated TypeScript or Postcard binding files in this directory manually.
 
 The event bus types are determined by the Rust [`AppEvent`](../../../../../packages/app-lib/src/event/mod.rs) contract.
 
