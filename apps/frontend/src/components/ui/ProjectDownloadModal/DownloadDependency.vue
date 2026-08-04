@@ -56,26 +56,27 @@
 					{{ metadataLabel }}
 				</span>
 			</span>
-			<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
-				<a
-					v-tooltip="downloadTooltip"
-					:href="dependency.downloadHref"
-					:download="dependency.filename"
-					:aria-label="downloadTooltip"
-					@click="emit('download')"
-				>
-					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
-				</a>
-			</ButtonStyled>
-			<ButtonStyled v-else circular type="transparent">
-				<button
-					v-tooltip="dependency.unavailableTooltip"
-					disabled
-					:aria-label="dependency.unavailableTooltip"
-				>
-					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
-				</button>
-			</ButtonStyled>
+			<ButtonLink
+				v-if="dependency.downloadHref"
+				v-tooltip="downloadTooltip"
+				type="quiet"
+				:href="dependency.downloadHref"
+				:download="dependency.filename"
+				:aria-label="downloadTooltip"
+				class="!w-9 !rounded-full !px-0"
+				@click="emit('download')"
+			>
+				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+			</ButtonLink>
+			<IconButton
+				v-else
+				v-tooltip="dependency.unavailableTooltip"
+				type="quiet"
+				:label="dependency.unavailableTooltip"
+				disabled
+			>
+				<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+			</IconButton>
 		</div>
 		<div
 			v-for="childDependency in dependency.dependencies"
@@ -100,8 +101,9 @@
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	ButtonLink,
 	defineMessages,
+	IconButton,
 	TagItem,
 	truncatedTooltip,
 	useFormatBytes,

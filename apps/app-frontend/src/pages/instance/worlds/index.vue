@@ -35,18 +35,14 @@
 					"
 				/>
 				<div class="flex gap-2">
-					<ButtonStyled type="outlined">
-						<button class="!h-10" @click="addServerModal?.show()">
-							<PlusIcon class="size-5" />
-							{{ formatMessage(messages.addServer) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button class="!h-10 flex items-center gap-2" @click="instancePage.browseServers">
-							<CompassIcon class="size-5" />
-							<span>{{ formatMessage(messages.browseServers) }}</span>
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" size="lg" @click="addServerModal?.show()">
+						<PlusIcon class="size-5" />
+						{{ formatMessage(messages.addServer) }}
+					</Button>
+					<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
+						<CompassIcon class="size-5" />
+						<span>{{ formatMessage(messages.browseServers) }}</span>
+					</Button>
 				</div>
 			</div>
 			<div class="flex flex-wrap items-center justify-between gap-2">
@@ -67,16 +63,17 @@
 						{{ option.label }}
 					</button>
 				</div>
-				<ButtonStyled type="transparent" hover-color-fill="none">
-					<button :disabled="refreshingAll" @click="refreshAllWorlds">
-						<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
-						{{
-							formatMessage(
-								refreshingAll ? messages.refreshingButton : commonMessages.refreshButton,
-							)
-						}}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="quiet"
+					:disabled="refreshingAll"
+					class="hover:!bg-transparent focus-visible:!bg-transparent"
+					@click="refreshAllWorlds"
+				>
+					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
+					{{
+						formatMessage(refreshingAll ? messages.refreshingButton : commonMessages.refreshButton)
+					}}
+				</Button>
 			</div>
 			<div class="flex flex-col w-full gap-2">
 				<WorldItem
@@ -122,26 +119,22 @@
 			:description="formatMessage(messages.noWorldsDescription)"
 		>
 			<template #actions>
-				<ButtonStyled type="outlined">
-					<button class="!h-10" @click="addServerModal?.show()">
-						<PlusIcon class="size-5" />
-						{{ formatMessage(messages.addServer) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button class="!h-10 flex items-center gap-2" @click="instancePage.browseServers">
-						<CompassIcon class="size-5" />
-						<span>{{ formatMessage(messages.browseServers) }}</span>
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" size="lg" @click="addServerModal?.show()">
+					<PlusIcon class="size-5" />
+					{{ formatMessage(messages.addServer) }}
+				</Button>
+				<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
+					<CompassIcon class="size-5" />
+					<span>{{ formatMessage(messages.browseServers) }}</span>
+				</Button>
 			</template>
 		</EmptyState>
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
 import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	EmptyState,

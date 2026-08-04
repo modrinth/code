@@ -14,18 +14,14 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="green">
-					<button @click="confirm">
-						<HammerIcon />
-						{{ formatMessage(messages.repairButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="green" @click="confirm">
+					<HammerIcon />
+					{{ formatMessage(messages.repairButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -35,7 +31,7 @@
 import { HammerIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

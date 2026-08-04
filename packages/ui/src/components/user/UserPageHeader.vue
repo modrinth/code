@@ -57,21 +57,19 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<ButtonStyled v-if="isSelf" size="large">
-					<AutoLink :to="editProfileLink">
-						<EditIcon />
-						{{ formatMessage(commonMessages.editButton) }}
-					</AutoLink>
-				</ButtonStyled>
-				<ButtonStyled circular size="large" type="transparent">
-					<TeleportOverflowMenu
-						:options="moreActions"
-						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-					>
-						<MoreVerticalIcon />
-					</TeleportOverflowMenu>
-				</ButtonStyled>
+				<ButtonLink v-if="isSelf" size="xl" :to="editProfileLink">
+					<EditIcon />
+					{{ formatMessage(commonMessages.editButton) }}
+				</ButtonLink>
+				<TeleportOverflowMenu
+					type="quiet"
+					size="xl"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+					:options="moreActions"
+				>
+					<MoreVerticalIcon />
+				</TeleportOverflowMenu>
 			</PageHeaderActions>
 		</template>
 	</PageHeader>
@@ -96,17 +94,15 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import { ButtonLink, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataNumberItem from '#ui/components/base/page-header/metadata/page-header-metadata-number-item.vue'
 import PageHeaderMetadataTimeItem from '#ui/components/base/page-header/metadata/page-header-metadata-time-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
-import type { Item as TeleportOverflowMenuItem } from '#ui/components/base/TeleportOverflowMenu.vue'
-import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { defineMessages, useFormatDateTime, useFormatNumber, useVIntl } from '#ui/composables'
 import type { AuthUser } from '#ui/providers/auth'
 import { commonMessages } from '#ui/utils'
@@ -228,7 +224,7 @@ const formatDateTime = useFormatDateTime({
 const downloadsTooltip = computed(() => formatNumber(props.downloads))
 const joinedTooltip = computed(() => formatDateTime(props.user.created))
 
-const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
+const moreActions = computed<OverflowMenuOption[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.profileManageProjectsButton),
@@ -236,16 +232,13 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		action: () => emit('manageProjects'),
 		shown: props.isSelf,
 	},
-	{
-		divider: true,
-		shown: props.isSelf,
-	},
+	{ type: 'divider', shown: props.isSelf },
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
 		action: () => emit('report'),
-		color: 'red',
+		tone: 'red',
 		shown: props.authUser?.id !== props.user.id,
 	},
 	{
@@ -253,7 +246,7 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		label: formatMessage(props.isBlocked ? messages.unblockButton : messages.blockButton),
 		icon: BanIcon,
 		action: () => emit('block'),
-		color: 'red',
+		tone: 'red',
 		shown: props.authUser?.id !== props.user.id,
 	},
 	{
@@ -268,15 +261,13 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyPermalink'),
 	},
-	{
-		divider: true,
-		shown: props.showStaffActions && (props.isAdmin || props.isStaff),
-	},
+	{ type: 'divider', shown: props.showStaffActions && (props.isAdmin || props.isStaff) },
 	{
 		id: 'open-billing',
 		label: formatMessage(messages.billingButton),
 		icon: CurrencyIcon,
 		action: () => emit('openBilling'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isStaff,
 	},
 	{
@@ -287,14 +278,15 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		icon: AffiliateIcon,
 		action: () => emit('toggleAffiliate'),
 		shown: props.showStaffActions && props.isAdmin,
-		remainOnClick: true,
-		color: props.isAffiliate ? 'red' : 'orange',
+		remainOpen: true,
+		tone: props.isAffiliate ? 'red' : 'orange',
 	},
 	{
 		id: 'open-info',
 		label: formatMessage(messages.infoButton),
 		icon: InfoIcon,
 		action: () => emit('openInfo'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isStaff,
 	},
 	{
@@ -302,6 +294,7 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		label: formatMessage(messages.analyticsButton),
 		icon: ChartIcon,
 		action: () => emit('openAnalytics'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
@@ -309,6 +302,7 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		label: formatMessage(messages.editRoleButton),
 		icon: EditIcon,
 		action: () => emit('editRole'),
+		tone: 'orange',
 		shown: props.showStaffActions && props.isAdmin,
 	},
 ])

@@ -17,10 +17,11 @@ import {
 	Accordion,
 	Avatar,
 	Badge,
-	ButtonStyled,
+	Button,
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
@@ -546,20 +547,16 @@ useSeoMeta({
 				{{ formatMessage(messages.description) }}
 			</h2>
 			<div class="button-group">
-				<ButtonStyled v-if="os" color="brand" size="large">
-					<button rel="noopener nofollow" @click="handleDownload">
-						<LinuxIcon v-if="os === 'Linux'" />
-						<WindowsIcon v-else-if="os === 'Windows'" />
-						<AppleIcon v-else-if="os === 'Mac'" />
-						{{ formatMessage(messages.downloadModrinthAppButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined" size="large">
-					<button @click="scrollToSection">
-						<ArrowDownIcon />
-						{{ formatMessage(messages.moreDownloadOptions) }}
-					</button>
-				</ButtonStyled>
+				<Button v-if="os" type="colored" color="brand" size="xl" @click="handleDownload">
+					<LinuxIcon v-if="os === 'Linux'" />
+					<WindowsIcon v-else-if="os === 'Windows'" />
+					<AppleIcon v-else-if="os === 'Mac'" />
+					{{ formatMessage(messages.downloadModrinthAppButton) }}
+				</Button>
+				<Button type="outlined" size="xl" @click="scrollToSection">
+					<ArrowDownIcon />
+					{{ formatMessage(messages.moreDownloadOptions) }}
+				</Button>
 			</div>
 			<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="" />
 			<div class="bottom-transition" />
@@ -602,11 +599,9 @@ useSeoMeta({
 							<div class="cell">{{ mod.version }}</div>
 							<div class="cell check">
 								<Checkbox :model-value="true" tabindex="-1" />
-								<ButtonStyled circular type="transparent">
-									<button tabindex="-1">
-										<TrashIcon />
-									</button>
-								</ButtonStyled>
+								<IconButton type="quiet" label="Delete" tabindex="-1">
+									<TrashIcon />
+								</IconButton>
 							</div>
 						</div>
 					</div>

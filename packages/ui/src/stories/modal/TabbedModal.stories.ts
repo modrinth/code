@@ -14,7 +14,7 @@ import {
 import type { StoryObj } from '@storybook/vue3-vite'
 import { defineComponent, h, ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
 import TabbedModal from '../../components/modal/TabbedModal.vue'
 
@@ -42,7 +42,7 @@ export default meta
 
 export const Default: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { TabbedModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -66,9 +66,7 @@ export const Default: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open Tabbed Modal</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open Tabbed Modal</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -77,7 +75,7 @@ export const Default: StoryObj = {
 
 export const WithTitleSlot: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled, SettingsIcon },
+		components: { TabbedModal, SettingsIcon, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -96,9 +94,7 @@ export const WithTitleSlot: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Title Slot</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Title Slot</Button>
 				<TabbedModal ref="modalRef" :tabs="tabs">
 					<template #title>
 						<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
@@ -113,7 +109,7 @@ export const WithTitleSlot: StoryObj = {
 
 export const WithFooter: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { TabbedModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -137,9 +133,7 @@ export const WithFooter: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Footer</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Footer</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs">
 					<template #footer>
 						<div class="mt-auto text-secondary text-sm">
@@ -155,7 +149,7 @@ export const WithFooter: StoryObj = {
 
 export const WithFloatingActionBar: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled, UnsavedChangesPopup },
+		components: { TabbedModal, UnsavedChangesPopup, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const dirty = ref(true)
@@ -170,9 +164,7 @@ export const WithFloatingActionBar: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="dirty = true; modalRef?.show()">Open with Floating Action Bar</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="dirty = true; modalRef?.show()">Open with Floating Action Bar</Button>
 				<TabbedModal
 					ref="modalRef"
 					header="Settings"
@@ -196,7 +188,7 @@ export const WithFloatingActionBar: StoryObj = {
 
 export const WithBadge: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { TabbedModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -221,9 +213,7 @@ export const WithBadge: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Badge</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Badge</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -232,7 +222,7 @@ export const WithBadge: StoryObj = {
 
 export const HiddenTabs: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { TabbedModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -257,9 +247,7 @@ export const HiddenTabs: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Hidden Tab</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Hidden Tab</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -268,7 +256,7 @@ export const HiddenTabs: StoryObj = {
 
 export const ManyTabs: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { TabbedModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -331,9 +319,7 @@ export const ManyTabs: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Many Tabs</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Many Tabs</Button>
 				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
@@ -342,7 +328,7 @@ export const ManyTabs: StoryObj = {
 
 export const ScrollableContent: StoryObj = {
 	render: () => ({
-		components: { TabbedModal, ButtonStyled },
+		components: { TabbedModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
 			const tabs = [
@@ -361,9 +347,7 @@ export const ScrollableContent: StoryObj = {
 		},
 		template: /* html */ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Scrollable Content</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Scrollable Content</Button>
 				<TabbedModal ref="modalRef" header="Scrollable Demo" :tabs="tabs" />
 			</div>
 		`,

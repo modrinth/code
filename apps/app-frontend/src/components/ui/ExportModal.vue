@@ -1,7 +1,7 @@
 <script setup>
 import { XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	FileTreeSelect,
@@ -208,18 +208,14 @@ function normalizeExportPath(path) {
 		</div>
 		<template #actions>
 			<div class="flex items-center justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="exportModal.hide">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button @click="exportPack">
-						<PackageIcon />
-						{{ formatMessage(messages.exportButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="exportModal.hide">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" @click="exportPack">
+					<PackageIcon />
+					{{ formatMessage(messages.exportButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>

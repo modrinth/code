@@ -2,13 +2,11 @@
 	<div v-if="canUnpublish" class="flex flex-col gap-2.5">
 		<span class="text-lg font-semibold text-contrast">{{ formatMessage(messages.title) }}</span>
 		<div>
-			<ButtonStyled color="orange">
-				<button :disabled="busy" @click="unpublishModal?.show()">
-					<SpinnerIcon v-if="unpublishing" class="animate-spin" />
-					<UnlinkIcon v-else class="size-5" />
-					{{ formatMessage(unpublishing ? messages.unpublishingButton : messages.unpublishButton) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="orange" :disabled="busy" @click="unpublishModal?.show()">
+				<SpinnerIcon v-if="unpublishing" class="animate-spin" />
+				<UnlinkIcon v-else class="size-5" />
+				{{ formatMessage(unpublishing ? messages.unpublishingButton : messages.unpublishButton) }}
+			</Button>
 		</div>
 		<span class="text-primary">{{ formatMessage(messages.unpublishDescription) }}</span>
 	</div>
@@ -17,13 +15,11 @@
 			formatMessage(messages.linkedTitle)
 		}}</span>
 		<div>
-			<ButtonStyled color="orange">
-				<button :disabled="busy" @click="unlinkModal?.show()">
-					<SpinnerIcon v-if="unlinking" class="animate-spin" />
-					<UnlinkIcon v-else class="size-5" />
-					{{ formatMessage(unlinking ? messages.unlinkingButton : messages.unlinkButton) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="orange" :disabled="busy" @click="unlinkModal?.show()">
+				<SpinnerIcon v-if="unlinking" class="animate-spin" />
+				<UnlinkIcon v-else class="size-5" />
+				{{ formatMessage(unlinking ? messages.unlinkingButton : messages.unlinkButton) }}
+			</Button>
 		</div>
 		<span class="text-primary">{{ formatMessage(messages.unlinkDescription) }}</span>
 	</div>
@@ -39,15 +35,11 @@
 		}}</Admonition>
 		<template #actions
 			><div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined"
-					><button class="!border" @click="unpublishModal?.hide()">
-						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-					</button></ButtonStyled
-				><ButtonStyled color="orange"
-					><button :disabled="busy" @click="confirmUnpublish">
-						<UnlinkIcon />{{ formatMessage(messages.unpublishButton) }}
-					</button></ButtonStyled
-				>
+				<Button type="outlined" class="!border" @click="unpublishModal?.hide()">
+					<XIcon />{{ formatMessage(commonMessages.cancelButton) }} </Button
+				><Button type="colored" color="orange" :disabled="busy" @click="confirmUnpublish">
+					<UnlinkIcon />{{ formatMessage(messages.unpublishButton) }}
+				</Button>
 			</div></template
 		>
 	</NewModal>
@@ -70,15 +62,16 @@
 		</div>
 		<template #actions
 			><div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined"
-					><button class="!border" @click="unlinkModal?.hide()">
-						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-					</button></ButtonStyled
-				><ButtonStyled color="orange"
-					><button :disabled="busy || backupBusy" @click="confirmUnlink">
-						<UnlinkIcon />{{ formatMessage(messages.unlinkButton) }}
-					</button></ButtonStyled
+				<Button type="outlined" class="!border" @click="unlinkModal?.hide()">
+					<XIcon />{{ formatMessage(commonMessages.cancelButton) }} </Button
+				><Button
+					type="colored"
+					color="orange"
+					:disabled="busy || backupBusy"
+					@click="confirmUnlink"
 				>
+					<UnlinkIcon />{{ formatMessage(messages.unlinkButton) }}
+				</Button>
 			</div></template
 		>
 	</NewModal>
@@ -88,7 +81,7 @@
 import { SpinnerIcon, UnlinkIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	InlineBackupCreator,

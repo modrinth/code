@@ -13,19 +13,26 @@
 
 			<template #actions>
 				<div class="flex justify-end gap-2">
-					<ButtonStyled type="outlined">
-						<button type="button" :disabled="isBlockingUser" @click="blockUserModal?.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button type="button" :disabled="isBlockingUser" @click="confirmBlockUser">
-							<SpinnerIcon v-if="isBlockingUser" class="animate-spin" />
-							<BanIcon v-else />
-							{{ formatMessage(messages.blockButton) }}
-						</button>
-					</ButtonStyled>
+					<Button
+						type="outlined"
+						native-type="button"
+						:disabled="isBlockingUser"
+						@click="blockUserModal?.hide()"
+					>
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="red"
+						native-type="button"
+						:disabled="isBlockingUser"
+						@click="confirmBlockUser"
+					>
+						<SpinnerIcon v-if="isBlockingUser" class="animate-spin" />
+						<BanIcon v-else />
+						{{ formatMessage(messages.blockButton) }}
+					</Button>
 				</div>
 			</template>
 		</NewModal>
@@ -42,28 +49,26 @@
 					:placeholder="formatMessage(messages.selectRolePlaceholder)"
 				/>
 				<div class="flex justify-end gap-2">
-					<ButtonStyled>
-						<button type="button" @click="cancelRoleEdit">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button
-							type="button"
-							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
-							@click="saveRoleEdit"
-						>
-							<template v-if="isSavingRole">
-								<SpinnerIcon class="animate-spin" />
-								{{ formatMessage(messages.savingLabel) }}
-							</template>
-							<template v-else>
-								<SaveIcon />
-								{{ formatMessage(commonMessages.saveChangesButton) }}
-							</template>
-						</button>
-					</ButtonStyled>
+					<Button native-type="button" @click="cancelRoleEdit">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						native-type="button"
+						:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+						@click="saveRoleEdit"
+					>
+						<template v-if="isSavingRole">
+							<SpinnerIcon class="animate-spin" />
+							{{ formatMessage(messages.savingLabel) }}
+						</template>
+						<template v-else>
+							<SaveIcon />
+							{{ formatMessage(commonMessages.saveChangesButton) }}
+						</template>
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -192,7 +197,7 @@
 			</div>
 		</NewModal>
 
-		<NormalPage :sidebar="sidebarPosition">
+		<NormalPage :sidebar="sidebarPosition" :full-width="variant === 'app'">
 			<template #header>
 				<UserPageHeader
 					:user="user"
@@ -284,7 +289,11 @@
 							}"
 							:layout="displayMode === 'list' ? 'list' : 'grid'"
 							:status="project.status"
-						/>
+						>
+							<template v-if="$slots['project-actions']" #actions>
+								<slot name="project-actions" :project="project" />
+							</template>
+						</ProjectCard>
 					</ProjectCardList>
 
 					<EmptyState
@@ -296,11 +305,9 @@
 						"
 					>
 						<template v-if="isSelf" #actions>
-							<ButtonStyled color="brand">
-								<button type="button" @click="createProject">
-									{{ formatMessage(messages.createProjectButton) }}
-								</button>
-							</ButtonStyled>
+							<Button type="colored" color="brand" native-type="button" @click="createProject">
+								{{ formatMessage(messages.createProjectButton) }}
+							</Button>
 						</template>
 					</EmptyState>
 
@@ -380,11 +387,9 @@
 						"
 					>
 						<template v-if="isSelf" #actions>
-							<ButtonStyled color="brand">
-								<button type="button" @click="createCollection">
-									{{ formatMessage(messages.createCollectionButton) }}
-								</button>
-							</ButtonStyled>
+							<Button type="colored" color="brand" native-type="button" @click="createCollection">
+								{{ formatMessage(messages.createCollectionButton) }}
+							</Button>
 						</template>
 					</EmptyState>
 				</div>
@@ -437,11 +442,9 @@
 			:description="formatMessage(messages.userLoadErrorDescription)"
 		>
 			<template #actions>
-				<ButtonStyled color="brand">
-					<button type="button" @click="retryQueries">
-						{{ formatMessage(commonMessages.retryButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" native-type="button" @click="retryQueries">
+					{{ formatMessage(commonMessages.retryButton) }}
+				</Button>
 			</template>
 		</EmptyState>
 	</div>
@@ -473,7 +476,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import Combobox from '#ui/components/base/Combobox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'

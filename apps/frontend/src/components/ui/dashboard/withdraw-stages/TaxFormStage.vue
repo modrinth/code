@@ -47,11 +47,9 @@
 					<FileTextIcon :class="iconClass" />
 				</template>
 				<template #actions>
-					<ButtonStyled color="orange">
-						<button @click="showTaxFormModal">
-							{{ formatMessage(messages.completeTaxForm) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="orange" @click="showTaxFormModal">
+						{{ formatMessage(messages.completeTaxForm) }}
+					</Button>
 				</template>
 			</Admonition>
 		</template>
@@ -76,7 +74,7 @@
 import { FileTextIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
+	Button,
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,

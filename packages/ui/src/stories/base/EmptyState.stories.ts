@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import EmptyState from '../../components/base/EmptyState.vue'
 
 const meta = {
@@ -42,7 +42,7 @@ export const Default: Story = {
 
 export const WithActions: StoryObj = {
 	render: () => ({
-		components: { EmptyState, ButtonStyled },
+		components: { EmptyState, Button },
 		template: /*html*/ `
 			<EmptyState
 				type="empty-inbox"
@@ -50,9 +50,7 @@ export const WithActions: StoryObj = {
 				description="Create your first backup"
 			>
 				<template #actions>
-					<ButtonStyled color="brand">
-						<button>Create backup</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand">Create backup</Button>
 				</template>
 			</EmptyState>
 		`,

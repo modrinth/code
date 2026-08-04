@@ -7,6 +7,7 @@
 		:show-preview-filter-icon="showPreviewFilterIcon"
 		:preview-trigger-class="previewTriggerClass"
 		:add-button-class="addButtonClass"
+		:add-button-size="addButtonSize"
 		:clear-label="formatMessage(analyticsMessages.resetButton)"
 		:add-label="resolvedAddLabel"
 		checkbox-position="right"
@@ -199,6 +200,7 @@
 import { BoxIcon, UserIcon } from '@modrinth/assets'
 import {
 	buildDependentsSearchFilters,
+	type ButtonSize,
 	DropdownFilterBar,
 	type DropdownFilterBarCategory,
 	type DropdownFilterBarOption,
@@ -273,6 +275,7 @@ const props = withDefaults(
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
 		addButtonClass?: string
+		addButtonSize?: ButtonSize
 		showClearAction?: boolean
 	}>(),
 	{

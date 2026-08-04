@@ -1307,14 +1307,16 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	const options: OverflowMenuOption[] = []
 
 	options.push({
-		id: formatMessage(commonMessages.showFileButton),
+		id: 'show-file',
+		label: formatMessage(commonMessages.showFileButton),
 		icon: FolderOpenIcon,
 		action: () => highlightModInInstance(instance.value.id, item.file_path),
 	})
 
 	if (item.project?.slug) {
 		options.push({
-			id: formatMessage(commonMessages.copyLinkButton),
+			id: 'copy-link',
+			label: formatMessage(commonMessages.copyLinkButton),
 			icon: ClipboardCopyIcon,
 			action: async () => {
 				await navigator.clipboard.writeText(

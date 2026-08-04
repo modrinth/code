@@ -9,7 +9,7 @@ import {
 	XCircleIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
@@ -224,45 +224,60 @@ const messages = defineMessages({
 							wrapper-class="flex-1 min-w-0"
 							@update:model-value="(val) => (javaPath = String(val))"
 						/>
-						<ButtonStyled
+						<Button
+							type="quiet"
 							:color="
 								!hoveringTest && !testingJava
 									? javaTestResult === true
 										? 'green'
 										: 'red'
-									: 'standard'
+									: undefined
 							"
-							color-fill="text"
+							:disabled="!overrideJavaInstall || testingJava"
+							:style="{
+								'--legacy-button-color':
+									(!hoveringTest && !testingJava
+										? javaTestResult === true
+											? 'green'
+											: 'red'
+										: 'standard') &&
+									(!hoveringTest && !testingJava
+										? javaTestResult === true
+											? 'green'
+											: 'red'
+										: 'standard') !== 'standard'
+										? `var(--color-${
+												!hoveringTest && !testingJava
+													? javaTestResult === true
+														? 'green'
+														: 'red'
+													: 'standard'
+											})`
+										: undefined,
+							}"
+							class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
+							@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
+							@mouseenter="overrideJavaInstall && (hoveringTest = true)"
+							@mouseleave="hoveringTest = false"
 						>
-							<button
-								:disabled="!overrideJavaInstall || testingJava"
-								@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
-								@mouseenter="overrideJavaInstall && (hoveringTest = true)"
-								@mouseleave="hoveringTest = false"
-							>
-								<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-								<CheckCircleIcon
-									v-else-if="javaTestResult === true && !hoveringTest"
-									class="h-4 w-4"
-								/>
-								<XCircleIcon v-else-if="javaTestResult !== true && !hoveringTest" class="h-4 w-4" />
-								<RefreshCwIcon v-else-if="overrideJavaInstall" class="h-4 w-4" />
-							</button>
-						</ButtonStyled>
+							<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+							<CheckCircleIcon
+								v-else-if="javaTestResult === true && !hoveringTest"
+								class="h-4 w-4"
+							/>
+							<XCircleIcon v-else-if="javaTestResult !== true && !hoveringTest" class="h-4 w-4" />
+							<RefreshCwIcon v-else-if="overrideJavaInstall" class="h-4 w-4" />
+						</Button>
 					</div>
 					<div v-if="overrideJavaInstall" class="flex gap-2">
-						<ButtonStyled>
-							<button @click="handleDetectJava">
-								<SearchIcon />
-								Detect
-							</button>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button @click="handleBrowseJava">
-								<FolderSearchIcon />
-								Browse
-							</button>
-						</ButtonStyled>
+						<Button @click="handleDetectJava">
+							<SearchIcon />
+							Detect
+						</Button>
+						<Button @click="handleBrowseJava">
+							<FolderSearchIcon />
+							Browse
+						</Button>
 					</div>
 				</div>
 			</div>

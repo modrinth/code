@@ -1229,6 +1229,9 @@
   "app.update.complete-toast.title": {
     "message": "Version {version} was successfully installed!"
   },
+  "app.user.project.install-to-instance": {
+    "message": "Install to instance"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },

@@ -15,11 +15,12 @@ import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { useFormatPrice } from '../../composables'
 import { useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import { regionOverrides } from '../../utils/regions'
-import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
 import TagItem from '../base/TagItem.vue'
 import ModrinthServersIcon from '../servers/ModrinthServersIcon.vue'
@@ -323,12 +324,10 @@ function setInterval(newInterval: ServerBillingInterval) {
 				No payment method selected
 			</div>
 		</template>
-		<ButtonStyled size="small" type="transparent">
-			<button class="ml-auto" @click="emit('changePaymentMethod')">
-				<template v-if="selectedPaymentMethod || hasPaymentMethod"> <EditIcon /> Change </template>
-				<template v-else> Select payment method <RightArrowIcon /> </template>
-			</button>
-		</ButtonStyled>
+		<Button type="quiet" size="xs" class="ml-auto !h-6" @click="emit('changePaymentMethod')">
+			<template v-if="selectedPaymentMethod || hasPaymentMethod"> <EditIcon /> Change </template>
+			<template v-else> Select payment method <RightArrowIcon /> </template>
+		</Button>
 	</div>
 	<p v-if="!noPaymentRequired" class="m-0 mt-4 text-sm text-secondary">
 		<template v-if="isUpgrade && (total ?? 0) > 0">

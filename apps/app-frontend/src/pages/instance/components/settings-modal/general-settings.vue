@@ -2,13 +2,13 @@
 import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	Checkbox,
 	Chips,
 	defineMessages,
 	injectNotificationManager,
-	OverflowMenu,
 	StyledInput,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -298,17 +298,24 @@ const messages = defineMessages({
 			<div class="flex flex-col gap-1">
 				<span class="text-lg font-semibold text-contrast">Icon</span>
 				<div class="group relative w-fit">
-					<OverflowMenu
-						v-tooltip="formatMessage(messages.editIcon)"
-						class="bg-transparent border-none appearance-none p-0 m-0 cursor-pointer group-active:scale-95 transition-transform"
+					<TeleportOverflowMenu
+						:label="formatMessage(messages.editIcon)"
+						:tooltip="formatMessage(messages.editIcon)"
+						:icon-only="false"
+						type="quiet"
+						interaction="none"
+						class="m-0 !h-auto cursor-pointer appearance-none border-none bg-transparent !p-0 transition-transform group-active:scale-95"
 						:options="[
 							{
 								id: 'select',
+								label: icon
+									? formatMessage(messages.replaceIcon)
+									: formatMessage(messages.selectIcon),
 								action: () => setIcon(),
 							},
 							{
 								id: 'remove',
-								color: 'danger',
+								label: formatMessage(messages.removeIcon),
 								action: () => resetIcon(),
 								shown: !!icon,
 							},
@@ -331,7 +338,7 @@ const messages = defineMessages({
 							{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
 						</template>
 						<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
-					</OverflowMenu>
+					</TeleportOverflowMenu>
 				</div>
 			</div>
 		</div>
@@ -352,17 +359,15 @@ const messages = defineMessages({
 				<h2 id="duplicate-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
-				<ButtonStyled>
-					<button
-						v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
-						aria-labelledby="duplicate-instance-label"
-						:disabled="installing"
-						class="w-max !shadow-none"
-						@click="duplicateInstance"
-					>
-						<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
+					aria-labelledby="duplicate-instance-label"
+					:disabled="installing"
+					class="w-max"
+					@click="duplicateInstance"
+				>
+					<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
+				</Button>
 				<p class="m-0">
 					{{ formatMessage(messages.duplicateInstanceDescription) }}
 				</p>
@@ -388,11 +393,9 @@ const messages = defineMessages({
 						class="w-full max-w-[300px]"
 						@submit="() => addCategory"
 					/>
-					<ButtonStyled>
-						<button class="w-fit !shadow-none" @click="() => addCategory()">
-							<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
-						</button>
-					</ButtonStyled>
+					<Button class="w-fit" @click="() => addCategory()">
+						<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
+					</Button>
 				</div>
 			</div>
 			<p class="m-0">
@@ -421,22 +424,22 @@ const messages = defineMessages({
 			<h2 id="delete-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.deleteInstance) }}
 			</h2>
-			<ButtonStyled color="red">
-				<button
-					aria-labelledby="delete-instance-label"
-					:disabled="removing"
-					class="w-fit !shadow-none"
-					@click="deleteConfirmModal.show()"
-				>
-					<SpinnerIcon v-if="removing" class="animate-spin" />
-					<TrashIcon v-else />
-					{{
-						removing
-							? formatMessage(messages.deletingInstanceButton)
-							: formatMessage(messages.deleteInstanceButton)
-					}}
-				</button>
-			</ButtonStyled>
+			<Button
+				type="colored"
+				color="red"
+				aria-labelledby="delete-instance-label"
+				:disabled="removing"
+				class="w-fit"
+				@click="deleteConfirmModal.show()"
+			>
+				<SpinnerIcon v-if="removing" class="animate-spin" />
+				<TrashIcon v-else />
+				{{
+					removing
+						? formatMessage(messages.deletingInstanceButton)
+						: formatMessage(messages.deleteInstanceButton)
+				}}
+			</Button>
 			<p class="m-0">
 				{{ formatMessage(messages.deleteInstanceDescription) }}
 			</p>
