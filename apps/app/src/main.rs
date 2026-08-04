@@ -9,7 +9,6 @@ use std::env;
 use std::sync::atomic::Ordering;
 use tauri::{Listener, Manager};
 use tauri_plugin_fs::FsExt;
-use theseus::AppEvent;
 use theseus::prelude::*;
 
 mod api;
@@ -28,7 +27,7 @@ mod updater_impl_noop;
 #[tauri::command]
 async fn initialize_state(
     app: tauri::AppHandle,
-    events: tauri::ipc::Channel<AppEvent>,
+    events: tauri::ipc::Channel<tauri::ipc::InvokeResponseBody>,
 ) -> api::Result<()> {
     tracing::info!("Initializing app event state...");
     theseus::EventState::init(app.clone(), events).await?;
@@ -115,6 +114,13 @@ async fn set_restart_after_pending_update(
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
+    #[cfg(feature = "export-app-events")]
+    theseus::export_app_event_bindings(
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../app-frontend/src/generated/app-events"),
+    )
+    .expect("failed to export app event TypeScript bindings");
+
     /*
         tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
             ERROR > WARN > INFO > DEBUG > TRACE

@@ -5,4 +5,4 @@
 
 The event bus types are determined by the Rust [`AppEvent`](../../../../../packages/app-lib/src/event/mod.rs) contract.
 
-After changing that contract, run `cargo export-app-events` from the workspace root.
+They are regenerated automatically when you run `pnpm app:dev` from the workspace root. Commit any generated changes with the Rust contract change.

@@ -30,7 +30,7 @@ export type OpeningCommand = Extract<AppEvent, { type: 'command' }>['payload']
 
 // Initialize the theseus API state
 // This should be called during the initializion/opening of the launcher
-export async function initialize_state(events: Channel<AppEvent>) {
+export async function initialize_state(events: Channel<ArrayBuffer>) {
 	return await invoke<void>('initialize_state', { events })
 }
 

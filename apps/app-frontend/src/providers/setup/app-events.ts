@@ -1,3 +1,4 @@
+import { decode } from '@msgpack/msgpack'
 import { Channel } from '@tauri-apps/api/core'
 import { onScopeDispose } from 'vue'
 
@@ -39,7 +40,8 @@ export function setupAppEventsProvider() {
 	}
 
 	const events: AppEvents = { on, once }
-	const channel = new Channel<AppEvent>((event) => {
+	const channel = new Channel<ArrayBuffer>((payload) => {
+		const event = decode(payload) as AppEvent
 		const eventHandlers = handlers.get(event.type)
 		if (!eventHandlers) return
 

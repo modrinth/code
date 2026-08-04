@@ -76,6 +76,7 @@ reqwest = { workspace = true, features = [
   "stream",
 ] }
 rgb = { workspace = true }
+rmp-serde = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"] }
 serde_ini = { workspace = true }
 serde_json = { workspace = true }
@@ -108,7 +109,11 @@ tokio-util = { workspace = true, features = ["compat", "io", "io-util", "time"] 
 tracing = { workspace = true }
 tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
-ts-rs = { workspace = true, features = ["chrono-impl", "no-serde-warnings", "uuid-impl"], optional = true }
+ts-rs = { workspace = true, features = [
+  "chrono-impl",
+  "no-serde-warnings",
+  "uuid-impl"
+], optional = true }
 url = { workspace = true, features = ["serde"] }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
@@ -119,7 +124,6 @@ zip = { workspace = true }
 [build-dependencies]
 dotenvy = { workspace = true }
 dunce = { workspace = true }
-sha2 = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cidre = { workspace = true, features = ["blocks", "nw"] }
@@ -132,12 +136,7 @@ winreg = { workspace = true }
 [features]
 cli = ["dep:indicatif"]
 export-ts = ["dep:ts-rs"]
-tauri = ["dep:tauri"]
-
-[[bin]]
-name = "export-app-events"
-path = "src/bin/export_app_events.rs"
-required-features = ["export-ts"]
+tauri = ["dep:rmp-serde", "dep:tauri"]
 
 [lints]
 workspace = true
