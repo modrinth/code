@@ -147,7 +147,7 @@ onUnmounted(() => {
 })
 </script>
 <template>
-	<SmartClickable>
+	<SmartClickable class="[--active-scale:0.99]">
 		<template #clickable>
 			<router-link
 				class="no-click-animation"
@@ -155,7 +155,7 @@ onUnmounted(() => {
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 border border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover min-h-20 p-3"
+			class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 border border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover transition-[filter] ease-out [--hover-brightness:1.1] min-h-20 p-3"
 			:class="newlyAdded ? 'border-dashed bg-surface-2' : 'bg-bg-raised border-solid'"
 		>
 			<Avatar
@@ -168,7 +168,7 @@ onUnmounted(() => {
 			<div class="flex flex-col col-span-2 justify-center gap-1 h-full">
 				<div class="flex items-center gap-2">
 					<div
-						class="text-contrast truncate smart-clickable:underline-on-hover"
+						class="text-contrast truncate"
 						:class="newlyAdded ? 'text-base font-semibold' : 'text-lg font-bold'"
 					>
 						{{ instance.name }}
@@ -184,6 +184,7 @@ onUnmounted(() => {
 				<div class="flex items-center gap-1.5 text-sm text-secondary">
 					<span v-if="modpack" class="flex items-center gap-1 truncate text-secondary">
 						<router-link
+							data-no-card-click
 							class="inline-flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
 							:to="`/project/${modpack.id}`"
 						>
@@ -218,7 +219,7 @@ onUnmounted(() => {
 					</div>
 				</div>
 			</div>
-			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
+			<div data-no-card-click class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
 				<ButtonStyled v-if="playing && !loading" color="red">
 					<button @click="stop">
 						<StopCircleIcon aria-hidden="true" />
@@ -271,3 +272,8 @@ onUnmounted(() => {
 		</div>
 	</SmartClickable>
 </template>
+<style scoped>
+.clickable-card:has([data-no-card-click]:hover) {
+	--hover-brightness: 1;
+}
+</style>

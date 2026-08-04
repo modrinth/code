@@ -247,7 +247,7 @@ const messages = defineMessages({
 })
 </script>
 <template>
-	<SmartClickable>
+	<SmartClickable class="[--active-scale:0.985]">
 		<template v-if="instanceId" #clickable>
 			<router-link
 				class="no-click-animation"
@@ -255,7 +255,7 @@ const messages = defineMessages({
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] active:scale-[0.99]! min-h-20"
+			class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
 			:class="{
 				'world-item-highlighted': highlighted,
 			}"
@@ -272,7 +272,7 @@ const messages = defineMessages({
 			/>
 			<div class="flex flex-col justify-center gap-0.5 h-full">
 				<div class="flex items-center gap-2">
-					<div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
+					<div class="text-lg text-contrast font-bold truncate">
 						{{ world.name }}
 					</div>
 					<TagItem
@@ -351,6 +351,7 @@ const messages = defineMessages({
 				<div class="flex items-center gap-1.5 text-sm text-secondary">
 					<template v-if="instanceId">
 						<router-link
+							data-no-card-click
 							class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
 							:to="`/instance/${instanceId}`"
 						>
@@ -411,7 +412,7 @@ const messages = defineMessages({
 					</template>
 				</template>
 			</div>
-			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
+			<div data-no-card-click class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
 				<ButtonStyled
 					v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
 					color="red"
@@ -588,6 +589,10 @@ const messages = defineMessages({
 	</SmartClickable>
 </template>
 <style scoped lang="scss">
+.clickable-card:has([data-no-card-click]:hover) {
+	--hover-brightness: 1;
+}
+
 .world-item-highlighted {
 	position: relative;
 	animation: fade-highlight 4s ease-out;
