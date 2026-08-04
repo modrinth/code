@@ -29,7 +29,7 @@ import { computed } from 'vue'
 
 import { get_user } from '@/helpers/cache'
 
-import { instanceAdmonitionsMessages as messages } from './instance-admonitions-messages'
+import { instanceAdmonitionsMessages as messages } from './messages'
 import type { SharedInstanceRole } from './types'
 
 const props = defineProps<{
