@@ -73,6 +73,10 @@ impl LauncherFeatureVersion {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ModLoader {
     Vanilla,

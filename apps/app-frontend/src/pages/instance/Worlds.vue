@@ -174,9 +174,9 @@ import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWo
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
-import { instance_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
@@ -188,7 +188,6 @@ import {
 	handleDefaultInstanceUpdateEvent,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
-	type InstanceEvent,
 	normalizeServerAddress,
 	type ProtocolVersion,
 	refreshServerData,
@@ -428,35 +427,31 @@ watch(
 	{ immediate: true },
 )
 
-let unlistenInstance: (() => void) | null = null
 let worldsTabAlive = true
 
+useAppEvent('instance', async (event) => {
+	if (event.instance_id !== instance.value.id) return
+
+	console.info(`Handling instance event '${event.event}' for instance: ${event.instance_id}`)
+
+	if (event.event === 'servers_updated') {
+		if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
+		if (isLinux) linuxRefreshCount.value++
+
+		await refreshAllWorlds()
+	}
+
+	await handleDefaultInstanceUpdateEvent(worlds.value, instance.value.id, event)
+})
+
 async function initWorldsTab() {
-	const [_unlistenInstance, resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
-		instance_listener(async (e: InstanceEvent) => {
-			if (e.instance_id !== instance.value.id) return
-
-			console.info(`Handling instance event '${e.event}' for instance: ${e.instance_id}`)
-
-			if (e.event === 'servers_updated') {
-				if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
-				if (isLinux) linuxRefreshCount.value++
-
-				await refreshAllWorlds()
-			}
-
-			await handleDefaultInstanceUpdateEvent(worlds.value, instance.value.id, e)
-		}),
+	const [resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
 		get_instance_protocol_version(instance.value.id).catch(() => null),
 		get_game_versions().catch(() => [] as GameVersion[]),
 	])
 
-	if (!worldsTabAlive) {
-		_unlistenInstance()
-		return
-	}
+	if (!worldsTabAlive) return
 
-	unlistenInstance = _unlistenInstance
 	protocolVersion.value = resolvedProtocolVersion
 	gameVersions.value = resolvedGameVersions
 	protocolVersionReady.value = true
@@ -753,6 +748,5 @@ async function proceedRemoveWorld(world: World) {
 
 onBeforeUnmount(() => {
 	worldsTabAlive = false
-	unlistenInstance?.()
 })
 </script>

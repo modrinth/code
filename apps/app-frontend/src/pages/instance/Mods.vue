@@ -126,13 +126,9 @@ import { useRouter } from 'vue-router'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
-import {
-	instance_bulk_update_progress_listener,
-	instance_listener,
-	type InstanceBulkUpdateProgress,
-} from '@/helpers/events.js'
 import {
 	add_project_from_path,
 	edit,
@@ -148,10 +144,13 @@ import { type InstanceContentData, loadInstanceContentData } from '@/helpers/ins
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
+import { type AppEventPayload, injectAppEvents } from '@/providers/app-events'
 import { injectContentInstall } from '@/providers/content-install'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { useTheming } from '@/store/state'
 import type { FeatureFlag } from '@/store/theme'
+
+type InstanceBulkUpdateProgress = AppEventPayload<'instance_bulk_update_progress'>
 
 const messages = defineMessages({
 	shareTitle: {
@@ -207,6 +206,7 @@ function contentOwnerLink(owner: ContentOwner): NonNullable<ContentOwner['link']
 
 const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
+const appEvents = injectAppEvents()
 const { installingItems, installRevisionByInstance, installFailureRevisionByInstance } =
 	injectContentInstall()
 const router = useRouter()
@@ -786,7 +786,7 @@ async function bulkUpdateAllProjects(onProgress?: (status: BulkOperationStatus) 
 				message: formatMessage(messages.bulkUpdateResolvingVersions),
 				waiting: true,
 			})
-			unlisten = await instance_bulk_update_progress_listener((progress) => {
+			unlisten = appEvents.on('instance_bulk_update_progress', (progress) => {
 				if (progress.instanceId !== props.instance.id) return
 				onProgress(formatBulkUpdateProgress(progress))
 			})
@@ -1547,7 +1547,18 @@ const removeBeforeEach = router.beforeEach(() => {
 
 let isUnmounted = false
 let unlistenDragDrop: UnlistenFn | null = null
-let unlistenInstances: UnlistenFn | null = null
+
+useAppEvent('instance', async (event) => {
+	if (
+		props.instance &&
+		event.instance_id === props.instance.id &&
+		event.event === 'synced' &&
+		props.instance.install_stage === 'installed' &&
+		!isBulkOperating.value
+	) {
+		await initProjects()
+	}
+})
 
 onMounted(() => {
 	void getCurrentWebview()
@@ -1567,27 +1578,6 @@ onMounted(() => {
 			}
 
 			unlistenDragDrop = unlisten
-		})
-		.catch(handleError)
-
-	void instance_listener(async (event: { event: string; instance_id: string }) => {
-		if (
-			props.instance &&
-			event.instance_id === props.instance.id &&
-			event.event === 'synced' &&
-			props.instance.install_stage === 'installed' &&
-			!isBulkOperating.value
-		) {
-			await initProjects()
-		}
-	})
-		.then((unlisten) => {
-			if (isUnmounted) {
-				unlisten()
-				return
-			}
-
-			unlistenInstances = unlisten
 		})
 		.catch(handleError)
 })
@@ -1625,6 +1615,5 @@ onUnmounted(() => {
 	isUnmounted = true
 	removeBeforeEach()
 	unlistenDragDrop?.()
-	unlistenInstances?.()
 })
 </script>

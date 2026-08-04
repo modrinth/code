@@ -126,7 +126,9 @@ pub async fn parse_command(
         if let Some(ext) = path.extension()
             && ext == "mrpack"
         {
-            return Ok(CommandPayload::RunMRPack { path });
+            return Ok(CommandPayload::RunMRPack {
+                path: path.to_string_lossy().into_owned(),
+            });
         }
         emit_warning(&format!(
             "Invalid command, unrecognized filetype: {}",

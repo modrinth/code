@@ -1,0 +1,8 @@
+{
+    "name": "postcard",
+    "description": "Auto generated bindings for postcard format serializing and deserializing javascript to and from bytes.",
+    "version": "0.0.0",
+    "main": "index.js",
+	"types": "index.d.ts",
+	"type": "module"
+}

@@ -59,6 +59,14 @@ apps/frontend/src/generated
 .turbo
 target
 generated
+!apps/app-frontend/src/generated/
+!apps/app-frontend/src/generated/app-events/
+!apps/app-frontend/src/generated/app-events/*.ts
+!apps/app-frontend/src/generated/app-events/README.md
+!apps/app-frontend/src/generated/app-events/postcard/
+!apps/app-frontend/src/generated/app-events/postcard/index.d.ts
+!apps/app-frontend/src/generated/app-events/postcard/index.js
+!apps/app-frontend/src/generated/app-events/postcard/package.json
 .env
 
 # app testing dir
