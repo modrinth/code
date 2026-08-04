@@ -71,7 +71,7 @@
 					</span>
 				</label>
 
-				<div class="flex w-1/2 items-center gap-2">
+				<div class="flex w-1/2 flex-col gap-2">
 					<StyledInput
 						id="license-url"
 						v-model="current.licenseUrl"
@@ -83,7 +83,7 @@
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
-					<LinkWarningIcon :check="effectiveLicenseCheck" />
+					<LinkCheckMessage :check="effectiveLicenseCheck" />
 				</div>
 			</div>
 
@@ -155,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLicenseUrlCheck } from '@modrinth/moderation'
+import { useLinkCheck } from '@modrinth/moderation'
 import {
 	Checkbox,
 	ConfirmLeaveModal,
@@ -174,7 +174,7 @@ import {
 } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import LinkWarningIcon from '@/components/LinkWarningIcon.vue'
+import LinkCheckMessage from '@/components/LinkCheckMessage.vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
@@ -227,10 +227,13 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	},
 )
 
-const licenseUrl = computed(() => current.value.licenseUrl)
-const effectiveLicenseCheck = useLicenseUrlCheck(
-	licenseUrl,
-	computed(() => current.value.license),
+const effectiveLicenseCheck = useLinkCheck(
+	computed(() => ({
+		field: 'license',
+		url: current.value.licenseUrl,
+		expectedLicense: current.value.license.short,
+		isCustom: current.value.license.friendly === 'Custom',
+	})),
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)

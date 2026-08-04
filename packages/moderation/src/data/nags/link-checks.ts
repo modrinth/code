@@ -1,36 +1,17 @@
 import {defineMessage, defineMessages, type MessageDescriptor} from "@modrinth/ui"
 import {computed, reactive, type Ref, watch} from "vue"
 
-export type LinkField =
-  | "source"
-  | "issues"
-  | "wiki"
-  | "discord"
-  | "site"
-  | "store"
-  | "patreon"
-  | "bmac"
-  | "paypal"
-  | "github"
-  | "ko-fi"
-  | "other"
-  | "license"
-
-const donationFields = new Set<LinkField>(["patreon", "bmac", "paypal", "github", "ko-fi", "other"])
-
-interface LinkFieldInfo {
-  name: LinkField
-  isDonation: boolean
+export interface LinkCheckContext {
+  url: string | undefined
+  field: string
+  [key: string]: unknown
 }
 
-function fieldInfo(name: LinkField): LinkFieldInfo {
-  return {name, isDonation: donationFields.has(name)}
+export interface LinkCheckResult {
+  severity: "valid" | "warn" | "error"
+  message?: MessageDescriptor
+  values?: Record<string, unknown>
 }
-
-export type LinkCheckResult =
-  | { severity: "valid" }
-  | { severity: "warn"; message: MessageDescriptor; values?: Record<string, unknown> }
-  | { severity: "error"; message: MessageDescriptor; values?: Record<string, unknown> }
 
 const valid: LinkCheckResult = {severity: "valid"}
 
@@ -42,16 +23,20 @@ function error(message: MessageDescriptor, values?: Record<string, unknown>): Li
   return {severity: "error", message, values}
 }
 
-type FieldMatcher = LinkField | LinkField[] | ((field: LinkFieldInfo) => boolean)
+type FieldMatcher = string | string[] | ((field: string, context: LinkCheckContext) => boolean)
 
-function matchesField(matcher: FieldMatcher, field: LinkFieldInfo): boolean {
-  if (typeof matcher === "function") return matcher(field)
-  if (Array.isArray(matcher)) return matcher.includes(field.name)
-  return matcher === field.name
+function matchesField(matcher: FieldMatcher, context: LinkCheckContext): boolean {
+  if (typeof matcher === "function") return matcher(context.field, context)
+  if (Array.isArray(matcher)) return matcher.includes(context.field)
+  return matcher === context.field
 }
 
-type LinkCheckVerify = (match: RegExpMatchArray) => Promise<LinkCheckResult>
-type LinkCheckMatcher = RegExp | ((remaining: string) => number | null)
+type LinkCheckVerify = (match: RegExpMatchArray, context: LinkCheckContext) => Promise<LinkCheckResult>
+type LinkCheckMatcher = RegExp | ((remaining: string) => number | null | Promise<number | null>)
+
+function isAsyncMatcher(when: LinkCheckMatcher): boolean {
+  return when instanceof RegExp ? false : when.constructor.name === "AsyncFunction"
+}
 
 interface LinkCheckNode {
   when: LinkCheckMatcher
@@ -81,7 +66,12 @@ interface LinkCheckBuilder {
   transparent(): LinkCheckBuilder
 }
 
-type LinkCheckChildShape = LinkCheckNode | LinkCheckBuilder | RegExp | string | ((remaining: string) => number | null)
+type LinkCheckChildShape =
+  | LinkCheckNode
+  | LinkCheckBuilder
+  | RegExp
+  | string
+  | ((remaining: string) => number | null | Promise<number | null>)
 
 function anchored(source: string): RegExp {
   return new RegExp(`^${source}`, "i")
@@ -127,7 +117,7 @@ function buildNode(when: LinkCheckMatcher, label?: string): LinkCheckBuilder {
   return node as unknown as LinkCheckBuilder
 }
 
-function check(when: RegExp | string | ((remaining: string) => number | null), label?: string): LinkCheckBuilder {
+function check(when: RegExp | string | ((remaining: string) => number | null | Promise<number | null>), label?: string): LinkCheckBuilder {
   const matcher = typeof when === "function" ? when : typeof when === "string" ? new RegExp(when) : when
   return buildNode(matcher, label)
 }
@@ -148,12 +138,17 @@ interface MatchResult {
   expectedChild?: LinkCheckNode
 }
 
-function matchNode(node: LinkCheckNode, remaining: string, field: LinkFieldInfo): MatchResult | null {
+async function matchNode(
+  node: LinkCheckNode,
+  remaining: string,
+  context: LinkCheckContext,
+  isRoot = false,
+): Promise<MatchResult | null> {
   let match: RegExpMatchArray | null
   if (node.when instanceof RegExp) {
     match = node.when.exec(remaining)
   } else {
-    const consumed = node.when(remaining)
+    const consumed = await node.when(remaining)
     match =
       consumed === null
         ? null
@@ -161,7 +156,7 @@ function matchNode(node: LinkCheckNode, remaining: string, field: LinkFieldInfo)
   }
 
   if (!match) {
-    if (!node.unrecognizedMessage) return null
+    if (!isRoot || !node.unrecognizedMessage) return null
     return {
       node: {
         when: node.when,
@@ -175,11 +170,13 @@ function matchNode(node: LinkCheckNode, remaining: string, field: LinkFieldInfo)
 
   if (node.childNodes?.length) {
     const rest = remaining.slice(match[0].length)
+    const syncChildren = node.childNodes.filter((child) => !isAsyncMatcher(child.when))
+    const asyncChildren = node.childNodes.filter((child) => isAsyncMatcher(child.when))
     let expectedChild: LinkCheckNode | undefined
-    for (const child of node.childNodes) {
-      const found = matchNode(child, rest, field)
+    for (const child of [...syncChildren, ...asyncChildren]) {
+      const found = await matchNode(child, rest, context)
       if (found) return found
-      if (!expectedChild && child.forMatchers?.some((matcher) => matchesField(matcher, field))) expectedChild = child
+      if (!expectedChild && child.forMatchers?.some((matcher) => matchesField(matcher, context))) expectedChild = child
     }
     if (node.isTransparent) return null
     return {node, match, expectedChild}
@@ -206,7 +203,7 @@ const coreMessages = defineMessages({
 //TODO: we should probably just let you not provide https but backend currently requires it
 const invalidUrlMessage = defineMessage({
   id: "nags.link.invalid-url",
-  defaultMessage: "Links must be a valid https:// URL, not a raw IP address or localhost.",
+  defaultMessage: "This is not a valid URL.",
 })
 
 function validUrlPrefix(remaining: string): number | null {
@@ -218,8 +215,8 @@ function validUrlPrefix(remaining: string): number | null {
     // https pls
     if (url.protocol !== "https:") return null;
 
-    // ensure domain is present
-    if (!hostname.includes(".")) return null;
+    // ensure there's a domain and TLD
+    if (!/[^.]\.[^.]/.test(hostname)) return null;
 
     // reserved TLDs
     if (/(^|\.)(local|localhost|test|example|invalid|onion|arpa|home)$/i.test(hostname)) return null;
@@ -243,24 +240,29 @@ const rootNode = checks as unknown as LinkCheckNode
 
 const cache = reactive(new Map<string, "pending" | LinkCheckResult>())
 
-function cacheKey(field: LinkField, url: string): string {
-  return `${field}:${url}`
+function cacheKey(context: LinkCheckContext): string {
+  return JSON.stringify(context)
 }
 
-function checkLink(field: LinkField, url: string | null | undefined) {
+async function checkLink(context: LinkCheckContext) {
+  const url = context.url
   if (!url) return
-  const key = cacheKey(field, url)
+  const key = cacheKey(context)
   if (cache.has(key)) return
 
   const normalizedUrl = url.replace(/^(https:\/\/)www\./i, "$1")
-  const info = fieldInfo(field)
 
-  const found = matchNode(rootNode, normalizedUrl, info)
-  if (!found) return
+  cache.set(key, "pending")
+
+  const found = await matchNode(rootNode, normalizedUrl, context, true)
+  if (!found) {
+    cache.delete(key)
+    return
+  }
   const {node: matched, match, expectedChild} = found
 
   const isLeaf = !matched.childNodes?.length
-  const applies = isLeaf && matched.forMatchers?.some((matcher) => matchesField(matcher, info))
+  const applies = isLeaf && matched.forMatchers?.some((matcher) => matchesField(matcher, context))
 
   if (!applies) {
     const build = matched.unrecognizedSeverity === "warn" ? warn : error
@@ -292,28 +294,30 @@ function checkLink(field: LinkField, url: string | null | undefined) {
   }
 
   cache.set(key, "pending")
-  matched.verify(match).then(
+  matched.verify(match, context).then(
     (result) => cache.set(key, result),
     () => cache.delete(key),
   )
 }
 
-function getLinkCheckState(field: LinkField, url: string | null | undefined) {
-  if (!url) return undefined
-  return cache.get(cacheKey(field, url))
+function getLinkCheckState(context: LinkCheckContext): LinkCheckResult | undefined {
+  if (!context.url) return undefined
+  const state = cache.get(cacheKey(context))
+  return typeof state === "object" ? state : undefined
 }
 
-function useLinkCheck(field: LinkField, url: Ref<string | null | undefined>) {
+function useLinkCheck(context: Ref<LinkCheckContext>) {
   let timeout: ReturnType<typeof setTimeout>
-  watch(url, (value) => {
-    clearTimeout(timeout)
-    timeout = setTimeout(() => checkLink(field, value), 500)
-  })
+  watch(
+    context,
+    (value) => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => checkLink(value), 500)
+    },
+    {deep: true},
+  )
 
-  return computed(() => {
-    const state = getLinkCheckState(field, url.value)
-    return typeof state === "object" ? state : null
-  })
+  return computed(() => getLinkCheckState(context.value) ?? null)
 }
 
 async function discordInviteVerify(match: RegExpMatchArray): Promise<LinkCheckResult> {
@@ -353,15 +357,8 @@ async function discordInviteVerify(match: RegExpMatchArray): Promise<LinkCheckRe
 
 checks.children(
   ...named("Discord", [
-    check(/^discord\.gg\/([\w-]+)/i).for("discord").verify(discordInviteVerify),
-    check(/^(?:discord\.com|discordapp\.com)/i)
-      .message(
-        defineMessage({
-          id: "nags.link.discord.unrecognized",
-          defaultMessage: "This doesn't look like a Discord invite.",
-        }),
-      )
-      .children(
+    check(/^discord\.gg/i).children(check(/^\/([\w-]+)/i).for("discord").verify(discordInviteVerify)),
+    check(/^(?:discord\.com|discordapp\.com)/i).children(
         check(/^\/invite\/([\w-]+)/i).for("discord").verify(discordInviteVerify),
         check(/^\/channels\//i).message(
           defineMessage({
@@ -379,6 +376,47 @@ checks.children(
   ]),
 )
 
+const gitRepoMessages = defineMessages({
+  notFound: {
+    id: "nags.link.git.not-found",
+    defaultMessage: "This repository could not be found (it may be private or deleted).",
+  },
+  empty: {
+    id: "nags.link.git.empty",
+    defaultMessage: "This repository appears to be empty.",
+  },
+  archived: {
+    id: "nags.link.git.archived",
+    defaultMessage: "This repository is archived, which disables issues.",
+  },
+  issuesDisabled: {
+    id: "nags.link.git.issues-disabled",
+    defaultMessage: "Issues are disabled on this repository.",
+  },
+  wikiDisabled: {
+    id: "nags.link.git.wiki-disabled",
+    defaultMessage: "The wiki is disabled on this repository.",
+  },
+})
+
+async function checkRepo(
+  fetchRepo: (path: string) => Promise<Record<string, boolean> | undefined>,
+  path: string,
+  evaluate: (facts: Record<string, boolean>) => LinkCheckResult,
+): Promise<LinkCheckResult> {
+  const facts = await fetchRepo(path)
+  if (!facts) return error(gitRepoMessages.notFound)
+
+  return evaluate(facts)
+}
+
+async function giteaFetchRepo(host: string, path: string): Promise<Record<string, boolean> | undefined> {
+  const res = await fetch(`https://${host}/api/v1/repos/${path}`)
+  if (!res.ok) return undefined
+  const data = await res.json()
+  return {empty: data.size === 0, archived: data.archived, issues: data.has_issues, wiki: data.has_wiki}
+}
+
 function gitHost(
   name: string,
   domain: string,
@@ -393,70 +431,23 @@ function gitHost(
   const sep = options.subPageSeparator ?? ""
   const wikiPath = options.wikiPath ?? "wiki"
 
-  async function checkRepo(
-    fetchRepo: (path: string) => Promise<Record<string, boolean> | undefined>,
-    path: string,
-    evaluate: (facts: Record<string, boolean>) => LinkCheckResult,
-  ): Promise<LinkCheckResult> {
-    const facts = await fetchRepo(path)
-    if (!facts)
-      return error(
-        defineMessage({
-          id: "nags.link.git.not-found",
-          defaultMessage: "This repository could not be found (it may be private or deleted).",
-        }),
-      )
-
-    return evaluate(facts)
-  }
-
   return check(anchored(domain), name)
     .severity("warn")
     .children(
       check(anchored(`/(${path})/?$`), "repo").for("source").verify(async (match) =>
-        checkRepo(fetchRepo, match[1], (facts) =>
-          facts.empty
-            ? error(
-              defineMessage({
-                id: "nags.link.git.empty",
-                defaultMessage: "This repository appears to be empty.",
-              }),
-            )
-            : valid,
-        ),
+        checkRepo(fetchRepo, match[1], (facts) => (facts.empty ? error(gitRepoMessages.empty) : valid)),
       ),
 
       check(anchored(`/(${path})${sep}/issues`), "issues").for("issues").verify(async (match) =>
         checkRepo(fetchRepo, match[1], (facts) => {
-          if (facts.archived)
-            return error(
-              defineMessage({
-                id: "nags.link.git.archived",
-                defaultMessage: "This repository is archived, which disables issues.",
-              }),
-            )
-          if (facts.issues === false)
-            return error(
-              defineMessage({
-                id: "nags.link.git.issues-disabled",
-                defaultMessage: "Issues are disabled on this repository.",
-              }),
-            )
+          if (facts.archived) return error(gitRepoMessages.archived)
+          if (facts.issues === false) return error(gitRepoMessages.issuesDisabled)
           return valid
         }),
       ),
 
       check(anchored(`/(${path})${sep}/${wikiPath}`), "wiki").for("wiki").verify(async (match) =>
-        checkRepo(fetchRepo, match[1], (facts) =>
-          facts.wiki === false
-            ? error(
-              defineMessage({
-                id: "nags.link.git.wiki-disabled",
-                defaultMessage: "The wiki is disabled on this repository.",
-              }),
-            )
-            : valid,
-        ),
+        checkRepo(fetchRepo, match[1], (facts) => (facts.wiki === false ? error(gitRepoMessages.wikiDisabled) : valid)),
       ),
     )
 }
@@ -479,17 +470,7 @@ checks.children(
     //TODO: we can't actually check if sponsors is setup with auth or cuz of cors im not really sure but regardless it doesn't works from browser
     .children(check(/^\/sponsors\/[^/]+/i, "sponsors").for("github")),
 
-  gitHost("Codeberg", "codeberg\\.org", async (path) => {
-    const res = await fetch(`https://codeberg.org/api/v1/repos/${path}`)
-    if (!res.ok) return undefined
-    const data = await res.json()
-    return {
-      empty: data.size === 0,
-      archived: data.archived,
-      issues: data.has_issues,
-      wiki: data.has_wiki,
-    }
-  }),
+  gitHost("Codeberg", "codeberg\\.org", (path) => giteaFetchRepo("codeberg.org", path)),
 
   gitHost(
     "GitLab",
@@ -529,6 +510,56 @@ checks.children(
   }),
 )
 
+const giteaHostCache = new Map<string, boolean>()
+
+async function probeGiteaHost(hostname: string): Promise<boolean> {
+  if (giteaHostCache.has(hostname)) return giteaHostCache.get(hostname)!
+  try {
+    const res = await fetch(`https://${hostname}/api/v1/version`)
+    giteaHostCache.set(hostname, res.ok)
+    return res.ok
+  } catch {
+    giteaHostCache.set(hostname, false)
+    return false
+  }
+}
+
+checks.children(
+  check(async (remaining) => {
+    const hostMatch = /^[^/]+/.exec(remaining)
+    if (!hostMatch) return null
+    return (await probeGiteaHost(hostMatch[0])) ? 0 : null
+  }, "Self-hosted Gitea/Forgejo")
+    .severity("warn")
+    .children(
+      check(/^([^/]+)\/([^/]+\/[^/]+)\/?$/i, "repo")
+        .for("source")
+        .verify(async (match) =>
+          checkRepo((path) => giteaFetchRepo(match[1], path), match[2], (facts) =>
+            facts.empty ? error(gitRepoMessages.empty) : valid,
+          ),
+        ),
+
+      check(/^([^/]+)\/([^/]+\/[^/]+)\/issues/i, "issues")
+        .for("issues")
+        .verify(async (match) =>
+          checkRepo((path) => giteaFetchRepo(match[1], path), match[2], (facts) => {
+            if (facts.archived) return error(gitRepoMessages.archived)
+            if (facts.issues === false) return error(gitRepoMessages.issuesDisabled)
+            return valid
+          }),
+        ),
+
+      check(/^([^/]+)\/([^/]+\/[^/]+)\/wiki/i, "wiki")
+        .for("wiki")
+        .verify(async (match) =>
+          checkRepo((path) => giteaFetchRepo(match[1], path), match[2], (facts) =>
+            facts.wiki === false ? error(gitRepoMessages.wikiDisabled) : valid,
+          ),
+        ),
+    ),
+)
+
 // Donation
 checks.children(
   check(/^patreon\.com/i, "Patreon")
@@ -561,42 +592,12 @@ checks.children(
         }),
       )
       .for("other")
-      .children(check(anchored(`${YOUTUBE_CHANNEL}/join`)), check(anchored(`${YOUTUBE_CHANNEL}/store`)))
+      .children(
+        check(anchored(`/${YOUTUBE_CHANNEL}/join`)),
+        check(anchored(`/${YOUTUBE_CHANNEL}/store`))
+      )
   })(),
 )
-
-interface KnownLicenseSite {
-  domain: string
-  path: string
-  label: string
-  extract?: (match: RegExpMatchArray) => string
-}
-
-const knownLicenseSites: KnownLicenseSite[] = [
-  {domain: "spdx\\.org", path: "/licenses/([\\w.-]+)\\.html", label: "SPDX", extract: (m) => m[1]},
-  {domain: "opensource\\.org", path: "/licenses?/([\\w.-]+)", label: "OSI", extract: (m) => m[1]},
-  {domain: "choosealicense\\.com", path: "/licenses/([\\w.-]+)", label: "choosealicense.com", extract: (m) => m[1]},
-  {domain: "(?:www\\.)?gnu\\.org", path: "/licenses/[\\w.-]+", label: "GNU"},
-  {domain: "(?:www\\.)?apache\\.org", path: "/licenses/[\\w.-]+", label: "Apache"},
-  {domain: "creativecommons\\.org", path: "/(?:licenses/[\\w-]+|publicdomain/zero)/[\\d.]+/?", label: "Creative Commons"},
-]
-
-checks.children(
-  ...knownLicenseSites.map(({domain, path, label}) =>
-    check(anchored(domain), label).children(check(anchored(path)).for("license")),
-  ),
-)
-
-function identifyLicenseFromUrl(url: string): string | null {
-  const normalized = url.replace(/^https:\/\/(?:www\.)?/i, "")
-  for (const site of knownLicenseSites) {
-    if (!site.extract) continue
-    const pattern = new RegExp(`^${site.domain}${site.path}`, "i")
-    const match = pattern.exec(normalized)
-    if (match) return site.extract(match)
-  }
-  return null
-}
 
 const licenseCheckMessages = defineMessages({
   urlMismatch: {
@@ -610,31 +611,51 @@ const licenseCheckMessages = defineMessages({
   },
 })
 
-function useLicenseUrlCheck(
-  url: Ref<string | null | undefined>,
-  license: Ref<{ friendly: string; short: string }>,
-) {
-  const baseCheck = useLinkCheck("license", url)
+function licenseVerify(detected: string | null, context: Record<string, unknown>): LinkCheckResult {
+  const expectedLicense = context.expectedLicense as string | undefined
+  const isCustom = context.isCustom as boolean | undefined
 
-  return computed<LinkCheckResult | null>(() => {
-    const isCustom = license.value.friendly === "Custom"
-    const detected = url.value ? identifyLicenseFromUrl(url.value) : null
+  if (detected && expectedLicense && !isCustom) {
+    return detected.toLowerCase() === expectedLicense.toLowerCase()
+      ? valid
+      : warn(licenseCheckMessages.urlMismatch, {detected, selected: expectedLicense})
+  }
 
-    if (detected && !isCustom && detected.toLowerCase() !== license.value.short.toLowerCase()) {
-      return {
-        severity: "warn",
-        message: licenseCheckMessages.urlMismatch,
-        values: {detected, selected: license.value.short},
-      }
-    }
-
-    if (baseCheck.value?.severity === "valid" && !isCustom) {
-      return {severity: "warn", message: licenseCheckMessages.urlRedundant}
-    }
-
-    return baseCheck.value
-  })
+  return isCustom ? valid : warn(licenseCheckMessages.urlRedundant)
 }
+
+checks.children(
+  check(anchored("spdx\\.org"), "SPDX").children(
+    check(anchored("/licenses/([\\w.-]+)\\.html"))
+      .for("license")
+      .verify(async (match, ctx) => licenseVerify(match[1], ctx)),
+  ),
+  check(anchored("opensource\\.org"), "OSI").children(
+    check(anchored("/licenses?/([\\w.-]+)"))
+      .for("license")
+      .verify(async (match, ctx) => licenseVerify(match[1], ctx)),
+  ),
+  check(anchored("choosealicense\\.com"), "choosealicense.com").children(
+    check(anchored("/licenses/([\\w.-]+)"))
+      .for("license")
+      .verify(async (match, ctx) => licenseVerify(match[1], ctx)),
+  ),
+  check(anchored("(?:www\\.)?gnu\\.org"), "GNU").children(
+    check(anchored("/licenses/[\\w.-]+"))
+      .for("license")
+      .verify(async (_match, ctx) => licenseVerify(null, ctx)),
+  ),
+  check(anchored("(?:www\\.)?apache\\.org"), "Apache").children(
+    check(anchored("/licenses/[\\w.-]+"))
+      .for("license")
+      .verify(async (_match, ctx) => licenseVerify(null, ctx)),
+  ),
+  check(anchored("creativecommons\\.org"), "Creative Commons").children(
+    check(anchored("/(?:licenses/[\\w-]+|publicdomain/zero)/[\\d.]+/?"))
+      .for("license")
+      .verify(async (_match, ctx) => licenseVerify(null, ctx)),
+  ),
+)
 
 // Kinda just everything else
 checks.children(
@@ -655,6 +676,7 @@ checks.children(
   check(/^twitch\.tv/i, "Twitch"),
   check(/^minecraft\.net/i, "Minecraft"),
   check(/^bsky\.app/i, "Bluesky"),
+  check(/^9minecraft\.net/i, "9Minecraft"),
 )
 
-export {checkLink, getLinkCheckState, useLinkCheck, useLicenseUrlCheck}
+export {checkLink, getLinkCheckState, useLinkCheck}
