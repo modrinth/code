@@ -63,8 +63,8 @@ impl ProjectDisclosure {
         metadata: serde_json::Value,
     ) -> Result<Self, serde_json::Error> {
         let serde_json::Value::Object(mut object) = metadata else {
-            return Err(serde::ser::Error::custom(
-                "project disclosure metadata must be a JSON object, this should never be reachable",
+            return Err(serde::de::Error::custom(
+                "project disclosure metadata must be a JSON object",
             ));
         };
         object.insert(
