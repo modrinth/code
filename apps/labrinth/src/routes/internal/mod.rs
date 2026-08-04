@@ -13,6 +13,7 @@ pub mod medal;
 pub mod moderation;
 pub mod mural;
 pub mod pats;
+pub mod payouts;
 pub mod search;
 pub mod server_ping;
 pub mod session;
@@ -32,6 +33,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(session::config)
             .configure(flows::config)
             .configure(pats::config)
+            .configure(payouts::config)
             .configure(oauth_clients::config)
             .service(web::scope("/moderation").configure(moderation::config))
             .service(web::scope("/affiliate").configure(affiliate::config))
@@ -100,6 +102,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		pats::create_pat,
 		pats::edit_pat,
 		pats::delete_pat,
+		payouts::get,
 		moderation::get_projects,
 		moderation::get_project_ids,
 		moderation::get_project_meta,

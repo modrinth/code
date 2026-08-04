@@ -14,6 +14,7 @@ pub use v3::oauth_clients;
 pub use v3::organizations;
 pub use v3::pack;
 pub use v3::pats;
+pub use v3::payout_runs;
 pub use v3::payouts;
 pub use v3::projects;
 pub use v3::reports;

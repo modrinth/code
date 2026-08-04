@@ -11,6 +11,7 @@ pub mod oauth_clients;
 pub mod organizations;
 pub mod pack;
 pub mod pats;
+pub mod payout_runs;
 pub mod payouts;
 pub mod projects;
 pub mod reports;
