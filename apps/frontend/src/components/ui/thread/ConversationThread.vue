@@ -342,9 +342,7 @@
 									"
 								>
 									<SpinnerIcon
-										v-if="
-											loadingAction === 'reject-with-reply' || loadingAction === 'reject'
-										"
+										v-if="loadingAction === 'reject-with-reply' || loadingAction === 'reject'"
 										class="animate-spin"
 										aria-hidden="true"
 									/>

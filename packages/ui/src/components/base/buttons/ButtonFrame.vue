@@ -100,7 +100,8 @@ const classes = computed(() => [
 ])
 const style = computed((): CSSProperties | undefined => {
 	if ((props.type === 'outlined' || props.type === 'quiet') && !props.color) return undefined
-	if (props.type !== 'colored' && props.type !== 'outlined' && props.type !== 'quiet') return undefined
+	if (props.type !== 'colored' && props.type !== 'outlined' && props.type !== 'quiet')
+		return undefined
 
 	return {
 		'--button-color': colorVariables[props.color ?? 'brand'],

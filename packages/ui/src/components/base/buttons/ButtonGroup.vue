@@ -20,16 +20,20 @@ withDefaults(
 </template>
 
 <style scoped>
-.button-group :deep([data-button].button-frame--colored:first-child:not(:last-child):not(:focus-visible)) {
+.button-group
+	:deep([data-button].button-frame--colored:first-child:not(:last-child):not(:focus-visible)) {
 	clip-path: inset(-4rem var(--button-group-inner-clip, 1px) -4rem -4rem);
 }
 
 .button-group
-	:deep([data-button].button-frame--colored:not(:first-child):not(:last-child):not(:focus-visible)) {
+	:deep(
+		[data-button].button-frame--colored:not(:first-child):not(:last-child):not(:focus-visible)
+	) {
 	clip-path: inset(-4rem var(--button-group-inner-clip, 1px) -4rem 0);
 }
 
-.button-group :deep([data-button].button-frame--colored:last-child:not(:first-child):not(:focus-visible)) {
+.button-group
+	:deep([data-button].button-frame--colored:last-child:not(:first-child):not(:focus-visible)) {
 	clip-path: inset(-4rem -4rem -4rem 0);
 }
 
@@ -41,7 +45,9 @@ withDefaults(
 
 :dir(rtl)
 	.button-group
-	:deep([data-button].button-frame--colored:not(:first-child):not(:last-child):not(:focus-visible)) {
+	:deep(
+		[data-button].button-frame--colored:not(:first-child):not(:last-child):not(:focus-visible)
+	) {
 	clip-path: inset(-4rem 0 -4rem var(--button-group-inner-clip, 1px));
 }
 

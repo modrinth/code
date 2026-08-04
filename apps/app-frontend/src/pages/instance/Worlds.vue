@@ -78,9 +78,7 @@
 				>
 					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
 					{{
-						formatMessage(
-							refreshingAll ? messages.refreshingButton : commonMessages.refreshButton,
-						)
+						formatMessage(refreshingAll ? messages.refreshingButton : commonMessages.refreshButton)
 					}}
 				</Button>
 			</div>
