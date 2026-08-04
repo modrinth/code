@@ -10,6 +10,7 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import {
 	mkdir,
@@ -22,21 +23,17 @@ import {
 	writeFile as writeFileBytes,
 	writeTextFile,
 } from '@tauri-apps/plugin-fs'
-import { onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { instance_listener } from '@/helpers/events'
 import { get_full_path } from '@/helpers/instance'
-import type { GameInstance } from '@/helpers/types'
 import { highlightInFolder } from '@/helpers/utils'
 
-const props = defineProps<{
-	instance: GameInstance
-	options: unknown
-	offline: boolean
-	playing: boolean
-	installed: boolean
-	isServerInstance: boolean
-}>()
+import { injectInstancePage } from '../instance-context'
+
+const instancePage = injectInstancePage()
+const instanceId = instancePage.instanceId
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -53,7 +50,15 @@ const messages = defineMessages({
 	},
 })
 
-const instanceRoot = ref('')
+const instanceRootQuery = useQuery(
+	computed(() => ({
+		queryKey: instanceKeys.rootPath(instancePage.instanceId.value),
+		queryFn: () => get_full_path(instancePage.instanceId.value),
+		enabled: !!instancePage.instanceId.value,
+		staleTime: Infinity,
+	})),
+)
+const instanceRoot = computed(() => instanceRootQuery.data.value ?? '')
 const items = ref<FileItem[]>([])
 /** True until the first directory read for the current instance path finishes (initial load only). */
 const firstPaintPending = ref(true)
@@ -62,12 +67,7 @@ const error = ref<Error | null>(null)
 const currentPath = ref('')
 const editingFile = ref<EditingFile | null>(null)
 
-debug('setup: start, instance.id =', props.instance.id)
-
-instanceRoot.value = await get_full_path(props.instance.id)
-debug('setup: instanceRoot =', instanceRoot.value)
-await refresh()
-debug('setup: refresh complete, items =', items.value.length, 'error =', error.value)
+debug('setup: start, instance.id =', instanceId.value)
 
 function resolvePath(relativePath: string): string {
 	return relativePath ? `${instanceRoot.value}/${relativePath}` : instanceRoot.value
@@ -113,21 +113,39 @@ async function listDirectory(dirPath: string): Promise<FileItem[]> {
 	return results.filter((item): item is FileItem => item !== null)
 }
 
+const directoryQuery = useQuery(
+	computed(() => ({
+		queryKey: instanceKeys.files(instancePage.instanceId.value, currentPath.value),
+		queryFn: () => listDirectory(currentPath.value),
+		enabled: !!instanceRoot.value,
+		staleTime: 30_000,
+	})),
+)
+
+watch(
+	directoryQuery.data,
+	(data) => {
+		if (!data) return
+		items.value = data
+		firstPaintPending.value = false
+	},
+	{ immediate: true },
+)
+watch(directoryQuery.isFetching, (fetching) => {
+	loading.value = fetching
+})
+watch(directoryQuery.error, (queryError) => {
+	error.value = queryError
+	if (queryError) items.value = []
+})
+
+await instanceRootQuery.suspense()
+await directoryQuery.refetch()
+firstPaintPending.value = false
+
 async function refresh() {
 	debug('refresh: called, currentPath =', currentPath.value, 'instanceRoot =', instanceRoot.value)
-	loading.value = true
-	error.value = null
-	try {
-		items.value = await listDirectory(currentPath.value)
-		debug('refresh: success, items =', items.value.length)
-	} catch (e) {
-		debug('refresh: error =', e)
-		error.value = e instanceof Error ? e : new Error(String(e))
-		items.value = []
-	} finally {
-		loading.value = false
-		firstPaintPending.value = false
-	}
+	await directoryQuery.refetch()
 }
 
 function navigateTo(path: string) {
@@ -221,7 +239,7 @@ async function handleWriteFile(path: string, content: string) {
 
 async function handleDownloadFile(path: string, _fileName: string) {
 	await invoke('plugin:files|file_save_as', {
-		instanceId: props.instance.id,
+		instanceId: instanceId.value,
 		filePath: path,
 	})
 }
@@ -275,7 +293,7 @@ async function handleUploadFiles(files: File[]) {
 async function handleExtractFile(path: string, override: boolean, dry: boolean) {
 	try {
 		return await invoke('plugin:files|file_extract_zip', {
-			instanceId: props.instance.id,
+			instanceId: instanceId.value,
 			filePath: path,
 			overrideConflicts: override,
 			dryRun: dry,
@@ -293,7 +311,7 @@ debug('setup: registering instance_listener')
 const unlistenInstances = await instance_listener(
 	async (event: { event: string; instance_id: string }) => {
 		debug('instance_listener: event =', event.event, 'path =', event.instance_id)
-		if (event.instance_id === props.instance.id && event.event === 'synced') {
+		if (event.instance_id === instanceId.value && event.event === 'synced') {
 			debug('instance_listener: synced event matched, calling refresh')
 			await refresh()
 		}
@@ -306,12 +324,12 @@ onUnmounted(() => {
 })
 
 watch(
-	() => props.instance.id,
+	instanceId,
 	async () => {
-		debug('watch instance.id: changed to', props.instance.id)
+		debug('watch instance.id: changed to', instanceId.value)
 		firstPaintPending.value = true
-		instanceRoot.value = await get_full_path(props.instance.id)
 		currentPath.value = ''
+		await instanceRootQuery.refetch()
 		await refresh()
 	},
 )

@@ -12,6 +12,7 @@ import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { process_listener } from '@/helpers/events'
 import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
@@ -38,7 +39,7 @@ interface ContextMenuOptionClick {
 }
 
 export interface UseAppServerBrowseOptions {
-	instance: Ref<BrowseServerInstance | null>
+	instance: Readonly<Ref<BrowseServerInstance | null>>
 	isFromWorlds: ComputedRef<boolean>
 	allInstalledIds: ComputedRef<Set<string>>
 	newlyInstalled: Ref<string[]>
@@ -131,7 +132,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					project.minecraft_java_server?.content?.kind,
 				)
 				options.newlyInstalled.value.push(project.project_id)
-				await queryClient.invalidateQueries({ queryKey: ['worlds', instanceId] })
+				await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instanceId) })
 			} catch (error) {
 				options.handleError(error)
 			}

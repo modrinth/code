@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { instance_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
 
@@ -123,7 +124,7 @@ const getInstances = async () => {
 	const instances = await list().catch(handleError)
 
 	for (const instance of instances) {
-		queryClient.setQueryData(['instances', 'summary', instance.id], instance)
+		queryClient.setQueryData(instanceKeys.detail(instance.id), instance)
 	}
 
 	allInstances.value = instances.sort((a, b) => {

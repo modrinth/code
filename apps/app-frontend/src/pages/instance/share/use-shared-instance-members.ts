@@ -2,6 +2,7 @@ import type { InvitePlayersUser } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref } from 'vue'
 
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { get_user_many } from '@/helpers/cache.js'
 import {
 	get_shared_instance_users,
@@ -18,7 +19,7 @@ import {
 	type ShareRow,
 } from './shared-instance-share-types'
 
-type MembersQueryKey = readonly ['sharedInstanceUsers', string]
+type MembersQueryKey = ReturnType<typeof instanceKeys.sharedMembers>
 
 type OptimisticChange = {
 	queryKey: MembersQueryKey
@@ -48,7 +49,7 @@ export function useSharedInstanceMembers(options: {
 	onError: (error: unknown) => void
 }) {
 	const queryClient = useQueryClient()
-	const queryKey = computed(() => ['sharedInstanceUsers', options.instance.value.id] as const)
+	const queryKey = computed(() => instanceKeys.sharedMembers(options.instance.value.id))
 	const invitingUserIds = new Set<string>()
 	const removingUserIds = new Set<string>()
 	const exclusiveMutationPending = ref(false)

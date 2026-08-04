@@ -12,6 +12,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { trackEvent } from '@/helpers/analytics'
 import { list } from '@/helpers/instance'
 import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
@@ -67,7 +68,7 @@ async function addServer(instance) {
 	try {
 		await add_server_to_instance(instance.id, serverName.value, serverAddress.value, 'prompt')
 		instance.added = true
-		await queryClient.invalidateQueries({ queryKey: ['worlds', instance.id] })
+		await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instance.id) })
 
 		trackEvent('AddServerToInstance', {
 			server_name: serverName.value,

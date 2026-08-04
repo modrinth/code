@@ -16,6 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
@@ -148,7 +149,9 @@ async function unlinkSharedInstance() {
 	unlinkingSharedInstance.value = true
 	try {
 		await unlink_shared_instance(instance.value.id)
-		await queryClient.invalidateQueries({ queryKey: ['sharedInstanceUsers', instance.value.id] })
+		await queryClient.invalidateQueries({
+			queryKey: instanceKeys.sharedMembers(instance.value.id),
+		})
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
 		onUnlinked()
 	} catch (error) {

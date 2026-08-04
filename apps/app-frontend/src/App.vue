@@ -86,6 +86,7 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
@@ -242,7 +243,7 @@ const { data: authenticatedModrinthUser } = useQuery({
 	retry: false,
 })
 useQuery({
-	queryKey: computed(() => ['shared-instance-eligibility', credentials.value?.user?.id]),
+	queryKey: computed(() => instanceKeys.sharedEligibility(credentials.value?.user?.id)),
 	queryFn: can_current_user_use_shared_instances,
 	enabled: () => !!credentials.value?.session && !!credentials.value?.user?.id,
 	retry: false,

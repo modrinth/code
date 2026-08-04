@@ -96,6 +96,7 @@ import { computed, ref } from 'vue'
 
 import ConfirmRevokeSharedInstanceInviteModal from '@/components/ui/shared-instances/ConfirmRevokeSharedInstanceInviteModal.vue'
 import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
+import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { config } from '@/config'
 import {
 	get_shared_instance_invites,
@@ -193,7 +194,7 @@ async function unpublishSharedInstance() {
 	unpublishing.value = true
 	try {
 		await unpublish_shared_instance(instance.value.id)
-		queryClient.setQueryData(['sharedInstanceUsers', instance.value.id], [])
+		queryClient.setQueryData(instanceKeys.sharedMembers(instance.value.id), [])
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
 		onUnlinked()
 	} catch (error) {
