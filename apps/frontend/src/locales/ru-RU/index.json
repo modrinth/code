@@ -9,19 +9,19 @@
     "message": "Пользователь не найден"
   },
   "ads-consent.accept": {
-    "message": "Принять все"
+    "message": "Принять всё"
   },
   "ads-consent.body": {
-    "message": "Реклама обеспечивает работу Modrinth и финансирует выплаты авторам. Наши партнёры могут хранить или получать доступ к файлам cookie на сайте для персонализации рекламы и измерения производительности."
+    "message": "Реклама обеспечивает работу Modrinth и выплаты авторам. Для персонализации и анализа рекламы наши партнёры могут использовать куки."
   },
   "ads-consent.manage": {
-    "message": "Настроить предпочтения"
+    "message": "Настроить"
   },
   "ads-consent.reject": {
     "message": "Отклонить всё"
   },
   "ads-consent.title": {
-    "message": "Конфиденциальность и как реклама помогает Modrinth"
+    "message": "Конфиденциальность и реклама на Modrinth"
   },
   "analytics.action.add": {
     "message": "Добавить"
@@ -184,6 +184,9 @@
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Скрыть {name} на диаграмме"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Нет данных"
   },
   "analytics.chart.tooltip.pinned": {
     "message": "Подсказка графика закреплена"
@@ -411,7 +414,7 @@
     "message": "Скачивания"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "К монетизации допускаются только проверенные просмотры и скачивания, выполненные через Modrinth. Для скачивания через Modrinth App пользователь также должен быть авторизован. Поскольку все проекты имеют схожее соотношение монетизируемых скачиваний, ваш доход существенно бы не изменился при учёте каждой загрузки."
+    "message": "Только просмотры и загрузки сделанные через Modrinth доступны для монетизации и должны пройти фильтры предотвращения накрутки.\nЗагрузки в приложении Modrinth еще требует аккаунт зарегистрированным. Потому что все проекты имеют похожую пропорцию монетизированных загрузок, ваш доход много бы не изменился, если все загрузки будут считаться."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Подробнее"
@@ -801,7 +804,7 @@
     "message": "Проверка безопасности"
   },
   "auth.create-account.subscribe.label": {
-    "message": "Держите меня в курсе всего крутого, над чем работает Modrinth"
+    "message": "Держите меня в курсе над всеми крутыми вещами, над чем работает Modrinth через почту"
   },
   "auth.create-account.title": {
     "message": "Создание аккаунта"
@@ -810,7 +813,7 @@
     "message": "Имя пользователя"
   },
   "auth.create-account.username.placeholder": {
-    "message": "Введите имя пользователя"
+    "message": "Введите никнейм"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Отправить письмо"
@@ -2166,7 +2169,7 @@
     "message": "Находите лучшие Minecraft {projectType} на Modrinth с помощью мгновенного и точного поиска. Наши фильтры помогут быстро подобрать подходящие {projectType}."
   },
   "discover.seo.title": {
-    "message": "Искать {projectType}"
+    "message": "Поиск {projectType}"
   },
   "discover.seo.title-with-query": {
     "message": "Искать {projectType} | {query}"
@@ -2910,13 +2913,22 @@
     "message": "Поиск"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Перейти на Modrinth+"
+    "message": "Перейти на Modrinth+"
   },
   "layout.publish.email-verification-required.description": {
     "message": "Перед публикацией на Modrinth необходимо подтвердить адрес электронной почты."
   },
   "layout.publish.email-verification-required.title": {
     "message": "Необходимо подтвердить почту"
+  },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Автоматически устанавливайте все, во что они играют"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Играйте в тот же контент, что и ваши друзья"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Постоянно обновляйте общий контент по мере его изменения"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Скачать лаунчер"
@@ -2953,6 +2965,12 @@
   },
   "moderation.page.technicalReview": {
     "message": "Техпроверка"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} за страницу"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Кол-во страниц"
   },
   "modpack-scan-modal.delete-all-groups-confirmation.description": {
     "message": "Все группы атрибуции для этого проекта и все находящиеся в них файлы будут удалены навсегда. Это действие необратимо."
@@ -4389,7 +4407,7 @@
     "message": "Популярный"
   },
   "servers.purchase.step.plan.per-month-billing": {
-    "message": "в месяц{interval, select, monthly {} quarterly {, на 3 месяца} yearly {, на год} other {, billed {interval}}}"
+    "message": "в месяц{interval, select, monthly {} quarterly {, за 3 месяца} yearly {, за год} other {, billed {interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
@@ -4736,11 +4754,23 @@
   "settings.authorizations.about-this-app": {
     "message": "О приложении"
   },
+  "settings.authorizations.created-by": {
+    "message": "Создано {user}"
+  },
   "settings.authorizations.description": {
     "message": "Авторизованные приложения получают доступ к аккаунту Modrinth. Здесь можно просматривать и отзывать этот доступ."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Авторизованные вами приложения появятся здесь."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Нет приложений"
+  },
   "settings.authorizations.head-title": {
     "message": "Авторизации"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Это приложение создано официальным аккаунтом Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Деавторизовать"
@@ -4750,6 +4780,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Вы действительно хотите деавторизовать это приложение?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Это приложение никак не связано с Modrinth."
   },
   "settings.billing.charges.description": {
     "message": "Здесь перечислены все списания по аккаунту Modrinth:"
@@ -5100,7 +5133,7 @@
     "message": "Текущий сеанс"
   },
   "settings.sessions.description": {
-    "message": "Ниже представлены все устройства, с которых осуществлён вход в вашу учётную запись Modrinth. Вы можете управлять сеансом каждого из них по отдельности.\n\nЕсли среди них присутствует незнакомое устройство, незамедлительно завершите его сеанс и смените пароль своей учётной записи."
+    "message": "Ниже показаны устройства, использующие ваш аккаунт Modrinth. Сеансом каждого из них можно управлять по отдельности.\n\nЕсли в списке есть незнакомое устройство, немедленно завершите его сеанс и смените пароль от аккаунта."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Активность {ago}"
@@ -5140,6 +5173,9 @@
   },
   "shared-instance.invite.trust.heading": {
     "message": "Вы знакомы с этим пользователем?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Возможно, срок действия приглашения истек, исчерпан лимит использования или оно было удалено пользователем, который им поделился."
   },
   "shared-instance.invite.unavailable.title": {
     "message": "Приглашение недоступно"
