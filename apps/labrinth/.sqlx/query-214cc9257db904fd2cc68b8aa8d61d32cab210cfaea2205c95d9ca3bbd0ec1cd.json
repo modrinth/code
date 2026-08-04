@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT id, enum_id, value, ordering, metadata, created FROM loader_field_enum_values\n                    WHERE enum_id = ANY($1)\n                    ORDER BY enum_id, ordering, created DESC\n                    ",
+  "query": "\n                    SELECT id, enum_id, value, ordering,\n                    metadata->>'type' AS \"ty?\",\n                    (metadata->>'major')::boolean AS \"major?\",\n                    created FROM loader_field_enum_values\n                    WHERE enum_id = ANY($1)\n                    ORDER BY enum_id, ordering, created DESC\n                    ",
   "describe": {
     "columns": [
       {
@@ -25,11 +25,16 @@
       },
       {
         "ordinal": 4,
-        "name": "metadata",
-        "type_info": "Jsonb"
+        "name": "ty?",
+        "type_info": "Text"
       },
       {
         "ordinal": 5,
+        "name": "major?",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
         "name": "created",
         "type_info": "Timestamptz"
       }
@@ -44,9 +49,10 @@
       false,
       false,
       true,
-      true,
+      null,
+      null,
       false
     ]
   },
-  "hash": "04c04958c71c4fab903c46c9185286e7460a6ff7b03cbc90939ac6c7cb526433"
+  "hash": "214cc9257db904fd2cc68b8aa8d61d32cab210cfaea2205c95d9ca3bbd0ec1cd"
 }

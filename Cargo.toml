@@ -15,6 +15,7 @@ members = [
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
+  "packages/serde-binhum",
   "packages/xredis",
 ]
 
@@ -183,6 +184,7 @@ sentry = { version = "0.45.0", default-features = false, features = [
   "rustls",
 ] }
 serde = "1.0.228"
+serde-binhum = { path = "packages/serde-binhum" }
 serde_bytes = "0.11.19"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"

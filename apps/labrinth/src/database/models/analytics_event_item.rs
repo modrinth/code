@@ -9,7 +9,7 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 
-const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events:v3";
+const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events:v4";
 const ANALYTICS_EVENTS_ALL_KEY: &str = "all";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

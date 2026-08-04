@@ -10,8 +10,10 @@ ariadne = { workspace = true }
 chrono = { workspace = true }
 dashmap = { workspace = true }
 deadpool-redis = { workspace = true, features = ["cluster-async"] }
+eyre = { workspace = true }
 futures = { workspace = true }
 lz4_flex = { workspace = true }
+postcard = { workspace = true }
 prometheus = { workspace = true }
 redis = { workspace = true, features = [
   "ahash",
@@ -20,7 +22,6 @@ redis = { workspace = true, features = [
   "tokio-comp"
 ] }
 serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "sync", "time"] }
 tracing = { workspace = true }

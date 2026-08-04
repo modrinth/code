@@ -12,7 +12,7 @@ use crate::{
     routes::analytics::MINECRAFT_SERVER_PLAYS, util::error::Context,
 };
 
-pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v3";
+pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v4";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MinecraftServerAnalytics {
