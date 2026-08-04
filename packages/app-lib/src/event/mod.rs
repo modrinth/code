@@ -112,7 +112,7 @@ pub enum AppEvent {
     Process(ProcessPayload),
     Instance(InstancePayload),
     InstanceBulkUpdateProgress(InstanceBulkUpdateProgressPayload),
-    InstallJob(InstallJobSnapshot),
+    InstallJob(std::sync::Arc<InstallJobSnapshot>),
     Command(CommandPayload),
     Warning(WarningPayload),
     Friend(FriendPayload),

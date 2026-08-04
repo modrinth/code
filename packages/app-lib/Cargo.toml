@@ -78,7 +78,7 @@ reqwest = { workspace = true, features = [
   "stream",
 ] }
 rgb = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["derive", "rc"] }
 serde-binhum = { workspace = true }
 serde_ini = { workspace = true }
 serde_json = { workspace = true }
