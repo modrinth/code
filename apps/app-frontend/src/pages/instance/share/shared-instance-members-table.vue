@@ -15,7 +15,7 @@
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2 !border"
 							:disabled="pushUpdateDisabled"
-							@click="emit('push-update', $event)"
+							@click="management.pushUpdate($event)"
 						>
 							<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
 							<UploadIcon v-else aria-hidden="true" />
@@ -26,7 +26,7 @@
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
 							:disabled="invitePending || inviteDisabled"
-							@click="emit('invite', $event)"
+							@click="management.invite($event)"
 						>
 							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
 							<UserPlusIcon v-else aria-hidden="true" />
@@ -125,7 +125,7 @@
 							v-tooltip="'Revoke access'"
 							:aria-label="`Revoke access for ${row.username}`"
 							class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
-							@click="emit('remove', row)"
+							@click="management.remove(row)"
 						>
 							<XIcon aria-hidden="true" /></button
 					></ButtonStyled>
@@ -161,6 +161,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
+import { injectSharedInstanceManagement } from './shared-instance-management-context'
 import {
 	type MethodFilter,
 	methodLabels,
@@ -169,19 +170,15 @@ import {
 	type ShareTableColumn,
 } from './shared-instance-share-types'
 
-const props = defineProps<{
-	rows: ShareRow[]
-	actionsLocked?: boolean
-	inviteDisabled?: boolean
-	invitePending?: boolean
-	pushUpdateDisabled?: boolean
-	pushUpdatePending?: boolean
-}>()
-const emit = defineEmits<{
-	invite: [event: MouseEvent]
-	remove: [row: ShareRow]
-	'push-update': [event: MouseEvent]
-}>()
+const management = injectSharedInstanceManagement()
+const {
+	rows,
+	actionsLocked,
+	inviteDisabled,
+	invitePending,
+	pushUpdateDisabled,
+	pushUpdatePending,
+} = management
 const search = ref('')
 const methodFilter = ref<MethodFilter>('all')
 const sortColumn = ref<string | undefined>('joined')
@@ -194,7 +191,7 @@ const methodFilterOptions: Array<{ id: ShareMethod; label: string }> = [
 	{ id: 'direct', label: methodLabels.direct },
 	{ id: 'link', label: methodLabels.link },
 ]
-const hasMultipleMethods = computed(() => new Set(props.rows.map((row) => row.method)).size > 1)
+const hasMultipleMethods = computed(() => new Set(rows.value.map((row) => row.method)).size > 1)
 const columns = computed<TableColumn<ShareTableColumn>[]>(() => {
 	const result: TableColumn<ShareTableColumn>[] = [
 		{
@@ -230,7 +227,7 @@ const columns = computed<TableColumn<ShareTableColumn>[]>(() => {
 			cellClass: 'whitespace-nowrap !px-2',
 		},
 	]
-	if (!props.actionsLocked)
+	if (!actionsLocked.value)
 		result.push({
 			key: 'actions',
 			label: 'Actions',
@@ -243,7 +240,7 @@ const columns = computed<TableColumn<ShareTableColumn>[]>(() => {
 })
 const filteredRows = computed(() => {
 	const query = search.value.trim().toLowerCase()
-	return props.rows.filter((row) => {
+	return rows.value.filter((row) => {
 		if (methodFilter.value !== 'all' && row.method !== methodFilter.value) return false
 		if (!query) return true
 		return [

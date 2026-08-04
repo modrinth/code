@@ -120,6 +120,7 @@ import {
 } from '@/helpers/utils.js'
 import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n from '@/i18n.config'
+import { instanceKeys } from '@/pages/instance/query-options'
 import {
 	appUpdateState,
 	downloadAvailableAppUpdate,
@@ -242,7 +243,7 @@ const { data: authenticatedModrinthUser } = useQuery({
 	retry: false,
 })
 useQuery({
-	queryKey: computed(() => ['shared-instance-eligibility', credentials.value?.user?.id]),
+	queryKey: computed(() => instanceKeys.sharedEligibility(credentials.value?.user?.id)),
 	queryFn: can_current_user_use_shared_instances,
 	enabled: () => !!credentials.value?.session && !!credentials.value?.user?.id,
 	retry: false,

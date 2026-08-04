@@ -11,51 +11,20 @@ import {
 	injectNotificationManager,
 	provideConsoleManager,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, onUnmounted, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
 
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { log_listener, process_listener } from '@/helpers/events.js'
 import { delete_logs_by_filename, get_output_by_filename } from '@/helpers/logs.js'
 
+import { injectInstancePage } from '../instance-context'
+import { instanceKeys } from '../query-options'
+
 const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
-const route = useRoute()
-
-const props = defineProps({
-	instance: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	options: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	offline: {
-		type: Boolean,
-		default() {
-			return false
-		},
-	},
-	playing: {
-		type: Boolean,
-		default() {
-			return false
-		},
-	},
-	installed: {
-		type: Boolean,
-		default() {
-			return false
-		},
-	},
-})
-
-const instanceId = computed(() => route.params.id)
+const instancePage = injectInstancePage()
+const instanceId = instancePage.instanceId
 const {
 	liveConsole,
 	historicalConsole,
@@ -66,7 +35,17 @@ const {
 	clearLive,
 } = useInstanceConsole(instanceId.value)
 
-await hydrate()
+const consoleHydrationQuery = useQuery({
+	queryKey: computed(() => instanceKeys.console(instanceId.value)),
+	queryFn: async () => {
+		await hydrate()
+		return true
+	},
+	staleTime: 0,
+	refetchOnMount: 'always',
+})
+
+await consoleHydrationQuery.suspense()
 
 function buildLogList(rawLogs) {
 	return [
@@ -88,18 +67,29 @@ function buildLogList(rawLogs) {
 }
 
 const logs = ref(buildLogList([]))
-
-void getHistoricalLogs()
-	.then((allLogs) => {
-		logs.value = buildLogList(allLogs)
-	})
-	.catch(handleError)
+const historicalLogsQuery = useQuery({
+	queryKey: computed(() => instanceKeys.logs(instanceId.value)),
+	queryFn: getHistoricalLogs,
+	staleTime: 0,
+})
+watch(
+	historicalLogsQuery.data,
+	(allLogs) => {
+		if (allLogs) logs.value = buildLogList(allLogs)
+	},
+	{ immediate: true },
+)
+watch(historicalLogsQuery.error, (error) => {
+	if (error) handleError(error)
+})
 
 const selectedLogIndex = ref(0)
 const isLive = computed(() => selectedLogIndex.value === 0)
 
 const filteredLogs = computed(() =>
-	props.playing ? logs.value.filter((l) => l.live || l.name !== 'latest.log') : logs.value,
+	instancePage.playing.value
+		? logs.value.filter((l) => l.live || l.name !== 'latest.log')
+		: logs.value,
 )
 
 const logSources = computed(() =>
@@ -140,16 +130,16 @@ const selectedLog = computed(() => filteredLogs.value[selectedLogIndex.value])
 const deleteDisabled = computed(() => {
 	const log = selectedLog.value
 	if (!log || log.live) return true
-	return log.filename === 'latest.log' && props.playing
+	return log.filename === 'latest.log' && instancePage.playing.value
 })
 
 async function deleteSelectedLog() {
 	const log = selectedLog.value
 	if (!log || log.live) return
-	await delete_logs_by_filename(props.instance.id, log.log_type, log.filename)
+	await delete_logs_by_filename(instanceId.value, log.log_type, log.filename)
 	invalidate()
-	const freshLogs = await getHistoricalLogs()
-	logs.value = buildLogList(freshLogs)
+	const { data } = await historicalLogsQuery.refetch()
+	if (data) logs.value = buildLogList(data)
 	selectedLogIndex.value = 0
 }
 
@@ -166,7 +156,7 @@ provideConsoleManager({
 	onDelete: deleteSelectedLog,
 	deleteDisabled,
 	deleteDisabledTooltip: 'Cannot delete latest.log while the instance is running',
-	shareDisabled: computed(() => props.offline),
+	shareDisabled: instancePage.offline,
 	emptyStateType: 'instance',
 	crashAnalysis,
 	onDismissCrash: () => {
@@ -186,7 +176,7 @@ watch(selectedLogIndex, async (newIndex) => {
 		return
 	}
 
-	const output = await get_output_by_filename(props.instance.id, log.log_type, log.filename).catch(
+	const output = await get_output_by_filename(instanceId.value, log.log_type, log.filename).catch(
 		handleError,
 	)
 	if (output) {
@@ -197,7 +187,7 @@ watch(selectedLogIndex, async (newIndex) => {
 
 selectedLogIndex.value = 0
 
-if (!props.playing) {
+if (!instancePage.playing.value) {
 	void analyseForCrash()
 }
 
@@ -216,12 +206,13 @@ const unlistenProcesses = await process_listener(async (e) => {
 	if (e.event === 'launched') {
 		liveConsole.clear()
 		invalidate()
+		void historicalLogsQuery.refetch()
 		selectedLogIndex.value = 0
 	}
 	if (e.event === 'finished') {
 		invalidate()
-		const freshLogs = await getHistoricalLogs()
-		logs.value = buildLogList(freshLogs)
+		const { data } = await historicalLogsQuery.refetch()
+		if (data) logs.value = buildLogList(data)
 		void analyseForCrash()
 	}
 })
