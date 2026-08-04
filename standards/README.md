@@ -1,5 +1,7 @@
 # Standards
 
-This folder contains technical standards and documentation we use to develop Modrinth. The majority of this has been migrated from our internal documentation.
+This directory contains technical standards that apply to Modrinth development. Most of this content comes from internal Modrinth documentation.
 
-For contributing guidelines, please refer to [docs.modrinth.com](https://docs.modrinth.com/contributing/getting-started/) — these documents are more for technical reference, not a guide on making pull requests, features, etc.
+For contribution instructions, refer to [docs.modrinth.com](https://docs.modrinth.com/contributing/getting-started/). Use these documents only as technical references.
+
+Do not use these documents as instructions for pull requests or feature development.
