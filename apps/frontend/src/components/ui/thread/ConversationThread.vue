@@ -275,6 +275,7 @@
 									{{ formatMessage(messages.actionApprove) }}
 								</Button>
 								<SplitButton
+									class="!m-0 !inline-flex !flex-nowrap !justify-start !gap-0"
 									type="colored"
 									color="red"
 									:menu-label="formatMessage(commonMessages.moreOptionsButton)"
@@ -286,7 +287,7 @@
 													{
 														id: 'withhold-reply',
 														label: formatMessage(messages.actionWithholdWithReply),
-														tone: 'red',
+														tone: 'orange',
 														hoverFilled: true,
 														action: () =>
 															runBlockingAction('withhold-reply', () => sendReply('withheld')),
@@ -295,6 +296,8 @@
 													{
 														id: 'set-to-draft-reply',
 														label: formatMessage(messages.actionSetToDraftWithReply),
+														tone: 'orange',
+														hoverFilled: true,
 														action: () =>
 															runBlockingAction('set-to-draft-reply', () => sendReply('draft')),
 														disabled: project.status === 'draft' || isLoading,
@@ -302,6 +305,8 @@
 													{
 														id: 'send-to-review-reply',
 														label: formatMessage(messages.actionSendToReviewWithReply),
+														tone: 'orange',
+														hoverFilled: true,
 														action: () =>
 															runBlockingAction('send-to-review-reply', () =>
 																sendReply('processing', true),
@@ -313,7 +318,7 @@
 													{
 														id: 'withhold',
 														label: formatMessage(messages.actionWithhold),
-														tone: 'red',
+														tone: 'orange',
 														hoverFilled: true,
 														action: () =>
 															runBlockingAction('withhold', () => setStatus('withheld')),
@@ -322,6 +327,8 @@
 													{
 														id: 'set-to-draft',
 														label: formatMessage(messages.actionSetToDraft),
+														tone: 'orange',
+														hoverFilled: true,
 														action: () =>
 															runBlockingAction('set-to-draft', () => setStatus('draft')),
 														disabled: project.status === 'draft' || isLoading,
@@ -329,6 +336,8 @@
 													{
 														id: 'send-to-review',
 														label: formatMessage(messages.actionSendToReview),
+														tone: 'orange',
+														hoverFilled: true,
 														action: () =>
 															runBlockingAction('send-to-review', () => setStatus('processing')),
 														disabled: project.status === 'processing' || isLoading,
