@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Er is minstens één afbeelding in de galerij vereist om de inhoud van je {type} te tonen."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "bronpakket, met uitzondering van audio- of lokalisatiepakketten. Als dit op jouw pakket van toepassing is, selecteer dan de juiste tag"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Bezoek linkjes instellingen"
   }
 }
-

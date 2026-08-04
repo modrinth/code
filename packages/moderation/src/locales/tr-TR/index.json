@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "{type} içeriğinizi sergilemek için en az bir galeri görseli gereklidir."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "ses veya yerelleştirme paketleri hariç kaynak paketi. Eğer paketiniz bu tanıma uyuyorsa, lütfen uygun etiketi seçin"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Bağlantı ayarlarına göz at"
   }
 }
-
