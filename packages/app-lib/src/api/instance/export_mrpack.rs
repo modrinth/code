@@ -46,6 +46,7 @@ const NEVER_EXPORTABLE_PATH_PREFIXES: &[&str] = &[
     ".fabric",
     "__MACOSX",
 ];
+const NEVER_EXPORTABLE_PATH_SUFFIXES: &[&str] = &[".DS_Store"];
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -272,16 +273,14 @@ pub async fn export_mrpack(
 fn is_path_exportable(relative_path: &SafeRelativeUtf8UnixPathBuf) -> bool {
     let path = relative_path.as_str();
 
-    if path.ends_with(".DS_Store") {
-        return false;
-    }
-
     !NEVER_EXPORTABLE_PATH_PREFIXES.iter().any(|prefix| {
         path == *prefix
             || path
                 .strip_prefix(prefix)
                 .is_some_and(|suffix| suffix.starts_with('/'))
-    })
+    }) && !NEVER_EXPORTABLE_PATH_SUFFIXES
+        .iter()
+        .any(|suffix| path.ends_with(suffix))
 }
 
 #[tracing::instrument]
