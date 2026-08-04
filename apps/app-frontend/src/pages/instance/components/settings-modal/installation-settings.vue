@@ -15,8 +15,6 @@ import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
-import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
@@ -35,10 +33,12 @@ import {
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { provideInstanceBackup } from '@/providers/instance-backup'
-import { injectInstanceSettings } from '@/providers/instance-settings'
 import { useTheming } from '@/store/state'
 
-import type { Manifest } from '../../../helpers/types'
+import type { Manifest } from '../../../../helpers/types'
+import { instanceKeys } from '../../query-options.ts'
+import { injectInstanceSettings } from './instance-settings-context.ts'
+import SharedInstanceInstallationSettingsControls from './shared-instance-installation-settings-controls.vue'
 
 const { handleError } = injectNotificationManager()
 const filePicker = injectFilePicker()

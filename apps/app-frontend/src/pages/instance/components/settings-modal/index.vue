@@ -22,19 +22,19 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
-import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
-import InstallationSettings from '@/components/ui/instance_settings/InstallationSettings.vue'
-import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
-import SharingSettings from '@/components/ui/instance_settings/SharingSettings.vue'
-import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
-import { provideInstanceSettings } from '@/providers/instance-settings'
+import type { GameInstance } from '@/helpers/types'
 
-import type { GameInstance } from '../../../helpers/types'
+import GeneralSettings from './general-settings.vue'
+import HooksSettings from './hooks-settings.vue'
+import InstallationSettings from './installation-settings.vue'
+import { provideInstanceSettings } from './instance-settings-context.ts'
+import JavaSettings from './java-settings.vue'
+import SharingSettings from './sharing-settings.vue'
+import WindowSettings from './window-settings.vue'
 
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()

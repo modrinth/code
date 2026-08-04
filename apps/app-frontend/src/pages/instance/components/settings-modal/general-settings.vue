@@ -21,9 +21,9 @@ import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInsta
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, list, remove } from '@/helpers/instance'
-import { injectInstanceSettings } from '@/providers/instance-settings'
+import { injectInstanceSettings } from './instance-settings-context'
 
-import type { GameInstance } from '../../../helpers/types'
+import type { GameInstance } from '../../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

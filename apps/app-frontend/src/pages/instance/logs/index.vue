@@ -14,12 +14,12 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed, onUnmounted, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
 
-import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { log_listener, process_listener } from '@/helpers/events.js'
 import { delete_logs_by_filename, get_output_by_filename } from '@/helpers/logs.js'
 
 import { injectInstancePage } from '../instance-context'
+import { instanceKeys } from '../query-options'
 
 const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()

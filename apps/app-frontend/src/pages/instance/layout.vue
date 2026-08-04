@@ -124,17 +124,9 @@ import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
-import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
-import {
-	instanceContentQueryOptions,
-	instanceDetailQueryOptions,
-	instanceKeys,
-	instanceLinkedProjectQueryOptions,
-	instanceProcessesQueryOptions,
-} from '@/composables/instances/instance-query-options'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
@@ -161,9 +153,17 @@ import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useTheming } from '@/store/state'
 
-import InstanceAdmonitions from './admonitions/index.vue'
+import InstanceAdmonitions from './components/admonitions/index.vue'
 import { provideInstancePage } from './instance-context'
-import InstancePageHeader from './page-header/index.vue'
+import InstancePageHeader from './components/page-header/index.vue'
+import {
+	instanceContentQueryOptions,
+	instanceDetailQueryOptions,
+	instanceKeys,
+	instanceLinkedProjectQueryOptions,
+	instanceProcessesQueryOptions,
+} from './query-options'
+import InstanceSettingsModal from './components/settings-modal/index.vue'
 import { createSharedInstanceContext, provideSharedInstance } from './shared-instance-context'
 
 dayjs.extend(relativeTime)

@@ -2,7 +2,6 @@ import { createContext, injectAuth } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref, watch } from 'vue'
 
-import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { useUserQuery } from '@/composables/users/use-user-query'
 import {
 	getSharedInstanceUnavailableReason,
@@ -12,6 +11,8 @@ import {
 } from '@/helpers/install'
 import { can_current_user_use_shared_instances } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
+
+import { instanceKeys } from './query-options'
 
 export type SharedInstanceManager =
 	| {

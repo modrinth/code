@@ -169,10 +169,6 @@ import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWo
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
-import {
-	instanceKeys,
-	instanceWorldsQueryOptions,
-} from '@/composables/instances/instance-query-options'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener } from '@/helpers/events'
@@ -207,6 +203,7 @@ import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 
 import { injectInstancePage } from '../instance-context'
+import { instanceKeys, instanceWorldsQueryOptions } from '../query-options'
 
 const messages = defineMessages({
 	searchWorldsPlaceholder: {

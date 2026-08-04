@@ -45,7 +45,7 @@ import {
 	instanceDetailQueryOptions,
 	instanceKeys,
 	instanceLinkedProjectQueryOptions,
-} from '@/composables/instances/instance-query-options'
+} from '@/pages/instance/query-options'
 import {
 	get_project,
 	get_search_results_v3,

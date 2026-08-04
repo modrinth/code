@@ -8,7 +8,7 @@ import type { ComputedRef, Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
-import { instanceKeys } from '@/composables/instances/instance-query-options'
+import { instanceKeys } from '@/pages/instance/query-options'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,

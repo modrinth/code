@@ -25,12 +25,12 @@ import {
 } from '@tauri-apps/plugin-fs'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
-import { instanceKeys } from '@/composables/instances/instance-query-options'
 import { instance_listener } from '@/helpers/events'
 import { get_full_path } from '@/helpers/instance'
 import { highlightInFolder } from '@/helpers/utils'
 
 import { injectInstancePage } from '../instance-context'
+import { instanceKeys } from '../query-options'
 
 const instancePage = injectInstancePage()
 const instanceId = instancePage.instanceId

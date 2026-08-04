@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
-import { instanceKeys } from '@/composables/instances/instance-query-options'
+import { instanceKeys } from '@/pages/instance/query-options'
 import { instance_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
 

@@ -125,10 +125,6 @@ import { useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
-import {
-	instanceContentQueryOptions,
-	instanceKeys,
-} from '@/composables/instances/instance-query-options'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
@@ -157,6 +153,7 @@ import { useTheming } from '@/store/state'
 import type { FeatureFlag } from '@/store/theme'
 
 import { injectInstancePage } from '../instance-context'
+import { instanceContentQueryOptions, instanceKeys } from '../query-options'
 
 const messages = defineMessages({
 	shareTitle: {
