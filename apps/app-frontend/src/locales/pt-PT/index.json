@@ -140,20 +140,11 @@
   "app.ads-consent.title": {
     "message": "A sua privacidade e como os anúncios são financiados pela Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Ativa a renderização avançada, como efeitos de desfoque, que podem causar problemas de desempenho sem o uso de renderização acelerada por hardware."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Renderização avançada"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Seleciona a tua cor preferida para a Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Cor de tema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Mudar a página em que o launcher abre."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Casa"
@@ -164,50 +155,17 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Página de carregamento principal"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Desativa o nametag acima do seu player na página de skins."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Inclui mundos recentes na secção \"Voltar à ação\" na página inicial."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Volte aos mundos"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiza o inicializador quando um processo Minecraft é iniciado."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimizar launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Utilizar a moldura da janela do sistema (é necessário reiniciar a aplicação)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Decorações nativas"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Apresenta quanto tempo passou a jogar uma instância."
-  },
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostrar tempo de jogo"
   },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Ignora automaticamente confirmações de baixo risco, como instalações duplicadas de pacotes de mods, eliminação normal de conteúdo, atualizações em massa, desvinculação de pacotes de mods e pedidos de reparação. Os avisos de perigo ainda serão exibidos."
-  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Ignorar avisos não essenciais"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Permite ativar/desativar a barra lateral."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Ativar/desativar Barra lateral"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Se tentar instalar um ficheiro Modrinth Pack (.mrpack) que não esteja alojado no Modrinth, iremos garantir que compreende os riscos antes de o instalar."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Avise-me antes de instalar pacotes de mods desconhecidos."
@@ -502,9 +460,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Aparência"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Opções padrão de instância"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalações Java"

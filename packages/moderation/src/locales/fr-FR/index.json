@@ -144,7 +144,7 @@
     "defaultMessage": "Examinez et traitez toutes les remarques de l’équipe de modération avant de soumettre à nouveau."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Retours de revue"
+    "defaultMessage": "Voir les retours"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Vous avez sélectionné {count, plural, one {# tag de résolution} other {# tags de résolution}} ({tags}). Les packs de ressources ne devraient généralement avoir qu’un seul tag de résolution correspondant à leur résolution principale."

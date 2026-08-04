@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Egy leírás ami leírja a projekt célját és funkcióját szükséges."
+    "defaultMessage": "Szükséges egy leírás ami leírja a projekt célját és funkcióját."
   },
   "nags.add-description.title": {
     "defaultMessage": "Adj hozzá egy leírást"

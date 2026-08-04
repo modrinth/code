@@ -12,7 +12,7 @@
     "defaultMessage": "Simge ekle"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Java Sürümü oyuncuların sunucunuza girebileceği IP adresi ve portu girin."
+    "defaultMessage": "Java Sürümü oyuncularının sunucunuza girmek için kullanabileceği IP adresi ve portu girin."
   },
   "nags.add-java-address.title": {
     "defaultMessage": "Java adresleri ekle"
@@ -51,7 +51,7 @@
     "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "Açıklamayı uzat"
+    "defaultMessage": "Açıklamayı genişlet"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Açıklamayı düzenle"
