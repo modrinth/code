@@ -4,4 +4,4 @@ import type { InstallErrorContext } from "./InstallErrorContext";
 import type { InstallPhaseId } from "./InstallPhaseId";
 import type { SharedInstanceUnavailableReason } from "./SharedInstanceUnavailableReason";
 
-export type InstallErrorView = { code: string, phase?: InstallPhaseId | null, message: string, reason?: SharedInstanceUnavailableReason | null, api?: InstallApiErrorDetails | null, context?: InstallErrorContext | null, };
+export type InstallErrorView = { code: string, phase?: InstallPhaseId, message: string, reason?: SharedInstanceUnavailableReason, api?: InstallApiErrorDetails, context?: InstallErrorContext, };
