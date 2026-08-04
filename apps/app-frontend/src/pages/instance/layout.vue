@@ -161,9 +161,9 @@ import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useTheming } from '@/store/state'
 
-import InstanceAdmonitions from './instance-admonitions/index.vue'
+import InstanceAdmonitions from './admonitions/index.vue'
 import { provideInstancePage } from './instance-context'
-import InstancePageHeader from './instance-page-header/index.vue'
+import InstancePageHeader from './page-header/index.vue'
 import { createSharedInstanceContext, provideSharedInstance } from './shared-instance-context'
 
 dayjs.extend(relativeTime)
@@ -290,7 +290,11 @@ const recentPlays = computed(
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
-const sharedInstanceState = createSharedInstanceContext(instance, offline, notifySharedInstanceError)
+const sharedInstanceState = createSharedInstanceContext(
+	instance,
+	offline,
+	notifySharedInstanceError,
+)
 provideSharedInstance(sharedInstanceState)
 const {
 	actionsLocked: sharedInstanceActionsLocked,
@@ -631,10 +635,8 @@ const repairInstance = async () => {
 	) {
 		await install_pack_to_existing_instance(currentInstance.id, {
 			type: 'fromVersionId',
-			project_id:
-				currentInstance.link.project_id ?? currentInstance.link.server_project_id ?? '',
-			version_id:
-				currentInstance.link.version_id ?? currentInstance.link.content_version_id ?? '',
+			project_id: currentInstance.link.project_id ?? currentInstance.link.server_project_id ?? '',
+			version_id: currentInstance.link.version_id ?? currentInstance.link.content_version_id ?? '',
 			title: currentInstance.name,
 		}).catch(handleError)
 	} else {
