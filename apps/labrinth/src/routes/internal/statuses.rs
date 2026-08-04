@@ -3,7 +3,6 @@ use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::notification_item::DBNotification;
-use crate::database::redis::RedisPool;
 use crate::models::notifications::{Notification, NotificationBody};
 use crate::models::pats::Scopes;
 use crate::models::users::User;
@@ -28,12 +27,12 @@ use chrono::Utc;
 use either::Either;
 use futures_util::future::select;
 use futures_util::{StreamExt, TryStreamExt};
-use redis::AsyncCommands;
 use serde::Deserialize;
 use std::pin::pin;
 use std::sync::atomic::Ordering;
 use tokio::sync::oneshot::error::TryRecvError;
 use tokio::time::{Duration, sleep};
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ws_init);
@@ -393,13 +392,10 @@ pub async fn broadcast_friends_message(
     redis: &RedisPool,
     message: RedisFriendsMessage,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    let _: () = redis
-        .pool
-        .get()
-        .await?
+    redis
         .publish(FRIENDS_CHANNEL_NAME, message)
-        .await?;
-    Ok(())
+        .await
+        .map_err(Into::into)
 }
 
 pub async fn broadcast_to_local_friends(

@@ -29,6 +29,12 @@
   "nags.add-links.title": {
     "defaultMessage": "Añadir enlaces externos"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "Has elegido todos los idiomas. Por favor elige solo a los que tu servidor de soporte activamente."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correspondientes"
+  },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Has seleccionado {totalAvailableTags, plural, one {la única etiqueta disponible} other {todas las # etiquetas disponibles}}. Esto anula el propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
   },
@@ -72,7 +78,7 @@
     "defaultMessage": "Proporcionar el código fuente"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado"
+    "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Limpiar links idénticos"
@@ -220,6 +226,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpiar el nombre"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Has seleccionado {languageCount, plural, one {# language} other {# languages}}. Por favor elige solo a los que tu servidor de soporte activamente."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correspondientes"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Por favor, redúcelas a {maxTagCount} o menos para que tu servidor aparezca en los resultados de búsqueda relevantes."

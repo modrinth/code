@@ -1,8 +1,8 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
+use crate::database::models::blocked_user_item::DBBlockedUser;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::{DBUser, DBUserId};
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
@@ -16,6 +16,7 @@ use crate::sync::status::get_user_status;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(add_friend);
@@ -48,6 +49,18 @@ pub async fn add_friend(
     let Some(friend) = DBUser::get(&string, &**pool, &redis).await? else {
         return Err(ApiError::NotFound);
     };
+
+    if DBBlockedUser::is_blocked(friend.id, user.id.into(), &**pool).await? {
+        return Err(ApiError::InvalidInput(
+            "You've been blocked the other user!".to_string(),
+        ));
+    } else if DBBlockedUser::is_blocked(user.id.into(), friend.id, &**pool)
+        .await?
+    {
+        return Err(ApiError::InvalidInput(
+            "You've blocked the other user!".to_string(),
+        ));
+    }
 
     let mut transaction = pool.begin().await?;
 

@@ -233,6 +233,9 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "İsmi düzenle"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "{languageCount, plural,one {# dil}other {# dil}} seçtiniz. Lütfen sadece sunucunuzun aktif olarak desteklediği dilleri seçiniz."
+  },
   "nags.too-many-languages.title": {
     "defaultMessage": "Doğru dilleri seçin"
   },

@@ -16,6 +16,15 @@ pub enum ContentSourceKind {
 }
 
 impl ContentSourceKind {
+    pub fn is_shared_instance_managed(self) -> bool {
+        matches!(
+            self,
+            Self::SharedInstance
+                | Self::ModrinthModpack
+                | Self::ImportedModpack
+        )
+    }
+
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Local => "local",

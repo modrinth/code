@@ -253,7 +253,7 @@
 							/>
 							<CompassIcon v-else aria-hidden="true" />
 							<span class="hidden md:contents">{{
-								formatMessage(navMenuMessages.discoverContent)
+								formatMessage(commonMessages.discoverContentLabel)
 							}}</span>
 							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
 							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
@@ -932,10 +932,6 @@ const navMenuMessages = defineMessages({
 	search: {
 		id: 'layout.nav.search',
 		defaultMessage: 'Search',
-	},
-	discoverContent: {
-		id: 'layout.nav.discover-content',
-		defaultMessage: 'Discover content',
 	},
 	discover: {
 		id: 'layout.nav.discover',

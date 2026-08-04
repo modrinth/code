@@ -1,6 +1,6 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::{models::DatabaseError, redis::RedisPool};
+use crate::database::models::DatabaseError;
 use crate::models::notifications::{
     NotificationBody, NotificationChannel, NotificationDeliveryStatus,
     NotificationType,
@@ -8,8 +8,9 @@ use crate::models::notifications::{
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v1";
+const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v3";
 
 pub struct NotificationBuilder {
     pub body: NotificationBody,
@@ -433,13 +434,11 @@ impl DBNotification {
     {
         {
             let mut redis = redis.connect().await?;
+            let key =
+                redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
 
-            let cached_notifications: Option<Vec<DBNotification>> = redis
-                .get_deserialized(
-                    USER_NOTIFICATIONS_NAMESPACE,
-                    &user_id.0.to_string(),
-                )
-                .await?;
+            let cached_notifications: Option<Vec<DBNotification>> =
+                redis.get_deserialized(&key).await?;
 
             if let Some(notifications) = cached_notifications {
                 return Ok(notifications);
@@ -491,15 +490,9 @@ impl DBNotification {
             .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
 
-        redis
-            .set_serialized(
-                USER_NOTIFICATIONS_NAMESPACE,
-                user_id.0,
-                &db_notifications,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &db_notifications, None).await?;
 
         Ok(db_notifications)
     }
@@ -638,12 +631,12 @@ impl DBNotification {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let keys = user_ids
+            .into_iter()
+            .map(|id| redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
 
-        redis
-            .delete_many(user_ids.into_iter().map(|id| {
-                (USER_NOTIFICATIONS_NAMESPACE, Some(id.0.to_string()))
-            }))
-            .await?;
+        redis.delete_many(&keys).await?;
 
         Ok(())
     }

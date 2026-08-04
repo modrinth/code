@@ -6,7 +6,6 @@ use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::{
     FileQueryResult, VersionQueryResult,
 };
-use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::models::projects::FileType;
@@ -16,6 +15,7 @@ use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
 use quick_xml::escape::escape;
 use std::collections::HashSet;
+use xredis::RedisPool;
 use yaserde::YaSerialize;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {

@@ -23,6 +23,7 @@ import {
 	type InstallProgress,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
+import { useTheming } from '@/store/state'
 
 const messages = defineMessages({
 	installs: {
@@ -52,6 +53,10 @@ const messages = defineMessages({
 	unknownInstance: {
 		id: 'app.action-bar.install.unknown-instance',
 		defaultMessage: 'Unknown instance',
+	},
+	updatingSharedContent: {
+		id: 'app.action-bar.install.updating-shared-content',
+		defaultMessage: 'Updating shared content',
 	},
 })
 
@@ -217,13 +222,6 @@ const failureSummaryMessages = defineMessages({
 })
 
 const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
-const copyDetailsStallMs = 30_000
-
-interface ProgressSnapshot {
-	signature: string
-	changedAt: number
-	timeout: number | null
-}
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
 	if (!icon) return null
@@ -237,6 +235,7 @@ export async function useInstallJobNotifications(opts: {
 	onChange: () => void
 }) {
 	const { formatMessage } = useVIntl()
+	const themeStore = useTheming()
 	const jobs = ref<InstallJobSnapshot[]>([])
 	const iconUrls = ref<Record<string, string | null>>({})
 	const instanceNames = ref<Record<string, string>>({})
@@ -246,7 +245,6 @@ export async function useInstallJobNotifications(opts: {
 	let metadataRequest = 0
 	let nextJobOrder = 0
 	const copiedResetTimeouts = new Map<string, number>()
-	const progressSnapshots = new Map<string, ProgressSnapshot>()
 
 	function getTitle(job: InstallJobSnapshot): string {
 		if (job.display?.title) return job.display.title
@@ -267,6 +265,9 @@ export async function useInstallJobNotifications(opts: {
 			return formatMessage(javaStepMessages[job.details.step], {
 				version: job.details.major_version,
 			})
+		}
+		if (job.kind === 'update_shared_instance' && job.phase === 'downloading_content') {
+			return formatMessage(messages.updatingSharedContent)
 		}
 		return formatMessage(phaseMessages[job.phase])
 	}
@@ -414,116 +415,14 @@ export async function useInstallJobNotifications(opts: {
 		return job.status === 'failed' || job.status === 'interrupted'
 	}
 
-	function canShowStalledProgressDetails(job: InstallJobSnapshot): boolean {
-		return (
-			job.status === 'running' &&
-			job.phase !== 'preparing_instance' &&
-			job.phase !== 'finalizing' &&
-			job.phase !== 'rolling_back'
-		)
-	}
-
 	function getJobSortRank(job: InstallJobSnapshot): number {
 		if (isTerminalJob(job)) return 0
 		if (job.status === 'queued' || job.phase === 'preparing_instance') return 2
 		return 1
 	}
 
-	function progressSignature(job: InstallJobSnapshot): string {
-		const progress = job.progress
-		const secondary = progress?.secondary
-		return [
-			job.status,
-			job.phase,
-			JSON.stringify(job.details),
-			progress?.current ?? '',
-			progress?.total ?? '',
-			secondary?.current ?? '',
-			secondary?.total ?? '',
-		].join(':')
-	}
-
-	function clearCopied(jobId: string) {
-		if (!copiedJobIds.value.has(jobId)) {
-			return
-		}
-
-		const timeout = copiedResetTimeouts.get(jobId)
-		if (timeout != null) {
-			window.clearTimeout(timeout)
-			copiedResetTimeouts.delete(jobId)
-		}
-
-		const nextCopiedJobIds = new Set(copiedJobIds.value)
-		nextCopiedJobIds.delete(jobId)
-		copiedJobIds.value = nextCopiedJobIds
-	}
-
-	function clearProgressSnapshot(jobId: string) {
-		const snapshot = progressSnapshots.get(jobId)
-		if (snapshot?.timeout != null) {
-			window.clearTimeout(snapshot.timeout)
-		}
-		progressSnapshots.delete(jobId)
-	}
-
-	function scheduleStaleProgressRefresh(jobId: string) {
-		const snapshot = progressSnapshots.get(jobId)
-		if (!snapshot) {
-			return
-		}
-
-		snapshot.timeout = window.setTimeout(() => {
-			const snapshot = progressSnapshots.get(jobId)
-			if (!snapshot) {
-				return
-			}
-
-			snapshot.timeout = null
-			opts.onChange()
-		}, copyDetailsStallMs)
-	}
-
-	function syncProgressSnapshots(nextJobs: InstallJobSnapshot[]) {
-		const trackedJobIds = new Set<string>()
-		const now = Date.now()
-
-		for (const job of nextJobs) {
-			if (!canShowStalledProgressDetails(job)) {
-				continue
-			}
-
-			trackedJobIds.add(job.job_id)
-			const signature = progressSignature(job)
-			const snapshot = progressSnapshots.get(job.job_id)
-			if (snapshot?.signature === signature) {
-				continue
-			}
-
-			clearProgressSnapshot(job.job_id)
-			clearCopied(job.job_id)
-			progressSnapshots.set(job.job_id, {
-				signature,
-				changedAt: now,
-				timeout: null,
-			})
-			scheduleStaleProgressRefresh(job.job_id)
-		}
-
-		for (const jobId of progressSnapshots.keys()) {
-			if (!trackedJobIds.has(jobId)) {
-				clearProgressSnapshot(jobId)
-			}
-		}
-	}
-
-	function hasStalledProgress(job: InstallJobSnapshot): boolean {
-		const snapshot = progressSnapshots.get(job.job_id)
-		return !!snapshot && Date.now() - snapshot.changedAt >= copyDetailsStallMs
-	}
-
 	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
-		return isTerminalJob(job) || (canShowStalledProgressDetails(job) && hasStalledProgress(job))
+		return isTerminalJob(job) || themeStore.getFeatureFlag('always_show_copy_details')
 	}
 
 	function isCopied(job: InstallJobSnapshot): boolean {
@@ -600,6 +499,16 @@ export async function useInstallJobNotifications(opts: {
 		return buttons
 	}
 
+	function getDismissHandler(job: InstallJobSnapshot): (() => Promise<void>) | undefined {
+		if (isTerminalJob(job)) {
+			return async () => {
+				await install_job_dismiss(job.job_id).catch(opts.handleError)
+				await refresh()
+			}
+		}
+		return undefined
+	}
+
 	function setJobs(nextJobs: InstallJobSnapshot[]) {
 		for (const job of nextJobs) {
 			if (!jobOrder.has(job.job_id)) {
@@ -608,7 +517,6 @@ export async function useInstallJobNotifications(opts: {
 		}
 
 		const visibleJobs = nextJobs.filter((job) => visibleJobStatuses.has(job.status))
-		syncProgressSnapshots(visibleJobs)
 
 		jobs.value = visibleJobs.sort(
 			(a, b) =>
@@ -635,12 +543,8 @@ export async function useInstallJobNotifications(opts: {
 				progressCurrent: isTerminalJob(job) ? undefined : progress?.current,
 				progressTotal: isTerminalJob(job) ? undefined : progress?.total,
 				buttons: getButtons(job),
-				onDismiss: isTerminalJob(job)
-					? async () => {
-							await install_job_dismiss(job.job_id).catch(opts.handleError)
-							await refresh()
-						}
-					: undefined,
+				dismissible: isTerminalJob(job),
+				onDismiss: getDismissHandler(job),
 			}
 		}),
 	)
@@ -723,8 +627,8 @@ export async function useInstallJobNotifications(opts: {
 		void refreshMetadata()
 	}
 
-	await refresh(false)
 	const unlisten = await install_job_listener((job: InstallJobSnapshot) => applyJobUpdate(job))
+	await refresh(false)
 
 	return {
 		active: computed(() => jobs.value.length > 0),
@@ -735,9 +639,6 @@ export async function useInstallJobNotifications(opts: {
 		dispose: () => {
 			for (const timeout of copiedResetTimeouts.values()) {
 				window.clearTimeout(timeout)
-			}
-			for (const jobId of progressSnapshots.keys()) {
-				clearProgressSnapshot(jobId)
 			}
 			unlisten()
 		},

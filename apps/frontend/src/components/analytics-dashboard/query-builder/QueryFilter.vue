@@ -492,7 +492,7 @@ watch(dependentProjectSearchError, (error) => {
 	if (!error) return
 
 	addNotification({
-		title: 'Dependent projects failed to load',
+		title: formatMessage(analyticsMessages.dependentProjectSearchFailedTitle),
 		text: getDependentProjectSearchErrorMessage(error),
 		type: 'error',
 	})

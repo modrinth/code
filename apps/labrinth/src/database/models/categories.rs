@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use crate::database::redis::RedisPool;
+use xredis::RedisPool;
 
 use super::DatabaseError;
 use super::ids::*;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-const TAGS_NAMESPACE: &str = "tags:v1";
+const TAGS_NAMESPACE: &str = "tags:v3";
 
 pub struct ProjectType {
     pub id: ProjectTypeId,
@@ -95,9 +95,10 @@ impl Category {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(TAGS_NAMESPACE, "category");
 
             let res: Option<Vec<Category>> =
-                redis.get_deserialized(TAGS_NAMESPACE, "category").await?;
+                redis.get_deserialized(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -124,10 +125,9 @@ impl Category {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(TAGS_NAMESPACE, "category");
 
-        redis
-            .set_serialized(TAGS_NAMESPACE, "category", &result, None)
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -163,10 +163,10 @@ impl LinkPlatform {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(TAGS_NAMESPACE, "link_platform");
 
-            let res: Option<Vec<LinkPlatform>> = redis
-                .get_deserialized(TAGS_NAMESPACE, "link_platform")
-                .await?;
+            let res: Option<Vec<LinkPlatform>> =
+                redis.get_deserialized(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -188,10 +188,9 @@ impl LinkPlatform {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(TAGS_NAMESPACE, "link_platform");
 
-        redis
-            .set_serialized(TAGS_NAMESPACE, "link_platform", &result, None)
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -227,10 +226,9 @@ impl ReportType {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(TAGS_NAMESPACE, "report_type");
 
-            let res: Option<Vec<String>> = redis
-                .get_deserialized(TAGS_NAMESPACE, "report_type")
-                .await?;
+            let res: Option<Vec<String>> = redis.get_deserialized(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -248,10 +246,9 @@ impl ReportType {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(TAGS_NAMESPACE, "report_type");
 
-        redis
-            .set_serialized(TAGS_NAMESPACE, "report_type", &result, None)
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -287,10 +284,9 @@ impl ProjectType {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(TAGS_NAMESPACE, "project_type");
 
-            let res: Option<Vec<String>> = redis
-                .get_deserialized(TAGS_NAMESPACE, "project_type")
-                .await?;
+            let res: Option<Vec<String>> = redis.get_deserialized(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -308,10 +304,9 @@ impl ProjectType {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(TAGS_NAMESPACE, "project_type");
 
-        redis
-            .set_serialized(TAGS_NAMESPACE, "project_type", &result, None)
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }

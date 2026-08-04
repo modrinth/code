@@ -3,7 +3,6 @@ use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::pats::Scopes;
@@ -18,6 +17,7 @@ use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use woothee::parser::Parser;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(

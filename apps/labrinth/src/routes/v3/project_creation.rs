@@ -9,7 +9,6 @@ use crate::database::models::loader_fields::{
 };
 use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, DBUser, image_item};
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::exp;
@@ -45,6 +44,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use thiserror::Error;
 use validator::Validate;
+use xredis::RedisPool;
 
 pub mod new;
 

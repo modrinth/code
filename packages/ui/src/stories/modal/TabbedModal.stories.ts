@@ -15,6 +15,7 @@ import type { StoryObj } from '@storybook/vue3-vite'
 import { defineComponent, h, ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
 import TabbedModal from '../../components/modal/TabbedModal.vue'
 
 function makeTabContent(label: string, lines = 3) {
@@ -152,6 +153,47 @@ export const WithFooter: StoryObj = {
 	}),
 }
 
+export const WithFloatingActionBar: StoryObj = {
+	render: () => ({
+		components: { TabbedModal, ButtonStyled, UnsavedChangesPopup },
+		setup() {
+			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
+			const dirty = ref(true)
+			const tabs = [
+				{
+					name: { id: 'general', defaultMessage: 'General' },
+					icon: InfoIcon,
+					content: makeTabContent('General', 20),
+				},
+			]
+			return { modalRef, dirty, tabs }
+		},
+		template: /* html */ `
+			<div>
+				<ButtonStyled color="brand">
+					<button @click="dirty = true; modalRef?.show()">Open with Floating Action Bar</button>
+				</ButtonStyled>
+				<TabbedModal
+					ref="modalRef"
+					header="Settings"
+					:tabs="tabs"
+					:floating-action-bar-shown="dirty"
+				>
+					<template #floating-action-bar>
+						<UnsavedChangesPopup
+							:original="{ dirty: false }"
+							:modified="{ dirty }"
+							inline
+							@save="dirty = false"
+							@reset="dirty = false"
+						/>
+					</template>
+				</TabbedModal>
+			</div>
+		`,
+	}),
+}
+
 export const WithBadge: StoryObj = {
 	render: () => ({
 		components: { TabbedModal, ButtonStyled },
@@ -232,46 +274,55 @@ export const ManyTabs: StoryObj = {
 			const tabs = [
 				{
 					name: { id: 'general', defaultMessage: 'General' },
+					category: { id: 'display-category', defaultMessage: 'Display' },
 					icon: InfoIcon,
 					content: makeTabContent('General'),
 				},
 				{
 					name: { id: 'appearance', defaultMessage: 'Appearance' },
+					category: { id: 'display-category', defaultMessage: 'Display' },
 					icon: PaintbrushIcon,
 					content: makeTabContent('Appearance'),
 				},
 				{
 					name: { id: 'language', defaultMessage: 'Language' },
+					category: { id: 'display-category', defaultMessage: 'Display' },
 					icon: LanguagesIcon,
 					content: makeTabContent('Language'),
 				},
 				{
 					name: { id: 'privacy', defaultMessage: 'Privacy' },
+					category: { id: 'account-category', defaultMessage: 'Account' },
 					icon: ShieldIcon,
 					content: makeTabContent('Privacy'),
 				},
 				{
 					name: { id: 'java', defaultMessage: 'Java and memory' },
+					category: { id: 'instances-category', defaultMessage: 'Instances' },
 					icon: CoffeeIcon,
 					content: makeTabContent('Java and memory'),
 				},
 				{
 					name: { id: 'instances', defaultMessage: 'Default instance options' },
+					category: { id: 'instances-category', defaultMessage: 'Instances' },
 					icon: GameIcon,
 					content: makeTabContent('Default instance options'),
 				},
 				{
 					name: { id: 'resources', defaultMessage: 'Resource management' },
+					category: { id: 'instances-category', defaultMessage: 'Instances' },
 					icon: GaugeIcon,
 					content: makeTabContent('Resource management'),
 				},
 				{
 					name: { id: 'window', defaultMessage: 'Window' },
+					category: { id: 'advanced-category', defaultMessage: 'Advanced' },
 					icon: MonitorIcon,
 					content: makeTabContent('Window'),
 				},
 				{
 					name: { id: 'hooks', defaultMessage: 'Launch hooks' },
+					category: { id: 'advanced-category', defaultMessage: 'Advanced' },
 					icon: WrenchIcon,
 					content: makeTabContent('Launch hooks'),
 				},

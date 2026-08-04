@@ -7,7 +7,6 @@ import {
 	injectFilePicker,
 	injectNotificationManager,
 	InstallationSettingsLayout,
-	provideAppBackup,
 	provideInstallationSettings,
 	useDebugLogger,
 	useVIntl,
@@ -16,24 +15,25 @@ import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
+import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
-	install_duplicate_instance,
 	install_existing_instance,
 	install_pack_to_existing_instance,
-	installJobInstanceId,
 	wait_for_install_job,
 } from '@/helpers/install'
 import {
 	edit,
 	get_linked_modpack_info,
-	list,
+	unlink_shared_instance,
 	update_managed_modrinth_version,
 	update_repair_modrinth,
 } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 import { useTheming } from '@/store/state'
 
@@ -47,6 +47,7 @@ const debug = useDebugLogger('AppInstallationSettings')
 const themeStore = useTheming()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
+const managedContentPolicy = useManagedContentPolicy(instance)
 const skipNonEssentialWarnings = computed(() =>
 	themeStore.getFeatureFlag('skip_non_essential_warnings'),
 )
@@ -111,9 +112,14 @@ debug('metadata queries configured', {
 const isModrinthLinkedModpack = computed(
 	() =>
 		instance.value.link?.type === 'modrinth_modpack' ||
-		instance.value.link?.type === 'server_project_modpack',
+		instance.value.link?.type === 'server_project_modpack' ||
+		(instance.value.link?.type === 'shared_instance' &&
+			!!instance.value.link.modpack_project_id &&
+			!!instance.value.link.modpack_version_id),
 )
 const isImportedModpack = computed(() => instance.value.link?.type === 'imported_modpack')
+const isSharedInstanceManagedModpack = managedContentPolicy.isManagedModpack
+const canUnlinkSharedInstance = managedContentPolicy.canUnlink
 
 const modpackInfoQuery = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.id]),
@@ -124,11 +130,42 @@ const modpackInfo = modpackInfoQuery.data
 
 const repairing = ref(false)
 const reinstalling = ref(false)
+const unlinkingSharedInstance = ref(false)
+const installationSettingsBusy = computed(
+	() =>
+		instance.value.quarantined ||
+		instance.value.install_stage !== 'installed' ||
+		repairing.value ||
+		reinstalling.value ||
+		unlinkingSharedInstance.value ||
+		!!offline,
+)
+const installationSettingsBusyMessage = computed(() =>
+	instance.value.quarantined ? formatMessage(messages.locked) : null,
+)
+
+async function unlinkSharedInstance() {
+	unlinkingSharedInstance.value = true
+	try {
+		await unlink_shared_instance(instance.value.id)
+		await queryClient.invalidateQueries({ queryKey: ['sharedInstanceUsers', instance.value.id] })
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
+		onUnlinked()
+	} catch (error) {
+		handleError(error)
+	} finally {
+		unlinkingSharedInstance.value = false
+	}
+}
 
 const messages = defineMessages({
 	loaderVersion: {
 		id: 'instance.settings.tabs.installation.loader-version',
 		defaultMessage: '{loader} version',
+	},
+	locked: {
+		id: 'instance.settings.tabs.installation.locked',
+		defaultMessage: 'Installation settings are unavailable while this instance is locked.',
 	},
 })
 
@@ -162,27 +199,7 @@ async function installLocalModpackFromPicker() {
 	return !!completed
 }
 
-provideAppBackup({
-	async createBackup() {
-		debug('createBackup: start', {
-			instanceId: instance.value.id,
-			instanceName: instance.value.name,
-		})
-		const allInstances = await list()
-		const prefix = `${instance.value.name} - Backup #`
-		const existingNums = allInstances
-			.filter((p) => p.name.startsWith(prefix))
-			.map((p) => parseInt(p.name.slice(prefix.length), 10))
-			.filter((n) => !isNaN(n))
-		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const job = await install_duplicate_instance(instance.value.id)
-		const newInstanceId = installJobInstanceId(job)
-		if (newInstanceId) {
-			await edit(newInstanceId, { name: `${prefix}${nextNum}` })
-		}
-		debug('createBackup: done', { newInstanceId, backupName: `${prefix}${nextNum}` })
-	},
-})
+provideInstanceBackup(instance)
 
 provideInstallationSettings({
 	closeSettings: closeModal,
@@ -208,14 +225,14 @@ provideInstallationSettings({
 		}
 		return rows
 	}),
-	isLinked: computed(() => isModrinthLinkedModpack.value || isImportedModpack.value),
-	isBusy: computed(
+	isLinked: computed(
 		() =>
-			instance.value.install_stage !== 'installed' ||
-			repairing.value ||
-			reinstalling.value ||
-			!!offline,
+			isModrinthLinkedModpack.value ||
+			isImportedModpack.value ||
+			isSharedInstanceManagedModpack.value,
 	),
+	isBusy: installationSettingsBusy,
+	busyMessage: installationSettingsBusyMessage,
 	skipNonEssentialWarnings,
 	modpack: computed(() => {
 		if (isImportedModpack.value && instance.value.link?.type === 'imported_modpack') {
@@ -452,14 +469,28 @@ provideInstallationSettings({
 	isServer: false,
 	isApp: true,
 	showModpackVersionActions: computed(
-		() => isModrinthLinkedModpack.value && !isMinecraftServer.value,
+		() =>
+			isModrinthLinkedModpack.value &&
+			!isMinecraftServer.value &&
+			!isSharedInstanceManagedModpack.value,
 	),
 	isLocalFile: isImportedModpack,
+	isManagedModpack: isSharedInstanceManagedModpack,
+	managedModpackWarning: managedContentPolicy.managedModpackWarning,
 	repairing,
 	reinstalling,
 })
 </script>
 
 <template>
-	<InstallationSettingsLayout />
+	<InstallationSettingsLayout>
+		<template #extra>
+			<SharedInstanceInstallationSettingsControls
+				:can-unlink="canUnlinkSharedInstance"
+				:busy="installationSettingsBusy"
+				:unlinking="unlinkingSharedInstance"
+				:unlink="unlinkSharedInstance"
+			/>
+		</template>
+	</InstallationSettingsLayout>
 </template>

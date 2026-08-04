@@ -44,9 +44,6 @@
   "app.browse.already-added": {
     "message": "כבר נוסף"
   },
-  "app.browse.discover-content": {
-    "message": "גלה תוכן"
-  },
   "app.browse.discover-servers": {
     "message": "גלה שרתים"
   },
@@ -154,9 +151,6 @@
   },
   "app.modal.update-to-play.header": {
     "message": "צריך לעדכן כדי לשחק"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "עדכון נדרש כדי לשחק ב{name}. ניתן להתחיל את המשחק רק לאחר עדכון לגרסה החדשה."
   },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."

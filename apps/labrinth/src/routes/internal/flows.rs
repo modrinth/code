@@ -8,7 +8,6 @@ use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::{DBPasskey, DBPasskeyId, DBUser, DBUserId};
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::error::ApiError as ApiErrorResponse;
@@ -59,7 +58,12 @@ use webauthn_rs::prelude::{
     PublicKeyCredential, RegisterPublicKeyCredential, RequestChallengeResponse,
     Webauthn, WebauthnError,
 };
+use xredis::RedisPool;
 use zxcvbn::Score;
+
+/// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.
+const DISPOSABLE_EMAIL_BLOCKLIST: &str =
+    include_str!("../../../assets/disposable_email_blocklist.txt");
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
@@ -1498,7 +1502,7 @@ pub async fn create_oauth_account(
     };
 
     if let Some(email) = &user.email {
-        ensure_email_is_usable(email).await?;
+        ensure_email_domain_is_allowed(email)?;
     }
 
     let mut txn = db
@@ -1816,7 +1820,50 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
+/// The bundled disposable domain list is checked first. Environment blacklist
+/// entries are matched literally, unless they begin with `*.`, in which case
+/// they match any subdomain of the remaining suffix.
+fn is_blacklisted_domain(domain: &str) -> bool {
+    let domain = domain.to_ascii_lowercase();
+
+    if DISPOSABLE_EMAIL_BLOCKLIST.lines().any(|entry| {
+        // The upstream list expects listed domains to match subdomains too.
+        domain == entry
+            || domain
+                .strip_suffix(entry)
+                .is_some_and(|subdomain| subdomain.ends_with('.'))
+    }) {
+        return true;
+    }
+
+    ENV.EMAIL_DOMAIN_BLACKLIST.iter().any(|entry| {
+        let entry = entry.trim().to_ascii_lowercase();
+
+        match entry.strip_prefix("*.") {
+            Some(suffix) => domain
+                .strip_suffix(suffix)
+                .is_some_and(|subdomain| subdomain.ends_with('.')),
+            None => entry == domain,
+        }
+    })
+}
+
+fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
+    let Some((_, domain)) = email.rsplit_once('@') else {
+        return Err(ApiError::Request(email_check_error_generic()));
+    };
+
+    if is_blacklisted_domain(domain) {
+        info!(email.domain = domain, "blacklisted email domain, denying");
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
+}
+
 async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
+    ensure_email_domain_is_allowed(email)?;
+
     let result = check_email(email).await.map_err(ApiError::Request)?;
 
     if matches!(
@@ -2166,15 +2213,15 @@ async fn validate_2fa_code(
     )
     .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
-    const TOTP_NAMESPACE: &str = "used_totp:v1";
+    const TOTP_NAMESPACE: &str = "used_totp:v3";
     let mut conn = redis.connect().await?;
+    let logical_key = format!("{}-{}", input, user_id.0);
+    let key = redis
+        .key()
+        .with_slot(TOTP_NAMESPACE, &logical_key, &logical_key);
 
     // Check if TOTP has already been used
-    if conn
-        .get(TOTP_NAMESPACE, &format!("{}-{}", input, user_id.0))
-        .await?
-        .is_some()
-    {
+    if conn.get(&key).await?.is_some() {
         return Err(AuthenticationError::InvalidCredentials);
     }
 
@@ -2182,13 +2229,7 @@ async fn validate_2fa_code(
         .check_current(input.as_str())
         .map_err(|_| AuthenticationError::InvalidCredentials)?
     {
-        conn.set(
-            TOTP_NAMESPACE,
-            &format!("{}-{}", input, user_id.0),
-            "",
-            Some(60),
-        )
-        .await?;
+        conn.set(&key, "", Some(60)).await?;
 
         Ok(true)
     } else if allow_backup {

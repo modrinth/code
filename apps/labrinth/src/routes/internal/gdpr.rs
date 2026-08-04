@@ -1,10 +1,10 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, post, web};
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(web::scope("/gdpr").service(export));

@@ -19,7 +19,7 @@
 						:option="option"
 						:included="included(option)"
 						:excluded="excluded(option)"
-						:supports-negative-filter="supportsNegativeFilter"
+						:supports="supports"
 						@toggle="(o) => emit('toggle', o)"
 						@toggle-exclude="(o) => emit('toggleExclude', o)"
 					>
@@ -44,13 +44,13 @@
 import { DropdownIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import type { FilterOption } from '../../utils/search'
+import type { FilterMode, FilterOption } from '../../utils/search'
 import SearchFilterOption from './SearchFilterOption.vue'
 
 defineProps<{
 	groupName: string
 	options: FilterOption[]
-	supportsNegativeFilter: boolean
+	supports: FilterMode[]
 	included: (option: FilterOption) => boolean
 	excluded: (option: FilterOption) => boolean
 }>()

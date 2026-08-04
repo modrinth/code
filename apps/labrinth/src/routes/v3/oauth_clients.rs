@@ -1,4 +1,5 @@
 use std::{collections::HashSet, fmt::Display};
+use xredis::RedisPool;
 
 use super::ApiError;
 use crate::database::{PgPool, PgTransaction};
@@ -7,14 +8,11 @@ use crate::models::ids::OAuthClientId;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
-    database::{
-        models::{
-            DBOAuthClientId, DBUser, DatabaseError, generate_oauth_client_id,
-            generate_oauth_redirect_id,
-            oauth_client_authorization_item::DBOAuthClientAuthorization,
-            oauth_client_item::{DBOAuthClient, DBOAuthRedirectUri},
-        },
-        redis::RedisPool,
+    database::models::{
+        DBOAuthClientId, DBUser, DatabaseError, generate_oauth_client_id,
+        generate_oauth_redirect_id,
+        oauth_client_authorization_item::DBOAuthClientAuthorization,
+        oauth_client_item::{DBOAuthClient, DBOAuthRedirectUri},
     },
     models::{
         self,

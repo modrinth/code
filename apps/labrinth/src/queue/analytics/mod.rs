@@ -1,21 +1,19 @@
 use crate::database::PgPool;
-use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::analytics::{
     AffiliateCodeClick, Download, MinecraftServerPlay, PageView, Playtime,
 };
 use crate::routes::ApiError;
 use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 use dashmap::{DashMap, DashSet};
-use redis::cmd;
 use std::collections::HashMap;
 use tracing::trace;
+use xredis::RedisPool;
 
 pub mod cache;
 
-const DOWNLOADS_NAMESPACE: &str = "downloads:v1";
-const VIEWS_NAMESPACE: &str = "views:v1";
-const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays:v1";
+const DOWNLOADS_NAMESPACE: &str = "downloads:v3";
+const VIEWS_NAMESPACE: &str = "views:v3";
+const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays:v3";
 const MINECRAFT_SERVER_PLAYS_EXPIRY: u64 = 86_400; // 24 hours
 const MINECRAFT_SERVER_PLAYS_LIMIT: u32 = 5;
 
@@ -133,29 +131,22 @@ impl AnalyticsQueue {
                 raw_plays.insert(index, play);
             }
 
-            let mut redis =
-                redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
+            let redis_keys = plays_keys
+                .iter()
+                .map(|key| {
+                    let logical_key = format!("{}-{}", key.0, key.1);
+                    redis.key().with_slot(
+                        MINECRAFT_SERVER_PLAYS_NAMESPACE,
+                        &logical_key,
+                        &logical_key,
+                    )
+                })
+                .collect::<Vec<_>>();
+            let mut redis_connection = redis.connect().await?;
 
-            let results = cmd("MGET")
-                .arg(
-                    plays_keys
-                        .iter()
-                        .map(|x| {
-                            format!(
-                                "{}:{}-{}",
-                                MINECRAFT_SERVER_PLAYS_NAMESPACE, x.0, x.1
-                            )
-                        })
-                        .collect::<Vec<_>>(),
-                )
-                .query_async::<Vec<Option<u32>>>(&mut redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
-
-            let mut pipe = redis::pipe();
+            let results =
+                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
             for (idx, count) in results.into_iter().enumerate() {
-                let key = &plays_keys[idx];
-
                 let new_count = if let Some(count) = count {
                     if count >= MINECRAFT_SERVER_PLAYS_LIMIT {
                         raw_plays.remove(&idx);
@@ -166,18 +157,15 @@ impl AnalyticsQueue {
                     1
                 };
 
-                pipe.atomic().set_ex(
-                    format!(
-                        "{}:{}-{}",
-                        MINECRAFT_SERVER_PLAYS_NAMESPACE, key.0, key.1
-                    ),
-                    new_count,
-                    MINECRAFT_SERVER_PLAYS_EXPIRY,
-                );
+                let key = &redis_keys[idx];
+                redis_connection
+                    .set(
+                        key,
+                        new_count,
+                        Some(MINECRAFT_SERVER_PLAYS_EXPIRY as i64),
+                    )
+                    .await?;
             }
-            pipe.query_async::<()>(&mut *redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
 
             let mut plays = client
                 .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
@@ -199,24 +187,22 @@ impl AnalyticsQueue {
                 raw_views.push((views, true));
             }
 
-            let mut redis =
-                redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
+            let redis_keys = views_keys
+                .iter()
+                .map(|key| {
+                    let logical_key = format!("{}-{}", key.0, key.1);
+                    redis.key().with_slot(
+                        VIEWS_NAMESPACE,
+                        &logical_key,
+                        &logical_key,
+                    )
+                })
+                .collect::<Vec<_>>();
+            let mut redis_connection = redis.connect().await?;
 
-            let results = cmd("MGET")
-                .arg(
-                    views_keys
-                        .iter()
-                        .map(|x| format!("{}:{}-{}", VIEWS_NAMESPACE, x.0, x.1))
-                        .collect::<Vec<_>>(),
-                )
-                .query_async::<Vec<Option<u32>>>(&mut redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
-
-            let mut pipe = redis::pipe();
+            let results =
+                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
             for (idx, count) in results.into_iter().enumerate() {
-                let key = &views_keys[idx];
-
                 let new_count =
                     if let Some((views, monetized)) = raw_views.get_mut(idx) {
                         if let Some(count) = count {
@@ -237,15 +223,11 @@ impl AnalyticsQueue {
                         1
                     };
 
-                pipe.atomic().set_ex(
-                    format!("{}:{}-{}", VIEWS_NAMESPACE, key.0, key.1),
-                    new_count,
-                    6 * 60 * 60,
-                );
+                let key = &redis_keys[idx];
+                redis_connection
+                    .set(key, new_count, Some(6 * 60 * 60))
+                    .await?;
             }
-            pipe.query_async::<()>(&mut *redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
 
             let mut views = client.insert::<PageView>("views").await?;
 
@@ -274,26 +256,22 @@ impl AnalyticsQueue {
                 raw_downloads.insert(index, download);
             }
 
-            let mut redis =
-                redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
+            let redis_keys = downloads_keys
+                .iter()
+                .map(|key| {
+                    let logical_key = format!("{}-{}", key.0, key.1);
+                    redis.key().with_slot(
+                        DOWNLOADS_NAMESPACE,
+                        &logical_key,
+                        &logical_key,
+                    )
+                })
+                .collect::<Vec<_>>();
+            let mut redis_connection = redis.connect().await?;
 
-            let results = cmd("MGET")
-                .arg(
-                    downloads_keys
-                        .iter()
-                        .map(|x| {
-                            format!("{}:{}-{}", DOWNLOADS_NAMESPACE, x.0, x.1)
-                        })
-                        .collect::<Vec<_>>(),
-                )
-                .query_async::<Vec<Option<u32>>>(&mut redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
-
-            let mut pipe = redis::pipe();
+            let results =
+                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
             for (idx, count) in results.into_iter().enumerate() {
-                let key = &downloads_keys[idx];
-
                 let new_count = if let Some(count) = count {
                     if count > 5 {
                         raw_downloads.remove(&idx);
@@ -305,15 +283,11 @@ impl AnalyticsQueue {
                     1
                 };
 
-                pipe.atomic().set_ex(
-                    format!("{}:{}-{}", DOWNLOADS_NAMESPACE, key.0, key.1),
-                    new_count,
-                    6 * 60 * 60,
-                );
+                let key = &redis_keys[idx];
+                redis_connection
+                    .set(key, new_count, Some(6 * 60 * 60))
+                    .await?;
             }
-            pipe.query_async::<()>(&mut *redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
 
             let mut transaction = pool.begin().await?;
             let mut downloads = client.insert::<Download>("downloads").await?;

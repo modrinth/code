@@ -1,5 +1,5 @@
 <template>
-	<div class="universal-card">
+	<div class="flex flex-col">
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(messages.revokeConfirmTitle)"
@@ -7,101 +7,70 @@
 			:proceed-label="formatMessage(messages.revokeAction)"
 			@proceed="revokeApp(revokingId)"
 		/>
-		<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.authorizedApps) }}</h2>
-		<p>
+		<h2 class="m-0 text-2xl font-semibold">
+			{{ formatMessage(commonSettingsMessages.authorizedApps) }}
+		</h2>
+		<p class="mb-4 mt-2">
 			{{ formatMessage(messages.description) }}
 		</p>
-		<div v-if="appInfoLookup.length === 0" class="universal-card recessed">
-			{{ formatMessage(messages.emptyState) }}
-		</div>
-		<div
-			v-for="authorization in appInfoLookup"
-			:key="authorization.id"
-			class="universal-card recessed token mt-4"
-		>
-			<div class="token-content">
-				<div>
-					<div class="icon-name">
-						<Avatar :src="authorization.app.icon_url" />
-						<div>
-							<h2 class="token-title">
-								{{ authorization.app.name }}
-							</h2>
-							<div>
-								{{ formatMessage(messages.byLabel) }}
-								<nuxt-link class="text-link" :to="'/user/' + authorization.owner.id">{{
-									authorization.owner.username
-								}}</nuxt-link>
-								<template v-if="authorization.app.url">
-									<span> ⋅ </span>
-									<nuxt-link class="text-link" :to="authorization.app.url">
-										{{ authorization.app.url }}
-									</nuxt-link>
-								</template>
-							</div>
+		<template v-if="isLoading">
+			<div class="flex flex-col gap-4">
+				<div
+					v-for="i in 2"
+					:key="`authorization-skeleton-${i}`"
+					class="overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-3"
+				>
+					<div class="flex items-center gap-3 border-0 border-b border-solid border-surface-4 p-4">
+						<div class="size-12 shrink-0 animate-pulse rounded-xl bg-surface-4" />
+						<div class="flex flex-1 flex-col gap-2">
+							<div class="h-4 w-36 animate-pulse rounded-lg bg-surface-4" />
+							<div class="h-3 w-48 animate-pulse rounded-lg bg-surface-4" />
 						</div>
+						<div class="h-9 w-24 animate-pulse rounded-xl bg-surface-4" />
 					</div>
-				</div>
-				<div>
-					<template v-if="authorization.app.description">
-						<label for="app-description">
-							<span class="label__title">{{ formatMessage(messages.aboutThisAppLabel) }}</span>
-						</label>
-						<div id="app-description">{{ authorization.app.description }}</div>
-					</template>
-
-					<label for="app-scope-list">
-						<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
-					</label>
-					<div class="scope-list">
-						<div
-							v-for="scope in scopesToDefinitions(authorization.scopes)"
-							:key="scope"
-							class="scope-list-item"
-						>
-							<div class="scope-list-item-icon">
-								<CheckIcon />
-							</div>
-							{{ scope }}
+					<div class="bg-surface-2 p-4">
+						<div class="mb-3 h-3 w-28 animate-pulse rounded-lg bg-surface-3" />
+						<div class="grid gap-2 sm:grid-cols-2">
+							<div
+								v-for="j in 4"
+								:key="`authorization-skeleton-${i}-scope-${j}`"
+								class="h-4 w-full animate-pulse rounded-lg bg-surface-3"
+							/>
 						</div>
 					</div>
 				</div>
 			</div>
-
-			<div class="input-group">
-				<ButtonStyled color="red">
-					<button
-						@click="
-							() => {
-								revokingId = authorization.app_id
-								$refs.modal_confirm.show()
-							}
-						"
-					>
-						<TrashIcon />
-						{{ formatMessage(messages.revokeAction) }}
-					</button>
-				</ButtonStyled>
-			</div>
+		</template>
+		<EmptyState
+			v-else-if="showEmptyState"
+			type="done"
+			:heading="formatMessage(messages.emptyStateHeading)"
+			:description="formatMessage(messages.emptyStateDescription)"
+		/>
+		<div v-else class="flex flex-col gap-4">
+			<AuthorizationCard
+				v-for="authorization in appInfoLookup"
+				:key="authorization.id"
+				:authorization="authorization"
+				@revoke="onRevoke"
+			/>
 		</div>
 	</div>
 </template>
 <script setup>
-import { CheckIcon, TrashIcon } from '@modrinth/assets'
 import {
-	Avatar,
-	ButtonStyled,
 	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,
 	defineMessages,
+	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
-import { useScopes } from '~/composables/auth/scopes.ts'
+import AuthorizationCard from '~/components/ui/AuthorizationCard.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -117,10 +86,13 @@ const messages = defineMessages({
 		defaultMessage:
 			'When you authorize an application with your Modrinth account, you grant it access to your account. You can manage and review access to your account here at any time.',
 	},
-	emptyState: {
-		id: 'settings.authorizations.empty-state',
-		defaultMessage:
-			"We currently can't display your authorized apps, we're working to fix this. Please visit this page at a later date!",
+	emptyStateHeading: {
+		id: 'settings.authorizations.empty-state.heading',
+		defaultMessage: 'No authorized apps',
+	},
+	emptyStateDescription: {
+		id: 'settings.authorizations.empty-state.description',
+		defaultMessage: 'Applications you authorize will appear here.',
 	},
 	revokeConfirmTitle: {
 		id: 'settings.authorizations.revoke.confirm.title',
@@ -135,19 +107,10 @@ const messages = defineMessages({
 		id: 'settings.authorizations.revoke.action',
 		defaultMessage: 'Revoke',
 	},
-	byLabel: {
-		id: 'settings.authorizations.by',
-		defaultMessage: 'by',
-	},
-	aboutThisAppLabel: {
-		id: 'settings.authorizations.about-this-app',
-		defaultMessage: 'About this app',
-	},
 })
 
-const { scopesToDefinitions } = useScopes()
-
 const revokingId = ref(null)
+const modal_confirm = ref()
 
 definePageMeta({
 	middleware: 'auth',
@@ -176,19 +139,57 @@ const { data: appCreatorsInformation } = useQuery({
 })
 
 const appInfoLookup = computed(() => {
-	if (!usersApps.value || !appInformation.value || !appCreatorsInformation.value) {
+	if (!usersApps.value || !appInformation.value) {
 		return []
 	}
-	return usersApps.value.map((app) => {
-		const info = appInformation.value.find((c) => c.id === app.app_id)
-		const owner = appCreatorsInformation.value.find((c) => c.id === info?.created_by)
-		return {
-			...app,
-			app: info || null,
-			owner: owner || null,
-		}
-	})
+	if (appInformation.value.length === 0) {
+		return []
+	}
+	if (!appCreatorsInformation.value) {
+		return []
+	}
+
+	return usersApps.value
+		.map((app) => {
+			const info = appInformation.value.find((c) => c.id === app.app_id)
+			const owner = appCreatorsInformation.value.find((c) => c.id === info?.created_by)
+			if (!info || !owner) {
+				return null
+			}
+			return {
+				...app,
+				app: info,
+				owner,
+			}
+		})
+		.filter(Boolean)
 })
+
+const showEmptyState = computed(() => {
+	if (!usersApps.value) {
+		return false
+	}
+	if (usersApps.value.length === 0) {
+		return true
+	}
+	if (!appInformation.value) {
+		return false
+	}
+	if (appInformation.value.length === 0) {
+		return true
+	}
+	if (!appCreatorsInformation.value) {
+		return false
+	}
+	return appInfoLookup.value.length === 0
+})
+
+const isLoading = computed(() => !showEmptyState.value && appInfoLookup.value.length === 0)
+
+function onRevoke(appId) {
+	revokingId.value = appId
+	modal_confirm.value.show()
+}
 
 async function revokeApp(id) {
 	try {
@@ -204,73 +205,3 @@ async function revokeApp(id) {
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-.input-group {
-	// Overrides for omorphia compat
-	> * {
-		padding: var(--gap-sm) var(--gap-lg) !important;
-	}
-}
-
-.scope-list {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-	gap: var(--gap-sm);
-
-	.scope-list-item {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		border-radius: 0.25rem;
-		background-color: var(--color-gray-200);
-		color: var(--color-gray-700);
-		font-size: 0.875rem;
-		font-weight: 500;
-		line-height: 1.25rem;
-
-		// avoid breaking text or overflowing
-		white-space: nowrap;
-		overflow: hidden;
-	}
-
-	.scope-list-item-icon {
-		width: 1.25rem;
-		height: 1.25rem;
-		flex: 0 0 auto;
-
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background-color: var(--color-green);
-		color: var(--color-raised-bg);
-	}
-}
-
-.icon-name {
-	display: flex;
-	align-items: flex-start;
-	gap: var(--gap-lg);
-	padding-bottom: var(--gap-sm);
-}
-
-.token-content {
-	width: 100%;
-
-	.token-title {
-		margin-bottom: var(--spacing-card-xs);
-	}
-}
-
-.token {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-
-	@media screen and (min-width: 800px) {
-		flex-direction: row;
-		align-items: flex-start;
-	}
-}
-</style>

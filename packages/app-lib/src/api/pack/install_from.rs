@@ -10,7 +10,7 @@ use crate::state::{
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch,
-    fetch_advanced_with_progress, sha1_file_async, write_cached_icon,
+    fetch_advanced_with_progress, sha1_file_async,
 };
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use reqwest::Method;
@@ -415,21 +415,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
             )
             .await?;
 
-            let filename = icon_url.rsplit('/').next();
-
-            if let Some(filename) = filename {
-                Some(
-                    write_cached_icon(
-                        filename,
-                        &state.directories.caches_dir(),
-                        icon_bytes,
-                        &state.io_semaphore,
-                    )
-                    .await?,
-                )
-            } else {
-                None
-            }
+            Some(crate::api::instance::cache_icon(icon_bytes, &state).await?)
         } else {
             None
         }

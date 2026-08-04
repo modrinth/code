@@ -129,7 +129,7 @@
     "defaultMessage": "Bei einigen deiner Bilder fehlt der Alt-Text, der besonders für sehbehinderte Nutzer wichtig ist, um die Barrierefreiheit zu gewährleisten."
   },
   "nags.missing-alt-text.title": {
-    "defaultMessage": "Alternativen Bild-Text Hinzufügen"
+    "defaultMessage": "Alternativen Bild-Text hinzufügen"
   },
   "nags.misused-discord-link-description": {
     "defaultMessage": "Discord-Einladungen können nicht für andere Link-Typen verwendet werden. Bitte füge deinen Discord-Link nur in das Feld „Discord-Einladungslink“ ein."
@@ -168,7 +168,7 @@
     "defaultMessage": "Lass die Spieler wissen, in welcher Region sich dein Server befindet."
   },
   "nags.select-country.title": {
-    "defaultMessage": "Wählen eine Region aus"
+    "defaultMessage": "Region auswählen"
   },
   "nags.select-language.description": {
     "defaultMessage": "Wähle die Sprache oder Sprachen, welche auf deinem Server unterstützt werden."
@@ -201,13 +201,13 @@
     "defaultMessage": "Linkeinstellungen ansehen"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "Berechtigung-Dashboard besuchen"
+    "defaultMessage": "Berechtigungs-Dashboard besuchen"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Tageinstellungen ansehen"
   },
   "nags.settings.title": {
-    "defaultMessage": "Einstellungen aufrufen"
+    "defaultMessage": "Allgemeine Einstellungen aufrufen"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Deine Zusammenfassung darf nicht identisch mit dem Namen deines Projekts sein. Es ist wichtig, eine informative und ansprechende Zusammenfassung zu erstellen."
@@ -240,13 +240,13 @@
     "defaultMessage": "Wähle passende Sprachen aus"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchen erscheint."
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchergebnissen erscheint."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Wähle passende Tags"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in den relevanten Suchergebnissen erscheint."
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in relevanten Suchergebnissen erscheint."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wähle passende Tags aus"

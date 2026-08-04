@@ -1,7 +1,6 @@
 use super::AuthProvider;
 use crate::auth::AuthenticationError;
 use crate::database::models::{DBUser, user_item};
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
@@ -10,6 +9,7 @@ use crate::routes::internal::session::get_session_metadata;
 use actix_web::HttpRequest;
 use actix_web::http::header::{AUTHORIZATION, HeaderValue};
 use chrono::Utc;
+use xredis::RedisPool;
 
 pub async fn get_maybe_user_from_headers<'a, E>(
     req: &HttpRequest,

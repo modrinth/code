@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::models::reports::Report;
 use crate::models::v2::reports::LegacyReport;
 use crate::queue::session::AuthQueue;
@@ -7,6 +6,7 @@ use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(reports_get);
@@ -60,15 +60,12 @@ pub async fn report_create(
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
     count: u16,
-    #[serde(default = "default_all")]
+    #[serde(default)]
     all: bool,
 }
 
 fn default_count() -> u16 {
     100
-}
-fn default_all() -> bool {
-    true
 }
 
 /// Get open reports for the current user.  

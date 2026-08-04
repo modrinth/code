@@ -17,6 +17,7 @@ const props = defineProps<{
 	ariaLabel?: string
 	belowModal?: boolean
 	hideWhenModalOpen?: boolean
+	inline?: boolean
 }>()
 
 const INTERCOM_BUBBLE_GAP = 8
@@ -24,6 +25,7 @@ const INTERCOM_BUBBLE_GAP = 8
 const barEl = ref<HTMLElement | null>(null)
 const toolbarEl = ref<HTMLElement | null>(null)
 const compact = ref(false)
+const attentionRequested = ref(false)
 
 const { stackCount } = useModalStack()
 const pageContext = injectPageContext(null)
@@ -75,6 +77,7 @@ function updateIntercomBubbleClearance() {
 
 	if (
 		typeof window === 'undefined' ||
+		props.inline ||
 		!shown.value ||
 		stackCount.value > 0 ||
 		!barEl.value ||
@@ -105,7 +108,7 @@ function updateIntercomBubbleClearance() {
 function updateBodyState(isShown = shown.value) {
 	if (typeof document === 'undefined') return
 
-	if (isShown) {
+	if (isShown && !props.inline) {
 		visibleFloatingActionBars.add(floatingActionBarId)
 	} else {
 		visibleFloatingActionBars.delete(floatingActionBarId)
@@ -149,10 +152,10 @@ watch(
 )
 
 watch(
-	shown,
+	[shown, () => props.inline],
 	async (isShown) => {
 		await nextTick()
-		updateBodyState(isShown)
+		updateBodyState(isShown[0])
 		scheduleIntercomBubbleClearanceUpdate()
 	},
 	{ immediate: true },
@@ -187,24 +190,44 @@ onUnmounted(() => {
 	if (typeof document === 'undefined') return
 	updateFloatingActionBarBodyClass()
 })
+
+async function nudge(): Promise<void> {
+	attentionRequested.value = false
+	await nextTick()
+	attentionRequested.value = true
+}
+
+defineExpose({ nudge })
+defineOptions({
+	inheritAttrs: false,
+})
 </script>
 
 <template>
-	<Teleport to="body">
+	<Teleport to="body" :disabled="inline">
 		<Transition name="floating-action-bar" appear>
 			<div
 				v-if="shown"
+				v-bind="$attrs"
 				ref="barEl"
-				class="floating-action-bar drop-shadow-2xl fixed p-4 bottom-0"
-				:style="barStyle"
+				class="floating-action-bar drop-shadow-2xl"
+				:class="inline ? 'floating-action-bar--inline z-10' : 'fixed bottom-0 p-4'"
+				:style="inline ? undefined : barStyle"
 				aria-live="polite"
 			>
 				<div
 					ref="toolbarEl"
 					role="toolbar"
 					:aria-label="ariaLabel"
-					class="relative overflow-clip flex items-center gap-1.5 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto md:max-w-[60vw] px-3 py-2.5 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
-					:class="{ 'bar-compact': compact }"
+					class="relative overflow-clip flex items-center gap-1.5 rounded-[20px] bg-surface-3 border border-surface-5 border-solid px-3 py-2.5 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
+					:class="[
+						{
+							'bar-compact': compact,
+							'floating-action-bar-attention': attentionRequested,
+						},
+						inline ? 'w-full' : 'mx-auto md:max-w-[60vw]',
+					]"
+					@animationend="attentionRequested = false"
 				>
 					<slot />
 				</div>
@@ -218,6 +241,31 @@ onUnmounted(() => {
 	left: var(--floating-action-bar-left-offset, var(--left-bar-width, 0px));
 	right: var(--floating-action-bar-right-offset, var(--right-bar-width, 0px));
 	transition: bottom 0.25s ease-in-out;
+}
+
+.floating-action-bar--inline {
+	left: auto;
+	right: auto;
+}
+
+.floating-action-bar-attention {
+	animation: floating-action-bar-attention 300ms ease-in-out;
+}
+
+@keyframes floating-action-bar-attention {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-0.4rem);
+	}
+	50% {
+		transform: translateX(0.4rem);
+	}
+	75% {
+		transform: translateX(-0.2rem);
+	}
 }
 
 .floating-action-bar-enter-active {
@@ -243,12 +291,18 @@ onUnmounted(() => {
 }
 
 @media (any-hover: none) and (max-width: 640px) {
-	.floating-action-bar {
+	.floating-action-bar:not(.floating-action-bar--inline) {
 		bottom: var(--size-mobile-navbar-height);
 	}
 
-	.expanded-mobile-nav .floating-action-bar {
+	.expanded-mobile-nav .floating-action-bar:not(.floating-action-bar--inline) {
 		bottom: var(--size-mobile-navbar-height-expanded);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.floating-action-bar-attention {
+		animation: none;
 	}
 }
 </style>

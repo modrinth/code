@@ -77,6 +77,7 @@ const props = withDefaults(
 		startingInstance?: boolean
 		supportsServerQuickPlay?: boolean
 		supportsWorldQuickPlay?: boolean
+		quarantined?: boolean
 		currentProtocol?: ProtocolVersion | null
 		highlighted?: boolean
 
@@ -105,6 +106,7 @@ const props = withDefaults(
 		startingInstance: false,
 		supportsServerQuickPlay: true,
 		supportsWorldQuickPlay: false,
+		quarantined: false,
 		currentProtocol: null,
 
 		refreshing: false,
@@ -139,7 +141,7 @@ const managed = computed(() => props.managed)
 const shortcutInstanceId = computed(() => props.shortcutInstanceId ?? props.instanceId)
 
 async function createShortcut() {
-	if (!shortcutInstanceId.value) return
+	if (!shortcutInstanceId.value || props.quarantined) return
 
 	try {
 		const shortcutPath = await createInstanceShortcut(
@@ -422,23 +424,26 @@ const messages = defineMessages({
 				<ButtonStyled v-else>
 					<button
 						v-tooltip="
-							world.type === 'server'
-								? !supportsServerQuickPlay
-									? formatMessage(messages.noServerQuickPlay)
-									: playingOtherWorld
-										? formatMessage(messages.gameAlreadyOpen)
-										: !serverStatus
-											? formatMessage(messages.noContact)
-											: serverIncompatible
-												? formatMessage(messages.incompatibleServer)
-												: null
-								: !supportsWorldQuickPlay
-									? formatMessage(messages.noSingleplayerQuickPlay)
-									: playingOtherWorld || locked
-										? formatMessage(messages.gameAlreadyOpen)
-										: null
+							quarantined
+								? 'This instance has been locked'
+								: world.type === 'server'
+									? !supportsServerQuickPlay
+										? formatMessage(messages.noServerQuickPlay)
+										: playingOtherWorld
+											? formatMessage(messages.gameAlreadyOpen)
+											: !serverStatus
+												? formatMessage(messages.noContact)
+												: serverIncompatible
+													? formatMessage(messages.incompatibleServer)
+													: null
+									: !supportsWorldQuickPlay
+										? formatMessage(messages.noSingleplayerQuickPlay)
+										: playingOtherWorld || locked
+											? formatMessage(messages.gameAlreadyOpen)
+											: null
 						"
 						:disabled="
+							quarantined ||
 							playingOtherWorld ||
 							startingInstance ||
 							(world.type == 'server' && !supportsServerQuickPlay) ||
@@ -457,7 +462,7 @@ const messages = defineMessages({
 							{
 								id: 'play-instance',
 								shown: !!instanceId,
-								disabled: playingInstance,
+								disabled: playingInstance || quarantined,
 								action: () => emit('play-instance'),
 							},
 							{
@@ -511,7 +516,7 @@ const messages = defineMessages({
 							},
 							{
 								id: 'create-shortcut',
-								shown: !!shortcutInstanceId,
+								shown: !!shortcutInstanceId && !quarantined,
 								action: () => createShortcut(),
 							},
 							{

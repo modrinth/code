@@ -1,7 +1,6 @@
 use crate::database::PgPool;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::{project_item, version_item};
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::projects::{
@@ -22,6 +21,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn default_requested_status() -> VersionStatus {
     VersionStatus::Listed

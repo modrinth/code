@@ -4,12 +4,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use actix_web::web;
-use database::redis::RedisPool;
 use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
 };
 use tracing::{debug, info, warn};
+use xredis::RedisPool;
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
@@ -26,7 +26,7 @@ use crate::util::archon::ArchonClient;
 use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use crate::util::tiltify::TiltifyClient;
-use sync::friends::handle_pubsub;
+use sync::friends::{FRIENDS_CHANNEL_NAME, handle_pubsub};
 use url::Url;
 use webauthn_rs::{Webauthn, WebauthnBuilder};
 
@@ -131,30 +131,6 @@ pub fn app_setup(
     ));
 
     if enable_background_tasks {
-        // The interval in seconds at which the local database is indexed
-        // for searching.  Defaults to 1 hour if unset.
-        let local_index_interval =
-            Duration::from_secs(ENV.LOCAL_INDEX_INTERVAL);
-        let pool_ref = pool.clone();
-        let redis_pool_ref = redis_pool.clone();
-        let search_backend_ref = search_backend.clone();
-        scheduler.run(local_index_interval, move || {
-            let pool_ref = pool_ref.clone();
-            let redis_pool_ref = redis_pool_ref.clone();
-            let search_backend = search_backend_ref.clone();
-            async move {
-                if let Err(err) = background_task::index_search(
-                    pool_ref,
-                    redis_pool_ref,
-                    search_backend,
-                )
-                .await
-                {
-                    warn!("Failed to index search: {err:?}");
-                }
-            }
-        });
-
         // Changes statuses of scheduled projects/versions
         let pool_ref = pool.clone();
         // TODO: Clear cache when these are run
@@ -290,11 +266,10 @@ pub fn app_setup(
 
     {
         let pool = pool.clone();
-        let redis_client = redis::Client::open(redis_pool.url.clone()).unwrap();
+        let pubsub_messages = redis_pool.subscribe(FRIENDS_CHANNEL_NAME);
         let sockets = active_sockets.clone();
         actix_rt::spawn(async move {
-            let pubsub = redis_client.get_async_pubsub().await.unwrap();
-            handle_pubsub(pubsub, pool, sockets).await;
+            handle_pubsub(pubsub_messages, pool, sockets).await;
         });
     }
 

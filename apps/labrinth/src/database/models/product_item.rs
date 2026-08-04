@@ -1,15 +1,15 @@
 use crate::database::models::{
     DBProductId, DBProductPriceId, DatabaseError, product_item,
 };
-use crate::database::redis::RedisPool;
 use crate::models::billing::{Price, ProductMetadata};
 use dashmap::DashMap;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::convert::TryInto;
+use xredis::RedisPool;
 
-const PRODUCTS_NAMESPACE: &str = "products:v1";
+const PRODUCTS_NAMESPACE: &str = "products:v3";
 
 pub struct DBProduct {
     pub id: DBProductId,
@@ -152,9 +152,10 @@ impl QueryProductWithPrices {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(PRODUCTS_NAMESPACE, "all");
 
             let res: Option<Vec<QueryProductWithPrices>> =
-                redis.get_deserialized(PRODUCTS_NAMESPACE, "all").await?;
+                redis.get_deserialized(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -193,10 +194,9 @@ impl QueryProductWithPrices {
             .collect::<Vec<_>>();
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(PRODUCTS_NAMESPACE, "all");
 
-        redis
-            .set_serialized(PRODUCTS_NAMESPACE, "all", &products, None)
-            .await?;
+        redis.set_serialized(&key, &products, None).await?;
 
         Ok(products)
     }

@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "未找到用户"
   },
+  "ads-consent.accept": {
+    "message": "全部接受"
+  },
+  "ads-consent.body": {
+    "message": "广告使 Modrinth 得以运营，并为创作者报酬提供资金支持。我们的合作伙伴可能会在网站上存储或访问 Cookie，以便实现广告个性化和效果衡量。"
+  },
+  "ads-consent.manage": {
+    "message": "管理偏好设置"
+  },
+  "ads-consent.reject": {
+    "message": "全部拒绝"
+  },
+  "ads-consent.title": {
+    "message": "您的隐私以及广告如何支持 Modrinth"
+  },
   "analytics.action.add": {
     "message": "添加"
   },
@@ -81,7 +96,7 @@
     "message": "{hours}小时"
   },
   "analytics.chart.controls.active-count": {
-    "message": "在线{count}人"
+    "message": "显示{count}项"
   },
   "analytics.chart.controls.annotations": {
     "message": "注释"
@@ -236,6 +251,9 @@
   "analytics.empty.select-project": {
     "message": "至少选择一个项目来查看数据"
   },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "无法加载依赖项目"
+  },
   "analytics.filter.game-version-type": {
     "message": "游戏版本类型"
   },
@@ -246,22 +264,22 @@
     "message": "正式版"
   },
   "analytics.filter.search.countries": {
-    "message": "搜索国家/地区…"
+    "message": "搜索国家或地区……"
   },
   "analytics.filter.search.dependent-projects": {
     "message": "搜索项目……"
   },
   "analytics.filter.search.download-sources": {
-    "message": "搜索下载源…"
+    "message": "搜索下载源……"
   },
   "analytics.filter.search.members": {
     "message": "搜索成员……"
   },
   "analytics.filter.search.project-versions": {
-    "message": "搜索项目版本…"
+    "message": "搜索项目版本……"
   },
   "analytics.filter.search.versions": {
-    "message": "搜索版本…"
+    "message": "搜索版本……"
   },
   "analytics.graph.title.downloads": {
     "message": "下载量趋势"
@@ -318,7 +336,7 @@
     "message": "正在加载数据……"
   },
   "analytics.options.loading": {
-    "message": "加载中…"
+    "message": "加载中……"
   },
   "analytics.project-event.project-approved": {
     "message": "项目批准"
@@ -334,6 +352,9 @@
   },
   "analytics.project-event.version-released": {
     "message": "{version} 版本已发布"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "版本已上传"
   },
   "analytics.project-status.approved": {
     "message": "已批准"
@@ -381,7 +402,7 @@
     "message": "添加过滤条件"
   },
   "analytics.query.label.breakdown": {
-    "message": "拆分维度"
+    "message": "分类："
   },
   "analytics.query.label.grouped-by": {
     "message": "分组依据"
@@ -390,7 +411,7 @@
     "message": "项目："
   },
   "analytics.query.label.timeframe": {
-    "message": "统计周期"
+    "message": "统计周期："
   },
   "analytics.stat.downloads": {
     "message": "下载量"
@@ -414,7 +435,7 @@
     "message": "相较上一统计周期"
   },
   "analytics.stat.previous-period-comparison-short": {
-    "message": "相较上期"
+    "message": "相较上期."
   },
   "analytics.stat.revenue": {
     "message": "收益"
@@ -468,7 +489,7 @@
     "message": "显示第{start}至{end}条，共{total}条"
   },
   "analytics.table.search.placeholder": {
-    "message": "搜索…"
+    "message": "搜索……"
   },
   "analytics.threshold.countries-above": {
     "message": "上述所选国家"
@@ -528,7 +549,7 @@
     "message": "下载 AppImage"
   },
   "app-marketing.download.download-beta": {
-    "message": "下载测试版"
+    "message": "下载 beta 版"
   },
   "app-marketing.download.download-deb": {
     "message": "下载 DEB"
@@ -555,7 +576,7 @@
     "message": "下载 Modrinth App 即表示你同意我们的<terms-link>服务条款</terms-link>和<privacy-link>隐私政策</privacy-link>。"
   },
   "app-marketing.download.title": {
-    "message": "下载 Modrinth App（测试版）"
+    "message": "下载 Modrinth App（Beta版）"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -753,19 +774,19 @@
     "message": "完成注册"
   },
   "auth.create-account.date-of-birth.invalid.text": {
-    "message": "请输入一个出生日期，年份不能是0000。"
+    "message": "请输入一个有效的出生日期，年份不能是0000。"
   },
   "auth.create-account.date-of-birth.invalid.title": {
     "message": "无效的出生日期"
   },
   "auth.create-account.date-of-birth.label": {
-    "message": "生日"
+    "message": "出生日期"
   },
   "auth.create-account.date-of-birth.placeholder": {
-    "message": "请填写你的生日"
+    "message": "请选择你的出生日期"
   },
   "auth.create-account.date-of-birth.required.text": {
-    "message": "请先输入您的生日。"
+    "message": "请先输入您的出生日期。"
   },
   "auth.create-account.date-of-birth.required.title": {
     "message": "需提供出生日期"
@@ -837,7 +858,7 @@
     "message": "双因素验证"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "输入验证码…"
+    "message": "输入验证码……"
   },
   "auth.sign-in.continue-with-email": {
     "message": "使用邮箱继续"
@@ -928,6 +949,12 @@
   },
   "auth.verify-email.title": {
     "message": "验证电子邮箱"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "上传图标"
+  },
+  "collection.button.discover-mods": {
+    "message": "发现模组"
   },
   "collection.button.edit-icon": {
     "message": "编辑图标"
@@ -1059,10 +1086,10 @@
     "message": "发送消息出错"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
-    "message": "回复对话消息…"
+    "message": "回复对话消息……"
   },
   "conversation-thread.reply-editor.placeholder.send": {
-    "message": "发送消息…"
+    "message": "发送消息……"
   },
   "conversation-thread.reply-modal.confirmation.description": {
     "message": "确认管理员不会主动审核此内容"
@@ -1102,6 +1129,135 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "补充文件仅用来保存源代码等支持性资料，不能用来存放替代版本或者变体文件。"
+  },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "详细信息"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "文件"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "元数据"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "主要文件即用户安装该项目时下载的默认文件。"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "主要文件"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "你还可选择添加补充文件，例如源代码、文档或需要的资源包。"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "补充文件"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "上传附加文件"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "上传文件"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "上传主要文件和支持文件"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "拖放文件或单击浏览"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "详细信息"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "文件"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "元数据"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "版本更新日志"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "版本号"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "版本号可以将此版本与其他版本区分开来。"
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "输入版本号，例如 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "版本副标题"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "输入副标题……"
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "版本类型"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "添加依赖项"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "依赖项"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "详细信息"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "检测到的模组加载器"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "检测到的游戏版本"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "编辑"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "环境"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "文件"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "加载器"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "元数据"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "模组包的模组加载器无法编辑"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "模组包的游戏版本无法编辑"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "没有添加依赖。"
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "没有添加环境。"
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "没有加载器被选中。"
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "无模组加载器"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "没有版本被选中。"
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "已根据先前的相似版本自动填写"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "资源包加载器无法被编辑"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "建议的"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "上传文件"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "版本"
   },
   "create.collection.collection-info": {
     "message": "将创建一个公开收藏夹，包含{count, plural, =0 {0个项目}  other {#个项目}}。"
@@ -1167,7 +1323,7 @@
     "message": "组织名称"
   },
   "create.organization.name-placeholder": {
-    "message": "输入组织名称…"
+    "message": "输入组织名称……"
   },
   "create.organization.ownership-info": {
     "message": "你将成为这个组织的所有者，但你可以随时邀请其他成员并转让所有权。"
@@ -1199,6 +1355,9 @@
   "create.project.name-placeholder": {
     "message": "输入项目名称…"
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name} 图标"
+  },
   "create.project.owner-description": {
     "message": "将项目所有者设置为你自己或你所属的组织。"
   },
@@ -1229,8 +1388,14 @@
   "create.project.type-server": {
     "message": "服务器"
   },
+  "create.project.unknown-user": {
+    "message": "未知用户"
+  },
   "create.project.url-label": {
     "message": "URL链接"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "用户头像"
   },
   "create.project.visibility-description": {
     "message": "你的项目在获得批准后的可见性。"
@@ -1266,7 +1431,7 @@
     "message": "你确定要撤销你的 ''{title}'' 推广链接吗？"
   },
   "dashboard.affiliate-links.search": {
-    "message": "搜索推广链接…"
+    "message": "搜索推广链接……"
   },
   "dashboard.analytics.from-projects": {
     "message": "来自 {count} {count, plural, other {个项目}}"
@@ -1313,6 +1478,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "最近更新"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "关闭"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下载{formType}"
   },
@@ -1339,6 +1507,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "税务表格"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "您尚未完成税务表单的填写，请重试。"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "税务表单未填写完整"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此了解更多。</security-link>"
@@ -1379,6 +1553,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "企业实体"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "选择生日"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "企业实体指的是如公司、合伙企业或有限责任公司等注册组织。"
   },
@@ -1387,6 +1564,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "个人"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "搜索国家……"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "搜索省/州/行政区……"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "选择你的国家/地区"
@@ -1523,6 +1706,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "输入金额"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "该礼品卡最低面值需 {min}，已超出您的当前余额{balance}。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "兑换此礼品卡需账户余额不少于 {min}。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "当前余额不足，暂无可选的礼品卡金额"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "未找到该金额对应的礼品卡面值"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "未找到该金额对应的礼品卡面值，单张最高可选面值为 {max}。"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "支付方式"
   },
@@ -1537,6 +1735,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "搜索金额"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "搜索 {category}……"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "选择 {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "请选择面额："
@@ -1555,6 +1759,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "你已为 PayPal 国际支付选择美元。<direct-paypal-link>切换至直接 PayPal 支付</direct-paypal-link>可享受更优惠的手续费（≈2%而非≈6%）。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "单笔提现限制：最低 {min}，最高 {max} 。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "最低提现金额为 {min} 。"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "提现"
@@ -1575,7 +1785,7 @@
     "message": "领取你的 Discord 身分组"
   },
   "dashboard.discord-roles.role.big-creator": {
-    "message": "破百万下载"
+    "message": "1OO万+ 下载"
   },
   "dashboard.discord-roles.role.creator": {
     "message": "创作者"
@@ -1632,7 +1842,7 @@
     "message": "历史通知"
   },
   "dashboard.overview.notifications.loading": {
-    "message": "加载通知…"
+    "message": "加载通知……"
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "服务器项目不支持批量编辑"
@@ -1922,6 +2132,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "金额过低"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "本支付方式已被支付提供商取消。请用不同的支付方式或联系客服。"
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "支付方式不可用"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "请使用你所在地区（美国或国际）正确的 PayPal 转账选项。"
   },
@@ -1956,7 +2172,7 @@
     "message": "使用Modrinth即时、准确搜索数千个Minecraft {projectType}，并通过我们的过滤器帮助您快速找到最好的Minecraft {projectType}。"
   },
   "discover.seo.title": {
-    "message": "搜索 {projectType}"
+    "message": "搜索{projectType}"
   },
   "discover.seo.title-with-query": {
     "message": "搜索{projectType} | {query}"
@@ -2082,10 +2298,10 @@
     "message": "按年支付"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "CPU 突发线程是如何工作的？"
+    "message": "CPU 爆发线程是怎样运作的？"
   },
   "hosting-marketing.faq.burst-threads.answer": {
-    "message": "当您的服务器处于高负载状态时，我们会临时为其分配额外的 CPU 线程，以帮助缓解卡顿和性能不稳定。这有助于防止 TPS 降至 20 以下，从而尽确保玩家体验。由于这些额外的 CPU 线程仅会在高负载期间短暂提供，因此它们可能不会显示在 Spark 报告或其他性能分析工具中。"
+    "message": "当你的服务器负载过高时，我们会暂时让它使用额外的 CPU 线程，帮你缓解延迟飙升与不稳定的问题。这有助于防止 TPS 掉到 20 以下，尽可能确保你获得最流畅的体验。由于只有在高负载期间，这些额外 CPU 线程才会短暂出现，所以 Spark 等性能分析工具可能不会显示出这些线程。"
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Modrinth Hosting 服务器是在哪种 CPU 上运行的？"
@@ -2218,6 +2434,24 @@
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "限时优惠活动，无需信用卡信息，美国服务器可用。"
+  },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "获取支付数据失败"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "已找到所选商品，但缺少必要的数据信息，请联系客服处理。"
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "无效产品"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "当前服务暂已达承载上限，请稍后重试。"
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "服务器负载已满"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "发生未知错误"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "按照你需要的配置选择自定义方案。"
@@ -2537,6 +2771,21 @@
   "layout.footer.about.status": {
     "message": "服务状态"
   },
+  "layout.footer.based-on-label": {
+    "message": "基于"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "开发者模式已启用"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "开发者模式已激活"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "开发者模式已禁用"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "开发者模式已停用"
+  },
   "layout.footer.legal": {
     "message": "法律文件"
   },
@@ -2606,6 +2855,9 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "未知"
+  },
   "layout.menu-toggle.action": {
     "message": "切换菜单"
   },
@@ -2626,9 +2878,6 @@
   },
   "layout.nav.discover": {
     "message": "发现"
-  },
-  "layout.nav.discover-content": {
-    "message": "发现内容"
   },
   "layout.nav.get-modrinth-app": {
     "message": "获取 Modrinth App"
@@ -2669,6 +2918,36 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升级至 Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "您必须先验证您的电子邮箱才能在 Modrinth 上发布内容。"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "需要验证电子邮件"
+  },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "自动安装他们正在玩的所有游戏"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "和好友畅玩同款内容"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "共享内容实时同步更新"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "获取 Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "管理者"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "即将自动打开 Modrinth App……"
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "正在打开 Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "为什么选择 Modrinth 客户端"
+  },
   "moderation.exclude-technical-review": {
     "message": "排除技术评审"
   },
@@ -2689,6 +2968,24 @@
   },
   "moderation.page.technicalReview": {
     "message": "技术审查"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "每批 {amount}"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "批量金额"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "此操作将永久删除该项目的所有归属组及其内部的所有文件。此操作无法撤销。"
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "未能清除所有组:{error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "清除"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "所有组均已成功清除。"
   },
   "modpack-scan-modal.failed": {
     "message": "失败"
@@ -2721,10 +3018,13 @@
     "message": "扫描所有文件"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "一些文件扫描失败：{error}"
+    "message": "某些文件扫描失败:\n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "扫描中……"
+  },
+  "modpack-scan-modal.success": {
+    "message": "成功"
   },
   "modpack-scan-modal.title": {
     "message": "模组包扫描 ({scanned}/{total} 个文件)"
@@ -2940,13 +3240,13 @@
     "message": "输入哥斯达黎加 IBAN"
   },
   "muralpay.placeholder.phone-cop": {
-    "message": "+57..."
+    "message": "+57……"
   },
   "muralpay.placeholder.pix-phone": {
-    "message": "+55..."
+    "message": "+55……"
   },
   "muralpay.placeholder.wallet-address-eth": {
-    "message": "0x..."
+    "message": "0x……"
   },
   "muralpay.rail.fiat-ars.name": {
     "message": "银行转账（阿根廷比索）"
@@ -2996,116 +3296,50 @@
   "muralpay.warning.wallet-address": {
     "message": "请再次确认你的钱包地址。发送到错误地址的资金将无法追回。"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "将对{count, plural,one {# 项目}other {# 项目}}应用更改。"
+  "organization.button.manage": {
+    "message": "管理"
   },
-  "profile.bio.fallback.creator": {
-    "message": "一位 Modrinth 创作者。"
-  },
-  "profile.bio.fallback.user": {
-    "message": "一位 Modrinth 用户。"
-  },
-  "profile.button.analytics": {
-    "message": "查看用户分析"
-  },
-  "profile.button.billing": {
-    "message": "管理用户财务"
-  },
-  "profile.button.edit-role": {
-    "message": "编辑角色"
-  },
-  "profile.button.info": {
-    "message": "查看用户详情"
-  },
-  "profile.button.manage-projects": {
+  "organization.button.manage-projects": {
     "message": "管理项目"
   },
-  "profile.button.remove-affiliate": {
-    "message": "解除作为联盟伙伴"
+  "organization.label.downloads": {
+    "message": "下载量"
   },
-  "profile.button.set-affiliate": {
-    "message": "设置为联盟伙伴"
+  "organization.label.members": {
+    "message": "成员"
   },
-  "profile.details.label.auth-providers": {
-    "message": "身份验证提供者"
-  },
-  "profile.details.label.email": {
-    "message": "电子邮箱"
-  },
-  "profile.details.label.email-verified": {
-    "message": "电子邮箱已验证"
-  },
-  "profile.details.label.has-password": {
-    "message": "已设置密码"
-  },
-  "profile.details.label.has-totp": {
-    "message": "已设置动态令牌"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "支付方式"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "电子邮箱未验证"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "电子邮箱验证成功"
-  },
-  "profile.error.not-found": {
-    "message": "未找到用户"
-  },
-  "profile.label.affiliate": {
-    "message": "联盟"
-  },
-  "profile.label.badges": {
-    "message": "徽章"
-  },
-  "profile.label.collection": {
-    "message": "收藏夹"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {次下载}}"
-  },
-  "profile.label.joined": {
-    "message": "加入于"
-  },
-  "profile.label.no-collections": {
-    "message": "该用户没有收藏夹！"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "你还没有收藏夹。\n想要<create-link>创建一个</create-link>吗？"
-  },
-  "profile.label.no-projects": {
-    "message": "该用户没有项目！"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "你还没有项目。\n想要<create-link>创建一个</create-link>吗？"
-  },
-  "profile.label.organizations": {
+  "organization.label.organization": {
     "message": "组织"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {个项目}}"
+  "organization.label.projects": {
+    "message": "项目"
   },
-  "profile.label.saving": {
-    "message": "正在保存…"
+  "organization.project-transfer.id-column": {
+    "message": "ID"
   },
-  "profile.meta.description": {
-    "message": "前往 Modrinth 下载 {username} 的项目"
+  "organization.project-transfer.name-column": {
+    "message": "名称"
   },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - 前往 Modrinth 下载 {username} 的项目"
+  "organization.project-transfer.no-projects-available": {
+    "message": "没有可转让的项目。"
   },
-  "profile.official-account": {
-    "message": "Modrinth 官方账户"
+  "organization.project-transfer.project-icon-alt": {
+    "message": "{name} 的图标"
   },
-  "profile.official-account.bio": {
-    "message": "Modrinth的官方用户账号。在<support-link></support-link>处获取支持或通过电子邮件<email></email>获取支持。"
+  "organization.project-transfer.title": {
+    "message": "转让项目"
   },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat>项目关注者}}"
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "转让 {count, plural, other {# 个项目}}"
   },
-  "profile.user-id": {
-    "message": "用户ID：{id}"
+  "organization.project-transfer.type-column": {
+    "message": "类型"
+  },
+  "organization.projects.none": {
+    "message": "该组织还没有项目。"
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "该组织还没有项目。想要<create-link>创建一个</create-link>吗？"
   },
   "project-member-header.error-decline": {
     "message": "拒绝团队邀请时失败"
@@ -3221,24 +3455,6 @@
   "project-type.shader.singular": {
     "message": "光影包"
   },
-  "project.about.details.created": {
-    "message": "{date}创建"
-  },
-  "project.about.details.licensed": {
-    "message": "许可证：{license}"
-  },
-  "project.about.details.published": {
-    "message": "{date}发布"
-  },
-  "project.about.details.submitted": {
-    "message": "{date}提交"
-  },
-  "project.about.details.title": {
-    "message": "详细信息"
-  },
-  "project.about.details.updated": {
-    "message": "{date}更新"
-  },
   "project.actions.create-server": {
     "message": "创建服务器"
   },
@@ -3247,6 +3463,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "不再显示"
+  },
+  "project.actions.edit-project": {
+    "message": "编辑项目"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "重新扫描整合包"
   },
   "project.actions.review-project": {
     "message": "审核项目"
@@ -3268,9 +3490,6 @@
   },
   "project.description.title": {
     "message": "描述"
-  },
-  "project.details.licensed": {
-    "message": "许可证"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "此游戏版本与基础项目不兼容。"
@@ -3425,14 +3644,8 @@
   "project.gallery.title": {
     "message": "图库"
   },
-  "project.license.error": {
-    "message": "获取许可证文本内容时出错。"
-  },
-  "project.license.loading": {
-    "message": "正在加载许可证文本……"
-  },
-  "project.license.title": {
-    "message": "许可证"
+  "project.install-context.back-to-discover": {
+    "message": "返回发现页"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "你的项目是私人的，这意味着它只能由你本人或受你邀请的人访问。"
@@ -3447,7 +3660,7 @@
     "message": "您可以在项目的<visibility-settings-link>可见性设置</visibility-settings-link>中更改项目的可见性。"
   },
   "project.moderation.admonition.approved.header": {
-    "message": "已批准项目"
+    "message": "项目已被批准"
   },
   "project.moderation.admonition.draft.body": {
     "message": "这是一个草稿项目，在提交审核并获得 Modrinth 管理团队批准之前，其他人无法查看。"
@@ -3479,6 +3692,9 @@
   "project.moderation.admonition.under-review.body.4": {
     "message": "我们计划在24-48小时内审查提交内容，但某些项目可能会有延迟。这并不意味着你的提交有问题。"
   },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "我们计划在一周内审查提交内容，但某些项目可能会有延迟。这并不意味着你的提交有问题。"
+  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>我们感谢您的耐心等待，同时我们的管理员正在努力保持 Modrinth 的安全，并期待帮助您分享内容！💚</emphasis>"
   },
@@ -3486,7 +3702,7 @@
     "message": "在审项目"
   },
   "project.moderation.admonition.withheld.body": {
-    "message": "你的项目不会公开显示，只能通过直链访问。{requestedStatus, select, unlisted {由于你在<visibility-settings-link>可见性设置</visibility-settings-link>作出了设置，无需处理。} other {在重新提交项目前，请解决所有审核关切和下方列出的问题。}}"
+    "message": "你的项目不会公开显示，只能通过直链访问。{requestedStatus, select, unlisted { 根据你选择的 <visibility-settings-link>可见性设置</visibility-settings-link>，很可能无需操作。} other { 请在重新提交项目前，解决所有审核关切，包括下方消息中列出的任何问题。}}"
   },
   "project.moderation.admonition.withheld.header": {
     "message": "由管理员下架"
@@ -3596,11 +3812,26 @@
   "project.settings.permissions.completed.title": {
     "message": "权限设置已完成！"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "删除所有分组"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "此操作将永久删除该项目的 {count, plural, other {# 个贡献者分组}} 及其包含的所有文件，且无法撤销。"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "确定要删除所有贡献者分组吗？"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "无法删除所有贡献者分组"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "已成功删除所有贡献者分组。"
+  },
   "project.settings.permissions.empty-state.description": {
     "message": "你的所有版本都不包含外部内容，因此无需担心存在权限问题。"
   },
   "project.settings.permissions.empty-state.heading": {
-    "message": "搞定啦！"
+    "message": "搞定啦🎉！"
   },
   "project.settings.permissions.expand-all": {
     "message": "展开全部"
@@ -3644,23 +3875,155 @@
   "project.settings.permissions.sort.status": {
     "message": "状态"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "基岩版地址"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "保存之前，Java 版服务器必须可以连通。请确保 Ping 测试成功。"
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "无法保存"
+  },
+  "project.settings.server.details-heading": {
+    "message": "服务器详情"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "输入地址"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Java 版地址"
+  },
+  "project.settings.server.languages-label": {
+    "message": "语言"
+  },
+  "project.settings.server.latency-label": {
+    "message": "延迟：{latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "可选"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "我们无法对该服务器进行 Ping 测试。该服务器可能正被你的主机阻止连接，因此可以尝试刷新几次，如果仍无回应，请<support-link>联系客服</support-link>。"
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "刷新 Ping"
+  },
+  "project.settings.server.region-label": {
+    "message": "地区"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "选择语言"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "选择地区"
+  },
+  "project.settings.server.server-online": {
+    "message": "服务器在线！"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "如果有 <srv-tooltip>[SRV 记录]</srv-tooltip>，你就不必添加端口号。如果没有上述记录，且端口号不是 25565，你可以将端口号以形如 :12345 的格式包含进地址内"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "你在此处输入的地址可能拥有 DNS SRV 记录 _minecraft._tcp.(你的域名)，指向你的 Minecraft 服务器地址和端口。"
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "你选择了全部的 {count} 个可用标签。请仅选择真正适合你项目的标签。"
+  },
+  "project.settings.tags.categories-description": {
+    "message": "选择所有能反映出你{type}的主题或功能的分类。"
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "精选标签"
+  },
+  "project.settings.tags.featured-tags-description": {
+    "message": "你可以设置最多 3 个精选标签，标示出最相关的特点。如果没有选完 3 个标签，其他标签也可能提升为精选标签。"
+  },
+  "project.settings.tags.features-description": {
+    "message": "选择你的{type}作用于哪类特性。"
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "你选择了 {count} 个分辨率标签（{tags}）。资源包通常应仅保留一个标签。"
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "选择你{type}的真实性能影响。如果{type}有多种性能等级可以配置，可选择多项。"
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "选择你的{type}中（多个）纹理的分辨率。"
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "请先至少选择一个分类，再设置精选分类。"
+  },
+  "project.settings.tags.tagging-importance-description": {
+    "message": "准确选好标签，能极大帮助别人找到你的{type}。请确保选择所有合适的标签。"
+  },
+  "project.settings.tags.title": {
+    "message": "标签"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "你选择了 {count} 个标签。建议将数量减少到 8 个或更少，以确保你的项目主题更明确，且更容易发现。"
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "你选择了 {count} 个标签。请将数量减少到 18 个或更少，以确保你的服务器主题更明确，且更容易发现。"
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "你选择了 {count} 个标签。建议将数量减少到 12 个或更少，以确保你的服务器主题更明确，且更容易发现。"
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "请先上传一个版本再选择标签！"
+  },
   "project.settings.title": {
     "message": "设置"
   },
   "project.settings.visit-dashboard": {
     "message": "访问项目的控制面板"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {下载}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, other {关注者}}"
-  },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
   },
+  "project.versions.copy-id-option": {
+    "message": "复制 ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "复制链接"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "复制 Maven 坐标"
+  },
+  "project.versions.delete-button": {
+    "message": "删除"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "此操作将永久移除此版本（真的很久！）。"
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "你确定要删除此版本吗？"
+  },
+  "project.versions.edit-details-option": {
+    "message": "编辑项目信息"
+  },
+  "project.versions.edit-files-option": {
+    "message": "编辑文件"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "编辑元数据"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "编辑版本"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "在新标签页中打开"
+  },
+  "project.versions.share-option": {
+    "message": "分享"
+  },
   "project.versions.title": {
     "message": "版本"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "版本已成功删除。"
+  },
+  "project.versions.version-deleted-title": {
+    "message": "版本已删除"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, other {上述版本}}已被暂留而未公开列出。请提供你有权再分发上述整合包{count, plural, other {版本}}所包含的某些文件的证明。"
@@ -3684,7 +4047,7 @@
     "message": "请提供关于你所举报情况的更多上下文信息"
   },
   "report.checking": {
-    "message": "核对{item}......"
+    "message": "核对 {item}……"
   },
   "report.could-not-find": {
     "message": "无法找到 {item}"
@@ -3882,7 +4245,7 @@
     "message": "提款"
   },
   "scopes.payoutsWrite.label": {
-    "message": "写入提款"
+    "message": "写入支出"
   },
   "scopes.performAnalytics.description": {
     "message": "进行分析操作"
@@ -4076,8 +4439,11 @@
   "servers.plan.small.description": {
     "message": "适合 1–5 位朋友使用，加少量轻量模组。"
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "计费{interval, select, monthly {按月} quarterly {按季度} yearly {按年} other {{interval}}}"
+  "servers.purchase.step.plan.most-popular": {
+    "message": "最热门"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ 月{interval, select, monthly {} other {，按{interval, select, quarterly {季度计费} yearly {年计费} other {{interval}计费}}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "完成设置"
@@ -4284,25 +4650,25 @@
     "message": "账户安全"
   },
   "settings.account.security.two-factor.action.remove": {
-    "message": "移除双因素验证"
+    "message": "移除2次验证"
   },
   "settings.account.security.two-factor.action.setup": {
-    "message": "设置双因素验证"
+    "message": "设置2次验证"
   },
   "settings.account.security.two-factor.description": {
     "message": "在登录时为你的账户增加一层额外的安全保障。"
   },
   "settings.account.security.two-factor.modal.remove.header": {
-    "message": "移除双因素验证"
+    "message": "移除2次验证"
   },
   "settings.account.security.two-factor.modal.setup.header": {
-    "message": "设置双因素验证"
+    "message": "设置2次验证"
   },
   "settings.account.security.two-factor.title": {
     "message": "双因素验证"
   },
   "settings.account.two-factor.backup.intro": {
-    "message": "下载这些备用码，然后将其保存在安全的地方。如果你无法访问设备，就可以用备用码代替双因素验证码！务必像保护密码一样保护备用码。"
+    "message": "下载这些备用码，然后将其保存在安全的地方。如果你无法访问设备，就可以用备用码代替2次验证验证码！请你务必像保护密码一样保护备用码。"
   },
   "settings.account.two-factor.backup.single-use": {
     "message": "备用码只能使用一次。"
@@ -4317,7 +4683,7 @@
     "message": "输入双因素验证码"
   },
   "settings.account.two-factor.field.code.placeholder": {
-    "message": "输入验证码…"
+    "message": "输入验证码……"
   },
   "settings.account.two-factor.setup.intro": {
     "message": "双因素验证需要访问另一部设备才能登录，从而保护你的账户安全。"
@@ -4326,7 +4692,7 @@
     "message": "如果二维码无法扫描，你可以手动输入密码："
   },
   "settings.account.two-factor.setup.scan": {
-    "message": "使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 等双因素验证应用，扫描二维码即可开始。"
+    "message": "使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 等2次验证应用，扫描二维码即可开始。"
   },
   "settings.account.two-factor.verify.description": {
     "message": "输入验证器提供的一次性验证码以验证访问权限。"
@@ -4343,23 +4709,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "添加重定向 URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "取消"
-  },
   "settings.applications.button.create": {
     "message": "新建 App"
   },
   "settings.applications.button.delete": {
     "message": "删除"
   },
-  "settings.applications.button.edit": {
-    "message": "编辑"
-  },
   "settings.applications.button.new": {
     "message": "新建应用程序"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "保存更改"
   },
   "settings.applications.button.upload-icon": {
     "message": "上传图标"
@@ -4389,7 +4746,7 @@
     "message": "描述"
   },
   "settings.applications.field.description.placeholder": {
-    "message": "输入应用程序的描述…"
+    "message": "输入应用程序的描述……"
   },
   "settings.applications.field.icon": {
     "message": "图标"
@@ -4433,14 +4790,8 @@
   "settings.authorizations.about-this-app": {
     "message": "关于此应用"
   },
-  "settings.authorizations.by": {
-    "message": "by"
-  },
   "settings.authorizations.description": {
     "message": "当您使用 Modrinth 账户授权某个应用程序时，即表示您授予其访问您账户的权限。您可以随时在此处管理和审查对您账户的访问权限。"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "我们目前无法显示您授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
   },
   "settings.authorizations.head-title": {
     "message": "授权"
@@ -4566,7 +4917,7 @@
     "message": "{price} / {interval}"
   },
   "settings.billing.pyro.cpu": {
-    "message": "{shared} 共享 CPU（突发高达 {bursts} 个 CPU）"
+    "message": "{shared} 个共享 CPU（爆发时最多 {bursts} CPU）"
   },
   "settings.billing.pyro.linked-server.not-found": {
     "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被停用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
@@ -4764,7 +5115,7 @@
     "message": "名称"
   },
   "settings.pats.modal.create.name.placeholder": {
-    "message": "输入个人访问令牌的名称…"
+    "message": "输入个人访问令牌的名称……"
   },
   "settings.pats.modal.create.title": {
     "message": "创建个人访问令牌"
@@ -4799,27 +5150,6 @@
   "settings.pats.token.never-used": {
     "message": "从未使用"
   },
-  "settings.profile.bio.description": {
-    "message": "做个简短的自我介绍吧。"
-  },
-  "settings.profile.bio.title": {
-    "message": "个人简介"
-  },
-  "settings.profile.description": {
-    "message": "你的个人资料信息在 Modrinth 网站及<docs-link>其 API </docs-link>上均公开可见。"
-  },
-  "settings.profile.head-title": {
-    "message": "个人资料设置"
-  },
-  "settings.profile.profile-info": {
-    "message": "个人资料信息"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "头像"
-  },
-  "settings.profile.username.description": {
-    "message": "不区分大小写的唯一名称，用于识别你的个人资料。"
-  },
   "settings.sessions.action.revoke-session": {
     "message": "登出设备"
   },
@@ -4849,6 +5179,33 @@
   },
   "settings.sidebar.label.display": {
     "message": "显示设置"
+  },
+  "shared-instance.invite.accept": {
+    "message": "接受邀请"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "一位 Modrinth 用户"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, other {已有 # 人加入}}"
+  },
+  "shared-instance.invite.loading": {
+    "message": "正在加载邀请信息…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} 邀请你一起游玩"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "此邀请由 Modrinth 用户创建，并非来自 Modrinth 官方。请仅接受来自信任好友的邀请。"
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "你认识这位用户吗？"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "邀请可能已过期、达到使用次数上限，或已被分享者撤销。"
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "此邀请不可用"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"
@@ -4921,6 +5278,18 @@
   },
   "version.environment.unknown.title": {
     "message": "未知运行环境"
+  },
+  "version.notification.deleted-text": {
+    "message": "版本已成功删除。"
+  },
+  "version.notification.deleted-title": {
+    "message": "版本已删除"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "你的数据包已成功封装为模组！请务必进行游戏测试以检查错误。"
+  },
+  "version.notification.packaging-success-title": {
+    "message": "封装成功"
   },
   "version.package-as-mod.button": {
     "message": "打包为模组"

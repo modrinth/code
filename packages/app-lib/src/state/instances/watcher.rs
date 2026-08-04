@@ -1,4 +1,5 @@
 use crate::State;
+use crate::api::instance::CONFIG_DIRECTORY;
 use crate::event::InstancePayloadType;
 use crate::event::emit::{emit_instance, emit_warning};
 use crate::state::{
@@ -128,17 +129,41 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     Some(InstancePayloadType::WorldUpdated {
                                         world,
                                     })
-                                } else if first_file_name
-                                    .as_ref()
-                                    .is_none_or(|x| *x != "saves")
-                                {
+                                } else if first_file_name.as_ref().is_none_or(
+                                    |x| *x != "saves" && *x != CONFIG_DIRECTORY,
+                                ) {
                                     Some(InstancePayloadType::Synced)
                                 } else {
                                     None
                                 };
                                 if let Some(event) = event {
                                     let emit_instance_id = instance_id.clone();
+                                    let mark_shared_stale = first_file_name
+                                        .as_ref()
+                                        .is_some_and(|name| {
+                                            ProjectType::iterator().any(
+                                                |project_type| {
+                                                    *name
+                                                        == project_type
+                                                            .get_folder()
+                                                },
+                                            )
+                                        });
                                     tokio::spawn(async move {
+                                        if mark_shared_stale
+                                            && let Ok(state) =
+                                                State::get().await
+                                            && let Err(error) =
+                                                crate::state::mark_shared_instance_stale(
+                                                    &emit_instance_id,
+                                                    &state.pool,
+                                                )
+                                                .await
+                                        {
+                                            tracing::error!(
+                                                "Failed to mark shared instance stale after filesystem sync: {error}"
+                                            );
+                                        }
                                         let _ = emit_instance(
                                             &emit_instance_id,
                                             event,
@@ -194,10 +219,11 @@ pub(crate) async fn watch_instance_folder(
     }
 
     let mut to_watch = Vec::new();
-    for sub_path in ProjectType::iterator()
-        .map(|x| x.get_folder())
-        .chain(["crash-reports", "saves"])
-    {
+    for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
+        "crash-reports",
+        "saves",
+        CONFIG_DIRECTORY,
+    ]) {
         let full_path = full_instance_path.join(sub_path);
 
         let meta = tokio::fs::symlink_metadata(&full_path).await;

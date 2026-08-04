@@ -32,7 +32,7 @@
 					@update:selection="updateProjectDownloadSelection"
 					@download="onDownload"
 				/>
-				<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-4 empty:hidden">
 					<DownloadDependencies @download="onDownload" />
 				</div>
 				<ServersPromo

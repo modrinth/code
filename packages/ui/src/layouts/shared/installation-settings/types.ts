@@ -36,12 +36,23 @@ export interface LoaderVersionEntry {
 }
 
 export interface ContentDiffItem {
-	type: 'added' | 'removed' | 'updated'
-	external?: boolean
+	type:
+		| 'added'
+		| 'removed'
+		| 'updated'
+		| 'modpack_linked'
+		| 'modpack_updated'
+		| 'modpack_unlinked'
+		| 'game_version_updated'
+		| 'loader_updated'
+		| 'config_files_updated'
 	projectName?: string
 	fileName?: string
 	currentVersionName?: string
 	newVersionName?: string
+	fileCount?: number
+	disabled?: boolean
+	external?: boolean
 }
 
 export interface ContentDiffPreview {

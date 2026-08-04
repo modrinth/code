@@ -8,10 +8,10 @@
 		<ConfirmModal
 			v-if="currentMember"
 			ref="deleteVersionModal"
-			title="Are you sure you want to delete this version?"
-			description="This will remove this version forever (like really forever)."
+			:title="formatMessage(messages.deleteVersionConfirmTitle)"
+			:description="formatMessage(messages.deleteVersionConfirmDescription)"
 			:has-to-type="false"
-			proceed-label="Delete"
+			:proceed-label="formatMessage(messages.deleteButton)"
 			@proceed="deleteVersion()"
 		/>
 		<Admonition
@@ -69,7 +69,7 @@
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
-						v-tooltip="'Edit version'"
+						v-tooltip="formatMessage(messages.editVersionTooltip)"
 						class="hover:!bg-button-bg [&>svg]:!text-green"
 						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 						:options="[
@@ -86,26 +86,26 @@
 								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
 							},
 						]"
-						aria-label="Edit version"
+						:aria-label="formatMessage(messages.editVersionTooltip)"
 					>
 						<EditIcon aria-hidden="true" />
 						<template #edit-files>
 							<FileIcon aria-hidden="true" />
-							Edit files
+							{{ formatMessage(messages.editFilesOption) }}
 						</template>
 						<template #edit-details>
 							<InfoIcon aria-hidden="true" />
-							Edit details
+							{{ formatMessage(messages.editDetailsOption) }}
 						</template>
 						<template #edit-metadata>
 							<BoxIcon aria-hidden="true" />
-							Edit metadata
+							{{ formatMessage(messages.editMetadataOption) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
-						v-tooltip="'More options'"
+						v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
 						class="hover:!bg-button-bg"
 						:dropdown-id="`${baseDropdownId}-${version.id}`"
 						:options="[
@@ -192,52 +192,52 @@
 								shown: !!currentMember,
 							},
 						]"
-						aria-label="More options"
+						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
 					>
 						<MoreVerticalIcon aria-hidden="true" />
 						<template #download>
 							<DownloadIcon aria-hidden="true" />
-							Download
+							{{ formatMessage(commonMessages.downloadButton) }}
 						</template>
 						<template #new-tab>
 							<ExternalIcon aria-hidden="true" />
-							Open in new tab
+							{{ formatMessage(messages.openInNewTabOption) }}
 						</template>
 						<template #copy-link>
 							<LinkIcon aria-hidden="true" />
-							Copy link
+							{{ formatMessage(messages.copyLinkOption) }}
 						</template>
 						<template #share>
 							<ShareIcon aria-hidden="true" />
-							Share
+							{{ formatMessage(messages.shareOption) }}
 						</template>
 						<template #report>
 							<ReportIcon aria-hidden="true" />
-							Report
+							{{ formatMessage(commonMessages.reportButton) }}
 						</template>
 						<template #edit-files>
 							<FileIcon aria-hidden="true" />
-							Edit files
+							{{ formatMessage(messages.editFilesOption) }}
 						</template>
 						<template #edit-details>
 							<InfoIcon aria-hidden="true" />
-							Edit details
+							{{ formatMessage(messages.editDetailsOption) }}
 						</template>
 						<template #edit-metadata>
 							<BoxIcon aria-hidden="true" />
-							Edit metadata
+							{{ formatMessage(messages.editMetadataOption) }}
 						</template>
 						<template #delete>
 							<TrashIcon aria-hidden="true" />
-							Delete
+							{{ formatMessage(commonMessages.deleteLabel) }}
 						</template>
 						<template #copy-id>
 							<ClipboardCopyIcon aria-hidden="true" />
-							Copy ID
+							{{ formatMessage(messages.copyIdOption) }}
 						</template>
 						<template #copy-maven>
 							<ClipboardCopyIcon aria-hidden="true" />
-							Copy Maven coordinates
+							{{ formatMessage(messages.copyMavenCoordinatesOption) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -336,6 +336,7 @@ import {
 import {
 	Admonition,
 	ButtonStyled,
+	commonMessages,
 	commonProjectSettingsMessages,
 	ConfirmModal,
 	defineMessages,
@@ -444,13 +445,13 @@ async function deleteVersion() {
 		await client.labrinth.versions_v3.deleteVersion(id)
 
 		addNotification({
-			title: 'Version deleted',
-			text: 'The version has been successfully deleted.',
+			title: formatMessage(messages.versionDeletedTitle),
+			text: formatMessage(messages.versionDeletedText),
 			type: 'success',
 		})
 	} catch (err: any) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -476,6 +477,62 @@ const messages = defineMessages({
 		id: 'project.versions.withheld-versions-warning.description',
 		defaultMessage:
 			'{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}.',
+	},
+	deleteVersionConfirmTitle: {
+		id: 'project.versions.delete-confirm.title',
+		defaultMessage: 'Are you sure you want to delete this version?',
+	},
+	deleteVersionConfirmDescription: {
+		id: 'project.versions.delete-confirm.description',
+		defaultMessage: 'This will remove this version forever (like really forever).',
+	},
+	deleteButton: {
+		id: 'project.versions.delete-button',
+		defaultMessage: 'Delete',
+	},
+	editVersionTooltip: {
+		id: 'project.versions.edit-version-tooltip',
+		defaultMessage: 'Edit version',
+	},
+	editFilesOption: {
+		id: 'project.versions.edit-files-option',
+		defaultMessage: 'Edit files',
+	},
+	editDetailsOption: {
+		id: 'project.versions.edit-details-option',
+		defaultMessage: 'Edit details',
+	},
+	editMetadataOption: {
+		id: 'project.versions.edit-metadata-option',
+		defaultMessage: 'Edit metadata',
+	},
+	openInNewTabOption: {
+		id: 'project.versions.open-in-new-tab-option',
+		defaultMessage: 'Open in new tab',
+	},
+	copyLinkOption: {
+		id: 'project.versions.copy-link-option',
+		defaultMessage: 'Copy link',
+	},
+	shareOption: {
+		id: 'project.versions.share-option',
+		defaultMessage: 'Share',
+	},
+	copyIdOption: {
+		id: 'project.versions.copy-id-option',
+		defaultMessage: 'Copy ID',
+	},
+	copyMavenCoordinatesOption: {
+		id: 'project.versions.copy-maven-coordinates-option',
+		defaultMessage: 'Copy Maven coordinates',
+	},
+	versionDeletedTitle: {
+		id: 'project.versions.version-deleted-title',
+		defaultMessage: 'Version deleted',
+	},
+	versionDeletedText: {
+		id: 'project.versions.version-deleted-text',
+		defaultMessage: 'The version has been successfully deleted.',
 	},
 })
 </script>

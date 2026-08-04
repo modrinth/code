@@ -5,7 +5,6 @@ use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{DBOrganization, DBTeam, DBTeamMember, DBUser};
-use crate::database::redis::RedisPool;
 use crate::models::ids::TeamId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -17,6 +16,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(teams_get_route)

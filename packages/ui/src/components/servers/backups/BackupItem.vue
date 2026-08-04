@@ -76,7 +76,7 @@ const backupCreator = computed(() => {
 
 const creatorProfileLink = computed(() =>
 	backupCreator.value && backupCreator.value.id !== 'support'
-		? `https://modrinth.com/user/${encodeURIComponent(backupCreator.value.username)}`
+		? `/user/${encodeURIComponent(backupCreator.value.username)}`
 		: undefined,
 )
 
@@ -224,8 +224,6 @@ const creatorAvatarSrc = computed(() =>
 					<template v-else-if="backupCreator">
 						<AutoLink
 							:to="creatorProfileLink"
-							:target="creatorProfileLink ? '_blank' : undefined"
-							:rel="creatorProfileLink ? 'noopener noreferrer' : undefined"
 							class="group flex min-w-0 items-center gap-1.5"
 							:class="creatorProfileLink ? 'text-secondary hover:underline' : 'text-primary'"
 						>
