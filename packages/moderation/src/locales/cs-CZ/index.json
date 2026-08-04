@@ -251,9 +251,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Je vyžadován alespoň jeden obrázek v galerii pro zobrazení obsahu vašeho {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "resource packu, s výjimkou audia nebo lokalizačních balíčků. Pokud popis odpovídá vašemu balíčku, vyberte prosím příslušný štítek"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Nahrajte obrázek do galerie"
   },
@@ -276,4 +273,3 @@
     "defaultMessage": "Přejděte do nastavení odkazů"
   }
 }
-
