@@ -290,7 +290,8 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			...(props.switchVersion
 				? [
 						{
-							id: formatMessage(commonMessages.switchVersionButton),
+							id: 'switch-version',
+							label: formatMessage(commonMessages.switchVersionButton),
 							icon: ArrowLeftRightIcon,
 							action: () => props.switchVersion!(item),
 						},

@@ -122,6 +122,7 @@
 			<div class="z-10 ml-auto">
 				<Button
 					type="outlined"
+					color="medal_promotion"
 					size="xl"
 					class="my-auto"
 					data-server-listing-button

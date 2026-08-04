@@ -63,7 +63,7 @@
 						type="quiet"
 						color="red"
 						:label="formatMessage(messages.removeAccount)"
-						class="mr-2 hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+						class="mr-2 !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)] hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 						@click="logout(account.profile.id)"
 					>
 						<TrashIcon />
@@ -73,7 +73,7 @@
 			<div class="flex flex-col gap-2 px-2 pt-2">
 				<Button
 					v-if="accounts.length > 0"
-					class="w-full"
+					class="w-full !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
 					:disabled="loginDisabled"
 					@click="login()"
 				>

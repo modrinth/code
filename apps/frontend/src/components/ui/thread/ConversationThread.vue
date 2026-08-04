@@ -274,127 +274,111 @@
 									<CheckIcon v-else aria-hidden="true" />
 									{{ formatMessage(messages.actionApprove) }}
 								</Button>
-								<div class="joined-buttons">
-									<Button
-										v-if="replyBody"
-										type="colored"
-										color="red"
-										:disabled="project.status === 'rejected' || isLoading"
-										@click="runBlockingAction('reject-with-reply', () => sendReply('rejected'))"
-									>
-										<SpinnerIcon
-											v-if="loadingAction === 'reject-with-reply'"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<XIcon v-else aria-hidden="true" />
-										{{ formatMessage(messages.actionRejectWithReply) }}
-									</Button>
-									<Button
-										v-else
-										type="colored"
-										color="red"
-										:disabled="project.status === 'rejected' || isLoading"
-										@click="runBlockingAction('reject', () => setStatus('rejected'))"
-									>
-										<SpinnerIcon
-											v-if="loadingAction === 'reject'"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<XIcon v-else aria-hidden="true" />
-										{{ formatMessage(messages.actionReject) }}
-									</Button>
-									<TeleportOverflowMenu
-										type="colored"
-										color="red"
-										:label="formatMessage(commonMessages.moreOptionsButton)"
-										class="btn-dropdown-animation !w-auto !rounded-xl !px-2.5"
-										:disabled="isLoading"
-										:options="
-											replyBody
-												? [
-														{
-															id: 'withhold-reply',
-															label: formatMessage(messages.actionWithholdWithReply),
-															tone: 'red',
-															hoverFilled: true,
-															action: () =>
-																runBlockingAction('withhold-reply', () => sendReply('withheld')),
-															disabled: project.status === 'withheld' || isLoading,
-														},
-														{
-															id: 'set-to-draft-reply',
-															label: formatMessage(messages.actionSetToDraftWithReply),
-															action: () =>
-																runBlockingAction('set-to-draft-reply', () => sendReply('draft')),
-															disabled: project.status === 'draft' || isLoading,
-														},
-														{
-															id: 'send-to-review-reply',
-															label: formatMessage(messages.actionSendToReviewWithReply),
-															action: () =>
-																runBlockingAction('send-to-review-reply', () =>
-																	sendReply('processing', true),
-																),
-															disabled: project.status === 'processing' || isLoading,
-														},
-													]
-												: [
-														{
-															id: 'withhold',
-															label: formatMessage(messages.actionWithhold),
-															tone: 'red',
-															hoverFilled: true,
-															action: () =>
-																runBlockingAction('withhold', () => setStatus('withheld')),
-															disabled: project.status === 'withheld' || isLoading,
-														},
-														{
-															id: 'set-to-draft',
-															label: formatMessage(messages.actionSetToDraft),
-															action: () =>
-																runBlockingAction('set-to-draft', () => setStatus('draft')),
-															disabled: project.status === 'draft' || isLoading,
-														},
-														{
-															id: 'send-to-review',
-															label: formatMessage(messages.actionSendToReview),
-															action: () =>
-																runBlockingAction('send-to-review', () => setStatus('processing')),
-															disabled: project.status === 'processing' || isLoading,
-														},
-													]
+								<SplitButton
+									type="colored"
+									color="red"
+									:menu-label="formatMessage(commonMessages.moreOptionsButton)"
+									:disabled="isLoading"
+									:primary-disabled="project.status === 'rejected'"
+									:options="
+										replyBody
+											? [
+													{
+														id: 'withhold-reply',
+														label: formatMessage(messages.actionWithholdWithReply),
+														tone: 'red',
+														hoverFilled: true,
+														action: () =>
+															runBlockingAction('withhold-reply', () => sendReply('withheld')),
+														disabled: project.status === 'withheld' || isLoading,
+													},
+													{
+														id: 'set-to-draft-reply',
+														label: formatMessage(messages.actionSetToDraftWithReply),
+														action: () =>
+															runBlockingAction('set-to-draft-reply', () => sendReply('draft')),
+														disabled: project.status === 'draft' || isLoading,
+													},
+													{
+														id: 'send-to-review-reply',
+														label: formatMessage(messages.actionSendToReviewWithReply),
+														action: () =>
+															runBlockingAction('send-to-review-reply', () =>
+																sendReply('processing', true),
+															),
+														disabled: project.status === 'processing' || isLoading,
+													},
+												]
+											: [
+													{
+														id: 'withhold',
+														label: formatMessage(messages.actionWithhold),
+														tone: 'red',
+														hoverFilled: true,
+														action: () =>
+															runBlockingAction('withhold', () => setStatus('withheld')),
+														disabled: project.status === 'withheld' || isLoading,
+													},
+													{
+														id: 'set-to-draft',
+														label: formatMessage(messages.actionSetToDraft),
+														action: () =>
+															runBlockingAction('set-to-draft', () => setStatus('draft')),
+														disabled: project.status === 'draft' || isLoading,
+													},
+													{
+														id: 'send-to-review',
+														label: formatMessage(messages.actionSendToReview),
+														action: () =>
+															runBlockingAction('send-to-review', () => setStatus('processing')),
+														disabled: project.status === 'processing' || isLoading,
+													},
+												]
+									"
+									@click="
+										replyBody
+											? runBlockingAction('reject-with-reply', () => sendReply('rejected'))
+											: runBlockingAction('reject', () => setStatus('rejected'))
+									"
+								>
+									<SpinnerIcon
+										v-if="
+											loadingAction === 'reject-with-reply' || loadingAction === 'reject'
 										"
-									>
-										<SpinnerIcon v-if="isDropdownLoading" class="animate-spin" aria-hidden="true" />
-										<DropdownIcon v-else aria-hidden="true" />
-										<template #withhold-reply>
-											<EyeOffIcon aria-hidden="true" />
-											{{ formatMessage(messages.actionWithholdWithReply) }}
-										</template>
-										<template #withhold>
-											<EyeOffIcon aria-hidden="true" />
-											{{ formatMessage(messages.actionWithhold) }}
-										</template>
-										<template #set-to-draft-reply>
-											<FileTextIcon aria-hidden="true" />
-											{{ formatMessage(messages.actionSetToDraftWithReply) }}
-										</template>
-										<template #set-to-draft>
-											<FileTextIcon aria-hidden="true" />
-											{{ formatMessage(messages.actionSetToDraft) }}
-										</template>
-										<template #send-to-review-reply>
-											<ScaleIcon aria-hidden="true" />
-											{{ formatMessage(messages.actionSendToReviewWithReply) }}
-										</template>
-										<template #send-to-review>
-											<ScaleIcon aria-hidden="true" />
-											{{ formatMessage(messages.actionSendToReview) }}
-										</template>
-									</TeleportOverflowMenu>
-								</div>
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<XIcon v-else aria-hidden="true" />
+									{{
+										formatMessage(
+											replyBody ? messages.actionRejectWithReply : messages.actionReject,
+										)
+									}}
+									<template #withhold-reply>
+										<EyeOffIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionWithholdWithReply) }}
+									</template>
+									<template #withhold>
+										<EyeOffIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionWithhold) }}
+									</template>
+									<template #set-to-draft-reply>
+										<FileTextIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionSetToDraftWithReply) }}
+									</template>
+									<template #set-to-draft>
+										<FileTextIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionSetToDraft) }}
+									</template>
+									<template #send-to-review-reply>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionSendToReviewWithReply) }}
+									</template>
+									<template #send-to-review>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionSendToReview) }}
+									</template>
+								</SplitButton>
 							</template>
 						</template>
 					</div>
@@ -408,7 +392,6 @@
 import {
 	CheckCircleIcon,
 	CheckIcon,
-	DropdownIcon,
 	EyeOffIcon,
 	FileTextIcon,
 	ReplyIcon,
@@ -427,7 +410,7 @@ import {
 	IntlFormatted,
 	MarkdownEditor,
 	NewModal,
-	TeleportOverflowMenu,
+	SplitButton,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -655,15 +638,6 @@ const modalReply = ref(null)
 
 const loadingAction = ref(null)
 const isLoading = computed(() => loadingAction.value !== null)
-const dropdownActionIds = [
-	'withhold',
-	'withhold-reply',
-	'set-to-draft',
-	'set-to-draft-reply',
-	'send-to-review',
-	'send-to-review-reply',
-]
-const isDropdownLoading = computed(() => dropdownActionIds.includes(loadingAction.value))
 
 async function runBlockingAction(actionId, action) {
 	if (loadingAction.value !== null) {

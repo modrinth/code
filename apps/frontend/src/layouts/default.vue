@@ -207,6 +207,7 @@
 					<TeleportOverflowMenu
 						type="quiet"
 						:label="formatMessage(commonMessages.moreOptionsButton)"
+						hoverable
 						:options="[
 							{
 								id: 'mods',

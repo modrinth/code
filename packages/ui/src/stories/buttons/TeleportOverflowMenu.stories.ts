@@ -59,6 +59,7 @@ const meta = {
 		size: 'md',
 		placement: 'bottom-end',
 		disabled: false,
+		hoverable: false,
 	},
 	render: (args) => ({
 		components: { MoreVerticalIcon, TeleportOverflowMenu },
@@ -93,5 +94,11 @@ export const OutlinedTrigger: Story = {
 export const QuietTrigger: Story = {
 	args: {
 		type: 'quiet',
+	},
+}
+
+export const Hoverable: Story = {
+	args: {
+		hoverable: true,
 	},
 }

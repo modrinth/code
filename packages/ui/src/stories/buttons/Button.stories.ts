@@ -24,6 +24,11 @@ const typeRows = [
 		color,
 	})),
 	...colors.map((color) => ({
+		label: `Outlined / ${color.charAt(0).toUpperCase()}${color.slice(1)}`,
+		type: 'outlined' as const,
+		color,
+	})),
+	...colors.map((color) => ({
 		label: `Quiet / ${color.charAt(0).toUpperCase()}${color.slice(1)}`,
 		type: 'quiet' as const,
 		color,

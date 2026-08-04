@@ -571,9 +571,10 @@ function dismissInfoBanner() {
 				<div>
 					<Combobox
 						v-model="currentSortType"
-						class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0 [&>span]:h-[40px]"
+						class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0"
 						:options="sortTypes"
 						:placeholder="formatMessage(commonMessages.sortByLabel)"
+						trigger-size="lg"
 					>
 						<template #selected>
 							<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -598,7 +599,7 @@ function dismissInfoBanner() {
 						</template>
 					</Combobox>
 				</div>
-				<Button native-type="button" class="!h-[40px]" @click="toggleAllCardsCollapsed">
+				<Button native-type="button" size="lg" @click="toggleAllCardsCollapsed">
 					<UnfoldVerticalIcon
 						v-if="allCardsCollapsed"
 						class="size-5 flex-shrink-0 text-secondary"
@@ -610,7 +611,8 @@ function dismissInfoBanner() {
 					v-if="isModerator"
 					type="outlined"
 					native-type="button"
-					class="!h-[40px] !text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
+					size="lg"
+					class="!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
 					:disabled="deleteAllGroupsMutation.isPending.value"
 					@click="showDeleteAllGroupsConfirmation"
 				>

@@ -27,17 +27,18 @@
 				</div>
 			</template>
 
-			<Button v-if="onRemove" aria-label="Remove file" @click="onRemove">
+			<IconButton v-if="onRemove" label="Remove file" type="quiet" @click="onRemove">
 				<XIcon aria-hidden="true" />
-			</Button>
-			<Button
+			</IconButton>
+			<IconButton
 				v-if="isPrimary"
 				v-tooltip="
 					editingVersion
 						? 'Primary file cannot be changed after version is uploaded'
 						: 'Replace primary file'
 				"
-				aria-label="Change primary file"
+				label="Change primary file"
+				type="quiet"
 				:disabled="editingVersion"
 				@click="primaryFileInput?.click()"
 			>
@@ -55,7 +56,7 @@
 						}
 					"
 				/>
-			</Button>
+			</IconButton>
 		</div>
 	</div>
 </template>
@@ -63,7 +64,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
-import { Button, Combobox, injectProjectPageContext } from '@modrinth/ui'
+import { Combobox, IconButton, injectProjectPageContext } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 

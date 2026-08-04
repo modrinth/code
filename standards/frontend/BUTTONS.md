@@ -92,13 +92,15 @@ All button components use the same four visual types:
 highest-emphasis action.
 
 The available colors are `brand`, `red`, `orange`, `green`, `blue`, `purple`, and
-`medal_promotion`. Color is supported by `colored` and `quiet`; `base` and `outlined`
-use their standard neutral treatment.
+`medal_promotion`. Color is supported by `colored`, `outlined`, and `quiet`; `base` uses
+its standard neutral treatment. An outlined button without a color uses the standard
+neutral treatment.
 
 ```vue
 <Button type="colored" color="brand">Create project</Button>
 <Button type="colored" color="red">Delete project</Button>
 <Button type="outlined">Cancel</Button>
+<Button type="outlined" color="blue">View analytics</Button>
 <Button type="quiet" color="red">Remove</Button>
 ```
 
@@ -127,15 +129,12 @@ communicate an action's meaning.
 
 ## Sizes
 
-| Size | Height | Typical use                                      |
-| ---- | ------ | ------------------------------------------------ |
-| `sm` | 32px   | Dense toolbars and constrained secondary actions |
-| `md` | 36px   | Default application controls                     |
-| `lg` | 40px   | Prominent actions and roomier layouts            |
-| `xl` | 48px   | Large, high-emphasis actions                     |
+- `sm`: Notifications and popups, usually for icon-only actions.
+- `md`: Modal and card actions that do not appear at the top of a page.
+- `lg`: Actions at the top of a page or subpage, such as beside inputs or filters.
+- `xl`: Header actions.
 
-`md` is the default. `IconButton` uses the same value for its width and height. Buttons
-that appear together must use the same size.
+`md` is the default. Buttons that appear together must use the same size.
 
 Prefer the size prop over overriding height, padding, border radius, font weight, gap, or
 icon dimensions with utility classes. Width and layout utilities such as `w-full` are
@@ -324,6 +323,9 @@ visible text or composite content, such as an avatar and chevron; it will use a 
 
 The component implements menu keyboard navigation, focus management, typeahead, and
 Escape handling. Consumers should not add competing keyboard or focus behaviour.
+
+Set `hoverable` when a navigation menu should also open on pointer hover. Click, touch,
+and keyboard activation remain available.
 
 ## Popout menus
 

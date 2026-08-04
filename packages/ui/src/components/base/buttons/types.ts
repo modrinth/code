@@ -29,7 +29,7 @@ export type ButtonVisualProps = {
 	  }
 	| {
 			type: 'outlined'
-			color?: never
+			color?: ButtonColor
 	  }
 	| {
 			type: 'colored'

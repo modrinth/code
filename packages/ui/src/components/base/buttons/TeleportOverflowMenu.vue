@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, useId, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
@@ -34,6 +34,7 @@ const props = withDefaults(
 		tooltip?: string
 		placement?: TeleportPlacement
 		distance?: number
+		hoverable?: boolean
 	}>(),
 	{
 		type: 'base',
@@ -43,6 +44,7 @@ const props = withDefaults(
 		circular: true,
 		placement: 'bottom-end',
 		distance: 8,
+		hoverable: false,
 	},
 )
 
@@ -61,6 +63,7 @@ const menuId = `button-overflow-${useId()}`
 const selectedIndex = ref(-1)
 const typeahead = ref('')
 let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
+let hoverCloseTimer: ReturnType<typeof setTimeout> | undefined
 const triggerComponent = computed(() => (props.iconOnly ? IconButton : Button))
 
 const visibleOptions = computed(() => props.options.filter((option) => option.shown !== false))
@@ -123,10 +126,11 @@ function focusItem(index: number) {
 	items[selectedIndex.value]?.focus()
 }
 
-async function openMenu(position: 'first' | 'last' = 'first') {
+async function openMenu(position: 'first' | 'last' = 'first', focus = true) {
 	if (props.disabled || isOpen.value) return
 	await open()
 	emit('open')
+	if (!focus) return
 	await nextTick()
 	focusItem(position === 'first' ? 0 : getMenuItems().length - 1)
 }
@@ -137,9 +141,28 @@ function closeMenu(restoreFocus = false) {
 	close(restoreFocus)
 }
 
-async function toggleMenu() {
+async function toggleMenu(event?: MouseEvent) {
+	if (props.hoverable && window.matchMedia('(hover: hover)').matches && event?.detail) return
 	if (isOpen.value) closeMenu()
 	else await openMenu()
+}
+
+function clearHoverCloseTimer() {
+	if (!hoverCloseTimer) return
+	clearTimeout(hoverCloseTimer)
+	hoverCloseTimer = undefined
+}
+
+function handleMouseEnter() {
+	if (!props.hoverable || !window.matchMedia('(hover: hover)').matches) return
+	clearHoverCloseTimer()
+	openMenu('first', false)
+}
+
+function handleMouseLeave() {
+	if (!props.hoverable || !window.matchMedia('(hover: hover)').matches) return
+	clearHoverCloseTimer()
+	hoverCloseTimer = setTimeout(() => closeMenu(), 250)
 }
 
 function handleTriggerKeydown(event: KeyboardEvent) {
@@ -240,6 +263,8 @@ watch(isOpen, (openState, previousOpenState) => {
 	}
 })
 
+onUnmounted(clearHoverCloseTimer)
+
 defineExpose({ open: openMenu, close: closeMenu })
 </script>
 
@@ -262,6 +287,8 @@ defineExpose({ open: openMenu, close: closeMenu })
 		aria-haspopup="menu"
 		@click="toggleMenu"
 		@keydown="handleTriggerKeydown"
+		@mouseenter="handleMouseEnter"
+		@mouseleave="handleMouseLeave"
 	>
 		<slot />
 	</component>
@@ -284,6 +311,8 @@ defineExpose({ open: openMenu, close: closeMenu })
 				role="menu"
 				:aria-label="props.label"
 				@keydown="handleMenuKeydown"
+				@mouseenter="handleMouseEnter"
+				@mouseleave="handleMouseLeave"
 			>
 				<span
 					aria-hidden="true"

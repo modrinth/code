@@ -232,6 +232,8 @@
 							<IconButton
 								v-tooltip="formatMessage(button.label)"
 								:label="formatMessage(button.label)"
+								type="quiet"
+								size="sm"
 								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
 								:disabled="previewMode || disabled"
 								@click="() => button.action(editor)"
