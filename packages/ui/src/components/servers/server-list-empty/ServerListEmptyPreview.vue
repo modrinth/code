@@ -80,7 +80,7 @@
 		/>
 
 		<div
-			class="absolute left-[50%] top-[24rem] z-10 flex w-[21rem] max-w-[calc(100%-1rem)] gap-4 !overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-2 px-4 py-3 shadow-card"
+			class="absolute left-[28%] top-[23.5rem] z-10 flex w-[21rem] max-w-[calc(100%-1rem)] gap-4 !overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-2 px-4 py-3 shadow-card"
 		>
 			<div
 				class="absolute top-[20px] left-[20px] size-[20px] rounded-full bg-contrast opacity-70 blur-xl"

@@ -2,8 +2,8 @@
 	<div
 		class="flex w-full max-w-[56rem] h-[calc(100vh-120px)] flex-col items-stretch justify-between gap-8 py-8"
 	>
-		<div class="flex w-full flex-wrap grow items-center justify-center gap-10">
-			<div class="mx-auto flex w-full max-w-[24rem] flex-col items-start gap-8">
+		<div class="flex w-full flex-wrap grow items-center justify-center gap-2">
+			<div class="mx-auto flex w-full max-w-[20rem] flex-col items-start gap-8">
 				<div class="flex flex-col gap-2">
 					<div class="flex items-center gap-3">
 						<h1 class="m-0 text-3xl font-semibold leading-9 text-contrast">
