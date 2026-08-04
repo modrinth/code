@@ -31,6 +31,11 @@ const props = withDefaults(
 	},
 )
 
+const emit = defineEmits<{
+	onOpen: []
+	onClose: []
+}>()
+
 function createContextMenuOptions(friend: FriendWithUserData) {
 	if (friend.accepted) {
 		return [
@@ -112,6 +117,8 @@ const messages = defineMessages({
 				? ''
 				: ' cursor-pointer hover:brightness-[--hover-brightness] active:scale-[0.98] transition-all')
 		"
+		@on-open="emit('onOpen')"
+		@on-close="emit('onClose')"
 	>
 		<template #title>
 			<h3 class="text-base text-primary font-medium m-0">
