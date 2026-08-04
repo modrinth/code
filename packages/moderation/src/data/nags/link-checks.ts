@@ -47,6 +47,7 @@ interface LinkCheckNode {
   verify?: LinkCheckVerify
   childNodes?: LinkCheckNode[]
   isTransparent?: boolean
+  isFallback?: boolean
 }
 
 interface LinkCheckBuilder {
@@ -64,6 +65,12 @@ interface LinkCheckBuilder {
   message(descriptor: MessageDescriptor): LinkCheckBuilder
 
   transparent(): LinkCheckBuilder
+
+  fallback(): LinkCheckBuilder
+
+  warn(message: MessageDescriptor, values?: Record<string, unknown>): LinkCheckBuilder
+
+  error(message: MessageDescriptor, values?: Record<string, unknown>): LinkCheckBuilder
 }
 
 type LinkCheckChildShape =
@@ -102,6 +109,18 @@ function buildNode(when: LinkCheckMatcher, label?: string): LinkCheckBuilder {
     node.isTransparent = true
     return node
   }
+  node.fallback = () => {
+    node.isFallback = true
+    return node
+  }
+  node.warn = (message: MessageDescriptor, values?: Record<string, unknown>) => {
+    node.verify = async () => warn(message, values)
+    return node
+  }
+  node.error = (message: MessageDescriptor, values?: Record<string, unknown>) => {
+    node.verify = async () => error(message, values)
+    return node
+  }
   node.children = (...shapes: LinkCheckChildShape[]) => {
     const parentLabel = node.label as string | undefined
     const parentForMatchers = node.forMatchers as FieldMatcher[] | undefined
@@ -120,6 +139,10 @@ function buildNode(when: LinkCheckMatcher, label?: string): LinkCheckBuilder {
 function check(when: RegExp | string | ((remaining: string) => number | null | Promise<number | null>), label?: string): LinkCheckBuilder {
   const matcher = typeof when === "function" ? when : typeof when === "string" ? new RegExp(when) : when
   return buildNode(matcher, label)
+}
+
+function fallback(label?: string): LinkCheckBuilder {
+  return buildNode(() => 0, label).fallback()
 }
 
 function normalizeChild(shape: LinkCheckChildShape): LinkCheckNode {
@@ -170,14 +193,23 @@ async function matchNode(
 
   if (node.childNodes?.length) {
     const rest = remaining.slice(match[0].length)
-    const syncChildren = node.childNodes.filter((child) => !isAsyncMatcher(child.when))
-    const asyncChildren = node.childNodes.filter((child) => isAsyncMatcher(child.when))
+    const syncChildren = node.childNodes.filter((child) => !isAsyncMatcher(child.when) && !child.isFallback)
+    const asyncChildren = node.childNodes.filter((child) => isAsyncMatcher(child.when) && !child.isFallback)
+    const fallbackChildren = node.childNodes.filter((child) => child.isFallback)
     let expectedChild: LinkCheckNode | undefined
     for (const child of [...syncChildren, ...asyncChildren]) {
       const found = await matchNode(child, rest, context)
       if (found) return found
       if (!expectedChild && child.forMatchers?.some((matcher) => matchesField(matcher, context))) expectedChild = child
     }
+
+    const matchingFallback = fallbackChildren.find((child) =>
+      child.forMatchers?.some((matcher) => matchesField(matcher, context)),
+    )
+    if (matchingFallback) {
+      return {node: matchingFallback, match: Object.assign([rest], {input: rest, index: 0}) as RegExpMatchArray}
+    }
+
     if (node.isTransparent) return null
     return {node, match, expectedChild}
   }
@@ -196,7 +228,7 @@ const coreMessages = defineMessages({
   },
   expectedType: {
     id: "nags.link.expected-type",
-    defaultMessage: "This doesn't look like a {label} link.",
+    defaultMessage: "This isn't a valid {label} link.",
   },
 })
 
@@ -314,7 +346,7 @@ function useLinkCheck(context: Ref<LinkCheckContext>) {
       clearTimeout(timeout)
       timeout = setTimeout(() => checkLink(value), 500)
     },
-    {deep: true},
+    {deep: true, immediate: true},
   )
 
   return computed(() => getLinkCheckState(context.value) ?? null)
@@ -597,6 +629,20 @@ checks.children(
         check(anchored(`/${YOUTUBE_CHANNEL}/store`))
       )
   })(),
+)
+
+//TODO: remove this if/when we move this to the backend as we can know this if its backend
+// tho actually we will probably still need it even then if we're fine with non immediate redirects
+// we at the very least need to reword it in that case idk man
+checks.children(
+  fallback("Unrecognized redirect link")
+    .for(["discord", "github", "patreon", "ko-fi", "paypal", "bmac"])
+    .verify(async (_match, context) =>
+      warn(defineMessage({
+        id: "nags.link.unverifiable-redirect",
+        defaultMessage: "This doesn't look like a {platform} link.",
+      }), {platform: context.platformName ?? context.field}),
+    ),
 )
 
 const licenseCheckMessages = defineMessages({

@@ -171,7 +171,7 @@
 				/>
 				<DropdownSelect
 					v-model="donationLink.id"
-					name="Donation platform selector"
+					:name="`Donation platform selector ${index}`"
 					:options="tags.donationPlatforms.map((x) => x.short)"
 					:display-name="
 						(option) => tags.donationPlatforms.find((platform) => platform.short === option)?.name
@@ -259,11 +259,13 @@ function reset() {
 	resetDonations()
 }
 
-function fieldContext(field, getUrl) {
-	return computed(() => ({ field, url: getUrl() }))
+function fieldContext(field, getUrl, extra) {
+	return computed(() => ({ field, url: getUrl(), ...extra }))
 }
 
-const discordInviteCheck = useLinkCheck(fieldContext('discord', () => current.value.discord))
+const discordInviteCheck = useLinkCheck(
+	fieldContext('discord', () => current.value.discord, { platformName: 'Discord' }),
+)
 const issuesCheck = useLinkCheck(fieldContext('issues', () => current.value.issues))
 const sourceCheck = useLinkCheck(fieldContext('source', () => current.value.source))
 const wikiCheck = useLinkCheck(fieldContext('wiki', () => current.value.wiki))
@@ -271,7 +273,12 @@ const siteCheck = useLinkCheck(fieldContext('site', () => current.value.site))
 const storeCheck = useLinkCheck(fieldContext('store', () => current.value.store))
 
 function donationContext(row) {
-	return { field: row.id, url: row.url, isDonation: true }
+	return {
+		field: row.id,
+		url: row.url,
+		isDonation: true,
+		platformName: tags.value.donationPlatforms.find((platform) => platform.short === row.id)?.name,
+	}
 }
 
 function donationCheckState(row, index) {
