@@ -202,8 +202,9 @@ pub async fn emit_install_job(
     {
         let result: crate::Result<()> = (|| {
             let event_state = crate::EventState::get()?;
-            event_state
-                .send(crate::event::AppEvent::InstallJob(snapshot.clone()))?;
+            event_state.send(crate::event::AppEvent::InstallJob(
+                std::sync::Arc::new(snapshot.clone()),
+            ))?;
             Ok(())
         })();
         if let Err(error) = result {
