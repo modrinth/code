@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{path::PathBuf, sync::Arc};
 #[cfg(feature = "tauri")]
-use tauri::ipc::Channel;
+use tauri::ipc::{Channel, InvokeResponseBody};
 use tokio::sync::OnceCell;
 use uuid::Uuid;
 
@@ -23,7 +23,7 @@ pub struct EventState {
     #[cfg(feature = "tauri")]
     pub app: tauri::AppHandle,
     #[cfg(feature = "tauri")]
-    event_channel: RwLock<Channel<AppEvent>>,
+    event_channel: RwLock<Channel<InvokeResponseBody>>,
     pub loading_bars: DashMap<Uuid, LoadingBar>,
 }
 
@@ -31,7 +31,7 @@ impl EventState {
     #[cfg(feature = "tauri")]
     pub async fn init(
         app: tauri::AppHandle,
-        event_channel: Channel<AppEvent>,
+        event_channel: Channel<InvokeResponseBody>,
     ) -> crate::Result<Arc<Self>> {
         let state = EVENT_STATE
             .get_or_try_init(|| async {
@@ -66,9 +66,11 @@ impl EventState {
 
     #[cfg(feature = "tauri")]
     pub fn send(&self, event: AppEvent) -> crate::Result<()> {
+        let payload = rmp_serde::to_vec_named(&event)
+            .map_err(EventError::from)?;
         self.event_channel
             .read()
-            .send(event)
+            .send(InvokeResponseBody::Raw(payload))
             .map_err(EventError::from)?;
         Ok(())
     }
@@ -107,6 +109,19 @@ pub enum AppEvent {
     ),
     Log(LogPayload),
     AdsConsentRequired(bool),
+}
+
+#[cfg(feature = "export-ts")]
+pub fn export_app_event_bindings(
+    output: impl Into<PathBuf>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    use ts_rs::{Config, TS};
+
+    let config = Config::default()
+        .with_out_dir(output)
+        .with_large_int("number");
+    AppEvent::export_all(&config)?;
+    Ok(())
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -400,6 +415,10 @@ pub enum EventError {
 
     #[error("Non-existent loading bar of key: {0}")]
     NoLoadingBar(Uuid),
+
+    #[cfg(feature = "tauri")]
+    #[error("MessagePack encoding error: {0}")]
+    MessagePackEncode(#[from] rmp_serde::encode::Error),
 
     #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]
