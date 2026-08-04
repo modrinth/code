@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Pelo menos uma imagem de galeria é necessária para mostrar o conteúdo do seu {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pacote de recursos, exceto pacotes de áudio ou localização. Se esta descrição se aplica ao seu pacote, selecione a etiqueta apropriada"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Envie uma imagem para a galeria"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Visitar página de links"
   }
 }
-

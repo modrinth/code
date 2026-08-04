@@ -65,38 +65,37 @@
 			</div>
 			<template #actions>
 				<div class="flex justify-end gap-2">
-					<ButtonStyled type="outlined">
-						<button @click="hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="selectedProjects.length === 0" @click="submitTransfer()">
-							<TransferIcon />
-							{{
-								formatMessage(messages.transferSelectedProjects, {
-									count: selectedProjects.length,
-								})
-							}}
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" @click="hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="selectedProjects.length === 0"
+						@click="submitTransfer()"
+					>
+						<TransferIcon />
+						{{
+							formatMessage(messages.transferSelectedProjects, {
+								count: selectedProjects.length,
+							})
+						}}
+					</Button>
 				</div>
 			</template>
 		</NewModal>
-		<ButtonStyled>
-			<button @click="show($event)">
-				<TransferIcon />
-				<span>{{ formatMessage(messages.transferProjectsTitle) }}</span>
-			</button>
-		</ButtonStyled>
+		<Button @click="show($event)">
+			<TransferIcon />
+			<span>{{ formatMessage(messages.transferProjectsTitle) }}</span>
+		</Button>
 	</div>
 </template>
 
 <script setup>
 import { BoxIcon, TransferIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	Checkbox,
 	commonMessages,
 	CopyCode,

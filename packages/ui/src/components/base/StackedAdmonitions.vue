@@ -5,8 +5,9 @@ import { ChevronDownIcon, XIcon } from '@modrinth/assets'
 import { AnimatePresence, Motion } from 'motion-v'
 import { computed, onBeforeUnmount, onMounted, ref, useAttrs, useId, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import ButtonStyled from './ButtonStyled.vue'
 export type StackedAdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 
 /** Extend this interface to attach arbitrary per-item data consumed in the #item slot. */
@@ -486,32 +487,34 @@ const messages = defineMessages({
 			>
 				<div v-if="hasActionBar" :ref="(el: unknown) => setActionBarRef(el)">
 					<div class="flex items-center justify-between pb-2">
-						<ButtonStyled type="transparent">
-							<button
-								type="button"
-								:aria-expanded="isExpanded"
-								:aria-controls="stackId"
-								@click="toggleExpanded"
+						<Button
+							type="quiet"
+							native-type="button"
+							:aria-expanded="isExpanded"
+							:aria-controls="stackId"
+							@click="toggleExpanded"
+						>
+							<Motion
+								as="span"
+								class="inline-flex"
+								:animate="{ rotate: isExpanded ? 0 : -90 }"
+								:transition="{ type: 'spring', stiffness: 350, damping: 30 }"
 							>
-								<Motion
-									as="span"
-									class="inline-flex"
-									:animate="{ rotate: isExpanded ? 0 : -90 }"
-									:transition="{ type: 'spring', stiffness: 350, damping: 30 }"
-								>
-									<ChevronDownIcon class="h-4 w-4" />
-								</Motion>
-								<slot name="header-label" :count="items.length" :expanded="isExpanded">
-									{{ formatMessage(messages.alertCount, { count: items.length }) }}
-								</slot>
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="dismissAllEnabled" type="transparent">
-							<button type="button" @click="$emit('dismiss-all')">
-								<XIcon class="h-4 w-4" />
-								{{ formatMessage(messages.dismissAll) }}
-							</button>
-						</ButtonStyled>
+								<ChevronDownIcon class="h-4 w-4" />
+							</Motion>
+							<slot name="header-label" :count="items.length" :expanded="isExpanded">
+								{{ formatMessage(messages.alertCount, { count: items.length }) }}
+							</slot>
+						</Button>
+						<Button
+							v-if="dismissAllEnabled"
+							type="quiet"
+							native-type="button"
+							@click="$emit('dismiss-all')"
+						>
+							<XIcon class="h-4 w-4" />
+							{{ formatMessage(messages.dismissAll) }}
+						</Button>
 					</div>
 				</div>
 			</Transition>

@@ -237,6 +237,11 @@ vars! {
     SEARCH_TYPESENSE_DEFAULT_BUCKETING: Json<crate::search::backend::typesense::Bucketing> =
         Json(crate::search::backend::typesense::Bucketing::Buckets(5));
     SEARCH_TYPESENSE_DEFAULT_MAX_CANDIDATES: usize = 24usize;
+    ELASTICSEARCH_URL: String = "http://localhost:9200";
+    ELASTICSEARCH_INDEX_PREFIX: String = "labrinth";
+    ELASTICSEARCH_USERNAME: String = "";
+    ELASTICSEARCH_PASSWORD: String = "";
+    ELASTICSEARCH_BULK_BATCH_SIZE: usize = 1000usize;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;

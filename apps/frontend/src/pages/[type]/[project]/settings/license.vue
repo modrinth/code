@@ -28,12 +28,13 @@
 				</label>
 
 				<div class="w-1/2">
-					<DropdownSelect
-						v-model="current.license"
-						name="License selector"
-						:options="builtinLicenses"
-						:display-name="(chosen: BuiltinLicense) => chosen.friendly"
+					<Combobox
+						v-model="selectedLicense"
+						:options="licenseOptions"
+						:display-value="current.license.friendly || undefined"
 						placeholder="Select license..."
+						:disabled="!hasPermission"
+						trigger-type="base"
 					/>
 				</div>
 			</div>
@@ -158,25 +159,26 @@
 import { useLinkCheck } from '@modrinth/moderation'
 import {
 	Checkbox,
+	Combobox,
+	type ComboboxOption,
 	ConfirmLeaveModal,
-	DropdownSelect,
 	injectProjectPageContext,
 	StyledInput,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import {
-	type BuiltinLicense,
-	builtinLicenses,
-	formatProjectType,
-	TeamMemberPermission,
-} from '@modrinth/utils'
+import { builtinLicenses, formatProjectType, TeamMemberPermission } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import LinkCheckMessage from '@/components/LinkCheckMessage.vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+
+const licenseOptions: ComboboxOption<string>[] = builtinLicenses.map((license) => ({
+	value: license.short,
+	label: license.friendly,
+}))
 
 function getInitialLicense() {
 	const oldLicenseId = project.value.license.id
@@ -237,6 +239,14 @@ const effectiveLicenseCheck = useLinkCheck(
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
+
+const selectedLicense = computed({
+	get: () => (current.value.license.friendly === 'Custom' ? '' : current.value.license.short),
+	set: (short: string) => {
+		const license = builtinLicenses.find((option) => option.short === short)
+		if (license) current.value.license = license
+	},
+})
 
 const hasPermission = computed(() => {
 	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS

@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Нужно минимум одно изображение, чтобы показать контент, входящий в {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "набор ресурсов, кроме наборов аудио и локализации. Если это описывает ваш набор, выберите подходящий тег"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Добавьте изображения"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Настроить ссылки"
   }
 }
-

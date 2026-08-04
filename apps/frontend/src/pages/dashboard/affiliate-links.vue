@@ -26,12 +26,10 @@
 					:placeholder="formatMessage(messages.searchAffiliateLinks)"
 					clearable
 				/>
-				<ButtonStyled color="brand">
-					<button @click="createModal?.show">
-						<PlusIcon />
-						{{ formatMessage(messages.createButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="createModal?.show">
+					<PlusIcon />
+					{{ formatMessage(messages.createButton) }}
+				</Button>
 			</div>
 		</div>
 		<Admonition v-if="error" type="critical">
@@ -63,7 +61,7 @@ import {
 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
-	ButtonStyled,
+	Button,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,

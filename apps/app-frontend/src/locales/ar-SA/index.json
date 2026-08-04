@@ -134,20 +134,11 @@
   "app.ads-consent.reject": {
     "message": "رفض الكل"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "يتيح العرض المتقدم لتأثيرات مثل التشويش الذي قد تسبب مشكلات في الأداء دون استخدام العرض المسرع بالأجهزة."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "العرض المتقدم"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "اختر لون سمتك المفضل من أجل تطبيق Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "لون السمة"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "غير الصفحة التي يفتح عليها المشغل."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "صفحة الرئيسية"
@@ -158,50 +149,23 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "الصفحة الرئيسة الافتراضية"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "ألغ تفعيل عرض الاسم فوق لاعبك في صفحة المظاهر."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "إخفاء عرض الاسم"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "يتضمن العوالم الحديثة في قسم \"العودة إلى اللعب\" على الصفحة الرئيسية."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "العودة إلى العوالم"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "قم بتصغير نافذة المشغل عند بدء تشغيل عملية Minecraft."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "تصغير نافذة المشغل"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "استخدام إطار نافذة النظام (يتطلب إعادة تشغيل التطبيق)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "الزخارف التقليدية"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "يعرض مقدار الوقت الذي قضيته في لعب إحدى المهام."
-  },
   "app.appearance-settings.show-play-time.title": {
     "message": "إظهار مدة التشغيل"
-  },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "يتخطى تلقائيًا عمليات التأكيد ذات المخاطر المنخفضة، مثل تثبيت حزم التعديلات المكررة، وحذف المحتوى العادي، والتحديثات الجماعية، وإلغاء ربط حزم التعديلات، ومطالبات الإصلاح. وسيستمر عرض التحذيرات الخطيرة."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "تخطي التحذيرات غير الضرورية"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "يتيح إمكانية إظهار الشريط الجانبي أو إخفائه."
+    "message": "قم بإخفاء الشريط الجانبي الأيمن افتراضيًا وأضف زرًا لإظهاره أو إخفائه."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "تبديل الشريط الجانبي"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "إذا حاولت تثبيت ملف Modrinth Pack (.mrpack) غير مستضاف على Modrinth، فسنتأكد من أنك على دراية بالمخاطر قبل تثبيته."
+    "message": "قم بإخفاء الشريط الجانبي الأيمن"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "أخبرني قبل تثبيت حزم التعديلات غير المعروفة"
@@ -487,9 +451,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "المظهر"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "خيارات النسخة الافتراضية"
   },
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"

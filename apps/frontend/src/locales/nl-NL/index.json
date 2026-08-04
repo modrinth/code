@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Verberg {name} in de grafiek"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Geen gegevens"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Grafiek tooltip vastgepind"
   },
@@ -1599,7 +1602,7 @@
     "message": "Bankrekeninghouder"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
-    "message": "Voer de naam in van de persoon die bevoegd is om dit bank account namens het bedrijf te beheren."
+    "message": "Vul de naam in van de persoon die bevoegd is om namens het bedrijf deze bankrekening te beheren."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Munt"
@@ -4787,11 +4790,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Over deze app"
   },
+  "settings.authorizations.created-by": {
+    "message": "Gemaakt door {user}"
+  },
   "settings.authorizations.description": {
     "message": "Wanneer je een app via je Modrinth-account autoriseert, verleen je die app toegang tot je account. Je kunt de toegang tot je account hier op elk moment beheren en bekijken."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "De apps die je autoriseert, worden hier weergegeven."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Geen geautoriseerde apps"
+  },
   "settings.authorizations.head-title": {
     "message": "Toestemmingen"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Deze app is gemaakt door een officieel Modrinth-account."
   },
   "settings.authorizations.revoke.action": {
     "message": "Intrekken"
@@ -4801,6 +4816,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Weet u zeker dat u deze aanvraag wilt intrekken?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Deze app heeft, ondanks de naam, op geen enkele manier verband met Modrinth."
   },
   "settings.billing.charges.description": {
     "message": "Al je eerdere afschrijvingen van je Modrinth-account worden hier weergegeven:"

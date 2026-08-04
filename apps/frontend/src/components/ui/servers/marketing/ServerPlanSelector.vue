@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type MessageDescriptor, useFormatPrice } from '@modrinth/ui'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessage,
 	defineMessages,
@@ -146,18 +146,24 @@ const billingMonths = computed(() => {
 				</span>
 				<p class="m-0 max-w-[18rem]">{{ formatMessage(plans[plan].description) }}</p>
 			</div>
-			<ButtonStyled
-				:color="plans[plan].buttonColor"
-				:type="plans[plan].mostPopular ? 'standard' : 'highlight-colored-text'"
-				size="large"
+			<Button
+				v-if="outOfStock"
+				disabled
+				size="xl"
+				:type="plans[plan].mostPopular ? 'colored' : 'base'"
+				:color="plans[plan].mostPopular ? plans[plan].buttonColor : undefined"
 			>
-				<span v-if="outOfStock" class="button-like disabled">{{
-					formatMessage(messages.outOfStock)
-				}}</span>
-				<button v-else @click="() => emit('select')">
-					{{ formatMessage(messages.selectPlanButton) }}
-				</button>
-			</ButtonStyled>
+				{{ formatMessage(messages.outOfStock) }}
+			</Button>
+			<Button
+				v-else
+				size="xl"
+				:type="plans[plan].mostPopular ? 'colored' : 'base'"
+				:color="plans[plan].mostPopular ? plans[plan].buttonColor : undefined"
+				@click="() => emit('select')"
+			>
+				{{ formatMessage(messages.selectPlanButton) }}
+			</Button>
 			<ServersSpecs
 				:ram="ram"
 				:storage="storage"

@@ -169,16 +169,14 @@
 					:disabled="!hasPermission"
 					@update:model-value="updateDonationLinks"
 				/>
-				<DropdownSelect
+				<Combobox
 					v-model="donationLink.id"
-					:name="`Donation platform selector ${index}`"
-					:options="tags.donationPlatforms.map((x) => x.short)"
-					:display-name="
-						(option) => tags.donationPlatforms.find((platform) => platform.short === option)?.name
-					"
-					placeholder="Select platform"
-					render-up
-					class="platform-selector"
+          :options="donationPlatformOptions"
+          placeholder="Select platform"
+					:disabled="!hasPermission"
+					force-direction="up"
+					trigger-type="base"
+					class="platform-selector !w-80"
 					@update:model-value="updateDonationLinks"
 				/>
 				<LinkCheckMessage :check="donationCheckState(donationLink, index)" />
@@ -198,9 +196,6 @@
 <script setup>
 import { checkLink, getLinkCheckState, useLinkCheck } from '@modrinth/moderation'
 import {
-	ConfirmLeaveModal,
-	defineMessage,
-	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -213,6 +208,13 @@ import {
 import LinkCheckMessage from '@/components/LinkCheckMessage.vue'
 
 const tags = useGeneratedState()
+
+const donationPlatformOptions = computed(() =>
+	tags.value.donationPlatforms.map((platform) => ({
+		value: platform.short,
+		label: platform.name,
+	})),
+)
 
 const { projectV3: project, currentMember, invalidate } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
@@ -477,10 +479,6 @@ function updateDonationLinks() {
 	input {
 		flex-grow: 2;
 		max-width: 26rem;
-	}
-
-	:deep(.animated-dropdown .selected) {
-		height: 40px;
 	}
 }
 </style>

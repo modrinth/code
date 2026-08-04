@@ -27,39 +27,36 @@
 				</div>
 			</template>
 
-			<ButtonStyled v-if="onRemove" size="standard" :circular="true">
-				<button aria-label="Remove file" class="!shadow-none" @click="onRemove">
-					<XIcon aria-hidden="true" />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-if="isPrimary" size="standard" :circular="true">
-				<button
-					v-tooltip="
-						editingVersion
-							? 'Primary file cannot be changed after version is uploaded'
-							: 'Replace primary file'
-					"
-					aria-label="Change primary file"
-					class="!shadow-none"
+			<IconButton v-if="onRemove" label="Remove file" type="quiet" @click="onRemove">
+				<XIcon aria-hidden="true" />
+			</IconButton>
+			<IconButton
+				v-if="isPrimary"
+				v-tooltip="
+					editingVersion
+						? 'Primary file cannot be changed after version is uploaded'
+						: 'Replace primary file'
+				"
+				label="Change primary file"
+				type="quiet"
+				:disabled="editingVersion"
+				@click="primaryFileInput?.click()"
+			>
+				<ArrowLeftRightIcon aria-hidden="true" />
+				<input
+					ref="primaryFileInput"
+					class="hidden"
+					type="file"
+					:accept="acceptFileFromProjectType(projectV2.project_type)"
 					:disabled="editingVersion"
-					@click="primaryFileInput?.click()"
-				>
-					<ArrowLeftRightIcon aria-hidden="true" />
-					<input
-						ref="primaryFileInput"
-						class="hidden"
-						type="file"
-						:accept="acceptFileFromProjectType(projectV2.project_type)"
-						:disabled="editingVersion"
-						@change="
-							(e) => {
-								emit('setPrimaryFile', (e.target as HTMLInputElement)?.files?.[0])
-								;(e.target as HTMLInputElement).value = ''
-							}
-						"
-					/>
-				</button>
-			</ButtonStyled>
+					@change="
+						(e) => {
+							emit('setPrimaryFile', (e.target as HTMLInputElement)?.files?.[0])
+							;(e.target as HTMLInputElement).value = ''
+						}
+					"
+				/>
+			</IconButton>
 		</div>
 	</div>
 </template>
@@ -67,7 +64,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
+import { Combobox, IconButton, injectProjectPageContext } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 

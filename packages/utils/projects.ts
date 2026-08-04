@@ -66,6 +66,11 @@ export type PlatformTag = {
 	supported_project_types: DisplayProjectType[]
 }
 
+export type VersionDisplayGroup = {
+	label: string
+	versions: string[]
+}
+
 export function getVersionsToDisplay(project, allGameVersions: GameVersionTag[]) {
 	return formatVersionsForDisplay(project.game_versions.slice(), allGameVersions)
 }
@@ -74,6 +79,13 @@ export function formatVersionsForDisplay(
 	gameVersions: string[],
 	allGameVersions: GameVersionTag[],
 ) {
+	return getVersionGroupsForDisplay(gameVersions, allGameVersions).map((group) => group.label)
+}
+
+export function getVersionGroupsForDisplay(
+	gameVersions: string[],
+	allGameVersions: GameVersionTag[],
+): VersionDisplayGroup[] {
 	const inputVersions = gameVersions.slice()
 	const allVersions = allGameVersions.slice()
 
@@ -112,26 +124,33 @@ export function formatVersionsForDisplay(
 	)
 	const projectVersionsGrouped = groupVersions(releaseVersions, true)
 
-	const releaseVersionsAsRanges = projectVersionsGrouped.map(({ major, minor }) => {
-		if (minor.length === 1) {
-			return formatMinecraftMinorVersion(major, minor[0])
-		}
+	const releaseVersionsAsRanges: VersionDisplayGroup[] = projectVersionsGrouped.map(
+		({ major, minor }) => {
+			const versions = minor.map((minorVersion) => formatMinecraftMinorVersion(major, minorVersion))
 
-		const range = allReleasesGrouped.find((x) => x.major === major)
+			if (minor.length === 1) {
+				return { label: versions[0], versions }
+			}
 
-		if (range?.minor.every((value, index) => value === minor[index])) {
-			return `${major}.x`
-		}
+			const range = allReleasesGrouped.find((x) => x.major === major)
 
-		return `${formatMinecraftMinorVersion(major, minor[0])}–${formatMinecraftMinorVersion(major, minor[minor.length - 1])}`
-	})
+			if (range?.minor.every((value, index) => value === minor[index])) {
+				return { label: `${major}.x`, versions }
+			}
+
+			return {
+				label: `${formatMinecraftMinorVersion(major, minor[0])}–${formatMinecraftMinorVersion(major, minor[minor.length - 1])}`,
+				versions,
+			}
+		},
+	)
 
 	const legacyVersionsAsRanges = groupConsecutiveIndices(
 		inputVersions.filter((projVer) => allLegacy.some((gameVer) => gameVer.version === projVer)),
 		allLegacy,
 	)
 
-	let output = [...legacyVersionsAsRanges]
+	let output: VersionDisplayGroup[] = [...legacyVersionsAsRanges]
 
 	// show all snapshots if there's no release versions
 	if (releaseVersionsAsRanges.length === 0) {
@@ -141,14 +160,14 @@ export function formatVersionsForDisplay(
 		const snapshotVersionsAsRanges =
 			snapshotVersions.length > 3
 				? groupConsecutiveIndices(snapshotVersions, allSnapshots)
-				: snapshotVersions
+				: snapshotVersions.map((version) => ({ label: version, versions: [version] }))
 		output = [...snapshotVersionsAsRanges, ...output]
 	} else {
 		output = [...releaseVersionsAsRanges, ...output]
 	}
 
 	if (releaseVersionsAsRanges.length > 0 && latestSnapshot) {
-		output = [latestSnapshot, ...output]
+		output = [{ label: latestSnapshot, versions: [latestSnapshot] }, ...output]
 	}
 	return output
 }
@@ -188,7 +207,10 @@ function groupVersions(versions: string[], consecutive = false) {
 		.reverse()
 }
 
-function groupConsecutiveIndices(versions: string[], referenceList: GameVersionTag[]) {
+function groupConsecutiveIndices(
+	versions: string[],
+	referenceList: GameVersionTag[],
+): VersionDisplayGroup[] {
 	if (!versions || versions.length === 0) {
 		return []
 	}
@@ -202,20 +224,22 @@ function groupConsecutiveIndices(versions: string[], referenceList: GameVersionT
 		.slice()
 		.sort((a, b) => referenceMap.get(a) - referenceMap.get(b))
 
-	const ranges: string[] = []
-	let start = sortedList[0]
-	let previous = sortedList[0]
+	const ranges: VersionDisplayGroup[] = []
+	let rangeStartIndex = 0
 
-	for (let i = 1; i < sortedList.length; i++) {
-		const current = sortedList[i]
-		if (referenceMap.get(current) !== referenceMap.get(previous) + 1) {
-			ranges.push(validateRange(`${previous}–${start}`))
-			start = current
+	for (let i = 1; i <= sortedList.length; i++) {
+		if (
+			i === sortedList.length ||
+			referenceMap.get(sortedList[i]) !== referenceMap.get(sortedList[i - 1]) + 1
+		) {
+			const members = sortedList.slice(rangeStartIndex, i)
+			ranges.push({
+				label: validateRange(`${members[members.length - 1]}–${members[0]}`),
+				versions: members,
+			})
+			rangeStartIndex = i
 		}
-		previous = current
 	}
-
-	ranges.push(validateRange(`${previous}–${start}`))
 
 	return ranges
 }

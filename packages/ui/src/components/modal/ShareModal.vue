@@ -12,9 +12,10 @@ import {
 import QrcodeVue from 'qrcode.vue'
 import { computed, nextTick, ref } from 'vue'
 
+import { ButtonLink, IconButton } from '#ui/components/base/buttons'
 import { injectNotificationManager } from '#ui/providers'
 
-import { ButtonStyled, NewModal, StyledInput } from '../index'
+import { NewModal, StyledInput } from '../index'
 
 const props = defineProps({
 	header: {
@@ -156,16 +157,15 @@ defineExpose({
 					<div ref="qrCode">
 						<QrcodeVue :value="url" class="!bg-white rounded-[var(--radius-md)]" margin="3" />
 					</div>
-					<ButtonStyled circular type="transparent">
-						<button
-							v-tooltip="'Copy QR code'"
-							class="absolute top-0 right-0 m-2"
-							aria-label="Copy QR code"
-							@click="copyImage"
-						>
-							<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-tooltip="'Copy QR code'"
+						type="quiet"
+						label="Copy QR code"
+						class="absolute top-0 right-0 m-2"
+						@click="copyImage"
+					>
+						<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
+					</IconButton>
 				</div>
 				<StyledInput
 					v-else
@@ -175,17 +175,16 @@ defineExpose({
 					wrapper-class="h-full w-[30rem]"
 				>
 					<template #right>
-						<ButtonStyled circular type="transparent">
-							<button
-								v-tooltip="'Copy Text'"
-								type="button"
-								aria-label="Copy Text"
-								class="absolute top-0 right-0 m-2"
-								@click="copyText"
-							>
-								<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
-							</button>
-						</ButtonStyled>
+						<IconButton
+							v-tooltip="'Copy Text'"
+							type="quiet"
+							label="Copy Text"
+							native-type="button"
+							class="absolute top-0 right-0 m-2"
+							@click="copyText"
+						>
+							<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
+						</IconButton>
 					</template>
 				</StyledInput>
 				<div
@@ -207,75 +206,67 @@ defineExpose({
 							<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
 						</div>
 					</button>
-					<ButtonStyled v-if="link">
-						<a
-							:href="url"
-							target="_blank"
-							rel="noopener noreferrer"
-							aria-label="Open in new tab"
-							class="w-full"
-						>
-							Open in new tab
-							<ExternalIcon aria-hidden="true" />
-						</a>
-					</ButtonStyled>
+					<ButtonLink
+						v-if="link"
+						:href="url"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="Open in new tab"
+						class="w-full"
+					>
+						Open in new tab
+						<ExternalIcon aria-hidden="true" />
+					</ButtonLink>
 					<div v-if="socialButtons" class="flex flex-row gap-1">
-						<ButtonStyled v-if="canShare" circular>
-							<button v-tooltip="'Share'" aria-label="Share" @click="share">
-								<ShareIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								v-tooltip="'Send as an email'"
-								:href="sendEmail"
-								:target="targetParameter"
-								aria-label="Send as an email"
-							>
-								<MailIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								v-if="link"
-								v-tooltip="'Open link in browser'"
-								:target="targetParameter"
-								:href="url"
-								aria-label="Open link in browser"
-							>
-								<GlobeIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								v-tooltip="'Toot about it'"
-								:target="targetParameter"
-								:href="sendToot"
-								aria-label="Toot about it"
-							>
-								<MastodonIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								v-tooltip="'Tweet about it'"
-								:target="targetParameter"
-								:href="sendTweet"
-								aria-label="Tweet about it"
-							>
-								<TwitterIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								v-tooltip="'Share on Reddit'"
-								:target="targetParameter"
-								:href="postOnReddit"
-								aria-label="Share on Reddit"
-							>
-								<RedditIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
+						<IconButton v-if="canShare" v-tooltip="'Share'" label="Share" @click="share">
+							<ShareIcon aria-hidden="true" />
+						</IconButton>
+						<ButtonLink
+							v-tooltip="'Send as an email'"
+							:href="sendEmail"
+							:target="targetParameter"
+							aria-label="Send as an email"
+							class="!w-9 !px-0 !rounded-full"
+						>
+							<MailIcon aria-hidden="true" />
+						</ButtonLink>
+						<ButtonLink
+							v-if="link"
+							v-tooltip="'Open link in browser'"
+							:target="targetParameter"
+							:href="url"
+							aria-label="Open link in browser"
+							class="!w-9 !px-0 !rounded-full"
+						>
+							<GlobeIcon aria-hidden="true" />
+						</ButtonLink>
+						<ButtonLink
+							v-tooltip="'Toot about it'"
+							:target="targetParameter"
+							:href="sendToot"
+							aria-label="Toot about it"
+							class="!w-9 !px-0 !rounded-full"
+						>
+							<MastodonIcon aria-hidden="true" />
+						</ButtonLink>
+						<ButtonLink
+							v-tooltip="'Tweet about it'"
+							:target="targetParameter"
+							:href="sendTweet"
+							aria-label="Tweet about it"
+							class="!w-9 !px-0 !rounded-full"
+						>
+							<TwitterIcon aria-hidden="true" />
+						</ButtonLink>
+						<ButtonLink
+							v-tooltip="'Share on Reddit'"
+							:target="targetParameter"
+							:href="postOnReddit"
+							aria-label="Share on Reddit"
+							class="!w-9 !px-0 !rounded-full"
+						>
+							<RedditIcon aria-hidden="true" />
+						</ButtonLink>
 					</div>
 				</div>
 			</div>

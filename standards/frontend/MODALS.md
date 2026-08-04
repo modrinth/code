@@ -104,12 +104,8 @@ Renders a bottom action bar below the content area (with `p-4 pt-0` padding). Us
 <NewModal ref="modal" header="Delete Item" fade="danger">
 	<p>This action cannot be undone.</p>
 	<template #actions>
-		<ButtonStyled color="danger">
-			<button @click="handleDelete">Delete</button>
-		</ButtonStyled>
-		<ButtonStyled>
-			<button @click="modal?.hide()">Cancel</button>
-		</ButtonStyled>
+		<Button type="colored" color="red" @click="handleDelete">Delete</Button>
+		<Button @click="modal?.hide()">Cancel</Button>
 	</template>
 </NewModal>
 ```
@@ -274,7 +270,7 @@ export const detailsStageConfig: StageConfigInput<MyModalContext> = {
 | `label`        | Button text             |
 | `icon`         | Icon component          |
 | `iconPosition` | `'before'` or `'after'` |
-| `color`        | ButtonStyled color prop |
+| `color`        | Button color prop       |
 | `disabled`     | Disable the button      |
 | `onClick`      | Click handler           |
 

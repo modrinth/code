@@ -21,11 +21,9 @@
 							formatMessage(messages.settingsTitle)
 						}}</span>
 						<div class="flex gap-2">
-							<ButtonStyled>
-								<nuxt-link to="/dashboard/projects"
-									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink to="/dashboard/projects"
+								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+							</ButtonLink>
 						</div>
 					</div>
 					<ProjectMemberHeader
@@ -138,93 +136,97 @@
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					>
 						<template #actions>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand" circular>
-								<nuxt-link
-									v-tooltip="formatMessage(messages.editProject)"
-									:to="`${projectPath}/settings`"
-									class="!font-bold lg:!hidden"
-								>
-									<SettingsIcon />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
-								<nuxt-link :to="`${projectPath}/settings`" class="!font-bold max-lg:!hidden">
-									<SettingsIcon />
-									{{ formatMessage(messages.editProject) }}
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								v-if="auth.user && currentMember"
+								v-tooltip="formatMessage(messages.editProject)"
+								type="colored"
+								color="brand"
+								size="xl"
+								:to="`${projectPath}/settings`"
+								class="!w-12 !rounded-full !px-0 !font-bold lg:!hidden"
+							>
+								<SettingsIcon />
+							</ButtonLink>
+							<ButtonLink
+								v-if="auth.user && currentMember"
+								type="colored"
+								color="brand"
+								size="xl"
+								:to="`${projectPath}/settings`"
+								class="!font-bold max-lg:!hidden"
+							>
+								<SettingsIcon />
+								{{ formatMessage(messages.editProject) }}
+							</ButtonLink>
 
 							<div class="hidden sm:contents">
-								<ButtonStyled
-									v-if="!isServerProject"
-									size="large"
-									:color="projectHeaderPrimaryColor"
-									:circular="!!auth.user && !!currentMember"
+								<IconButton
+									v-if="!isServerProject && auth.user && currentMember"
+									v-tooltip="formatMessage(commonMessages.downloadButton)"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.downloadButton)"
+									@click="handleProjectHeaderPrimary"
 								>
-									<button
-										v-tooltip="
-											auth.user && currentMember
-												? formatMessage(commonMessages.downloadButton)
-												: undefined
-										"
-										type="button"
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										@click="handleProjectHeaderPrimary"
-									>
-										<DownloadIcon />
-										{{
-											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
-										}}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-else
-									size="large"
-									:color="projectHeaderPrimaryColor"
-									:circular="!!auth.user && !!currentMember"
+									<DownloadIcon />
+								</IconButton>
+								<Button
+									v-else-if="!isServerProject"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									@click="handleProjectHeaderPrimary"
 								>
-									<button
-										v-tooltip="
-											auth.user && currentMember
-												? formatMessage(commonMessages.playButton)
-												: undefined
-										"
-										type="button"
-										:aria-label="formatMessage(commonMessages.playButton)"
-										@click="handleProjectHeaderPrimary"
-									>
-										<PlayIcon />
-										{{ auth.user && currentMember ? '' : formatMessage(commonMessages.playButton) }}
-									</button>
-								</ButtonStyled>
+									<DownloadIcon />
+									{{ formatMessage(commonMessages.downloadButton) }}
+								</Button>
+								<IconButton
+									v-if="isServerProject && auth.user && currentMember"
+									v-tooltip="formatMessage(commonMessages.playButton)"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.playButton)"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon />
+								</IconButton>
+								<Button
+									v-else-if="isServerProject"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon />
+									{{ formatMessage(commonMessages.playButton) }}
+								</Button>
 							</div>
 
 							<div class="contents sm:hidden">
-								<ButtonStyled
+								<IconButton
 									v-if="!isServerProject"
-									size="large"
-									circular
-									:color="projectHeaderPrimaryColor"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.downloadButton)"
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
 								>
-									<button
-										type="button"
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
-										<DownloadIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled v-else size="large" circular :color="projectHeaderPrimaryColor">
-									<button
-										type="button"
-										:aria-label="formatMessage(commonMessages.playButton)"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
-										<PlayIcon />
-									</button>
-								</ButtonStyled>
+									<DownloadIcon />
+								</IconButton>
+								<IconButton
+									v-else
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.playButton)"
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon />
+								</IconButton>
 							</div>
 
 							<Tooltip
@@ -238,16 +240,16 @@
 								:auto-hide="false"
 								placement="bottom-start"
 							>
-								<ButtonStyled circular size="large">
-									<nuxt-link
-										v-tooltip="formatMessage(messages.createServerTooltip)"
-										:to="projectHeaderCreateServerTo"
-										:aria-label="formatMessage(messages.serversPromoTitle)"
-										@click="dismissProjectHeaderCreateServerPrompt"
-									>
-										<ServerPlusIcon />
-									</nuxt-link>
-								</ButtonStyled>
+								<ButtonLink
+									v-tooltip="formatMessage(messages.createServerTooltip)"
+									size="xl"
+									:to="projectHeaderCreateServerTo"
+									:aria-label="formatMessage(messages.serversPromoTitle)"
+									class="!w-12 !rounded-full !px-0"
+									@click="dismissProjectHeaderCreateServerPrompt"
+								>
+									<ServerPlusIcon />
+								</ButtonLink>
 								<template #popper>
 									<div class="grid max-w-[18rem] gap-2">
 										<div class="flex items-center justify-between gap-4">
@@ -261,14 +263,15 @@
 													{{ formatMessage(commonMessages.newBadge) }}
 												</span>
 											</div>
-											<ButtonStyled size="small" circular>
-												<button
-													v-tooltip="formatMessage(messages.dontShowAgain)"
-													@click="dismissProjectHeaderCreateServerPrompt"
-												>
-													<XIcon aria-hidden="true" />
-												</button>
-											</ButtonStyled>
+											<IconButton
+												v-tooltip="formatMessage(messages.dontShowAgain)"
+												class="!size-6"
+												size="xs"
+												:label="formatMessage(messages.dontShowAgain)"
+												@click="dismissProjectHeaderCreateServerPrompt"
+											>
+												<XIcon aria-hidden="true" />
+											</IconButton>
 										</div>
 										<p class="m-0 text-sm font-medium leading-tight text-secondary">
 											{{ formatMessage(messages.serversPromoDescription) }}
@@ -286,55 +289,58 @@
 									</div>
 								</template>
 							</Tooltip>
-							<ButtonStyled v-else-if="showProjectHeaderCreateServerAction" circular size="large">
-								<nuxt-link
-									v-tooltip="formatMessage(messages.createServerTooltip)"
-									:to="projectHeaderCreateServerTo"
-									:aria-label="formatMessage(messages.serversPromoTitle)"
-									@click="dismissProjectHeaderCreateServerPrompt"
-								>
-									<ServerPlusIcon />
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								v-else-if="showProjectHeaderCreateServerAction"
+								v-tooltip="formatMessage(messages.createServerTooltip)"
+								size="xl"
+								:to="projectHeaderCreateServerTo"
+								:aria-label="formatMessage(messages.serversPromoTitle)"
+								class="!w-12 !rounded-full !px-0"
+								@click="dismissProjectHeaderCreateServerPrompt"
+							>
+								<ServerPlusIcon />
+							</ButtonLink>
 
-							<ButtonStyled circular size="large">
-								<ClientOnly>
-									<button
-										v-if="auth.user"
-										v-tooltip="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										type="button"
-										:aria-label="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										@click="followProjectFromHeader"
-									>
-										<HeartIcon :fill="following ? 'currentColor' : 'none'" />
-									</button>
-									<nuxt-link
-										v-else
+							<ClientOnly>
+								<IconButton
+									v-if="auth.user"
+									v-tooltip="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									size="xl"
+									:label="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									@click="followProjectFromHeader"
+								>
+									<HeartIcon :fill="following ? 'currentColor' : 'none'" />
+								</IconButton>
+								<ButtonLink
+									v-else
+									v-tooltip="formatMessage(commonMessages.followButton)"
+									size="xl"
+									:to="signInRouteObj"
+									:aria-label="formatMessage(commonMessages.followButton)"
+									class="!w-12 !rounded-full !px-0"
+								>
+									<HeartIcon aria-hidden="true" />
+								</ButtonLink>
+								<template #fallback>
+									<ButtonLink
 										v-tooltip="formatMessage(commonMessages.followButton)"
+										size="xl"
 										:to="signInRouteObj"
 										:aria-label="formatMessage(commonMessages.followButton)"
+										class="!w-12 !rounded-full !px-0"
 									>
 										<HeartIcon aria-hidden="true" />
-									</nuxt-link>
-									<template #fallback>
-										<nuxt-link
-											v-tooltip="formatMessage(commonMessages.followButton)"
-											:to="signInRouteObj"
-											:aria-label="formatMessage(commonMessages.followButton)"
-										>
-											<HeartIcon aria-hidden="true" />
-										</nuxt-link>
-									</template>
-								</ClientOnly>
-							</ButtonStyled>
+									</ButtonLink>
+								</template>
+							</ClientOnly>
 
 							<ProjectCollectionSaveButton
 								:auth-user="auth.user"
@@ -349,15 +355,15 @@
 								:create-collection="(event) => modalCollection?.show(event)"
 							/>
 
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
-									:options="projectHeaderMoreActions"
-									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-									:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								:label="formatMessage(commonMessages.moreOptionsButton)"
+								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+								:options="projectHeaderMoreActions"
+							>
+								<MoreVerticalIcon />
+							</TeleportOverflowMenu>
 						</template>
 					</ProjectPageHeader>
 					<ProjectMemberHeader
@@ -406,11 +412,15 @@
 						>
 							{{ formatMessage(messages.environmentMigrationLink) }}
 						</nuxt-link>
-						<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
-							<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
-								<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							v-if="hasEditDetailsPermission"
+							type="colored"
+							color="orange"
+							class="mt-3 w-fit"
+							@click="() => projectEnvironmentModal.show()"
+						>
+							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
+						</Button>
 					</Admonition>
 					<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
 						{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
@@ -506,9 +516,11 @@ import {
 	Admonition,
 	Avatar,
 	BrowseInstallHeader,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
@@ -1589,27 +1601,26 @@ const projectHeaderMoreActions = computed(() => {
 			id: 'analytics',
 			label: formatMessage(commonMessages.analyticsButton),
 			icon: ChartIcon,
-			link: `${projectPath.value}/settings/analytics`,
+			type: 'link',
+			to: `${projectPath.value}/settings/analytics`,
 			shown: !!auth.value.user && !!currentMember.value,
 		},
-		{
-			divider: true,
-			shown: !!auth.value.user && !!currentMember.value,
-		},
+		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value },
 		{
 			id: 'moderation-checklist',
 			label: formatMessage(messages.reviewProject),
 			icon: ScaleIcon,
 			action: openModerationChecklistFromMenu,
-			color: 'orange',
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff && !showModerationChecklist.value,
 		},
 		{
 			id: 'tech-review',
 			label: 'Tech review',
 			icon: ScanEyeIcon,
-			link: `/moderation/technical-review/${project.value?.id}`,
-			color: 'orange',
+			type: 'link',
+			to: `/moderation/technical-review/${project.value?.id}`,
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff,
 		},
 		{
@@ -1617,19 +1628,16 @@ const projectHeaderMoreActions = computed(() => {
 			label: formatMessage(messages.rescanModpack),
 			icon: FolderSearchIcon,
 			action: () => scanModal.value?.show(),
-			color: 'orange',
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
 		},
-		{
-			divider: true,
-			shown: !!auth.value.user && isStaff,
-		},
+		{ type: 'divider', shown: !!auth.value.user && isStaff },
 		{
 			id: 'report',
 			label: formatMessage(commonMessages.reportButton),
 			icon: ReportIcon,
 			action: reportProjectFromHeader,
-			color: 'red',
+			tone: 'red',
 			shown: !isMember.value,
 		},
 		{

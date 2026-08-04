@@ -39,6 +39,14 @@ fn connect() -> clickhouse::error::Result<clickhouse::Client> {
         .with_validation(false))
 }
 
+#[cfg(feature = "test")]
+pub async fn create_database(database: &str) -> clickhouse::error::Result<()> {
+    connect()?
+        .query(&format!("CREATE DATABASE IF NOT EXISTS {database}"))
+        .execute()
+        .await
+}
+
 pub async fn run_migrations() -> clickhouse::error::Result<()> {
     run_migrations_on_database(&ENV.CLICKHOUSE_DATABASE).await
 }

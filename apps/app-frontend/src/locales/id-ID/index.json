@@ -44,20 +44,11 @@
   "app.action-bar.view-logs": {
     "message": "Lihat catatan"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Menghidupkan renderasi tingkat lanjut seperti efek buram yang dapat menyebabkan masalah kinerja tanpa renderasi yang dipercepat perangkat keras."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Renderasi tingkat lanjut"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Pilih tema warna pilihan Anda untuk Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema warna"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ubah halaman utama yang dibuka oleh peluncur."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Beranda"
@@ -68,44 +59,14 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Halaman arahan bawaan"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan label nama"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Menyertakan dunia terkini dalam bagian \"Masuk kembali\" pada Beranda."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Masuk kembali ke dunia"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Kecilkan pluncur ketika proses Minecraft berjalan."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Kecilkan peluncur"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gunakan bingkai jendela sistem (wajib menjalankan ulang aplikasi)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Hiasan asli"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Menampilkan seberapa lama Anda memainkan sebuah instans."
-  },
   "app.appearance-settings.show-play-time.title": {
     "message": "Tampilkan waktu bermain"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Menghidupkan kemampuan untuk menghidupkan dan mematikan bilah sisi."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Hidup/matikan bilah sisi"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Bila Anda mencoba memasangkan berkas Modrinth Pack (.mrpack) yang tidak dihoskan pada Modrinth, kami akan memastikan Anda untuk memahami risikonya sebelum memasangkannya."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Peringatkan saya sebelum memasang paket mod tidak dikenal"
@@ -271,9 +232,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Tampilan"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Pilihan instans bawaan"
   },
   "app.settings.tabs.java-installations": {
     "message": "Pemasangan Java"

@@ -27,6 +27,7 @@
 				<Combobox
 					:model-value="ctx.activeLogSourceIndex.value"
 					:options="logSourceOptions"
+					trigger-size="lg"
 					@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
 				/>
 			</div>
@@ -79,18 +80,14 @@
 		</div>
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="deleteModal?.hide()">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button :disabled="isDeleting" @click="confirmDelete">
-						<TrashIcon />
-						Delete
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="deleteModal?.hide()">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button type="colored" color="red" :disabled="isDeleting" @click="confirmDelete">
+					<TrashIcon />
+					Delete
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -103,7 +100,7 @@ import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import type { CollapsibleAdmonitionItem } from '#ui/components/base/CollapsibleAdmonition.vue'
 import CollapsibleAdmonition from '#ui/components/base/CollapsibleAdmonition.vue'
 import Combobox from '#ui/components/base/Combobox.vue'

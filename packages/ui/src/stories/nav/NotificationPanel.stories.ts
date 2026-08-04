@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import NotificationPanel from '../../components/nav/NotificationPanel.vue'
 import { injectNotificationManager } from '../../providers'
 
@@ -13,7 +13,7 @@ export default meta
 
 export const Default: StoryObj = {
 	render: () => ({
-		components: { NotificationPanel, ButtonStyled },
+		components: { NotificationPanel, Button },
 		setup() {
 			const notificationManager = injectNotificationManager()
 
@@ -87,24 +87,12 @@ export const Default: StoryObj = {
 		template: /* html */ `
 			<div>
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled color="green">
-						<button @click="showSuccess">Success</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="showError">Error</button>
-					</ButtonStyled>
-					<ButtonStyled color="orange">
-						<button @click="showWarning">Warning</button>
-					</ButtonStyled>
-					<ButtonStyled color="blue">
-						<button @click="showInfo">Info</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showActions">Actions</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="clearAll">Clear All</button>
-					</ButtonStyled>
+					<Button type="colored" color="green" @click="showSuccess">Success</Button>
+					<Button type="colored" color="red" @click="showError">Error</Button>
+					<Button type="colored" color="orange" @click="showWarning">Warning</Button>
+					<Button type="colored" color="blue" @click="showInfo">Info</Button>
+					<Button @click="showActions">Actions</Button>
+					<Button @click="clearAll">Clear All</Button>
 				</div>
 				<NotificationPanel />
 			</div>
@@ -114,7 +102,7 @@ export const Default: StoryObj = {
 
 export const LeftSide: StoryObj = {
 	render: () => ({
-		components: { NotificationPanel, ButtonStyled },
+		components: { NotificationPanel, Button },
 		setup() {
 			const notificationManager = injectNotificationManager()
 			notificationManager.setNotificationLocation('left')
@@ -161,21 +149,11 @@ export const LeftSide: StoryObj = {
 		template: /* html */ `
 			<div>
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled color="green">
-						<button @click="showSuccess">Success</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="showError">Error</button>
-					</ButtonStyled>
-					<ButtonStyled color="orange">
-						<button @click="showWarning">Warning</button>
-					</ButtonStyled>
-					<ButtonStyled color="blue">
-						<button @click="showInfo">Info</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="clearAll">Clear All</button>
-					</ButtonStyled>
+					<Button type="colored" color="green" @click="showSuccess">Success</Button>
+					<Button type="colored" color="red" @click="showError">Error</Button>
+					<Button type="colored" color="orange" @click="showWarning">Warning</Button>
+					<Button type="colored" color="blue" @click="showInfo">Info</Button>
+					<Button @click="clearAll">Clear All</Button>
 				</div>
 				<NotificationPanel />
 			</div>
