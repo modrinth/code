@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Åtminstone en galleribild måste visa innehållet av din {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "resurspaket, förutom ljud eller lokaliseringspaket. Om detta beskriver ditt paket, vänligen välj den passande taggen"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ladda upp en galleribild"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Besök länkinställningar"
   }
 }
-
