@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Ocultar {name} no gráfico"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Sem dados"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Dica de ferramenta do gráfico fixada"
   },
@@ -3918,7 +3921,7 @@
     "message": "Selecionar região"
   },
   "project.settings.server.server-online": {
-    "message": "O servidor está ativo!"
+    "message": "O servidor está online!"
   },
   "project.settings.server.srv-records-hint": {
     "message": "Se você tiver <srv-tooltip>[registros SRV]</srv-tooltip>, não precisará adicionar uma porta. Caso contrário, se você tiver uma porta que não seja 25565, poderá incluí-la como :12345"
@@ -4790,11 +4793,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre este aplicativo"
   },
+  "settings.authorizations.created-by": {
+    "message": "Criado por {user}"
+  },
   "settings.authorizations.description": {
     "message": "Ao autorizar um aplicativo com sua conta do Modrinth, você concede acesso à sua conta. Você pode gerenciar e revisar o acesso à sua conta aqui a qualquer momento."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Os aplicativos que você autorizar aparecerão aqui."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Nenhum aplicativo autorizado"
+  },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Este aplicativo foi criado por uma conta oficial do Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Revogar"
@@ -4804,6 +4819,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Tem certeza de que deseja revogar este aplicativo?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Este aplicativo não é afiliado ao Modrinth em nenhum modo, apesar do nome."
   },
   "settings.billing.charges.description": {
     "message": "Todas as suas cobranças anteriores na sua conta Modrinth serão listadas aqui:"
