@@ -118,7 +118,7 @@ const messages = defineMessages({
 	creatingBackupDescription: {
 		id: 'servers.backups.admonition.creating-backup.description',
 		defaultMessage:
-			'Saving world data and server configuration for {backupName}. This can take a few minutes.',
+			'Saving instance data and server configuration for {backupName}. This can take a few minutes.',
 	},
 	backupFailedTitle: {
 		id: 'servers.backups.admonition.backup-failed.title',

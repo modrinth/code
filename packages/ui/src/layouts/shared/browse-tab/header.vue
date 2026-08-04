@@ -11,7 +11,7 @@ import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
-import { useServerImage } from '#ui/composables/use-server-image'
+import { useServerImage } from '#ui/composables/servers/use-server-image'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import SelectedProjectsLeaveModal from './components/SelectedProjectsLeaveModal.vue'

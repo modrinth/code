@@ -181,12 +181,13 @@ interface UploadItem {
 		| 'cancelled'
 		| 'incorrect-type'
 	size: string
-	uploader?: ReturnType<typeof client.kyros.files_v0.uploadFile>
+	uploader?: ReturnType<typeof client.kyros.files_v1.uploadFile>
 	error?: Error
 }
 
 interface Props {
 	currentPath: string
+	worldId: string
 	fileType?: string
 	marginBottom?: number
 	acceptedTypes?: Array<string>
@@ -281,11 +282,12 @@ const uploadFile = async (file: File) => {
 		uploadItem.status = 'uploading'
 		const filePath = `${props.currentPath}/${file.name}`.replace('//', '/')
 
-		const uploader = client.kyros.files_v0.uploadFile(filePath, file, {
+		await client.kyros.files_v1.ensureFile(props.worldId, filePath)
+		const uploader = client.kyros.files_v1.uploadFile(props.worldId, filePath, file, {
 			onProgress: ({ progress }) => {
 				const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
 				if (index !== -1) {
-					uploadQueue.value[index].progress = Math.round(progress)
+					uploadQueue.value[index].progress = Math.round(progress * 100)
 				}
 			},
 		})

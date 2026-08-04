@@ -1,4 +1,7 @@
-import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
+import type {
+	ServerInstanceSettingsTabId,
+	ServerSettingsTabId,
+} from '#ui/layouts/shared/server-settings'
 
 import { createContext } from './create-context'
 
@@ -10,6 +13,10 @@ export interface BrowseServerContentArgs {
 
 export interface ServerSettingsModalContext {
 	openServerSettings: (options?: { tabId?: ServerSettingsTabId }) => void
+	openServerInstanceSettings: (options?: {
+		tabId?: ServerInstanceSettingsTabId
+		worldId?: string | null
+	}) => void
 	browseServerContent?: (args: BrowseServerContentArgs) => void | Promise<void>
 }
 

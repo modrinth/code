@@ -54,7 +54,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showViewProdRouteBanner: false,
 	showModeratorProjectMemberUi: false,
 	archonApiStaging: false,
-	showHostingAccessInstanceAuditLog: false,
 	versionDevInfoCollapsed: true,
 	alwaysShowVersionDevInfo: false,
 	advancedFiltersCollapsed: true,

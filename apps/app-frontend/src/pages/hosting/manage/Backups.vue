@@ -13,7 +13,7 @@ const queryClient = useQueryClient()
 if (worldId.value) {
 	try {
 		await queryClient.ensureQueryData({
-			queryKey: ['backups', 'list', serverId],
+			queryKey: ['backups', 'list', serverId, worldId.value],
 			queryFn: () => client.archon.backups_v1.list(serverId, worldId.value!),
 			staleTime: 30_000,
 		})

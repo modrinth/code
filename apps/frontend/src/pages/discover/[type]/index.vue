@@ -114,6 +114,7 @@ debug('initial route.params.type:', route.params.type, '→ currentType:', curre
 const isServerType = computed(() => currentType.value === 'server')
 
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
+const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 watch(
 	() => projectType.value?.id,
@@ -164,6 +165,7 @@ const {
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
 	isInstallingQueuedServerInstalls,
+	serverContentProjectType,
 	installContext,
 	setBrowseSearchState,
 	syncHiddenInstalledProjectIds,
@@ -176,6 +178,27 @@ const {
 	onboardingModalRef,
 	debug,
 })
+
+watch(
+	[currentServerId, fromContext, projectTypeId, serverContentProjectType],
+	([serverId, from, currentProjectType, targetProjectType]) => {
+		if (!serverId || from || !targetProjectType) return
+		if (!['mod', 'plugin', 'datapack'].includes(currentProjectType)) return
+		if (currentProjectType === targetProjectType) return
+
+		navigateTo({
+			path: `/discover/${targetProjectType}s`,
+			query: {
+				sid: route.query.sid,
+				wid: route.query.wid,
+				shi: route.query.shi,
+				from: route.query.from,
+				q: route.query.q,
+			},
+		})
+	},
+	{ immediate: true },
+)
 
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
 	const content = project.minecraft_java_server?.content
@@ -400,8 +423,6 @@ const advancedFiltersCollapsed = computed({
 		saveFeatureFlags()
 	},
 })
-
-const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 debug('projectTypeId:', projectTypeId.value)
 watch(projectTypeId, (val) => debug('projectTypeId changed:', val))

@@ -6,7 +6,7 @@
 			<div v-else class="size-5 shrink-0 animate-pulse rounded-full bg-button-border"></div>
 			<AutoLink
 				v-if="isLink"
-				v-tooltip="'Change server loader'"
+				v-tooltip="'Change instance loader'"
 				:to="settingsLinkTarget"
 				class="flex min-w-0 items-center font-medium text-sm"
 				:class="settingsLinkTarget ? 'hover:underline' : ''"
@@ -54,7 +54,7 @@ defineProps<{
 const settingsModal = injectServerSettingsModal(null)
 const settingsLinkTarget = computed(() => {
 	if (settingsModal) {
-		return () => settingsModal.openServerSettings({ tabId: 'installation' })
+		return () => settingsModal.openServerInstanceSettings({ tabId: 'installation' })
 	}
 	return ''
 })

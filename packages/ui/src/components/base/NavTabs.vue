@@ -6,40 +6,138 @@
 		:class="{ 'drop-shadow-xl border border-solid border-surface-4': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
-			<RouterLink
-				v-for="(link, index) in filteredLinks"
-				v-show="link.shown ?? true"
-				:key="link.href"
-				ref="tabLinkElements"
-				:replace="replace"
-				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
-				:class="getSSRFallbackClasses(index)"
-				@mouseenter="link.onHover?.()"
-				@focus="link.onHover?.()"
-			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
-				<span class="text-nowrap" :class="getLabelClasses(index)">
-					{{ link.label }}
-				</span>
-			</RouterLink>
+			<template v-for="(link, index) in filteredLinks" :key="link.href">
+				<Tooltip
+					v-if="link.prompt"
+					theme="dismissable-prompt"
+					:triggers="[]"
+					:shown="link.prompt.shown"
+					:auto-hide="false"
+					:placement="link.prompt.placement ?? 'bottom'"
+				>
+					<RouterLink
+						ref="tabLinkElements"
+						:replace="replace"
+						:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
+						class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+						:class="getSSRFallbackClasses(index)"
+						@mouseenter="link.onHover?.()"
+						@focus="link.onHover?.()"
+						@click="dismissPrompt(link)"
+					>
+						<component
+							:is="link.icon"
+							v-if="link.icon"
+							class="size-5"
+							:class="getIconClasses(index)"
+						/>
+						<span class="text-nowrap" :class="getLabelClasses(index)">
+							{{ link.label }}
+						</span>
+					</RouterLink>
+					<template #popper>
+						<div class="grid grid-cols-[min-content] gap-1">
+							<div class="flex min-w-48 items-center justify-between gap-8">
+								<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+									{{ link.prompt.title }}
+								</h3>
+								<ButtonStyled size="small" circular>
+									<button v-tooltip="link.prompt.dismissLabel" @click="link.prompt.onDismiss?.()">
+										<XIcon aria-hidden="true" />
+									</button>
+								</ButtonStyled>
+							</div>
+							<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+								{{ link.prompt.description }}
+							</p>
+						</div>
+					</template>
+				</Tooltip>
+				<RouterLink
+					v-else
+					ref="tabLinkElements"
+					:replace="replace"
+					:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
+					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+					:class="getSSRFallbackClasses(index)"
+					@mouseenter="link.onHover?.()"
+					@focus="link.onHover?.()"
+				>
+					<component
+						:is="link.icon"
+						v-if="link.icon"
+						class="size-5"
+						:class="getIconClasses(index)"
+					/>
+					<span class="text-nowrap" :class="getLabelClasses(index)">
+						{{ link.label }}
+					</span>
+				</RouterLink>
+			</template>
 		</template>
 
 		<template v-else>
-			<div
-				v-for="(link, index) in filteredLinks"
-				v-show="link.shown ?? true"
-				:key="link.href"
-				ref="tabLinkElements"
-				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
-				:class="getSSRFallbackClasses(index)"
-				@click="emit('tabClick', index, link)"
-			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
-				<span class="text-nowrap" :class="getLabelClasses(index)">
-					{{ link.label }}
-				</span>
-			</div>
+			<template v-for="(link, index) in filteredLinks" :key="link.href">
+				<Tooltip
+					v-if="link.prompt"
+					theme="dismissable-prompt"
+					:triggers="[]"
+					:shown="link.prompt.shown"
+					:auto-hide="false"
+					:placement="link.prompt.placement ?? 'bottom'"
+				>
+					<div
+						ref="tabLinkElements"
+						class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
+						:class="getSSRFallbackClasses(index)"
+						@click="handleLocalTabClick(index, link)"
+					>
+						<component
+							:is="link.icon"
+							v-if="link.icon"
+							class="size-5"
+							:class="getIconClasses(index)"
+						/>
+						<span class="text-nowrap" :class="getLabelClasses(index)">
+							{{ link.label }}
+						</span>
+					</div>
+					<template #popper>
+						<div class="grid grid-cols-[min-content] gap-1">
+							<div class="flex min-w-48 items-center justify-between gap-8">
+								<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+									{{ link.prompt.title }}
+								</h3>
+								<ButtonStyled size="small" circular>
+									<button v-tooltip="link.prompt.dismissLabel" @click="link.prompt.onDismiss?.()">
+										<XIcon aria-hidden="true" />
+									</button>
+								</ButtonStyled>
+							</div>
+							<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+								{{ link.prompt.description }}
+							</p>
+						</div>
+					</template>
+				</Tooltip>
+				<div
+					v-else
+					ref="tabLinkElements"
+					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
+					:class="getSSRFallbackClasses(index)"
+					@click="handleLocalTabClick(index, link)"
+				>
+					<component
+						:is="link.icon"
+						v-if="link.icon"
+						class="size-5"
+						:class="getIconClasses(index)"
+					/>
+					<span class="text-nowrap" :class="getLabelClasses(index)">
+						{{ link.label }}
+					</span>
+				</div>
+			</template>
 		</template>
 
 		<!-- Animated slider background -->
@@ -57,11 +155,24 @@
 </template>
 
 <script setup lang="ts">
+import { XIcon } from '@modrinth/assets'
+import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
+import ButtonStyled from './ButtonStyled.vue'
+
 const route = useRoute()
+
+interface TabPrompt {
+	title: string
+	description: string
+	dismissLabel?: string
+	shown?: boolean
+	placement?: string
+	onDismiss?: () => void
+}
 
 interface Tab {
 	label: string
@@ -70,6 +181,7 @@ interface Tab {
 	icon?: Component
 	subpages?: string[]
 	onHover?: () => void
+	prompt?: TabPrompt
 }
 
 const props = withDefaults(
@@ -130,6 +242,17 @@ const bottomDelay = computed(() => sliderDelays.value.bottom)
 const isActiveAndNotSubpage = computed(
 	() => (index: number) => currentActiveIndex.value === index && !subpageSelected.value,
 )
+
+function dismissPrompt(link: Tab) {
+	if (link.prompt?.shown) {
+		link.prompt.onDismiss?.()
+	}
+}
+
+function handleLocalTabClick(index: number, link: Tab) {
+	dismissPrompt(link)
+	emit('tabClick', index, link)
+}
 
 function getSSRFallbackClasses(index: number) {
 	if (sliderReady.value) return {}

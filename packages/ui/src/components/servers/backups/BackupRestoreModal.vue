@@ -74,7 +74,7 @@ const props = withDefaults(
 	},
 )
 
-const backupsQueryKey = ['backups', 'queue', ctx.serverId]
+const backupsQueryKey = computed(() => ['backups', 'queue', ctx.serverId, ctx.worldId.value])
 
 function safetyBackupName(backupName: string) {
 	const base = `Before restoring "${backupName}"`
@@ -84,7 +84,7 @@ function safetyBackupName(backupName: string) {
 const restoreMutation = useMutation({
 	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
 		client.archon.backups_queue_v1.restore(ctx.serverId, ctx.worldId.value!, backupId, { name }),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey.value }),
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()

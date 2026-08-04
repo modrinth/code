@@ -31,42 +31,6 @@
 					row-key="id"
 					:row-transition-name="rowTransitionName"
 				>
-					<template #header-world="{ column }">
-						<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
-							<span class="min-w-0 truncate">{{ column.label }}</span>
-							<Tooltip
-								theme="dismissable-prompt"
-								class="inline-flex shrink-0"
-								:triggers="['hover', 'focus']"
-								:popper-triggers="['hover', 'focus']"
-								popper-class="v-popper--interactive"
-								placement="top"
-								:delay="{ show: 200, hide: 100 }"
-								no-auto-focus
-							>
-								<button
-									type="button"
-									:aria-label="formatMessage(messages.instanceTooltipTitle)"
-									class="inline-flex cursor-help items-center justify-center border-0 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
-								>
-									<UnknownIcon class="size-4" aria-hidden="true" />
-								</button>
-								<template #popper>
-									<div class="grid !w-64 gap-1">
-										<h3 class="m-0 whitespace-nowrap text-base w-full font-bold text-contrast">
-											{{ formatMessage(messages.instanceTooltipTitle) }}
-										</h3>
-										<p
-											class="m-0 text-wrap text-sm w-full font-medium leading-tight text-secondary"
-										>
-											{{ formatMessage(messages.instanceTooltipDescription) }}
-										</p>
-									</div>
-								</template>
-							</Tooltip>
-						</span>
-					</template>
-
 					<template #cell-user="{ row: entry }">
 						<AutoLink
 							v-tooltip="actorName(entry)"
@@ -171,7 +135,7 @@
 						class="hidden min-h-14 bg-surface-3 @[800px]:grid @[800px]:h-14"
 						:class="
 							showWorldColumn
-								? '@[800px]:grid-cols-[18%_52%_20%_10%]'
+								? '@[800px]:grid-cols-[18%_46%_22%_14%]'
 								: '@[800px]:grid-cols-[26%_58%_16%]'
 						"
 					>
@@ -185,37 +149,7 @@
 							v-if="showWorldColumn"
 							class="hidden items-center px-2 font-semibold text-secondary @[800px]:flex"
 						>
-							<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
-								<span class="min-w-0 truncate">{{ formatMessage(messages.worldColumn) }}</span>
-								<Tooltip
-									theme="dismissable-prompt"
-									class="inline-flex shrink-0"
-									:triggers="['hover', 'focus']"
-									:popper-triggers="['hover', 'focus']"
-									popper-class="v-popper--interactive"
-									placement="top"
-									:delay="{ show: 200, hide: 100 }"
-									no-auto-focus
-								>
-									<button
-										type="button"
-										:aria-label="formatMessage(messages.instanceTooltipTitle)"
-										class="inline-flex cursor-help items-center justify-center border-0 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
-									>
-										<UnknownIcon class="size-4" aria-hidden="true" />
-									</button>
-									<template #popper>
-										<div class="grid !w-64 gap-1">
-											<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
-												{{ formatMessage(messages.instanceTooltipTitle) }}
-											</h3>
-											<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-												{{ formatMessage(messages.instanceTooltipDescription) }}
-											</p>
-										</div>
-									</template>
-								</Tooltip>
-							</span>
+							<span class="min-w-0 truncate">{{ formatMessage(messages.worldColumn) }}</span>
 						</div>
 						<div
 							class="hidden items-center justify-end pl-2 pr-4 font-semibold text-secondary @[800px]:flex"
@@ -250,8 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { IntercomBubbleIcon, UnknownIcon } from '@modrinth/assets'
-import { Tooltip } from 'floating-vue'
+import { IntercomBubbleIcon } from '@modrinth/assets'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
@@ -323,15 +256,6 @@ const messages = defineMessages({
 	worldColumn: {
 		id: 'servers.audit-log.column.world',
 		defaultMessage: 'Instance',
-	},
-	instanceTooltipTitle: {
-		id: 'servers.audit-log.column.world.tooltip-title',
-		defaultMessage: 'Coming soon!',
-	},
-	instanceTooltipDescription: {
-		id: 'servers.audit-log.column.world.tooltip-description',
-		defaultMessage:
-			'Server instances are contained environments with their own installed content and world files.',
 	},
 	eventColumn: {
 		id: 'servers.audit-log.column.event',
@@ -417,7 +341,7 @@ const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => {
 		{
 			key: 'event',
 			label: formatMessage(messages.eventColumn),
-			width: showWorldColumn.value ? '52%' : '58%',
+			width: showWorldColumn.value ? '46%' : '58%',
 		},
 	]
 
@@ -425,7 +349,7 @@ const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => {
 		tableColumns.push({
 			key: 'world',
 			label: formatMessage(messages.worldColumn),
-			width: '20%',
+			width: '22%',
 		})
 	}
 
@@ -434,7 +358,7 @@ const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => {
 		label: formatMessage(messages.timeColumn),
 		align: 'right',
 		enableSorting: true,
-		width: showWorldColumn.value ? '10%' : '16%',
+		width: showWorldColumn.value ? '14%' : '16%',
 	})
 
 	return tableColumns

@@ -116,7 +116,10 @@ const breadcrumbLabel = computed(() => {
 const themeStore = useTheming()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
-const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = createServerInstallContent({
+	serverSetupModalRef,
+	isRouteInContext: (targetRoute) => targetRoute.path.startsWith('/browse/'),
+})
 provideServerInstallContent(serverInstallContent)
 const {
 	serverIdQuery,
@@ -126,6 +129,10 @@ const {
 	isSetupServerContext,
 	effectiveServerWorldId,
 	serverContextServerData,
+	serverContextWorldName,
+	serverContextWorldGameVersion,
+	serverContextWorldLoader,
+	serverContextWorldLoaderVersion,
 	serverContentProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
@@ -444,10 +451,10 @@ const serverContextFilters = computed(() => {
 	const pt = projectType.value
 
 	if (pt !== 'modpack') {
-		const gameVersion = serverContextServerData.value.mc_version
+		const gameVersion = serverContextWorldGameVersion.value
 		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
 
-		const platform = serverContextServerData.value.loader?.toLowerCase()
+		const platform = serverContextWorldLoader.value?.toLowerCase().replaceAll('_', '')
 		if (platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
 			filters.push({ type: 'mod_loader', option: platform })
 		if (platform && ['paper', 'purpur'].includes(platform))
@@ -487,6 +494,14 @@ const serverContextFilters = computed(() => {
 const combinedProvidedFilters = computed(() =>
 	isServerContext.value ? serverContextFilters.value : instanceFilters.value,
 )
+
+const serverContentProjectType = computed<ProjectType | null>(() => {
+	const loader = serverContextWorldLoader.value?.toLowerCase()
+	if (!loader) return null
+	if (loader === 'paper' || loader === 'purpur') return 'plugin'
+	if (loader === 'vanilla') return 'datapack'
+	return 'mod'
+})
 
 const {
 	serverPings,
@@ -555,6 +570,10 @@ const messages = defineMessages({
 		id: 'app.browse.back-to-instance',
 		defaultMessage: 'Back to instance',
 	},
+	worldFallbackName: {
+		id: 'app.browse.server.world-fallback-name',
+		defaultMessage: 'Instance',
+	},
 	serverInstanceContentWarning: {
 		id: 'app.browse.server-instance-content-warning',
 		defaultMessage:
@@ -587,6 +606,27 @@ const messages = defineMessages({
 })
 
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
+
+watch(
+	[isServerContext, isSetupServerContext, projectType, serverContentProjectType],
+	([serverContext, setupServerContext, currentProjectType, targetProjectType]) => {
+		if (!serverContext || setupServerContext || !targetProjectType) return
+		if (!['mod', 'plugin', 'datapack'].includes(currentProjectType)) return
+		if (currentProjectType === targetProjectType) return
+
+		router.replace({
+			path: `/browse/${targetProjectType}`,
+			query: {
+				sid: route.query.sid,
+				wid: route.query.wid,
+				shi: route.query.shi,
+				from: route.query.from,
+				q: route.query.q,
+			},
+		})
+	},
+	{ immediate: true },
+)
 
 function resetInstanceContext() {
 	debugLog('instance context removed, resetting')
@@ -693,9 +733,10 @@ const selectableProjectTypes = computed(() => {
 const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
-			name: serverContextServerData.value.name,
-			loader: serverContextServerData.value.loader ?? '',
-			gameVersion: serverContextServerData.value.mc_version ?? '',
+			name: serverContextWorldName.value ?? formatMessage(messages.worldFallbackName),
+			loader: serverContextWorldLoader.value ?? '',
+			loaderVersion: serverContextWorldLoaderVersion.value ?? '',
+			gameVersion: serverContextWorldGameVersion.value ?? '',
 			serverId: serverIdQuery.value,
 			upstream: serverContextServerData.value.upstream,
 			iconSrc: null as string | null,
@@ -764,8 +805,8 @@ function getCurrentSelectedInstallPreferences(projectTypeValue: string) {
 function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
 	return getTargetInstallPreferences(
 		{
-			gameVersion: serverContextServerData.value?.mc_version,
-			loader: serverContextServerData.value?.loader,
+			gameVersion: serverContextWorldGameVersion.value,
+			loader: serverContextWorldLoader.value,
 		},
 		contentType,
 	)

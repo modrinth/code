@@ -41,7 +41,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	rateLimitTitle: {
 		id: 'servers.setup.rate-limit.title',
-		defaultMessage: 'Cannot reinstall server',
+		defaultMessage: 'Cannot reinstall instance',
 	},
 	rateLimitText: {
 		id: 'servers.setup.rate-limit.text',

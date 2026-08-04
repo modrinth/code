@@ -2,6 +2,7 @@
 	<FloatingActionBar
 		:shown="shown"
 		:aria-label="formatMessage(messages.ariaLabel)"
+		toolbar-max-width="min(1152px, calc(100vw - 3rem))"
 		hide-when-modal-open
 	>
 		<div class="flex min-w-0 items-center gap-0.5">

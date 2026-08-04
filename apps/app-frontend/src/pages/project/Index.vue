@@ -342,6 +342,10 @@ const messages = defineMessages({
 		id: 'app.project.install-context.back-to-instance',
 		defaultMessage: 'Back to instance',
 	},
+	worldFallbackName: {
+		id: 'app.project.install-context.world-fallback-name',
+		defaultMessage: 'Instance',
+	},
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
 		defaultMessage: 'This project is already installed',
@@ -410,7 +414,10 @@ const serverStatusOnline = ref(false)
 const serverInstancePath = ref(null)
 const serverPlaying = ref(false)
 const serverSetupModalRef = ref(null)
-const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = createServerInstallContent({
+	serverSetupModalRef,
+	isRouteInContext: (targetRoute) => targetRoute.path.startsWith('/project/'),
+})
 
 serverInstallContent.watchServerContextChanges()
 await serverInstallContent.initServerContext()
@@ -486,9 +493,12 @@ const projectInstallContext = computed(() => {
 	const serverData = serverInstallContent.serverContextServerData.value
 	if (serverData) {
 		return {
-			name: serverData.name,
-			loader: serverData.loader ?? '',
-			gameVersion: serverData.mc_version ?? '',
+			name:
+				serverInstallContent.serverContextWorldName.value ??
+				formatMessage(messages.worldFallbackName),
+			loader: serverInstallContent.serverContextWorldLoader.value ?? '',
+			loaderVersion: serverInstallContent.serverContextWorldLoaderVersion.value ?? '',
+			gameVersion: serverInstallContent.serverContextWorldGameVersion.value ?? '',
 			serverId: serverInstallContent.serverIdQuery.value,
 			upstream: serverData.upstream,
 			iconSrc: null,
@@ -846,8 +856,8 @@ async function install(version) {
 				overriddenProvidedFilterTypes: [],
 				targetPreferences: getTargetInstallPreferences(
 					{
-						gameVersion: serverInstallContent.serverContextServerData.value?.mc_version,
-						loader: serverInstallContent.serverContextServerData.value?.loader,
+						gameVersion: serverInstallContent.serverContextWorldGameVersion.value,
+						loader: serverInstallContent.serverContextWorldLoader.value,
 					},
 					contentType,
 				),

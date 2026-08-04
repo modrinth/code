@@ -1,14 +1,24 @@
 <template>
 	<div class="contents">
 		<div class="flex flex-row items-center gap-2 rounded-lg">
-			<ButtonStyled v-if="isInstalling" type="standard" color="brand" size="large">
+			<ButtonStyled v-if="isInstalling" type="standard" color="brand" :size="size">
 				<button disabled class="flex-shrink-0">
 					<LoaderCircleIcon class="size-5 animate-spin" /> Installing...
 				</button>
 			</ButtonStyled>
 
 			<template v-else-if="showRestartButton">
-				<ButtonStyled type="standard" color="orange" size="large">
+				<JoinedButtons
+					v-if="powerActionWorlds.length"
+					color="orange"
+					:size="size"
+					:actions="restartSplitActions"
+					:primary-disabled="!canTakeAction"
+					:dropdown-disabled="!canTakeAction"
+					:primary-tooltip="busyTooltip"
+					:dropdown-tooltip="busyTooltip"
+				/>
+				<ButtonStyled v-else type="standard" color="orange" :size="size">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<UpdatedIcon />
 						<span>{{ primaryActionText }}</span>
@@ -17,7 +27,7 @@
 
 				<JoinedButtons
 					color="red"
-					size="large"
+					:size="size"
 					:actions="stopSplitActions"
 					:primary-disabled="!canTakeAction"
 					:dropdown-disabled="!canKill"
@@ -34,7 +44,7 @@
 			<template v-else-if="isStopping">
 				<JoinedButtons
 					color="red"
-					size="large"
+					:size="size"
 					:actions="stopSplitActions"
 					:primary-disabled="true"
 					:dropdown-disabled="!canKill"
@@ -49,10 +59,20 @@
 			</template>
 
 			<template v-else>
-				<ButtonStyled type="standard" color="brand" size="large">
+				<JoinedButtons
+					v-if="powerActionWorlds.length"
+					color="brand"
+					:size="size"
+					:actions="startSplitActions"
+					:primary-disabled="!canTakeAction"
+					:dropdown-disabled="!canTakeAction"
+					:primary-tooltip="busyTooltip"
+					:dropdown-tooltip="busyTooltip"
+				/>
+				<ButtonStyled v-else type="standard" color="brand" :size="size">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<PlayIcon />
-						<span>{{ primaryActionText }}</span>
+						<span>{{ startActionText }}</span>
 					</button>
 				</ButtonStyled>
 			</template>
@@ -77,9 +97,15 @@ import { useServerPowerAction } from './use-server-power-action'
 const props = withDefaults(
 	defineProps<{
 		disabled?: boolean
+		size?: 'standard' | 'large' | 'small'
+		startLabel?: string
+		worlds?: { id: string; name: string }[]
 	}>(),
 	{
 		disabled: false,
+		size: 'large',
+		startLabel: 'Start',
+		worlds: () => [],
 	},
 )
 
@@ -96,6 +122,42 @@ const {
 } = useServerPowerAction({
 	disabled: computed(() => props.disabled),
 })
+
+const size = computed(() => props.size)
+const startActionText = computed(() =>
+	primaryActionText.value === 'Start' ? props.startLabel : primaryActionText.value,
+)
+const powerActionWorlds = computed(() => (props.worlds.length > 1 ? props.worlds : []))
+
+const startSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'start',
+		label: startActionText.value,
+		icon: PlayIcon,
+		action: handlePrimaryAction,
+	},
+	...powerActionWorlds.value.map((world) => ({
+		id: `start-${world.id}`,
+		label: `Start with ${world.name}`,
+		icon: PlayIcon,
+		action: () => initiateAction('Start', world.id),
+	})),
+])
+
+const restartSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'restart',
+		label: primaryActionText.value,
+		icon: UpdatedIcon,
+		action: handlePrimaryAction,
+	},
+	...powerActionWorlds.value.map((world) => ({
+		id: `restart-${world.id}`,
+		label: `Restart with ${world.name}`,
+		icon: UpdatedIcon,
+		action: () => initiateAction('Restart', world.id),
+	})),
+])
 
 const stopSplitActions = computed<JoinedButtonAction[]>(() => [
 	{

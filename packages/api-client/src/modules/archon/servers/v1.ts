@@ -44,6 +44,54 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Create a world
+	 * POST /v1/servers/:id/worlds
+	 */
+	public async createWorld(
+		serverId: string,
+		request: Archon.Servers.v1.CreateWorld,
+	): Promise<Archon.Servers.v1.CreateWorldResponse> {
+		return this.client.request<Archon.Servers.v1.CreateWorldResponse>(
+			`/servers/${serverId}/worlds`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/**
+	 * Modify a world
+	 * PATCH /v1/servers/:id/worlds/:wid
+	 */
+	public async patchWorld(
+		serverId: string,
+		worldId: string,
+		request: Archon.Servers.v1.PatchWorld,
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}`, {
+			api: 'archon',
+			version: 1,
+			method: 'PATCH',
+			body: request,
+		})
+	}
+
+	/**
+	 * Delete a world
+	 * DELETE /v1/servers/:id/worlds/:wid
+	 */
+	public async deleteWorld(serverId: string, worldId: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}`, {
+			api: 'archon',
+			version: 1,
+			method: 'DELETE',
+		})
+	}
+
+	/**
 	 * End the intro flow for a server
 	 * DELETE /v1/servers/:id/flows/intro
 	 */
@@ -56,14 +104,36 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
-	 * Reset a world to onboarding
-	 * POST /v1/servers/:id/worlds/:wid/onboard
+	 * Run a power action for a specific world
+	 * POST /v1/servers/:id/worlds/:wid/power
 	 */
-	public async resetToOnboarding(serverId: string, worldId: string): Promise<void> {
-		await this.client.request(`/servers/${serverId}/worlds/${worldId}/onboard`, {
+	public async powerWorld(
+		serverId: string,
+		worldId: string,
+		request: Archon.Servers.v1.WorldPowerActionRequest,
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}/power`, {
 			api: 'archon',
 			version: 1,
 			method: 'POST',
+			body: request,
 		})
+	}
+
+	/**
+	 * Reset a server to onboarding
+	 * POST /v1/servers/:id/onboard
+	 */
+	public async resetToOnboarding(
+		serverId: string,
+	): Promise<Archon.Servers.v1.ServerOnboardResponse> {
+		return this.client.request<Archon.Servers.v1.ServerOnboardResponse>(
+			`/servers/${serverId}/onboard`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+			},
+		)
 	}
 }

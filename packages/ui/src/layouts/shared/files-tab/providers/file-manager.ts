@@ -35,6 +35,7 @@ export interface FileManagerContext {
 	uploadFiles: (files: File[]) => void
 	cancelUpload?: () => void
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
+	worldId?: Ref<string | null> | ComputedRef<string | null>
 
 	refresh: () => void
 

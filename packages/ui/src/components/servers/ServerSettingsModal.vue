@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
 import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
-	ServerSettingsAdvancedPage,
 	ServerSettingsGeneralPage,
-	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
-	ServerSettingsPropertiesPage,
 	serverSettingsTabDefinitions,
 	type ServerSettingsTabId,
 } from '#ui/layouts/shared/server-settings'
@@ -53,29 +50,16 @@ const messages = defineMessages({
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
-const { serverId: currentServerId, worldId, server } = injectModrinthServerContext()
+const { serverId: currentServerId, server } = injectModrinthServerContext()
 
 const currentUserId = ref<string | null>(null)
 const currentUserRole = ref<string | null>(null)
 
 const isApp = ref(true)
 
-// Preload
-useQuery({
-	queryKey: computed(() => ['content', 'list', 'v1', currentServerId]),
-	queryFn: () =>
-		client.archon.content_v1.getAddons(currentServerId, worldId.value!, {
-			from_modpack: false,
-		}),
-	enabled: computed(() => !!worldId.value),
-})
-
 const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
-	installation: ServerSettingsInstallationPage,
 	network: ServerSettingsNetworkPage,
-	properties: ServerSettingsPropertiesPage,
-	advanced: ServerSettingsAdvancedPage,
 } as const
 
 provideServerSettings({
@@ -146,12 +130,6 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 			'detail',
 			targetServerId,
 		])
-		const cachedFull = queryClient.getQueryData<Archon.Servers.v1.ServerFull>([
-			'servers',
-			'v1',
-			'detail',
-			targetServerId,
-		])
 
 		modal.value?.show()
 		const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
@@ -179,27 +157,7 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 			)
 		}
 
-		if (!cachedFull) {
-			fetchPromises.push(
-				queryClient.fetchQuery({
-					queryKey: ['servers', 'v1', 'detail', targetServerId],
-					queryFn: () => client.archon.servers_v1.get(targetServerId),
-				}),
-			)
-		}
-
 		await Promise.all(fetchPromises)
-
-		if (worldId.value) {
-			queryClient.prefetchQuery({
-				queryKey: ['servers', 'properties', 'v1', targetServerId, worldId.value],
-				queryFn: () => client.archon.properties_v1.getProperties(targetServerId, worldId.value!),
-			})
-			queryClient.prefetchQuery({
-				queryKey: ['servers', 'startup', 'v1', targetServerId, worldId.value],
-				queryFn: () => client.archon.options_v1.getStartup(targetServerId, worldId.value!),
-			})
-		}
 	} catch (error) {
 		console.error(error)
 		addNotification({

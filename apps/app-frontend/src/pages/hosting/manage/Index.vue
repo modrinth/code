@@ -30,7 +30,7 @@
 			"
 		>
 			<template #default="{ onReinstall, onReinstallFailed }">
-				<RouterView v-slot="{ Component }">
+				<RouterView v-slot="{ Component }" :route="managedRoute">
 					<template v-if="Component">
 						<Suspense>
 							<component
@@ -58,7 +58,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { get_user } from '@/helpers/cache'
@@ -74,12 +74,24 @@ const queryClient = useQueryClient()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
 
-const isContainedServerRoute = computed(() => route.name === 'ServerManageOverview')
+const managedRoute = shallowRef(router.currentRoute.value)
+const serverId = ref(getRouteParam(managedRoute.value.params.id) ?? '')
+const isContainedServerRoute = computed(() => managedRoute.value.name === 'ServerManageOverview')
 
-const serverId = computed(() => {
-	const rawId = route.params.id
-	return Array.isArray(rawId) ? (rawId[0] ?? '') : (rawId ?? '')
-})
+watch(
+	router.currentRoute,
+	(nextRoute) => {
+		if (!nextRoute.path.startsWith('/hosting/manage/')) return
+		managedRoute.value = nextRoute
+		serverId.value = getRouteParam(nextRoute.params.id) ?? ''
+	},
+	{ immediate: true },
+)
+
+function getRouteParam(param: string | string[] | undefined): string | null {
+	if (Array.isArray(param)) return param[0] ?? null
+	return param ?? null
+}
 
 function getCachedServerName(id: string): string | undefined {
 	return queryClient

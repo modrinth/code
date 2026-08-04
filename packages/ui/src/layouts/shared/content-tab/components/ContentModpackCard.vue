@@ -5,9 +5,11 @@ import {
 	DownloadIcon,
 	HeartIcon,
 	MoreVerticalIcon,
-	Settings2Icon,
 	SpinnerIcon,
+	WrenchIcon,
+	XIcon,
 } from '@modrinth/assets'
+import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, onMounted, onUnmounted, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -34,9 +36,17 @@ import type {
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	installationSettingsTooltip: {
-		id: 'content.modpack-card.installation-settings',
-		defaultMessage: 'Installation settings',
+	contentHintTitle: {
+		id: 'content.modpack-card.content-hint-title',
+		defaultMessage: 'Modpack content moved',
+	},
+	contentHintDescription: {
+		id: 'content.modpack-card.content-hint-description',
+		defaultMessage: "Your modpack's content can now be found here!",
+	},
+	dismissHint: {
+		id: 'content.modpack-card.dismiss-hint',
+		defaultMessage: "Don't show again",
 	},
 })
 
@@ -51,6 +61,7 @@ interface Props {
 	overflowOptions?: OverflowMenuOption[]
 	hasUpdate?: boolean
 	disabledText?: string
+	showContentHint?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
@@ -63,12 +74,14 @@ withDefaults(defineProps<Props>(), {
 	overflowOptions: undefined,
 	hasUpdate: false,
 	disabledText: undefined,
+	showContentHint: false,
 })
 
 const emit = defineEmits<{
 	update: []
 	content: []
 	settings: []
+	'dismiss-content-hint': []
 }>()
 
 const instance = getCurrentInstance()
@@ -124,7 +137,7 @@ onUnmounted(() => {
 <template>
 	<div
 		ref="containerRef"
-		class="@container flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md border border-solid border-surface-4"
+		class="@container flex flex-col gap-4 rounded-[20px] border border-solid border-surface-4 bg-bg-raised p-6 shadow-md"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div class="flex flex-wrap items-start justify-between gap-4">
@@ -141,18 +154,9 @@ onUnmounted(() => {
 						>
 							{{ project.title }}
 						</AutoLink>
-						<span
-							v-if="project.filename && (owner || version)"
-							class="truncate text-secondary mb-2"
-						>
+						<span v-if="project.filename" class="truncate text-secondary mb-2">
 							{{ project.filename }}
 						</span>
-					</div>
-					<div
-						v-if="project.filename && !(owner || version)"
-						class="flex min-h-8 min-w-0 items-center text-secondary"
-					>
-						<span class="truncate">{{ project.filename }}</span>
 					</div>
 					<div
 						v-if="owner || version"
@@ -217,19 +221,61 @@ onUnmounted(() => {
 							</button>
 						</ButtonStyled>
 
-						<ButtonStyled v-if="hasContentListener">
-							<button class="!shadow-none" @click="emit('content')">
-								<BoxesIcon />
-								{{ formatMessage(commonMessages.contentLabel) }}
-							</button>
-						</ButtonStyled>
+						<Tooltip
+							v-if="hasContentListener"
+							theme="dismissable-prompt"
+							class="inline-flex"
+							:triggers="[]"
+							:shown="showContentHint && isExpanded"
+							:auto-hide="false"
+							placement="bottom-end"
+						>
+							<ButtonStyled>
+								<button
+									class="!shadow-none"
+									@click="
+										() => {
+											emit('content')
+											emit('dismiss-content-hint')
+										}
+									"
+								>
+									<BoxesIcon />
+									{{ formatMessage(commonMessages.contentLabel) }}
+								</button>
+							</ButtonStyled>
+							<template #popper>
+								<div class="grid grid-cols-[min-content] gap-1">
+									<div class="flex min-w-48 items-center justify-between gap-8">
+										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+											{{ formatMessage(messages.contentHintTitle) }}
+										</h3>
+										<ButtonStyled size="small" circular>
+											<button
+												v-tooltip="formatMessage(messages.dismissHint)"
+												@click="emit('dismiss-content-hint')"
+											>
+												<XIcon aria-hidden="true" />
+											</button>
+										</ButtonStyled>
+									</div>
+									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+										{{ formatMessage(messages.contentHintDescription) }}
+									</p>
+								</div>
+							</template>
+						</Tooltip>
 
 						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
 							<button
-								v-tooltip="formatMessage(messages.installationSettingsTooltip)"
-								@click="emit('settings')"
+								@click="
+									() => {
+										emit('settings')
+										emit('dismiss-content-hint')
+									}
+								"
 							>
-								<Settings2Icon />
+								<WrenchIcon />
 							</button>
 						</ButtonStyled>
 					</div>
@@ -245,19 +291,53 @@ onUnmounted(() => {
 							</button>
 						</ButtonStyled>
 					</div>
-					<ButtonStyled v-if="collapsedOptions.length" circular type="outlined">
-						<TeleportOverflowMenu :options="collapsedOptions" class="flex @[700px]:hidden">
-							<MoreVerticalIcon class="size-5" />
-							<template #content>
-								<BoxesIcon class="size-5" />
-								{{ formatMessage(commonMessages.contentLabel) }}
-							</template>
-							<template #settings>
-								<Settings2Icon class="size-5" />
-								{{ formatMessage(messages.installationSettingsTooltip) }}
-							</template>
-						</TeleportOverflowMenu>
-					</ButtonStyled>
+					<Tooltip
+						v-if="collapsedOptions.length"
+						theme="dismissable-prompt"
+						class="inline-flex"
+						:triggers="[]"
+						:shown="showContentHint && !isExpanded"
+						:auto-hide="false"
+						placement="bottom-end"
+					>
+						<ButtonStyled circular type="outlined"
+							><TeleportOverflowMenu
+								:options="collapsedOptions"
+								class="flex @[700px]:hidden"
+								@open="emit('dismiss-content-hint')"
+							>
+								<MoreVerticalIcon class="size-5" />
+								<template #content>
+									<BoxesIcon class="size-5" />
+									{{ formatMessage(commonMessages.contentLabel) }}
+								</template>
+								<template #settings>
+									<WrenchIcon class="size-5" />
+									{{ formatMessage(commonMessages.settingsLabel) }}
+								</template>
+							</TeleportOverflowMenu></ButtonStyled
+						>
+						<template #popper>
+							<div class="grid grid-cols-[min-content] gap-1">
+								<div class="flex min-w-48 items-center justify-between gap-8">
+									<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+										{{ formatMessage(messages.contentHintTitle) }}
+									</h3>
+									<ButtonStyled size="small" circular>
+										<button
+											v-tooltip="formatMessage(messages.dismissHint)"
+											@click="emit('dismiss-content-hint')"
+										>
+											<XIcon aria-hidden="true" />
+										</button>
+									</ButtonStyled>
+								</div>
+								<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+									{{ formatMessage(messages.contentHintDescription) }}
+								</p>
+							</div>
+						</template>
+					</Tooltip>
 
 					<ButtonStyled
 						v-if="overflowOptions?.length"

@@ -38,6 +38,33 @@ export default new createRouter({
 					component: Hosting.Content,
 				},
 				{
+					path: 'instances',
+					name: 'ServerManageInstances',
+					component: Hosting.Instances,
+				},
+				{
+					path: 'instances/:instance_id',
+					name: 'ServerManageInstance',
+					component: Hosting.Instance,
+					children: [
+						{
+							path: '',
+							name: 'ServerManageInstanceContent',
+							component: Hosting.Content,
+						},
+						{
+							path: 'files',
+							name: 'ServerManageInstanceFiles',
+							component: Hosting.Files,
+						},
+						{
+							path: 'backups',
+							name: 'ServerManageInstanceBackups',
+							component: Hosting.Backups,
+						},
+					],
+				},
+				{
 					path: 'files',
 					name: 'ServerManageFiles',
 					component: Hosting.Files,

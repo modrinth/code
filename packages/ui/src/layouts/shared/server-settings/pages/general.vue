@@ -1,5 +1,17 @@
 <template>
 	<div class="relative h-full w-full">
+		<Teleport to="body">
+			<div class="relative z-[100]">
+				<ConfirmModal
+					ref="resetToOnboardingModal"
+					:title="formatMessage(messages.resetToOnboardingModalTitle)"
+					:description="formatMessage(messages.resetToOnboardingModalDescription)"
+					:proceed-label="formatMessage(messages.resetToOnboardingButton)"
+					@proceed="confirmResetToOnboarding"
+				/>
+			</div>
+		</Teleport>
+
 		<div v-if="data" class="flex h-full w-full flex-col">
 			<div class="flex flex-col gap-6">
 				<div class="flex justify-start gap-16">
@@ -109,7 +121,7 @@
 				</div>
 
 				<!-- Info -->
-				<div class="flex flex-col gap-2.5 pb-10">
+				<div class="flex flex-col gap-2.5">
 					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
 					<div class="flex flex-col gap-2.5 rounded-xl bg-surface-2 p-4">
 						<div
@@ -131,6 +143,34 @@
 						</div>
 					</div>
 				</div>
+
+				<div v-if="isSiteAdmin" class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.supportZoneLabel) }}
+					</span>
+					<div class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 p-4">
+						<div class="flex flex-col items-start gap-2.5">
+							<ButtonStyled color="blue">
+								<button
+									v-tooltip="supportResetToOnboardingTooltip"
+									class="!shadow-none"
+									:disabled="supportResetToOnboardingDisabled"
+									@click="showResetToOnboardingModal"
+								>
+									<SpinnerIcon
+										v-if="resetToOnboardingMutation.isPending.value"
+										class="size-5 animate-spin"
+									/>
+									<RotateCounterClockwiseIcon v-else class="size-5" />
+									{{ formatMessage(messages.resetToOnboardingButton) }}
+								</button>
+							</ButtonStyled>
+							<span class="text-primary">
+								{{ formatMessage(messages.resetToOnboardingDescription) }}
+							</span>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div v-else />
@@ -146,14 +186,18 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { RotateCounterClockwiseIcon, SpinnerIcon } from '@modrinth/assets'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
-import { CopyCode, StyledInput, Toggle } from '#ui/components'
+import { ButtonStyled, ConfirmModal, CopyCode, StyledInput, Toggle } from '#ui/components'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { useModrinthServersConsole } from '#ui/composables'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -161,18 +205,59 @@ import {
 	injectPageContext,
 } from '#ui/providers'
 
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { server: data, serverId, busyReasons } = injectModrinthServerContext()
 const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
-const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
+const serverSettings = injectServerSettings()
+const modrinthServersConsole = useModrinthServersConsole()
+const { canResetServer, canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } =
+	useServerPermissions()
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
 )
 
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
+const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
+
+const messages = defineMessages({
+	supportZoneLabel: {
+		id: 'server.settings.general.support-zone.label',
+		defaultMessage: 'Support zone',
+	},
+	resetToOnboardingButton: {
+		id: 'hosting.loader.reset-to-onboarding-button',
+		defaultMessage: 'Reset to onboarding',
+	},
+	resetToOnboardingDescription: {
+		id: 'server.settings.general.reset-to-onboarding.description',
+		defaultMessage: 'Send this server back into onboarding so setup can be completed again.',
+	},
+	resetToOnboardingModalTitle: {
+		id: 'hosting.loader.reset-to-onboarding-modal-title',
+		defaultMessage: 'Reset to onboarding',
+	},
+	resetToOnboardingModalDescription: {
+		id: 'server.settings.general.reset-to-onboarding.modal.description',
+		defaultMessage:
+			'This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?',
+	},
+	resetToOnboardingSuccessTitle: {
+		id: 'server.settings.general.reset-to-onboarding.success.title',
+		defaultMessage: 'Server reset to onboarding',
+	},
+	resetToOnboardingSuccessDescription: {
+		id: 'server.settings.general.reset-to-onboarding.success.description',
+		defaultMessage: 'The server has been returned to the onboarding flow.',
+	},
+	failedToResetToOnboarding: {
+		id: 'server.settings.general.reset-to-onboarding.error',
+		defaultMessage: 'Failed to reset server to onboarding',
+	},
+})
 
 watch(data, (newData) => {
 	if (newData) {
@@ -188,6 +273,7 @@ const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidC
 
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
+const isSiteAdmin = computed(() => serverSettings.currentUserRole.value === 'admin')
 
 // Preferences
 const preferences = {
@@ -417,5 +503,68 @@ const resetGeneral = () => {
 	serverName.value = data.value?.name || ''
 	serverSubdomain.value = data.value?.net?.domain ?? ''
 	newUserPreferences.value = { ...userPreferences.value }
+}
+
+function showResetToOnboardingModal() {
+	if (supportResetToOnboardingDisabled.value) return
+	resetToOnboardingModal.value?.show()
+}
+
+const resetToOnboardingMutation = useMutation({
+	mutationFn: async () => {
+		await client.archon.servers_v1.resetToOnboarding(serverId)
+		try {
+			await client.kyros.logs_v1.clear()
+		} catch (error) {
+			console.error('Failed to clear server logs:', error)
+		}
+	},
+	onSuccess: async () => {
+		modrinthServersConsole.clear()
+		if (data.value) {
+			data.value.flows = { ...data.value.flows, intro: true }
+		}
+		await invalidateServerState()
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.resetToOnboardingSuccessTitle),
+			text: formatMessage(messages.resetToOnboardingSuccessDescription),
+		})
+		serverSettings.closeModal?.()
+	},
+	onError: (error) => {
+		addNotification({
+			type: 'error',
+			text:
+				error instanceof Error ? error.message : formatMessage(messages.failedToResetToOnboarding),
+		})
+	},
+})
+
+const supportResetToOnboardingDisabled = computed(
+	() => resetToOnboardingMutation.isPending.value || !canResetServer.value,
+)
+const supportResetToOnboardingTooltip = computed(() =>
+	!canResetServer.value ? permissionDeniedMessage.value : undefined,
+)
+
+function confirmResetToOnboarding() {
+	if (supportResetToOnboardingDisabled.value) return
+
+	resetToOnboardingMutation.mutate()
+}
+
+function invalidateServerState() {
+	return Promise.all([
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+		queryClient.invalidateQueries({
+			queryKey: ['servers', 'worlds', 'summary', 'v1', serverId],
+		}),
+		queryClient.invalidateQueries({ queryKey: ['files', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'properties', 'v1', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
+	])
 }
 </script>

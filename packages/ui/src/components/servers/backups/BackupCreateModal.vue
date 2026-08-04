@@ -103,12 +103,12 @@ const props = withDefaults(
 	},
 )
 
-const backupsQueryKey = ['backups', 'queue', ctx.serverId]
+const backupsQueryKey = computed(() => ['backups', 'queue', ctx.serverId, ctx.worldId.value])
 
 const createMutation = useMutation({
 	mutationFn: (name: string) =>
 		client.archon.backups_queue_v1.create(ctx.serverId, ctx.worldId.value!, { name }),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey.value }),
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()

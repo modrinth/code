@@ -4,7 +4,9 @@
 			v-if="ctx.flowType !== 'server-onboarding' && ctx.flowType !== 'reset-server'"
 			class="flex flex-col gap-2"
 		>
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.worldNameLabel) }}</span>
+			<span class="font-semibold text-contrast">
+				{{ formatMessage(messages.worldNameLabel) }}
+			</span>
 			<StyledInput
 				v-model="worldName"
 				:placeholder="formatMessage(messages.worldNamePlaceholder)"
@@ -156,11 +158,11 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	worldNameLabel: {
 		id: 'creation-flow.modal.final-config.world-name.label',
-		defaultMessage: 'World name',
+		defaultMessage: 'Instance name',
 	},
 	worldNamePlaceholder: {
 		id: 'creation-flow.modal.final-config.world-name.placeholder',
-		defaultMessage: 'Enter world name',
+		defaultMessage: 'Enter instance name',
 	},
 	gameVersionPlaceholder: {
 		id: 'creation-flow.modal.final-config.game-version.placeholder',
@@ -285,7 +287,7 @@ const messages = defineMessages({
 	},
 	beforeResetServerBackupName: {
 		id: 'creation-flow.modal.final-config.backup.before-reset-server.name',
-		defaultMessage: 'Before reset server',
+		defaultMessage: 'Before reset instance',
 	},
 })
 

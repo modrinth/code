@@ -180,6 +180,7 @@
 								v-for="server in ownedFilteredData.filter((s) => !s.is_medal)"
 								:key="`owned-${server.server_id}`"
 								v-bind="server"
+								:world-id="getServerWorldId(server.server_id)"
 								:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
 								:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
 								:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
@@ -211,6 +212,7 @@
 								v-for="server in sharedFilteredData.filter((s) => !s.is_medal)"
 								:key="`shared-${server.server_id}`"
 								v-bind="server"
+								:world-id="getServerWorldId(server.server_id)"
 							/>
 						</TransitionGroup>
 						<div v-else class="text-secondary">
@@ -761,6 +763,12 @@ const { data: serverFullList } = useQuery({
 	queryFn: () => client.archon.servers_v1.list(),
 	enabled: loggedIn,
 })
+
+function getServerWorldId(serverId: string): string | null {
+	const server = serverFullList.value?.find((server) => server.id === serverId)
+	const activeWorld = server?.worlds.find((world) => world.is_active)
+	return activeWorld?.id ?? server?.worlds[0]?.id ?? null
+}
 
 type ServerBillingInfo = {
 	cancellationDate?: string | null

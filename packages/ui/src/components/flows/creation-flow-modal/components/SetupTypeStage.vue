@@ -83,7 +83,7 @@ const messages = defineMessages({
 	},
 	worldTypeTitle: {
 		id: 'creation-flow.modal.setup-type.title.world',
-		defaultMessage: 'Select world type',
+		defaultMessage: 'Select instance type',
 	},
 	customSetupTitle: {
 		id: 'creation-flow.modal.setup-type.option.custom-setup.title',
@@ -95,11 +95,11 @@ const messages = defineMessages({
 	},
 	modpackBaseTitle: {
 		id: 'creation-flow.modal.setup-type.option.modpack-base.title',
-		defaultMessage: 'Install modpack',
+		defaultMessage: 'Modpack base',
 	},
 	modpackBaseDescription: {
 		id: 'creation-flow.modal.setup-type.option.modpack-base.description',
-		defaultMessage: 'Browse modpacks on Modrinth or import one from a file.',
+		defaultMessage: 'Use a popular modpack as your starting point.',
 	},
 	importInstanceTitle: {
 		id: 'creation-flow.modal.setup-type.option.import-instance.title',
@@ -127,7 +127,7 @@ const setupTypeTitle = computed(() => {
 	if (ctx.flowType === 'instance') {
 		return formatMessage(messages.instanceTypeTitle)
 	}
-	if (ctx.flowType === 'server-onboarding' || ctx.flowType === 'reset-server') {
+	if (ctx.flowType === 'reset-server') {
 		return formatMessage(messages.installationTypeTitle)
 	}
 	return formatMessage(messages.worldTypeTitle)
