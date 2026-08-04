@@ -21,6 +21,7 @@ import {
 import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
+	BulletDivider,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
@@ -254,7 +255,7 @@ const messages = defineMessages({
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised card-shadow smart-clickable:highlight-on-hover rounded-xl"
+			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] active:scale-[0.99]! min-h-20"
 			:class="{
 				'world-item-highlighted': highlighted,
 			}"
@@ -266,6 +267,8 @@ const messages = defineMessages({
 						: world.icon
 				"
 				size="48px"
+				no-shadow
+				class="!border-none !rounded-[14px]"
 			/>
 			<div class="flex flex-col justify-between h-full">
 				<div class="flex items-center gap-2">
@@ -345,25 +348,8 @@ const messages = defineMessages({
 						</template>
 					</div>
 				</div>
-				<div class="flex items-center gap-2 text-sm text-secondary">
-					<div
-						v-tooltip="world.last_played ? formatDateTime(world.last_played) : null"
-						class="w-fit shrink-0"
-						:class="{
-							'cursor-help smart-clickable:allow-pointer-events': world.last_played,
-						}"
-					>
-						<template v-if="world.last_played">
-							{{
-								formatMessage(commonMessages.playedLabel, {
-									ago: formatRelativeTime(dayjs(world.last_played).toISOString()),
-								})
-							}}
-						</template>
-						<template v-else> {{ formatMessage(messages.notPlayedYet) }} </template>
-					</div>
+				<div class="flex items-center gap-1.5 text-sm text-secondary">
 					<template v-if="instanceId">
-						•
 						<router-link
 							class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
 							:to="`/instance/${instanceId}`"
@@ -376,7 +362,20 @@ const messages = defineMessages({
 							/>
 							<span class="truncate">{{ instanceName }}</span>
 						</router-link>
+						<BulletDivider class="shrink-0" />
 					</template>
+					<div
+						v-tooltip="world.last_played ? formatDateTime(world.last_played) : null"
+						class="w-fit shrink-0"
+						:class="{
+							'cursor-help smart-clickable:allow-pointer-events': world.last_played,
+						}"
+					>
+						<template v-if="world.last_played">
+							{{ formatRelativeTime(dayjs(world.last_played).toISOString()) }}
+						</template>
+						<template v-else> {{ formatMessage(messages.notPlayedYet) }} </template>
+					</div>
 				</div>
 			</div>
 			<div
@@ -421,7 +420,7 @@ const messages = defineMessages({
 						{{ formatMessage(commonMessages.stopButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-else>
+				<ButtonStyled v-else color="brand">
 					<button
 						v-tooltip="
 							quarantined

@@ -9,6 +9,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	BulletDivider,
 	ButtonStyled,
 	commonMessages,
 	injectNotificationManager,
@@ -135,11 +136,13 @@ onUnmounted(() => {
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised card-shadow rounded-xl smart-clickable:highlight-on-hover"
+			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover min-h-20"
 		>
 			<Avatar
 				:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
 				:tint-by="instance.id"
+				no-shadow
+				class="!border-none !rounded-[14px]"
 				size="48px"
 			/>
 			<div class="flex flex-col col-span-2 justify-between h-full">
@@ -148,22 +151,7 @@ onUnmounted(() => {
 						{{ instance.name }}
 					</div>
 				</div>
-				<div class="flex items-center gap-2 text-sm text-secondary">
-					<div
-						v-tooltip="instance.last_played ? formatDateTime(instance.last_played) : null"
-						class="w-fit shrink-0"
-						:class="{ 'cursor-help smart-clickable:allow-pointer-events': last_played }"
-					>
-						<template v-if="last_played">
-							{{
-								formatMessage(commonMessages.playedLabel, {
-									ago: formatRelativeTime(last_played.toISOString?.()),
-								})
-							}}
-						</template>
-						<template v-else> Not played yet </template>
-					</div>
-					•
+				<div class="flex items-center gap-1.5 text-sm text-secondary">
 					<span v-if="modpack" class="flex items-center gap-1 truncate text-secondary">
 						<router-link
 							class="inline-flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
@@ -182,6 +170,17 @@ onUnmounted(() => {
 						{{ loader }}
 						{{ instance.game_version }}
 					</span>
+					<BulletDivider class="shrink-0" />
+					<div
+						v-tooltip="instance.last_played ? formatDateTime(instance.last_played) : null"
+						class="w-fit shrink-0"
+						:class="{ 'cursor-help smart-clickable:allow-pointer-events': last_played }"
+					>
+						<template v-if="last_played">
+							{{ formatRelativeTime(last_played.toISOString?.()) }}
+						</template>
+						<template v-else> Not played yet </template>
+					</div>
 				</div>
 			</div>
 			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
@@ -191,7 +190,7 @@ onUnmounted(() => {
 						{{ formatMessage(commonMessages.stopButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-else>
+				<ButtonStyled v-else color="brand">
 					<button
 						v-tooltip="
 							instance.quarantined
