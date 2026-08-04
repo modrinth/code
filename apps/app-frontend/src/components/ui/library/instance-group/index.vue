@@ -463,7 +463,7 @@ onMounted(startInstanceGridResizeObserver)
 				<div ref="instanceGridContent">
 					<TransitionGroup
 						tag="section"
-						class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
+						class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] max-xl:grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
 						move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
 						enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
 						enter-from-class="opacity-0"
