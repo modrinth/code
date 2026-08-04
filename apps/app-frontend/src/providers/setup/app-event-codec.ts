@@ -163,8 +163,7 @@ function normalizeInstallContext(value: unknown): WireObject {
 	const context = wireObject(value)
 	return {
 		...context,
-		expected_size:
-			context.expected_size === undefined ? undefined : number(context.expected_size),
+		expected_size: context.expected_size === undefined ? undefined : number(context.expected_size),
 	}
 }
 
@@ -175,8 +174,7 @@ function normalizeInstallError(value: unknown): WireObject {
 		phase: error.phase === undefined ? undefined : unitVariant(error.phase),
 		reason: error.reason === undefined ? undefined : unitVariant(error.reason),
 		api: error.api === undefined ? undefined : wireObject(error.api),
-		context:
-			error.context === undefined ? undefined : normalizeInstallContext(error.context),
+		context: error.context === undefined ? undefined : normalizeInstallContext(error.context),
 	}
 }
 
@@ -197,8 +195,7 @@ function normalizeInstallJob(value: unknown): WireObject {
 			return target
 		})(),
 		phase: unitVariant(job.phase),
-		progress:
-			job.progress === undefined ? null : normalizeInstallProgress(job.progress),
+		progress: job.progress === undefined ? null : normalizeInstallProgress(job.progress),
 		details: normalizeInstallDetails(job.details),
 		display,
 		error: job.error === undefined ? null : normalizeInstallError(job.error),
