@@ -35,11 +35,13 @@ const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500
 
 const props = withDefaults(
 	defineProps<{
+		canDragReorder?: boolean
 		hideHeader?: boolean
 		instanceGroup: InstanceGroupType
 		selectionAnchorInstanceId?: string | null
 	}>(),
 	{
+		canDragReorder: false,
 		hideHeader: false,
 		selectionAnchorInstanceId: null,
 	},
@@ -376,6 +378,9 @@ onMounted(startInstanceGridResizeObserver)
 		<div
 			v-if="!hideHeader"
 			class="group/header h-10 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
+			:class="{
+				'instance-group-reorder-handle': isCustomGroup && canDragReorder,
+			}"
 		>
 			<div
 				class="group/open-target flex min-w-0 items-center gap-2"

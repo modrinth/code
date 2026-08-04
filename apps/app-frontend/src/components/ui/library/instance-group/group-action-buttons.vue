@@ -41,7 +41,7 @@ const messages = defineMessages({
 
 <template>
 	<div
-		class="flex shrink-0 items-center opacity-0 transition-opacity duration-250 group-hover/header:opacity-100 focus-within:opacity-100"
+		class="instance-group-reorder-ignore flex shrink-0 items-center opacity-0 transition-opacity duration-250 group-hover/header:opacity-100 focus-within:opacity-100"
 	>
 		<ButtonStyled circular type="transparent" size="standard">
 			<button

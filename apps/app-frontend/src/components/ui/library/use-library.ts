@@ -985,21 +985,29 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 	}
 
-	const moveGroup = async (groupId: string, direction: -1 | 1) => {
+	const reorderGroups = async (orderedGroupIds: string[]) => {
 		if (reorderingGroups.value) return false
 
 		const previousGroups = libraryGroups.value
-		const reorderedCustomGroups = [...customLibraryGroups.value]
-		const groupIndex = reorderedCustomGroups.findIndex((group) => group.id === groupId)
-		const targetIndex = groupIndex + direction
+		const customGroupsById = new Map(customLibraryGroups.value.map((group) => [group.id, group]))
+		const orderedGroupIdSet = new Set(orderedGroupIds)
 
-		if (groupIndex < 0 || targetIndex < 0 || targetIndex >= reorderedCustomGroups.length) {
+		if (
+			orderedGroupIdSet.size !== orderedGroupIds.length ||
+			orderedGroupIds.some((groupId) => !customGroupsById.has(groupId))
+		) {
 			return false
 		}
 
-		const targetGroup = reorderedCustomGroups[targetIndex]
-		reorderedCustomGroups[targetIndex] = reorderedCustomGroups[groupIndex]
-		reorderedCustomGroups[groupIndex] = targetGroup
+		const orderedGroups = orderedGroupIds.map((groupId) => customGroupsById.get(groupId)!)
+		let orderedGroupIndex = 0
+		const reorderedCustomGroups = customLibraryGroups.value.map((group) =>
+			orderedGroupIdSet.has(group.id) ? orderedGroups[orderedGroupIndex++] : group,
+		)
+
+		if (reorderedCustomGroups.every((group, index) => group === customLibraryGroups.value[index])) {
+			return false
+		}
 
 		const favoriteGroups = previousGroups.filter((group) => group.id === FAVORITES_GROUP_ID)
 		libraryGroups.value = [...favoriteGroups, ...reorderedCustomGroups]
@@ -1016,6 +1024,22 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		} finally {
 			reorderingGroups.value = false
 		}
+	}
+
+	const moveGroup = async (groupId: string, direction: -1 | 1) => {
+		const orderedGroupIds = customLibraryGroups.value.map((group) => group.id)
+		const groupIndex = orderedGroupIds.indexOf(groupId)
+		const targetIndex = groupIndex + direction
+
+		if (groupIndex < 0 || targetIndex < 0 || targetIndex >= orderedGroupIds.length) {
+			return false
+		}
+
+		const targetGroupId = orderedGroupIds[targetIndex]
+		orderedGroupIds[targetIndex] = orderedGroupIds[groupIndex]
+		orderedGroupIds[groupIndex] = targetGroupId
+
+		return await reorderGroups(orderedGroupIds)
 	}
 
 	const deleteInstance = async () => {
@@ -1185,6 +1209,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		renameGroup,
 		canMoveGroupUp,
 		canMoveGroupDown,
+		reorderGroups,
 		moveGroup,
 		deleteInstance,
 		handleInstanceContextMenu,

@@ -10,7 +10,8 @@ import {
 	StopCircleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, toRef, watch } from 'vue'
+import Draggable from 'vuedraggable'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
@@ -18,7 +19,11 @@ import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
-import { getLibraryInstanceSelectionKey, provideLibrary } from '@/components/ui/library/use-library'
+import {
+	getLibraryInstanceSelectionKey,
+	type InstanceGroup as InstanceGroupType,
+	provideLibrary,
+} from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
@@ -30,7 +35,10 @@ const props = defineProps<{
 const {
 	instanceGroups,
 	libraryGroupsLoaded,
+	displayState,
 	filters,
+	reorderingGroups,
+	reorderGroups,
 	instanceOptions,
 	confirmDeleteModal,
 	deleteInstance,
@@ -52,6 +60,105 @@ const visibleInstanceGroups = computed(() =>
 				(!hasActiveFilters.value && instanceGroup.key !== 'None'),
 	),
 )
+
+const visibleCustomGroups = computed(() =>
+	displayState.value.group === 'Group'
+		? visibleInstanceGroups.value.filter(
+				(group) => group.id !== FAVORITES_GROUP_ID && group.id !== 'group:none',
+			)
+		: [],
+)
+const visibleFavoritesGroup = computed(() =>
+	visibleInstanceGroups.value.find((group) => group.id === FAVORITES_GROUP_ID),
+)
+const visibleUngroupedGroup = computed(() =>
+	visibleInstanceGroups.value.find((group) => group.id === 'group:none'),
+)
+const draggableCustomGroups = ref<InstanceGroupType[]>([])
+const libraryGroupsContainer = ref<HTMLElement>()
+const isDraggingGroup = ref(false)
+const GROUP_REORDERING_CLASS = 'instance-group-reordering'
+const canDragReorderGroups = computed(
+	() => !reorderingGroups.value && draggableCustomGroups.value.length > 1,
+)
+
+watch(
+	visibleCustomGroups,
+	(groups) => {
+		if (!isDraggingGroup.value) {
+			const previousGroupTops = getCustomGroupTops()
+			draggableCustomGroups.value = [...groups]
+			void nextTick(() => animateCustomGroupReorder(previousGroupTops))
+		}
+	},
+	{ immediate: true },
+)
+
+function getCustomGroupTops() {
+	const groupTops = new Map<string, number>()
+	const groupElements = libraryGroupsContainer.value?.querySelectorAll<HTMLElement>(
+		'[data-instance-group-reorder-id]',
+	)
+
+	for (const groupElement of groupElements ?? []) {
+		const groupId = groupElement.dataset.instanceGroupReorderId
+		if (groupId) {
+			groupTops.set(groupId, groupElement.getBoundingClientRect().top)
+		}
+	}
+
+	return groupTops
+}
+
+function animateCustomGroupReorder(previousGroupTops: Map<string, number>) {
+	if (
+		previousGroupTops.size === 0 ||
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches
+	) {
+		return
+	}
+
+	const groupElements = libraryGroupsContainer.value?.querySelectorAll<HTMLElement>(
+		'[data-instance-group-reorder-id]',
+	)
+
+	for (const groupElement of groupElements ?? []) {
+		const groupId = groupElement.dataset.instanceGroupReorderId
+		const previousTop = groupId ? previousGroupTops.get(groupId) : undefined
+		if (previousTop === undefined) continue
+
+		const offset = previousTop - groupElement.getBoundingClientRect().top
+		if (Math.abs(offset) < 1) continue
+
+		groupElement.animate(
+			[{ transform: `translateY(${offset}px)` }, { transform: 'translateY(0)' }],
+			{ duration: 200, easing: 'ease-out' },
+		)
+	}
+}
+
+function onGroupDragStart() {
+	isDraggingGroup.value = true
+	document.documentElement.classList.add(GROUP_REORDERING_CLASS)
+}
+
+function onGroupDragEnd() {
+	isDraggingGroup.value = false
+	document.documentElement.classList.remove(GROUP_REORDERING_CLASS)
+
+	const currentGroupIds = visibleCustomGroups.value.map((group) => group.id)
+	const orderedGroupIds = draggableCustomGroups.value.map((group) => group.id)
+	if (orderedGroupIds.every((groupId, index) => groupId === currentGroupIds[index])) {
+		draggableCustomGroups.value = [...visibleCustomGroups.value]
+		return
+	}
+
+	void reorderGroups(orderedGroupIds)
+}
+
+onUnmounted(() => {
+	document.documentElement.classList.remove(GROUP_REORDERING_CLASS)
+})
 
 const anchorInstance = ref<{ groupId: string; instanceId: string } | null>(null)
 
@@ -136,8 +243,84 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 				enter-from-class="opacity-0"
 				enter-to-class="opacity-100"
 			>
+				<div
+					v-if="libraryGroupsLoaded && displayState.group === 'Group'"
+					ref="libraryGroupsContainer"
+					data-library-page-background
+					class="flex flex-col"
+				>
+					<div v-if="visibleFavoritesGroup" class="min-w-0">
+						<InstanceGroup
+							:instance-group="visibleFavoritesGroup"
+							:selection-anchor-instance-id="
+								anchorInstance?.groupId === FAVORITES_GROUP_ID ? anchorInstance.instanceId : null
+							"
+							@toggle-selection="
+								(instanceId: string, shiftKey: boolean) =>
+									handleToggleInstance(FAVORITES_GROUP_ID, instanceId, shiftKey)
+							"
+						/>
+					</div>
+
+					<Draggable
+						:list="draggableCustomGroups"
+						class="flex flex-col"
+						item-key="id"
+						:disabled="!canDragReorderGroups"
+						:animation="250"
+						:swap-threshold="0.75"
+						:invert-swap="true"
+						:force-fallback="true"
+						:fallback-on-body="true"
+						:fallback-tolerance="4"
+						filter=".instance-group-reorder-ignore, input, textarea, [contenteditable='true']"
+						handle=".instance-group-reorder-handle"
+						:prevent-on-filter="false"
+						ghost-class="instance-group-reorder-ghost"
+						chosen-class="instance-group-reorder-chosen"
+						drag-class="instance-group-reorder-drag"
+						fallback-class="instance-group-reorder-fallback"
+						@start="onGroupDragStart"
+						@end="onGroupDragEnd"
+					>
+						<template #item="{ element: instanceGroup }">
+							<div
+								:key="instanceGroup.id"
+								class="min-w-0 w-full"
+								:data-instance-group-reorder-id="instanceGroup.id"
+							>
+								<InstanceGroup
+									:can-drag-reorder="canDragReorderGroups"
+									:instance-group="instanceGroup"
+									:selection-anchor-instance-id="
+										anchorInstance?.groupId === instanceGroup.id ? anchorInstance?.instanceId : null
+									"
+									@toggle-selection="
+										(instanceId: string, shiftKey: boolean) =>
+											handleToggleInstance(instanceGroup.id, instanceId, shiftKey)
+									"
+								/>
+							</div>
+						</template>
+					</Draggable>
+
+					<div v-if="visibleUngroupedGroup" class="min-w-0">
+						<InstanceGroup
+							:hide-header="visibleInstanceGroups.length === 1"
+							:instance-group="visibleUngroupedGroup"
+							:selection-anchor-instance-id="
+								anchorInstance?.groupId === 'group:none' ? anchorInstance.instanceId : null
+							"
+							@toggle-selection="
+								(instanceId: string, shiftKey: boolean) =>
+									handleToggleInstance('group:none', instanceId, shiftKey)
+							"
+						/>
+					</div>
+				</div>
+
 				<TransitionGroup
-					v-if="libraryGroupsLoaded"
+					v-else-if="libraryGroupsLoaded"
 					data-library-page-background
 					tag="div"
 					class="flex flex-col"
@@ -187,3 +370,21 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 		<template #remove_from_group> <MinusIcon /> Remove from group </template>
 	</ContextMenu>
 </template>
+
+<style scoped>
+:global(.instance-group-reorder-ghost) {
+	opacity: 0.35;
+}
+
+:global(html.instance-group-reordering),
+:global(html.instance-group-reordering *) {
+	-webkit-user-select: none !important;
+	cursor: grabbing !important;
+	user-select: none !important;
+}
+
+:global(.instance-group-reorder-fallback) {
+	opacity: 0.9;
+	pointer-events: none;
+}
+</style>
