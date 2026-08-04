@@ -6,7 +6,6 @@ use chrono::{Months, Utc};
 
 use crate::auth::get_user_from_headers;
 use crate::database::models::DBUserId;
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::pats::Scopes;
 use crate::models::payout_runs::{Adjustment, PayoutRun, PayoutRunStatus};
@@ -14,6 +13,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context;
 use crate::util::time::YearMonth;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get);
