@@ -344,6 +344,11 @@ function getLinkCheckState(context: LinkCheckContext): LinkCheckResult | undefin
   return typeof state === "object" ? state : undefined
 }
 
+function isLinkCheckPending(context: LinkCheckContext): boolean {
+  if (!context.url) return false
+  return cache.get(cacheKey(context)) === "pending"
+}
+
 function useLinkCheck(context: Ref<LinkCheckContext>) {
   let timeout: ReturnType<typeof setTimeout>
   watch(
@@ -737,6 +742,8 @@ checks.children(
   blacklist("Minecraft", "minecraft.net"),
   //TODO we should probably setup curseforge/planetminecraft issues for issues but im too lazy to do that rn
   blacklist("Mod Distribution Platform", "curseforge.com", "planetminecraft.com", "9minecraft.net", "mcmod.cn"),
+
+  blacklist("AI Mod Generation Platform", "creativemode.net", "orcaclient.com", "autoforged.cn")
 )
 
-export {checkLink, getLinkCheckState, useLinkCheck}
+export {checkLink, getLinkCheckState, isLinkCheckPending, useLinkCheck}

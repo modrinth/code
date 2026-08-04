@@ -186,7 +186,7 @@
 			:original="original"
 			:modified="modified"
 			:saving="saving"
-			:can-save="!hasConfirmedInvalidLinks"
+			:can-save="canSave"
 			@reset="reset"
 			@save="save"
 		/>
@@ -194,8 +194,11 @@
 </template>
 
 <script setup>
-import { checkLink, getLinkCheckState, useLinkCheck } from '@modrinth/moderation'
+import { checkLink, getLinkCheckState, isLinkCheckPending, useLinkCheck } from '@modrinth/moderation'
 import {
+	Combobox,
+	ConfirmLeaveModal,
+	defineMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -265,14 +268,19 @@ function fieldContext(field, getUrl, extra) {
 	return computed(() => ({ field, url: getUrl(), ...extra }))
 }
 
-const discordInviteCheck = useLinkCheck(
-	fieldContext('discord', () => current.value.discord, { platformName: 'Discord' }),
-)
-const issuesCheck = useLinkCheck(fieldContext('issues', () => current.value.issues))
-const sourceCheck = useLinkCheck(fieldContext('source', () => current.value.source))
-const wikiCheck = useLinkCheck(fieldContext('wiki', () => current.value.wiki))
-const siteCheck = useLinkCheck(fieldContext('site', () => current.value.site))
-const storeCheck = useLinkCheck(fieldContext('store', () => current.value.store))
+const discordContext = fieldContext('discord', () => current.value.discord, { platformName: 'Discord' })
+const issuesContext = fieldContext('issues', () => current.value.issues)
+const sourceContext = fieldContext('source', () => current.value.source)
+const wikiContext = fieldContext('wiki', () => current.value.wiki)
+const siteContext = fieldContext('site', () => current.value.site)
+const storeContext = fieldContext('store', () => current.value.store)
+
+const discordInviteCheck = useLinkCheck(discordContext)
+const issuesCheck = useLinkCheck(issuesContext)
+const sourceCheck = useLinkCheck(sourceContext)
+const wikiCheck = useLinkCheck(wikiContext)
+const siteCheck = useLinkCheck(siteContext)
+const storeCheck = useLinkCheck(storeContext)
 
 function donationContext(row) {
 	return {
@@ -286,7 +294,7 @@ function donationContext(row) {
 function donationCheckState(row, index) {
 	if (row.url && !row.id) {
 		return {
-			severity: 'warn',
+			severity: 'error',
 			message: defineMessage({
 				id: 'project.settings.links.donation.no-type',
 				defaultMessage: 'Please select a platform for this Donation link.',
@@ -298,7 +306,7 @@ function donationCheckState(row, index) {
 		const firstIndex = donationLinks.value.findIndex((other) => other.id === row.id)
 		if (firstIndex !== index) {
 			return {
-				severity: 'warn',
+				severity: 'error',
 				message: defineMessage({
 					id: 'project.settings.links.donation.duplicate-type',
 					defaultMessage: 'You already have another {platform} link.',
@@ -358,12 +366,13 @@ const donationsModified = computed(() => {
 })
 
 function serializeDonationRow(row) {
-	return `${row.id ?? ''}:${row.url ?? ''}`
+	return `${row.id ?? ''}:${row.url}`
 }
 
 function donationRowsToObject(rows) {
 	const entries = {}
 	rows.forEach((row, index) => {
+		if (!row.url) return
 		entries[`donation-row-${index}`] = serializeDonationRow(row)
 	})
 	return entries
@@ -403,17 +412,31 @@ const patchData = computed(() => {
 	return data
 })
 
-const hasConfirmedInvalidLinks = computed(() => {
+const canSave = computed(() => {
 	const checks = isServerProject.value
 		? [siteCheck, storeCheck, wikiCheck, discordInviteCheck]
 		: [issuesCheck, sourceCheck, wikiCheck, discordInviteCheck]
+	const contexts = isServerProject.value
+		? [siteContext, storeContext, wikiContext, discordContext]
+		: [issuesContext, sourceContext, wikiContext, discordContext]
 
 	const fieldsInvalid = checks.some((check) => check.value?.severity === 'error')
+	const fieldsPending = contexts.some((context) => isLinkCheckPending(context.value))
+
 	const donationsInvalid =
 		!isServerProject.value &&
 		donationLinks.value.some((row, index) => donationCheckState(row, index)?.severity === 'error')
+	const donationsPending =
+		!isServerProject.value &&
+		donationLinks.value.some((row) => isLinkCheckPending(donationContext(row)))
 
-	return fieldsInvalid || donationsInvalid
+	return (
+		!fieldsInvalid &&
+		!fieldsPending &&
+		!donationsInvalid &&
+		!donationsPending &&
+		Object.keys(patchData.value).length > 0
+	)
 })
 
 const saving = ref(false)
