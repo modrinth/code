@@ -59,10 +59,13 @@ export function instanceLinkedProjectQueryOptions(projectId: string) {
 	})
 }
 
-export function instanceContentQueryOptions(instanceId: string) {
+export function instanceContentQueryOptions(
+	instanceId: string,
+	onError?: (error: Error) => unknown,
+) {
 	return queryOptions({
 		queryKey: instanceKeys.content(instanceId),
-		queryFn: () => loadInstanceContentData(instanceId),
+		queryFn: () => loadInstanceContentData(instanceId, undefined, onError),
 		staleTime: 30_000,
 	})
 }

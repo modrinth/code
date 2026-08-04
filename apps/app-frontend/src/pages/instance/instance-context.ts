@@ -6,7 +6,7 @@ import type { GameInstance } from '@/helpers/types'
 
 export interface InstancePageContext {
 	readonly instanceId: ComputedRef<string>
-	readonly instance: ComputedRef<GameInstance | undefined>
+	readonly instance: ComputedRef<GameInstance>
 	readonly linkedProject: ComputedRef<Labrinth.Projects.v3.Project | undefined>
 	readonly isServerInstance: ComputedRef<boolean>
 	readonly offline: Readonly<Ref<boolean>>

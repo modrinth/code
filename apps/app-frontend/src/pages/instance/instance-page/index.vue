@@ -118,8 +118,8 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { useOnline } from '@vueuse/core'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, type ComputedRef, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
@@ -129,6 +129,7 @@ import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import {
+	instanceContentQueryOptions,
 	instanceDetailQueryOptions,
 	instanceKeys,
 	instanceLinkedProjectQueryOptions,
@@ -186,6 +187,12 @@ const instanceQuery = useQuery(
 		enabled: !!instanceId.value,
 	})),
 )
+const criticalContentQuery = useQuery(
+	computed(() => ({
+		...instanceContentQueryOptions(instanceId.value, (error) => handleError(error)),
+		enabled: !!instanceId.value,
+	})),
+)
 const instance = computed(() => instanceQuery.data.value)
 const linkedProjectId = computed(() => instance.value?.link?.project_id ?? '')
 const linkedProjectQuery = useQuery(
@@ -203,6 +210,44 @@ const processesQuery = useQuery(
 	})),
 )
 const playing = computed(() => (processesQuery.data.value?.length ?? 0) > 0)
+
+async function ensureCriticalContent(targetInstanceId: string) {
+	await queryClient.ensureQueryData(
+		instanceContentQueryOptions(targetInstanceId, (error) => handleError(error)),
+	)
+}
+
+async function ensureCriticalInstanceData(targetInstanceId: string) {
+	await Promise.all([
+		queryClient.ensureQueryData(instanceDetailQueryOptions(targetInstanceId)),
+		ensureCriticalContent(targetInstanceId),
+	])
+}
+
+function isUnmanagedInstanceError(error: unknown) {
+	return error instanceof Error && error.message.includes('is not managed')
+}
+
+try {
+	await ensureCriticalInstanceData(instanceId.value)
+} catch (error) {
+	if (isUnmanagedInstanceError(error)) await router.replace('/')
+	else handleError(error)
+}
+
+onBeforeRouteUpdate(async (to, from) => {
+	const targetInstanceId = String(to.params.id ?? '')
+	const currentInstanceId = String(from.params.id ?? '')
+	if (!targetInstanceId || targetInstanceId === currentInstanceId) return
+
+	try {
+		await ensureCriticalInstanceData(targetInstanceId)
+	} catch (error) {
+		if (isUnmanagedInstanceError(error)) return { path: '/' }
+		handleError(error)
+		return false
+	}
+})
 
 useRootBreadcrumb({
 	slot: 'instance',
@@ -724,7 +769,7 @@ let instancePageAlive = true
 
 provideInstancePage({
 	instanceId,
-	instance,
+	instance: instance as ComputedRef<GameInstance>,
 	linkedProject: linkedProjectV3,
 	isServerInstance,
 	offline,
