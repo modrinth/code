@@ -300,6 +300,7 @@ impl InstallRequest {
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 pub enum InstallJobKind {
     CreateInstance,
@@ -345,6 +346,7 @@ impl InstallJobKind {
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 pub enum InstallJobStatus {
     Queued,
@@ -387,6 +389,7 @@ impl InstallJobStatus {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum InstallTarget {
     NewInstance { instance_id: Option<String> },
@@ -408,6 +411,7 @@ pub struct InstallProgressState {
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 pub enum InstallPhaseId {
     PreparingInstance,
@@ -426,6 +430,7 @@ pub enum InstallPhaseId {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct InstallProgress {
     pub current: u64,
     pub total: u64,
@@ -434,12 +439,14 @@ pub struct InstallProgress {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct InstallProgressSecondary {
     pub current: u64,
     pub total: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 pub enum InstallJavaStep {
     Resolving,
@@ -450,6 +457,7 @@ pub enum InstallJavaStep {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum InstallPhaseDetails {
     Empty,
@@ -482,6 +490,7 @@ pub struct InstallJobPaths {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, bon::Builder)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[builder(start_fn = new)]
 pub struct InstallErrorContext {
     #[builder(start_fn, into)]
@@ -527,6 +536,7 @@ pub struct InstallErrorContext {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct InstallJobDisplay {
     pub title: String,
     pub icon: Option<String>,
@@ -539,6 +549,7 @@ pub struct InstallRollbackState {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct InstallErrorView {
     pub code: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -553,6 +564,7 @@ pub struct InstallErrorView {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct InstallApiErrorDetails {
     pub error: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -610,6 +622,7 @@ impl InstallErrorView {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct InstallJobSnapshot {
     pub job_id: Uuid,
     pub instance_id: Option<String>,

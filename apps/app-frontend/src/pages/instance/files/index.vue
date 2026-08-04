@@ -23,9 +23,9 @@ import {
 	writeFile as writeFileBytes,
 	writeTextFile,
 } from '@tauri-apps/plugin-fs'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-import { instance_listener } from '@/helpers/events'
+import { useAppEvent } from '@/composables/use-app-event'
 import { get_full_path } from '@/helpers/instance'
 import { highlightInFolder } from '@/helpers/utils'
 
@@ -307,20 +307,12 @@ async function handleExtractFile(path: string, override: boolean, dry: boolean) 
 	}
 }
 
-debug('setup: registering instance_listener')
-const unlistenInstances = await instance_listener(
-	async (event: { event: string; instance_id: string }) => {
-		debug('instance_listener: event =', event.event, 'path =', event.instance_id)
-		if (event.instance_id === instanceId.value && event.event === 'synced') {
-			debug('instance_listener: synced event matched, calling refresh')
-			await refresh()
-		}
-	},
-)
-debug('setup: instance_listener registered')
-
-onUnmounted(() => {
-	unlistenInstances()
+useAppEvent('instance', async (event) => {
+	debug('app event: instance =', event.event, 'path =', event.instance_id)
+	if (event.instance_id === instanceId.value && event.event === 'synced') {
+		debug('app event: synced instance matched, calling refresh')
+		await refresh()
+	}
 })
 
 watch(instanceId, async () => {

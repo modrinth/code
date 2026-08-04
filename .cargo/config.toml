@@ -1,3 +1,6 @@
+[alias]
+export-app-events = "run -p theseus --bin export-app-events --features export-ts"
+
 # Windows has stack overflows when calling from Tauri, so we increase the default stack size used by the compiler
 [target."cfg(windows)"]
 rustflags = ["-C", "link-args=/STACK:16777220"]

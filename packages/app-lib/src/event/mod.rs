@@ -1,14 +1,17 @@
 //! Theseus state management system
-use ariadne::ids::UserId;
-use ariadne::users::UserStatus;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+#[cfg(feature = "tauri")]
+use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::{path::PathBuf, sync::Arc};
 #[cfg(feature = "tauri")]
-use tauri::Emitter;
+use tauri::ipc::Channel;
 use tokio::sync::OnceCell;
 use uuid::Uuid;
+
+use crate::install::InstallJobSnapshot;
 
 pub mod emit;
 
@@ -19,21 +22,30 @@ pub struct EventState {
     /// Tauri app
     #[cfg(feature = "tauri")]
     pub app: tauri::AppHandle,
+    #[cfg(feature = "tauri")]
+    event_channel: RwLock<Channel<AppEvent>>,
     pub loading_bars: DashMap<Uuid, LoadingBar>,
 }
 
 impl EventState {
     #[cfg(feature = "tauri")]
-    pub async fn init(app: tauri::AppHandle) -> crate::Result<Arc<Self>> {
-        EVENT_STATE
+    pub async fn init(
+        app: tauri::AppHandle,
+        event_channel: Channel<AppEvent>,
+    ) -> crate::Result<Arc<Self>> {
+        let state = EVENT_STATE
             .get_or_try_init(|| async {
-                Ok(Arc::new(Self {
+                Ok::<_, crate::Error>(Arc::new(Self {
                     app,
+                    event_channel: RwLock::new(event_channel.clone()),
                     loading_bars: DashMap::new(),
                 }))
             })
             .await
-            .cloned()
+            .cloned()?;
+
+        *state.event_channel.write() = event_channel;
+        Ok(state)
     }
 
     #[cfg(not(feature = "tauri"))]
@@ -52,6 +64,15 @@ impl EventState {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
     }
 
+    #[cfg(feature = "tauri")]
+    pub fn send(&self, event: AppEvent) -> crate::Result<()> {
+        self.event_channel
+            .read()
+            .send(event)
+            .map_err(EventError::from)?;
+        Ok(())
+    }
+
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
     pub async fn list_progress_bars() -> crate::Result<DashMap<Uuid, LoadingBar>>
     {
@@ -66,6 +87,26 @@ impl EventState {
         let value = Self::get()?;
         Ok(value.app.get_webview_window("main"))
     }
+}
+
+#[derive(Serialize, Clone)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+#[serde(tag = "type", content = "payload", rename_all = "snake_case")]
+#[cfg_attr(feature = "export-ts", ts(export_to = "AppEvent.ts"))]
+pub enum AppEvent {
+    Loading(LoadingPayload),
+    Process(ProcessPayload),
+    Instance(InstancePayload),
+    InstanceBulkUpdateProgress(InstanceBulkUpdateProgressPayload),
+    InstallJob(InstallJobSnapshot),
+    Command(CommandPayload),
+    Warning(WarningPayload),
+    Friend(FriendPayload),
+    Notification(
+        #[cfg_attr(feature = "export-ts", ts(type = "unknown"))] Value,
+    ),
+    Log(LogPayload),
+    AdsConsentRequired(bool),
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -102,15 +143,14 @@ impl Drop for LoadingBarId {
                         let event = bar.bar_type.clone();
                         let fraction = bar.current / bar.total;
 
-                        let _ = event_state.app.emit(
-                            "loading",
+                        let _ = event_state.send(AppEvent::Loading(
                             LoadingPayload {
                                 fraction: None,
                                 message: "Completed".to_string(),
                                 event,
                                 loader_uuid,
                             },
-                        );
+                        ));
                         tracing::trace!(
                             "Exited at {fraction} for loading bar: {:?}",
                             loader_uuid
@@ -133,6 +173,7 @@ impl Drop for LoadingBarId {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
 pub enum LoadingBarType {
@@ -186,7 +227,7 @@ pub enum LoadingBarType {
 }
 
 #[derive(Serialize, Clone)]
-#[cfg(feature = "tauri")]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct LoadingPayload {
     pub event: LoadingBarType,
     pub loader_uuid: Uuid,
@@ -195,12 +236,13 @@ pub struct LoadingPayload {
 }
 
 #[derive(Serialize, Clone)]
-#[cfg(feature = "tauri")]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct WarningPayload {
     pub message: String,
 }
 
 #[derive(Serialize, Clone)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "camelCase")]
 pub struct InstanceBulkUpdateProgressPayload {
     pub instance_id: String,
@@ -210,6 +252,7 @@ pub struct InstanceBulkUpdateProgressPayload {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 pub enum InstanceBulkUpdateProgressStage {
     ResolvingVersions,
@@ -218,6 +261,7 @@ pub enum InstanceBulkUpdateProgressStage {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(tag = "event")]
 pub enum CommandPayload {
     InstallMod {
@@ -247,7 +291,7 @@ pub enum CommandPayload {
 }
 
 #[derive(Serialize, Clone)]
-#[cfg(feature = "tauri")]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct ProcessPayload {
     pub instance_id: String,
     pub uuid: Uuid,
@@ -256,6 +300,7 @@ pub struct ProcessPayload {
 }
 
 #[derive(Serialize, Clone, Debug)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
     Launched,
@@ -263,7 +308,7 @@ pub enum ProcessPayloadType {
 }
 
 #[derive(Serialize, Clone)]
-#[cfg(feature = "tauri")]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 pub struct InstancePayload {
     pub instance_id: String,
     #[serde(flatten)]
@@ -271,6 +316,7 @@ pub struct InstancePayload {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(tag = "event", rename_all = "snake_case")]
 pub enum InstancePayloadType {
     Created,
@@ -296,24 +342,42 @@ pub enum InstancePayloadType {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "event")]
 pub enum FriendPayload {
-    FriendRequest { from: UserId },
-    UserOffline { id: UserId },
-    StatusUpdate { user_status: UserStatus },
+    FriendRequest { from: String },
+    UserOffline { id: String },
+    StatusUpdate { user_status: FriendStatusPayload },
     StatusSync,
 }
 
-#[cfg(feature = "tauri")]
+#[derive(Serialize, Clone)]
+#[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
+pub struct FriendStatusPayload {
+    pub user_id: String,
+    pub profile_name: Option<String>,
+    pub last_update: DateTime<Utc>,
+}
+
+impl From<ariadne::users::UserStatus> for FriendStatusPayload {
+    fn from(status: ariadne::users::UserStatus) -> Self {
+        Self {
+            user_id: status.user_id.to_string(),
+            profile_name: status.profile_name,
+            last_update: status.last_update,
+        }
+    }
+}
+
 pub use self::log_types::*;
 
-#[cfg(feature = "tauri")]
 mod log_types {
     use crate::state::Log4jEvent;
     use serde::Serialize;
 
     #[derive(Serialize, Clone)]
+    #[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
     #[serde(tag = "type", rename_all = "snake_case")]
     pub enum LogEvent {
         Log4j(Log4jEvent),
@@ -321,6 +385,7 @@ mod log_types {
     }
 
     #[derive(Serialize, Clone)]
+    #[cfg_attr(feature = "export-ts", derive(ts_rs::TS))]
     pub struct LogPayload {
         pub instance_id: String,
         #[serde(flatten)]

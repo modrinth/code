@@ -59,6 +59,11 @@ apps/frontend/src/generated
 .turbo
 target
 generated
+!apps/app-frontend/src/generated/
+!apps/app-frontend/src/generated/app-events/
+!apps/app-frontend/src/generated/app-events/*.ts
+!apps/app-frontend/src/generated/app-events/.manifest
+!apps/app-frontend/src/generated/app-events/README.md
 .env
 
 # app testing dir
