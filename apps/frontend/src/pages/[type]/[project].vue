@@ -2008,7 +2008,7 @@ const navLinks = computed(() => {
 			shown:
 				hasVersions.value &&
 				projectV3Loaded.value &&
-				projectV3.value?.minecraft_server === undefined,
+				projectV3.value?.minecraft_server == null,
 			onHover: loadVersions,
 		},
 		{
@@ -2017,7 +2017,7 @@ const navLinks = computed(() => {
 			shown:
 				(hasVersions.value || !!currentMember.value) &&
 				projectV3Loaded.value &&
-				projectV3.value?.minecraft_server === undefined,
+				projectV3.value?.minecraft_server == null,
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
 		},
