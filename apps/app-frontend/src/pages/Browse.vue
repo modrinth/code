@@ -56,11 +56,7 @@ import {
 	instanceKeys,
 	instanceLinkedProjectQueryOptions,
 } from '@/pages/instance/query-options'
-import {
-	type BreadcrumbDefinition,
-	useBreadcrumb,
-	useRootBreadcrumb,
-} from '@/providers/breadcrumbs'
+import { type BreadcrumbDefinition, injectBreadcrumbManager } from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {
@@ -177,45 +173,46 @@ const isServerInstance = computed(
 	() => linkedInstanceProjectQuery.data.value?.minecraft_server != null,
 )
 
-const instanceBreadcrumb = route.query.i
-	? useBreadcrumb({
-			slot: 'instance',
-			id: () => `instance:${String(displayedBrowseRoute.value.query.i ?? '')}`,
-			label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
-			visual: () => ({
-				type: 'image',
-				src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
-				alt: instance.value?.name,
-				tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
-			}),
-			to: () => {
-				const instancePath = `/instance/${encodeURIComponent(
-					String(displayedBrowseRoute.value.query.i ?? ''),
-				)}`
-				return displayedBrowseRoute.value.query.from === 'worlds'
-					? `${instancePath}/worlds`
-					: instancePath
-			},
-		})
-	: undefined
+const breadcrumbManager = injectBreadcrumbManager()
+const instanceBreadcrumbDefinition = {
+	slot: 'instance',
+	id: () => `instance:${String(displayedBrowseRoute.value.query.i ?? '')}`,
+	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: () => ({
+		type: 'image' as const,
+		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		alt: instance.value?.name,
+		tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
+	}),
+	to: () => {
+		const instancePath = `/instance/${encodeURIComponent(
+			String(displayedBrowseRoute.value.query.i ?? ''),
+		)}`
+		return displayedBrowseRoute.value.query.from === 'worlds'
+			? `${instancePath}/worlds`
+			: instancePath
+	},
+} satisfies BreadcrumbDefinition
+const serversBreadcrumbDefinition = {
+	slot: 'root',
+	id: 'servers',
+	label: () => formatMessage(commonMessages.serversLabel),
+	to: '/hosting/manage/',
+	visual: { type: 'icon', component: ServerStackIcon },
+} satisfies BreadcrumbDefinition
 const serverBreadcrumbTo = ref(serverBackUrl.value)
 watch(serverBackUrl, (value) => {
 	if (route.path.startsWith('/browse/')) {
 		serverBreadcrumbTo.value = value
 	}
 })
-const serverBreadcrumb =
-	!instanceBreadcrumb && serverIdQuery.value
-		? useBreadcrumb({
-				slot: 'server',
-				id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
-				label: () =>
-					serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
-				visual: { type: 'icon', component: ServerStackIcon },
-				to: serverBreadcrumbTo,
-			})
-		: undefined
-const breadcrumbParent = instanceBreadcrumb ?? serverBreadcrumb
+const serverBreadcrumbDefinition = {
+	slot: 'server',
+	id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
+	label: () => serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: { type: 'icon', component: ServerStackIcon },
+	to: serverBreadcrumbTo,
+} satisfies BreadcrumbDefinition
 const breadcrumbDefinition = {
 	slot: 'browse',
 	id: () =>
@@ -228,9 +225,27 @@ const breadcrumbDefinition = {
 	to: () => displayedBrowseRoute.value.fullPath,
 	visual: { type: 'icon', component: CompassIcon },
 } satisfies BreadcrumbDefinition
-const browseBreadcrumb = breadcrumbParent
-	? useBreadcrumb(breadcrumbDefinition, { parent: breadcrumbParent })
-	: useRootBreadcrumb(breadcrumbDefinition)
+
+function syncBreadcrumbs() {
+	if (displayedBrowseRoute.value.query.i) {
+		const instanceBreadcrumb = breadcrumbManager.reset(instanceBreadcrumbDefinition)
+		breadcrumbManager.push(breadcrumbDefinition, { parent: instanceBreadcrumb })
+		return
+	}
+
+	if (displayedBrowseRoute.value.query.sid) {
+		const serversBreadcrumb = breadcrumbManager.reset(serversBreadcrumbDefinition)
+		const serverBreadcrumb = breadcrumbManager.push(serverBreadcrumbDefinition, {
+			parent: serversBreadcrumb,
+		})
+		breadcrumbManager.push(breadcrumbDefinition, { parent: serverBreadcrumb })
+		return
+	}
+
+	breadcrumbManager.reset(breadcrumbDefinition)
+}
+
+watch(displayedBrowseRoute, syncBreadcrumbs, { immediate: true, flush: 'sync' })
 
 debugLog('fetching tags (categories, loaders, gameVersions)')
 const [categories, loaders, availableGameVersions] = await Promise.all([
@@ -595,6 +610,7 @@ function resetInstanceContext() {
 	newlyInstalled.value = []
 	hiddenInstanceProjectIds.value = new Set()
 	hiddenInstanceProjectIdsInitialized.value = false
+	isServerInstance.value = false
 	browseBreadcrumb.reset()
 	void refreshInstalledProjectIds()
 }
