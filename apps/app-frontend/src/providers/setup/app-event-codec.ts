@@ -1,5 +1,5 @@
-import { deserialize } from '@/generated/app-events/postcard'
 import type { AppEvent } from '@/generated/app-events/AppEvent'
+import { deserialize } from '@/generated/app-events/postcard'
 
 type WireObject = Record<string, unknown>
 
