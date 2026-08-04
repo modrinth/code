@@ -95,6 +95,7 @@ interface Props {
 	ariaLabel?: string
 	getItemId?: (item: ContentItem) => string
 	toggleItems?: ContentItem[]
+	hideWhenModalOpen?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -111,6 +112,7 @@ const props = withDefaults(defineProps<Props>(), {
 	ariaLabel: undefined,
 	getItemId: undefined,
 	toggleItems: undefined,
+	hideWhenModalOpen: true,
 })
 
 const emit = defineEmits<{
@@ -181,7 +183,11 @@ const bulkProgressMessage = computed(() => {
 </script>
 
 <template>
-	<FloatingActionBar :shown="shown" :aria-label="ariaLabel" hide-when-modal-open>
+	<FloatingActionBar
+		:shown="shown"
+		:aria-label="ariaLabel"
+		:hide-when-modal-open="hideWhenModalOpen"
+	>
 		<div class="flex items-center gap-0.5">
 			<div
 				v-if="selectedItems.length > 0"
