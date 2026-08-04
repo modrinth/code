@@ -114,6 +114,7 @@ debug('initial route.params.type:', route.params.type, '→ currentType:', curre
 const isServerType = computed(() => currentType.value === 'server')
 
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
+const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 watch(
 	() => projectType.value?.id,
@@ -422,8 +423,6 @@ const advancedFiltersCollapsed = computed({
 		saveFeatureFlags()
 	},
 })
-
-const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 debug('projectTypeId:', projectTypeId.value)
 watch(projectTypeId, (val) => debug('projectTypeId changed:', val))

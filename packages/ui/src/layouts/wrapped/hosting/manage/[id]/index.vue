@@ -158,12 +158,12 @@
 									{{ formatLoaderLabel(serverData.loader) }} {{ serverData.mc_version }}
 								</PageHeaderMetadataItem>
 								<PageHeaderMetadataItem
-									v-if="serverData.net?.domain && !serverPreferences.hideSubdomainLabel"
+									v-if="showServerAddress"
 									:icon="LinkIcon"
 									tooltip="Copy server address"
 									:action="copyServerAddress"
 								>
-									{{ serverData.net.domain }}.modrinth.gg
+									{{ serverAddress }}
 								</PageHeaderMetadataItem>
 								<PageHeaderMetadataItem v-if="showServerUptime" :icon="TimerIcon">
 									{{ formattedUptime }}
@@ -183,7 +183,10 @@
 
 					<template #actions>
 						<PageHeaderActions>
-							<PanelServerActionButton :disabled="!!installError" />
+							<PanelServerActionButton
+								:disabled="!!installError"
+								:worlds="serverFull?.worlds ?? []"
+							/>
 							<Tooltip
 								theme="dismissable-prompt"
 								:triggers="[]"
@@ -1070,6 +1073,22 @@ const showServerUptime = computed(() => props.showUptime && serverPowerState.val
 
 const formattedUptime = computed(() => formatUptime(uptimeSeconds.value))
 
+const serverAddress = computed(() => {
+	const domain = serverData.value?.net?.domain
+	if (domain) return `${domain}.modrinth.gg`
+
+	const ip = serverData.value?.net?.ip
+	if (!ip) return null
+	const port = serverData.value?.net?.port
+	return port ? `${ip}:${port}` : ip
+})
+
+const showServerAddress = computed(
+	() =>
+		!!serverAddress.value &&
+		(!serverData.value?.net?.domain || !serverPreferences.value.hideSubdomainLabel),
+)
+
 const serverProjectLink = computed(() => {
 	if (!serverProject.value) return ''
 	return `/project/${serverProject.value.slug ?? serverProject.value.id}`
@@ -1105,10 +1124,9 @@ function formatUptime(uptime: number) {
 }
 
 function copyServerAddress() {
-	const domain = serverData.value?.net?.domain
-	if (!domain) return
+	if (!serverAddress.value) return
 
-	void navigator.clipboard.writeText(`${domain}.modrinth.gg`)
+	void navigator.clipboard.writeText(serverAddress.value)
 	addNotification({
 		title: 'Server address copied',
 		text: "Your server's address has been copied to your clipboard.",

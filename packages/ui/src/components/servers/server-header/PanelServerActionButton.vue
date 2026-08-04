@@ -8,7 +8,17 @@
 			</ButtonStyled>
 
 			<template v-else-if="showRestartButton">
-				<ButtonStyled type="standard" color="orange" :size="size">
+				<JoinedButtons
+					v-if="powerActionWorlds.length"
+					color="orange"
+					:size="size"
+					:actions="restartSplitActions"
+					:primary-disabled="!canTakeAction"
+					:dropdown-disabled="!canTakeAction"
+					:primary-tooltip="busyTooltip"
+					:dropdown-tooltip="busyTooltip"
+				/>
+				<ButtonStyled v-else type="standard" color="orange" :size="size">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<UpdatedIcon />
 						<span>{{ primaryActionText }}</span>
@@ -49,7 +59,17 @@
 			</template>
 
 			<template v-else>
-				<ButtonStyled type="standard" color="brand" :size="size">
+				<JoinedButtons
+					v-if="powerActionWorlds.length"
+					color="brand"
+					:size="size"
+					:actions="startSplitActions"
+					:primary-disabled="!canTakeAction"
+					:dropdown-disabled="!canTakeAction"
+					:primary-tooltip="busyTooltip"
+					:dropdown-tooltip="busyTooltip"
+				/>
+				<ButtonStyled v-else type="standard" color="brand" :size="size">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<PlayIcon />
 						<span>{{ startActionText }}</span>
@@ -79,11 +99,13 @@ const props = withDefaults(
 		disabled?: boolean
 		size?: 'standard' | 'large' | 'small'
 		startLabel?: string
+		worlds?: { id: string; name: string }[]
 	}>(),
 	{
 		disabled: false,
 		size: 'large',
 		startLabel: 'Start',
+		worlds: () => [],
 	},
 )
 
@@ -105,6 +127,37 @@ const size = computed(() => props.size)
 const startActionText = computed(() =>
 	primaryActionText.value === 'Start' ? props.startLabel : primaryActionText.value,
 )
+const powerActionWorlds = computed(() => (props.worlds.length > 1 ? props.worlds : []))
+
+const startSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'start',
+		label: startActionText.value,
+		icon: PlayIcon,
+		action: handlePrimaryAction,
+	},
+	...powerActionWorlds.value.map((world) => ({
+		id: `start-${world.id}`,
+		label: `Start with ${world.name}`,
+		icon: PlayIcon,
+		action: () => initiateAction('Start', world.id),
+	})),
+])
+
+const restartSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'restart',
+		label: primaryActionText.value,
+		icon: UpdatedIcon,
+		action: handlePrimaryAction,
+	},
+	...powerActionWorlds.value.map((world) => ({
+		id: `restart-${world.id}`,
+		label: `Restart with ${world.name}`,
+		icon: UpdatedIcon,
+		action: () => initiateAction('Restart', world.id),
+	})),
+])
 
 const stopSplitActions = computed<JoinedButtonAction[]>(() => [
 	{
