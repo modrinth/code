@@ -12,10 +12,10 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
-	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
 	StyledInput,
+	TeleportPopoutMenu,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -611,6 +611,8 @@ watch(totalPages, (pages) => {
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
 					:options="responseFilterTypes"
+					trigger-type="base"
+					trigger-size="lg"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -625,6 +627,8 @@ watch(totalPages, (pages) => {
 					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
 					:placeholder="formatMessage(commonMessages.sortByLabel)"
+					trigger-type="base"
+					trigger-size="lg"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -638,8 +642,11 @@ watch(totalPages, (pages) => {
 					</template>
 				</Combobox>
 
-				<FloatingPanel button-class="!h-10 !shadow-none !text-contrast">
-					<BlendIcon class="size-5" /> Advanced filters
+				<TeleportPopoutMenu label="Advanced filters" size="lg">
+					<template #trigger>
+						<BlendIcon aria-hidden="true" />
+						Advanced filters
+					</template>
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
@@ -684,7 +691,7 @@ watch(totalPages, (pages) => {
 							</div>
 						</div>
 					</template>
-				</FloatingPanel>
+				</TeleportPopoutMenu>
 			</div>
 		</div>
 

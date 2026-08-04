@@ -183,46 +183,53 @@
 			</div>
 
 			<div v-if="noticeButtons" class="flex gap-2">
-				<ButtonStyled
+				<IconButton
 					v-if="noticeButtons.downloadBackup && onDownloadBackup && isBackupDownloadEnabled"
+					v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
 					type="outlined"
-					circular
+					:label="formatMessage(messages.downloadLatestBackupTooltip)"
+					data-server-listing-button
+					@click="onDownloadBackup"
 				>
-					<button
-						v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
-						data-server-listing-button
-						@click="onDownloadBackup"
-					>
-						<DownloadIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="noticeButtons.copyId" type="outlined">
-					<button
-						v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
-						data-server-listing-button
-						@click="copyToClipboard(server_id)"
-					>
-						<template v-if="copied">
-							{{ formatMessage(messages.copiedLabel) }} <CheckIcon class="text-green" />
-						</template>
-						<template v-else> {{ formatMessage(messages.copyIdLabel) }} <CopyIcon /> </template>
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="noticeButtons.support">
-					<a href="https://support.modrinth.com/en/" target="_blank" data-server-listing-button
-						><MessagesSquareIcon /> {{ formatMessage(messages.supportLabel) }}
-					</a>
-				</ButtonStyled>
-				<ButtonStyled v-if="noticeButtons.manageBilling" color="brand">
-					<AutoLink :to="`/settings/billing#server-${server_id}`" data-server-listing-button>
-						<CardIcon /> {{ formatMessage(messages.manageBillingLabel) }}
-					</AutoLink>
-				</ButtonStyled>
-				<ButtonStyled v-if="noticeButtons.resubscribe && onResubscribe" color="brand">
-					<button data-server-listing-button @click="onResubscribe">
-						<RotateCounterClockwiseIcon /> {{ formatMessage(messages.resubscribeLabel) }}
-					</button>
-				</ButtonStyled>
+					<DownloadIcon />
+				</IconButton>
+				<Button
+					v-if="noticeButtons.copyId"
+					v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
+					type="outlined"
+					data-server-listing-button
+					@click="copyToClipboard(server_id)"
+				>
+					<template v-if="copied">
+						{{ formatMessage(messages.copiedLabel) }} <CheckIcon class="text-green" />
+					</template>
+					<template v-else> {{ formatMessage(messages.copyIdLabel) }} <CopyIcon /> </template>
+				</Button>
+				<ButtonLink
+					v-if="noticeButtons.support"
+					href="https://support.modrinth.com/en/"
+					target="_blank"
+					data-server-listing-button
+					><MessagesSquareIcon /> {{ formatMessage(messages.supportLabel) }}
+				</ButtonLink>
+				<ButtonLink
+					v-if="noticeButtons.manageBilling"
+					type="colored"
+					color="brand"
+					:to="`/settings/billing#server-${server_id}`"
+					data-server-listing-button
+				>
+					<CardIcon /> {{ formatMessage(messages.manageBillingLabel) }}
+				</ButtonLink>
+				<Button
+					v-if="noticeButtons.resubscribe && onResubscribe"
+					type="colored"
+					color="brand"
+					data-server-listing-button
+					@click="onResubscribe"
+				>
+					<RotateCounterClockwiseIcon /> {{ formatMessage(messages.resubscribeLabel) }}
+				</Button>
 			</div>
 		</div>
 
@@ -261,10 +268,11 @@ import {
 	SparklesIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 
 import {
 	CardIcon,

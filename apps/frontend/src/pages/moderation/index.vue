@@ -18,7 +18,8 @@
 					<Combobox
 						v-model="currentFilterType"
 						class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="filterTypes"
 						:placeholder="formatMessage(commonMessages.filterByLabel)"
 						@select="goToPage(1)"
@@ -36,7 +37,8 @@
 					<Combobox
 						v-model="currentSortType"
 						class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="sortTypes"
 						:placeholder="formatMessage(commonMessages.sortByLabel)"
 						@select="goToPage(1)"
@@ -56,7 +58,8 @@
 					<Combobox
 						v-model="itemsPerPage"
 						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="itemsPerPageOptions"
 						placeholder="Items per page"
 						@select="goToPage(1)"
@@ -69,17 +72,17 @@
 					</Combobox>
 				</div>
 
-				<ButtonStyled color="orange">
-					<button
-						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
-						:disabled="pending || paginatedProjects?.length === 0"
-						@click="moderateAllInFilter()"
-					>
-						<ScaleIcon class="flex-shrink-0" />
-						<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
-						<span class="sm:hidden">Moderate</span>
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="orange"
+					class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+					:disabled="pending || paginatedProjects?.length === 0"
+					@click="moderateAllInFilter()"
+				>
+					<ScaleIcon class="flex-shrink-0" />
+					<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
+					<span class="sm:hidden">Moderate</span>
+				</Button>
 			</div>
 		</div>
 
@@ -139,8 +142,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,

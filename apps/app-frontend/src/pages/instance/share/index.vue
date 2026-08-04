@@ -55,20 +55,7 @@
 
 		<div v-else-if="membersTableLoading" class="h-64" aria-hidden="true" />
 
-		<SharedInstanceMembersTable
-			v-else-if="showMembersTable"
-			:rows="members.rows.value"
-			:actions-locked="sharedInstanceActionsLocked"
-			:invite-disabled="!hasRemainingUserSlots"
-			:invite-pending="inviteLink.pending.value"
-			:push-update-disabled="
-				instance.install_stage !== 'installed' || publishState !== 'idle' || !!offline
-			"
-			:push-update-pending="publishState !== 'idle'"
-			@invite="showInvitePlayers"
-			@remove="showRemoveMemberModal"
-			@push-update="reviewUpdate"
-		/>
+		<SharedInstanceMembersTable v-else-if="showMembersTable" />
 
 		<SharedInstanceShareEmptyState
 			v-else-if="sharedInstanceUnavailable"
@@ -109,11 +96,9 @@
 				</span>
 			</template>
 			<template #actions>
-				<ButtonStyled color="brand"
-					><button class="!h-10" @click="signInToShare">
-						<LogInIcon aria-hidden="true" />{{ formatMessage(lockedActionButton) }}
-					</button></ButtonStyled
-				>
+				<Button type="colored" color="brand" size="lg" @click="signInToShare">
+					<LogInIcon aria-hidden="true" />{{ formatMessage(lockedActionButton) }}
+				</Button>
 			</template>
 		</SharedInstanceShareEmptyState>
 
@@ -123,21 +108,21 @@
 			:description="formatMessage(messages.noFriendsInvitedDescription)"
 		>
 			<template #actions>
-				<ButtonStyled color="brand"
-					><button
-						class="!h-10"
-						:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
-						@click="showInvitePlayers($event)"
-					>
-						<SpinnerIcon
-							v-if="inviteLink.pending.value"
-							class="animate-spin"
-							aria-hidden="true"
-						/><UserPlusIcon v-else aria-hidden="true" />{{
-							formatMessage(messages.inviteFriendsButton)
-						}}
-					</button></ButtonStyled
+				<Button
+					type="colored"
+					color="brand"
+					size="lg"
+					:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
+					@click="showInvitePlayers($event)"
 				>
+					<SpinnerIcon
+						v-if="inviteLink.pending.value"
+						class="animate-spin"
+						aria-hidden="true"
+					/><UserPlusIcon v-else aria-hidden="true" />{{
+						formatMessage(messages.inviteFriendsButton)
+					}}
+				</Button>
 			</template>
 		</SharedInstanceShareEmptyState>
 	</div>
@@ -147,7 +132,7 @@
 import { LogInIcon, SpinnerIcon, UserPlusIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	ConfirmUnlinkModal,
 	defineMessages,
 	injectAuth,
@@ -156,8 +141,8 @@ import {
 	type InvitePlayersUser,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, toRef, watch } from 'vue'
+import { useQueryClient } from '@tanstack/vue-query'
+import { computed, ref, watch } from 'vue'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
@@ -166,16 +151,16 @@ import {
 	isSharedInstancesApiError,
 	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
-import { can_current_user_use_shared_instances, edit } from '@/helpers/instance'
+import { edit } from '@/helpers/instance'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import {
 	sharedInstanceErrorMessages,
 	useSharedInstanceErrors,
 } from '@/helpers/shared-instance-errors'
-import type { GameInstance } from '@/helpers/types'
-import { provideInstanceBackup } from '@/providers/instance-backup'
 
-import { injectSharedInstanceState } from '../use-shared-instance-state'
+import { injectInstancePage } from '../instance-context'
+import { injectSharedInstance } from '../shared-instance-context'
+import { provideSharedInstanceManagement } from './shared-instance-management-context'
 import SharedInstanceMembersTable from './shared-instance-members-table.vue'
 import SharedInstanceRemoveMemberModal from './shared-instance-remove-member-modal.vue'
 import SharedInstanceShareEmptyState from './shared-instance-share-empty-state.vue'
@@ -184,10 +169,7 @@ import { useSharedInstanceInviteCandidates } from './use-shared-instance-invite-
 import { useSharedInstanceInviteLink } from './use-shared-instance-invite-link'
 import { useSharedInstanceMembers } from './use-shared-instance-members'
 
-const props = defineProps<{
-	instance: GameInstance
-	offline?: boolean
-}>()
+const instancePage = injectInstancePage()
 const auth = injectAuth()
 const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
@@ -196,8 +178,9 @@ const {
 	notifySharedInstanceError,
 	notifySharedInstanceUnavailable,
 } = useSharedInstanceErrors()
-const sharedInstanceState = injectSharedInstanceState()
-const instance = toRef(props, 'instance')
+const sharedInstanceState = injectSharedInstance()
+const instance = computed(() => instancePage.instance.value!)
+const offline = instancePage.offline
 const actionsLocked = sharedInstanceState.shareActionsLocked
 const sharedInstanceActionsLocked = actionsLocked
 const currentUserId = computed(() => auth.user.value?.id ?? null)
@@ -224,16 +207,7 @@ function notifyOperationError(error: unknown) {
 	}
 }
 
-const eligibilityQuery = useQuery({
-	queryKey: computed(() => ['shared-instance-eligibility', currentUserId.value]),
-	queryFn: can_current_user_use_shared_instances,
-	enabled: () => isSignedIn.value && !!currentUserId.value,
-	retry: false,
-	staleTime: Infinity,
-	refetchOnMount: 'always',
-	refetchOnWindowFocus: false,
-	refetchOnReconnect: false,
-})
+const eligibilityQuery = sharedInstanceState.eligibilityQuery
 
 const members = useSharedInstanceMembers({
 	instance,
@@ -257,7 +231,7 @@ const {
 	actionsLocked,
 })
 const inviteLink = useSharedInstanceInviteLink(
-	computed(() => props.instance.id),
+	computed(() => instance.value.id),
 	remainingUserSlots,
 	notifyOperationError,
 )
@@ -286,7 +260,7 @@ const unableToConnect = computed(
 const membersTableLoading = computed(
 	() =>
 		members.rows.value.length === 0 &&
-		!!props.instance.shared_instance &&
+		!!instance.value.shared_instance &&
 		(members.query.data.value === undefined || members.query.isFetching.value) &&
 		!sharedInstanceUnavailable.value &&
 		!sharedInstanceActionsLocked.value,
@@ -294,7 +268,7 @@ const membersTableLoading = computed(
 const showMembersTable = computed(
 	() =>
 		members.rows.value.length > 0 ||
-		(!!props.instance.shared_instance &&
+		(!!instance.value.shared_instance &&
 			members.query.data.value !== undefined &&
 			!members.query.isFetching.value &&
 			!sharedInstanceUnavailable.value &&
@@ -302,13 +276,13 @@ const showMembersTable = computed(
 )
 const requiresUnlink = computed(
 	() =>
-		props.instance.link?.type === 'imported_modpack' &&
-		!props.instance.shared_instance &&
+		instance.value.link?.type === 'imported_modpack' &&
+		!instance.value.shared_instance &&
 		!importedModpackUnlinked.value,
 )
 const importedModpackBackupTip = computed(() =>
-	props.instance.link?.type === 'imported_modpack'
-		? (props.instance.link.name ?? props.instance.link.filename ?? undefined)
+	instance.value.link?.type === 'imported_modpack'
+		? (instance.value.link.name ?? instance.value.link.filename ?? undefined)
 		: undefined,
 )
 
@@ -395,9 +369,9 @@ async function showInvitePlayers(event?: MouseEvent) {
 }
 async function unlinkImportedModpack() {
 	try {
-		await edit(props.instance.id, { link: null as unknown as undefined })
+		await edit(instance.value.id, { link: null as unknown as undefined })
 		importedModpackUnlinked.value = true
-		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', props.instance.id] })
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
 		if (await inviteLink.ensure()) invitePlayersModal.value?.show()
 	} catch (error) {
 		notifyOperationError(error)
@@ -419,7 +393,7 @@ function userProfileLink(username: string) {
 	return !username || username.includes('@') ? undefined : `/user/${encodeURIComponent(username)}`
 }
 async function requestAuth(flow: ModrinthAuthFlow) {
-	await auth.requestSignIn(`/instance/${encodeURIComponent(props.instance.id)}/share`, flow, {
+	await auth.requestSignIn(`/instance/${encodeURIComponent(instance.value.id)}/share`, flow, {
 		showModal: false,
 	})
 	return !!auth.session_token.value
@@ -427,6 +401,23 @@ async function requestAuth(flow: ModrinthAuthFlow) {
 function signInToShare(event?: MouseEvent) {
 	void accountRequiredModal.value?.show(event)
 }
+
+provideSharedInstanceManagement({
+	rows: members.rows,
+	actionsLocked: sharedInstanceActionsLocked,
+	inviteDisabled: computed(() => !hasRemainingUserSlots.value),
+	invitePending: inviteLink.pending,
+	pushUpdateDisabled: computed(
+		() =>
+			instance.value.install_stage !== 'installed' ||
+			publishState.value !== 'idle' ||
+			offline.value,
+	),
+	pushUpdatePending: computed(() => publishState.value !== 'idle'),
+	invite: (event) => void showInvitePlayers(event),
+	remove: showRemoveMemberModal,
+	pushUpdate: reviewUpdate,
+})
 
 watch(
 	[eligibilityQuery.error, members.query.error],
@@ -443,7 +434,7 @@ watch([eligibilityQuery.data, members.query.data], ([eligibility, memberRows]) =
 	}
 })
 watch(
-	() => props.instance.id,
+	() => instance.value.id,
 	() => {
 		importedModpackUnlinked.value = false
 	},
@@ -455,6 +446,4 @@ watch(
 	},
 	{ immediate: true, flush: 'post' },
 )
-
-provideInstanceBackup(() => props.instance)
 </script>

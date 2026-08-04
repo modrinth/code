@@ -9,6 +9,9 @@
 		:min-date="ANALYTICS_START_DATE_INPUT_VALUE"
 		:now-timestamp="queryRefreshTimestamp"
 		:trigger-class="triggerClass"
+		:trigger-type="triggerType"
+		:trigger-size="triggerSize"
+		:trigger-interaction="triggerInteraction"
 		@open="handleTimeframeOpen"
 		@commit="handleTimeframeCommit"
 		@apply="handleTimeframeApply"
@@ -23,6 +26,9 @@
 
 <script setup lang="ts">
 import {
+	type ButtonInteraction,
+	type ButtonSize,
+	type ButtonType,
 	type ComboboxOption,
 	TimeFramePicker as BaseTimeFramePicker,
 	type TimeFramePickerSelection,
@@ -58,6 +64,9 @@ const {
 
 defineProps<{
 	triggerClass?: string
+	triggerType?: ButtonType
+	triggerSize?: ButtonSize
+	triggerInteraction?: ButtonInteraction
 }>()
 
 const draftSelectedGroupBy = ref(selectedGroupBy.value)

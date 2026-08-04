@@ -55,10 +55,14 @@
 						no-auto-focus
 					>
 						<span class="my-auto align-middle"
-							><ButtonStyled circular type="outlined" size="small">
-								<button class="align-middle" @click="cancelPayout">
-									<XIcon />
-								</button> </ButtonStyled
+							><IconButton
+								type="outlined"
+								size="xs"
+								label="Button"
+								class="!size-6 align-middle"
+								@click="cancelPayout"
+							>
+								<XIcon /> </IconButton
 						></span>
 						<template #popper>
 							<div class="font-semibold text-contrast">Cancel transaction</div>
@@ -82,8 +86,8 @@ import {
 } from '@modrinth/assets'
 import {
 	BulletDivider,
-	ButtonStyled,
 	getCurrencyIcon,
+	IconButton,
 	injectNotificationManager,
 	useFormatDateTime,
 	useFormatMoney,

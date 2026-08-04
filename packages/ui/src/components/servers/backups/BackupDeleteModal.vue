@@ -60,22 +60,20 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button
-						v-tooltip="deleteDisabledTooltip"
-						:disabled="!props.canDelete"
-						@click="confirmDelete"
-					>
-						<TrashIcon />
-						{{ formatMessage(messages.confirm, { count }) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="deleteDisabledTooltip"
+					type="colored"
+					color="red"
+					:disabled="!props.canDelete"
+					@click="confirmDelete"
+				>
+					<TrashIcon />
+					{{ formatMessage(messages.confirm, { count }) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -86,11 +84,12 @@ import type { Archon } from '@modrinth/api-client'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { useScrollIndicator } from '../../../composables/scroll-indicator'
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 

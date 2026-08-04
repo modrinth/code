@@ -21,20 +21,22 @@
 				</span>
 			</div>
 		</div>
-		<ButtonStyled color="medal-promo" type="outlined" size="large">
-			<nuxt-link
-				to="https://medal.tv/modrinth"
-				class="z-10 my-auto mt-2 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto"
-				>{{ formatMessage(messages.learnMoreButton) }} <ExternalIcon
-			/></nuxt-link>
-		</ButtonStyled>
+		<ButtonLink
+			type="outlined"
+			size="xl"
+			href="https://medal.tv/modrinth"
+			class="z-10 my-auto mt-2 w-full md:mt-0 md:w-auto"
+		>
+			{{ formatMessage(messages.learnMoreButton) }}
+			<ExternalIcon aria-hidden="true" />
+		</ButtonLink>
 	</div>
 </template>
 
 <script lang="ts" setup>
 import { ExternalIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	ButtonLink,
 	defineMessages,
 	IntlFormatted,
 	MedalBackgroundImage,

@@ -54,19 +54,17 @@
 				<p class="m-0 text-secondary text-sm">
 					{{ formatMessage(messages.lockedDescription) }}
 				</p>
-				<ButtonStyled>
-					<button
-						class="w-fit"
-						@click="
-							() => {
-								overriddenProvidedFilterTypes.push(filterType.id)
-							}
-						"
-					>
-						<LockOpenIcon />
-						{{ formatMessage(messages.unlockFilterButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					class="w-fit"
+					@click="
+						() => {
+							overriddenProvidedFilterTypes.push(filterType.id)
+						}
+					"
+				>
+					<LockOpenIcon />
+					{{ formatMessage(messages.unlockFilterButton) }}
+				</Button>
 			</div>
 		</template>
 		<template v-else #default>
@@ -157,25 +155,23 @@
 					@update:model-value="toggleGroup(group.id)"
 				/>
 				<div v-if="hasProvidedFilter" class="mt-2 mx-1">
-					<ButtonStyled>
-						<button
-							class="w-fit"
-							@click="
-								() => {
-									overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
-										(id) => id !== filterType.id,
-									)
-									accordion?.close()
-									clearFilters()
-								}
-							"
-						>
-							<UpdatedIcon />
-							<slot name="sync-button">
-								{{ formatMessage(messages.syncFilterButton) }}
-							</slot>
-						</button>
-					</ButtonStyled>
+					<Button
+						class="w-fit"
+						@click="
+							() => {
+								overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
+									(id) => id !== filterType.id,
+								)
+								accordion?.close()
+								clearFilters()
+							}
+						"
+					>
+						<UpdatedIcon />
+						<slot name="sync-button">
+							{{ formatMessage(messages.syncFilterButton) }}
+						</slot>
+					</Button>
 				</div>
 			</div>
 		</template>
@@ -186,10 +182,11 @@
 import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'

@@ -9,6 +9,7 @@
 				v-model:custom-start-date="timeframeCustomStartDate"
 				v-model:custom-end-date="timeframeCustomEndDate"
 				:class="timeframePickerClass"
+				trigger-size="lg"
 				:trigger-class="timeframePickerTriggerClass"
 			/>
 			<template v-if="slots.filters">
@@ -363,7 +364,7 @@ const timeframePickerClass = computed(() =>
 	slots.filters ? '!w-full @[640px]:!w-[225px] shrink-0' : '!w-full @[640px]:!w-[225px]',
 )
 const timeframePickerTriggerClass =
-	'!h-10 !min-h-10 !w-full !rounded-[14px] !bg-surface-4 !py-2.5 !pl-4 !pr-3 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]'
+	'!w-full !rounded-[14px] !bg-surface-4 !py-2.5 !pl-4 !pr-3 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]'
 
 onMounted(() => {
 	updateLoadMoreObserver()

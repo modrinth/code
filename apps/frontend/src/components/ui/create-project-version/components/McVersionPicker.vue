@@ -26,36 +26,60 @@
 			<div v-for="group in groupedGameVersions" :key="group.key" class="space-y-1.5">
 				<span class="font-semibold">{{ group.key }}</span>
 				<div class="flex flex-wrap gap-2 gap-x-1.5">
-					<ButtonStyled
+					<Button
 						v-for="version in group.versions"
 						:key="version"
+						:type="
+							modelValue.includes(version) || (holdingShift && version === anchorVersion)
+								? 'colored'
+								: 'base'
+						"
 						:color="
-							holdingShift && version === anchorVersion
+							(holdingShift && version === anchorVersion
 								? 'purple'
 								: modelValue.includes(version)
 									? 'green'
-									: 'standard'
+									: 'standard') &&
+							(holdingShift && version === anchorVersion
+								? 'purple'
+								: modelValue.includes(version)
+									? 'green'
+									: 'standard') !== 'standard'
+								? (holdingShift && version === anchorVersion
+										? 'purple'
+										: modelValue.includes(version)
+											? 'green'
+											: 'standard') === 'medal-promo'
+									? 'medal_promotion'
+									: holdingShift && version === anchorVersion
+										? 'purple'
+										: modelValue.includes(version)
+											? 'green'
+											: 'standard'
+								: undefined
 						"
-						:highlighted="modelValue.includes(version)"
-						type="chip"
-					>
-						<button
-							class="!py-1.5 focus:outline-none"
-							:class="[
+						class="!py-1.5 focus:outline-none"
+						:class="[
+							[
 								versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16',
 								modelValue.includes(version) ? '!text-contrast' : '',
-							]"
-							:disabled="disabled"
-							@click="() => handleToggleVersion(version)"
-							@blur="
-								() => {
-									if (!holdingShift) anchorVersion = ''
-								}
-							"
-						>
-							{{ version }}
-						</button>
-					</ButtonStyled>
+							],
+							modelValue.includes(version)
+								? true
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: '',
+						]"
+						:disabled="disabled"
+						@click="() => handleToggleVersion(version)"
+						@blur="
+							() => {
+								if (!holdingShift) anchorVersion = ''
+							}
+						"
+					>
+						{{ version }}
+					</Button>
 				</div>
 			</div>
 
@@ -68,7 +92,7 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, StyledInput } from '@modrinth/ui'
+import { Button, Chips, StyledInput } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 

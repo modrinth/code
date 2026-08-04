@@ -16,6 +16,7 @@
 				:max-tag-rows="1"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
+				trigger-type="base"
 				checkbox-position="right"
 				show-selection-actions
 				@open="handleProjectSelectOpen"
@@ -32,7 +33,7 @@
 							decoding="async"
 						/>
 						<LayersIcon v-else class="size-5 shrink-0 text-primary" />
-						<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary">
+						<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit">
 							{{ selectedProjectLabel }}
 						</span>
 						<ChevronLeftIcon
@@ -145,6 +146,7 @@
 				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 				:display-value="selectedGroupByLabel"
 				:trigger-class="analyticsQueryChipTriggerClass"
+				trigger-type="base"
 			>
 				<template #prefix>
 					<ClockIcon class="size-5 shrink-0 text-primary" />
@@ -160,6 +162,7 @@
 				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
+				trigger-type="base"
 				checkbox-position="right"
 				:placeholder="formatMessage(analyticsMessages.none)"
 				show-selection-actions
@@ -170,7 +173,7 @@
 					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-1.5 pr-1">
 						<BlocksIcon class="size-5 shrink-0 text-primary" />
 						<span
-							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary"
+							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit"
 							:title="mobileSelectedBreakdownLabel"
 						>
 							{{ mobileSelectedBreakdownLabel }}
@@ -191,6 +194,7 @@
 				show-preview-filter-icon
 				:show-clear-action="false"
 				:add-button-class="analyticsQueryAddFilterButtonClass"
+				add-button-size="lg"
 			/>
 		</div>
 
@@ -214,6 +218,7 @@
 						:searchable="projectOptions.length > 6"
 						fuzzy-search
 						:max-tag-rows="1"
+						trigger-type="base"
 						checkbox-position="right"
 						show-selection-actions
 						@open="handleProjectSelectOpen"
@@ -243,7 +248,7 @@
 										class="size-5 shrink-0 text-primary"
 									/>
 									<BoxIcon v-else class="size-5 shrink-0 text-primary" />
-									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary">
+									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-inherit">
 										{{ selectedProjectLabel }}
 									</span>
 								</div>
@@ -372,18 +377,19 @@
 							:options="groupByOptions"
 							:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 							:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+							trigger-type="base"
 						/>
 					</div>
 				</div>
-				<ButtonStyled v-if="!isTimeframeAndGroupByDefault" type="transparent">
-					<button
-						type="button"
-						:disabled="isTimeframeAndGroupByDefault"
-						@click="resetTimeframeAndGroupBy"
-					>
-						{{ formatMessage(analyticsMessages.resetButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="!isTimeframeAndGroupByDefault"
+					type="quiet"
+					native-type="button"
+					:disabled="isTimeframeAndGroupByDefault"
+					@click="resetTimeframeAndGroupBy"
+				>
+					{{ formatMessage(analyticsMessages.resetButton) }}
+				</Button>
 			</div>
 
 			<div class="flex flex-wrap items-start gap-2">
@@ -403,6 +409,7 @@
 									:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 									:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+									trigger-type="base"
 									checkbox-position="right"
 									:placeholder="formatMessage(analyticsMessages.none)"
 									show-selection-actions
@@ -412,7 +419,7 @@
 									<template #input-content="{ isOpen, openDirection }">
 										<div class="flex min-h-7 min-w-0 flex-1 items-center gap-1.5 pr-1">
 											<span
-												class="min-w-0 flex-1 truncate font-semibold text-primary"
+												class="min-w-0 flex-1 truncate font-semibold text-inherit"
 												:title="selectedBreakdownLabel"
 											>
 												{{ selectedBreakdownLabel }}
@@ -453,8 +460,8 @@ import {
 	LayersIcon,
 	UserIcon,
 } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	MultiSelect,
@@ -504,7 +511,7 @@ import TimeFramePicker from './TimeframePicker.vue'
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '14rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
-const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
+const analyticsQueryAddFilterButtonClass = 'max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 type ProjectSelectionPreset = 'user' | 'all'
 

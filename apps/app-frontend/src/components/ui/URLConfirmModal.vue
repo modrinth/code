@@ -1,5 +1,5 @@
 <script setup>
-import { ButtonStyled, injectNotificationManager, ProjectCard } from '@modrinth/ui'
+import { Button, injectNotificationManager, ProjectCard } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -69,9 +69,7 @@ async function install() {
 					</p>
 				</div>
 				<div class="button-group">
-					<ButtonStyled color="brand">
-						<button @click="install">Install</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="install">Install</Button>
 				</div>
 			</div>
 		</div>

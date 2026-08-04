@@ -16,6 +16,7 @@ use crate::ErrorKind;
 use crate::api::pack::install_from::{
     CreatePackLocation, generate_pack_from_file,
     generate_pack_from_version_id_with_reporter, get_instance_from_pack,
+    get_local_pack_instance,
 };
 use crate::api::pack::install_mrpack::install_zipped_mrpack_files_with_reporter;
 use crate::event::InstancePayloadType;
@@ -163,16 +164,6 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.progress.phase = InstallPhaseId::PreparingInstance;
     job.state.progress.progress = None;
     job.state.progress.details = InstallPhaseDetails::Empty;
-    if let Err(error) = prepare_initial_instance(&mut job.state, &state).await {
-        if let Err(cleanup_error) =
-            recovery::apply_cleanup(&job.state, &state).await
-        {
-            tracing::error!(
-                "Error cleaning up install job {job_id} retry preparation: {cleanup_error}"
-            );
-        }
-        return Err(error);
-    }
     job.state.record_event(InstallJobEventKind::JobQueued {
         kind: job.state.request.kind(),
     });
@@ -192,6 +183,42 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
             {
                 tracing::error!(
                     "Error cleaning up unqueued install job {job_id}: {cleanup_error}"
+                );
+            }
+            return Err(error);
+        }
+    };
+    emit_install_job(&record.snapshot()).await?;
+
+    if let Err(error) = prepare_initial_instance(&mut job.state, &state).await {
+        let error_view = install_error_view(
+            job.state.progress.phase,
+            &error,
+            job.state.context.clone(),
+        );
+        if let Err(terminal_error) =
+            terminalize_failed_job(job_id, job.state, error_view, &state).await
+        {
+            tracing::error!(
+                "Failed to terminalize retried install job {job_id}: {terminal_error}"
+            );
+        }
+        return Err(error);
+    }
+    let record = match store::update_state(job_id, &job.state, &state).await {
+        Ok(record) => record,
+        Err(error) => {
+            let error_view = install_error_view(
+                job.state.progress.phase,
+                &error,
+                job.state.context.clone(),
+            );
+            if let Err(terminal_error) =
+                terminalize_failed_job(job_id, job.state, error_view, &state)
+                    .await
+            {
+                tracing::error!(
+                    "Failed to terminalize retried install job {job_id}: {terminal_error}"
                 );
             }
             return Err(error);
@@ -337,31 +364,39 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let id = Uuid::new_v4();
     let mut job_state = InstallJobState::new(request);
+    set_initial_display(&mut job_state);
+    let record =
+        store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
+    emit_install_job(&record.snapshot()).await?;
+
     if let Err(error) = prepare_initial_instance(&mut job_state, &state).await {
-        if let Err(cleanup_error) =
-            recovery::apply_cleanup(&job_state, &state).await
+        let error_view = install_error_view(
+            job_state.progress.phase,
+            &error,
+            job_state.context.clone(),
+        );
+        if let Err(terminal_error) =
+            terminalize_failed_job(id, job_state, error_view, &state).await
         {
             tracing::error!(
-                "Error cleaning up install job preparation: {cleanup_error}"
+                "Failed to terminalize install job {id} after setup error: {terminal_error}"
             );
         }
         return Err(error);
     }
-    let record = match store::insert(
-        id,
-        &job_state,
-        InstallJobStatus::Queued,
-        &state,
-    )
-    .await
-    {
+    let record = match store::update_state(id, &job_state, &state).await {
         Ok(record) => record,
         Err(error) => {
-            if let Err(cleanup_error) =
-                recovery::apply_cleanup(&job_state, &state).await
+            let error_view = install_error_view(
+                job_state.progress.phase,
+                &error,
+                job_state.context.clone(),
+            );
+            if let Err(terminal_error) =
+                terminalize_failed_job(id, job_state, error_view, &state).await
             {
                 tracing::error!(
-                    "Error cleaning up untracked install job {id}: {cleanup_error}"
+                    "Failed to terminalize install job {id} after setup error: {terminal_error}"
                 );
             }
             return Err(error);
@@ -422,7 +457,12 @@ async fn prepare_initial_instance(
             location,
             post_install_edit,
         } => {
-            let preview = get_instance_from_pack(location).await?;
+            let preview = match location {
+                CreatePackLocation::FromFile { path } => {
+                    get_local_pack_instance(&path)
+                }
+                location => get_instance_from_pack(location).await?,
+            };
             let name = post_install_edit
                 .as_ref()
                 .and_then(|edit| edit.name.clone())
@@ -1441,6 +1481,26 @@ fn set_display(
     icon: Option<String>,
 ) {
     job_state.display = Some(InstallJobDisplay { title, icon });
+}
+
+fn set_initial_display(job_state: &mut InstallJobState) {
+    let display = match &job_state.request {
+        InstallRequest::CreateModpackInstance { location, .. } => {
+            match location {
+                CreatePackLocation::FromVersionId {
+                    title, icon_url, ..
+                } => Some((title.clone(), icon_url.clone())),
+                CreatePackLocation::FromFile { path } => {
+                    Some((get_local_pack_instance(path).name, None))
+                }
+            }
+        }
+        _ => None,
+    };
+
+    if let Some((title, icon)) = display {
+        set_display(job_state, title, icon);
+    }
 }
 
 fn install_error_view(

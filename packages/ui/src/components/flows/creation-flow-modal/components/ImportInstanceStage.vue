@@ -5,13 +5,14 @@
 			<span class="font-semibold text-contrast">{{
 				formatMessage(messages.launcherInstancesTitle)
 			}}</span>
-			<ButtonStyled
-				type="transparent"
-				size="small"
+			<Button
+				type="quiet"
+				size="xs"
+				class="!h-6"
 				:class="{ invisible: totalSelectedCount === 0 }"
+				@click="clearAll"
+				>{{ formatMessage(messages.clearAll) }}</Button
 			>
-				<button @click="clearAll">{{ formatMessage(messages.clearAll) }}</button>
-			</ButtonStyled>
 		</div>
 
 		<template v-if="loading">
@@ -76,28 +77,22 @@
 
 			<!-- Add launcher path -->
 			<div v-if="!showAddPath">
-				<ButtonStyled>
-					<button class="w-full !shadow-none" @click="showAddPath = true">
-						{{ formatMessage(messages.addLauncherPath) }}
-					</button>
-				</ButtonStyled>
+				<Button class="w-full" @click="showAddPath = true">
+					{{ formatMessage(messages.addLauncherPath) }}
+				</Button>
 			</div>
 			<div v-else class="flex items-center gap-2">
-				<ButtonStyled circular>
-					<button class="!shadow-none" @click="browseForLauncherPath">
-						<FolderSearchIcon />
-					</button>
-				</ButtonStyled>
+				<IconButton label="Browse for launcher path" @click="browseForLauncherPath">
+					<FolderSearchIcon />
+				</IconButton>
 				<StyledInput
 					v-model="newLauncherPath"
 					:placeholder="formatMessage(messages.launcherPathPlaceholder)"
 					class="flex-1"
 				/>
-				<ButtonStyled>
-					<button class="!shadow-none" :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
-						{{ formatMessage(messages.add) }}
-					</button>
-				</ButtonStyled>
+				<Button :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
+					{{ formatMessage(messages.add) }}
+				</Button>
 			</div>
 		</template>
 	</div>
@@ -108,9 +103,10 @@ import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@modrinth/assets
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
+import { Button, IconButton } from '#ui/components/base/buttons'
+
 import { injectInstanceImport, injectNotificationManager } from '../../../../providers'
 import type { ImportableLauncher } from '../../../../providers/instance-import'
-import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import StyledInput from '../../../base/StyledInput.vue'

@@ -17,6 +17,9 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Añade una dirección Java"
   },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Agregar detalles de la licencia"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Añade cualquier enlace relevante, como un sitio web, tienda o una invitación de Discord."
   },

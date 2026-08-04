@@ -43,33 +43,28 @@
 						</div>
 						<div class="flex items-center gap-2">
 							<slot name="header-actions" />
-							<ButtonStyled v-if="closable" circular>
-								<button
-									v-tooltip="closeLabel"
-									:aria-label="closeLabel"
-									:disabled="disableClose"
-									@click="hide"
-								>
-									<XIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
+							<IconButton
+								v-if="closable"
+								v-tooltip="closeLabel"
+								:label="closeLabel"
+								:disabled="disableClose"
+								@click="hide"
+							>
+								<XIcon aria-hidden="true" />
+							</IconButton>
 						</div>
 					</div>
 
-					<ButtonStyled
+					<IconButton
 						v-if="props.mergeHeader && closable"
+						v-tooltip="closeLabel"
+						:label="closeLabel"
 						class="absolute top-4 right-4 z-10"
-						circular
+						:disabled="disableClose"
+						@click="hide"
 					>
-						<button
-							v-tooltip="closeLabel"
-							:aria-label="closeLabel"
-							:disabled="disableClose"
-							@click="hide"
-						>
-							<XIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+						<XIcon aria-hidden="true" />
+					</IconButton>
 
 					<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
 						<Transition
@@ -144,12 +139,13 @@
 import { XIcon } from '@modrinth/assets'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
+import { IconButton } from '#ui/components/base/buttons'
+
 import { useVIntl } from '../../composables/i18n'
 import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import { injectModalBehavior } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
-import ButtonStyled from '../base/ButtonStyled.vue'
 
 const { formatMessage } = useVIntl()
 

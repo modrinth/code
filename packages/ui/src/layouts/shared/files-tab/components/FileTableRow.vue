@@ -49,41 +49,49 @@
 				>
 					{{ formatMessage(commonMessages.actionsLabel) }}
 				</span>
-				<div class="col-start-1 row-start-1 flex justify-end">
-					<ButtonStyled circular type="transparent">
-						<TeleportOverflowMenu :options="menuOptions">
-							<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-							<template #copy-filename
-								><ClipboardCopyIcon />
-								{{ formatMessage(commonMessages.copyFilenameButton) }}</template
-							>
-							<template #copy-full-path
-								><ClipboardCopyIcon />
-								{{ formatMessage(commonMessages.copyFullPathButton) }}</template
-							>
-							<template #open-in-folder
-								><FolderOpenIcon /> {{ formatMessage(commonMessages.openInFolderButton) }}</template
-							>
-							<template #extract
-								><PackageOpenIcon /> {{ formatMessage(commonMessages.extractButton) }}</template
-							>
-							<template #rename
-								><EditIcon /> {{ formatMessage(commonMessages.renameButton) }}</template
-							>
-							<template #move
-								><RightArrowIcon /> {{ formatMessage(commonMessages.moveButton) }}</template
-							>
-							<template #download
-								><DownloadIcon />
-								{{
-									ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton)
-								}}</template
-							>
-							<template #delete
-								><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template
-							>
-						</TeleportOverflowMenu>
-					</ButtonStyled>
+				<div
+					class="col-start-1 row-start-1 flex justify-end"
+					@click.stop
+					@contextmenu.stop
+					@keydown.stop
+					@pointerdown.stop
+				>
+					<TeleportOverflowMenu
+						type="quiet"
+						:label="formatMessage(commonMessages.actionsLabel)"
+						:options="menuOptions"
+					>
+						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+						<template #copy-filename
+							><ClipboardCopyIcon />
+							{{ formatMessage(commonMessages.copyFilenameButton) }}</template
+						>
+						<template #copy-full-path
+							><ClipboardCopyIcon />
+							{{ formatMessage(commonMessages.copyFullPathButton) }}</template
+						>
+						<template #open-in-folder
+							><FolderOpenIcon /> {{ formatMessage(commonMessages.openInFolderButton) }}</template
+						>
+						<template #extract
+							><PackageOpenIcon /> {{ formatMessage(commonMessages.extractButton) }}</template
+						>
+						<template #rename
+							><EditIcon /> {{ formatMessage(commonMessages.renameButton) }}</template
+						>
+						<template #move
+							><RightArrowIcon /> {{ formatMessage(commonMessages.moveButton) }}</template
+						>
+						<template #download
+							><DownloadIcon />
+							{{
+								ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton)
+							}}</template
+						>
+						<template #delete
+							><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template
+						>
+					</TeleportOverflowMenu>
 				</div>
 			</div>
 		</div>
@@ -109,9 +117,8 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -211,6 +218,7 @@ const menuOptions = computed(() => {
 	return [
 		{
 			id: 'copy-filename',
+			label: formatMessage(commonMessages.copyFilenameButton),
 			icon: ClipboardCopyIcon,
 			action: () => {
 				navigator.clipboard.writeText(props.name)
@@ -222,6 +230,7 @@ const menuOptions = computed(() => {
 		},
 		{
 			id: 'copy-full-path',
+			label: formatMessage(commonMessages.copyFullPathButton),
 			icon: ClipboardCopyIcon,
 			action: () => {
 				navigator.clipboard.writeText(getFullPath())
@@ -230,45 +239,48 @@ const menuOptions = computed(() => {
 		},
 		{
 			id: 'open-in-folder',
+			label: formatMessage(commonMessages.openInFolderButton),
 			icon: FolderOpenIcon,
 			shown: !!ctx.openInFolder,
 			action: () => ctx.openInFolder?.(getFullPath()),
 		},
-		{ divider: true },
+		{ type: 'divider' },
 		{
 			id: 'extract',
+			label: formatMessage(commonMessages.extractButton),
 			shown: isZip.value,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('extract', item),
 		},
-		{
-			divider: true,
-			shown: isZip.value,
-		},
+		{ type: 'divider', shown: isZip.value },
 		{
 			id: 'rename',
+			label: formatMessage(commonMessages.renameButton),
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('rename', item),
 		},
 		{
 			id: 'move',
+			label: formatMessage(commonMessages.moveButton),
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('move', item),
 		},
 		{
 			id: 'download',
+			label: ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton),
 			action: () => emit('download', item),
 			shown: props.type !== 'directory',
 		},
 		{
 			id: 'delete',
+			label: formatMessage(commonMessages.deleteLabel),
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('delete', item),
-			color: 'red' as const,
+			tone: 'red',
 		},
 	]
 })

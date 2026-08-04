@@ -1,0 +1,161 @@
+<script setup lang="ts">
+import {
+	Checkbox,
+	defineMessages,
+	injectNotificationManager,
+	StyledInput,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed, type Ref, ref, watch } from 'vue'
+
+import { edit } from '@/helpers/instance'
+import { get } from '@/helpers/settings.ts'
+
+import type { AppSettings } from '../../../../helpers/types'
+import { injectInstanceSettings } from './instance-settings-context'
+
+const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const { instance } = injectInstanceSettings()
+
+const globalSettings = (await get().catch(handleError)) as AppSettings
+
+const overrideWindowSettings = ref(
+	!!instance.value.game_resolution || !!instance.value.force_fullscreen,
+)
+const resolution: Ref<[number, number]> = ref(
+	instance.value.game_resolution ?? (globalSettings.game_resolution.slice() as [number, number]),
+)
+const fullscreenSetting: Ref<boolean> = ref(
+	instance.value.force_fullscreen ?? globalSettings.force_fullscreen,
+)
+
+const editInstanceObject = computed(() => {
+	if (!overrideWindowSettings.value) {
+		return {
+			force_fullscreen: null,
+			game_resolution: null,
+		}
+	}
+	return {
+		force_fullscreen: fullscreenSetting.value,
+		game_resolution: fullscreenSetting.value ? null : resolution.value,
+	}
+})
+
+watch(
+	[overrideWindowSettings, resolution, fullscreenSetting],
+	async () => {
+		await edit(instance.value.id, editInstanceObject.value)
+	},
+	{ deep: true },
+)
+
+const messages = defineMessages({
+	customWindowSettings: {
+		id: 'instance.settings.tabs.window.custom-window-settings',
+		defaultMessage: 'Custom window settings',
+	},
+	fullscreen: {
+		id: 'instance.settings.tabs.window.fullscreen',
+		defaultMessage: 'Fullscreen',
+	},
+	fullscreenDescription: {
+		id: 'instance.settings.tabs.window.fullscreen.description',
+		defaultMessage: 'Make the game start in full screen when launched (using options.txt).',
+	},
+	width: {
+		id: 'instance.settings.tabs.window.width',
+		defaultMessage: 'Width',
+	},
+	widthDescription: {
+		id: 'instance.settings.tabs.window.width.description',
+		defaultMessage: 'The width of the game window when launched.',
+	},
+	enterWidth: {
+		id: 'instance.settings.tabs.window.width.enter',
+		defaultMessage: 'Enter width...',
+	},
+	height: {
+		id: 'instance.settings.tabs.window.height',
+		defaultMessage: 'Height',
+	},
+	heightDescription: {
+		id: 'instance.settings.tabs.window.height.description',
+		defaultMessage: 'The height of the game window when launched.',
+	},
+	enterHeight: {
+		id: 'instance.settings.tabs.window.height.enter',
+		defaultMessage: 'Enter height...',
+	},
+})
+</script>
+
+<template>
+	<div class="flex flex-col gap-6">
+		<Checkbox
+			v-model="overrideWindowSettings"
+			:label="formatMessage(messages.customWindowSettings)"
+		/>
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.fullscreen) }}
+				</h2>
+				<p class="m-0">
+					{{ formatMessage(messages.fullscreenDescription) }}
+				</p>
+			</div>
+			<Toggle
+				id="fullscreen"
+				:model-value="overrideWindowSettings ? fullscreenSetting : globalSettings.force_fullscreen"
+				:disabled="!overrideWindowSettings"
+				@update:model-value="
+					(e) => {
+						fullscreenSetting = e
+					}
+				"
+			/>
+		</div>
+
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.width) }}
+				</h2>
+				<p class="m-0">
+					{{ formatMessage(messages.widthDescription) }}
+				</p>
+			</div>
+			<StyledInput
+				id="width"
+				v-model="resolution[0]"
+				autocomplete="off"
+				:disabled="!overrideWindowSettings || fullscreenSetting"
+				type="number"
+				:placeholder="formatMessage(messages.enterWidth)"
+			/>
+		</div>
+
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.height) }}
+				</h2>
+				<p class="m-0">
+					{{ formatMessage(messages.heightDescription) }}
+				</p>
+			</div>
+			<StyledInput
+				id="height"
+				v-model="resolution[1]"
+				autocomplete="off"
+				:disabled="!overrideWindowSettings || fullscreenSetting"
+				type="number"
+				:placeholder="formatMessage(messages.enterHeight)"
+			/>
+		</div>
+	</div>
+</template>

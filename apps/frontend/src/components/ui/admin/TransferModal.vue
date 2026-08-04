@@ -56,12 +56,15 @@
 							placeholder="us-vin200, us-vin201"
 							@keydown.enter.prevent="addNodes"
 						/>
-						<ButtonStyled color="blue" color-fill="text">
-							<button class="shrink-0" @click="addNodes">
-								<PlusIcon />
-								Add
-							</button>
-						</ButtonStyled>
+						<Button
+							type="quiet"
+							color="blue"
+							class="shrink-0 !text-blue [&>svg]:!text-blue"
+							@click="addNodes"
+						>
+							<PlusIcon />
+							Add
+						</Button>
 					</div>
 					<div v-if="selectedNodes.length" class="mt-1 flex flex-wrap gap-2">
 						<TagItem v-for="h in selectedNodes" :key="`node-${h}`" :action="() => removeNode(h)">
@@ -122,12 +125,15 @@
 						placeholder="ovh-gen4"
 						@keydown.enter.prevent="addTag"
 					/>
-					<ButtonStyled color="blue" color-fill="text">
-						<button class="shrink-0" @click="addTag">
-							<PlusIcon />
-							Add
-						</button>
-					</ButtonStyled>
+					<Button
+						type="quiet"
+						color="blue"
+						class="shrink-0 !text-blue [&>svg]:!text-blue"
+						@click="addTag"
+					>
+						<PlusIcon />
+						Add
+					</Button>
 				</div>
 				<div v-if="selectedTags.length" class="mt-1 flex flex-wrap gap-2">
 					<TagItem v-for="t in selectedTags" :key="`tag-${t}`" :action="() => removeTag(t)">
@@ -175,18 +181,19 @@
 			</div>
 
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="submitDisabled || submitting" @click="submit">
-						<SendIcon aria-hidden="true" />
-						{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="modal?.hide?.()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="submitDisabled || submitting"
+					@click="submit"
+				>
+					<SendIcon aria-hidden="true" />
+					{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
+				</Button>
+				<Button @click="modal?.hide?.()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -195,7 +202,7 @@
 <script setup lang="ts">
 import { PlusIcon, SendIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	Chips,
 	Combobox,
 	injectModrinthClient,
