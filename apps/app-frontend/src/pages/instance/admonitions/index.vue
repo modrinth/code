@@ -40,7 +40,7 @@ import InstanceAdmonitionsSharedInstanceStale from './shared-instance-stale.vue'
 import InstanceAdmonitionsSharedInstanceUnavailable from './shared-instance-unavailable.vue'
 import InstanceAdmonitionsSharedInstanceUpdateAvailable from './shared-instance-update-available.vue'
 import InstanceAdmonitionsSharedInstanceWrongAccount from './shared-instance-wrong-account.vue'
-import type { InstanceAdmonitionItem, SharedInstanceRole } from './types'
+import type { InstanceAdmonitionItem, SharedInstanceRole } from './types.ts'
 
 defineOptions({
 	inheritAttrs: false,
