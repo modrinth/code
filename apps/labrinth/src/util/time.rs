@@ -1,6 +1,6 @@
 use std::{fmt, str::FromStr};
 
-use chrono::{Datelike, NaiveDate};
+use chrono::{DateTime, Datelike, Days, Months, NaiveDate, Utc};
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -26,6 +26,16 @@ impl YearMonth {
     pub fn date(self) -> NaiveDate {
         self.0
     }
+}
+
+/// Calculate when a payout period becomes available under Net-60 terms.
+pub fn net_60_payout_available_at(period: YearMonth) -> Option<DateTime<Utc>> {
+    period
+        .date()
+        .checked_add_months(Months::new(1))?
+        .and_hms_opt(0, 0, 0)?
+        .and_utc()
+        .checked_add_days(Days::new(59))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
@@ -170,5 +180,32 @@ mod tests {
         for value in [r#""2026""#, r#""2026-07-01""#, r#""2026-13""#] {
             assert!(serde_json::from_str::<YearMonth>(value).is_err());
         }
+    }
+
+    #[test]
+    fn calculates_net_60_payout_availability() {
+        let august = YearMonth::from_year_month(2026, 8).unwrap();
+        let december = YearMonth::from_year_month(2026, 12).unwrap();
+
+        assert_eq!(
+            net_60_payout_available_at(august),
+            Some(
+                NaiveDate::from_ymd_opt(2026, 10, 30)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()
+                    .and_utc()
+            )
+        );
+        assert_eq!(
+            net_60_payout_available_at(december),
+            Some(
+                NaiveDate::from_ymd_opt(2027, 3, 1)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()
+                    .and_utc()
+            )
+        );
     }
 }

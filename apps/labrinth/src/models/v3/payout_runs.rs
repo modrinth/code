@@ -40,7 +40,7 @@ pub enum PayoutRunStatus {
     Pending,
     /// The ad provider should have issued payouts to us by now, and we will
     /// soon run the payouts.
-    Review,
+    InReview,
     /// Payouts run is currently being performed.
     Running,
     /// Payouts run is complete and payouts have been distributed to users.

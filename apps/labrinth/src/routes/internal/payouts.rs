@@ -12,7 +12,7 @@ use crate::models::payout_runs::{Adjustment, PayoutRun, PayoutRunStatus};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context;
-use crate::util::time::YearMonth;
+use crate::util::time::{YearMonth, net_60_payout_available_at};
 use xredis::RedisPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -100,9 +100,19 @@ pub async fn get(
 
         while period <= newest_period {
             if !stored_periods.contains(&period) {
+                let status =
+                    if net_60_payout_available_at(period).wrap_internal_err(
+                        "failed to calculate payout review date",
+                    )? <= newest_created
+                    {
+                        PayoutRunStatus::InReview
+                    } else {
+                        PayoutRunStatus::Pending
+                    };
+
                 runs.push(PayoutRun {
                     period_start: period,
-                    status: PayoutRunStatus::Pending,
+                    status,
                     started_at: None,
                     started_by: None,
                     completed_at: None,

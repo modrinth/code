@@ -1,11 +1,11 @@
 use crate::database::PgPool;
 use crate::env::ENV;
-use chrono::{Datelike, Duration, TimeZone, Utc};
 use eyre::{Context, Result, eyre};
 use rust_decimal::{Decimal, dec};
 use tracing::warn;
 
 use crate::database::models::{DBAffiliateCodeId, DBUserId};
+use crate::util::time::{YearMonth, net_60_payout_available_at};
 
 pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
     // process:
@@ -91,21 +91,10 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             continue;
         };
 
-        // affiliate payouts are Net 60 from the end of the month
-        // this is net 60 relative to the time of the charge's last attempt, not from now
-        let available = {
-            let year = last_attempt.year();
-            let month = last_attempt.month();
-
-            // get the first day of the next month
-            let last_day_of_month = if month == 12 {
-                Utc.with_ymd_and_hms(year + 1, 1, 1, 0, 0, 0).unwrap()
-            } else {
-                Utc.with_ymd_and_hms(year, month + 1, 1, 0, 0, 0).unwrap()
-            };
-
-            last_day_of_month + Duration::days(59)
-        };
+        let available = net_60_payout_available_at(YearMonth::from_day1(
+            last_attempt.date_naive(),
+        ))
+        .ok_or_else(|| eyre!("failed to calculate affiliate payout date"))?;
 
         let revenue_split = row
             .revenue_split

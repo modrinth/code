@@ -9,12 +9,13 @@ use crate::models::payouts::{
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
 use crate::util::error::Context;
+use crate::util::time::{YearMonth, net_60_payout_available_at};
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
 };
 use arc_swap::ArcSwapOption;
 use base64::Engine;
-use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
+use chrono::{DateTime, Duration, NaiveTime, Utc};
 use dashmap::DashMap;
 use eyre::Result;
 use futures::TryStreamExt;
@@ -1132,22 +1133,10 @@ pub async fn process_payout(
 
     let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
 
-    // Ad payouts are Net 60 from the end of the month
-    let available = {
-        let now = Utc::now().date_naive();
-
-        let year = now.year();
-        let month = now.month();
-
-        // Get the first day of the next month
-        let last_day_of_month = if month == 12 {
-            Utc.with_ymd_and_hms(year + 1, 1, 1, 0, 0, 0).unwrap()
-        } else {
-            Utc.with_ymd_and_hms(year, month + 1, 1, 0, 0, 0).unwrap()
-        };
-
-        last_day_of_month + Duration::days(59)
-    };
+    let available = net_60_payout_available_at(YearMonth::from_day1(
+        Utc::now().date_naive(),
+    ))
+    .wrap_internal_err("failed to calculate creator payout date")?;
 
     let (
         mut insert_user_ids,
