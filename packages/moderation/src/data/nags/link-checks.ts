@@ -4,6 +4,7 @@ import {computed, reactive, type Ref, watch} from "vue"
 export interface LinkCheckContext {
   url: string | undefined
   field: string
+
   [key: string]: unknown
 }
 
@@ -82,6 +83,11 @@ type LinkCheckChildShape =
 
 function anchored(source: string): RegExp {
   return new RegExp(`^${source}`, "i")
+}
+
+function blacklist(label: string, ...domains: string[]): LinkCheckBuilder {
+  const pattern = domains.map((domain) => domain.replace(/\./g, "\\.")).join("|")
+  return check(new RegExp(`^(?:${pattern})`, "i"), label)
 }
 
 function buildNode(when: LinkCheckMatcher, label?: string): LinkCheckBuilder {
@@ -391,20 +397,20 @@ checks.children(
   ...named("Discord", [
     check(/^discord\.gg/i).children(check(/^\/([\w-]+)/i).for("discord").verify(discordInviteVerify)),
     check(/^(?:discord\.com|discordapp\.com)/i).children(
-        check(/^\/invite\/([\w-]+)/i).for("discord").verify(discordInviteVerify),
-        check(/^\/channels\//i).message(
-          defineMessage({
-            id: "nags.link.discord.channel",
-            defaultMessage: "This is a link to a Discord channel, not a server invite.",
-          }),
-        ),
-        check(/^\/users\//i).message(
-          defineMessage({
-            id: "nags.link.discord.user",
-            defaultMessage: "This is a link to a Discord user, not a server invite.",
-          }),
-        ),
+      check(/^\/invite\/([\w-]+)/i).for("discord").verify(discordInviteVerify),
+      check(/^\/channels\//i).message(
+        defineMessage({
+          id: "nags.link.discord.channel",
+          defaultMessage: "This is a link to a Discord channel, not a server invite.",
+        }),
       ),
+      check(/^\/users\//i).message(
+        defineMessage({
+          id: "nags.link.discord.user",
+          defaultMessage: "This is a link to a Discord user, not a server invite.",
+        }),
+      ),
+    ),
   ]),
 )
 
@@ -626,9 +632,10 @@ checks.children(
       .for("other")
       .children(
         check(anchored(`/${YOUTUBE_CHANNEL}/join`)),
-        check(anchored(`/${YOUTUBE_CHANNEL}/store`))
+        check(anchored(`/${YOUTUBE_CHANNEL}/store`)),
       )
   })(),
+
 )
 
 //TODO: remove this if/when we move this to the backend as we can know this if its backend
@@ -703,26 +710,33 @@ checks.children(
   ),
 )
 
-// Kinda just everything else
+// Google Forms for issues and Docs for Wiki
 checks.children(
   check(/^docs\.google\.com/i, "Google").children(
     check(/^\/forms\//i, "Forms").for("issues"),
     check(/^\/document\//i, "Documents").for("wiki"),
   ),
-  check(/^(?:bit\.ly|adf\.ly|tinyurl\.com|short\.io|is\.gd)/i, "Link shortener"),
-  check(/^(?:twitter\.com|x\.com)/i, "Twitter"),
-  check(/^instagram\.com/i, "Instagram"),
-  check(/^facebook\.com/i, "Facebook"),
-  check(/^tiktok\.com/i, "TikTok"),
-  check(/^(?:telegram\.org|t\.me)/i, "Telegram"),
-  check(/^bilibili\.com/i, "Bilibili"),
-  check(/^curseforge\.com/i, "CurseForge"),
-  check(/^modrinth\.com/i, "Modrinth"),
-  check(/^reddit\.com/i, "Reddit"),
-  check(/^twitch\.tv/i, "Twitch"),
-  check(/^minecraft\.net/i, "Minecraft"),
-  check(/^bsky\.app/i, "Bluesky"),
-  check(/^9minecraft\.net/i, "9Minecraft"),
+);
+
+checks.children(
+  blacklist("URL Shortener", "bit.ly", "adf.ly", "tinyurl.com", "short.io", "is.gd"),
+
+  // Social Media
+  blacklist("Twitter", "twitter.com", "x.com"),
+  blacklist("Instagram", "instagram.com"),
+  blacklist("Facebook", "facebook.com"),
+  blacklist("TikTok", "tiktok.com"),
+  blacklist("Telegram", "telegram.org", "t.me"),
+  blacklist("Bilibili", "bilibili.com"),
+  blacklist("Bluesky", "bsky.app"),
+  blacklist("Twitch", "twitch.tv"),
+  blacklist("Reddit", "reddit.com", "redd.it"),
+
+  // Minecraft
+  blacklist("Modrinth", "modrinth.com"),
+  blacklist("Minecraft", "minecraft.net"),
+  //TODO we should probably setup curseforge/planetminecraft issues for issues but im too lazy to do that rn
+  blacklist("Mod Distribution Platform", "curseforge.com", "planetminecraft.com", "9minecraft.net", "mcmod.cn"),
 )
 
 export {checkLink, getLinkCheckState, useLinkCheck}
