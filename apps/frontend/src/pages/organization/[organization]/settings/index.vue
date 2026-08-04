@@ -6,7 +6,8 @@ import {
 	ConfirmModal,
 	FileInput,
 	injectNotificationManager,
-	StyledInput,
+	Input,
+	Textarea,
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
@@ -188,7 +189,7 @@ const onDeleteOrganization = useClientTry(async () => {
 			<label for="project-name">
 				<span class="label__title">Name</span>
 			</label>
-			<StyledInput
+			<Input
 				id="project-name"
 				v-model="current.name"
 				:maxlength="2048"
@@ -200,7 +201,7 @@ const onDeleteOrganization = useClientTry(async () => {
 			</label>
 			<div class="text-input-wrapper">
 				<div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
-				<StyledInput
+				<Input
 					id="project-slug"
 					v-model="current.slug"
 					:maxlength="64"
@@ -212,10 +213,9 @@ const onDeleteOrganization = useClientTry(async () => {
 			<label for="project-summary">
 				<span class="label__title">Summary</span>
 			</label>
-			<StyledInput
+			<Textarea
 				id="project-summary"
 				v-model="current.summary"
-				multiline
 				:maxlength="256"
 				:disabled="!hasPermission"
 				resize="vertical"

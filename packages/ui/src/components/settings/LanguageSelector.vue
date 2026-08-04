@@ -11,7 +11,7 @@ import {
 } from '../../composables/i18n'
 import { metaLocaleModules } from '../../locales.ts'
 import { isModifierKeyDown } from '../../utils/events'
-import StyledInput from '../base/StyledInput.vue'
+import Input from '../base/inputs/Input.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -176,7 +176,7 @@ function getCategoryName(category: Category): string {
 <template>
 	<div class="flex flex-col gap-4">
 		<div v-if="$locales.length > 1" class="-mb-4">
-			<StyledInput
+			<Input
 				id="language-search"
 				v-model="$query"
 				:icon="SearchIcon"

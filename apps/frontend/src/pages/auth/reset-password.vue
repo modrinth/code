@@ -20,7 +20,7 @@
 				<label class="text-md font-semibold text-contrast" for="email">
 					{{ formatMessage(commonMessages.emailLabel) }}
 				</label>
-				<StyledInput
+				<Input
 					id="email"
 					v-model="email"
 					:icon="MailIcon"
@@ -61,7 +61,7 @@
 
 			<div class="flex flex-col gap-2.5">
 				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-				<StyledInput
+				<Input
 					id="password"
 					v-model="newPassword"
 					:icon="KeyIcon"
@@ -74,7 +74,7 @@
 				<label for="confirm-password" hidden>
 					{{ formatMessage(commonMessages.passwordLabel) }}
 				</label>
-				<StyledInput
+				<Input
 					id="confirm-password"
 					v-model="confirmNewPassword"
 					:icon="KeyIcon"
@@ -102,7 +102,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'

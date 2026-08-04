@@ -4,7 +4,7 @@
 			<label for="backup-name-input">
 				<span class="text-lg font-semibold text-contrast"> Name </span>
 			</label>
-			<StyledInput
+			<Input
 				id="backup-name-input"
 				ref="input"
 				v-model="backupName"
@@ -63,7 +63,7 @@ import {
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
-import StyledInput from '../../base/StyledInput.vue'
+import Input from '../../base/inputs/Input.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()

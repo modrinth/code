@@ -23,7 +23,7 @@
 					</div>
 
 					<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
-						<StyledInput
+						<Input
 							v-model="searchQuery"
 							:icon="SearchIcon"
 							:placeholder="formatMessage(analyticsTableMessages.searchPlaceholder)"
@@ -193,10 +193,10 @@
 import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Input,
 	OverflowMenu,
 	type OverflowMenuOption,
 	Pagination,
-	StyledInput,
 	Table,
 	useFormatNumber,
 	useVIntl,

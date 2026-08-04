@@ -21,7 +21,7 @@
 					<label for="pat-name">
 						<span class="font-semibold">{{ formatMessage(createModalMessages.nameLabel) }}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="pat-name"
 						v-model="name"
 						:maxlength="2048"
@@ -216,9 +216,9 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
-	StyledInput,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,

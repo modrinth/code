@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<StyledInput
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"
@@ -210,10 +210,10 @@ import {
 	commonMessages,
 	FloatingPanel,
 	injectModrinthClient,
+	Input,
 	MultiSelect,
 	type MultiSelectItem,
 	Pagination,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Card, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, Card, Input } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import docs from '~/templates/docs'
@@ -51,7 +51,7 @@ onMounted(() => {
 		<div class="normal-page__content">
 			<Card class="mb-6 flex flex-col gap-4">
 				<div class="flex flex-wrap items-center gap-3">
-					<StyledInput
+					<Input
 						id="doc-search"
 						v-model="query"
 						type="search"

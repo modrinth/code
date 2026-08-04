@@ -21,7 +21,7 @@
 		</template>
 		<template v-else>
 			<!-- Search -->
-			<StyledInput
+			<Input
 				v-if="ctx.importLaunchers.value.length > 0"
 				v-model="ctx.importSearchQuery.value"
 				:icon="SearchIcon"
@@ -88,7 +88,7 @@
 						<FolderSearchIcon />
 					</button>
 				</ButtonStyled>
-				<StyledInput
+				<Input
 					v-model="newLauncherPath"
 					:placeholder="formatMessage(messages.launcherPathPlaceholder)"
 					class="flex-1"
@@ -113,7 +113,7 @@ import type { ImportableLauncher } from '../../../../providers/instance-import'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
 import Collapsible from '../../../base/Collapsible.vue'
-import StyledInput from '../../../base/StyledInput.vue'
+import Input from '../../../base/inputs/Input.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()

@@ -33,7 +33,7 @@
 				</span>
 			</span>
 			<div class="input-group">
-				<StyledInput
+				<Input
 					id="username"
 					v-model="currentUsername"
 					placeholder="Username"
@@ -112,7 +112,7 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						:id="`member-${allTeamMembers[index].user.username}-role`"
 						v-model="allTeamMembers[index].role"
 						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
@@ -126,7 +126,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						:id="`member-${allTeamMembers[index].user.username}-monetization-weight`"
 						v-model="allTeamMembers[index].payouts_split"
 						type="number"
@@ -378,7 +378,7 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						:id="`member-${allOrgMembers[index].user.username}-role`"
 						v-model="allOrgMembers[index].role"
 						:disabled="
@@ -395,7 +395,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						:id="`member-${allOrgMembers[index].user.username}-monetization-weight`"
 						v-model="allOrgMembers[index].payouts_split"
 						type="number"
@@ -568,7 +568,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	StyledInput,
+	Input,
 	Toggle,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'

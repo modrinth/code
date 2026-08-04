@@ -45,7 +45,7 @@
 			<label class="text-md font-semibold text-contrast" for="create-account-username">
 				{{ formatMessage(messages.usernameOptionalLabel) }}
 			</label>
-			<StyledInput
+			<Input
 				id="create-account-username"
 				v-model="usernameModel"
 				type="text"
@@ -106,7 +106,7 @@ import {
 	DatePicker,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'

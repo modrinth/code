@@ -136,7 +136,7 @@
 								}}
 							</span>
 							<div class="flex gap-4">
-								<StyledInput
+								<Input
 									id="report-item-id"
 									v-model="reportItemID"
 									placeholder="ex: Dc7EYhxG"
@@ -293,12 +293,12 @@ import {
 	defineMessages,
 	formatReportItemType,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	MarkdownEditor,
 	type MessageDescriptor,
 	RadialHeader,
 	RadioButtons,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'

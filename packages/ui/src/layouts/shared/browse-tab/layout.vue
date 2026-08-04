@@ -5,10 +5,10 @@ import { computed, ref, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import Pagination from '#ui/components/base/Pagination.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
@@ -113,7 +113,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		:replace="ctx.variant === 'app'"
 	/>
 
-	<StyledInput
+	<Input
 		v-model="ctx.query.value"
 		:icon="SearchIcon"
 		type="text"
@@ -125,7 +125,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		"
 		clearable
 		wrapper-class="w-full"
-		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
+		size="large"
 		@clear="ctx.clearSearch()"
 	/>
 

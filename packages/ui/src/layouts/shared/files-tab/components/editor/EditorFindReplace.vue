@@ -24,7 +24,7 @@
 					@keydown.enter.exact.prevent.stop="emit('findNext')"
 					@keydown.shift.enter.prevent.stop="emit('findPrevious')"
 				>
-					<StyledInput
+					<Input
 						ref="findInputRef"
 						:model-value="findQuery"
 						type="search"
@@ -83,7 +83,7 @@
 			<div v-if="isReplaceOpen" class="flex items-center gap-1">
 				<div class="w-9 flex-shrink-0" />
 				<div @keydown.enter.prevent.stop="emit('replace', replaceQuery)">
-					<StyledInput
+					<Input
 						ref="replaceInputRef"
 						v-model="replaceQuery"
 						type="search"
@@ -122,7 +122,7 @@ import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, XIcon } from '@modrin
 import { nextTick, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const props = defineProps<{

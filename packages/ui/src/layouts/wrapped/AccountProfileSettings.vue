@@ -89,7 +89,7 @@
 					{{ formatMessage(commonMessages.usernameLabel) }}
 				</h2>
 				<div class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						id="username-field"
 						v-model="current.username"
 						class="w-full max-w-md"
@@ -112,12 +112,7 @@
 				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.bioTitle) }}
 				</h2>
-				<StyledInput
-					id="bio-field"
-					v-model="current.bio"
-					multiline
-					:error="current.bio.length > 160"
-				/>
+				<Textarea id="bio-field" v-model="current.bio" :error="current.bio.length > 160" />
 				<div class="text-secondary" :class="{ 'text-red': current.bio.length > 160 }">
 					{{ current.bio.length }}/160
 				</div>
@@ -138,8 +133,9 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FileInput from '#ui/components/base/FileInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
+import Textarea from '#ui/components/base/inputs/Textarea.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
 import { type AuthUser, injectAuth, injectNotificationManager } from '#ui/providers'
 import { commonMessages } from '#ui/utils'

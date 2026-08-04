@@ -14,7 +14,7 @@ import { builtinLicenses } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { ButtonStyled, Chips, Combobox, type ComboboxOption, StyledInput } from '#ui/components'
+import { ButtonStyled, Chips, Combobox, type ComboboxOption, Input, Textarea } from '#ui/components'
 import { FileInput } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
 
@@ -474,7 +474,7 @@ function cancelEditing() {
 			<span class="text-contrast font-semibold mt-1">
 				{{ formatMessage(messages.linkLabel) }}
 			</span>
-			<StyledInput
+			<Input
 				v-model="linkInput"
 				type="text"
 				class="max-w-[40rem]"
@@ -515,7 +515,7 @@ function cancelEditing() {
 					)
 				}}
 			</span>
-			<StyledInput
+			<Input
 				v-model="customLicenseInput"
 				type="text"
 				class="max-w-[40rem]"
@@ -542,11 +542,9 @@ function cancelEditing() {
 							formatMessage(selectedPermissionReason.notesDescription)
 						}}</span>
 					</div>
-					<StyledInput
+					<Textarea
 						v-model="notesInput"
-						type="text"
 						resize="both"
-						multiline
 						:rows="notesInputRows"
 						class="max-w-[40rem]"
 						:placeholder="formatMessage(messages.notesPlaceholder)"

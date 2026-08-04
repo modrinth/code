@@ -72,7 +72,7 @@
 				</label>
 
 				<div class="w-1/2">
-					<StyledInput
+					<Input
 						id="license-url"
 						v-model="current.licenseUrl"
 						type="url"
@@ -105,7 +105,7 @@
 				</label>
 
 				<div class="flex w-1/2 flex-col gap-2">
-					<StyledInput
+					<Input
 						v-if="!current.nonSpdxLicense"
 						id="license-spdx"
 						v-model="current.license.short"
@@ -114,7 +114,7 @@
 						placeholder="SPDX identifier"
 						:disabled="!hasPermission"
 					/>
-					<StyledInput
+					<Input
 						v-else
 						id="license-name"
 						v-model="current.license.short"
@@ -158,7 +158,7 @@ import {
 	ConfirmLeaveModal,
 	DropdownSelect,
 	injectProjectPageContext,
-	StyledInput,
+	Input,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,

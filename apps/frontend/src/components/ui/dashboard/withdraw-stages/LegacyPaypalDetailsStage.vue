@@ -41,7 +41,7 @@
 				>
 			</label>
 			<div class="flex flex-row gap-2">
-				<StyledInput
+				<Input
 					v-model="venmoHandle"
 					:placeholder="formatMessage(messages.venmoHandlePlaceholder)"
 					wrapper-class="w-full"
@@ -110,9 +110,9 @@ import {
 	defineMessages,
 	financialMessages,
 	formFieldLabels,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'

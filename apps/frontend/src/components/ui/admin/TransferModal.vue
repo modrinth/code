@@ -25,10 +25,9 @@
 					</span>
 					<span>Server IDs (one per line or comma-separated.)</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="server-ids"
 					v-model="serverIdsInput"
-					multiline
 					:rows="4"
 					input-class="bg-surface-3"
 					placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
@@ -48,7 +47,7 @@
 						<span>Add nodes to transfer (comma or space-separated).</span>
 					</label>
 					<div class="flex items-center gap-2">
-						<StyledInput
+						<Input
 							id="node-input"
 							v-model="nodeInput"
 							wrapper-class="w-64"
@@ -86,7 +85,7 @@
 						<span class="text-lg font-semibold text-contrast">Tag transferred nodes</span>
 						<span>Optional tag to add to the transferred nodes.</span>
 					</label>
-					<StyledInput
+					<Input
 						id="tag-nodes"
 						v-model="tagNodes"
 						wrapper-class="max-w-[12rem]"
@@ -114,7 +113,7 @@
 					<span>Optional preferred node tags for node selection.</span>
 				</label>
 				<div class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						id="tag-input"
 						v-model="tagInput"
 						wrapper-class="w-40"
@@ -147,7 +146,7 @@
 					:format-label="(item) => scheduleOptionLabels[item]"
 					:capitalize="false"
 				/>
-				<StyledInput
+				<DateInput
 					v-if="scheduleOption === 'later'"
 					v-model="scheduledDate"
 					type="datetime-local"
@@ -164,10 +163,9 @@
 					</span>
 					<span>Provide a reason for this transfer batch.</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="reason"
 					v-model="reason"
-					multiline
 					:rows="2"
 					input-class="bg-surface-3"
 					placeholder="Node maintenance scheduled"
@@ -198,11 +196,13 @@ import {
 	ButtonStyled,
 	Chips,
 	Combobox,
+	DateInput,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
 	TagItem,
+	Textarea,
 	Toggle,
 } from '@modrinth/ui'
 import dayjs from 'dayjs'

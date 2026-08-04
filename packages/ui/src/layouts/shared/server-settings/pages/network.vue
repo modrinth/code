@@ -5,7 +5,7 @@
 				<NewModal ref="editAllocationModal" header="Edit allocation" width="550px">
 					<form class="flex w-full flex-col gap-2" @submit.prevent="editAllocation">
 						<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
-						<StyledInput
+						<Input
 							id="edit-allocation-name"
 							ref="editAllocationInput"
 							v-model="editAllocationName"
@@ -74,7 +74,7 @@
 						<span class="text-lg font-semibold text-contrast">Allocations</span>
 
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
-							<StyledInput
+							<Input
 								v-model="createAllocationName"
 								v-tooltip="advancedActionTooltip"
 								wrapper-class="grow max-w-[400px]"
@@ -145,7 +145,7 @@
 							<span class="text-lg font-semibold text-contrast">DNS records</span>
 						</label>
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
-							<StyledInput
+							<Input
 								id="user-domain"
 								v-model="userDomain"
 								wrapper-class="grow max-w-[400px]"
@@ -223,7 +223,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
+import { ButtonStyled, ConfirmModal, Input, NewModal, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {

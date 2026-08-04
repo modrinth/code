@@ -192,13 +192,12 @@
 				v-if="activeCategory.searchable"
 				class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 w-full"
 			>
-				<StyledInput
+				<Input
 					v-model="categorySearchQuery"
 					:icon="SearchIcon"
 					type="text"
 					:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
-					wrapper-class="grow bg-surface-4 mx-1"
-					input-class="ps-9 mx-1.5"
+					wrapper-class="grow mx-1"
 				/>
 				<slot
 					name="search-actions"
@@ -387,8 +386,8 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import ButtonStyled from './ButtonStyled.vue'
+import Input from './inputs/Input.vue'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
-import StyledInput from './StyledInput.vue'
 
 export type DropdownFilterBarOption = {
 	value: string

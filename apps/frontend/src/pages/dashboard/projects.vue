@@ -8,7 +8,7 @@
 						<span class="label__title">{{ formatMessage(messages.issueTrackerLabel) }}</span>
 					</label>
 					<div class="flex gap-2">
-						<StyledInput
+						<Input
 							id="issue-tracker-input"
 							v-model="editLinks.issues.val"
 							:disabled="editLinks.issues.clear"
@@ -33,7 +33,7 @@
 						<span class="label__title">{{ formatMessage(messages.sourceCodeLabel) }}</span>
 					</label>
 					<div class="flex gap-2">
-						<StyledInput
+						<Input
 							id="source-code-input"
 							v-model="editLinks.source.val"
 							:disabled="editLinks.source.clear"
@@ -58,7 +58,7 @@
 						<span class="label__title">{{ formatMessage(messages.wikiPageLabel) }}</span>
 					</label>
 					<div class="flex gap-2">
-						<StyledInput
+						<Input
 							id="wiki-page-input"
 							v-model="editLinks.wiki.val"
 							:disabled="editLinks.wiki.clear"
@@ -86,7 +86,7 @@
 						<span class="label__title">{{ formatMessage(messages.discordInviteLabel) }}</span>
 					</label>
 					<div class="flex gap-2">
-						<StyledInput
+						<Input
 							id="discord-invite-input"
 							v-model="editLinks.discord.val"
 							:disabled="editLinks.discord.clear"
@@ -364,10 +364,10 @@ import {
 	defineMessages,
 	FloatingActionBar,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
 	ProjectStatusBadge,
-	StyledInput,
 	Table,
 	useVIntl,
 } from '@modrinth/ui'

@@ -84,7 +84,7 @@
 
 		<section class="flex flex-col gap-2.5">
 			<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
-			<StyledInput
+			<Input
 				id="email"
 				v-model="emailModel"
 				:icon="MailIcon"
@@ -95,7 +95,7 @@
 			/>
 
 			<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-			<StyledInput
+			<Input
 				id="password"
 				v-model="passwordModel"
 				:icon="KeyIcon"
@@ -162,8 +162,8 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	Input,
 	IntlFormatted,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'

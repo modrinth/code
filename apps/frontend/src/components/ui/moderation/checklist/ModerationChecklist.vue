@@ -218,10 +218,9 @@
 								:heading-buttons="false"
 								:on-image-upload="onUploadHandler"
 							/>
-							<StyledInput
+							<Textarea
 								v-else
 								v-model="messageText"
-								multiline
 								placeholder="No message generated."
 								autocomplete="off"
 								input-class="h-[400px] font-mono"
@@ -414,7 +413,7 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	MarkdownEditor,
-	StyledInput,
+	Textarea,
 	useDebugLogger,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'

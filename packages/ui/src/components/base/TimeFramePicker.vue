@@ -199,7 +199,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import ButtonStyled from './ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from './Combobox.vue'
-import DatePicker from './DatePicker.vue'
+import DatePicker from './inputs/DatePicker.vue'
 
 export type TimeFramePreset =
 	| 'today'

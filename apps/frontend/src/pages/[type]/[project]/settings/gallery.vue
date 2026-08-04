@@ -43,7 +43,7 @@
 				<label for="gallery-image-title">
 					<span class="label__title">Title</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-title"
 					v-model="editTitle"
 					:maxlength="64"
@@ -52,17 +52,16 @@
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="gallery-image-desc"
 					v-model="editDescription"
-					multiline
 					:maxlength="255"
 					placeholder="Enter description..."
 				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-ordering"
 					v-model="editOrder"
 					type="number"
@@ -295,8 +294,9 @@ import {
 	DropArea,
 	FileInput,
 	injectProjectPageContext,
+	Input,
 	NewModal as Modal,
-	StyledInput,
+	Textarea,
 	useFormatDateTime,
 } from '@modrinth/ui'
 

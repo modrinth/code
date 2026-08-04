@@ -15,7 +15,7 @@
 		>
 			<div class="w-[300px] flex flex-col relative bg-surface-3">
 				<div class="p-4 pb-2">
-					<StyledInput
+					<Input
 						v-model="searchQuery"
 						:icon="SearchIcon"
 						type="text"
@@ -295,7 +295,7 @@ import { computed, ref, toRef } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'

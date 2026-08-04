@@ -14,8 +14,8 @@ import {
 	commonMessages,
 	FloatingPanel,
 	injectModrinthClient,
+	Input,
 	Pagination,
-	StyledInput,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -582,7 +582,7 @@ watch(totalPages, (pages) => {
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<StyledInput
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"

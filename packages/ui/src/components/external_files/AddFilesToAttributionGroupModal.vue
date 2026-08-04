@@ -3,7 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, NewModal, StyledInput } from '#ui/components'
+import { ButtonStyled, Input, NewModal } from '#ui/components'
 import { commonMessages } from '#ui/utils'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -189,7 +189,7 @@ defineExpose({ show, hide })
 			<p class="text-secondary m-0">
 				{{ formatMessage(messages.addFilesModalDescription) }}
 			</p>
-			<StyledInput
+			<Input
 				ref="searchInputRef"
 				v-model="searchQuery"
 				type="text"
@@ -197,7 +197,7 @@ defineExpose({ show, hide })
 				:placeholder="formatMessage(messages.addFilesModalSearchPlaceholder)"
 				:icon="SearchIcon"
 				:disabled="pending"
-				input-class="h-[40px]"
+				size="medium"
 				class="sticky top-0"
 				clearable
 			/>

@@ -11,7 +11,7 @@
 		>
 			<BookmarkIcon aria-hidden="true" :fill="saved ? 'currentColor' : 'none'" />
 			<template #menu>
-				<StyledInput
+				<Input
 					v-model="displayCollectionsSearch"
 					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 					wrapper-class="menu-search"
@@ -52,14 +52,7 @@
 
 <script setup lang="ts">
 import { BookmarkIcon, PlusIcon } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	Checkbox,
-	commonMessages,
-	PopoutMenu,
-	StyledInput,
-	useVIntl,
-} from '@modrinth/ui'
+import { ButtonStyled, Checkbox, commonMessages, Input, PopoutMenu, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
