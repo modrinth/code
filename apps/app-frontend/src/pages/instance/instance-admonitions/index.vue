@@ -36,10 +36,10 @@ import { computed, ref, watch } from 'vue'
 import type { SharedInstanceUnavailableReason } from '@/helpers/install'
 import type { GameInstance } from '@/helpers/types'
 
-import InstanceAdmonitionsSharedInstanceStale from './instance-admonitions-shared-instance-stale.vue'
-import InstanceAdmonitionsSharedInstanceUnavailable from './instance-admonitions-shared-instance-unavailable.vue'
-import InstanceAdmonitionsSharedInstanceUpdateAvailable from './instance-admonitions-shared-instance-update-available.vue'
-import InstanceAdmonitionsSharedInstanceWrongAccount from './instance-admonitions-shared-instance-wrong-account.vue'
+import InstanceAdmonitionsSharedInstanceStale from './shared-instance-stale.vue'
+import InstanceAdmonitionsSharedInstanceUnavailable from './shared-instance-unavailable.vue'
+import InstanceAdmonitionsSharedInstanceUpdateAvailable from './shared-instance-update-available.vue'
+import InstanceAdmonitionsSharedInstanceWrongAccount from './shared-instance-wrong-account.vue'
 import type { InstanceAdmonitionItem, SharedInstanceRole } from './types'
 
 defineOptions({

@@ -162,9 +162,9 @@ import { handleSevereError } from '@/store/error.js'
 import { useTheming } from '@/store/state'
 
 import InstanceAdmonitions from './instance-admonitions/index.vue'
-import { provideInstancePage } from '../instance-context'
+import { provideInstancePage } from './instance-context'
 import InstancePageHeader from './instance-page-header/index.vue'
-import { createSharedInstanceContext, provideSharedInstance } from '../shared-instance-context'
+import { createSharedInstanceContext, provideSharedInstance } from './shared-instance-context'
 
 dayjs.extend(relativeTime)
 

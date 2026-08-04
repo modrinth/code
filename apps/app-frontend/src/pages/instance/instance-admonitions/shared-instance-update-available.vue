@@ -20,7 +20,7 @@
 import { DownloadIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, useVIntl } from '@modrinth/ui'
 
-import { instanceAdmonitionsMessages as messages } from './instance-admonitions-messages'
+import { instanceAdmonitionsMessages as messages } from './messages'
 
 defineProps<{
 	instanceName: string
