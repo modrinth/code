@@ -23,8 +23,9 @@ pub use self::export_mrpack::{
 };
 pub use self::get::{get, get_many, list};
 pub use self::groups::{
-    InstanceGroup, InstanceGroupMembershipUpdate, create_group, delete_group,
-    list_groups, rename_group, set_group_memberships,
+    FAVORITES_GROUP_ID, InstanceGroup, InstanceGroupMembershipUpdate,
+    create_group, delete_group, list_groups, rename_group,
+    set_group_memberships, set_group_order,
 };
 pub use self::install::get_optimal_jre_key;
 pub(crate) use self::lifecycle::create;

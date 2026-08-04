@@ -90,6 +90,11 @@ pub async fn create_group(name: String) -> crate::Result<InstanceGroup> {
     })
 }
 
+pub async fn set_group_order(group_ids: Vec<String>) -> crate::Result<()> {
+    let state = State::get().await?;
+    instance_rows::set_instance_group_order(&group_ids, &state.pool).await
+}
+
 pub async fn set_group_memberships(
     updates: Vec<InstanceGroupMembershipUpdate>,
 ) -> crate::Result<()> {

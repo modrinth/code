@@ -28,6 +28,10 @@ export async function delete_group(id: string): Promise<void> {
 	return await invoke('plugin:instance|instance_delete_group', { id })
 }
 
+export async function set_group_order(groupIds: string[]): Promise<void> {
+	return await invoke('plugin:instance|instance_set_group_order', { groupIds })
+}
+
 export async function set_group_memberships(
 	updates: InstanceGroupMembershipUpdate[],
 ): Promise<void> {

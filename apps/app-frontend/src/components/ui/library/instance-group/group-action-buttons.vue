@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { EditIcon, SquarePlusIcon, TrashIcon } from '@modrinth/assets'
+import { ArrowDownIcon, ArrowUpIcon, EditIcon, SquarePlusIcon, TrashIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
 
 defineProps<{
 	deleting?: boolean
+	canMoveDown: boolean
+	canMoveUp: boolean
 	onAddToGroup: () => void
 	onDeleteGroup: () => void
 	onEditGroupName: () => void
+	onMoveDown: () => void
+	onMoveUp: () => void
 }>()
 
 const { formatMessage } = useVIntl()
@@ -24,6 +28,14 @@ const messages = defineMessages({
 		id: 'app.library.group.delete',
 		defaultMessage: 'Delete group',
 	},
+	moveGroupUp: {
+		id: 'app.library.group.move-up',
+		defaultMessage: 'Move group up',
+	},
+	moveGroupDown: {
+		id: 'app.library.group.move-down',
+		defaultMessage: 'Move group down',
+	},
 })
 </script>
 
@@ -31,6 +43,30 @@ const messages = defineMessages({
 	<div
 		class="flex shrink-0 items-center opacity-0 transition-opacity duration-250 group-hover/header:opacity-100 focus-within:opacity-100"
 	>
+		<ButtonStyled circular type="transparent" size="standard">
+			<button
+				v-tooltip="formatMessage(messages.moveGroupUp)"
+				class="!size-8 !min-w-8"
+				type="button"
+				:aria-label="formatMessage(messages.moveGroupUp)"
+				:disabled="!canMoveUp"
+				@click.stop="onMoveUp"
+			>
+				<ArrowUpIcon class="!min-w-4 !min-h-4 !size-4" />
+			</button>
+		</ButtonStyled>
+		<ButtonStyled circular type="transparent" size="standard">
+			<button
+				v-tooltip="formatMessage(messages.moveGroupDown)"
+				class="!size-8 !min-w-8"
+				type="button"
+				:aria-label="formatMessage(messages.moveGroupDown)"
+				:disabled="!canMoveDown"
+				@click.stop="onMoveDown"
+			>
+				<ArrowDownIcon class="!min-w-4 !min-h-4 !size-4" />
+			</button>
+		</ButtonStyled>
 		<ButtonStyled circular type="transparent" size="standard">
 			<button
 				v-tooltip="formatMessage(messages.editGroupName)"

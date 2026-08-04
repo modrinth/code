@@ -12,6 +12,7 @@ use crate::state::{
 use chrono::{DateTime, TimeZone, Utc};
 use serde::de::DeserializeOwned;
 use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
+use std::collections::HashSet;
 use uuid::Uuid;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -770,7 +771,7 @@ pub(crate) async fn list_instance_groups(
         "
 		SELECT id, name
 		FROM instance_groups
-		ORDER BY name, id
+		ORDER BY display_order, name, id
 		",
     )
     .fetch_all(pool)
@@ -784,16 +785,97 @@ pub(crate) async fn create_instance_group(
     name: &str,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
+    let mut tx = pool.begin().await?;
+
     sqlx::query(
         "
-		INSERT INTO instance_groups (id, name)
-		VALUES (?, ?)
+		UPDATE instance_groups
+		SET display_order = display_order + 1
+		WHERE id != ?
+		",
+    )
+    .bind(crate::api::instance::FAVORITES_GROUP_ID)
+    .execute(&mut *tx)
+    .await?;
+
+    sqlx::query(
+        "
+		INSERT INTO instance_groups (id, name, display_order)
+		VALUES (?, ?, 0)
 		",
     )
     .bind(id)
     .bind(name)
-    .execute(pool)
+    .execute(&mut *tx)
     .await?;
+
+    tx.commit().await?;
+
+    Ok(())
+}
+
+pub(crate) async fn set_instance_group_order(
+    group_ids: &[String],
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let mut tx = pool.begin().await?;
+    let existing_group_ids = sqlx::query_scalar::<_, String>(
+        "
+		SELECT id
+		FROM instance_groups
+		WHERE id != ?
+		ORDER BY display_order, name, id
+		",
+    )
+    .bind(crate::api::instance::FAVORITES_GROUP_ID)
+    .fetch_all(&mut *tx)
+    .await?;
+    let existing_group_id_set = existing_group_ids
+        .iter()
+        .map(String::as_str)
+        .collect::<HashSet<_>>();
+    let mut seen_group_ids = HashSet::new();
+    let mut ordered_group_ids = Vec::with_capacity(existing_group_ids.len());
+
+    for group_id in group_ids {
+        if !seen_group_ids.insert(group_id.as_str()) {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Duplicate instance group {group_id} in group order"
+            ))
+            .into());
+        }
+
+        if !existing_group_id_set.contains(group_id.as_str()) {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Unknown instance group {group_id}"
+            ))
+            .into());
+        }
+
+        ordered_group_ids.push(group_id.as_str());
+    }
+
+    for group_id in &existing_group_ids {
+        if seen_group_ids.insert(group_id.as_str()) {
+            ordered_group_ids.push(group_id.as_str());
+        }
+    }
+
+    for (display_order, group_id) in ordered_group_ids.into_iter().enumerate() {
+        sqlx::query(
+            "
+			UPDATE instance_groups
+			SET display_order = ?
+			WHERE id = ?
+			",
+        )
+        .bind(display_order as i64)
+        .bind(group_id)
+        .execute(&mut *tx)
+        .await?;
+    }
+
+    tx.commit().await?;
 
     Ok(())
 }

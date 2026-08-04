@@ -29,6 +29,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_create_group,
             instance_rename_group,
             instance_delete_group,
+            instance_set_group_order,
             instance_set_group_memberships,
             instance_get_projects,
             instance_get_installed_project_ids,
@@ -503,6 +504,11 @@ pub async fn instance_rename_group(
 #[tauri::command]
 pub async fn instance_delete_group(id: String) -> Result<()> {
     Ok(theseus::instance::delete_group(id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_group_order(group_ids: Vec<String>) -> Result<()> {
+    Ok(theseus::instance::set_group_order(group_ids).await?)
 }
 
 #[tauri::command]

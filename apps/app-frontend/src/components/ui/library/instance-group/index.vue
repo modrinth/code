@@ -52,6 +52,9 @@ const {
 	setSectionCollapsed,
 	deleteGroup,
 	renameGroup,
+	canMoveGroupUp,
+	canMoveGroupDown,
+	moveGroup,
 	groupIdPendingNameEdit,
 	completePendingGroupNameEdit,
 	handleInstanceContextMenu,
@@ -428,11 +431,15 @@ onMounted(startInstanceGridResizeObserver)
 			</div>
 			<div class="min-w-0 flex-1" />
 			<GroupActionButtons
-				v-if="!isUngrouped && !isFavorites"
+				v-if="isCustomGroup"
+				:can-move-down="canMoveGroupDown(instanceGroup.id)"
+				:can-move-up="canMoveGroupUp(instanceGroup.id)"
 				:deleting="deletingGroup"
 				:on-add-to-group="() => openGroupInstancesModal(instanceGroup.id)"
 				:on-delete-group="requestGroupDeletion"
 				:on-edit-group-name="() => groupNameInput?.startEditing()"
+				:on-move-down="() => moveGroup(instanceGroup.id, 1)"
+				:on-move-up="() => moveGroup(instanceGroup.id, -1)"
 			/>
 		</div>
 		<Accordion
