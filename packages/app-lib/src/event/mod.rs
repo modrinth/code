@@ -64,7 +64,8 @@ impl EventState {
 
     #[cfg(feature = "tauri")]
     pub fn send(&self, event: AppEvent) -> crate::Result<()> {
-        let payload = postcard::to_allocvec(&event).map_err(EventError::from)?;
+        let payload =
+            postcard::to_allocvec(&event).map_err(EventError::from)?;
         self.event_channel
             .read()
             .send(InvokeResponseBody::Raw(payload))
@@ -191,7 +192,9 @@ fn fix_postcard_javascript_utf8(
 
     let javascript = std::fs::read_to_string(output)?;
     if !javascript.contains(GENERATED) {
-        return Err("postcard-bindgen's generated string decoder changed".into());
+        return Err(
+            "postcard-bindgen's generated string decoder changed".into()
+        );
     }
     std::fs::write(output, javascript.replace(GENERATED, UTF8))?;
     Ok(())
@@ -516,7 +519,10 @@ mod log_types {
     )]
     #[serde_binhum::serde_binhum]
     #[serde(tag = "type", rename_all = "snake_case")]
-    #[cfg_attr(feature = "export-ts", ts(tag = "type", rename_all = "snake_case"))]
+    #[cfg_attr(
+        feature = "export-ts",
+        ts(tag = "type", rename_all = "snake_case")
+    )]
     pub enum LogEvent {
         Log4j(Log4jEvent),
         Legacy { message: String },

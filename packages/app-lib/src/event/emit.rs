@@ -248,9 +248,8 @@ pub async fn emit_notification(payload: Value) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
         let event_state = crate::EventState::get()?;
-        event_state.send(AppEvent::Notification(serde_json::to_string(
-            &payload,
-        )?))?;
+        event_state
+            .send(AppEvent::Notification(serde_json::to_string(&payload)?))?;
     }
 
     Ok(())
