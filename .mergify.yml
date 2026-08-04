@@ -1,0 +1,23 @@
+merge_queue:
+  mode: parallel
+scopes:
+  source:
+    files:
+      frontend:
+        include:
+          - apps/frontend/**/*
+          - packages/ui/**/*
+          - packages/utils/**/*
+          - packages/assets/**/*
+          - "**/wrangler.jsonc"
+          - "**/pnpm-*.yaml"
+      backend:
+        include:
+          - apps/labrinth/**
+          - Cargo.toml
+      app:
+        include:
+          - apps/app/**
+          - apps/app-frontend/**
+          - packages/app-lib/**
+          - packages/app-macros/**

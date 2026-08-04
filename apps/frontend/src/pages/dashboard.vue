@@ -65,12 +65,10 @@
 					}}
 				</div>
 				<template #actions>
-					<ButtonStyled color="blue">
-						<NuxtLink to="/discord/link" class="w-fit !px-4">
-							<ExternalIcon />
-							{{ formatMessage(messages.discordRoleBannerCta) }}
-						</NuxtLink>
-					</ButtonStyled>
+					<ButtonLink type="colored" color="blue" to="/discord/link" class="w-fit !px-4">
+						<ExternalIcon />
+						{{ formatMessage(messages.discordRoleBannerCta) }}
+					</ButtonLink>
 				</template>
 			</Admonition>
 			<NuxtPage :route="route" />
@@ -93,7 +91,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

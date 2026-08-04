@@ -17,6 +17,7 @@ import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { add_server_to_instance, getServerAddress } from '@/helpers/worlds'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 interface BrowseServerInstance {
 	id: string
@@ -38,7 +39,7 @@ interface ContextMenuOptionClick {
 }
 
 export interface UseAppServerBrowseOptions {
-	instance: Ref<BrowseServerInstance | null>
+	instance: Readonly<Ref<BrowseServerInstance | null>>
 	isFromWorlds: ComputedRef<boolean>
 	allInstalledIds: ComputedRef<Set<string>>
 	newlyInstalled: Ref<string[]>
@@ -131,7 +132,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					project.minecraft_java_server?.content?.kind,
 				)
 				options.newlyInstalled.value.push(project.project_id)
-				await queryClient.invalidateQueries({ queryKey: ['worlds', instanceId] })
+				await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instanceId) })
 			} catch (error) {
 				options.handleError(error)
 			}

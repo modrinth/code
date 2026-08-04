@@ -14,18 +14,14 @@
 				</template>
 				<template #cell-actions="{ row }">
 					<div class="flex items-center justify-end">
-						<ButtonStyled v-if="currentSelected.path === row.path">
-							<button class="!shadow-none" disabled>
-								<CheckIcon aria-hidden="true" />
-								{{ formatMessage(messages.selected) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else>
-							<button class="!shadow-none" @click="setJavaInstall(row)">
-								<PlusIcon aria-hidden="true" />
-								{{ formatMessage(messages.select) }}
-							</button>
-						</ButtonStyled>
+						<Button v-if="currentSelected.path === row.path" disabled>
+							<CheckIcon aria-hidden="true" />
+							{{ formatMessage(messages.selected) }}
+						</Button>
+						<Button v-else @click="setJavaInstall(row)">
+							<PlusIcon aria-hidden="true" />
+							{{ formatMessage(messages.select) }}
+						</Button>
 					</div>
 				</template>
 				<template #empty-state>
@@ -35,28 +31,21 @@
 				</template>
 			</Table>
 			<div class="flex justify-end">
-				<ButtonStyled type="outlined">
-					<button
-						class="!shadow-none !border-surface-4 !border"
-						@click="$refs.detectJavaModal.hide()"
-					>
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="outlined"
+					class="!border-surface-4 !border"
+					@click="$refs.detectJavaModal.hide()"
+				>
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(messages.cancel) }}
+				</Button>
 			</div>
 		</div>
 	</ModalWrapper>
 </template>
 <script setup>
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	defineMessages,
-	injectNotificationManager,
-	Table,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, defineMessages, injectNotificationManager, Table, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

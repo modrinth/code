@@ -89,6 +89,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Nepoznata instanca"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Ažuriranje deljenog sadržaja"
+  },
   "app.action-bar.installs": {
     "message": "Instalacije"
   },
@@ -125,20 +128,35 @@
   "app.action-bar.view-logs": {
     "message": "Pregledaj dnevnike"
   },
+  "app.ads-consent.accept": {
+    "message": "Prihvati sve"
+  },
+  "app.ads-consent.body": {
+    "message": "Reklame omogućavaju da Modrinth radi i finansiraju isplate kreatorima. Naši partneri mogu da čuvaju i koriste kolačiće u aplikaciji da bi personalizovali reklame i merili performanse."
+  },
+  "app.ads-consent.manage": {
+    "message": "Upravljaj podešavanjima"
+  },
+  "app.ads-consent.reject": {
+    "message": "Odbij sve"
+  },
+  "app.ads-consent.title": {
+    "message": "Tvoja bezbednost i kako reklame pomažu Modrinth-u"
+  },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Omogućava napredno renderovanje kao što su efekti zamućenja koji mogu izazvati probleme sa performansama bez hardverski ubrzanog renderovanja."
+    "message": "Uključi vizuelne efekte kao što je blur pozadine. Ovo može da pogorša performanse bez hardverskog ubrzanja."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Napredno renderovanje"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Izaberi svoju preferiranu temu boja za Modrinth aplikaciju."
+    "message": "Izaberi boju teme koju koristi Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema boje"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Promeni stranicu na kojoj se otvara pokretač."
+    "message": "Izaberi stranicu prikazanu kada se Modrinth App pokrene."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Početna stranica"
@@ -150,49 +168,46 @@
     "message": "Podrazumevana odredišna stranica"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Onemogućava oznaku sa imenom iznad tvog igrača na stranici sa skinovima."
+    "message": "Sakrij svoje korisničko ime iznad pregleda igrača na stranici Skin birača."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sakrij ime"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Uključuje nedavne svetove u odeljku „Povratak“ na početnoj stranici."
+    "message": "Prikaži skorije igrane svetove na odeljku \"Vrati se u\" na početnoj stranici."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Vrati se u svetove"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiziraj pokretač kada se pokrene Minecraft proces."
+    "message": "Smanji Modrinth App kada se Minecraft pokrene."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimiziraj pokretač"
+    "message": "Smanji aplikaciju"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Koristi okvir sistemskog prozora (potrebno je ponovno pokretanje aplikacije)."
+    "message": "Koristi naslovnu traku i kontrole prozora tvog operativnog sistema. Restart aplikacije obavezan."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Zavičajni ukrasi"
+    "message": "Sistemski okvir prozora"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Pokazuje koliko vremena si proveo igrajući instancu."
+    "message": "Prikaži koliko dugo ste igrali svaku instancu."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Pokazivaj vreme igranja"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Automatski preskače potvrde niskog rizika kao duplirane instalacije modpakova, normalno brisanje sadržaja, grupna ažuriranja, prekidanje veze sa modpakovima i upiti za popravku. Opasna upozorenja će se i dalje prikazivati."
+    "message": "Preskoči potvrde za radnje niskog rizika kao što je dupliranje instalacije, brisanje normalnog sadržaja, grupna ažuriranja, prekid veze i popravke. Upozorenja za opasne radnje se uvek prikazuju."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Preskači nebitna upozorenja"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Omogućava mogućnost prebacivanja bočne trake."
+    "message": "Sakrij desnu bočnu traku podrazumevano i dodaj dugme da se prikaže i sakrije."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Prebaci bočnu traku"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Ako pokušaš da instaliraš datoteku Modrinth Pack datoteke (.mrpack) koja nije hostovana na Modrinthu, uverićemo se da razumeš rizike pre nego što je instaliraš."
+    "message": "Sakrij desnu bočnu traku"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Upozoti me prije instalacije nepoznatih modpackova"
@@ -487,9 +502,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Izgled"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Podrazumevane opcije instance"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java instalacije"

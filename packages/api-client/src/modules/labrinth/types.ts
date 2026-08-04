@@ -463,6 +463,16 @@ export namespace Labrinth {
 	}
 
 	export namespace Analytics {
+		export namespace Internal {
+			export type AnalyticsEventUpsert = {
+				announcement_url: string | null
+				for_metric_kind: v3.AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				starts: string
+			}
+		}
+
 		export namespace v3 {
 			export type AnalyticsEventId = number
 			export type AnalyticsEventMetricKind = 'views' | 'revenue' | 'downloads' | 'playtime'
@@ -473,14 +483,6 @@ export namespace Labrinth {
 				title: string
 				ends: string
 				id: AnalyticsEventId
-				starts: string
-			}
-
-			export type AnalyticsEventUpsert = {
-				announcement_url: string | null
-				for_metric_kind: AnalyticsEventMetricKind[] | null
-				title: string
-				ends: string
 				starts: string
 			}
 

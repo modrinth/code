@@ -1,7 +1,9 @@
 <template>
 	<div>
-		<MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
-			<CodeIcon class="inline-flex" />
+		<Admonition v-if="flags.developerMode" type="critical" class="mb-4" show-actions-underneath>
+			<template #icon="{ iconClass }">
+				<CodeIcon :class="iconClass" aria-hidden="true" />
+			</template>
 			<IntlFormatted :message-id="developerModeBanner.description">
 				<template #strong="{ children }">
 					<strong>
@@ -9,12 +11,12 @@
 					</strong>
 				</template>
 			</IntlFormatted>
-			<ButtonStyled color="red" type="highlight">
-				<button class="mt-3" @click="disableDeveloperMode()">
+			<template #actions>
+				<Button type="colored" color="red" @click="disableDeveloperMode()">
 					{{ formatMessage(developerModeBanner.deactivate) }}
-				</button>
-			</ButtonStyled>
-		</MessageBanner>
+				</Button>
+			</template>
+		</Admonition>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
 			<p>{{ formatMessage(colorTheme.description) }}</p>
@@ -180,7 +182,8 @@
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Admonition,
+	Button,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
@@ -191,7 +194,6 @@ import {
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 
-import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'
 import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 
@@ -499,14 +501,6 @@ const listTypes = computed(() => {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-}
-
-.developer-message {
-	svg {
-		vertical-align: middle;
-		margin-bottom: 2px;
-		margin-right: 0.5rem;
 	}
 }
 </style>

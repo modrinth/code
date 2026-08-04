@@ -1,7 +1,7 @@
 import { EditIcon, TrashIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button, IconButton } from '../../components/base/buttons'
 import SkinButton from '../../components/skin/SkinButton.vue'
 
 const frontImage = `data:image/svg+xml,${encodeURIComponent(`
@@ -62,7 +62,7 @@ export const ActiveUnselected: Story = {
 
 export const WithActions: Story = {
 	render: (args) => ({
-		components: { ButtonStyled, EditIcon, SkinButton, TrashIcon },
+		components: { EditIcon, SkinButton, TrashIcon, Button, IconButton },
 		setup() {
 			return { args }
 		},
@@ -70,16 +70,12 @@ export const WithActions: Story = {
 			<div class="w-[156px]">
 				<SkinButton v-bind="args">
 					<template #overlay-buttons>
-						<ButtonStyled color="brand">
-							<button class="pointer-events-auto">
-								<EditIcon /> Edit
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular color="red">
-							<button class="pointer-events-auto" aria-label="Delete skin">
-								<TrashIcon />
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" class="pointer-events-auto">
+							<EditIcon /> Edit
+						</Button>
+						<IconButton type="colored" color="red" label="Delete skin" class="pointer-events-auto">
+							<TrashIcon />
+						</IconButton>
 					</template>
 				</SkinButton>
 			</div>

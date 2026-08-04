@@ -20,6 +20,8 @@
 		:fit-content="true"
 		:searchable="preview.category.searchable"
 		:search-placeholder="preview.category.searchPlaceholder"
+		trigger-type="base"
+		trigger-size="lg"
 		:trigger-class="effectivePreviewTriggerClass"
 		:dropdown-width="getPreviewDropdownWidth(preview.category)"
 		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
@@ -105,24 +107,24 @@
 	</MultiSelect>
 
 	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
-		<ButtonStyled type="outlined">
-			<button
-				ref="addMenuTrigger"
-				type="button"
-				:class="addButtonClass ?? '!border'"
-				:aria-expanded="isAddMenuOpen"
-				aria-haspopup="menu"
-				@click="handleAddMenuTriggerClick"
-				@keydown="handleAddMenuTriggerKeydown"
-			>
-				<PlusIcon />
-				{{ addLabel }}
-			</button>
-		</ButtonStyled>
+		<Button
+			ref="addMenuTrigger"
+			type="outlined"
+			native-type="button"
+			:size="addButtonSize"
+			:class="addButtonClass ?? '!border'"
+			:aria-expanded="isAddMenuOpen"
+			aria-haspopup="menu"
+			@click="handleAddMenuTriggerClick"
+			@keydown="handleAddMenuTriggerKeydown"
+		>
+			<PlusIcon />
+			{{ addLabel }}
+		</Button>
 
-		<ButtonStyled v-if="shouldShowClear" type="transparent">
-			<button type="button" @click="clearAllFilters">{{ clearLabel }}</button>
-		</ButtonStyled>
+		<Button v-if="shouldShowClear" type="quiet" native-type="button" @click="clearAllFilters">{{
+			clearLabel
+		}}</Button>
 	</div>
 
 	<Teleport to="#teleports">
@@ -385,8 +387,9 @@ import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
+import { Button, type ButtonSize } from '#ui/components/base/buttons'
+
 import { useVirtualScroll } from '../../composables/virtual-scroll'
-import ButtonStyled from './ButtonStyled.vue'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 import StyledInput from './StyledInput.vue'
 
@@ -514,6 +517,7 @@ const props = withDefaults(
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
 		addButtonClass?: string
+		addButtonSize?: ButtonSize
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
@@ -525,6 +529,7 @@ const props = withDefaults(
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
+		addButtonSize: 'md',
 		applyImmediately: false,
 		showPreviewFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',
@@ -752,8 +757,7 @@ const appliedFilterPreviews = computed(() =>
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
-const DEFAULT_PREVIEW_TRIGGER_CLASS =
-	'h-10 max-w-[16rem] bg-surface-4 px-4 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
+const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem]'
 const effectivePreviewTriggerClass = computed(
 	() => props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS,
 )

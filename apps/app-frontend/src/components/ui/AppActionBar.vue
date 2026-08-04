@@ -1,15 +1,15 @@
 <template>
 	<div class="flex gap-2 items-center">
-		<ButtonStyled
+		<IconButton
 			v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts"
+			v-tooltip="formatMessage(messages.viewActiveDownloads)"
+			type="quiet"
 			color="brand"
-			type="transparent"
-			circular
+			:label="formatMessage(messages.viewActiveDownloads)"
+			@click="openDownloadToast()"
 		>
-			<button v-tooltip="formatMessage(messages.viewActiveDownloads)" @click="openDownloadToast()">
-				<DownloadIcon />
-			</button>
-		</ButtonStyled>
+			<DownloadIcon />
+		</IconButton>
 		<div v-if="offline" class="flex items-center gap-1">
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
@@ -36,17 +36,23 @@
 						@show="showInstances = true"
 						@hide="showInstances = false"
 					>
-						<ButtonStyled type="transparent" circular size="small">
-							<button
-								v-tooltip="
-									showInstances
-										? formatMessage(messages.hideMoreRunningInstances)
-										: formatMessage(messages.showMoreRunningInstances)
-								"
-							>
-								<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
-							</button>
-						</ButtonStyled>
+						<IconButton
+							v-tooltip="
+								showInstances
+									? formatMessage(messages.hideMoreRunningInstances)
+									: formatMessage(messages.showMoreRunningInstances)
+							"
+							class="!size-6"
+							type="quiet"
+							size="xs"
+							:label="
+								showInstances
+									? formatMessage(messages.hideMoreRunningInstances)
+									: formatMessage(messages.showMoreRunningInstances)
+							"
+						>
+							<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
+						</IconButton>
 						<template #popper>
 							<div class="flex w-[20rem] max-h-[24rem] flex-col gap-2 overflow-auto">
 								<div
@@ -125,8 +131,8 @@ import {
 	TerminalSquareIcon,
 	UnplugIcon,
 } from '@modrinth/assets'
+import { IconButton } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	injectPopupNotificationManager,
@@ -345,7 +351,7 @@ function buildDownloadItems(): PopupNotificationProgressItem[] {
 			iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
 			progress: getLoadingProgress(bar),
 			waiting: !bar.total || bar.total <= 0,
-			progressType: 'percentage',
+			progressType: bar.bar_type?.type === 'pack_import' ? 'bytes' : 'percentage',
 			progressCurrent: bar.current,
 			progressTotal: bar.total,
 		})),

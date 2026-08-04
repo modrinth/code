@@ -93,7 +93,7 @@
 		}
 	}
 
-	:where(button, .button, .iconified-button) {
+	:where(button:not([data-button]), .button, .iconified-button) {
 		width: fit-content;
 	}
 

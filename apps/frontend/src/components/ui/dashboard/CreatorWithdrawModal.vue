@@ -58,39 +58,40 @@
 		</div>
 		<template #actions>
 			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
-				<ButtonStyled>
-					<button class="w-full flex-1 text-contrast" @click="handleClose">
-						{{ formatMessage(commonMessages.closeButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button class="w-full flex-1 text-contrast" @click="handleViewTransactions">
-						{{ formatMessage(messages.transactionsButton) }}
-					</button>
-				</ButtonStyled>
+				<Button class="w-full flex-1 text-contrast" @click="handleClose">
+					{{ formatMessage(commonMessages.closeButton) }}
+				</Button>
+				<Button class="w-full flex-1 text-contrast" @click="handleViewTransactions">
+					{{ formatMessage(messages.transactionsButton) }}
+				</Button>
 			</div>
 			<div v-else class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
-				<ButtonStyled type="outlined">
-					<button :disabled="leftButtonConfig.disabled" @click="leftButtonConfig.handler">
-						<component :is="leftButtonConfig.icon" />
-						{{ leftButtonConfig.label }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled :color="rightButtonConfig.color">
-					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.handler">
-						<component
-							:is="rightButtonConfig.icon"
-							v-if="rightButtonConfig.iconPosition === 'before'"
-							:class="rightButtonConfig.iconClass"
-						/>
-						{{ rightButtonConfig.label }}
-						<component
-							:is="rightButtonConfig.icon"
-							v-if="rightButtonConfig.iconPosition === 'after'"
-							:class="rightButtonConfig.iconClass"
-						/>
-					</button>
-				</ButtonStyled>
+				<Button
+					type="outlined"
+					:disabled="leftButtonConfig.disabled"
+					@click="leftButtonConfig.handler"
+				>
+					<component :is="leftButtonConfig.icon" />
+					{{ leftButtonConfig.label }}
+				</Button>
+				<Button
+					:type="rightButtonConfig.color === 'standard' ? 'base' : 'colored'"
+					:color="rightButtonConfig.color === 'standard' ? undefined : rightButtonConfig.color"
+					:disabled="rightButtonConfig.disabled"
+					@click="rightButtonConfig.handler"
+				>
+					<component
+						:is="rightButtonConfig.icon"
+						v-if="rightButtonConfig.iconPosition === 'before'"
+						:class="rightButtonConfig.iconClass"
+					/>
+					{{ rightButtonConfig.label }}
+					<component
+						:is="rightButtonConfig.icon"
+						v-if="rightButtonConfig.iconPosition === 'after'"
+						:class="rightButtonConfig.iconClass"
+					/>
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -114,7 +115,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,

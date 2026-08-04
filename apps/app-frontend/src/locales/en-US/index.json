@@ -590,6 +590,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "No servers or worlds added"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Refreshing..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Remove server"
   },
@@ -1225,6 +1228,9 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} was successfully installed!"
+  },
+  "app.user.project.install-to-instance": {
+    "message": "Install to instance"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
