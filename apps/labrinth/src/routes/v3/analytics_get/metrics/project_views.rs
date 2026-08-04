@@ -1,3 +1,5 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use const_format::formatcp;
@@ -188,10 +190,16 @@ pub(crate) async fn fetch(
         query = filter_param.bind(query);
     }
 
-    let mut cursor = query.fetch::<ViewRow>()?;
+    let mut cursor = query
+        .fetch::<ViewRow>()
+        .wrap_internal_err("fetching project-view pagination cursor")?;
     let mut buckets = HashMap::<ViewBucket, u64>::new();
 
-    while let Some(row) = cursor.next().await? {
+    while let Some(row) = cursor
+        .next()
+        .await
+        .wrap_internal_err("fetching project views")?
+    {
         let key = ViewBucket {
             bucket: row.bucket,
             project_id: row.project_id,
@@ -252,7 +260,8 @@ pub(crate) async fn fetch(
                     views,
                 }),
             }),
-        )?;
+        )
+        .wrap_api_err("executing `ProjectMetrics::Views`")?;
     }
 
     Ok(())

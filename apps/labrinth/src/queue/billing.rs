@@ -24,6 +24,7 @@ use crate::routes::internal::billing::payments::*;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::archon::{CreateServerRequest, Specs};
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
@@ -48,9 +49,14 @@ async fn update_tax_amounts(
     let mut processed_charges = 0;
 
     loop {
-        let mut txn = pg.begin().await?;
+        let mut txn = pg
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
 
-        let charges = DBCharge::get_updateable_lock(&mut txn, 5).await?;
+        let charges = DBCharge::get_updateable_lock(&mut txn, 5)
+            .await
+            .wrap_internal_err("fetching charges from database")?;
 
         if charges.is_empty() {
             info!("No more charges to process");
@@ -82,67 +88,70 @@ async fn update_tax_amounts(
                         charge.price_id,
                         &pg,
                     )
-                    .await?
+                    .await
+                    .wrap_api_err("fetching price")?
                     .ok_or_else(|| {
                         DatabaseError::Database(sqlx::Error::RowNotFound)
-                    })?;
+                    })
+                    .wrap_internal_err("querying database for `update_tax_amounts`")?;
 
-                    let product =
-                        DBProduct::get_price(charge.price_id, &pg)
-                            .await?
-                            .ok_or_else(|| {
-                            DatabaseError::Database(
-                                sqlx::Error::RowNotFound,
-                            )
-                        })?;
+                    let product = DBProduct::get_price(charge.price_id, &pg)
+                        .await
+                        .wrap_internal_err(
+                            "fetching product price from database",
+                        )?
+                        .ok_or_else(|| {
+                            DatabaseError::Database(sqlx::Error::RowNotFound)
+                        })
+                        .wrap_internal_err(
+                            "finding product price in database",
+                        )?;
 
                     let stripe_address = 'a: {
-                        let stripe_customer_id =
+                        let stripe_customer =
                             DBUser::get_id(charge.user_id, &pg, &redis)
-                                .await?
-                                .ok_or_else(|| {
-                                    ApiError::from(DatabaseError::Database(
-                                        sqlx::Error::RowNotFound,
-                                    ))
-                                })
-                                .and_then(|user| {
-                                    user.stripe_customer_id.ok_or_else(
-                                        || {
-                                            ApiError::InvalidInput(
-                                            "User has no Stripe customer ID"
-                                                .to_owned(),
-                                        )
-                                        },
-                                    )
-                                })?
-                                .parse()
-                                .map_err(|_| {
-                                    ApiError::InvalidInput(
-                                        "User Stripe customer ID was invalid".to_owned(),
-                                    )
-                                })?;
+                                .await
+                                .wrap_internal_err(
+                                    "fetching Stripe customer from database",
+                                )?
+                                .wrap_internal_err(
+                                    "finding Stripe customer in database",
+                                )?;
+                        let stripe_customer_id = stripe_customer
+                            .stripe_customer_id
+                            .wrap_request_err(
+                                "finding Stripe customer ID on user",
+                            )?
+                            .parse()
+                            .wrap_request_err(
+                                "parsing user Stripe customer ID",
+                            )?;
 
                         let customer = stripe::Customer::retrieve(
                             &stripe_client,
                             &stripe_customer_id,
                             &["invoice_settings.default_payment_method"],
                         )
-                        .await?;
+                        .await
+                        .wrap_failed_dependency_err(
+                            "communicating with payment provider",
+                        )?;
 
                         // A customer should have a default payment method if they have an active subscription.
 
                         let payment_method = customer
                             .invoice_settings
                             .and_then(|x| {
-                                x.default_payment_method.and_then(|x| x.into_object())
+                                x.default_payment_method
+                                    .and_then(|x| x.into_object())
                             })
-                            .ok_or_else(|| {
-                                ApiError::InvalidInput(
-                                    "Customer has no default payment method!".to_string(),
-                                )
+                            .wrap_request_err_with(|| {
+                                "customer has no default payment method!"
+                                    .to_string()
                             })?;
 
-                        let stripe_address = payment_method.billing_details.address;
+                        let stripe_address =
+                            payment_method.billing_details.address;
 
                         // Attempt the default payment method's address first, then the customer's address.
                         match stripe_address {
@@ -152,18 +161,14 @@ async fn update_tax_amounts(
                             }
                         };
 
-                        customer.address.ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "Couldn't get an address for the Stripe customer"
-                                    .to_owned(),
-                            )
+                        customer.address.wrap_request_err_with(|| {
+                            "couldn't get an address for the Stripe customer"
+                                .to_owned()
                         })?
                     };
 
                     let customer_address =
-                        anrok::Address::from_stripe_address(
-                            &stripe_address,
-                        );
+                        anrok::Address::from_stripe_address(&stripe_address);
 
                     let tax_amount = anrok_client
                         .create_ephemeral_txn(&anrok::TransactionFields {
@@ -179,17 +184,16 @@ async fn update_tax_amounts(
                             customer_id: None,
                             customer_name: None,
                         })
-                        .await?
+                        .await
+                        .wrap_internal_err("inserting database records for `update_tax_amounts`")?
                         .tax_amount_to_collect;
 
-                    Result::<ProcessedCharge, ApiError>::Ok(
-                        ProcessedCharge {
-                            new_tax_amount: tax_amount,
-                            product_name: product
-                                .name
-                                .unwrap_or_else(|| "Modrinth".to_owned()),
-                        },
-                    )
+                    Result::<ProcessedCharge, ApiError>::Ok(ProcessedCharge {
+                        new_tax_amount: tax_amount,
+                        product_name: product
+                            .name
+                            .unwrap_or_else(|| "Modrinth".to_owned()),
+                    })
                 };
 
                 op_fut.then(move |res| async move { (charge_clone, res) })
@@ -212,11 +216,9 @@ async fn update_tax_amounts(
                         // for this.
 
                         let subscription_id =
-                            charge.subscription_id.ok_or_else(|| {
-                                ApiError::InvalidInput(
-                                    "Charge has no subscription ID".to_owned(),
-                                )
-                            })?;
+                            charge.subscription_id.wrap_request_err_with(
+                                || "charge has no subscription ID".to_owned(),
+                            )?;
 
                         NotificationBuilder {
                             body: NotificationBody::TaxNotification {
@@ -234,7 +236,8 @@ async fn update_tax_amounts(
                             },
                         }
                         .insert(charge.user_id, &mut txn, redis)
-                        .await?;
+                        .await
+                        .wrap_internal_err("inserting database records for `update_tax_amounts`")?;
 
                         charge.tax_amount = new_tax_amount;
                     }
@@ -248,10 +251,15 @@ async fn update_tax_amounts(
             };
 
             charge.tax_last_updated = Some(Utc::now());
-            charge.upsert(&mut txn).await?;
+            charge
+                .upsert(&mut txn)
+                .await
+                .wrap_internal_err("updating subscription id in database")?;
         }
 
-        txn.commit().await?;
+        txn.commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
 
         if processed_charges >= limit {
             break Ok(());
@@ -287,11 +295,9 @@ async fn update_anrok_transactions(
                     .payment_platform_id
                     .as_ref()
                     .and_then(|x| x.parse().ok())
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput(
-                            "Refund charge has no or an invalid refund ID"
-                                .to_owned(),
-                        )
+                    .wrap_request_err_with(|| {
+                        "refund charge has no or an invalid refund ID"
+                            .to_owned()
                     })?;
 
                 let refund = stripe::Refund::retrieve(
@@ -299,15 +305,16 @@ async fn update_anrok_transactions(
                     &refund_id,
                     &["payment_intent.payment_method"],
                 )
-                .await?;
+                .await
+                .wrap_failed_dependency_err(
+                    "communicating with payment provider",
+                )?;
 
                 let pi = refund
                     .payment_intent
                     .and_then(|x| x.into_object())
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput(
-                            "Refund charge has no payment intent".to_owned(),
-                        )
+                    .wrap_request_err_with(|| {
+                        "refund charge has no payment intent".to_owned()
                     })?;
 
                 (pi, anrok::transaction_id_stripe_pyr(&refund_id))
@@ -316,10 +323,8 @@ async fn update_anrok_transactions(
                     .payment_platform_id
                     .as_ref()
                     .and_then(|x| x.parse().ok())
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput(
-                            "Charge has no payment platform ID".to_owned(),
-                        )
+                    .wrap_request_err_with(|| {
+                        "charge has no payment platform ID".to_owned()
                     })?;
 
                 // Attempt retrieving the address via the payment intent's payment method
@@ -329,7 +334,10 @@ async fn update_anrok_transactions(
                     &stripe_id,
                     &["payment_method"],
                 )
-                .await?;
+                .await
+                .wrap_failed_dependency_err(
+                    "communicating with payment provider",
+                )?;
 
                 let anrok_id = anrok::transaction_id_stripe_pi(&stripe_id);
 
@@ -341,27 +349,17 @@ async fn update_anrok_transactions(
                 .and_then(|x| x.into_object())
                 .and_then(|x| x.billing_details.address);
 
-            let stripe_customer_id =
-                DBUser::get_id(c.user_id, &mut *txn, redis)
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::from(DatabaseError::Database(
-                            sqlx::Error::RowNotFound,
-                        ))
-                    })
-                    .and_then(|user| {
-                        user.stripe_customer_id.ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "User has no Stripe customer ID".to_owned(),
-                            )
-                        })
-                    })?;
+            let stripe_customer = DBUser::get_id(c.user_id, &mut *txn, redis)
+                .await
+                .wrap_internal_err("fetching Stripe customer from database")?
+                .wrap_internal_err("finding Stripe customer in database")?;
+            let stripe_customer_id = stripe_customer
+                .stripe_customer_id
+                .wrap_request_err("finding Stripe customer ID on user")?;
 
-            let customer_id = stripe_customer_id.parse().map_err(|e| {
-                ApiError::InvalidInput(format!(
-                    "Charge's Stripe customer ID was invalid ({e})"
-                ))
-            })?;
+            let customer_id = stripe_customer_id
+                .parse()
+                .wrap_request_err("parsing request value")?;
 
             match pi_stripe_address {
                 Some(address) => {
@@ -377,7 +375,10 @@ async fn update_anrok_transactions(
 
             let customer =
                 stripe::Customer::retrieve(stripe_client, &customer_id, &[])
-                    .await?;
+                    .await
+                    .wrap_failed_dependency_err(
+                        "communicating with payment provider",
+                    )?;
 
             let Some(address) = customer.address else {
                 // We won't really be able to do anything about this.
@@ -388,7 +389,9 @@ async fn update_anrok_transactions(
                 );
 
                 c.tax_platform_id = Some("unresolved".to_owned());
-                c.upsert(txn).await?;
+                c.upsert(txn)
+                    .await
+                    .wrap_internal_err("updating customer in database")?;
 
                 return Ok(());
             };
@@ -397,8 +400,12 @@ async fn update_anrok_transactions(
         };
 
         let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut *txn)
-            .await?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
+            .await
+            .wrap_api_err("fetching price")?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
+            .wrap_internal_err(
+                "fetching products tax identifier from database",
+            )?;
 
         // Note: if the tax amount that was charged to the customer is *different* than
         // what it *should* be NOW, we will take on a loss here.
@@ -427,18 +434,18 @@ async fn update_anrok_transactions(
 
         match result {
             Ok(response) => {
-                let version = response.version.ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Anrok response is missing tax transaction version"
-                            .to_owned(),
-                    )
+                let version = response.version.wrap_request_err_with(|| {
+                    "anrok response is missing tax transaction version"
+                        .to_owned()
                 })?;
 
                 c.tax_drift_loss = Some(response.tax_amount_to_collect);
                 c.tax_platform_id = Some(tax_platform_id);
                 c.tax_transaction_version = Some(version);
                 c.tax_platform_accounting_time = Some(c.due);
-                c.upsert(txn).await?;
+                c.upsert(txn)
+                    .await
+                    .wrap_internal_err("updating version in database")?;
 
                 Ok(())
             }
@@ -449,11 +456,15 @@ async fn update_anrok_transactions(
                     .is_conflict_and(|x| x == "customerAddressCouldNotResolve")
                 {
                     c.tax_platform_id = Some("unresolved".to_owned());
-                    c.upsert(txn).await?;
+                    c.upsert(txn)
+                        .await
+                        .wrap_internal_err("updating version in database")?;
 
                     Ok(())
                 } else {
-                    Err(error.into())
+                    Err(ApiError::Internal(eyre::eyre!(
+                        "calculating tax with Anrok: {error}"
+                    )))
                 }
             }
         }
@@ -464,11 +475,15 @@ async fn update_anrok_transactions(
     let mut offset = 0;
 
     loop {
-        let mut txn = pg.begin().await?;
+        let mut txn = pg
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
 
         let mut charges =
             DBCharge::get_missing_tax_identifier_lock(&mut txn, offset, 1)
-                .await?;
+                .await
+                .wrap_internal_err("fetching charges from database")?;
 
         let Some(c) = charges.pop() else {
             info!("No more charges to process");
@@ -492,7 +507,9 @@ async fn update_anrok_transactions(
             offset += 1;
         }
 
-        txn.commit().await?;
+        txn.commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
 
         if processed_charges >= limit {
             break Ok(());
@@ -512,7 +529,10 @@ pub async fn try_process_user_redeemal(
     user_redeemal.last_attempt = Some(Utc::now());
     user_redeemal.n_attempts += 1;
     user_redeemal.status = users_redeemals::Status::Processing;
-    let updated = user_redeemal.update_status_if_pending(pool).await?;
+    let updated = user_redeemal
+        .update_status_if_pending(pool)
+        .await
+        .wrap_internal_err("updating updated in database")?;
 
     if !updated {
         return Ok(());
@@ -526,7 +546,8 @@ pub async fn try_process_user_redeemal(
         product_item::QueryProductWithPrices::list_by_product_type(
             pool, "medal",
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching query product with prices from Redis")?;
 
     let Some(product_item::QueryProductWithPrices {
         id: _product_id,
@@ -536,9 +557,9 @@ pub async fn try_process_user_redeemal(
         name: _,
     }) = medal_products.pop()
     else {
-        return Err(ApiError::Conflict(
+        return Err(ApiError::Conflict(eyre::eyre!(
             "Missing Medal subscription product".to_owned(),
-        ));
+        )));
     };
 
     let ProductMetadata::Medal {
@@ -549,31 +570,31 @@ pub async fn try_process_user_redeemal(
         region,
     } = metadata
     else {
-        return Err(ApiError::Conflict(
+        return Err(ApiError::Conflict(eyre::eyre!(
             "Missing or incorrect metadata for Medal subscription".to_owned(),
-        ));
+        )));
     };
 
     let Some(medal_price) = prices.pop() else {
-        return Err(ApiError::Conflict(
+        return Err(ApiError::Conflict(eyre::eyre!(
             "Missing price for Medal subscription".to_owned(),
-        ));
+        )));
     };
 
     let (price_duration, price_amount) = match medal_price.prices {
         Price::OneTime { price: _ } => {
-            return Err(ApiError::Conflict(
+            return Err(ApiError::Conflict(eyre::eyre!(
                 "Unexpected metadata for Medal subscription price".to_owned(),
-            ));
+            )));
         }
 
         Price::Recurring { intervals } => {
             let Some((price_duration, price_amount)) =
                 intervals.into_iter().next()
             else {
-                return Err(ApiError::Conflict(
+                return Err(ApiError::Conflict(eyre::eyre!(
                     "Missing price interval for Medal subscription".to_owned(),
-                ));
+                )));
             };
 
             (price_duration, price_amount)
@@ -585,13 +606,15 @@ pub async fn try_process_user_redeemal(
     // Get the user's username
 
     let user = DBUser::get_id(user_id, pool, redis)
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .wrap_not_found_err("resource not found")?;
 
     // Send the provision request to Archon. On failure, the redeemal will be "stuck" processing,
     // and moved back to pending by `index_subscriptions`.
 
-    let archon_client = ArchonClient::from_env()?;
+    let archon_client = ArchonClient::from_env()
+        .wrap_api_err("executing `ArchonClient::from_env`")?;
     let server_id = archon_client
         .create_server(&CreateServerRequest {
             user_id: to_base62(user_id.0 as u64),
@@ -606,13 +629,21 @@ pub async fn try_process_user_redeemal(
             region,
             tags: vec!["medal".to_owned()],
         })
-        .await?;
+        .await
+        .wrap_internal_err(
+            "inserting database records for `try_process_user_redeemal`",
+        )?;
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     // Build a subscription using this price ID.
     let subscription = DBUserSubscription {
-        id: generate_user_subscription_id(&mut txn).await?,
+        id: generate_user_subscription_id(&mut txn)
+            .await
+            .wrap_internal_err("generating user subscription ID")?,
         user_id,
         price_id,
         interval: PriceDuration::FiveDays,
@@ -623,12 +654,17 @@ pub async fn try_process_user_redeemal(
         }),
     };
 
-    subscription.upsert(&mut txn).await?;
+    subscription
+        .upsert(&mut txn)
+        .await
+        .wrap_internal_err("generating user subscription ID")?;
 
     // Insert an expiring charge, `index_subscriptions` will unprovision the
     // subscription when expired.
     DBCharge {
-        id: generate_charge_id(&mut txn).await?,
+        id: generate_charge_id(&mut txn)
+            .await
+            .wrap_internal_err("generating redeemal charge ID")?,
         user_id,
         price_id,
         amount: price_amount.into(),
@@ -651,26 +687,42 @@ pub async fn try_process_user_redeemal(
         tax_platform_accounting_time: None,
     }
     .upsert(&mut txn)
-    .await?;
+    .await
+    .wrap_internal_err("upserting redeemal charge")?;
 
     // Update `users_redeemal`, mark subscription as redeemed.
     user_redeemal.status = users_redeemals::Status::Processed;
-    user_redeemal.update(&mut txn).await?;
+    user_redeemal.update(&mut txn).await.wrap_internal_err(
+        "updating database records for `try_process_user_redeemal`",
+    )?;
 
-    txn.commit().await?;
+    txn.commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }
 
 pub async fn cancel_failing_charges(pool: &PgPool) -> Result<(), ApiError> {
-    let charges_to_cancel = DBCharge::get_cancellable(pool).await?;
+    let charges_to_cancel = DBCharge::get_cancellable(pool)
+        .await
+        .wrap_internal_err("fetching charge from database")?;
 
     for mut charge in charges_to_cancel {
         charge.status = ChargeStatus::Cancelled;
 
-        let mut transaction = pool.begin().await?;
-        charge.upsert(&mut transaction).await?;
-        transaction.commit().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
+        charge
+            .upsert(&mut transaction)
+            .await
+            .wrap_internal_err("updating transaction in database")?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
     }
 
     Ok(())
@@ -682,7 +734,9 @@ pub async fn process_chargeable_charges(
     stripe_client: &stripe::Client,
     anrok_client: &anrok::Client,
 ) -> Result<(), ApiError> {
-    let charges_to_do = DBCharge::get_chargeable(pool).await?;
+    let charges_to_do = DBCharge::get_chargeable(pool)
+        .await
+        .wrap_internal_err("fetching charge from database")?;
 
     let prices = product_item::DBProductPrice::get_many(
         &charges_to_do
@@ -693,7 +747,8 @@ pub async fn process_chargeable_charges(
             .collect::<Vec<_>>(),
         pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching product prices from database")?;
 
     let users = crate::database::models::DBUser::get_many_ids(
         &charges_to_do
@@ -705,7 +760,8 @@ pub async fn process_chargeable_charges(
         pool,
         redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching users from database")?;
 
     for mut charge in charges_to_do {
         let Some(product_price) =
@@ -784,9 +840,18 @@ pub async fn process_chargeable_charges(
             charge.status = ChargeStatus::Failed;
         }
 
-        let mut transaction = pool.begin().await?;
-        charge.upsert(&mut transaction).await?;
-        transaction.commit().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
+        charge
+            .upsert(&mut transaction)
+            .await
+            .wrap_internal_err("updating transaction in database")?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
     }
 
     Ok(())
@@ -798,7 +863,10 @@ async fn unprovision_subscriptions(
 ) -> Result<(), ApiError> {
     info!("Gathering charges to unprovision");
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
     let mut clear_cache_users = Vec::new();
 
     // If an active subscription has:
@@ -806,7 +874,9 @@ async fn unprovision_subscriptions(
     // - An expiring charge due now
     // - A failed charge more than two days ago
     // It should be unprovisioned
-    let all_charges = DBCharge::get_unprovision(pool).await?;
+    let all_charges = DBCharge::get_unprovision(pool)
+        .await
+        .wrap_internal_err("fetching charges from database")?;
 
     let mut all_subscriptions =
         user_subscription_item::DBUserSubscription::get_many(
@@ -818,7 +888,8 @@ async fn unprovision_subscriptions(
                 .collect::<Vec<_>>(),
             pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching user subscriptions from database")?;
     let subscription_prices = product_item::DBProductPrice::get_many(
         &all_subscriptions
             .iter()
@@ -828,7 +899,8 @@ async fn unprovision_subscriptions(
             .collect::<Vec<_>>(),
         pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching product prices from database")?;
     let subscription_products = product_item::DBProduct::get_many(
         &subscription_prices
             .iter()
@@ -838,7 +910,8 @@ async fn unprovision_subscriptions(
             .collect::<Vec<_>>(),
         pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching products from database")?;
     let users = DBUser::get_many_ids(
         &all_subscriptions
             .iter()
@@ -849,7 +922,8 @@ async fn unprovision_subscriptions(
         pool,
         redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching users from database")?;
 
     for charge in all_charges {
         debug!("Unprovisioning charge '{}'", to_base62(charge.id.0 as u64));
@@ -898,7 +972,10 @@ async fn unprovision_subscriptions(
                     user.id as DBUserId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `unprovision_subscriptions`",
+                )?;
 
                 true
             }
@@ -939,7 +1016,10 @@ async fn unprovision_subscriptions(
 
         if unprovisioned {
             subscription.status = SubscriptionStatus::Unprovisioned;
-            subscription.upsert(&mut transaction).await?;
+            subscription
+                .upsert(&mut transaction)
+                .await
+                .wrap_internal_err("updating err in database")?;
 
             DBUsersSubscriptionsAffiliations::deactivate(
                 subscription.id,
@@ -961,8 +1041,12 @@ async fn unprovision_subscriptions(
             .collect::<Vec<_>>(),
         redis,
     )
-    .await?;
-    transaction.commit().await?;
+    .await
+    .wrap_internal_err("clearing cached data from Redis")?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }
@@ -972,11 +1056,17 @@ async fn process_redeemals(
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
     // If an offer redeemal has been processing for over 5 minutes, it should be set pending.
-    UserRedeemal::update_stuck_5_minutes(pool).await?;
+    UserRedeemal::update_stuck_5_minutes(pool)
+        .await
+        .wrap_internal_err(
+            "updating database records for `process_redeemals`",
+        )?;
 
     // If an offer redeemal is pending, try processing it.
     // Try processing it.
-    let pending_redeemals = UserRedeemal::get_pending(pool, 100).await?;
+    let pending_redeemals = UserRedeemal::get_pending(pool, 100)
+        .await
+        .wrap_internal_err("fetching user redeemal from Redis")?;
     for redeemal in pending_redeemals {
         if let Err(error) =
             try_process_user_redeemal(pool, redis, redeemal).await

@@ -13,6 +13,8 @@ use crate::routes::internal::statuses::{
 };
 use crate::sync::friends::RedisFriendsMessage;
 use crate::sync::status::get_user_status;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
@@ -42,41 +44,54 @@ pub async fn add_friend(
         &session_queue,
         Scopes::USER_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let string = info.into_inner().0;
-    let Some(friend) = DBUser::get(&string, &**pool, &redis).await? else {
-        return Err(ApiError::NotFound);
+    let Some(friend) = DBUser::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?
+    else {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-    if DBBlockedUser::is_blocked(friend.id, user.id.into(), &**pool).await? {
-        return Err(ApiError::InvalidInput(
-            "You've been blocked the other user!".to_string(),
-        ));
-    } else if DBBlockedUser::is_blocked(user.id.into(), friend.id, &**pool)
-        .await?
+    if DBBlockedUser::is_blocked(friend.id, user.id.into(), &**pool)
+        .await
+        .wrap_internal_err("checking whether target user blocked requester")?
     {
-        return Err(ApiError::InvalidInput(
-            "You've blocked the other user!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "You've been blocked the other user!",
+        )));
+    } else if DBBlockedUser::is_blocked(user.id.into(), friend.id, &**pool)
+        .await
+        .wrap_internal_err("checking whether requester blocked target user")?
+    {
+        return Err(ApiError::Request(eyre::eyre!(
+            "You've blocked the other user!",
+        )));
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     if let Some(friend) =
-        DBFriend::get_friend(user.id.into(), friend.id, &**pool).await?
+        DBFriend::get_friend(user.id.into(), friend.id, &**pool)
+            .await
+            .wrap_internal_err("fetching friend from database")?
     {
         if friend.accepted {
-            return Err(ApiError::InvalidInput(
-                "You are already friends with this user!".to_string(),
-            ));
+            return Err(ApiError::Request(eyre::eyre!(
+                "You are already friends with this user!",
+            )));
         }
 
         if !friend.accepted && user.id != friend.friend_id.into() {
-            return Err(ApiError::InvalidInput(
-                "You cannot accept your own friend request!".to_string(),
-            ));
+            return Err(ApiError::Request(eyre::eyre!(
+                "You cannot accept your own friend request!",
+            )));
         }
 
         DBFriend::update_friend(
@@ -85,7 +100,8 @@ pub async fn add_friend(
             true,
             &mut transaction,
         )
-        .await?;
+        .await
+        .wrap_internal_err("updating friend in database")?;
 
         async fn send_friend_status(
             user_id: DBUserId,
@@ -103,27 +119,30 @@ pub async fn add_friend(
                         status: friend_status,
                     },
                 )
-                .await?;
+                .await
+                .wrap_internal_err("updating friend in database")?;
             }
 
             Ok(())
         }
 
         send_friend_status(friend.user_id, friend.friend_id, &db, &redis)
-            .await?;
+            .await
+            .wrap_api_err("executing `send_friend_status`")?;
         send_friend_status(friend.friend_id, friend.user_id, &db, &redis)
-            .await?;
+            .await
+            .wrap_api_err("executing `send_friend_status`")?;
     } else {
         if friend.id == user.id.into() {
-            return Err(ApiError::InvalidInput(
-                "You cannot add yourself as a friend!".to_string(),
-            ));
+            return Err(ApiError::Request(eyre::eyre!(
+                "You cannot add yourself as a friend!",
+            )));
         }
 
         if !friend.allow_friend_requests {
-            return Err(ApiError::InvalidInput(
-                "Friend requests are disabled for this user!".to_string(),
-            ));
+            return Err(ApiError::Request(eyre::eyre!(
+                "Friend requests are disabled for this user!",
+            )));
         }
 
         DBFriend {
@@ -133,17 +152,26 @@ pub async fn add_friend(
             accepted: false,
         }
         .insert(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "inserting database records for `send_friend_status`",
+        )?;
 
         send_message_to_user(
             &db,
             friend.id.into(),
             &ServerToClientMessage::FriendRequest { from: user.id },
         )
-        .await?;
+        .await
+        .wrap_internal_err(
+            "inserting database records for `send_friend_status`",
+        )?;
     }
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -166,29 +194,41 @@ pub async fn remove_friend(
         &session_queue,
         Scopes::USER_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let string = info.into_inner().0;
-    let friend = DBUser::get(&string, &**pool, &redis).await?;
+    let friend = DBUser::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?;
 
     if let Some(friend) = friend {
-        let mut transaction = pool.begin().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
 
-        DBFriend::remove(user.id.into(), friend.id, &mut transaction).await?;
+        DBFriend::remove(user.id.into(), friend.id, &mut transaction)
+            .await
+            .wrap_internal_err("deleting friend from database")?;
 
         send_message_to_user(
             &db,
             friend.id.into(),
             &ServerToClientMessage::FriendRequestRejected { from: user.id },
         )
-        .await?;
+        .await
+        .wrap_internal_err("deleting friend from database")?;
 
-        transaction.commit().await?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -208,11 +248,13 @@ pub async fn friends(
         &session_queue,
         Scopes::USER_READ,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let friends = DBFriend::get_user_friends(user.id.into(), None, &**pool)
-        .await?
+        .await
+        .wrap_internal_err("fetching friends from database")?
         .into_iter()
         .map(UserFriend::from)
         .collect::<Vec<_>>();

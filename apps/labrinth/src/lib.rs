@@ -328,16 +328,16 @@ pub fn app_data_config(
     labrinth_config: LabrinthConfig,
 ) {
     cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        routes::ApiError::Request(eyre::eyre!("{err}")).into()
     }))
     .app_data(web::PathConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        routes::ApiError::Request(eyre::eyre!("{err}")).into()
     }))
     .app_data(web::QueryConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        routes::ApiError::Request(eyre::eyre!("{err}")).into()
     }))
     .app_data(web::JsonConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        routes::ApiError::Request(eyre::eyre!("{err}")).into()
     }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))

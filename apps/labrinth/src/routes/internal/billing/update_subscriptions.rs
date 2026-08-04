@@ -104,7 +104,10 @@ pub async fn update_many(
             *region = Some(new_region);
         }
 
-        subscription.upsert(&mut txn).await?;
+        subscription
+            .upsert(&mut txn)
+            .await
+            .wrap_internal_err("updating uuid in database")?;
     }
 
     txn.commit()
