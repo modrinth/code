@@ -1,7 +1,7 @@
 import type { ISO3166 } from '@modrinth/api-client'
 
-import { countries, subdivisions } from '~/generated/state.json'
 import { useRequestHeaders, useState } from '#imports'
+import { countries, subdivisions } from '~/generated/state.json'
 
 export const useCountries = () => {
 	return computed(() => (countries ?? []) as ISO3166.Country[])

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ServersManagePageIndex } from '@modrinth/ui'
-
 import type { Labrinth } from '@modrinth/api-client'
+import { ServersManagePageIndex } from '@modrinth/ui'
 
 import { products } from '~/generated/state.json'
 
