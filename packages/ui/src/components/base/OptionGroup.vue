@@ -3,19 +3,21 @@
 		ref="scrollContainer"
 		class="card-shadow relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
 	>
-		<button
+		<Button
 			v-for="(option, index) in options"
 			:key="`option-group-${index}`"
 			ref="optionButtons"
-			class="button-animation z-[1] flex flex-row items-center gap-2 rounded-full bg-transparent px-4 py-2 font-semibold"
+			type="quiet"
+			interaction="none"
+			class="z-[1] !h-auto !gap-2 !rounded-full !px-4 !py-2"
 			:class="{
-				'text-button-textSelected': modelValue === option,
-				'text-primary': modelValue !== option,
+				'!text-brand': modelValue === option,
+				'!text-primary': modelValue !== option,
 			}"
 			@click="setOption(option)"
 		>
 			<slot :option="option" :selected="modelValue === option" />
-		</button>
+		</Button>
 		<div
 			class="navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full bg-button-bgSelected p-1"
 			:style="{
@@ -32,6 +34,8 @@
 
 <script setup lang="ts" generic="T">
 import { computed, onMounted, ref, watch } from 'vue'
+
+import Button from './buttons/Button.vue'
 
 const modelValue = defineModel<T>({ required: true })
 
@@ -64,7 +68,7 @@ watch(modelValue, () => {
 })
 
 function startAnimation(index: number) {
-	const el = optionButtons.value[index]
+	const el = optionButtons.value[index]?.element
 
 	if (!el || !el.offsetParent) return
 

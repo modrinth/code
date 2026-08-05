@@ -369,7 +369,4 @@ function getVersionLoaders(version) {
 	}
 }
 
-.brand-button {
-	color: var(--color-accent-contrast);
-}
 </style>

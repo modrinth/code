@@ -50,10 +50,12 @@
 			<div v-if="rows" class="projects-showcase">
 				<div v-for="(row, index) in rows" :key="index" class="row">
 					<div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
-						<nuxt-link
+						<ButtonLink
 							v-for="project in row"
 							:key="project.id"
-							class="project button-animation"
+							type="quiet"
+							interaction="none"
+							class="project !h-auto !shrink !items-stretch !justify-start !whitespace-normal !p-4 !font-normal !leading-normal"
 							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
 						>
 							<Avatar :src="project.icon_url" :alt="project.title" size="sm" loading="lazy" />
@@ -65,7 +67,7 @@
 									{{ project.description }}
 								</span>
 							</div>
-						</nuxt-link>
+						</ButtonLink>
 					</div>
 				</div>
 			</div>

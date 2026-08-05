@@ -43,13 +43,15 @@
 					</div>
 					<div class="project-list-layouts">
 						<button
-							class="preview-radio button-base"
+							type="button"
+							class="flex !w-full cursor-pointer flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-divider bg-button-bg p-0 text-left text-primary outline-2 outline-transparent transition-[filter,transform] hover:brightness-[0.85] focus-visible:ring-4 focus-visible:ring-brand-shadow active:scale-[0.97] active:brightness-[0.8] [&_.example-card]:m-0 [&_.example-card]:min-h-0 [&_.example-card]:border-2 [&_.example-card]:border-solid [&_.example-card]:border-transparent [&_.example-card]:p-4 [&_.example-card]:outline-2 [&_.example-card]:outline-transparent"
 							:class="{
-								selected: cosmetics.searchDisplayMode[projectType.id] === 'list',
+								'!text-contrast [&_.example-card]:!border-brand [&_.example-card]:!bg-brand-highlight [&_.radio]:text-brand':
+									cosmetics.searchDisplayMode[projectType.id] === 'list',
 							}"
 							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'list')"
 						>
-							<div class="preview">
+							<div class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent">
 								<div class="layout-list-mode">
 									<div class="example-card card"></div>
 									<div class="example-card card"></div>
@@ -57,25 +59,26 @@
 									<div class="example-card card"></div>
 								</div>
 							</div>
-							<div class="label">
+							<div class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left">
 								<RadioButtonCheckedIcon
 									v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
-									class="radio shrink-0"
+									class="radio mr-2 shrink-0"
 								/>
-								<RadioButtonIcon v-else class="radio shrink-0" />
+								<RadioButtonIcon v-else class="radio mr-2 shrink-0" />
 								{{ formatMessage(layoutMode.rows) }}
 							</div>
 						</button>
 						<button
-							class="preview-radio button-base"
+							type="button"
+							class="flex !w-full cursor-pointer flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-divider bg-button-bg p-0 text-left text-primary outline-2 outline-transparent transition-[filter,transform] hover:brightness-[0.85] focus-visible:ring-4 focus-visible:ring-brand-shadow active:scale-[0.97] active:brightness-[0.8] [&_.example-card]:m-0 [&_.example-card]:min-h-0 [&_.example-card]:border-2 [&_.example-card]:border-solid [&_.example-card]:border-transparent [&_.example-card]:p-4 [&_.example-card]:outline-2 [&_.example-card]:outline-transparent"
 							:class="{
-								selected:
+								'!text-contrast [&_.example-card]:!border-brand [&_.example-card]:!bg-brand-highlight [&_.radio]:text-brand':
 									cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
 									cosmetics.searchDisplayMode[projectType.id] === 'grid',
 							}"
 							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'grid')"
 						>
-							<div class="preview">
+							<div class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent">
 								<div class="layout-gallery-mode">
 									<div class="example-card card"></div>
 									<div class="example-card card"></div>
@@ -83,15 +86,15 @@
 									<div class="example-card card"></div>
 								</div>
 							</div>
-							<div class="label">
+							<div class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left">
 								<RadioButtonCheckedIcon
 									v-if="
 										cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
 										cosmetics.searchDisplayMode[projectType.id] === 'grid'
 									"
-									class="radio shrink-0"
+									class="radio mr-2 shrink-0"
 								/>
-								<RadioButtonIcon v-else class="radio shrink-0" />
+								<RadioButtonIcon v-else class="radio mr-2 shrink-0" />
 								{{ formatMessage(layoutMode.grid) }}
 							</div>
 						</button>
@@ -488,19 +491,5 @@ const listTypes = computed(() => {
 	grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
 	gap: var(--gap-lg);
 
-	.preview-radio .example-card {
-		border: 2px solid transparent;
-	}
-
-	.preview-radio.selected .example-card {
-		border-color: var(--color-brand);
-		background-color: var(--color-brand-highlight);
-	}
-
-	.preview {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
 }
 </style>

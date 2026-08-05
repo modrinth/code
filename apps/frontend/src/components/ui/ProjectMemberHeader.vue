@@ -6,7 +6,7 @@
 		</p>
 		<p v-else>{{ getFormattedMessage(messages.invitationNoRole) }}</p>
 		<div class="input-group">
-			<Button type="colored" color="brand" class="brand-button" @click="acceptInvite()">
+			<Button type="colored" color="brand" @click="acceptInvite()">
 				<CheckIcon />
 				{{ getFormattedMessage(commonMessages.acceptButton) }}
 			</Button>
