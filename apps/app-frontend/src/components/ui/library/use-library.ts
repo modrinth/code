@@ -621,10 +621,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			return [
 				{
 					instanceId: instance.id,
-					selections,
 					nextGroupIds,
-					destinationSelectionGroupId:
-						toGroup !== null || nextGroupIds.length === 0 ? groupId : null,
 				},
 			]
 		})
@@ -654,23 +651,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			return false
 		}
 
-		const nextSelectedInstances = new Map(selectedLibraryInstances.value)
-		for (const operation of operations) {
-			const selectedMovedSelections = operation.selections.filter((selection) =>
-				nextSelectedInstances.has(getLibraryInstanceSelectionKey(selection)),
-			)
-			for (const selection of selectedMovedSelections) {
-				nextSelectedInstances.delete(getLibraryInstanceSelectionKey(selection))
-			}
-			if (selectedMovedSelections.length > 0 && operation.destinationSelectionGroupId !== null) {
-				const movedSelection = {
-					instanceId: operation.instanceId,
-					groupId: operation.destinationSelectionGroupId,
-				}
-				nextSelectedInstances.set(getLibraryInstanceSelectionKey(movedSelection), movedSelection)
-			}
-		}
-		selectedLibraryInstances.value = nextSelectedInstances
+		selectedLibraryInstances.value = new Map()
 
 		return operations.length > 0
 	}
