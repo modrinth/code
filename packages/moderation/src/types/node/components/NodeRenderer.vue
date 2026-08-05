@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ButtonStyled } from '@modrinth/ui'
+import { Button, IconButton } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import { computed, inject, watchEffect } from 'vue'
 import type { Component } from 'vue'
@@ -184,7 +184,8 @@ function resolveTooltip(node: object): Record<string, unknown> | undefined {
 			if (content) return { ...TOOLTIP_BASE, content }
 		}
 	}
-	const html = hasCap(node, '_segments') ? metaCtx?.value.tooltipHtml.get(node) : undefined
+	const hasSegments = hasCap(node, '_segments')
+	const html = hasSegments ? metaCtx?.value.tooltipHtml.get(node) : undefined
 	return html ? { ...TOOLTIP_BASE, content: html, html: true } : undefined
 }
 
@@ -210,6 +211,11 @@ function tweakTooltip(tweak: TweakDef, node: RenderableValueNode): Record<string
 	if (!tweakEnabled(tweak, node)) return undefined
 	const content = tweakResult(tweak, node)
 	return content ? { ...TOOLTIP_BASE, content: String(content) } : undefined
+}
+
+function tweakLabel(tweak: TweakDef, node: RenderableValueNode): string {
+	const result = tweakResult(tweak, node)
+	return result !== null && result !== undefined ? String(result) : 'Apply suggested value'
 }
 
 function applyTweak(tweak: TweakDef, node: RenderableValueNode): void {
@@ -299,8 +305,16 @@ watchEffect(() => {
 
 					<template v-else-if="hasValueCap(item) && hasIdCap(item)">
 						<component
+							v-if="resolveComponent(item as RenderableValueNode) === ActionButton"
 							:is="resolveComponent(item as RenderableValueNode)"
-							v-tooltip="resolveComponent(item as RenderableValueNode) === ActionButton ? undefined : resolveTooltip(item)"
+							v-bind="componentProps(item as RenderableValueNode)"
+							:[modelProp(item)]="getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)"
+							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
+						/>
+						<component
+							v-else
+							:is="resolveComponent(item as RenderableValueNode)"
+							v-tooltip="resolveTooltip(item)"
 							v-bind="componentProps(item as RenderableValueNode)"
 							:[modelProp(item)]="getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)"
 							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
@@ -309,30 +323,27 @@ watchEffect(() => {
 							v-for="(tweak, tIdx) in (item as RenderableValueNode)._tweaks ?? []"
 							:key="`tweak-${tIdx}`"
 						>
-							<ButtonStyled circular>
-								<button
-									v-tooltip="tweakTooltip(tweak, item as RenderableValueNode)"
-									:disabled="!tweakEnabled(tweak, item as RenderableValueNode)"
-									@click="applyTweak(tweak, item as RenderableValueNode)"
-								>
-									<component :is="tweak.icon" />
-								</button>
-							</ButtonStyled>
+							<IconButton
+								v-tooltip="tweakTooltip(tweak, item as RenderableValueNode)"
+								:label="tweakLabel(tweak, item as RenderableValueNode)"
+								:disabled="!tweakEnabled(tweak, item as RenderableValueNode)"
+								@click="applyTweak(tweak, item as RenderableValueNode)"
+							>
+								<component :is="tweak.icon" />
+							</IconButton>
 						</template>
 					</template>
 
 					<template v-else-if="hasCap(item, '_onClick')">
-						<ButtonStyled :circular="!!(item as any)._icon && !(item as any).label">
-							<button
-								v-tooltip="resolveTooltip(item)"
-								:disabled="!isEnabled(item as any)"
-								:aria-label="(item as any)._icon ? (item as any).label : undefined"
-								@click="clickButton(item)"
-							>
-								<component :is="(item as any)._icon" v-if="(item as any)._icon" />
-								<template v-else>{{ (item as any).label }}</template>
-							</button>
-						</ButtonStyled>
+						<Button
+							v-tooltip="resolveTooltip(item)"
+							:disabled="!isEnabled(item as any)"
+							:aria-label="(item as any)._icon ? (item as any).label : undefined"
+							@click="clickButton(item)"
+						>
+							<component :is="(item as any)._icon" v-if="(item as any)._icon" />
+							<template v-else>{{ (item as any).label }}</template>
+						</Button>
 					</template>
 				</div>
 			</template>

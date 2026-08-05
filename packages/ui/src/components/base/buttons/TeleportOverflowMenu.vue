@@ -306,7 +306,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 				v-if="isOpen"
 				:id="menuId"
 				ref="panelElement"
-				class="fixed isolate z-[9999] flex min-w-48 flex-col gap-1 rounded-[14px] bg-surface-3 p-2 shadow-lg ring-1 ring-surface-5"
+				class="fixed isolate z-[9999] rounded-[14px] bg-surface-3 shadow-lg ring-1 ring-surface-5"
 				:style="panelStyle"
 				role="menu"
 				:aria-label="props.label"
@@ -320,6 +320,11 @@ defineExpose({ open: openMenu, close: closeMenu })
 					:data-side="resolvedSide"
 					:style="anchorStyle"
 				/>
+				<div
+					data-anchored-scroll-region
+					class="flex min-w-48 flex-col gap-1 overflow-y-auto p-2"
+					:style="{ maxHeight: panelStyle.maxHeight }"
+				>
 				<template v-for="(option, index) in visibleOptions" :key="option.id ?? `divider-${index}`">
 					<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
 
@@ -390,6 +395,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 						</slot>
 					</button>
 				</template>
+				</div>
 			</div>
 		</Transition>
 	</Teleport>

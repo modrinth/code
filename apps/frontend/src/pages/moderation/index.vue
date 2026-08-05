@@ -168,6 +168,7 @@ import ConfettiExplosion from 'vue-confetti-explosion'
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
 import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
 import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
+import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
 
@@ -535,11 +536,17 @@ function getProjectRouteParam(projectId: string): string {
 	return projectsById.value.get(projectId)?.project.slug || projectId
 }
 
+function getProjectRouteType(projectId: string): string {
+	const projectType = projectsById.value.get(projectId)?.project.project_types[0]
+	if (!projectType) return 'project'
+	return getProjectTypeForUrlShorthand(projectType, [])
+}
+
 async function navigateToModerationProject(projectId: string) {
 	await navigateTo({
 		name: 'type-project',
 		params: {
-			type: 'project',
+			type: getProjectRouteType(projectId),
 			project: getProjectRouteParam(projectId),
 		},
 		state: {

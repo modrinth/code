@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ScaleIcon, XIcon } from '@modrinth/assets'
-import { AutoLink, ButtonStyled, injectModrinthClient, NewModal } from '@modrinth/ui'
+import { AutoLink, Button, injectModrinthClient, NewModal } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
@@ -96,18 +96,14 @@ defineExpose({ show, hide })
 			</div>
 
 			<div class="flex justify-end gap-2">
-				<ButtonStyled v-if="skippedEntries.length > 0" color="orange">
-					<button @click="reviewSkipped">
-						<ScaleIcon />
-						Review skipped ({{ skippedEntries.length }})
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="hide">
-						<XIcon />
-						Close
-					</button>
-				</ButtonStyled>
+				<Button v-if="skippedEntries.length > 0" type="colored" color="orange" @click="reviewSkipped">
+					<ScaleIcon />
+					Review skipped ({{ skippedEntries.length }})
+				</Button>
+				<Button @click="hide">
+					<XIcon />
+					Close
+				</Button>
 			</div>
 		</div>
 	</NewModal>

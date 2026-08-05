@@ -109,93 +109,93 @@ export default function () {
             .suggestedStatus('flagged')
             .message(),
 
-					toggle('loader', 'Loaders (WIP)')
-						.suggestedStatus('flagged')
-						.rawMessage(async (state) => {
-							const selected =
-								state.loaders instanceof Set ? state.loaders : new Set(project.value.loaders)
-							const current = new Set(project.value.loaders)
-							const isCorrected =
-								selected.size !== current.size || [...selected].some((id) => !current.has(id))
-
-							let correct = ''
-							if (isCorrected) {
-								const list = [...selected].map((id) => formatLoaderLabel(id)).join(', ')
-								correct = await md('checklist/messages/metadata/loader/correction', () => ({
-									LOADERS: list || 'none',
-								}))(state)
-							}
-
-							return md('checklist/messages/metadata/loader/inaccurate', () => ({
-								CORRECT: correct,
-							}))(state)
-						})
-						.fix(
-							fix().project((patch, state) => {
-								const selected =
-									state.loaders instanceof Set ? state.loaders : new Set(project.value.loaders)
-								const next = [...selected]
-								const current = project.value.loaders
-								if (next.length === current.length && next.every((id) => current.includes(id)))
-									return
-								patch.loaders = next
-							}),
-						)
-						.children(
-							appComponent('loaders', 'loader-picker')
-								.valueKind('set')
-								.initial(() => new Set(project.value.loaders))
-								.props((ctx) => ({
-									loaders: loaders.value,
-									toggleLoader: ctx.toggleSetValue,
-								})),
-						),
-
-					toggle('game-version', 'Game Versions (WIP)')
-						.suggestedStatus('flagged')
-						.rawMessage(async (state) => {
-							const selected =
-								state['game-versions'] instanceof Set
-									? state['game-versions']
-									: new Set(currentGameVersions.value)
-							const current = new Set(currentGameVersions.value)
-							const isCorrected =
-								selected.size !== current.size || [...selected].some((id) => !current.has(id))
-
-							let correct = ''
-							if (isCorrected) {
-								const list = [...selected].join(', ')
-								correct = await md('checklist/messages/metadata/game-version/correction', () => ({
-									GAME_VERSIONS: list || 'none',
-								}))(state)
-							}
-
-							return md('checklist/messages/metadata/game-version/inaccurate', () => ({
-								CORRECT: correct,
-							}))(state)
-						})
-						.fix(
-							fix().project((patch, state) => {
-								const selected =
-									state['game-versions'] instanceof Set
-										? state['game-versions']
-										: new Set(currentGameVersions.value)
-								const next = [...selected]
-								const current = currentGameVersions.value
-								if (next.length === current.length && next.every((id) => current.includes(id)))
-									return
-								patch.game_versions = next
-							}),
-						)
-						.children(
-							appComponent('game-versions', 'game-version-picker')
-								.valueKind('set')
-								.initial(() => new Set(currentGameVersions.value))
-								.props(() => ({
-									gameVersions: gameVersions.value,
-									noHeader: true,
-								})),
-						),
+					// toggle('loader', 'Loaders (WIP)')
+					// 	.suggestedStatus('flagged')
+					// 	.rawMessage(async (state) => {
+					// 		const selected =
+					// 			state.loaders instanceof Set ? state.loaders : new Set(project.value.loaders)
+					// 		const current = new Set(project.value.loaders)
+					// 		const isCorrected =
+					// 			selected.size !== current.size || [...selected].some((id) => !current.has(id))
+          //
+					// 		let correct = ''
+					// 		if (isCorrected) {
+					// 			const list = [...selected].map((id) => formatLoaderLabel(id)).join(', ')
+					// 			correct = await md('checklist/messages/metadata/loader/correction', () => ({
+					// 				LOADERS: list || 'none',
+					// 			}))(state)
+					// 		}
+          //
+					// 		return md('checklist/messages/metadata/loader/inaccurate', () => ({
+					// 			CORRECT: correct,
+					// 		}))(state)
+					// 	})
+					// 	.fix(
+					// 		fix().project((patch, state) => {
+					// 			const selected =
+					// 				state.loaders instanceof Set ? state.loaders : new Set(project.value.loaders)
+					// 			const next = [...selected]
+					// 			const current = project.value.loaders
+					// 			if (next.length === current.length && next.every((id) => current.includes(id)))
+					// 				return
+					// 			patch.loaders = next
+					// 		}),
+					// 	)
+					// 	.children(
+					// 		appComponent('loaders', 'loader-picker')
+					// 			.valueKind('set')
+					// 			.initial(() => new Set(project.value.loaders))
+					// 			.props((ctx) => ({
+					// 				loaders: loaders.value,
+					// 				toggleLoader: ctx.toggleSetValue,
+					// 			})),
+					// 	),
+          //
+					// toggle('game-version', 'Game Versions (WIP)')
+					// 	.suggestedStatus('flagged')
+					// 	.rawMessage(async (state) => {
+					// 		const selected =
+					// 			state['game-versions'] instanceof Set
+					// 				? state['game-versions']
+					// 				: new Set(currentGameVersions.value)
+					// 		const current = new Set(currentGameVersions.value)
+					// 		const isCorrected =
+					// 			selected.size !== current.size || [...selected].some((id) => !current.has(id))
+          //
+					// 		let correct = ''
+					// 		if (isCorrected) {
+					// 			const list = [...selected].join(', ')
+					// 			correct = await md('checklist/messages/metadata/game-version/correction', () => ({
+					// 				GAME_VERSIONS: list || 'none',
+					// 			}))(state)
+					// 		}
+          //
+					// 		return md('checklist/messages/metadata/game-version/inaccurate', () => ({
+					// 			CORRECT: correct,
+					// 		}))(state)
+					// 	})
+					// 	.fix(
+					// 		fix().project((patch, state) => {
+					// 			const selected =
+					// 				state['game-versions'] instanceof Set
+					// 					? state['game-versions']
+					// 					: new Set(currentGameVersions.value)
+					// 			const next = [...selected]
+					// 			const current = currentGameVersions.value
+					// 			if (next.length === current.length && next.every((id) => current.includes(id)))
+					// 				return
+					// 			patch.game_versions = next
+					// 		}),
+					// 	)
+					// 	.children(
+					// 		appComponent('game-versions', 'game-version-picker')
+					// 			.valueKind('set')
+					// 			.initial(() => new Set(currentGameVersions.value))
+					// 			.props(() => ({
+					// 				gameVersions: gameVersions.value,
+					// 				noHeader: true,
+					// 			})),
+					// 	),
 				),
 			)
 	)

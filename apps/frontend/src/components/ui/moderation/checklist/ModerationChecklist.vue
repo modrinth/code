@@ -26,8 +26,11 @@
 						v-if="canOpenStageSelectorFromTitle"
 						:label="checklistTitleText"
 						:options="stageOptions"
-						placement="bottom-start"
-						class="!h-auto !w-auto gap-2 !bg-transparent !p-0 text-2xl font-extrabold text-contrast"
+						:icon-only="false"
+						type="quiet"
+						size="xl"
+						placement="bottom-center"
+						class="!h-auto !w-auto !gap-2 !bg-transparent !p-0 !text-2xl !font-extrabold !text-contrast [&>svg]:!text-orange"
 					>
 						<component
 							:is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)"
@@ -62,42 +65,61 @@
 						{{ checklistTitleText }}
 					</button>
 				</h1>
-				<ButtonStyled v-if="!isPseudoStage && currentStageObj._guidanceUrl" circular>
-					<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj._guidanceUrl">
-						<FileTextIcon />
-					</a>
-				</ButtonStyled>
-				<ButtonStyled
-					circular
-					:color="!isPseudoStage && currentStageHasState ? 'orange' : 'red'"
-					color-fill="none"
-					hover-color-fill="background"
+				<ButtonLink
+					v-if="!isPseudoStage && currentStageObj._guidanceUrl"
+					v-tooltip="`Stage guidance`"
+					type="quiet"
+					target="_blank"
+					:href="currentStageObj._guidanceUrl"
+					class="!w-9 !rounded-full !bg-button-bg !px-0 !text-primary ![box-shadow:var(--shadow-button)]"
 				>
-					<button
-						v-tooltip="
-							!isPseudoStage && currentStageHasState
-								? 'Reset Stage'
-								: !isPseudoStage && !checklistHasState
-									? 'Return to Start'
-									: 'Reset Checklist'
-						"
-						:disabled="!isPseudoStage && !checklistHasState && isOnFirstStage"
-						@click="resetProgress"
-					>
-						<UndoIcon v-if="!isPseudoStage && !checklistHasState" />
-						<BrushCleaningIcon v-else />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-					<button v-tooltip="`Exit moderation`" @click="handleExit">
-						<XIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular>
-					<button v-tooltip="collapsed ? `Expand` : `Collapse`" @click="emit('toggleCollapsed')">
-						<DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
-					</button>
-				</ButtonStyled>
+					<FileTextIcon />
+				</ButtonLink>
+				<IconButton
+					v-tooltip="
+						!isPseudoStage && currentStageHasState
+							? 'Reset Stage'
+							: !isPseudoStage && !checklistHasState
+								? 'Return to Start'
+								: 'Reset Checklist'
+					"
+					type="quiet"
+					interaction="filled"
+					:color="!isPseudoStage && currentStageHasState ? 'orange' : 'red'"
+					:label="
+						!isPseudoStage && currentStageHasState
+							? 'Reset Stage'
+							: !isPseudoStage && !checklistHasState
+								? 'Return to Start'
+								: 'Reset Checklist'
+					"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					:disabled="!isPseudoStage && !checklistHasState && isOnFirstStage"
+					@click="resetProgress"
+				>
+					<UndoIcon v-if="!isPseudoStage && !checklistHasState" />
+					<BrushCleaningIcon v-else />
+				</IconButton>
+				<IconButton
+					v-tooltip="`Exit moderation`"
+					type="quiet"
+					interaction="filled"
+					color="red"
+					label="Exit moderation"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					@click="handleExit"
+				>
+					<XIcon />
+				</IconButton>
+				<IconButton
+					v-tooltip="collapsed ? `Expand` : `Collapse`"
+					type="quiet"
+					:label="collapsed ? `Expand` : `Collapse`"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					@click="emit('toggleCollapsed')"
+				>
+					<DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
+				</IconButton>
 			</div>
 		</div>
 		<p
@@ -439,6 +461,7 @@ import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import {
+	clearSessionChecklistState,
 	getSessionChecklistState,
 	patchSessionChecklistState,
 } from '~/services/moderation/checklist-session-storage.ts'
@@ -776,22 +799,6 @@ function reviewAnyway() {
 	maintainPrefetchQueue()
 }
 
-// Batch check locks, processing status, and fetch project metadata in parallel
-interface QueueCandidateCheck {
-	locked: boolean
-	expired?: boolean
-	isOwnLock?: boolean
-	slug?: string
-	projectType?: string
-	status?: string
-	isProcessing: boolean
-}
-
-function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
-	if (!result?.isProcessing) return false
-	return !result.locked || !!result.expired || !!result.isOwnLock
-}
-
 function notifySkippedQueueProjects(count: number) {
 	if (count <= 0) return
 	addNotification({
@@ -816,66 +823,6 @@ function navigateToQueueProject(result: QueueCandidateCheck, projectId: string) 
 			state: { showChecklist: true },
 		})
 	}
-}
-
-async function batchCheckQueueCandidates(
-	projectIds: string[],
-): Promise<Map<string, QueueCandidateCheck>> {
-	const results = new Map<string, QueueCandidateCheck>()
-
-	const checks = await Promise.allSettled(
-		projectIds.map(async (id) => {
-			const [lockResponse, projectData] = await Promise.all([
-				moderationQueue.checkLock(id),
-				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
-			])
-
-			const status = (projectData as { status?: string } | null)?.status
-
-			return {
-				id,
-				locked: lockResponse.locked,
-				expired: lockResponse.expired,
-				isOwnLock: lockResponse.is_own_lock,
-				slug: (projectData as { slug?: string } | null)?.slug,
-				projectType: (projectData as { project_type?: string } | null)?.project_type,
-				status,
-				isProcessing: projectData === null ? true : status === 'processing',
-			}
-		}),
-	)
-
-	checks.forEach((result, index) => {
-		if (result.status === 'fulfilled') {
-			results.set(result.value.id, result.value)
-		} else {
-			results.set(projectIds[index], { locked: false, isProcessing: true })
-		}
-	})
-
-	return results
-}
-
-async function findNextEligibleQueueProject(candidateIds: string[]) {
-	const skippedIds: string[] = []
-	let checkedCount = 0
-
-	while (checkedCount < candidateIds.length) {
-		const batch = candidateIds.slice(checkedCount, checkedCount + PREFETCH_BATCH_SIZE)
-		checkedCount += batch.length
-
-		const results = await batchCheckQueueCandidates(batch)
-
-		for (const id of batch) {
-			const result = results.get(id)
-			if (isEligibleQueueCandidate(result)) {
-				return { projectId: id, result: result!, skippedIds: [...skippedIds] }
-			}
-			skippedIds.push(id)
-		}
-	}
-
-	return null
 }
 
 // Maintain a queue of prefetched unlocked projects for instant navigation
@@ -1137,6 +1084,7 @@ const restoredStage = persistedState
 const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
 const initialAutoStage = currentStage.value
 const needsInitialStageSettle = !persistedState && thread.value === undefined
+const hasSettledInitialStage = ref(!needsInitialStageSettle)
 
 // Thread data may not be loaded when currentStage is first set, so stages that depend on it
 // (like re-review) may be invisible initially. Re-evaluate once thread loads.
@@ -1147,12 +1095,25 @@ if (!persistedState) {
 			if (thread.value === undefined) return
 			if (currentStage.value === initialAutoStage) {
 				const firstValid = findFirstValidStage()
+				console.log('[DEBUG settle]', {
+					initialAutoStage,
+					currentStage: currentStage.value,
+					firstValid,
+					initialAutoStageId: resolvedStages.value[initialAutoStage]?.id,
+					firstValidId: resolvedStages.value[firstValid]?.id,
+				})
 				if (firstValid !== currentStage.value) {
 					currentStage.value = firstValid
 				} else if (needsInitialStageSettle) {
 					markStageVisited(currentStageObj.value.id)
 				}
+			} else {
+				console.log('[DEBUG settle] currentStage already changed before settle', {
+					initialAutoStage,
+					currentStage: currentStage.value,
+				})
 			}
+			hasSettledInitialStage.value = true
 		},
 		{ once: true },
 	)
@@ -1164,6 +1125,21 @@ const route = useRoute()
 const projectUrlType = computed(() =>
 	getProjectTypeForUrlShorthand(projectV2.value.project_type, projectV2.value.loaders ?? [], tags.value),
 )
+
+let lastSyncedStageTarget: string | null = null
+function syncStageUrl(stage: StageNode | undefined) {
+	const navigate = stage?._navigate
+	console.log('[DEBUG syncStageUrl]', { stageId: stage?.id, navigate, lastSyncedStageTarget })
+	if (navigate === undefined) return
+	const target = `/${projectUrlType.value}/${projectV2.value.slug}${navigate}`
+	if (target === lastSyncedStageTarget) return
+	lastSyncedStageTarget = target
+	setTimeout(() => router.replace(target), 0)
+}
+
+watch(hasSettledInitialStage, (settled) => {
+	if (settled) syncStageUrl(currentStageObj.value)
+}, { immediate: true })
 
 const stageNavigateTarget = computed(() => {
 	const navigate = currentStageObj.value?._navigate
@@ -1400,10 +1376,8 @@ onUnmounted(() => {
 watch(
 	currentStage,
 	(newIndex, oldIndex) => {
-		const stage = resolvedStages.value[newIndex]
-		// only navigate when the stage actually changes (not on initial mount/remount)
-		if (oldIndex !== undefined && newIndex !== oldIndex && stage?._navigate !== undefined) {
-			router.push(`/${projectUrlType.value}/${projectV2.value.slug}${stage._navigate}`)
+		if (hasSettledInitialStage.value && oldIndex !== undefined && newIndex !== oldIndex) {
+			syncStageUrl(resolvedStages.value[newIndex])
 		}
 	},
 	{ immediate: true },
@@ -1628,11 +1602,6 @@ if (finishedId === projectV2.value.id) {
 	done.value = true
 } else if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
 	alreadyReviewed.value = true
-} else {
-	const initialStage = resolvedStages.value[currentStage.value]
-	if (initialStage?._navigate !== undefined) {
-		navigateTo(`/${projectUrlType.value}/${projectV2.value.slug}${initialStage._navigate}`)
-	}
 }
 
 async function refreshModerationCaches(threadId?: string) {
@@ -1836,8 +1805,10 @@ async function clearProjectLocalStorage() {
 
 	nodeStates.value = {}
 	activatedStages.value = new Set()
+	visitedStages.value = new Set()
 	message.value = null
 	await clearChecklistState(checklistPersistenceProjectId)
+	clearSessionChecklistState(checklistPersistenceProjectId)
 }
 
 const isLastVisibleStage = computed(() => {
@@ -1868,6 +1839,7 @@ interface StageOption {
 	fixes?: number
 	requiredMissing?: boolean
 	visited?: boolean
+	tone?: 'green'
 }
 
 const stageOptions = computed<StageOption[]>(() => {
@@ -1889,8 +1861,11 @@ const stageOptions = computed<StageOption[]>(() => {
 				fixes: countStageFixes(stage) || undefined,
 				requiredMissing: hasRequiredMissing(stage) || undefined,
 				visited:
-					(index !== currentStage.value && stage.id && visitedStages.value.has(stage.id)) ||
+					((index !== currentStage.value || generatedMessage.value) &&
+						stage.id &&
+						visitedStages.value.has(stage.id)) ||
 					undefined,
+				tone: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
 			}
 		})
 		.filter((opt): opt is StageOption => opt !== null)
@@ -1901,6 +1876,7 @@ const stageOptions = computed<StageOption[]>(() => {
 		action: () => generateMessage(),
 		text: 'Generate Message',
 		icon: CheckIcon,
+		tone: generatedMessage.value ? 'green' : undefined,
 	})
 
 	return options

@@ -26,3 +26,9 @@ export function patchSessionChecklistState(
 		)
 	} catch {}
 }
+
+export function clearSessionChecklistState(projectId: string): void {
+	try {
+		sessionStorage.removeItem(sessionStorageKey(projectId))
+	} catch {}
+}

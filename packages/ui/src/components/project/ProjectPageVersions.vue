@@ -471,7 +471,11 @@ import {
 	VersionChannelIndicator,
 	VersionFilterControl,
 } from '@modrinth/ui'
-import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@modrinth/utils'
+import {
+	type GameVersionTag,
+	getVersionGroupsForDisplay,
+	type VersionDisplayGroup,
+} from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

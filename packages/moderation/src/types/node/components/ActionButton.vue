@@ -1,19 +1,19 @@
 <template>
-	<ButtonStyled :color="color" :circular="!!icon">
-		<button
-			v-tooltip="tooltip"
-			:disabled="disabled"
-			:aria-label="icon ? label : undefined"
-			@click="emit('update:modelValue', !modelValue)"
-		>
-			<component :is="icon" v-if="icon" />
-			<template v-else>{{ label }}</template>
-		</button>
-	</ButtonStyled>
+	<Button
+		v-tooltip="tooltip"
+		:type="color === 'standard' ? 'base' : 'colored'"
+		:color="color === 'standard' ? undefined : color"
+		:disabled="disabled"
+		:aria-label="icon ? label : undefined"
+		@click="emit('update:modelValue', !modelValue)"
+	>
+		<component :is="icon" v-if="icon" />
+		<template v-else>{{ label }}</template>
+	</Button>
 </template>
 
 <script lang="ts" setup>
-import { ButtonStyled } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { computed } from 'vue'
 import type { Component } from 'vue'
 

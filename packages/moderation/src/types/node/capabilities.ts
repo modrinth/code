@@ -1,4 +1,5 @@
 import type { Component, FunctionalComponent, SVGAttributes } from 'vue'
+import { markRaw } from 'vue'
 
 import type { FixBuilder } from './fix'
 import { Priority } from '../priority.ts'
@@ -34,7 +35,7 @@ export function withIcon<T extends object>(node: T): T & Iconable {
 	return Object.assign(node, {
 		_icon: undefined as FunctionalComponent<SVGAttributes> | undefined,
 		icon(this: any, icon: FunctionalComponent<SVGAttributes> | undefined) {
-			this._icon = icon
+			this._icon = icon ? markRaw(icon) : undefined
 			return this
 		},
 	})
@@ -420,7 +421,7 @@ export function withTweak<T extends HasValue<V>, V>(node: T): T & Tweakable<V> {
 	return Object.assign(node, {
 		_tweaks: [] as TweakDef<V>[],
 		tweak(this: any, icon: FunctionalComponent<SVGAttributes>, compute: TweakDef<V>['compute']) {
-			this._tweaks.push({ icon, compute })
+			this._tweaks.push({ icon: markRaw(icon), compute })
 			return this
 		},
 	})
