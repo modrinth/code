@@ -1,6 +1,6 @@
 mod create_instance;
 pub use self::create_instance::CreateInstance;
-pub(crate) use self::create_instance::create_instance;
+pub(crate) use self::create_instance::{create_instance, resolve_icon_path};
 
 mod edit_instance;
 pub(crate) use self::edit_instance::edit_instance;

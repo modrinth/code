@@ -166,7 +166,7 @@ async fn path_available(
         .is_none())
 }
 
-async fn resolve_icon_path(
+pub(crate) async fn resolve_icon_path(
     icon_path: Option<&str>,
     state: &State,
 ) -> crate::Result<Option<String>> {
