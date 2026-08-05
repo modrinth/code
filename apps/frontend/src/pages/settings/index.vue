@@ -51,7 +51,9 @@
 							}"
 							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'list')"
 						>
-							<div class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent">
+							<div
+								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
+							>
 								<div class="layout-list-mode">
 									<div class="example-card card"></div>
 									<div class="example-card card"></div>
@@ -59,7 +61,9 @@
 									<div class="example-card card"></div>
 								</div>
 							</div>
-							<div class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left">
+							<div
+								class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left"
+							>
 								<RadioButtonCheckedIcon
 									v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
 									class="radio mr-2 shrink-0"
@@ -78,7 +82,9 @@
 							}"
 							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'grid')"
 						>
-							<div class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent">
+							<div
+								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
+							>
 								<div class="layout-gallery-mode">
 									<div class="example-card card"></div>
 									<div class="example-card card"></div>
@@ -86,7 +92,9 @@
 									<div class="example-card card"></div>
 								</div>
 							</div>
-							<div class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left">
+							<div
+								class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left"
+							>
 								<RadioButtonCheckedIcon
 									v-if="
 										cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
@@ -490,6 +498,5 @@ const listTypes = computed(() => {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
 	gap: var(--gap-lg);
-
 }
 </style>

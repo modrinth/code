@@ -274,10 +274,7 @@ function developerModeIncrement() {
 							@click="developerModeIncrement()"
 						>
 							<span class="inline-flex">
-								<TextLogo
-									aria-hidden="true"
-									class="text-logo h-6 w-auto text-contrast lg:h-8"
-								/>
+								<TextLogo aria-hidden="true" class="text-logo h-6 w-auto text-contrast lg:h-8" />
 							</span>
 						</Button>
 						<ButtonLink

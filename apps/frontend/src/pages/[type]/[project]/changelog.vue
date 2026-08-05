@@ -368,5 +368,4 @@ function getVersionLoaders(version) {
 		}
 	}
 }
-
 </style>

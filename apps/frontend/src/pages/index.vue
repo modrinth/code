@@ -740,7 +740,6 @@ const creatorFeatureMessages = defineMessages({
 		color: var(--landing-color-subheading);
 		max-width: 50rem;
 	}
-
 }
 
 .users-section-outer {

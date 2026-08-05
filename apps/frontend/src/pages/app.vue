@@ -547,9 +547,7 @@ useSeoMeta({
 			<h2 class="main-subheader">
 				{{ formatMessage(messages.description) }}
 			</h2>
-			<div
-				class="mx-auto flex w-fit flex-wrap justify-center gap-2 [mask-image:none]"
-			>
+			<div class="mx-auto flex w-fit flex-wrap justify-center gap-2 [mask-image:none]">
 				<Button v-if="os" type="colored" color="brand" size="xl" @click="handleDownload">
 					<LinuxIcon v-if="os === 'Linux'" />
 					<WindowsIcon v-else-if="os === 'Windows'" />
