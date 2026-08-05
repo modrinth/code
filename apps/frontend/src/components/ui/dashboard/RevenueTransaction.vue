@@ -96,7 +96,7 @@ import {
 import { capitalizeString } from '@modrinth/utils'
 import { Tooltip } from 'floating-vue'
 
-import { useGeneratedState } from '~/composables/generated'
+import { tremendousIdMap } from '~/generated/state.json'
 import { findRail } from '~/utils/muralpay-rails'
 
 type Transaction = Labrinth.Payout.v3.TransactionItem
@@ -110,7 +110,6 @@ const emit = defineEmits<{
 }>()
 
 const { addNotification } = injectNotificationManager()
-const generatedState = useGeneratedState()
 
 const isIncome = computed(() => props.transaction.type === 'payout_available')
 
@@ -120,7 +119,7 @@ const methodIconUrl = computed(() => {
 	const methodId = props.transaction.method_id
 
 	if (method === 'tremendous' && methodId) {
-		const methodInfo = generatedState.value.tremendousIdMap?.[methodId]
+		const methodInfo = tremendousIdMap?.[methodId]
 		if (methodInfo?.name?.toLowerCase()?.includes('paypal')) return null
 		return methodInfo?.image_url ?? null
 	}
@@ -137,7 +136,7 @@ const methodIconComponent = computed(() => {
 		case 'tremendous': {
 			const methodId = props.transaction.method_id
 			if (methodId) {
-				const info = generatedState.value.tremendousIdMap?.[methodId]
+				const info = tremendousIdMap?.[methodId]
 				if (info?.name?.toLowerCase()?.includes('paypal')) {
 					return PayPalColorIcon
 				}
@@ -187,7 +186,7 @@ function formatMethodName(method: string | undefined, method_id: string | undefi
 			return 'Venmo'
 		case 'tremendous':
 			if (method_id) {
-				const info = generatedState.value.tremendousIdMap?.[method_id]
+				const info = tremendousIdMap?.[method_id]
 				if (info) return `${info.name}`
 			}
 			return 'Tremendous'

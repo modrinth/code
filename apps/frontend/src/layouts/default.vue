@@ -902,12 +902,13 @@ import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateMo
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
-import { errors as generatedStateErrors } from '~/generated/state.json'
+import {
+	errors as generatedStateErrors,
+	taxComplianceThresholds,
+} from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'
-
-const generatedState = useGeneratedState()
 
 const country = useUserCountry()
 
@@ -956,7 +957,7 @@ const showTaxComplianceBanner = computed(() => {
 	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
-	const threshold = getTaxThreshold(generatedState.value?.taxComplianceThresholds)
+	const threshold = getTaxThreshold(taxComplianceThresholds)
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= threshold
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
