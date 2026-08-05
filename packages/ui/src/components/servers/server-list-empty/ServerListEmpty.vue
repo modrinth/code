@@ -1,7 +1,5 @@
 <template>
-	<div
-		class="flex w-full max-w-[56rem] h-[calc(100vh-120px)] flex-col items-stretch justify-between gap-8 py-8"
-	>
+	<div class="flex w-full max-w-[56rem] h-full flex-col items-stretch justify-between gap-8 py-6">
 		<div class="flex w-full flex-wrap grow items-center justify-center gap-2">
 			<div class="mx-auto flex w-full max-w-[20rem] flex-col items-start gap-8">
 				<div class="flex flex-col gap-2">
@@ -64,12 +62,16 @@
 			<ServerListEmptyPreview />
 		</div>
 
-		<div v-if="!loggedIn" class="flex flex-col items-center gap-3 text-center">
+		<div v-if="!loggedIn" class="flex flex-col items-center gap-4 text-center">
 			<p class="m-0 text-sm text-secondary">
 				{{ formatMessage(messages.alreadyHaveServerLabel) }}
 			</p>
 			<ButtonStyled>
-				<button type="button" @click="onClickSignIn?.()">
+				<button
+					class="!h-10 !gap-2 !rounded-[0.875rem] !px-4 !py-2.5 !font-medium"
+					type="button"
+					@click="onClickSignIn?.()"
+				>
 					<LogInIcon aria-hidden="true" />
 					{{ formatMessage(messages.signInButton) }}
 				</button>
