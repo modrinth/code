@@ -629,14 +629,14 @@
 				@focusout="isBrowseMenuOpen = false"
 			>
 				<div class="links cascade-links">
-					<NuxtLink
+					<ButtonLink
 						v-for="navRoute in navRoutes"
 						:key="navRoute.href"
 						:to="navRoute.href"
-						class="iconified-button"
+						class="!h-auto !whitespace-normal"
 					>
 						{{ navRoute.label }}
-					</NuxtLink>
+					</ButtonLink>
 				</div>
 			</div>
 			<div
@@ -646,10 +646,10 @@
 				@focusout="isMobileMenuOpen = false"
 			>
 				<div class="account-container">
-					<NuxtLink
+					<ButtonLink
 						v-if="auth.user"
 						:to="`/user/${auth.user.username}`"
-						class="iconified-button account-button"
+						class="account-button !h-auto !whitespace-normal"
 					>
 						<Avatar
 							:src="auth.user.avatar_url"
@@ -662,66 +662,85 @@
 							<div>@{{ auth.user.username }}</div>
 							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
 						</div>
-					</NuxtLink>
-					<nuxt-link v-else class="iconified-button brand-button" :to="signInRouteObj">
+					</ButtonLink>
+					<ButtonLink
+						v-else
+						type="colored"
+						color="brand"
+						:to="signInRouteObj"
+						class="!h-auto !whitespace-normal"
+					>
 						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
-					</nuxt-link>
+					</ButtonLink>
 				</div>
 				<div class="links">
 					<template v-if="auth.user">
-						<button class="iconified-button danger-button" @click="logoutUser()">
+						<Button
+							type="colored"
+							color="red"
+							class="!h-auto !whitespace-normal"
+							@click="logoutUser()"
+						>
 							<LogOutIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.signOutButton) }}
-						</button>
-						<button class="iconified-button" @click="$refs.modal_creation.show()">
+						</Button>
+						<Button class="!h-auto !whitespace-normal" @click="$refs.modal_creation.show()">
 							<PlusIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.createAProjectButton) }}
-						</button>
-						<NuxtLink class="iconified-button" to="/dashboard/collections">
+						</Button>
+						<ButtonLink class="!h-auto !whitespace-normal" to="/dashboard/collections">
 							<LibraryIcon class="icon" />
 							{{ formatMessage(commonMessages.collectionsLabel) }}
-						</NuxtLink>
-						<NuxtLink class="iconified-button" to="/hosting/manage">
+						</ButtonLink>
+						<ButtonLink class="!h-auto !whitespace-normal" to="/hosting/manage">
 							<ServerIcon class="icon" />
 							{{ formatMessage(commonMessages.serversLabel) }}
-						</NuxtLink>
-						<NuxtLink
+						</ButtonLink>
+						<ButtonLink
 							v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
-							class="iconified-button"
+							class="!h-auto !whitespace-normal"
 							to="/moderation"
 						>
 							<ScaleIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.moderationLabel) }}
-						</NuxtLink>
-						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/settings/flags">
+						</ButtonLink>
+						<ButtonLink
+							v-if="flags.developerMode"
+							class="!h-auto !whitespace-normal"
+							to="/settings/flags"
+						>
 							<ToggleRightIcon aria-hidden="true" />
 							{{ formatMessage(commonSettingsMessages.featureFlags) }}
-						</NuxtLink>
+						</ButtonLink>
 					</template>
-					<NuxtLink class="iconified-button" to="/settings">
+					<ButtonLink class="!h-auto !whitespace-normal" to="/settings">
 						<SettingsIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.settingsLabel) }}
-					</NuxtLink>
-					<button class="iconified-button" @click="changeTheme">
+					</ButtonLink>
+					<Button class="!h-auto !whitespace-normal" @click="changeTheme">
 						<MoonIcon v-if="$theme.active === 'light'" class="icon" />
 						<SunIcon v-else class="icon" />
 						<span class="dropdown-item__text">
 							{{ formatMessage(messages.changeTheme) }}
 						</span>
-					</button>
+					</Button>
 				</div>
 			</div>
 			<div class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen || isMobileMenuOpen }">
-				<NuxtLink
+				<ButtonLink
 					to="/"
-					class="tab button-animation"
+					type="quiet"
+					interaction="none"
+					class="tab !h-auto !rounded-none !px-0"
 					:title="formatMessage(navMenuMessages.home)"
 					:aria-label="formatMessage(navMenuMessages.home)"
 				>
 					<HomeIcon aria-hidden="true" />
-				</NuxtLink>
-				<button
-					class="tab button-animation"
+				</ButtonLink>
+				<Button
+					type="quiet"
+					interaction="none"
+					class="tab !h-auto !rounded-none !px-0"
 					:class="{ 'router-link-exact-active': isBrowseMenuOpen }"
 					:title="formatMessage(navMenuMessages.search)"
 					:aria-label="formatMessage(navMenuMessages.search)"
@@ -734,11 +753,13 @@
 						<SearchIcon aria-hidden="true" class="smaller" />
 						{{ formatMessage(navMenuMessages.search) }}
 					</template>
-				</button>
+				</Button>
 				<template v-if="auth.user">
-					<NuxtLink
+					<ButtonLink
 						to="/dashboard/notifications"
-						class="tab button-animation"
+						type="quiet"
+						interaction="none"
+						class="tab !h-auto !rounded-none !px-0"
 						:aria-label="formatMessage(commonMessages.notificationsLabel)"
 						:class="{
 							'no-active': isMobileMenuOpen || isBrowseMenuOpen,
@@ -752,18 +773,22 @@
 						"
 					>
 						<BellIcon aria-hidden="true" />
-					</NuxtLink>
-					<NuxtLink
+					</ButtonLink>
+					<ButtonLink
 						to="/dashboard"
-						class="tab button-animation"
+						type="quiet"
+						interaction="none"
+						class="tab !h-auto !rounded-none !px-0"
 						:aria-label="formatMessage(commonMessages.dashboardLabel)"
 						:title="formatMessage(commonMessages.dashboardLabel)"
 					>
 						<ChartIcon aria-hidden="true" />
-					</NuxtLink>
+					</ButtonLink>
 				</template>
-				<button
-					class="tab button-animation"
+				<Button
+					type="quiet"
+					interaction="none"
+					class="tab !h-auto !rounded-none !px-0"
 					:title="formatMessage(messages.toggleMenu)"
 					:aria-label="
 						isMobileMenuOpen ? formatMessage(messages.closeMenu) : formatMessage(messages.openMenu)
@@ -784,7 +809,7 @@
 							circle
 						/>
 					</template>
-				</button>
+				</Button>
 			</div>
 		</header>
 		<main class="min-h-[calc(100vh-4.5rem-310.59px)]">
@@ -842,6 +867,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	Button,
 	ButtonLink,
 	commonMessages,
 	commonProjectTypeCategoryMessages,

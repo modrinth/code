@@ -643,6 +643,7 @@ import {
 	IntlFormatted,
 	LoaderIcon,
 	ModrinthServersPurchaseModal,
+	OptionGroup,
 	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'
@@ -650,7 +651,6 @@ import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import OptionGroup from '~/components/ui/OptionGroup.vue'
 import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { products } from '~/generated/state.json'

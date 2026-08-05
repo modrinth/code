@@ -7,7 +7,7 @@ import {
 	ToggleRightIcon,
 	TwitterIcon,
 } from '@modrinth/assets'
-import { ButtonLink } from '@modrinth/ui'
+import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	AutoLink,
 	defineMessage,
@@ -266,11 +266,17 @@ function developerModeIncrement() {
 					:aria-label="formatMessage(messages.modrinthInformation)"
 				>
 					<div class="flex items-center gap-2">
-						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+						<Button
+							type="quiet"
+							interaction="none"
+							aria-label="Modrinth"
+							class="!h-auto !p-0"
 							@click="developerModeIncrement()"
-						/>
+						>
+							<span class="inline-flex">
+								<TextLogo aria-hidden="true" class="text-logo h-6 w-auto text-contrast lg:h-8" />
+							</span>
+						</Button>
 						<ButtonLink
 							v-if="flags.developerMode"
 							v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"

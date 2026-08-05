@@ -104,7 +104,7 @@
 					:disabled="!hasPermission"
 				/>
 			</div>
-			<div class="button-group">
+			<div class="mt-3 flex flex-wrap justify-start gap-2">
 				<Button
 					type="colored"
 					color="brand"
@@ -272,7 +272,7 @@
 					@update:model-value="updateDonationLinks"
 				/>
 			</div>
-			<div class="button-group">
+			<div class="mt-3 flex flex-wrap justify-start gap-2">
 				<Button type="colored" color="brand" :disabled="!hasChanges" @click="saveChanges()">
 					<SaveIcon />
 					Save changes
@@ -559,9 +559,5 @@ function checkDifference(newLink, existingLink) {
 		flex-grow: 2;
 		max-width: 26rem;
 	}
-}
-
-.button-group {
-	justify-content: flex-start;
 }
 </style>

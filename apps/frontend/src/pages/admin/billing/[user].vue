@@ -166,7 +166,7 @@
 							v-if="
 								subscription.metadata?.type === 'pyro' || subscription.metadata?.type === 'medal'
 							"
-							:to="`/hosting/manage/${subscription.metadata.id}`"
+							:href="`/hosting/manage/${subscription.metadata.id}`"
 							target="_blank"
 							class="w-fit"
 						>
