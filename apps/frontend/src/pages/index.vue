@@ -25,7 +25,7 @@
 			<h2>
 				{{ formatMessage(messages.discoverHeading) }}
 			</h2>
-			<div class="button-group">
+			<div class="mx-auto mb-20 flex w-fit flex-wrap justify-center gap-5">
 				<ButtonLink type="colored" color="brand" size="xl" to="/discover/mods">
 					<CompassIcon aria-hidden="true" />
 					{{ formatMessage(messages.discoverMods) }}
@@ -739,12 +739,6 @@ const creatorFeatureMessages = defineMessages({
 		max-width: 50rem;
 	}
 
-	.button-group {
-		width: fit-content;
-		gap: 1.25rem;
-		margin: 0 auto 5rem;
-		justify-content: center;
-	}
 }
 
 .users-section-outer {

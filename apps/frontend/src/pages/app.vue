@@ -546,7 +546,9 @@ useSeoMeta({
 			<h2 class="main-subheader">
 				{{ formatMessage(messages.description) }}
 			</h2>
-			<div class="button-group">
+			<div
+				class="mx-auto flex w-fit flex-wrap justify-center gap-2 [mask-image:none]"
+			>
 				<Button v-if="os" type="colored" color="brand" size="xl" @click="handleDownload">
 					<LinuxIcon v-if="os === 'Linux'" />
 					<WindowsIcon v-else-if="os === 'Windows'" />
@@ -1225,13 +1227,6 @@ useSeoMeta({
 		line-break: loose;
 		color: var(--landing-color-subheading);
 		max-width: 1096px;
-		mask-image: none;
-	}
-
-	.button-group {
-		width: fit-content;
-		margin: 0 auto;
-		justify-content: center;
 		mask-image: none;
 	}
 

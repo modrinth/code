@@ -86,7 +86,7 @@
 					<StarIcon fill="currentColor" aria-hidden="true" />
 					Unset as banner
 				</Button>
-				<div class="button-group">
+				<div class="mt-3 flex flex-wrap justify-end gap-2">
 					<Button type="outlined" @click="modalEditItem?.hide()">
 						<XIcon aria-hidden="true" />
 						Cancel

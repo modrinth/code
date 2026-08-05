@@ -740,8 +740,4 @@ svg {
 		color: var(--color-orange);
 	}
 }
-
-.button-group {
-	justify-content: flex-start;
-}
 </style>

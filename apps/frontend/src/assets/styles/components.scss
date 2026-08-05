@@ -421,14 +421,6 @@ tr.button-transparent {
 	--text-color: var(--color-brand-inverted);
 }
 
-.button-group {
-	display: flex;
-	grid-gap: var(--spacing-card-sm);
-	flex-wrap: wrap;
-	margin-top: var(--spacing-card-md);
-	justify-content: right;
-}
-
 .error {
 	display: flex;
 	flex-direction: column;
