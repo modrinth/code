@@ -147,6 +147,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const isAddingInstanceToGroup = ref(false)
 	const instanceOptions = ref<InstanceContextMenu | null>(null)
 	const currentDeleteInstanceId = ref<string | null>(null)
+	const currentDeleteInstanceNames = computed(() =>
+		instances.value
+			.filter((instance) => instance.id === currentDeleteInstanceId.value)
+			.map((instance) => instance.name),
+	)
 	const currentContextGroupId = ref<string | null>(null)
 	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
 
@@ -158,7 +163,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		'Instances-grid-display-state',
 		{
 			group: 'Group',
-			sortBy: 'Name',
+			sortBy: 'Last played',
 			collapsedGroups: [],
 		},
 		localStorage,
@@ -166,7 +171,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	)
 
 	if (!librarySortOptions.includes(displayState.value.sortBy)) {
-		displayState.value.sortBy = 'Name'
+		displayState.value.sortBy = 'Last played'
 	}
 
 	if (!libraryGroupOptions.some((option) => option.value === displayState.value.group)) {
@@ -1165,6 +1170,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		canCreateGroup,
 		instanceOptions,
 		confirmDeleteModal,
+		currentDeleteInstanceNames,
 		isSectionCollapsed,
 		setSectionCollapsed,
 		startInstanceGroupDrag,

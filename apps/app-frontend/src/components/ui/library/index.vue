@@ -41,6 +41,7 @@ const {
 	reorderGroups,
 	instanceOptions,
 	confirmDeleteModal,
+	currentDeleteInstanceNames,
 	clearLibraryInstanceSelection,
 	deleteInstance,
 	handleInstanceOption,
@@ -355,7 +356,11 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 	</InstanceGroupDnd>
 	<LibrarySelectionActionBar />
 	<GroupInstancesModal />
-	<ConfirmDeleteInstanceModal :ref="setConfirmDeleteModal" @delete="deleteInstance" />
+	<ConfirmDeleteInstanceModal
+		:ref="setConfirmDeleteModal"
+		:instance-names="currentDeleteInstanceNames"
+		@delete="deleteInstance"
+	/>
 	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">
 		<template #play> <PlayIcon /> Play </template>
 		<template #stop> <StopCircleIcon /> Stop </template>

@@ -3,6 +3,14 @@
 		<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
 			{{ admonitionBody }}
 		</Admonition>
+		<div v-if="instanceNames.length > 0" class="flex flex-col gap-2.5 mt-4">
+			<p class="m-0">{{ formatMessage(messages.instancesToDelete) }}</p>
+			<ul class="m-0 list-disc pl-5 flex flex-col gap-1.5">
+				<li v-for="(instanceName, index) in instanceNames" :key="`${index}:${instanceName}`">
+					{{ instanceName }}
+				</li>
+			</ul>
+		</div>
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
@@ -60,6 +68,10 @@ const messages = defineMessages({
 		defaultMessage:
 			'All data for these {count} instances will be permanently deleted, including their worlds, configs, and all installed content.',
 	},
+	instancesToDelete: {
+		id: 'app.instance.confirm-delete.instances-to-delete',
+		defaultMessage: 'These instances will be deleted:',
+	},
 	deleteButton: {
 		id: 'app.instance.confirm-delete.delete-button',
 		defaultMessage: 'Delete instance',
@@ -70,8 +82,9 @@ const messages = defineMessages({
 	},
 })
 
-const { count = 1 } = defineProps<{
+const { count = 1, instanceNames = [] } = defineProps<{
 	count?: number
+	instanceNames?: string[]
 }>()
 
 const emit = defineEmits<{

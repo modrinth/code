@@ -290,7 +290,11 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeInstance" />
+	<ConfirmDeleteInstanceModal
+		ref="deleteConfirmModal"
+		:instance-names="[instance.name]"
+		@delete="removeInstance"
+	/>
 	<div class="block">
 		<div class="float-end ml-10 relative group w-fit">
 			<div class="flex flex-col gap-1">

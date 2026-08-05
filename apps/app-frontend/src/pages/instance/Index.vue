@@ -5,7 +5,11 @@
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal v-if="!instance.quarantined" ref="exportModal" :instance="instance" />
-			<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="deleteSelectedInstance" />
+			<ConfirmDeleteInstanceModal
+				ref="deleteConfirmModal"
+				:instance-names="selectedInstanceToDelete ? [selectedInstanceToDelete.name] : []"
+				@delete="deleteSelectedInstance"
+			/>
 			<InstanceSettingsModal
 				:key="instance.id"
 				ref="settingsModal"

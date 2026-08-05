@@ -50,6 +50,7 @@
 	<ConfirmDeleteInstanceModal
 		ref="confirmDeleteModal"
 		:count="selectedInstanceIds.size"
+		:instance-names="selectedInstanceNames"
 		@delete="deleteSelectedInstances"
 	/>
 </template>
@@ -91,6 +92,11 @@ const selectedInstanceCount = computed(() => selectedLibraryInstances.value.size
 const selectedInstanceIds = computed(
 	() =>
 		new Set([...selectedLibraryInstances.value.values()].map((selection) => selection.instanceId)),
+)
+const selectedInstanceNames = computed(() =>
+	instances.value
+		.filter((instance) => selectedInstanceIds.value.has(instance.id))
+		.map((instance) => instance.name),
 )
 const selectedGroupedInstances = computed(() =>
 	[...selectedLibraryInstances.value.values()].flatMap((selection) => {
