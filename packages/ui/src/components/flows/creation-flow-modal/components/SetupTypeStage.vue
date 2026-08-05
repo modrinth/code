@@ -8,6 +8,8 @@
 			v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
 			:options="ctx.projectSearchOptions.value"
 			searchable
+			show-search-icon
+			:show-chevron="false"
 			:disabled="ctx.finishDisabled.value"
 			:search-placeholder="formatMessage(messages.searchProjectPlaceholder)"
 			:no-options-message="
