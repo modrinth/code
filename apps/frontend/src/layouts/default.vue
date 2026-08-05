@@ -1306,7 +1306,7 @@ const userMenuOptions = computed(() => {
 			label: formatMessage(commonMessages.affiliateLinksButton),
 			type: 'link',
 			to: '/dashboard/affiliate-links',
-			shown: user.badges & UserBadge.AFFILIATE,
+			shown: Boolean(user.badges & UserBadge.AFFILIATE),
 		},
 		{
 			id: 'revenue',
