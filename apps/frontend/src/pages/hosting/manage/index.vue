@@ -19,7 +19,7 @@ const config = useRuntimeConfig()
 	<ServersManagePageIndex
 		:stripe-publishable-key="config.public.stripePublishableKey"
 		:site-url="config.public.siteUrl"
-		:products="((products ?? []) as Labrinth.Billing.Internal.Product[])"
+		:products="(products ?? []) as Labrinth.Billing.Internal.Product[]"
 		class="max-w-[1280px] py-0"
 	/>
 </template>

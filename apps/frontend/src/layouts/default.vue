@@ -902,10 +902,7 @@ import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateMo
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
-import {
-	errors as generatedStateErrors,
-	taxComplianceThresholds,
-} from '~/generated/state.json'
+import { errors as generatedStateErrors, taxComplianceThresholds } from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'

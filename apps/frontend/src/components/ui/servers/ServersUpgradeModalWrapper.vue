@@ -3,7 +3,7 @@
 		ref="wrapperRef"
 		:stripe-publishable-key="config.public.stripePublishableKey"
 		:site-url="config.public.siteUrl"
-		:products="((products ?? []) as Labrinth.Billing.Internal.Product[])"
+		:products="(products ?? []) as Labrinth.Billing.Internal.Product[]"
 	/>
 </template>
 
