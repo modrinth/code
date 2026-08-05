@@ -52,7 +52,7 @@
 				:color="action.color === 'standard' ? undefined : (action.color ?? 'brand')"
 				size="xl"
 				:disabled="action.disabled"
-				class="!w-full"
+				class="flex-1"
 				@click="action.onClick"
 			>
 				<component :is="action.icon" v-if="action.icon && !action.showAltIcon" class="size-4" />
@@ -64,7 +64,7 @@
 				{{ action.label }}
 			</Button>
 
-			<Button v-if="errorDetails" size="xl" class="!w-full" @click="copyErrorInformation">
+			<Button v-if="errorDetails" size="xl" class="flex-1" @click="copyErrorInformation">
 				<CopyIcon v-if="!infoCopied" class="size-4" />
 				<CheckIcon v-else class="size-4" />
 				Copy Information
