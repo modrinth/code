@@ -18,6 +18,7 @@ const emit = defineEmits<{
 const props = withDefaults(
 	defineProps<{
 		canReset?: boolean
+		canSave?: boolean
 		original: T
 		modified: Partial<T>
 		saving?: boolean
@@ -29,6 +30,7 @@ const props = withDefaults(
 	}>(),
 	{
 		canReset: true,
+		canSave: true,
 		saving: false,
 		text: () =>
 			defineMessage({
@@ -66,7 +68,7 @@ defineExpose({ nudge })
 			<Button v-if="canReset" type="quiet" :disabled="saving" @click="(e) => emit('reset', e)">
 				<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
 			</Button>
-			<Button type="colored" color="brand" :disabled="saving" @click="(e) => emit('save', e)">
+			<Button type="colored" color="brand" :disabled="saving || !canSave" @click="(e) => emit('save', e)">
 				<SpinnerIcon v-if="saving" class="animate-spin" />
 				<component :is="saveIcon" v-else />
 				{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
