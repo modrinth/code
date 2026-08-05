@@ -20,3 +20,4 @@ pub mod teams;
 pub mod threads;
 pub mod user_limits;
 pub mod users;
+pub mod preferences;
