@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CheckIcon } from '@modrinth/assets'
 import { ref, watch } from 'vue'
 
 const emit = defineEmits<{
@@ -73,6 +74,14 @@ watch(
 			v-if="active && !selected && !$slots['top-buttons']"
 			class="pointer-events-none absolute right-3 top-3 z-20 size-3 rounded-full border-2 border-solid border-surface-3 bg-green"
 		></span>
+
+		<span
+			v-if="selected"
+			class="pointer-events-none absolute right-3 top-3 z-20 flex size-6 items-center justify-center rounded-full"
+		>
+			<span class="absolute inset-0 rounded-full bg-contrast"></span>
+			<CheckIcon class="relative size-4 invert [stroke-width:3]" />
+		</span>
 
 		<div v-if="!imagesLoaded.forward" class="skeleton-loader h-full w-full">
 			<div class="skeleton absolute inset-0 aspect-[5/7]"></div>
@@ -168,13 +177,10 @@ watch(
 .skin-button.skin-button--selected:hover,
 .skin-button.skin-button--selected:focus-within,
 .skin-button.skin-button--selected.skin-button--with-actions:hover,
-.skin-button.skin-button--selected.skin-button--with-actions:focus-within,
-.skin-button.skin-button--active:hover,
-.skin-button.skin-button--active:focus-within,
-.skin-button.skin-button--active.skin-button--with-actions:hover,
-.skin-button.skin-button--active.skin-button--with-actions:focus-within {
-	border-color: var(--color-brand);
-	background: var(--color-brand-highlight);
+.skin-button.skin-button--selected.skin-button--with-actions:focus-within {
+	border-color: color-mix(in srgb, var(--color-text-primary) 40%, transparent);
+	background: var(--surface-3);
+	filter: brightness(1.1);
 }
 
 .skin-button--disabled {
