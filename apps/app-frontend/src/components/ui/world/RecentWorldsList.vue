@@ -48,6 +48,7 @@ const locallyPlayedInstances = ref<Record<string, Dayjs>>({})
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
 
 const MAX_JUMP_BACK_IN = 5
+const MAX_NEW_INSTANCES = 3
 const MAX_LINUX_POPULATES = 3
 
 // Track populate calls on Linux to prevent server ping spam
@@ -170,7 +171,15 @@ async function populateJumpBackIn() {
 
 	const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
 	items.sort((a, b) => b.sort_time.diff(a.sort_time))
-	jumpBackInItems.value = items.slice(0, MAX_JUMP_BACK_IN)
+	let newInstanceCount = 0
+	jumpBackInItems.value = items
+		.filter((item) => {
+			if (item.type !== 'instance' || !item.newly_added) return true
+			if (newInstanceCount >= MAX_NEW_INSTANCES) return false
+			newInstanceCount++
+			return true
+		})
+		.slice(0, MAX_JUMP_BACK_IN)
 }
 
 function markInstancePlayed(item: InstanceJumpBackInItem) {
