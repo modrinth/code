@@ -162,7 +162,7 @@ onUnmounted(() => {
 				:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
 				:tint-by="instance.id"
 				no-shadow
-				class="!border-none !rounded-[14px]"
+				class="!rounded-[14px]"
 				size="48px"
 			/>
 			<div class="flex flex-col col-span-2 justify-center gap-1 h-full">

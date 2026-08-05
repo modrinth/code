@@ -268,7 +268,7 @@ const messages = defineMessages({
 				"
 				size="48px"
 				no-shadow
-				class="!border-none !rounded-[14px]"
+				class="!rounded-[14px]"
 			/>
 			<div class="flex flex-col justify-center gap-0.5 h-full">
 				<div class="flex items-center gap-2">
