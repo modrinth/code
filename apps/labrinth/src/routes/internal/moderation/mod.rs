@@ -333,7 +333,7 @@ pub async fn get_projects_internal(
                     search_organization.name AS organization_name,
                     search_owner.username AS owner_name,
                     CASE
-                        WHEN mp.components ? 'minecraft_server'
+                        WHEN jsonb_typeof(mp.components -> 'minecraft_server') = 'object'
                             THEN ARRAY_APPEND(
                                 ARRAY_REMOVE(
                                     COALESCE(vpt.project_types::text[], ARRAY[]::text[]),
@@ -603,7 +603,7 @@ pub async fn get_projects_internal(
                     owner.username AS owner_name,
                     owner.avatar_url AS owner_icon_url,
                     CASE
-                        WHEN m.components ? 'minecraft_server'
+                        WHEN jsonb_typeof(m.components -> 'minecraft_server') = 'object'
                             THEN ARRAY_APPEND(
                                 ARRAY_REMOVE(
                                     COALESCE(ppt.project_types::text[], ARRAY[]::text[]),
@@ -808,7 +808,7 @@ pub async fn get_project_ids(
                     search_organization.name AS organization_name,
                     search_owner.username AS owner_name,
                     CASE
-                        WHEN mp.components ? 'minecraft_server'
+                        WHEN jsonb_typeof(mp.components -> 'minecraft_server') = 'object'
                             THEN ARRAY_APPEND(
                                 ARRAY_REMOVE(
                                     COALESCE(vpt.project_types::text[], ARRAY[]::text[]),

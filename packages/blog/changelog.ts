@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-31T06:10:23+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed randomly getting signed out of Modrinth account due to random non-auth related errors.`,
+	},
+	{
 		date: `2026-07-29T21:32:06+00:00`,
 		product: 'app',
 		version: '0.17.3',

@@ -1,9 +1,10 @@
-import { useGeneratedState } from '@/composables/generated.ts'
+import type { ISO3166 } from '@modrinth/api-client'
+
 import { useRequestHeaders, useState } from '#imports'
+import { countries, subdivisions } from '~/generated/state.json'
 
 export const useCountries = () => {
-	const generated = useGeneratedState()
-	return computed(() => generated.value.countries ?? [])
+	return computed(() => (countries ?? []) as ISO3166.Country[])
 }
 
 export const useFormattedCountries = () => {
@@ -28,10 +29,10 @@ export const useFormattedCountries = () => {
 }
 
 export const useSubdivisions = (countryCode: ComputedRef<string> | Ref<string> | string) => {
-	const generated = useGeneratedState()
 	const code = isRef(countryCode) ? countryCode : ref(countryCode)
+	const byCountry = (subdivisions ?? {}) as Record<string, ISO3166.Subdivision[]>
 
-	return computed(() => generated.value.subdivisions?.[unref(code)] ?? [])
+	return computed(() => byCountry[unref(code)] ?? [])
 }
 
 export const useUserCountry = () => {

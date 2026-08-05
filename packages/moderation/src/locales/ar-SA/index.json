@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "يُطلب صورة واحدة على الأقل في المَعْرِض لعرض محتوى {type} الخاص بك."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "حُزْمَة موارد، باستثناء حزم الصوت أو التعريب. إذا كان هذا يصف حزمتك، يرجى اختيار الوسم المناسب"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "رفع صورة من المَعْرِض"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "زيارة إعدادات الروابط"
   }
 }
-

@@ -65,20 +65,11 @@
   "app.action-bar.view-logs": {
     "message": "Zobrazit logy"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Povolí pokročilé vykreslování, například efekty rozmazání, které mohou bez hardwarového zrychlení způsobovat problémy s výkonem."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Pokročilé vykreslování"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Vyberte si váš preferovaný motiv pro aplikaci Modrinth."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Barevný motiv"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Změňte stránku, která se otevře po spuštění launcheru."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Domů"
@@ -89,50 +80,17 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Výchozí stránka po spuštění"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Zakáže zobrazení jmenovky nad vaší postavou na stránce skinů."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Skrýt jmenovku"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Zahrne nedávné světy do sekce „Vrátit se do hry“ na domovské stránce."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Rychlý návrat do světů"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimalizovat launcher při spuštění Minecraftu."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimalizovat launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Použít systémový rámeček okna (vyžaduje restart aplikace)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systémové dekorace"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Zobrazuje, kolik času jsi strávil hraním instance."
-  },
   "app.appearance-settings.show-play-time.title": {
     "message": "Zobrazit odehraný čas"
   },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Automaticky přeskočí nízko riziková potrvzení jako duplicitní instalace modpacků, běžné mazání obsahu, hromadné aktualizace, odpojování modpacků a výzvy k opravě. Nebezpečná upozornění se budou nadále zobrazovat."
-  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Přeskočit nedůležitá upozornění"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Umožňí přepínat zobrazení postranního panelu."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Přepnout postranní panel"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Pokud se pokusíte nainstalovat soubor Modrinth Pack (.mrpack), který není hostován na Modrinth, zajistíme, abyste si před instalací uvědomili související rizika."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Upozorni mě před instalací neznámých modpacků"
@@ -400,9 +358,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Vzhled"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Výchozí možnosti instance"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalace Javy"

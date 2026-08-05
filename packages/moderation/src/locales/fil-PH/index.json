@@ -227,9 +227,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Mangangailangan ng hindi kukulang sa isang imaheng panggaleriya na pang-showcase ng kontento ng iyong {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "resource pack, maliban sa audio o mga pack ng pagsasalon. Kung napaglarawan nito ang iyong pack, mangyaring piliin ang nakawawastong tag"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Mag-upload ng imaheng panggaleriya"
   },
@@ -252,4 +249,3 @@
     "defaultMessage": "Bisitahin ang mga setting sa mga link"
   }
 }
-

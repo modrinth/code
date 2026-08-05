@@ -11,12 +11,10 @@
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.uploadedFiles) }}</span>
 
-				<ButtonStyled type="transparent" size="standard">
-					<button @click="editFiles">
-						<EditIcon />
-						{{ formatMessage(messages.editButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="quiet" @click="editFiles">
+					<EditIcon />
+					{{ formatMessage(messages.editButton) }}
+				</Button>
 			</div>
 			<div class="flex flex-col gap-2.5">
 				<ViewOnlyFileRow
@@ -50,22 +48,21 @@
 					}}
 				</span>
 
-				<ButtonStyled type="transparent" size="standard">
-					<button
-						v-tooltip="
-							isModpack
-								? formatMessage(messages.modpackLoadersTooltip)
-								: isResourcePack
-									? formatMessage(messages.resourcePackLoadersTooltip)
-									: undefined
-						"
-						:disabled="isModpack || isResourcePack"
-						@click="editLoaders"
-					>
-						<EditIcon />
-						{{ formatMessage(messages.editButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="
+						isModpack
+							? formatMessage(messages.modpackLoadersTooltip)
+							: isResourcePack
+								? formatMessage(messages.resourcePackLoadersTooltip)
+								: undefined
+					"
+					type="quiet"
+					:disabled="isModpack || isResourcePack"
+					@click="editLoaders"
+				>
+					<EditIcon />
+					{{ formatMessage(messages.editButton) }}
+				</Button>
 			</div>
 
 			<div
@@ -111,16 +108,15 @@
 					}}
 				</span>
 
-				<ButtonStyled type="transparent" size="standard">
-					<button
-						v-tooltip="isModpack ? formatMessage(messages.modpackVersionsTooltip) : undefined"
-						:disabled="isModpack"
-						@click="editVersions"
-					>
-						<EditIcon />
-						{{ formatMessage(messages.editButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="isModpack ? formatMessage(messages.modpackVersionsTooltip) : undefined"
+					type="quiet"
+					:disabled="isModpack"
+					@click="editVersions"
+				>
+					<EditIcon />
+					{{ formatMessage(messages.editButton) }}
+				</Button>
 			</div>
 
 			<div
@@ -152,12 +148,10 @@
 						<UnknownIcon v-tooltip="formatMessage(messages.prefilledEnvironmentTooltip)" />
 					</div>
 
-					<ButtonStyled type="transparent" size="standard">
-						<button @click="editEnvironment">
-							<EditIcon />
-							{{ formatMessage(messages.editButton) }}
-						</button>
-					</ButtonStyled>
+					<Button type="quiet" @click="editEnvironment">
+						<EditIcon />
+						{{ formatMessage(messages.editButton) }}
+					</Button>
 				</div>
 
 				<div class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
@@ -183,12 +177,10 @@
 							formatMessage(messages.dependencies)
 						}}</span>
 
-						<ButtonStyled type="transparent" size="standard">
-							<button @click="addDependency">
-								<PlusIcon />
-								{{ formatMessage(messages.addDependency) }}
-							</button>
-						</ButtonStyled>
+						<Button type="quiet" @click="addDependency">
+							<PlusIcon />
+							{{ formatMessage(messages.addDependency) }}
+						</Button>
 					</div>
 
 					<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
@@ -215,8 +207,8 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { EditIcon, getLoaderIcon, PlusIcon, UnknownIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	defineMessages,
 	ENVIRONMENTS_COPY,
 	FormattedTag,

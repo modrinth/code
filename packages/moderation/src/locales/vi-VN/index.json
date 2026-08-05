@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Cần ít nhất một hình ảnh minh họa cho {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "gói tài nguyên, trừ gói tài nguyên nhạc hoặc phiên dịch. Nếu các trường hợp trên bao gồm gói tài nguyên của bạn, hãy lựa chọn một nhãn thích hợp"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tải lên hình ảnh thư viện"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
-

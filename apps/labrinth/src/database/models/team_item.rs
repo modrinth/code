@@ -10,7 +10,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const TEAMS_NAMESPACE: &str = "teams:v3";
+const TEAMS_NAMESPACE: &str = "teams:v4";
 
 pub struct TeamBuilder {
     pub members: Vec<TeamMemberBuilder>,

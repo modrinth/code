@@ -137,6 +137,9 @@
   "analytics.chart.tooltip.dependent-on-project": {
     "message": "{project} に依存"
   },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} は {dependencyProject} の {version} に依存しています"
+  },
   "analytics.chart.tooltip.total": {
     "message": "合計"
   },
@@ -198,7 +201,7 @@
     "message": "ソースを検索..."
   },
   "analytics.filter.search.members": {
-    "message": "メンバーを検索..."
+    "message": "メンバーを検索…"
   },
   "analytics.filter.search.project-versions": {
     "message": "プロジェクトバージョンを検索…"

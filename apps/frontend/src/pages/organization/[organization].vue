@@ -112,18 +112,14 @@
 					<h2>Invitation to join {{ organization.name }}</h2>
 					<p>You have been invited to join {{ organization.name }}.</p>
 					<div class="input-group">
-						<ButtonStyled color="brand">
-							<button @click="onAcceptInvite">
-								<CheckIcon />
-								Accept
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button @click="onDeclineInvite">
-								<XIcon />
-								Decline
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" @click="onAcceptInvite">
+							<CheckIcon />
+							Accept
+						</Button>
+						<Button type="colored" color="red" @click="onDeclineInvite">
+							<XIcon />
+							Decline
+						</Button>
 					</div>
 				</div>
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
@@ -229,7 +225,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

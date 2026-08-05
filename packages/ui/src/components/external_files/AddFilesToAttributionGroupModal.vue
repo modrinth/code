@@ -3,7 +3,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, NewModal, StyledInput } from '#ui/components'
+import { NewModal, StyledInput } from '#ui/components'
+import { Button } from '#ui/components/base/buttons'
 import { commonMessages } from '#ui/utils'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -263,23 +264,21 @@ defineExpose({ show, hide })
 					{{ formatMessage(messages.addFilesModalSelectedCount, { count: selectedFileCount }) }}
 				</p>
 				<div class="flex gap-2 ml-auto">
-					<ButtonStyled type="outlined">
-						<button type="button" :disabled="pending" @click="hide">
-							<XIcon class="size-4 shrink-0" />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button
-							type="button"
-							:disabled="selectedFileCount === 0 || pending"
-							@click="handleConfirm"
-						>
-							<SpinnerIcon v-if="pending" class="size-4 shrink-0 animate-spin" />
-							<PlusIcon v-else class="size-4 shrink-0" />
-							{{ formatMessage(messages.addFilesModalConfirm, { count: selectedFileCount }) }}
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" native-type="button" :disabled="pending" @click="hide">
+						<XIcon class="size-4 shrink-0" />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						native-type="button"
+						:disabled="selectedFileCount === 0 || pending"
+						@click="handleConfirm"
+					>
+						<SpinnerIcon v-if="pending" class="size-4 shrink-0 animate-spin" />
+						<PlusIcon v-else class="size-4 shrink-0" />
+						{{ formatMessage(messages.addFilesModalConfirm, { count: selectedFileCount }) }}
+					</Button>
 				</div>
 			</div>
 		</template>

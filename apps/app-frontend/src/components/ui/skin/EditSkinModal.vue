@@ -22,11 +22,9 @@
 			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
 				<section v-if="mode === 'edit' && canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.textureSection) }}</h2>
-					<ButtonStyled>
-						<button class="!shadow-none" @click="openTextureFileBrowser">
-							<UploadIcon /> {{ formatMessage(messages.replaceTextureButton) }}
-						</button>
-					</ButtonStyled>
+					<Button @click="openTextureFileBrowser">
+						<UploadIcon /> {{ formatMessage(messages.replaceTextureButton) }}
+					</Button>
 					<input
 						ref="textureFileInput"
 						type="file"
@@ -112,19 +110,21 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button :disabled="isSaving" @click="hide">
-						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
-						<SpinnerIcon v-if="isSaving" class="animate-spin" />
-						<CheckIcon v-else-if="mode === 'new'" />
-						<SaveIcon v-else />
-						{{ formatMessage(mode === 'new' ? messages.addSkinButton : messages.saveSkinButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" :disabled="isSaving" @click="hide">
+					<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="saveTooltip"
+					type="colored"
+					color="brand"
+					:disabled="disableSave || isSaving"
+					@click="save"
+				>
+					<SpinnerIcon v-if="isSaving" class="animate-spin" />
+					<CheckIcon v-else-if="mode === 'new'" />
+					<SaveIcon v-else />
+					{{ formatMessage(mode === 'new' ? messages.addSkinButton : messages.saveSkinButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -133,7 +133,7 @@
 <script setup lang="ts">
 import { CheckIcon, SaveIcon, SpinnerIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	CapeButton,
 	CapeLikeTextButton,
 	commonMessages,

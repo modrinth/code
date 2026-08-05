@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import ContentDependencyWarningModal from '../../layouts/shared/content-tab/components/modals/ContentDependencyWarningModal.vue'
 import type { ContentCardTableItem } from '../../layouts/shared/content-tab/types'
 
@@ -165,7 +165,7 @@ type Story = StoryObj<typeof meta>
 
 export const InstanceDependency: Story = {
 	render: () => ({
-		components: { ButtonStyled, ContentDependencyWarningModal },
+		components: { ContentDependencyWarningModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDependencyWarningModal> | null>(null)
 			const deleted = ref(false)
@@ -186,9 +186,7 @@ export const InstanceDependency: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="orange">
-					<button @click="modalRef?.show()">Delete dependency</button>
-				</ButtonStyled>
+				<Button type="colored" color="orange" @click="modalRef?.show()">Delete dependency</Button>
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"
@@ -210,7 +208,7 @@ export const InstanceDependency: Story = {
 
 export const ServerDependency: Story = {
 	render: () => ({
-		components: { ButtonStyled, ContentDependencyWarningModal },
+		components: { ContentDependencyWarningModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDependencyWarningModal> | null>(null)
 			const deleted = ref(false)
@@ -227,9 +225,7 @@ export const ServerDependency: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="orange">
-					<button @click="modalRef?.show()">Delete server dependency</button>
-				</ButtonStyled>
+				<Button type="colored" color="orange" @click="modalRef?.show()">Delete server dependency</Button>
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Server dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"
@@ -246,7 +242,7 @@ export const ServerDependency: Story = {
 
 export const BulkDependencies: Story = {
 	render: () => ({
-		components: { ButtonStyled, ContentDependencyWarningModal },
+		components: { ContentDependencyWarningModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDependencyWarningModal> | null>(null)
 			const deleted = ref(false)
@@ -267,9 +263,7 @@ export const BulkDependencies: Story = {
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
-				<ButtonStyled color="orange">
-					<button @click="modalRef?.show()">Delete selected dependencies</button>
-				</ButtonStyled>
+				<Button type="colored" color="orange" @click="modalRef?.show()">Delete selected dependencies</Button>
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Bulk dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"

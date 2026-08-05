@@ -245,9 +245,6 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pacchetto di risorse, eccetto per audio e localizzazioni. Se ciò descrive il pacchetto, seleziona il tag appropriato"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Carica un'immagine"
   },
@@ -267,6 +264,6 @@
     "defaultMessage": "Visita pagina delle versioni"
   },
   "nags.visit-links-settings.title": {
-    "defaultMessage": "Visita impostazioni dei link"
+    "defaultMessage": "Vedi impostazioni dei link"
   }
 }

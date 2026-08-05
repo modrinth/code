@@ -50,12 +50,10 @@
 				</template>
 				<div v-else class="universal-body">
 					<p>{{ formatMessage(messages.noUnreadNotifications) }}</p>
-					<ButtonStyled>
-						<nuxt-link to="/dashboard/notifications/history" class="!mt-4 w-fit">
-							<HistoryIcon />
-							{{ formatMessage(messages.viewNotificationHistory) }}
-						</nuxt-link>
-					</ButtonStyled>
+					<ButtonLink to="/dashboard/notifications/history" class="!mt-4 w-fit">
+						<HistoryIcon />
+						{{ formatMessage(messages.viewNotificationHistory) }}
+					</ButtonLink>
 				</div>
 			</section>
 		</div>
@@ -65,7 +63,7 @@
 import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

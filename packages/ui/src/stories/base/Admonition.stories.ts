@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 
 const meta = {
 	title: 'Base/Admonition',
@@ -78,7 +78,7 @@ export const HeaderWithTimestamp: Story = {
 
 export const WithTopRightActions: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled },
+		components: { Admonition, Button },
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
 				<Admonition
@@ -88,9 +88,7 @@ export const WithTopRightActions: Story = {
 				>
 					Uploading server files...
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="blue">
-							<button class="!border" type="button">Cancel</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]" native-type="button">Cancel</Button>
 					</template>
 				</Admonition>
 				<Admonition
@@ -100,9 +98,7 @@ export const WithTopRightActions: Story = {
 				>
 					Something went wrong while extracting the archive.
 					<template #top-right-actions>
-						<ButtonStyled color="red">
-							<button type="button">Retry</button>
-						</ButtonStyled>
+						<Button type="colored" color="red" native-type="button">Retry</Button>
 					</template>
 				</Admonition>
 				<Admonition type="success" header="Extraction complete" :dismissible="true">
@@ -115,7 +111,7 @@ export const WithTopRightActions: Story = {
 
 export const WithProgressBar: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled },
+		components: { Admonition, Button },
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
 				<Admonition
@@ -127,9 +123,7 @@ export const WithProgressBar: Story = {
 				>
 					128 KB / 1.2 MB (45%)
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="blue">
-							<button class="!border" type="button">Cancel</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]" native-type="button">Cancel</Button>
 					</template>
 				</Admonition>
 				<Admonition
@@ -141,9 +135,7 @@ export const WithProgressBar: Story = {
 				>
 					24 MB extracted — config/settings.yml
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="blue">
-							<button class="!border" type="button">Cancel</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]" native-type="button">Cancel</Button>
 					</template>
 				</Admonition>
 				<Admonition

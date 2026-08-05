@@ -70,87 +70,104 @@
 				>
 					<template #actions>
 						<template v-if="isServerProject">
-							<ButtonStyled v-if="serverPlaying" color="red" size="large">
-								<button type="button" @click="handleStopServer">
-									<StopCircleIcon />
-									{{ formatMessage(commonMessages.stopButton) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" size="large">
-								<button type="button" :disabled="serverInstallLoading" @click="handleClickPlay">
-									<PlayIcon />
-									{{
-										serverInstallLoading
-											? formatMessage(commonMessages.installingLabel)
-											: formatMessage(commonMessages.playButton)
-									}}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large">
-								<button
-									v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
-									type="button"
-									:aria-label="formatMessage(commonMessages.addServerToInstanceButton)"
-									@click="handleAddServerToInstance"
-								>
-									<PlusIcon />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
-									:options="serverProjectHeaderMoreActions"
-									tooltip="More options"
-									aria-label="More options"
-								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+							<Button
+								v-if="serverPlaying"
+								type="colored"
+								color="red"
+								size="xl"
+								native-type="button"
+								@click="handleStopServer"
+							>
+								<StopCircleIcon />
+								{{ formatMessage(commonMessages.stopButton) }}
+							</Button>
+							<Button
+								v-else
+								type="colored"
+								color="brand"
+								size="xl"
+								native-type="button"
+								:disabled="serverInstallLoading"
+								@click="handleClickPlay"
+							>
+								<PlayIcon />
+								{{
+									serverInstallLoading
+										? formatMessage(commonMessages.installingLabel)
+										: formatMessage(commonMessages.playButton)
+								}}
+							</Button>
+							<IconButton
+								v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
+								size="xl"
+								:label="formatMessage(commonMessages.addServerToInstanceButton)"
+								native-type="button"
+								@click="handleAddServerToInstance"
+							>
+								<PlusIcon />
+							</IconButton>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								label="More options"
+								:options="serverProjectHeaderMoreActions"
+							>
+								<MoreVerticalIcon />
+							</TeleportOverflowMenu>
 						</template>
 						<template v-else>
-							<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
-								<button v-tooltip="formatMessage(messages.alreadyInstalled)" type="button" disabled>
-									<CheckIcon />
-									{{ formatMessage(commonMessages.installedLabel) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else-if="showSwitchVersion" size="large">
-								<button type="button" @click="goToVersions">
-									<SwapIcon />
-									{{ formatMessage(messages.switchVersion) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" size="large">
-								<button
-									v-tooltip="
-										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
-									"
-									type="button"
-									:disabled="installButtonDisabled"
-									@click="install(null)"
-								>
-									<component :is="installButtonIcon" :class="installButtonIconClass" />
-									{{
-										installButtonInstalled
-											? formatMessage(commonMessages.installedLabel)
-											: installButtonValidating
-												? formatMessage(commonMessages.validatingLabel)
-												: installButtonLoading
-													? formatMessage(commonMessages.installingLabel)
-													: serverProjectSelected
-														? formatMessage(commonMessages.selectedLabel)
-														: formatMessage(commonMessages.installButton)
-									}}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
-									:options="projectHeaderMoreActions"
-									tooltip="More options"
-									aria-label="More options"
-								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+							<Button
+								v-if="showSwitchVersion && onVersionsPage"
+								v-tooltip="formatMessage(messages.alreadyInstalled)"
+								size="xl"
+								native-type="button"
+								disabled
+							>
+								<CheckIcon />
+								{{ formatMessage(commonMessages.installedLabel) }}
+							</Button>
+							<Button
+								v-else-if="showSwitchVersion"
+								size="xl"
+								native-type="button"
+								@click="goToVersions"
+							>
+								<SwapIcon />
+								{{ formatMessage(messages.switchVersion) }}
+							</Button>
+							<Button
+								v-else
+								v-tooltip="
+									installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
+								"
+								type="colored"
+								color="brand"
+								size="xl"
+								native-type="button"
+								:disabled="installButtonDisabled"
+								@click="install(null)"
+							>
+								<component :is="installButtonIcon" :class="installButtonIconClass" />
+								{{
+									installButtonInstalled
+										? formatMessage(commonMessages.installedLabel)
+										: installButtonValidating
+											? formatMessage(commonMessages.validatingLabel)
+											: installButtonLoading
+												? formatMessage(commonMessages.installingLabel)
+												: serverProjectSelected
+													? formatMessage(commonMessages.selectedLabel)
+													: formatMessage(commonMessages.installButton)
+								}}
+							</Button>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								label="More options"
+								:options="projectHeaderMoreActions"
+							>
+								<MoreVerticalIcon />
+							</TeleportOverflowMenu>
 						</template>
 					</template>
 				</ProjectPageHeader>
@@ -241,11 +258,12 @@ import {
 } from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	getTargetInstallPreferences,
+	IconButton,
 	injectNotificationManager,
 	NavTabs,
 	ProjectBackgroundGradient,
@@ -571,13 +589,13 @@ const serverProjectHeaderMoreActions = computed(() => [
 		action: openProjectInBrowser,
 	},
 	{
-		divider: true,
+		type: 'divider',
 	},
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
-		color: 'red',
+		tone: 'red',
 		action: reportProject,
 	},
 ])
@@ -605,13 +623,13 @@ const projectHeaderMoreActions = computed(() => [
 		action: openProjectInBrowser,
 	},
 	{
-		divider: true,
+		type: 'divider',
 	},
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
-		color: 'red',
+		tone: 'red',
 		action: reportProject,
 	},
 ])

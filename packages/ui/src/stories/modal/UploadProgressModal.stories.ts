@@ -2,7 +2,7 @@ import type { UploadHandle, UploadProgress } from '@modrinth/api-client'
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import UploadProgressModal from '../../components/modal/UploadProgressModal.vue'
 
 const meta = {
@@ -52,7 +52,7 @@ function createMockUploadHandle(totalBytes: number, durationMs: number): UploadH
 
 export const Default: Story = {
 	render: () => ({
-		components: { UploadProgressModal, ButtonStyled },
+		components: { UploadProgressModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UploadProgressModal> | null>(null)
 			const startUpload = () => {
@@ -63,9 +63,7 @@ export const Default: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="startUpload">Upload 50MB file (3s)</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="startUpload">Upload 50MB file (3s)</Button>
 				<UploadProgressModal ref="modalRef" />
 			</div>
 		`,
@@ -74,7 +72,7 @@ export const Default: Story = {
 
 export const LargeFile: Story = {
 	render: () => ({
-		components: { UploadProgressModal, ButtonStyled },
+		components: { UploadProgressModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof UploadProgressModal> | null>(null)
 			const startUpload = () => {
@@ -85,9 +83,7 @@ export const LargeFile: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="startUpload">Upload 500MB file (8s)</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="startUpload">Upload 500MB file (8s)</Button>
 				<UploadProgressModal ref="modalRef" />
 			</div>
 		`,

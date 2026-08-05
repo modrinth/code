@@ -4,6 +4,7 @@ use crate::models::ids::{
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
@@ -14,7 +15,7 @@ pub struct Product {
     pub unitary: bool,
 }
 
-#[derive(Serialize, Deserialize)]
+#[serde_binhum]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ProductMetadata {
     Midas,
@@ -55,7 +56,7 @@ pub struct ProductPrice {
     pub currency_code: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[serde_binhum]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum Price {
     OneTime {

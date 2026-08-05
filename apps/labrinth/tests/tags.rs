@@ -47,12 +47,7 @@ async fn get_tags_v3() {
 
             let loader_metadata = loaders
                 .into_iter()
-                .map(|x| {
-                    (
-                        x.name,
-                        x.metadata.get("platform").and_then(|x| x.as_bool()),
-                    )
-                })
+                .map(|x| (x.name, x.metadata.platform))
                 .collect::<HashMap<_, _>>();
             let loader_names =
                 loader_metadata.keys().cloned().collect::<HashSet<String>>();

@@ -22,17 +22,16 @@
 						formatMessage(messages.resetServerTitle)
 					}}</span>
 					<div>
-						<ButtonStyled color="red">
-							<button
-								v-tooltip="resetServerDisabledTooltip"
-								class="!shadow-none"
-								:disabled="resetServerDisabled"
-								@click="showResetServerModal"
-							>
-								<RotateCounterClockwiseIcon class="size-5" />
-								{{ formatMessage(commonMessages.resetServerButton) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							v-tooltip="resetServerDisabledTooltip"
+							type="colored"
+							color="red"
+							:disabled="resetServerDisabled"
+							@click="showResetServerModal"
+						>
+							<RotateCounterClockwiseIcon class="size-5" />
+							{{ formatMessage(commonMessages.resetServerButton) }}
+						</Button>
 					</div>
 					<span class="text-primary">
 						{{ formatMessage(messages.resetServerDescription) }}
@@ -59,17 +58,16 @@
 				{{ formatMessage(messages.supportOptionsTitle) }}
 			</span>
 			<div>
-				<ButtonStyled color="red">
-					<button
-						v-tooltip="supportResetToOnboardingTooltip"
-						class="!shadow-none"
-						:disabled="supportResetToOnboardingDisabled"
-						@click="showResetToOnboardingModal"
-					>
-						<RotateCounterClockwiseIcon class="size-5" />
-						{{ formatMessage(messages.resetToOnboardingButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="supportResetToOnboardingTooltip"
+					type="colored"
+					color="red"
+					:disabled="supportResetToOnboardingDisabled"
+					@click="showResetToOnboardingModal"
+				>
+					<RotateCounterClockwiseIcon class="size-5" />
+					{{ formatMessage(messages.resetToOnboardingButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>
@@ -79,7 +77,6 @@
 import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -103,6 +100,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { injectFilePicker } from '#ui/providers/file-picker'
 
 const debug = useDebugLogger('LoaderPage')

@@ -7,8 +7,8 @@ import {
 	StarIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { Button, IconButton } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	ConfirmModal,
@@ -405,26 +405,26 @@ defineExpose({ show, hide })
 							</span>
 						</template>
 					</Combobox>
-					<ButtonStyled circular color="red" color-fill="none">
-						<button
-							v-tooltip="formatMessage(messages.deleteAllGroups)"
-							:disabled="titleButtonsDisabled"
-							@click="showConfirmClearGroups"
-						>
-							<TrashIcon v-if="!isClearing" aria-hidden="true" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular>
-						<button
-							v-tooltip="formatMessage(messages.scanAllFiles)"
-							:disabled="titleButtonsDisabled"
-							@click="fetchAllScans"
-						>
-							<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-tooltip="formatMessage(messages.deleteAllGroups)"
+						type="quiet"
+						color="red"
+						:label="formatMessage(messages.deleteAllGroups)"
+						:disabled="titleButtonsDisabled"
+						@click="showConfirmClearGroups"
+					>
+						<TrashIcon v-if="!isClearing" aria-hidden="true" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</IconButton>
+					<IconButton
+						v-tooltip="formatMessage(messages.scanAllFiles)"
+						:label="formatMessage(messages.scanAllFiles)"
+						:disabled="titleButtonsDisabled"
+						@click="fetchAllScans"
+					>
+						<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</IconButton>
 				</div>
 			</div>
 		</template>
@@ -454,17 +454,15 @@ defineExpose({ show, hide })
 				<template #cell-newFiles="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<ButtonStyled
-							class="justify-self-center"
-							color="red"
+						<Button
 							type="outlined"
-							hover-color-fill="background"
+							:disabled="rescanButtonsDisabled"
+							class="justify-self-center !text-red !shadow-[inset_0_0_0_1px_var(--color-red)] hover:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!bg-red focus-visible:!text-[var(--color-accent-contrast)] [&>svg]:!text-red"
+							@click="() => fetchScan(row.id)"
 						>
-							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
-								<RotateCounterClockwiseIcon />
-								{{ formatMessage(messages.failed) }}
-							</button>
-						</ButtonStyled>
+							<RotateCounterClockwiseIcon />
+							{{ formatMessage(messages.failed) }}
+						</Button>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_files }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>
@@ -472,17 +470,15 @@ defineExpose({ show, hide })
 				<template #cell-newGroups="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<ButtonStyled
-							class="justify-self-center"
-							color="red"
+						<Button
 							type="outlined"
-							hover-color-fill="background"
+							:disabled="rescanButtonsDisabled"
+							class="justify-self-center !text-red !shadow-[inset_0_0_0_1px_var(--color-red)] hover:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!bg-red focus-visible:!text-[var(--color-accent-contrast)] [&>svg]:!text-red"
+							@click="() => fetchScan(row.id)"
 						>
-							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
-								<RotateCounterClockwiseIcon />
-								{{ formatMessage(messages.failed) }}
-							</button>
-						</ButtonStyled>
+							<RotateCounterClockwiseIcon />
+							{{ formatMessage(messages.failed) }}
+						</Button>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_groups }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>

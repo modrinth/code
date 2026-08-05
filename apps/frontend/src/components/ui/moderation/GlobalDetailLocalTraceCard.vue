@@ -20,12 +20,10 @@
 					<span class="text-sm text-secondary">Local</span>
 					<Badge :type="trace.local_status" />
 				</template>
-				<ButtonStyled>
-					<NuxtLink :to="localTraceLink">
-						<ExternalIcon aria-hidden="true" />
-						View
-					</NuxtLink>
-				</ButtonStyled>
+				<ButtonLink :to="localTraceLink">
+					<ExternalIcon aria-hidden="true" />
+					View
+				</ButtonLink>
 			</div>
 		</div>
 	</div>
@@ -34,7 +32,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ChevronRightIcon, ExternalIcon } from '@modrinth/assets'
-import { Badge, ButtonStyled } from '@modrinth/ui'
+import { Badge, ButtonLink } from '@modrinth/ui'
 
 const props = defineProps<{
 	trace: Labrinth.TechReview.Internal.GlobalIssueDetailTrace

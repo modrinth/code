@@ -144,7 +144,7 @@
     "defaultMessage": "Examinez et traitez toutes les remarques de l’équipe de modération avant de soumettre à nouveau."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Retours de revue"
+    "defaultMessage": "Voir les retours"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Vous avez sélectionné {count, plural, one {# tag de résolution} other {# tags de résolution}} ({tags}). Les packs de ressources ne devraient généralement avoir qu’un seul tag de résolution correspondant à leur résolution principale."
@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Au moins une image dans la galerie est nécessaire pour montrer le contenu de votre {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pack de ressource, sauf pour les packs d'audio ou de localisation. Si cela décrit votre pack, veuillez sélectionner les étiquettes appropriées"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ajouter une image à la galerie"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Accéder aux paramètres des liens"
   }
 }
-

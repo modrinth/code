@@ -35,7 +35,7 @@
 		"vite-svg-loader": "^5.1.0",
 		"vue-component-type-helpers": "^3.1.8",
 		"vue-tsc": "^2.0.24",
-		"wrangler": "^4.54.0"
+		"wrangler": "^4.115.0"
 	},
 	"dependencies": {
 		"@formatjs/intl-localematcher": "^0.5.4",

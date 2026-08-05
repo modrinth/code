@@ -188,6 +188,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Ukryj {name} na wykresie"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Brak danych"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Przypięto informacje"
   },
@@ -247,6 +250,9 @@
   },
   "analytics.empty.select-project": {
     "message": "Wybierz przynajmniej jeden projekt, by przeglądać dane"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Nie udało się załadować zależnych projektów"
   },
   "analytics.filter.game-version-type": {
     "message": "Rodzaj wersji gry"
@@ -969,7 +975,7 @@
     "message": "Przestań obserwować projekt"
   },
   "collection.delete-modal.description": {
-    "message": "To trwale usunie tę kolekcję. Tej akcji nie można odwrócić."
+    "message": "To trwale usunie tę kolekcję. Tej akcji nie można cofnąć."
   },
   "collection.delete-modal.title": {
     "message": "Czy na pewno chcesz usunąć tę kolekcję?"
@@ -2966,6 +2972,9 @@
   "modpack-scan-modal.batch.placeholder": {
     "message": "Ilość elementów na stronę"
   },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Trwale usunie to wszystkie grupy atrybucji i wszystkie zawarte w nich pliki. Tej akcji nie można cofnąć."
+  },
   "modpack-scan-modal.delete-all-groups.proceed": {
     "message": "Wyczyść"
   },
@@ -3784,6 +3793,9 @@
   },
   "project.settings.permissions.delete-all-groups": {
     "message": "Usuń wszystkie grupy"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Trwale usunie to {count, plural, one {# grupę atrybucji} few {wszystkie # grupy atrybucji} other {wszystkie # grup atrybucji}} i wszystkie zawarte w nich pliki. Tej akcji nie można cofnąć."
   },
   "project.settings.permissions.empty-state.description": {
     "message": "Żadne z wersji Twojego projektu nie zawierają zewnętrznej zawartości, więc nie musisz martwić się o uzyskanie zezwoleń."
@@ -4703,11 +4715,23 @@
   "settings.authorizations.about-this-app": {
     "message": "O aplikacji"
   },
+  "settings.authorizations.created-by": {
+    "message": "Stworzone przez {user}"
+  },
   "settings.authorizations.description": {
     "message": "Kiedy autoryzujesz aplikacje ze swoim kontem Modrinth, dajesz jej dostęp do swojego konta. Możesz tutaj zawsze zarządzać oraz przeglądać stan aplikacji z dostępem do Twojego konta."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Aplikacje, które autoryzujesz, pojawią się tutaj."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Brak autoryzowanych aplikacji"
+  },
   "settings.authorizations.head-title": {
     "message": "Autoryzacje"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Ta aplikacja jest utworzona przez oficjalne konto Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Unieważnij"
@@ -4717,6 +4741,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Czy na pewno chcesz unieważnić dostęp tej aplikacji?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Ta aplikacja nie jest powiązana w żaden sposób z Modrinth, mimo jej nazwy."
   },
   "settings.billing.charges.description": {
     "message": "Wszystkie pobrane opłaty z twojego konta Modrinth są wyświetlane poniżej:"
@@ -5139,7 +5166,7 @@
     "message": "Wszystkie wersje"
   },
   "version.confirm-delete.description": {
-    "message": "Ta wersja zostanie trwale usunięta. Tej akcji nie będzie można cofnąć."
+    "message": "Ta wersja zostanie trwale usunięta. Tej akcji nie można cofnąć."
   },
   "version.confirm-delete.proceed": {
     "message": "Usuń wersję"
@@ -5197,6 +5224,12 @@
   },
   "version.notification.deleted-title": {
     "message": "Wersja usunięta"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "Twoja paczka danych została pomyślnie zapakowana jako mod! Zalecamy upewnienie się, że działa poprawnie."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Zapakowano pomyślnie"
   },
   "version.package-as-mod.button": {
     "message": "Zapakuj jako mod"

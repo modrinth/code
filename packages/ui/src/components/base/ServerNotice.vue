@@ -18,14 +18,15 @@
 			</template>
 		</template>
 		<template #actions>
-			<ButtonStyled v-if="dismissable" :color="NOTICE_TYPE_BTN[level]">
-				<button
-					v-tooltip="formatMessage(messages.dismiss)"
-					@click="() => (preview ? {} : emit('dismiss'))"
-				>
-					<XIcon /> Dismiss
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="dismissable"
+				v-tooltip="formatMessage(messages.dismiss)"
+				type="colored"
+				:color="NOTICE_TYPE_BTN[level]"
+				@click="() => (preview ? {} : emit('dismiss'))"
+			>
+				<XIcon /> Dismiss
+			</Button>
 		</template>
 		<div v-if="message" class="markdown-body" v-html="renderString(message)" />
 	</Admonition>
@@ -36,9 +37,10 @@ import { XIcon } from '@modrinth/assets'
 import { renderString } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import Admonition from './Admonition.vue'
-import ButtonStyled from './ButtonStyled.vue'
 import CopyCode from './CopyCode.vue'
 
 const { formatMessage } = useVIntl()
