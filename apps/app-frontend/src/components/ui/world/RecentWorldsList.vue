@@ -47,7 +47,7 @@ const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
 const locallyPlayedInstances = ref<Record<string, Dayjs>>({})
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
 
-const MAX_JUMP_BACK_IN = 6
+const MAX_JUMP_BACK_IN = 5
 const MAX_LINUX_POPULATES = 3
 
 // Track populate calls on Linux to prevent server ping spam
