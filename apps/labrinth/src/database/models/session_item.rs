@@ -10,9 +10,9 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-const SESSIONS_NAMESPACE: &str = "sessions:v3";
-const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids:v3";
-const SESSIONS_USERS_NAMESPACE: &str = "sessions_users:v3";
+const SESSIONS_NAMESPACE: &str = "sessions:v4";
+const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids:v4";
+const SESSIONS_USERS_NAMESPACE: &str = "sessions_users:v4";
 
 pub struct SessionBuilder {
     pub session: String,

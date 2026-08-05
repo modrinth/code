@@ -1,5 +1,6 @@
 use std::{fmt, str::FromStr};
 
+use eyre::{Result, WrapErr};
 use thiserror::Error;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -91,13 +92,11 @@ pub(crate) struct RedisPoolSize {
 }
 
 impl RedisPoolSize {
-    fn new(
-        name: &'static str,
-        max: usize,
-        min: usize,
-    ) -> Result<Self, RedisConfigError> {
+    fn new(name: &'static str, max: usize, min: usize) -> Result<Self> {
         if max == 0 || min > max {
-            return Err(RedisConfigError::InvalidPoolSize { name, max, min });
+            return Err(
+                RedisConfigError::InvalidPoolSize { name, max, min }.into()
+            );
         }
 
         Ok(Self { max, min })
@@ -193,11 +192,12 @@ impl RedisConfig {
         blocking_pool_size: (usize, usize),
         cache_locking_strategy: CacheLockingStrategy,
         read_replica_strategy: ReadReplicaStrategy,
-    ) -> Result<Self, RedisConfigError> {
+    ) -> Result<Self> {
         if cache_locking_strategy == CacheLockingStrategy::Distributed {
             return Err(RedisConfigError::UnsupportedCacheLockingStrategy {
                 strategy: cache_locking_strategy,
-            });
+            }
+            .into());
         }
 
         let seed_urls = raw_urls
@@ -208,26 +208,32 @@ impl RedisConfig {
             .collect::<Vec<_>>();
 
         if seed_urls.is_empty() {
-            return Err(RedisConfigError::MissingUrl);
+            return Err(RedisConfigError::MissingUrl.into());
         }
 
         let backend = match (mode, connection_type) {
             (RedisTopology::Standalone, RedisConnectionType::Pooled) => {
                 if seed_urls.len() != 1 {
-                    return Err(RedisConfigError::MultipleStandaloneUrls);
+                    return Err(RedisConfigError::MultipleStandaloneUrls.into());
                 }
-                RedisBackendConfig::StandalonePooled(RedisPoolSize::new(
-                    "standalone",
-                    standalone_pool_size.0,
-                    standalone_pool_size.1,
-                )?)
+                RedisBackendConfig::StandalonePooled(
+                    RedisPoolSize::new(
+                        "standalone",
+                        standalone_pool_size.0,
+                        standalone_pool_size.1,
+                    )
+                    .wrap_err("validating standalone Redis pool size")?,
+                )
             }
             (RedisTopology::Cluster, RedisConnectionType::Pooled) => {
-                RedisBackendConfig::ClusterPooled(RedisPoolSize::new(
-                    "cluster",
-                    cluster_pool_size.0,
-                    cluster_pool_size.1,
-                )?)
+                RedisBackendConfig::ClusterPooled(
+                    RedisPoolSize::new(
+                        "cluster",
+                        cluster_pool_size.0,
+                        cluster_pool_size.1,
+                    )
+                    .wrap_err("validating clustered Redis pool size")?,
+                )
             }
             (RedisTopology::Cluster, RedisConnectionType::Multiplexed) => {
                 RedisBackendConfig::ClusterMultiplexed
@@ -236,7 +242,8 @@ impl RedisConfig {
                 return Err(RedisConfigError::UnsupportedConnectionType {
                     mode,
                     connection_type,
-                });
+                }
+                .into());
             }
         };
 
@@ -249,7 +256,8 @@ impl RedisConfig {
                 "blocking",
                 blocking_pool_size.0,
                 blocking_pool_size.1,
-            )?,
+            )
+            .wrap_err("validating blocking Redis pool size")?,
             cache_locking_strategy,
             read_replica_strategy,
         })

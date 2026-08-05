@@ -111,6 +111,7 @@ rusty-money = { workspace = true }
 scalar_api_reference = { workspace = true, features = ["actix-web"] }
 sentry = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+serde-binhum = { workspace = true }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
 sha1 = { workspace = true }
