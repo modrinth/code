@@ -55,13 +55,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<div class="grid min-h-full grid-rows-[30.8125rem_1fr_auto] px-6 pb-6 pt-16">
-		<div class="relative flex items-end justify-center">
-			<div
-				class="dot-pattern pointer-events-none absolute left-1/2 top-0 h-[29.875rem] w-[min(25.9375rem,80vw)] -translate-x-1/2 rounded-2xl [@media(max-height:700px)]:h-[23rem]"
-				aria-hidden="true"
-			/>
+	<div class="flex flex-col min-h-full px-6 pb-6 pt-16">
+		<div class="relative flex grow items-center justify-center">
 			<div class="relative flex flex-col items-center gap-6">
+				<div
+					class="dot-pattern pointer-events-none absolute left-1/2 -top-52 h-[29.875rem] w-[min(25.9375rem,80vw)] -translate-x-1/2 rounded-2xl [@media(max-height:700px)]:h-[23rem]"
+					aria-hidden="true"
+				/>
 				<div
 					class="welcome-icon relative h-[6.25rem] w-[6.25rem] overflow-hidden rounded-3xl border-[1.5px] border-solid bg-surface-1"
 					style="border-color: color-mix(in srgb, var(--color-text-primary) 15%, transparent)"
@@ -111,7 +111,9 @@ onUnmounted(() => {
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-col items-center justify-end gap-4 text-sm leading-5 text-secondary">
+		<div
+			class="flex flex-col h-max items-center justify-end gap-4 text-sm leading-5 text-secondary"
+		>
 			<span class="whitespace-nowrap">Escaping another launcher?</span>
 			<ButtonStyled>
 				<button
