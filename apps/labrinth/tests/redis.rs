@@ -22,7 +22,7 @@ use serde_json::json;
 use tokio::sync::{Barrier, Notify};
 use tokio::time::timeout;
 use uuid::Uuid;
-use xredis::{KeyBuilder, RedisPool, RedisTopology};
+use xredis::{KeyBuilder, RedisPool, RedisTopology, RedisValue};
 
 pub mod common;
 
@@ -250,7 +250,7 @@ async fn cache_lock_coalesces_concurrent_misses_for_one_key() {
         tasks.push(tokio::spawn(async move {
             barrier.wait().await;
             pool.get_cached_keys_raw(
-                "single_flight:v3",
+                "single_flight:v4",
                 &["shared".to_string()],
                 move |keys| async move {
                     fetch_count.fetch_add(1, Ordering::SeqCst);
@@ -292,7 +292,7 @@ async fn cache_lock_coalesces_only_overlapping_keys() {
         tasks.push(tokio::spawn(async move {
             barrier.wait().await;
             pool.get_cached_keys_raw(
-                "overlapping_locks:v3",
+                "overlapping_locks:v4",
                 &requested,
                 move |keys| async move {
                     tokio::time::sleep(Duration::from_millis(75)).await;
@@ -333,7 +333,7 @@ async fn cache_lock_does_not_block_independent_keys() {
     let slow = tokio::spawn(async move {
         slow_pool
             .get_cached_keys_raw(
-                "independent_locks:v3",
+                "independent_locks:v4",
                 &["slow".to_string()],
                 move |keys| async move {
                     slow_started.notify_one();
@@ -350,7 +350,7 @@ async fn cache_lock_does_not_block_independent_keys() {
     let fast = timeout(
         Duration::from_secs(1),
         pool.get_cached_keys_raw(
-            "independent_locks:v3",
+            "independent_locks:v4",
             &["fast".to_string()],
             |keys| async move {
                 let values = DashMap::new();
@@ -379,7 +379,7 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
 
     let failed = pool
         .get_cached_keys_raw(
-            "error_recovery:v3",
+            "error_recovery:v4",
             &["key".to_string()],
             |_| async {
                 Err::<DashMap<String, String>, _>(DatabaseError::Internal(
@@ -393,7 +393,7 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
     let recovered = timeout(
         Duration::from_secs(1),
         pool.get_cached_keys_raw(
-            "error_recovery:v3",
+            "error_recovery:v4",
             &["key".to_string()],
             |keys| async move {
                 let values = DashMap::new();
@@ -413,7 +413,7 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
     let cancelled = tokio::spawn(async move {
         cancelled_pool
             .get_cached_keys_raw(
-                "cancellation_recovery:v3",
+                "cancellation_recovery:v4",
                 &["key".to_string()],
                 move |_| async move {
                     cancelled_started.notify_one();
@@ -432,7 +432,7 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
     let recovered = timeout(
         Duration::from_secs(1),
         pool.get_cached_keys_raw(
-            "cancellation_recovery:v3",
+            "cancellation_recovery:v4",
             &["key".to_string()],
             |keys| async move {
                 let values = DashMap::new();
@@ -452,19 +452,19 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
 #[actix_rt::test]
 async fn expired_cache_value_serves_waiter_while_writer_refreshes() {
     let pool = isolated_redis_pool("stale_while_revalidate").await;
-    let namespace = "stale_while_revalidate:v3";
+    let namespace = "stale_while_revalidate:v4";
     let logical_key = "key".to_string();
     let mut connection = pool.connect().await.unwrap();
     let redis_key = connection.key().entity(namespace, &logical_key);
     connection
         .set_serialized(
             &redis_key,
-            json!({
-                "key": logical_key,
-                "alias": null,
-                "iat": 0,
-                "val": "stale",
-            }),
+            RedisValue::<String, String, String>::new(
+                logical_key.clone(),
+                None,
+                0,
+                "stale".to_string(),
+            ),
             None,
         )
         .await
@@ -539,8 +539,8 @@ async fn case_insensitive_slug_requests_share_one_cache_lock() {
             let requested = vec![requested];
             barrier.wait().await;
             pool.get_cached_keys_raw_with_slug(
-                "slug_values:v3",
-                Some("slug_aliases:v3"),
+                "slug_values:v4",
+                Some("slug_aliases:v4"),
                 false,
                 &requested,
                 move |_| async move {
@@ -651,11 +651,11 @@ async fn many_get_routes_handle_cross_slot_cache_lifecycle() {
                 redis.key().entity(VERSIONS_NAMESPACE, alpha_version_id),
                 redis.key().entity(VERSIONS_NAMESPACE, beta_version_id),
                 redis.key().entity(
-                    "versions_files:v3",
+                    "versions_files:v4",
                     format!("sha1_{}", alpha.file_hash),
                 ),
                 redis.key().entity(
-                    "versions_files:v3",
+                    "versions_files:v4",
                     format!("sha1_{}", beta.file_hash),
                 ),
             ];

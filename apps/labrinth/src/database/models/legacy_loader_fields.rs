@@ -117,17 +117,8 @@ impl MinecraftGameVersion {
             id: loader_field_enum_value.id,
             version: loader_field_enum_value.value,
             created: loader_field_enum_value.created,
-            type_: loader_field_enum_value
-                .metadata
-                .get("type")
-                .and_then(|x| x.as_str())
-                .map(|x| x.to_string())
-                .unwrap_or_default(),
-            major: loader_field_enum_value
-                .metadata
-                .get("major")
-                .and_then(|x| x.as_bool())
-                .unwrap_or_default(),
+            type_: loader_field_enum_value.ty.unwrap_or_default(),
+            major: loader_field_enum_value.major.unwrap_or_default(),
         }
     }
 }
