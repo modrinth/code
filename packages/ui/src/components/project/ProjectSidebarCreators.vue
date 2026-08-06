@@ -12,9 +12,7 @@
 				</div>
 			</template>
 			<template v-else-if="isEmpty">
-				<span class="text-red">
-					Error: Project has no members. This shouldn't happen.
-				</span>
+				<span class="text-red"> Error: Project has no members. This shouldn't happen. </span>
 			</template>
 			<template v-else>
 				<template v-if="organization">
