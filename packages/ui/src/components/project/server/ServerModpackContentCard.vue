@@ -27,6 +27,10 @@
 				>
 					{{ versionNumber }}
 				</div>
+				<div
+					v-else-if="loadingVersion"
+					class="w-16 h-4 my-0.5 rounded-full bg-surface-4 animate-pulse"
+				></div>
 			</div>
 		</div>
 		<IconButton
@@ -58,6 +62,7 @@ defineProps<{
 	onclickVersion?: () => void
 	onclickDownload?: () => void
 	showCustomModpackTooltip?: boolean
+	loadingVersion?: boolean
 }>()
 
 const { formatMessage } = useVIntl()

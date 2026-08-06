@@ -429,7 +429,8 @@
 
 				<div class="normal-page__sidebar">
 					<ProjectSidebarServerInfo
-						v-if="isServerProject && serverDataLoaded"
+						v-if="isServerProject"
+						:loading="!serverDataLoaded"
 						:project-v3="projectV3"
 						:tags="tags"
 						:required-content="serverRequiredContent"
@@ -459,6 +460,7 @@
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
+						:loading="creatorsLoading"
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
@@ -1018,7 +1020,11 @@ watch(serverModpackVersionId, (versionId) => {
 })
 
 // Members
-const { data: allMembersRaw, error: _membersError } = useQuery({
+const {
+	data: allMembersRaw,
+	error: _membersError,
+	isPending: membersPending,
+} = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'members']),
 	queryFn: () => client.labrinth.projects_v3.getMembers(projectId.value),
 	staleTime: STALE_TIME,
@@ -1069,7 +1075,7 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organizationRaw } = useQuery({
+const { data: organizationRaw, isPending: organizationPending } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
@@ -1079,6 +1085,13 @@ const { data: organizationRaw } = useQuery({
 // When project is removed from org, enabled becomes false but TanStack keeps stale data.
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
+
+const creatorsLoading = computed(
+	() =>
+		!projectRaw.value ||
+		membersPending.value ||
+		(!!projectRaw.value.organization && organizationPending.value),
+)
 
 const { data: thread } = useQuery({
 	queryKey: computed(() => ['thread', projectRaw.value?.thread_id]),
