@@ -2186,7 +2186,7 @@ provideProjectPageContext({
 
 .servers-popup {
 	box-shadow:
-		0 0 12px 1px rgba(0, 175, 92, 0.6),
+		0 0 12px 1px color-mix(in srgb, var(--color-brand) 60%, transparent),
 		var(--shadow-floating);
 
 	&::before {

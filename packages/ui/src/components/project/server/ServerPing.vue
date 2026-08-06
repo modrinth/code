@@ -33,10 +33,10 @@ const { formatMessage } = useVIntl()
 
 const pingClass = computed(() => {
 	if (props.ping === undefined) {
-		return 'border-brand bg-highlight-green text-brand'
+		return 'border-green bg-highlight-green text-green'
 	}
 	if (props.ping < 150) {
-		return 'border-brand bg-highlight-green text-brand'
+		return 'border-green bg-highlight-green text-green'
 	}
 	if (props.ping < 250) {
 		return 'border-brand-orange bg-highlight-orange text-orange'
