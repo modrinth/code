@@ -14,7 +14,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 use crate::{
     database::{
         PgPool,
-        models::{DBProjectId, DBVersion, DBVersionId},
+        models::{DBProjectId, DBVersionId},
     },
     models::{
         ids::{ProjectId, VersionId},
@@ -326,37 +326,28 @@ async fn fetch_dependent_version_projects(
         return Ok(HashMap::new());
     }
 
-    let dependent_on_version_ids =
-        dependent_on_version_ids.into_iter().collect::<Vec<_>>();
-    let versions =
-        DBVersion::get_many(&dependent_on_version_ids, cx.pool, cx.redis)
-            .await?;
-
-    let dependent_project_ids = versions
-        .iter()
-        .map(|version| version.inner.project_id.0)
+    let dependent_on_version_ids = dependent_on_version_ids
+        .into_iter()
+        .map(|version_id| version_id.0)
         .collect::<Vec<_>>();
-    let server_projects = sqlx::query!(
+    let versions = sqlx::query!(
         "
-        SELECT id FROM mods
-        WHERE id = ANY($1)
-            AND components ? 'minecraft_server'
+        SELECT v.id, v.mod_id
+        FROM versions v
+        INNER JOIN mods m ON m.id = v.mod_id
+        WHERE
+            v.id = ANY($1)
+            AND jsonb_typeof(m.components -> 'minecraft_server') IS DISTINCT FROM 'object'
         ",
-        &dependent_project_ids,
+        &dependent_on_version_ids,
     )
     .fetch_all(cx.pool)
     .await
-    .wrap_internal_err("failed to fetch server dependent projects")?
-    .into_iter()
-    .map(|project| DBProjectId(project.id))
-    .collect::<HashSet<_>>();
+    .wrap_internal_err("failed to fetch dependent version projects")?;
 
     Ok(versions
         .into_iter()
-        .filter_map(|version| {
-            (!server_projects.contains(&version.inner.project_id))
-                .then_some((version.inner.id, version.inner.project_id))
-        })
+        .map(|version| (DBVersionId(version.id), DBProjectId(version.mod_id)))
         .collect())
 }
 

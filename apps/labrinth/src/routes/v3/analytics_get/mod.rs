@@ -330,7 +330,6 @@ pub async fn fetch_analytics(
     let mut query_clickhouse_cx = QueryClickhouseContext {
         clickhouse: &clickhouse,
         pool: &pool,
-        redis: &redis,
         req: &req,
         time_slices: &mut time_slices,
         project_ids: &project_ids,
@@ -677,7 +676,6 @@ async fn fetch_project_status_change_events(
 pub(crate) struct QueryClickhouseContext<'a> {
     pub(crate) clickhouse: &'a clickhouse::Client,
     pub(crate) pool: &'a PgPool,
-    pub(crate) redis: &'a RedisPool,
     pub(crate) req: &'a GetRequest,
     pub(crate) time_slices: &'a mut [TimeSlice],
     pub(crate) project_ids: &'a [DBProjectId],
