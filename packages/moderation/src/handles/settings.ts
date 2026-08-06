@@ -1,4 +1,4 @@
-import type { SettingDefinitionBase } from '../types/settings.ts'
+import { isValidFor, type SettingDefinitionBase } from '../types/settings.ts'
 
 export class Settings {
 	private readonly settings: { [id: string]: any }
@@ -13,7 +13,9 @@ export class Settings {
 	}
 
 	get<T>(definition: SettingDefinitionBase<T>): T {
-		return this.settings[definition.id] ?? definition.default
+		const value = this.settings[definition.id]
+
+		return (isValidFor(definition, value) ? value : undefined) ?? definition.default
 	}
 
 	set<T>(definition: SettingDefinitionBase<T>, value?: T): void {

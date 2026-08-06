@@ -1,8 +1,8 @@
-import type { EnumSettingDefinition, ToggleSettingDefinition } from '../types/settings.ts'
+import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
-		ChecklistPosition: {
+		ChecklistPosition: setting.asEnum({
 			type: 'enum',
 			id: 'checklist-position',
 			title: 'Checklist Position',
@@ -12,21 +12,20 @@ const settings = {
 				{ value: 'right', label: 'Right' },
 			],
 			default: 'right',
-		} as EnumSettingDefinition,
-		ProjectKeybinds: {
+		}),
+		ProjectKeybinds: setting.asToggle({
 			type: 'toggle',
 			id: 'project-keybinds',
 			title: 'Enable Project Keybinds',
 			description: 'Weather certain keybinds should work without the checklist visible.',
 			default: false,
-		} as ToggleSettingDefinition,
-		PrivateMessageHighlight: {
+		}),
+		PrivateMessageHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'private-message-highlight',
 			title: 'Highlight Private Messages',
 			description: 'Whether private messages should be highlighted in the chat.',
 			default: true,
-		} as ToggleSettingDefinition,
 	},
 } as const
 
