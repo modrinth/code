@@ -466,6 +466,7 @@
 					<ProjectSidebarDetails
 						:project="project"
 						:link-target="$external()"
+						:hide-license="isServerProject"
 						:show-followers="isServerProject"
 						class="card flex-card"
 					/>
