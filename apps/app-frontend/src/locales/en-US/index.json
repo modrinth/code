@@ -1269,13 +1269,13 @@
     "message": "Dusk block"
   },
   "instance.icon-editor.symbol.dusk-block-gold": {
-    "message": "Gold dusk block"
+    "message": "Test block"
   },
   "instance.icon-editor.symbol.dusk-block-rose": {
-    "message": "Rose dusk block"
+    "message": "Test block"
   },
   "instance.icon-editor.symbol.dusk-block-teal": {
-    "message": "Teal dusk block"
+    "message": "Test block"
   },
   "instance.icon-editor.title": {
     "message": "Icon editor"

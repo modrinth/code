@@ -36,15 +36,15 @@ const names = defineMessages({
 	},
 	duskBlockRose: {
 		id: 'instance.icon-editor.symbol.dusk-block-rose',
-		defaultMessage: 'Rose dusk block',
+		defaultMessage: 'Test block',
 	},
 	duskBlockGold: {
 		id: 'instance.icon-editor.symbol.dusk-block-gold',
-		defaultMessage: 'Gold dusk block',
+		defaultMessage: 'Test block',
 	},
 	duskBlockTeal: {
 		id: 'instance.icon-editor.symbol.dusk-block-teal',
-		defaultMessage: 'Teal dusk block',
+		defaultMessage: 'Test block',
 	},
 })
 

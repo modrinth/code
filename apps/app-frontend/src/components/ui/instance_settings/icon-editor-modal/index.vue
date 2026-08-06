@@ -10,6 +10,7 @@ import {
 } from '@modrinth/ui'
 import { computed, nextTick, ref } from 'vue'
 
+import { toError } from '@/helpers/errors'
 import { edit_generated_icon, get_recent_icon_recipes } from '@/helpers/instance'
 import type { IconBackground, InstanceIconRecipe } from '@/helpers/types'
 
@@ -76,19 +77,26 @@ function selectRecent(recipe: InstanceIconRecipe) {
 }
 
 function surpriseMe() {
-	const currentIndex = backgroundOptions.findIndex(
+	const currentBackgroundIndex = backgroundOptions.findIndex(
 		(option) => option.background.value === selectedBackground.value,
 	)
-	const offset = Math.floor(Math.random() * (backgroundOptions.length - 1)) + 1
+	const backgroundOffset = Math.floor(Math.random() * (backgroundOptions.length - 1)) + 1
 	selectedBackground.value =
-		backgroundOptions[(currentIndex + offset) % backgroundOptions.length].background.value
+		backgroundOptions[
+			(currentBackgroundIndex + backgroundOffset) % backgroundOptions.length
+		].background.value
+
+	const currentSymbolIndex = symbolOptions.findIndex((option) => option.id === selectedSymbol.value)
+	const symbolOffset = Math.floor(Math.random() * (symbolOptions.length - 1)) + 1
+	selectedSymbol.value =
+		symbolOptions[(currentSymbolIndex + symbolOffset) % symbolOptions.length].id
 }
 
 async function loadRecents() {
 	try {
 		recentRecipes.value = await get_recent_icon_recipes()
 	} catch (error) {
-		handleError(error)
+		handleError(toError(error))
 	}
 }
 
@@ -127,7 +135,7 @@ async function saveIcon() {
 		await nextTick()
 		hide()
 	} catch (error) {
-		handleError(error)
+		handleError(toError(error))
 	} finally {
 		saving.value = false
 	}
@@ -218,7 +226,7 @@ const messages = defineMessages({
 				</div>
 
 				<ButtonStyled class="w-full">
-					<button class="w-full" @click="surpriseMe">
+					<button class="w-full !shadow-none" @click="surpriseMe">
 						<RefreshCwIcon />
 						{{ formatMessage(messages.surpriseMe) }}
 					</button>
