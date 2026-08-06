@@ -65,6 +65,17 @@
 						{{ checklistTitleText }}
 					</button>
 				</h1>
+				<IconButton
+					v-if="!isPseudoStage && stageNavigateTarget"
+					v-tooltip="`Navigate to ${stageNavigateLabel}`"
+					type="quiet"
+					:label="`Navigate to ${stageNavigateLabel}`"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					:disabled="route.path === stageNavigateTarget"
+					@click="navigateToStagePage"
+				>
+					<MapPinIcon />
+				</IconButton>
 				<ButtonLink
 					v-if="!isPseudoStage && currentStageObj._guidanceUrl"
 					v-tooltip="`Stage guidance`"
