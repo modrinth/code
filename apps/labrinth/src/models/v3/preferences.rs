@@ -1,16 +1,19 @@
+use partially::Partial;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct UserPreferences {
     pub appearance: AppearancePreferences,
     pub localization: LocalizationPreferences,
     pub layouts: LayoutPreferences,
     pub sidebars: SidebarPreferences,
-    pub social: SocialPreferences
+    pub social: SocialPreferences,
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct AppearancePreferences {
     pub theme: Theme
 }
@@ -20,12 +23,14 @@ pub enum Theme {
     Light, Dark, Oled, Retro
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct LocalizationPreferences {
-    pub locale: String // FIXME: validate input
+    pub locale: String
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct LayoutPreferences {
     pub mods: LayoutOption,
     pub plugins: LayoutOption,
@@ -42,13 +47,15 @@ pub enum LayoutOption {
     Grid, Rows
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct SidebarPreferences {
     pub right_aligned_search: bool,
     pub left_aligned_content: bool,
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct SocialPreferences {
     pub friend_privacy: FriendPrivacy,
     pub shared_instances_privacy: SharedInstancesPrivacy
