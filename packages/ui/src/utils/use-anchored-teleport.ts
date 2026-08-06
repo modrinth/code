@@ -39,7 +39,8 @@ export function useAnchoredTeleport(
 		if (!isOpen.value || !trigger.value || !panel.value) return
 
 		const triggerRect = trigger.value.getBoundingClientRect()
-    const scrollRegion = panel.value.querySelector<HTMLElement>('[data-anchored-scroll-region]') ?? panel.value
+		const scrollRegion =
+			panel.value.querySelector<HTMLElement>('[data-anchored-scroll-region]') ?? panel.value
 		const panelRect = { width: panel.value.offsetWidth, height: scrollRegion.scrollHeight }
 		const offset = distance.value
 		const alignsEnd = placement.value.endsWith('end')

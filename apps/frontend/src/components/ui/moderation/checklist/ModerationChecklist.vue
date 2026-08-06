@@ -410,10 +410,10 @@ import {
 	LinkIcon,
 	ListBulletedIcon,
 	LockIcon,
+	MapPinIcon,
 	RightArrowIcon,
 	ScaleIcon,
 	SpinnerIcon,
-	MapPinIcon,
 	ToggleLeftIcon,
 	ToggleRightIcon,
 	UndoIcon,
@@ -481,14 +481,14 @@ import {
 	loadChecklistState,
 	saveChecklistState,
 } from '~/services/moderation/checklist-storage.ts'
+import type { LockAcquireResponse } from '~/services/moderation/queue.ts'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
 import {
 	batchCheckQueueCandidates,
 	findNextEligibleQueueProject,
 	isEligibleQueueCandidate,
 	type QueueCandidateCheck,
 } from '~/services/moderation/queue-eligibility.ts'
-import type { LockAcquireResponse } from '~/services/moderation/queue.ts'
-import { useModerationQueue } from '~/services/moderation/queue.ts'
 
 import { type LiveNode, STATE_KEY } from './checklist-context'
 

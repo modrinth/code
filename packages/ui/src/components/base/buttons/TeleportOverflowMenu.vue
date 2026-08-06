@@ -325,76 +325,79 @@ defineExpose({ open: openMenu, close: closeMenu })
 					class="flex min-w-48 flex-col gap-1 overflow-y-auto p-2"
 					:style="{ maxHeight: panelStyle.maxHeight }"
 				>
-				<template v-for="(option, index) in visibleOptions" :key="option.id ?? `divider-${index}`">
-					<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
-
-					<RouterLink
-						v-else-if="isLink(option) && option.to !== undefined && !option.disabled"
-						v-tooltip="option.tooltip"
-						:to="option.to"
-						:class="menuItemClasses"
-						:style="getMenuItemStyle(option)"
-						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
-						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
-						:data-hover-filled-only="option.hoverFilledOnly || undefined"
-						role="menuitem"
-						tabindex="-1"
-						@click="handleLink(option, $event)"
-						@keydown="handleLinkKeydown(option, $event)"
-						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+					<template
+						v-for="(option, index) in visibleOptions"
+						:key="option.id ?? `divider-${index}`"
 					>
-						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
-							{{ option.label }}
-						</slot>
-					</RouterLink>
+						<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
 
-					<a
-						v-else-if="isLink(option)"
-						v-tooltip="option.tooltip"
-						:href="option.disabled ? undefined : option.href"
-						:target="option.target"
-						:rel="option.rel ?? (option.target === '_blank' ? 'noopener noreferrer' : undefined)"
-						:download="option.download"
-						:aria-disabled="option.disabled || undefined"
-						:class="menuItemClasses"
-						:style="getMenuItemStyle(option)"
-						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
-						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
-						:data-hover-filled-only="option.hoverFilledOnly || undefined"
-						role="menuitem"
-						tabindex="-1"
-						@click="handleLink(option, $event)"
-						@keydown="handleLinkKeydown(option, $event)"
-						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
-					>
-						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
-							{{ option.label }}
-						</slot>
-					</a>
+						<RouterLink
+							v-else-if="isLink(option) && option.to !== undefined && !option.disabled"
+							v-tooltip="option.tooltip"
+							:to="option.to"
+							:class="menuItemClasses"
+							:style="getMenuItemStyle(option)"
+							:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+							:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+							:data-hover-filled-only="option.hoverFilledOnly || undefined"
+							role="menuitem"
+							tabindex="-1"
+							@click="handleLink(option, $event)"
+							@keydown="handleLinkKeydown(option, $event)"
+							@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+						>
+							<slot :name="option.id" :option="option">
+								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								{{ option.label }}
+							</slot>
+						</RouterLink>
 
-					<button
-						v-else
-						v-tooltip="option.tooltip"
-						type="button"
-						:aria-disabled="option.disabled || undefined"
-						:class="menuItemClasses"
-						:style="getMenuItemStyle(option)"
-						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
-						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
-						:data-hover-filled-only="option.hoverFilledOnly || undefined"
-						role="menuitem"
-						tabindex="-1"
-						@click="handleAction(option, $event)"
-						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
-					>
-						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
-							{{ option.label }}
-						</slot>
-					</button>
-				</template>
+						<a
+							v-else-if="isLink(option)"
+							v-tooltip="option.tooltip"
+							:href="option.disabled ? undefined : option.href"
+							:target="option.target"
+							:rel="option.rel ?? (option.target === '_blank' ? 'noopener noreferrer' : undefined)"
+							:download="option.download"
+							:aria-disabled="option.disabled || undefined"
+							:class="menuItemClasses"
+							:style="getMenuItemStyle(option)"
+							:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+							:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+							:data-hover-filled-only="option.hoverFilledOnly || undefined"
+							role="menuitem"
+							tabindex="-1"
+							@click="handleLink(option, $event)"
+							@keydown="handleLinkKeydown(option, $event)"
+							@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+						>
+							<slot :name="option.id" :option="option">
+								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								{{ option.label }}
+							</slot>
+						</a>
+
+						<button
+							v-else
+							v-tooltip="option.tooltip"
+							type="button"
+							:aria-disabled="option.disabled || undefined"
+							:class="menuItemClasses"
+							:style="getMenuItemStyle(option)"
+							:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+							:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+							:data-hover-filled-only="option.hoverFilledOnly || undefined"
+							role="menuitem"
+							tabindex="-1"
+							@click="handleAction(option, $event)"
+							@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+						>
+							<slot :name="option.id" :option="option">
+								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								{{ option.label }}
+							</slot>
+						</button>
+					</template>
 				</div>
 			</div>
 		</Transition>

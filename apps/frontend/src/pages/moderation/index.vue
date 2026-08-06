@@ -169,8 +169,8 @@ import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.
 import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
 import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
-import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
+import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
 
