@@ -3,9 +3,10 @@ import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import { isEqual } from 'es-toolkit'
 import { type Component, computed, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
-import ButtonStyled from './ButtonStyled.vue'
 import FloatingActionBar from './FloatingActionBar.vue'
 
 const { formatMessage } = useVIntl()
@@ -84,27 +85,25 @@ defineExpose({ nudge })
 	<FloatingActionBar ref="actionBar" :shown="shown" :inline="inline">
 		<p class="m-0 font-semibold text-sm md:text-base">{{ localizeIfPossible(text) }}</p>
 		<div class="ml-auto flex gap-2">
-			<ButtonStyled v-if="canReset" type="transparent">
-				<button :disabled="saving" @click="(e) => emit('reset', e)">
-					<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
-				</button>
-			</ButtonStyled>
+			<Button v-if="canReset" type="quiet" :disabled="saving" @click="(e) => emit('reset', e)">
+				<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
+			</Button>
 			<span
 				v-tooltip="saveDisabledTooltip"
 				class="flex"
 				:class="{ 'cursor-not-allowed': saveDisabled }"
 			>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="saveDisabled"
-						:class="{ 'pointer-events-none': saveDisabled }"
-						@click="(e) => emit('save', e)"
-					>
-						<SpinnerIcon v-if="saving" class="animate-spin" />
-						<component :is="saveIcon" v-else />
-						{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="saveDisabled"
+					:class="{ 'pointer-events-none': saveDisabled }"
+					@click="(e) => emit('save', e)"
+				>
+					<SpinnerIcon v-if="saving" class="animate-spin" />
+					<component :is="saveIcon" v-else />
+					{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
+				</Button>
 			</span>
 		</div>
 	</FloatingActionBar>

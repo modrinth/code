@@ -10,7 +10,7 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -1038,6 +1038,7 @@ async function checkUserChanges() {
 	try {
 		const defaultId = await get_default_user()
 		if (defaultId !== currentUserId.value) {
+			await accountsCard.value?.refreshValues()
 			await loadCurrentUser()
 			await loadCapes()
 			await loadSkins()
@@ -1111,13 +1112,15 @@ await loadSkins()
 								class="skin-preview-actions flex w-full items-center justify-center gap-1.5"
 								:class="selectedSkinHasEarsFeatures ? 'flex-nowrap' : 'flex-wrap'"
 							>
-								<button
+								<Button
 									v-tooltip="
 										selectedSkinHasEarsFeatures
 											? formatMessage(commonMessages.resetButton)
 											: undefined
 									"
-									class="skin-preview-action-button flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 text-contrast shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
+									type="base"
+									size="lg"
+									class="skin-preview-action-button"
 									:disabled="isApplyingSkin || isSkinManagementReadOnly"
 									:aria-label="formatMessage(commonMessages.resetButton)"
 									@click="resetSelectedSkin"
@@ -1126,12 +1129,15 @@ await loadSkins()
 									<span class="skin-preview-action-label">
 										{{ formatMessage(commonMessages.resetButton) }}
 									</span>
-								</button>
-								<button
+								</Button>
+								<Button
 									v-tooltip="
 										selectedSkinHasEarsFeatures ? formatMessage(messages.applyButton) : undefined
 									"
-									class="skin-preview-action-button flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-brand px-4 py-2.5 text-base font-semibold leading-5 text-[rgba(0,0,0,0.9)] shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
+									type="colored"
+									color="brand"
+									size="lg"
+									class="skin-preview-action-button"
 									:disabled="isApplyingSkin || isSkinManagementReadOnly"
 									:aria-label="formatMessage(messages.applyButton)"
 									@click="applySelectedSkin"
@@ -1141,17 +1147,18 @@ await loadSkins()
 									<span class="skin-preview-action-label">
 										{{ formatMessage(messages.applyButton) }}
 									</span>
-								</button>
+								</Button>
 							</div>
-							<button
+							<Button
 								v-else
-								class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
+								type="base"
+								size="lg"
 								:disabled="!selectedSkin || isSkinManagementReadOnly"
 								@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
 							>
 								<EditIcon />
 								{{ formatMessage(messages.editSkinButton) }}
-							</button>
+							</Button>
 
 							<div
 								v-if="selectedSkinHasEarsFeatures"
@@ -1180,28 +1187,28 @@ await loadSkins()
 										>Ears</router-link
 									>
 								</div>
-								<ButtonStyled type="outlined">
-									<button
-										class="ears-feature-toggle-button !h-10 !rounded-[14px] !px-4 shadow-md"
-										:aria-pressed="earsFeaturesEnabled"
-										:aria-label="
-											formatMessage(
-												earsFeaturesEnabled
-													? messages.toggleEarsFeaturesOff
-													: messages.toggleEarsFeaturesOn,
-											)
-										"
-										@click="earsFeaturesEnabled = !earsFeaturesEnabled"
-									>
-										{{
-											formatMessage(
-												earsFeaturesEnabled
-													? messages.toggleEarsFeaturesOff
-													: messages.toggleEarsFeaturesOn,
-											)
-										}}
-									</button>
-								</ButtonStyled>
+								<Button
+									type="outlined"
+									size="lg"
+									class="ears-feature-toggle-button shadow-md"
+									:aria-pressed="earsFeaturesEnabled"
+									:aria-label="
+										formatMessage(
+											earsFeaturesEnabled
+												? messages.toggleEarsFeaturesOff
+												: messages.toggleEarsFeaturesOn,
+										)
+									"
+									@click="earsFeaturesEnabled = !earsFeaturesEnabled"
+								>
+									{{
+										formatMessage(
+											earsFeaturesEnabled
+												? messages.toggleEarsFeaturesOff
+												: messages.toggleEarsFeaturesOn,
+										)
+									}}
+								</Button>
 								<Toggle
 									v-model="earsFeaturesEnabled"
 									v-tooltip="
@@ -1278,13 +1285,17 @@ await loadSkins()
 				<p class="text-lg m-0">
 					{{ formatMessage(messages.signInDescription) }}
 				</p>
-				<ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
-					<button :disabled="accountsCard.loginDisabled" @click="login">
-						<LogInIcon v-if="!accountsCard.loginDisabled" />
-						<SpinnerIcon v-else class="animate-spin" />
-						{{ formatMessage(messages.signInButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-show="accountsCard"
+					type="colored"
+					color="brand"
+					:disabled="accountsCard.loginDisabled"
+					@click="login"
+				>
+					<LogInIcon v-if="!accountsCard.loginDisabled" />
+					<SpinnerIcon v-else class="animate-spin" />
+					{{ formatMessage(messages.signInButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>

@@ -7,9 +7,9 @@ use xredis::RedisPool;
 
 use super::{DBOrganizationId, DBUserId, DatabaseError};
 
-const MODERATION_NOTES_USERS_NAMESPACE: &str = "moderation_notes_users:v3";
+const MODERATION_NOTES_USERS_NAMESPACE: &str = "moderation_notes_users:v4";
 const MODERATION_NOTES_ORGANIZATIONS_NAMESPACE: &str =
-    "moderation_notes_organizations:v3";
+    "moderation_notes_organizations:v4";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DBModerationNote {

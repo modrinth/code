@@ -79,6 +79,26 @@ pub enum MinecraftAuthenticationError {
     NoUserHash,
 }
 
+#[derive(Deserialize)]
+struct OAuthErrorResponse {
+    error: String,
+}
+
+impl MinecraftAuthenticationError {
+    fn is_invalid_grant(&self) -> bool {
+        matches!(
+            self,
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::RefreshOAuthToken,
+                raw,
+                status_code: StatusCode::BAD_REQUEST,
+                ..
+            } if serde_json::from_str::<OAuthErrorResponse>(raw)
+                .is_ok_and(|response| response.error == "invalid_grant")
+        )
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MinecraftLoginFlow {
     pub verifier: String,
@@ -464,6 +484,23 @@ impl Credentials {
                         && (source.is_connect() || source.is_timeout())
                     {
                         return Ok(Some(creds));
+                    }
+
+                    if matches!(
+                        &*err.raw,
+                        ErrorKind::MinecraftAuthenticationError(source)
+                            if source.is_invalid_grant()
+                    ) {
+                        Self::remove(creds.offline_profile.id, exec).await?;
+
+                        if let Some((_, mut user)) =
+                            Self::get_all(exec).await?.into_iter().next()
+                        {
+                            user.active = true;
+                            user.upsert(exec).await?;
+                        }
+
+                        return Ok(None);
                     }
 
                     Err(err)

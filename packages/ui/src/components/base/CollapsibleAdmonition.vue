@@ -17,24 +17,26 @@
 					</span>
 				</div>
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular type="highlight-colored-text" :color="buttonColors[type]">
-						<button aria-label="Toggle" @click.stop="expanded = !expanded">
-							<ChevronDownIcon
-								class="h-4 w-4 transition-transform duration-300"
-								:class="expanded && 'rotate-180'"
-							/>
-						</button>
-					</ButtonStyled>
-					<ButtonStyled
-						v-if="dismissible"
-						circular
-						type="highlight-colored-text"
+					<IconButton
+						type="quiet"
 						:color="buttonColors[type]"
+						label="Toggle"
+						@click.stop="expanded = !expanded"
 					>
-						<button aria-label="Dismiss" @click.stop="handleDismiss">
-							<XIcon class="h-4 w-4" />
-						</button>
-					</ButtonStyled>
+						<ChevronDownIcon
+							class="h-4 w-4 transition-transform duration-300"
+							:class="expanded && 'rotate-180'"
+						/>
+					</IconButton>
+					<IconButton
+						v-if="dismissible"
+						type="quiet"
+						:color="buttonColors[type]"
+						label="Dismiss"
+						@click.stop="handleDismiss"
+					>
+						<XIcon class="h-4 w-4" />
+					</IconButton>
 				</div>
 			</div>
 
@@ -72,7 +74,7 @@
 import { ChevronDownIcon, LightBulbIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import ButtonStyled from './ButtonStyled.vue'
+import { IconButton } from '#ui/components/base/buttons'
 
 export interface CollapsibleAdmonitionItem {
 	title: string

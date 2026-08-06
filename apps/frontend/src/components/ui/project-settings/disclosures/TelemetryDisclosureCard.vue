@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ListPlusIcon, RadioTowerIcon, TrashIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	Chips,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	SettingsFormGroup,
 	SettingsToggleCard,
 	StyledInput,
@@ -116,24 +117,20 @@ function removeEntry(index: number) {
 						:disabled="disabled"
 						:placeholder="formatMessage(messages.dataPlaceholder)"
 					/>
-					<ButtonStyled v-if="model.entries.length > 1" circular>
-						<button
-							type="button"
-							:disabled="disabled"
-							:aria-label="formatMessage(commonMessages.removeButton)"
-							@click="removeEntry(index)"
-						>
-							<TrashIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-if="model.entries.length > 1"
+						:label="formatMessage(commonMessages.removeButton)"
+						:disabled="disabled"
+						@click="removeEntry(index)"
+					>
+						<TrashIcon />
+					</IconButton>
 				</div>
 			</SettingsFormGroup>
-			<ButtonStyled>
-				<button type="button" class="w-fit" :disabled="disabled" @click="addEntry">
-					<ListPlusIcon />
-					{{ formatMessage(commonMessages.addAnotherButton) }}
-				</button>
-			</ButtonStyled>
+			<Button class="w-fit" :disabled="disabled" @click="addEntry">
+				<ListPlusIcon />
+				{{ formatMessage(commonMessages.addAnotherButton) }}
+			</Button>
 		</template>
 	</SettingsToggleCard>
 </template>

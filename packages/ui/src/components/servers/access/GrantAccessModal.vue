@@ -126,18 +126,20 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="hide">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button v-tooltip="grantPermissionTooltip" :disabled="!canSubmit" @click="submit">
-						<UserPlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.inviteButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hide">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(messages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="grantPermissionTooltip"
+					type="colored"
+					color="brand"
+					:disabled="!canSubmit"
+					@click="submit"
+				>
+					<UserPlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.inviteButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -148,10 +150,11 @@ import { EyeIcon, PencilIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import Checkbox from '../../base/Checkbox.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'

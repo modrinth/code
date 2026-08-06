@@ -13,16 +13,15 @@
 					"
 					listbox
 				/>
-				<ButtonStyled circular>
-					<button
-						v-tooltip="formatMessage(messages.downloadCsv)"
-						:disabled="buildingCsv"
-						@click="onDownloadCSV"
-					>
-						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
-						<DownloadIcon v-else />
-					</button>
-				</ButtonStyled>
+				<IconButton
+					v-tooltip="formatMessage(messages.downloadCsv)"
+					:label="formatMessage(messages.downloadCsv)"
+					:disabled="buildingCsv"
+					@click="onDownloadCSV"
+				>
+					<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
+					<DownloadIcon v-else />
+				</IconButton>
 			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -90,10 +89,10 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Combobox,
 	defineMessages,
 	EmptyState,
+	IconButton,
 	injectModrinthClient,
 	useFormatDateTime,
 	useFormatMoney,
@@ -104,7 +103,7 @@ import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
-import { useGeneratedState } from '~/composables/generated'
+import { tremendousIdMap } from '~/generated/state.json'
 import { findRail } from '~/utils/muralpay-rails'
 
 const { formatMessage } = useVIntl()
@@ -115,7 +114,6 @@ const formatMonth = useFormatDateTime({
 })
 
 const client = injectModrinthClient()
-const generatedState = useGeneratedState()
 
 const messages = defineMessages({
 	transactionsHeader: {
@@ -282,7 +280,7 @@ function transactionsToCSV() {
 					break
 				case 'tremendous':
 					if (txn.method_id) {
-						const info = generatedState.value.tremendousIdMap?.[txn.method_id]
+						const info = tremendousIdMap?.[txn.method_id]
 						if (info) {
 							methodOrSource = `Tremendous (${info.name})`
 							break

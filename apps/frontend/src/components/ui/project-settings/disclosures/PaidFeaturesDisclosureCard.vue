@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { CircleDollarSignIcon, ListPlusIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	SettingsFormGroup,
 	SettingsToggleCard,
 	StyledInput,
@@ -77,24 +78,20 @@ function removeFeature(index: number) {
 						:disabled="disabled"
 						:placeholder="formatMessage(messages.featurePlaceholder)"
 					/>
-					<ButtonStyled v-if="model.features.length > 1" circular>
-						<button
-							type="button"
-							:disabled="disabled"
-							:aria-label="formatMessage(commonMessages.removeButton)"
-							@click="removeFeature(index)"
-						>
-							<XIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-if="model.features.length > 1"
+						:label="formatMessage(commonMessages.removeButton)"
+						:disabled="disabled"
+						@click="removeFeature(index)"
+					>
+						<XIcon />
+					</IconButton>
 				</div>
 			</SettingsFormGroup>
-			<ButtonStyled>
-				<button type="button" class="w-fit" :disabled="disabled" @click="addFeature">
-					<ListPlusIcon />
-					{{ formatMessage(commonMessages.addAnotherButton) }}
-				</button>
-			</ButtonStyled>
+			<Button class="w-fit" :disabled="disabled" @click="addFeature">
+				<ListPlusIcon />
+				{{ formatMessage(commonMessages.addAnotherButton) }}
+			</Button>
 		</template>
 	</SettingsToggleCard>
 </template>

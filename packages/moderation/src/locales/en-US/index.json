@@ -254,8 +254,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "At least one gallery image is required to showcase the content of your {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "At least one gallery image is required to showcase the content of your resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "At least three gallery images are required to showcase the content of your shader in a variety of situations and conditions."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload a gallery image"

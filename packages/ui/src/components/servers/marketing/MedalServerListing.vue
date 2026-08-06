@@ -120,11 +120,17 @@
 			</div>
 
 			<div class="z-10 ml-auto">
-				<ButtonStyled color="medal-promo" type="outlined" size="large">
-					<button class="my-auto" data-server-listing-button @click="handleUpgrade">
-						<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="outlined"
+					color="medal_promotion"
+					size="xl"
+					class="my-auto"
+					data-server-listing-button
+					@click="handleUpgrade"
+				>
+					<RocketIcon aria-hidden="true" />
+					{{ formatMessage(messages.upgradeButton) }}
+				</Button>
 			</div>
 		</div>
 
@@ -168,10 +174,11 @@ import dayjsDuration from 'dayjs/plugin/duration'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectModrinthClient } from '../../../providers/api-client'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import CopyCode from '../../base/CopyCode.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
 import type { ServerListingOwner } from '../access/types'

@@ -95,11 +95,15 @@
 									</div>
 								</template>
 							</div>
-							<ButtonStyled v-if="item.dismissible !== false" type="transparent" circular>
-								<button class="-m-1.5" @click="dismiss(item.id)">
-									<XIcon />
-								</button>
-							</ButtonStyled>
+							<IconButton
+								v-if="item.dismissible !== false"
+								type="quiet"
+								label="Close"
+								class="-m-1.5"
+								@click="dismiss(item.id)"
+							>
+								<XIcon />
+							</IconButton>
 						</div>
 						<span v-if="item.text" class="text-primary">
 							{{ item.text }}
@@ -142,16 +146,28 @@
 						full-width
 					/>
 					<div v-if="item.buttons?.length" class="flex gap-1.5">
-						<ButtonStyled
+						<Button
 							v-for="(btn, idx) in item.buttons"
 							:key="idx"
-							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
+							:type="
+								(btn.color || (idx === 0 ? 'brand' : undefined)) &&
+								(btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard'
+									? 'colored'
+									: 'base'
+							"
+							:color="
+								(btn.color || (idx === 0 ? 'brand' : undefined)) &&
+								(btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard'
+									? (btn.color || (idx === 0 ? 'brand' : undefined)) === 'medal-promo'
+										? 'medal_promotion'
+										: btn.color || (idx === 0 ? 'brand' : undefined)
+									: undefined
+							"
+							@click="handleButtonClick(item.id, btn)"
 						>
-							<button class="!shadow-none" @click="handleButtonClick(item.id, btn)">
-								<component :is="btn.icon" v-if="btn.icon" />
-								{{ btn.label }}
-							</button>
-						</ButtonStyled>
+							<component :is="btn.icon" v-if="btn.icon" />
+							{{ btn.label }}
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -171,6 +187,8 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import { Button, IconButton } from '#ui/components/base/buttons'
+
 import { useModalStack } from '../../composables/modal-stack'
 import {
 	injectPopupNotificationManager,
@@ -178,7 +196,6 @@ import {
 	type PopupNotificationButton,
 	type PopupNotificationProgressItem,
 } from '../../providers'
-import ButtonStyled from '../base/ButtonStyled.vue'
 import ProgressBar from '../base/ProgressBar.vue'
 import NotificationToast from '../notifications/NotificationToast.vue'
 

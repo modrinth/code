@@ -8,7 +8,7 @@ use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const COLLECTIONS_NAMESPACE: &str = "collections:v3";
+const COLLECTIONS_NAMESPACE: &str = "collections:v4";
 
 #[derive(Clone)]
 pub struct CollectionBuilder {

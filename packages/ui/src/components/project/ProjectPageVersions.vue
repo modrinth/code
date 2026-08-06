@@ -9,9 +9,14 @@
 				@update:query="updateQuery"
 			/>
 
-			<ButtonStyled v-if="openModal" :color="createVersionButtonSecondary ? 'standard' : 'green'">
-				<button @click="openModal"><PlusIcon /> Create version</button>
-			</ButtonStyled>
+			<Button
+				v-if="openModal"
+				:type="createVersionButtonSecondary ? 'base' : 'colored'"
+				:color="createVersionButtonSecondary ? undefined : 'green'"
+				@click="openModal"
+			>
+				<PlusIcon /> Create version
+			</Button>
 
 			<Pagination
 				v-if="!openModal"
@@ -115,14 +120,17 @@
 		<template #cell-gameVersions="{ row: version }">
 			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<TagItem
-					v-for="gameVersion in getDisplayGameVersions(version).slice(0, MAX_GAME_VERSION_TAGS)"
-					:key="`version-tag-${gameVersion}`"
-					v-tooltip="getFilterTooltip(gameVersion)"
+					v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
+						0,
+						MAX_GAME_VERSION_TAGS,
+					)"
+					:key="`version-tag-${gameVersionGroup.label}`"
+					v-tooltip="getFilterTooltip(gameVersionGroup.label)"
 					data-no-row-click
 					class="w-fit max-w-full truncate"
-					:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
+					:action="() => versionFilters?.toggleFilters('gameVersion', gameVersionGroup.versions)"
 				>
-					<span class="min-w-0 truncate">{{ gameVersion }}</span>
+					<span class="min-w-0 truncate">{{ gameVersionGroup.label }}</span>
 				</TagItem>
 				<Menu
 					v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
@@ -139,12 +147,16 @@
 					<template #popper>
 						<div class="flex max-w-[20rem] flex-wrap gap-1">
 							<TagItem
-								v-for="gameVersion in getDisplayGameVersions(version).slice(MAX_GAME_VERSION_TAGS)"
-								:key="`overflow-version-tag-${gameVersion}`"
+								v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
+									MAX_GAME_VERSION_TAGS,
+								)"
+								:key="`overflow-version-tag-${gameVersionGroup.label}`"
 								class="w-fit max-w-full truncate"
-								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
+								:action="
+									() => versionFilters?.toggleFilters('gameVersion', gameVersionGroup.versions)
+								"
 							>
-								<span class="min-w-0 truncate">{{ gameVersion }}</span>
+								<span class="min-w-0 truncate">{{ gameVersionGroup.label }}</span>
 							</TagItem>
 						</div>
 					</template>
@@ -311,16 +323,18 @@
 					<div class="flex flex-col justify-center gap-3">
 						<div class="flex flex-row flex-wrap items-center gap-1.5">
 							<TagItem
-								v-for="gameVersion in getDisplayGameVersions(version).slice(
+								v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
 									0,
 									MAX_GAME_VERSION_TAGS,
 								)"
-								:key="`version-tag-${gameVersion}`"
-								v-tooltip="getFilterTooltip(gameVersion)"
+								:key="`version-tag-${gameVersionGroup.label}`"
+								v-tooltip="getFilterTooltip(gameVersionGroup.label)"
 								class="smart-clickable:allow-pointer-events"
-								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
+								:action="
+									() => versionFilters?.toggleFilters('gameVersion', gameVersionGroup.versions)
+								"
 							>
-								{{ gameVersion }}
+								{{ gameVersionGroup.label }}
 							</TagItem>
 							<Menu
 								v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
@@ -334,15 +348,16 @@
 								<template #popper>
 									<div class="flex max-w-[20rem] flex-wrap gap-1">
 										<TagItem
-											v-for="gameVersion in getDisplayGameVersions(version).slice(
+											v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
 												MAX_GAME_VERSION_TAGS,
 											)"
-											:key="`overflow-version-tag-${gameVersion}`"
+											:key="`overflow-version-tag-${gameVersionGroup.label}`"
 											:action="
-												() => versionFilters?.toggleFilters('gameVersion', version.game_versions)
+												() =>
+													versionFilters?.toggleFilters('gameVersion', gameVersionGroup.versions)
 											"
 										>
-											{{ gameVersion }}
+											{{ gameVersionGroup.label }}
 										</TagItem>
 									</div>
 								</template>
@@ -445,7 +460,6 @@ import {
 } from '@modrinth/assets'
 import {
 	AutoLink,
-	ButtonStyled,
 	Pagination,
 	SmartClickable,
 	Table,
@@ -457,10 +471,17 @@ import {
 	VersionChannelIndicator,
 	VersionFilterControl,
 } from '@modrinth/ui'
-import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@modrinth/utils'
+import {
+	type GameVersionTag,
+	getVersionGroupsForDisplay,
+	type Version,
+	type VersionDisplayGroup,
+} from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -616,8 +637,8 @@ function hasNoModLoader(loaders: string[]): boolean {
 	)
 }
 
-function getDisplayGameVersions(version: DisplayVersion): string[] {
-	return formatVersionsForDisplay(version.game_versions, props.gameVersions)
+function getDisplayGameVersions(version: DisplayVersion): VersionDisplayGroup[] {
+	return getVersionGroupsForDisplay(version.game_versions, props.gameVersions)
 }
 
 function getFilterTooltip(filter: string): string {

@@ -21,38 +21,33 @@
 
 		<div class="flex flex-col gap-6 px-6 pb-6">
 			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<a class="w-full !shadow-none" href="https://support.modrinth.com" @click="modal?.hide()">
-						<MessagesSquareIcon />
-						{{ formatMessage(messages.getSupport) }}
-					</a>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button class="w-full !shadow-none" :disabled="loadingSignIn" @click="signIn">
-						<SpinnerIcon v-if="loadingSignIn" class="animate-spin" />
-						<svg
-							v-else
-							width="20"
-							height="20"
-							viewBox="0 0 20 20"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<rect width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
-							<rect x="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
-							<rect y="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
-							<rect
-								x="10.75"
-								y="10.75"
-								width="9.25"
-								height="9.25"
-								fill="black"
-								fill-opacity="0.9"
-							/>
-						</svg>
-						{{ formatMessage(messages.signIn) }}
-					</button>
-				</ButtonStyled>
+				<ButtonLink class="w-full" href="https://support.modrinth.com" @click="modal?.hide()">
+					<MessagesSquareIcon />
+					{{ formatMessage(messages.getSupport) }}
+				</ButtonLink>
+				<Button
+					type="colored"
+					color="brand"
+					class="w-full"
+					:disabled="loadingSignIn"
+					@click="signIn"
+				>
+					<SpinnerIcon v-if="loadingSignIn" class="animate-spin" />
+					<svg
+						v-else
+						width="20"
+						height="20"
+						viewBox="0 0 20 20"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<rect width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
+						<rect x="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
+						<rect y="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
+						<rect x="10.75" y="10.75" width="9.25" height="9.25" fill="black" fill-opacity="0.9" />
+					</svg>
+					{{ formatMessage(messages.signIn) }}
+				</Button>
 			</div>
 			<p class="m-0 text-center text-sm text-secondary">
 				{{ formatMessage(messages.dontHaveAccount) }}
@@ -69,7 +64,7 @@
 
 <script setup lang="ts">
 import { MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
+import { Button, ButtonLink, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
 import { inject, type Ref, ref } from 'vue'
 
 import steveImage from '@/assets/steve-look-up-left.webp'

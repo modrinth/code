@@ -53,17 +53,18 @@
 										{{ formatDate(version.date_published) }}</span
 									>
 								</div>
-								<ButtonStyled v-if="getPrimaryFile(version)" color="brand" type="transparent">
-									<a
-										class="ml-auto"
-										:href="createDownloadUrl(version)"
-										:download="getPrimaryFile(version)?.filename"
-										:title="`Download ${version.name}`"
-									>
-										<DownloadIcon aria-hidden="true" />
-										Download
-									</a>
-								</ButtonStyled>
+								<ButtonLink
+									v-if="getPrimaryFile(version)"
+									type="quiet"
+									color="brand"
+									class="ml-auto"
+									:href="createDownloadUrl(version)"
+									:download="getPrimaryFile(version)?.filename"
+									:title="`Download ${version.name}`"
+								>
+									<DownloadIcon aria-hidden="true" />
+									Download
+								</ButtonLink>
 							</div>
 							<div
 								v-if="version.changelog && !version.duplicate"
@@ -90,7 +91,7 @@
 <script setup>
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	ButtonLink,
 	injectModrinthClient,
 	injectProjectPageContext,
 	Pagination,
@@ -366,9 +367,5 @@ function getVersionLoaders(version) {
 			}
 		}
 	}
-}
-
-.brand-button {
-	color: var(--color-accent-contrast);
 }
 </style>

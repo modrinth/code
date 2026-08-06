@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SettingsIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { ButtonLink, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 
@@ -30,12 +30,10 @@ const messages = defineMessages({
 			<span>{{ formatMessage(messages.description) }}</span>
 		</template>
 		<template #actions_right>
-			<ButtonStyled color="red">
-				<nuxt-link to="/settings/billing">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(messages.action) }}
-				</nuxt-link>
-			</ButtonStyled>
+			<ButtonLink type="colored" color="red" to="/settings/billing">
+				<SettingsIcon aria-hidden="true" />
+				{{ formatMessage(messages.action) }}
+			</ButtonLink>
 		</template>
 	</PagewideBanner>
 </template>

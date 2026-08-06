@@ -574,12 +574,7 @@ async fn minecraft_game_version_update() {
         // A couple specific checks- in the dummy data, all game versions are marked as major=false except 1.20.5
         let name_to_major = game_versions
             .iter()
-            .map(|x| {
-                (
-                    x.value.clone(),
-                    x.metadata.get("major").unwrap().as_bool().unwrap(),
-                )
-            })
+            .map(|x| (x.value.clone(), x.major.unwrap()))
             .collect::<std::collections::HashMap<_, _>>();
         for (name, major) in name_to_major {
             if name == "1.20.5" {
@@ -612,12 +607,7 @@ async fn minecraft_game_version_update() {
 
         let name_to_major = game_versions
             .iter()
-            .map(|x| {
-                (
-                    x.value.clone(),
-                    x.metadata.get("major").unwrap().as_bool().unwrap(),
-                )
-            })
+            .map(|x| (x.value.clone(), x.major.unwrap()))
             .collect::<std::collections::HashMap<_, _>>();
         // Confirm that the new version is there
         assert!(name_to_major.contains_key("1.20.6"));

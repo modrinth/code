@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { GitForkIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
@@ -107,12 +107,16 @@ function setOptionalField(
 				class="relative flex flex-col gap-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
 			>
 				<div class="absolute right-3 top-3">
-					<ButtonStyled v-if="model.sources.length > 1" color="red" color-fill="text">
-						<button type="button" :disabled="disabled" @click="removeSource(index)">
-							<TrashIcon />
-							{{ formatMessage(commonMessages.removeButton) }}
-						</button>
-					</ButtonStyled>
+					<Button
+						v-if="model.sources.length > 1"
+						type="quiet"
+						color="red"
+						:disabled="disabled"
+						@click="removeSource(index)"
+					>
+						<TrashIcon />
+						{{ formatMessage(commonMessages.removeButton) }}
+					</Button>
 				</div>
 				<SettingsFormGroup
 					:title="formatMessage(messages.nameLabel)"
@@ -158,12 +162,10 @@ function setOptionalField(
 					/>
 				</SettingsFormGroup>
 			</div>
-			<ButtonStyled>
-				<button type="button" class="w-fit" :disabled="disabled" @click="addSource">
-					<PlusIcon />
-					{{ formatMessage(commonMessages.addAnotherButton) }}
-				</button>
-			</ButtonStyled>
+			<Button class="w-fit" :disabled="disabled" @click="addSource">
+				<PlusIcon />
+				{{ formatMessage(commonMessages.addAnotherButton) }}
+			</Button>
 		</template>
 	</SettingsToggleCard>
 </template>
