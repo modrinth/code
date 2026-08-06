@@ -10,6 +10,7 @@
 	"routes": ["modrinth.com/*"],
 	"preview_urls": true,
 	"workers_dev": true,
+	"upload_source_maps": true,
 	"limits": {
 		"cpu_ms": 5000
 	},
