@@ -387,7 +387,7 @@ import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
-import { Button, type ButtonSize } from '#ui/components/base/buttons'
+import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/components/base/buttons'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
@@ -554,7 +554,7 @@ const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
 const isMobileAddMenuLayout = ref(false)
 const submenuOpenDirection = ref<SubmenuOpenDirection>('right')
-const addMenuTrigger = ref<HTMLElement | null>(null)
+const addMenuTrigger = ref<ButtonElementHandle | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
 const activeCategoryOptionsScrollbar = ref<HTMLElement | null>(null)
@@ -732,8 +732,9 @@ const addMenuTransitionEnterActiveClass = computed(() =>
 const addMenuTransitionEnterFromClass = computed(() =>
 	isMobileAddMenuLayout.value ? 'opacity-100' : 'opacity-0',
 )
+const addMenuTriggerElement = computed(() => addMenuTrigger.value?.element ?? null)
 const addMenuOutsideClickTarget = computed(() => menuContainer.value ?? submenu.value)
-const addMenuOutsideClickIgnore = computed(() => [addMenuTrigger, menuContainer, submenu])
+const addMenuOutsideClickIgnore = computed(() => [addMenuTriggerElement, menuContainer, submenu])
 
 const appliedFilterPreviews = computed(() =>
 	Object.entries(props.modelValue)
@@ -984,7 +985,7 @@ function handleAddMenuKeydown(event: KeyboardEvent) {
 
 	event.preventDefault()
 	closeAddMenu()
-	nextTick(() => addMenuTrigger.value?.focus())
+	nextTick(() => addMenuTriggerElement.value?.focus())
 }
 
 function setCategoryButtonRef(
@@ -1585,11 +1586,12 @@ function triangleArea(a: Point, b: Point, c: Point): number {
 function updateAddMenuPosition(): boolean {
 	const positioningElement =
 		menuContainer.value ?? (isMobileActiveSubmenu.value ? submenu.value : null)
-	if (typeof window === 'undefined' || !addMenuTrigger.value || !positioningElement) {
+	const triggerElement = addMenuTriggerElement.value
+	if (typeof window === 'undefined' || !triggerElement || !positioningElement) {
 		return false
 	}
 
-	const triggerRect = addMenuTrigger.value.getBoundingClientRect()
+	const triggerRect = triggerElement.getBoundingClientRect()
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
 
 	addMenuStyle.value = {
