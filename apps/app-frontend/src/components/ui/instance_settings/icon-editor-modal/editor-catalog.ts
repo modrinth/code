@@ -1,6 +1,9 @@
 import { defineMessages } from '@modrinth/ui'
 
 import duskBlock from '@/assets/instance-icons/dusk-block.png'
+import duskBlockGold from '@/assets/instance-icons/dusk-block-gold-test.png'
+import duskBlockRose from '@/assets/instance-icons/dusk-block-rose-test.png'
+import duskBlockTeal from '@/assets/instance-icons/dusk-block-teal-test.png'
 
 const names = defineMessages({
 	surface: {
@@ -31,6 +34,18 @@ const names = defineMessages({
 		id: 'instance.icon-editor.symbol.dusk-block',
 		defaultMessage: 'Dusk block',
 	},
+	duskBlockRose: {
+		id: 'instance.icon-editor.symbol.dusk-block-rose',
+		defaultMessage: 'Rose dusk block',
+	},
+	duskBlockGold: {
+		id: 'instance.icon-editor.symbol.dusk-block-gold',
+		defaultMessage: 'Gold dusk block',
+	},
+	duskBlockTeal: {
+		id: 'instance.icon-editor.symbol.dusk-block-teal',
+		defaultMessage: 'Teal dusk block',
+	},
 })
 
 export const backgroundOptions = [
@@ -44,6 +59,9 @@ export const backgroundOptions = [
 
 export const symbolOptions = [
 	{ id: 'dusk_block', name: names.duskBlock, asset: duskBlock },
+	{ id: 'dusk_block_rose_test', name: names.duskBlockRose, asset: duskBlockRose },
+	{ id: 'dusk_block_gold_test', name: names.duskBlockGold, asset: duskBlockGold },
+	{ id: 'dusk_block_teal_test', name: names.duskBlockTeal, asset: duskBlockTeal },
 ] as const
 
 export type BackgroundColor = (typeof backgroundOptions)[number]['background']['value']

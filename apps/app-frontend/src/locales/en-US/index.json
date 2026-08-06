@@ -1268,6 +1268,15 @@
   "instance.icon-editor.symbol.dusk-block": {
     "message": "Dusk block"
   },
+  "instance.icon-editor.symbol.dusk-block-gold": {
+    "message": "Gold dusk block"
+  },
+  "instance.icon-editor.symbol.dusk-block-rose": {
+    "message": "Rose dusk block"
+  },
+  "instance.icon-editor.symbol.dusk-block-teal": {
+    "message": "Teal dusk block"
+  },
   "instance.icon-editor.title": {
     "message": "Icon editor"
   },
