@@ -26,6 +26,20 @@ const settings = {
 			title: 'Highlight Private Messages',
 			description: 'Whether private messages should be highlighted in the chat.',
 			default: true,
+		}),
+		AdjustPageAlignment: setting.asEnum({
+			type: 'enum',
+			id: 'adjust-page-alignment',
+			title: 'Adjust Page Alignment',
+			description:
+				'Whether the main page elements should be centered or offset opposite to the Checklist Position.',
+			entries: [
+				{ value: 'never', label: 'Never' },
+				{ value: 'checklist-present', label: 'Checklist Needed' },
+				{ value: 'always', label: 'Always' },
+			],
+			default: 'never',
+		}),
 	},
 } as const
 

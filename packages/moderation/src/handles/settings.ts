@@ -1,4 +1,5 @@
 import { isValidFor, type SettingDefinitionBase } from '../types/settings.ts'
+import { moderationSettings } from '../index.ts'
 
 export class Settings {
 	private readonly settings: { [id: string]: any }
@@ -24,4 +25,12 @@ export class Settings {
 		definition.onChange?.(previous, value ?? definition.default)
 		this.onChange()
 	}
+}
+
+export function getMarginTarget(settings: Settings): string {
+	return settings.get(moderationSettings.General.AdjustPageAlignment) == 'always'
+		? settings.get(moderationSettings.General.ChecklistPosition) == 'right'
+			? 'r'
+			: 'l'
+		: 'x'
 }

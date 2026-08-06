@@ -4,7 +4,7 @@
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
 		<template v-if="isSettings">
-			<div v-if="canAccessSettings" class="normal-page no-sidebar">
+			<div v-if="canAccessSettings" class="normal-page no-sidebar" :class="`align-${marginTarget}`">
 				<div class="normal-page__header">
 					<div
 						class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
@@ -94,17 +94,20 @@
 			/>
 			<div
 				class="new-page sidebar"
-				:class="{
-					'alt-layout': cosmetics.leftContentLayout,
-					'checklist-open':
-						showModerationChecklist &&
-						!collapsedModerationChecklist &&
-						!flags.alwaysShowChecklistAsPopup,
-					'checklist-collapsed':
-						showModerationChecklist &&
-						collapsedModerationChecklist &&
-						!flags.alwaysShowChecklistAsPopup,
-				}"
+				:class="[
+					{
+						'alt-layout': cosmetics.leftContentLayout,
+						'checklist-open':
+							showModerationChecklist &&
+							!collapsedModerationChecklist &&
+							!flags.alwaysShowChecklistAsPopup,
+						'checklist-collapsed':
+							showModerationChecklist &&
+							collapsedModerationChecklist &&
+							!flags.alwaysShowChecklistAsPopup,
+					},
+					`align-${marginTarget}`,
+				]"
 			>
 				<div
 					class="normal-page__header relative mb-4"
@@ -511,7 +514,7 @@ import {
 	SettingsIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { moderationSettings } from '@modrinth/moderation'
+import { getMarginTarget, moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
 	Avatar,
@@ -583,6 +586,7 @@ const config = useRuntimeConfig()
 const moderationQueue = useModerationQueue()
 const keybinds = useModerationKeybinds()
 const modSettings = useModerationSettings()
+const marginTarget = computed(() => getMarginTarget(modSettings.value))
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
