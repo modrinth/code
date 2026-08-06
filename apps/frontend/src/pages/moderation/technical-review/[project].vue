@@ -286,7 +286,7 @@ function handleKeybinds(event: KeyboardEvent) {
 					top: document.body.scrollHeight,
 					behavior: 'smooth',
 				})
-			}
+			},
 		},
 	})
 }
@@ -297,7 +297,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeybinds)
-});
+})
 </script>
 
 <template>

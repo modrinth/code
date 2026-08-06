@@ -54,7 +54,11 @@
 						<DownloadIcon aria-hidden="true" />
 					</ButtonLink>
 					<ButtonLink
-						v-if="!!getPrimaryFile(version) && isStaff(auth.user) && modSettings.get(moderationSettings.General.SlicerButtonInVersions)"
+						v-if="
+							!!getPrimaryFile(version) &&
+							isStaff(auth.user) &&
+							modSettings.get(moderationSettings.General.SlicerButtonInVersions)
+						"
 						v-tooltip="`Open in Slicer`"
 						type="quiet"
 						target="_blank"
@@ -289,7 +293,7 @@ import {
 	ProjectPageVersions,
 	TeleportOverflowMenu,
 } from '@modrinth/ui'
-import {isStaff} from "@modrinth/utils";
+import { isStaff } from '@modrinth/utils'
 import { onMounted, useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'

@@ -856,7 +856,9 @@ async function updateDetailStatus(
 
 	updatingDetails.add(detailId)
 
-	const previousMarkedCount = selectedFile.value ? getFileMarkedCount(selectedFile.value) : undefined
+	const previousMarkedCount = selectedFile.value
+		? getFileMarkedCount(selectedFile.value)
+		: undefined
 
 	try {
 		await updateIssueDetails([{ detail_id: detailId, verdict }])
@@ -940,7 +942,9 @@ async function updateGlobalDetailStatus(
 
 	updatingGlobalDetailKeys.add(detail.key)
 
-	const previousMarkedCount = selectedFile.value ? getFileMarkedCount(selectedFile.value) : undefined
+	const previousMarkedCount = selectedFile.value
+		? getFileMarkedCount(selectedFile.value)
+		: undefined
 
 	try {
 		await updateGlobalIssueDetail(detail.key, verdict)
@@ -1538,10 +1542,7 @@ function copyId() {
 					@tab-click="handleTabClick"
 				/>
 
-				<div
-					v-if="selectedFile"
-					class="flex flex-row gap-2 items-end"
-				>
+				<div v-if="selectedFile" class="flex flex-row items-end gap-2">
 					<ButtonLink
 						v-tooltip="`Download`"
 						type="outlined"
@@ -1587,7 +1588,13 @@ function copyId() {
 						>
 							<template #additionalActions>
 								<Button
-									v-tooltip="!canSubmitReview ? 'There are still pending flags!' : hasSubmittedPassReview ? 'Project already passed!' : undefined"
+									v-tooltip="
+										!canSubmitReview
+											? 'There are still pending flags!'
+											: hasSubmittedPassReview
+												? 'Project already passed!'
+												: undefined
+									"
 									type="colored"
 									color="brand"
 									:disabled="!canSubmitReview || hasSubmittedPassReview"

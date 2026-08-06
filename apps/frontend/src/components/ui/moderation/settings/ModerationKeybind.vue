@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { GlobeIcon, ShieldCheckIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
+import { GlobeIcon, RotateCounterClockwiseIcon, ShieldCheckIcon } from '@modrinth/assets'
 import { type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
 import { IconButton } from '@modrinth/ui'
 import { onUnmounted } from 'vue'

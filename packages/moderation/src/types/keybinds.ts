@@ -54,7 +54,10 @@ export type ModerationTechReviewContext = {
 	actions: TechReviewActions
 }
 
-export type ModerationContext = ModerationProjectContext | ModerationChecklistContext | ModerationTechReviewContext
+export type ModerationContext =
+	| ModerationProjectContext
+	| ModerationChecklistContext
+	| ModerationTechReviewContext
 
 export interface KeybindDefinition {
 	key: string
@@ -82,7 +85,10 @@ export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistCo
 export type KeybindTechReviewListener = BaseKeybindListener<ModerationTechReviewContext> & {
 	scope: 'tech-review'
 }
-export type KeybindListener = KeybindProjectListener | KeybindChecklistListener | KeybindTechReviewListener
+export type KeybindListener =
+	| KeybindProjectListener
+	| KeybindChecklistListener
+	| KeybindTechReviewListener
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())

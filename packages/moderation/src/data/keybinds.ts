@@ -126,7 +126,7 @@ const keybinds: { [id: string]: KeybindListener } = {
 		description: 'Go to bottom of the tech review card',
 		scope: 'tech-review',
 		action: (ctx) => ctx.actions.goToBottom(),
-	}
+	},
 }
 
 export default keybinds

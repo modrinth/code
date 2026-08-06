@@ -145,7 +145,11 @@
 							{{ formatMessage(commonMessages.downloadButton) }}
 						</ButtonLink>
 						<ButtonLink
-							v-if="!!primaryFile?.url && isStaff(auth.user) && modSettings.get(moderationSettings.General.SlicerButtonInVersions)"
+							v-if="
+								!!primaryFile?.url &&
+								isStaff(auth.user) &&
+								modSettings.get(moderationSettings.General.SlicerButtonInVersions)
+							"
 							v-tooltip="`Open in Slicer`"
 							type="quiet"
 							target="_blank"
@@ -514,7 +518,7 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {moderationSettings} from "@modrinth/moderation";
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
 	Button,
