@@ -1304,9 +1304,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Archivo guardado"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Cerrar"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Buscar"
   },
@@ -5414,12 +5411,6 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar de {username}"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Cancelar"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Cancelar"
-  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Otro..."
   },
@@ -6255,4 +6246,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

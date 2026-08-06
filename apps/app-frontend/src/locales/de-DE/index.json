@@ -1853,9 +1853,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "Ein neuer Tab zum Anmelden wurde geöffnet. Schließe die Anmeldung dort ab und kehren anschließend zur App zurück."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Abbrechen"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Im Browser fortfahren"
   },

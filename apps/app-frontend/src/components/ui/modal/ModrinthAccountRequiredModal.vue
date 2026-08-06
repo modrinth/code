@@ -73,7 +73,7 @@
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
 					<Button type="outlined" class="w-full" native-type="button" @click="modal?.hide()">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancelButton) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
 					<Button
 						class="w-full"
@@ -106,7 +106,14 @@
 
 <script setup lang="ts">
 import { LogInIcon, RefreshCwIcon, SpinnerIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
-import { Button, defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'
 
@@ -244,10 +251,6 @@ const messages = defineMessages({
 	waitingForBrowser: {
 		id: 'modal.modrinth-account-required.waiting-for-browser',
 		defaultMessage: 'Waiting for browser confirmation...',
-	},
-	cancelButton: {
-		id: 'modal.modrinth-account-required.cancel-button',
-		defaultMessage: 'Cancel',
 	},
 	openBrowserAgainButton: {
 		id: 'modal.modrinth-account-required.open-browser-again-button',

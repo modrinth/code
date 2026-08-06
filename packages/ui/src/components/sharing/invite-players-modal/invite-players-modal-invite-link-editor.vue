@@ -32,7 +32,7 @@
 							/>
 							<div class="flex justify-end gap-2 p-3 pt-1">
 								<Button type="outlined" native-type="button" @click="cancelCustomExpiry">
-									{{ formatMessage(messages.cancel) }}
+									{{ formatMessage(commonMessages.cancelButton) }}
 								</Button>
 								<Button
 									type="colored"
@@ -73,7 +73,7 @@
 			<div class="flex justify-end gap-2">
 				<Button :disabled="saving" @click="modal?.hide()">
 					<XIcon aria-hidden="true" />
-					{{ formatMessage(messages.cancel) }}
+					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<Button type="colored" color="brand" :disabled="!canSave" @click="save">
 					<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
@@ -94,6 +94,7 @@ import { Button } from '#ui/components/base/buttons'
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'
+import { commonMessages } from '../../../utils/common-messages'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import DatePicker from '../../base/DatePicker.vue'
 import StyledInput from '../../base/StyledInput.vue'
@@ -185,10 +186,6 @@ const messages = defineMessages({
 	customExpiryValue: {
 		id: 'sharing.invite-players-modal.custom-expiry-value',
 		defaultMessage: 'Custom: {date}',
-	},
-	cancel: {
-		id: 'sharing.invite-players-modal.cancel-button',
-		defaultMessage: 'Cancel',
 	},
 	apply: {
 		id: 'sharing.invite-players-modal.apply-button',

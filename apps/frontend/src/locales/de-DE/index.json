@@ -1481,9 +1481,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Kürzlich aktualisiert"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Schließen"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Lade {formType} herunter"
   },
@@ -2984,9 +2981,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Fehler beim Löschen aller Gruppen: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Löschen"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Alle Gruppen wurden gelöscht."
   },
@@ -3025,9 +3019,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Wird gescannt..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Erfolg"
   },
   "modpack-scan-modal.title": {
     "message": "Modpack-Scan ({scanned}/{total} Dateien)"

@@ -1853,9 +1853,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "Si è aperta una nuova scheda per effettuare l'accesso. Poi torna all'app."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Annulla"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Continua nel browser"
   },
