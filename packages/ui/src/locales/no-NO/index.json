@@ -449,9 +449,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Søk etter spillversjon..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Fjern ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Velg ikon"
   },

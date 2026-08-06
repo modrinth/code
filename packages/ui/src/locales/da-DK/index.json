@@ -422,9 +422,6 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "Opsæt server"
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Fjern ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Vælg ikon"
   },

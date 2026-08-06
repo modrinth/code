@@ -59,6 +59,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_edit,
             instance_edit_icon,
             instance_edit_generated_icon,
+            instance_cache_generated_icon,
             instance_get_recent_icon_recipes,
             instance_share_can_current_user_use,
             instance_share_get_users,
@@ -847,6 +848,14 @@ pub async fn instance_edit_generated_icon(
         symbol_bytes,
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn instance_cache_generated_icon(
+    recipe: theseus::data::InstanceIconRecipe,
+    symbol_bytes: Vec<u8>,
+) -> Result<String> {
+    Ok(theseus::instance::cache_generated_icon(recipe, symbol_bytes).await?)
 }
 
 #[tauri::command]

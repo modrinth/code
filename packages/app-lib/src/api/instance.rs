@@ -30,7 +30,8 @@ pub use self::groups::{
 pub use self::install::get_optimal_jre_key;
 pub(crate) use self::lifecycle::create;
 pub use self::lifecycle::{
-    edit, edit_generated_icon, edit_icon, get_recent_icon_recipes, remove,
+    cache_generated_icon, edit, edit_generated_icon, edit_icon,
+    get_recent_icon_recipes, remove,
 };
 pub use self::paths::{get_full_path, get_mod_full_path};
 pub use self::projects::{

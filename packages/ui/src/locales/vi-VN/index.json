@@ -620,9 +620,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Tìm phiên bản Game..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Xóa biểu tượng"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Chọn biểu tượng"
   },

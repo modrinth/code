@@ -686,9 +686,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "게임 버전 검색..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "아이콘 제거"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "아이콘 선택"
   },

@@ -686,9 +686,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Oyun sürümü ara..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Simgeyi kaldır"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Simge seç"
   },

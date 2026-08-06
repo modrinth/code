@@ -11,7 +11,11 @@ import {
 import { computed, nextTick, ref } from 'vue'
 
 import { toError } from '@/helpers/errors'
-import { edit_generated_icon, get_recent_icon_recipes } from '@/helpers/instance'
+import {
+	cache_generated_icon,
+	edit_generated_icon,
+	get_recent_icon_recipes,
+} from '@/helpers/instance'
 import type { IconBackground, InstanceIconRecipe } from '@/helpers/types'
 
 import {
@@ -24,7 +28,7 @@ import {
 } from './editor-catalog'
 
 const props = defineProps<{
-	instanceId: string
+	instanceId?: string
 	recipe?: InstanceIconRecipe | null
 }>()
 
@@ -125,11 +129,10 @@ async function saveIcon() {
 	saving.value = true
 	try {
 		const recipe = selectedRecipe.value
-		const iconPath = await edit_generated_icon(
-			props.instanceId,
-			recipe,
-			await loadSymbolBytes(selectedSymbolOption.value.asset),
-		)
+		const symbolBytes = await loadSymbolBytes(selectedSymbolOption.value.asset)
+		const iconPath = props.instanceId
+			? await edit_generated_icon(props.instanceId, recipe, symbolBytes)
+			: await cache_generated_icon(recipe, symbolBytes)
 		emit('saved', iconPath, recipe)
 		saving.value = false
 		await nextTick()
@@ -141,7 +144,22 @@ async function saveIcon() {
 	}
 }
 
-defineExpose({ show, hide })
+async function randomizeAndSave() {
+	try {
+		surpriseMe()
+		const recipe = selectedRecipe.value
+		const iconPath = await cache_generated_icon(
+			recipe,
+			await loadSymbolBytes(selectedSymbolOption.value.asset),
+		)
+		return { iconPath, recipe }
+	} catch (error) {
+		handleError(toError(error))
+		return null
+	}
+}
+
+defineExpose({ show, hide, randomizeAndSave })
 
 const messages = defineMessages({
 	title: {

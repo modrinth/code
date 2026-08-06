@@ -719,9 +719,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "搜索游戏版本……"
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "移除图标"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "选择图标"
   },

@@ -45,6 +45,8 @@ const props = withDefaults(
 		createProjectInstall?: (data: ProjectInstallCreateData) => Promise<void>
 		getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 		getLoaderManifest?: LoaderManifestResolver
+		randomizeInstanceIcon?: () => Promise<{ path: string; previewUrl: string } | null>
+		customizeInstanceIcon?: () => void
 		finishDisabled?: boolean
 		finishDisabledTooltip?: string
 	}>(),
@@ -58,6 +60,8 @@ const props = withDefaults(
 		initialGameVersion: undefined,
 		fetchExistingInstanceNames: undefined,
 		onBack: null,
+		randomizeInstanceIcon: undefined,
+		customizeInstanceIcon: undefined,
 	},
 )
 
@@ -89,6 +93,8 @@ const ctx = createCreationFlowContext(
 		createProjectInstall: props.createProjectInstall,
 		getProjectVersions: props.getProjectVersions,
 		getLoaderManifest: props.getLoaderManifest,
+		randomizeInstanceIcon: props.randomizeInstanceIcon,
+		customizeInstanceIcon: props.customizeInstanceIcon,
 		finishDisabled: computed(() => props.finishDisabled ?? false),
 		finishDisabledTooltip: computed(() => props.finishDisabledTooltip),
 	},

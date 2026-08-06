@@ -148,7 +148,6 @@ pub async fn edit_generated_icon(
     recipe: InstanceIconRecipe,
     symbol_bytes: Vec<u8>,
 ) -> crate::Result<String> {
-    let background_color = validate_icon_recipe(&recipe)?;
     let state = State::get().await?;
     let instance =
         instance_rows::get_instance_display_info(instance_id, &state.pool)
@@ -156,18 +155,7 @@ pub async fn edit_generated_icon(
             .ok_or_else(|| {
                 crate::ErrorKind::InputError("Unknown instance".to_string())
             })?;
-    let icon_bytes = tokio::task::spawn_blocking(move || {
-        render_generated_icon(background_color, &symbol_bytes)
-    })
-    .await??;
-    let file = crate::util::fetch::write_cached_icon(
-        "generated-instance-icon.png",
-        &state.directories.caches_dir(),
-        Bytes::from(icon_bytes),
-        &state.io_semaphore,
-    )
-    .await?;
-    let icon_path = file.to_string_lossy().to_string();
+    let icon_path = cache_generated_icon(recipe.clone(), symbol_bytes).await?;
 
     crate::state::edit_instance(
         instance_id,
@@ -197,6 +185,27 @@ pub async fn edit_generated_icon(
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     Ok(icon_path)
+}
+
+pub async fn cache_generated_icon(
+    recipe: InstanceIconRecipe,
+    symbol_bytes: Vec<u8>,
+) -> crate::Result<String> {
+    let background_color = validate_icon_recipe(&recipe)?;
+    let state = State::get().await?;
+    let icon_bytes = tokio::task::spawn_blocking(move || {
+        render_generated_icon(background_color, &symbol_bytes)
+    })
+    .await??;
+    let file = crate::util::fetch::write_cached_icon(
+        "generated-instance-icon.png",
+        &state.directories.caches_dir(),
+        Bytes::from(icon_bytes),
+        &state.io_semaphore,
+    )
+    .await?;
+
+    Ok(file.to_string_lossy().to_string())
 }
 
 pub async fn get_recent_icon_recipes() -> crate::Result<Vec<InstanceIconRecipe>>

@@ -659,9 +659,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Поиск версии игры..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Удалить иконку"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Выбрать иконку"
   },

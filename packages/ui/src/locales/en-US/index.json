@@ -719,11 +719,14 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Search game version..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Remove icon"
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Customize"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Randomize"
   },
   "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Select icon"
+    "defaultMessage": "Upload"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Latest"

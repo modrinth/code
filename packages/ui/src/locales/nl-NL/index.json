@@ -719,9 +719,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Spelversie zoeken..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Pictogram verwijderen"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Pictogram selecteren"
   },

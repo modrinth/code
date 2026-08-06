@@ -56,7 +56,7 @@ import {
 import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
-import { invoke } from '@tauri-apps/api/core'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -74,6 +74,7 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
+import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
@@ -289,6 +290,33 @@ const {
 } = setupProviders(notificationManager, popupNotificationManager)
 const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
 const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
+const creationIconEditorModal = ref(null)
+const creationIconRecipe = ref(null)
+
+async function randomizeCreationIcon() {
+	const generated = await creationIconEditorModal.value?.randomizeAndSave()
+	if (!generated) return null
+
+	creationIconRecipe.value = generated.recipe
+	return {
+		path: generated.iconPath,
+		previewUrl: convertFileSrc(generated.iconPath),
+	}
+}
+
+function customizeCreationIcon() {
+	creationIconEditorModal.value?.show()
+}
+
+function onCreationIconSaved(iconPath, recipe) {
+	creationIconRecipe.value = recipe
+	const context = installationModal.value?.ctx
+	if (!context) return
+
+	context.instanceIcon.value = null
+	context.instanceIconUrl.value = convertFileSrc(iconPath)
+	context.instanceIconPath.value = iconPath
+}
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -1614,8 +1642,15 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			:prepare-project-install="prepareCreationProjectInstall"
 			:create-project-install="handleCreateAndInstall"
 			:get-loader-manifest="getLoaderManifest"
+			:randomize-instance-icon="randomizeCreationIcon"
+			:customize-instance-icon="customizeCreationIcon"
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
+		/>
+		<IconEditorModal
+			ref="creationIconEditorModal"
+			:recipe="creationIconRecipe"
+			@saved="onCreationIconSaved"
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div

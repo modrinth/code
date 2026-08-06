@@ -46,19 +46,42 @@
 		</div>
 
 		<!-- Instance-specific: Icon upload -->
-		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-4">
-			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" />
-			<div class="flex flex-col gap-2">
+		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-2.5">
+			<div class="group relative size-[7.75rem] shrink-0">
+				<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="100%" no-shadow />
+				<div
+					v-if="ctx.instanceIconUrl.value"
+					class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+				>
+					<ButtonStyled circular>
+						<button
+							type="button"
+							:aria-label="formatMessage(commonMessages.removeImageButton)"
+							@click="removeIcon"
+						>
+							<XIcon />
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+			<div class="flex flex-col gap-1.5">
 				<ButtonStyled type="outlined">
 					<button @click="triggerIconInput">
 						<UploadIcon />
-						{{ formatMessage(messages.selectIcon) }}
+						{{ formatMessage(messages.uploadIcon) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled type="outlined">
-					<button :disabled="!ctx.instanceIcon.value" @click="removeIcon">
-						<XIcon />
-						{{ formatMessage(messages.removeIcon) }}
+					<button @click="randomizeIcon">
+						<SpinnerIcon v-if="randomizing" class="animate-spin" />
+						<RefreshCwIcon v-else />
+						{{ formatMessage(messages.randomizeIcon) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled type="outlined">
+					<button @click="ctx.customizeInstanceIcon?.()">
+						<PaletteIcon />
+						{{ formatMessage(messages.customizeIcon) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -194,7 +217,15 @@
 
 <script setup lang="ts">
 import type { Paper } from '@modrinth/api-client'
-import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import {
+	EyeIcon,
+	EyeOffIcon,
+	PaletteIcon,
+	RefreshCwIcon,
+	SpinnerIcon,
+	UploadIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -227,13 +258,17 @@ const {
 } = ctx
 
 const messages = defineMessages({
-	selectIcon: {
+	uploadIcon: {
 		id: 'creation-flow.modal.custom-setup.icon.select',
-		defaultMessage: 'Select icon',
+		defaultMessage: 'Upload',
 	},
-	removeIcon: {
-		id: 'creation-flow.modal.custom-setup.icon.remove',
-		defaultMessage: 'Remove icon',
+	randomizeIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.randomize',
+		defaultMessage: 'Randomize',
+	},
+	customizeIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.customize',
+		defaultMessage: 'Customize',
 	},
 	nameLabel: {
 		id: 'creation-flow.modal.custom-setup.name.label',
@@ -372,6 +407,23 @@ function removeIcon() {
 	ctx.instanceIcon.value = null
 	ctx.instanceIconUrl.value = null
 	ctx.instanceIconPath.value = null
+}
+
+const randomizing = ref(false)
+
+async function randomizeIcon() {
+	if (!ctx.randomizeInstanceIcon || randomizing.value) return
+
+	randomizing.value = true
+	try {
+		const generated = await ctx.randomizeInstanceIcon()
+		if (!generated) return
+		ctx.instanceIcon.value = null
+		ctx.instanceIconUrl.value = generated.previewUrl
+		ctx.instanceIconPath.value = generated.path
+	} finally {
+		randomizing.value = false
+	}
 }
 
 const loaderVersionsLoading = ref(false)

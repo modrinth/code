@@ -141,6 +141,11 @@ export interface ProjectInstallCreateData {
 	gameVersion: string
 }
 
+export interface GeneratedInstanceIcon {
+	path: string
+	previewUrl: string
+}
+
 export interface CreationFlowContextValue {
 	// Flow
 	flowType: FlowType
@@ -174,6 +179,8 @@ export interface CreationFlowContextValue {
 	instanceIcon: Ref<File | null>
 	instanceIconUrl: Ref<string | null>
 	instanceIconPath: Ref<string | null>
+	randomizeInstanceIcon: (() => Promise<GeneratedInstanceIcon | null>) | null
+	customizeInstanceIcon: (() => void) | null
 
 	// Loader/version state (custom setup)
 	selectedLoader: Ref<string | null>
@@ -262,6 +269,8 @@ export interface CreationFlowOptions {
 	createProjectInstall?: (data: ProjectInstallCreateData) => Promise<void>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest?: LoaderManifestResolver
+	randomizeInstanceIcon?: () => Promise<GeneratedInstanceIcon | null>
+	customizeInstanceIcon?: () => void
 	finishDisabled?: ComputedRef<boolean>
 	finishDisabledTooltip?: ComputedRef<string | undefined>
 }
@@ -287,6 +296,8 @@ export function createCreationFlowContext(
 	const initialLoader = options.initialLoader ?? null
 	const initialGameVersion = options.initialGameVersion ?? null
 	const onBack = options.onBack ?? null
+	const randomizeInstanceIcon = options.randomizeInstanceIcon ?? null
+	const customizeInstanceIcon = options.customizeInstanceIcon ?? null
 	const searchProjects = options.searchProjects!
 	const prepareProjectInstall = options.prepareProjectInstall
 	const createProjectInstall = options.createProjectInstall
@@ -647,6 +658,8 @@ export function createCreationFlowContext(
 		instanceIcon,
 		instanceIconUrl,
 		instanceIconPath,
+		randomizeInstanceIcon,
+		customizeInstanceIcon,
 		selectedLoader,
 		selectedGameVersion,
 		loaderVersionType,

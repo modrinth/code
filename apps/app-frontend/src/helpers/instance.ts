@@ -350,6 +350,16 @@ export async function edit_generated_icon(
 	})
 }
 
+export async function cache_generated_icon(
+	recipe: InstanceIconRecipe,
+	symbolBytes: number[],
+): Promise<string> {
+	return await invoke('plugin:instance|instance_cache_generated_icon', {
+		recipe,
+		symbolBytes,
+	})
+}
+
 export async function get_recent_icon_recipes(): Promise<InstanceIconRecipe[]> {
 	return await invoke('plugin:instance|instance_get_recent_icon_recipes')
 }
