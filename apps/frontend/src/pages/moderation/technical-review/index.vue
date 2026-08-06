@@ -582,18 +582,26 @@ function handleKeybinds(event: KeyboardEvent) {
 			goToTop: () => {
 				Array.from(cardRefs.values())
 					.filter((card) => card.getBoundingClientRect().top <= 0)
-					.reduce((prev, curr) => curr.getBoundingClientRect().top > prev.getBoundingClientRect().top ? curr : prev)
+					.reduce((prev, curr) =>
+						curr.getBoundingClientRect().top > prev.getBoundingClientRect().top ? curr : prev,
+					)
 					?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 			},
 			goToBottom: () => {
 				const nearestCard = Array.from(cardRefs.values())
 					.filter((card) => card.getBoundingClientRect().bottom >= window.innerHeight)
-					.reduce((prev, curr) => curr.getBoundingClientRect().top < prev.getBoundingClientRect().top ? curr : prev)
+					.reduce((prev, curr) =>
+						curr.getBoundingClientRect().top < prev.getBoundingClientRect().top ? curr : prev,
+					)
 
 				if (nearestCard) {
 					window.scrollTo({
 						behavior: 'smooth',
-						top: nearestCard.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + CARD_BOTTOM_OFFSET
+						top:
+							nearestCard.getBoundingClientRect().bottom +
+							window.scrollY -
+							window.innerHeight +
+							CARD_BOTTOM_OFFSET,
 					})
 				}
 			},
@@ -607,8 +615,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeybinds)
-});
-
+})
 </script>
 
 <template>
