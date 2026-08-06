@@ -118,22 +118,23 @@ watch(
 }
 
 .skeleton {
-	background: linear-gradient(
-		90deg,
-		var(--color-bg) 25%,
-		var(--color-raised-bg) 50%,
-		var(--color-bg) 75%
-	);
-	background-size: 200% 100%;
-	animation: wave 1500ms infinite linear;
+	background: linear-gradient(145deg, var(--surface-2), var(--surface-3));
+	animation: skeleton-pulse 2700ms ease-in-out infinite;
 }
 
-@keyframes wave {
-	0% {
-		background-position: -200% 0;
-	}
+@keyframes skeleton-pulse {
+	0%,
 	100% {
-		background-position: 200% 0;
+		filter: brightness(0.95);
+	}
+	50% {
+		filter: brightness(1.15);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skeleton {
+		animation: none;
 	}
 }
 
