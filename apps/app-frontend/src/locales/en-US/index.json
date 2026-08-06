@@ -272,6 +272,12 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.home.jump-back-in.never-played": {
+    "message": "Never played"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "New instance"
+  },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
   },
@@ -376,6 +382,9 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Delete instance"
+  },
+  "app.instance.confirm-delete.instances-to-delete": {
+    "message": "These instances will be deleted:"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "This modpack is already installed in the <bold>{instanceName}</bold> instance. Are you sure you want to duplicate it?"
@@ -602,6 +611,12 @@
   "app.library.group.instances-modal.title": {
     "message": "Add instances to \"{groupName}\""
   },
+  "app.library.group.move-down": {
+    "message": "Move group down"
+  },
+  "app.library.group.move-up": {
+    "message": "Move group up"
+  },
   "app.library.group.name-empty": {
     "message": "Group names cannot be empty."
   },
@@ -814,6 +829,9 @@
   },
   "app.skins.delete-modal.title": {
     "message": "Are you sure you want to delete this skin?"
+  },
+  "app.skins.demo.apply-tooltip": {
+    "message": "Sign in to apply skins."
   },
   "app.skins.demo.description": {
     "message": "Sign in to your Minecraft account to save and apply skins!"
@@ -1211,6 +1229,48 @@
   "instance.files.save-as": {
     "message": "Save as..."
   },
+  "instance.icon-editor.background": {
+    "message": "Background"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Blue"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Green"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Orange"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "Purple"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Red"
+  },
+  "instance.icon-editor.background.surface": {
+    "message": "Surface"
+  },
+  "instance.icon-editor.description": {
+    "message": "Mix and match elements to create a custom icon."
+  },
+  "instance.icon-editor.recents": {
+    "message": "Recents"
+  },
+  "instance.icon-editor.save": {
+    "message": "Save icon"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "Surprise me"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "Symbol"
+  },
+  "instance.icon-editor.symbol.dusk-block": {
+    "message": "Dusk block"
+  },
+  "instance.icon-editor.title": {
+    "message": "Icon editor"
+  },
   "instance.locked.delete-button": {
     "message": "Delete instance"
   },
@@ -1262,6 +1322,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "Edit icon"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "Create an icon"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "Edit icon"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Remove icon"
   },
@@ -1270,18 +1336,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Select icon"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Library groups"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Create new group"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Library groups allow you to organize your instances into different sections in your library."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Enter group name"
   },
   "instance.settings.tabs.general.name": {
     "message": "Name"

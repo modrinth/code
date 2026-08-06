@@ -839,18 +839,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Izaberi ikonu"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupe biblioteke"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Kreiraj novu grupu"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupe biblioteka ti omogućavaju da organizuješ svoje instance u različite odeljke u svojoj biblioteci."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ukucaj ime grupe"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Ime"
   },

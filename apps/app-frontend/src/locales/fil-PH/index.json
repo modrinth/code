@@ -506,18 +506,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Pumili ng ikono"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Mga grupo ng librerya"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Lumikha ng bagong grupo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Binibigyan ng mga grupo ng librerya na iyong maayos ang iyong mga instansiya sa iba't-ibang pangkat in iyong librerya."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ilagay ang pangalan ng grupo"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Pangalan"
   },

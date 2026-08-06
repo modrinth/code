@@ -4,6 +4,18 @@ use crate::state::{
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum InstanceIconBackground {
+    Color { value: String },
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub struct InstanceIconRecipe {
+    pub background: InstanceIconBackground,
+    pub symbol: String,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
     pub id: String,

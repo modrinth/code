@@ -1181,18 +1181,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecteer pictogram"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Bibliotheekgroepen"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Nieuwe groep creëren"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Bibliotheekgroepen stellen je in staat om je instanties in verschillende secties in je bibliotheek te organiseren."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Voer groepsnaam in"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Naam"
   },

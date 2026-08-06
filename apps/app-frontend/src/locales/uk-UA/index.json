@@ -1061,18 +1061,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Вибрати значок"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Групи бібліотеки"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Створити нову групу"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Групи бібліотеки дозволяють вам упорядковувати профілі в різні секції у вашій бібліотеці."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Уведіть назву групи"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Назва"
   },

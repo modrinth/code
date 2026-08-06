@@ -380,18 +380,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "בחירת סמל"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "קבוצות ספרייה"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "יצירת קבוצה חדשה"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לחלקים שונים בספרייה שלך."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "שם קבוצה"
-  },
   "instance.settings.tabs.general.name": {
     "message": "שם"
   },

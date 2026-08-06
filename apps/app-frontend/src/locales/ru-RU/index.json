@@ -1070,18 +1070,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Выбрать иконку"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Группировка"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Создать новую группу"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Позволяет организовать сборки по разным разделам в библиотеке."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Введите название группы"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Название"
   },

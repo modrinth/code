@@ -752,18 +752,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Vybrat ikonu"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Skupiny knihovny"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Vytvořit novou skupinu"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Skupiny knihovny ti umožňují uspořádat instance do různých sekcí v knihovně."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Zadej název skupiny"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Jméno"
   },

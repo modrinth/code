@@ -590,18 +590,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Pilih ikon"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Kumpulan pustaka"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Cipta kumpulan baharu"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Kumpulan pustaka membolehkan anda menyusun pemasangan anda ke dalam bahagian yang berbeza dalam pustaka anda."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Masukkan nama kumpulan"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nama"
   },

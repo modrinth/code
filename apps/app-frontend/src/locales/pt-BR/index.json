@@ -1181,18 +1181,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecionar ícone"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupos"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Criar grupo novo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Os grupos da biblioteca permitem que você organize suas instâncias em diferentes seções."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Insira o nome do grupo"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nome"
   },

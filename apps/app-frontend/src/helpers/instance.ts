@@ -13,6 +13,7 @@ import type {
 	ContentFile,
 	ContentFileProjectType,
 	GameInstance,
+	InstanceIconRecipe,
 	InstanceLoader,
 	SharedInstanceAttachment,
 } from './types'
@@ -335,6 +336,22 @@ export async function edit(instanceId: string, editInstance: Partial<GameInstanc
 // Edits an instance's icon
 export async function edit_icon(instanceId: string, iconPath: string | null): Promise<void> {
 	return await invoke('plugin:instance|instance_edit_icon', { instanceId, iconPath })
+}
+
+export async function edit_generated_icon(
+	instanceId: string,
+	recipe: InstanceIconRecipe,
+	symbolBytes: number[],
+): Promise<string> {
+	return await invoke('plugin:instance|instance_edit_generated_icon', {
+		instanceId,
+		recipe,
+		symbolBytes,
+	})
+}
+
+export async function get_recent_icon_recipes(): Promise<InstanceIconRecipe[]> {
+	return await invoke('plugin:instance|instance_get_recent_icon_recipes')
 }
 
 export type SharedInstanceUsers = {

@@ -989,18 +989,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Välj ikon"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Biblioteksgrupper"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Skapa ny grupp"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Biblioteksgrupper tillåter dig att organisera dina instanser till olika sektioner i ditt bibliotek."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ange grupp namn"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Namn"
   },

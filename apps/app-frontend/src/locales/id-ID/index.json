@@ -620,18 +620,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Pilih ikon"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Pengelompokan koleksi"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Buat kelompok baru"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Pengelompokan koleksi membolehkan Anda mengorganisasi instans ke dalam bagian-bagian berbeda dalam koleksi Anda."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Masukkan nama kelompok"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nama"
   },

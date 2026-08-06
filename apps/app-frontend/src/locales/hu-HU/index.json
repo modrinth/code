@@ -1049,18 +1049,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Ikon kiválasztása"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Könyvtárgyűjtemények"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Új gyűjtemény létrehozása"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "A könyvtárgyűjtemények segítenek külön kategóriákba rendszerezni a játékpéldányokat."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Add meg a gyűjtemény nevét"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Név"
   },

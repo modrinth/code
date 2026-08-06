@@ -2,7 +2,8 @@
 
 use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSetSyncStatus, ContentSourceKind,
-    Instance, InstanceLaunchContext, InstanceLaunchOverrides,
+    Instance, InstanceIconBackground, InstanceIconRecipe,
+    InstanceLaunchContext, InstanceLaunchOverrides,
     InstanceLaunchOverridesData, InstanceLink, SharedInstanceAttachment,
     SharedInstanceRole, playtime_to_storage,
 };
@@ -162,6 +163,7 @@ pub(crate) struct InstanceLaunchOverridesRow {
 #[derive(Debug)]
 pub(crate) struct InstanceMetadataRecord {
     pub instance: Instance,
+    pub icon_recipe: Option<InstanceIconRecipe>,
     pub applied_content_set: ContentSet,
     pub link: InstanceLink,
     pub shared_instance: Option<SharedInstanceAttachment>,
@@ -185,6 +187,8 @@ struct InstanceMetadataRow {
     update_channel: String,
     name: String,
     icon_path: Option<String>,
+    icon_recipe_background: Option<String>,
+    icon_recipe_symbol: Option<String>,
     created: i64,
     modified: i64,
     last_played: Option<i64>,
@@ -337,9 +341,24 @@ impl InstanceMetadataRow {
         let group_ids = parse_group_ids(self.group_ids)?;
         let launch_overrides =
             launch_overrides_from_json(instance_id, self.launch_overrides)?;
+        let icon_recipe =
+            match (self.icon_recipe_background, self.icon_recipe_symbol) {
+                (Some(background), Some(symbol)) => Some(InstanceIconRecipe {
+                    background: deserialize_icon_background(background)?,
+                    symbol,
+                }),
+                (None, None) => None,
+                _ => {
+                    return Err(crate::ErrorKind::InputError(
+                        "Instance icon recipe is incomplete".to_string(),
+                    )
+                    .into());
+                }
+            };
 
         Ok(InstanceMetadataRecord {
             instance,
+            icon_recipe,
             applied_content_set,
             link,
             shared_instance,
@@ -539,6 +558,8 @@ macro_rules! query_instance_metadata {
                     i.update_channel AS "update_channel!: String",
                     i.name AS "name!: String",
                     i.icon_path AS "icon_path?: String",
+                    recipe.background AS "icon_recipe_background?: String",
+                    recipe.symbol AS "icon_recipe_symbol?: String",
                     i.created AS "created!: i64",
                     i.modified AS "modified!: i64",
                     i.last_played AS "last_played?: i64",
@@ -601,11 +622,122 @@ macro_rules! query_instance_metadata {
                     AND sync.provider = 'shared_instance'
                 LEFT JOIN instance_launch_overrides overrides
                     ON overrides.instance_id = i.id
+                LEFT JOIN instance_icon_recipes recipe
+                    ON recipe.instance_id = i.id
                 "#
                 + $suffix,
             $arg,
         )
     };
+}
+
+pub(crate) async fn update_instance_icon_recipe(
+    instance_id: &str,
+    recipe: Option<&InstanceIconRecipe>,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    if let Some(recipe) = recipe {
+        let background = serde_json::to_string(&recipe.background)?;
+        let symbol = &recipe.symbol;
+        let used_at = Utc::now().timestamp_millis();
+
+        sqlx::query(
+            "
+			INSERT INTO instance_icon_recipes (instance_id, background, symbol)
+			VALUES (?, ?, ?)
+			ON CONFLICT (instance_id) DO UPDATE SET
+				background = excluded.background,
+				symbol = excluded.symbol
+			",
+        )
+        .bind(instance_id)
+        .bind(&background)
+        .bind(symbol)
+        .execute(&mut **tx)
+        .await?;
+
+        sqlx::query(
+            "
+			INSERT INTO recent_instance_icon_recipes (background, symbol, used_at)
+			VALUES (?, ?, ?)
+			ON CONFLICT (background, symbol) DO UPDATE SET
+				used_at = excluded.used_at
+			",
+        )
+        .bind(&background)
+        .bind(symbol)
+        .bind(used_at)
+        .execute(&mut **tx)
+        .await?;
+
+        sqlx::query(
+            "
+			DELETE FROM recent_instance_icon_recipes
+			WHERE rowid NOT IN (
+				SELECT rowid
+				FROM recent_instance_icon_recipes
+				ORDER BY used_at DESC, background, symbol
+				LIMIT 6
+			)
+			",
+        )
+        .execute(&mut **tx)
+        .await?;
+    } else {
+        sqlx::query(
+            "
+			DELETE FROM instance_icon_recipes
+			WHERE instance_id = ?
+			",
+        )
+        .bind(instance_id)
+        .execute(&mut **tx)
+        .await?;
+    }
+
+    Ok(())
+}
+
+pub(crate) async fn get_recent_instance_icon_recipes(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstanceIconRecipe>> {
+    let rows = sqlx::query_as::<_, InstanceIconRecipeRow>(
+        "
+		SELECT background, symbol
+		FROM recent_instance_icon_recipes
+		ORDER BY used_at DESC, background, symbol
+		LIMIT 6
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    rows.into_iter()
+        .map(|row| {
+            Ok(InstanceIconRecipe {
+                background: deserialize_icon_background(row.background)?,
+                symbol: row.symbol,
+            })
+        })
+        .collect()
+}
+
+#[derive(sqlx::FromRow)]
+struct InstanceIconRecipeRow {
+    background: String,
+    symbol: String,
+}
+
+fn deserialize_icon_background(
+    background: String,
+) -> crate::Result<InstanceIconBackground> {
+    match serde_json::from_str(&background) {
+        Ok(background) => Ok(background),
+        Err(_) if background.starts_with('#') => {
+            Ok(InstanceIconBackground::Color { value: background })
+        }
+        Err(error) => Err(error.into()),
+    }
 }
 
 pub(crate) async fn get_instance_metadata_by_id(

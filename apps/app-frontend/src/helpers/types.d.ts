@@ -8,6 +8,7 @@ export type GameInstance = {
 
 	name: string
 	icon_path?: string
+	icon_recipe?: InstanceIconRecipe | null
 
 	game_version: string
 	protocol_version?: number
@@ -36,6 +37,16 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+}
+
+export type IconBackground = {
+	type: 'color'
+	value: string
+}
+
+export type InstanceIconRecipe = {
+	background: IconBackground
+	symbol: string
 }
 
 type InstallStage =

@@ -797,18 +797,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Chọn biểu tượng"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Nhóm thư viện"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Tạo nhóm mới"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Nhóm thư viện cho phép bạn tổ chức các hiện thể thành các phần khác nhau trong thư viện của bạn."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Nhập tên nhóm"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Tên"
   },

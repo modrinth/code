@@ -758,18 +758,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Valitse kuvake"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Kirjaston ryhmät"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Luo uusi ryhmä"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Kirjaston ryhmät sallivat sinun järjestää instanssisi eri osioihin kirjastossasi."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Syötä ryhmän nimi"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nimi"
   },

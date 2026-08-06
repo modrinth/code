@@ -644,18 +644,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Seleccionar icono"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupos de librerías"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Crear un nuevo grupo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Los grupos de librerías te permiten organizar tus instancias en diferentes secciones en tu librería."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Inserta nombre de grupo"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nombre"
   },

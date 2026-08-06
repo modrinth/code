@@ -866,18 +866,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "اختر الأيقونة"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "مجموعات المكتبة"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "إنشاء مجموعة جديدة"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "مجموعات المكتبة تساعدك على ترتيب حالاتك على أقسام مختلفة في مكتبتك."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "إدخال اسم المجموعة"
-  },
   "instance.settings.tabs.general.name": {
     "message": "الاسم"
   },

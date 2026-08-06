@@ -48,6 +48,7 @@ heck = { workspace = true }
 hickory-resolver = { workspace = true }
 httpdate = { workspace = true }
 indicatif = { workspace = true, optional = true }
+image = { workspace = true, features = ["png"] }
 itertools = { workspace = true }
 modrinth-content-management = { workspace = true }
 notify = { workspace = true }

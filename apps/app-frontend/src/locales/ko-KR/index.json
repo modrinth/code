@@ -1046,18 +1046,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "아이콘 선택"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "라이브러리 그룹"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "새 그룹 만들기"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "라이브러리 그룹을 사용하면 인스턴스를 라이브러리 내 여러 섹션으로 나눠서 정리할 수 있습니다."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "그룹 이름 입력"
-  },
   "instance.settings.tabs.general.name": {
     "message": "이름"
   },

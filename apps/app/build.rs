@@ -237,6 +237,8 @@ fn main() {
                         "instance_kill",
                         "instance_edit",
                         "instance_edit_icon",
+                        "instance_edit_generated_icon",
+                        "instance_get_recent_icon_recipes",
                         "instance_share_can_current_user_use",
                         "instance_share_get_users",
                         "instance_share_invite_users",

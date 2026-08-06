@@ -1052,18 +1052,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Wybierz ikonę"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupy bibliotek"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Utwórz nową grupę"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupy bibliotek pozwalają ci organizować twoje instancje w różne sekcje w twojej bibliotece."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Wpisz nazwę grupy"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nazwa"
   },

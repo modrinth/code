@@ -977,18 +977,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Simge seç"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Kütüphane grupları"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Yeni grup oluştur"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Kütüphane grupları profillerinizi kütüphane içinde farklı bölümler altında organize etmenizi sağlar."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Grup adı girin"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Ad"
   },

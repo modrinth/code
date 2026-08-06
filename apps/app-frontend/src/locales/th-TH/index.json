@@ -629,18 +629,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "เลือกรูปสัญลักษณ์"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "จัดกลุ่ม"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "สร้างกลุ่มใหม่"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "การจัดกลุ่มจะช่วยจัดระเบียบโปรแกรมของคุณภายในหน้ารายการให้เป็นหมวดหมู่"
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "ใส่ชื่อกลุ่ม"
-  },
   "instance.settings.tabs.general.name": {
     "message": "ชื่อ"
   },

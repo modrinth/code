@@ -1181,18 +1181,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "选择图标"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "库分组"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "新建分组"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "库分组功能可以让你将实例整理到库中的不同部分。"
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "输入分组名称"
-  },
   "instance.settings.tabs.general.name": {
     "message": "名称"
   },

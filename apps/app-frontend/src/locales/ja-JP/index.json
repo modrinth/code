@@ -1115,18 +1115,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "アイコンを選択"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "ライブラリグループ"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "新しいグループを作成"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "ライブラリグループを使用することで、インスタンスをライブラリ内で整理することができます。"
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "グループ名を入力"
-  },
   "instance.settings.tabs.general.name": {
     "message": "名前"
   },

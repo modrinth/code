@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { CopyIcon, EditIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+import {
+	CopyIcon,
+	EditIcon,
+	PaletteIcon,
+	SpinnerIcon,
+	TrashIcon,
+	UploadIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -16,13 +23,14 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, remove } from '@/helpers/instance'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { GameInstance } from '../../../helpers/types'
+import type { GameInstance, InstanceIconRecipe } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -30,6 +38,7 @@ const router = useRouter()
 const queryClient = useQueryClient()
 
 const deleteConfirmModal = ref()
+const iconEditorModal = ref<InstanceType<typeof IconEditorModal> | null>(null)
 
 const { instance } = injectInstanceSettings()
 type ReleaseChannel = GameInstance['update_channel']
@@ -37,6 +46,7 @@ const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
+const iconRecipe = ref<InstanceIconRecipe | null>(instance.value.icon_recipe ?? null)
 const savingReleaseChannel = ref(false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
@@ -44,6 +54,14 @@ const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 )
 
 const installing = computed(() => instance.value.install_stage !== 'installed')
+
+watch(
+	() => [instance.value.id, instance.value.icon_path, instance.value.icon_recipe] as const,
+	() => {
+		icon.value = instance.value.icon_path
+		iconRecipe.value = instance.value.icon_recipe ?? null
+	},
+)
 
 async function duplicateInstance() {
 	await install_duplicate_instance(instance.value.id).catch(handleError)
@@ -100,8 +118,14 @@ watch(selectedReleaseChannel, async (channel, previousChannel) => {
 })
 
 async function resetIcon() {
-	icon.value = undefined
-	await edit_icon(instance.value.id, null).catch(handleError)
+	try {
+		await edit_icon(instance.value.id, null)
+		icon.value = undefined
+		iconRecipe.value = null
+	} catch (error) {
+		handleError(error)
+		return
+	}
 	trackEvent('InstanceRemoveIcon')
 }
 
@@ -118,10 +142,27 @@ async function setIcon() {
 
 	if (!value) return
 
-	icon.value = value
-	await edit_icon(instance.value.id, icon.value).catch(handleError)
+	try {
+		await edit_icon(instance.value.id, value)
+		icon.value = value
+		iconRecipe.value = null
+	} catch (error) {
+		handleError(error)
+		return
+	}
 
 	trackEvent('InstanceSetIcon')
+}
+
+function openIconEditor() {
+	iconEditorModal.value?.show()
+	trackEvent(iconRecipe.value ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
+}
+
+function onGeneratedIconSaved(iconPath: string, recipe: InstanceIconRecipe) {
+	icon.value = iconPath
+	iconRecipe.value = recipe
+	trackEvent('InstanceSaveCreatedIcon')
 }
 
 const editInstanceObject = computed(() => ({
@@ -167,6 +208,14 @@ const messages = defineMessages({
 	replaceIcon: {
 		id: 'instance.settings.tabs.general.edit-icon.replace',
 		defaultMessage: 'Replace icon',
+	},
+	createIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.create',
+		defaultMessage: 'Create an icon',
+	},
+	editCreatedIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.edit-created',
+		defaultMessage: 'Edit icon',
 	},
 	removeIcon: {
 		id: 'instance.settings.tabs.general.edit-icon.remove',
@@ -246,6 +295,12 @@ const messages = defineMessages({
 		:instance-names="[instance.name]"
 		@delete="removeInstance"
 	/>
+	<IconEditorModal
+		ref="iconEditorModal"
+		:instance-id="instance.id"
+		:recipe="iconRecipe"
+		@saved="onGeneratedIconSaved"
+	/>
 	<div class="block">
 		<div class="float-end ml-10 relative group w-fit">
 			<div class="flex flex-col gap-1">
@@ -258,6 +313,10 @@ const messages = defineMessages({
 							{
 								id: 'select',
 								action: () => setIcon(),
+							},
+							{
+								id: 'create',
+								action: () => openIconEditor(),
 							},
 							{
 								id: 'remove',
@@ -282,6 +341,10 @@ const messages = defineMessages({
 						<template #select>
 							<UploadIcon />
 							{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
+						</template>
+						<template #create>
+							<PaletteIcon />
+							{{ formatMessage(iconRecipe ? messages.editCreatedIcon : messages.createIcon) }}
 						</template>
 						<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
 					</OverflowMenu>
