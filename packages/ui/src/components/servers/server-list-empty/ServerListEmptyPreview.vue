@@ -1,5 +1,9 @@
 <template>
-	<div inert aria-hidden="true" class="relative mx-auto h-[36rem] w-full max-w-[25rem] select-none">
+	<div
+		inert
+		aria-hidden="true"
+		class="relative mx-auto h-[38rem] w-full max-w-[25rem] select-none -mb-10"
+	>
 		<div
 			class="absolute inset-x-0 top-0 h-full overflow-hidden rounded-2xl border border-solid border-surface-3 bg-surface-2 shadow-card"
 		>
@@ -18,23 +22,25 @@
 					class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-xl bg-surface-3 px-3 text-sm text-secondary"
 				>
 					<SearchIcon class="size-4 shrink-0" />
-					<span class="truncate">{{ formatMessage(messages.searchPlaceholder) }}</span>
+					<span class="truncate text-secondary">{{
+						formatMessage(messages.searchPlaceholder)
+					}}</span>
 				</div>
-				<Button type="colored" color="brand" class="!cursor-default">
+				<Button type="colored" color="brand" class="!cursor-default" disabled>
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.addButton) }}
 				</Button>
 			</div>
 
-			<div class="bg-surface-1 px-4 py-3">
-				<p class="m-0 pb-2 text-sm font-semibold text-primary">
+			<div class="bg-surface-1 py-3">
+				<p class="m-0 pb-2 text-sm font-semibold text-primary px-4">
 					{{ formatMessage(messages.friendsHeading, { count: totalFriendCount }) }}
 				</p>
 				<div
 					v-for="(friend, index) in friends"
 					:key="friend.username"
-					class="flex h-10 items-center justify-between gap-3"
-					:class="index > 4 ? 'opacity-40' : ''"
+					class="relative flex h-11 items-center justify-between gap-3 px-4"
+					:class="[index > 4 ? 'opacity-40' : '', friend.showPointer ? 'bg-surface-2' : '']"
 				>
 					<div class="flex min-w-0 items-center gap-2">
 						<div class="relative flex shrink-0">
@@ -49,12 +55,20 @@
 					</div>
 					<Button
 						:type="friend.status === 'cancel' ? 'outlined' : 'base'"
-						class="!cursor-default"
-						disabled
+						class="!cursor-default !font-medium !h-8"
+						size="md"
+						:disabled="friend.status === 'added'"
+						:class="friend.status === 'added' ? '' : 'w-20'"
 					>
 						<CheckIcon v-if="friend.status === 'added'" aria-hidden="true" />
 						{{ friendStatusLabel(friend.status) }}
 					</Button>
+					<div
+						v-if="friend.showPointer"
+						class="absolute right-[14.25rem] top-9 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 opacity-75"
+					>
+						<img :src="pointerIcon" alt="" class="size-4" />
+					</div>
 				</div>
 			</div>
 
@@ -77,10 +91,10 @@
 		/>
 
 		<div
-			class="absolute left-[28%] top-[23.5rem] z-10 flex w-[21rem] max-w-[calc(100%-1rem)] gap-4 !overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-2 px-4 py-3 shadow-card"
+			class="absolute left-[32%] top-[23rem] z-10 flex w-[21rem] max-w-[calc(100%-1rem)] gap-4 !overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-2 px-4 py-3 shadow-card"
 		>
 			<div
-				class="absolute top-[20px] left-[20px] size-[20px] rounded-full bg-contrast opacity-70 blur-xl"
+				class="absolute top-[16px] left-[16px] size-[20px] rounded-full bg-contrast opacity-75 blur-xl"
 			/>
 			<div class="relative h-max">
 				<Avatar :src="geometricallyAvatar" size="2.25rem" circle no-shadow />
@@ -104,10 +118,10 @@
 					<XIcon class="size-5 shrink-0 text-secondary" />
 				</div>
 				<div class="mt-2.5 flex gap-2">
-					<Button type="colored" color="brand" class="!cursor-default">
+					<Button type="colored" color="brand" class="!cursor-default !font-medium">
 						{{ formatMessage(messages.acceptButton) }}
 					</Button>
-					<Button type="outlined" class="!cursor-default">
+					<Button type="outlined" class="!cursor-default !font-medium">
 						{{ formatMessage(messages.declineButton) }}
 					</Button>
 				</div>
@@ -140,6 +154,7 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import Button from '#ui/components/base/buttons/Button.vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import pointerIcon from './Pointer.png'
 
 type FriendStatus = 'added' | 'cancel' | 'invite'
 type FriendPresence = 'online' | 'playing'
@@ -202,9 +217,16 @@ const friends: Array<{
 	avatarUrl: string
 	status: FriendStatus
 	presence?: FriendPresence
+	showPointer?: boolean
 }> = [
 	{ username: 'Josh', avatarUrl: joshAvatar, status: 'added' },
-	{ username: 'Prospector', avatarUrl: prospectorAvatar, status: 'invite', presence: 'online' },
+	{
+		username: 'Prospector',
+		avatarUrl: prospectorAvatar,
+		status: 'invite',
+		presence: 'online',
+		showPointer: true,
+	},
 	{ username: 'Fetch', avatarUrl: fetchAvatar, status: 'cancel', presence: 'playing' },
 	{ username: 'IMB11', avatarUrl: imb11Avatar, status: 'invite' },
 	{ username: 'Truman', avatarUrl: trumanAvatar, status: 'invite' },

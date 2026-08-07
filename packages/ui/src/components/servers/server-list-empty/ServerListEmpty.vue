@@ -43,7 +43,7 @@
 					</div>
 				</div>
 
-				<div class="flex flex-wrap items-center gap-3">
+				<div class="flex flex-wrap items-center gap-4">
 					<Button type="colored" color="brand" size="lg" @click="onClickNewServer?.()">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.newServerButton) }}
@@ -180,7 +180,7 @@ const features = computed(() => [
 	box-shadow:
 		0 0 0 1px color-mix(in srgb, var(--color-brand) 30%, var(--surface-1)),
 		var(--shadow-card),
-		0 0 3.75rem color-mix(in srgb, var(--color-brand) 20%, transparent);
+		0 0 3.75rem color-mix(in srgb, var(--color-brand) 10%, transparent);
 }
 
 .feature-icon-gradient {
