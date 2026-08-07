@@ -146,7 +146,7 @@
 								color="brand"
 								size="xl"
 								:to="`${projectPath}/settings`"
-								class="!w-12 !rounded-full !px-0 !font-bold lg:!hidden"
+								class="lg:!hidden"
 							>
 								<SettingsIcon />
 							</ButtonLink>
@@ -156,7 +156,7 @@
 								color="brand"
 								size="xl"
 								:to="`${projectPath}/settings`"
-								class="!font-bold max-lg:!hidden"
+								class="max-lg:!hidden"
 							>
 								<SettingsIcon />
 								{{ formatMessage(messages.editProject) }}
@@ -498,12 +498,15 @@
 
 <script setup>
 import {
+	BulletListIcon,
 	ChartIcon,
 	ChevronRightIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	FolderSearchIcon,
 	HeartIcon,
+	ImagesIcon,
+	InfoIcon,
 	ListIcon,
 	MoreVerticalIcon,
 	PlayIcon,
@@ -512,6 +515,7 @@ import {
 	ScanEyeIcon,
 	ServerPlusIcon,
 	SettingsIcon,
+	VersionIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { getMarginTarget, moderationSettings } from '@modrinth/moderation'
@@ -2007,15 +2011,18 @@ const navLinks = computed(() => {
 	return [
 		{
 			label: formatMessage(messages.descriptionTab),
+			icon: InfoIcon,
 			href: withInstallContextQuery(projectUrl),
 		},
 		{
 			label: formatMessage(messages.galleryTab),
+			icon: ImagesIcon,
 			href: withInstallContextQuery(`${projectUrl}/gallery`),
 			shown: galleryCount > 0 || !!currentMember.value,
 		},
 		{
 			label: formatMessage(messages.changelogTab),
+			icon: BulletListIcon,
 			href: withInstallContextQuery(`${projectUrl}/changelog`),
 			shown:
 				hasVersions.value && projectV3Loaded.value && projectV3.value?.minecraft_server == null,
@@ -2023,6 +2030,7 @@ const navLinks = computed(() => {
 		},
 		{
 			label: formatMessage(messages.versionsTab),
+			icon: VersionIcon,
 			href: withInstallContextQuery(`${projectUrl}/versions`),
 			shown:
 				(hasVersions.value || !!currentMember.value) &&
@@ -2033,6 +2041,7 @@ const navLinks = computed(() => {
 		},
 		{
 			label: formatMessage(messages.moderationTab),
+			icon: ScaleIcon,
 			href: withInstallContextQuery(`${projectUrl}/moderation`),
 			shown: !!currentMember.value,
 		},

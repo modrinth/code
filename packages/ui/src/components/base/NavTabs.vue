@@ -2,7 +2,7 @@
 	<nav
 		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
-		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-semibold"
 		:class="{ 'drop-shadow-xl border border-solid border-surface-4': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
@@ -18,8 +18,13 @@
 				@mouseenter="link.onHover?.()"
 				@focus="link.onHover?.()"
 			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
-				<span class="text-nowrap" :class="getLabelClasses(index)">
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="size-5 hidden md:flex"
+					:class="getIconClasses(index)"
+				/>
+				<span class="text-nowrap" :class="getLabelClasses(index, !!link.icon)">
 					{{ link.label }}
 				</span>
 			</RouterLink>
@@ -35,8 +40,13 @@
 				:class="getSSRFallbackClasses(index)"
 				@click="emit('tabClick', index, link)"
 			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
-				<span class="text-nowrap" :class="getLabelClasses(index)">
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="size-5 hidden md:flex"
+					:class="getIconClasses(index)"
+				/>
+				<span class="text-nowrap" :class="getLabelClasses(index, !!link.icon)">
 					{{ link.label }}
 				</span>
 			</div>
@@ -144,14 +154,16 @@ function getSSRFallbackClasses(index: number) {
 
 function getIconClasses(index: number) {
 	return {
-		'text-button-textSelected': isActiveAndNotSubpage.value(index),
+		'text-button-iconSelected': isActiveAndNotSubpage.value(index),
 		'text-secondary': !isActiveAndNotSubpage.value(index),
 	}
 }
 
-function getLabelClasses(index: number) {
+function getLabelClasses(index: number, hasIcon: boolean = false) {
 	return {
-		'text-button-textSelected': isActiveAndNotSubpage.value(index),
+		'text-button-iconSelected md:text-button-textSelected':
+			hasIcon && isActiveAndNotSubpage.value(index),
+		'text-button-iconSelected': !hasIcon && isActiveAndNotSubpage.value(index),
 		'text-contrast': !isActiveAndNotSubpage.value(index),
 	}
 }

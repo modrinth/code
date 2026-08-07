@@ -177,6 +177,7 @@ const config: Config = {
 					border: 'var(--color-button-border)',
 					bgSelected: 'var(--color-button-bg-selected)',
 					textSelected: 'var(--color-button-text-selected)',
+					iconSelected: 'var(--color-button-icon-selected)',
 				},
 				toggleHandle: 'var(--color-toggle-handle)',
 				dropdown: {

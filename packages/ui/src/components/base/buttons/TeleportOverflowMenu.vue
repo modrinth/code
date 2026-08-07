@@ -81,7 +81,7 @@ const { isOpen, panelStyle, anchorStyle, resolvedSide, open, close } = useAnchor
 )
 
 const menuItemClasses =
-	'overflow-menu-item flex min-h-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
+	'overflow-menu-item flex min-h-10 w-full items-center gap-2.5 rounded-[14px] border-0 bg-transparent px-3 py-2 text-left text-4 font-[500] leading-5 text-contrast no-underline ' +
 	'cursor-pointer whitespace-nowrap hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:outline-none ' +
 	'disabled:cursor-not-allowed disabled:opacity-50 [&[aria-disabled=true]]:cursor-not-allowed [&[aria-disabled=true]]:opacity-50 ' +
 	'[&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:text-primary'
