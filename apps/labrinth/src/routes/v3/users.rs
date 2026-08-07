@@ -29,8 +29,15 @@ use crate::{
 };
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use ariadne::ids::UserId;
+use eyre::eyre;
+use partially::Partial;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+
+use crate::database::models::user_preferences_item::DBUserPreferences;
+use crate::models::v3::preferences::{
+    PartialUserPreferences, UserPreferences,
+};
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(user_auth_get_route)
@@ -49,6 +56,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(user_delete_route)
         .service(user_follows_route)
         .service(user_notifications_route)
+        .service(get_user_preferences)
+        .service(edit_user_preferences)
         .service(get_user_clients);
 }
 
@@ -365,6 +374,93 @@ pub async fn user_auth_get(
     }
 
     Ok(HttpResponse::Ok().json(user))
+}
+
+#[utoipa::path(tag = "users", responses((status = OK, body = UserPreferences)))]
+#[get("/user/{id}/preferences")]
+pub async fn get_user_preferences(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<UserPreferences>, ApiError> {
+    let (_, requester) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_READ,
+    )
+    .await?;
+
+    let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await?
+        .ok_or(ApiError::NotFound)?;
+
+    if requester.id != target.id.into() && !requester.role.is_mod() {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to access this user's preferences"
+        )));
+    }
+
+    let preferences = DBUserPreferences::get(target.id, &**pool)
+        .await
+        .wrap_internal_err("failed to fetch user preferences")?
+        .unwrap_or_default();
+
+    Ok(web::Json(preferences))
+}
+
+#[utoipa::path(
+	tag = "users",
+	request_body = PartialUserPreferences,
+	responses((status = OK, body = UserPreferences))
+)]
+#[patch("/user/{id}/preferences")]
+pub async fn edit_user_preferences(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<PartialUserPreferences>,
+) -> Result<web::Json<UserPreferences>, ApiError> {
+    let (_, requester) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_WRITE,
+    )
+    .await?;
+
+    let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await?
+        .ok_or(ApiError::NotFound)?;
+
+    if requester.id != target.id.into() && !requester.role.is_mod() {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to access this user's preferences"
+        )));
+    }
+
+    let mut txn = pool.begin().await?;
+
+    let mut preferences = DBUserPreferences::get(target.id, &mut txn)
+        .await
+        .wrap_internal_err("failed to fetch user preferences")?
+        .unwrap_or_default();
+
+    preferences.apply_some(body.into_inner());
+
+    DBUserPreferences::upsert(target.id, &preferences, &mut txn)
+        .await
+        .wrap_internal_err("failed to update user preferences")?;
+
+    txn.commit().await?;
+
+    Ok(web::Json(preferences))
 }
 
 #[derive(Serialize, Deserialize)]
