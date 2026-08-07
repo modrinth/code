@@ -22,7 +22,7 @@
 						class="border !border-solid !transition-all hover:bg-button-bgHover hover:no-underline"
 						:class="
 							selectedLoaders.includes(loader.name)
-								? 'border-brand bg-highlight-green text-brand'
+								? 'border-brand bg-brand-highlight text-brand'
 								: 'border-surface-5'
 						"
 						:style="`--_color: var(--color-platform-${loader.name})`"

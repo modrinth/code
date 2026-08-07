@@ -533,7 +533,7 @@ useSeoMeta({
 	<div>
 		<div class="landing-hero">
 			<div
-				class="relative mt-4 h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+				class="relative mt-4 h-fit w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 			>
 				{{ formatMessage(commonMessages.betaRelease) }}
 			</div>
