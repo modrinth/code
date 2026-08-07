@@ -46,7 +46,7 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'project.settings.disclosures.description',
-		defaultMessage: `You must add any applicable content disclosures to your project in compliance with Modrinth's <rules>Content Rules</rules>.`,
+		defaultMessage: `You must add any applicable content disclosures to your project in compliance with <rules>Modrinth's Content Rules</rules>.`,
 	},
 	noPermission: {
 		id: 'project.settings.disclosures.save-blocked.no-permission',

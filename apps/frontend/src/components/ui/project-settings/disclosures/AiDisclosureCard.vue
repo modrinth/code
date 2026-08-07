@@ -39,7 +39,7 @@ const messages = defineMessages({
 	contentRules: {
 		id: 'project.settings.disclosures.ai.content-rules',
 		defaultMessage:
-			"Please refer to Section 6 of Modrinth's <rules>Content Rules</rules> for more information.",
+			"Please refer to Section 6 of <rules>Modrinth's Content Rules</rules> for more information.",
 	},
 	typesDescription: {
 		id: 'project.settings.disclosures.ai.types-description',
