@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { InfoIcon, XIcon } from '@modrinth/assets'
-import { computed, toValue } from 'vue'
+import { computed, nextTick, toValue, useTemplateRef, watch } from 'vue'
 
 import { IconButton } from '#ui/components/base/buttons'
 import Toggle from '#ui/components/base/Toggle.vue'
+import PhotosensitivityWarningModal from '#ui/components/modal/PhotosensitivityWarningModal.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import { injectBrowseManager } from './providers/browse-manager'
+
+const PHOTOSENSITIVITY_FILTER_OPTION = 'epilepsy_triggers'
 
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
@@ -18,10 +21,33 @@ const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 const hiddenFilterTypes = computed(() => ctx.hiddenFilterTypes?.value ?? [])
 
 const advancedFiltersCollapsed = computed(() => ctx.advancedFiltersCollapsed?.value ?? true)
+const photosensitivityWarningModal = useTemplateRef('photosensitivityWarningModal')
 
 function setAdvancedFiltersCollapsed(collapsed: boolean) {
 	if (ctx.advancedFiltersCollapsed) {
 		ctx.advancedFiltersCollapsed.value = collapsed
+	}
+}
+
+function isPhotosensitivityExclusionSelected(filters: { type: string; option: string }[]) {
+	return filters.some(
+		(filter) => filter.type === 'advanced' && filter.option === PHOTOSENSITIVITY_FILTER_OPTION,
+	)
+}
+
+watch(
+	() => isPhotosensitivityExclusionSelected(ctx.currentFilters.value),
+	(isSelected, wasSelected) => {
+		if (isSelected && !wasSelected && !ctx.dismissedPhotosensitivityFilterWarning?.value) {
+			nextTick(() => photosensitivityWarningModal.value?.show())
+		}
+	},
+	{ immediate: true },
+)
+
+function onPhotosensitivityWarningDismiss(dontShowAgain: boolean) {
+	if (dontShowAgain && ctx.dismissedPhotosensitivityFilterWarning) {
+		ctx.dismissedPhotosensitivityFilterWarning.value = true
 	}
 }
 
@@ -87,6 +113,11 @@ function getFilterOpenByDefault(filterId: string): boolean {
 
 <template>
 	<slot name="prepend" />
+
+	<PhotosensitivityWarningModal
+		ref="photosensitivityWarningModal"
+		@dismiss="onPhotosensitivityWarningDismiss"
+	/>
 
 	<div v-if="ctx.filtersMenuOpen?.value" class="fixed inset-0 z-40 bg-bg" />
 

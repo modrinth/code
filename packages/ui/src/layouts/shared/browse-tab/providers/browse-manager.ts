@@ -74,6 +74,7 @@ export interface BrowseManagerContext {
 	serverOnlyLabel?: ComputedRef<string>
 	hiddenFilterTypes?: ComputedRef<string[]>
 	advancedFiltersCollapsed?: Ref<boolean>
+	dismissedPhotosensitivityFilterWarning?: Ref<boolean>
 	onInstalled?: (projectId: string) => void
 
 	displayMode?: Ref<'list' | 'grid' | 'gallery'> | ComputedRef<'list' | 'grid' | 'gallery'>

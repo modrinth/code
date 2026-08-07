@@ -3876,16 +3876,31 @@
     "defaultMessage": "Show more"
   },
   "search.filter_type.advanced": {
-    "defaultMessage": "Advanced"
+    "defaultMessage": "Advanced exclusions"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Exclude data packs"
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "Advertisements"
   },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Exclude mods"
+  "search.filter_type.advanced.disclosure.ai_content": {
+    "defaultMessage": "AI-generated content"
   },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Exclude plugins"
+  "search.filter_type.advanced.disclosure.archived": {
+    "defaultMessage": "Archived"
+  },
+  "search.filter_type.advanced.disclosure.derivative_work": {
+    "defaultMessage": "Derivative content"
+  },
+  "search.filter_type.advanced.disclosure.epilepsy_triggers": {
+    "defaultMessage": "Photosensitivity triggers"
+  },
+  "search.filter_type.advanced.disclosure.paid_features": {
+    "defaultMessage": "Paid features"
+  },
+  "search.filter_type.advanced.disclosure.system_interactions": {
+    "defaultMessage": "External system interactions"
+  },
+  "search.filter_type.advanced.disclosure.telemetry": {
+    "defaultMessage": "Telemetry"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
@@ -3937,6 +3952,21 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "search.photosensitivity-warning-modal.body.1": {
+    "defaultMessage": "We cannot guarantee that all content on Modrinth that may be dangerous for users with photosensitivity is labeled appropriately with a photosensitivity warning."
+  },
+  "search.photosensitivity-warning-modal.body.2": {
+    "defaultMessage": "The label is self-assigned by the users who uploaded the content, and do not indicate that the content has gone through any kind of safety testing. Using any content on Modrinth is at your own risk. Please stay safe."
+  },
+  "search.photosensitivity-warning-modal.dont-show-again": {
+    "defaultMessage": "Don't show this again"
+  },
+  "search.photosensitivity-warning-modal.i-understand": {
+    "defaultMessage": "I understand"
+  },
+  "search.photosensitivity-warning-modal.title": {
+    "defaultMessage": "Results are not guaranteed to be safe"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modded"

@@ -3572,9 +3572,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "もっと見る"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "データパックを除く"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "環境"
   },

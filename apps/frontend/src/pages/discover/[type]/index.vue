@@ -416,6 +416,14 @@ const advancedFiltersCollapsed = computed({
 	},
 })
 
+const dismissedPhotosensitivityFilterWarning = computed({
+	get: () => flags.value.dismissedPhotosensitivityFilterWarning,
+	set: (value) => {
+		flags.value.dismissedPhotosensitivityFilterWarning = value
+		saveFeatureFlags()
+	},
+})
+
 const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 debug('projectTypeId:', projectTypeId.value)
@@ -525,6 +533,7 @@ provideBrowseManager({
 	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
 	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
 	advancedFiltersCollapsed,
+	dismissedPhotosensitivityFilterWarning,
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,
