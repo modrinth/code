@@ -22,7 +22,7 @@
 		:search-placeholder="preview.category.searchPlaceholder"
 		trigger-type="base"
 		trigger-size="lg"
-		:trigger-class="effectivePreviewTriggerClass"
+		:trigger-class="effectivePreviewTriggerClass + ' h-9'"
 		:dropdown-width="getPreviewDropdownWidth(preview.category)"
 		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
 		:checkbox-position="checkboxPosition"
