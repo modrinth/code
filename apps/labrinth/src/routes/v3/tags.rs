@@ -6,6 +6,7 @@ use crate::database::models::categories::{
 };
 use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
+    LoaderMetadata,
 };
 use actix_web::{HttpResponse, get, web};
 use xredis::RedisPool;
@@ -103,7 +104,7 @@ pub struct LoaderData {
     pub supported_project_types: Vec<String>,
     pub supported_games: Vec<String>,
     pub supported_fields: Vec<String>, // Available loader fields for this loader
-    pub metadata: Value,
+    pub metadata: LoaderMetadata,
 }
 
 #[utoipa::path(tag = "tags", responses((status = OK)))]

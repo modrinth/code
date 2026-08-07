@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { LoaderCircleIcon } from '@modrinth/assets'
 import type { GameVersion } from '@modrinth/ui'
-import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
+import { GAME_MODES, injectNotificationManager } from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
@@ -291,11 +291,7 @@ onUnmounted(() => {
 		</div>
 	</div>
 	<div v-else-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-		<HeadingLink v-if="theme.getFeatureFlag('worlds_tab')" to="/worlds" class="mt-1">
-			Jump in
-		</HeadingLink>
 		<span
-			v-else
 			class="flex mt-1 mb-3 leading-none items-center gap-1 text-2xl font-semibold text-contrast"
 		>
 			Jump in

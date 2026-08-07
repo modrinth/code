@@ -1,6 +1,5 @@
 export { default as ConfirmLeaveModal } from './ConfirmLeaveModal.vue'
 export { default as ConfirmModal } from './ConfirmModal.vue'
-export { default as Modal } from './Modal.vue'
 export { default as NewModal } from './NewModal.vue'
 export type { ServerProject as OpenInAppModalServerProject } from './OpenInAppModal.vue'
 export { default as OpenInAppModal } from './OpenInAppModal.vue'

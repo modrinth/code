@@ -1,43 +1,43 @@
 <template>
 	<div class="flex items-center gap-1">
-		<ButtonStyled v-if="showClear && hasLogs" type="transparent">
-			<button
-				v-tooltip="clearDisabled ? clearDisabledTooltip : undefined"
-				:disabled="clearDisabled"
-				@click="emit('clear')"
-			>
-				<XIcon />
-				Clear
-			</button>
-		</ButtonStyled>
-		<ButtonStyled v-if="showDelete" type="transparent" hover-color-fill="background" color="red">
-			<button
-				v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
-				:disabled="deleteDisabled"
-				@click="emit('delete')"
-			>
-				<TrashIcon />
-				Delete
-			</button>
-		</ButtonStyled>
-		<ButtonStyled v-if="hasLogs" type="transparent">
-			<button
-				v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
-				:disabled="shareDisabled || sharing"
-				@click="emit('share')"
-			>
-				<SpinnerIcon v-if="sharing" class="animate-spin" />
-				<ShareIcon v-else />
-				Share
-			</button>
-		</ButtonStyled>
-		<ButtonStyled type="transparent">
-			<button @click="emit('toggle-fullscreen')">
-				<ContractIcon v-if="fullscreen" />
-				<ExpandIcon v-else />
-				{{ fullscreen ? 'Collapse' : 'Expand' }}
-			</button>
-		</ButtonStyled>
+		<Button
+			v-if="showClear && hasLogs"
+			v-tooltip="clearDisabled ? clearDisabledTooltip : undefined"
+			type="quiet"
+			:disabled="clearDisabled"
+			@click="emit('clear')"
+		>
+			<XIcon />
+			Clear
+		</Button>
+		<Button
+			v-if="showDelete"
+			v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
+			type="quiet"
+			color="red"
+			:disabled="deleteDisabled"
+			class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+			@click="emit('delete')"
+		>
+			<TrashIcon />
+			Delete
+		</Button>
+		<Button
+			v-if="hasLogs"
+			v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
+			type="quiet"
+			:disabled="shareDisabled || sharing"
+			@click="emit('share')"
+		>
+			<SpinnerIcon v-if="sharing" class="animate-spin" />
+			<ShareIcon v-else />
+			Share
+		</Button>
+		<Button type="quiet" @click="emit('toggle-fullscreen')">
+			<ContractIcon v-if="fullscreen" />
+			<ExpandIcon v-else />
+			{{ fullscreen ? 'Collapse' : 'Expand' }}
+		</Button>
 	</div>
 </template>
 
@@ -51,7 +51,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 
 defineProps<{
 	showClear?: boolean

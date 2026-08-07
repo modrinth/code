@@ -30,29 +30,26 @@
 			</AutoLink>
 		</div>
 
-		<ButtonStyled v-if="status === 'added'" type="standard" color-fill="none">
-			<button disabled>
-				<CheckIcon aria-hidden="true" />
-				{{ addedLabel }}
-			</button>
-		</ButtonStyled>
-		<ButtonStyled v-else-if="status === 'pending'" type="outlined">
-			<button :disabled="disabled" @click="$emit('cancel', user)">
-				{{ cancelLabel }}
-			</button>
-		</ButtonStyled>
+		<Button v-if="status === 'added'" type="quiet" disabled>
+			<CheckIcon aria-hidden="true" />
+			{{ addedLabel }}
+		</Button>
+		<Button
+			v-else-if="status === 'pending'"
+			type="outlined"
+			:disabled="disabled"
+			@click="$emit('cancel', user)"
+		>
+			{{ cancelLabel }}
+		</Button>
 		<span v-else-if="status === 'requested'" v-tooltip="requestedTooltip" class="inline-flex">
-			<ButtonStyled type="standard" color-fill="none">
-				<button disabled>
-					{{ requestedLabel }}
-				</button>
-			</ButtonStyled>
+			<Button type="quiet" disabled>
+				{{ requestedLabel }}
+			</Button>
 		</span>
-		<ButtonStyled v-else color-fill="none">
-			<button :disabled="disabled" @click="$emit('invite', user)">
-				{{ inviteLabel }}
-			</button>
-		</ButtonStyled>
+		<Button v-else type="quiet" :disabled="disabled" @click="$emit('invite', user)">
+			{{ inviteLabel }}
+		</Button>
 	</div>
 </template>
 
@@ -60,9 +57,10 @@
 import { CheckIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import type { InvitePlayersUser, InvitePlayersUserProfileLink } from './types'
 
 const props = withDefaults(

@@ -1949,9 +1949,6 @@
   "layout.nav.discover": {
     "message": "Objevit"
   },
-  "layout.nav.discover-content": {
-    "message": "Objevit obsah"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Získat Modrinth App"
   },
@@ -2747,23 +2744,14 @@
   "settings.applications.about": {
     "message": "O"
   },
-  "settings.applications.button.cancel": {
-    "message": "Zrušit"
-  },
   "settings.applications.button.create": {
     "message": "Vytvořit aplikaci"
   },
   "settings.applications.button.delete": {
     "message": "Smazat"
   },
-  "settings.applications.button.edit": {
-    "message": "Upravit"
-  },
   "settings.applications.button.new": {
     "message": "Nová aplikace"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Uložit změny"
   },
   "settings.applications.button.upload-icon": {
     "message": "Nahrát ikonu"
@@ -2830,9 +2818,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "O této aplikaci"
-  },
-  "settings.authorizations.by": {
-    "message": "od"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizace"
@@ -2977,12 +2962,6 @@
   },
   "settings.pats.modal.delete.description": {
     "message": "Toto vymaže tento token navždy (jako opravdu navždy)."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilový obrázek"
   },
   "settings.sidebar.label.developer": {
     "message": "Vývojář"

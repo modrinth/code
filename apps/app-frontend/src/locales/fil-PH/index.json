@@ -47,26 +47,26 @@
   "app.action-bar.view-logs": {
     "message": "Tignan ang logs"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Pagpapagana ng masalimuot na pagrerender katulad ng paglalabo na maaaring magdudulot ng mga isyu sa performance kapag walang hardware-acceleration."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Masalimuot na pagrerender"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Piliin ang iyong mas gustong kulay para sa Modrinth app."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema ng kulay"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Tahanan"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Librarya"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Panimulang pahina ng paglapag"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Pagtatago ng nametag na nasa itaas ng iyong manlalaro sa loob ng pahina ng mga skin."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Itago ang nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Pagsasali ng mga kamakailang mundo sa seksiyong \"Jump back in\" sa pahina ng Tahanan."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Bumalik sa mga mundo"
@@ -124,9 +124,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Bumalik sa instansiya"
-  },
-  "app.browse.discover-content": {
-    "message": "Tumuklas ng kontento"
   },
   "app.browse.discover-servers": {
     "message": "Tumuklas ng mga server"
@@ -259,9 +256,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Itsura"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Mga pagpipilian sa default na instansiya"
   },
   "app.settings.tabs.java-installations": {
     "message": "Mga instalasyon ng Java"

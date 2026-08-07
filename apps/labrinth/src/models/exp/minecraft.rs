@@ -3,6 +3,7 @@ use std::time::Duration;
 use chrono::{DateTime, Utc};
 use eyre::Result;
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use tracing::warn;
 use validator::Validate;
 
@@ -324,7 +325,8 @@ impl ComponentEdit for JavaServerProjectEdit {
 }
 
 /// What game content a [`JavaServerProject`] is using.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(Debug, Clone)]
+#[serde_binhum(schema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ServerContent {
     /// Server runs modded content with a modpack found on the Modrinth platform.
@@ -346,7 +348,8 @@ pub enum ServerContent {
 }
 
 /// What game content a [`JavaServerProject`] is using.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(Debug, Clone)]
+#[serde_binhum(schema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ServerContentQuery {
     /// Server runs modded content with a modpack found on the Modrinth platform.

@@ -3,8 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
 import Badge from '../../components/base/Badge.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
-import OverflowMenu from '../../components/base/OverflowMenu.vue'
+import { Button, TeleportOverflowMenu } from '../../components/base/buttons'
 import Table from '../../components/base/Table.vue'
 
 interface User {
@@ -54,7 +53,7 @@ export default meta
 export const Default: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -74,7 +73,7 @@ export const Default: StoryObj = {
 export const HorizontalOverflow: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -103,7 +102,7 @@ export const HorizontalOverflow: StoryObj = {
 export const CustomClasses: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name', cellClass: '!overflow-visible py-3' },
@@ -129,7 +128,7 @@ export const CustomClasses: StoryObj = {
 export const WithSelection: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -160,7 +159,7 @@ export const WithSelection: StoryObj = {
 export const WithSelectionData: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -193,7 +192,7 @@ export const WithSelectionData: StoryObj = {
 export const WithSelectionIds: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -233,7 +232,7 @@ export const WithSorting: StoryObj = {
 		},
 	},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name', enableSorting: true },
@@ -269,7 +268,7 @@ export const WithSorting: StoryObj = {
 export const WithColumnAlignment: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name', align: 'left' as const },
@@ -289,7 +288,7 @@ export const WithColumnAlignment: StoryObj = {
 export const WithCustomCellSlots: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Badge },
+		components: { Table, Badge, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -335,7 +334,7 @@ export const WithCustomCellSlots: StoryObj = {
 export const WithCustomHeaderSlots: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -365,7 +364,7 @@ export const WithCustomHeaderSlots: StoryObj = {
 export const WithHeaderSlot: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, ButtonStyled },
+		components: { Table, Button, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -383,9 +382,7 @@ export const WithHeaderSlot: StoryObj = {
 					<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
 						<div class="text-lg font-semibold text-contrast">Team Members</div>
 						<div class="flex items-center gap-2">
-							<ButtonStyled color="brand">
-								<button type="button">Invite member</button>
-							</ButtonStyled>
+							<Button type="colored" color="brand" native-type="button">Invite member</Button>
 						</div>
 					</div>
 				</template>
@@ -397,7 +394,7 @@ export const WithHeaderSlot: StoryObj = {
 export const WithActionsColumn: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, ButtonStyled, EditIcon, TrashIcon },
+		components: { Table, EditIcon, TrashIcon, Button, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -421,18 +418,14 @@ export const WithActionsColumn: StoryObj = {
 			<Table :columns="columns" :data="data">
 				<template #cell-actions="{ row }">
 					<div class="flex items-center justify-end gap-2">
-						<ButtonStyled color="brand" type="transparent" @click="handleEdit(row)">
-							<button class="flex items-center gap-1">
-								<EditIcon class="size-4" />
-								Edit
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red" type="transparent" @click="handleDelete(row)">
-							<button class="flex items-center gap-1">
-								<TrashIcon class="size-4" />
-								Delete
-							</button>
-						</ButtonStyled>
+						<Button type="quiet" color="brand" @click="handleEdit(row)" class="flex items-center gap-1">
+							<EditIcon class="size-4" />
+							Edit
+						</Button>
+						<Button type="quiet" color="red" @click="handleDelete(row)" class="flex items-center gap-1">
+							<TrashIcon class="size-4" />
+							Delete
+						</Button>
 					</div>
 				</template>
 			</Table>
@@ -443,7 +436,7 @@ export const WithActionsColumn: StoryObj = {
 export const WithLocalizedActionsColumn: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, ButtonStyled, EditIcon, TrashIcon },
+		components: { Table, EditIcon, TrashIcon, Button, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Nombre' },
@@ -467,18 +460,14 @@ export const WithLocalizedActionsColumn: StoryObj = {
 			<Table :columns="columns" :data="data">
 				<template #cell-actions="{ row }">
 					<div class="flex items-center justify-end gap-2">
-						<ButtonStyled color="brand" type="transparent" @click="handleEdit(row)">
-							<button class="flex items-center gap-1">
-								<EditIcon class="size-4" />
-								Editar
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red" type="transparent" @click="handleDelete(row)">
-							<button class="flex items-center gap-1">
-								<TrashIcon class="size-4" />
-								Eliminar
-							</button>
-						</ButtonStyled>
+						<Button type="quiet" color="brand" @click="handleEdit(row)" class="flex items-center gap-1">
+							<EditIcon class="size-4" />
+							Editar
+						</Button>
+						<Button type="quiet" color="red" @click="handleDelete(row)" class="flex items-center gap-1">
+							<TrashIcon class="size-4" />
+							Eliminar
+						</Button>
 					</div>
 				</template>
 			</Table>
@@ -489,7 +478,7 @@ export const WithLocalizedActionsColumn: StoryObj = {
 export const FullFeatured: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Badge, ButtonStyled, EditIcon, TrashIcon },
+		components: { Table, Badge, EditIcon, TrashIcon, Button, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name', enableSorting: true },
@@ -565,18 +554,14 @@ export const FullFeatured: StoryObj = {
 					</template>
 					<template #cell-actions="{ row }">
 						<div class="flex items-center justify-end gap-2">
-							<ButtonStyled color="brand" type="transparent" @click="handleEdit(row)">
-								<button class="flex items-center gap-1">
-									<EditIcon class="size-4" />
-									Edit
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="red" type="transparent" @click="handleDelete(row)">
-								<button class="flex items-center gap-1">
-									<TrashIcon class="size-4" />
-									Delete
-								</button>
-							</ButtonStyled>
+							<Button type="quiet" color="brand" @click="handleEdit(row)" class="flex items-center gap-1">
+								<EditIcon class="size-4" />
+								Edit
+							</Button>
+							<Button type="quiet" color="red" @click="handleDelete(row)" class="flex items-center gap-1">
+								<TrashIcon class="size-4" />
+								Delete
+							</Button>
 						</div>
 					</template>
 				</Table>
@@ -592,7 +577,7 @@ export const FullFeatured: StoryObj = {
 export const VirtualizedLargeData: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Badge },
+		components: { Table, Badge, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name', enableSorting: true },
@@ -710,7 +695,15 @@ export const VirtualizedLargeData: StoryObj = {
 export const WithOverflowMenu: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table, Badge, ButtonStyled, OverflowMenu, MoreVerticalIcon, EditIcon, TrashIcon },
+		components: {
+			Table,
+			Badge,
+			MoreVerticalIcon,
+			EditIcon,
+			TrashIcon,
+			Button,
+			TeleportOverflowMenu,
+		},
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },
@@ -737,17 +730,19 @@ export const WithOverflowMenu: StoryObj = {
 			const getMenuOptions = (row: User) => [
 				{
 					id: 'edit',
+					label: 'Edit',
 					action: () => alert(`Edit user: ${row.name}`),
 				},
 				{
 					id: 'duplicate',
+					label: 'Duplicate',
 					action: () => alert(`Duplicate user: ${row.name}`),
 				},
-				{ divider: true },
+				{ type: 'divider' },
 				{
 					id: 'delete',
-					color: 'red' as const,
-					hoverFilled: true,
+					label: 'Delete',
+					tone: 'red',
 					action: () => alert(`Delete user: ${row.name}`),
 				},
 			]
@@ -766,26 +761,23 @@ export const WithOverflowMenu: StoryObj = {
 				</template>
 				<template #cell-actions="{ row }">
 					<div class="flex justify-end">
-						<ButtonStyled circular type="transparent">
-							<OverflowMenu
+						<TeleportOverflowMenu type="quiet" label="More options"
 								:options="getMenuOptions(row)"
-								aria-label="More options"
 							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #edit>
-									<EditIcon class="size-4" aria-hidden="true" />
-									Edit
-								</template>
-								<template #duplicate>
-									<EditIcon class="size-4" aria-hidden="true" />
-									Duplicate
-								</template>
-								<template #delete>
-									<TrashIcon class="size-4" aria-hidden="true" />
-									Delete
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
+							<MoreVerticalIcon aria-hidden="true" />
+							<template #edit>
+								<EditIcon class="size-4" aria-hidden="true" />
+								Edit
+							</template>
+							<template #duplicate>
+								<EditIcon class="size-4" aria-hidden="true" />
+								Duplicate
+							</template>
+							<template #delete>
+								<TrashIcon class="size-4" aria-hidden="true" />
+								Delete
+							</template>
+						</TeleportOverflowMenu>
 					</div>
 				</template>
 			</Table>
@@ -796,7 +788,7 @@ export const WithOverflowMenu: StoryObj = {
 export const EmptyState: StoryObj = {
 	args: {},
 	render: () => ({
-		components: { Table },
+		components: { Table, TeleportOverflowMenu },
 		setup() {
 			const columns = [
 				{ key: 'name', label: 'Name' },

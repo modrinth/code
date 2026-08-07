@@ -3,7 +3,7 @@ import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
-	ButtonStyled,
+	Button,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
@@ -181,24 +181,33 @@ defineExpose({ show, hide })
 						wrapper-class="w-full"
 						autocomplete="off"
 					/>
-					<ButtonStyled color="green" color-fill="text">
-						<button class="shrink-0" @click="() => assign(true)">
-							<PlusIcon />
-							Add server
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="blue" color-fill="text">
-						<button class="shrink-0" @click="() => assign(false)">
-							<PlusIcon />
-							Add node
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="red" color-fill="text">
-						<button class="shrink-0" @click="() => unassignDetect()">
-							<XIcon />
-							Remove
-						</button>
-					</ButtonStyled>
+					<Button
+						type="quiet"
+						color="green"
+						class="shrink-0 !text-green [&>svg]:!text-green"
+						@click="() => assign(true)"
+					>
+						<PlusIcon />
+						Add server
+					</Button>
+					<Button
+						type="quiet"
+						color="blue"
+						class="shrink-0 !text-blue [&>svg]:!text-blue"
+						@click="() => assign(false)"
+					>
+						<PlusIcon />
+						Add node
+					</Button>
+					<Button
+						type="quiet"
+						color="red"
+						class="shrink-0 !text-red [&>svg]:!text-red"
+						@click="() => unassignDetect()"
+					>
+						<XIcon />
+						Remove
+					</Button>
 				</div>
 			</div>
 		</div>

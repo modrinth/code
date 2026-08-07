@@ -1580,9 +1580,6 @@
   "layout.nav.discover": {
     "message": "גלה"
   },
-  "layout.nav.discover-content": {
-    "message": "גלה תוכן"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "להוריד אפליקציאת Modrinth"
   },
@@ -2285,9 +2282,6 @@
   "settings.account.data-export.description": {
     "message": "תבקש עותק של כל הדאטה האישי שהעלית ל-Modrinth. זה יכול לקחת כמה דקות."
   },
-  "settings.applications.button.edit": {
-    "message": "ערוך"
-  },
   "settings.applications.field.name": {
     "message": "שם"
   },
@@ -2308,11 +2302,5 @@
   },
   "settings.pats.modal.create.name.label": {
     "message": "שם"
-  },
-  "settings.profile.bio.title": {
-    "message": "תיאור"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "תמונת פרופיל"
   }
 }

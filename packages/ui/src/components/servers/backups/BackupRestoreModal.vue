@@ -17,23 +17,21 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button
-						v-tooltip="restoreDisabledTooltip"
-						:disabled="restoreDisabled"
-						@click="restoreBackup"
-					>
-						<SpinnerIcon v-if="isRestoring" class="animate-spin" />
-						<RotateCounterClockwiseIcon v-else />
-						{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button
+					v-tooltip="restoreDisabledTooltip"
+					type="colored"
+					color="red"
+					:disabled="restoreDisabled"
+					@click="restoreBackup"
+				>
+					<SpinnerIcon v-if="isRestoring" class="animate-spin" />
+					<RotateCounterClockwiseIcon v-else />
+					{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -45,6 +43,8 @@ import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@modrinth/assets
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { useVIntl } from '../../../composables/i18n'
 import {
 	injectModrinthClient,
@@ -53,7 +53,6 @@ import {
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 

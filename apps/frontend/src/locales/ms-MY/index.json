@@ -893,6 +893,18 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
   },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Fail"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Fail"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Sunting"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Fail"
+  },
   "create.collection.collection-info": {
     "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
   },
@@ -1099,6 +1111,9 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "Dikemas Kini Baru-baru Ini"
+  },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "Tutup"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Muat turun {formType}"
@@ -2354,9 +2369,6 @@
   "layout.nav.discover": {
     "message": "Temui"
   },
-  "layout.nav.discover-content": {
-    "message": "Temui kandungan"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
   },
@@ -2410,6 +2422,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Semakan teknikal"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Kosongkan"
   },
   "modpack-scan-modal.failed": {
     "message": "Gagal"
@@ -2683,6 +2698,15 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Nama"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Jenis"
   },
   "project-member-header.error-decline": {
     "message": "Gagal menolak jemputan pasukan"
@@ -3041,6 +3065,9 @@
   "project.settings.permissions.sort.status": {
     "message": "Status"
   },
+  "project.settings.tags.title": {
+    "message": "Tag"
+  },
   "project.settings.title": {
     "message": "Tetapan"
   },
@@ -3049,6 +3076,9 @@
   },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
+  },
+  "project.versions.share-option": {
+    "message": "Kongsi"
   },
   "project.versions.title": {
     "message": "Versi"
@@ -3656,23 +3686,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Tambah URI pengubah hala"
   },
-  "settings.applications.button.cancel": {
-    "message": "Batal"
-  },
   "settings.applications.button.create": {
     "message": "Cipta aplikasi"
   },
   "settings.applications.button.delete": {
     "message": "Padam"
   },
-  "settings.applications.button.edit": {
-    "message": "Sunting"
-  },
   "settings.applications.button.new": {
     "message": "Aplikasi baharu"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Simpan perubahan"
   },
   "settings.applications.button.upload-icon": {
     "message": "Muat naik ikon"
@@ -3746,14 +3767,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Mengenai aplikasi ini"
   },
-  "settings.authorizations.by": {
-    "message": "oleh"
-  },
   "settings.authorizations.description": {
     "message": "Apabila anda membenarkan aplikasi ini dengan akaun Modrinth anda, anda memberikannya akses kepada akaun anda. Anda boleh mengurus dan menyemak akses kepada akaun anda di sini pada bila-bila masa."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Kami tidak dapat memaparkan aplikasi yang dibenarkan oleh anda pada masa ini, kami sedang berusaha untuk memperbaikinya. Sila kunjungi laman ini pada tarikh yang akan datang!"
   },
   "settings.authorizations.head-title": {
     "message": "Kebenaran"
@@ -4111,27 +4126,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Tidak pernah digunakan"
-  },
-  "settings.profile.bio.description": {
-    "message": "Keterangan ringkas untuk memberitahu semua orang serba sedikit tentang anda."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Maklumat profil anda boleh dilihat secara terbuka pada Modrinth dan melalui <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Tetapan profil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Maklumat profil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Gambar profil"
-  },
-  "settings.profile.username.description": {
-    "message": "Nama unik (tidak sensitif huruf besar dan kecil) untuk mengenal pasti profil anda."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Batalkan sesi"

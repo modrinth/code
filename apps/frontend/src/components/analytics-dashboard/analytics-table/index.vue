@@ -31,23 +31,22 @@
 							wrapper-class="w-full sm:w-64"
 							@focusin="selectSearchInputText"
 						/>
-						<ButtonStyled>
-							<OverflowMenu
-								class="!shadow-none"
-								:options="csvExportOptions"
-								:disabled="isDataLoading || filteredRows.length === 0"
-							>
-								<DownloadIcon />
-								{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
-								<DropdownIcon />
-								<template #cumulative-csv>
-									{{ formatMessage(analyticsTableMessages.cumulativeCsv) }}
-								</template>
-								<template #grouped-csv>
-									{{ formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel }) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
+						<TeleportOverflowMenu
+							label="More options"
+							class="!w-auto !rounded-xl !px-2.5"
+							:options="csvExportOptions"
+							:disabled="isDataLoading || filteredRows.length === 0"
+						>
+							<DownloadIcon />
+							{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
+							<DropdownIcon />
+							<template #cumulative-csv>
+								{{ formatMessage(analyticsTableMessages.cumulativeCsv) }}
+							</template>
+							<template #grouped-csv>
+								{{ formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel }) }}
+							</template>
+						</TeleportOverflowMenu>
 					</div>
 				</div>
 			</template>
@@ -191,9 +190,8 @@
 
 <script setup lang="ts">
 import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
+import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
-	ButtonStyled,
-	OverflowMenu,
 	type OverflowMenuOption,
 	Pagination,
 	StyledInput,
@@ -370,10 +368,12 @@ const csvExportOptions = computed<OverflowMenuOption[]>(() => {
 		return [
 			{
 				id: 'cumulative-csv',
+				label: formatMessage(analyticsTableMessages.cumulativeCsv),
 				action: () => downloadCsv('breakdown_only'),
 			},
 			{
 				id: 'grouped-csv',
+				label: formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel.value }),
 				action: () => downloadCsv('date_breakdown'),
 			},
 		]
@@ -384,6 +384,10 @@ const csvExportOptions = computed<OverflowMenuOption[]>(() => {
 	return [
 		{
 			id: mode === 'date_breakdown' ? 'grouped-csv' : 'cumulative-csv',
+			label:
+				mode === 'date_breakdown'
+					? formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel.value })
+					: formatMessage(analyticsTableMessages.cumulativeCsv),
 			action: () => downloadCsv(mode),
 		},
 	]

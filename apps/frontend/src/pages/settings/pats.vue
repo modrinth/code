@@ -62,28 +62,40 @@
 					<label for="pat-expires">
 						<span class="font-semibold">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 					</label>
-					<DatePicker id="pat-expires" v-model="expires" show-today wrapper-class="w-full" />
+					<DatePicker
+						id="pat-expires"
+						v-model="expires"
+						:min-date="minimumPatExpiry"
+						show-today
+						wrapper-class="w-full"
+					/>
 				</div>
 
 				<div class="ml-auto mt-4 flex gap-2">
-					<ButtonStyled type="outlined">
-						<button @click="$refs.patModal.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="editPatId !== null" color="brand">
-						<button :disabled="loading || !name || !expires" @click="editPat">
-							<SaveIcon />
-							{{ formatMessage(commonMessages.saveChangesButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button :disabled="loading || !name || !expires" @click="createPat">
-							<PlusIcon />
-							{{ formatMessage(createModalMessages.action) }}
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" @click="$refs.patModal.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						v-if="editPatId !== null"
+						type="colored"
+						color="brand"
+						:disabled="loading || !name || !isExpiryInFuture"
+						@click="editPat"
+					>
+						<SaveIcon />
+						{{ formatMessage(commonMessages.saveChangesButton) }}
+					</Button>
+					<Button
+						v-else
+						type="colored"
+						color="brand"
+						:disabled="loading || !name || !isExpiryInFuture"
+						@click="createPat"
+					>
+						<PlusIcon />
+						{{ formatMessage(createModalMessages.action) }}
+					</Button>
 				</div>
 			</div>
 		</NewModal>
@@ -92,21 +104,21 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.pats) }}</h2>
 			</div>
-			<ButtonStyled color="brand">
-				<button
-					@click="
-						() => {
-							name = null
-							scopesVal = 0
-							expires = null
-							editPatId = null
-							$refs.patModal.show()
-						}
-					"
-				>
-					<PlusIcon /> {{ formatMessage(messages.create) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				type="colored"
+				color="brand"
+				@click="
+					() => {
+						name = null
+						scopesVal = 0
+						expires = null
+						editPatId = null
+						$refs.patModal.show()
+					}
+				"
+			>
+				<PlusIcon /> {{ formatMessage(messages.create) }}
+			</Button>
 		</div>
 		<p>
 			<IntlFormatted :message-id="messages.description">
@@ -123,8 +135,8 @@
 					<strong>{{ pat.name }}</strong>
 				</div>
 				<div>
-					<template v-if="pat.access_token">
-						<CopyCode :text="pat.access_token" />
+					<template v-if="createdPatTokens[pat.id] || pat.access_token">
+						<CopyCode :text="createdPatTokens[pat.id] || pat.access_token" />
 					</template>
 					<template v-else>
 						<span v-tooltip="pat.last_used ? formatDateTime(pat.last_used) : null">
@@ -166,33 +178,29 @@
 				</div>
 			</div>
 			<div class="token-actions ml-auto flex flex-col gap-2">
-				<ButtonStyled>
-					<button
-						@click="
-							() => {
-								editPatId = pat.id
-								name = pat.name
-								scopesVal = pat.scopes
-								expires = $dayjs(pat.expires).format('YYYY-MM-DD')
-								$refs.patModal.show()
-							}
-						"
-					>
-						<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button
-						@click="
-							() => {
-								deletePatIndex = pat.id
-								$refs.modal_confirm.show()
-							}
-						"
-					>
-						<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					@click="
+						() => {
+							editPatId = pat.id
+							name = pat.name
+							scopesVal = pat.scopes
+							expires = $dayjs(pat.expires).format('YYYY-MM-DD')
+							$refs.patModal.show()
+						}
+					"
+				>
+					<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
+				</Button>
+				<Button
+					@click="
+						() => {
+							deletePatIndex = pat.id
+							$refs.modal_confirm.show()
+						}
+					"
+				>
+					<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
+				</Button>
 			</div>
 		</div>
 	</div>
@@ -200,7 +208,7 @@
 <script setup>
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	Checkbox,
 	commonMessages,
 	commonSettingsMessages,
@@ -331,12 +339,17 @@ useHead({
 const data = useNuxtApp()
 const { scopesToLabels } = useScopes()
 const patModal = ref()
+const minimumPatExpiry = data.$dayjs().add(1, 'day').format('YYYY-MM-DD')
 
 const editPatId = ref(null)
 
 const name = ref(null)
 const scopesVal = ref(BigInt(0))
 const expires = ref(null)
+const createdPatTokens = ref({})
+const isExpiryInFuture = computed(
+	() => expires.value && data.$dayjs(expires.value).isAfter(data.$dayjs(), 'day'),
+)
 
 const deletePatIndex = ref(null)
 
@@ -415,6 +428,9 @@ async function createPat() {
 			scopes: Number(scopesVal.value),
 			expires: data.$dayjs(expires.value).toISOString(),
 		})
+		if (res.access_token) {
+			createdPatTokens.value[res.id] = res.access_token
+		}
 		queryClient.setQueryData(['pat'], (old) => [...(old || []), res])
 		patModal.value.hide()
 	} catch (err) {

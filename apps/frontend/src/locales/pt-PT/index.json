@@ -2183,9 +2183,6 @@
   "layout.nav.discover": {
     "message": "Descobrir"
   },
-  "layout.nav.discover-content": {
-    "message": "Descobrir conteúdo"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Obter a Modrinth App"
   },
@@ -3353,23 +3350,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Adicionar um endereço de redirecionamento"
   },
-  "settings.applications.button.cancel": {
-    "message": "Cancelar"
-  },
   "settings.applications.button.create": {
     "message": "Criar app"
   },
   "settings.applications.button.delete": {
     "message": "Apagar"
   },
-  "settings.applications.button.edit": {
-    "message": "Editar"
-  },
   "settings.applications.button.new": {
     "message": "Nova aplicação"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Guardar alterações"
   },
   "settings.applications.button.upload-icon": {
     "message": "Carregar ícone"
@@ -3443,14 +3431,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre esta aplicação"
   },
-  "settings.authorizations.by": {
-    "message": "por"
-  },
   "settings.authorizations.description": {
     "message": "Quando autorizas uma aplicação com a tua conta Modrinth, dás-lhe acesso à tua conta. Podes gerir e rever acesso à tua conta aqui quando quiseres."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Neste momento, não conseguimos mostrar as tuas aplicações autorizadas, estamos a tentar corrigir isto. Por favor tenta novamente mais tarde!"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
@@ -3784,27 +3766,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
-  },
-  "settings.profile.bio.description": {
-    "message": "Uma breve descrição para que todos possam saber mais sobre ti."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biografia"
-  },
-  "settings.profile.description": {
-    "message": "As informações do teu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Definições do perfil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informação do perfil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Imagem do perfil"
-  },
-  "settings.profile.username.description": {
-    "message": "Um nome único sem distinção de maiúsculas de minúsculas para identificar o teu perfil."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revogar sessão"

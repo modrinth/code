@@ -1,31 +1,34 @@
 <template>
 	<div class="chips" role="radiogroup" :aria-label="ariaLabel">
-		<ButtonStyled
+		<Button
 			v-for="item in items"
 			:key="formatLabel(item)"
-			type="chip"
-			:size="size"
-			:color="selected === item ? 'brand' : 'standard'"
+			v-tooltip="isDisabled(item) ? disabledTooltip : undefined"
+			role="radio"
+			:aria-checked="selected === item"
+			:disabled="isDisabled(item)"
+			class="btn !brightness-100 hover:!brightness-125"
+			:class="{
+				selected: selected === item,
+				capitalize: capitalize,
+				'!px-2.5 !py-1.5': size === 'small',
+			}"
+			@click="toggleItem(item)"
 		>
-			<button
-				v-tooltip="isDisabled(item) ? disabledTooltip : undefined"
-				role="radio"
-				:aria-checked="selected === item"
-				:disabled="isDisabled(item)"
-				:class="{ capitalize }"
-				@click="toggleItem(item)"
-			>
-				<CheckIcon v-if="selected === item && !hideCheckmarkIcon" />
-				<span>{{ formatLabel(item) }}</span>
-			</button>
-		</ButtonStyled>
+			<CheckIcon
+				v-if="selected === item && !hideCheckmarkIcon"
+				class="!text-brand"
+				aria-hidden="true"
+			/>
+			<span>{{ formatLabel(item) }}</span>
+		</Button>
 	</div>
 </template>
 
 <script setup lang="ts" generic="T">
 import { CheckIcon } from '@modrinth/assets'
 
-import ButtonStyled from './ButtonStyled.vue'
+import Button from './buttons/Button.vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -75,12 +78,26 @@ function toggleItem(item: T) {
 	grid-gap: 0.5rem;
 	flex-wrap: wrap;
 
-	:deep(button) {
-		transition-property: scale, filter !important;
+	.btn {
+		border: 1px solid transparent;
+		&.capitalize {
+			text-transform: capitalize;
+		}
+
+		svg {
+			width: 1em;
+			height: 1em;
+		}
+
+		&:focus-visible {
+			outline: 0.25rem solid var(--color-focus-ring);
+		}
 	}
 
-	.capitalize {
-		text-transform: capitalize;
+	.selected {
+		color: var(--color-brand);
+		background-color: var(--color-brand-highlight);
+		border: 1px solid var(--color-brand);
 	}
 }
 </style>

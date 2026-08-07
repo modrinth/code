@@ -71,26 +71,26 @@
   "app.action-bar.view-logs": {
     "message": "Katso lokeja"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Mahdollistaa edistyneen renderöinnin, kuten sumennus efektit, jotka voivat aiheuttaa suorituskykyongelmia ilman laitteistokiihdytettyä renderöintiä."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Edistynyt renderointi"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Valitse haluamasi väriteema Modrinth Appille."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Väriteema"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Koti"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Kirjasto"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Oletus laskeutumissivu"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Kytkee pois päältä nimikyltin pelaajasi päällä skinit sivulla."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Piilota nimikyltti"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Sisällyttää viimeaikaiset maailmat \"Hyppää takaisin sisään\" osiossa Koti sivulla."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Hyppää takaisin sisään maailmoihin"
@@ -113,20 +113,8 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Näyttää peliaika"
   },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Ohittaa automaattisesti vähäriskiset vahvistukset, kuten modpackien kaksoisasennukset, tavallisen sisällön poistamisen, massapäivitykset, modpackien linkityksen poistamisen ja korjauskehotteet. Vaaralliset varoitukset näytetään silti."
-  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Ohita ei olennaiset varoitukset"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Laittaa päälle mahdollisuuden kytkeä sivupalkkia."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Kytke sivupalkki"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Jos yrität asentaa Modrinth-pakettitiedoston (.mrpack), jota ei ole isännöity Modrinthissä, varmistamme, että ymmärrät riskit ennen asennusta."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Varoita minua ennen tuntemattomien modipakettien asentamista"
@@ -157,9 +145,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Takaisin instanssiin"
-  },
-  "app.browse.discover-content": {
-    "message": "Löydä sisältöä"
   },
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
@@ -391,9 +376,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Ulkonäkö"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Oletusinstanssin asetukset"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java asennukset"

@@ -37,7 +37,7 @@ export type AppSettings = {
 
 	theme: ColorTheme
 	locale: string
-	default_page: 'home' | 'library'
+	default_page: 'Home' | 'Library'
 	collapsed_navigation: boolean
 	hide_nametag_skins_page: boolean
 	advanced_rendering: boolean

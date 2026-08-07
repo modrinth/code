@@ -14,12 +14,13 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import { ButtonLink } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectPageContext } from '#ui/providers/page-context'
 import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
@@ -28,11 +29,12 @@ import {
 } from '#ui/utils/common-messages'
 
 import { getClientWarningType, isClientOnlyEnvironment } from '../../composables/content-filtering'
-import type { ContentCardTableItem, ContentItem } from '../../types'
+import type { ContentCardProject, ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
 
 const { formatMessage } = useVIntl()
+const pageContext = injectPageContext(null)
 
 interface Props {
 	header?: string
@@ -266,6 +268,12 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 							: `https://modrinth.com/organization/${item.owner.id}`,
 				}
 			: undefined,
+		source: item.source
+			? {
+					...item.source,
+					link: item.source.link ?? sourceProjectLink(item.source.project),
+				}
+			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
@@ -282,7 +290,8 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			...(props.switchVersion
 				? [
 						{
-							id: formatMessage(commonMessages.switchVersionButton),
+							id: 'switch-version',
+							label: formatMessage(commonMessages.switchVersionButton),
 							icon: ArrowLeftRightIcon,
 							action: () => props.switchVersion!(item),
 						},
@@ -293,7 +302,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 	})),
 )
 const externalItemIds = computed(
-	() => new Set(items.value.filter((item) => item.external).map((item) => item.id)),
+	() => new Set(items.value.filter((item) => item.external && !item.source).map((item) => item.id)),
 )
 const externalSlicerUrls = computed(() => {
 	const urls: Record<string, string> = {}
@@ -333,6 +342,12 @@ function sortContentItems(contentItems: ContentItem[], sortByName = true) {
 
 function itemDisplayName(item: ContentItem) {
 	return item.project?.title ?? item.file_name
+}
+
+function sourceProjectLink(project: ContentCardProject) {
+	const projectId = project.slug ?? project.id
+	const url = `https://modrinth.com/modpack/${encodeURIComponent(projectId)}`
+	return pageContext ? () => pageContext.openExternalUrl(url) : url
 }
 
 function handleEnabledChange(id: string, value: boolean) {
@@ -597,17 +612,18 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 								</span>
 							</template>
 							<template #itemButtonsRight="{ item }">
-								<ButtonStyled v-if="externalSlicerUrls[item.id]" circular type="transparent">
-									<a
-										v-tooltip="formatMessage(messages.openInSlicer)"
-										:aria-label="formatMessage(messages.openInSlicer)"
-										:href="externalSlicerUrls[item.id]"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<ExternalIcon class="size-4" />
-									</a>
-								</ButtonStyled>
+								<ButtonLink
+									v-if="externalSlicerUrls[item.id]"
+									v-tooltip="formatMessage(messages.openInSlicer)"
+									type="quiet"
+									:aria-label="formatMessage(messages.openInSlicer)"
+									:href="externalSlicerUrls[item.id]"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="!w-9 !px-0 !rounded-full"
+								>
+									<ExternalIcon class="size-4" />
+								</ButtonLink>
 							</template>
 						</ContentCardTable>
 					</div>
@@ -648,6 +664,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 			:selected-items="selectedItems"
 			:is-busy="props.actionDisabled"
 			:busy-tooltip="props.actionDisabledTooltip"
+			:hide-when-modal-open="false"
 			style="--left-bar-width: 0px; --right-bar-width: 0px"
 			@clear="selectedIds = []"
 			@enable="bulkEnable"

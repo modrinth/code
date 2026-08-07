@@ -88,36 +88,42 @@ pub async fn sync_project_tech_review_state(
         r#"
         WITH project_ids AS (
             SELECT unnest($1::bigint[]) AS project_id
+        ),
+        detail_states AS (
+            SELECT
+                p.project_id,
+                COALESCE(
+                    BOOL_OR(
+                        didws.status = 'pending'
+                        AND dri.issue_type != $3
+                    ),
+                    FALSE
+                ) AS has_pending_detail,
+                COALESCE(
+                    BOOL_OR(
+                        didws.status = 'unsafe'
+                        AND dri.issue_type != $3
+                    ),
+                    FALSE
+                ) AS has_unsafe_detail,
+                COALESCE(
+                    BOOL_OR(
+                        didws.status = 'pending'
+                        AND dri.issue_type = $3
+                    ),
+                    FALSE
+                ) AS has_dummy
+            FROM project_ids p
+            LEFT JOIN delphi_issue_details_with_statuses didws
+                ON didws.project_id = p.project_id
+            LEFT JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+            GROUP BY p.project_id
         )
         SELECT
             p.project_id AS "project_id!: DBProjectId",
-            EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-                WHERE
-                    didws.project_id = p.project_id
-                    AND didws.status = 'pending'
-                    AND dri.issue_type != $3
-            ) AS "has_pending_detail!",
-            EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-                WHERE
-                    didws.project_id = p.project_id
-                    AND didws.status = 'unsafe'
-                    AND dri.issue_type != $3
-            ) AS "has_unsafe_detail!",
-            EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-                WHERE
-                    didws.project_id = p.project_id
-                    AND didws.status = 'pending'
-                    AND dri.issue_type = $3
-            ) AS "has_dummy!",
+            p.has_pending_detail AS "has_pending_detail!",
+            p.has_unsafe_detail AS "has_unsafe_detail!",
+            p.has_dummy AS "has_dummy!",
             (
                 SELECT t.id
                 FROM threads t
@@ -144,7 +150,7 @@ pub async fn sync_project_tech_review_state(
                 ORDER BY dr.created DESC, dr.id DESC
                 LIMIT 1
             ) AS "report_id: DelphiReportId"
-        FROM project_ids p
+        FROM detail_states p
         "#,
         &project_ids_raw,
         &tech_review_message_types,

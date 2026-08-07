@@ -1,11 +1,12 @@
 <script setup lang="ts" generic="T">
 import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import { isEqual } from 'es-toolkit'
-import { type Component, computed } from 'vue'
+import { type Component, computed, ref } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
-import ButtonStyled from './ButtonStyled.vue'
 import FloatingActionBar from './FloatingActionBar.vue'
 
 const { formatMessage } = useVIntl()
@@ -24,6 +25,7 @@ const props = withDefaults(
 		saveLabel?: MessageDescriptor | string
 		savingLabel?: MessageDescriptor | string
 		saveIcon?: Component
+		inline?: boolean
 	}>(),
 	{
 		canReset: true,
@@ -36,6 +38,7 @@ const props = withDefaults(
 		saveLabel: () => commonMessages.saveButton,
 		savingLabel: () => commonMessages.savingButton,
 		saveIcon: SaveIcon,
+		inline: false,
 	},
 )
 
@@ -46,24 +49,28 @@ const shown = computed(() =>
 function localizeIfPossible(message: MessageDescriptor | string) {
 	return typeof message === 'string' ? message : formatMessage(message)
 }
+
+const actionBar = ref<InstanceType<typeof FloatingActionBar> | null>(null)
+
+function nudge(): void {
+	void actionBar.value?.nudge()
+}
+
+defineExpose({ nudge })
 </script>
 
 <template>
-	<FloatingActionBar :shown="shown">
+	<FloatingActionBar ref="actionBar" :shown="shown" :inline="inline">
 		<p class="m-0 font-semibold text-sm md:text-base">{{ localizeIfPossible(text) }}</p>
 		<div class="ml-auto flex gap-2">
-			<ButtonStyled v-if="canReset" type="transparent">
-				<button :disabled="saving" @click="(e) => emit('reset', e)">
-					<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled color="brand">
-				<button :disabled="saving" @click="(e) => emit('save', e)">
-					<SpinnerIcon v-if="saving" class="animate-spin" />
-					<component :is="saveIcon" v-else />
-					{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
-				</button>
-			</ButtonStyled>
+			<Button v-if="canReset" type="quiet" :disabled="saving" @click="(e) => emit('reset', e)">
+				<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
+			</Button>
+			<Button type="colored" color="brand" :disabled="saving" @click="(e) => emit('save', e)">
+				<SpinnerIcon v-if="saving" class="animate-spin" />
+				<component :is="saveIcon" v-else />
+				{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
+			</Button>
 		</div>
 	</FloatingActionBar>
 </template>

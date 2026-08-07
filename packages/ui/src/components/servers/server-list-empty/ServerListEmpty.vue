@@ -44,18 +44,18 @@
 				</div>
 
 				<div class="flex flex-wrap items-center gap-3">
-					<ButtonStyled color="brand" size="large">
-						<button type="button" @click="onClickNewServer?.()">
-							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(messages.newServerButton) }}
-						</button>
-					</ButtonStyled>
-					<!-- <ButtonStyled size="large">
-						<AutoLink to="https://modrinth.com/hosting" target="_blank">
-							<VideoIcon aria-hidden="true" />
-							{{ formatMessage(messages.demoButton) }}
-						</AutoLink>
-					</ButtonStyled> -->
+					<Button type="colored" color="brand" size="lg" @click="onClickNewServer?.()">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.newServerButton) }}
+					</Button>
+					<AutoLink
+						to="https://modrinth.com/hosting"
+						target="_blank"
+						class="flex items-center gap-1 hover:brightness-125"
+					>
+						{{ formatMessage(messages.learnMoreLink) }}
+						<RightArrowIcon class="size-5 shrink-0" aria-hidden="true" />
+					</AutoLink>
 				</div>
 			</div>
 
@@ -66,27 +66,29 @@
 			<p class="m-0 text-sm text-secondary">
 				{{ formatMessage(messages.alreadyHaveServerLabel) }}
 			</p>
-			<ButtonStyled>
-				<button
-					class="!h-10 !gap-2 !rounded-[0.875rem] !px-4 !py-2.5 !font-medium"
-					type="button"
-					@click="onClickSignIn?.()"
-				>
-					<LogInIcon aria-hidden="true" />
-					{{ formatMessage(messages.signInButton) }}
-				</button>
-			</ButtonStyled>
+			<Button @click="onClickSignIn?.()">
+				<LogInIcon aria-hidden="true" />
+				{{ formatMessage(messages.signInButton) }}
+			</Button>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { GlobeIcon, LogInIcon, PackageOpenIcon, PlusIcon, UsersIcon } from '@modrinth/assets'
+import {
+	GlobeIcon,
+	LogInIcon,
+	PackageOpenIcon,
+	PlusIcon,
+	RightArrowIcon,
+	UsersIcon,
+} from '@modrinth/assets'
 import { computed } from 'vue'
 
 import frog from '#ui/assets/welcome/frog.png'
 import iconTexture from '#ui/assets/welcome/icon-texture.png'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import AutoLink from '#ui/components/base/AutoLink.vue'
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import ServerListEmptyPreview from './ServerListEmptyPreview.vue'
@@ -136,9 +138,9 @@ const messages = defineMessages({
 		id: 'servers.list-empty.new-server-button',
 		defaultMessage: 'New server',
 	},
-	demoButton: {
-		id: 'servers.list-empty.demo-button',
-		defaultMessage: 'Demo',
+	learnMoreLink: {
+		id: 'servers.list-empty.learn-more-link',
+		defaultMessage: 'Learn more',
 	},
 	alreadyHaveServerLabel: {
 		id: 'servers.list-empty.already-have-server-label',

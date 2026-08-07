@@ -26,7 +26,7 @@ Self-contained page layouts shared across frontends. Split into two categories:
 - **`shared/`** — Reusable layout modules with their own components, composables, providers, and types. Each module is a self-contained unit (e.g. `shared/content-tab/` contains the content/mods tab layout with its own `layout.vue`, `components/`, `composables/`, `providers/`, and `types.ts`).
 - **`wrapped/`** — Page-level Vue components that mirror route structures (e.g. `wrapped/hosting/manage/`). These are full page implementations consumed by both `apps/frontend` and `apps/app-frontend`.
 
-Files inside `layouts/` use the `#ui/*` import alias (resolved via the `"imports"` field in `package.json`) to reference other `src/` modules like `#ui/components/base/ButtonStyled.vue` or `#ui/composables/i18n`.
+Files inside `layouts/` use the `#ui/*` import alias (resolved via the `"imports"` field in `package.json`) to reference other `src/` modules like `#ui/components/base/buttons` or `#ui/composables/i18n`.
 
 # Code Guidelines
 

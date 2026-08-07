@@ -49,42 +49,50 @@
 		</template>
 		<template v-if="showDependencyDownloadActions" #actions>
 			<div class="flex flex-wrap justify-end gap-2 p-2">
-				<ButtonStyled>
-					<button
-						class="!shadow-none"
-						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-						@click="downloadSelectedVersionZip"
-					>
-						<SpinnerIcon
-							v-if="downloadingActionType === 'zip'"
-							aria-hidden="true"
-							class="animate-spin"
-						/>
-						<DownloadIcon v-else aria-hidden="true" />
-						{{ formatMessage(messages.downloadAsZip) }}
-					</button>
-				</ButtonStyled>
-				<JoinedButtons
-					v-if="hasRecommendedDownloadFiles"
-					color="brand"
-					:actions="downloadWithRecommendedActions"
+				<Button
 					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-				/>
-				<ButtonStyled v-else color="brand">
-					<button
-						class="!shadow-none"
-						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-						@click="downloadFilesWithDependencies"
-					>
-						<SpinnerIcon
-							v-if="downloadingActionType === 'dependencies'"
-							aria-hidden="true"
-							class="animate-spin"
-						/>
-						<DownloadIcon v-else aria-hidden="true" />
-						{{ formatMessage(messages.downloadWithDependencies) }}
-					</button>
-				</ButtonStyled>
+					@click="downloadSelectedVersionZip"
+				>
+					<SpinnerIcon
+						v-if="downloadingActionType === 'zip'"
+						aria-hidden="true"
+						class="animate-spin"
+					/>
+					<DownloadIcon v-else aria-hidden="true" />
+					{{ formatMessage(messages.downloadAsZip) }}
+				</Button>
+				<SplitButton
+					v-if="hasRecommendedDownloadFiles"
+					type="colored"
+					color="brand"
+					:options="downloadWithRecommendedOptions"
+					:menu-label="formatMessage(messages.downloadWithRecommended)"
+					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+					@click="downloadFilesWithDependencies"
+				>
+					<SpinnerIcon
+						v-if="downloadingActionType === 'dependencies'"
+						aria-hidden="true"
+						class="animate-spin"
+					/>
+					<DownloadIcon v-else aria-hidden="true" />
+					{{ formatMessage(messages.downloadWithDependencies) }}
+				</SplitButton>
+				<Button
+					v-else
+					type="colored"
+					color="brand"
+					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+					@click="downloadFilesWithDependencies"
+				>
+					<SpinnerIcon
+						v-if="downloadingActionType === 'dependencies'"
+						aria-hidden="true"
+						class="animate-spin"
+					/>
+					<DownloadIcon v-else aria-hidden="true" />
+					{{ formatMessage(messages.downloadWithDependencies) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -95,15 +103,15 @@ import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	type CdnDownloadReason,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	type JoinedButtonAction,
-	JoinedButtons,
 	NewModal,
+	type OverflowMenuOption,
 	ServersPromo,
+	SplitButton,
 	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,
@@ -342,13 +350,7 @@ const showDependencyDownloadActions = computed(
 			hasRecommendedDownloadFiles.value),
 )
 
-const downloadWithRecommendedActions = computed<JoinedButtonAction[]>(() => [
-	{
-		id: 'download-with-dependencies',
-		label: formatMessage(messages.downloadWithDependencies),
-		icon: downloadingActionType.value === 'dependencies' ? SpinnerIcon : DownloadIcon,
-		action: () => void downloadFilesWithDependencies(),
-	},
+const downloadWithRecommendedOptions = computed<OverflowMenuOption[]>(() => [
 	{
 		id: 'download-with-recommended',
 		label: formatMessage(messages.downloadWithRecommended),

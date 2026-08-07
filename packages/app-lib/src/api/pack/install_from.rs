@@ -1,5 +1,7 @@
 use crate::State;
 use crate::data::ModLoader;
+use crate::event::LoadingBarType;
+use crate::event::emit::{emit_loading, init_loading};
 use crate::install::{
     InstallErrorContext, InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter,
@@ -10,7 +12,7 @@ use crate::state::{
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch,
-    fetch_advanced_with_progress, sha1_file_async, write_cached_icon,
+    fetch_advanced_with_progress, sha1_file_async_with_progress,
 };
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use reqwest::Method;
@@ -18,7 +20,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::Future;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
@@ -153,6 +155,17 @@ pub struct CreatePack {
 
 const MAX_LOCAL_FILE_HASH_LOOKUP_SIZE: u64 = 1024 * 1024 * 1024;
 
+pub(crate) fn get_local_pack_instance(path: &Path) -> CreatePackInstance {
+    CreatePackInstance {
+        name: path
+            .file_stem()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string(),
+        ..Default::default()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct CreatePackDescription {
     pub icon: Option<PathBuf>,
@@ -182,17 +195,60 @@ pub async fn get_instance_from_pack(
             ..Default::default()
         }),
         CreatePackLocation::FromFile { path } => {
-            let file_name = path
-                .file_stem()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_string();
+            let mut instance = get_local_pack_instance(&path);
+            let file_size = tokio::fs::metadata(&path).await?.len();
+            let hashes_archive = file_size <= MAX_LOCAL_FILE_HASH_LOOKUP_SIZE;
+            let archive_hashing_bytes =
+                if hashes_archive { file_size } else { 0 };
+            let pack_file = CreatePackFile::Path(path.clone());
+            let external_file_hashing_bytes =
+                super::install_mrpack::get_external_file_hashing_size_from_mrpack(
+                    &pack_file,
+                )
+                .await?;
+            let inspection_total_bytes = archive_hashing_bytes
+                .saturating_add(external_file_hashing_bytes)
+                .max(1);
+            let inspection = init_loading(
+                LoadingBarType::PackImport {
+                    pack_name: instance.name.clone(),
+                },
+                inspection_total_bytes as f64,
+                "Inspecting modpack",
+            )
+            .await
+            .ok();
+            let min_delta = (inspection_total_bytes / 200).max(256 * 1024);
+            let mut reported_bytes = 0_u64;
+            let mut report_progress =
+                |current: u64, offset: u64, message: &str| {
+                    let target = offset
+                        .saturating_add(current)
+                        .min(inspection_total_bytes);
+                    let increment = target.saturating_sub(reported_bytes);
+                    if target < inspection_total_bytes && increment < min_delta
+                    {
+                        return;
+                    }
 
-            let is_known_file = if tokio::fs::metadata(&path).await?.len()
-                <= MAX_LOCAL_FILE_HASH_LOOKUP_SIZE
-            {
+                    if let Some(inspection) = &inspection {
+                        let _ = emit_loading(
+                            inspection,
+                            increment as f64,
+                            Some(message),
+                        );
+                    }
+                    reported_bytes = target;
+                };
+
+            let is_known_file = if hashes_archive {
                 let state = State::get().await?;
-                let (_, hash) = sha1_file_async(&path).await?;
+                let (_, hash) =
+                    sha1_file_async_with_progress(&path, |current, _| {
+                        report_progress(current, 0, "Hashing local modpack");
+                        Ok(())
+                    })
+                    .await?;
                 match CachedEntry::get_file_many(
                     &[&hash],
                     Some(CacheBehaviour::StaleWhileRevalidateSkipOffline),
@@ -217,16 +273,26 @@ pub async fn get_instance_from_pack(
 
             let external_files_in_modpack =
                 super::install_mrpack::get_external_files_from_mrpack(
-                    &CreatePackFile::Path(path),
+                    &pack_file,
+                    |current, _| {
+                        report_progress(
+                            current,
+                            archive_hashing_bytes,
+                            "Inspecting modpack files",
+                        );
+                        Ok(())
+                    },
                 )
                 .await?;
+            report_progress(
+                inspection_total_bytes,
+                0,
+                "Finished inspecting modpack",
+            );
 
-            Ok(CreatePackInstance {
-                name: file_name,
-                unknown_file: !is_known_file,
-                external_files_in_modpack,
-                ..Default::default()
-            })
+            instance.unknown_file = !is_known_file;
+            instance.external_files_in_modpack = external_files_in_modpack;
+            Ok(instance)
         }
     }
 }
@@ -415,21 +481,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
             )
             .await?;
 
-            let filename = icon_url.rsplit('/').next();
-
-            if let Some(filename) = filename {
-                Some(
-                    write_cached_icon(
-                        filename,
-                        &state.directories.caches_dir(),
-                        icon_bytes,
-                        &state.io_semaphore,
-                    )
-                    .await?,
-                )
-            } else {
-                None
-            }
+            Some(crate::api::instance::cache_icon(icon_bytes, &state).await?)
         } else {
             None
         }

@@ -6,10 +6,10 @@
     "defaultMessage": "Agrega una descripción"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Agrega un ícono único, relevante y atractivo hace que tu proyecto sea fácilmente identificable y destaque."
+    "defaultMessage": "Añade un ícono único, relevante y atractivo hace que tu proyecto sea fácilmente identificable y destaque."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "Agrega un ícono"
+    "defaultMessage": "Añade un ícono"
   },
   "nags.add-java-address.description": {
     "defaultMessage": "Agrega la dirección IP y el puerto que los jugadores de Java Edition pueden usar para unirse a tu servidor."
@@ -33,7 +33,7 @@
     "defaultMessage": "Agrega cualquier enlace relevante fuera de Modrinth, como el código fuente, un rastreador de incidencias o una invitación de Discord."
   },
   "nags.add-links.title": {
-    "defaultMessage": "Agregar enlaces externos"
+    "defaultMessage": "Añadir enlaces externos"
   },
   "nags.all-languages.description": {
     "defaultMessage": "Has seleccionado todas las opciones de idioma disponibles. Por favor, indica solo los idiomas que tu servidor admite activamente."
@@ -129,7 +129,7 @@
     "defaultMessage": "Algunas de tus imágenes no tienen texto alternativo, lo cual es importante para la accesibilidad, sobre todo para usuarios con discapacidad visual."
   },
   "nags.missing-alt-text.title": {
-    "defaultMessage": "Agregar texto alternativo a la imagen"
+    "defaultMessage": "Añadir texto alternativo a la imagen"
   },
   "nags.misused-discord-link-description": {
     "defaultMessage": "Los enlaces de invitación de Discord no se pueden usar para otros tipos de enlaces. Pon tu enlace de Discord únicamente en el campo de enlace de invitación de Discord."
@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pack de recursos, excepto para audio o packs de localización. Si esto describe tu pack, por favor, seleccionar la etiqueta apropiada"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Ver configuración de enlaces"
   }
 }
-

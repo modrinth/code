@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Verberg {name} in de grafiek"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Geen gegevens"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Grafiek tooltip vastgepind"
   },
@@ -1599,7 +1602,7 @@
     "message": "Bankrekeninghouder"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
-    "message": "Voer de naam in van de persoon die bevoegd is om dit bank account namens het bedrijf te beheren."
+    "message": "Vul de naam in van de persoon die bevoegd is om namens het bedrijf deze bankrekening te beheren."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Munt"
@@ -2875,9 +2878,6 @@
   },
   "layout.nav.discover": {
     "message": "Ontdek"
-  },
-  "layout.nav.discover-content": {
-    "message": "Ontdek inhoud"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth-app downloaden"
@@ -4709,23 +4709,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Voeg een URI toe"
   },
-  "settings.applications.button.cancel": {
-    "message": "Annuleren"
-  },
   "settings.applications.button.create": {
     "message": "Maak nieuwe"
   },
   "settings.applications.button.delete": {
     "message": "Verwijder"
   },
-  "settings.applications.button.edit": {
-    "message": "Bewerk"
-  },
   "settings.applications.button.new": {
     "message": "Nieuw project"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Wijzigingen opslaan"
   },
   "settings.applications.button.upload-icon": {
     "message": "Pictogram uploaden"
@@ -4799,17 +4790,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Over deze app"
   },
-  "settings.authorizations.by": {
-    "message": "door"
+  "settings.authorizations.created-by": {
+    "message": "Gemaakt door {user}"
   },
   "settings.authorizations.description": {
     "message": "Wanneer je een app via je Modrinth-account autoriseert, verleen je die app toegang tot je account. Je kunt de toegang tot je account hier op elk moment beheren en bekijken."
   },
-  "settings.authorizations.empty-state": {
-    "message": "We kunnen je geautoriseerde apps momenteel niet weergeven, maar we werken eraan om dit te verhelpen. Kom later nog eens terug op deze pagina!"
+  "settings.authorizations.empty-state.description": {
+    "message": "De apps die je autoriseert, worden hier weergegeven."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Geen geautoriseerde apps"
   },
   "settings.authorizations.head-title": {
     "message": "Toestemmingen"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Deze app is gemaakt door een officieel Modrinth-account."
   },
   "settings.authorizations.revoke.action": {
     "message": "Intrekken"
@@ -4819,6 +4816,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Weet u zeker dat u deze aanvraag wilt intrekken?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Deze app heeft, ondanks de naam, op geen enkele manier verband met Modrinth."
   },
   "settings.billing.charges.description": {
     "message": "Al je eerdere afschrijvingen van je Modrinth-account worden hier weergegeven:"
@@ -5149,27 +5149,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Nooit gebruikt"
-  },
-  "settings.profile.bio.description": {
-    "message": "Een korte beschrijving om iedereen wat over jou te vertellen."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Je profielgegevens zijn openbaar op Modrinth en zichtbaar via de <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Profielinstellingen"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profielgegevens"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profielfoto"
-  },
-  "settings.profile.username.description": {
-    "message": "Een unieke hoofdletterongevoelige naam om je profiel mee te identificeren."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Sessie beëindigen"

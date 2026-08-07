@@ -1,0 +1,198 @@
+<script setup lang="ts">
+import {
+	Checkbox,
+	defineMessages,
+	injectNotificationManager,
+	StyledInput,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed, ref, watch } from 'vue'
+
+import { edit } from '@/helpers/instance'
+import { get } from '@/helpers/settings.ts'
+
+import type { AppSettings, Hooks } from '../../../../helpers/types'
+import { injectInstanceSettings } from './instance-settings-context'
+
+const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const { instance } = injectInstanceSettings()
+
+const globalSettings = (await get().catch(handleError)) as AppSettings
+
+const overrideHooks = ref(
+	!!instance.value.hooks.pre_launch ||
+		!!instance.value.hooks.wrapper ||
+		!!instance.value.hooks.post_exit,
+)
+const hooks = ref(instance.value.hooks ?? globalSettings.hooks)
+
+const editInstanceObject = computed(() => {
+	const editInstancePatch: {
+		hooks?: Hooks
+	} = {}
+
+	// When hooks are not overridden per-instance, we want to clear them
+	editInstancePatch.hooks = overrideHooks.value ? hooks.value : {}
+
+	return editInstancePatch
+})
+
+watch(
+	[overrideHooks, hooks],
+	async () => {
+		await edit(instance.value.id, editInstanceObject.value)
+	},
+	{ deep: true },
+)
+const messages = defineMessages({
+	hooks: {
+		id: 'instance.settings.tabs.hooks.title',
+		defaultMessage: 'Game launch hooks',
+	},
+	hooksDescription: {
+		id: 'instance.settings.tabs.hooks.description',
+		defaultMessage:
+			'Hooks allow advanced users to run certain system commands before and after launching the game.',
+	},
+	hookVariablesDescription: {
+		id: 'instance.settings.tabs.hooks.variables.description',
+		defaultMessage:
+			'Hooks run in the working directory of the instance, with the following variables:',
+	},
+	instanceNameDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-name.description',
+		defaultMessage: '$INST_NAME: The name of the instance',
+	},
+	instanceIdDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-id.description',
+		defaultMessage: "$INST_ID: The name of the instance's folder",
+	},
+	instanceDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-dir.description',
+		defaultMessage: "$INST_DIR: The absolute path to the instance's folder",
+	},
+	instanceMcDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-mc-dir.description',
+		defaultMessage: '$INST_MC_DIR: An alias for $INST_DIR',
+	},
+	instanceJavaDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java.description',
+		defaultMessage: '$INST_JAVA: The absolute path to the java binary',
+	},
+	instanceJavaArgsDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java-args.description',
+		defaultMessage: '$INST_JAVA_ARGS: The JVM Arguments provided to the game',
+	},
+	customHooks: {
+		id: 'instance.settings.tabs.hooks.custom-hooks',
+		defaultMessage: 'Custom launch hooks',
+	},
+	preLaunch: {
+		id: 'instance.settings.tabs.hooks.pre-launch',
+		defaultMessage: 'Pre-launch',
+	},
+	preLaunchDescription: {
+		id: 'instance.settings.tabs.hooks.pre-launch.description',
+		defaultMessage: 'Ran before the instance is launched.',
+	},
+	preLaunchEnter: {
+		id: 'instance.settings.tabs.hooks.pre-launch.enter',
+		defaultMessage: 'Enter pre-launch command...',
+	},
+	wrapper: {
+		id: 'instance.settings.tabs.hooks.wrapper',
+		defaultMessage: 'Wrapper',
+	},
+	wrapperDescription: {
+		id: 'instance.settings.tabs.hooks.wrapper.description',
+		defaultMessage: 'Wrapper command for launching Minecraft.',
+	},
+	wrapperEnter: {
+		id: 'instance.settings.tabs.hooks.wrapper.enter',
+		defaultMessage: 'Enter wrapper command...',
+	},
+	postExit: {
+		id: 'instance.settings.tabs.hooks.post-exit',
+		defaultMessage: 'Post-exit',
+	},
+	postExitDescription: {
+		id: 'instance.settings.tabs.hooks.post-exit.description',
+		defaultMessage: 'Ran after the game closes.',
+	},
+	postExitEnter: {
+		id: 'instance.settings.tabs.hooks.post-exit.enter',
+		defaultMessage: 'Enter post-exit command...',
+	},
+})
+</script>
+
+<template>
+	<div>
+		<h2 class="m-0 m-0 text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.hooks) }}
+		</h2>
+		<Checkbox v-model="overrideHooks" :label="formatMessage(messages.customHooks)" class="my-2.5" />
+		<p class="m-0">
+			{{ formatMessage(messages.hooksDescription) }}
+		</p>
+
+		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.preLaunch) }}
+		</h2>
+		<StyledInput
+			id="pre-launch"
+			v-model="hooks.pre_launch"
+			autocomplete="off"
+			:disabled="!overrideHooks"
+			:placeholder="formatMessage(messages.preLaunchEnter)"
+			wrapper-class="w-full my-2.5"
+		/>
+		<p class="m-0">
+			{{ formatMessage(messages.preLaunchDescription) }}
+		</p>
+
+		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.wrapper) }}
+		</h2>
+		<StyledInput
+			id="wrapper"
+			v-model="hooks.wrapper"
+			autocomplete="off"
+			:disabled="!overrideHooks"
+			:placeholder="formatMessage(messages.wrapperEnter)"
+			wrapper-class="w-full my-2.5"
+		/>
+		<p class="m-0">
+			{{ formatMessage(messages.wrapperDescription) }}
+		</p>
+
+		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.postExit) }}
+		</h2>
+		<StyledInput
+			id="post-exit"
+			v-model="hooks.post_exit"
+			autocomplete="off"
+			:disabled="!overrideHooks"
+			:placeholder="formatMessage(messages.postExitEnter)"
+			wrapper-class="w-full my-2.5"
+		/>
+		<p class="m-0">
+			{{ formatMessage(messages.postExitDescription) }}
+		</p>
+
+		<div class="m-0 mt-6">
+			{{ formatMessage(messages.hookVariablesDescription) }}
+		</div>
+		<ul class="m-0 mt-2">
+			<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
+		</ul>
+	</div>
+</template>

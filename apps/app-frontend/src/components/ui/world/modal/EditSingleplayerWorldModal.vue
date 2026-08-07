@@ -2,7 +2,7 @@
 import { ChevronRightIcon, SaveIcon, UndoIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
@@ -113,24 +113,18 @@ const messages = defineMessages({
 			<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
 		</div>
 		<div class="flex gap-2 mt-4">
-			<ButtonStyled color="brand">
-				<button @click="saveWorld">
-					<SaveIcon />
-					{{ formatMessage(commonMessages.saveChangesButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button :disabled="removeIcon || !icon" @click="removeIcon = true">
-					<UndoIcon />
-					{{ formatMessage(messages.resetIcon) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="hide()">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" @click="saveWorld">
+				<SaveIcon />
+				{{ formatMessage(commonMessages.saveChangesButton) }}
+			</Button>
+			<Button :disabled="removeIcon || !icon" @click="removeIcon = true">
+				<UndoIcon />
+				{{ formatMessage(messages.resetIcon) }}
+			</Button>
+			<Button @click="hide()">
+				<XIcon />
+				{{ formatMessage(commonMessages.cancelButton) }}
+			</Button>
 		</div>
 	</ModalWrapper>
 </template>

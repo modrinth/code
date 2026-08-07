@@ -6,7 +6,6 @@ import {
 	ClockArrowDownIcon,
 	FoldVerticalIcon,
 	PauseIcon,
-	RightArrowIcon,
 	ScaleIcon,
 	SearchIcon,
 	SpinnerIcon,
@@ -14,9 +13,9 @@ import {
 	UnfoldVerticalIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	Admonition,
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -495,13 +494,6 @@ function dismissInfoBanner() {
 				</nuxt-link>
 			</template>
 		</IntlFormatted>
-		<template v-if="false" #actions>
-			<div class="flex">
-				<ButtonStyled color="blue">
-					<a> {{ formatMessage(messages.learnMore) }} <RightArrowIcon /> </a>
-				</ButtonStyled>
-			</div>
-		</template>
 	</Admonition>
 	<template v-if="pending">
 		<div class="flex flex-col gap-3">
@@ -579,9 +571,10 @@ function dismissInfoBanner() {
 				<div>
 					<Combobox
 						v-model="currentSortType"
-						class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0 [&>span]:h-[40px]"
+						class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0"
 						:options="sortTypes"
 						:placeholder="formatMessage(commonMessages.sortByLabel)"
+						trigger-size="lg"
 					>
 						<template #selected>
 							<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -606,31 +599,30 @@ function dismissInfoBanner() {
 						</template>
 					</Combobox>
 				</div>
-				<ButtonStyled>
-					<button type="button" class="!h-[40px]" @click="toggleAllCardsCollapsed">
-						<UnfoldVerticalIcon
-							v-if="allCardsCollapsed"
-							class="size-5 flex-shrink-0 text-secondary"
-						/>
-						<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
-						{{ expandCollapseAllLabel }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="isModerator" color="red" type="outlined">
-					<button
-						type="button"
-						class="!h-[40px]"
-						:disabled="deleteAllGroupsMutation.isPending.value"
-						@click="showDeleteAllGroupsConfirmation"
-					>
-						<SpinnerIcon
-							v-if="deleteAllGroupsMutation.isPending.value"
-							class="size-5 flex-shrink-0 animate-spin"
-						/>
-						<TrashIcon v-else class="size-5 flex-shrink-0" />
-						{{ formatMessage(messages.deleteAllGroups) }}
-					</button>
-				</ButtonStyled>
+				<Button native-type="button" size="lg" @click="toggleAllCardsCollapsed">
+					<UnfoldVerticalIcon
+						v-if="allCardsCollapsed"
+						class="size-5 flex-shrink-0 text-secondary"
+					/>
+					<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+					{{ expandCollapseAllLabel }}
+				</Button>
+				<Button
+					v-if="isModerator"
+					type="outlined"
+					native-type="button"
+					size="lg"
+					class="!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
+					:disabled="deleteAllGroupsMutation.isPending.value"
+					@click="showDeleteAllGroupsConfirmation"
+				>
+					<SpinnerIcon
+						v-if="deleteAllGroupsMutation.isPending.value"
+						class="size-5 flex-shrink-0 animate-spin"
+					/>
+					<TrashIcon v-else class="size-5 flex-shrink-0" />
+					{{ formatMessage(messages.deleteAllGroups) }}
+				</Button>
 			</div>
 		</div>
 		<div v-if="isModerator" class="mt-4 flex flex-wrap items-center gap-3">

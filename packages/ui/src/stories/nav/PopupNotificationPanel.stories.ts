@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import PopupNotificationPanel from '../../components/nav/PopupNotificationPanel.vue'
 import { injectPopupNotificationManager } from '../../providers'
 
@@ -13,7 +13,7 @@ export default meta
 
 export const Default: StoryObj = {
 	render: () => ({
-		components: { PopupNotificationPanel, ButtonStyled },
+		components: { PopupNotificationPanel, Button },
 		setup() {
 			const popupManager = injectPopupNotificationManager()
 
@@ -209,39 +209,17 @@ export const Default: StoryObj = {
 		template: /* html */ `
 			<div>
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled color="green">
-						<button @click="showSuccess">Install Complete</button>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button @click="showError">Download Failed</button>
-					</ButtonStyled>
-					<ButtonStyled color="orange">
-						<button @click="showWarning">Update Available (Permanent)</button>
-					</ButtonStyled>
-					<ButtonStyled color="blue">
-						<button @click="showInfo">Download Complete</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showNoButtons">No Buttons</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showPermanent">Permanent</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showBlocking">Blocking</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showWaitingProgress">Waiting Progress</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showDeterminateProgress">Determinate Progress</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="showGroupedDownloads">Grouped Downloads</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="clearAll">Clear All</button>
-					</ButtonStyled>
+					<Button type="colored" color="green" @click="showSuccess">Install Complete</Button>
+					<Button type="colored" color="red" @click="showError">Download Failed</Button>
+					<Button type="colored" color="orange" @click="showWarning">Update Available (Permanent)</Button>
+					<Button type="colored" color="blue" @click="showInfo">Download Complete</Button>
+					<Button @click="showNoButtons">No Buttons</Button>
+					<Button @click="showPermanent">Permanent</Button>
+					<Button @click="showBlocking">Blocking</Button>
+					<Button @click="showWaitingProgress">Waiting Progress</Button>
+					<Button @click="showDeterminateProgress">Determinate Progress</Button>
+					<Button @click="showGroupedDownloads">Grouped Downloads</Button>
+					<Button @click="clearAll">Clear All</Button>
 				</div>
 				<PopupNotificationPanel />
 			</div>

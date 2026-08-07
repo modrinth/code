@@ -53,37 +53,30 @@
 					v-if="ctx.instanceIconUrl.value"
 					class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
 				>
-					<ButtonStyled circular>
-						<button
-							type="button"
-							:aria-label="formatMessage(commonMessages.removeImageButton)"
-							@click="removeIcon"
-						>
-							<XIcon />
-						</button>
-					</ButtonStyled>
+					<Button
+						size="sm"
+						class="!p-2"
+						:aria-label="formatMessage(commonMessages.removeImageButton)"
+						@click="removeIcon"
+					>
+						<XIcon />
+					</Button>
 				</div>
 			</div>
 			<div class="flex flex-col gap-1.5">
-				<ButtonStyled type="outlined">
-					<button @click="triggerIconInput">
-						<UploadIcon />
-						{{ formatMessage(messages.uploadIcon) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined">
-					<button @click="randomizeIcon">
-						<SpinnerIcon v-if="randomizing" class="animate-spin" />
-						<RefreshCwIcon v-else />
-						{{ formatMessage(messages.randomizeIcon) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined">
-					<button @click="ctx.customizeInstanceIcon?.()">
-						<PaletteIcon />
-						{{ formatMessage(messages.customizeIcon) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="triggerIconInput">
+					<UploadIcon />
+					{{ formatMessage(messages.uploadIcon) }}
+				</Button>
+				<Button type="outlined" :disabled="randomizing" @click="randomizeIcon">
+					<SpinnerIcon v-if="randomizing" class="animate-spin" />
+					<RefreshCwIcon v-else />
+					{{ formatMessage(messages.randomizeIcon) }}
+				</Button>
+				<Button type="outlined" @click="ctx.customizeInstanceIcon?.()">
+					<PaletteIcon />
+					{{ formatMessage(messages.customizeIcon) }}
+				</Button>
 			</div>
 		</div>
 
@@ -229,12 +222,12 @@ import {
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
 import AutoLink from '../../../base/AutoLink.vue'
 import Avatar from '../../../base/Avatar.vue'
-import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'

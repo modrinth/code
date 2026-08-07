@@ -161,6 +161,9 @@
   "button.enable": {
     "defaultMessage": "Aktiver"
   },
+  "button.extract": {
+    "defaultMessage": "Pak ud"
+  },
   "button.follow": {
     "defaultMessage": "Følg"
   },
@@ -272,11 +275,23 @@
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
   },
+  "changelog.product.web": {
+    "defaultMessage": "Platform"
+  },
   "collection-widget.loading-projects": {
     "defaultMessage": "Indlæser projekter..."
   },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Søg efter projekter"
+  },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "indhold"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {genstand} other {genstande}}"
   },
   "content.card.select-project": {
     "defaultMessage": "Vælg {project}"
@@ -2131,9 +2146,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Personlige adgangstokens"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Offentlig profil"
   },
   "settings.sessions.title": {
     "defaultMessage": "Sessioner"

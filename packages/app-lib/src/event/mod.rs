@@ -157,6 +157,9 @@ pub enum LoadingBarType {
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
+    PackImport {
+        pack_name: String,
+    },
     MinecraftDownload {
         instance_id: String,
         instance_name: String,

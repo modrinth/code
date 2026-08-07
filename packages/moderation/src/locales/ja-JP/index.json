@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "{type}の内容を展示するには、少なくとも１枚の画像が必要です。"
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "音声パックや翻訳パックを除くリソースパックに該当する場合は、適切なタグを選択してください"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "ギャラリー画像をアップロード"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "リンク設定を表示"
   }
 }
-

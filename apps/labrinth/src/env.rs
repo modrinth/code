@@ -165,7 +165,7 @@ vars! {
     REDIS_BLOCKING_MAX_CONNECTIONS: u32 = 256u32;
 
     // The encoding format used for Redis cache values.
-    REDIS_ENCODING_FORMAT: xredis::EncodingFormat = xredis::EncodingFormat::Json;
+    REDIS_ENCODING_FORMAT: xredis::EncodingFormat = xredis::EncodingFormat::Postcard;
     // The level of LZ4 compression used for Redis cache values. A value of 0 disables compression (supports 1-12)
     REDIS_COMPRESSION_LEVEL: i32 = 0i32;
     // The compression algorithm used for Redis cache values. Currently only LZ4 is supported.
@@ -237,6 +237,11 @@ vars! {
     SEARCH_TYPESENSE_DEFAULT_BUCKETING: Json<crate::search::backend::typesense::Bucketing> =
         Json(crate::search::backend::typesense::Bucketing::Buckets(5));
     SEARCH_TYPESENSE_DEFAULT_MAX_CANDIDATES: usize = 24usize;
+    ELASTICSEARCH_URL: String = "http://localhost:9200";
+    ELASTICSEARCH_INDEX_PREFIX: String = "labrinth";
+    ELASTICSEARCH_USERNAME: String = "";
+    ELASTICSEARCH_PASSWORD: String = "";
+    ELASTICSEARCH_BULK_BATCH_SIZE: usize = 1000usize;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;

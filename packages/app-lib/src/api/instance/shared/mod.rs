@@ -31,7 +31,7 @@ pub(crate) const CONFIG_DIRECTORY: &str = "config";
 pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
 pub(crate) const MAX_CONFIG_BUNDLE_FILE_SIZE: u64 = 16 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_TOTAL_SIZE: u64 = 128 * 1024 * 1024;
-pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 13] = [
+pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 14] = [
     "json",
     "json5",
     "jsonc",
@@ -45,6 +45,7 @@ pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 13] = [
     "conf",
     "properties",
     "xml",
+    "nbt",
 ];
 
 pub(crate) fn read_bounded_config_bundle_entry(
@@ -110,8 +111,9 @@ pub use self::install::{
 };
 pub use self::invites::{
     accept_pending_shared_instance_invite, create_shared_instance_invite_link,
-    decline_pending_shared_instance_invite, get_shared_instance_users,
-    invite_shared_instance_users, remove_shared_instance_users,
+    decline_pending_shared_instance_invite, get_shared_instance_invites,
+    get_shared_instance_users, invite_shared_instance_users,
+    remove_shared_instance_users, revoke_shared_instance_invite,
 };
 pub use self::publish::{
     get_shared_instance_publish_preview, publish_shared_instance,
@@ -119,10 +121,11 @@ pub use self::publish::{
 };
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
-    SharedInstanceJoinType, SharedInstancePublishPreview,
-    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
-    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
+    SharedInstanceInvite, SharedInstanceInviteInstallPreview,
+    SharedInstanceInviteLink, SharedInstanceJoinType,
+    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
+    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
+    SharedInstanceUser, SharedInstanceUsers,
 };
 
 pub async fn can_active_user_use_shared_instances() -> crate::Result<bool> {

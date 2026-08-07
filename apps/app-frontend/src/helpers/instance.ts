@@ -283,12 +283,13 @@ export async function update_repair_modrinth(instanceId: string): Promise<Instal
 }
 
 // Export an instance to .mrpack
-// included_overrides is an array of paths to override folders to include (ie: 'mods', 'resource_packs')
+// included_overrides and excluded_overrides are inherited path rules for files in the export.
 // Version id is optional (ie: 1.1.5)
 export async function export_instance_mrpack(
 	instanceId: string,
 	exportLocation: string,
 	includedOverrides: string[],
+	excludedOverrides: string[],
 	versionId?: string,
 	description?: string,
 	name?: string,
@@ -297,22 +298,33 @@ export async function export_instance_mrpack(
 		instanceId,
 		exportLocation,
 		includedOverrides,
+		excludedOverrides,
 		versionId,
 		description,
 		name,
 	})
 }
 
-// Given a folder path, populate an array of all the subfolders
-// Intended to be used for finding potential override folders
-// profile
-// -- mods
-// -- resourcepacks
-// -- file1
-// => [mods, resourcepacks]
-// allows selection for 'included_overrides' in export_instance_mrpack
-export async function get_pack_export_candidates(instanceId: string): Promise<string[]> {
-	return await invoke('plugin:instance|instance_get_pack_export_candidates', { instanceId })
+export type PackExportCandidate = {
+	path: string
+	type: 'directory' | 'file'
+	size?: number
+	modified?: number
+	count?: number
+	disabled: boolean
+	defaultSelected: boolean
+}
+
+// Given a folder path, populate an array of exportable direct children.
+// Allows selection for 'included_overrides' in export_instance_mrpack.
+export async function get_pack_export_candidates(
+	instanceId: string,
+	parent?: string,
+): Promise<PackExportCandidate[]> {
+	return await invoke('plugin:instance|instance_get_pack_export_candidates', {
+		instanceId,
+		parent: parent ?? null,
+	})
 }
 
 // Run Minecraft using an instance
@@ -392,6 +404,13 @@ export interface SharedInstanceInviteLink {
 	maxUses: number
 }
 
+export interface SharedInstanceInvite {
+	id: string
+	expiration: string
+	maxUses: number
+	uses: number
+}
+
 export async function can_current_user_use_shared_instances(): Promise<boolean> {
 	return await invoke('plugin:instance|instance_share_can_current_user_use')
 }
@@ -419,6 +438,19 @@ export async function create_shared_instance_invite_link(
 		instanceId,
 		...options,
 	})
+}
+
+export async function get_shared_instance_invites(
+	instanceId: string,
+): Promise<SharedInstanceInvite[]> {
+	return await invoke('plugin:instance|instance_share_get_invites', { instanceId })
+}
+
+export async function revoke_shared_instance_invite(
+	instanceId: string,
+	inviteId: string,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_share_revoke_invite', { instanceId, inviteId })
 }
 
 export async function remove_shared_instance_users(

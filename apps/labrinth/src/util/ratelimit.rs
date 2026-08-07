@@ -12,7 +12,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use xredis::RedisPool;
 
-const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v3";
+const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v4";
 const RATE_LIMIT_EXPIRY: i64 = 300; // 5 minutes
 const MINUTE_IN_NANOS: i64 = 60_000_000_000;
 

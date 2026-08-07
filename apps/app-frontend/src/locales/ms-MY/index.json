@@ -8,6 +8,9 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Sembunyikan lebih banyak pemasangan yang berjalan"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Disalin"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Ketepikan"
   },
@@ -44,26 +47,26 @@
   "app.action-bar.view-logs": {
     "message": "Lihat log"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Mendayakan pemaparan lanjutan seperti kesan kabur yang boleh menyebabkan masalah prestasi tanpa pemaparan dipercepatkan perkakasan."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Pemaparan lanjutan"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Pilih tema warna pilihan anda untuk Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema warna"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Laman utama"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Pustaka"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Laman pendaratan lalai"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Menyahdayakan tanda nama di atas pemain anda pada halaman kekulit."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan tanda nama"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Sertakan dunia terkini dalam bahagian \"Lompat kembali\" pada Laman Utama."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Lompat kembali ke dalam dunia"
@@ -122,9 +125,6 @@
   "app.browse.back-to-instance": {
     "message": "Kembali ke pemasangan"
   },
-  "app.browse.discover-content": {
-    "message": "Temui kandungan"
-  },
   "app.browse.discover-servers": {
     "message": "Temui pelayan"
   },
@@ -175,6 +175,9 @@
   },
   "app.install.phase.reading_pack_manifest": {
     "message": "Sedang membaca manifest pek"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Ditambah"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Semua data untuk pemasangan anda akan dipadamkan secara kekal, termasuk dunia, konfigurasi dan semua kandungan yang dipasang."
@@ -245,6 +248,15 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
   },
+  "app.java-detection.cancel": {
+    "message": "Batal"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Laluan"
+  },
+  "app.java-detection.select": {
+    "message": "Pilih"
+  },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk mainkan"
   },
@@ -253,6 +265,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "Spam"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Pemasangan yang dikongsi"
@@ -263,11 +278,23 @@
   "app.modal.update-to-play.header": {
     "message": "Kemas kini untuk mainkan"
   },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Ditambah"
+  },
+  "app.nav.home": {
+    "message": "Laman utama"
+  },
+  "app.news.title": {
+    "message": "Berita"
+  },
   "app.project.install-button.already-installed": {
     "message": "Projek ini sudah dipasang"
   },
   "app.project.install-context.back-to-browse": {
     "message": "Kembali menemukan"
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Lebar"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Mod pembangun didayakan."
@@ -275,11 +302,11 @@
   "app.settings.downloading": {
     "message": "Sedang memuat turun v{version}"
   },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.tabs.appearance": {
     "message": "Tampilan"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Tetapan lalai pemasangan"
   },
   "app.settings.tabs.java-installations": {
     "message": "Pemasangan Java"
@@ -715,6 +742,9 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Masukkan lebar..."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Ditambah"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Pelayan Minecraft"

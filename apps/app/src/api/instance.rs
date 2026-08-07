@@ -65,6 +65,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_get_users,
             instance_share_invite_users,
             instance_share_create_invite_link,
+            instance_share_get_invites,
+            instance_share_revoke_invite,
             instance_share_remove_users,
             instance_share_get_publish_preview,
             instance_share_publish,
@@ -777,6 +779,7 @@ pub async fn instance_export_mrpack(
     instance_id: &str,
     export_location: PathBuf,
     included_overrides: Vec<String>,
+    excluded_overrides: Vec<String>,
     version_id: Option<String>,
     description: Option<String>,
     name: Option<String>,
@@ -785,6 +788,7 @@ pub async fn instance_export_mrpack(
         instance_id,
         export_location,
         included_overrides,
+        excluded_overrides,
         version_id,
         description,
         name,
@@ -796,8 +800,13 @@ pub async fn instance_export_mrpack(
 #[tauri::command]
 pub async fn instance_get_pack_export_candidates(
     instance_id: &str,
-) -> Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
-    Ok(theseus::instance::get_pack_export_candidates(instance_id).await?)
+    parent: Option<SafeRelativeUtf8UnixPathBuf>,
+) -> Result<Vec<theseus::instance::PackExportCandidate>> {
+    Ok(theseus::instance::get_pack_export_candidates_for_parent(
+        instance_id,
+        parent,
+    )
+    .await?)
 }
 
 #[tauri::command]
@@ -901,6 +910,27 @@ pub async fn instance_share_create_invite_link(
         replace_invite_id,
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_get_invites(
+    instance_id: &str,
+) -> Result<Vec<theseus::instance::SharedInstanceInvite>> {
+    Ok(theseus::instance::get_shared_instance_invites(instance_id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_revoke_invite(
+    instance_id: &str,
+    invite_id: String,
+) -> Result<()> {
+    Ok(
+        theseus::instance::revoke_shared_instance_invite(
+            instance_id,
+            invite_id,
+        )
+        .await?,
+    )
 }
 
 #[tauri::command]

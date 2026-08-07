@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { EditIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 
+import { TeleportOverflowMenu } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import { Avatar, OverflowMenu } from '../index'
+import { Avatar } from '../index'
 
 const { formatMessage } = useVIntl()
 
@@ -43,17 +45,22 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<OverflowMenu
-		v-tooltip="formatMessage(messages.editIcon)"
-		class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
+	<TeleportOverflowMenu
+		:label="formatMessage(messages.editIcon)"
+		:tooltip="formatMessage(messages.editIcon)"
+		:icon-only="false"
+		type="quiet"
+		interaction="none"
+		class="m-0 !h-auto cursor-pointer appearance-none border-none bg-transparent !p-0 transition-transform group-active:scale-95"
 		:options="[
 			{
 				id: 'select',
+				label: icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon),
 				action: () => emit('select'),
 			},
 			{
 				id: 'remove',
-				color: 'danger',
+				label: formatMessage(messages.removeIcon),
 				action: () => emit('remove'),
 				shown: !!icon,
 			},
@@ -72,5 +79,5 @@ const messages = defineMessages({
 			{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
 		</template>
 		<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
-	</OverflowMenu>
+	</TeleportOverflowMenu>
 </template>

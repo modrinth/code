@@ -244,6 +244,8 @@ fn main() {
                         "instance_share_get_users",
                         "instance_share_invite_users",
                         "instance_share_create_invite_link",
+                        "instance_share_get_invites",
+                        "instance_share_revoke_invite",
                         "instance_share_remove_users",
                         "instance_share_get_publish_preview",
                         "instance_share_publish",
@@ -300,6 +302,9 @@ fn main() {
                         "get_user_organizations",
                         "get_user_collections",
                         "patch_user",
+                        "block_user",
+                        "unblock_user",
+                        "get_blocked_users",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

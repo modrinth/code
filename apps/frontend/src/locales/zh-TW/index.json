@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "在圖表中隱藏 {name}"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "沒有數據"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "圖表工具提示已固定"
   },
@@ -975,7 +978,7 @@
     "message": "取消追蹤專案"
   },
   "collection.delete-modal.description": {
-    "message": "這將永久刪除這個收藏。此動作無法復原。"
+    "message": "這會永久刪除這個收藏，這項動作無法復原。"
   },
   "collection.delete-modal.title": {
     "message": "確定要刪除這個收藏嗎？"
@@ -996,7 +999,7 @@
     "message": "建立時間：{ago}"
   },
   "collection.label.curated-by": {
-    "message": "策劃者"
+    "message": "策展人"
   },
   "collection.label.no-projects": {
     "message": "收藏中暫無專案"
@@ -2879,9 +2882,6 @@
   "layout.nav.discover": {
     "message": "探索"
   },
-  "layout.nav.discover-content": {
-    "message": "探索內容"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "取得 Modrinth App"
   },
@@ -2976,7 +2976,7 @@
     "message": "每批 {amount} 個"
   },
   "modpack-scan-modal.batch.placeholder": {
-    "message": "批量數量"
+    "message": "批次數量"
   },
   "modpack-scan-modal.delete-all-groups-confirmation.description": {
     "message": "這會永久刪除這個專案的所有引用標註群組及其中的所有檔案，這項動作無法復原。"
@@ -4712,23 +4712,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "新增重新導向 URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "取消"
-  },
   "settings.applications.button.create": {
     "message": "建立應用程式"
   },
   "settings.applications.button.delete": {
     "message": "刪除"
   },
-  "settings.applications.button.edit": {
-    "message": "編輯"
-  },
   "settings.applications.button.new": {
     "message": "新的應用程式"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "儲存變更"
   },
   "settings.applications.button.upload-icon": {
     "message": "上傳圖示"
@@ -4802,17 +4793,23 @@
   "settings.authorizations.about-this-app": {
     "message": "關於這個應用程式"
   },
-  "settings.authorizations.by": {
-    "message": "作者"
+  "settings.authorizations.created-by": {
+    "message": "由 {user} 建立"
   },
   "settings.authorizations.description": {
-    "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳戶的權限。你可以隨時在這裡管理並審查帳號的存取權。"
+    "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳號的權限。你可以隨時在這裡管理並審查帳號的存取權。"
   },
-  "settings.authorizations.empty-state": {
-    "message": "目前無法顯示你已授權的應用程式，我們正在努力修正這個問題。請稍後再回來查看！"
+  "settings.authorizations.empty-state.description": {
+    "message": "你授權的應用程式將顯示在這裡。"
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "沒有授權任何應用程式"
   },
   "settings.authorizations.head-title": {
     "message": "授權"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "這個應用程式由 Modrinth 官方帳號建立。"
   },
   "settings.authorizations.revoke.action": {
     "message": "撤銷"
@@ -4822,6 +4819,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "確定要撤銷這個應用程式的授權嗎？"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "儘管名稱如此，這個應用程式與 Modrinth 沒有任何關聯。"
   },
   "settings.billing.charges.description": {
     "message": "你對 Modrinth 帳號的所有過往支付紀錄皆會列於這裡："
@@ -5167,27 +5167,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "從未使用"
-  },
-  "settings.profile.bio.description": {
-    "message": "簡單介紹一下你自己。"
-  },
-  "settings.profile.bio.title": {
-    "message": "關於我"
-  },
-  "settings.profile.description": {
-    "message": "你的個人檔案資訊會公開顯示在 Modrinth 上，並可透過 <docs-link>Modrinth API</docs-link> 查詢。"
-  },
-  "settings.profile.head-title": {
-    "message": "個人設定"
-  },
-  "settings.profile.profile-info": {
-    "message": "個人檔案資訊"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "頭貼"
-  },
-  "settings.profile.username.description": {
-    "message": "獨特且不區分大小寫的名稱，用於識別你的個人檔案。"
   },
   "settings.sessions.action.revoke-session": {
     "message": "撤銷工作階段"

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="pb-20">
 		<section>
 			<Breadcrumbs
 				v-if="breadcrumbsStack"
@@ -111,6 +111,16 @@ const { data: project } = useQuery({
 	enabled: computed(() => !!projectId.value),
 })
 
+const sharedInstanceId = computed(() =>
+	rawReport.value?.item_type === 'shared-instance' ? rawReport.value.item_id : null,
+)
+
+const { data: sharedInstance } = useQuery({
+	queryKey: computed(() => ['shared-instance', sharedInstanceId.value]),
+	queryFn: () => client.sharedinstances.instances_v1.get(sharedInstanceId.value),
+	enabled: computed(() => !!sharedInstanceId.value),
+})
+
 // Assemble the full report object
 const report = computed(() => {
 	if (!rawReport.value) return null
@@ -118,6 +128,7 @@ const report = computed(() => {
 		...rawReport.value,
 		project: project.value ?? null,
 		version: version.value ?? null,
+		shared_instance: sharedInstance.value ?? null,
 		reporterUser: (users.value || []).find((user) => user.id === rawReport.value.reporter),
 		user:
 			rawReport.value.item_type === 'user'

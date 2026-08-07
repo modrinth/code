@@ -32,9 +32,6 @@
   "app.settings.tabs.appearance": {
     "message": "Aspect"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Opțiuni implicite instanță"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Instalări Java"
   },

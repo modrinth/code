@@ -37,14 +37,10 @@
 				class="w-[30rem]"
 			/>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<button @click="closeEditModal">Cancel</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button type="submit" :disabled="isSavingEdit">
-						{{ isSavingEdit ? 'Saving...' : 'Save' }}
-					</button>
-				</ButtonStyled>
+				<Button @click="closeEditModal">Cancel</Button>
+				<Button type="colored" color="brand" native-type="submit" :disabled="isSavingEdit">
+					{{ isSavingEdit ? 'Saving...' : 'Save' }}
+				</Button>
 			</div>
 		</form>
 	</NewModal>
@@ -59,24 +55,18 @@
 				clearable
 				wrapper-class="flex-1 w-full"
 			/>
-			<ButtonStyled color="brand">
-				<button type="submit">
-					<SearchIcon aria-hidden="true" />
-					Search by title
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button type="button" @click="executeFlameIdLookup">
-					<BinaryIcon aria-hidden="true" />
-					Lookup CurseForge ID
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button type="button" @click="executeSha1Lookup">
-					<HashIcon aria-hidden="true" />
-					Lookup SHA-1
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" native-type="submit">
+				<SearchIcon aria-hidden="true" />
+				Search by title
+			</Button>
+			<Button native-type="button" @click="executeFlameIdLookup">
+				<BinaryIcon aria-hidden="true" />
+				Lookup CurseForge ID
+			</Button>
+			<Button native-type="button" @click="executeSha1Lookup">
+				<HashIcon aria-hidden="true" />
+				Lookup SHA-1
+			</Button>
 		</form>
 		<div>
 			<template v-if="lastSearchKind !== 'none'">
@@ -106,12 +96,10 @@
 							:cf_id="project.flame_project_id"
 						>
 							<template #actions>
-								<ButtonStyled>
-									<button @click="openEditModal(project)">
-										<EditIcon />
-										Edit
-									</button>
-								</ButtonStyled>
+								<Button @click="openEditModal(project)">
+									<EditIcon />
+									Edit
+								</Button>
 							</template>
 						</ExternalProjectLookupCard>
 					</div>
@@ -130,8 +118,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { BinaryIcon, EditIcon, HashIcon, SearchIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	EmptyState,

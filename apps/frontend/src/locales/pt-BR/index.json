@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Ocultar {name} no gráfico"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Sem dados"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Dica de ferramenta do gráfico fixada"
   },
@@ -2879,9 +2882,6 @@
   "layout.nav.discover": {
     "message": "Descubra"
   },
-  "layout.nav.discover-content": {
-    "message": "Descubra conteúdo"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Baixe o Modrinth App"
   },
@@ -3921,7 +3921,7 @@
     "message": "Selecionar região"
   },
   "project.settings.server.server-online": {
-    "message": "O servidor está ativo!"
+    "message": "O servidor está online!"
   },
   "project.settings.server.srv-records-hint": {
     "message": "Se você tiver <srv-tooltip>[registros SRV]</srv-tooltip>, não precisará adicionar uma porta. Caso contrário, se você tiver uma porta que não seja 25565, poderá incluí-la como :12345"
@@ -4712,23 +4712,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Adicionar URI de redirecionamento"
   },
-  "settings.applications.button.cancel": {
-    "message": "Cancelar"
-  },
   "settings.applications.button.create": {
     "message": "Criar app"
   },
   "settings.applications.button.delete": {
     "message": "Excluir"
   },
-  "settings.applications.button.edit": {
-    "message": "Editar"
-  },
   "settings.applications.button.new": {
     "message": "Novo aplicativo"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Salvar alterações"
   },
   "settings.applications.button.upload-icon": {
     "message": "Enviar ícone"
@@ -4802,17 +4793,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre este aplicativo"
   },
-  "settings.authorizations.by": {
-    "message": "por"
+  "settings.authorizations.created-by": {
+    "message": "Criado por {user}"
   },
   "settings.authorizations.description": {
     "message": "Ao autorizar um aplicativo com sua conta do Modrinth, você concede acesso à sua conta. Você pode gerenciar e revisar o acesso à sua conta aqui a qualquer momento."
   },
-  "settings.authorizations.empty-state": {
-    "message": "No momento, não podemos exibir seus aplicativos autorizados. Estamos trabalhando para corrigir isso. Visite esta página novamente mais tarde!"
+  "settings.authorizations.empty-state.description": {
+    "message": "Os aplicativos que você autorizar aparecerão aqui."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Nenhum aplicativo autorizado"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Este aplicativo foi criado por uma conta oficial do Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Revogar"
@@ -4822,6 +4819,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Tem certeza de que deseja revogar este aplicativo?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Este aplicativo não é afiliado ao Modrinth em nenhum modo, apesar do nome."
   },
   "settings.billing.charges.description": {
     "message": "Todas as suas cobranças anteriores na sua conta Modrinth serão listadas aqui:"
@@ -5167,27 +5167,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
-  },
-  "settings.profile.bio.description": {
-    "message": "Uma breve descrição para falar um pouco sobre você para todos."
-  },
-  "settings.profile.bio.title": {
-    "message": "Sobre"
-  },
-  "settings.profile.description": {
-    "message": "As informações do seu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>API do Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Configurações de perfil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informação do perfil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Foto de perfil"
-  },
-  "settings.profile.username.description": {
-    "message": "Um nome único sem distinção de maiúsculas e minúsculas para identificar o seu perfil."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Encerrar sessão"

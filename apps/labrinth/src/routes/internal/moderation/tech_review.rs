@@ -1288,16 +1288,20 @@ pub async fn update_issue_details(
             INSERT INTO delphi_issue_detail_verdicts (
                 project_id,
                 detail_key,
-                verdict
+                verdict,
+                updated_at
             )
             SELECT
                 project_id,
                 detail_key,
-                verdict::delphi_report_issue_status
+                verdict::delphi_report_issue_status,
+                NOW()
             FROM latest
             WHERE verdict != 'pending'
             ON CONFLICT (project_id, detail_key)
-            DO UPDATE SET verdict = EXCLUDED.verdict
+            DO UPDATE SET
+                verdict = EXCLUDED.verdict,
+                updated_at = EXCLUDED.updated_at
             RETURNING 1
         )
         SELECT
@@ -1431,15 +1435,19 @@ pub async fn update_global_issue_details(
         )
         INSERT INTO delphi_global_detail_verdicts (
             detail_key,
-            verdict
+            verdict,
+            updated_at
         )
         SELECT
             detail_key,
-            verdict::delphi_report_issue_status
+            verdict::delphi_report_issue_status,
+            NOW()
         FROM latest
         WHERE verdict != 'pending'
         ON CONFLICT (detail_key)
-        DO UPDATE SET verdict = EXCLUDED.verdict
+        DO UPDATE SET
+            verdict = EXCLUDED.verdict,
+            updated_at = EXCLUDED.updated_at
         "#,
         &detail_keys,
         &verdicts,

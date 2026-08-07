@@ -19,22 +19,20 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="orange">
-					<button
-						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
-						:disabled="buttonsDisabled || props.actionDisabled"
-						@click="confirm"
-					>
-						<UnlinkIcon />
-						{{ formatMessage(actionMessage) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+					type="colored"
+					color="orange"
+					:disabled="buttonsDisabled || props.actionDisabled"
+					@click="confirm"
+				>
+					<UnlinkIcon />
+					{{ formatMessage(actionMessage) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -45,7 +43,7 @@ import { UnlinkIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

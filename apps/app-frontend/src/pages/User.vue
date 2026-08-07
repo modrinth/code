@@ -1,40 +1,127 @@
 <template>
-	<div class="w-full pt-2">
+	<div class="w-full p-2">
 		<UserProfilePageLayout
 			:user-id="userId"
 			:project-type="projectType"
 			variant="app"
 			site-url="https://modrinth.com"
 			project-link-mode="app"
+			:edit-profile-link="openProfileSettings"
 			external-navigation
-		/>
+		>
+			<template #project-actions="{ project }">
+				<Button
+					type="outlined"
+					class="!text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
+					:disabled="isProjectInstalling(project.id)"
+					@click.stop="installProject(project)"
+				>
+					<SpinnerIcon v-if="isProjectInstalling(project.id)" class="animate-spin" />
+					<DownloadIcon v-else-if="project.project_type === 'modpack'" />
+					<PlusIcon v-else />
+					{{
+						formatMessage(
+							isProjectInstalling(project.id)
+								? commonMessages.installingLabel
+								: project.project_type === 'modpack'
+									? commonMessages.installButton
+									: messages.installToInstance,
+						)
+					}}
+				</Button>
+			</template>
+		</UserProfilePageLayout>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
+import type { Labrinth } from '@modrinth/api-client'
+import { DownloadIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
+import {
+	Button,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	provideUserProfile,
+	UserProfilePageLayout,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, watch } from 'vue'
-import { onBeforeRouteUpdate, useRoute } from 'vue-router'
+import { computed, inject, ref, watch } from 'vue'
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import {
+	block_user,
+	get_blocked_users,
 	get_user_collections,
 	get_user_organizations,
 	get_user_profile,
 	get_user_projects,
 	patch_user,
+	unblock_user,
 } from '@/helpers/users'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { appSettingsModalOpenProfileKey } from '@/providers/app-settings-modal'
+import { useBreadcrumb } from '@/providers/breadcrumbs'
+import { injectContentInstall } from '@/providers/content-install'
 
 const route = useRoute()
+const router = useRouter()
+const openProfileSettings = inject(appSettingsModalOpenProfileKey, () => {})
 const queryClient = useQueryClient()
-const breadcrumbs = useBreadcrumbs()
+const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
+const { install: installVersion } = injectContentInstall()
+const installingProjectIds = ref(new Set<string>())
+
+const messages = defineMessages({
+	installToInstance: {
+		id: 'app.user.project.install-to-instance',
+		defaultMessage: 'Install to instance',
+	},
+})
+
+function isProjectInstalling(projectId: string): boolean {
+	return installingProjectIds.value.has(projectId)
+}
+
+function setProjectInstalling(projectId: string, installing: boolean): void {
+	const next = new Set(installingProjectIds.value)
+	if (installing) {
+		next.add(projectId)
+	} else {
+		next.delete(projectId)
+	}
+	installingProjectIds.value = next
+}
+
+async function installProject(project: Labrinth.Projects.v2.Project): Promise<void> {
+	if (isProjectInstalling(project.id)) return
+
+	setProjectInstalling(project.id, true)
+	try {
+		await installVersion(
+			project.id,
+			null,
+			null,
+			'UserPage',
+			() => setProjectInstalling(project.id, false),
+			(instanceId) => router.push(`/instance/${encodeURIComponent(instanceId)}`),
+		)
+	} catch (error) {
+		setProjectInstalling(project.id, false)
+		handleError(error)
+	}
+}
+
 const userProfile = provideUserProfile({
 	getUser: get_user_profile,
 	getProjects: get_user_projects,
 	getOrganizations: get_user_organizations,
 	getCollections: get_user_collections,
 	patchUser: patch_user,
+	getBlockedUsers: get_blocked_users,
+	blockUser: block_user,
+	unblockUser: unblock_user,
 })
 
 const userId = computed(() => {
@@ -46,17 +133,54 @@ const projectType = computed(() => {
 	return Array.isArray(value) ? value[0] : value
 })
 
+function getCachedUserSummary(id: string) {
+	return queryClient.getQueryData<Labrinth.Users.v3.User>(['users', 'summary', id])
+}
+
+const { data: user } = useQuery({
+	queryKey: computed(() => ['user', userId.value]),
+	queryFn: () => userProfile.getUser(userId.value),
+	enabled: false,
+	staleTime: 30_000,
+})
+
+const breadcrumbUserId = ref(userId.value)
+const breadcrumbLabel = ref(getCachedUserSummary(userId.value)?.username ?? userId.value)
+const breadcrumbTo = ref(route.fullPath)
+watch(
+	[userId, user, () => route.fullPath],
+	([currentUserId, currentUser, currentPath]) => {
+		if (route.name !== 'User') return
+		breadcrumbUserId.value = currentUserId
+		breadcrumbLabel.value = currentUser?.username ?? currentUserId
+		breadcrumbTo.value = currentPath
+	},
+	{ immediate: true, flush: 'sync' },
+)
+
+useBreadcrumb({
+	slot: 'user',
+	id: () => `user:${breadcrumbUserId.value}`,
+	label: breadcrumbLabel,
+	to: breadcrumbTo,
+	visual: () => ({
+		type: 'image',
+		src: user.value?.avatar_url ?? getCachedUserSummary(breadcrumbUserId.value)?.avatar_url,
+		alt: breadcrumbLabel.value,
+		circle: true,
+		tintBy: breadcrumbUserId.value,
+	}),
+})
+
 async function ensureUserProfileData(id: string): Promise<void> {
 	if (!id) return
 
-	let breadcrumbName = id
 	try {
-		const user = await queryClient.ensureQueryData({
+		await queryClient.ensureQueryData({
 			queryKey: ['user', id],
 			queryFn: () => userProfile.getUser(id),
 			staleTime: 30_000,
 		})
-		breadcrumbName = user.username
 	} catch {
 		// Let the mounted layout's useQuery surface errors; do not fail route setup.
 	}
@@ -78,8 +202,6 @@ async function ensureUserProfileData(id: string): Promise<void> {
 			staleTime: 30_000,
 		}),
 	])
-
-	breadcrumbs.setName('User', breadcrumbName)
 }
 
 onBeforeRouteUpdate(async (to) => {
@@ -88,21 +210,5 @@ onBeforeRouteUpdate(async (to) => {
 	await ensureUserProfileData(id)
 })
 
-breadcrumbs.setName('User', userId.value)
 await ensureUserProfileData(userId.value)
-
-const { data: user } = useQuery({
-	queryKey: computed(() => ['user', userId.value]),
-	queryFn: () => userProfile.getUser(userId.value),
-	enabled: false,
-	staleTime: 30_000,
-})
-
-watch(
-	[userId, user],
-	([currentUserId, value]) => {
-		breadcrumbs.setName('User', value?.username ?? currentUserId)
-	},
-	{ immediate: true },
-)
 </script>

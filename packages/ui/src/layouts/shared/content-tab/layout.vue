@@ -20,9 +20,8 @@ import {
 } from '@modrinth/assets'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
-import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -763,9 +762,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="universal-card flex flex-col items-center gap-4 p-6">
 					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
 					<p class="text-secondary">{{ ctx.error.value.message }}</p>
-					<ButtonStyled color="brand">
-						<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="handleRefresh">{{
+						formatMessage(commonMessages.retryButton)
+					}}</Button>
 				</div>
 			</div>
 
@@ -818,34 +817,33 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							/>
 
 							<div class="flex gap-2">
-								<ButtonStyled type="outlined">
-									<button
-										v-tooltip="
-											ctx.busyMessage?.value ??
-											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-										"
-										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10"
-										@click="ctx.uploadFiles"
-									>
-										<FolderOpenIcon class="size-5" />
-										{{ formatMessage(messages.uploadFiles) }}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="brand">
-									<button
-										v-tooltip="
-											ctx.busyMessage?.value ??
-											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-										"
-										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10 flex items-center gap-2"
-										@click="ctx.browse"
-									>
-										<CompassIcon class="size-5" />
-										<span>{{ formatMessage(messages.browseContent) }}</span>
-									</button>
-								</ButtonStyled>
+								<Button
+									v-tooltip="
+										ctx.busyMessage?.value ??
+										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+									"
+									type="outlined"
+									size="lg"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+									@click="ctx.uploadFiles"
+								>
+									<FolderOpenIcon class="size-5" />
+									{{ formatMessage(messages.uploadFiles) }}
+								</Button>
+								<Button
+									v-tooltip="
+										ctx.busyMessage?.value ??
+										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+									"
+									type="colored"
+									color="brand"
+									size="lg"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+									@click="ctx.browse"
+								>
+									<CompassIcon class="size-5" />
+									<span>{{ formatMessage(messages.browseContent) }}</span>
+								</Button>
 							</div>
 						</div>
 
@@ -879,66 +877,58 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									{{ option.label }}
 								</button>
 								<div class="hidden @[900px]:block">
-									<ButtonStyled type="transparent">
-										<button
-											:aria-label="
-												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-											"
-											@click="cycleSortMode"
-										>
-											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-												v-else-if="sortMode === 'date-added-newest'"
-											/><ClockArrowUpIcon
-												v-else-if="sortMode === 'date-added-oldest'"
-											/><ArrowDownAZIcon v-else />
-											{{ sortLabels[sortMode]() }}
-										</button>
-									</ButtonStyled>
+									<Button
+										type="quiet"
+										:aria-label="
+											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+										"
+										@click="cycleSortMode"
+									>
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon v-else />
+										{{ sortLabels[sortMode]() }}
+									</Button>
 								</div>
 							</div>
 
 							<div class="flex items-center gap-2">
 								<div class="@[900px]:hidden">
-									<ButtonStyled type="transparent">
-										<button
-											:aria-label="
-												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-											"
-											@click="cycleSortMode"
-										>
-											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-												v-else-if="sortMode === 'date-added-newest'"
-											/><ClockArrowUpIcon
-												v-else-if="sortMode === 'date-added-oldest'"
-											/><ArrowDownAZIcon v-else />
-											{{ sortLabels[sortMode]() }}
-										</button>
-									</ButtonStyled>
+									<Button
+										type="quiet"
+										:aria-label="
+											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+										"
+										@click="cycleSortMode"
+									>
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon v-else />
+										{{ sortLabels[sortMode]() }}
+									</Button>
 								</div>
 
-								<ButtonStyled
+								<Button
 									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
+									v-tooltip="formatMessage(messages.updateAll)"
+									type="quiet"
 									color="green"
-									type="transparent"
-									color-fill="text"
-									hover-color-fill="background"
+									:disabled="isBulkOperating"
+									class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+									@click="promptUpdateAll"
 								>
-									<button
-										v-tooltip="formatMessage(messages.updateAll)"
-										:disabled="isBulkOperating"
-										@click="promptUpdateAll"
-									>
-										<DownloadIcon />
-										{{ formatMessage(messages.updateAll) }}
-									</button>
-								</ButtonStyled>
+									<DownloadIcon />
+									{{ formatMessage(messages.updateAll) }}
+								</Button>
 
-								<ButtonStyled type="transparent">
-									<button :disabled="refreshing" @click="handleRefresh">
-										<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-										{{ formatMessage(commonMessages.refreshButton) }}
-									</button>
-								</ButtonStyled>
+								<Button type="quiet" :disabled="refreshing" @click="handleRefresh">
+									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
+									{{ formatMessage(commonMessages.refreshButton) }}
+								</Button>
 							</div>
 						</div>
 
@@ -981,34 +971,33 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						}}
 					</template>
 					<template #actions>
-						<ButtonStyled type="outlined">
-							<button
-								v-tooltip="
-									ctx.busyMessage?.value ??
-									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-								"
-								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10"
-								@click="ctx.uploadFiles"
-							>
-								<FolderOpenIcon class="size-5" />
-								{{ formatMessage(messages.uploadFiles) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button
-								v-tooltip="
-									ctx.busyMessage?.value ??
-									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-								"
-								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10 flex items-center gap-2"
-								@click="ctx.browse"
-							>
-								<CompassIcon class="size-5" />
-								<span>{{ formatMessage(messages.browseContent) }}</span>
-							</button>
-						</ButtonStyled>
+						<Button
+							v-tooltip="
+								ctx.busyMessage?.value ??
+								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
+							type="outlined"
+							size="lg"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+							@click="ctx.uploadFiles"
+						>
+							<FolderOpenIcon class="size-5" />
+							{{ formatMessage(messages.uploadFiles) }}
+						</Button>
+						<Button
+							v-tooltip="
+								ctx.busyMessage?.value ??
+								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
+							type="colored"
+							color="brand"
+							size="lg"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+							@click="ctx.browse"
+						>
+							<CompassIcon class="size-5" />
+							<span>{{ formatMessage(messages.browseContent) }}</span>
+						</Button>
 					</template>
 				</EmptyState>
 			</template>
@@ -1034,84 +1023,82 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			@disable="bulkDisable"
 		>
 			<template #actions>
-				<ButtonStyled
+				<Button
 					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
-					type="transparent"
+					v-tooltip="formatMessage(commonMessages.updateButton)"
+					type="quiet"
 					color="green"
-					color-fill="text"
-					hover-color-fill="background"
+					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="promptUpdateSelected"
 				>
-					<button
-						v-tooltip="formatMessage(commonMessages.updateButton)"
-						@click="promptUpdateSelected"
-					>
-						<DownloadIcon />
-						<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
-					</button>
-				</ButtonStyled>
+					<DownloadIcon />
+					<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
+				</Button>
 
-				<ButtonStyled v-if="ctx.shareItems" type="transparent">
-					<OverflowMenu
-						:options="[
-							{
-								id: 'share-names',
-								action: () => ctx.shareItems!(selectedItems, 'names'),
-							},
-							{
-								id: 'share-file-names',
-								action: () => ctx.shareItems!(selectedItems, 'file-names'),
-							},
-							{
-								id: 'share-urls',
-								action: () => ctx.shareItems!(selectedItems, 'urls'),
-							},
-							{
-								id: 'share-markdown',
-								action: () => ctx.shareItems!(selectedItems, 'markdown'),
-							},
-						]"
-					>
-						<ShareIcon />
-						<span class="bar-label">{{ formatMessage(messages.share) }}</span>
-						<DropdownIcon />
-						<template #share-names>
-							<TextCursorInputIcon />
-							{{ formatMessage(messages.shareProjectNames) }}
-						</template>
-						<template #share-file-names>
-							<FileIcon />
-							{{ formatMessage(messages.shareFileNames) }}
-						</template>
-						<template #share-urls>
-							<LinkIcon />
-							{{ formatMessage(messages.shareProjectLinks) }}
-						</template>
-						<template #share-markdown>
-							<CodeIcon />
-							{{ formatMessage(messages.shareMarkdownLinks) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+				<TeleportOverflowMenu
+					v-if="ctx.shareItems"
+					type="quiet"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					:options="[
+						{
+							id: 'share-names',
+							label: formatMessage(messages.shareProjectNames),
+							action: () => ctx.shareItems!(selectedItems, 'names'),
+						},
+						{
+							id: 'share-file-names',
+							label: formatMessage(messages.shareFileNames),
+							action: () => ctx.shareItems!(selectedItems, 'file-names'),
+						},
+						{
+							id: 'share-urls',
+							label: formatMessage(messages.shareProjectLinks),
+							action: () => ctx.shareItems!(selectedItems, 'urls'),
+						},
+						{
+							id: 'share-markdown',
+							label: formatMessage(messages.shareMarkdownLinks),
+							action: () => ctx.shareItems!(selectedItems, 'markdown'),
+						},
+					]"
+					class="!w-auto !px-2.5 !rounded-xl"
+				>
+					<ShareIcon />
+					<span class="bar-label">{{ formatMessage(messages.share) }}</span>
+					<DropdownIcon />
+					<template #share-names>
+						<TextCursorInputIcon />
+						{{ formatMessage(messages.shareProjectNames) }}
+					</template>
+					<template #share-file-names>
+						<FileIcon />
+						{{ formatMessage(messages.shareFileNames) }}
+					</template>
+					<template #share-urls>
+						<LinkIcon />
+						{{ formatMessage(messages.shareProjectLinks) }}
+					</template>
+					<template #share-markdown>
+						<CodeIcon />
+						{{ formatMessage(messages.shareMarkdownLinks) }}
+					</template>
+				</TeleportOverflowMenu>
 			</template>
 
 			<template #actions-end>
 				<div v-if="deletableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
 
-				<ButtonStyled
+				<Button
 					v-if="deletableSelectedItems.length > 0"
-					type="transparent"
+					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					type="quiet"
 					color="red"
-					color-fill="text"
-					hover-color-fill="background"
+					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="showBulkDeleteModal"
 				>
-					<button
-						v-tooltip="formatMessage(commonMessages.deleteLabel)"
-						@click="showBulkDeleteModal"
-					>
-						<TrashIcon />
-						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-					</button>
-				</ButtonStyled>
+					<TrashIcon />
+					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+				</Button>
 			</template>
 		</ContentSelectionBar>
 

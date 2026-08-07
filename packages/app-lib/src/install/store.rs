@@ -201,6 +201,17 @@ pub async fn list_interrupted_candidates(
     Ok(deserialize_rows(rows))
 }
 
+pub async fn list_active_for_instance(
+    instance_id: &str,
+    app_state: &State,
+) -> crate::Result<Vec<InstallJobRecord>> {
+    Ok(list_interrupted_candidates(app_state)
+        .await?
+        .into_iter()
+        .filter(|job| job.instance_id.as_deref() == Some(instance_id))
+        .collect())
+}
+
 pub async fn update_state(
     id: Uuid,
     state: &InstallJobState,
@@ -212,19 +223,29 @@ pub async fn update_state(
     let id_value = id.to_string();
     let modified = now.timestamp();
 
-    sqlx::query!(
+    let result = sqlx::query(
         "
 		UPDATE install_jobs
-		SET instance_id = ?, state = ?, modified = ?
-		WHERE id = ?
+		SET
+			instance_id = (SELECT id FROM instances WHERE id = ?),
+			state = ?,
+			modified = ?
+		WHERE id = ? AND status IN ('queued', 'running')
 		",
-        instance_id,
-        json,
-        modified,
-        id_value,
     )
+    .bind(instance_id)
+    .bind(json)
+    .bind(modified)
+    .bind(id_value)
     .execute(&app_state.pool)
     .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Install job {id} is no longer active"
+        ))
+        .into());
+    }
 
     get_required(id, app_state).await
 }
@@ -319,7 +340,12 @@ pub async fn finish_active(
     let result = sqlx::query(
         "
 		UPDATE install_jobs
-		SET instance_id = ?, status = ?, state = ?, modified = ?, finished = ?
+		SET
+			instance_id = (SELECT id FROM instances WHERE id = ?),
+			status = ?,
+			state = ?,
+			modified = ?,
+			finished = ?
 		WHERE id = ? AND status IN ('queued', 'running')
 		",
     )
@@ -356,19 +382,24 @@ pub async fn complete_success(
     let mut transaction = app_state.pool.begin().await?;
 
     let job_result = sqlx::query(
-		"
+        "
 		UPDATE install_jobs
-		SET instance_id = ?, status = 'succeeded', state = ?, modified = ?, finished = ?
+		SET
+			instance_id = (SELECT id FROM instances WHERE id = ?),
+			status = 'succeeded',
+			state = ?,
+			modified = ?,
+			finished = ?
 		WHERE id = ? AND status = 'running'
 		",
-	)
-	.bind(&instance_id)
-	.bind(json)
-	.bind(now)
-	.bind(now)
-	.bind(id_value)
-	.execute(&mut *transaction)
-	.await?;
+    )
+    .bind(&instance_id)
+    .bind(json)
+    .bind(now)
+    .bind(now)
+    .bind(id_value)
+    .execute(&mut *transaction)
+    .await?;
 
     if job_result.rows_affected() == 0 {
         transaction.rollback().await?;

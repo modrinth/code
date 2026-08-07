@@ -2,6 +2,8 @@ export type ShareMethod = 'direct' | 'link'
 export type MethodFilter = ShareMethod | 'all'
 export type ShareTableColumn = 'username' | 'lastPlayed' | 'joined' | 'method' | 'actions'
 
+export const SHARED_INSTANCE_USER_LIMIT = 50
+
 export type ShareRow = {
 	id: string
 	username: string

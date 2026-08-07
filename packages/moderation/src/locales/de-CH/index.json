@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Es wird mindestens ein Galeriebild benötigt, um den Inhalt deines/deiner {type} zu präsentieren."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "Resource Pack, ausgenommen Audio- oder Lokalisierungs-Packs. Wenn dies auf dein Pack zutrifft, wähle bitte das entsprechende Tag aus"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Lade ein Galeriebild hoch"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "Link-Einstellungen ansehen"
   }
 }
-

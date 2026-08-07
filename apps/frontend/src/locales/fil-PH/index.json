@@ -1829,9 +1829,6 @@
   "layout.nav.discover": {
     "message": "Tumuklas"
   },
-  "layout.nav.discover-content": {
-    "message": "Tumuklas ng kontento"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Kunin ang Modrinth App"
   },
@@ -2843,23 +2840,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Magdagdag ng redirect URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Kanselahin"
-  },
   "settings.applications.button.create": {
     "message": "Lumikha ng app"
   },
   "settings.applications.button.delete": {
     "message": "Tanggalin"
   },
-  "settings.applications.button.edit": {
-    "message": "Baguhin"
-  },
   "settings.applications.button.new": {
     "message": "Bagong aplikasyon"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "I-save ang mga pagbabago"
   },
   "settings.applications.button.upload-icon": {
     "message": "I-upload ang ikono"
@@ -2932,12 +2920,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "Tungkol sa app"
-  },
-  "settings.authorizations.by": {
-    "message": "ni/ng"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Kasalukuyang hindi namin mapapakita ang mga pinahintulutang app, kinukumpuni pa namin ito. Mangyaring bisitahin ang pahinang ito sa ibang pagkataon!"
   },
   "settings.authorizations.head-title": {
     "message": "Mga pagpapahintulot"
@@ -3175,27 +3157,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Hindi ginamit"
-  },
-  "settings.profile.bio.description": {
-    "message": "Isang maikling paglalarawan upang maipaalam sa lahat ang maliit na sipi ukol sa iyo."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biyograpiya"
-  },
-  "settings.profile.description": {
-    "message": "Makikita ng publiko ang impormasyon ng iyong profile at sa <docs-link>API ng Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Settings ng profile"
-  },
-  "settings.profile.profile-info": {
-    "message": "Impormasyon ng profile"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profile picture"
-  },
-  "settings.profile.username.description": {
-    "message": "Isang natatanging case-insensitive na pangalan upang matukoy ang iyong profile."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Bawiin ang sesyon"

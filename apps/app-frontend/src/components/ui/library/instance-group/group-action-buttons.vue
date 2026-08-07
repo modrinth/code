@@ -18,7 +18,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	addToGroup: {
 		id: 'app.library.group.context-menu.add-to-group',
-		defaultMessage: 'Add instances to group',
+		defaultMessage: 'Add to group',
 	},
 	editGroupName: {
 		id: 'app.library.group.edit-name',
