@@ -11,6 +11,7 @@ import { Button, IconButton } from '@modrinth/ui'
 import {
 	Combobox,
 	type ComboboxOption,
+	commonMessages,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
@@ -61,10 +62,6 @@ const messages = defineMessages({
 		id: 'modpack-scan-modal.scanning',
 		defaultMessage: 'Scanning...',
 	},
-	success: {
-		id: 'modpack-scan-modal.success',
-		defaultMessage: 'Success',
-	},
 	failed: {
 		id: 'modpack-scan-modal.failed',
 		defaultMessage: 'Failed',
@@ -101,10 +98,6 @@ const messages = defineMessages({
 		id: 'modpack-scan-modal.delete-all-groups-confirmation.description',
 		defaultMessage:
 			'This will permanently delete all attribution groups for this project and all files inside them. This action cannot be undone.',
-	},
-	deleteAllGroupsConfirmationProceed: {
-		id: 'modpack-scan-modal.delete-all-groups.proceed',
-		defaultMessage: 'Clear',
 	},
 	deleteAllGroupsSuccess: {
 		id: 'modpack-scan-modal.delete-all-groups.success',
@@ -344,7 +337,7 @@ async function clearAllGroups() {
 	if (!failed) {
 		addNotification({
 			type: 'success',
-			title: formatMessage(messages.success),
+			title: formatMessage(commonMessages.successLabel),
 			text: formatMessage(messages.deleteAllGroupsSuccess),
 		})
 	}
@@ -369,7 +362,7 @@ defineExpose({ show, hide })
 		ref="clearModalRef"
 		:title="formatMessage(messages.deleteAllGroupsConfirmationTitle)"
 		:description="formatMessage(messages.deleteAllGroupsConfirmationDescription)"
-		:proceed-label="formatMessage(messages.deleteAllGroupsConfirmationProceed)"
+		:proceed-label="formatMessage(commonMessages.clearButton)"
 		@proceed="clearAllGroups"
 	/>
 

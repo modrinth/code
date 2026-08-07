@@ -1856,9 +1856,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "Megnyílt egy új lap a bejelentkezéshez. Végezd el ott a bejelentkezést, majd térj vissza az alkalmazásba."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Mégse"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Folytatás a böngészőben"
   },

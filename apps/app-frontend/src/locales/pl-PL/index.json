@@ -1619,9 +1619,6 @@
   "minecraft-required.sign-in": {
     "message": "Zaloguj się do Microsoft"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Anuluj"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Kontynuuj w przeglądarce"
   },

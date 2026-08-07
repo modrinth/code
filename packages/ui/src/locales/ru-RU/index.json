@@ -1232,9 +1232,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Файл сохранён"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Закрыть"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Найти"
   },
@@ -5326,12 +5323,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Аватар {username}"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Отозвать"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Отмена"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Другое..."

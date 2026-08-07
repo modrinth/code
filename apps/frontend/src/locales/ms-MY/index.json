@@ -1112,9 +1112,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Dikemas Kini Baru-baru Ini"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Tutup"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Muat turun {formType}"
   },
@@ -2422,9 +2419,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Semakan teknikal"
-  },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Kosongkan"
   },
   "modpack-scan-modal.failed": {
     "message": "Gagal"

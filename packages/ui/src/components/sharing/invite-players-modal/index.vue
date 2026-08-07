@@ -147,6 +147,7 @@ import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'
+import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
 import Combobox from '../../base/Combobox.vue'
 import NewModal from '../../modal/NewModal.vue'
@@ -226,10 +227,6 @@ const messages = defineMessages({
 		id: 'sharing.invite-players-modal.added',
 		defaultMessage: 'Added',
 	},
-	cancelButton: {
-		id: 'sharing.invite-players-modal.cancel',
-		defaultMessage: 'Cancel',
-	},
 	requestedButton: {
 		id: 'sharing.invite-players-modal.requested',
 		defaultMessage: 'Request sent',
@@ -297,7 +294,9 @@ const searchPlaceholderLabel = computed(
 const addButtonLabel = computed(() => props.addLabel ?? formatMessage(messages.addButton))
 const inviteButtonLabel = computed(() => props.inviteLabel ?? formatMessage(messages.inviteButton))
 const addedButtonLabel = computed(() => props.addedLabel ?? formatMessage(messages.addedButton))
-const cancelButtonLabel = computed(() => props.cancelLabel ?? formatMessage(messages.cancelButton))
+const cancelButtonLabel = computed(
+	() => props.cancelLabel ?? formatMessage(commonMessages.cancelButton),
+)
 const requestedButtonLabel = computed(
 	() => props.requestedLabel ?? formatMessage(messages.requestedButton),
 )

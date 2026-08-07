@@ -1142,9 +1142,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Filen sparades"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Stäng"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Hitta"
   },
@@ -4760,12 +4757,6 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username}s avatar"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Avbryt"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Avbryt"
-  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Anpassat..."
   },
@@ -5442,4 +5433,3 @@
     "defaultMessage": "Typ"
   }
 }
-
