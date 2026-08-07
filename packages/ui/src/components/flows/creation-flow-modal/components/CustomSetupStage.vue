@@ -4,7 +4,7 @@
 			v-if="ctx.projectInstall.value"
 			class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3"
 		>
-			<AutoLink :to="ctx.projectInstall.value.link" class="shrink-0">
+			<div class="shrink-0">
 				<div
 					class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
 				>
@@ -13,25 +13,20 @@
 						:src="ctx.projectInstall.value.iconUrl"
 						:alt="ctx.projectInstall.value.title"
 						size="100%"
+						class="!rounded-2xl"
 						no-shadow
 					/>
 				</div>
-			</AutoLink>
+			</div>
 			<div class="flex flex-col gap-1">
-				<AutoLink
-					:to="ctx.projectInstall.value.link"
-					class="font-semibold text-contrast hover:underline"
-				>
+				<span class="font-semibold text-contrast">
 					{{ ctx.projectInstall.value.title }}
-				</AutoLink>
+				</span>
 				<div
 					v-if="ctx.projectInstall.value.owner"
 					class="flex items-center gap-2 text-sm text-secondary"
 				>
-					<AutoLink
-						:to="ctx.projectInstall.value.owner.link"
-						class="flex items-center gap-1.5 text-inherit no-underline hover:underline"
-					>
+					<div class="flex items-center gap-1.5 text-inherit">
 						<Avatar
 							:src="ctx.projectInstall.value.owner.iconUrl"
 							:alt="ctx.projectInstall.value.owner.name"
@@ -40,7 +35,7 @@
 							no-shadow
 						/>
 						<span class="font-medium">{{ ctx.projectInstall.value.owner.name }}</span>
-					</AutoLink>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -226,7 +221,6 @@ import { Button } from '#ui/components/base/buttons'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
-import AutoLink from '../../../base/AutoLink.vue'
 import Avatar from '../../../base/Avatar.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
