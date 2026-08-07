@@ -53,6 +53,7 @@ pub struct AppearancePreferences {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
+#[serde(rename_all = "snake_case")]
 pub enum Theme {
     Light,
     #[default]
@@ -104,6 +105,7 @@ impl Default for LayoutPreferences {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
 pub enum LayoutOption {
     Grid,
     Rows,
@@ -124,6 +126,7 @@ pub struct SocialPreferences {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
+#[serde(rename_all = "snake_case")]
 pub enum FriendPrivacy {
     None,
     Mutual,
@@ -132,6 +135,7 @@ pub enum FriendPrivacy {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
+#[serde(rename_all = "snake_case")]
 pub enum SharedInstancesPrivacy {
     None,
     Friends,
