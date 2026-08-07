@@ -292,7 +292,7 @@ const messages = defineMessages({
 <template>
 	<ConfirmDeleteInstanceModal
 		ref="deleteConfirmModal"
-		:instance-names="[instance.name]"
+		:instances="[instance]"
 		@delete="removeInstance"
 	/>
 	<IconEditorModal

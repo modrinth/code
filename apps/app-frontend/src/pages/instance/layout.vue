@@ -7,7 +7,7 @@
 			<ExportModal v-if="!instance.quarantined" ref="exportModal" :instance="instance" />
 			<ConfirmDeleteInstanceModal
 				ref="deleteConfirmModal"
-				:instance-names="selectedInstanceToDelete ? [selectedInstanceToDelete.name] : []"
+				:instances="selectedInstanceToDelete ? [selectedInstanceToDelete] : []"
 				@delete="deleteSelectedInstance"
 			/>
 			<InstanceSettingsModal

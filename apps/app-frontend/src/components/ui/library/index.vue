@@ -41,7 +41,7 @@ const {
 	reorderGroups,
 	instanceOptions,
 	confirmDeleteModal,
-	currentDeleteInstanceNames,
+	currentDeleteInstances,
 	clearLibraryInstanceSelection,
 	deleteInstance,
 	handleInstanceOption,
@@ -358,7 +358,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 	<GroupInstancesModal />
 	<ConfirmDeleteInstanceModal
 		:ref="setConfirmDeleteModal"
-		:instance-names="currentDeleteInstanceNames"
+		:instances="currentDeleteInstances"
 		@delete="deleteInstance"
 	/>
 	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">

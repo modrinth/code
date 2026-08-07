@@ -53,8 +53,7 @@
 	</FloatingActionBar>
 	<ConfirmDeleteInstanceModal
 		ref="confirmDeleteModal"
-		:count="selectedInstanceIds.size"
-		:instance-names="selectedInstanceNames"
+		:instances="selectedInstances"
 		@delete="deleteSelectedInstances"
 	/>
 </template>
@@ -97,10 +96,8 @@ const selectedInstanceIds = computed(
 	() =>
 		new Set([...selectedLibraryInstances.value.values()].map((selection) => selection.instanceId)),
 )
-const selectedInstanceNames = computed(() =>
-	instances.value
-		.filter((instance) => selectedInstanceIds.value.has(instance.id))
-		.map((instance) => instance.name),
+const selectedInstances = computed(() =>
+	instances.value.filter((instance) => selectedInstanceIds.value.has(instance.id)),
 )
 const selectedGroupedInstances = computed(() =>
 	[...selectedLibraryInstances.value.values()].flatMap((selection) => {
