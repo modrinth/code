@@ -2858,9 +2858,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Crea un progetto"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Modifica ruolo"
-  },
   "profile.button.info": {
     "defaultMessage": "Mostra info utente"
   },
@@ -2957,23 +2954,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {progetto} other {progetti}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Salvataggio..."
-  },
   "profile.official-account": {
     "defaultMessage": "Account Modrinth ufficiale"
   },
   "profile.official-account.bio": {
     "defaultMessage": "L'account ufficiale di Modrinth. Ricevi assistenza presso <support-link></support-link> o tramite mail presso <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Seleziona il ruolo"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Sì è verificato un errore nel salvataggio del ruolo utente. Riprova più tardi."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Impossibile salvare il ruolo"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Sì è verificato un errore nello sbloccare l'utente. Riprova più tardi."

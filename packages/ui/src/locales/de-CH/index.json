@@ -2900,9 +2900,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Projekt erstellen"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Rolle bearbeiten"
-  },
   "profile.button.info": {
     "defaultMessage": "Nutzerdetails anzeigen"
   },
@@ -2984,23 +2981,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {Projekt} other {Projekte}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Speichert..."
-  },
   "profile.official-account": {
     "defaultMessage": "Offizielles Modrinth-Konto"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Das offizielle Benutzerkonto von Modrinth. Erhalte Hilfe unter <support-link></support-link> oder per E-Mail unter <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Eine Rolle auswählen"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Beim Aktualisieren dieser Nutzerrolle ist ein Fehler aufgetreten. Bitte versuche es erneut."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Rolle konnte nicht aktualisiert werden"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Beim Freigeben dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
@@ -6240,4 +6225,3 @@
     "defaultMessage": "Typ"
   }
 }
-

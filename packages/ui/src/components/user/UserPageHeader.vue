@@ -128,10 +128,6 @@ const messages = defineMessages({
 		id: 'profile.button.unblock',
 		defaultMessage: 'Unblock',
 	},
-	editRoleButton: {
-		id: 'profile.button.edit-role',
-		defaultMessage: 'Edit role',
-	},
 	infoButton: {
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
@@ -212,7 +208,7 @@ const emit = defineEmits<{
 	toggleAffiliate: []
 	openInfo: []
 	openAnalytics: []
-	editRole: []
+	editUser: []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -298,10 +294,10 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
-		id: 'edit-role',
-		label: formatMessage(messages.editRoleButton),
+		id: 'edit-user',
+		label: 'Edit user',
 		icon: EditIcon,
-		action: () => emit('editRole'),
+		action: () => emit('editUser'),
 		tone: 'orange',
 		shown: props.showStaffActions && props.isAdmin,
 	},

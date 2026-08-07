@@ -2894,9 +2894,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Créer un projet"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Modifier le rôle"
-  },
   "profile.button.info": {
     "defaultMessage": "Voir les détails de l'utilisateur"
   },
@@ -2978,23 +2975,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural,one {projet}other {projets}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Enregistrement..."
-  },
   "profile.official-account": {
     "defaultMessage": "Compte Modrinth officiel"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Le compte utilisateur officiel de Modrinth. Obtenez de l’aide via <support-link></support-link> ou par e-mail à <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Sélectionner un rôle"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Une erreur s'est produite lors de la mise à jour du rôle utilisateur. Veuillez réessayer."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Impossible de mettre à jour le rôle"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Une erreur s'est produite pendant le déblocage de cet utilisateur. Veuillez réessayer."

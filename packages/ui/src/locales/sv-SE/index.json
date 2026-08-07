@@ -2561,9 +2561,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Skapa ett projekt"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Ändra roll"
-  },
   "profile.button.info": {
     "defaultMessage": "Visa användardetaljer"
   },
@@ -2630,20 +2627,8 @@
   "profile.label.project-count": {
     "defaultMessage": "Projekt"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Sparar..."
-  },
   "profile.official-account": {
     "defaultMessage": "Officiellt Modrinth-konto"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Välj en roll"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Ett fel inträffade medan användarrollen uppdaterades. Vänligen försök igen."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Misslyckades att uppdatera rollen"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Ett fel inträffade under avblockeringen av den här användaren. Vänligen försök igen."
@@ -5442,4 +5427,3 @@
     "defaultMessage": "Typ"
   }
 }
-
