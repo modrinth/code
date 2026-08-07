@@ -23,9 +23,9 @@
 					class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
 				></div>
 				<div
-					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
+					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-contrast"
 				>
-					?
+					<ModrinthIcon aria-hidden="true" class="h-1/2 w-1/2" />
 				</div>
 			</div>
 		</div>

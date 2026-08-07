@@ -4,7 +4,7 @@
 		<NotificationPanel />
 		<div class="main">
 			<div v-if="is404" class="error-graphic">
-				<Logo404 />
+				<Logo404 :class="{ spinning: logoSpinning }" @click="spinLogo" />
 			</div>
 			<div class="error-box" :class="{ 'has-bot': !is404 }">
 				<img
@@ -147,6 +147,22 @@ const props = defineProps({
 
 const is404 = computed(() => props.error.statusCode === 404)
 const is401 = computed(() => props.error.statusCode === 401)
+
+const LOGO_SPIN_DURATION_MS = 2000
+
+const logoSpinning = ref(false)
+let logoSpinTimeout
+
+function spinLogo() {
+	if (logoSpinning.value) return
+
+	logoSpinning.value = true
+	logoSpinTimeout = setTimeout(() => {
+		logoSpinning.value = false
+	}, LOGO_SPIN_DURATION_MS)
+}
+
+onBeforeUnmount(() => clearTimeout(logoSpinTimeout))
 
 const unauthorizedMessages = defineMessages({
 	signedInAsLabel: {
@@ -380,6 +396,44 @@ const routeMessages = [
 		color: var(--color-text);
 		width: min(15rem, 100%);
 		height: auto;
+		pointer-events: none;
+
+		:deep(.logo) {
+			pointer-events: auto;
+			cursor: pointer;
+		}
+
+		:deep(.logo-hitbox) {
+			pointer-events: all;
+		}
+
+		:deep(.ring) {
+			transform-box: fill-box;
+			transform-origin: center;
+		}
+
+		&.spinning {
+			:deep(.ring-1),
+			:deep(.ring-3),
+			:deep(.ring-5) {
+				animation: spin 2s ease-in-out infinite reverse;
+			}
+
+			:deep(.ring-2),
+			:deep(.ring-4) {
+				animation: spin 1s ease-in-out infinite;
+			}
+		}
+	}
+
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+
+		to {
+			transform: rotate(360deg);
+		}
 	}
 }
 
