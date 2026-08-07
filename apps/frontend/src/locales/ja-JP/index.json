@@ -2153,6 +2153,54 @@
   "landing.subheading": {
     "message": "コミュニティ向けに構築されたオープンソースプラットフォームを通じて、Minecraftコンテンツを発見、プレイ、共有できます。"
   },
+  "layout.action.change-theme": {
+    "message": "テーマを変える"
+  },
+  "layout.action.create-new": {
+    "message": "新規作成…"
+  },
+  "layout.action.external-projects": {
+    "message": "外部プロジェクト"
+  },
+  "layout.action.file-lookup": {
+    "message": "ファイル検索"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "メールで探す"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "アフィリエイトリンクを管理"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "サーバー通知を管理"
+  },
+  "layout.action.new-collection": {
+    "message": "新規コレクション"
+  },
+  "layout.action.new-organization": {
+    "message": "新規組織"
+  },
+  "layout.action.new-project": {
+    "message": "新規プロジェクト"
+  },
+  "layout.action.new-server-project": {
+    "message": "新規サーバー"
+  },
+  "layout.action.publish": {
+    "message": "公開する"
+  },
+  "layout.action.reports": {
+    "message": "レビューレポート"
+  },
+  "layout.action.review-projects": {
+    "message": "プロジェクトレビュー"
+  },
+  "layout.action.tech-review": {
+    "message": "技術レビュー"
+  },
+  "layout.avatar.alt": {
+    "message": "あなたのアバター"
+  },
   "layout.banner.account-action": {
     "message": "アカウント操作が必要"
   },
@@ -2299,6 +2347,66 @@
   },
   "layout.footer.unknown-commit": {
     "message": "不明"
+  },
+  "layout.menu-toggle.action": {
+    "message": "メニューを切り替える"
+  },
+  "layout.meta.description": {
+    "message": "ModrinthでMinecraftのMod、プラグイン、データパック、シェーダー、リソースパック、そしてModパックをダウンロードしましょう。Modrinthでは、モダンで使いやすいインターフェースとAPIを使って、プロジェクトを探索したり公開したりできます。"
+  },
+  "layout.meta.og-description": {
+    "message": "Minecraftのコンテンツを探索、公開してみよう！"
+  },
+  "layout.mobile.close-menu": {
+    "message": "メニューを閉じる"
+  },
+  "layout.mobile.open-menu": {
+    "message": "メニューを開く"
+  },
+  "layout.nav.active-reports": {
+    "message": "有効なレポート"
+  },
+  "layout.nav.discover": {
+    "message": "探索"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Modrinth Appを入手"
+  },
+  "layout.nav.home": {
+    "message": "ホーム"
+  },
+  "layout.nav.host-a-server": {
+    "message": "サーバーをホスト"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinthホームページ"
+  },
+  "layout.nav.my-servers": {
+    "message": "自分のサーバー"
+  },
+  "layout.nav.organizations": {
+    "message": "組織"
+  },
+  "layout.nav.profile": {
+    "message": "プロフィール"
+  },
+  "layout.nav.projects": {
+    "message": "プロジェクト"
+  },
+  "layout.nav.revenue": {
+    "message": "収益"
+  },
+  "layout.nav.saved-projects": {
+    "message": "保存されたプロジェクト"
+  },
+  "layout.nav.search": {
+    "message": "検索"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Modrinth+にアップグレード"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Modrinth Appを取得"

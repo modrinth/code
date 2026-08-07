@@ -995,6 +995,21 @@
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "serveri"
   },
+  "layout.action.analytics-events": {
+    "message": "Analitički događaji"
+  },
+  "layout.action.change-theme": {
+    "message": "Promeni temu"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Upravljaj obaveštenjima servera"
+  },
+  "layout.action.new-server-project": {
+    "message": "Novi server"
+  },
+  "layout.avatar.alt": {
+    "message": "Tvoj avatar"
+  },
   "layout.banner.account-action": {
     "message": "Potrebna akcija na nalogu"
   },
@@ -1114,6 +1129,27 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Prebaci meni"
+  },
+  "layout.meta.description": {
+    "message": "Preuzimaj Minecraft modove, plugine, datapackove, shadere, resourcepackove i modpackove na Modrinthu. Otkrij i objavi projekte na Modrinthu koristeći moderan, jednostavan interfejs i API."
+  },
+  "layout.meta.og-description": {
+    "message": "Otkrijte i objavite Minecraft sadržaj!"
+  },
+  "layout.nav.home": {
+    "message": "Početna"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Hostuj server"
+  },
+  "layout.nav.my-servers": {
+    "message": "Moji serveri"
+  },
+  "layout.nav.search": {
+    "message": "Pretraga"
   },
   "moderation.moderate": {
     "message": "Moderiraj"

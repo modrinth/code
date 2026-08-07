@@ -2063,6 +2063,57 @@
   "landing.subheading": {
     "message": "Oppdag, spill, og del Minecraft-innhold gjennom den åpenkjeldekode-plattformen vår, bygd for fellesskapet."
   },
+  "layout.action.analytics-events": {
+    "message": "Statistikkhendelser"
+  },
+  "layout.action.change-theme": {
+    "message": "Endre tema"
+  },
+  "layout.action.create-new": {
+    "message": "Lag ny..."
+  },
+  "layout.action.external-projects": {
+    "message": "Eksterne prosjekter"
+  },
+  "layout.action.file-lookup": {
+    "message": "Filoppslag"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Bla gjennom med email"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Hold styr på tilknytte lenker"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Hold styr på servervarsler"
+  },
+  "layout.action.new-collection": {
+    "message": "Ny samling"
+  },
+  "layout.action.new-organization": {
+    "message": "Ny organisering"
+  },
+  "layout.action.new-project": {
+    "message": "Nytt prosjekt"
+  },
+  "layout.action.new-server-project": {
+    "message": "Ny server"
+  },
+  "layout.action.publish": {
+    "message": "Publiser"
+  },
+  "layout.action.reports": {
+    "message": "Gå gjennom rapporter"
+  },
+  "layout.action.review-projects": {
+    "message": "Prosjektgjennomgåing"
+  },
+  "layout.action.tech-review": {
+    "message": "Teknologigjennomgang"
+  },
+  "layout.avatar.alt": {
+    "message": "Avataren din"
+  },
   "layout.banner.account-action": {
     "message": "Kontohandling påkrevd"
   },
@@ -2212,6 +2263,66 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Vekslingsmeny"
+  },
+  "layout.meta.description": {
+    "message": "Last ned Minecraft mods, plugins, datapacks, shaders, ressurspakker, og modpacks på Modrinth. Utforsk og last opp prosjekt på Modrinth med et moderne og lett å bruke grensesnitt og API."
+  },
+  "layout.meta.og-description": {
+    "message": "Utforsk og publiser Minecraft-innhold!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Lukk ned menyen"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Åpne meny"
+  },
+  "layout.nav.active-reports": {
+    "message": "Akrive rapporter"
+  },
+  "layout.nav.discover": {
+    "message": "Utforsk"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Skaff deg Modrinth App-en"
+  },
+  "layout.nav.home": {
+    "message": "Heim"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Opprett en server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth-heimeside"
+  },
+  "layout.nav.my-servers": {
+    "message": "Serverne mine"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisasjon"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Prosjekt"
+  },
+  "layout.nav.revenue": {
+    "message": "Inntekt"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Lagra prosjekt"
+  },
+  "layout.nav.search": {
+    "message": "Søk"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Oppgrader til Modrinth+"
   },
   "moderation.moderate": {
     "message": "Moderer"

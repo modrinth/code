@@ -2636,6 +2636,57 @@
   "landing.subheading": {
     "message": "커뮤니티를 위해 구축된 오픈소스 플랫폼을 통해 마인크래프트 콘텐츠를 발견하고, 플레이하고, 공유하세요."
   },
+  "layout.action.analytics-events": {
+    "message": "분석 이벤트"
+  },
+  "layout.action.change-theme": {
+    "message": "테마 변경"
+  },
+  "layout.action.create-new": {
+    "message": "새로 만들기..."
+  },
+  "layout.action.external-projects": {
+    "message": "외부 프로젝트"
+  },
+  "layout.action.file-lookup": {
+    "message": "파일 찾기"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "이메일로 찾기"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "제휴 링크 관리"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "서버 알림 관리"
+  },
+  "layout.action.new-collection": {
+    "message": "새 컬렉션"
+  },
+  "layout.action.new-organization": {
+    "message": "새 조직"
+  },
+  "layout.action.new-project": {
+    "message": "새 프로젝트"
+  },
+  "layout.action.new-server-project": {
+    "message": "새 서버"
+  },
+  "layout.action.publish": {
+    "message": "게시"
+  },
+  "layout.action.reports": {
+    "message": "보고서 검토"
+  },
+  "layout.action.review-projects": {
+    "message": "프로젝트 검토"
+  },
+  "layout.action.tech-review": {
+    "message": "기술 검토"
+  },
+  "layout.avatar.alt": {
+    "message": "당신의 아바타"
+  },
   "layout.banner.account-action": {
     "message": "계정 작업 필요"
   },
@@ -2806,6 +2857,72 @@
   },
   "layout.footer.unknown-commit": {
     "message": "확인되지 않음"
+  },
+  "layout.menu-toggle.action": {
+    "message": "메뉴 전환"
+  },
+  "layout.meta.description": {
+    "message": "Modrinth에서 마인크래프트 모드, 플러그인, 데이터 팩, 셰이더, 리소스 팩, 모드팩을 다운로드하세요. 현대적이고 사용하기 쉬운 인터페이스와 API를 통해 Modrinth에서 프로젝트를 탐색하고 게시하세요."
+  },
+  "layout.meta.og-description": {
+    "message": "마인크래프트 콘텐츠를 탐색하고 게시하세요!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "메뉴 닫기"
+  },
+  "layout.mobile.open-menu": {
+    "message": "메뉴 열기"
+  },
+  "layout.nav.active-reports": {
+    "message": "활성된 신고"
+  },
+  "layout.nav.discover": {
+    "message": "탐색"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Modrinth App 받기"
+  },
+  "layout.nav.home": {
+    "message": "홈"
+  },
+  "layout.nav.host-a-server": {
+    "message": "서버 호스트하기"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth 앱"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth 홈페이지"
+  },
+  "layout.nav.my-servers": {
+    "message": "내 서버"
+  },
+  "layout.nav.organizations": {
+    "message": "조직"
+  },
+  "layout.nav.profile": {
+    "message": "프로필"
+  },
+  "layout.nav.projects": {
+    "message": "프로젝트"
+  },
+  "layout.nav.revenue": {
+    "message": "수익"
+  },
+  "layout.nav.saved-projects": {
+    "message": "저장한 프로젝트"
+  },
+  "layout.nav.search": {
+    "message": "검색"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Modrinth+ 로 업그레이드"
+  },
+  "layout.publish.email-verification-required.description": {
+    "message": "Modrinth에 개시하기 전 이메일에서 승인해야 합니다."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "이메일 승인이 필요합니다"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "친구들이 플레이 중인 모든 콘텐츠 자동 설치"

@@ -2630,6 +2630,57 @@
   "landing.subheading": {
     "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым кодом, созданной для сообщества."
   },
+  "layout.action.analytics-events": {
+    "message": "События аналитики"
+  },
+  "layout.action.change-theme": {
+    "message": "Изменить тему"
+  },
+  "layout.action.create-new": {
+    "message": "Создать..."
+  },
+  "layout.action.external-projects": {
+    "message": "Сторонние проекты"
+  },
+  "layout.action.file-lookup": {
+    "message": "Поиск файла"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Поиск по почте"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Партнёрские ссылки"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Оповещения серверов"
+  },
+  "layout.action.new-collection": {
+    "message": "Новая коллекция"
+  },
+  "layout.action.new-organization": {
+    "message": "Новая организация"
+  },
+  "layout.action.new-project": {
+    "message": "Новый проект"
+  },
+  "layout.action.new-server-project": {
+    "message": "Новый сервер"
+  },
+  "layout.action.publish": {
+    "message": "Опубликовать"
+  },
+  "layout.action.reports": {
+    "message": "Рассмотрение жалоб"
+  },
+  "layout.action.review-projects": {
+    "message": "Проверка проектов"
+  },
+  "layout.action.tech-review": {
+    "message": "Техпроверка"
+  },
+  "layout.avatar.alt": {
+    "message": "Ваш аватар"
+  },
   "layout.banner.account-action": {
     "message": "Требуются действия с аккаунтом"
   },
@@ -2800,6 +2851,72 @@
   },
   "layout.footer.unknown-commit": {
     "message": "неизвестно"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Меню"
+  },
+  "layout.meta.description": {
+    "message": "Скачивайте моды, плагины, наборы данных, шейдеры, наборы ресурсов и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
+  },
+  "layout.meta.og-description": {
+    "message": "Ищите и публикуйте проекты для Minecraft!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Закрыть меню"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Открыть меню"
+  },
+  "layout.nav.active-reports": {
+    "message": "Активные жалобы"
+  },
+  "layout.nav.discover": {
+    "message": "Найти"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Скачать Modrinth App"
+  },
+  "layout.nav.home": {
+    "message": "Главная"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Создать сервер"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Главная страница Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Мои серверы"
+  },
+  "layout.nav.organizations": {
+    "message": "Организации"
+  },
+  "layout.nav.profile": {
+    "message": "Профиль"
+  },
+  "layout.nav.projects": {
+    "message": "Проекты"
+  },
+  "layout.nav.revenue": {
+    "message": "Доход"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Сохранённые проекты"
+  },
+  "layout.nav.search": {
+    "message": "Поиск"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Перейти на Modrinth+"
+  },
+  "layout.publish.email-verification-required.description": {
+    "message": "Перед публикацией на Modrinth необходимо подтвердить адрес электронной почты."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Необходимо подтвердить почту"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Автоматически устанавливайте все, во что они играют"

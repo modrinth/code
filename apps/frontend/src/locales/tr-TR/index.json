@@ -2450,6 +2450,57 @@
   "landing.subheading": {
     "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
   },
+  "layout.action.analytics-events": {
+    "message": "Analitik olayları"
+  },
+  "layout.action.change-theme": {
+    "message": "Tema değiştir"
+  },
+  "layout.action.create-new": {
+    "message": "Yeni oluştur..."
+  },
+  "layout.action.external-projects": {
+    "message": "Harici projeler"
+  },
+  "layout.action.file-lookup": {
+    "message": "Dosya bulma"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "E-posta ile arama"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Ortaklık linklerini yönet"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Sunucu bildirimlerini yönet"
+  },
+  "layout.action.new-collection": {
+    "message": "Yeni koleksiyon"
+  },
+  "layout.action.new-organization": {
+    "message": "Yeni organizasyon"
+  },
+  "layout.action.new-project": {
+    "message": "Yeni proje"
+  },
+  "layout.action.new-server-project": {
+    "message": "Yeni Sunucu"
+  },
+  "layout.action.publish": {
+    "message": "Yayınla"
+  },
+  "layout.action.reports": {
+    "message": "Raporları incele"
+  },
+  "layout.action.review-projects": {
+    "message": "Proje incelemesi"
+  },
+  "layout.action.tech-review": {
+    "message": "Teknoloji incelemesi"
+  },
+  "layout.avatar.alt": {
+    "message": "Avatarınız"
+  },
   "layout.banner.account-action": {
     "message": "Kullanıcı eylemi zorunlu"
   },
@@ -2605,6 +2656,66 @@
   },
   "layout.footer.unknown-commit": {
     "message": "bilinmeyen"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Menü aç/kapa"
+  },
+  "layout.meta.description": {
+    "message": "Modrinth üzerinden Minecraft modları, pluginleri, veri paketleri, shaderları, kaynak paketleri ve mod paketleri indir. Modern ve kullanımı kolay bir arayüz ve API ile Modrinth üzerinden projeler keşfet ve yayınla."
+  },
+  "layout.meta.og-description": {
+    "message": "Minecraft içeriği keşfet ve yayınla!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Menüyü kapat"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Menüyü aç"
+  },
+  "layout.nav.active-reports": {
+    "message": "Aktif Raporlar"
+  },
+  "layout.nav.discover": {
+    "message": "Keşfet"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Modrinth App yükle"
+  },
+  "layout.nav.home": {
+    "message": "Anasayfa"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Sunucu kur"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth ana sayfası"
+  },
+  "layout.nav.my-servers": {
+    "message": "Sunucularım"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizasyonlar"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projeler"
+  },
+  "layout.nav.revenue": {
+    "message": "Gelir"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Kayıtlı projeler"
+  },
+  "layout.nav.search": {
+    "message": "Arama"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Modrinth+ Kullan"
   },
   "moderation.exclude-technical-review": {
     "message": "TR Hariç"

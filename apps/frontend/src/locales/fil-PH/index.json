@@ -1616,6 +1616,51 @@
   "landing.subheading": {
     "message": "Magtuklas, maglaro, at magbahagi ng mga kontentong Minecraft sa aming open-source na platapormang ginawa para sa komunidad."
   },
+  "layout.action.change-theme": {
+    "message": "Palitan ang theme"
+  },
+  "layout.action.create-new": {
+    "message": "Lumikha ng bago..."
+  },
+  "layout.action.file-lookup": {
+    "message": "File lookup"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Lookup by email"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Pamahalaan ang mga affiliate link"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Pamahalaan ang mga paunawa ng server"
+  },
+  "layout.action.new-collection": {
+    "message": "Bagong koleksiyon"
+  },
+  "layout.action.new-organization": {
+    "message": "Bagong organisasyon"
+  },
+  "layout.action.new-project": {
+    "message": "Bagong proyekto"
+  },
+  "layout.action.new-server-project": {
+    "message": "Bagong server"
+  },
+  "layout.action.publish": {
+    "message": "Ilathala"
+  },
+  "layout.action.reports": {
+    "message": "Suriin ang mga sumbong"
+  },
+  "layout.action.review-projects": {
+    "message": "Suriin ang proyekto"
+  },
+  "layout.action.tech-review": {
+    "message": "Tech review"
+  },
+  "layout.avatar.alt": {
+    "message": "Iyong avatar"
+  },
   "layout.banner.account-action": {
     "message": "Nangangailangan ng account"
   },
@@ -1762,6 +1807,66 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "I-toggle ang menu"
+  },
+  "layout.meta.description": {
+    "message": "Mag-download ng mga Minecraft mod, plugin, datapack, shader, resourcepack, at modpack sa Modrinth. Tumuklas at mag-publish ng mga proyekto sa Modrinth na may moderno at madaling gamitin na interface at API."
+  },
+  "layout.meta.og-description": {
+    "message": "Tumuklas at lumathala ng mga kontentong Minecraft!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Isarado ang menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Buksan ang menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Mga aktibong sumbong"
+  },
+  "layout.nav.discover": {
+    "message": "Tumuklas"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Kunin ang Modrinth App"
+  },
+  "layout.nav.home": {
+    "message": "Tahanan"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Mag-host ng server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Pahina ng tahanan ng Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Aking mga server"
+  },
+  "layout.nav.organizations": {
+    "message": "Mga organisasyon"
+  },
+  "layout.nav.profile": {
+    "message": "Profile"
+  },
+  "layout.nav.projects": {
+    "message": "Mga proyekto"
+  },
+  "layout.nav.revenue": {
+    "message": "Revenue"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Mga na-save na proyekto"
+  },
+  "layout.nav.search": {
+    "message": "Maghanap"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Mag-upgrade sa Modrinth+"
   },
   "moderation.moderate": {
     "message": "Moderate"

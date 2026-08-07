@@ -1631,6 +1631,51 @@
   "landing.subheading": {
     "message": "Temukan, mainkan, dan bagikan konten Minecraft melalui platform sumber terbuka kami yang dibangun untuk komunitas."
   },
+  "layout.action.change-theme": {
+    "message": "Ubah tema"
+  },
+  "layout.action.create-new": {
+    "message": "Buat baru..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Pencarian berkas"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Cari dengan sur-el"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Kelola tautan afiliasi"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Kelola pemberitahuan server"
+  },
+  "layout.action.new-collection": {
+    "message": "Koleksi baru"
+  },
+  "layout.action.new-organization": {
+    "message": "Organisasi baru"
+  },
+  "layout.action.new-project": {
+    "message": "Proyek baru"
+  },
+  "layout.action.new-server-project": {
+    "message": "Server baru"
+  },
+  "layout.action.publish": {
+    "message": "Terbitkan"
+  },
+  "layout.action.reports": {
+    "message": "Tinjau laporan"
+  },
+  "layout.action.review-projects": {
+    "message": "Peninjauan proyek"
+  },
+  "layout.action.tech-review": {
+    "message": "Tinjauan teknis"
+  },
+  "layout.avatar.alt": {
+    "message": "Avatar Anda"
+  },
   "layout.banner.account-action": {
     "message": "Tindakan akun diperlukan"
   },
@@ -1774,6 +1819,66 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Hidup/matikan menu"
+  },
+  "layout.meta.description": {
+    "message": "Unduh mod, pasang-masuk, paket data, efek gambar, paket sumber, dan paket mod untuk Minecraft di Modrinth. Temukan dan terbitkan proyek di Modrinth dengan antarmuka dan API yang modern dan mudah digunakan."
+  },
+  "layout.meta.og-description": {
+    "message": "Temukan dan terbitkan konten Minecraft!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Tutup menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Buka menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Laporan aktif"
+  },
+  "layout.nav.discover": {
+    "message": "Temukan"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Dapatkan Modrinth App"
+  },
+  "layout.nav.home": {
+    "message": "Beranda"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Jalankan server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Beranda Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Server saya"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisasi"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Proyek"
+  },
+  "layout.nav.revenue": {
+    "message": "Pendapatan"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Proyek tersimpan"
+  },
+  "layout.nav.search": {
+    "message": "Cari"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Tingkatkan ke Modrinth+"
   },
   "moderation.moderate": {
     "message": "Moderasi"

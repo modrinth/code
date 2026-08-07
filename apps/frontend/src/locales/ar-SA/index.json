@@ -1724,6 +1724,21 @@
   "landing.subheading": {
     "message": "اكتشف محتوى Minecraft والعب وشاركه من خلال منصتنا مفتوحة المصدر المصممة خصيصًا للمجتمع."
   },
+  "layout.action.new-project": {
+    "message": "مشروع جديد"
+  },
+  "layout.action.new-server-project": {
+    "message": "خادم جديد"
+  },
+  "layout.action.publish": {
+    "message": "نشر"
+  },
+  "layout.action.review-projects": {
+    "message": "مراجعه المشروع"
+  },
+  "layout.avatar.alt": {
+    "message": "صورتك الرمزية"
+  },
   "layout.banner.add-email.description": {
     "message": "لأسباب أمنية، يحتاج مودرنث منك تسجيل عنوان بريد إلكتروني في حسابك."
   },
@@ -1804,6 +1819,15 @@
   },
   "layout.footer.resources.help-center": {
     "message": "مركز المساعدة"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "الصفحة الرئيسة لمودرينث"
+  },
+  "layout.nav.my-servers": {
+    "message": "خوادمي"
+  },
+  "layout.nav.saved-projects": {
+    "message": "المشاريع المحفوظة"
   },
   "muralpay.field.account-number-type": {
     "message": "نوع رقم الحساب"

@@ -2636,6 +2636,57 @@
   "landing.subheading": {
     "message": "在我们为社区打造的开源平台上，探索、畅玩并分享 Minecraft 的无限可能。"
   },
+  "layout.action.analytics-events": {
+    "message": "分析活动"
+  },
+  "layout.action.change-theme": {
+    "message": "更改界面主题"
+  },
+  "layout.action.create-new": {
+    "message": "新建……"
+  },
+  "layout.action.external-projects": {
+    "message": "外部项目"
+  },
+  "layout.action.file-lookup": {
+    "message": "文件查询"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "通过电子邮箱查找"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "管理推广链接"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "管理服务器通知"
+  },
+  "layout.action.new-collection": {
+    "message": "新建收藏夹"
+  },
+  "layout.action.new-organization": {
+    "message": "新建组织"
+  },
+  "layout.action.new-project": {
+    "message": "新建项目"
+  },
+  "layout.action.new-server-project": {
+    "message": "新建服务器"
+  },
+  "layout.action.publish": {
+    "message": "发布"
+  },
+  "layout.action.reports": {
+    "message": "审查举报"
+  },
+  "layout.action.review-projects": {
+    "message": "项目审查"
+  },
+  "layout.action.tech-review": {
+    "message": "技术审查"
+  },
+  "layout.avatar.alt": {
+    "message": "你的头像"
+  },
   "layout.banner.account-action": {
     "message": "需要进行账户操作"
   },
@@ -2806,6 +2857,72 @@
   },
   "layout.footer.unknown-commit": {
     "message": "未知"
+  },
+  "layout.menu-toggle.action": {
+    "message": "切换菜单"
+  },
+  "layout.meta.description": {
+    "message": "在 Modrinth 上下载 Minecraft 模组、插件、数据包、光影、资源包及整合包。通过我们现代化而易用的界面与 API，探索及发布项目。"
+  },
+  "layout.meta.og-description": {
+    "message": "浏览及发布 Minecraft 内容！"
+  },
+  "layout.mobile.close-menu": {
+    "message": "关闭菜单"
+  },
+  "layout.mobile.open-menu": {
+    "message": "打开菜单"
+  },
+  "layout.nav.active-reports": {
+    "message": "处理中的举报"
+  },
+  "layout.nav.discover": {
+    "message": "发现"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "获取 Modrinth App"
+  },
+  "layout.nav.home": {
+    "message": "首页"
+  },
+  "layout.nav.host-a-server": {
+    "message": "租赁服务器"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth 首页"
+  },
+  "layout.nav.my-servers": {
+    "message": "我的服务器"
+  },
+  "layout.nav.organizations": {
+    "message": "组织"
+  },
+  "layout.nav.profile": {
+    "message": "主页"
+  },
+  "layout.nav.projects": {
+    "message": "项目"
+  },
+  "layout.nav.revenue": {
+    "message": "收益"
+  },
+  "layout.nav.saved-projects": {
+    "message": "收藏"
+  },
+  "layout.nav.search": {
+    "message": "搜索"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "升级至 Modrinth+"
+  },
+  "layout.publish.email-verification-required.description": {
+    "message": "您必须先验证您的电子邮箱才能在 Modrinth 上发布内容。"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "需要验证电子邮件"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "自动安装他们正在玩的所有游戏"

@@ -1817,6 +1817,45 @@
   "landing.subheading": {
     "message": "Udforsk, spil, og del Minecraft indhold gennem vores open souce platform bygget for fællesskabet."
   },
+  "layout.action.change-theme": {
+    "message": "Skift tema"
+  },
+  "layout.action.create-new": {
+    "message": "Opret ny..."
+  },
+  "layout.action.external-projects": {
+    "message": "Eksterne projekter"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Styr patnerskabs-links"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Styr din servermeddelelser"
+  },
+  "layout.action.new-collection": {
+    "message": "Ny samling"
+  },
+  "layout.action.new-organization": {
+    "message": "Ny organisation"
+  },
+  "layout.action.new-project": {
+    "message": "Nyt projekt"
+  },
+  "layout.action.new-server-project": {
+    "message": "Ny server"
+  },
+  "layout.action.publish": {
+    "message": "Udgiv"
+  },
+  "layout.action.reports": {
+    "message": "Gennemgå rapporter"
+  },
+  "layout.action.review-projects": {
+    "message": "Projekt gennemgang"
+  },
+  "layout.avatar.alt": {
+    "message": "Din avatar"
+  },
   "layout.banner.account-action": {
     "message": "Kontohandling krævet"
   },
@@ -1924,6 +1963,69 @@
   },
   "layout.footer.unknown-commit": {
     "message": "ukendt"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Vis/skjul menu"
+  },
+  "layout.meta.description": {
+    "message": "Download Minecraft mods, plugins, datapakker, shaders, ressourcepakker, og modpacks på Modrinth. Opdag og udgiv projekter på Modrinth med et moderne, en brugervenligt hjemmeside og API."
+  },
+  "layout.meta.og-description": {
+    "message": "Opdag og udgiv Minecraft indhold!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Luk menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Åben menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Aktive rapporter"
+  },
+  "layout.nav.discover": {
+    "message": "Opdag"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Hent Modrinth-app"
+  },
+  "layout.nav.home": {
+    "message": "Hjem"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Host en server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth forside"
+  },
+  "layout.nav.my-servers": {
+    "message": "Mine servere"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisationer"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projekter"
+  },
+  "layout.nav.revenue": {
+    "message": "Indtægter"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Gemte projekter"
+  },
+  "layout.nav.search": {
+    "message": "Søg"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Opgrader til Modrinth+"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "E-mailbekræftelse påkrævet"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Hent Modrinth App"

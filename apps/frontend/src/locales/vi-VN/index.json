@@ -2294,6 +2294,57 @@
   "landing.subheading": {
     "message": "Khám phá, chơi và chia sẻ nội dung Minecraft thông qua nền tảng nguồn mở được xây dựng cho cộng đồng."
   },
+  "layout.action.analytics-events": {
+    "message": "Sự kiện phân tích"
+  },
+  "layout.action.change-theme": {
+    "message": "Đổi chủ đề"
+  },
+  "layout.action.create-new": {
+    "message": "Tạo mới..."
+  },
+  "layout.action.external-projects": {
+    "message": "Dự án ngoài"
+  },
+  "layout.action.file-lookup": {
+    "message": "Tra cứu tệp"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Tra cứu theo email"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Quản lý link affiliate"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Quản lý thông báo máy chủ"
+  },
+  "layout.action.new-collection": {
+    "message": "Bộ sưu tập mới"
+  },
+  "layout.action.new-organization": {
+    "message": "Tổ chức mới"
+  },
+  "layout.action.new-project": {
+    "message": "Dự án mới"
+  },
+  "layout.action.new-server-project": {
+    "message": "Máy chủ mới"
+  },
+  "layout.action.publish": {
+    "message": "Đăng tải"
+  },
+  "layout.action.reports": {
+    "message": "Xem xét báo cáo"
+  },
+  "layout.action.review-projects": {
+    "message": "Đánh giá dự án"
+  },
+  "layout.action.tech-review": {
+    "message": "Đánh giá kỹ thuật"
+  },
+  "layout.avatar.alt": {
+    "message": "Hình đại diện của bạn"
+  },
   "layout.banner.account-action": {
     "message": "Cần thao tác với tài khoản"
   },
@@ -2446,6 +2497,66 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Chuyển đổi menu"
+  },
+  "layout.meta.description": {
+    "message": "Tải xuống các mod Minecraft, plugin, datapack, shader, gói tài nguyên và modpack trên Modrinth. Khám phá và xuất bản các dự án trên Modrinth với giao diện và API hiện đại, dễ sử dụng."
+  },
+  "layout.meta.og-description": {
+    "message": "Khám phá và xuất bản nội dung Minecraft!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Đóng menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Mở menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Báo cáo hoạt động"
+  },
+  "layout.nav.discover": {
+    "message": "Khám phá"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Tải ứng dụng Modrinth"
+  },
+  "layout.nav.home": {
+    "message": "Trang chủ"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Tạo máy chủ"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Ứng dụng Modrinth"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Trang chủ Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Máy chủ của tôi"
+  },
+  "layout.nav.organizations": {
+    "message": "Tổ chức"
+  },
+  "layout.nav.profile": {
+    "message": "Hồ sơ"
+  },
+  "layout.nav.projects": {
+    "message": "Dự án"
+  },
+  "layout.nav.revenue": {
+    "message": "Doanh thu"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Dự án đã lưu"
+  },
+  "layout.nav.search": {
+    "message": "Tìm kiếm"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Nâng cấp lên Modrinth+"
   },
   "moderation.moderate": {
     "message": "Kiểm duyệt"

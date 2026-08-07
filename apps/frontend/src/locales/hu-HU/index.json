@@ -2477,6 +2477,57 @@
   "landing.subheading": {
     "message": "Fedezz fel, játssz és ossz meg Minecraft-tartalmakat a közösség számára létrehozott nyílt forráskódú platformunkon."
   },
+  "layout.action.analytics-events": {
+    "message": "Statisztikai események"
+  },
+  "layout.action.change-theme": {
+    "message": "Téma"
+  },
+  "layout.action.create-new": {
+    "message": "Új létrehozása..."
+  },
+  "layout.action.external-projects": {
+    "message": "Külső projektek"
+  },
+  "layout.action.file-lookup": {
+    "message": "Fájl keresés"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Keresés e-mail cím alapján"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Partnerlinkek kezelése"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Szerver megjegyzések kezelése"
+  },
+  "layout.action.new-collection": {
+    "message": "Új gyűjtemény"
+  },
+  "layout.action.new-organization": {
+    "message": "Új szervezet"
+  },
+  "layout.action.new-project": {
+    "message": "Új projekt"
+  },
+  "layout.action.new-server-project": {
+    "message": "Új szerver"
+  },
+  "layout.action.publish": {
+    "message": "Létrehozás"
+  },
+  "layout.action.reports": {
+    "message": "Jelentések áttekintése"
+  },
+  "layout.action.review-projects": {
+    "message": "Projekt áttekintés"
+  },
+  "layout.action.tech-review": {
+    "message": "Technikai áttekintés"
+  },
+  "layout.avatar.alt": {
+    "message": "Az avatárod"
+  },
   "layout.banner.account-action": {
     "message": "Fiók akció szükséges"
   },
@@ -2626,6 +2677,72 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Menü ki-be"
+  },
+  "layout.meta.description": {
+    "message": "Tölts le Minecraft modokat, bővítményeket, adatcsomagokat, shadereket, forráscsomagokat és modcsomagokat a Modrinthról. Fedezd fel és tedd közzé projektjeidet a Modrinthon egy modern, könnyen használható felületen és API-n keresztül."
+  },
+  "layout.meta.og-description": {
+    "message": "Fedezz fel és tegyél közzé Minecraft tartalmakat!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Menü bezárása"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Menü megnyitása"
+  },
+  "layout.nav.active-reports": {
+    "message": "Aktív jelentések"
+  },
+  "layout.nav.discover": {
+    "message": "Felfedezés"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Szerezd meg a Modrinth Appot"
+  },
+  "layout.nav.home": {
+    "message": "Kezdőlap"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Hozz létre egy szervert"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth kezdőlap"
+  },
+  "layout.nav.my-servers": {
+    "message": "Szervereim"
+  },
+  "layout.nav.organizations": {
+    "message": "Szervezetek"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projektek"
+  },
+  "layout.nav.revenue": {
+    "message": "Bevétel"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Elmentett projektek"
+  },
+  "layout.nav.search": {
+    "message": "Keresés"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Frissíts a Modrinth+-ra"
+  },
+  "layout.publish.email-verification-required.description": {
+    "message": "A Modrinthon való közzététel előtt hitelesítened kell az e-mail címedet."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "E-mail hitelesítés szükséges"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Automatikusan letölt mindent, amivel ők játszanak"
