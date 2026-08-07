@@ -4,6 +4,7 @@
 			{{ formatMessage(messages.knownProjectPrompt) }}
 		</span>
 		<Combobox
+			ref="projectSearchCombobox"
 			v-model="ctx.projectSearchProjectId.value"
 			v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
 			:options="ctx.projectSearchOptions.value"
@@ -134,6 +135,7 @@ const { setSetupType: _setSetupType } = ctx
 const { formatMessage } = useVIntl()
 
 const searchLoading = ref(false)
+const projectSearchCombobox = ref<{ $el: HTMLElement }>()
 
 const messages = defineMessages({
 	knownProjectPrompt: {
@@ -313,6 +315,9 @@ async function handleSearch(query: string) {
 onMounted(() => {
 	ctx.projectSearchProjectId.value = undefined
 	search('')
+	setTimeout(() => {
+		projectSearchCombobox.value?.$el.querySelector('input')?.focus()
+	}, 150)
 })
 
 watch(
