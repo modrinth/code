@@ -11,6 +11,35 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-07T20:41:51+00:00`,
+		product: 'app',
+		version: '0.17.4',
+		body: `## Changed
+- Added loading states for project members and server details, to make it feel smoother.
+- Improved popout menu animations.
+- Updated NeoForge icon to be closer to the actual logo and look more like a fox.
+- Updated design of buttons.
+
+## Fixed
+- Fixed "Licensed Unknown" showing up under details on server projects.
+- Fixed project types sometimes appearing in random orders on some pages.`,
+	},
+	{
+		date: `2026-08-07T20:41:51+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added loading states for project members and server details, to make it feel smoother.
+- Improved popout menu animations.
+- Updated project tag settings page to new design.
+- Updated NeoForge icon to be closer to the actual logo and look more like a fox.
+
+## Fixed
+- Fixed "Licensed Unknown" showing up under details on server projects.
+- Fixed tags settings page being broken.
+- Fixed project types sometimes appearing in random orders on some pages.
+- Fixed when the project download UI has two compatible versions and no additional content, it showed as radio buttons.`,
+	},
+	{
 		date: `2026-07-31T06:10:23+00:00`,
 		product: 'web',
 		body: `## Fixed

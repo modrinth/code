@@ -3926,9 +3926,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Основні теґи"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Ви можете обрати основними до 3 найбільш описових теґів. Інші теґи можуть стати основними, якщо не оберете всі 3."
-  },
   "project.settings.tags.features-description": {
     "message": "Оберіть увесь функціонал, який присутній у {type}."
   },
@@ -3943,9 +3940,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Виберіть хоча б одну категорію, щоб рекомендувати її."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Указання правильних теґів необхідне, щоб люди могли легше знайти ваш {type}. Переконайтеся, що ви обрали підхожі теґи."
   },
   "project.settings.tags.title": {
     "message": "Теґи"

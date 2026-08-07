@@ -2858,9 +2858,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Een project aanmaken"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Rol bewerken"
-  },
   "profile.button.info": {
     "defaultMessage": "Gebruikersgegevens bekijken"
   },
@@ -2938,9 +2935,6 @@
   },
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {project} other {projecten}}"
-  },
-  "profile.label.saving": {
-    "defaultMessage": "Opslaan..."
   },
   "profile.official-account": {
     "defaultMessage": "Officieel Modrinth-account"

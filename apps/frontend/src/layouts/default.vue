@@ -138,23 +138,8 @@
 					</ButtonLink>
 					<ButtonLink
 						type="quiet"
-						to="/discover/modpacks"
-						size="sm"
-						:class="
-							route.path.startsWith('/discover/modpacks')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
-								: route.path.startsWith('/modpack/')
-									? '!bg-[var(--color-button-bg)] !text-contrast'
-									: ''
-						"
-					>
-						<PackageOpenIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						size="sm"
 						to="/discover/shaders"
+						size="sm"
 						:class="
 							route.path.startsWith('/discover/shaders')
 								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
@@ -165,6 +150,21 @@
 					>
 						<GlassesIcon aria-hidden="true" />
 						{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
+					</ButtonLink>
+					<ButtonLink
+						type="quiet"
+						size="sm"
+						to="/discover/modpacks"
+						:class="
+							route.path.startsWith('/discover/modpacks')
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								: route.path.startsWith('/modpack/')
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: ''
+						"
+					>
+						<PackageOpenIcon aria-hidden="true" />
+						{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
 					</ButtonLink>
 					<ButtonLink
 						type="quiet"
@@ -1209,8 +1209,8 @@ const navRoutes = computed(() => [
 		href: '/discover/mods',
 	},
 	{
-		label: formatMessage(getProjectTypeMessage('plugin', true)),
-		href: '/discover/plugins',
+		label: formatMessage(getProjectTypeMessage('resourcepack', true)),
+		href: '/discover/resourcepacks',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('datapack', true)),
@@ -1221,12 +1221,12 @@ const navRoutes = computed(() => [
 		href: '/discover/shaders',
 	},
 	{
-		label: formatMessage(getProjectTypeMessage('resourcepack', true)),
-		href: '/discover/resourcepacks',
-	},
-	{
 		label: formatMessage(getProjectTypeMessage('modpack', true)),
 		href: '/discover/modpacks',
+	},
+	{
+		label: formatMessage(getProjectTypeMessage('plugin', true)),
+		href: '/discover/plugins',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('server', true)),

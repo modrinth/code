@@ -27,6 +27,13 @@ const settings = {
 			description: 'Whether private messages should be highlighted in the chat.',
 			default: true,
 		}),
+		SlicerButtonInVersions: setting.asToggle({
+			type: 'toggle',
+			id: 'slicer-button-in-versions',
+			title: 'Show Slicer Button in Versions Table and Page',
+			description: 'Whether the slicer button should be shown in the versions table and page.',
+			default: false,
+		}),
 		AdjustPageAlignment: setting.asEnum({
 			type: 'enum',
 			id: 'adjust-page-alignment',

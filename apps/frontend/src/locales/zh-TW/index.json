@@ -3929,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "精選標籤"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "你可以選擇最多 3 個最相關的標籤作為精選標籤。如果沒有選完 3 個標籤，系統可能會自動將其他標籤選為精選標籤。"
-  },
   "project.settings.tags.features-description": {
     "message": "請選擇你的{type}包含的功能。"
   },
@@ -3946,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "請選擇至少一個類別再選擇精選標籤。"
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "精確的標籤對於協助使用者找到你的{type}非常重要。請務必選擇所有合適的標籤。"
   },
   "project.settings.tags.title": {
     "message": "標籤"

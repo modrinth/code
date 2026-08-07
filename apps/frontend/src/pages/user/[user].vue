@@ -34,6 +34,9 @@ const userProfile = provideUserProfile({
 	getOrganizations: (userId) => client.labrinth.users_v2.getOrganizations(userId),
 	getCollections: (userId) => client.labrinth.users_v2.getCollections(userId),
 	patchUser: (userId, patch) => client.labrinth.users_v2.patch(userId, patch),
+	changeAvatar: (userId, file, extension) =>
+		client.labrinth.users_v2.changeIcon(userId, file, extension),
+	deleteAvatar: (userId) => client.labrinth.users_v2.deleteIcon(userId),
 	getBlockedUsers: () => client.labrinth.blocked_users_v3.list(),
 	blockUser: (userId) => client.labrinth.blocked_users_v3.block(userId),
 	unblockUser: (userId) => client.labrinth.blocked_users_v3.unblock(userId),
