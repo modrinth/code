@@ -152,9 +152,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Livraria"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Página de carregamento principal"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Desativa o nametag acima do seu player na página de skins."
   },

@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema boje"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Izaberi stranicu prikazanu kada se Modrinth App pokrene."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Početna stranica"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Podrazumevana odredišna stranica"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Sakrij svoje korisničko ime iznad pregleda igrača na stranici Skin birača."

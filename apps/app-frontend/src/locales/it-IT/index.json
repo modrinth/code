@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Scegli la pagina che Modrinth App mostrerà all'avvio."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Libreria"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Pagina di avvio"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Nasconde il tuo nome dalle anteprime della pagina delle Skin."

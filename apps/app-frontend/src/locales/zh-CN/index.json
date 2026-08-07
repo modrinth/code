@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "色彩主题"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "选择 Modrinth App 启动时显示的页面。"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首页"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "库"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "默认起始页"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "在皮肤选择器页面的玩家预览上隐藏用户名。"

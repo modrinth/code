@@ -2,17 +2,19 @@
 import { HomeIcon, PlusIcon } from '@modrinth/assets'
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import dayjs from 'dayjs'
-import { computed, inject, onUnmounted, ref } from 'vue'
+import { computed, inject, onActivated, onUnmounted, ref } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import LibrarySection from '@/components/ui/library/index.vue'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
+import { toError } from '@/helpers/errors'
 import { instance_groups_listener, instance_listener } from '@/helpers/events'
 import { list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
+import { useTheming } from '@/store/theme.ts'
 
 defineOptions({
 	name: 'LibraryPage',
@@ -23,6 +25,7 @@ const { formatMessage } = useVIntl()
 const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
 const showCreationModal = inject<() => void>('showCreationModal')
 const pageOptions = ref<InstanceType<typeof ContextMenu>>()
+const themeStore = useTheming()
 
 const messages = defineMessages({
 	newInstance: {
@@ -31,13 +34,14 @@ const messages = defineMessages({
 	},
 })
 
-useRootBreadcrumb({
+const homeBreadcrumb = useRootBreadcrumb({
 	slot: 'root',
 	id: 'home',
 	label: 'Home',
 	to: '/',
 	visual: { type: 'icon', component: HomeIcon },
 })
+onActivated(homeBreadcrumb.reset)
 
 const instances = ref<GameInstance[]>([])
 let latestInstanceFetch = 0
@@ -57,7 +61,7 @@ async function fetchInstances() {
 		}
 	} catch (error: unknown) {
 		if (fetchId === latestInstanceFetch) {
-			handleError(error)
+			handleError(toError(error))
 		}
 	}
 }
@@ -104,7 +108,10 @@ function handlePageOption({ option }: { option: string }) {
 		class="flex flex-col gap-6 p-6"
 		@contextmenu="openPageContextMenu"
 	>
-		<RecentWorldsList v-if="recentInstances?.length > 0" :recent-instances="recentInstances" />
+		<RecentWorldsList
+			v-if="recentInstances?.length > 0 && themeStore.getFeatureFlag('worlds_in_home')"
+			:recent-instances="recentInstances"
+		/>
 		<LibrarySection :instances="instances" />
 		<ContextMenu ref="pageOptions" @option-clicked="handlePageOption">
 			<template #new_instance> <PlusIcon /> {{ formatMessage(messages.newInstance) }} </template>

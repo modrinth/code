@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "색상 테마"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Modrinth 앱이 실행될 때 표시될 페이지를 선택하세요."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "홈"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "라이브러리"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "기본 시작 화면"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "스킨 페이지의 플레이어 미리보기 위에 있는 사용자 이름을 숨깁니다."

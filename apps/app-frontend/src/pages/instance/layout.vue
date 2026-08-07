@@ -52,7 +52,7 @@
 				@play-server="() => handlePlayServer()"
 				@settings="() => settingsModal?.show()"
 				@open-folder="() => instance && showInstanceInFolder(instance.id)"
-				@export="() => !instance.quarantined && exportModal?.show()"
+				@export="() => !instance?.quarantined && exportModal?.show()"
 				@create-shortcut="() => createShortcut()"
 				@report="reportSharedInstance"
 			/>
@@ -122,7 +122,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { useOnline } from '@vueuse/core'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, type ComputedRef, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, type ComputedRef, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -137,6 +137,7 @@ import {
 } from '@/composables/instances/use-server-status-query'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
+import { toError } from '@/helpers/errors'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
 	getSharedInstanceUnavailableReason,
@@ -179,12 +180,22 @@ const route = useRoute()
 const { formatMessage } = useVIntl()
 
 const router = useRouter()
+const displayedInstanceRoute = shallowRef(router.currentRoute.value)
+watch(
+	() => router.currentRoute.value,
+	(nextRoute) => {
+		if (nextRoute.path.startsWith('/instance/')) {
+			displayedInstanceRoute.value = nextRoute
+		}
+	},
+	{ immediate: true },
+)
 const themeStore = useTheming()
 const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_instance_play_time'))
 
 const online = useOnline()
 const offline = computed(() => !online.value)
-const instanceId = computed(() => String(route.params.id ?? ''))
+const instanceId = computed(() => String(displayedInstanceRoute.value.params.id ?? ''))
 const instanceQuery = useQuery(
 	computed(() => ({
 		...instanceDetailQueryOptions(instanceId.value),
@@ -193,7 +204,7 @@ const instanceQuery = useQuery(
 )
 useQuery(
 	computed(() => ({
-		...instanceContentQueryOptions(instanceId.value, (error) => handleError(error)),
+		...instanceContentQueryOptions(instanceId.value, (error) => handleError(toError(error))),
 		enabled: !!instanceId.value,
 	})),
 )
@@ -217,7 +228,7 @@ const playing = computed(() => (processesQuery.data.value?.length ?? 0) > 0)
 
 async function ensureCriticalContent(targetInstanceId: string) {
 	await queryClient.ensureQueryData(
-		instanceContentQueryOptions(targetInstanceId, (error) => handleError(error)),
+		instanceContentQueryOptions(targetInstanceId, (error) => handleError(toError(error))),
 	)
 }
 
@@ -236,7 +247,7 @@ try {
 	await ensureCriticalInstanceData(instanceId.value)
 } catch (error) {
 	if (isUnmanagedInstanceError(error)) await router.replace('/')
-	else handleError(error)
+	else handleError(toError(error))
 }
 
 onBeforeRouteUpdate(async (to, from) => {
@@ -248,7 +259,7 @@ onBeforeRouteUpdate(async (to, from) => {
 		await ensureCriticalInstanceData(targetInstanceId)
 	} catch (error) {
 		if (isUnmanagedInstanceError(error)) return { path: '/' }
-		handleError(error)
+		handleError(toError(error))
 		return false
 	}
 })
@@ -384,14 +395,14 @@ watch(
 	(error) => {
 		if (!error) return
 		if (error.message.includes('is not managed')) void router.replace('/')
-		else handleError(error)
+		else handleError(toError(error))
 	},
 	{ immediate: true },
 )
 watch(
 	linkedProjectQuery.error,
 	(error) => {
-		if (error) handleError(error)
+		if (error) handleError(toError(error))
 	},
 	{ immediate: true },
 )
@@ -586,7 +597,7 @@ const stopInstance = async (context: string) => {
 	const currentInstance = instance.value
 	if (!currentInstance) return
 	stopping.value = true
-	await kill(currentInstance.id).catch(handleError)
+	await kill(currentInstance.id).catch((error) => handleError(toError(error)))
 	stopping.value = false
 	queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [])
 
@@ -642,9 +653,11 @@ const repairInstance = async () => {
 			project_id: currentInstance.link.project_id ?? currentInstance.link.server_project_id ?? '',
 			version_id: currentInstance.link.version_id ?? currentInstance.link.content_version_id ?? '',
 			title: currentInstance.name,
-		}).catch(handleError)
+		}).catch((error) => handleError(toError(error)))
 	} else {
-		await install_existing_instance(currentInstance.id, false).catch(handleError)
+		await install_existing_instance(currentInstance.id, false).catch((error) =>
+			handleError(toError(error)),
+		)
 	}
 }
 
@@ -706,7 +719,7 @@ async function deleteSelectedInstance() {
 		game_version: selectedInstance.game_version,
 	})
 	await router.push({ path: '/' })
-	await remove(selectedInstance.id).catch(handleError)
+	await remove(selectedInstance.id).catch((error) => handleError(toError(error)))
 }
 
 const handleRightClick = (event: MouseEvent) => {
@@ -819,7 +832,7 @@ onMounted(() => {
 			if (instancePageAlive) unlistenInstances = unlisten
 			else unlisten()
 		})
-		.catch(handleError)
+		.catch((error) => handleError(toError(error)))
 
 	void process_listener((event: { event: string; instance_id: string }) => {
 		if (event.instance_id !== instanceId.value) return
@@ -835,7 +848,7 @@ onMounted(() => {
 			if (instancePageAlive) unlistenProcesses = unlisten
 			else unlisten()
 		})
-		.catch(handleError)
+		.catch((error) => handleError(toError(error)))
 })
 
 const icon = computed(() =>

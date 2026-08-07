@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Kleurenthema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Kies de pagina die wordt weergegeven wanneer de Modrinth-app wordt geopend."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotheek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standaard openingspagina"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Verberg je gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."

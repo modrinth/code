@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Téma"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Válaszd ki, hogy a Modrinth App megnyitásakor melyik oldal jelenjen meg."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Kezdőlap"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Könyvtár"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Alapértelmezett nyitóoldal"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Elrejti a játékosod előnézete felett megjelenő névcímkét a Kinézetváltó oldalon."

@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Тема"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Выберите страницу для показа при запуске Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Главная"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Библиотека"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Стартовая страница"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Скрывать имя над игроком на странице выбора скина."

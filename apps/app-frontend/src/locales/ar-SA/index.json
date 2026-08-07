@@ -146,9 +146,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "مكتبة"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "الصفحة الرئيسة الافتراضية"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "ألغ تفعيل عرض الاسم فوق لاعبك في صفحة المظاهر."
   },

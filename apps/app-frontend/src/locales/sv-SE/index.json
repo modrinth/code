@@ -143,17 +143,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Färgtema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Välj sidan som visas när Modrinth App öppnas."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hem"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standardlandingssida"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Inaktiverar namnskylten ovanför din spelare på utseende-sidan."

@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Farbschema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Wähle die Seite, die beim Öffnen der Modrinth App erscheint."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliothek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standard-Startseite"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Verbirgt deinen Benutzernamen über der Spielervorschau auf der Skin-Auswahlseite."

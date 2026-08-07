@@ -59,9 +59,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Librarya"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Panimulang pahina ng paglapag"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Pagtatago ng nametag na nasa itaas ng iyong manlalaro sa loob ng pahina ng mga skin."
   },

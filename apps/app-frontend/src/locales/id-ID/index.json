@@ -56,9 +56,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Pustaka"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Halaman arahan bawaan"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
   },

@@ -71,9 +71,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "ไลบรารี"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "หน้าเริ่มต้น"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "ซ่อนป้ายชื่อบนศีรษะของผู้เล่นในหน้าแสดงสกิน"
   },

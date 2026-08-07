@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "色彩主題"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "選擇 Modrinth App 開啟時顯示的頁面。"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首頁"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "遊戲庫"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "預設起始頁面"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "在外觀選擇工具頁面中隱藏玩家預覽上方的使用者名稱。"

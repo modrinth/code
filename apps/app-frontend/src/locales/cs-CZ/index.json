@@ -77,9 +77,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Knihovna"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Výchozí stránka po spuštění"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Zakáže zobrazení jmenovky nad vaší postavou na stránce skinů."
   },

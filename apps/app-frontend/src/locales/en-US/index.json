@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Choose the page shown when Modrinth App opens."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Library"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Default landing page"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Hide your username above the player preview on the Skin selector page."

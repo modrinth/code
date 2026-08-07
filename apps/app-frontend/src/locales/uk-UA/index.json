@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Колірна тема"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Оберіть сторінку, яка показуватиметься при відкритті Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Головна"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Бібліотека"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Усталена цільова сторінка"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Приховати ваш нікнейм над попереднім переглядом гравця на сторінці вибору skin."

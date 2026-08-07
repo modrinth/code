@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Motyw"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Wybierz stronę, która pojawi się po uruchomieniu Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Strona główna"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Domyślna strona główna"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Ukryj nazwę użytkownika pokazaną nad podglądem wyglądu gracza na stronie wyboru skórki."

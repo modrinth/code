@@ -83,9 +83,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Kirjasto"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Oletus laskeutumissivu"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Kytkee pois päältä nimikyltin pelaajasi päällä skinit sivulla."
   },

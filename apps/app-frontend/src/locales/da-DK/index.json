@@ -149,9 +149,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standard startside"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Slår nametagget over din spiller på skins siden fra."
   },

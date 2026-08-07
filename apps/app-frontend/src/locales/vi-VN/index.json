@@ -146,9 +146,6 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Thư viện"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Trang mặc định"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Tắt hiển thị thẻ tên phía trên người chơi ở trang skin."
   },

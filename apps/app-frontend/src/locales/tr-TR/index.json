@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Renk teması"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Modrinth App açıldığında gözüken sayfayı seçin."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Ana Sayfa"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Kütüphane"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Varsayılan karşılama sayfası"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Dış görünüm seçici sayfasında oyuncu önizlemesinin üzerindeki kullanıcı adınızı gizleyin."
