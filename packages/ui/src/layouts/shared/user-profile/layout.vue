@@ -496,7 +496,7 @@ import {
 	injectPageContext,
 	injectTags,
 } from '#ui/providers'
-import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils'
+import { commonMessages, getProjectTypeTitleMessage, sortProjectTypes } from '#ui/utils'
 
 import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import {
@@ -840,7 +840,7 @@ const projectTypes = computed(() => {
 	const types = new Set(projects.value.map((project) => project.resolvedProjectType))
 	if (collections.value.length > 0) types.add('collection')
 	types.delete('project')
-	return [...types]
+	return sortProjectTypes(types)
 })
 
 const navLinks = computed(() => {
@@ -851,15 +851,13 @@ const navLinks = computed(() => {
 			label: formatMessage(commonMessages.allProjectType),
 			href: profilePath,
 		},
-		...projectTypes.value
-			.map((projectType) => ({
-				label:
-					projectType === 'collection'
-						? formatMessage(messages.collectionsLabel)
-						: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
-				href: `${profilePath}/${projectType}s`,
-			}))
-			.sort((first, second) => first.label.localeCompare(second.label)),
+		...projectTypes.value.map((projectType) => ({
+			label:
+				projectType === 'collection'
+					? formatMessage(messages.collectionsLabel)
+					: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
+			href: `${profilePath}/${projectType}s`,
+		})),
 	]
 })
 

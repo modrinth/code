@@ -3917,9 +3917,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Tag in evidenza"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Puoi mettere in evidenza fino a 3 tag. Altri tag potrebbero aggiungersi se non bastassero."
-  },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero averne solo uno."
   },

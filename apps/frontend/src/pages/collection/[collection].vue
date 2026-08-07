@@ -425,6 +425,7 @@ import {
 	ProjectCardList,
 	RadioButtons,
 	SidebarCard,
+	sortProjectTypes,
 	StyledInput,
 	TeleportOverflowMenu,
 	useCompactNumber,
@@ -769,7 +770,7 @@ const projectTypes = computed(() => {
 		projects.value?.map((project) => project?.project_type).filter((x) => x !== undefined) || [],
 	)
 	projectSet.delete('project')
-	return Array.from(projectSet)
+	return sortProjectTypes(projectSet)
 })
 
 function getProjectTypeSentenceMessage(type) {

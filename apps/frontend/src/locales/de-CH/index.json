@@ -3929,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Hervorgehobene Tags"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Du kannst bis zu 3 deiner relevantesten Tags als hervorheben. Andere Tags werden möglicherweise hervorgehoben, falls du nicht alle 3 auswählst."
-  },
   "project.settings.tags.features-description": {
     "message": "Wähle alle Funktionen aus, die dein {type} nutzt."
   },
@@ -3946,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Wähle mindestens eine Kategorie aus, um eine Kategorie hervorzuheben."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Genaue Tags sind wichtig, damit Nutzer dein {type} leichter finden können. Achte darauf, alle zutreffenden Tags auszuwählen."
   },
   "project.settings.tags.title": {
     "message": "Tags"

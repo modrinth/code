@@ -3920,9 +3920,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Ключевые теги"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Можно выбрать до 3 ключевых тегов. Если не выбрать все 3, то другие теги могут стать ключевыми."
-  },
   "project.settings.tags.features-description": {
     "message": "Выберите все особенности, которые использует ваш {type}"
   },
@@ -3934,9 +3931,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Выберите хотя бы одну категорию, чтобы отобразить ее."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Аккуратная маркировка важна, чтобы помочь людям найти ваш {type}"
   },
   "project.settings.tags.title": {
     "message": "Теги"
