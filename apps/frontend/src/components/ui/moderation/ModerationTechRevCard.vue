@@ -856,6 +856,10 @@ async function updateDetailStatus(
 
 	updatingDetails.add(detailId)
 
+	const previousMarkedCount = selectedFile.value
+		? getFileMarkedCount(selectedFile.value)
+		: undefined
+
 	try {
 		await updateIssueDetails([{ detail_id: detailId, verdict }])
 
@@ -880,7 +884,7 @@ async function updateDetailStatus(
 		if (verdict !== 'pending' && selectedFile.value) {
 			const markedCount = getFileMarkedCount(selectedFile.value)
 			const totalCount = getFileDetailCount(selectedFile.value)
-			if (markedCount === totalCount) {
+			if (previousMarkedCount != markedCount && markedCount === totalCount) {
 				backToFileList()
 			}
 		}
@@ -938,6 +942,10 @@ async function updateGlobalDetailStatus(
 
 	updatingGlobalDetailKeys.add(detail.key)
 
+	const previousMarkedCount = selectedFile.value
+		? getFileMarkedCount(selectedFile.value)
+		: undefined
+
 	try {
 		await updateGlobalIssueDetail(detail.key, verdict)
 
@@ -958,7 +966,7 @@ async function updateGlobalDetailStatus(
 		if (verdict !== 'pending' && selectedFile.value) {
 			const markedCount = getFileMarkedCount(selectedFile.value)
 			const totalCount = getFileDetailCount(selectedFile.value)
-			if (markedCount === totalCount) {
+			if (previousMarkedCount != markedCount && markedCount === totalCount) {
 				backToFileList()
 			}
 		}
@@ -1355,8 +1363,10 @@ const canSubmitReview = computed(() => {
 	if (totalIssues === 0) return true
 	return allIssuesResolved.value
 })
+const hasSubmittedPassReview = ref(false)
 
 async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
+	hasSubmittedPassReview.value = verdict === 'safe'
 	const editorContent = threadViewRef.value?.getReplyContent() || ''
 
 	let message: string | undefined
@@ -1523,13 +1533,39 @@ function copyId() {
 
 			<div class="h-px w-full bg-surface-5"></div>
 
-			<NavTabs
-				mode="local"
-				:links="navTabsLinks"
-				:active-index="activeTabIndex"
-				class="bg-surface-3! shadow-none!"
-				@tab-click="handleTabClick"
-			/>
+			<div class="flex flex-row justify-between">
+				<NavTabs
+					mode="local"
+					:links="navTabsLinks"
+					:active-index="activeTabIndex"
+					class="bg-surface-3! shadow-none!"
+					@tab-click="handleTabClick"
+				/>
+
+				<div v-if="selectedFile" class="flex flex-row items-end gap-2">
+					<ButtonLink
+						v-tooltip="`Download`"
+						type="outlined"
+						target="_blank"
+						:href="selectedFile.download_url"
+						:download="selectedFile.file_name"
+						class="!bg-surface-2"
+						aria-label="Download"
+					>
+						<DownloadIcon aria-hidden="true" />
+					</ButtonLink>
+					<ButtonLink
+						v-tooltip="`Open in Slicer`"
+						type="outlined"
+						target="_blank"
+						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
+						class="!bg-surface-2"
+						aria-label="Open in Slicer"
+					>
+						<ExternalIcon aria-hidden="true" /> Open
+					</ButtonLink>
+				</div>
+			</div>
 		</div>
 
 		<div class="border-t border-surface-3 bg-surface-2">
@@ -1552,10 +1588,16 @@ function copyId() {
 						>
 							<template #additionalActions>
 								<Button
-									v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+									v-tooltip="
+										!canSubmitReview
+											? 'There are still pending flags!'
+											: hasSubmittedPassReview
+												? 'Project already passed!'
+												: undefined
+									"
 									type="colored"
 									color="brand"
-									:disabled="!canSubmitReview"
+									:disabled="!canSubmitReview || hasSubmittedPassReview"
 									@click="handleSubmitReview('safe')"
 								>
 									<ShieldCheckIcon /> Pass
@@ -1683,7 +1725,16 @@ function copyId() {
 							:download="file.file_name"
 							tabindex="0"
 						>
-							<DownloadIcon /> Download
+							<DownloadIcon />
+						</ButtonLink>
+						<ButtonLink
+							v-tooltip="`Open in Slicer`"
+							type="outlined"
+							target="_blank"
+							:href="`https://slicer.run/?url=${encodeURIComponent(file.download_url)}`"
+							aria-label="Open in Slicer"
+						>
+							<ExternalIcon aria-hidden="true" /> Open
 						</ButtonLink>
 					</div>
 				</div>
@@ -2063,7 +2114,7 @@ function copyId() {
 										v-tooltip="`Copy code`"
 										type="quiet"
 										:label="`Copy code`"
-										class="absolute right-2 top-2 border-[1px]"
+										class="!absolute right-2 top-2 border-[1px]"
 										@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
 									>
 										<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />

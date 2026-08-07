@@ -102,21 +102,20 @@ pub(super) async fn execute(
         if let Some(venmo) = &user.venmo_handle {
             ("Venmo", "user_handle", venmo.clone(), venmo)
         } else {
-            return Err(ApiError::InvalidInput(
-                "Venmo address has not been set for account!".to_string(),
-            ));
+            return Err(ApiError::Request(eyre::eyre!(
+                "Venmo address has not been set for account!",
+            )));
         }
     } else if let Some(paypal_id) = &user.paypal_id {
         if let Some(paypal_country) = &user.paypal_country {
             if paypal_country == "US" && method_id != "paypal_us" {
-                return Err(ApiError::InvalidInput(
-                    "Please use the US PayPal transfer option!".to_string(),
-                ));
+                return Err(ApiError::Request(eyre::eyre!(
+                    "Please use the US PayPal transfer option!",
+                )));
             } else if paypal_country != "US" && method_id == "paypal_us" {
-                return Err(ApiError::InvalidInput(
-                    "Please use the International PayPal transfer option!"
-                        .to_string(),
-                ));
+                return Err(ApiError::Request(eyre::eyre!(
+                    "Please use the International PayPal transfer option!",
+                )));
             }
 
             (
@@ -126,14 +125,14 @@ pub(super) async fn execute(
                 user.paypal_email.as_ref().unwrap_or(paypal_id),
             )
         } else {
-            return Err(ApiError::InvalidInput(
-                "Please re-link your PayPal account!".to_string(),
-            ));
+            return Err(ApiError::Request(eyre::eyre!(
+                "Please re-link your PayPal account!",
+            )));
         }
     } else {
-        return Err(ApiError::InvalidInput(
-            "You have not linked a PayPal account!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "You have not linked a PayPal account!",
+        )));
     };
 
     let payout_req = json!({

@@ -5,6 +5,7 @@ use crate::models::threads::{MessageBody, Thread};
 use crate::models::v2::threads::LegacyThread;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::Deserialize;
 use xredis::RedisPool;
@@ -88,7 +89,8 @@ pub async fn threads_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Thread>>(response).await {

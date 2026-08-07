@@ -1853,9 +1853,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "Відкрилася нова вкладка, де ви зможете ввійти. Увійдіть, тоді поверніться до застосунку."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Скасувати"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Продовжити у браузері"
   },

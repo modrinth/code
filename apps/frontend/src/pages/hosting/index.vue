@@ -33,7 +33,7 @@
 			<div class="z-[5] flex w-full flex-col gap-8">
 				<div class="flex flex-col gap-4">
 					<div
-						class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+						class="relative h-fit w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 					>
 						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
@@ -110,7 +110,7 @@
 			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
 			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
 				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+					class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
 					{{ formatMessage(messages.whyModrinthHosting) }}
 				</div>
@@ -154,7 +154,7 @@
 					</div>
 
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<LoaderIcon loader="fabric" class="size-8 text-brand" />
+						<TagIcon tag="fabric" enforce-type="loader" class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.yourFavoriteMods) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
 							{{ formatMessage(messages.yourFavoriteModsDescription) }}
@@ -238,7 +238,7 @@
 			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
 			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
 				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+					class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
 					{{ formatMessage(messages.includedWithYourServer) }}
 				</div>
@@ -641,9 +641,9 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
-	LoaderIcon,
 	ModrinthServersPurchaseModal,
 	OptionGroup,
+	TagIcon,
 	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'

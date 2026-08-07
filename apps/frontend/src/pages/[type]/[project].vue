@@ -4,7 +4,7 @@
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
 		<template v-if="isSettings">
-			<div v-if="canAccessSettings" class="normal-page no-sidebar">
+			<div v-if="canAccessSettings" class="normal-page no-sidebar" :class="`align-${marginTarget}`">
 				<div class="normal-page__header mb-6">
 					<PageHeader :title="project.title" :row-class="'items-center'">
 						<template #leading>
@@ -115,17 +115,20 @@
 			/>
 			<div
 				class="new-page sidebar"
-				:class="{
-					'alt-layout': cosmetics.leftContentLayout,
-					'checklist-open':
-						showModerationChecklist &&
-						!collapsedModerationChecklist &&
-						!flags.alwaysShowChecklistAsPopup,
-					'checklist-collapsed':
-						showModerationChecklist &&
-						collapsedModerationChecklist &&
-						!flags.alwaysShowChecklistAsPopup,
-				}"
+				:class="[
+					{
+						'alt-layout': cosmetics.leftContentLayout,
+						'checklist-open':
+							showModerationChecklist &&
+							!collapsedModerationChecklist &&
+							!flags.alwaysShowChecklistAsPopup,
+						'checklist-collapsed':
+							showModerationChecklist &&
+							collapsedModerationChecklist &&
+							!flags.alwaysShowChecklistAsPopup,
+					},
+					`align-${marginTarget}`,
+				]"
 			>
 				<div
 					class="normal-page__header relative mb-4"
@@ -453,7 +456,8 @@
 
 				<div class="normal-page__sidebar">
 					<ProjectSidebarServerInfo
-						v-if="isServerProject && serverDataLoaded"
+						v-if="isServerProject"
+						:loading="!serverDataLoaded"
 						:project-v3="projectV3"
 						:tags="tags"
 						:required-content="serverRequiredContent"
@@ -483,6 +487,7 @@
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
+						:loading="creatorsLoading"
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
@@ -490,6 +495,7 @@
 					<ProjectSidebarDetails
 						:project="project"
 						:link-target="$external()"
+						:hide-license="isServerProject"
 						:show-followers="isServerProject"
 						class="card flex-card"
 					/>
@@ -535,7 +541,7 @@ import {
 	SettingsIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { moderationSettings } from '@modrinth/moderation'
+import { getMarginTarget, moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
 	ArchivedProjectBanner,
@@ -612,6 +618,7 @@ const config = useRuntimeConfig()
 const moderationQueue = useModerationQueue()
 const keybinds = useModerationKeybinds()
 const modSettings = useModerationSettings()
+const marginTarget = computed(() => getMarginTarget(modSettings.value))
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
@@ -1091,7 +1098,11 @@ watch(serverModpackVersionId, (versionId) => {
 })
 
 // Members
-const { data: allMembersRaw, error: _membersError } = useQuery({
+const {
+	data: allMembersRaw,
+	error: _membersError,
+	isPending: membersPending,
+} = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'members']),
 	queryFn: () => client.labrinth.projects_v3.getMembers(projectId.value),
 	staleTime: STALE_TIME,
@@ -1142,7 +1153,7 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organizationRaw } = useQuery({
+const { data: organizationRaw, isPending: organizationPending } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
@@ -1165,6 +1176,13 @@ const archivedDisclosure = computed(() =>
 	disclosuresResponse.value?.disclosures?.find((disclosure) => disclosure.type === 'archived'),
 )
 const isArchived = computed(() => !!archivedDisclosure.value)
+
+const creatorsLoading = computed(
+	() =>
+		!projectRaw.value ||
+		membersPending.value ||
+		(!!projectRaw.value.organization && organizationPending.value),
+)
 
 const { data: thread } = useQuery({
 	queryKey: computed(() => ['thread', projectRaw.value?.thread_id]),
@@ -2318,7 +2336,7 @@ provideProjectPageContext({
 
 .servers-popup {
 	box-shadow:
-		0 0 12px 1px rgba(0, 175, 92, 0.6),
+		0 0 12px 1px color-mix(in srgb, var(--color-brand) 60%, transparent),
 		var(--shadow-floating);
 
 	&::before {

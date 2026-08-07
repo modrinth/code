@@ -123,14 +123,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 	</component>
 
 	<Teleport to="body">
-		<Transition
-			enter-active-class="transition duration-125 ease-out"
-			enter-from-class="scale-95 opacity-0"
-			enter-to-class="scale-100 opacity-100"
-			leave-active-class="transition duration-100 ease-in"
-			leave-from-class="scale-100 opacity-100"
-			leave-to-class="scale-95 opacity-0"
-		>
+		<Transition name="floating-expand">
 			<div
 				v-if="isOpen"
 				:id="panelId"

@@ -9,6 +9,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::http::HttpClient;
 use actix_web::{HttpRequest, HttpResponse};
@@ -84,11 +85,11 @@ pub async fn page_view_ingest(
     .ok();
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
-    let url = Url::parse(&url_input.url).map_err(|_| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
-    })?;
-    let domain = url.host_str().ok_or_else(|| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+    let url = Url::parse(&url_input.url)
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("invalid page view URL specified!".to_string())?;
+    let domain = url.host_str().wrap_request_err_with(|| {
+        "invalid page view URL specified!".to_string()
     })?;
     let url_origin = url.origin().ascii_serialization();
 
@@ -98,9 +99,9 @@ pub async fn page_view_ingest(
         .any(|origin| origin == "*" || url_origin == *origin);
 
     if !is_valid_url_origin {
-        return Err(ApiError::InvalidInput(
-            "invalid page view URL specified!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "invalid page view URL specified!",
+        )));
     }
 
     let headers = req
@@ -158,7 +159,8 @@ pub async fn page_view_ingest(
                     &**pool,
                     &redis,
                 )
-                .await?;
+                .await
+                .wrap_api_err("fetching project from database")?;
 
                 if let Some(project) = project {
                     view.project_id = project.inner.id.0 as u64;
@@ -209,14 +211,15 @@ pub async fn playtime_ingest(
         &session_queue,
         Scopes::PERFORM_ANALYTICS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let playtimes = playtime_input.0;
 
     if playtimes.len() > 2000 {
-        return Err(ApiError::InvalidInput(
-            "Too much playtime entered for version!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "Too much playtime entered for version!",
+        )));
     }
 
     let versions = crate::database::models::DBVersion::get_many(
@@ -224,7 +227,8 @@ pub async fn playtime_ingest(
         &**pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching versions from database")?;
 
     let headers = req.headers();
 
@@ -300,8 +304,9 @@ pub async fn minecraft_server_play_ingest(
     let project_id = play_input.project_id;
 
     let project = DBProject::get(&project_id.to_string(), &**pool, &redis)
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_api_err("fetching project from database")?
+        .wrap_not_found_err("resource not found")?;
 
     if project.components.minecraft_server.is_none() {
         return Err(ApiError::Request(eyre!(

@@ -6,6 +6,7 @@ use crate::models::teams::{
 use crate::models::v2::teams::LegacyTeamMember;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;
@@ -63,7 +64,8 @@ pub async fn team_members_get_project(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<TeamMember>>(response).await {
         Ok(members) => {
@@ -101,7 +103,8 @@ pub async fn team_members_get(
     let response =
         v3::teams::team_members_get(req, info, pool, redis, session_queue)
             .await
-            .or_else(v2_reroute::flatten_404_error)?;
+            .or_else(v2_reroute::flatten_404_error)
+            .wrap_api_err("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<TeamMember>>(response).await {
         Ok(members) => {
@@ -148,7 +151,11 @@ pub async fn teams_get(
     .await
     .or_else(v2_reroute::flatten_404_error);
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<Vec<Vec<TeamMember>>>(response?).await {
+    match v2_reroute::extract_ok_json::<Vec<Vec<TeamMember>>>(
+        response.wrap_api_err("extracting v2 response body")?,
+    )
+    .await
+    {
         Ok(members) => {
             let members = members
                 .into_iter()

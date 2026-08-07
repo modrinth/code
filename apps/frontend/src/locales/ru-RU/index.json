@@ -1475,9 +1475,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Дата обновления"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Закрыть"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Скачать {formType}"
   },
@@ -2978,9 +2975,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Не удалось удалить все группы: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Удалить"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Все группы успешно удалены."
   },
@@ -3019,9 +3013,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Сканирование..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Готово"
   },
   "muralpay.account-type.checking": {
     "message": "Расчётный"
@@ -3929,9 +3920,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Ключевые теги"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Можно выбрать до 3 ключевых тегов. Если не выбрать все 3, то другие теги могут стать ключевыми."
-  },
   "project.settings.tags.features-description": {
     "message": "Выберите все особенности, которые использует ваш {type}"
   },
@@ -3943,9 +3931,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Выберите хотя бы одну категорию, чтобы отобразить ее."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Аккуратная маркировка важна, чтобы помочь людям найти ваш {type}"
   },
   "project.settings.tags.title": {
     "message": "Теги"

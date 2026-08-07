@@ -1253,9 +1253,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Datoteka sačuvana"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Zatvori"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Pronađi"
   },

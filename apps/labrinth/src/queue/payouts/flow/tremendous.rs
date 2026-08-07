@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use chrono::Utc;
 use eyre::eyre;
 use modrinth_util::decimal::Decimal2dp;
@@ -64,7 +65,8 @@ pub(super) async fn create(
         "paypal" | "venmo" => {
             let currency = details.currency.unwrap_or(TremendousCurrency::Usd);
             let currency_code = currency.to_string();
-            let usd_to_currency = usd_to_currency_for(&currency_code)?;
+            let usd_to_currency = usd_to_currency_for(&currency_code)
+                .wrap_api_err("executing `usd_to_currency_for`")?;
 
             let fee = PayoutMethodFee {
                 // If a user withdraws $10:
@@ -127,7 +129,8 @@ pub(super) async fn create(
                 } else {
                     TremendousCurrency::Usd.to_string()
                 };
-            let usd_to_currency = usd_to_currency_for(&currency_code)?;
+            let usd_to_currency = usd_to_currency_for(&currency_code)
+                .wrap_api_err("executing `usd_to_currency_for`")?;
             let currency_to_usd = dec!(1) / usd_to_currency;
 
             // no fees
@@ -190,7 +193,8 @@ pub(super) async fn execute(
         pub order: Order,
     }
 
-    let user_email = get_verified_email(user)?;
+    let user_email = get_verified_email(user)
+        .wrap_api_err("fetching verified user email")?;
 
     let order_req = json!({
         "payment": {

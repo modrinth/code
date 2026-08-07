@@ -1415,9 +1415,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Nemrég frissített"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Bezárás"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Letöltés {formType}"
   },
@@ -3644,9 +3641,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Kiemelt címkék"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Legfeljebb 3 legrelevánsabb címkét jelölhetsz ki kiemeltként. Ha nem választod ki mind a 3-at, akkor a többi címke is kiemeltként jelenhet meg."
-  },
   "project.settings.tags.features-description": {
     "message": "Jelöld ki az összes olyan funkciót, amelyet a {type} használ."
   },
@@ -3661,9 +3655,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Válassz ki legalább egy kategóriát ahhoz, hogy kiemelj egy kategóriát."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "A pontos címkézés fontos ahhoz, hogy a {type} könnyebben me. Feltétlenül válaszd ki az összes releváns címkét."
   },
   "project.settings.tags.title": {
     "message": "Címkék"

@@ -7,6 +7,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::HashAlgorithm;
 use crate::routes::v3::version_file::{DownloadRedirect, HashQuery};
 use crate::routes::{FileHash, v2_reroute, v3};
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -69,7 +71,8 @@ pub async fn get_version_from_hash(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
@@ -233,7 +236,8 @@ pub async fn get_update_from_hash(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
@@ -289,7 +293,8 @@ pub async fn get_versions_from_hashes(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
@@ -342,7 +347,8 @@ pub async fn get_projects_from_hashes(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2
     match v2_reroute::extract_ok_json::<HashMap<String, Project>>(response)
@@ -361,7 +367,8 @@ pub async fn get_projects_from_hashes(
                 &**pool,
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("converting projects to legacy responses")?;
             let legacy_projects_hashes = hash_to_project_id
                 .into_iter()
                 .filter_map(|(hash, project_id)| {
@@ -426,7 +433,9 @@ pub async fn update_files(
     .await
     {
         Ok(resp) => resp,
-        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(ApiError::NotFound(_)) => {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
         Err(err) => return Err(err),
     };
 
@@ -477,7 +486,9 @@ pub async fn update_files_many(
     .await
     {
         Ok(resp) => resp,
-        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(ApiError::NotFound(_)) => {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
         Err(err) => return Err(err),
     };
 
@@ -565,7 +576,8 @@ pub async fn update_individual_files(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)

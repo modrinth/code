@@ -108,10 +108,10 @@ export type ProjectType =
 
 const ALL_PROJECT_TYPES: ProjectType[] = [
 	'mod',
-	'modpack',
 	'resourcepack',
-	'shader',
 	'datapack',
+	'shader',
+	'modpack',
 	'plugin',
 	'server',
 ]

@@ -1844,9 +1844,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "Открылась вкладка для входа. Завершение вход и вернитесь в приложение."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Отмена"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Продолжите в браузере"
   },

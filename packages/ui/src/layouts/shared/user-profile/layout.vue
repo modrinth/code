@@ -37,41 +37,7 @@
 			</template>
 		</NewModal>
 
-		<NewModal
-			v-if="variant === 'web'"
-			ref="editRoleModal"
-			:header="formatMessage(messages.editRoleButton)"
-		>
-			<div class="flex w-80 flex-col gap-4">
-				<Combobox
-					v-model="selectedRole"
-					:options="roleOptions"
-					:placeholder="formatMessage(messages.selectRolePlaceholder)"
-				/>
-				<div class="flex justify-end gap-2">
-					<Button native-type="button" @click="cancelRoleEdit">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						native-type="button"
-						:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
-						@click="saveRoleEdit"
-					>
-						<template v-if="isSavingRole">
-							<SpinnerIcon class="animate-spin" />
-							{{ formatMessage(messages.savingLabel) }}
-						</template>
-						<template v-else>
-							<SaveIcon />
-							{{ formatMessage(commonMessages.saveChangesButton) }}
-						</template>
-					</Button>
-				</div>
-			</div>
-		</NewModal>
+		<EditUserModal v-if="variant === 'web'" ref="editUserModal" :user="user" :user-id="userId" />
 
 		<NewModal
 			v-if="variant === 'web' && isStaffViewing"
@@ -226,7 +192,7 @@
 					@open-analytics="
 						openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
 					"
-					@edit-role="openRoleEditModal"
+					@edit-user="editUserModal?.show()"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -460,7 +426,6 @@ import {
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
-	SaveIcon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -477,7 +442,6 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import { Button } from '#ui/components/base/buttons'
-import Combobox from '#ui/components/base/Combobox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -496,8 +460,9 @@ import {
 	injectPageContext,
 	injectTags,
 } from '#ui/providers'
-import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils'
+import { commonMessages, getProjectTypeTitleMessage, sortProjectTypes } from '#ui/utils'
 
+import EditUserModal from './components/edit-user-modal.vue'
 import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import {
 	hasActivePride26Midas,
@@ -570,18 +535,6 @@ const messages = defineMessages({
 	collectionProjectsCount: {
 		id: 'profile.collection.projects-count',
 		defaultMessage: '{count, plural, one {# project} other {# projects}}',
-	},
-	savingLabel: {
-		id: 'profile.label.saving',
-		defaultMessage: 'Saving...',
-	},
-	editRoleButton: {
-		id: 'profile.button.edit-role',
-		defaultMessage: 'Edit role',
-	},
-	selectRolePlaceholder: {
-		id: 'profile.role.select-placeholder',
-		defaultMessage: 'Select a role',
 	},
 	userDetailsTitle: {
 		id: 'profile.details.title',
@@ -691,14 +644,6 @@ const messages = defineMessages({
 		id: 'profile.official-account.bio',
 		defaultMessage:
 			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
-	},
-	roleUpdateErrorTitle: {
-		id: 'profile.role.update-error-title',
-		defaultMessage: 'Failed to update role',
-	},
-	roleUpdateErrorDescription: {
-		id: 'profile.role.update-error-description',
-		defaultMessage: 'An error occurred while updating the user role. Please try again.',
 	},
 	blockButton: {
 		id: 'profile.button.block',
@@ -840,7 +785,7 @@ const projectTypes = computed(() => {
 	const types = new Set(projects.value.map((project) => project.resolvedProjectType))
 	if (collections.value.length > 0) types.add('collection')
 	types.delete('project')
-	return [...types]
+	return sortProjectTypes(types)
 })
 
 const navLinks = computed(() => {
@@ -851,15 +796,13 @@ const navLinks = computed(() => {
 			label: formatMessage(commonMessages.allProjectType),
 			href: profilePath,
 		},
-		...projectTypes.value
-			.map((projectType) => ({
-				label:
-					projectType === 'collection'
-						? formatMessage(messages.collectionsLabel)
-						: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
-				href: `${profilePath}/${projectType}s`,
-			}))
-			.sort((first, second) => first.label.localeCompare(second.label)),
+		...projectTypes.value.map((projectType) => ({
+			label:
+				projectType === 'collection'
+					? formatMessage(messages.collectionsLabel)
+					: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
+			href: `${profilePath}/${projectType}s`,
+		})),
 	]
 })
 
@@ -1045,33 +988,13 @@ async function retryQueries(): Promise<void> {
 }
 
 const userDetailsModal = ref<ModalRef | null>(null)
-const editRoleModal = ref<ModalRef | null>(null)
+const editUserModal = ref<InstanceType<typeof EditUserModal> | null>(null)
 const blockUserModal = ref<ModalRef | null>(null)
-const selectedRole = ref<Labrinth.Users.v3.Role | null>(null)
-const isSavingRole = ref(false)
 const isBlockingUser = ref(false)
 const isUnblockingUser = ref(false)
-const roleOptions = [
-	{ value: 'developer', label: 'Developer' },
-	{ value: 'moderator', label: 'Moderator' },
-	{ value: 'admin', label: 'Admin' },
-] satisfies { value: Labrinth.Users.v3.Role; label: string }[]
-
-watch(
-	user,
-	(currentUser) => {
-		selectedRole.value = currentUser?.role ?? null
-	},
-	{ immediate: true },
-)
 
 function openUserDetails(): void {
 	userDetailsModal.value?.show()
-}
-
-function openRoleEditModal(): void {
-	selectedRole.value = user.value?.role ?? null
-	editRoleModal.value?.show()
 }
 
 async function handleBlockAction(): Promise<void> {
@@ -1150,35 +1073,11 @@ async function unblockCurrentUser(): Promise<void> {
 	}
 }
 
-function cancelRoleEdit(): void {
-	selectedRole.value = user.value?.role ?? null
-	editRoleModal.value?.hide()
-}
-
 async function toggleAffiliate(): Promise<void> {
 	if (!user.value) return
 	await userProfile.patchUser(user.value.id, {
 		badges: user.value.badges ^ UserBadge.AFFILIATE,
 	})
 	await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
-}
-
-async function saveRoleEdit(): Promise<void> {
-	if (!user.value || !selectedRole.value || selectedRole.value === user.value.role) return
-
-	isSavingRole.value = true
-	try {
-		await userProfile.patchUser(user.value.id, { role: selectedRole.value })
-		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
-		editRoleModal.value?.hide()
-	} catch {
-		notificationManager.addNotification({
-			type: 'error',
-			title: formatMessage(messages.roleUpdateErrorTitle),
-			text: formatMessage(messages.roleUpdateErrorDescription),
-		})
-	} finally {
-		isSavingRole.value = false
-	}
 }
 </script>

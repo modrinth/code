@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -18,6 +19,7 @@ use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::search::SearchState;
+use crate::util::error::Context;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -65,10 +67,13 @@ pub async fn organization_projects_get(
     .map(|x| x.1)
     .ok();
 
-    let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
+    let organization_data = DBOrganization::get(&id, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching organization from database")?;
     if let Some(organization) = organization_data
         && is_visible_organization(&organization, &current_user, &pool, &redis)
-            .await?
+            .await
+            .wrap_api_err("checking organization visibility")?
     {
         let project_ids = sqlx::query!(
             "
@@ -81,22 +86,25 @@ pub async fn organization_projects_get(
         .fetch(&**pool)
         .map_ok(|m| database::models::DBProjectId(m.id))
         .try_collect::<Vec<_>>()
-        .await?;
+        .await
+        .wrap_internal_err("fetching project IDs from database")?;
 
         let projects_data = crate::database::models::DBProject::get_many_ids(
             &project_ids,
             &**pool,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_api_err("fetching organization projects")?;
 
         let projects =
             filter_visible_projects(projects_data, &current_user, &pool, true)
-                .await?;
+                .await
+                .wrap_api_err("filtering visible projects")?;
 
         Ok(HttpResponse::Ok().json(projects))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -242,20 +250,26 @@ pub async fn organization_get(
     .ok();
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
-    let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
+    let organization_data = DBOrganization::get(&id, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching organization from database")?;
     if let Some(data) = organization_data
-        && is_visible_organization(&data, &current_user, &pool, &redis).await?
+        && is_visible_organization(&data, &current_user, &pool, &redis)
+            .await
+            .wrap_api_err("checking organization visibility")?
     {
         let members_data =
             DBTeamMember::get_from_team_full(data.team_id, &**pool, &redis)
-                .await?;
+                .await
+                .wrap_internal_err("fetching team members from database")?;
 
         let users = crate::database::models::DBUser::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching users from database")?;
         let logged_in = current_user
             .as_ref()
             .and_then(|user| {
@@ -292,12 +306,13 @@ pub async fn organization_get(
                 &**pool,
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("fetching moderation note from database")?;
             organization.moderation_notes = Some(note.map(Into::into));
         }
         return Ok(HttpResponse::Ok().json(organization));
     }
-    Err(ApiError::NotFound)
+    Err(ApiError::NotFound(eyre::eyre!("resource not found")))
 }
 
 #[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
@@ -317,25 +332,35 @@ pub async fn organization_notes_edit(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     if !user.role.is_mod() {
-        return Err(ApiError::CustomAuthentication(
-            "you do not have permission to edit moderation notes".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "you do not have permission to edit moderation notes",
+        )));
     }
 
-    new_note.validate_not_empty()?;
+    new_note
+        .validate_not_empty()
+        .wrap_api_err("validating not empty")?;
     let expected_version =
-        crate::models::moderation_notes::parse_if_match_header(&req)?;
+        crate::models::moderation_notes::parse_if_match_header(&req)
+            .wrap_api_err(
+                "executing `moderation_notes::parse_if_match_header`",
+            )?;
 
     let organization =
         DBOrganization::get(&info.into_inner().0, &**pool, &redis)
-            .await?
-            .ok_or(ApiError::NotFound)?;
+            .await
+            .wrap_internal_err("fetching organization from database")?
+            .wrap_not_found_err("resource not found")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
     if let Some(expected) = expected_version {
         let updated = DBModerationNote::update(
             None,
@@ -346,12 +371,13 @@ pub async fn organization_notes_edit(
             new_note.user_rating,
             &mut transaction,
         )
-        .await?;
+        .await
+        .wrap_internal_err("updating moderation note in database")?;
 
         if updated.is_none() {
-            return Err(ApiError::PreconditionFailed(
-                "moderation note version does not match".to_string(),
-            ));
+            return Err(ApiError::PreconditionFailed(eyre::eyre!(
+                "moderation note version does not match",
+            )));
         }
     } else {
         let updated = DBModerationNote::insert(
@@ -362,17 +388,23 @@ pub async fn organization_notes_edit(
             new_note.user_rating,
             &mut transaction,
         )
-        .await?;
+        .await
+        .wrap_internal_err("inserting moderation note into database")?;
 
         if updated.is_none() {
-            return Err(ApiError::PreconditionRequired(
-                "moderation note version does not match".to_string(),
-            ));
+            return Err(ApiError::PreconditionRequired(eyre::eyre!(
+                "moderation note version does not match",
+            )));
         }
     };
 
-    transaction.commit().await?;
-    DBModerationNote::clear_organization_cache(organization.id, &redis).await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
+    DBModerationNote::clear_organization_cache(organization.id, &redis)
+        .await
+        .wrap_internal_err("clearing cached moderation note in Redis")?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -395,9 +427,11 @@ pub async fn organizations_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
-    let organizations_data =
-        DBOrganization::get_many(&ids, &**pool, &redis).await?;
+    let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)
+        .wrap_request_err("deserializing JSON data")?;
+    let organizations_data = DBOrganization::get_many(&ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching organizations from database")?;
     let team_ids = organizations_data
         .iter()
         .map(|x| x.team_id)
@@ -405,13 +439,15 @@ pub async fn organizations_get(
 
     let teams_data =
         DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
-            .await?;
+            .await
+            .wrap_internal_err("fetching team members from database")?;
     let users = crate::database::models::DBUser::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching users from database")?;
 
     let current_user = get_user_from_headers(
         &req,
@@ -431,7 +467,8 @@ pub async fn organizations_get(
             &**pool,
             &redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("fetching moderation notes from database")?
     } else {
         HashMap::new()
     };
@@ -444,7 +481,9 @@ pub async fn organizations_get(
     }
 
     for data in organizations_data {
-        if !is_visible_organization(&data, &current_user, &pool, &redis).await?
+        if !is_visible_organization(&data, &current_user, &pool, &redis)
+            .await
+            .wrap_api_err("checking organization visibility")?
         {
             continue;
         }
@@ -522,16 +561,20 @@ pub async fn organizations_edit(
         &session_queue,
         Scopes::ORGANIZATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    new_organization.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    new_organization
+        .validate()
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("validating request")?;
 
     let string = info.into_inner().0;
     let result =
-        database::models::DBOrganization::get(&string, &**pool, &redis).await?;
+        database::models::DBOrganization::get(&string, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching organization from database")?;
     if let Some(organization_item) = result {
         let id = organization_item.id;
 
@@ -540,7 +583,8 @@ pub async fn organizations_edit(
             user.id.into(),
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching team member from database")?;
 
         let permissions = OrganizationPermissions::get_permissions_by_role(
             &user.role,
@@ -548,13 +592,15 @@ pub async fn organizations_edit(
         );
 
         if let Some(perms) = permissions {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
             if let Some(description) = &new_organization.description {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the description of this organization!"
-                            .to_string(),
-                    ));
+                    return Err(ApiError::Auth(eyre::eyre!(
+                        "You do not have the permissions to edit the description of this organization!",
+                    )));
                 }
                 sqlx::query!(
                     "
@@ -566,15 +612,17 @@ pub async fn organizations_edit(
                     id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `organizations_edit`",
+                )?;
             }
 
             if let Some(name) = &new_organization.name {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the name of this organization!"
-                            .to_string(),
-                    ));
+                    return Err(ApiError::Auth(eyre::eyre!(
+                        "You do not have the permissions to edit the name of this organization!",
+                    )));
                 }
                 sqlx::query!(
                     "
@@ -586,15 +634,17 @@ pub async fn organizations_edit(
                     id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `organizations_edit`",
+                )?;
             }
 
             if let Some(slug) = &new_organization.slug {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the slug of this organization!"
-                            .to_string(),
-                    ));
+                    return Err(ApiError::Auth(eyre::eyre!(
+                        "You do not have the permissions to edit the slug of this organization!",
+                    )));
                 }
 
                 let existing = DBOrganization::get(
@@ -602,12 +652,12 @@ pub async fn organizations_edit(
                     &mut transaction,
                     &redis,
                 )
-                .await?;
+                .await
+                .wrap_internal_err("fetching organization from database")?;
                 if existing.is_some() {
-                    return Err(ApiError::InvalidInput(
-                        "Slug collides with other organization's id!"
-                            .to_string(),
-                    ));
+                    return Err(ApiError::Request(eyre::eyre!(
+                        "Slug collides with other organization's id!",
+                    )));
                 }
 
                 // Make sure the new name is different from the old one
@@ -625,13 +675,15 @@ pub async fn organizations_edit(
                         slug
                     )
                     .fetch_one(&mut transaction)
-                    .await?;
+                    .await
+                    .wrap_internal_err(
+                        "querying database for `organizations_edit`",
+                    )?;
 
                     if results.exists.unwrap_or(true) {
-                        return Err(ApiError::InvalidInput(
-                            "Slug collides with other organization's id!"
-                                .to_string(),
-                        ));
+                        return Err(ApiError::Request(eyre::eyre!(
+                            "Slug collides with other organization's id!",
+                        )));
                     }
                 }
 
@@ -645,26 +697,32 @@ pub async fn organizations_edit(
                     id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `organizations_edit`",
+                )?;
             }
 
-            transaction.commit().await?;
+            transaction
+                .commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
             database::models::DBOrganization::clear_cache(
                 organization_item.id,
                 Some(organization_item.slug),
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("clearing cached data from Redis")?;
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this organization!"
-                    .to_string(),
-            ))
+            Err(ApiError::Auth(eyre::eyre!(
+                "You do not have permission to edit this organization!",
+            )))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -685,17 +743,17 @@ pub async fn organization_delete(
         &session_queue,
         Scopes::ORGANIZATION_DELETE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
     let string = info.into_inner().0;
 
     let organization =
         database::models::DBOrganization::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
+            .await
+            .wrap_internal_err("fetching organization from database")?
+            .wrap_request_err_with(|| {
+                "the specified organization does not exist!".to_string()
             })?;
 
     if !user.role.is_admin() {
@@ -707,11 +765,9 @@ pub async fn organization_delete(
                 &**pool,
             )
             .await
-            .map_err(ApiError::Database)?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
+            .wrap_internal_err("fetching organization team member")?
+            .wrap_request_err_with(|| {
+                "the specified organization does not exist!".to_string()
             })?;
 
         let permissions = OrganizationPermissions::get_permissions_by_role(
@@ -721,10 +777,9 @@ pub async fn organization_delete(
         .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::DELETE_ORGANIZATION) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to delete this organization!"
-                    .to_string(),
-            ));
+            return Err(ApiError::Auth(eyre::eyre!(
+                "You don't have permission to delete this organization!",
+            )));
         }
     }
 
@@ -736,11 +791,15 @@ pub async fn organization_delete(
         organization.team_id as database::models::ids::DBTeamId
     )
     .fetch_one(&**pool)
-    .await?
+    .await
+    .wrap_internal_err("fetching owner ID from database")?
     .user_id;
     let owner_id = database::models::ids::DBUserId(owner_id);
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     // Handle projects- every project that is in this organization needs to have its owner changed the organization owner
     // Now, no project should have an owner if it is in an organization, and also
@@ -762,7 +821,8 @@ pub async fn organization_delete(
         )
     })
     .try_collect::<Vec<_>>()
-    .await?;
+    .await
+    .wrap_internal_err("querying database for `organization_delete`")?;
     let organization_project_teams = organization_projects
         .iter()
         .map(|(team_id, _)| *team_id)
@@ -776,7 +836,8 @@ pub async fn organization_delete(
         let new_id = crate::database::models::ids::generate_team_member_id(
             &mut transaction,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching query results from database")?;
         let member = DBTeamMember {
             id: new_id,
             team_id: *organization_project_team,
@@ -789,7 +850,9 @@ pub async fn organization_delete(
             payouts_split: Decimal::ZERO,
             ordering: 0,
         };
-        member.insert(&mut transaction).await?;
+        member.insert(&mut transaction).await.wrap_internal_err(
+            "inserting database records for `organization_delete`",
+        )?;
     }
     // Safely remove the organization
     let result = database::models::DBOrganization::remove(
@@ -797,19 +860,26 @@ pub async fn organization_delete(
         &mut transaction,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching query results from database")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     database::models::DBOrganization::clear_cache(
         organization.id,
         Some(organization.slug),
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("clearing cached data from Redis")?;
 
     for team_id in &organization_project_teams {
-        database::models::DBTeamMember::clear_cache(*team_id, &redis).await?;
+        database::models::DBTeamMember::clear_cache(*team_id, &redis)
+            .await
+            .wrap_internal_err("clearing cached data from Redis")?;
     }
 
     for project_id in organization_project_ids {
@@ -820,18 +890,22 @@ pub async fn organization_delete(
             None,
             None,
         )
-        .await?;
+        .await
+        .wrap_api_err(
+            "executing `projects::clear_project_cache_and_queue_search`",
+        )?;
     }
 
     if !organization_project_teams.is_empty() {
         database::models::DBUser::clear_project_cache(&[owner_id], &redis)
-            .await?;
+            .await
+            .wrap_internal_err("clearing cached user in Redis")?;
     }
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -858,16 +932,16 @@ pub async fn organization_projects_add(
         &session_queue,
         Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let organization =
         database::models::DBOrganization::get(&info, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
+            .await
+            .wrap_internal_err("fetching organization from database")?
+            .wrap_request_err_with(|| {
+                "the specified organization does not exist!".to_string()
             })?;
 
     let project_item = database::models::DBProject::get(
@@ -875,17 +949,15 @@ pub async fn organization_projects_add(
         &**pool,
         &redis,
     )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified project does not exist!".to_string(),
-        )
+    .await
+    .wrap_api_err("fetching project from database")?
+    .wrap_request_err_with(|| {
+        "the specified project does not exist!".to_string()
     })?;
     if project_item.inner.organization_id.is_some() {
-        return Err(ApiError::InvalidInput(
-            "The specified project is already owned by an organization!"
-                .to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "The specified project is already owned by an organization!",
+        )));
     }
 
     let project_team_member =
@@ -895,11 +967,10 @@ pub async fn organization_projects_add(
             false,
             &**pool,
         )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "You are not a member of this project!".to_string(),
-            )
+        .await
+        .wrap_internal_err("fetching team member from database")?
+        .wrap_request_err_with(|| {
+            "you are not a member of this project!".to_string()
         })?;
     let organization_team_member =
         database::models::DBTeamMember::get_from_user_id_organization(
@@ -908,18 +979,17 @@ pub async fn organization_projects_add(
             false,
             &**pool,
         )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "You are not a member of this organization!".to_string(),
-            )
+        .await
+        .wrap_internal_err("fetching team member from database")?
+        .wrap_request_err_with(|| {
+            "you are not a member of this organization!".to_string()
         })?;
 
     // Require ownership of a project to add it to an organization
     if !current_user.role.is_admin() && !project_team_member.is_owner {
-        return Err(ApiError::CustomAuthentication(
-            "You need to be an owner of a project to add it to an organization!".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You need to be an owner of a project to add it to an organization!",
+        )));
     }
 
     let permissions = OrganizationPermissions::get_permissions_by_role(
@@ -928,7 +998,10 @@ pub async fn organization_projects_add(
     )
     .unwrap_or_default();
     if permissions.contains(OrganizationPermissions::ADD_PROJECT) {
-        let mut transaction = pool.begin().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
         sqlx::query!(
             "
             UPDATE mods
@@ -939,7 +1012,10 @@ pub async fn organization_projects_add(
             project_item.inner.id as database::models::ids::DBProjectId
         )
         .execute(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "querying database for `organization_projects_add`",
+        )?;
 
         // The former owner is no longer an owner (as it is now 'owned' by the organization, 'given' to them)
         // The former owner is still a member of the project, but not an owner
@@ -955,7 +1031,10 @@ pub async fn organization_projects_add(
             organization.team_id as database::models::ids::DBTeamId
         )
         .fetch_one(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "fetching organization owner user ID from database",
+        )?;
         let organization_owner_user_id =
             database::models::ids::DBUserId(organization_owner_user_id.id);
 
@@ -968,20 +1047,28 @@ pub async fn organization_projects_add(
             organization_owner_user_id as database::models::ids::DBUserId,
         )
         .execute(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "querying database for `organization_projects_add`",
+        )?;
 
-        transaction.commit().await?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
 
         database::models::DBUser::clear_project_cache(
             &[current_user.id.into()],
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("clearing cached user in Redis")?;
         database::models::DBTeamMember::clear_cache(
             project_item.inner.team_id,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
@@ -989,12 +1076,14 @@ pub async fn organization_projects_add(
             project_item.inner.slug,
             None,
         )
-        .await?;
+        .await
+        .wrap_api_err(
+            "executing `projects::clear_project_cache_and_queue_search`",
+        )?;
     } else {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to add projects to this organization!"
-                .to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to add projects to this organization!",
+        )));
     }
     Ok(HttpResponse::Ok().finish())
 }
@@ -1025,7 +1114,8 @@ pub async fn organization_projects_remove(
         &session_queue,
         Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let organization = database::models::DBOrganization::get(
@@ -1033,20 +1123,18 @@ pub async fn organization_projects_remove(
         &**pool,
         &redis,
     )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified organization does not exist!".to_string(),
-        )
+    .await
+    .wrap_internal_err("fetching organization from database")?
+    .wrap_request_err_with(|| {
+        "the specified organization does not exist!".to_string()
     })?;
 
     let project_item =
         database::models::DBProject::get(&project_id, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
+            .await
+            .wrap_api_err("fetching project from database")?
+            .wrap_request_err_with(|| {
+                "the specified project does not exist!".to_string()
             })?;
 
     if !project_item
@@ -1054,10 +1142,9 @@ pub async fn organization_projects_remove(
         .organization_id
         .eq(&Some(organization.id))
     {
-        return Err(ApiError::InvalidInput(
-            "The specified project is not owned by this organization!"
-                .to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "The specified project is not owned by this organization!",
+        )));
     }
 
     let organization_team_member =
@@ -1067,11 +1154,10 @@ pub async fn organization_projects_remove(
             false,
             &**pool,
         )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "You are not a member of this organization!".to_string(),
-            )
+        .await
+        .wrap_internal_err("fetching team member from database")?
+        .wrap_request_err_with(|| {
+            "you are not a member of this organization!".to_string()
         })?;
 
     let permissions = OrganizationPermissions::get_permissions_by_role(
@@ -1087,12 +1173,11 @@ pub async fn organization_projects_remove(
             false,
             &**pool,
         )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified user is not a member of this organization!"
-                    .to_string(),
-            )
+        .await
+        .wrap_internal_err("deleting team member from database")?
+        .wrap_request_err_with(|| {
+            "the specified user is not a member of this organization!"
+                .to_string()
         })?;
 
         // Then, we get the team member of the project and that user (if it exists)
@@ -1104,9 +1189,13 @@ pub async fn organization_projects_remove(
                 true,
                 &**pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("fetching team member from database")?;
 
-        let mut transaction = pool.begin().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
 
         // If the user is not a member of the project, we add them
         let new_owner = match new_owner {
@@ -1116,7 +1205,8 @@ pub async fn organization_projects_remove(
                     crate::database::models::ids::generate_team_member_id(
                         &mut transaction,
                     )
-                    .await?;
+                    .await
+                    .wrap_internal_err("generating team member ID")?;
                 let member = DBTeamMember {
                     id: new_id,
                     team_id: project_item.inner.team_id,
@@ -1129,7 +1219,10 @@ pub async fn organization_projects_remove(
                     payouts_split: Decimal::ZERO,
                     ordering: 0,
                 };
-                member.insert(&mut transaction).await?;
+                member
+                    .insert(&mut transaction)
+                    .await
+                    .wrap_internal_err("inserting database records for `organization_projects_remove`")?;
                 member
             }
         };
@@ -1150,7 +1243,10 @@ pub async fn organization_projects_remove(
             ProjectPermissions::all().bits() as i64
         )
         .execute(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "querying database for `organization_projects_remove`",
+        )?;
 
         sqlx::query!(
             "
@@ -1161,19 +1257,27 @@ pub async fn organization_projects_remove(
             project_item.inner.id as database::models::ids::DBProjectId
         )
         .execute(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "querying database for `organization_projects_remove`",
+        )?;
 
-        transaction.commit().await?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
         database::models::DBUser::clear_project_cache(
             &[current_user.id.into()],
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("clearing cached user in Redis")?;
         database::models::DBTeamMember::clear_cache(
             project_item.inner.team_id,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
@@ -1181,12 +1285,14 @@ pub async fn organization_projects_remove(
             project_item.inner.slug,
             None,
         )
-        .await?;
+        .await
+        .wrap_api_err(
+            "executing `projects::clear_project_cache_and_queue_search`",
+        )?;
     } else {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to add projects to this organization!"
-                .to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to add projects to this organization!",
+        )));
     }
     Ok(HttpResponse::Ok().finish())
 }
@@ -1221,17 +1327,17 @@ pub async fn organization_icon_edit(
         &session_queue,
         Scopes::ORGANIZATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
     let string = info.into_inner().0;
 
     let organization_item =
         database::models::DBOrganization::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
+            .await
+            .wrap_internal_err("fetching organization from database")?
+            .wrap_request_err_with(|| {
+                "the specified organization does not exist!".to_string()
             })?;
 
     if !user.role.is_mod() {
@@ -1241,7 +1347,7 @@ pub async fn organization_icon_edit(
             &**pool,
         )
         .await
-        .map_err(ApiError::Database)?;
+        .wrap_internal_err("fetching organization team member")?;
 
         let permissions = OrganizationPermissions::get_permissions_by_role(
             &user.role,
@@ -1250,10 +1356,9 @@ pub async fn organization_icon_edit(
         .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this organization's icon."
-                    .to_string(),
-            ));
+            return Err(ApiError::Auth(eyre::eyre!(
+                "You don't have permission to edit this organization's icon.",
+            )));
         }
     }
 
@@ -1263,14 +1368,16 @@ pub async fn organization_icon_edit(
         FileHostPublicity::Public,
         &**file_host,
     )
-    .await?;
+    .await
+    .wrap_api_err("deleting old images")?;
 
     let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
     )
-    .await?;
+    .await
+    .wrap_api_err("executing `read_limited_from_payload`")?;
 
     let organization_id: OrganizationId = organization_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
@@ -1282,9 +1389,13 @@ pub async fn organization_icon_edit(
         Some(1.0),
         &**file_host,
     )
-    .await?;
+    .await
+    .wrap_api_err("uploading image")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     sqlx::query!(
         "
@@ -1298,15 +1409,20 @@ pub async fn organization_icon_edit(
         organization_item.id as database::models::ids::DBOrganizationId,
     )
     .execute(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("querying database for `organization_icon_edit`")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
     database::models::DBOrganization::clear_cache(
         organization_item.id,
         Some(organization_item.slug),
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("clearing cached data from Redis")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -1328,17 +1444,17 @@ pub async fn delete_organization_icon(
         &session_queue,
         Scopes::ORGANIZATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
     let string = info.into_inner().0;
 
     let organization_item =
         database::models::DBOrganization::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
+            .await
+            .wrap_internal_err("fetching organization from database")?
+            .wrap_request_err_with(|| {
+                "the specified organization does not exist!".to_string()
             })?;
 
     if !user.role.is_mod() {
@@ -1348,7 +1464,7 @@ pub async fn delete_organization_icon(
             &**pool,
         )
         .await
-        .map_err(ApiError::Database)?;
+        .wrap_internal_err("fetching organization team member")?;
 
         let permissions = OrganizationPermissions::get_permissions_by_role(
             &user.role,
@@ -1357,10 +1473,9 @@ pub async fn delete_organization_icon(
         .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this organization's icon."
-                    .to_string(),
-            ));
+            return Err(ApiError::Auth(eyre::eyre!(
+                "You don't have permission to edit this organization's icon.",
+            )));
         }
     }
 
@@ -1370,9 +1485,13 @@ pub async fn delete_organization_icon(
         FileHostPublicity::Public,
         &**file_host,
     )
-    .await?;
+    .await
+    .wrap_api_err("deleting old images")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     sqlx::query!(
         "
@@ -1383,16 +1502,21 @@ pub async fn delete_organization_icon(
         organization_item.id as database::models::ids::DBOrganizationId,
     )
     .execute(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("querying database for `delete_organization_icon`")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     database::models::DBOrganization::clear_cache(
         organization_item.id,
         Some(organization_item.slug),
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("clearing cached data from Redis")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }

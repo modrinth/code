@@ -1640,9 +1640,6 @@
   "minecraft-required.sign-in": {
     "message": "Logga in på Microsoft"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Avbryt"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Fortsätt i din webbläsare"
   },

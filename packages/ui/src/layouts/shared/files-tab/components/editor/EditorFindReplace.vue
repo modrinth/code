@@ -66,9 +66,9 @@
 				</IconButton>
 				<div class="mx-0.5 h-4 w-px bg-surface-5" />
 				<IconButton
-					v-tooltip="formatMessage(messages.closeFind)"
+					v-tooltip="formatMessage(commonMessages.closeButton)"
 					type="quiet"
-					:label="formatMessage(messages.closeFind)"
+					:label="formatMessage(commonMessages.closeButton)"
 					@click="close"
 				>
 					<XIcon />
@@ -118,6 +118,7 @@ import { nextTick, ref, watch } from 'vue'
 import { Button, IconButton } from '#ui/components/base/buttons'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
 
 const props = defineProps<{
 	isFindOpen: boolean
@@ -160,10 +161,6 @@ const messages = defineMessages({
 	nextMatch: {
 		id: 'files.editor.find-next-match',
 		defaultMessage: 'Next match',
-	},
-	closeFind: {
-		id: 'files.editor.find-close',
-		defaultMessage: 'Close',
 	},
 	toggleReplace: {
 		id: 'files.editor.find-toggle-replace',

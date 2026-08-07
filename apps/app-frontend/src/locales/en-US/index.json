@@ -1880,9 +1880,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "A new tab opened to sign in. Complete the sign in there, then return to the app."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Cancel"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Continue in your browser"
   },

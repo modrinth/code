@@ -1301,9 +1301,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Bestand opgeslagen"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Sluiten"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Vind"
   },
@@ -2861,9 +2858,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Een project aanmaken"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Rol bewerken"
-  },
   "profile.button.info": {
     "defaultMessage": "Gebruikersgegevens bekijken"
   },
@@ -2941,9 +2935,6 @@
   },
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {project} other {projecten}}"
-  },
-  "profile.label.saving": {
-    "defaultMessage": "Opslaan..."
   },
   "profile.official-account": {
     "defaultMessage": "Officieel Modrinth-account"
@@ -5209,12 +5200,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar van {username}"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Annuleren"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Annuleren"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Uitnodigingslink bewerken."
