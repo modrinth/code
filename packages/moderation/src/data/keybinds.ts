@@ -115,6 +115,18 @@ const keybinds: { [id: string]: KeybindListener } = {
 		scope: 'checklist',
 		action: (ctx) => ctx.actions.tryReject(),
 	},
+	'tech-review-top': {
+		keybind: 'ArrowUp',
+		description: 'Go to top of the tech review card',
+		scope: 'tech-review',
+		action: (ctx) => ctx.actions.goToTop(),
+	},
+	'tech-review-bottom': {
+		keybind: 'ArrowDown',
+		description: 'Go to bottom of the tech review card',
+		scope: 'tech-review',
+		action: (ctx) => ctx.actions.goToBottom(),
+	},
 }
 
 export default keybinds
