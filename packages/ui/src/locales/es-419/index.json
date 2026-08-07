@@ -2897,9 +2897,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Crear un proyecto"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Editar rol"
-  },
   "profile.button.info": {
     "defaultMessage": "Ver detalles del usuario"
   },
@@ -2996,23 +2993,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {proyecto} other {proyectos}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Guardando..."
-  },
   "profile.official-account": {
     "defaultMessage": "Cuenta oficial de Modrinth"
   },
   "profile.official-account.bio": {
     "defaultMessage": "La cuenta oficial de Modrinth. Consigue ayuda en <support-link></support-link> o escríbenos a través de email: <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Selecciona un rol"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Ocurrió un error al actualizar el rol del usuario. Por favor inténtalo otra vez."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Error al actualizar el rol"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Ocurrió un error al desbloquear a este usuario. Por favor inténtalo otra vez."

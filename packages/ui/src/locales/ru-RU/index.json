@@ -2810,9 +2810,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Создать проект"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Настройка роли"
-  },
   "profile.button.info": {
     "defaultMessage": "Посмотреть подробности"
   },
@@ -2909,23 +2906,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Сохранение..."
-  },
   "profile.official-account": {
     "defaultMessage": "Официальный аккаунт Modrinth"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Официальный аккаунт Modrinth. Связь с поддержкой: <support-link></support-link> или по почте <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Выберите роль"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Произошла ошибка при обновлении роли. Попробуйте снова."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Не удалось обновить роль"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Произошла ошибка при разблокировке пользователя. Попробуйте снова."
