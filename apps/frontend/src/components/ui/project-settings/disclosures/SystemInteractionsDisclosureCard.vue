@@ -30,8 +30,7 @@ const messages = defineMessages({
 	},
 	noteLabel: {
 		id: 'project.settings.disclosures.system-interactions.note-label',
-		defaultMessage:
-			'Please describe the external system interactions in the mod so users can know what to expect.',
+		defaultMessage: 'Describe the external system interactions',
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.system-interactions.note-placeholder',

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { MegaphoneIcon } from '@modrinth/assets'
 import {
+	commonMessages,
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,
@@ -33,11 +34,6 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.advertising.description.2',
 		defaultMessage: `If the promotion has no direct monetary value <emphasis>and</emphasis> it is for something that the average person would consider <italic>relevant</italic> and <italic>unobtrusive</italic> (such as a link to your Modrinth profile in the corner of the settings page for your own mod), we would not consider that an advertisement.`,
 	},
-	noteDescription: {
-		id: 'project.settings.disclosures.advertising.note-description',
-		defaultMessage:
-			'Please explain how your project utilizes advertising so that users can know what to expect.',
-	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.advertising.note-placeholder',
 		defaultMessage: 'e.g. Adds the Modrinth SMP server to your server list automatically.',
@@ -69,7 +65,7 @@ const messages = defineMessages({
 		</p>
 		<template #expanded>
 			<SettingsFormGroup
-				:title="formatMessage(messages.noteDescription)"
+				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="advertising-disclosure-note"
 			>
 				<StyledInput

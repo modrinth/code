@@ -49,7 +49,7 @@ const messages = defineMessages({
 	},
 	noteLabel: {
 		id: 'project.settings.disclosures.derivative.note-label',
-		defaultMessage: 'Please explain how your project is based on the original work',
+		defaultMessage: 'Explain how your project is based on the original work',
 	},
 })
 

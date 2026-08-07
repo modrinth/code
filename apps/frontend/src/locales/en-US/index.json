@@ -3782,9 +3782,6 @@
   "project.settings.disclosures.advertising.description.2": {
     "message": "If the promotion has no direct monetary value <emphasis>and</emphasis> it is for something that the average person would consider <italic>relevant</italic> and <italic>unobtrusive</italic> (such as a link to your Modrinth profile in the corner of the settings page for your own mod), we would not consider that an advertisement."
   },
-  "project.settings.disclosures.advertising.note-description": {
-    "message": "Please explain how your project utilizes advertising so that users can know what to expect."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "e.g. Adds the Modrinth SMP server to your server list automatically."
   },
@@ -3796,9 +3793,6 @@
   },
   "project.settings.disclosures.ai.description": {
     "message": "You must enable this if this project contains a substantial amount of AI-generated code, any\n\t\t\t\tassets that are substantially AI-generated, the project's functionality relies on the use of\n\t\t\t\tgenerative AI, or if any element of your project's page such as description or publishing\n\t\t\t\trelies on generative AI."
-  },
-  "project.settings.disclosures.ai.note-description": {
-    "message": "You may optionally provide a note to explain how you use generative AI in this project."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "e.g. The Chinese and Arabic translations are AI-generated."
@@ -3813,7 +3807,7 @@
     "message": "Code"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "Select what this project uses generative AI for."
+    "message": "What is generative AI being used for?"
   },
   "project.settings.disclosures.ai.types-functionality": {
     "message": "Functionality"
@@ -3828,10 +3822,7 @@
     "message": "Mark your project as archived to let users know that you are no longer working on it."
   },
   "project.settings.disclosures.archived.description.2": {
-    "message": "Archived projects remain discoverable when their visibility is set to Public. If you wish to de-list your project, set its visibility to Unlisted"
-  },
-  "project.settings.disclosures.archived.note-label": {
-    "message": "Optionally explain why this project is archived."
+    "message": "Archived projects remain discoverable when their visibility is set to Public. If you wish to de-list your project, set its visibility to Unlisted."
   },
   "project.settings.disclosures.archived.note-placeholder": {
     "message": "e.g. I don't have time to maintain this project anymore, feel free to fork it!"
@@ -3858,7 +3849,7 @@
     "message": "Example project"
   },
   "project.settings.disclosures.derivative.note-label": {
-    "message": "Please explain how your project is based on the original work"
+    "message": "Explain how your project is based on the original work"
   },
   "project.settings.disclosures.derivative.title": {
     "message": "Contains derivative content"
@@ -3873,16 +3864,13 @@
     "message": "e.g. Cosmetics available as Patreon reward"
   },
   "project.settings.disclosures.paid-features.features-description": {
-    "message": "What kinds of paid features does it add?"
+    "message": "List the types of paid features"
   },
   "project.settings.disclosures.paid-features.title": {
     "message": "Contains paid features"
   },
   "project.settings.disclosures.photosensitivity.description": {
     "message": "Enable this if your project contains anything that you think may be dangerous to certain people who are sensitive to flashing lights or patterns."
-  },
-  "project.settings.disclosures.photosensitivity.note-label": {
-    "message": "Please briefly describe why your project has a photosensitivity warning."
   },
   "project.settings.disclosures.photosensitivity.note-placeholder": {
     "message": "e.g. It adds a flashlight item that has a strobe mode. It can be disabled in Accessibility settings in-game."
@@ -3918,7 +3906,7 @@
     "message": "You must enable this if your project reads or edits things on the user's system outside of the game."
   },
   "project.settings.disclosures.system-interactions.note-label": {
-    "message": "Please describe the external system interactions in the mod so users can know what to expect."
+    "message": "Describe the external system interactions"
   },
   "project.settings.disclosures.system-interactions.note-placeholder": {
     "message": "e.g. It adds a file to the desktop called wake_up.txt"
@@ -3942,7 +3930,7 @@
     "message": "You can either add a privacy policy, or a list of types of data that are collected. Remember to mention if it is anonymous or contains personally identifiable information (PII)."
   },
   "project.settings.disclosures.telemetry.data-label": {
-    "message": "What data is being collected?"
+    "message": "What data is collected?"
   },
   "project.settings.disclosures.telemetry.data-placeholder": {
     "message": "e.g. Anonymous launch analytics to track Minecraft version and mod loader usage."

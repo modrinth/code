@@ -2261,6 +2261,9 @@
   "label.error": {
     "defaultMessage": "Error"
   },
+  "label.explanation": {
+    "defaultMessage": "Explanation"
+  },
   "label.extract-failed": {
     "defaultMessage": "Extract failed"
   },
@@ -5314,6 +5317,9 @@
   },
   "settings.feature-flags.title": {
     "defaultMessage": "Feature flags"
+  },
+  "settings.form.group.optional": {
+    "defaultMessage": "(optional)"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Standard languages"

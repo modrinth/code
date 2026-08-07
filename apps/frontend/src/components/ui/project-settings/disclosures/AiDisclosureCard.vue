@@ -2,6 +2,7 @@
 import { SparklesIcon } from '@modrinth/assets'
 import {
 	Checkbox,
+	commonMessages,
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,
@@ -42,7 +43,7 @@ const messages = defineMessages({
 	},
 	typesDescription: {
 		id: 'project.settings.disclosures.ai.types-description',
-		defaultMessage: 'Select what this project uses generative AI for.',
+		defaultMessage: 'What is generative AI being used for?',
 	},
 	typeCode: {
 		id: 'project.settings.disclosures.ai.types-code',
@@ -59,11 +60,6 @@ const messages = defineMessages({
 	typeFunctionality: {
 		id: 'project.settings.disclosures.ai.types-functionality',
 		defaultMessage: 'Functionality',
-	},
-	noteDescription: {
-		id: 'project.settings.disclosures.ai.note-description',
-		defaultMessage:
-			'You may optionally provide a note to explain how you use generative AI in this project.',
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.ai.note-placeholder',
@@ -129,8 +125,9 @@ function setUse(use: AiUsage, enabled: boolean) {
 				</div>
 			</SettingsFormGroup>
 			<SettingsFormGroup
-				:title="formatMessage(messages.noteDescription)"
+				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="ai-disclosure-note"
+				optional
 			>
 				<StyledInput
 					id="ai-disclosure-note"

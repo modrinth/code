@@ -34,7 +34,7 @@ const messages = defineMessages({
 	},
 	featuresDescription: {
 		id: 'project.settings.disclosures.paid-features.features-description',
-		defaultMessage: 'What kinds of paid features does it add?',
+		defaultMessage: 'List the types of paid features',
 	},
 	featurePlaceholder: {
 		id: 'project.settings.disclosures.paid-features.feature-placeholder',

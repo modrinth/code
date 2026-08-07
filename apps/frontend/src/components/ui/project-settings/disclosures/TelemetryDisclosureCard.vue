@@ -56,7 +56,7 @@ const messages = defineMessages({
 	},
 	dataLabel: {
 		id: 'project.settings.disclosures.telemetry.data-label',
-		defaultMessage: 'What data is being collected?',
+		defaultMessage: 'What data is collected?',
 	},
 	dataDescription: {
 		id: 'project.settings.disclosures.telemetry.data-description',

@@ -2,6 +2,7 @@
 import { ArchiveIcon } from '@modrinth/assets'
 import {
 	ArchivedProjectBanner,
+	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
 	SettingsToggleCard,
@@ -33,11 +34,7 @@ const messages = defineMessages({
 	description2: {
 		id: 'project.settings.disclosures.archived.description.2',
 		defaultMessage:
-			'Archived projects remain discoverable when their visibility is set to Public. If you wish to de-list your project, set its visibility to Unlisted',
-	},
-	noteLabel: {
-		id: 'project.settings.disclosures.archived.note-label',
-		defaultMessage: 'Optionally explain why this project is archived.',
+			'Archived projects remain discoverable when their visibility is set to Public. If you wish to de-list your project, set its visibility to Unlisted.',
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.archived.note-placeholder',
@@ -61,8 +58,9 @@ const messages = defineMessages({
 		<p>{{ formatMessage(messages.description2) }}</p>
 		<template #expanded>
 			<SettingsFormGroup
-				:title="formatMessage(messages.noteLabel)"
+				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="archived-disclosure-note"
+				optional
 			>
 				<StyledInput
 					id="archived-disclosure-note"

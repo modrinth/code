@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { EyeIcon } from '@modrinth/assets'
 import {
+	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
 	SettingsToggleCard,
@@ -28,10 +29,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'Enable this if your project contains anything that you think may be dangerous to certain people who are sensitive to flashing lights or patterns.',
 	},
-	noteLabel: {
-		id: 'project.settings.disclosures.photosensitivity.note-label',
-		defaultMessage: 'Please briefly describe why your project has a photosensitivity warning.',
-	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.photosensitivity.note-placeholder',
 		defaultMessage:
@@ -50,7 +47,7 @@ const messages = defineMessages({
 	>
 		<template #expanded>
 			<SettingsFormGroup
-				:title="formatMessage(messages.noteLabel)"
+				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="photosensitivity-disclosure-note"
 			>
 				<StyledInput
