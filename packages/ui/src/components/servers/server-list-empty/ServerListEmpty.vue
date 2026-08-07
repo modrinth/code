@@ -116,13 +116,13 @@ const messages = defineMessages({
 		id: 'servers.list-empty.one-click-mod-installs-description',
 		defaultMessage: 'Pick your favorite mods and we handle the rest.',
 	},
-	serverInstancesTitle: {
-		id: 'servers.list-empty.server-instances-title',
-		defaultMessage: 'Server instances',
+	simpleSetupTitle: {
+		id: 'servers.list-empty.simple-setup-title',
+		defaultMessage: 'Simple setup',
 	},
-	serverInstancesDescription: {
-		id: 'servers.list-empty.server-instances-description',
-		defaultMessage: 'Switch between server instances and play different mods.',
+	simpleSetupDescription: {
+		id: 'servers.list-empty.simple-setup-description',
+		defaultMessage: 'Set up your server just like a single player world.',
 	},
 	playWithFriendsTitle: {
 		id: 'servers.list-empty.play-with-friends-title',
@@ -158,10 +158,10 @@ const features = computed(() => [
 		description: formatMessage(messages.oneClickModInstallsDescription),
 	},
 	{
-		key: 'server-instances',
+		key: 'simple-setup',
 		icon: GlobeIcon,
-		title: formatMessage(messages.serverInstancesTitle),
-		description: formatMessage(messages.serverInstancesDescription),
+		title: formatMessage(messages.simpleSetupTitle),
+		description: formatMessage(messages.simpleSetupDescription),
 	},
 	{
 		key: 'play-with-friends',
