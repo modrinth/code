@@ -2,11 +2,9 @@
 import { ImportIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import frog from '@modrinth/ui/src/assets/welcome/frog.png'
-import iconTexture from '@modrinth/ui/src/assets/welcome/icon-texture.png'
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
-import iconLights from '../../assets/welcome/icon-lights.svg?url'
-import iconLogo from '../../assets/welcome/icon-logo.svg?url'
+import modrinthSocialIcon from '../../assets/welcome/modrinth-social-icon.png'
 
 const showCreationModal = inject<() => void>('showCreationModal')
 const showImportModal = inject<() => void>('showImportModal')
@@ -62,26 +60,11 @@ onUnmounted(() => {
 					class="dot-pattern pointer-events-none absolute left-1/2 -top-52 h-[29.875rem] w-[min(25.9375rem,80vw)] -translate-x-1/2 rounded-2xl [@media(max-height:700px)]:h-[23rem]"
 					aria-hidden="true"
 				/>
-				<div
-					class="welcome-icon relative h-[6.25rem] w-[6.25rem] overflow-hidden rounded-3xl border-[1.5px] border-solid bg-surface-1"
-					style="border-color: color-mix(in srgb, var(--color-text-primary) 15%, transparent)"
-				>
-					<div
-						class="absolute inset-0 bg-[linear-gradient(180deg,rgb(37_114_79)_0%,rgb(15_64_36)_100%)] opacity-50"
-					/>
-					<div
-						class="absolute inset-0 bg-[linear-gradient(-14deg,rgb(0_0_0_/_37%)_8%,transparent_86%)]"
-					/>
+				<div class="relative h-[6.25rem] w-[6.25rem]">
 					<img
-						:src="iconTexture"
+						:src="modrinthSocialIcon"
 						alt=""
-						class="absolute left-1/2 top-1/2 h-[12.70625rem] w-[19.96875rem] max-w-none -translate-x-1/2 -translate-y-1/2 object-cover opacity-40 mix-blend-luminosity"
-					/>
-					<img :src="iconLogo" alt="" class="absolute inset-[13%] h-[74%] w-[74%]" />
-					<img
-						:src="iconLights"
-						alt=""
-						class="absolute left-[0.4775rem] top-[0.4775rem] h-[0.4804rem] w-[1.2714rem]"
+						class="welcome-artwork pointer-events-none absolute left-1/2 top-1/2 h-[33.75rem] w-[33.75rem] max-w-none -translate-x-1/2 -translate-y-1/2"
 					/>
 				</div>
 				<div class="flex flex-col items-center gap-2">
@@ -89,9 +72,7 @@ onUnmounted(() => {
 						Welcome to Modrinth
 						<img :src="frog" alt="" class="h-8 w-8 [image-rendering:pixelated]" />
 					</h1>
-					<p class="m-0 text-center text-base leading-6 text-primary">
-						Minecraft was never meant to fit in one jar.
-					</p>
+					<p class="m-0 text-center text-base leading-6 text-primary">Ready to start playing?</p>
 				</div>
 				<div class="flex w-72 flex-col items-center gap-4">
 					<ButtonStyled color="brand" size="large">
@@ -130,6 +111,11 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.welcome-artwork {
+	-webkit-mask-image: radial-gradient(circle, black 45%, transparent 72%);
+	mask-image: radial-gradient(circle, black 45%, transparent 72%);
+}
+
 .dot-pattern {
 	background-image: radial-gradient(
 		circle,
@@ -142,15 +128,5 @@ onUnmounted(() => {
 	mask-image: radial-gradient(ellipse at center, black 10%, transparent 68%);
 	-webkit-mask-repeat: no-repeat;
 	mask-repeat: no-repeat;
-}
-
-.welcome-icon {
-	box-shadow:
-		0 0 0 1.5px #07180d,
-		0 1.5rem 3rem rgb(0 0 0 / 3%),
-		0 0.625rem 1.125rem rgb(0 0 0 / 3%),
-		0 0.3125rem 0.5rem rgb(0 0 0 / 4%),
-		0 0.125rem 0.25rem rgb(0 0 0 / 4%),
-		0 0.625rem 13.75rem color-mix(in srgb, var(--color-brand) 32%, transparent);
 }
 </style>
