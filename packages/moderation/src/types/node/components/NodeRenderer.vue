@@ -27,7 +27,7 @@ import {
 	isNodeActive,
 	isShown,
 	resolveChildren,
-	withDefaults,
+	withStateDefaults,
 } from '../resolve'
 import type { NodeState, Reactive } from '../state'
 import { resolve } from '../state'
@@ -86,7 +86,7 @@ function isFixActionable(node: object): boolean {
 	return metaCtx?.value.metaMap.get(node)?.isFixActionable ?? false
 }
 
-const wrappedState = computed(() => withDefaults(props.state, props.nodes, props.write))
+const wrappedState = computed(() => withStateDefaults(props.state, props.nodes, props.write))
 
 function isEnabled(node: Partial<Enableable>): boolean {
 	if (node._enabled === undefined) return true

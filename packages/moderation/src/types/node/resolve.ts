@@ -130,7 +130,7 @@ function optionChildrenFor(node: object, state: Record<string, NodeState>): Chil
 	return resolveChildren(selected, state)
 }
 
-export function withDefaults<T extends Record<string, NodeState>>(
+export function withStateDefaults<T extends Record<string, NodeState>>(
 	rawState: T,
 	children: ChildNode[],
 	write?: Writer,
@@ -157,7 +157,7 @@ export function withDefaults<T extends Record<string, NodeState>>(
 					const effective = getEffectiveValue(child, undefined, proxy)
 					const grandchildren = hasChildrenCap(child) ? resolveChildren(child, {}) : []
 					if (grandchildren.length > 0) {
-						return withDefaults(
+						return withStateDefaults(
 							{ value: effective } as Record<string, NodeState>,
 							grandchildren,
 							write && childWriter(target, write, key),
@@ -177,7 +177,7 @@ export function withDefaults<T extends Record<string, NodeState>>(
 				!(value instanceof Set)
 			) {
 				const nested = value as Record<string, NodeState>
-				return withDefaults(
+				return withStateDefaults(
 					nested,
 					resolveChildren(child, nested),
 					write && childWriter(target, write, key),
@@ -213,7 +213,7 @@ export function resolveActionState(
 	if (!hasValueCap(node)) return localState
 	const childState = getBooleanChildState(nodeState)
 	const base = hasChildrenCap(node)
-		? withDefaults(childState, resolveChildren(node, childState))
+		? withStateDefaults(childState, resolveChildren(node, childState))
 		: childState
 	return new Proxy(base, {
 		get(target, key, receiver) {
