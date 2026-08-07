@@ -185,7 +185,10 @@ pub async fn random_projects_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let count = v3::projects::RandomProjects { count: count.count };
+    let count = v3::projects::RandomProjects {
+        count: count.count,
+        project_type: None,
+    };
 
     let response = v3::projects::random_projects_get(
         web::Query(count),
