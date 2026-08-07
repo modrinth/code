@@ -582,6 +582,8 @@ networks:
     driver: bridge
   meilisearch-mesh:
     driver: bridge
+  redis-cluster-mesh:
+    driver: bridge
 volumes:
   typesense-data:
   meilisearch-data:
