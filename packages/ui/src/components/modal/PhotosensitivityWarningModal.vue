@@ -8,12 +8,15 @@
 		fade="warning"
 		max-width="544px"
 	>
-		<div class="flex flex-col gap-6">
-			<p class="m-0 leading-normal">
+		<div class="flex flex-col">
+			<p class="mt-0 mb-4 leading-normal">
 				{{ formatMessage(messages.body1) }}
 			</p>
-			<p class="m-0 leading-normal">
+			<p class="mt-0 mb-4 leading-normal">
 				{{ formatMessage(messages.body2) }}
+			</p>
+			<p class="mt-0 mb-4 leading-normal">
+				{{ formatMessage(messages.body3) }}
 			</p>
 
 			<div class="flex justify-between items-center">
@@ -54,12 +57,16 @@ const messages = defineMessages({
 	body1: {
 		id: 'search.photosensitivity-warning-modal.body.1',
 		defaultMessage:
-			'We cannot guarantee that all content on Modrinth that may be dangerous for users with photosensitivity is labeled appropriately with a photosensitivity warning.',
+			'We cannot guarantee that all content on Modrinth has been labeled appropriately.',
 	},
 	body2: {
 		id: 'search.photosensitivity-warning-modal.body.2',
 		defaultMessage:
-			'The label is self-assigned by the users who uploaded the content, and do not indicate that the content has gone through any kind of safety testing. Using any content on Modrinth is at your own risk. Please stay safe.',
+			'Content labels for photosensitivity triggers are self-assigned by the creators who upload their content to Modrinth. These projects have not gone through any safety testing.',
+	},
+	body3: {
+		id: 'search.photosensitivity-warning-modal.body.3',
+		defaultMessage: 'Using any content on Modrinth is at your own risk, please stay safe! 💚',
 	},
 	dontShowAgain: {
 		id: 'search.photosensitivity-warning-modal.dont-show-again',

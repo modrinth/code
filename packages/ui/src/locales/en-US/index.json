@@ -3954,10 +3954,13 @@
     "defaultMessage": "Loader"
   },
   "search.photosensitivity-warning-modal.body.1": {
-    "defaultMessage": "We cannot guarantee that all content on Modrinth that may be dangerous for users with photosensitivity is labeled appropriately with a photosensitivity warning."
+    "defaultMessage": "We cannot guarantee that all content on Modrinth has been labeled appropriately."
   },
   "search.photosensitivity-warning-modal.body.2": {
-    "defaultMessage": "The label is self-assigned by the users who uploaded the content, and do not indicate that the content has gone through any kind of safety testing. Using any content on Modrinth is at your own risk. Please stay safe."
+    "defaultMessage": "Content labels for photosensitivity triggers are self-assigned by the creators who upload their content to Modrinth. These projects have not gone through any safety testing."
+  },
+  "search.photosensitivity-warning-modal.body.3": {
+    "defaultMessage": "Using any content on Modrinth is at your own risk, please stay safe! 💚"
   },
   "search.photosensitivity-warning-modal.dont-show-again": {
     "defaultMessage": "Don't show this again"
