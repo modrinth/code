@@ -74,9 +74,6 @@
 					@click="ctx.setImportMode()"
 				/>
 			</div>
-			<span class="text-sm text-secondary">
-				{{ formatMessage(messages.instanceDescription) }}
-			</span>
 		</template>
 
 		<template v-else>
@@ -202,10 +199,6 @@ const messages = defineMessages({
 	importInstanceDescription: {
 		id: 'creation-flow.modal.setup-type.option.import-instance.description',
 		defaultMessage: 'Import an instance from Prism, CurseForge, or similar.',
-	},
-	instanceDescription: {
-		id: 'creation-flow.modal.setup-type.instance.description',
-		defaultMessage: 'An instance is a Minecraft setup with a specific loader, version, and mods.',
 	},
 	vanillaMinecraftTitle: {
 		id: 'creation-flow.modal.setup-type.option.vanilla-minecraft.title',
