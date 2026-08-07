@@ -108,12 +108,7 @@
 		</component>
 
 		<Teleport to="#teleports">
-			<Transition
-				enter-active-class="transition-opacity duration-150"
-				leave-active-class="transition-opacity duration-150"
-				enter-from-class="opacity-0"
-				leave-to-class="opacity-0"
-			>
+			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"
 					ref="dropdownRef"

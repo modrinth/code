@@ -97,12 +97,7 @@
 		</ButtonFrame>
 
 		<Teleport to="#teleports">
-			<Transition
-				enter-active-class="transition-opacity duration-150"
-				leave-active-class="transition-opacity duration-150"
-				enter-from-class="opacity-0"
-				leave-to-class="opacity-0"
-			>
+			<Transition name="floating-expand">
 				<div
 					v-if="shouldRenderDropdown"
 					ref="dropdownRef"
@@ -110,7 +105,6 @@
 					:class="[
 						props.dropdownClass,
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
-						props.dropdownClass,
 					]"
 					:style="dropdownStyle"
 					:role="listbox ? 'listbox' : 'menu'"
