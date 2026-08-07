@@ -24,11 +24,15 @@ export function patchSessionChecklistState(
 			sessionStorageKey(projectId),
 			JSON.stringify({ ...getSessionChecklistState(projectId), ...patch }),
 		)
-	} catch {}
+	} catch {
+		// Shush
+	}
 }
 
 export function clearSessionChecklistState(projectId: string): void {
 	try {
 		sessionStorage.removeItem(sessionStorageKey(projectId))
-	} catch {}
+	} catch {
+		// Shush
+	}
 }

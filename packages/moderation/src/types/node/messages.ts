@@ -47,7 +47,13 @@ export function mdEscape(text: string): string {
 	return text.replace(/[\\*_`[~]/g, '\\$&')
 }
 
-const USER_CONTENT_KEYS = ['PROJECT_TITLE', 'PROJECT_SLUG', 'PROJECT_SUMMARY', 'PROJECT_TYPE', 'PROJECT_STATUS']
+const USER_CONTENT_KEYS = [
+	'PROJECT_TITLE',
+	'PROJECT_SLUG',
+	'PROJECT_SUMMARY',
+	'PROJECT_TYPE',
+	'PROJECT_STATUS',
+]
 
 export async function loadMd(
 	path: string,
@@ -88,14 +94,20 @@ export function mdOptional(path: string, getVars?: GetVarsFn): MessageFn {
 	})
 }
 
-export function md(path: string | ((state: Record<string, NodeState>) => string), getVars?: GetVarsFn): MessageFn {
+export function md(
+	path: string | ((state: Record<string, NodeState>) => string),
+	getVars?: GetVarsFn,
+): MessageFn {
 	return makeMessageFn(async (state) => {
 		const resolvedPath = typeof path === 'function' ? path(state) : path
 		return loadMd(resolvedPath, state, _project!.value, _projectV2!.value, getVars)
 	})
 }
 
-export function resolveRelativeMessagePath(messagePath: string | (() => string), statePath: string[]): string {
+export function resolveRelativeMessagePath(
+	messagePath: string | (() => string),
+	statePath: string[],
+): string {
 	const name = typeof messagePath === 'function' ? messagePath() : messagePath
 	if (name.startsWith('/')) return `checklist/messages${name}`
 	const parts = [...statePath.slice(0, -1), ...name.split('/')]
@@ -115,7 +127,19 @@ export async function evalSegment(
 	if (seg.type === 'collect') return ''
 	if (seg.type === 'fn') return String((await seg.fn(state)) ?? '')
 	if (seg.type === 'auto') {
-		return loadMd(`checklist/messages/${statePath.join('/')}`, state, _project!.value, _projectV2!.value, seg.getVars)
+		return loadMd(
+			`checklist/messages/${statePath.join('/')}`,
+			state,
+			_project!.value,
+			_projectV2!.value,
+			seg.getVars,
+		)
 	}
-	return loadMd(resolveRelativeMessagePath(seg.path, statePath), state, _project!.value, _projectV2!.value, seg.getVars)
+	return loadMd(
+		resolveRelativeMessagePath(seg.path, statePath),
+		state,
+		_project!.value,
+		_projectV2!.value,
+		seg.getVars,
+	)
 }

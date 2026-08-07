@@ -27,7 +27,7 @@ export interface HasChildren {
 export function withChildren<T extends object>(node: T): T & HasChildren {
 	return Object.assign(node, {
 		_children: [] as ChildEntry[],
-		children(this: any, ...args: [ChildrenFn] | ChildEntry[]) {
+		children(this: HasChildren, ...args: [ChildrenFn] | ChildEntry[]) {
 			if (args.length === 1 && typeof args[0] === 'function' && args[0].length >= 1) {
 				this._childrenFn = args[0] as ChildrenFn
 			} else {

@@ -26,7 +26,7 @@ export default function () {
 					.children(
 						dropdown('type')
 							.title('Correct Project Type')
-              .required()
+							.required()
 							.none('Unknown')
 							.options(
 								option('modpack', 'Modpack').message(),
@@ -41,7 +41,7 @@ export default function () {
 					.children(
 						dropdown('distribution')
 							.title('Distribution Type')
-              .required()
+							.required()
 							.none('Unknown')
 							.options(
 								option('primary', 'Primary Files').message(),

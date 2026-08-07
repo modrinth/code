@@ -23,7 +23,7 @@ export function resolve<T>(value: Reactive<T>): T {
 	return toValue(value as T | Ref<T>)
 }
 
-export type GetVarsFn = (state: Record<string, any>) => Record<string, any>
+export type GetVarsFn = (state: Record<string, NodeState>) => Record<string, unknown>
 export type ContentFn = (state: Record<string, NodeState>) => string | Promise<string>
 
 export type MessageSegment =

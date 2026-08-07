@@ -23,9 +23,7 @@ export default function () {
 					.suggestedStatus('flagged')
 					.message(),
 
-				toggle('showcase-clarity', 'Showcase Clarity')
-					.suggestedStatus('rejected')
-					.message(),
+				toggle('showcase-clarity', 'Showcase Clarity').suggestedStatus('rejected').message(),
 			),
 		)
 }

@@ -34,7 +34,9 @@ export function fix(): FixBuilder {
 	return new FixBuilder()
 }
 
-export function createTrackedPatch<T extends object>(source: T): { proxy: T; changes: () => Partial<T> } {
+export function createTrackedPatch<T extends object>(
+	source: T,
+): { proxy: T; changes: () => Partial<T> } {
 	const written = new Set<string | symbol>()
 	const data = { ...source }
 	const proxy = new Proxy(data, {
@@ -50,6 +52,7 @@ export function createTrackedPatch<T extends object>(source: T): { proxy: T; cha
 	})
 	return {
 		proxy,
-		changes: () => Object.fromEntries([...written].map((k) => [k, data[k as keyof T]])) as Partial<T>,
+		changes: () =>
+			Object.fromEntries([...written].map((k) => [k, data[k as keyof T]])) as Partial<T>,
 	}
 }

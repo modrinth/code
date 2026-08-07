@@ -42,17 +42,13 @@ export default function () {
 		.sticky()
 		.children(
 			group().children(
-				toggle('invalid-permissions', 'Invalid permissions')
-					.suggestedStatus('rejected')
-					.message(),
+				toggle('invalid-permissions', 'Invalid permissions').suggestedStatus('rejected').message(),
 
 				toggle('prohibited-external-content', 'Prohibited externals')
 					.suggestedStatus('rejected')
 					.message(),
 
-				toggle('missing-permissions', 'Missing permissions')
-					.suggestedStatus('rejected')
-					.message(),
+				toggle('missing-permissions', 'Missing permissions').suggestedStatus('rejected').message(),
 
 				toggle('non-commercial-external-content', 'Non-commercial externals')
 					.shown(computed(() => project.value.monetization_status === 'monetized'))

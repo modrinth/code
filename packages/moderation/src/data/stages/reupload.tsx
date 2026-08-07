@@ -45,9 +45,7 @@ export default function () {
 					.suggestedStatus('rejected')
 					.message(),
 
-				toggle('request-proof', 'Proof of permissions')
-					.suggestedStatus('rejected')
-					.message(),
+				toggle('request-proof', 'Proof of permissions').suggestedStatus('rejected').message(),
 
 				toggle('identity-verification', 'Verify Identity')
 					.shown(computed(() => !project.value.minecraft_server))

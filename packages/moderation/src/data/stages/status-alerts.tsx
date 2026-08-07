@@ -3,8 +3,18 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import type { ChildNode, NodeState, StageNode } from '../../types/node'
-import { externalGroup, getBooleanChildState, group, isNodeActive, md, resolveChildren, stage, toggle, walkNodes } from '../../types/node'
+import type { AnyNode, ChildNode, NodeState, StageNode } from '../../types/node'
+import {
+	externalGroup,
+	getBooleanChildState,
+	group,
+	isNodeActive,
+	md,
+	resolveChildren,
+	stage,
+	toggle,
+	walkNodes,
+} from '../../types/node'
 import { Priorities } from '../priorities.ts'
 
 export default function (
@@ -37,7 +47,7 @@ export default function (
 					.priority(Priorities.alerts)
 					.applyFixes()
 					.children(
-						computed<ChildNode | null>(() => {
+						computed<AnyNode | null>(() => {
 							const fixGroups: ChildNode[] = []
 							walkNodes(
 								[group().children(...mainStages)],
@@ -45,7 +55,10 @@ export default function (
 								(node, nodeState, _localState, path) => {
 									if (!('_fixes' in node) || !(node as { _fixes: unknown[] })._fixes.length) return
 									if (!isNodeActive(node, nodeState)) return
-									const children = resolveChildren(node as never, getBooleanChildState(nodeState)).filter(
+									const children = resolveChildren(
+										node as never,
+										getBooleanChildState(nodeState),
+									).filter(
 										(c): c is Exclude<ChildNode, string | (() => unknown)> =>
 											typeof c === 'object' && c !== null,
 									)

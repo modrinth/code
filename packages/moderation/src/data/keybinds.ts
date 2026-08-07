@@ -1,5 +1,6 @@
-import type { KeybindListener } from '../types/keybinds'
 import type { Labrinth } from '@modrinth/api-client'
+
+import type { KeybindListener } from '../types/keybinds'
 
 const copyProjectLink = async (
 	project: Labrinth.Projects.v2.Project,

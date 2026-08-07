@@ -3,7 +3,16 @@ import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { appComponent, dropdown, fix, group, md, option, stage, toggle } from '../../types/node'
+import {
+	appComponent as _appComponent,
+	dropdown,
+	fix,
+	group,
+	md,
+	option,
+	stage,
+	toggle,
+} from '../../types/node'
 import { requiresEnvironmentInfo } from '../../utils'
 
 const loaderLabels: Record<string, string> = {
@@ -13,7 +22,7 @@ const loaderLabels: Record<string, string> = {
 	resourcepack: 'Resource Pack',
 }
 
-function formatLoaderLabel(id: string): string {
+function _formatLoaderLabel(id: string): string {
 	return (
 		loaderLabels[id] ??
 		id
@@ -25,9 +34,11 @@ function formatLoaderLabel(id: string): string {
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
-	const { loaders, gameVersions } = injectTags()
+	const { loaders: _loaders, gameVersions: _gameVersions } = injectTags()
 
-			const currentGameVersions = computed(() => (project.value.game_versions as string[] | undefined) ?? [])
+	const _currentGameVersions = computed(
+		() => (project.value.game_versions as string[] | undefined) ?? [],
+	)
 
 	return (
 		stage('metadata', 'Metadata')
@@ -105,9 +116,7 @@ export default function () {
 								),
 						),
 
-          toggle('dependencies', 'Dependencies')
-            .suggestedStatus('flagged')
-            .message(),
+					toggle('dependencies', 'Dependencies').suggestedStatus('flagged').message(),
 
 					// toggle('loader', 'Loaders (WIP)')
 					// 	.suggestedStatus('flagged')
@@ -117,7 +126,7 @@ export default function () {
 					// 		const current = new Set(project.value.loaders)
 					// 		const isCorrected =
 					// 			selected.size !== current.size || [...selected].some((id) => !current.has(id))
-          //
+					//
 					// 		let correct = ''
 					// 		if (isCorrected) {
 					// 			const list = [...selected].map((id) => formatLoaderLabel(id)).join(', ')
@@ -125,7 +134,7 @@ export default function () {
 					// 				LOADERS: list || 'none',
 					// 			}))(state)
 					// 		}
-          //
+					//
 					// 		return md('checklist/messages/metadata/loader/inaccurate', () => ({
 					// 			CORRECT: correct,
 					// 		}))(state)
@@ -150,7 +159,7 @@ export default function () {
 					// 				toggleLoader: ctx.toggleSetValue,
 					// 			})),
 					// 	),
-          //
+					//
 					// toggle('game-version', 'Game Versions (WIP)')
 					// 	.suggestedStatus('flagged')
 					// 	.rawMessage(async (state) => {
@@ -161,7 +170,7 @@ export default function () {
 					// 		const current = new Set(currentGameVersions.value)
 					// 		const isCorrected =
 					// 			selected.size !== current.size || [...selected].some((id) => !current.has(id))
-          //
+					//
 					// 		let correct = ''
 					// 		if (isCorrected) {
 					// 			const list = [...selected].join(', ')
@@ -169,7 +178,7 @@ export default function () {
 					// 				GAME_VERSIONS: list || 'none',
 					// 			}))(state)
 					// 		}
-          //
+					//
 					// 		return md('checklist/messages/metadata/game-version/inaccurate', () => ({
 					// 			CORRECT: correct,
 					// 		}))(state)

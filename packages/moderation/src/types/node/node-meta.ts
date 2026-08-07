@@ -1,6 +1,18 @@
 import type { AnyNode, ChildNode, HasChildren } from './builder'
 import type { FixBuilder } from './fix'
-import { getBooleanChildState, hasCap, hasChildrenCap, hasIdCap, hasOptionsCap, hasValueCap, isNodeActive, isShown, resolveActionState, resolveChildren, walkNodes } from './resolve'
+import {
+	getBooleanChildState,
+	hasCap,
+	hasChildrenCap,
+	hasIdCap,
+	hasOptionsCap,
+	hasValueCap,
+	isNodeActive,
+	isShown,
+	resolveActionState,
+	resolveChildren,
+	walkNodes,
+} from './resolve'
 import type { NodeState } from './state'
 
 export interface NodeMeta {
@@ -65,7 +77,12 @@ export function computeAttentionMap(
 					const selectedValue = typeof rawNodeState === 'string' ? rawNodeState : undefined
 					const selected = node._options.find((o) => o.value === selectedValue)
 					if (selected && isShown(selected) && hasChildrenCap(selected)) {
-						computeAttentionMap(resolveChildren(selected, stageState), stageState, metaMap, attention)
+						computeAttentionMap(
+							resolveChildren(selected, stageState),
+							stageState,
+							metaMap,
+							attention,
+						)
 						childrenNeedAttention = someChildNeedsAttention(selected, stageState, attention)
 					}
 				} else if (hasChildrenCap(node)) {
@@ -82,10 +99,15 @@ export function computeAttentionMap(
 	return attention
 }
 
-function childScopeFor(node: HasChildren & { id?: string }, state: Record<string, NodeState>): Record<string, NodeState> {
+function childScopeFor(
+	node: HasChildren & { id?: string },
+	state: Record<string, NodeState>,
+): Record<string, NodeState> {
 	if (!hasIdCap(node)) return state
 	const raw = state[node.id]
-	return raw && typeof raw === 'object' && !(raw instanceof Set) ? (raw as Record<string, NodeState>) : {}
+	return raw && typeof raw === 'object' && !(raw instanceof Set)
+		? (raw as Record<string, NodeState>)
+		: {}
 }
 
 function hasActiveChild(node: HasChildren, childState: Record<string, NodeState>): boolean {

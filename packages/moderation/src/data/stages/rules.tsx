@@ -2,7 +2,7 @@ import { ListBulletedIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { toggle, group, markdown, stage } from '../../types/node'
+import { group, markdown, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -44,13 +44,9 @@ export default function () {
 							),
 					),
 
-				toggle('cheat-or-hack-advertising', 'Hacks')
-					.suggestedStatus('rejected')
-					.message(),
+				toggle('cheat-or-hack-advertising', 'Hacks').suggestedStatus('rejected').message(),
 
-				toggle('server-side-opt-out', 'Opt-out')
-					.suggestedStatus('flagged')
-					.message(),
+				toggle('server-side-opt-out', 'Opt-out').suggestedStatus('flagged').message(),
 
 				toggle('server-side-opt-in', 'Opt-in')
 					.suggestedStatus('flagged')

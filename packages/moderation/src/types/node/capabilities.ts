@@ -1,15 +1,9 @@
 import type { Component, FunctionalComponent, SVGAttributes } from 'vue'
 import { markRaw } from 'vue'
 
-import type { FixBuilder } from './fix'
 import { Priority } from '../priority.ts'
-import type {
-	GetVarsFn,
-	MessageSegment,
-	ModerationStatus,
-	NodeState,
-	Reactive,
-} from './state'
+import type { FixBuilder } from './fix'
+import type { GetVarsFn, MessageSegment, ModerationStatus, NodeState, Reactive } from './state'
 
 export interface Visible {
 	_shown: Reactive<boolean> | undefined
@@ -19,7 +13,7 @@ export interface Visible {
 export function withShown<T extends object>(node: T): T & Visible {
 	return Object.assign(node, {
 		_shown: undefined as Reactive<boolean> | undefined,
-		shown(this: any, condition: Reactive<boolean>) {
+		shown(this: Visible, condition: Reactive<boolean>) {
 			this._shown = condition
 			return this
 		},
@@ -34,7 +28,7 @@ export interface Iconable {
 export function withIcon<T extends object>(node: T): T & Iconable {
 	return Object.assign(node, {
 		_icon: undefined as FunctionalComponent<SVGAttributes> | undefined,
-		icon(this: any, icon: FunctionalComponent<SVGAttributes> | undefined) {
+		icon(this: Iconable, icon: FunctionalComponent<SVGAttributes> | undefined) {
 			this._icon = icon ? markRaw(icon) : undefined
 			return this
 		},
@@ -52,7 +46,7 @@ export interface Tooltippable {
 export function withTooltip<T extends object>(node: T): T & Tooltippable {
 	return Object.assign(node, {
 		_tooltip: undefined as Tooltippable['_tooltip'],
-		tooltip(this: any, tooltip: Tooltippable['_tooltip']) {
+		tooltip(this: Tooltippable, tooltip: Tooltippable['_tooltip']) {
 			this._tooltip = tooltip
 			return this
 		},
@@ -67,7 +61,7 @@ export interface Titled {
 export function withTitle<T extends object>(node: T): T & Titled {
 	return Object.assign(node, {
 		_title: undefined as Reactive<string> | undefined,
-		title(this: any, title: Reactive<string>) {
+		title(this: Titled, title: Reactive<string>) {
 			this._title = title
 			return this
 		},
@@ -83,7 +77,7 @@ export interface Identified {
 export function withId<T extends object>(node: T, id: string): T & Identified {
 	return Object.assign(node, {
 		id,
-		statePath(this: any, path: string[]) {
+		statePath(this: Identified, path: string[]) {
 			this._statePath = path
 			return this
 		},
@@ -98,7 +92,7 @@ export interface Prioritizable {
 export function withPriority<T extends object>(node: T): T & Prioritizable {
 	return Object.assign(node, {
 		_priority: new Priority(),
-		priority(this: any, p: Priority) {
+		priority(this: Prioritizable, p: Priority) {
 			this._priority = p
 			return this
 		},
@@ -130,11 +124,15 @@ function splitPathAndVars(
 export function withMessaging<T extends object>(node: T): T & Messageable {
 	return Object.assign(node, {
 		_segments: [] as MessageSegment[],
-		suggestedStatus(this: any, status: ModerationStatus) {
+		suggestedStatus(this: Messageable, status: ModerationStatus) {
 			this._suggestedStatus = status
 			return this
 		},
-		message(this: any, pathOrGetVars?: string | (() => string) | GetVarsFn, getVarsArg?: GetVarsFn) {
+		message(
+			this: Messageable,
+			pathOrGetVars?: string | (() => string) | GetVarsFn,
+			getVarsArg?: GetVarsFn,
+		) {
 			const { path, getVars } = splitPathAndVars(pathOrGetVars, getVarsArg)
 			const segment: MessageSegment =
 				path === undefined
@@ -144,14 +142,18 @@ export function withMessaging<T extends object>(node: T): T & Messageable {
 			return this
 		},
 		rawMessage(
-			this: any,
+			this: Messageable,
 			content: string | ((state: Record<string, NodeState>) => string | Promise<string>),
 		) {
 			const fn = typeof content === 'string' ? () => content : content
 			this._segments.push({ type: 'fn', fn })
 			return this
 		},
-		collect(this: any, pathOrGetVars?: string | (() => string) | GetVarsFn, getVarsArg?: GetVarsFn) {
+		collect(
+			this: Messageable,
+			pathOrGetVars?: string | (() => string) | GetVarsFn,
+			getVarsArg?: GetVarsFn,
+		) {
 			const { path, getVars } = splitPathAndVars(pathOrGetVars, getVarsArg)
 			const fallback: MessageSegment | undefined =
 				path !== undefined || getVars !== undefined
@@ -173,7 +175,7 @@ export interface Requireable {
 export function withRequired<T extends object>(node: T): T & Requireable {
 	return Object.assign(node, {
 		_required: undefined as boolean | undefined,
-		required(this: any, v = true) {
+		required(this: Requireable, v = true) {
 			this._required = v
 			return this
 		},
@@ -190,11 +192,11 @@ export interface Fixable {
 export function withFix<T extends object>(node: T): T & Fixable {
 	return Object.assign(node, {
 		_fixes: [] as FixBuilder[],
-		fix(this: any, f: FixBuilder) {
+		fix(this: Fixable, f: FixBuilder) {
 			this._fixes.push(f)
 			return this
 		},
-		applyFixes(this: any) {
+		applyFixes(this: Fixable) {
 			this._applyFixes = true
 			return this
 		},
@@ -209,7 +211,7 @@ export interface Enableable {
 export function withEnabled<T extends object>(node: T): T & Enableable {
 	return Object.assign(node, {
 		_enabled: undefined as Enableable['_enabled'],
-		enabled(this: any, condition: Enableable['_enabled']) {
+		enabled(this: Enableable, condition: Enableable['_enabled']) {
 			this._enabled = condition
 			return this
 		},
@@ -230,7 +232,7 @@ export function withValue<T extends object, V>(
 ): T & HasValue<V> {
 	return Object.assign(node, {
 		...behavior,
-		initial(this: any, v: V | ((state: Record<string, NodeState>) => V)) {
+		initial(this: HasValue<V>, v: V | ((state: Record<string, NodeState>) => V)) {
 			this._defaultValue = v
 			return this
 		},
@@ -245,7 +247,7 @@ export interface Clickable {
 export function withOnClick<T extends object>(node: T): T & Clickable {
 	return Object.assign(node, {
 		_onClick: undefined as Clickable['_onClick'],
-		onClick(this: any, fn: Clickable['_onClick']) {
+		onClick(this: Clickable, fn: Clickable['_onClick']) {
 			this._onClick = fn
 			return this
 		},
@@ -301,7 +303,7 @@ export interface HasNoneLabel {
 export function withNoneLabel<T extends object>(node: T): T & HasNoneLabel {
 	return Object.assign(node, {
 		_none: undefined as string | undefined,
-		none(this: any, text: string) {
+		none(this: HasNoneLabel, text: string) {
 			this._none = text
 			return this
 		},
@@ -316,7 +318,7 @@ export interface Layoutable {
 export function withLayout<T extends object>(node: T): T & Layoutable {
 	return Object.assign(node, {
 		_layout: undefined as 'flex' | 'column' | undefined,
-		layout(this: any, value: 'flex' | 'column') {
+		layout(this: Layoutable, value: 'flex' | 'column') {
 			this._layout = value
 			return this
 		},
@@ -331,7 +333,7 @@ export interface Selectable {
 export function withSelectable<T extends object>(node: T): T & Selectable {
 	return Object.assign(node, {
 		_exclusive: undefined as boolean | undefined,
-		singleSelect(this: any) {
+		singleSelect(this: Selectable) {
 			this._exclusive = true
 			return this
 		},
@@ -355,19 +357,19 @@ export function withStageMeta<T extends object>(node: T): T & StageMeta {
 		_guidanceUrl: undefined as string | undefined,
 		_navigate: undefined as string | undefined,
 		_shownSticky: undefined as boolean | undefined,
-		hint(this: any, hint: string) {
+		hint(this: StageMeta, hint: string) {
 			this._hint = hint
 			return this
 		},
-		guidance(this: any, url: string) {
+		guidance(this: StageMeta, url: string) {
 			this._guidanceUrl = url
 			return this
 		},
-		navigate(this: any, path?: string) {
+		navigate(this: StageMeta, path?: string) {
 			this._navigate = path ?? ''
 			return this
 		},
-		sticky(this: any) {
+		sticky(this: StageMeta) {
 			this._shownSticky = true
 			return this
 		},
@@ -396,11 +398,11 @@ export function withEditable<T extends object>(node: T): T & Editable {
 		_onChange: undefined as OnChangeFn | undefined,
 		_showTooltip: undefined as boolean | undefined,
 		_imperativeSync: undefined as boolean | undefined,
-		placeholder(this: any, p: Reactive<string>) {
+		placeholder(this: Editable, p: Reactive<string>) {
 			this._placeholder = p
 			return this
 		},
-		onChange(this: any, fn: OnChangeFn) {
+		onChange(this: Editable, fn: OnChangeFn) {
 			this._onChange = fn
 			return this
 		},
@@ -420,7 +422,11 @@ export interface Tweakable<V = unknown> {
 export function withTweak<T extends HasValue<V>, V>(node: T): T & Tweakable<V> {
 	return Object.assign(node, {
 		_tweaks: [] as TweakDef<V>[],
-		tweak(this: any, icon: FunctionalComponent<SVGAttributes>, compute: TweakDef<V>['compute']) {
+		tweak(
+			this: Tweakable<V>,
+			icon: FunctionalComponent<SVGAttributes>,
+			compute: TweakDef<V>['compute'],
+		) {
 			this._tweaks.push({ icon: markRaw(icon), compute })
 			return this
 		},
@@ -435,7 +441,7 @@ export interface StateOrigin {
 export function withStateOrigin<T extends object>(node: T): T & StateOrigin {
 	return Object.assign(node, {
 		_stateOrigin: undefined as string[] | undefined,
-		stateOrigin(this: any, path: string[]) {
+		stateOrigin(this: StateOrigin, path: string[]) {
 			this._stateOrigin = path
 			return this
 		},

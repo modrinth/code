@@ -34,9 +34,7 @@ export default function () {
 					.suggestedStatus('flagged')
 					.message()
 					.children(
-						toggle('warning', 'Multiple times in a row')
-							.suggestedStatus('rejected')
-							.message(),
+						toggle('warning', 'Multiple times in a row').suggestedStatus('rejected').message(),
 					)
 					.collect(),
 			),

@@ -3,7 +3,7 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { group, stage, text, toggle } from '../../types/node'
-import {Priorities} from "../priorities.ts";
+import { Priorities } from '../priorities.ts'
 
 //TODO chyz
 //TODO coolbot needs discussion
@@ -22,14 +22,14 @@ export default function () {
 				toggle('issue-warning', 'Issue warning')
 					.suggestedStatus('approved')
 					.message()
-          .priority(Priorities.tempLast),
+					.priority(Priorities.tempLast),
 
 				toggle('missed-deadline', 'Missed due date')
 					.suggestedStatus('flagged')
 					.message((state) => ({
 						STATUS: state.status,
 					}))
-          .priority(Priorities.tempLast)
+					.priority(Priorities.tempLast)
 					.children(
 						//TODO: chyz this shouldn't need to be provided by moderator
 						text('status').title('What status is the project being set to?').required(),

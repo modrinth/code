@@ -18,7 +18,9 @@ import useTitleSlugStage from './stages/title-slug'
 import useUndefinedProjectStage from './stages/undefined-project'
 import useVersionsStage from './stages/versions'
 
-export function useStages(globalState: Ref<Record<string, Record<string, NodeState>>>): StageNode[] {
+export function useStages(
+	globalState: Ref<Record<string, Record<string, NodeState>>>,
+): StageNode[] {
 	const mainStages: StageNode[] = [
 		usePostApprovalStage(),
 		useUndefinedProjectStage(),

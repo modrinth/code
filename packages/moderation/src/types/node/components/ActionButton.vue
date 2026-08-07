@@ -14,8 +14,8 @@
 
 <script lang="ts" setup>
 import { Button } from '@modrinth/ui'
-import { computed } from 'vue'
 import type { Component } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps<{
 	modelValue: boolean

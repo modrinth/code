@@ -26,7 +26,7 @@ export function childWriter(
 				: existing !== undefined
 					? { value: existing }
 					: {}
-		if (value === undefined) delete container[childId]
+		if (value === undefined) Reflect.deleteProperty(container, childId)
 		else container[childId] = value
 		parentWrite(containerId, Object.keys(container).length === 0 ? undefined : container)
 	}
@@ -49,13 +49,16 @@ export function originScope(
 ): { state: Record<string, NodeState>; write: Writer } {
 	let state = root
 	let write: Writer = (id, value) => {
-		if (value === undefined) delete root[id]
+		if (value === undefined) Reflect.deleteProperty(root, id)
 		else root[id] = value
 	}
 	for (const segment of path) {
 		write = childWriter(state, write, segment)
 		const raw = state[segment]
-		state = raw && typeof raw === 'object' && !(raw instanceof Set) ? (raw as Record<string, NodeState>) : {}
+		state =
+			raw && typeof raw === 'object' && !(raw instanceof Set)
+				? (raw as Record<string, NodeState>)
+				: {}
 	}
 	return { state, write }
 }

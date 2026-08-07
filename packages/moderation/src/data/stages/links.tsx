@@ -3,9 +3,9 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import { group, md, mdOptional, stage, toggle } from '../../types/node'
-import type { ChildEntry, GroupNode } from '../../types/node'
 import { promptSourceRequired } from '../..'
+import type { ChildEntry, GroupNode } from '../../types/node'
+import { group, md, mdOptional, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()

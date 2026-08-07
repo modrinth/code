@@ -1,6 +1,6 @@
+import type { ChildNode } from './builder'
 import { evalSegment } from './messages'
 import { hasCap, isNodeActive, resolveActionState, walkNodes } from './resolve'
-import type { ChildNode } from './builder'
 import type { MessageSegment, NodeState } from './state'
 
 export interface ActiveAction2 {
@@ -24,7 +24,12 @@ export function collectActiveActions(
 			const segments = node._segments as MessageSegment[]
 			if (segments.length === 0) return
 			if (!isNodeActive(node, nodeState, localState)) return
-			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path, active: true })
+			actions.push({
+				node,
+				state: resolveActionState(node, nodeState, localState),
+				statePath: path,
+				active: true,
+			})
 		},
 		basePath,
 	)
@@ -45,7 +50,12 @@ export function collectMessageNodes(
 			const segments = node._segments as MessageSegment[]
 			if (segments.length === 0) return
 			const active = isNodeActive(node, nodeState, localState)
-			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path, active })
+			actions.push({
+				node,
+				state: resolveActionState(node, nodeState, localState),
+				statePath: path,
+				active,
+			})
 		},
 		basePath,
 	)
@@ -53,7 +63,9 @@ export function collectMessageNodes(
 }
 
 function isDescendant(childPath: string[], ancestorPath: string[]): boolean {
-	return childPath.length > ancestorPath.length && ancestorPath.every((key, i) => childPath[i] === key)
+	return (
+		childPath.length > ancestorPath.length && ancestorPath.every((key, i) => childPath[i] === key)
+	)
 }
 
 export async function evalActiveAction(

@@ -3,9 +3,9 @@ import { toValue } from 'vue'
 
 import type { AnyNode, ChildEntry, ChildNode, HasChildren } from './builder'
 import type { HasValue, Identified } from './capabilities'
-import { childWriter, writeNodeValue } from './mutate'
 import type { Writer } from './mutate'
-import type { NodeState, NodeStateWithChildren } from './state'
+import { childWriter, writeNodeValue } from './mutate'
+import type { NodeState } from './state'
 import { resolve } from './state'
 
 export function hasCap<K extends string>(node: object, key: K): node is Record<K, unknown> {
@@ -69,10 +69,7 @@ export function getBooleanChildState(nodeState: NodeState): Record<string, NodeS
 	return {}
 }
 
-export function resolveChildren(
-	node: HasChildren,
-	state: Record<string, NodeState>,
-): ChildNode[] {
+export function resolveChildren(node: HasChildren, state: Record<string, NodeState>): ChildNode[] {
 	const entries: ChildEntry[] = node._childrenFn ? node._childrenFn(state) : node._children
 
 	const result: ChildNode[] = []
@@ -180,7 +177,11 @@ export function withDefaults<T extends Record<string, NodeState>>(
 				!(value instanceof Set)
 			) {
 				const nested = value as Record<string, NodeState>
-				return withDefaults(nested, resolveChildren(child, nested), write && childWriter(target, write, key))
+				return withDefaults(
+					nested,
+					resolveChildren(child, nested),
+					write && childWriter(target, write, key),
+				)
 			}
 
 			if (value === undefined && child && hasChildrenCap(child)) {

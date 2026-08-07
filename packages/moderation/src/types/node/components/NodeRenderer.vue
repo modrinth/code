@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Button, IconButton } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
-import { computed, inject, watchEffect } from 'vue'
 import type { Component } from 'vue'
+import { computed, inject, watchEffect } from 'vue'
 
 import type { AnyNode, ChildNode, HasChildren } from '../builder'
 import type {
@@ -14,9 +14,8 @@ import type {
 	TweakDef,
 } from '../capabilities'
 import { CHECKLIST_META_KEY } from '../context'
-import ActionButton from './ActionButton.vue'
-import { childWriter, originScope, writeNodeValue } from '../mutate'
 import type { Writer } from '../mutate'
+import { childWriter, originScope, writeNodeValue } from '../mutate'
 import {
 	getBooleanChildState,
 	getEffectiveValue,
@@ -32,6 +31,7 @@ import {
 } from '../resolve'
 import type { NodeState, Reactive } from '../state'
 import { resolve } from '../state'
+import ActionButton from './ActionButton.vue'
 
 const metaCtx = inject(CHECKLIST_META_KEY)
 
@@ -59,7 +59,9 @@ type RenderableValueNode = AnyNode &
 	}
 
 function resolveComponent(node: RenderableValueNode): Component | undefined {
-	return node._component ?? (node._rendererKey ? props.appComponents?.[node._rendererKey] : undefined)
+	return (
+		node._component ?? (node._rendererKey ? props.appComponents?.[node._rendererKey] : undefined)
+	)
 }
 
 function titleClass(depth: number): string {
@@ -93,7 +95,11 @@ function isEnabled(node: Partial<Enableable>): boolean {
 }
 
 function toggleSetValue(node: RenderableValueNode, value: string): void {
-	const current = getEffectiveValue(node, props.state[node.id], wrappedState.value) as unknown as string[]
+	const current = getEffectiveValue(
+		node,
+		props.state[node.id],
+		wrappedState.value,
+	) as unknown as string[]
 	const set = new Set(Array.isArray(current) ? current : [])
 	if (set.has(value)) set.delete(value)
 	else set.add(value)
@@ -161,11 +167,17 @@ function containerScope(node: HasChildren & Partial<Identified>): {
 	}
 	if (!hasIdCap(node)) return { state: props.state, write: props.write }
 	const raw = props.state[node.id]
-	const state = raw && typeof raw === 'object' && !(raw instanceof Set) ? (raw as Record<string, NodeState>) : {}
+	const state =
+		raw && typeof raw === 'object' && !(raw instanceof Set)
+			? (raw as Record<string, NodeState>)
+			: {}
 	return { state, write: childWriter(props.state, props.write, node.id) }
 }
 
-function valueScope(node: HasValue & Identified): { state: Record<string, NodeState>; write: Writer } {
+function valueScope(node: HasValue & Identified): {
+	state: Record<string, NodeState>
+	write: Writer
+} {
 	const state = getBooleanChildState(props.state[node.id])
 	return { state, write: childWriter(props.state, props.write, node.id) }
 }
@@ -178,7 +190,10 @@ const TOOLTIP_BASE = {
 
 function resolveTooltip(node: object): Record<string, unknown> | undefined {
 	if (hasCap(node, '_tooltip')) {
-		const t = node._tooltip as Reactive<string> | ((state: Record<string, NodeState>) => string) | undefined
+		const t = node._tooltip as
+			| Reactive<string>
+			| ((state: Record<string, NodeState>) => string)
+			| undefined
 		if (t !== undefined) {
 			const content = typeof t === 'function' ? t(wrappedState.value) : resolve(t)
 			if (content) return { ...TOOLTIP_BASE, content }
@@ -207,7 +222,10 @@ function tweakEnabled(tweak: TweakDef, node: RenderableValueNode): boolean {
 	return result !== null && result !== undefined && result !== tweakCurrent(node)
 }
 
-function tweakTooltip(tweak: TweakDef, node: RenderableValueNode): Record<string, unknown> | undefined {
+function tweakTooltip(
+	tweak: TweakDef,
+	node: RenderableValueNode,
+): Record<string, unknown> | undefined {
 	if (!tweakEnabled(tweak, node)) return undefined
 	const content = tweakResult(tweak, node)
 	return content ? { ...TOOLTIP_BASE, content: String(content) } : undefined
@@ -238,7 +256,9 @@ function updateEvent(item: object): string {
 }
 
 function updateValue(item: RenderableValueNode, v: unknown): void {
-	const onChange = hasCap(item, '_onChange') ? (item._onChange as OnChangeFn | undefined) : undefined
+	const onChange = hasCap(item, '_onChange')
+		? (item._onChange as OnChangeFn | undefined)
+		: undefined
 	if (onChange) {
 		const result = onChange(v as string, { override: (ov) => ({ __override: ov }) })
 		if (result && typeof result === 'object' && '__override' in result) {
@@ -285,9 +305,11 @@ watchEffect(() => {
 					"
 				>
 					<div v-if="getTitle(item)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
+						<!-- eslint-disable vue/no-v-html -- title text is author-controlled (stage definitions), not user input -->
 						<span
 							v-html="renderString(getTitle(item)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')"
 						/><span v-if="needsAttention(item)" class="text-red">*</span>
+						<!-- eslint-enable vue/no-v-html -->
 					</div>
 
 					<template v-if="hasChildrenCap(item) && !hasValueCap(item)">
@@ -305,18 +327,22 @@ watchEffect(() => {
 
 					<template v-else-if="hasValueCap(item) && hasIdCap(item)">
 						<component
-							v-if="resolveComponent(item as RenderableValueNode) === ActionButton"
 							:is="resolveComponent(item as RenderableValueNode)"
+							v-if="resolveComponent(item as RenderableValueNode) === ActionButton"
 							v-bind="componentProps(item as RenderableValueNode)"
-							:[modelProp(item)]="getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)"
+							:[modelProp(item)]="
+								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
+							"
 							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
 						/>
 						<component
-							v-else
 							:is="resolveComponent(item as RenderableValueNode)"
+							v-else
 							v-tooltip="resolveTooltip(item)"
 							v-bind="componentProps(item as RenderableValueNode)"
-							:[modelProp(item)]="getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)"
+							:[modelProp(item)]="
+								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
+							"
 							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
 						/>
 						<template
