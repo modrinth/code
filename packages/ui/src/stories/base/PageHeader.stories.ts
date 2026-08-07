@@ -35,8 +35,8 @@ import PageHeaderMetadataTagsItem from '../../components/base/page-header/metada
 import PageHeaderMetadataTimeItem from '../../components/base/page-header/metadata/page-header-metadata-time-item.vue'
 import PageHeaderActions from '../../components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '../../components/base/page-header/page-header-badge-item.vue'
+import TagIcon from '../../components/base/TagIcon.vue'
 import TagItem from '../../components/base/TagItem.vue'
-import LoaderIcon from '../../components/servers/icons/LoaderIcon.vue'
 import ServerIcon from '../../components/servers/icons/ServerIcon.vue'
 
 const noop = () => undefined
@@ -220,11 +220,11 @@ export const CreatorHeader: Story = {
 
 export const AppInstanceHeader: Story = {
 	render: () => ({
-		components: { ...pageHeaderComponents, LoaderIcon, TeleportOverflowMenu },
+		components: { ...pageHeaderComponents, TagIcon, TeleportOverflowMenu },
 		setup() {
 			return {
 				...pageHeaderIcons,
-				LoaderIcon,
+				TagIcon,
 				menuActions,
 				noop,
 			}
@@ -238,7 +238,7 @@ export const AppInstanceHeader: Story = {
 				<template #metadata>
 					<PageHeaderMetadata>
 						<PageHeaderMetadataItem :icon="Gamepad2Icon" tooltip="Minecraft version">Minecraft 1.20.1</PageHeaderMetadataItem>
-						<PageHeaderMetadataItem :icon="LoaderIcon" :icon-props="{ loader: 'Fabric' }" tooltip="Mod loader">
+						<PageHeaderMetadataItem :icon="TagIcon" :icon-props="{ tag: 'Fabric', enforceType: 'loader' }" tooltip="Mod loader">
 							Fabric 0.16.14
 						</PageHeaderMetadataItem>
 						<PageHeaderMetadataItem :icon="TimerIcon" tooltip="Total playtime">12 hours</PageHeaderMetadataItem>
@@ -266,11 +266,11 @@ export const AppInstanceHeader: Story = {
 
 export const BrowseHeader: Story = {
 	render: () => ({
-		components: { ...pageHeaderComponents, LoaderIcon, TeleportOverflowMenu },
+		components: { ...pageHeaderComponents, TagIcon, TeleportOverflowMenu },
 		setup() {
 			return {
 				...pageHeaderIcons,
-				LoaderIcon,
+				TagIcon,
 				noop,
 			}
 		},
@@ -289,7 +289,7 @@ export const BrowseHeader: Story = {
 						<PageHeaderMetadataItem class="!text-primary" :icon="Gamepad2Icon" tooltip="Minecraft version">
 							Minecraft 1.20.1
 						</PageHeaderMetadataItem>
-						<PageHeaderMetadataItem class="!text-primary" :icon="LoaderIcon" :icon-props="{ loader: 'Fabric' }" tooltip="Mod loader">
+						<PageHeaderMetadataItem class="!text-primary" :icon="TagIcon" :icon-props="{ tag: 'Fabric', enforceType: 'loader' }" tooltip="Mod loader">
 							Fabric
 						</PageHeaderMetadataItem>
 					</PageHeaderMetadata>
@@ -343,12 +343,12 @@ export const ServerPanelRootHeader: Story = {
 
 export const ServerPanelInstanceHeader: Story = {
 	render: () => ({
-		components: { ...pageHeaderComponents, LoaderIcon, TeleportOverflowMenu },
+		components: { ...pageHeaderComponents, TagIcon, TeleportOverflowMenu },
 		setup() {
 			return {
 				...pageHeaderIcons,
 				joinedActions,
-				LoaderIcon,
+				TagIcon,
 				noop,
 			}
 		},
@@ -363,7 +363,7 @@ export const ServerPanelInstanceHeader: Story = {
 				<template #metadata>
 					<PageHeaderMetadata>
 						<PageHeaderMetadataItem :icon="Gamepad2Icon" tooltip="Minecraft version">Minecraft 1.20.1</PageHeaderMetadataItem>
-						<PageHeaderMetadataItem :icon="LoaderIcon" :icon-props="{ loader: 'Fabric' }" tooltip="Mod loader">
+						<PageHeaderMetadataItem :icon="TagIcon" :icon-props="{ tag: 'Fabric', enforceType: 'loader' }" tooltip="Mod loader">
 							Fabric 0.19.2
 						</PageHeaderMetadataItem>
 						<PageHeaderMetadataItem :icon="TimerIcon" tooltip="Last activity">Last active 2 weeks ago</PageHeaderMetadataItem>
