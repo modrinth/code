@@ -1301,9 +1301,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Bestand opgeslagen"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Sluiten"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Vind"
   },
@@ -5218,12 +5215,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar van {username}"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Annuleren"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Annuleren"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Uitnodigingslink bewerken."

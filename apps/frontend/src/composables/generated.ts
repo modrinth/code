@@ -68,11 +68,16 @@ export interface GeneratedState extends GloballyUsedState {
 }
 
 /**
- * Composable for accessing the globally used generated state.
- * This includes both fetched data and runtime-defined constants.
+ * Built once per module load rather than via `useState`, because every `useState` value is
+ * serialized into the SSR payload of every page. This is build-time constant data that the
+ * client already has via the static import above, so putting it in the payload would ship a
+ * second copy for no benefit.
+ *
+ * Consequence: on the server this object is shared by every request in the isolate, so it must
+ * stay immutable there. Runtime refreshes are client-only and go through `setGameVersions`.
  */
-export const useGeneratedState = () =>
-	useState<GeneratedState>('generatedState', () => ({
+const generatedState = shallowRef<GeneratedState>(
+	Object.freeze({
 		// Cast JSON data to typed API responses
 		categories: (categories ?? []) as Labrinth.Tags.v2.Category[],
 		loaders: (loaders ?? []) as Labrinth.Tags.v2.Loader[],
@@ -147,4 +152,24 @@ export const useGeneratedState = () =>
 		errors,
 
 		buildYear: new Date().getFullYear(),
-	}))
+	}) as GeneratedState,
+)
+
+/**
+ * Composable for accessing the globally used generated state.
+ * This includes both fetched data and runtime-defined constants.
+ */
+export const useGeneratedState = () => generatedState
+
+/**
+ * Replaces the build-time game versions with a freshly fetched list. Client-only: mutating this
+ * on the server would leak across every request sharing the isolate.
+ */
+export function setGameVersions(versions: Labrinth.Tags.v2.GameVersion[]) {
+	if (import.meta.server) return
+
+	generatedState.value = Object.freeze({
+		...generatedState.value,
+		gameVersions: versions,
+	}) as GeneratedState
+}

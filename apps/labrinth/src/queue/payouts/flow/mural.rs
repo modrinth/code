@@ -19,7 +19,7 @@ use crate::{
         mural::MuralPayoutRequest,
     },
     routes::ApiError,
-    util::error::Context,
+    util::error::{ApiContext as _, Context},
 };
 
 pub const PLATFORM_FEE: PayoutMethodFee = PayoutMethodFee {
@@ -67,7 +67,7 @@ pub(super) async fn create(
     let mural = queue.muralpay.load();
     let mural = mural
         .as_ref()
-        .wrap_internal_err("Mural client not available")?;
+        .wrap_internal_err("required Mural client is not available")?;
 
     let method_fee_usd;
     let forex_usd_to_currency;
@@ -158,14 +158,15 @@ pub(super) async fn execute(
         recipient_info,
     }: MuralFlow,
 ) -> Result<(), ApiError> {
-    let user_email = get_verified_email(user)?;
+    let user_email = get_verified_email(user)
+        .wrap_api_err("fetching verified user email")?;
     let sent_to_method_usd = net_usd + method_fee_usd;
     let total_fee_usd = method_fee_usd + platform_fee_usd;
 
     let mural = queue.muralpay.load();
     let mural = mural
         .as_ref()
-        .wrap_internal_err("Mural client not available")?;
+        .wrap_internal_err("required Mural client is not available")?;
 
     let payment_statement_doc = queue
         .create_mural_payment_statement_doc(
@@ -175,7 +176,8 @@ pub(super) async fn execute(
             &recipient_info,
             gotenberg,
         )
-        .await?;
+        .await
+        .wrap_api_err("creating Mural payment statement document")?;
 
     let user_id = UserId::from(user.id);
     let method_id = match &payout_details {
@@ -235,13 +237,18 @@ pub(super) async fn execute(
             Some(format!("User {user_id}")),
             &[payout],
         )
-        .await
-        .map_err(|err| match err {
-            muralpay::MuralError::Api(err) => ApiError::Mural(Box::new(err)),
-            err => ApiError::Internal(
+        .await;
+    let payout_request = match payout_request {
+        Ok(payout_request) => payout_request,
+        Err(muralpay::MuralError::Api(err)) => {
+            return Err(ApiError::Request(eyre::eyre!(Box::new(err))));
+        }
+        Err(err) => {
+            return Err(ApiError::Internal(
                 eyre!(err).wrap_err("failed to create payout request"),
-            ),
-        })?;
+            ));
+        }
+    };
 
     // Once the Mural payout request has been created successfully,
     // then we *must* commit *a* payout row into the DB, to link the Mural

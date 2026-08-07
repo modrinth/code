@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ModerationNote {
@@ -37,9 +38,9 @@ pub struct PatchModerationNote {
 impl PatchModerationNote {
     pub fn validate_not_empty(&self) -> Result<(), ApiError> {
         if self.notes.is_none() && self.user_rating.is_none() {
-            return Err(ApiError::InvalidInput(
-                "must specify `notes` or `user_rating`".to_string(),
-            ));
+            return Err(ApiError::Request(eyre::eyre!(
+                "must specify `notes` or `user_rating`",
+            )));
         }
 
         Ok(())
@@ -53,16 +54,14 @@ pub fn parse_if_match_header(
         return Ok(None);
     };
 
-    let value = value.to_str().map_err(|_| {
-        ApiError::InvalidInput(
-            "`if-match` header must be a valid integer".to_string(),
-        )
-    })?;
+    let value = value.to_str().wrap_request_err(
+        "`if-match` header must be a valid integer".to_string(),
+    )?;
 
     Some(value.parse::<i32>().map_err(|_| {
-        ApiError::InvalidInput(
-            "`if-match` header must be a valid integer".to_string(),
-        )
+        ApiError::Request(eyre::eyre!(
+            "`if-match` header must be a valid integer",
+        ))
     }))
     .transpose()
 }

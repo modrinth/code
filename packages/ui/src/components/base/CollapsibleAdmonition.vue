@@ -132,51 +132,51 @@ const buttonColors: Record<string, 'blue' | 'orange' | 'red' | 'green'> = {
 
 <style scoped>
 .collapsible-admonition[data-type='critical'] {
-	border-color: rgba(255, 73, 110, 0.6);
+	border-color: color-mix(in srgb, var(--color-red) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='critical'] .collapsible-admonition__item {
-	background: rgba(255, 73, 110, 0.1);
+	background: var(--color-red-bg);
 }
 
 .collapsible-admonition[data-type='critical'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(255, 73, 110, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-red) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='info'] {
-	border-color: rgba(47, 158, 255, 0.6);
+	border-color: color-mix(in srgb, var(--color-blue) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='info'] .collapsible-admonition__item {
-	background: rgba(47, 158, 255, 0.1);
+	background: var(--color-blue-bg);
 }
 
 .collapsible-admonition[data-type='info'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(47, 158, 255, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-blue) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='warning'] {
-	border-color: rgba(255, 163, 71, 0.6);
+	border-color: color-mix(in srgb, var(--color-orange) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='warning'] .collapsible-admonition__item {
-	background: rgba(255, 163, 71, 0.1);
+	background: var(--color-orange-bg);
 }
 
 .collapsible-admonition[data-type='warning'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(255, 163, 71, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-orange) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='success'] {
-	border-color: rgba(27, 217, 106, 0.6);
+	border-color: color-mix(in srgb, var(--color-green) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='success'] .collapsible-admonition__item {
-	background: rgba(27, 217, 106, 0.1);
+	background: var(--color-green-bg);
 }
 
 .collapsible-admonition[data-type='success'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(27, 217, 106, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-green) 60%, transparent);
 }
 
 .collapsible-admonition-enter-active,

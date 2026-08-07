@@ -263,7 +263,7 @@ function filterPillClass(isActive: boolean) {
 	return [
 		'cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]',
 		isActive
-			? 'border-green bg-brand-highlight text-brand'
+			? 'border-brand bg-brand-highlight text-brand'
 			: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5',
 	]
 }

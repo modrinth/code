@@ -1304,9 +1304,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "已儲存檔案"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "關閉"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "尋找"
   },
@@ -5414,12 +5411,6 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} 的顯示圖片"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "取消"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "取消"
-  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "自訂..."
   },
@@ -6255,4 +6246,3 @@
     "defaultMessage": "類型"
   }
 }
-

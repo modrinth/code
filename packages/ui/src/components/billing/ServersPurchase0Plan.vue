@@ -246,9 +246,7 @@ function selectCustom() {
 			<div
 				class="z-10 -mb-3.5 rounded-full text-sm font-medium text-brand whitespace-nowrap absolute -top-3 right-4 bg-surface-3"
 			>
-				<div
-					class="bg-brand-highlight border border-solid border-highlight-green px-2.5 py-0.5 rounded-full"
-				>
+				<div class="bg-brand-highlight border border-solid border-brand px-2.5 py-0.5 rounded-full">
 					{{ formatMessage(messages.mostPopular) }}
 				</div>
 			</div>

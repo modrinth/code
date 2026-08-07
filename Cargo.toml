@@ -131,7 +131,6 @@ lz4_flex = { version = "0.11.5", default-features = false, features = [
   "std",
 ] }
 maxminddb = "0.26.0"
-meilisearch-sdk = { version = "0.30.0", default-features = false }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
 modrinth-util = { path = "packages/modrinth-util" }

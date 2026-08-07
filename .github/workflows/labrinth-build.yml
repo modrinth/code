@@ -8,6 +8,9 @@ on:
     paths:
       - .github/workflows/labrinth-build.yml
       - 'apps/labrinth/**'
+      - 'packages/**'
+      - '!packages/api-client/**'
+      - '!packages/app-lib/**'
       - Cargo.toml
       - Cargo.lock
   pull_request:
@@ -15,6 +18,9 @@ on:
     paths:
       - .github/workflows/labrinth-build.yml
       - 'apps/labrinth/**'
+      - 'packages/**'
+      - '!packages/api-client/**'
+      - '!packages/app-lib/**'
       - Cargo.toml
       - Cargo.lock
   merge_group:
