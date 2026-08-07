@@ -24,7 +24,7 @@
 					class="size-5 hidden md:flex"
 					:class="getIconClasses(index)"
 				/>
-				<span class="text-nowrap" :class="getLabelClasses(index, !!link.icon)">
+				<span class="text-nowrap" :class="getLabelClasses(index)">
 					{{ link.label }}
 				</span>
 			</RouterLink>
@@ -46,7 +46,7 @@
 					class="size-5 hidden md:flex"
 					:class="getIconClasses(index)"
 				/>
-				<span class="text-nowrap" :class="getLabelClasses(index, !!link.icon)">
+				<span class="text-nowrap" :class="getLabelClasses(index)">
 					{{ link.label }}
 				</span>
 			</div>
@@ -159,7 +159,7 @@ function getIconClasses(index: number) {
 	}
 }
 
-function getLabelClasses(index: number, hasIcon: boolean = false) {
+function getLabelClasses(index: number) {
 	return {
 		'text-button-textSelected': isActiveAndNotSubpage.value(index),
 		'text-contrast': !isActiveAndNotSubpage.value(index),
