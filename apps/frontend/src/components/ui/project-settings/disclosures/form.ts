@@ -16,7 +16,11 @@ function findDisclosure<T extends DisclosureType>(
 	return disclosures.find((disclosure): disclosure is DisclosureOf<T> => disclosure.type === type)
 }
 
-type NoteDisclosureType = 'advertisements' | 'epilepsy_triggers' | 'system_interactions'
+type NoteDisclosureType =
+	| 'advertisements'
+	| 'epilepsy_triggers'
+	| 'system_interactions'
+	| 'archived'
 
 function createNoteModel(
 	disclosures: ProjectDisclosureData[],
@@ -61,6 +65,7 @@ export function disclosuresToForm(disclosures: ProjectDisclosureData[]): Disclos
 		},
 		photosensitivity: createNoteModel(disclosures, 'epilepsy_triggers'),
 		systemInteractions: createNoteModel(disclosures, 'system_interactions'),
+		archived: createNoteModel(disclosures, 'archived'),
 	}
 }
 
@@ -111,6 +116,10 @@ export function formToDisclosures(form: DisclosureFormState): ProjectDisclosure[
 
 	if (form.systemInteractions.enabled) {
 		set.push({ type: 'system_interactions', note: form.systemInteractions.note.trim() || null })
+	}
+
+	if (form.archived.enabled) {
+		set.push({ type: 'archived', note: form.archived.note.trim() || null })
 	}
 
 	return set

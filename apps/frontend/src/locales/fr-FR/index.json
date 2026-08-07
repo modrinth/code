@@ -3974,9 +3974,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "Merci d'upload une version en premier afin de pouvoir sélectionner des tags !"
   },
-  "project.status.archived.message": {
-    "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
-  },
   "project.versions.copy-id-option": {
     "message": "Copier l'ID"
   },

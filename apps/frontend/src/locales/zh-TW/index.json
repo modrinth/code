@@ -3974,9 +3974,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "請先上傳一個版本再選擇標籤！"
   },
-  "project.status.archived.message": {
-    "message": "{title} 已封存。{title} 將不會再收到任何後續更新，除非作者決定解除封存該專案。"
-  },
   "project.versions.copy-id-option": {
     "message": "複製 ID"
   },

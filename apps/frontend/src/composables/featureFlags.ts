@@ -38,7 +38,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showProjectPageCreateServersTooltip: true,
 	showProjectPageQuickServerButton: false,
 	newProjectGeneralSettings: false,
-	newProjectEnvironmentSettings: true,
 	serverRamAsBytesAlwaysOn: false,
 	archonSentryCapture: false,
 	hideRussiaCensorshipBanner: false,

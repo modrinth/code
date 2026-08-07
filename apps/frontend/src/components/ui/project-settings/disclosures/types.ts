@@ -43,4 +43,5 @@ export type DisclosureFormState = {
 	derivative: DerivativeDisclosure
 	photosensitivity: NoteDisclosure
 	systemInteractions: NoteDisclosure
+	archived: NoteDisclosure
 }

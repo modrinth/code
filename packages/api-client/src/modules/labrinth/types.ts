@@ -1343,6 +1343,10 @@ export namespace Labrinth {
 						type: 'paid_features'
 						features: string[]
 				  }
+				| {
+						type: 'archived'
+						note?: string | null
+				  }
 
 			export type ProjectDisclosureData = ProjectDisclosure & {
 				set_by_moderator: boolean

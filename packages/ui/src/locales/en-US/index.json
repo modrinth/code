@@ -3776,6 +3776,12 @@
   "project.stats.followers-label": {
     "defaultMessage": "{count, plural, one {follower} other {followers}}"
   },
+  "project.status.archived.body": {
+    "defaultMessage": "{title} will not receive any further updates unless the author decides to unarchive the project."
+  },
+  "project.status.archived.header": {
+    "defaultMessage": "{title} has been archived"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3960,7 +3966,7 @@
     "defaultMessage": "Content labels for photosensitivity triggers are self-assigned by the creators who upload their content to Modrinth. These projects have not gone through any safety testing."
   },
   "search.photosensitivity-warning-modal.body.3": {
-    "defaultMessage": "Using any content on Modrinth is at your own risk, please stay safe! 💚"
+    "defaultMessage": "Using any content on Modrinth is at your own risk. Please stay safe! 💚"
   },
   "search.photosensitivity-warning-modal.dont-show-again": {
     "defaultMessage": "Don't show this again"

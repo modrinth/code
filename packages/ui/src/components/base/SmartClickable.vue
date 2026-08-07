@@ -5,7 +5,8 @@
 			v-bind="$attrs"
 			class="smart-clickable__contents"
 			:class="{
-				'pointer-events-none': !!$slots.clickable,
+				'smart-clickable__contents--disabled': disabled,
+				'pointer-events-none': !!$slots.clickable && !disabled,
 			}"
 		>
 			<slot />
@@ -14,6 +15,10 @@
 </template>
 
 <script setup lang="ts">
+defineProps<{
+	disabled?: boolean
+}>()
+
 defineOptions({
 	inheritAttrs: false,
 })
@@ -77,7 +82,7 @@ defineOptions({
 	}
 
 	// When clickable is being clicked, give contents an effect
-	:first-child:active + .smart-clickable__contents {
+	:first-child:active + .smart-clickable__contents:not(.smart-clickable__contents--disabled) {
 		scale: 0.98;
 	}
 }

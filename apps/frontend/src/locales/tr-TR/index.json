@@ -3539,9 +3539,6 @@
   "project.settings.tags.title": {
     "message": "Etiketler"
   },
-  "project.status.archived.message": {
-    "message": "{title} arşivlenmiş. {title}, yapımcı fikrini değiştirmediği sürece daha fazla güncelleme almayacak."
-  },
   "project.versions.copy-id-option": {
     "message": "ID'yi Kopyala"
   },

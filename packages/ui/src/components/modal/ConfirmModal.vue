@@ -1,10 +1,12 @@
 <template>
-	<NewModal ref="modal" :noblur="noblur" :danger="danger" :on-hide="onHide" max-width="550px">
-		<template #title>
-			<slot name="title">
-				<span class="font-extrabold text-contrast text-lg">{{ title }}</span>
-			</slot>
-		</template>
+	<NewModal
+		ref="modal"
+		:noblur="noblur"
+		:danger="danger"
+		:on-hide="onHide"
+		max-width="800px"
+		:header="title"
+	>
 		<div class="flex flex-col gap-4">
 			<template v-if="description">
 				<div
@@ -20,7 +22,7 @@
 			<label v-if="hasToType" for="confirmation">
 				<span>
 					To confirm you want to proceed, type
-					<span class="italic font-bold">{{ confirmationText }}</span> below:
+					<span class="font-semibold text-contrast">{{ confirmationText }}</span> below:
 				</span>
 			</label>
 			<StyledInput

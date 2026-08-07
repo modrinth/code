@@ -2756,9 +2756,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.status.archived.message": {
-    "message": "{title} foi arquivado. {title} não receberá mais atualizações, a menos que o autor decida desarquivar o projeto."
-  },
   "project.versions.title": {
     "message": "Versões"
   },

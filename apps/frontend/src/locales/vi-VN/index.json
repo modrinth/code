@@ -3179,9 +3179,6 @@
   "project.settings.permissions.learn-more": {
     "message": "Tìm hiểu thêm"
   },
-  "project.status.archived.message": {
-    "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
-  },
   "project.versions.title": {
     "message": "Phiên bản"
   },

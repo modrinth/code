@@ -36,7 +36,10 @@ function isPhotosensitivityExclusionSelected(filters: { type: string; option: st
 }
 
 watch(
-	() => isPhotosensitivityExclusionSelected(ctx.currentFilters.value),
+	() =>
+		isPhotosensitivityExclusionSelected(
+			ctx.isServerType.value ? ctx.serverCurrentFilters.value : ctx.currentFilters.value,
+		),
 	(isSelected, wasSelected) => {
 		if (isSelected && !wasSelected && !ctx.dismissedPhotosensitivityFilterWarning?.value) {
 			nextTick(() => photosensitivityWarningModal.value?.show())
@@ -204,6 +207,8 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:content-class="contentClass"
 				:inner-panel-class="innerPanelClass"
 				:open-by-default="getFilterOpenByDefault(filterType.id)"
+				@on-open="() => filterType.id === 'advanced' && setAdvancedFiltersCollapsed(false)"
+				@on-close="() => filterType.id === 'advanced' && setAdvancedFiltersCollapsed(true)"
 			>
 				<template #header>
 					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-base font-semibold'">

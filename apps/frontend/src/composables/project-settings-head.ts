@@ -8,7 +8,7 @@ import {
 const messages = defineMessages({
 	headTitle: {
 		id: 'project.settings.head-title',
-		defaultMessage: '⚙️{section} - {project}',
+		defaultMessage: '⚙️ {section} - {project}',
 	},
 })
 

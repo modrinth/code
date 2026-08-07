@@ -90,7 +90,7 @@
 			</div>
 			<ProjectDownloadModal
 				ref="downloadModal"
-				:project-id="routeProjectId"
+				:project-id="projectId"
 				:download-reason="downloadReason"
 				@download="triggerDownloadAnimation"
 			/>
@@ -136,7 +136,7 @@
 							v-if="
 								projectV3 &&
 								currentMember &&
-								(project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
+								(projectV3.status === 'draft' || tags.rejectedStatuses.includes(projectV3.status))
 							"
 							:project="project"
 							:project-v3="projectV3"
@@ -153,7 +153,7 @@
 						v-if="projectV3Loaded"
 						:project="project"
 						:project-v3="projectV3"
-						:show-status-badge="!!currentMember || project.status !== 'approved'"
+						:show-status-badge="!!currentMember || projectV3.status !== 'approved'"
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					>
 						<template #actions>
@@ -443,9 +443,12 @@
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</Button>
 					</Admonition>
-					<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
-						{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
-					</MessageBanner>
+					<ArchivedProjectBanner
+						v-if="isArchived"
+						:title="project.title"
+						:reason="archivedDisclosure?.note"
+						class="mt-4"
+					/>
 				</div>
 
 				<div class="normal-page__sidebar">
@@ -469,7 +472,7 @@
 						:project-v3="projectV3"
 						class="card flex-card"
 					/>
-					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
+					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(projectV3.status)" />
 					<ProjectSidebarLinks
 						:project="project"
 						:project-v3="projectV3"
@@ -535,6 +538,7 @@ import {
 import { moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
+	ArchivedProjectBanner,
 	Avatar,
 	BrowseInstallHeader,
 	Button,
@@ -579,7 +583,6 @@ import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } fro
 import { navigateTo } from '#app'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
-import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
@@ -588,7 +591,7 @@ import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
-import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
+import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
@@ -615,8 +618,11 @@ const { addNotification } = notifications
 const auth = await useAuth()
 const user = await useUser()
 
-// Route param for initial lookup (middleware caches by both slug and ID)
-const routeProjectId = ref(useRouteId('project'))
+// Route slug or ID — resolve to canonical ID before fetching project data
+const routeParam = computed(() => {
+	const param = route.params.project
+	return Array.isArray(param) ? param[0] : param
+})
 
 const { createProjectDownloadUrl } = useCdnDownloadContext()
 
@@ -678,11 +684,6 @@ function handlePlayServerProject() {
 }
 
 const messages = defineMessages({
-	archivedMessage: {
-		id: 'project.status.archived.message',
-		defaultMessage:
-			'{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project.',
-	},
 	backToAllProjects: {
 		id: 'project.settings.back-to-all-projects',
 		defaultMessage: 'Back to all projects',
@@ -838,7 +839,7 @@ const collections = computed(() =>
 )
 
 if (
-	!routeProjectId.value ||
+	!routeParam.value ||
 	!(
 		tags.value.projectTypes.find((x) => x.id === route.params.type) ||
 		route.params.type === 'project'
@@ -855,11 +856,42 @@ if (
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-// V2 Project - hits middleware cache (uses route param for lookup)
-const { data: projectRaw, error: projectV2Error } = useQuery({
-	queryKey: computed(() => ['project', 'v2', routeProjectId.value]),
-	queryFn: () => client.labrinth.projects_v2.get(routeProjectId.value),
+// Resolve route slug/ID to the canonical project ID (middleware warms this cache)
+const { data: projectCheck, error: projectCheckError } = useQuery({
+	queryKey: computed(() => ['project', 'check', routeParam.value]),
+	queryFn: () => client.labrinth.projects_v2.check(routeParam.value),
 	staleTime: STALE_TIME,
+	enabled: computed(() => !!routeParam.value),
+})
+
+const projectId = computed(() => projectCheck.value?.id)
+
+watch(
+	projectCheckError,
+	(error) => {
+		if (error) {
+			const status = error.statusCode ?? error.status ?? 500
+			showError({
+				fatal: true,
+				statusCode: status,
+				message:
+					status === 404
+						? formatMessage(messages.projectNotFound)
+						: formatMessage(messages.errorLoadingProject, {
+								message: error.message ? `: ${error.message}` : '',
+							}),
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+// V2 Project — keyed by canonical ID
+const { data: projectRaw, error: projectV2Error } = useQuery({
+	queryKey: computed(() => ['project', 'v2', projectId.value]),
+	queryFn: () => client.labrinth.projects_v2.get(projectId.value),
+	staleTime: STALE_TIME,
+	enabled: computed(() => !!projectId.value),
 })
 
 // Handle project not found - use showError since watch runs outside Nuxt context
@@ -943,9 +975,6 @@ const projectHeaderInstallContext = computed(() => {
 	}
 })
 
-// Use actual project ID for dependent queries (ensures cache consistency)
-const projectId = computed(() => projectRaw.value?.id)
-
 const sharedProjectId = injectCurrentProjectId(null)
 if (sharedProjectId) {
 	watchEffect(() => {
@@ -962,9 +991,10 @@ const {
 	error: _projectV3Error,
 	isPending: projectV3Pending,
 } = useQuery({
-	queryKey: computed(() => ['project', 'v3', routeProjectId.value]),
-	queryFn: () => client.labrinth.projects_v3.get(routeProjectId.value),
+	queryKey: computed(() => ['project', 'v3', projectId.value]),
+	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
 	staleTime: STALE_TIME,
+	enabled: computed(() => !!projectId.value),
 })
 
 // Server sidebar: modpack version + project for required content
@@ -1123,6 +1153,19 @@ const { data: organizationRaw } = useQuery({
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
+const DISCLOSURE_STALE_TIME = 1000 * 60 * 5
+const { data: disclosuresResponse } = useQuery({
+	queryKey: computed(() => ['project', 'disclosures', 'v3', projectId.value]),
+	queryFn: () => client.labrinth.projects_v3.getDisclosures(projectId.value),
+	staleTime: DISCLOSURE_STALE_TIME,
+	enabled: computed(() => !!projectId.value),
+})
+
+const archivedDisclosure = computed(() =>
+	disclosuresResponse.value?.disclosures?.find((disclosure) => disclosure.type === 'archived'),
+)
+const isArchived = computed(() => !!archivedDisclosure.value)
+
 const { data: thread } = useQuery({
 	queryKey: computed(() => ['thread', projectRaw.value?.thread_id]),
 	queryFn: () => client.labrinth.threads_v3.getThread(projectRaw.value.thread_id),
@@ -1178,62 +1221,93 @@ function loadDependencies() {
 const hasVersions = computed(() => (project.value?.versions?.length ?? 0) > 0)
 
 async function invalidateProject() {
-	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', routeProjectId.value] })
-	if (routeProjectId.value !== projectId.value) {
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId.value] })
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId.value] })
+	const id = projectId.value
+	if (!id) {
+		return
 	}
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', id] })
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', id] })
 	// Prefix match — invalidates members, versions, dependencies, organization
-	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value] })
+	await queryClient.invalidateQueries({ queryKey: ['project', id] })
+}
+
+async function redirectIfNewSlug(newSlug, id) {
+	if (newSlug === undefined || newSlug === route.params.project) {
+		return
+	}
+
+	warmProjectCheckCaches(queryClient, { id, slug: newSlug })
+
+	await navigateTo(
+		{
+			name: route.name,
+			params: {
+				type: route.params.type,
+				project: newSlug,
+			},
+			query: route.query,
+			hash: route.hash,
+		},
+		{ replace: true },
+	)
+}
+
+function mergeV3ProjectPatch(old, data) {
+	if (!old) {
+		return old
+	}
+	const merged = { ...old }
+	for (const [key, value] of Object.entries(data)) {
+		if (
+			value &&
+			typeof value === 'object' &&
+			!Array.isArray(value) &&
+			merged[key] &&
+			typeof merged[key] === 'object' &&
+			!Array.isArray(merged[key])
+		) {
+			merged[key] = { ...merged[key], ...value }
+		} else {
+			merged[key] = value
+		}
+	}
+	return merged
 }
 
 // Mutation for patching project data
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
 		await client.labrinth.projects_v2.edit(projectId, data)
-		if (data.slug !== undefined && data.slug !== route.params.project) {
-			routeProjectId.value = data.slug
-			await navigateTo(
-				{
-					name: route.name,
-					params: {
-						type: route.params.type,
-						project: data.slug,
-					},
-					query: route.query,
-					hash: route.hash,
-				},
-				{ replace: true },
-			)
-		}
+		await redirectIfNewSlug(data.slug, projectId)
 		return data
 	},
 
 	onMutate: async ({ projectId, data }) => {
-		// Cancel outgoing refetches for both slug-based and ID-based cache keys
-		// The query may be keyed by slug (routeProjectId.value) but we also have the actual UUID (projectId)
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-		if (routeProjectId.value !== projectId) {
-			await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
-		}
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
+		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
 
-		// Snapshot previous value from the active query (uses route param as key)
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousV2 = queryClient.getQueryData(['project', 'v2', projectId])
+		const previousV3 = queryClient.getQueryData(['project', 'v3', projectId])
 
-		// Optimistic update on the active query key
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
 			if (!old) return old
 			return { ...old, ...data }
 		})
+		if (data.slug !== undefined) {
+			queryClient.setQueryData(['project', 'v3', projectId], (old) =>
+				old ? { ...old, slug: data.slug } : old,
+			)
+		}
 
-		return { previousProject }
+		return { previousV2, previousV3, projectId }
 	},
 
 	onError: (err, _variables, context) => {
-		// Rollback on error using the active query key
-		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+		if (context?.previousV2) {
+			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousV2)
+		}
+		if (context?.previousV3) {
+			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousV3)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1254,28 +1328,21 @@ const patchStatusMutation = useMutation({
 	},
 
 	onMutate: async ({ projectId, status }) => {
-		// Cancel outgoing refetches for both slug-based and ID-based cache keys
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-		if (routeProjectId.value !== projectId) {
-			await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
-		}
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 
-		// Snapshot previous value from the active query (uses route param as key)
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
 
-		// Optimistic update on the active query key
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
 			if (!old) return old
 			return { ...old, status }
 		})
 
-		return { previousProject }
+		return { previousProject, projectId }
 	},
 
 	onError: (err, _variables, context) => {
-		// Rollback on error using the active query key
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1293,40 +1360,33 @@ const patchStatusMutation = useMutation({
 const patchProjectV3Mutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
 		await client.labrinth.projects_v3.edit(projectId, data)
+		await redirectIfNewSlug(data.slug, projectId)
 		return data
 	},
 
 	onMutate: async ({ projectId, data }) => {
 		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 
-		const previousProject = queryClient.getQueryData(['project', 'v3', projectId])
+		const previousV3 = queryClient.getQueryData(['project', 'v3', projectId])
+		const previousV2 = queryClient.getQueryData(['project', 'v2', projectId])
 
-		queryClient.setQueryData(['project', 'v3', projectId], (old) => {
-			if (!old) return old
-			const merged = { ...old }
-			for (const [key, value] of Object.entries(data)) {
-				if (
-					value &&
-					typeof value === 'object' &&
-					!Array.isArray(value) &&
-					merged[key] &&
-					typeof merged[key] === 'object' &&
-					!Array.isArray(merged[key])
-				) {
-					merged[key] = { ...merged[key], ...value }
-				} else {
-					merged[key] = value
-				}
-			}
-			return merged
-		})
+		queryClient.setQueryData(['project', 'v3', projectId], (old) => mergeV3ProjectPatch(old, data))
+		if (data.slug !== undefined) {
+			queryClient.setQueryData(['project', 'v2', projectId], (old) =>
+				old ? { ...old, slug: data.slug } : old,
+			)
+		}
 
-		return { previousProject, projectId }
+		return { previousV3, previousV2, projectId }
 	},
 
 	onError: (err, _variables, context) => {
-		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousProject)
+		if (context?.previousV3) {
+			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousV3)
+		}
+		if (context?.previousV2) {
+			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousV2)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1380,12 +1440,12 @@ const createGalleryItemMutation = useMutation({
 		})
 	},
 
-	onMutate: async ({ title, description, featured, ordering }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+	onMutate: async ({ projectId, title, description, featured, ordering }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
 
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
 			if (!old) return old
 			const newItem = {
 				url: '',
@@ -1402,12 +1462,12 @@ const createGalleryItemMutation = useMutation({
 			}
 		})
 
-		return { previousProject }
+		return { previousProject, projectId }
 	},
 
 	onError: (err, _variables, context) => {
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1431,12 +1491,12 @@ const editGalleryItemMutation = useMutation({
 		})
 	},
 
-	onMutate: async ({ imageUrl, title, description, featured, ordering }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+	onMutate: async ({ projectId, imageUrl, title, description, featured, ordering }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
 
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
 			if (!old) return old
 			return {
 				...old,
@@ -1455,12 +1515,12 @@ const editGalleryItemMutation = useMutation({
 			}
 		})
 
-		return { previousProject }
+		return { previousProject, projectId }
 	},
 
 	onError: (err, _variables, context) => {
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1479,12 +1539,12 @@ const deleteGalleryItemMutation = useMutation({
 		await client.labrinth.projects_v2.deleteGalleryImage(projectId, imageUrl)
 	},
 
-	onMutate: async ({ imageUrl }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+	onMutate: async ({ projectId, imageUrl }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
 
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
 			if (!old) return old
 			return {
 				...old,
@@ -1492,12 +1552,12 @@ const deleteGalleryItemMutation = useMutation({
 			}
 		})
 
-		return { previousProject }
+		return { previousProject, projectId }
 	},
 
 	onError: (err, _variables, context) => {
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1750,10 +1810,7 @@ if (!route.name.startsWith('type-project-settings')) {
 		ogDescription: () => project.value?.description ?? '',
 		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
 		ogUrl: createCanonicalUrl,
-		robots: () =>
-			project.value?.status === 'approved' || project.value?.status === 'archived'
-				? 'all'
-				: 'noindex',
+		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
 } else {
 	useSeoMeta({

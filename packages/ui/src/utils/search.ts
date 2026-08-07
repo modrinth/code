@@ -146,7 +146,7 @@ const DISCLOSURE_TYPE_FILTERS = [
 	'archived',
 ] as const
 
-type DisclosureTypeFilter = (typeof DISCLOSURE_TYPE_FILTERS)[number]
+export type DisclosureTypeFilter = (typeof DISCLOSURE_TYPE_FILTERS)[number]
 
 const DISCLOSURE_TYPE_SUPPORTED_PROJECT_TYPES: Record<
 	DisclosureTypeFilter,
@@ -175,6 +175,92 @@ const DISCLOSURE_TYPE_ICONS: Record<DisclosureTypeFilter, Component> = {
 
 function isProjectTypeExclusionOption(optionId: string): optionId is ProjectType {
 	return (ALL_PROJECT_TYPES as string[]).includes(optionId)
+}
+
+type FormatMessage = (
+	descriptor: { id: string; defaultMessage: string },
+	values?: Record<string, unknown>,
+) => string
+
+export function formatDisclosureTypeLabel(
+	formatMessage: FormatMessage,
+	disclosureType: DisclosureTypeFilter,
+): string {
+	switch (disclosureType) {
+		case 'ai_content':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.ai_content',
+					defaultMessage: 'AI-generated content',
+				}),
+			)
+		case 'advertisements':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.advertisements',
+					defaultMessage: 'Advertisements',
+				}),
+			)
+		case 'epilepsy_triggers':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.epilepsy_triggers',
+					defaultMessage: 'Photosensitivity triggers',
+				}),
+			)
+		case 'system_interactions':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.system_interactions',
+					defaultMessage: 'External system interactions',
+				}),
+			)
+		case 'telemetry':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.telemetry',
+					defaultMessage: 'Telemetry',
+				}),
+			)
+		case 'derivative_work':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.derivative_work',
+					defaultMessage: 'Derivative content',
+				}),
+			)
+		case 'paid_features':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.paid_features',
+					defaultMessage: 'Paid features',
+				}),
+			)
+		case 'archived':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.archived',
+					defaultMessage: 'Archived',
+				}),
+			)
+	}
+}
+
+export function createDisclosureFilterOptions(
+	formatMessage: FormatMessage,
+	projectTypes: readonly ProjectType[],
+): FilterOption[] {
+	return DISCLOSURE_TYPE_FILTERS.filter((disclosureType) =>
+		DISCLOSURE_TYPE_SUPPORTED_PROJECT_TYPES[disclosureType].some((projectType) =>
+			projectTypes.includes(projectType),
+		),
+	).map((disclosureType) => ({
+		id: disclosureType,
+		formatted_name: formatDisclosureTypeLabel(formatMessage, disclosureType),
+		icon: DISCLOSURE_TYPE_ICONS[disclosureType],
+		method: 'or' as const,
+		value: `disclosure_types:${disclosureType}`,
+	}))
 }
 
 export function useSearch(
@@ -206,67 +292,6 @@ export function useSearch(
 	const { formatMessage, locale } = useVIntl()
 	const formatCategoryName = (categoryName: string) => {
 		return formatCategory(formatMessage, categoryName)
-	}
-
-	const formatDisclosureTypeLabel = (disclosureType: DisclosureTypeFilter): string => {
-		switch (disclosureType) {
-			case 'ai_content':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.ai_content',
-						defaultMessage: 'AI-generated content',
-					}),
-				)
-			case 'advertisements':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.advertisements',
-						defaultMessage: 'Advertisements',
-					}),
-				)
-			case 'epilepsy_triggers':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.epilepsy_triggers',
-						defaultMessage: 'Photosensitivity triggers',
-					}),
-				)
-			case 'system_interactions':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.system_interactions',
-						defaultMessage: 'External system interactions',
-					}),
-				)
-			case 'telemetry':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.telemetry',
-						defaultMessage: 'Telemetry',
-					}),
-				)
-			case 'derivative_work':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.derivative_work',
-						defaultMessage: 'Derivative content',
-					}),
-				)
-			case 'paid_features':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.paid_features',
-						defaultMessage: 'Paid features',
-					}),
-				)
-			case 'archived':
-				return formatMessage(
-					defineMessage({
-						id: 'search.filter_type.advanced.disclosure.archived',
-						defaultMessage: 'Archived',
-					}),
-				)
-		}
 	}
 
 	const filters = computed(() => {
@@ -579,17 +604,7 @@ export function useSearch(
 				searchable: false,
 				ordering: -1000,
 				options: [
-					...DISCLOSURE_TYPE_FILTERS.filter((disclosureType) =>
-						DISCLOSURE_TYPE_SUPPORTED_PROJECT_TYPES[disclosureType].some((projectType) =>
-							projectTypes.value.includes(projectType),
-						),
-					).map((disclosureType) => ({
-						id: disclosureType,
-						formatted_name: formatDisclosureTypeLabel(disclosureType),
-						icon: DISCLOSURE_TYPE_ICONS[disclosureType],
-						method: 'or' as const,
-						value: `disclosure_types:${disclosureType}`,
-					})),
+					...createDisclosureFilterOptions(formatMessage, projectTypes.value),
 					...excludeableProjectTypes.map((target) => ({
 						id: target,
 						formatted_name: formatMessage(getProjectTypeCategoryMessage(target)),

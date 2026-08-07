@@ -19,6 +19,7 @@ import { computed, watch } from 'vue'
 import {
 	AdvertisingDisclosureCard,
 	AiDisclosureCard,
+	ArchivedDisclosureCard,
 	DerivativeDisclosureCard,
 	type DisclosureFormIssue,
 	disclosuresToForm,
@@ -168,6 +169,11 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 			<SystemInteractionsDisclosureCard
 				v-model="current.systemInteractions"
 				:disabled="!hasPermission"
+			/>
+			<ArchivedDisclosureCard
+				v-model="current.archived"
+				:disabled="!hasPermission"
+				:project-title="project.title"
 			/>
 		</div>
 		<UnsavedChangesPopup

@@ -3971,9 +3971,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "Спершу завантажте версію, щоб обирати теґи!"
   },
-  "project.status.archived.message": {
-    "message": "«{title}» було архівовано. «{title}» не отримуватиме подальших оновлень допоки автор не вирішить розархівувати проєкт."
-  },
   "project.versions.copy-id-option": {
     "message": "Копіювати ID"
   },
