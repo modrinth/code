@@ -638,15 +638,6 @@
   "app.modal.install-to-play.report-image-too-large": {
     "message": "Dosya 1 MiB boyut sınırını aşıyor"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Uygunsuz"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Kötü niyetli"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-submitted": {
     "message": "Rapor sunuldu"
   },

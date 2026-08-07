@@ -3848,6 +3848,24 @@
   "report.item-type.version": {
     "defaultMessage": "version"
   },
+  "report.type.copyright": {
+    "defaultMessage": "Reuploaded work"
+  },
+  "report.type.inappropriate": {
+    "defaultMessage": "Inappropriate"
+  },
+  "report.type.malicious": {
+    "defaultMessage": "Malicious"
+  },
+  "report.type.missing-disclosure": {
+    "defaultMessage": "Missing or incorrect disclosure"
+  },
+  "report.type.name-squatting": {
+    "defaultMessage": "Name squatting"
+  },
+  "report.type.spam": {
+    "defaultMessage": "Spam"
+  },
   "s.bg": {
     "defaultMessage": "Background task running"
   },

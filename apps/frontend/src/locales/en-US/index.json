@@ -4304,6 +4304,12 @@
   "report.note.malicious.2": {
     "message": "Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted."
   },
+  "report.note.missing-disclosure.1": {
+    "message": "Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures."
+  },
+  "report.note.missing-disclosure.2": {
+    "message": "Check back later once the grace period has ended. Reports of this type are not being accepted at this time."
+  },
   "report.please-report": {
     "message": "Please report:"
   },
@@ -4321,6 +4327,9 @@
   },
   "report.report-item": {
     "message": "Report {title} to moderators"
+  },
+  "report.reported-for": {
+    "message": "Reported for {type}"
   },
   "report.submit": {
     "message": "Submit report"

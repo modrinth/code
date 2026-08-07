@@ -695,15 +695,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Какое правило нарушает данная сборка?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Неприемлемое содержимое"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Вредоносное содержимое"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Спам"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Сообщить об общем экземпляре"
   },

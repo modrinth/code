@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { capitalizeString } from '@modrinth/utils'
 
 import { defineMessage, defineMessages, type MessageDescriptor } from '../composables/i18n'
 
@@ -1013,6 +1014,43 @@ export function formatReportItemType(
 			? (type as keyof typeof reportItemTypeMessages)
 			: 'content'
 	return formatMessage(reportItemTypeMessages[key])
+}
+
+export const reportTypeMessages = defineMessages({
+	spam: {
+		id: 'report.type.spam',
+		defaultMessage: 'Spam',
+	},
+	copyright: {
+		id: 'report.type.copyright',
+		defaultMessage: 'Reuploaded work',
+	},
+	inappropriate: {
+		id: 'report.type.inappropriate',
+		defaultMessage: 'Inappropriate',
+	},
+	malicious: {
+		id: 'report.type.malicious',
+		defaultMessage: 'Malicious',
+	},
+	'name-squatting': {
+		id: 'report.type.name-squatting',
+		defaultMessage: 'Name squatting',
+	},
+	'missing-disclosure': {
+		id: 'report.type.missing-disclosure',
+		defaultMessage: 'Missing or incorrect disclosure',
+	},
+})
+
+export function formatReportType(formatMessage: FormatMessage, type: string | undefined): string {
+	if (!type) return ''
+
+	if (type in reportTypeMessages) {
+		return formatMessage(reportTypeMessages[type as keyof typeof reportTypeMessages])
+	}
+
+	return capitalizeString(type.replace('-', ' '))
 }
 
 export const fileItemTypeMessages = defineMessages({

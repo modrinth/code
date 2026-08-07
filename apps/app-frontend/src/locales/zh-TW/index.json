@@ -704,15 +704,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "這個實例違反了哪一條規則？"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "不當內容"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "惡意內容"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "垃圾內容"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "檢舉共用實例"
   },
