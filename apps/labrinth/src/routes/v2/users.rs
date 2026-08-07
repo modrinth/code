@@ -8,6 +8,8 @@ use crate::models::v2::projects::LegacyProject;
 use crate::models::v2::user::LegacyUser;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -53,7 +55,8 @@ pub async fn user_auth_get(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::user_auth_get(req, pool, redis, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)?;
+        .or_else(v2_reroute::flatten_404_error)
+        .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<User>(response).await {
@@ -96,7 +99,8 @@ pub async fn users_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<User>>(response).await {
@@ -136,7 +140,8 @@ pub async fn user_get(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::user_get(req, info, pool, redis, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)?;
+        .or_else(v2_reroute::flatten_404_error)
+        .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<User>(response).await {
@@ -181,13 +186,18 @@ pub async fn projects_list(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &**pool, &redis)
+                    .await
+                    .wrap_internal_err(
+                        "executing `LegacyProject::from_many`",
+                    )?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -448,13 +458,18 @@ pub async fn user_follows(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &**pool, &redis)
+                    .await
+                    .wrap_internal_err(
+                        "executing `LegacyProject::from_many`",
+                    )?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -494,7 +509,8 @@ pub async fn user_notifications(
     let response =
         v3::users::user_notifications(req, info, pool, redis, session_queue)
             .await
-            .or_else(v2_reroute::flatten_404_error)?;
+            .or_else(v2_reroute::flatten_404_error)
+            .wrap_api_err("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Notification>>(response).await {
         Ok(notifications) => {

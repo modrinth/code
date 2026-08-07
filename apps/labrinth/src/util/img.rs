@@ -4,6 +4,7 @@ use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 use color_thief::ColorFormat;
 use hex::ToHex;
 use image::imageops::FilterType;
@@ -54,10 +55,8 @@ pub async fn upload_image_optimized(
     file_host: &dyn FileHost,
 ) -> Result<UploadImageResult, ApiError> {
     let content_type = crate::util::ext::get_image_content_type(file_extension)
-        .ok_or_else(|| {
-            ApiError::InvalidInput(format!(
-                "Invalid format for image: {file_extension}"
-            ))
+        .wrap_request_err_with(|| {
+            format!("invalid format for image: {file_extension}")
         })?;
 
     let cdn_url = &ENV.CDN_URL;
@@ -68,8 +67,10 @@ pub async fn upload_image_optimized(
         content_type,
         target_width,
         min_aspect_ratio,
-    )?;
-    let color = get_color_from_img(&bytes)?;
+    )
+    .wrap_request_err("processing uploaded image")?;
+    let color = get_color_from_img(&bytes)
+        .wrap_request_err("extracting color from uploaded image")?;
 
     // Only upload the processed image if it's smaller than the original
     let processed_upload_data = if processed_image.len() < bytes.len() {
@@ -87,7 +88,8 @@ pub async fn upload_image_optimized(
                     publicity,
                     processed_image,
                 )
-                .await?,
+                .await
+                .wrap_internal_err("uploading file to file host")?,
         )
     } else {
         None
@@ -100,7 +102,8 @@ pub async fn upload_image_optimized(
             publicity,
             bytes,
         )
-        .await?;
+        .await
+        .wrap_internal_err("uploading file to file host")?;
 
     let url = format!("{}/{}", cdn_url, upload_data.file_name);
     Ok(UploadImageResult {
@@ -182,7 +185,10 @@ pub async fn delete_old_images(
         let name = image_url.split(&cdn_url_start).nth(1);
 
         if let Some(icon_path) = name {
-            file_host.delete_file(icon_path, publicity).await?;
+            file_host
+                .delete_file(icon_path, publicity)
+                .await
+                .wrap_internal_err("deleting file from file host")?;
         }
     }
 
@@ -190,7 +196,10 @@ pub async fn delete_old_images(
         let name = raw_image_url.split(&cdn_url_start).nth(1);
 
         if let Some(icon_path) = name {
-            file_host.delete_file(icon_path, publicity).await?;
+            file_host
+                .delete_file(icon_path, publicity)
+                .await
+                .wrap_internal_err("deleting file from file host")?;
         }
     }
 
@@ -208,7 +217,8 @@ pub async fn delete_unused_images(
 ) -> Result<(), ApiError> {
     let uploaded_images =
         database::models::DBImage::get_many_contexted(context, transaction)
-            .await?;
+            .await
+            .wrap_internal_err("fetching images from database")?;
 
     for image in uploaded_images {
         let mut should_delete = true;
@@ -220,8 +230,12 @@ pub async fn delete_unused_images(
         }
 
         if should_delete {
-            image_item::DBImage::remove(image.id, transaction, redis).await?;
-            image_item::DBImage::clear_cache(image.id, redis).await?;
+            image_item::DBImage::remove(image.id, transaction, redis)
+                .await
+                .wrap_internal_err("deleting image from database")?;
+            image_item::DBImage::clear_cache(image.id, redis)
+                .await
+                .wrap_internal_err("clearing cached data from Redis")?;
         }
     }
 
