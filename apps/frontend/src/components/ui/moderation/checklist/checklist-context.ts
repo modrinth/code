@@ -1,4 +1,4 @@
-import type { ActiveAction2, NodeState } from '@modrinth/moderation/src/types/node'
+import type { ActiveAction, NodeState } from '@modrinth/moderation/src/types/node'
 import type { InjectionKey, Ref } from 'vue'
 
 export interface LiveNode {
@@ -8,7 +8,7 @@ export interface LiveNode {
 	messageCount: number
 	fixCount: number
 	hasRequiredMissing: boolean
-	activeActions: ActiveAction2[]
+	activeActions: ActiveAction[]
 }
 
 export const STATE_KEY: InjectionKey<Ref<Record<string, Record<string, NodeState>>>> =

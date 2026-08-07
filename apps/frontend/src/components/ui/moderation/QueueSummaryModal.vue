@@ -91,12 +91,20 @@ defineExpose({ show, hide })
 				</ul>
 			</div>
 
-			<div v-if="completedEntries.length === 0 && skippedEntries.length === 0" class="text-secondary">
+			<div
+				v-if="completedEntries.length === 0 && skippedEntries.length === 0"
+				class="text-secondary"
+			>
 				No projects were reviewed during this queue.
 			</div>
 
 			<div class="flex justify-end gap-2">
-				<Button v-if="skippedEntries.length > 0" type="colored" color="orange" @click="reviewSkipped">
+				<Button
+					v-if="skippedEntries.length > 0"
+					type="colored"
+					color="orange"
+					@click="reviewSkipped"
+				>
 					<ScaleIcon />
 					Review skipped ({{ skippedEntries.length }})
 				</Button>

@@ -588,8 +588,7 @@ async function moderateAllInFilter() {
 async function startFromProject(projectId: string) {
 	const allFilteredProjectIds = await getFilteredProjectIds()
 	const projectIndex = allFilteredProjectIds.indexOf(projectId)
-	const projectIds =
-		projectIndex === -1 ? [projectId] : allFilteredProjectIds.slice(projectIndex)
+	const projectIds = projectIndex === -1 ? [projectId] : allFilteredProjectIds.slice(projectIndex)
 	await moderationQueue.setQueue(projectIds)
 
 	const targetProjectId = await findFirstEligibleProject()

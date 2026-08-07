@@ -292,17 +292,18 @@
 								v-if="!done"
 								label="More options"
 								:options="stageOptions"
-								placement="bottom-end">
-									<ListBulletedIcon />
-									<span class="sr-only">Stages</span>
-									<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
-										<component
-											:is="opt.icon"
-											v-if="opt.icon"
-											class="mr-2"
-											:class="{ 'opacity-50': opt.visited }"
-										/>
-										<span :class="{ 'opacity-50': opt.visited }">
+								placement="bottom-end"
+							>
+								<ListBulletedIcon />
+								<span class="sr-only">Stages</span>
+								<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
+									<component
+										:is="opt.icon"
+										v-if="opt.icon"
+										class="mr-2"
+										:class="{ 'opacity-50': opt.visited }"
+									/>
+									<span :class="{ 'opacity-50': opt.visited }">
 										{{ opt.text
 										}}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
 									</span>
@@ -426,7 +427,7 @@ import {
 	moderationSettings,
 	useStages,
 } from '@modrinth/moderation'
-import type { ActiveAction2, NodeState, StageNode } from '@modrinth/moderation/src/types/node'
+import type { ActiveAction, NodeState, StageNode } from '@modrinth/moderation/src/types/node'
 import {
 	CHECKLIST_META_KEY,
 	collectActiveActions,
@@ -668,9 +669,7 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 
 	// Quick re-check if close to expiry (last 5 seconds of TTL)
 	if (now - next.validatedAt > PREFETCH_STALE_MS - 5000) {
-		const recheckResults = await batchCheckQueueCandidates(client, moderationQueue, [
-			next.project,
-		])
+		const recheckResults = await batchCheckQueueCandidates(client, moderationQueue, [next.project])
 		const recheck = recheckResults.get(next.project)
 		if (!isEligibleQueueCandidate(recheck)) {
 			prefetchQueue.value.shift()
@@ -722,7 +721,7 @@ function markStageVisited(stageId: string | undefined) {
 
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
-const generatedActiveActions = ref<ActiveAction2[] | null>(null)
+const generatedActiveActions = ref<ActiveAction[] | null>(null)
 const resolvedMessageAvailability = ref<Map<object, boolean>>(new Map())
 const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
@@ -912,6 +911,7 @@ async function goToNextEligibleProject(candidateIds: string[]): Promise<boolean>
 	}
 
 	await Promise.all(next.excluded.map((id) => moderationQueue.excludeProject(id)))
+	notifySkippedQueueProjects(next.excluded.length)
 	navigateToQueueProject(next.result, next.project)
 	return true
 }
@@ -1134,7 +1134,11 @@ const router = useRouter()
 const route = useRoute()
 
 const projectUrlType = computed(() =>
-	getProjectTypeForUrlShorthand(projectV2.value.project_type, projectV2.value.loaders ?? [], tags.value),
+	getProjectTypeForUrlShorthand(
+		projectV2.value.project_type,
+		projectV2.value.loaders ?? [],
+		tags.value,
+	),
 )
 
 let lastSyncedStageTarget: string | null = null
@@ -1148,9 +1152,13 @@ function syncStageUrl(stage: StageNode | undefined) {
 	setTimeout(() => router.replace(target), 0)
 }
 
-watch(hasSettledInitialStage, (settled) => {
-	if (settled) syncStageUrl(currentStageObj.value)
-}, { immediate: true })
+watch(
+	hasSettledInitialStage,
+	(settled) => {
+		if (settled) syncStageUrl(currentStageObj.value)
+	},
+	{ immediate: true },
+)
 
 const stageNavigateTarget = computed(() => {
 	const navigate = currentStageObj.value?._navigate
@@ -1413,11 +1421,11 @@ function hasRequiredMissing(stage: StageNode): boolean {
 	return checklistLive.value.get(stage)?.hasRequiredMissing ?? false
 }
 
-function collectAllActiveActions(): ActiveAction2[] {
+function collectAllActiveActions(): ActiveAction[] {
 	return resolvedStages.value.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
-function byPriority(a: ActiveAction2, b: ActiveAction2): number {
+function byPriority(a: ActiveAction, b: ActiveAction): number {
 	return ((a.node as any)._priority as Priority).compareTo((b.node as any)._priority as Priority)
 }
 
@@ -1427,7 +1435,7 @@ async function assembleFullMessage() {
 
 	const consumed = new Set<object>()
 
-	const parts: { entry: ActiveAction2; content: string }[] = []
+	const parts: { entry: ActiveAction; content: string }[] = []
 	for (const entry of allEntries) {
 		if (consumed.has(entry.node)) continue
 		const content = await evalActiveAction(entry, allEntries, consumed)
@@ -1499,10 +1507,10 @@ const stageWriter: Writer = (id, value) => {
 	const stageId = currentStageObj.value.id
 	const existing = nodeStates.value[stageId]
 	const next: Record<string, NodeState> = existing ? { ...existing } : {}
-	if (value === undefined) delete next[id]
+	if (value === undefined) Reflect.deleteProperty(next, id)
 	else next[id] = value
 	if (Object.keys(next).length === 0) {
-		if (existing !== undefined) delete nodeStates.value[stageId]
+		if (existing !== undefined) Reflect.deleteProperty(nodeStates.value, stageId)
 	} else {
 		nodeStates.value[stageId] = next
 	}
