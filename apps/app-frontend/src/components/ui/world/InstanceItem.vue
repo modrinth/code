@@ -25,11 +25,10 @@ import {
 import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_project } from '@/helpers/cache'
 import { process_listener } from '@/helpers/events'
 import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
@@ -67,17 +66,6 @@ const messages = defineMessages({
 		defaultMessage: 'Never played',
 	},
 })
-
-const loadingModpack = ref(!!props.instance.link)
-
-const modpack = ref()
-
-if (props.instance.link) {
-	nextTick().then(async () => {
-		modpack.value = await get_project(props.instance.link?.project_id, 'must_revalidate')
-		loadingModpack.value = false
-	})
-}
 
 const instanceIcon = computed(() => props.instance.icon_path)
 
@@ -182,22 +170,7 @@ onUnmounted(() => {
 					</TagItem>
 				</div>
 				<div class="flex items-center gap-1.5 text-sm text-secondary">
-					<span v-if="modpack" class="flex items-center gap-1 truncate text-secondary">
-						<router-link
-							data-no-card-click
-							class="inline-flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
-							:to="`/project/${modpack.id}`"
-						>
-							<Avatar :src="modpack.icon_url" size="16px" class="shrink-0" no-shadow />
-							<span class="truncate">{{ modpack.title }}</span>
-						</router-link>
-						({{ loader }} {{ instance.game_version }})
-					</span>
-					<span v-else-if="loadingModpack" class="flex items-center gap-1 truncate text-secondary">
-						<SpinnerIcon class="animate-spin shrink-0" />
-						<span class="truncate">Loading modpack...</span>
-					</span>
-					<span v-else class="flex items-center gap-1 truncate text-secondary">
+					<span class="flex items-center gap-1 truncate text-secondary">
 						{{ loader }}
 						{{ instance.game_version }}
 					</span>
