@@ -1478,9 +1478,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Ostatnio zaktualizowane"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Zamknij"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Pobierz {formType}"
   },
@@ -2975,9 +2972,6 @@
   "modpack-scan-modal.delete-all-groups-confirmation.description": {
     "message": "Trwale usunie to wszystkie grupy atrybucji i wszystkie zawarte w nich pliki. Tej akcji nie można cofnąć."
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Wyczyść"
-  },
   "modpack-scan-modal.failed": {
     "message": "Błąd"
   },
@@ -3013,9 +3007,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Skanowanie..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Sukces"
   },
   "modpack-scan-modal.title": {
     "message": "Skanowanie paczki modów ({scanned}/{total} plików)"

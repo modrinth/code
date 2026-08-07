@@ -1856,9 +1856,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "一个新的标签页已打开，你需要在那里完成登录，然后回到Modrinth app。"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "取消"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "请在你的浏览器中继续"
   },

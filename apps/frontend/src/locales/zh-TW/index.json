@@ -1481,9 +1481,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "最近更新"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "關閉"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下載 {formType}"
   },
@@ -2984,9 +2981,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "無法清除所有群組：{error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "清除"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "已成功清除所有群組。"
   },
@@ -3025,9 +3019,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "正在掃描..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "成功"
   },
   "modpack-scan-modal.title": {
     "message": "模組包掃描（{scanned}/{total} 個檔案）"

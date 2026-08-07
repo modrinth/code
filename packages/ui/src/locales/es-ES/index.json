@@ -1187,9 +1187,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Archivo guardado"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Cerrar"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Encontrar"
   },

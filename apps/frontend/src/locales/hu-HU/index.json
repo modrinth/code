@@ -1415,9 +1415,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Nemrég frissített"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Bezárás"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Letöltés {formType}"
   },

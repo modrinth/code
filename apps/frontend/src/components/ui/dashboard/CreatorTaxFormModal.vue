@@ -133,7 +133,7 @@
 				</div>
 				<div class="flex w-full flex-row justify-stretch gap-2">
 					<Button class="w-full text-contrast" @click="handleClose">
-						{{ props.closeButtonText ?? formatMessage(messages.closeButton) }}
+						{{ props.closeButtonText ?? formatMessage(commonMessages.closeButton) }}
 					</Button>
 					<Button
 						type="colored"
@@ -266,10 +266,6 @@ const messages = defineMessages({
 	downloadButton: {
 		id: 'dashboard.creator-tax-form-modal.confirmation.download-button',
 		defaultMessage: 'Download {formType}',
-	},
-	closeButton: {
-		id: 'dashboard.creator-tax-form-modal.close-button',
-		defaultMessage: 'Close',
 	},
 	incompleteTitle: {
 		id: 'dashboard.creator-tax-form-modal.incomplete.title',

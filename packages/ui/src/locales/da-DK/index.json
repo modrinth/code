@@ -557,9 +557,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Fil gemt"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Luk"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Find"
   },
@@ -2253,4 +2250,3 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
-

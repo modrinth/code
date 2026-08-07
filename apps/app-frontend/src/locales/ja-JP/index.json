@@ -1853,9 +1853,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "サインイン用のタブが開きました。そちらでサインインを完了してから、アプリに戻ってください。"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "キャンセル"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "ブラウザで続行"
   },

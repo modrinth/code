@@ -1481,9 +1481,6 @@
   "minecraft-required.sign-in": {
     "message": "Iniciar sesión con Microsoft"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Cancelar"
-  },
   "modal.modrinth-account-required.header": {
     "message": "Cuenta requerida"
   },

@@ -1754,9 +1754,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "A nouvel onglet a été ouvert pour vous connecter. Finissez la connexion, puis retournez dans l'application."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Annuler"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Continuer dans votre navigateur"
   },
