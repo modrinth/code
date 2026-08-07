@@ -573,8 +573,8 @@ import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
-import { loadChecklistState } from '~/services/moderation-checklist-storage.ts'
-import { useModerationQueue } from '~/services/moderation-queue.ts'
+import { loadChecklistState } from '~/services/moderation/checklist-storage.ts'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -1106,7 +1106,7 @@ const { data: thread } = useQuery({
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
 
-// Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
+// Jank modpack loaders fix
 const versionsRaw = computed(() => {
 	return (versionsV3.value ?? []).map((version) => {
 		const files = Array.isArray(version.files) ? version.files : []
@@ -1893,23 +1893,11 @@ function setModerationChecklistOpen(open) {
 	showModerationChecklist.value = open
 }
 
-function isProjectInActiveModerationQueue(projectId = project.value?.id) {
-	return (
-		!!projectId &&
-		moderationQueue.isQueueMode &&
-		moderationQueue.currentQueue.items.includes(projectId)
-	)
-}
-
 async function openModerationChecklistFromMenu() {
 	const projectId = project.value?.id
 	if (!projectId) return
 
 	await moderationQueue.ready
-	if (!isProjectInActiveModerationQueue(projectId)) {
-		await moderationQueue.setSingleProject(projectId)
-	}
-
 	setModerationChecklistOpen(true)
 }
 

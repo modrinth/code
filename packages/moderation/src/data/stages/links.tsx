@@ -3,15 +3,15 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import { group, md, mdOptional, stage, toggle } from '../../types/node'
-import type { ChildEntry, GroupNodeBuilder } from '../../types/node'
 import { promptSourceRequired } from '../..'
+import type { ChildEntry, GroupNode } from '../../types/node'
+import { group, md, mdOptional, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 	const linkNames: Record<string, string> = {}
 
-	type LinkSectionBuilder = GroupNodeBuilder & {
+	type LinkSectionBuilder = GroupNode & {
 		children(...extras: ChildEntry[]): LinkSectionBuilder
 		label(badge: Ref<boolean>): LinkSectionBuilder
 	}
@@ -75,7 +75,6 @@ export default function () {
 		.navigate('/settings/links')
 		.shown(computed(() => Object.keys(project.value.link_urls).length > 0))
 		.suggestedStatus('flagged')
-		.severity('low')
 		.rawMessage(async (state) => {
 			const sections = Object.entries(state).filter(
 				([, s]) => s && typeof s === 'object' && !(s instanceof Set),

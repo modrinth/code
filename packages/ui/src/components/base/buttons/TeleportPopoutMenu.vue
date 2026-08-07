@@ -128,7 +128,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 				v-if="isOpen"
 				:id="panelId"
 				ref="panelElement"
-				class="fixed isolate z-[9999] rounded-[14px] bg-surface-3 p-4 text-primary shadow-lg ring-1 ring-surface-5"
+				class="fixed isolate z-[9999] overflow-y-auto rounded-[14px] bg-surface-3 p-4 text-primary shadow-lg ring-1 ring-surface-5"
 				:style="panelStyle"
 				:role="props.panelRole"
 				:aria-label="props.label"

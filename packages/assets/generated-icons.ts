@@ -182,6 +182,7 @@ import _LogInIcon from './icons/log-in.svg?component'
 import _LogOutIcon from './icons/log-out.svg?component'
 import _MailIcon from './icons/mail.svg?component'
 import _ManageIcon from './icons/manage.svg?component'
+import _MapPinIcon from './icons/map-pin.svg?component'
 import _MaximizeIcon from './icons/maximize.svg?component'
 import _MemoryStickIcon from './icons/memory-stick.svg?component'
 import _MessageIcon from './icons/message.svg?component'
@@ -614,6 +615,7 @@ export const LogInIcon = _LogInIcon
 export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon
 export const ManageIcon = _ManageIcon
+export const MapPinIcon = _MapPinIcon
 export const MaximizeIcon = _MaximizeIcon
 export const MemoryStickIcon = _MemoryStickIcon
 export const MessageIcon = _MessageIcon

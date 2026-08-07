@@ -37,14 +37,14 @@ export const setting = {
 	asString: (data: StringSettingDefinition) => data,
 }
 
-export function isValidFor(definitionBase: SettingDefinitionBase<any>, value: any): boolean {
+export function isValidFor(
+	definitionBase: SettingDefinitionBase<unknown>,
+	value: unknown,
+): boolean {
 	if (value != null) {
 		// Tried my best with type safety but sadly having the `SettingDefinitions` as the type leads to issues handling types else where...
 		const definition = definitionBase as SettingDefinitions
-		if (
-			definition.type == 'enum' &&
-			definition.entries.map((entry) => entry.value).includes(value)
-		) {
+		if (definition.type == 'enum' && definition.entries.some((entry) => entry.value === value)) {
 			return true
 		} else if (definition.type == 'toggle' && typeof value === 'boolean') {
 			return true
