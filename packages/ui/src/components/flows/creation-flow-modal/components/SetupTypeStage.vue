@@ -63,7 +63,7 @@
 					@click="browseModpacks"
 				/>
 				<BigOptionButton
-					:icon="ImportIcon"
+					:icon="UploadIcon"
 					:title="formatMessage(messages.uploadModpackTitle)"
 					:description="formatMessage(messages.uploadModpackDescription)"
 					@click="triggerFileInput"
@@ -86,7 +86,7 @@
 					@click="browseModpacks"
 				/>
 				<BigOptionButton
-					:icon="ImportIcon"
+					:icon="UploadIcon"
 					:title="formatMessage(messages.uploadModpackTitle)"
 					:description="formatMessage(messages.uploadModpackDescription)"
 					@click="triggerFileInput"
@@ -117,6 +117,7 @@ import {
 	DownloadIcon,
 	ImportIcon,
 	RightArrowIcon,
+	UploadIcon,
 } from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
