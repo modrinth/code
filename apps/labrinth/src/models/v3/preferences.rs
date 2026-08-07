@@ -2,7 +2,7 @@ use partially::Partial;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, ToSchema, Partial, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Partial, Default)]
 #[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct UserPreferences {
     pub appearance: AppearancePreferences,
@@ -12,13 +12,13 @@ pub struct UserPreferences {
     pub social: SocialPreferences,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Partial, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Partial, Default)]
 #[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct AppearancePreferences {
     pub theme: Theme
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
 pub enum Theme {
     Light,
     #[default]
@@ -27,7 +27,7 @@ pub enum Theme {
     Retro,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Partial)]
 #[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct LocalizationPreferences {
     pub locale: String
@@ -41,7 +41,7 @@ impl Default for LocalizationPreferences {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Partial)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Partial)]
 #[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct LayoutPreferences {
     pub mods: LayoutOption,
@@ -69,26 +69,26 @@ impl Default for LayoutPreferences {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub enum LayoutOption {
     Grid, Rows
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Partial, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Partial, Default)]
 #[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct SidebarPreferences {
     pub right_aligned_search: bool,
     pub left_aligned_content: bool,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Partial, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Partial, Default)]
 #[partially(skip_attributes, derive(Deserialize, ToSchema))]
 pub struct SocialPreferences {
     pub friend_privacy: FriendPrivacy,
     pub shared_instances_privacy: SharedInstancesPrivacy
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
 pub enum FriendPrivacy {
     None,
     Mutual,
@@ -96,7 +96,7 @@ pub enum FriendPrivacy {
     Everyone,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
 pub enum SharedInstancesPrivacy {
     None,
     Friends,
