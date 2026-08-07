@@ -48,10 +48,10 @@ pub async fn fetch_playtimes(
         .bind(end_date.timestamp())
         .bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
 
-    Ok(query
+    query
         .fetch_all()
         .await
-        .wrap_internal_err("querying database for `fetch_playtimes`")?)
+        .wrap_internal_err("querying database for `fetch_playtimes`")
 }
 
 // Fetches views as a Vec of ReturnViews
@@ -81,10 +81,10 @@ pub async fn fetch_views(
         .bind(end_date.timestamp())
         .bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
 
-    Ok(query
+    query
         .fetch_all()
         .await
-        .wrap_internal_err("querying database for `fetch_views`")?)
+        .wrap_internal_err("querying database for `fetch_views`")
 }
 
 // Fetches downloads as a Vec of ReturnDownloads
@@ -113,10 +113,10 @@ pub async fn fetch_downloads(
         .bind(end_date.timestamp())
         .bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
 
-    Ok(query
+    query
         .fetch_all()
         .await
-        .wrap_internal_err("querying database for `fetch_downloads`")?)
+        .wrap_internal_err("querying database for `fetch_downloads`")
 }
 
 pub async fn fetch_countries_downloads(
@@ -143,9 +143,10 @@ pub async fn fetch_countries_downloads(
         .bind(end_date.timestamp())
         .bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
 
-    Ok(query.fetch_all().await.wrap_internal_err(
-        "querying database for `fetch_countries_downloads`",
-    )?)
+    query
+        .fetch_all()
+        .await
+        .wrap_internal_err("querying database for `fetch_countries_downloads`")
 }
 
 pub async fn fetch_countries_views(
@@ -172,8 +173,8 @@ pub async fn fetch_countries_views(
         .bind(end_date.timestamp())
         .bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
 
-    Ok(query
+    query
         .fetch_all()
         .await
-        .wrap_internal_err("querying database for `fetch_countries_views`")?)
+        .wrap_internal_err("querying database for `fetch_countries_views`")
 }

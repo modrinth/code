@@ -345,8 +345,8 @@ impl PayoutsQueue {
             )));
         }
 
-        Ok(serde_json::from_value(value)
-            .wrap_request_err("deserializing JSON data")?)
+        serde_json::from_value(value)
+            .wrap_request_err("deserializing JSON data")
     }
 
     pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
@@ -414,8 +414,8 @@ impl PayoutsQueue {
             )));
         }
 
-        Ok(serde_json::from_value(value)
-            .wrap_request_err("deserializing JSON data")?)
+        serde_json::from_value(value)
+            .wrap_request_err("deserializing JSON data")
     }
 
     pub async fn get_payout_methods(
