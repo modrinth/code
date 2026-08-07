@@ -55,9 +55,7 @@ export function useAnchoredTeleport(
 
 			resolvedSide.value = opensRight ? 'right' : 'left'
 			idealTop = alignsEnd ? triggerRect.bottom - panelHeight : triggerRect.top
-			idealLeft = opensRight
-				? triggerRect.right + offset
-				: triggerRect.left - panelWidth - offset
+			idealLeft = opensRight ? triggerRect.right + offset : triggerRect.left - panelWidth - offset
 		} else {
 			const prefersTop = placement.value.startsWith('top')
 			const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding
