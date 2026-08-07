@@ -779,9 +779,6 @@
   "app.nav.home": {
     "message": "Kezdőlap"
   },
-  "app.nav.library": {
-    "message": "Könyvtár"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth fiók"
   },

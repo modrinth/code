@@ -779,9 +779,6 @@
   "app.nav.home": {
     "message": "首頁"
   },
-  "app.nav.library": {
-    "message": "遊戲庫"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth 帳號"
   },

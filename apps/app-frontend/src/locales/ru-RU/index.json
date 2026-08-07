@@ -770,9 +770,6 @@
   "app.nav.home": {
     "message": "Главная"
   },
-  "app.nav.library": {
-    "message": "Библиотека"
-  },
   "app.nav.modrinth-account": {
     "message": "Аккаунт Modrinth"
   },

@@ -10,7 +10,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Accordion,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
@@ -526,18 +526,14 @@ onMounted(startInstanceGridResizeObserver)
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button type="button" @click="confirmDeleteGroupModal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button type="button" :disabled="deletingGroup" @click="removeGroup">
-						<TrashIcon />
-						{{ formatMessage(messages.deleteGroup) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="confirmDeleteGroupModal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red" :disabled="deletingGroup" @click="removeGroup">
+					<TrashIcon />
+					{{ formatMessage(messages.deleteGroup) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>

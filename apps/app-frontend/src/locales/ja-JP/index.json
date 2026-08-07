@@ -776,9 +776,6 @@
   "app.nav.home": {
     "message": "ホーム"
   },
-  "app.nav.library": {
-    "message": "ライブラリ"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinthアカウント"
   },

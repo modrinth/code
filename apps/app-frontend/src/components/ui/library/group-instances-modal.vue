@@ -51,35 +51,32 @@
 						/>
 						<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
 					</div>
-					<ButtonStyled :type="selectedGroupInstanceIds.has(instance.id) ? 'outlined' : 'standard'">
-						<button type="button" @click="toggleGroupInstance(instance.id)">
-							<CheckIcon v-if="selectedGroupInstanceIds.has(instance.id)" />
-							{{
-								formatMessage(
-									selectedGroupInstanceIds.has(instance.id) ? messages.added : messages.add,
-								)
-							}}
-						</button>
-					</ButtonStyled>
+					<Button
+						:type="selectedGroupInstanceIds.has(instance.id) ? 'outlined' : 'base'"
+						@click="toggleGroupInstance(instance.id)"
+					>
+						<CheckIcon v-if="selectedGroupInstanceIds.has(instance.id)" />
+						{{
+							formatMessage(
+								selectedGroupInstanceIds.has(instance.id) ? messages.added : messages.add,
+							)
+						}}
+					</Button>
 				</div>
 			</div>
 		</div>
 
 		<template #actions>
 			<div class="flex items-center justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button type="button" @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button type="button" :disabled="savingGroupInstances" @click="save">
-						<SpinnerIcon v-if="savingGroupInstances" class="animate-spin" />
-						<CheckIcon v-else />
-						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="savingGroupInstances" @click="save">
+					<SpinnerIcon v-if="savingGroupInstances" class="animate-spin" />
+					<CheckIcon v-else />
+					{{ formatMessage(commonMessages.saveChangesButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -89,7 +86,7 @@
 import { CheckIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	NewModal,

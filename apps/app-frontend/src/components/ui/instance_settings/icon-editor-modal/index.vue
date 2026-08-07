@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, InfoIcon, RefreshCwIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
@@ -243,12 +243,10 @@ const messages = defineMessages({
 					</div>
 				</div>
 
-				<ButtonStyled class="w-full">
-					<button class="w-full !shadow-none" @click="surpriseMe">
-						<RefreshCwIcon />
-						{{ formatMessage(messages.surpriseMe) }}
-					</button>
-				</ButtonStyled>
+				<Button class="w-full !shadow-none" @click="surpriseMe">
+					<RefreshCwIcon />
+					{{ formatMessage(messages.surpriseMe) }}
+				</Button>
 
 				<div v-if="visibleRecentRecipes.length" class="flex flex-col gap-2.5">
 					<span class="font-semibold text-contrast">{{ formatMessage(messages.recents) }}</span>
@@ -337,19 +335,15 @@ const messages = defineMessages({
 					<span>{{ formatMessage(messages.description) }}</span>
 				</div>
 				<div class="flex shrink-0 items-center gap-2">
-					<ButtonStyled>
-						<button :disabled="saving" @click="hide">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="saving" @click="saveIcon">
-							<SpinnerIcon v-if="saving" class="animate-spin" />
-							<SaveIcon v-else />
-							{{ formatMessage(messages.saveIcon) }}
-						</button>
-					</ButtonStyled>
+					<Button :disabled="saving" @click="hide">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" :disabled="saving" @click="saveIcon">
+						<SpinnerIcon v-if="saving" class="animate-spin" />
+						<SaveIcon v-else />
+						{{ formatMessage(messages.saveIcon) }}
+					</Button>
 				</div>
 			</div>
 		</template>

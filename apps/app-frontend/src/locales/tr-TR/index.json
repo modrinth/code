@@ -695,9 +695,6 @@
   "app.nav.home": {
     "message": "Ana Sayfa"
   },
-  "app.nav.library": {
-    "message": "Kütüphane"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth hesabı"
   },

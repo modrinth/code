@@ -779,9 +779,6 @@
   "app.nav.home": {
     "message": "首页"
   },
-  "app.nav.library": {
-    "message": "库"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth账户"
   },

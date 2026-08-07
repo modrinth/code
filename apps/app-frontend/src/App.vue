@@ -13,8 +13,7 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	CompassIcon,
-	HomeIcon,
-	LibraryIcon,
+	PlayIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -446,10 +445,6 @@ const messages = defineMessages({
 	home: {
 		id: 'app.nav.home',
 		defaultMessage: 'Home',
-	},
-	library: {
-		id: 'app.nav.library',
-		defaultMessage: 'Library',
 	},
 	modrinthHosting: {
 		id: 'app.nav.modrinth-hosting',
@@ -1603,8 +1598,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.25rem] w-[--left-bar-width]"
 		>
-			<NavButton v-tooltip.right="formatMessage(messages.home)" to="/">
-				<HomeIcon />
+			<NavButton
+				v-tooltip.right="formatMessage(messages.home)"
+				to="/"
+				:is-primary="(route) => route.path === '/'"
+				:is-subpage="
+					() =>
+						(route.path.startsWith('/browse') || route.path.startsWith('/project')) && route.query.i
+				"
+			>
+				<PlayIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.discoverContentLabel)"
@@ -1618,19 +1621,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
 				<ShirtIcon />
-			</NavButton>
-			<NavButton
-				v-tooltip.right="formatMessage(messages.library)"
-				to="/library"
-				:is-primary="(r) => r.path === '/library'"
-				:is-subpage="
-					() =>
-						route.path.startsWith('/instance') ||
-						((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
-							route.query.i)
-				"
-			>
-				<LibraryIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(messages.modrinthHosting)"

@@ -869,9 +869,6 @@
   "app.nav.home": {
     "message": "Home"
   },
-  "app.nav.library": {
-    "message": "Library"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth account"
   },

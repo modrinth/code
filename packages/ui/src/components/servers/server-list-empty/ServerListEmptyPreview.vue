@@ -20,12 +20,10 @@
 					<SearchIcon class="size-4 shrink-0" />
 					<span class="truncate">{{ formatMessage(messages.searchPlaceholder) }}</span>
 				</div>
-				<ButtonStyled color="brand">
-					<button type="button" class="!cursor-default">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.addButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" class="!cursor-default">
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.addButton) }}
+				</Button>
 			</div>
 
 			<div class="bg-surface-1 px-4 py-3">
@@ -49,15 +47,14 @@
 						</div>
 						<span class="truncate text-base font-medium text-primary">{{ friend.username }}</span>
 					</div>
-					<ButtonStyled
-						:type="friend.status === 'cancel' ? 'outlined' : 'standard'"
-						:color-fill="friend.status === 'cancel' ? 'auto' : 'none'"
+					<Button
+						:type="friend.status === 'cancel' ? 'outlined' : 'base'"
+						class="!cursor-default"
+						disabled
 					>
-						<button type="button" class="!cursor-default" disabled>
-							<CheckIcon v-if="friend.status === 'added'" aria-hidden="true" />
-							{{ friendStatusLabel(friend.status) }}
-						</button>
-					</ButtonStyled>
+						<CheckIcon v-if="friend.status === 'added'" aria-hidden="true" />
+						{{ friendStatusLabel(friend.status) }}
+					</Button>
 				</div>
 			</div>
 
@@ -107,16 +104,12 @@
 					<XIcon class="size-5 shrink-0 text-secondary" />
 				</div>
 				<div class="mt-2.5 flex gap-2">
-					<ButtonStyled color="brand">
-						<button type="button" class="!cursor-default">
-							{{ formatMessage(messages.acceptButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined">
-						<button type="button" class="!cursor-default">
-							{{ formatMessage(messages.declineButton) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" class="!cursor-default">
+						{{ formatMessage(messages.acceptButton) }}
+					</Button>
+					<Button type="outlined" class="!cursor-default">
+						{{ formatMessage(messages.declineButton) }}
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -144,7 +137,7 @@ import prospectorAvatar from '#ui/assets/servers/server-list-empty/prospector.pn
 import sayaAvatar from '#ui/assets/servers/server-list-empty/saya.png'
 import trumanAvatar from '#ui/assets/servers/server-list-empty/truman.png'
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 

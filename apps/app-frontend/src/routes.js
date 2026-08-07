@@ -3,7 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
 import * as Hosting from '@/pages/hosting/manage'
 import * as Instance from '@/pages/instance'
-import * as Library from '@/pages/library'
 import * as Project from '@/pages/project'
 
 /**
@@ -68,11 +67,6 @@ export default new createRouter({
 			path: '/user/:user/:projectType?',
 			name: 'User',
 			component: Pages.User,
-		},
-		{
-			path: '/library',
-			name: 'Library',
-			component: Library.Index,
 		},
 		{
 			path: '/:projectType(mod|plugin|datapack|resourcepack|shader|modpack)/:id/:rest(.*)*',

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowDownIcon, ArrowUpIcon, EditIcon, SquarePlusIcon, TrashIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
+import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 
 defineProps<{
 	deleting?: boolean
@@ -43,63 +43,53 @@ const messages = defineMessages({
 	<div
 		class="instance-group-reorder-ignore flex shrink-0 items-center opacity-0 transition-opacity duration-250 group-hover/header:opacity-100 focus-within:opacity-100"
 	>
-		<ButtonStyled circular type="transparent" size="standard">
-			<button
-				v-tooltip="formatMessage(messages.moveGroupUp)"
-				class="!size-8 !min-w-8"
-				type="button"
-				:aria-label="formatMessage(messages.moveGroupUp)"
-				:disabled="!canMoveUp"
-				@click.stop="onMoveUp"
-			>
-				<ArrowUpIcon class="!min-w-4 !min-h-4 !size-4" />
-			</button>
-		</ButtonStyled>
-		<ButtonStyled circular type="transparent" size="standard">
-			<button
-				v-tooltip="formatMessage(messages.moveGroupDown)"
-				class="!size-8 !min-w-8"
-				type="button"
-				:aria-label="formatMessage(messages.moveGroupDown)"
-				:disabled="!canMoveDown"
-				@click.stop="onMoveDown"
-			>
-				<ArrowDownIcon class="!min-w-4 !min-h-4 !size-4" />
-			</button>
-		</ButtonStyled>
-		<ButtonStyled circular type="transparent" size="standard">
-			<button
-				v-tooltip="formatMessage(messages.editGroupName)"
-				class="!size-8 !min-w-8"
-				type="button"
-				:aria-label="formatMessage(messages.editGroupName)"
-				@click.stop="onEditGroupName"
-			>
-				<EditIcon class="!min-w-4 !min-h-4 !size-4" />
-			</button>
-		</ButtonStyled>
-		<ButtonStyled circular type="transparent" size="standard">
-			<button
-				v-tooltip="formatMessage(messages.addToGroup)"
-				class="!size-8 !min-w-8"
-				type="button"
-				:aria-label="formatMessage(messages.addToGroup)"
-				@click.stop="onAddToGroup"
-			>
-				<SquarePlusIcon class="!min-w-4 !min-h-4 !size-4" />
-			</button>
-		</ButtonStyled>
-		<ButtonStyled circular type="transparent" size="standard">
-			<button
-				v-tooltip="formatMessage(messages.deleteGroup)"
-				class="!size-8 !min-w-8"
-				type="button"
-				:aria-label="formatMessage(messages.deleteGroup)"
-				:disabled="deleting"
-				@click.stop="onDeleteGroup"
-			>
-				<TrashIcon class="!min-w-4 !min-h-4 !size-4" />
-			</button>
-		</ButtonStyled>
+		<IconButton
+			v-tooltip="formatMessage(messages.moveGroupUp)"
+			:label="formatMessage(messages.moveGroupUp)"
+			type="quiet"
+			size="sm"
+			:disabled="!canMoveUp"
+			@click.stop="onMoveUp"
+		>
+			<ArrowUpIcon />
+		</IconButton>
+		<IconButton
+			v-tooltip="formatMessage(messages.moveGroupDown)"
+			:label="formatMessage(messages.moveGroupDown)"
+			type="quiet"
+			size="sm"
+			:disabled="!canMoveDown"
+			@click.stop="onMoveDown"
+		>
+			<ArrowDownIcon />
+		</IconButton>
+		<IconButton
+			v-tooltip="formatMessage(messages.editGroupName)"
+			:label="formatMessage(messages.editGroupName)"
+			type="quiet"
+			size="sm"
+			@click.stop="onEditGroupName"
+		>
+			<EditIcon />
+		</IconButton>
+		<IconButton
+			v-tooltip="formatMessage(messages.addToGroup)"
+			:label="formatMessage(messages.addToGroup)"
+			type="quiet"
+			size="sm"
+			@click.stop="onAddToGroup"
+		>
+			<SquarePlusIcon />
+		</IconButton>
+		<IconButton
+			v-tooltip="formatMessage(messages.deleteGroup)"
+			:label="formatMessage(messages.deleteGroup)"
+			type="quiet"
+			size="sm"
+			:disabled="deleting"
+			@click.stop="onDeleteGroup"
+		>
+			<TrashIcon />
+		</IconButton>
 	</div>
 </template>

@@ -9,42 +9,46 @@
 				{{ formatMessage(messages.selectedCount, { count: selectedLibraryInstances.size }) }}
 			</span>
 			<div class="mx-1 h-6 w-px bg-surface-5" />
-			<ButtonStyled type="transparent">
-				<button
-					class="!text-primary"
-					type="button"
-					:disabled="busy"
-					@click="clearLibraryInstanceSelection"
-				>
-					<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
-				</button>
-			</ButtonStyled>
+			<Button
+				type="quiet"
+				class="!text-primary"
+				:disabled="busy"
+				@click="clearLibraryInstanceSelection"
+			>
+				<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+			</Button>
 		</div>
 		<div class="ml-auto flex items-center gap-0.5">
-			<ButtonStyled v-if="displayState.group === 'Group'" type="transparent">
-				<button type="button" :disabled="busy" @click="createGroupFromSelection">
-					<SquarePlusIcon />
-					<span class="bar-label">{{ formatMessage(messages.newGroup) }}</span>
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-if="selectedGroupedInstances.length > 0" type="transparent">
-				<button type="button" :disabled="busy" @click="removeSelectedInstancesFromGroups">
-					<MinusIcon />
-					<span class="bar-label">{{ formatMessage(messages.removeFromGroup) }}</span>
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="displayState.group === 'Group'"
+				type="quiet"
+				:disabled="busy"
+				@click="createGroupFromSelection"
+			>
+				<SquarePlusIcon />
+				<span class="bar-label">{{ formatMessage(messages.newGroup) }}</span>
+			</Button>
+			<Button
+				v-if="selectedGroupedInstances.length > 0"
+				type="quiet"
+				:disabled="busy"
+				@click="removeSelectedInstancesFromGroups"
+			>
+				<MinusIcon />
+				<span class="bar-label">{{ formatMessage(messages.removeFromGroup) }}</span>
+			</Button>
 			<div class="mx-1 h-6 w-px bg-surface-5" />
-			<ButtonStyled type="transparent" color="red" color-fill="text" hover-color-fill="background">
-				<button
-					v-tooltip="deleting ? formatMessage(messages.deleting) : undefined"
-					type="button"
-					:disabled="busy"
-					@click="confirmDeleteModal?.show()"
-				>
-					<TrashIcon />
-					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-				</button>
-			</ButtonStyled>
+			<Button
+				v-tooltip="deleting ? formatMessage(messages.deleting) : undefined"
+				type="quiet"
+				color="red"
+				interaction="filled"
+				:disabled="busy"
+				@click="confirmDeleteModal?.show()"
+			>
+				<TrashIcon />
+				<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+			</Button>
 		</div>
 	</FloatingActionBar>
 	<ConfirmDeleteInstanceModal
@@ -58,7 +62,7 @@
 <script setup lang="ts">
 import { MinusIcon, SquarePlusIcon, TrashIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	FloatingActionBar,

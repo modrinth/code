@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PlusIcon, SearchIcon, SquarePlusIcon } from '@modrinth/assets'
-import { ButtonStyled, StyledInput } from '@modrinth/ui'
+import { Button, StyledInput } from '@modrinth/ui'
 import { computed, inject } from 'vue'
 
 import FilterMenu from '@/components/ui/library/library-toolbar/filter-menu.vue'
@@ -31,18 +31,14 @@ function openNewGroup() {
 				clearable
 				wrapper-class="min-w-[16rem] flex-1"
 			/>
-			<ButtonStyled>
-				<button type="button" @click="openNewGroup">
-					<SquarePlusIcon />
-					New group
-				</button>
-			</ButtonStyled>
-			<ButtonStyled color="brand">
-				<button type="button" @click="showCreationModal?.()">
-					<PlusIcon />
-					New instance
-				</button>
-			</ButtonStyled>
+			<Button @click="openNewGroup">
+				<SquarePlusIcon />
+				New group
+			</Button>
+			<Button type="colored" color="brand" @click="showCreationModal?.()">
+				<PlusIcon />
+				New instance
+			</Button>
 		</div>
 		<div class="flex flex-wrap items-center gap-2">
 			<SortMenu />

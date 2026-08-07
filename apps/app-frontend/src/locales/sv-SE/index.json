@@ -752,9 +752,6 @@
   "app.nav.home": {
     "message": "Hem"
   },
-  "app.nav.library": {
-    "message": "Bibliotek"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth-konto"
   },

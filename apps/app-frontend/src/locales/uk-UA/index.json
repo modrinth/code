@@ -776,9 +776,6 @@
   "app.nav.home": {
     "message": "Головна"
   },
-  "app.nav.library": {
-    "message": "Бібліотека"
-  },
   "app.nav.modrinth-account": {
     "message": "Обліковий запис Modrinth"
   },

@@ -64,33 +64,28 @@
 							</TagItem>
 						</div>
 					</div>
-					<ButtonStyled
-						:type="selectedNewGroupInstanceIds.has(instance.id) ? 'outlined' : 'standard'"
+					<Button
+						:type="selectedNewGroupInstanceIds.has(instance.id) ? 'outlined' : 'base'"
+						@click="toggleNewGroupInstance(instance.id)"
 					>
-						<button @click="toggleNewGroupInstance(instance.id)">
-							<CheckIcon v-if="selectedNewGroupInstanceIds.has(instance.id)" />
-							{{ selectedNewGroupInstanceIds.has(instance.id) ? 'Added' : 'Add' }}
-						</button>
-					</ButtonStyled>
+						<CheckIcon v-if="selectedNewGroupInstanceIds.has(instance.id)" />
+						{{ selectedNewGroupInstanceIds.has(instance.id) ? 'Added' : 'Add' }}
+					</Button>
 				</div>
 			</div>
 		</div>
 
 		<template #actions>
 			<div class="flex items-center justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!canCreateGroup" @click="handleCreateGroup">
-						<SpinnerIcon v-if="creatingGroup" class="animate-spin" />
-						<PlusIcon v-else />
-						Create group
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button type="colored" color="brand" :disabled="!canCreateGroup" @click="handleCreateGroup">
+					<SpinnerIcon v-if="creatingGroup" class="animate-spin" />
+					<PlusIcon v-else />
+					Create group
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -98,7 +93,7 @@
 
 <script setup lang="ts">
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, NewModal, StyledInput, TagItem } from '@modrinth/ui'
+import { Avatar, Button, NewModal, StyledInput, TagItem } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { IconButton, injectNotificationManager } from '@modrinth/ui'
 import { useEventListener, useMagicKeys } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -265,50 +265,49 @@ onUnmounted(() => {
 		<template #leading>
 			<div class="relative flex size-12 shrink-0 items-center justify-center">
 				<div class="absolute inset-0 flex items-center justify-center">
-					<ButtonStyled v-if="playing" color="red" size="large" circular>
-						<button
-							v-tooltip="'Stop'"
-							@click="(e) => stop(e, 'InstanceCard')"
-							@mouseenter="checkProcess"
-						>
-							<StopCircleIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-if="playing"
+						v-tooltip="'Stop'"
+						label="Stop"
+						type="colored"
+						color="red"
+						size="lg"
+						@click="(e) => stop(e, 'InstanceCard')"
+						@mouseenter="checkProcess"
+					>
+						<StopCircleIcon />
+					</IconButton>
 					<SpinnerIcon
 						v-else-if="modLoading || installing"
 						v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
 						class="size-8 animate-spin"
 						tabindex="-1"
 					/>
-					<ButtonStyled
+					<IconButton
 						v-else-if="!isLibraryInstanceSelectionActive && !installed && !instance.quarantined"
+						v-tooltip="'Repair'"
+						label="Repair"
+						type="colored"
 						color="brand"
-						size="large"
-						circular
+						size="lg"
+						class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+						@click="(e) => repair(e)"
 					>
-						<button
-							v-tooltip="'Repair'"
-							class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
-							@click="(e) => repair(e)"
-						>
-							<DownloadIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled
+						<DownloadIcon />
+					</IconButton>
+					<IconButton
 						v-else-if="!isLibraryInstanceSelectionActive && !instance.quarantined"
+						v-tooltip="'Play'"
+						label="Play"
+						type="colored"
 						color="brand"
-						size="large"
-						circular
+						size="lg"
+						class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+						@click="(e) => play(e, 'InstanceCard')"
+						@mouseenter="checkProcess"
 					>
-						<button
-							v-tooltip="'Play'"
-							class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
-							@click="(e) => play(e, 'InstanceCard')"
-							@mouseenter="checkProcess"
-						>
-							<PlayIcon class="translate-x-px" />
-						</button>
-					</ButtonStyled>
+						<PlayIcon class="translate-x-px" />
+					</IconButton>
 				</div>
 			</div>
 		</template>

@@ -776,9 +776,6 @@
   "app.nav.home": {
     "message": "홈"
   },
-  "app.nav.library": {
-    "message": "라이브러리"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth 계정"
   },

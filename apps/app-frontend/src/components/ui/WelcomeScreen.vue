@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ImportIcon, PlusIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import frog from '@modrinth/ui/src/assets/welcome/frog.png'
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
@@ -75,12 +75,17 @@ onUnmounted(() => {
 					<p class="m-0 text-center text-base leading-6 text-primary">Ready to start playing?</p>
 				</div>
 				<div class="flex w-72 flex-col items-center gap-4">
-					<ButtonStyled color="brand" size="large">
-						<button class="!shadow-none" :disabled="offline" @click="showCreationModal?.()">
-							<PlusIcon />
-							Create an instance
-						</button>
-					</ButtonStyled>
+					<Button
+						type="colored"
+						color="brand"
+						size="lg"
+						class="!shadow-none"
+						:disabled="offline"
+						@click="showCreationModal?.()"
+					>
+						<PlusIcon />
+						Create an instance
+					</Button>
 					<span class="flex items-center gap-1 text-sm leading-5 text-secondary">
 						Press
 						<kbd
@@ -96,16 +101,10 @@ onUnmounted(() => {
 			class="flex flex-col h-max items-center justify-end gap-4 text-sm leading-5 text-secondary"
 		>
 			<span class="whitespace-nowrap">Escaping another launcher?</span>
-			<ButtonStyled>
-				<button
-					class="!h-10 !gap-2 !rounded-[0.875rem] !px-4 !py-2.5 !font-medium"
-					:disabled="offline"
-					@click="showImportModal?.()"
-				>
-					<ImportIcon />
-					Import from launcher
-				</button>
-			</ButtonStyled>
+			<Button size="lg" class="!font-medium" :disabled="offline" @click="showImportModal?.()">
+				<ImportIcon />
+				Import from launcher
+			</Button>
 		</div>
 	</div>
 </template>

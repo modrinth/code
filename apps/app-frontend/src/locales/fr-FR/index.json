@@ -773,9 +773,6 @@
   "app.nav.home": {
     "message": "Accueil"
   },
-  "app.nav.library": {
-    "message": "Bibliothèque"
-  },
   "app.nav.modrinth-account": {
     "message": "Compte Modrinth"
   },
