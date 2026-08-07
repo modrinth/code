@@ -3929,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas destacadas"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Puedes destacar hasta 3 de tus etiquetas más relevantes. Otras etiquetas pueden ser promovidas a destacadas si no seleccionas las 3 completas."
-  },
   "project.settings.tags.features-description": {
     "message": "Selecciona todas las características que tu {type} usa."
   },
@@ -3946,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecciona al menos una categoría para destacar una categoría."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Seleccionar etiquetas relevantes es importante para ayudar a la gente a encontrar tu {type}. Asegúrate de seleccionar todas las etiquetas que apliquen."
   },
   "project.settings.tags.title": {
     "message": "Etiquetas"

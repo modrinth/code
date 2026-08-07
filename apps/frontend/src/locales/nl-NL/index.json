@@ -3926,9 +3926,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Uitgelichte tags"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Je kunt maximaal 3 van je meest relevante tags als uitgelichte tags selecteren. Als je niet alle 3 selecteert, kunnen andere tags als uitgelichte tags worden weergegeven."
-  },
   "project.settings.tags.features-description": {
     "message": "Selecteer alle functies waarvan je {type} gebruikmaakt."
   },
@@ -3943,9 +3940,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecteer minstens één categorie om een categorie uit te lichten."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Nauwkeurige tags zijn belangrijk om mensen te helpen je {type} te vinden. Zorg ervoor dat je alle relevante tags selecteert."
   },
   "project.settings.tags.title": {
     "message": "Tags"

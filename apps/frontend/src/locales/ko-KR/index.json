@@ -3929,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "추천 태그"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "가장 적합한 태그를 최대 3개까지 지정할 수 있습니다. 3개를 모두 선택하지 않으면 다른 태그가 추천 태그로 표시될 수 있습니다."
-  },
   "project.settings.tags.features-description": {
     "message": " {type}에서 사용하는 모든 기능을 선택하세요."
   },
@@ -3946,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "추천 카테고리를 지정하려면 적어도 하나의 카테고리를 선택해야 합니다."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "정확한 태그 선택은 {type}을 쉽게 찾을 수 있도록 돕습니다. 관련된 모든 태그를 선택해 주세요."
   },
   "project.settings.tags.title": {
     "message": "태그"

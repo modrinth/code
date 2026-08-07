@@ -3929,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Tags mis en avant"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Vous pouvez mettre en avant jusqu'à 3 de vos tags les plus pertinents. D'autres tags peuvent être mis en avant si vous ne sélectionnez pas les 3."
-  },
   "project.settings.tags.features-description": {
     "message": "Sélectionnez toutes les fonctionnalités que votre {type} utilise."
   },
@@ -3946,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Sélectionnez au moins une catégorie afin de pouvoir mettre en avant une catégorie."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Un étiquetage correct est important pour aider les gens à trouver votre {type}. Faites en sorte de sélectionner tous les tags qui s'appliquent."
   },
   "project.settings.tags.title": {
     "message": "Tags"

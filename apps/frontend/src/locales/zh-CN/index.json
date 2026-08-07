@@ -3929,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "精选标签"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "你可以设置最多 3 个精选标签，标示出最相关的特点。如果没有选完 3 个标签，其他标签也可能提升为精选标签。"
-  },
   "project.settings.tags.features-description": {
     "message": "选择你的{type}作用于哪类特性。"
   },
@@ -3946,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "请先至少选择一个分类，再设置精选分类。"
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "准确选好标签，能极大帮助别人找到你的{type}。请确保选择所有合适的标签。"
   },
   "project.settings.tags.title": {
     "message": "标签"
