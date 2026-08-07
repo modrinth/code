@@ -2630,57 +2630,6 @@
   "landing.subheading": {
     "message": "Odkrywaj, graj i udostępniaj treści Minecraft poprzez naszą otwartoźródłową platformę, stworzoną dla społeczności."
   },
-  "layout.action.analytics-events": {
-    "message": "Wydarzenia analityczne"
-  },
-  "layout.action.change-theme": {
-    "message": "Zmień motyw"
-  },
-  "layout.action.create-new": {
-    "message": "Stwórz nowy..."
-  },
-  "layout.action.external-projects": {
-    "message": "Zewnętrzne projekty"
-  },
-  "layout.action.file-lookup": {
-    "message": "Wyszukiwarka plików"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Szukaj po e-mailu"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Zarządzaj linkami afiliacyjnymi"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "Zarządzaj ogłoszeniami serwera"
-  },
-  "layout.action.new-collection": {
-    "message": "Nowa kolekcja"
-  },
-  "layout.action.new-organization": {
-    "message": "Nowa organizacja"
-  },
-  "layout.action.new-project": {
-    "message": "Nowy projekt"
-  },
-  "layout.action.new-server-project": {
-    "message": "Nowy serwer"
-  },
-  "layout.action.publish": {
-    "message": "Opublikuj"
-  },
-  "layout.action.reports": {
-    "message": "Przeglądaj zgłoszenia"
-  },
-  "layout.action.review-projects": {
-    "message": "Przegląd projektu"
-  },
-  "layout.action.tech-review": {
-    "message": "Przegląd techniczny"
-  },
-  "layout.avatar.alt": {
-    "message": "Twój awatar"
-  },
   "layout.banner.account-action": {
     "message": "Wymagana akcja na koncie"
   },
@@ -2851,72 +2800,6 @@
   },
   "layout.footer.unknown-commit": {
     "message": "nieznany"
-  },
-  "layout.menu-toggle.action": {
-    "message": "Przełącz menu"
-  },
-  "layout.meta.description": {
-    "message": "Pobieraj mody, pluginy, paczki danych, shadery, paczki zasobów i paczki modów do Minecrafta na Modrinth. Odkrywaj i publikuj projekty na Modrinth dzięki nowoczesnemu, łatwemu w użyciu interfejsowi i API."
-  },
-  "layout.meta.og-description": {
-    "message": "Odkrywaj i publikuj zawartość Minecraft!"
-  },
-  "layout.mobile.close-menu": {
-    "message": "Zamknij menu"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Otwórz menu"
-  },
-  "layout.nav.active-reports": {
-    "message": "Aktywne zgłoszenia"
-  },
-  "layout.nav.discover": {
-    "message": "Odkrywaj"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "Pobierz Modrinth App"
-  },
-  "layout.nav.home": {
-    "message": "Strona główna"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Hostuj serwer"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Strona główna Modrinth"
-  },
-  "layout.nav.my-servers": {
-    "message": "Moje serwery"
-  },
-  "layout.nav.organizations": {
-    "message": "Organizacje"
-  },
-  "layout.nav.profile": {
-    "message": "Profil"
-  },
-  "layout.nav.projects": {
-    "message": "Projekty"
-  },
-  "layout.nav.revenue": {
-    "message": "Przychód"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Zapisane projekty"
-  },
-  "layout.nav.search": {
-    "message": "Szukaj"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Ulepsz do Modrinth+"
-  },
-  "layout.publish.email-verification-required.description": {
-    "message": "Musisz zweryfikować adres e-mail, żeby móc publikować zawartość na Modrinth."
-  },
-  "layout.publish.email-verification-required.title": {
-    "message": "Wymagana weryfikacja adresu e-mail"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Automatycznie instaluj to, w co grają"

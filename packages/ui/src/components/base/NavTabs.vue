@@ -2,7 +2,7 @@
 	<nav
 		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
-		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-semibold"
+		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 font-semibold"
 		:class="{ 'drop-shadow-xl border border-solid border-surface-4': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
@@ -13,7 +13,7 @@
 				ref="tabLinkElements"
 				:replace="replace"
 				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2.5 focus:rounded-full"
 				:class="getSSRFallbackClasses(index)"
 				@mouseenter="link.onHover?.()"
 				@focus="link.onHover?.()"
@@ -36,7 +36,7 @@
 				v-show="link.shown ?? true"
 				:key="link.href"
 				ref="tabLinkElements"
-				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
+				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2.5 hover:cursor-pointer focus:rounded-full"
 				:class="getSSRFallbackClasses(index)"
 				@click="emit('tabClick', index, link)"
 			>
@@ -55,7 +55,7 @@
 		<!-- Animated slider background -->
 		<div
 			v-if="sliderReady && currentActiveIndex !== -1"
-			class="pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1"
+			class="pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full"
 			:class="[
 				subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
 				{ 'navtabs-transition': transitionsEnabled },
@@ -154,16 +154,14 @@ function getSSRFallbackClasses(index: number) {
 
 function getIconClasses(index: number) {
 	return {
-		'text-button-iconSelected': isActiveAndNotSubpage.value(index),
-		'text-secondary': !isActiveAndNotSubpage.value(index),
+		'text-button-textSelected': isActiveAndNotSubpage.value(index),
+		'text-primary': !isActiveAndNotSubpage.value(index),
 	}
 }
 
 function getLabelClasses(index: number, hasIcon: boolean = false) {
 	return {
-		'text-button-iconSelected md:text-button-textSelected':
-			hasIcon && isActiveAndNotSubpage.value(index),
-		'text-button-iconSelected': !hasIcon && isActiveAndNotSubpage.value(index),
+		'text-button-textSelected': isActiveAndNotSubpage.value(index),
 		'text-contrast': !isActiveAndNotSubpage.value(index),
 	}
 }

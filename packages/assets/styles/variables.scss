@@ -154,7 +154,6 @@
 	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(213, 235, 224, 0), #d0ece0 70%);
 
 	--color-button-bg-selected: var(--color-brand);
-	--color-button-icon-selected: var(--color-accent-contrast);
 	--color-button-text-selected: var(--color-accent-contrast);
 
 	--color-gradient-button-bg: linear-gradient(180deg, #f8f9fa 0%, #dce0e6 100%);
@@ -311,9 +310,9 @@ html {
 	--color-gray-950: #303136;
 	--color-gray: var(--color-gray-500);
 
-	--color-text-primary: #ffffff;
+	--color-text-primary: #ebebeb;
 	--color-text-default: #b0bac5;
-	--color-text-tertiary: #96a2b0;
+	--color-text-tertiary: #80878f;
 
 	// ===
 
@@ -369,8 +368,7 @@ html {
 	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(24, 30, 31, 0), #171d1e 80%);
 
 	--color-button-bg-selected: var(--color-brand-highlight);
-	--color-button-icon-selected: var(--color-brand);
-	--color-button-text-selected: var(--color-text-primary);
+	--color-button-text-selected: var(--color-brand);
 
 	--color-gradient-button-bg: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
 

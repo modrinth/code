@@ -2633,57 +2633,6 @@
   "landing.subheading": {
     "message": "Ontdek, speel en deel Minecraft-content via ons open-sourceplatform dat speciaal voor de gemeenschap is ontwikkeld."
   },
-  "layout.action.analytics-events": {
-    "message": "Analytics-gebeurtenissen"
-  },
-  "layout.action.change-theme": {
-    "message": "Thema aanpassen"
-  },
-  "layout.action.create-new": {
-    "message": "Maak nieuwe..."
-  },
-  "layout.action.external-projects": {
-    "message": "Externe projecten"
-  },
-  "layout.action.file-lookup": {
-    "message": "Bestand opzoeken"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Zoek op via email"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Beheer partner links"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "Beheer server mededelingen"
-  },
-  "layout.action.new-collection": {
-    "message": "Nieuwe collectie"
-  },
-  "layout.action.new-organization": {
-    "message": "Nieuwe organisatie"
-  },
-  "layout.action.new-project": {
-    "message": "Nieuw project"
-  },
-  "layout.action.new-server-project": {
-    "message": "Nieuwe server"
-  },
-  "layout.action.publish": {
-    "message": "Publiceer"
-  },
-  "layout.action.reports": {
-    "message": "Beoordeel meldingen"
-  },
-  "layout.action.review-projects": {
-    "message": "Project beoordeling"
-  },
-  "layout.action.tech-review": {
-    "message": "Technologie beoordeling"
-  },
-  "layout.avatar.alt": {
-    "message": "Jouw avatar"
-  },
   "layout.banner.account-action": {
     "message": "Account actie vereist"
   },
@@ -2854,72 +2803,6 @@
   },
   "layout.footer.unknown-commit": {
     "message": "onbekend"
-  },
-  "layout.menu-toggle.action": {
-    "message": "Menu in-/uitschakelen"
-  },
-  "layout.meta.description": {
-    "message": "Download Minecraft-mods, plug-ins, gegevenspakketten, shaders, bronpakketten op Modrinth. Ontdek en publiceer projecten op Modrinth via een moderne, gebruiksvriendelijke interface en API."
-  },
-  "layout.meta.og-description": {
-    "message": "Ontdek en publiceer Minecraft-inhoud!"
-  },
-  "layout.mobile.close-menu": {
-    "message": "Sluit menu"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Open menu"
-  },
-  "layout.nav.active-reports": {
-    "message": "Actieve meldingen"
-  },
-  "layout.nav.discover": {
-    "message": "Ontdek"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "Modrinth-app downloaden"
-  },
-  "layout.nav.home": {
-    "message": "Thuispagina"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Host een server"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth-app"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinth startpagina"
-  },
-  "layout.nav.my-servers": {
-    "message": "Mijn servers"
-  },
-  "layout.nav.organizations": {
-    "message": "Organisaties"
-  },
-  "layout.nav.profile": {
-    "message": "Profiel"
-  },
-  "layout.nav.projects": {
-    "message": "Projecten"
-  },
-  "layout.nav.revenue": {
-    "message": "Inkomsten"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Opgeslagen projecten"
-  },
-  "layout.nav.search": {
-    "message": "Zoeken"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Upgrade naar Modrinth+"
-  },
-  "layout.publish.email-verification-required.description": {
-    "message": "Je moet je e-mailadres verifiëren voordat je iets op Modrinth kunt publiceren."
-  },
-  "layout.publish.email-verification-required.title": {
-    "message": "E-mailverificatie vereist"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Alles wat ze spelen automatisch installeren"

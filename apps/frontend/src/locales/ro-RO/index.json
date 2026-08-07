@@ -932,33 +932,6 @@
   "landing.subheading": {
     "message": "Descoperă, joacă, și distribuie conținut pentru Minecraft prin platforma noastră deschisă și construită pentru comunitate."
   },
-  "layout.action.change-theme": {
-    "message": "Schimbă tema"
-  },
-  "layout.action.create-new": {
-    "message": "Creează nou..."
-  },
-  "layout.action.file-lookup": {
-    "message": "Căutare fișier"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Căutare după email"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "Administrează notificările serverului"
-  },
-  "layout.action.new-collection": {
-    "message": "Colecție nouă"
-  },
-  "layout.action.new-organization": {
-    "message": "Organizație nouă"
-  },
-  "layout.action.new-project": {
-    "message": "Proiect nou"
-  },
-  "layout.avatar.alt": {
-    "message": "Avatarul tău"
-  },
   "layout.banner.account-action": {
     "message": "Acțiunea contului necesară"
   },
@@ -1084,66 +1057,6 @@
   },
   "layout.footer.social.x": {
     "message": "X"
-  },
-  "layout.menu-toggle.action": {
-    "message": "Comută meniul"
-  },
-  "layout.meta.description": {
-    "message": "Descarcă moduri, pluginuri, pachete de date, shadere, pachete de resurse și pachete de moduri pentru Minecraft de pe Modrinth. Descoperă și publică proiecte pe Modrinth cu o interfață modernă și ușor de folosit și cu un API accesibil."
-  },
-  "layout.meta.og-description": {
-    "message": "Descoperă și publică conținut pentru Minecraft!"
-  },
-  "layout.mobile.close-menu": {
-    "message": "Inchide meniul"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Deschide meniul"
-  },
-  "layout.nav.active-reports": {
-    "message": "Rapoarte active"
-  },
-  "layout.nav.discover": {
-    "message": "Descoperă"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "Ia-ți Modrinth App"
-  },
-  "layout.nav.home": {
-    "message": "Acasă"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Găzduiește un server"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Pagina de pornire Modrinth"
-  },
-  "layout.nav.my-servers": {
-    "message": "Serverele mele"
-  },
-  "layout.nav.organizations": {
-    "message": "Organizații"
-  },
-  "layout.nav.profile": {
-    "message": "Profil"
-  },
-  "layout.nav.projects": {
-    "message": "Proiecte"
-  },
-  "layout.nav.revenue": {
-    "message": "Venituri"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Proiecte salvate"
-  },
-  "layout.nav.search": {
-    "message": "Caută"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Treci la Modrinth+"
   },
   "moderation.moderate": {
     "message": "Moderare"

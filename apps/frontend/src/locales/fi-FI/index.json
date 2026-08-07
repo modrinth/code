@@ -794,24 +794,6 @@
   "landing.section.for-players.label": {
     "message": "Pelaajille"
   },
-  "layout.action.change-theme": {
-    "message": "Vaihda teemaa"
-  },
-  "layout.action.create-new": {
-    "message": "Luo uusi..."
-  },
-  "layout.action.file-lookup": {
-    "message": "Etsi tiedosto"
-  },
-  "layout.action.new-project": {
-    "message": "Uusi projekti"
-  },
-  "layout.action.publish": {
-    "message": "Julkaise"
-  },
-  "layout.avatar.alt": {
-    "message": "Avatarisi"
-  },
   "layout.footer.about": {
     "message": "Tietoa meistä"
   },
@@ -871,33 +853,6 @@
   },
   "layout.footer.social.x": {
     "message": "X"
-  },
-  "layout.nav.discover": {
-    "message": "Löydä"
-  },
-  "layout.nav.home": {
-    "message": "Koti"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Hostaa palvelin"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.organizations": {
-    "message": "Organisaatiot"
-  },
-  "layout.nav.profile": {
-    "message": "Profiili"
-  },
-  "layout.nav.projects": {
-    "message": "Projektit"
-  },
-  "layout.nav.revenue": {
-    "message": "Tulot"
-  },
-  "layout.nav.search": {
-    "message": "Hae"
   },
   "moderation.moderate": {
     "message": "Moderoi"

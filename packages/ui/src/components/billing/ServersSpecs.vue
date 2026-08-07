@@ -54,7 +54,7 @@ const sharedCpus = computed(() => {
 })
 </script>
 <template>
-	<ul class="m-0 flex list-none flex-col gap-2 px-0 text-sm leading-normal text-secondary">
+	<ul class="m-0 flex list-none flex-col gap-2 px-0 text-sm leading-normal text-primary">
 		<li class="flex items-center gap-2">
 			<MemoryStickIcon class="h-5 w-5 shrink-0" />
 			{{ formatMessage(messages.gbRam, { ram: formattedRam }) }}
@@ -77,7 +77,7 @@ const sharedCpus = computed(() => {
 				target="_blank"
 				@click="() => emit('click-bursting-link')"
 			>
-				<UnknownIcon class="h-4 w-4 text-secondary opacity-80" />
+				<UnknownIcon class="h-4 w-4 text-secondary" />
 			</AutoLink>
 		</li>
 	</ul>

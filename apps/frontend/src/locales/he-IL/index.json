@@ -1397,51 +1397,6 @@
   "landing.subheading": {
     "message": "גלה, שחק, ושתף תוכן לMinecraft דרך הפלטפורמת קוד-פתוח שלנו שפותחה עבור הקהילה."
   },
-  "layout.action.change-theme": {
-    "message": "לשנות מצב צבע"
-  },
-  "layout.action.create-new": {
-    "message": "צור חדש..."
-  },
-  "layout.action.file-lookup": {
-    "message": "חיפוש קבצים"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "חיפוש על ידי אימייל"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "נהל את קישורי השותפים"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "ניהול הודעות השרת"
-  },
-  "layout.action.new-collection": {
-    "message": "אוסף חדש"
-  },
-  "layout.action.new-organization": {
-    "message": "ארגון חדש"
-  },
-  "layout.action.new-project": {
-    "message": "פרוייקט חדש"
-  },
-  "layout.action.new-server-project": {
-    "message": "יצירת שרת חדש"
-  },
-  "layout.action.publish": {
-    "message": "פרסם"
-  },
-  "layout.action.reports": {
-    "message": "סקירת דיווחים"
-  },
-  "layout.action.review-projects": {
-    "message": "סקירת פרויקט"
-  },
-  "layout.action.tech-review": {
-    "message": "סקירה טכנית"
-  },
-  "layout.avatar.alt": {
-    "message": "אוותר חשבון"
-  },
   "layout.banner.account-action": {
     "message": "נדרשת פעולה על החשבון"
   },
@@ -1573,48 +1528,6 @@
   },
   "layout.footer.social.x": {
     "message": "X"
-  },
-  "layout.nav.active-reports": {
-    "message": "דוחות פעילים"
-  },
-  "layout.nav.discover": {
-    "message": "גלה"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "להוריד אפליקציאת Modrinth"
-  },
-  "layout.nav.home": {
-    "message": "דף בית"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "דף הבית של Modrinth"
-  },
-  "layout.nav.my-servers": {
-    "message": "השרתים שלי"
-  },
-  "layout.nav.organizations": {
-    "message": "ארגונים"
-  },
-  "layout.nav.profile": {
-    "message": "פרופיל"
-  },
-  "layout.nav.projects": {
-    "message": "פרויקטים"
-  },
-  "layout.nav.revenue": {
-    "message": "הכנסות"
-  },
-  "layout.nav.saved-projects": {
-    "message": "פרויקטים שנשמרו"
-  },
-  "layout.nav.search": {
-    "message": "חיפוש"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "שדרגו ל-Modrinth+"
   },
   "moderation.page.projects": {
     "message": "פרויקטים"

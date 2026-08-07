@@ -1973,51 +1973,6 @@
   "landing.subheading": {
     "message": "Descobre, joga e partilha conteúdo de Minecraft através da nossa plataforma de código aberto criada para a comunidade."
   },
-  "layout.action.change-theme": {
-    "message": "Alterar tema"
-  },
-  "layout.action.create-new": {
-    "message": "Criar novo..."
-  },
-  "layout.action.file-lookup": {
-    "message": "Pesquisa de ficheiros"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Pesquisa por e-mail"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Gerir links de afiliado"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "Gerir notificações do servidor"
-  },
-  "layout.action.new-collection": {
-    "message": "Nova coleção"
-  },
-  "layout.action.new-organization": {
-    "message": "Nova organização"
-  },
-  "layout.action.new-project": {
-    "message": "Novo projeto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novo servidor"
-  },
-  "layout.action.publish": {
-    "message": "Publicar"
-  },
-  "layout.action.reports": {
-    "message": "Analisar relatórios"
-  },
-  "layout.action.review-projects": {
-    "message": "Revisão do projeto"
-  },
-  "layout.action.tech-review": {
-    "message": "Revisão técnica"
-  },
-  "layout.avatar.alt": {
-    "message": "O teu avatar"
-  },
   "layout.banner.account-action": {
     "message": "Ação da conta necessária"
   },
@@ -2161,66 +2116,6 @@
   },
   "layout.footer.social.x": {
     "message": "X"
-  },
-  "layout.menu-toggle.action": {
-    "message": "Abrir/Fechar menu"
-  },
-  "layout.meta.description": {
-    "message": "Transfere mods, plugins, pacotes de dados, shaders, pacotes de recursos e modpacks no Modrinth. Descobre e publica projetos no Modrinth com uma interface e API modernas e fáceis de usar."
-  },
-  "layout.meta.og-description": {
-    "message": "Descobre e publica conteúdo de Minecraft!"
-  },
-  "layout.mobile.close-menu": {
-    "message": "Fechar menu"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Abrir menu"
-  },
-  "layout.nav.active-reports": {
-    "message": "Denúncias ativas"
-  },
-  "layout.nav.discover": {
-    "message": "Descobrir"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "Obter a Modrinth App"
-  },
-  "layout.nav.home": {
-    "message": "Início"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Alojar um servidor"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Página inicial do Modrinth"
-  },
-  "layout.nav.my-servers": {
-    "message": "Meus servidores"
-  },
-  "layout.nav.organizations": {
-    "message": "Organizações"
-  },
-  "layout.nav.profile": {
-    "message": "Perfil"
-  },
-  "layout.nav.projects": {
-    "message": "Projetos"
-  },
-  "layout.nav.revenue": {
-    "message": "Rendimentos"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Projetos Salvos"
-  },
-  "layout.nav.search": {
-    "message": "Pesquisar"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Atualiza para o Modrinth+"
   },
   "moderation.moderate": {
     "message": "Moderar"

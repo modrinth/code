@@ -2633,57 +2633,6 @@
   "landing.subheading": {
     "message": "Досліджуйте, грайте, та діліться вмістом Minecraft через нашу платформу з відкритим кодом, розроблену для спільноти."
   },
-  "layout.action.analytics-events": {
-    "message": "Події аналітики"
-  },
-  "layout.action.change-theme": {
-    "message": "Змінити тему"
-  },
-  "layout.action.create-new": {
-    "message": "Створити новий…"
-  },
-  "layout.action.external-projects": {
-    "message": "Зовнішні проєкти"
-  },
-  "layout.action.file-lookup": {
-    "message": "Пошук файлів"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Пошук електронною поштою"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Керувати партнерськими посиланнями"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "Керування сповіщеннями сервера"
-  },
-  "layout.action.new-collection": {
-    "message": "Нова добірка"
-  },
-  "layout.action.new-organization": {
-    "message": "Нова організація"
-  },
-  "layout.action.new-project": {
-    "message": "Новий проєкт"
-  },
-  "layout.action.new-server-project": {
-    "message": "Новий сервер"
-  },
-  "layout.action.publish": {
-    "message": "Опублікувати"
-  },
-  "layout.action.reports": {
-    "message": "Перегляд звітів"
-  },
-  "layout.action.review-projects": {
-    "message": "Огляд проєкту"
-  },
-  "layout.action.tech-review": {
-    "message": "Технічний огляд"
-  },
-  "layout.avatar.alt": {
-    "message": "Ваш аватар"
-  },
   "layout.banner.account-action": {
     "message": "Необхідні дії щодо облікового запису"
   },
@@ -2854,72 +2803,6 @@
   },
   "layout.footer.unknown-commit": {
     "message": "невідомо"
-  },
-  "layout.menu-toggle.action": {
-    "message": "Перемкнути меню"
-  },
-  "layout.meta.description": {
-    "message": "Завантажуйте моди, плаґіни, шейдери, збірки, пакети даних і ресурсів на Modrinth. Досліджуйте інші та публікуйте свої проєкти на Modrinth за допомогою сучасного, простого у використанні інтерфейсу та API."
-  },
-  "layout.meta.og-description": {
-    "message": "Досліджуйте інший та публікуйте свій уміст для Minecraft!"
-  },
-  "layout.mobile.close-menu": {
-    "message": "Закрити меню"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Відкрити меню"
-  },
-  "layout.nav.active-reports": {
-    "message": "Активні скарги"
-  },
-  "layout.nav.discover": {
-    "message": "Дослідити"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "Установити Modrinth App"
-  },
-  "layout.nav.home": {
-    "message": "Головна"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Створити сервер"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Головна сторінка Modrinth"
-  },
-  "layout.nav.my-servers": {
-    "message": "Мої сервери"
-  },
-  "layout.nav.organizations": {
-    "message": "Організації"
-  },
-  "layout.nav.profile": {
-    "message": "Профіль"
-  },
-  "layout.nav.projects": {
-    "message": "Проєкти"
-  },
-  "layout.nav.revenue": {
-    "message": "Дохід"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Збережені проєкти"
-  },
-  "layout.nav.search": {
-    "message": "Пошук"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Оновитись до Modrinth+"
-  },
-  "layout.publish.email-verification-required.description": {
-    "message": "Підтвердьте свою електронну пошту, перш ніж публікувати на Modrinth."
-  },
-  "layout.publish.email-verification-required.title": {
-    "message": "Необхідно підтвердити електронну пошту"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Автоматично встановлювати все, у що вони грають"

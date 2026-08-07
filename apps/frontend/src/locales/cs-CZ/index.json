@@ -1769,33 +1769,6 @@
   "landing.section.for-players.label": {
     "message": "Pro hráče"
   },
-  "layout.action.change-theme": {
-    "message": "Změnit motiv"
-  },
-  "layout.action.create-new": {
-    "message": "Vytvořit nový..."
-  },
-  "layout.action.external-projects": {
-    "message": "Externí projekty"
-  },
-  "layout.action.new-collection": {
-    "message": "Nová kolekce"
-  },
-  "layout.action.new-organization": {
-    "message": "Nová organizace"
-  },
-  "layout.action.new-project": {
-    "message": "Nový projekt"
-  },
-  "layout.action.new-server-project": {
-    "message": "Nový server"
-  },
-  "layout.action.publish": {
-    "message": "Zveřejnit"
-  },
-  "layout.avatar.alt": {
-    "message": "Váš avatar"
-  },
   "layout.banner.account-action": {
     "message": "Požadovaná akce účtu"
   },
@@ -1927,66 +1900,6 @@
   },
   "layout.footer.social.x": {
     "message": "X"
-  },
-  "layout.menu-toggle.action": {
-    "message": "Přepnout menu"
-  },
-  "layout.meta.description": {
-    "message": "Stáhněte si Minecraft mody, pluginy, datapacky, shadery, resourcepacky a modpacky na Modrinthu. Objevte a publikujte projekty na Modrintu s moderním, snadno použitelným rozhraním a API."
-  },
-  "layout.meta.og-description": {
-    "message": "Objevujte a zveřejňujte obsah pro Minecraft!"
-  },
-  "layout.mobile.close-menu": {
-    "message": "Zavřít menu"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Otevřít menu"
-  },
-  "layout.nav.active-reports": {
-    "message": "Aktivní nahlášení"
-  },
-  "layout.nav.discover": {
-    "message": "Objevit"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "Získat Modrinth App"
-  },
-  "layout.nav.home": {
-    "message": "Domů"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Hostovat server"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Domovská stránka Modrinthu"
-  },
-  "layout.nav.my-servers": {
-    "message": "Moje servery"
-  },
-  "layout.nav.organizations": {
-    "message": "Organizace"
-  },
-  "layout.nav.profile": {
-    "message": "Profil"
-  },
-  "layout.nav.projects": {
-    "message": "Projekty"
-  },
-  "layout.nav.revenue": {
-    "message": "Zisk"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Uložené projekty"
-  },
-  "layout.nav.search": {
-    "message": "Hledat"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Upgradovat na Modrinth+"
   },
   "moderation.moderate": {
     "message": "Moderace"

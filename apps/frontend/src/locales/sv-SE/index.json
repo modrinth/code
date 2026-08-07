@@ -2357,51 +2357,6 @@
   "landing.subheading": {
     "message": "Upptäck, spela och dela Minecraft-innehåll via vår plattform med öppen källkod som skapades för communityn."
   },
-  "layout.action.change-theme": {
-    "message": "Ändra tema"
-  },
-  "layout.action.create-new": {
-    "message": "Skapa ny..."
-  },
-  "layout.action.file-lookup": {
-    "message": "Sök efter fil"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Sök efter e-post"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Hantera affiliatelänk"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "Hantera servernotiser"
-  },
-  "layout.action.new-collection": {
-    "message": "Ny samling"
-  },
-  "layout.action.new-organization": {
-    "message": "Ny organisation"
-  },
-  "layout.action.new-project": {
-    "message": "Nytt projekt"
-  },
-  "layout.action.new-server-project": {
-    "message": "Ny server"
-  },
-  "layout.action.publish": {
-    "message": "Skapa"
-  },
-  "layout.action.reports": {
-    "message": "Granska rapporter"
-  },
-  "layout.action.review-projects": {
-    "message": "Projektgranskning"
-  },
-  "layout.action.tech-review": {
-    "message": "Teknikgranskning"
-  },
-  "layout.avatar.alt": {
-    "message": "Din avatar"
-  },
   "layout.banner.account-action": {
     "message": "Kontoåtgärd krävs"
   },
@@ -2560,72 +2515,6 @@
   },
   "layout.footer.unknown-commit": {
     "message": "okänd"
-  },
-  "layout.menu-toggle.action": {
-    "message": "Växla meny"
-  },
-  "layout.meta.description": {
-    "message": "Ladda ned Minecraft moddar, plugins, datapaket, shaders, resurspaket och modpaket på Modrinth. Upptäck och lägg upp projekt på Modrinth med ett modernt, enkelt att använda gränssnitt och API."
-  },
-  "layout.meta.og-description": {
-    "message": "Utforska och lägg upp Minecraft-innehåll!"
-  },
-  "layout.mobile.close-menu": {
-    "message": "Stäng meny"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Öppna meny"
-  },
-  "layout.nav.active-reports": {
-    "message": "Aktiva rapporteringar"
-  },
-  "layout.nav.discover": {
-    "message": "Utforska"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "Installera Modrinth App"
-  },
-  "layout.nav.home": {
-    "message": "Hem"
-  },
-  "layout.nav.host-a-server": {
-    "message": "Skaffa en server"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinth hem sida"
-  },
-  "layout.nav.my-servers": {
-    "message": "Mina servrar"
-  },
-  "layout.nav.organizations": {
-    "message": "Organisationer"
-  },
-  "layout.nav.profile": {
-    "message": "Profil"
-  },
-  "layout.nav.projects": {
-    "message": "Projekt"
-  },
-  "layout.nav.revenue": {
-    "message": "Intäkter"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Sparade projekt"
-  },
-  "layout.nav.search": {
-    "message": "Sök"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Uppgradera till Modrinth+"
-  },
-  "layout.publish.email-verification-required.description": {
-    "message": "Du måste verifiera din e-post innan du publicerar på Modrinth."
-  },
-  "layout.publish.email-verification-required.title": {
-    "message": "E-post verifikation behövs"
   },
   "moderation.moderate": {
     "message": "Moderera"

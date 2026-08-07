@@ -2636,57 +2636,6 @@
   "landing.subheading": {
     "message": "透過我們為社群打造的開源平臺，探索、遊玩並分享 Minecraft 內容。"
   },
-  "layout.action.analytics-events": {
-    "message": "數據分析事件"
-  },
-  "layout.action.change-theme": {
-    "message": "更換主題"
-  },
-  "layout.action.create-new": {
-    "message": "新增..."
-  },
-  "layout.action.external-projects": {
-    "message": "外部專案"
-  },
-  "layout.action.file-lookup": {
-    "message": "檔案查詢"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "依電子郵件查詢"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "管理聯盟連結"
-  },
-  "layout.action.manage-server-notices": {
-    "message": "管理伺服器通知"
-  },
-  "layout.action.new-collection": {
-    "message": "新增收藏"
-  },
-  "layout.action.new-organization": {
-    "message": "新增組織"
-  },
-  "layout.action.new-project": {
-    "message": "新增專案"
-  },
-  "layout.action.new-server-project": {
-    "message": "新的伺服器"
-  },
-  "layout.action.publish": {
-    "message": "發布"
-  },
-  "layout.action.reports": {
-    "message": "審查檢舉"
-  },
-  "layout.action.review-projects": {
-    "message": "專案審查"
-  },
-  "layout.action.tech-review": {
-    "message": "技術審查"
-  },
-  "layout.avatar.alt": {
-    "message": "你的顯示圖片"
-  },
   "layout.banner.account-action": {
     "message": "帳號需採取行動"
   },
@@ -2857,72 +2806,6 @@
   },
   "layout.footer.unknown-commit": {
     "message": "未知"
-  },
-  "layout.menu-toggle.action": {
-    "message": "切換選單"
-  },
-  "layout.meta.description": {
-    "message": "前往 Modrinth 下載 Minecraft 模組、插件、資料包、光影包、資源包和模組包。使用現代、易於使用的介面和 API 在 Modrinth 上探索及發布專案。"
-  },
-  "layout.meta.og-description": {
-    "message": "探索及發布 Minecraft 內容！"
-  },
-  "layout.mobile.close-menu": {
-    "message": "關閉選單"
-  },
-  "layout.mobile.open-menu": {
-    "message": "開啟選單"
-  },
-  "layout.nav.active-reports": {
-    "message": "處理中的檢舉"
-  },
-  "layout.nav.discover": {
-    "message": "探索"
-  },
-  "layout.nav.get-modrinth-app": {
-    "message": "取得 Modrinth App"
-  },
-  "layout.nav.home": {
-    "message": "首頁"
-  },
-  "layout.nav.host-a-server": {
-    "message": "託管伺服器"
-  },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinth 首頁"
-  },
-  "layout.nav.my-servers": {
-    "message": "我的伺服器"
-  },
-  "layout.nav.organizations": {
-    "message": "組織"
-  },
-  "layout.nav.profile": {
-    "message": "個人檔案"
-  },
-  "layout.nav.projects": {
-    "message": "專案"
-  },
-  "layout.nav.revenue": {
-    "message": "收益"
-  },
-  "layout.nav.saved-projects": {
-    "message": "儲存專案"
-  },
-  "layout.nav.search": {
-    "message": "搜尋"
-  },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "升級至 Modrinth+"
-  },
-  "layout.publish.email-verification-required.description": {
-    "message": "在 Modrinth 上發行內容之前，你必須先驗證你的電子郵件地址。"
-  },
-  "layout.publish.email-verification-required.title": {
-    "message": "需要驗證電子郵件地址"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "自動安裝好友遊玩的所有內容"

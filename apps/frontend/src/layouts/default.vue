@@ -97,7 +97,7 @@
 						size="sm"
 						:class="
 							route.path.startsWith('/discover/mods')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: route.path.startsWith('/mod/')
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: ''
@@ -112,7 +112,7 @@
 						size="sm"
 						:class="
 							route.path.startsWith('/discover/resourcepacks')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: route.path.startsWith('/resourcepack/')
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: ''
@@ -127,7 +127,7 @@
 						size="sm"
 						:class="
 							route.path.startsWith('/discover/datapacks')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: route.path.startsWith('/datapack/')
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: ''
@@ -138,11 +138,11 @@
 					</ButtonLink>
 					<ButtonLink
 						type="quiet"
-						to="/discover/shaders"
 						size="sm"
+						to="/discover/shaders"
 						:class="
 							route.path.startsWith('/discover/shaders')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: route.path.startsWith('/shader/')
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: ''
@@ -153,14 +153,15 @@
 					</ButtonLink>
 					<ButtonLink
 						type="quiet"
-						size="sm"
 						to="/discover/modpacks"
 						:class="
-							route.path.startsWith('/discover/modpacks')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
-								: route.path.startsWith('/modpack/')
-									? '!bg-[var(--color-button-bg)] !text-contrast'
-									: ''
+							route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')
+								? (route.name === 'discover-modpacks'
+										? 'main-nav-primary'
+										: 'main-nav-secondary') === 'main-nav-primary'
+									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+									: '!bg-[var(--color-button-bg)] !text-contrast'
+								: ''
 						"
 					>
 						<PackageOpenIcon aria-hidden="true" />
@@ -172,7 +173,7 @@
 						size="sm"
 						:class="
 							route.path.startsWith('/discover/plugins')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: route.path.startsWith('/plugin/')
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: ''
@@ -187,7 +188,7 @@
 						size="sm"
 						:class="
 							route.path.startsWith('/discover/servers')
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: route.path.startsWith('/server/')
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: ''
@@ -249,7 +250,7 @@
 						]"
 						:class="[
 							isDiscovering
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-icon-selected)]'
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: isDiscoveringSubpage
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: '',

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { SearchIcon } from '@modrinth/assets'
+import { ArrowUpDownIcon, BulletListIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref, toValue } from 'vue'
 
 import { Button, IconButton } from '#ui/components/base/buttons'
@@ -158,15 +158,13 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
-					? '!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0'
-					: '!w-[16rem] min-w-max max-w-full'
+					? '!w-[14rem] min-w-max max-w-full flex-grow md:flex-grow-0'
+					: '!w-[14rem] min-w-max max-w-full'
 			"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
-				<span class="font-semibold text-primary">{{
-					formatMessage(commonMessages.sortByLabel)
-				}}</span>
+				<ArrowUpDownIcon class="size-5 shrink-0 text-primary stroke-[1.5px]" />
 			</template>
 		</Combobox>
 
@@ -176,14 +174,14 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
-					? '!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0'
-					: '!w-[9rem] min-w-max max-w-full'
+					? '!w-[8rem] min-w-max max-w-full flex-grow md:flex-grow-0'
+					: '!w-[8rem] min-w-max max-w-full'
 			"
 			:placeholder="formatMessage(commonMessages.viewLabel)"
 			@update:model-value="(val: number) => (ctx.maxResults.value = val)"
 		>
 			<template #prefix>
-				<span class="font-semibold text-primary">{{ formatMessage(messages.viewPrefix) }}</span>
+				<BulletListIcon class="size-5 shrink-0 text-primary stroke-[1.5px]" />
 			</template>
 		</Combobox>
 
