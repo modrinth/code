@@ -108,15 +108,7 @@ import { getSeverityIcon } from '../../utils'
 
 const props = withDefaults(
 	defineProps<{
-		type?:
-			| 'info'
-			| 'warning'
-			| 'critical'
-			| 'success'
-			| 'moderation'
-			| 'circle-warning'
-			| 'neutral'
-			| 'grey'
+		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation' | 'circle-warning' | 'neutral'
 		header?: string
 		body?: string
 		inlineActions?: boolean
@@ -182,7 +174,6 @@ const typeClasses = {
 	success: 'border-brand-green bg-bg-green',
 	moderation: 'border-brand-orange bg-bg-orange',
 	neutral: 'border-surface-4 bg-surface-3',
-	grey: 'border-gray-500 bg-gray-950',
 }
 
 const iconClasses = {
@@ -193,7 +184,6 @@ const iconClasses = {
 	success: 'text-brand-green',
 	moderation: 'text-brand-orange',
 	neutral: 'text-secondary',
-	grey: 'text-secondary',
 }
 
 const buttonColors = {
@@ -204,7 +194,6 @@ const buttonColors = {
 	success: 'green',
 	moderation: 'orange',
 	neutral: 'standard',
-	grey: 'standard',
 } as const
 
 const progressTrackClasses = {
@@ -215,7 +204,6 @@ const progressTrackClasses = {
 	success: 'bg-brand-green/20',
 	moderation: 'bg-brand-orange/20',
 	neutral: 'bg-surface-4',
-	grey: 'bg-surface-4',
 }
 
 const progressFillClasses = {
@@ -228,7 +216,6 @@ const progressFillClasses = {
 	green: 'bg-brand-green',
 	red: 'bg-brand-red',
 	neutral: 'bg-surface-5',
-	grey: 'bg-surface-5',
 }
 </script>
 

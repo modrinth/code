@@ -28,7 +28,7 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<Admonition type="grey" :header="formatMessage(messages.header, { title })">
+	<Admonition type="info" :header="formatMessage(messages.header, { title })">
 		<template #icon="{ iconClass }">
 			<ArchiveIcon :class="iconClass" />
 		</template>
