@@ -3,7 +3,7 @@ import { evalSegment } from './messages'
 import { hasCap, isNodeActive, resolveActionState, walkNodes } from './resolve'
 import type { MessageSegment, NodeState } from './state'
 
-export interface ActiveAction2 {
+export interface ActiveAction {
 	node: object
 	state: Record<string, NodeState>
 	statePath: string[]
@@ -14,8 +14,8 @@ export function collectActiveActions(
 	children: ChildNode[],
 	stageState: Record<string, NodeState>,
 	basePath: string[] = [],
-): ActiveAction2[] {
-	const actions: ActiveAction2[] = []
+): ActiveAction[] {
+	const actions: ActiveAction[] = []
 	walkNodes(
 		children,
 		stageState,
@@ -40,8 +40,8 @@ export function collectMessageNodes(
 	children: ChildNode[],
 	stageState: Record<string, NodeState>,
 	basePath: string[] = [],
-): ActiveAction2[] {
-	const actions: ActiveAction2[] = []
+): ActiveAction[] {
+	const actions: ActiveAction[] = []
 	walkNodes(
 		children,
 		stageState,
@@ -69,8 +69,8 @@ function isDescendant(childPath: string[], ancestorPath: string[]): boolean {
 }
 
 export async function evalActiveAction(
-	entry: ActiveAction2,
-	allActions: ActiveAction2[],
+	entry: ActiveAction,
+	allActions: ActiveAction[],
 	consumed: Set<object>,
 ): Promise<string> {
 	let result = ''
