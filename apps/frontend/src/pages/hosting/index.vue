@@ -33,7 +33,7 @@
 			<div class="z-[5] flex w-full flex-col gap-8">
 				<div class="flex flex-col gap-4">
 					<div
-						class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+						class="relative h-fit w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 					>
 						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
@@ -110,7 +110,7 @@
 			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
 			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
 				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+					class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
 					{{ formatMessage(messages.whyModrinthHosting) }}
 				</div>
@@ -238,7 +238,7 @@
 			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
 			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
 				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+					class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
 					{{ formatMessage(messages.includedWithYourServer) }}
 				</div>
