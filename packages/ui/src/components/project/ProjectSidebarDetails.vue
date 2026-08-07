@@ -31,9 +31,7 @@
 				<SparklesIcon aria-hidden="true" />
 				<div class="flex flex-col gap-1">
 					<span>
-						{{
-							capitalizeString(formatMessage(messages.aiGeneratedContent, { type: aiContentType }))
-						}}
+						{{ capitalizeString(aiGeneratedLabel) }}
 					</span>
 					<span v-if="aiDisclosure.note" class="text-sm text-secondary">
 						{{ aiDisclosure.note }}
@@ -224,7 +222,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../composables'
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
 import { Avatar, IntlFormatted } from '../base'
@@ -233,13 +231,15 @@ import { NewModal } from '../modal'
 const LICENSE_STALE_TIME = 1000 * 60 * 10
 const DISCLOSURE_STALE_TIME = 1000 * 60 * 5
 
-const { formatMessage } = useVIntl()
+const { formatMessage, locale } = useVIntl()
 const { labrinth } = injectModrinthClient()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
+
+const AI_USE_ORDER: Labrinth.Projects.v3.AiUsage[] = ['code', 'assets', 'text', 'functionality']
 
 const props = defineProps<{
 	project: Labrinth.Projects.v2.Project
@@ -278,8 +278,7 @@ const messages = defineMessages({
 	},
 	aiGeneratedContent: {
 		id: 'project.disclosure.ai-generated-content.title',
-		defaultMessage:
-			'Contains AI-generated {type, select, code {code} assets {assets} code_assets {code and assets} text {text} functionality {functionality} other {content}}',
+		defaultMessage: 'Contains AI-generated {types}',
 	},
 	derivativeWork: {
 		id: 'project.disclosure.derivative-work.title',
@@ -322,20 +321,45 @@ const derivativeWorkDisclosure = computed(() => findDisclosure('derivative_work'
 const photosensitivityDisclosure = computed(() => findDisclosure('epilepsy_triggers'))
 const systemInteractionsDisclosure = computed(() => findDisclosure('system_interactions'))
 
-const aiContentType = computed(() => {
+const aiUseLabels = {
+	code: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.code',
+		defaultMessage: 'code',
+	}),
+	assets: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.assets',
+		defaultMessage: 'assets',
+	}),
+	text: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.text',
+		defaultMessage: 'text',
+	}),
+	functionality: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.functionality',
+		defaultMessage: 'functionality',
+	}),
+	content: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.content',
+		defaultMessage: 'content',
+	}),
+} as const
+
+const aiGeneratedLabel = computed(() => {
 	const disclosure = aiDisclosure.value
 	if (!disclosure) {
-		return 'other'
+		return ''
 	}
 
-	const uses = new Set(disclosure.uses)
-	if (uses.size === 2 && uses.has('code') && uses.has('assets')) {
-		return 'code_assets'
-	}
-	if (uses.size === 1) {
-		return uses.values().next().value
-	}
-	return 'other'
+	const orderedUses = AI_USE_ORDER.filter((use) => disclosure.uses.includes(use))
+	const types =
+		orderedUses.length === 0
+			? formatMessage(aiUseLabels.content)
+			: new Intl.ListFormat(locale.value, {
+					style: 'long',
+					type: 'conjunction',
+				}).format(orderedUses.map((use) => formatMessage(aiUseLabels[use])))
+
+	return formatMessage(messages.aiGeneratedContent, { types })
 })
 
 const createdDate = computed(() =>

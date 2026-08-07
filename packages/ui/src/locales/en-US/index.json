@@ -3246,7 +3246,22 @@
     "defaultMessage": "Contains advertising"
   },
   "project.disclosure.ai-generated-content.title": {
-    "defaultMessage": "Contains AI-generated {type, select, code {code} assets {assets} code_assets {code and assets} text {text} functionality {functionality} other {content}}"
+    "defaultMessage": "Contains AI-generated {types}"
+  },
+  "project.disclosure.ai-generated-content.use.assets": {
+    "defaultMessage": "assets"
+  },
+  "project.disclosure.ai-generated-content.use.code": {
+    "defaultMessage": "code"
+  },
+  "project.disclosure.ai-generated-content.use.content": {
+    "defaultMessage": "content"
+  },
+  "project.disclosure.ai-generated-content.use.functionality": {
+    "defaultMessage": "functionality"
+  },
+  "project.disclosure.ai-generated-content.use.text": {
+    "defaultMessage": "text"
   },
   "project.disclosure.derivative-work.title": {
     "defaultMessage": "This is a derivative work of:"
