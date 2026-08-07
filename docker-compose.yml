@@ -415,6 +415,7 @@ services:
     ports:
       - '127.0.0.1:8123:8123'
     environment:
+      CLICKHOUSE_DB: staging_ariadne
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
     healthcheck:

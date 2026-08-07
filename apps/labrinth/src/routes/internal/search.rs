@@ -1,3 +1,4 @@
+use crate::util::error::Context as _;
 use crate::util::guards::admin_key_guard;
 use crate::{
     routes::ApiError,
@@ -19,7 +20,12 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub async fn tasks(
     search: web::Data<dyn SearchBackend>,
 ) -> Result<web::Json<serde_json::Value>, ApiError> {
-    Ok(web::Json(search.tasks().await.map_err(ApiError::Internal)?))
+    Ok(web::Json(
+        search
+            .tasks()
+            .await
+            .wrap_internal_err("fetching search tasks")?,
+    ))
 }
 
 /// Cancel search tasks.  
@@ -36,6 +42,6 @@ pub async fn tasks_cancel(
     search
         .tasks_cancel(&body)
         .await
-        .map_err(ApiError::Internal)?;
+        .wrap_internal_err("cancelling search tasks")?;
     Ok(())
 }

@@ -142,8 +142,8 @@
 							<template v-else>
 								<PageHeaderMetadataItem
 									v-if="serverData.loader"
-									:icon="LoaderIcon"
-									:icon-props="{ loader: serverData.loader }"
+									:icon="TagIcon"
+									:icon-props="{ tag: serverData.loader, enforceType: 'loader' }"
 								>
 									{{ formatLoaderLabel(serverData.loader) }} {{ serverData.mc_version }}
 								</PageHeaderMetadataItem>
@@ -433,9 +433,9 @@ import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.v
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
+import TagIcon from '#ui/components/base/TagIcon.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
-import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'

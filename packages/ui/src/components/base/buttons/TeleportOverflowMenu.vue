@@ -80,6 +80,19 @@ const { isOpen, panelStyle, anchorStyle, resolvedSide, open, close } = useAnchor
 	resolvedDistance,
 )
 
+const menuTransformOrigin = computed(() => {
+	switch (resolvedSide.value) {
+		case 'top':
+			return 'bottom center'
+		case 'left':
+			return 'right center'
+		case 'right':
+			return 'left center'
+		default:
+			return 'top center'
+	}
+})
+
 const menuItemClasses =
 	'overflow-menu-item flex min-h-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
 	'cursor-pointer whitespace-nowrap hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:outline-none ' +
@@ -294,20 +307,13 @@ defineExpose({ open: openMenu, close: closeMenu })
 	</component>
 
 	<Teleport to="body">
-		<Transition
-			enter-active-class="transition duration-125 ease-out"
-			enter-from-class="scale-95 opacity-0"
-			enter-to-class="scale-100 opacity-100"
-			leave-active-class="transition duration-100 ease-in"
-			leave-from-class="scale-100 opacity-100"
-			leave-to-class="scale-95 opacity-0"
-		>
+		<Transition name="floating-expand">
 			<div
 				v-if="isOpen"
 				:id="menuId"
 				ref="panelElement"
 				class="fixed isolate z-[9999] rounded-[14px] bg-surface-3 shadow-lg ring-1 ring-surface-5"
-				:style="panelStyle"
+				:style="[panelStyle, { transformOrigin: menuTransformOrigin }]"
 				role="menu"
 				:aria-label="props.label"
 				@keydown="handleMenuKeydown"

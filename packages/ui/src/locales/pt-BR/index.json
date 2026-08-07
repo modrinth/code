@@ -1304,9 +1304,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Arquivo salvo"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Fechar"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Localizar"
   },
@@ -2900,9 +2897,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Criar projeto"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Editar cargo"
-  },
   "profile.button.info": {
     "defaultMessage": "Ver detalhes do usuário"
   },
@@ -2999,23 +2993,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {projeto} other {projetos}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Salvando..."
-  },
   "profile.official-account": {
     "defaultMessage": "Conta oficial do Modrinth"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Conta oficial do Modrinth. Obtenha suporte em<support-link></support-link> ou por e-mail via <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Selecione um cargo"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Ocorreu um erro ao atualizar o cargo do usuário. Tente novamente."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Falha ao atualizar cargo"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Ocorreu um erro ao desbloquear este usuário. Tente novamente."
@@ -5414,12 +5396,6 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar de {username}"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Cancelar"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Cancelar"
-  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Personalizado..."
   },
@@ -6255,4 +6231,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

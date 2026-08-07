@@ -1,4 +1,5 @@
-import type { SettingDefinitionBase } from '../types/settings.ts'
+import { isValidFor, type SettingDefinitionBase } from '../types/settings.ts'
+import { moderationSettings } from '../index.ts'
 
 export class Settings {
 	private readonly settings: { [id: string]: any }
@@ -13,7 +14,9 @@ export class Settings {
 	}
 
 	get<T>(definition: SettingDefinitionBase<T>): T {
-		return this.settings[definition.id] ?? definition.default
+		const value = this.settings[definition.id]
+
+		return (isValidFor(definition, value) ? value : undefined) ?? definition.default
 	}
 
 	set<T>(definition: SettingDefinitionBase<T>, value?: T): void {
@@ -22,4 +25,12 @@ export class Settings {
 		definition.onChange?.(previous, value ?? definition.default)
 		this.onChange()
 	}
+}
+
+export function getMarginTarget(settings: Settings): string {
+	return settings.get(moderationSettings.General.AdjustPageAlignment) == 'always'
+		? settings.get(moderationSettings.General.ChecklistPosition) == 'right'
+			? 'r'
+			: 'l'
+		: 'x'
 }

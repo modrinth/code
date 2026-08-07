@@ -1457,9 +1457,6 @@
   "minecraft-required.sign-in": {
     "message": "Microsoft'a giriş yap"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "İptal"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Tarayıcında devam et"
   },

@@ -1304,9 +1304,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "已儲存檔案"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "關閉"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "尋找"
   },
@@ -2900,9 +2897,6 @@
   "profile.button.create-project": {
     "defaultMessage": "建立專案"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "編輯身分"
-  },
   "profile.button.info": {
     "defaultMessage": "檢視使用者詳細資訊"
   },
@@ -2999,23 +2993,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, other {個專案}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "正在儲存..."
-  },
   "profile.official-account": {
     "defaultMessage": "Modrinth 官方帳號"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Modrinth 的官方使用者帳號。請至 <support-link></support-link> 取得支援，或透過電子郵件 <email></email> 聯絡客服團隊"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "選擇身分"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "更新使用者身分時發生錯誤，請再試一次。"
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "無法更新身分"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "解除封鎖使用者時發生錯誤，請再試一次。"
@@ -5414,12 +5396,6 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} 的顯示圖片"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "取消"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "取消"
-  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "自訂..."
   },
@@ -6255,4 +6231,3 @@
     "defaultMessage": "類型"
   }
 }
-

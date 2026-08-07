@@ -1,4 +1,5 @@
 use crate::database::PgPool;
+use crate::util::error::Context as _;
 use actix_web::{HttpResponse, post, web};
 use ariadne::ids::UserId;
 use chrono::Utc;
@@ -45,10 +46,11 @@ pub async fn verify(
             &username,
             Offer::Medal,
         )
-        .await?;
+        .await
+        .wrap_internal_err("executing `RedeemalLookupFields::redeemal_status_by_username_and_offer`")?;
 
     match maybe_fields {
-        None => Err(ApiError::NotFound),
+        None => Err(ApiError::NotFound(eyre::eyre!("resource not found"))),
         Some(fields) => Ok(HttpResponse::Ok().json(VerifyResponse {
             user_id: fields.user_id.into(),
             redeemed: fields.redeemal_status.is_some(),
@@ -71,7 +73,10 @@ pub async fn redeem(
     // Check the offer hasn't been redeemed yet, then insert into the table.
     // In a transaction to avoid double inserts.
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let maybe_fields =
         RedeemalLookupFields::redeemal_status_by_username_and_offer(
@@ -79,15 +84,18 @@ pub async fn redeem(
             &username,
             Offer::Medal,
         )
-        .await?;
+        .await
+        .wrap_internal_err("executing `RedeemalLookupFields::redeemal_status_by_username_and_offer`")?;
 
     let user_id = match maybe_fields {
-        None => return Err(ApiError::NotFound),
+        None => {
+            return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        }
         Some(fields) => {
             if fields.redeemal_status.is_some() {
-                return Err(ApiError::Conflict(
-                    "User already redeemed this offer".to_string(),
-                ));
+                return Err(ApiError::Conflict(eyre::eyre!(
+                    "User already redeemed this offer",
+                )));
             }
 
             fields.user_id
@@ -105,9 +113,14 @@ pub async fn redeem(
         n_attempts: 0,
     };
 
-    redeemal.insert(&mut txn).await?;
+    redeemal
+        .insert(&mut txn)
+        .await
+        .wrap_internal_err("inserting database records for `redeem`")?;
 
-    txn.commit().await?;
+    txn.commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     // Immediately try to process the redeemal
     if let Err(error) = try_process_user_redeemal(&pool, &redis, redeemal).await

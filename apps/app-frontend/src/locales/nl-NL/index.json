@@ -1763,9 +1763,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "Er is een nieuw tabblad geopend om je aan te melden. Log daar in en ga vervolgens terug naar de app."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Annuleren"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Doorgaan in je browser"
   },

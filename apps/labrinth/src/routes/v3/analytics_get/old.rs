@@ -1,5 +1,8 @@
 //! TODO: this module should be removed; it is superseded by `analytics_get`
 
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
+
 use super::ApiError;
 use crate::database;
 use crate::database::PgPool;
@@ -13,7 +16,6 @@ use crate::{
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::PgInterval;
 use std::collections::HashMap;
@@ -77,13 +79,15 @@ pub async fn playtimes_get(
         Scopes::ANALYTICS,
     )
     .await
-    .map(|x| x.1)?;
+    .map(|x| x.1)
+    .wrap_auth_err("authenticating API request")?;
 
     let project_ids = data
         .project_ids
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
+        .transpose()
+        .wrap_request_err("deserializing JSON data")?;
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -95,7 +99,9 @@ pub async fn playtimes_get(
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
     let project_ids =
-        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+        filter_allowed_ids(project_ids, user, &pool, &redis, None)
+            .await
+            .wrap_api_err("filtering authorized playtime project IDs")?;
 
     // Get the views
     let playtimes = crate::clickhouse::fetch_playtimes(
@@ -105,7 +111,8 @@ pub async fn playtimes_get(
         resolution_minutes,
         clickhouse.into_inner(),
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching project playtime from ClickHouse")?;
 
     let mut hm = HashMap::new();
     for playtime in playtimes {
@@ -159,13 +166,15 @@ pub async fn views_get(
         Scopes::ANALYTICS,
     )
     .await
-    .map(|x| x.1)?;
+    .map(|x| x.1)
+    .wrap_auth_err("authenticating API request")?;
 
     let project_ids = data
         .project_ids
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
+        .transpose()
+        .wrap_request_err("deserializing JSON data")?;
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -177,7 +186,9 @@ pub async fn views_get(
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
     let project_ids =
-        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+        filter_allowed_ids(project_ids, user, &pool, &redis, None)
+            .await
+            .wrap_api_err("filtering authorized view project IDs")?;
 
     // Get the views
     let views = crate::clickhouse::fetch_views(
@@ -187,7 +198,8 @@ pub async fn views_get(
         resolution_minutes,
         clickhouse.into_inner(),
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching project views from ClickHouse")?;
 
     let mut hm = HashMap::new();
     for views in views {
@@ -241,13 +253,15 @@ pub async fn downloads_get(
         Scopes::ANALYTICS,
     )
     .await
-    .map(|x| x.1)?;
+    .map(|x| x.1)
+    .wrap_auth_err("authenticating API request")?;
 
     let project_ids = data
         .project_ids
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
+        .transpose()
+        .wrap_request_err("deserializing JSON data")?;
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -260,7 +274,8 @@ pub async fn downloads_get(
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
     let project_ids =
         filter_allowed_ids(project_ids, user_option, &pool, &redis, None)
-            .await?;
+            .await
+            .wrap_api_err("filtering authorized download project IDs")?;
 
     // Get the downloads
     let downloads = crate::clickhouse::fetch_downloads(
@@ -270,7 +285,8 @@ pub async fn downloads_get(
         resolution_minutes,
         clickhouse.into_inner(),
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching project downloads from ClickHouse")?;
 
     let mut hm = HashMap::new();
     for downloads in downloads {
@@ -323,13 +339,15 @@ pub async fn revenue_get(
         Scopes::PAYOUTS_READ,
     )
     .await
-    .map(|x| x.1)?;
+    .map(|x| x.1)
+    .wrap_auth_err("authenticating API request")?;
 
     let project_ids = data
         .project_ids
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
+        .transpose()
+        .wrap_request_err("deserializing JSON data")?;
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -357,13 +375,15 @@ pub async fn revenue_get(
         &redis,
         Some(true),
     )
-    .await?;
+    .await
+    .wrap_api_err("filtering authorized revenue project IDs")?;
 
     let duration: PgInterval = Duration::minutes(resolution_minutes as i64)
         .try_into()
-        .map_err(|_| {
-            ApiError::Request(eyre!("Invalid `resolution_minutes`"))
-        })?;
+        .map_err(|err: Box<dyn std::error::Error + Send + Sync>| {
+            eyre::eyre!("{err}")
+        })
+        .wrap_request_err("invalid `resolution_minutes`")?;
     // Get the revenue data
     let project_ids = project_ids.unwrap_or_default();
 
@@ -387,7 +407,7 @@ pub async fn revenue_get(
             duration,
         )
             .fetch_all(&**pool)
-            .await?.into_iter().map(|x| PayoutValue {
+            .await.wrap_internal_err("fetching payouts values from database")?.into_iter().map(|x| PayoutValue {
             mod_id: x.mod_id,
             amount_sum: x.amount_sum,
             interval_start: x.interval_start,
@@ -406,7 +426,7 @@ pub async fn revenue_get(
             duration,
         )
             .fetch_all(&**pool)
-            .await?.into_iter().map(|x| PayoutValue {
+            .await.wrap_internal_err("querying database for `revenue_get`")?.into_iter().map(|x| PayoutValue {
             mod_id: x.mod_id,
             amount_sum: x.amount_sum,
             interval_start: x.interval_start,
@@ -476,13 +496,15 @@ pub async fn countries_downloads_get(
         Scopes::ANALYTICS,
     )
     .await
-    .map(|x| x.1)?;
+    .map(|x| x.1)
+    .wrap_auth_err("authenticating API request")?;
 
     let project_ids = data
         .project_ids
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
+        .transpose()
+        .wrap_request_err("deserializing JSON data")?;
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -491,7 +513,11 @@ pub async fn countries_downloads_get(
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
     let project_ids =
-        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+        filter_allowed_ids(project_ids, user, &pool, &redis, None)
+            .await
+            .wrap_api_err(
+                "filtering authorized download-country project IDs",
+            )?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries_downloads(
@@ -500,7 +526,8 @@ pub async fn countries_downloads_get(
         end_date,
         clickhouse.into_inner(),
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching download countries from ClickHouse")?;
 
     let mut hm = HashMap::new();
     for views in countries {
@@ -562,13 +589,15 @@ pub async fn countries_views_get(
         Scopes::ANALYTICS,
     )
     .await
-    .map(|x| x.1)?;
+    .map(|x| x.1)
+    .wrap_auth_err("authenticating API request")?;
 
     let project_ids = data
         .project_ids
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
+        .transpose()
+        .wrap_request_err("deserializing JSON data")?;
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -577,7 +606,9 @@ pub async fn countries_views_get(
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
     let project_ids =
-        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+        filter_allowed_ids(project_ids, user, &pool, &redis, None)
+            .await
+            .wrap_api_err("filtering authorized view-country project IDs")?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries_views(
@@ -586,7 +617,8 @@ pub async fn countries_views_get(
         end_date,
         clickhouse.into_inner(),
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching view countries from ClickHouse")?;
 
     let mut hm = HashMap::new();
     for views in countries {
@@ -635,7 +667,8 @@ async fn filter_allowed_ids(
     if project_ids.is_none() && !remove_defaults.unwrap_or(false) {
         project_ids = Some(
             user_item::DBUser::get_projects(user.id.into(), &***pool, redis)
-                .await?
+                .await
+                .wrap_internal_err("deleting user from database")?
                 .into_iter()
                 .map(|x| ProjectId::from(x).to_string())
                 .collect(),
@@ -650,7 +683,8 @@ async fn filter_allowed_ids(
             &***pool,
             redis,
         )
-        .await?;
+        .await
+        .wrap_api_err("fetching analytics projects")?;
 
         let team_ids = projects_data
             .iter()
@@ -660,7 +694,8 @@ async fn filter_allowed_ids(
             database::models::DBTeamMember::get_from_team_full_many(
                 &team_ids, &***pool, redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("fetching team members from database")?;
 
         let organization_ids = projects_data
             .iter()
@@ -671,7 +706,8 @@ async fn filter_allowed_ids(
             &***pool,
             redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching organizations from database")?;
 
         let organization_team_ids = organizations
             .iter()
@@ -683,7 +719,8 @@ async fn filter_allowed_ids(
                 &***pool,
                 redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("fetching team members from database")?;
 
         let ids = projects_data
             .into_iter()

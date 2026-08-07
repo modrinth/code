@@ -1853,9 +1853,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "로그인을 위한 새 탭이 열렸습니다. 해당 탭에서 로그인을 완료한 후 앱 돌아오세요."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "취소"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "브라우저에서 계속 진행"
   },
