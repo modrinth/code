@@ -32,12 +32,13 @@ export type ProjectType =
 	| 'plugin'
 	| 'server'
 
-interface SearchHit {
+export interface SearchHit {
 	project_id: string
 	title: string
 	icon_url?: string
 	project_type: string
 	slug: string
+	author?: string
 }
 
 const props = withDefaults(
@@ -82,6 +83,10 @@ const selectedProject = ref<SearchHit | null>(null)
 const searchResultsCache = ref<Map<string, SearchHit>>(new Map())
 
 const { labrinth } = injectModrinthClient()
+
+function isAllowedProjectType(projectType: string): boolean {
+	return !props.projectTypes || props.projectTypes.includes(projectType as ProjectType)
+}
 
 const userProjectHits = ref<SearchHit[]>([])
 const userProjectsFuse = ref<Fuse<SearchHit> | null>(null)
@@ -163,7 +168,7 @@ watch(
 		} else {
 			try {
 				const project = await labrinth.projects_v2.get(newId)
-				if (project) {
+				if (project && isAllowedProjectType(project.project_type)) {
 					hit = {
 						project_id: project.id,
 						title: project.title,
@@ -177,6 +182,9 @@ watch(
 				selectedProject.value = null
 				return
 			}
+		}
+		if (hit && !isAllowedProjectType(hit.project_type)) {
+			hit = null
 		}
 
 		selectedProject.value = hit
@@ -220,7 +228,11 @@ const search = async (query: string) => {
 		const uniqueHits: SearchHit[] = []
 
 		for (const hit of allHits) {
-			if (!seenIds.has(hit.project_id) && !excludeSet.has(hit.project_id)) {
+			if (
+				isAllowedProjectType(hit.project_type) &&
+				!seenIds.has(hit.project_id) &&
+				!excludeSet.has(hit.project_id)
+			) {
 				seenIds.add(hit.project_id)
 				uniqueHits.push(hit)
 				searchResultsCache.value.set(hit.project_id, hit)
