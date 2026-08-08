@@ -24,7 +24,7 @@
 		<IconButton
 			type="quiet"
 			color="red"
-			interaction="filled"
+			interaction="hover"
 			label="Close window"
 			class="relative expanded-button close-button"
 			@click="handleClose"

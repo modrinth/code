@@ -110,7 +110,8 @@ treatment needs to differ from the default surface fill:
 | Interaction | Treatment |
 | ----------- | --------- |
 | `surface` | Uses the standard neutral hover/focus surface. This is the default. |
-| `filled` | Fills with the button's `color` and uses contrast text. |
+| `filled` | Tints text/icon with the button's `color` at rest, and fills with it on hover/focus using contrast text. |
+| `hover` | Like `filled`, but untinted at rest — `color` is only applied as the hover/focus fill. |
 | `none` | Keeps the background transparent while retaining the focus ring. |
 
 ```vue
@@ -118,7 +119,13 @@ treatment needs to differ from the default surface fill:
 <IconButton type="quiet" interaction="none" label="Open account menu">
 	<AvatarIcon aria-hidden="true" />
 </IconButton>
+<IconButton type="quiet" color="red" interaction="hover" label="Close window">
+	<XIcon aria-hidden="true" />
+</IconButton>
 ```
+
+Use `hover` for icons that should only signal danger or emphasis on interaction, such as a
+window close button, without tinting the icon at rest.
 
 Use `interaction` to describe behavior rather than passing arbitrary hover colors.
 Resting selected-state backgrounds, such as a current pagination page, remain the
