@@ -1,1 +1,2 @@
-- Per section 6.1 of %RULES% please label this %PROJECT_TYPE_FORMATTED_LOWER% as containing AI-generated content.
+- AI-generated or assisted content. </br>
+  Proper disclosure of AI usage is strictly required per section 6.1 of %RULES%.

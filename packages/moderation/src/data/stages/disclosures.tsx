@@ -11,48 +11,48 @@ export default function () {
 		.children(
 			group().children(
 				toggle('missing-disclosures', 'Disclosures Missing')
-					.message('header')
+					.message('missing-disclosures/missing-disclosures-header')
 					.children(
 						group()
 							.title('Which content disclosures are missing?')
 							.children(
-								option('ai', 'AI Usage')
+								toggle('ai', 'AI Usage')
 									.suggestedStatus('flagged')
 									.message()
 									.children(
 										group()
 											.title('What kind of AI content is present?')
 											.children(
-												option('code', 'Code').message(),
-												option('assets', 'Assets').message(),
-												option('text', 'Text').message(),
-												option('functionality', 'Functionality').message(),
+												toggle('code', 'Code').message('ai-usages/code'),
+												toggle('assets', 'Assets').message('ai-usages/assets'),
+												toggle('text', 'Text').message('ai-usages/text'),
+												toggle('functionality', 'Functionality').message('ai-usages/functionality'),
 											),
 									)
-									.collect(),
+									.collect(undefined, 'ai/list-intro'),
 
-								option('ads', 'Advertisements').suggestedStatus('flagged').message(),
+								toggle('ads', 'Advertisements').suggestedStatus('flagged').message(),
 
-								option('paid-features', 'Paid Features').suggestedStatus('flagged').message(),
+								toggle('paid-features', 'Paid Features').suggestedStatus('flagged').message(),
 
-								option('telemetry', 'Telemetry').suggestedStatus('rejected').message(),
+								toggle('telemetry', 'Telemetry').suggestedStatus('rejected').message(),
 
-								option('derivative-content', 'Derivative Content')
+								toggle('derivative-content', 'Derivative Content')
 									.suggestedStatus('rejected')
 									.message(),
 
-								option('photosensitivity', 'Photosensitivity')
+								toggle('photosensitivity', 'Photosensitivity')
 									.suggestedStatus('rejected')
 									.message(),
 
-								option('system-interactions', 'System Interactions')
+								toggle('system-interactions', 'System Interactions')
 									.suggestedStatus('rejected')
 									.message(),
 
-								option('archive', 'Archive').message(),
+								toggle('archive', 'Archive').message(),
 							),
 					)
-					.collect(undefined, 'list-intro'),
+					.collect(undefined, 'missing-disclosures/list-intro'),
 			),
 		)
 }
