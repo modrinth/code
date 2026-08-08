@@ -166,7 +166,6 @@ defineExpose({ element })
 	color: var(--button-color, var(--color-base));
 }
 
-/* interaction="hover": ignore --button-color at rest, only tint on hover/focus. */
 .button-frame--quiet-hover {
 	color: var(--color-base);
 }
