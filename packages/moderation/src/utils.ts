@@ -249,7 +249,7 @@ export function flattenProjectVariables(
 	vars[`PROJECT_CONTENT_DISCLOSURES_LINK`] =
 		`https://modrinth.com/project/${project.id}/settings/disclosures`
 	vars[`PROJECT_CONTENT_DISCLOSURES_FLINK`] =
-		`[Content disclosures](https://modrinth.com/project/${project.id}/settings/disclosures)`
+		`[Content Disclosures](https://modrinth.com/project/${project.id}/settings/disclosures)`
 
 	return vars
 }
