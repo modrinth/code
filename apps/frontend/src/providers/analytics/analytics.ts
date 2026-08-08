@@ -1031,8 +1031,17 @@ export function createAnalyticsDashboardContext(
 
 		return ANALYTICS_START_TIME
 	})
+	const comparisonOffsetMs = computed(() =>
+		selectedTimeframeMode.value === 'preset' && selectedTimeframe.value === 'yesterday'
+			? 7 * 24 * 60 * 60 * 1000 // 7 days
+			: undefined,
+	)
 	const comparisonFetchRequest = computed(() =>
-		buildComparisonFetchRequest(fetchRequest.value, analyticsComparisonStartTime.value),
+		buildComparisonFetchRequest(
+			fetchRequest.value,
+			analyticsComparisonStartTime.value,
+			comparisonOffsetMs.value,
+		),
 	)
 	const analyticsTimeSlicesFetchRequest = computed(
 		() => comparisonFetchRequest.value ?? fetchRequest.value,
@@ -1126,8 +1135,11 @@ export function createAnalyticsDashboardContext(
 
 		const dailyFetchRequest = buildDailyAnalyticsFetchRequest(fetchRequest.value)
 		return (
-			buildComparisonFetchRequest(dailyFetchRequest, analyticsComparisonStartTime.value) ??
-			dailyFetchRequest
+			buildComparisonFetchRequest(
+				dailyFetchRequest,
+				analyticsComparisonStartTime.value,
+				comparisonOffsetMs.value,
+			) ?? dailyFetchRequest
 		)
 	})
 
@@ -1583,6 +1595,7 @@ export function createAnalyticsDashboardContext(
 				nextAnalyticsData.metrics,
 				fetchRequest.value,
 				analyticsComparisonStartTime.value,
+				comparisonOffsetMs.value,
 			)
 			timeSlices.value = splitTimeSlices.currentTimeSlices
 			previousTimeSlices.value = splitTimeSlices.previousTimeSlices

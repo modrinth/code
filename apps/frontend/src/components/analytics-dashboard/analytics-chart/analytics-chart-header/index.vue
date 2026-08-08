@@ -40,6 +40,7 @@
 					v-model:show-previous-period="showPreviousPeriod"
 					:can-use-ratio-mode="canUseRatioMode"
 					:can-show-previous-period="canShowPreviousPeriod"
+					:is-same-day-last-week-comparison="isSameDayLastWeekComparison"
 					:has-chart-events="hasChartEvents"
 					:has-project-events="hasProjectEvents"
 					:small-toggles="smallToggles"
@@ -89,6 +90,7 @@ const props = defineProps<{
 	showTopGraphDatasetsButton: boolean
 	canUseRatioMode: boolean
 	canShowPreviousPeriod: boolean
+	isSameDayLastWeekComparison: boolean
 	hasChartEvents: boolean
 	hasProjectEvents: boolean
 	smallToggles: boolean

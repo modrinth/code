@@ -295,6 +295,14 @@ export const analyticsStatCardMessages = defineMessages({
 		id: 'analytics.stat.previous-period-comparison-short',
 		defaultMessage: 'vs prev.',
 	},
+	sameDayLastWeekComparison: {
+		id: 'analytics.stat.same-day-last-week-comparison',
+		defaultMessage: 'vs. same day last week',
+	},
+	sameDayLastWeekComparisonShort: {
+		id: 'analytics.stat.same-day-last-week-comparison-short',
+		defaultMessage: 'vs. last wk.',
+	},
 })
 
 export const analyticsGroupByMessages = defineMessages({
@@ -623,6 +631,10 @@ export const analyticsChartMessages = defineMessages({
 		id: 'analytics.chart.controls.previous-period',
 		defaultMessage: 'Previous period',
 	},
+	sameDayLastWeek: {
+		id: 'analytics.chart.controls.same-day-last-week',
+		defaultMessage: 'Same day last week',
+	},
 	ratio: {
 		id: 'analytics.chart.controls.ratio',
 		defaultMessage: 'Ratio',
@@ -667,6 +679,14 @@ export const analyticsChartMessages = defineMessages({
 	previousPeriodShort: {
 		id: 'analytics.chart.tooltip.previous-period-short',
 		defaultMessage: '(prev.)',
+	},
+	sameDayLastWeekSuffix: {
+		id: 'analytics.chart.legend.same-day-last-week-suffix',
+		defaultMessage: '{name} (Last wk.)',
+	},
+	sameDayLastWeekShort: {
+		id: 'analytics.chart.tooltip.same-day-last-week-short',
+		defaultMessage: '(last wk.)',
 	},
 	tooltipPinned: {
 		id: 'analytics.chart.tooltip.pinned',
