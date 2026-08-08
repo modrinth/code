@@ -181,6 +181,23 @@ fn main() {
                 .build(),
         )
         .setup(|app| {
+			#[cfg(target_os = "windows")]
+			{
+				let app_name = app.package_info().name.clone();
+				tauri::async_runtime::spawn(async move {
+					match theseus::cleanup_updater_temp_folders(&app_name).await
+					{
+						Ok(0) => {}
+						Ok(count) => tracing::info!(
+							"Cleaned up {count} updater temp folders"
+						),
+						Err(error) => tracing::warn!(
+							"Failed to clean up updater temp folders: {error}"
+						),
+					}
+				});
+			}
+
             #[cfg(target_os = "macos")]
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
