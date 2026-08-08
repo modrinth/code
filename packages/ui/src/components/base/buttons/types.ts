@@ -7,7 +7,7 @@ export type ButtonType = 'base' | 'colored' | 'outlined' | 'quiet'
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
-export type ButtonInteraction = 'surface' | 'filled' | 'none'
+export type ButtonInteraction = 'surface' | 'filled' | 'hover' | 'none'
 
 // TODO: Standardized color string enum props across @modrinth/ui
 export type ButtonColor =

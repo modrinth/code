@@ -50,11 +50,14 @@ const typeClasses: Record<ButtonType, string> = {
 	quiet: 'button-frame--quiet bg-transparent [&>svg]:text-inherit',
 }
 
+const filledOnInteractionClasses =
+	'[&:not(:disabled):not([aria-disabled=true]):hover]:!bg-[--button-color] [&:not(:disabled):not([aria-disabled=true]):focus-visible]:!bg-[--button-color] [&:not(:disabled):not([aria-disabled=true]):hover]:!text-[var(--color-accent-contrast)] [&:not(:disabled):not([aria-disabled=true]):focus-visible]:!text-[var(--color-accent-contrast)]'
+
 const interactionClasses: Record<ButtonInteraction, string> = {
 	surface:
 		'[&:not(:disabled):not([aria-disabled=true]):hover]:bg-surface-4 [&:not(:disabled):not([aria-disabled=true]):focus-visible]:bg-surface-4',
-	filled:
-		'[&:not(:disabled):not([aria-disabled=true]):hover]:!bg-[--button-color] [&:not(:disabled):not([aria-disabled=true]):focus-visible]:!bg-[--button-color] [&:not(:disabled):not([aria-disabled=true]):hover]:!text-[var(--color-accent-contrast)] [&:not(:disabled):not([aria-disabled=true]):focus-visible]:!text-[var(--color-accent-contrast)]',
+	filled: filledOnInteractionClasses,
+	hover: `button-frame--quiet-hover ${filledOnInteractionClasses}`,
 	none: '[&:not(:disabled):not([aria-disabled=true]):hover]:!brightness-100 [&:not(:disabled):not([aria-disabled=true]):focus-visible]:!brightness-100',
 }
 
@@ -161,5 +164,9 @@ defineExpose({ element })
 
 .button-frame--quiet {
 	color: var(--button-color, var(--color-base));
+}
+
+.button-frame--quiet-hover {
+	color: var(--color-base);
 }
 </style>

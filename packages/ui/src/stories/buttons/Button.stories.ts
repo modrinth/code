@@ -128,6 +128,23 @@ export const Quiet: Story = {
 	}),
 }
 
+export const QuietInteraction: Story = {
+	render: () => ({
+		components: { Button, DownloadIcon, IconButton },
+		template: /*html*/ `
+			<div class="flex flex-wrap items-center gap-4">
+				<Button type="quiet" color="red" interaction="surface">Surface (default)</Button>
+				<Button type="quiet" color="red" interaction="filled">Filled</Button>
+				<Button type="quiet" color="red" interaction="hover">Hover only</Button>
+				<Button type="quiet" color="red" interaction="none">None</Button>
+				<IconButton type="quiet" color="red" interaction="hover" label="Close window">
+					<DownloadIcon />
+				</IconButton>
+			</div>
+		`,
+	}),
+}
+
 export const Sizes: Story = {
 	render: () => ({
 		components: { Button, DownloadIcon, IconButton },
