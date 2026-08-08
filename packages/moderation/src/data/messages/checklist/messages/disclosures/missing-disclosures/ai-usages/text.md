@@ -1,0 +1,1 @@
+    - AI generated or assisted writting or text, including translations.

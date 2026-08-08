@@ -246,6 +246,10 @@ export function flattenProjectVariables(
 	vars[`PROJECT_MONETIZATION_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
 	vars[`PROJECT_MONETIZATION_SETTINGS_FLINK`] =
 		`[Monetization settings](https://modrinth.com/project/${project.id}/settings)`
+	vars[`PROJECT_CONTENT_DISCLOSURES_LINK`] =
+		`https://modrinth.com/project/${project.id}/settings/disclosures`
+	vars[`PROJECT_CONTENT_DISCLOSURES_FLINK`] =
+		`[Monetization settings](https://modrinth.com/project/${project.id}/settings/disclosures)`
 
 	return vars
 }

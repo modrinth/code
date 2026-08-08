@@ -11,6 +11,7 @@ import usePermissionsStage from './stages/permissions'
 import usePostApprovalStage from './stages/post-approval'
 import useReReviewStage from './stages/re-review'
 import useReuploadsStage from './stages/reupload'
+import useDisclosuresStage from './stages/disclosures'
 import useRulesStage from './stages/rules'
 import useStatusAlertsStage from './stages/status-alerts'
 import useSummaryStage from './stages/summary'
@@ -37,6 +38,7 @@ export function useStages(
 		useReuploadsStage(),
 		usePermissionsStage(),
 		useRulesStage(),
+		useDisclosuresStage(),
 	]
 	return [...mainStages, useStatusAlertsStage(mainStages, globalState)]
 }
