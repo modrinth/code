@@ -701,15 +701,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Quale regola è violata da quest'istanza?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Inappropriato"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Dannoso"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Segnala istanza condivisa"
   },

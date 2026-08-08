@@ -40,6 +40,8 @@ html {
 
 	interpolate-size: allow-keywords;
 	scrollbar-gutter: stable;
+
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .light-mode {

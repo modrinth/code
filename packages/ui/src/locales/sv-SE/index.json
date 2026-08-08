@@ -3437,12 +3437,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Avancerat"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Exkludera datapaket"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Exkludera moddar"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Miljö"
   },

@@ -3782,15 +3782,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Більше"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Виключити пакети даних"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Виключити моди"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Виключити плаґіни"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Середовище"
   },

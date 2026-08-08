@@ -3818,15 +3818,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "고급"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "데이터 팩 제외"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "모드 제외"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "플러그인 제외"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "실행 환경"
   },

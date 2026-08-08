@@ -3650,15 +3650,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Gelişmiş"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Veri paketlerini hariç tut"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Modları hariç tut"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Eklentileri hariç tut"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Ortam"
   },

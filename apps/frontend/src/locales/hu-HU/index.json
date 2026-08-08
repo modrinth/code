@@ -3671,15 +3671,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "A címkék kiválasztásához előbb tölts fel egy verziót!"
   },
-  "project.settings.title": {
-    "message": "Beállítások"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Projektek irányítópult megnyitása"
-  },
-  "project.status.archived.message": {
-    "message": "A(z) {title} archiválásra került. A(z) {title} nem kap további frissítéseket, kivéve, ha a fejlesztő úgy dönt, hogy visszavonja a projekt archiválását."
-  },
   "project.versions.copy-id-option": {
     "message": "Azonosító másolása"
   },

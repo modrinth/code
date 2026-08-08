@@ -145,6 +145,8 @@ const groupDescriptionMessages: Record<string, MessageDescriptor> = {
 
 const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
 
+useProjectSettingsHeadTitle(messages.title)
+
 const formatCategoryName = (categoryName: string) => formatCategory(formatMessage, categoryName)
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
@@ -390,10 +392,10 @@ const toggleFeatured = (tag: string) => {
 				:key="group.id"
 				class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
 			>
-				<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+				<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 					{{ group.title }}
 				</h3>
-				<p v-if="group.description" class="mb-3 mt-0 text-sm">
+				<p v-if="group.description" class="mb-3 mt-0">
 					{{ group.description }}
 				</p>
 				<div class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
@@ -413,7 +415,7 @@ const toggleFeatured = (tag: string) => {
 
 			<div class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
 				<div class="mb-1 flex items-center gap-2">
-					<h3 class="m-0 text-base font-semibold text-contrast">
+					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.featuredTags) }}
 					</h3>
 					<TagItem
@@ -427,10 +429,10 @@ const toggleFeatured = (tag: string) => {
 						{{ current.featuredTags.length }}/{{ MAX_FEATURED_TAGS }}
 					</TagItem>
 				</div>
-				<p class="mb-3 mt-0 text-sm">
+				<p class="mb-3 mt-0">
 					{{ formatMessage(messages.featuredTagsDescription) }}
 				</p>
-				<p v-if="current.selectedTags.length < 1" class="m-0 text-sm text-secondary">
+				<p v-if="current.selectedTags.length < 1" class="m-0 text-secondary">
 					{{ formatMessage(messages.selectAtLeastOneCategory) }}
 				</p>
 				<div v-else class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">

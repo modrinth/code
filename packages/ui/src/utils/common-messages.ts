@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { capitalizeString } from '@modrinth/utils'
 
 import { defineMessage, defineMessages, type MessageDescriptor } from '../composables/i18n'
 
@@ -34,6 +35,10 @@ export const commonMessages = defineMessages({
 	allProjectType: {
 		id: 'project-type.all',
 		defaultMessage: 'All',
+	},
+	addAnotherButton: {
+		id: 'button.add-another',
+		defaultMessage: 'Add another',
 	},
 	addServerToInstanceButton: {
 		id: 'button.add-server-to-instance',
@@ -143,6 +148,10 @@ export const commonMessages = defineMessages({
 		id: 'notification.error.title',
 		defaultMessage: 'An error occurred',
 	},
+	explanationLabel: {
+		id: 'label.explanation',
+		defaultMessage: 'Explanation',
+	},
 	filterByLabel: {
 		id: 'label.filter-by',
 		defaultMessage: 'Filter by',
@@ -166,6 +175,10 @@ export const commonMessages = defineMessages({
 	gridInputView: {
 		id: 'input.view.grid',
 		defaultMessage: 'Grid view',
+	},
+	iUnderstandButton: {
+		id: 'button.i-understand',
+		defaultMessage: 'I understand',
 	},
 	listInputView: {
 		id: 'input.view.list',
@@ -1007,6 +1020,43 @@ export function formatReportItemType(
 	return formatMessage(reportItemTypeMessages[key])
 }
 
+export const reportTypeMessages = defineMessages({
+	spam: {
+		id: 'report.type.spam',
+		defaultMessage: 'Spam',
+	},
+	copyright: {
+		id: 'report.type.copyright',
+		defaultMessage: 'Reuploaded work',
+	},
+	inappropriate: {
+		id: 'report.type.inappropriate',
+		defaultMessage: 'Inappropriate',
+	},
+	malicious: {
+		id: 'report.type.malicious',
+		defaultMessage: 'Malicious',
+	},
+	'name-squatting': {
+		id: 'report.type.name-squatting',
+		defaultMessage: 'Name squatting',
+	},
+	'missing-disclosure': {
+		id: 'report.type.missing-disclosure',
+		defaultMessage: 'Missing or incorrect disclosure',
+	},
+})
+
+export function formatReportType(formatMessage: FormatMessage, type: string | undefined): string {
+	if (!type) return ''
+
+	if (type in reportTypeMessages) {
+		return formatMessage(reportTypeMessages[type as keyof typeof reportTypeMessages])
+	}
+
+	return capitalizeString(type.replace('-', ' '))
+}
+
 export const fileItemTypeMessages = defineMessages({
 	file: {
 		id: 'files.item-type.file',
@@ -1093,6 +1143,10 @@ export const commonProjectSettingsMessages = defineMessages({
 	content: {
 		id: 'project.settings.content.title',
 		defaultMessage: 'Content',
+	},
+	disclosures: {
+		id: 'project.settings.disclosures.title',
+		defaultMessage: 'Disclosures',
 	},
 	description: {
 		id: 'project.settings.description.title',

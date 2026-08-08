@@ -3833,15 +3833,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "高级"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "排除数据包"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "排除模组"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "排除插件"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "运行环境"
   },

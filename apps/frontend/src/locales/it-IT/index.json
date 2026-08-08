@@ -3938,15 +3938,6 @@
   "project.settings.tags.upload-version-first": {
     "message": "Carica una vesione prima di selezionare i tag!"
   },
-  "project.settings.title": {
-    "message": "Impostazioni"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Visita bacheca del progetto"
-  },
-  "project.status.archived.message": {
-    "message": "{title} è stato archiviato. {title} non riceverà più aggiornamenti a meno che l'autore decida di rimuoverlo dall'archivio."
-  },
   "project.versions.copy-id-option": {
     "message": "Copia ID"
   },

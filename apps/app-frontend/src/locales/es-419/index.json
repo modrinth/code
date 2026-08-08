@@ -701,15 +701,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "¿Qué regla rompe esta instancia?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Inapropiado"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Malicioso"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Reportar instancia compartida"
   },

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<AiImageWarningModal ref="aiImageWarningModal" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<div class="universal-card">
 			<div class="markdown-disclaimer">
@@ -42,6 +43,7 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
 import {
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	injectProjectPageContext,
 	MarkdownEditor,
@@ -50,11 +52,16 @@ import {
 	useSavable,
 } from '@modrinth/ui'
 import { TeamMemberPermission } from '@modrinth/utils'
-import { computed } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
+import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { fileDeclaresAi } from '~/helpers/c2pa'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.description)
 
 const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({ description: project.value.body }),
@@ -77,6 +84,10 @@ const descriptionWarning = computed(() => {
 })
 
 async function onUploadHandler(file: File) {
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
 	const response = await useImageUpload(file, {
 		context: 'project',
 		projectID: project.value.id,
