@@ -23,7 +23,7 @@
 				<Checkbox v-model="dontShowAgain" :label="formatMessage(messages.dontShowAgain)" />
 				<Button type="colored" color="brand" native-type="button" @click="acknowledge">
 					<CheckCircleIcon class="size-4" />
-					{{ formatMessage(messages.iUnderstand) }}
+					{{ formatMessage(commonMessages.iUnderstandButton) }}
 				</Button>
 			</div>
 		</div>
@@ -37,6 +37,7 @@ import { ref, useTemplateRef } from 'vue'
 import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 import Checkbox from '../base/Checkbox.vue'
 import NewModal from './NewModal.vue'
 
@@ -71,10 +72,6 @@ const messages = defineMessages({
 	dontShowAgain: {
 		id: 'search.photosensitivity-warning-modal.dont-show-again',
 		defaultMessage: "Don't show this again",
-	},
-	iUnderstand: {
-		id: 'search.photosensitivity-warning-modal.i-understand',
-		defaultMessage: 'I understand',
 	},
 })
 

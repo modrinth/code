@@ -3485,6 +3485,12 @@
   "project.actions.servers-promo.title": {
     "message": "Create a server"
   },
+  "project.ai-image-warning-modal.body": {
+    "message": "Using AI-generated images to represent your project is not allowed. Attempting to work around detection may lead to your Modrinth account being suspended."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "AI-generated images not allowed"
+  },
   "project.collections.create-new": {
     "message": "Create new collection"
   },

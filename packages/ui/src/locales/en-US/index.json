@@ -206,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Hide snapshots"
   },
+  "button.i-understand": {
+    "defaultMessage": "I understand"
+  },
   "button.install": {
     "defaultMessage": "Install"
   },
@@ -3988,9 +3991,6 @@
   },
   "search.photosensitivity-warning-modal.dont-show-again": {
     "defaultMessage": "Don't show this again"
-  },
-  "search.photosensitivity-warning-modal.i-understand": {
-    "defaultMessage": "I understand"
   },
   "search.photosensitivity-warning-modal.title": {
     "defaultMessage": "Results are not guaranteed to be safe"

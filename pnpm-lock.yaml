@@ -263,6 +263,9 @@ importers:
 
   apps/frontend:
     dependencies:
+      '@contentauth/c2pa-web':
+        specifier: ^0.13.1
+        version: 0.13.1
       '@formatjs/intl-localematcher':
         specifier: ^0.5.4
         version: 0.5.10
@@ -1229,6 +1232,15 @@ packages:
 
   '@codemirror/view@6.39.12':
     resolution: {integrity: sha512-f+/VsHVn/kOA9lltk/GFzuYwVVAKmOnNjxbrhkk3tPHntFqjWeI2TbIXx006YkBkqC10wZ4NsnWXCQiFPeAISQ==}
+
+  '@contentauth/c2pa-types@0.7.2':
+    resolution: {integrity: sha512-SH+q4a6ZS2z2YhlqfTB2GzN1S4M9koLhJETGPxL5J4JVhJEFSyEQK52PnwOhee+ObiZdDZK18NI+s+1IrUSdTQ==}
+
+  '@contentauth/c2pa-wasm@0.11.0':
+    resolution: {integrity: sha512-pL7tGZnM/qQz7JFCPB0hWSZM41L4aUEF/SV9B1fL+0L2sUZT1Zj7UGcUjSmiRWeXLagQ8Jds7RF+XQ9gxZiG7g==}
+
+  '@contentauth/c2pa-web@0.13.1':
+    resolution: {integrity: sha512-K4GLdhqIdLE3DUdO0Ub2M6rnyopAnCtdOQhFx2ACayVXo6uLuYlMPRlBivqc4RlvuXMpvJcW2BMu6B1FZpbYhw==}
 
   '@crowdin/crowdin-api-client@1.55.2':
     resolution: {integrity: sha512-kEMiz25j9tSfhsyj8dZWdhKPdtTeVu9lWZFBIc+adHXZ8vs6zd4/6xaiYr3PamYhV3rIOBEv8ElyzpUSSO5LGg==}
@@ -6815,6 +6827,9 @@ packages:
   hey-listen@1.0.8:
     resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
 
+  highgain@0.1.0:
+    resolution: {integrity: sha512-Vw/g2upw4MYLZ9e95k79+idMoPFEKvTQVTce9LCDfI+T6AiG+SdiR4WDKszB1grQy0O+uhxd6cqbdi3VhECdbA==}
+
   highlight.js@11.11.1:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
@@ -9470,6 +9485,10 @@ packages:
     resolution: {integrity: sha512-q5W7tVM71e2xjHZTlgfTDoPF/SmqKG5hddq9SzR49CH2hayqRKJtQ4mtRlSxKaJlR/+9rEM+mnBHf7I2/BQcpQ==}
     engines: {node: '>=6.10'}
 
+  ts-deepmerge@8.0.0:
+    resolution: {integrity: sha512-133O+10nJmVI8w5xeVZPEv5PIrv7iaUae07wv1aH8XJH95Ur6YIhWAPhPyP1YPlbPS9fCVcNIZTu7m8urRVF0A==}
+    engines: {node: '>=14.13.1'}
+
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
@@ -10174,8 +10193,8 @@ packages:
   vue-component-type-helpers@3.2.4:
     resolution: {integrity: sha512-05lR16HeZDcDpB23ku5b5f1fBOoHqFnMiKRr2CiEvbG5Ux4Yi0McmQBOET0dR0nxDXosxyVqv67q6CzS3AK8rw==}
 
-  vue-component-type-helpers@3.3.8:
-    resolution: {integrity: sha512-troqCMmQodQDqUqn63NQaFi+CDSclSe7sc8VEBFqf5GFLqmGR2Ph3P2WEC7qwpRVyEWsTi/aAr4vyOe/B1hU3g==}
+  vue-component-type-helpers@3.3.9:
+    resolution: {integrity: sha512-3c/UfMe0SqyEfcGTyH7mfshHagJ9QTCbppCb0/uGpHZpFug7+If3GeGZN7I0YheKEExemx3xldQPoO7PQSOLQg==}
 
   vue-confetti-explosion@1.0.2:
     resolution: {integrity: sha512-80OboM3/6BItIoZ6DpNcZFqGpF607kjIVc5af56oKgtFmt5yWehvJeoYhkzYlqxrqdBe0Ko4Ie3bWrmLau+dJw==}
@@ -11028,6 +11047,17 @@ snapshots:
       crelt: 1.0.6
       style-mod: 4.1.3
       w3c-keyname: 2.2.8
+
+  '@contentauth/c2pa-types@0.7.2': {}
+
+  '@contentauth/c2pa-wasm@0.11.0': {}
+
+  '@contentauth/c2pa-web@0.13.1':
+    dependencies:
+      '@contentauth/c2pa-types': 0.7.2
+      '@contentauth/c2pa-wasm': 0.11.0
+      highgain: 0.1.0
+      ts-deepmerge: 8.0.0
 
   '@crowdin/crowdin-api-client@1.55.2':
     dependencies:
@@ -13822,7 +13852,7 @@ snapshots:
       storybook: 10.2.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       type-fest: 2.19.0
       vue: 3.5.27(typescript@5.9.3)
-      vue-component-type-helpers: 3.3.8
+      vue-component-type-helpers: 3.3.9
 
   '@stripe/stripe-js@7.9.0': {}
 
@@ -17066,6 +17096,8 @@ snapshots:
   he@1.2.0: {}
 
   hey-listen@1.0.8: {}
+
+  highgain@0.1.0: {}
 
   highlight.js@11.11.1: {}
 
@@ -20384,6 +20416,8 @@ snapshots:
 
   ts-dedent@2.2.0: {}
 
+  ts-deepmerge@8.0.0: {}
+
   ts-interface-checker@0.1.13: {}
 
   ts-map@1.0.3: {}
@@ -21040,7 +21074,7 @@ snapshots:
 
   vue-component-type-helpers@3.2.4: {}
 
-  vue-component-type-helpers@3.3.8: {}
+  vue-component-type-helpers@3.3.9: {}
 
   vue-confetti-explosion@1.0.2(vue@3.5.27(typescript@5.9.3)):
     dependencies:

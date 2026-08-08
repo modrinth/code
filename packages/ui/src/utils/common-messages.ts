@@ -176,6 +176,10 @@ export const commonMessages = defineMessages({
 		id: 'input.view.grid',
 		defaultMessage: 'Grid view',
 	},
+	iUnderstandButton: {
+		id: 'button.i-understand',
+		defaultMessage: 'I understand',
+	},
 	listInputView: {
 		id: 'input.view.list',
 		defaultMessage: 'Rows view',

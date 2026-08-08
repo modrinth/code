@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<AiImageWarningModal ref="aiImageWarningModal" />
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(messages.deleteConfirmationTitle)"
@@ -322,7 +323,9 @@ import {
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus } from '@modrinth/utils'
 
+import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import { useAuth } from '~/composables/auth.js'
+import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 const auth = await useAuth()
@@ -337,6 +340,7 @@ const {
 	invalidate,
 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
+const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
@@ -553,9 +557,17 @@ async function handleSave() {
 	}
 }
 
-const showPreviewImage = (files) => {
+const showPreviewImage = async (files) => {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
 	const reader = new FileReader()
-	icon.value = files[0]
+	icon.value = file
 	deletedIcon.value = false
 	reader.readAsDataURL(icon.value)
 	reader.onload = (event) => {
