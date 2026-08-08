@@ -449,9 +449,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Søk etter spillversjon..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Fjern ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Velg ikon"
   },
@@ -472,12 +469,6 @@
   },
   "creation-flow.modal.import-instance.search.placeholder": {
     "defaultMessage": "Søk etter instansnavn"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ingen resultater funnet"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Søk etter modpakke"
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# fil} other {# filer}} valgt"
@@ -2778,4 +2769,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

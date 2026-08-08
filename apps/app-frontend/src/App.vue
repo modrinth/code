@@ -13,11 +13,10 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	CompassIcon,
-	HomeIcon,
-	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
+	PlayIcon,
 	PlusIcon,
 	RefreshCwIcon,
 	RightArrowIcon,
@@ -57,7 +56,7 @@ import {
 import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
-import { invoke } from '@tauri-apps/api/core'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -73,6 +72,7 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
+import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
@@ -81,6 +81,7 @@ import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyIn
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
+import OnboardingChecklist from '@/components/ui/onboarding-checklist/index.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
@@ -291,13 +292,42 @@ const {
 	fetchExistingInstanceNames,
 	handleCreate,
 	handleBrowseModpacks,
-	searchModpacks,
-	getProjectVersions,
+	searchProjects,
 	getLoaderManifest,
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
+	onboardingChecklist,
 } = setupProviders(notificationManager, popupNotificationManager)
+const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
+const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
+const creationIconEditorModal = ref(null)
+const creationIconRecipe = ref(null)
+
+async function randomizeCreationIcon() {
+	const generated = await creationIconEditorModal.value?.randomizeAndSave()
+	if (!generated) return null
+
+	creationIconRecipe.value = generated.recipe
+	return {
+		path: generated.iconPath,
+		previewUrl: convertFileSrc(generated.iconPath),
+	}
+}
+
+function customizeCreationIcon() {
+	creationIconEditorModal.value?.show()
+}
+
+function onCreationIconSaved(iconPath, recipe) {
+	creationIconRecipe.value = recipe
+	const context = installationModal.value?.ctx
+	if (!context) return
+
+	context.instanceIcon.value = null
+	context.instanceIconUrl.value = convertFileSrc(iconPath)
+	context.instanceIconPath.value = iconPath
+}
 
 const news = ref([])
 const displayedServerInviteNotifications = new Set()
@@ -313,7 +343,6 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
 const os = ref('')
@@ -417,10 +446,6 @@ const messages = defineMessages({
 		id: 'app.nav.home',
 		defaultMessage: 'Home',
 	},
-	library: {
-		id: 'app.nav.library',
-		defaultMessage: 'Library',
-	},
 	modrinthHosting: {
 		id: 'app.nav.modrinth-hosting',
 		defaultMessage: 'Modrinth Hosting',
@@ -512,6 +537,8 @@ function handleAdsConsentRequired(required) {
 }
 
 async function setupApp() {
+	await onboardingChecklist.initialize()
+
 	const {
 		native_decorations,
 		theme,
@@ -520,8 +547,6 @@ async function setupApp() {
 		collapsed_navigation,
 		hide_nametag_skins_page,
 		advanced_rendering,
-		onboarded,
-		default_page,
 		toggle_sidebar,
 		developer_mode,
 		feature_flags,
@@ -533,16 +558,10 @@ async function setupApp() {
 		i18n.global.locale.value = locale
 	}
 
-	if (default_page === 'Library') {
-		await router.push('/library')
-	}
-
 	os.value = await getOS()
 	const dev = await isDev()
 	isDevEnvironment.value = dev
 	const version = await getVersion()
-	showOnboarding.value = !onboarded
-
 	nativeDecorations.value = native_decorations
 	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
@@ -564,7 +583,7 @@ async function setupApp() {
 	if (telemetry) {
 		initAnalytics()
 		if (dev) debugAnalytics()
-		trackEvent('Launched', { version, dev, onboarded })
+		trackEvent('Launched', { version, dev })
 	}
 
 	if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
@@ -776,6 +795,7 @@ const {
 	projectInfo: contentInstallProjectInfo,
 	handleInstallToInstance,
 	handleCreateAndInstall,
+	prepareNewInstance,
 	handleNavigate: handleContentInstallNavigate,
 	handleCancel: handleContentInstallCancel,
 	setContentInstallModal,
@@ -794,6 +814,35 @@ const {
 	handleIncompatibilityWarningInstall: handleContentInstallIncompatibilityWarningInstall,
 	handleIncompatibilityWarningCancel: handleContentInstallIncompatibilityWarningCancel,
 } = contentInstall
+
+async function prepareCreationProjectInstall(projectId, projectType) {
+	if (projectType === 'modpack') {
+		await contentInstall.install(
+			projectId,
+			null,
+			null,
+			'CreationModalProject',
+			undefined,
+			(instanceId) => void router.push(`/instance/${encodeURIComponent(instanceId)}`),
+		)
+		return null
+	}
+
+	await prepareNewInstance(projectId)
+	const info = contentInstallProjectInfo.value
+	if (!info) throw new Error(`Project information is unavailable: '${projectId}'`)
+
+	return {
+		projectId,
+		title: info.title,
+		iconUrl: info.iconUrl,
+		link: info.link,
+		owner: info.owner,
+		compatibleLoaders: [...contentInstallLoaders.value],
+		gameVersions: [...contentInstallGameVersions.value],
+		releaseGameVersions: new Set(contentInstallReleaseGameVersions.value),
+	}
+}
 
 const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
 provideServerInstall(serverInstall)
@@ -1531,18 +1580,34 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			type="instance"
 			show-snapshot-toggle
 			:fetch-existing-instance-names="fetchExistingInstanceNames"
-			:search-modpacks="searchModpacks"
-			:get-project-versions="getProjectVersions"
+			:search-projects="searchProjects"
+			:prepare-project-install="prepareCreationProjectInstall"
+			:create-project-install="handleCreateAndInstall"
 			:get-loader-manifest="getLoaderManifest"
+			:randomize-instance-icon="randomizeCreationIcon"
+			:customize-instance-icon="customizeCreationIcon"
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
+		/>
+		<IconEditorModal
+			ref="creationIconEditorModal"
+			:recipe="creationIconRecipe"
+			@saved="onCreationIconSaved"
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.25rem] w-[--left-bar-width]"
 		>
-			<NavButton v-tooltip.right="formatMessage(messages.home)" to="/">
-				<HomeIcon />
+			<NavButton
+				v-tooltip.right="formatMessage(messages.home)"
+				to="/"
+				:is-primary="(route) => route.path === '/'"
+				:is-subpage="
+					() =>
+						(route.path.startsWith('/browse') || route.path.startsWith('/project')) && route.query.i
+				"
+			>
+				<PlayIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.discoverContentLabel)"
@@ -1556,19 +1621,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
 				<ShirtIcon />
-			</NavButton>
-			<NavButton
-				v-tooltip.right="formatMessage(messages.library)"
-				to="/library"
-				:is-primary="(r) => r.path === '/library' || r.path === '/library'"
-				:is-subpage="
-					() =>
-						route.path.startsWith('/instance') ||
-						((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
-							route.query.i)
-				"
-			>
-				<LibraryIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(messages.modrinthHosting)"
@@ -1759,7 +1811,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
-						<component :is="Component"></component>
+						<KeepAlive include="LibraryPage">
+							<component :is="Component"></component>
+						</KeepAlive>
 					</Suspense>
 				</template>
 			</RouterView>
@@ -1774,9 +1828,17 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:class="{ 'pb-12': !hasPlus }"
 				data-overlayscrollbars-initialize
 			>
+				<OnboardingChecklist
+					@create-instance="installationModal?.show()"
+					@login-minecraft="accounts?.login()"
+					@login-modrinth="signIn"
+				/>
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div
+						v-show="hasLoggedIntoMinecraft"
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
 						<h3 class="text-base text-primary font-medium m-0">
 							{{ formatMessage(messages.playingAs) }}
 						</h3>
@@ -1784,7 +1846,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							<AccountsCard ref="accounts" />
 						</suspense>
 					</div>
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div
+						v-show="showFriendsList"
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
 						<suspense>
 							<FriendsList :credentials="credentials" :sign-in="() => requestSignIn()" />
 						</suspense>

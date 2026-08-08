@@ -4,15 +4,19 @@ import {
 	FolderOpenIcon,
 	MoreVerticalIcon,
 	PlayIcon,
+	SparklesIcon,
 	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
+	BulletDivider,
 	Button,
 	commonMessages,
+	defineMessages,
 	injectNotificationManager,
 	SmartClickable,
+	TagItem,
 	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
@@ -21,11 +25,10 @@ import {
 import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_project } from '@/helpers/cache'
 import { process_listener } from '@/helpers/events'
 import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
@@ -50,18 +53,19 @@ const emit = defineEmits<{
 const props = defineProps<{
 	instance: GameInstance
 	last_played: Dayjs
+	newlyAdded?: boolean
 }>()
 
-const loadingModpack = ref(!!props.instance.link)
-
-const modpack = ref()
-
-if (props.instance.link) {
-	nextTick().then(async () => {
-		modpack.value = await get_project(props.instance.link?.project_id, 'must_revalidate')
-		loadingModpack.value = false
-	})
-}
+const messages = defineMessages({
+	newInstance: {
+		id: 'app.home.jump-back-in.new-instance',
+		defaultMessage: 'New instance',
+	},
+	neverPlayed: {
+		id: 'app.home.jump-back-in.never-played',
+		defaultMessage: 'Never played',
+	},
+})
 
 const instanceIcon = computed(() => props.instance.icon_path)
 
@@ -82,8 +86,12 @@ const play = async (event: MouseEvent) => {
 	event?.stopPropagation()
 	if (props.instance.quarantined) return
 	loading.value = true
-	await run(props.instance.id)
-		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
+	const launched = await run(props.instance.id)
+		.then(() => true)
+		.catch((err) => {
+			handleSevereError(err, { instanceId: props.instance.id })
+			return false
+		})
 		.finally(() => {
 			trackEvent('InstanceStart', {
 				loader: props.instance.loader,
@@ -91,7 +99,7 @@ const play = async (event: MouseEvent) => {
 				source: 'InstanceItem',
 			})
 		})
-	emit('play')
+	if (launched) emit('play')
 	loading.value = false
 }
 
@@ -127,7 +135,7 @@ onUnmounted(() => {
 })
 </script>
 <template>
-	<SmartClickable>
+	<SmartClickable class="[--active-scale:0.99]">
 		<template #clickable>
 			<router-link
 				class="no-click-animation"
@@ -135,56 +143,56 @@ onUnmounted(() => {
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised card-shadow rounded-xl smart-clickable:highlight-on-hover"
+			class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 border border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover transition-[filter] ease-out [--hover-brightness:1.1] min-h-20 p-3"
+			:class="newlyAdded ? 'border-dashed bg-surface-2' : 'bg-bg-raised border-solid'"
 		>
 			<Avatar
 				:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
 				:tint-by="instance.id"
+				no-shadow
+				class="!rounded-[14px]"
 				size="48px"
 			/>
-			<div class="flex flex-col col-span-2 justify-between h-full">
+			<div class="flex flex-col col-span-2 justify-center gap-1 h-full">
 				<div class="flex items-center gap-2">
-					<div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
+					<div
+						class="text-contrast truncate"
+						:class="newlyAdded ? 'text-base font-semibold' : 'text-lg font-bold'"
+					>
 						{{ instance.name }}
 					</div>
-				</div>
-				<div class="flex items-center gap-2 text-sm text-secondary">
-					<div
-						v-tooltip="instance.last_played ? formatDateTime(instance.last_played) : null"
-						class="w-fit shrink-0"
-						:class="{ 'cursor-help smart-clickable:allow-pointer-events': last_played }"
+					<TagItem
+						v-if="newlyAdded"
+						class="!border-green !bg-bg-green !px-2 !font-medium !text-green"
 					>
-						<template v-if="last_played">
-							{{
-								formatMessage(commonMessages.playedLabel, {
-									ago: formatRelativeTime(last_played.toISOString?.()),
-								})
-							}}
-						</template>
-						<template v-else> Not played yet </template>
-					</div>
-					•
-					<span v-if="modpack" class="flex items-center gap-1 truncate text-secondary">
-						<router-link
-							class="inline-flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
-							:to="`/project/${modpack.id}`"
-						>
-							<Avatar :src="modpack.icon_url" size="16px" class="shrink-0" />
-							<span class="truncate">{{ modpack.title }}</span>
-						</router-link>
-						({{ loader }} {{ instance.game_version }})
-					</span>
-					<span v-else-if="loadingModpack" class="flex items-center gap-1 truncate text-secondary">
-						<SpinnerIcon class="animate-spin shrink-0" />
-						<span class="truncate">Loading modpack...</span>
-					</span>
-					<span v-else class="flex items-center gap-1 truncate text-secondary">
+						<SparklesIcon aria-hidden="true" />
+						{{ formatMessage(messages.newInstance) }}
+					</TagItem>
+				</div>
+				<div class="flex items-center gap-1.5 text-sm text-secondary">
+					<span class="flex items-center gap-1 truncate text-secondary">
 						{{ loader }}
 						{{ instance.game_version }}
 					</span>
+					<BulletDivider class="shrink-0" />
+					<div
+						v-tooltip="!newlyAdded ? formatDateTime(last_played.toDate()) : null"
+						class="w-fit shrink-0"
+						:class="{
+							'cursor-help smart-clickable:allow-pointer-events': !newlyAdded,
+						}"
+					>
+						<template v-if="newlyAdded">
+							{{ formatMessage(messages.neverPlayed) }}
+						</template>
+						<template v-else-if="last_played">
+							{{ formatRelativeTime(last_played.toISOString?.()) }}
+						</template>
+						<template v-else>{{ formatMessage(messages.neverPlayed) }}</template>
+					</div>
 				</div>
 			</div>
-			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
+			<div data-no-card-click class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
 				<Button v-if="playing && !loading" type="colored" color="red" @click="stop">
 					<StopCircleIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.stopButton) }}
@@ -236,3 +244,8 @@ onUnmounted(() => {
 		</div>
 	</SmartClickable>
 </template>
+<style scoped>
+.clickable-card:has([data-no-card-click]:hover) {
+	--hover-brightness: 1;
+}
+</style>

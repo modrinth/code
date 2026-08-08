@@ -5,8 +5,10 @@ use crate::event::{
 };
 #[cfg(feature = "tauri")]
 use crate::event::{
-    InstancePayload, LoadingPayload, ProcessPayload, WarningPayload,
+    InstanceGroupsChangedPayload, InstancePayload, LoadingPayload,
+    ProcessPayload, WarningPayload,
 };
+use crate::state::OnboardingChecklist;
 use futures::prelude::*;
 use serde_json::Value;
 #[cfg(feature = "tauri")]
@@ -259,6 +261,41 @@ pub async fn emit_instance(
                     event,
                 },
             )
+            .map_err(EventError::from)?;
+    }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_instance_groups_changed(
+    instance_ids: &[String],
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit(
+                "instance_groups_changed",
+                InstanceGroupsChangedPayload {
+                    instance_ids: instance_ids.to_vec(),
+                },
+            )
+            .map_err(EventError::from)?;
+    }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_onboarding_checklist(
+    checklist: OnboardingChecklist,
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit("onboarding_checklist", checklist)
             .map_err(EventError::from)?;
     }
     Ok(())

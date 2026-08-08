@@ -25,6 +25,12 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get,
             instance_get_many,
             instance_list,
+            instance_list_groups,
+            instance_create_group,
+            instance_rename_group,
+            instance_delete_group,
+            instance_set_group_order,
+            instance_set_group_memberships,
             instance_get_projects,
             instance_get_installed_project_ids,
             instance_get_install_candidates,
@@ -52,6 +58,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_kill,
             instance_edit,
             instance_edit_icon,
+            instance_edit_generated_icon,
+            instance_cache_generated_icon,
+            instance_get_recent_icon_recipes,
             instance_share_can_current_user_use,
             instance_share_get_users,
             instance_share_invite_users,
@@ -77,11 +86,12 @@ pub struct Instance {
     pub launcher_feature_version: String,
     pub name: String,
     pub icon_path: Option<String>,
+    pub icon_recipe: Option<theseus::data::InstanceIconRecipe>,
     pub game_version: String,
     pub protocol_version: Option<u32>,
     pub loader: ModLoader,
     pub loader_version: Option<String>,
-    pub groups: Vec<String>,
+    pub group_ids: Vec<String>,
     pub link: Option<InstanceLink>,
     pub shared_instance: Option<SharedInstanceAttachment>,
     pub quarantined: bool,
@@ -177,7 +187,7 @@ pub struct EditInstance {
     )]
     pub loader_version: Option<Option<String>>,
 
-    pub groups: Option<Vec<String>>,
+    pub group_ids: Option<Vec<String>>,
 
     #[serde(
         default,
@@ -240,11 +250,12 @@ impl From<InstanceMetadata> for Instance {
                 .to_string(),
             name: metadata.instance.name,
             icon_path: metadata.instance.icon_path,
+            icon_recipe: metadata.icon_recipe,
             game_version: metadata.applied_content_set.game_version,
             protocol_version: metadata.applied_content_set.protocol_version,
             loader: metadata.applied_content_set.loader,
             loader_version: metadata.applied_content_set.loader_version,
-            groups: metadata.groups,
+            group_ids: metadata.group_ids,
             link: InstanceLink::from_core(metadata.link),
             shared_instance: metadata.shared_instance.map(Into::into),
             quarantined: metadata.quarantined,
@@ -411,8 +422,9 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
         launcher_feature_version: None,
         name: edit_instance.name,
         icon_path: None,
+        icon_recipe: None,
         update_channel: edit_instance.update_channel,
-        groups: edit_instance.groups,
+        group_ids: edit_instance.group_ids,
         link: edit_instance
             .link
             .map(|link| match link {
@@ -474,6 +486,44 @@ pub async fn instance_list() -> Result<Vec<Instance>> {
         .into_iter()
         .map(Instance::from)
         .collect())
+}
+
+#[tauri::command]
+pub async fn instance_list_groups()
+-> Result<Vec<theseus::instance::InstanceGroup>> {
+    Ok(theseus::instance::list_groups().await?)
+}
+
+#[tauri::command]
+pub async fn instance_create_group(
+    name: String,
+) -> Result<theseus::instance::InstanceGroup> {
+    Ok(theseus::instance::create_group(name).await?)
+}
+
+#[tauri::command]
+pub async fn instance_rename_group(
+    id: String,
+    new_name: String,
+) -> Result<theseus::instance::InstanceGroup> {
+    Ok(theseus::instance::rename_group(id, new_name).await?)
+}
+
+#[tauri::command]
+pub async fn instance_delete_group(id: String) -> Result<()> {
+    Ok(theseus::instance::delete_group(id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_group_order(group_ids: Vec<String>) -> Result<()> {
+    Ok(theseus::instance::set_group_order(group_ids).await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_group_memberships(
+    updates: Vec<theseus::instance::InstanceGroupMembershipUpdate>,
+) -> Result<()> {
+    Ok(theseus::instance::set_group_memberships(updates).await?)
 }
 
 #[tauri::command]
@@ -793,6 +843,34 @@ pub async fn instance_edit_icon(
 ) -> Result<()> {
     theseus::instance::edit_icon(instance_id, icon_path).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_edit_generated_icon(
+    instance_id: &str,
+    recipe: theseus::data::InstanceIconRecipe,
+    symbol_bytes: Vec<u8>,
+) -> Result<String> {
+    Ok(theseus::instance::edit_generated_icon(
+        instance_id,
+        recipe,
+        symbol_bytes,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_cache_generated_icon(
+    recipe: theseus::data::InstanceIconRecipe,
+    symbol_bytes: Vec<u8>,
+) -> Result<String> {
+    Ok(theseus::instance::cache_generated_icon(recipe, symbol_bytes).await?)
+}
+
+#[tauri::command]
+pub async fn instance_get_recent_icon_recipes()
+-> Result<Vec<theseus::data::InstanceIconRecipe>> {
+    Ok(theseus::instance::get_recent_icon_recipes().await?)
 }
 
 #[tauri::command]

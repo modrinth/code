@@ -48,8 +48,6 @@ export type AppSettings = {
 	discord_rpc: boolean
 	personalized_ads: boolean
 
-	onboarded: boolean
-
 	extra_launch_args: string[]
 	custom_env_vars: [string, string][]
 	memory: MemorySettings

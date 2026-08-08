@@ -34,9 +34,18 @@ const options = ref([])
 const left = ref('0px')
 const top = ref('0px')
 const shown = ref(false)
+const contextMenuId = Symbol()
+const contextMenuOpenEvent = 'modrinth-context-menu-open'
+
+const hideContextMenu = () => {
+	shown.value = false
+	emit('menu-closed')
+}
 
 defineExpose({
 	showMenu: (event, passedItem, passedOptions) => {
+		window.dispatchEvent(new CustomEvent(contextMenuOpenEvent, { detail: contextMenuId }))
+
 		item.value = passedItem
 		options.value = passedOptions
 
@@ -62,6 +71,7 @@ defineExpose({
 			}
 		})
 	},
+	hideMenu: hideContextMenu,
 })
 
 const isInstanceLink = (item) => {
@@ -71,11 +81,6 @@ const isInstanceLink = (item) => {
 		return true
 	}
 	return false
-}
-
-const hideContextMenu = () => {
-	shown.value = false
-	emit('menu-closed')
 }
 
 const optionClicked = (option) => {
@@ -88,6 +93,12 @@ const optionClicked = (option) => {
 
 const onEscKeyRelease = (event) => {
 	if (event.keyCode === 27) {
+		hideContextMenu()
+	}
+}
+
+const handleContextMenuOpen = (event) => {
+	if (shown.value && event.detail !== contextMenuId) {
 		hideContextMenu()
 	}
 }
@@ -105,11 +116,13 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
 	window.addEventListener('click', handleClickOutside)
+	window.addEventListener(contextMenuOpenEvent, handleContextMenuOpen)
 	document.body.addEventListener('keyup', onEscKeyRelease)
 })
 
 onBeforeUnmount(() => {
 	window.removeEventListener('click', handleClickOutside)
+	window.removeEventListener(contextMenuOpenEvent, handleContextMenuOpen)
 	document.removeEventListener('keyup', onEscKeyRelease)
 })
 </script>
@@ -145,19 +158,19 @@ onBeforeUnmount(() => {
 			&.primary {
 				background-color: var(--color-brand);
 				color: var(--color-accent-contrast);
-				font-weight: bold;
+				font-weight: 500;
 			}
 
 			&.danger {
 				background-color: var(--color-red);
 				color: var(--color-accent-contrast);
-				font-weight: bold;
+				font-weight: 500;
 			}
 
 			&.contrast {
 				background-color: var(--color-orange);
 				color: var(--color-accent-contrast);
-				font-weight: bold;
+				font-weight: 500;
 			}
 		}
 	}

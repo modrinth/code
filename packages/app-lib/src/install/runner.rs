@@ -22,6 +22,7 @@ use crate::api::pack::install_mrpack::install_zipped_mrpack_files_with_reporter;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
+use crate::state::instances::commands::resolve_icon_path;
 use crate::state::{
     ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader, State,
 };
@@ -1084,12 +1085,23 @@ async fn apply_post_install_edit(
     instance_id: &str,
     edit: Option<InstallPostInstallEdit>,
 ) -> crate::Result<()> {
-    let Some(edit) = edit else {
+    let Some(mut edit) = edit else {
         return Ok(());
     };
 
     if edit.name.is_none() && edit.icon_path.is_none() && edit.link.is_none() {
         return Ok(());
+    }
+
+    if let Some(icon_path) = edit.icon_path.take() {
+        let icon_path = match icon_path {
+            Some(icon_path) => {
+                let state = State::get().await?;
+                resolve_icon_path(Some(&icon_path), false, &state).await?
+            }
+            None => None,
+        };
+        edit.icon_path = Some(icon_path);
     }
 
     crate::api::instance::edit(

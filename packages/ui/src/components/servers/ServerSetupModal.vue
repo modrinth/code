@@ -9,7 +9,7 @@
 		:initial-loader="initialLoader"
 		:initial-game-version="initialGameVersion"
 		:fade="props.initialSetup ? undefined : 'danger'"
-		:search-modpacks="searchModpacks"
+		:search-projects="searchModpacks"
 		:get-project-versions="getProjectVersions"
 		:finish-disabled="!canCompleteSetup"
 		:finish-disabled-tooltip="!canCompleteSetup ? permissionDeniedMessage : undefined"

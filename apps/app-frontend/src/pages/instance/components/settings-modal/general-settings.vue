@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+import {
+	CopyIcon,
+	EditIcon,
+	PaletteIcon,
+	SpinnerIcon,
+	TrashIcon,
+	UploadIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
-	Checkbox,
 	Chips,
 	defineMessages,
 	injectNotificationManager,
@@ -17,12 +23,13 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
-import { edit, edit_icon, list, remove } from '@/helpers/instance'
+import { edit, edit_icon, remove } from '@/helpers/instance'
+import type { GameInstance, InstanceIconRecipe } from '@/helpers/types'
 
-import type { GameInstance } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
 
 const { handleError } = injectNotificationManager()
@@ -31,6 +38,7 @@ const router = useRouter()
 const queryClient = useQueryClient()
 
 const deleteConfirmModal = ref()
+const iconEditorModal = ref<InstanceType<typeof IconEditorModal> | null>(null)
 
 const { instance } = injectInstanceSettings()
 type ReleaseChannel = GameInstance['update_channel']
@@ -38,16 +46,22 @@ const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
-const groups = ref([...instance.value.groups])
+const iconRecipe = ref<InstanceIconRecipe | null>(instance.value.icon_recipe ?? null)
 const savingReleaseChannel = ref(false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 	savingReleaseChannel.value ? [...releaseChannelOptions] : [],
 )
 
-const newCategoryInput = ref('')
-
 const installing = computed(() => instance.value.install_stage !== 'installed')
+
+watch(
+	() => [instance.value.id, instance.value.icon_path, instance.value.icon_recipe] as const,
+	() => {
+		icon.value = instance.value.icon_path
+		iconRecipe.value = instance.value.icon_recipe ?? null
+	},
+)
 
 async function duplicateInstance() {
 	await install_duplicate_instance(instance.value.id).catch(handleError)
@@ -56,11 +70,6 @@ async function duplicateInstance() {
 		game_version: instance.value.game_version,
 	})
 }
-
-const allInstances = ref((await list()) as GameInstance[])
-const availableGroups = computed(() => [
-	...new Set([...allInstances.value.flatMap((instance) => instance.groups), ...groups.value]),
-])
 
 function formatReleaseChannelLabel(channel: ReleaseChannel) {
 	switch (channel) {
@@ -112,10 +121,12 @@ async function resetIcon() {
 	try {
 		await edit_icon(instance.value.id, null)
 		icon.value = undefined
-		trackEvent('InstanceRemoveIcon')
+		iconRecipe.value = null
 	} catch (error) {
 		handleError(error)
+		return
 	}
+	trackEvent('InstanceRemoveIcon')
 }
 
 async function setIcon() {
@@ -134,36 +145,32 @@ async function setIcon() {
 	try {
 		await edit_icon(instance.value.id, value)
 		icon.value = value
-		trackEvent('InstanceSetIcon')
+		iconRecipe.value = null
 	} catch (error) {
 		handleError(error)
+		return
 	}
+
+	trackEvent('InstanceSetIcon')
+}
+
+function openIconEditor() {
+	iconEditorModal.value?.show()
+	trackEvent(iconRecipe.value ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
+}
+
+function onGeneratedIconSaved(iconPath: string, recipe: InstanceIconRecipe) {
+	icon.value = iconPath
+	iconRecipe.value = recipe
+	trackEvent('InstanceSaveCreatedIcon')
 }
 
 const editInstanceObject = computed(() => ({
 	name: title.value.trim().substring(0, 32) ?? 'Instance',
-	groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
 }))
 
-const toggleGroup = (group: string) => {
-	if (groups.value.includes(group)) {
-		groups.value = groups.value.filter((x) => x !== group)
-	} else {
-		groups.value.push(group)
-	}
-}
-
-const addCategory = () => {
-	const text = newCategoryInput.value.trim()
-
-	if (text.length > 0) {
-		groups.value.push(text.substring(0, 32))
-		newCategoryInput.value = ''
-	}
-}
-
 watch(
-	[title, groups, groups],
+	title,
 	async () => {
 		if (removing.value) return
 		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
@@ -190,23 +197,6 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.general.name',
 		defaultMessage: 'Name',
 	},
-	libraryGroups: {
-		id: 'instance.settings.tabs.general.library-groups',
-		defaultMessage: 'Library groups',
-	},
-	libraryGroupsDescription: {
-		id: 'instance.settings.tabs.general.library-groups.description',
-		defaultMessage:
-			'Library groups allow you to organize your instances into different sections in your library.',
-	},
-	libraryGroupsEnterName: {
-		id: 'instance.settings.tabs.general.library-groups.enter-name',
-		defaultMessage: 'Enter group name',
-	},
-	libraryGroupsCreate: {
-		id: 'instance.settings.tabs.general.library-groups.create',
-		defaultMessage: 'Create new group',
-	},
 	editIcon: {
 		id: 'instance.settings.tabs.general.edit-icon',
 		defaultMessage: 'Edit icon',
@@ -218,6 +208,14 @@ const messages = defineMessages({
 	replaceIcon: {
 		id: 'instance.settings.tabs.general.edit-icon.replace',
 		defaultMessage: 'Replace icon',
+	},
+	createIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.create',
+		defaultMessage: 'Create an icon',
+	},
+	editCreatedIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.edit-created',
+		defaultMessage: 'Edit icon',
 	},
 	removeIcon: {
 		id: 'instance.settings.tabs.general.edit-icon.remove',
@@ -292,7 +290,17 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeInstance" />
+	<ConfirmDeleteInstanceModal
+		ref="deleteConfirmModal"
+		:instances="[instance]"
+		@delete="removeInstance"
+	/>
+	<IconEditorModal
+		ref="iconEditorModal"
+		:instance-id="instance.id"
+		:recipe="iconRecipe"
+		@saved="onGeneratedIconSaved"
+	/>
 	<div class="block">
 		<div class="float-end ml-10 relative group w-fit">
 			<div class="flex flex-col gap-1">
@@ -312,6 +320,10 @@ const messages = defineMessages({
 									? formatMessage(messages.replaceIcon)
 									: formatMessage(messages.selectIcon),
 								action: () => setIcon(),
+							},
+							{
+								id: 'create',
+								action: () => openIconEditor(),
 							},
 							{
 								id: 'remove',
@@ -336,6 +348,10 @@ const messages = defineMessages({
 						<template #select>
 							<UploadIcon />
 							{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
+						</template>
+						<template #create>
+							<PaletteIcon />
+							{{ formatMessage(iconRecipe ? messages.editCreatedIcon : messages.createIcon) }}
 						</template>
 						<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
 					</TeleportOverflowMenu>
@@ -373,36 +389,6 @@ const messages = defineMessages({
 				</p>
 			</div>
 		</template>
-		<div class="flex flex-col gap-2.5 mt-6">
-			<h2 class="m-0 text-lg font-semibold text-contrast block">
-				{{ formatMessage(messages.libraryGroups) }}
-			</h2>
-
-			<div class="flex flex-col gap-1">
-				<Checkbox
-					v-for="group in availableGroups"
-					:key="group"
-					:model-value="groups.includes(group)"
-					:label="group"
-					@click="toggleGroup(group)"
-				/>
-				<div class="flex gap-2 items-center">
-					<StyledInput
-						v-model="newCategoryInput"
-						:placeholder="formatMessage(messages.libraryGroupsEnterName)"
-						class="w-full max-w-[300px]"
-						@submit="() => addCategory"
-					/>
-					<Button class="w-fit" @click="() => addCategory()">
-						<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
-					</Button>
-				</div>
-			</div>
-			<p class="m-0">
-				{{ formatMessage(messages.libraryGroupsDescription) }}
-			</p>
-		</div>
-
 		<div class="flex flex-col gap-2.5 mt-6">
 			<h2 class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.updateChannel) }}

@@ -184,6 +184,10 @@ const resizeClass = computed(
 
 defineExpose({
 	focus: () => inputRef.value?.focus(),
+	select: () => {
+		inputRef.value?.focus()
+		inputRef.value?.select()
+	},
 	setValue: (v: string) => {
 		if (inputRef.value) inputRef.value.value = v
 	},

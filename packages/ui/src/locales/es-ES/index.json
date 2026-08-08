@@ -623,9 +623,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Buscar versión de juego..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Eliminar icono"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Seleccionar icono"
   },
@@ -788,21 +785,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Borrar todo"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Descubrir modpacks"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importar modpack"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "¿Ya sabes cuál es el modpack que quieres instalar?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ningún resultado encontrado"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Buscar por modpack"
-  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "Una instancia es una configuración de Minecraft con un específico loader, versión, y mods."
   },
@@ -838,9 +820,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Seleccione tipo de mundo"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Elige modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Crear instancia"
@@ -4376,9 +4355,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "¿Ya tienes un servidor?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Conoce más sobre el alojamiento de servidores de Modrinth"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4387,9 +4363,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Instala mods, invita amigos, y jueguen todos juntos desde la Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "No se han encontrado servidores todavía"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Elige tus mods favoritos y nosotros nos encargamos del resto."
@@ -4405,12 +4378,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Inicia sesión"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Prepara tu servidor tal como si fuera un mundo de un solo jugador."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Configuración Simple"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Copiado"

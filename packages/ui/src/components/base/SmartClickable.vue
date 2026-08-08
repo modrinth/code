@@ -79,7 +79,7 @@ defineOptions({
 
 	// When clickable is being clicked, give contents an effect
 	:first-child:active + .smart-clickable__contents {
-		scale: 0.97;
+		scale: var(--active-scale, 0.97);
 	}
 }
 </style>

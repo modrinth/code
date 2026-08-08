@@ -722,11 +722,14 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Search game version..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Remove icon"
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Customize"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Randomize"
   },
   "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Select icon"
+    "defaultMessage": "Upload"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Latest"
@@ -902,6 +905,21 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Search for modpack"
   },
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Already know what you want to play?"
+  },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Create instance"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Install modpack"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "No results found"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Search mods, modpacks, and more..."
+  },
   "creation-flow.modal.setup-type.instance.description": {
     "defaultMessage": "An instance is a Minecraft setup with a specific loader, version, and mods."
   },
@@ -918,10 +936,16 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Browse modpacks on Modrinth or import one from a file."
+    "defaultMessage": "Choose a project and we’ll use its latest version."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Install modpack"
+    "defaultMessage": "Start from a mod or modpack"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "Install a modpack from an .mrpack file on your device."
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "Upload a modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Classic Minecraft with no mods or plugins."
@@ -937,9 +961,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Select world type"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Choose modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Create instance"
@@ -4716,7 +4737,7 @@
     "defaultMessage": "Already have a server?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Learn more about Modrinth Hosting"
+    "defaultMessage": "Learn more"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4727,9 +4748,6 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Install mods, invite friends, and play together all from the Modrinth App."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "No servers yet"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Pick your favorite mods and we handle the rest."
   },
@@ -4737,13 +4755,13 @@
     "defaultMessage": "One-click mod installs"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Invite friends and get them set up right in the Modrinth App."
+    "defaultMessage": "Invite friends to play your server with one-click play from the Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Play with friends"
   },
   "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "Sign in to Modrinth"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Set up your server just like a single player world."
@@ -5432,6 +5450,9 @@
   "sharing.invite-players-modal.friends-heading": {
     "defaultMessage": "Your friends - {count}"
   },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "Invite players"
+  },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "Invite"
   },
@@ -5476,6 +5497,18 @@
   },
   "sharing.invite-players-modal.update-invite-link-failed-title": {
     "defaultMessage": "Failed to update invite link"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "Accept"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "Decline"
+  },
+  "sharing.invite-players-toast.invited-you-to": {
+    "defaultMessage": "invited you to"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "server."
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

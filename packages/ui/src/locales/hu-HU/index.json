@@ -635,9 +635,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Játékverzió keresése..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Ikon eltávolítása"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Ikon feltöltése"
   },
@@ -847,9 +844,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Világ típusa"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modcsomag kiválasztása"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Játékprofil létrehozása"
@@ -3982,9 +3976,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Telepíts modokat, hívd meg a barátaidat, és játsszatok együtt, mindezt a Modrinth Appban."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Még nincsenek szerverek"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Válaszd ki a kedvenc modjaidat, a többit bízd ránk!"
