@@ -12,6 +12,7 @@ import type {
 } from './types'
 
 type ButtonLinkProps = ButtonLinkDestination & {
+	iconOnly?: boolean
 	type?: ButtonType
 	color?: ButtonColor
 	size?: ButtonSize
@@ -23,6 +24,7 @@ type ButtonLinkProps = ButtonLinkDestination & {
 }
 
 const props = withDefaults(defineProps<ButtonLinkProps>(), {
+	iconOnly: false,
 	type: 'base',
 	size: 'md',
 	target: undefined,
@@ -50,6 +52,8 @@ function handleClick(event: MouseEvent) {
 		:as="component"
 		:type="props.type"
 		:color="props.color"
+		:icon-only="props.iconOnly"
+		:circular="props.iconOnly"
 		:size="props.size"
 		:interaction="props.interaction"
 		:to="usesRouter ? props.to : undefined"

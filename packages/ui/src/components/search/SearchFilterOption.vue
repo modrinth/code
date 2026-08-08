@@ -1,7 +1,7 @@
 <template>
 	<div class="search-filter-option group flex gap-1 items-center">
 		<button
-			:class="`flex border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-2 [@media(hover:hover)]:py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98] ${included ? 'bg-brand-highlight text-contrast hover:brightness-125' : excluded ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg focus-visible:bg-button-bg [&>svg.check-icon]:hover:text-brand [&>svg.check-icon]:focus-visible:text-brand [&>svg.ban-icon]:hover:text-red [&>svg.ban-icon]:focus-visible:text-red'}`"
+			:class="`flex border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-2 [@media(hover:hover)]:py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98] ${included ? 'bg-brand-highlight text-contrast hover:brightness-125' : excluded ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-primary hover:bg-button-bg focus-visible:bg-button-bg [&>svg.check-icon]:hover:text-brand [&>svg.check-icon]:focus-visible:text-brand [&>svg.ban-icon]:hover:text-red [&>svg.ban-icon]:focus-visible:text-red'}`"
 			@click="() => emit(primaryAction === 'exclude' ? 'toggleExclude' : 'toggle', option)"
 		>
 			<slot> </slot>
@@ -24,7 +24,7 @@
 		<button
 			v-if="showExcludeButton"
 			v-tooltip="formatMessage(messages.excludeTooltip)"
-			class="flex border-none cursor-pointer items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary [@media(hover:hover)]:opacity-0 transition-all hover:bg-button-bg hover:text-red focus-visible:bg-button-bg focus-visible:text-red active:scale-[0.96]"
+			class="flex border-none cursor-pointer items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-primary [@media(hover:hover)]:opacity-0 transition-all hover:bg-button-bg hover:text-red focus-visible:bg-button-bg focus-visible:text-red active:scale-[0.96]"
 			@click="() => emit('toggleExclude', option)"
 		>
 			<BanIcon class="filter-action-icon h-4 w-4" aria-hidden="true" />

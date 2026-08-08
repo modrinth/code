@@ -76,7 +76,7 @@ const props = withDefaults(defineProps<PageHeaderMetadataItemProps>(), {
 
 const defaultIconClass = 'block size-5 shrink-0 text-current'
 const baseClass =
-	'relative flex min-w-0 items-center font-medium leading-none text-secondary text-nowrap'
+	'relative flex min-w-0 items-center font-normal leading-none text-primary text-nowrap'
 const contentBaseClass = 'inline-flex min-w-0 items-center gap-2 text-inherit'
 const interactiveClass = 'm-0 cursor-pointer border-0 bg-transparent p-0 hover:underline'
 
