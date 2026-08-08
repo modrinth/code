@@ -5,18 +5,23 @@ import {
 	TagCategoryRefreshCcwIcon,
 	TagCategoryWandSparklesIcon,
 	UserPlusIcon,
+	WrenchIcon,
 } from '@modrinth/assets'
-import { Alert, injectModrinthClient, injectProjectPageContext } from '@modrinth/ui'
+import {
+	Alert,
+	injectModrinthClient,
+	injectProjectPageContext,
+	ProjectStatusLink,
+} from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { md, type NodeState } from '../../types/node'
-import { button, fix, group, option, stage, text, toggle } from '../../types/node'
+import { check, fix, group, md, stage, text, toggle } from '../../types/node'
 
 const STALE_TIME = 1000 * 60 * 5
 
 type AutoSlugStatus = 'loading' | 'available' | 'unavailable'
-type SlugValidation = 'checking' | 'available' | 'unchanged' | 'taken' | null
+type SlugValidation = 'checking' | 'available' | 'unchanged' | 'taken' | 'empty' | 'invalid' | null
 
 //TODO: make this not a copy of frontend/src/utils/slugs.generateUrlSlug
 // (as in move the other one so we can use it here)
@@ -46,12 +51,6 @@ export default function () {
 	const slugValidation = ref<SlugValidation>(null)
 	let slugDebounceTimer: ReturnType<typeof setTimeout> | undefined
 
-	function currentSlug(state: Record<string, NodeState>) {
-		return (
-			(state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value ?? project.value.slug
-		)
-	}
-
 	async function checkSlugTaken(slug: string): Promise<Labrinth.Projects.v3.Project | null> {
 		try {
 			return await queryClient.fetchQuery({
@@ -66,8 +65,13 @@ export default function () {
 	}
 
 	const SlugStatus = () => {
-		const v = slugValidation.value
-		if (v === null) return null
+		const v =
+			slugValidation.value ??
+			(autoSlugStatus.value === 'loading'
+				? 'checking'
+				: autoSlugStatus.value === 'unavailable'
+					? 'taken'
+					: 'available')
 		if (v === 'checking')
 			return (
 				<Alert type="checking" class="w-full">
@@ -86,19 +90,25 @@ export default function () {
 					Slug is available
 				</Alert>
 			)
+		if (v === 'empty')
+			return (
+				<Alert type="error" class="w-full">
+					Slug cannot be empty
+				</Alert>
+			)
+		if (v === 'invalid')
+			return (
+				<Alert type="error" class="w-full">
+					Invalid Slug
+				</Alert>
+			)
 		const by = correctSlugConflict.value
 		return (
 			<Alert type="error" class="w-full">
-				Slug taken
-				{by ? (
-					<>
-						{' by '}
-						<a href={`/project/${by.slug}`} target="_blank" class="underline">
-							{by.name}
-						</a>
-						{` (${by.status})`}
-					</>
-				) : null}
+				<div class="flex flex-wrap items-center gap-1.5">
+					Slug taken
+					{by ? <ProjectStatusLink project={by} newTab /> : null}
+				</div>
 			</Alert>
 		)
 	}
@@ -157,7 +167,9 @@ export default function () {
 						return
 					}
 				}
-			} catch {}
+			} catch {
+				// fall through to 'unavailable' below
+			}
 
 			autoSlugStatus.value = 'unavailable'
 		},
@@ -190,12 +202,7 @@ export default function () {
 						{autoSlugStatus.value === 'loading' ? (
 							'...'
 						) : by ? (
-							<>
-								<a href={`/project/${by.slug}`} target="_blank" class="underline">
-									{by.name}
-								</a>
-								{` (${by.status})`}
-							</>
+							<ProjectStatusLink project={by} newTab />
 						) : (
 							'No'
 						)}
@@ -206,30 +213,22 @@ export default function () {
 			group('title')
 				.title('Title Issues?')
 				.children(
-					toggle('useless-info', 'Contains Useless Info')
-						.suggestedStatus('flagged')
-						.severity('low')
-						.message(),
+					toggle('useless-info', 'Contains Useless Info').suggestedStatus('flagged').message(),
 
-					toggle('minecraft-branding', 'Minecraft Title')
-						.suggestedStatus('flagged')
-						.severity('medium')
-						.message(),
+					toggle('minecraft-branding', 'Minecraft Title').suggestedStatus('flagged').message(),
 
 					toggle('similarities', 'Title Similarities')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message()
 						.children(
 							group()
 								.title('Similarities Additional Info')
-								.multiSelect('options')
 								.children(
-									option('modpack', 'Modpack Named After Mod')
+									check('modpack', 'Modpack Named After Mod')
 										.shown(computed(() => project.value.project_types.includes('modpack')))
 										.message(),
 
-									option('fork', 'Forked Project')
+									check('fork', 'Forked Project')
 										.shown(computed(() => !project.value?.minecraft_server))
 										.message(),
 								),
@@ -241,100 +240,76 @@ export default function () {
 				.title('Slug Issues')
 				.shown(computed(() => hasCustomSlug(project.value)))
 				.children(
-					group()
-						.multiSelect('issues')
-						.children(
-							toggle('misused', 'Misused')
-								.children(
-									group()
-										.title('Correct Slug')
-										.children(
-											text('correct-slug')
-												.initial(() => resolvedAutoSlug.value ?? project.value.slug)
-												.onChange((value, { override }) => {
-													if (!value) return override(project.value.slug ?? '')
-													clearTimeout(slugDebounceTimer)
-													if (value === project.value.slug) {
-														slugValidation.value = 'unchanged'
-														return
+					group().children(
+						toggle('misused', 'Misused')
+							.children(
+								group()
+									.title('Correct Slug')
+									.children(
+										text('correct-slug')
+											.initial(() => resolvedAutoSlug.value ?? project.value.slug ?? '')
+											.onChange((value) => {
+												clearTimeout(slugDebounceTimer)
+												if (value === project.value.slug) {
+													slugValidation.value = 'unchanged'
+													return
+												}
+												if (!value) {
+													slugValidation.value = 'empty'
+													correctSlugConflict.value = null
+													return
+												}
+												if (generateUrlSlug(value) !== value) {
+													slugValidation.value = 'invalid'
+													correctSlugConflict.value = null
+													return
+												}
+												slugValidation.value = 'checking'
+												slugDebounceTimer = setTimeout(async () => {
+													const conflict = await checkSlugTaken(value).catch(() => null)
+													if (conflict !== null && conflict.id !== project.value.id) {
+														correctSlugConflict.value = conflict
+														slugValidation.value = 'taken'
+													} else {
+														correctSlugConflict.value = null
+														slugValidation.value = 'available'
 													}
-													slugValidation.value = 'checking'
-													slugDebounceTimer = setTimeout(async () => {
-														const conflict = await checkSlugTaken(value).catch(() => null)
-														if (conflict !== null && conflict.id !== project.value.id) {
-															correctSlugConflict.value = conflict
-															slugValidation.value = 'taken'
-														} else {
-															correctSlugConflict.value = null
-															slugValidation.value = 'available'
-														}
-													}, 400)
-												}),
+												}, 400)
+											})
+											.tweak(TagCategoryWandSparklesIcon, () =>
+												autoSlugStatus.value === 'available' ? resolvedAutoSlug.value : null,
+											)
+											.tweak(UserPlusIcon, (current) =>
+												ownerUsername.value && !current?.includes(ownerUsername.value)
+													? `${current}-${ownerUsername.value}`
+													: null,
+											)
+											.tweak(WrenchIcon, (current) => generateUrlSlug(current ?? ''))
+											.tweak(TagCategoryRefreshCcwIcon, () => project.value.slug),
 
-											button()
-												.icon(TagCategoryWandSparklesIcon)
-												.tooltip(computed(() => resolvedAutoSlug.value ?? ''))
-												.enabled(
-													(state) =>
-														autoSlugStatus.value === 'available' &&
-														resolvedAutoSlug.value !== null &&
-														resolvedAutoSlug.value !== currentSlug(state),
-												)
-												.onClick((state) => {
-													if (resolvedAutoSlug.value) state['correct-slug'] = resolvedAutoSlug.value
-												}),
-
-											button()
-												.icon(UserPlusIcon)
-												.tooltip((state) => {
-													const current = currentSlug(state)
-													if (!ownerUsername.value || current?.includes(ownerUsername.value))
-														return current ?? ''
-													return `${current}-${ownerUsername.value}`
-												})
-												.enabled(
-													(state) =>
-														ownerUsername.value !== null &&
-														!currentSlug(state)?.includes(ownerUsername.value),
-												)
-												.onClick((state) => {
-													state['correct-slug'] = `${currentSlug(state)}-${ownerUsername.value}`
-												}),
-
-											button()
-												.icon(TagCategoryRefreshCcwIcon)
-												.tooltip(computed(() => project.value.slug ?? ''))
-												.enabled((state) => currentSlug(state) !== project.value.slug)
-												.onClick((state) => {
-													state['correct-slug'] = project.value.slug
-												}),
-
-											SlugStatus,
-										),
-								)
-								.rawMessage(async (state) => {
-									let correct = ''
-									if (slugValidation.value === 'available') {
-										const slug = state['correct-slug'] as string | undefined
-										if (slug)
-											correct = await md('checklist/messages/title-slug/slug/correction', () => ({
-												SUGGESTED_SLUG: slug,
-											}))(state)
-									}
-									return md('checklist/messages/title-slug/slug/misused', () => ({
-										CORRECT: correct,
-									}))(state)
-								})
-								.fix(
-									//TODO chyz think of some way to have initial values actually be reflected in state without having to store them
-									fix().project((patch, state) => {
-										const slug =
-											(state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value
-										if (!slug || slug === project.value.slug) return
-										patch.slug = slug
-									}),
-								),
-						),
+										SlugStatus,
+									),
+							)
+							.rawMessage(async (state) => {
+								let correct = ''
+								if (slugValidation.value === 'available') {
+									const slug = state['correct-slug'] as string | undefined
+									if (slug)
+										correct = await md('checklist/messages/title-slug/slug/correction', () => ({
+											SUGGESTED_SLUG: slug,
+										}))(state)
+								}
+								return md('checklist/messages/title-slug/slug/misused', () => ({
+									CORRECT: correct,
+								}))(state)
+							})
+							.fix(
+								fix().project((patch, state) => {
+									if (slugValidation.value !== 'available') return
+									patch.slug = state['correct-slug'] as string
+								}),
+							),
+					),
 				),
 		)
 }

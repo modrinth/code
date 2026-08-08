@@ -8,4 +8,5 @@ export const Priorities = new (class extends Priority {
 	rejected = this.before()
 	withheld = this.before()
 	note = this.after()
+	tempLast = this.after()
 })()

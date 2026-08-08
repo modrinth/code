@@ -1,5 +1,6 @@
-import type { KeybindListener } from '../types/keybinds'
 import type { Labrinth } from '@modrinth/api-client'
+
+import type { KeybindListener } from '../types/keybinds'
 
 const copyProjectLink = async (
 	project: Labrinth.Projects.v2.Project,
@@ -32,7 +33,6 @@ const keybinds: { [id: string]: KeybindListener } = {
 		keybind: 'ArrowRight',
 		description: 'Go to next stage',
 		scope: 'checklist',
-		enabled: (ctx) => !ctx.state.isDone,
 		action: (ctx) => ctx.actions.tryGoNext(),
 	},
 	'previous-stage': {

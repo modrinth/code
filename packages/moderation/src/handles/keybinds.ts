@@ -1,3 +1,4 @@
+import keybinds from '../data/keybinds.ts'
 import {
 	type KeybindDefinition,
 	type KeybindListener,
@@ -5,7 +6,6 @@ import {
 	type ModerationContext,
 	normalizeKeybind,
 } from '../types/keybinds.ts'
-import keybinds from '../data/keybinds.ts'
 
 function normalizeKeybinds(
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[],
@@ -58,6 +58,9 @@ export class Keybinds {
 				continue
 			}
 
+			// The scope check above guarantees ctx matches keybind's expected context shape,
+			// but TS can't correlate that narrowing across these two independently-typed variables.
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			if (keybind.enabled && !keybind.enabled(ctx as any)) {
 				continue
 			}
@@ -66,6 +69,7 @@ export class Keybinds {
 			const matches = definitions.some((def) => matchesKeybind(event, def))
 
 			if (matches) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				keybind.action(ctx as any)
 
 				const shouldPrevent = definitions.some((def) => def.preventDefault !== false)
