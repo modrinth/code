@@ -111,16 +111,13 @@ treatment needs to differ from the default surface fill:
 | ----------- | --------- |
 | `surface` | Uses the standard neutral hover/focus surface. This is the default. |
 | `filled` | Tints text/icon with the button's `color` at rest, and fills with it on hover/focus using contrast text. |
-| `hover` | Like `filled`, but untinted at rest — `color` is only applied as the hover/focus fill. |
+| `hover` | Like `filled`, but untinted at rest. `color` is only applied as the hover/focus fill. |
 | `none` | Keeps the background transparent while retaining the focus ring. |
 
 ```vue
 <Button type="quiet" color="brand" interaction="filled">Current page</Button>
 <IconButton type="quiet" interaction="none" label="Open account menu">
 	<AvatarIcon aria-hidden="true" />
-</IconButton>
-<IconButton type="quiet" color="red" interaction="hover" label="Close window">
-	<XIcon aria-hidden="true" />
 </IconButton>
 ```
 
