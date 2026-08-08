@@ -1,12 +1,8 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
-import { injectProjectPageContext } from '@modrinth/ui'
-import { computed } from 'vue'
 
-import { group, markdown, md, option, stage, toggle } from '../../types/node'
+import { group, option, stage, toggle } from '../../types/node'
 
 export default function () {
-	const { projectV3: project } = injectProjectPageContext()
-
 	return stage('disclosures', 'Disclosures')
 		.hint('Has this project selected all proper content disclosures?')
 		.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892')
@@ -15,25 +11,7 @@ export default function () {
 		.children(
 			group().children(
 				toggle('missing-disclosures', 'Disclosures Missing')
-					.rawMessage(async (state) => {
-						if (state?.['missing-disclosures'])
-							return md(
-								'checklist/messages/disclosures/missing-disclosures/missing-disclosures-header',
-								() => ({
-									DISCLOSURES_SELECTED: md(
-										'checklist/messages/disclosures/missing-disclosures/disclosures-selected',
-									),
-								}),
-							)(state)
-
-						return md(
-							'checklist/messages/disclosures/missing-disclosures/missing-disclosures-header',
-							() => ({
-								DISCLOSURES_SELECTED: '',
-							}),
-						)(state)
-					})
-
+					.message('header')
 					.children(
 						group()
 							.title('Which content disclosures are missing?')
@@ -50,7 +28,8 @@ export default function () {
 												option('text', 'Text').message(),
 												option('functionality', 'Functionality').message(),
 											),
-									),
+									)
+									.collect(),
 
 								option('ads', 'Advertisements').suggestedStatus('flagged').message(),
 
@@ -73,7 +52,7 @@ export default function () {
 								option('archive', 'Archive').message(),
 							),
 					)
-					.collect(),
+					.collect(undefined, 'list-intro'),
 			),
 		)
 }

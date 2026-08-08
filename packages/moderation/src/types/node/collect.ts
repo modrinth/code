@@ -87,6 +87,8 @@ export async function evalActiveAction(
 			}
 			if (!collected.trim() && seg.fallback) {
 				collected = await evalSegment(seg.fallback, entry.state, entry.statePath)
+			} else if (collected.trim() && seg.prefix) {
+				collected = (await evalSegment(seg.prefix, entry.state, entry.statePath)) + collected
 			}
 			result += collected
 		} else {
