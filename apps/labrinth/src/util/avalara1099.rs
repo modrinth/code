@@ -1,6 +1,8 @@
 use crate::database::models::{DBUserId, users_compliance::FormType};
 use crate::env::ENV;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Datelike;
 use serde::{Deserialize, Serialize};
@@ -62,7 +64,8 @@ pub async fn request_form(
     }
 
     let (request_builder, company_id) =
-        team_request(reqwest::Method::POST, "/form_requests")?;
+        team_request(reqwest::Method::POST, "/form_requests")
+            .wrap_api_err("executing `team_request`")?;
 
     let response = request_builder
         .json(&DataWrapper {
@@ -84,12 +87,19 @@ pub async fn request_form(
             },
         })
         .send()
-        .await?;
+        .await
+        .wrap_internal_err("deserializing HTTP response")?;
 
     Ok(if response.status().is_success() {
-        Ok(response.json::<DataWrapper<FormResponse>>().await?)
+        Ok(response
+            .json::<DataWrapper<FormResponse>>()
+            .await
+            .wrap_internal_err("deserializing HTTP response")?)
     } else {
-        Err(response.json().await?)
+        Err(response
+            .json()
+            .await
+            .wrap_internal_err("deserializing HTTP response")?)
     })
 }
 
@@ -104,12 +114,18 @@ pub async fn check_form(
         &format!(
             "/w9forms?filter[reference_id_eq]={reference_id}&page[number]=1&page[size]=1"
         ),
-    )?;
+    ).wrap_api_err("executing `team_request`")?;
 
-    let response = request_builder.send().await?;
+    let response = request_builder
+        .send()
+        .await
+        .wrap_internal_err("sending HTTP request")?;
 
     Ok(if response.status().is_success() {
-        let body = response.text().await?;
+        let body = response
+            .text()
+            .await
+            .wrap_internal_err("reading HTTP response body")?;
         let serde_result =
             serde_json::from_str::<ListWrapper<W9FormsResponse>>(&body);
 
@@ -118,13 +134,16 @@ pub async fn check_form(
                 Ok(list_wrapper.data.pop().map(|data| DataWrapper { data }))
             }
             Err(e) => {
-                return Err(ApiError::InvalidInput(format!(
+                return Err(ApiError::Request(eyre::eyre!(format!(
                     "Error parsing avalara1099 response: {e}. Actual response body: {body}"
-                )));
+                ))));
             }
         }
     } else {
-        Err(response.json().await?)
+        Err(response
+            .json()
+            .await
+            .wrap_internal_err("deserializing HTTP response")?)
     })
 }
 

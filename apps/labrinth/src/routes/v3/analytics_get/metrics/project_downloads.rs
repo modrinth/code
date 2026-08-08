@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::{
     collections::{HashMap, HashSet},
     sync::{
@@ -358,7 +359,9 @@ pub(crate) async fn fetch(
     use ProjectDownloadsField as F;
     let uses = |field| metrics.bucket_by.contains(&field);
     let dependent_on_version_filter =
-        fetch_dependent_on_version_filter(metrics, cx.pool).await?;
+        fetch_dependent_on_version_filter(metrics, cx.pool)
+            .await
+            .wrap_api_err("fetching dependent on version filter")?;
     if !metrics.filter_by.dependent_project_id.is_empty()
         && dependent_on_version_filter.is_empty()
     {
@@ -433,15 +436,23 @@ pub(crate) async fn fetch(
             .iter()
             .any(|(column_name, used)| *column_name == name && *used)
     };
-    let mut cursor = query.fetch::<DownloadRow>()?;
+    let mut cursor = query
+        .fetch::<DownloadRow>()
+        .wrap_internal_err("fetching project-download pagination cursor")?;
     let mut rows = Vec::new();
 
-    while let Some(row) = cursor.next().await? {
+    while let Some(row) = cursor
+        .next()
+        .await
+        .wrap_internal_err("fetching project downloads")?
+    {
         rows.push(row);
     }
 
     let dependent_version_projects =
-        fetch_dependent_version_projects(&rows, cx).await?;
+        fetch_dependent_version_projects(&rows, cx)
+            .await
+            .wrap_api_err("fetching dependent version projects")?;
     let mut buckets = HashMap::<DownloadBucket, u64>::new();
 
     for row in rows {
@@ -567,7 +578,8 @@ pub(crate) async fn fetch(
                     downloads,
                 }),
             }),
-        )?;
+        )
+        .wrap_api_err("executing `ProjectMetrics::Downloads`")?;
     }
 
     Ok(())

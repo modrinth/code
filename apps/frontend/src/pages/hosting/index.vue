@@ -154,7 +154,7 @@
 					</div>
 
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<LoaderIcon loader="fabric" class="size-8 text-brand" />
+						<TagIcon tag="fabric" enforce-type="loader" class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.yourFavoriteMods) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
 							{{ formatMessage(messages.yourFavoriteModsDescription) }}
@@ -641,9 +641,9 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
-	LoaderIcon,
 	ModrinthServersPurchaseModal,
 	OptionGroup,
+	TagIcon,
 	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'

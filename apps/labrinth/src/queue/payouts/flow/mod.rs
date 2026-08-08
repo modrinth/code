@@ -1,6 +1,7 @@
 //! Centralized place where payout rails are defined - their fees, minimum and
 //! maximum withdraw amounts, and execution logic.
 
+use crate::util::error::ApiContext as _;
 use eyre::eyre;
 use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::Decimal;
@@ -59,7 +60,9 @@ impl PayoutsQueue {
                     self,
                     withdrawal.amount,
                     method_details,
-                    &get_method.await?,
+                    &get_method
+                        .await
+                        .wrap_api_err("executing `tremendous::create`")?,
                 )
                 .await
             }

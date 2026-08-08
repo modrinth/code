@@ -236,6 +236,7 @@ import {
 	ProjectCard,
 	ProjectCardList,
 	SidebarCard,
+	sortProjectTypes,
 	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'
@@ -376,15 +377,14 @@ const isInvited = computed(() => {
 })
 
 const projectTypes = computed(() => {
-	const obj: Record<string, boolean> = {}
+	const types = new Set<string>()
 
 	for (const project of projects.value ?? []) {
-		obj[project.project_types[0] ?? 'project'] = true
+		const type = project.project_types[0] ?? 'project'
+		if (type !== 'project') types.add(type)
 	}
 
-	delete obj.project
-
-	return Object.keys(obj)
+	return sortProjectTypes(types)
 })
 function isProjectServer(project: ProjectV3): boolean {
 	return project.minecraft_server != null
@@ -494,15 +494,12 @@ const navLinks = computed(() => [
 		label: formatMessage(commonMessages.allProjectType),
 		href: `/organization/${organization.value?.slug}`,
 	},
-	...projectTypes.value
-		.map((x) => {
-			return {
-				label: formatMessage(getProjectTypeMessage(x as ProjectType, true)),
-				href: `/organization/${organization.value?.slug}/${x}s`,
-			}
-		})
-		.slice()
-		.sort((a, b) => a.label.localeCompare(b.label)),
+	...projectTypes.value.map((x) => {
+		return {
+			label: formatMessage(getProjectTypeMessage(x as ProjectType, true)),
+			href: `/organization/${organization.value?.slug}/${x}s`,
+		}
+	}),
 ])
 
 async function copyId() {

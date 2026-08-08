@@ -3875,9 +3875,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Wyróżnione tagi"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Możesz wyróżnić 3 z najlepiej pasujących do Twojego projektu tagów. Inne tagi mogą zostać pokazane jako wyróżnione, jeżeli nie wybierzesz wszystkich trzech."
-  },
   "project.settings.tags.features-description": {
     "message": "Wszystkie funkcjonalności, których używa {type}"
   },

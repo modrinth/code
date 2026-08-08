@@ -1,6 +1,6 @@
-import type { NodeState } from '@modrinth/moderation'
+import type { NodeState } from '@modrinth/moderation/src/types/node'
 
-import { dbDelete, dbGet, dbPut, dbScan } from './moderation-db.ts'
+import { dbDelete, dbGet, dbPut, dbScan } from './db.ts'
 
 export interface PersistedChecklistState {
 	savedAt: string
@@ -9,6 +9,7 @@ export interface PersistedChecklistState {
 	stage?: string
 	message?: string
 	state?: Record<string, Record<string, NodeState>>
+	activatedStages?: string[]
 }
 
 const STORE = 'checklist'

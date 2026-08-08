@@ -55,8 +55,8 @@
 				</PageHeaderMetadataItem>
 				<PageHeaderMetadataItem
 					v-if="sharedInstanceManager?.type !== 'user'"
-					:icon="ServerLoaderIcon"
-					:icon-props="{ loader: loaderDisplayName }"
+					:icon="TagIcon"
+					:icon-props="{ tag: loaderDisplayName, enforceType: 'loader' }"
 					tooltip="Mod loader"
 				>
 					{{ loaderLabel }}
@@ -205,7 +205,6 @@ import {
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
-	LoaderIcon as ServerLoaderIcon,
 	type OverflowMenuOption,
 	PageHeader,
 	PageHeaderActions,
@@ -213,6 +212,7 @@ import {
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
 	type ServerLoader,
+	TagIcon,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'

@@ -1,5 +1,8 @@
 <template>
-	<div class="relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6">
+	<div
+		class="relativemb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
+		:class="`m${marginTarget}-auto`"
+	>
 		<h1>Moderation</h1>
 		<NavTabs :links="moderationLinks" class="mb-4 hidden sm:flex" />
 		<div class="mb-4 sm:hidden">
@@ -16,6 +19,7 @@
 
 <script setup lang="ts">
 import { FolderIcon, GlobeIcon, HashIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
+import { getMarginTarget } from '@modrinth/moderation'
 import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 definePageMeta({
@@ -29,6 +33,9 @@ useSeoMeta({
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
+
+const modSettings = useModerationSettings()
+const marginTarget = computed(() => getMarginTarget(modSettings.value))
 
 const messages = defineMessages({
 	projectsTitle: {

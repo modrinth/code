@@ -2885,9 +2885,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Utwórz projekt"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Edytuj rolę"
-  },
   "profile.button.info": {
     "defaultMessage": "Otwórz szczegóły użytkownika"
   },
@@ -2960,23 +2957,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {projekt} few {projekty} other {projektów}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Zapisywanie..."
-  },
   "profile.official-account": {
     "defaultMessage": "Oficjalne konto Modrinth"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Oficjalne konto Modrinth. Otrzymaj wsparcie na stronie <support-link></support-link> lub poprzez e-mail <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Wybierz rolę"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Wystąpił błąd podczas ustawiania roli tego użytkownika. Spróbuj ponownie później."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Nie udało się zaktualizować roli"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Wystąpił błąd podczas odblokowywania tego użytkownika. Spróbuj ponownie później."

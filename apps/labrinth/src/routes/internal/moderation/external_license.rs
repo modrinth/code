@@ -1,3 +1,5 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use actix_web::{HttpRequest, get, patch, post, web};
@@ -99,9 +101,9 @@ impl LicenseId {
         match self {
             LicenseId::Number(id) => Ok(id),
             LicenseId::String(id) => id.parse().map_err(|_| {
-                ApiError::InvalidInput(
-                    "license_id must be a valid integer".to_string(),
-                )
+                ApiError::Request(eyre::eyre!(
+                    "license_id must be a valid integer",
+                ))
             }),
         }
     }
@@ -143,9 +145,9 @@ fn normalize_sha1_hashes(hashes: &[String]) -> Result<Vec<String>, ApiError> {
             let hash = hash.trim().to_lowercase();
             if hash.len() != 40 || !hash.chars().all(|c| c.is_ascii_hexdigit())
             {
-                return Err(ApiError::InvalidInput(
-                    "hash must be a valid SHA1 hex string".to_string(),
-                ));
+                return Err(ApiError::Request(eyre::eyre!(
+                    "hash must be a valid SHA1 hex string",
+                )));
             }
 
             Ok(hash)
@@ -196,7 +198,8 @@ async fn fetch_linked_files(
         license_ids,
     )
     .fetch_all(pool)
-    .await?;
+    .await
+    .wrap_internal_err("fetching file rows from database")?;
 
     let mut map: HashMap<i64, Vec<LinkedFile>> = HashMap::new();
     for row in file_rows {
@@ -247,10 +250,12 @@ async fn fetch_by_hashes(
         &hash_bytes,
     )
     .fetch_all(pool)
-    .await?;
+    .await.wrap_internal_err("querying database for `fetch_by_hashes`")?;
 
     let license_ids = rows.iter().map(|row| row.id).collect::<Vec<_>>();
-    let files_map = fetch_linked_files(pool, &license_ids).await?;
+    let files_map = fetch_linked_files(pool, &license_ids)
+        .await
+        .wrap_api_err("fetching linked files")?;
 
     let mut results = HashMap::new();
     for row in rows {
@@ -309,10 +314,13 @@ async fn fetch_by_flame_ids(
         flame_ids,
     )
     .fetch_all(pool)
-    .await?;
+    .await
+    .wrap_internal_err("querying database for `fetch_by_flame_ids`")?;
 
     let license_ids = rows.iter().map(|row| row.id).collect::<Vec<_>>();
-    let files_map = fetch_linked_files(pool, &license_ids).await?;
+    let files_map = fetch_linked_files(pool, &license_ids)
+        .await
+        .wrap_api_err("fetching linked files")?;
 
     let mut results: HashMap<i32, Vec<ExternalProject>> = HashMap::new();
     for row in rows {
@@ -350,7 +358,8 @@ pub async fn search(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating external license search")?;
 
     let rows = sqlx::query_as!(
         LicenseRow,
@@ -381,10 +390,13 @@ pub async fn search(
         body.flame_ids.as_deref(),
     )
     .fetch_all(&**pool)
-    .await?;
+    .await
+    .wrap_internal_err("querying database for `search`")?;
 
     let license_ids: Vec<i64> = rows.iter().map(|r| r.id).collect();
-    let files_map = fetch_linked_files(&pool, &license_ids).await?;
+    let files_map = fetch_linked_files(&pool, &license_ids)
+        .await
+        .wrap_api_err("fetching linked files")?;
 
     let results = rows
         .into_iter()
@@ -419,12 +431,18 @@ pub async fn lookup(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let body = body.into_inner();
-    let hashes = normalize_sha1_hashes(&body.hashes)?;
-    let flame_ids = fetch_by_flame_ids(&pool, &body.flame_ids).await?;
-    let hashes = fetch_by_hashes(&pool, &hashes).await?;
+    let hashes = normalize_sha1_hashes(&body.hashes)
+        .wrap_api_err("executing `normalize_sha1_hashes`")?;
+    let flame_ids = fetch_by_flame_ids(&pool, &body.flame_ids)
+        .await
+        .wrap_api_err("fetching by flame ids")?;
+    let hashes = fetch_by_hashes(&pool, &hashes)
+        .await
+        .wrap_api_err("fetching by hashes")?;
 
     Ok(web::Json(ExternalLicenseLookupResponse {
         flame_ids,
@@ -453,12 +471,18 @@ pub async fn get_by_sha1(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let hashes = normalize_sha1_hashes(&[path.into_inner().0])?;
-    let hash = hashes.first().ok_or(ApiError::NotFound)?;
-    let mut results = fetch_by_hashes(&pool, &hashes).await?;
-    let result = results.remove(hash).ok_or(ApiError::NotFound)?;
+    let hashes = normalize_sha1_hashes(&[path.into_inner().0])
+        .wrap_api_err("normalizing SHA-1 hash")?;
+    let hash = hashes.first().wrap_not_found_err("resource not found")?;
+    let mut results = fetch_by_hashes(&pool, &hashes)
+        .await
+        .wrap_api_err("fetching by hashes")?;
+    let result = results
+        .remove(hash)
+        .wrap_not_found_err("resource not found")?;
 
     Ok(web::Json(result))
 }
@@ -484,10 +508,14 @@ pub async fn get_by_sha1_bulk(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let hashes = normalize_sha1_hashes(&body.hashes)?;
-    let results = fetch_by_hashes(&pool, &hashes).await?;
+    let hashes = normalize_sha1_hashes(&body.hashes)
+        .wrap_api_err("executing `normalize_sha1_hashes`")?;
+    let results = fetch_by_hashes(&pool, &hashes)
+        .await
+        .wrap_api_err("fetching by hashes")?;
 
     Ok(web::Json(results))
 }
@@ -540,16 +568,21 @@ async fn upsert_file_license(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let body = body.into_inner();
-    let license_id = body.license_id.parse()?;
+    let license_id = body
+        .license_id
+        .parse()
+        .wrap_api_err("parsing external license ID")?;
     if body.hashes.is_empty() {
-        return Err(ApiError::InvalidInput(
-            "hashes must contain at least one SHA1 hex string".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "hashes must contain at least one SHA1 hex string",
+        )));
     }
-    let hashes = normalize_sha1_hashes(&body.hashes)?;
+    let hashes = normalize_sha1_hashes(&body.hashes)
+        .wrap_api_err("executing `normalize_sha1_hashes`")?;
     let hash_bytes = hashes
         .iter()
         .map(|hash| hash.as_bytes().to_vec())
@@ -557,7 +590,10 @@ async fn upsert_file_license(
     let filenames = vec![None; hashes.len()];
     let license_ids = vec![license_id; hashes.len()];
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let license = sqlx::query!(
         r#"
@@ -579,8 +615,9 @@ async fn upsert_file_license(
         license_id,
     )
     .fetch_optional(&mut transaction)
-    .await?
-    .ok_or(ApiError::NotFound)?;
+    .await
+    .wrap_internal_err("fetching license from database")?
+    .wrap_not_found_err("resource not found")?;
 
     ExternalLicense::insert_files(
         &mut transaction,
@@ -589,11 +626,19 @@ async fn upsert_file_license(
         &license_ids,
         DBUserId(user.id.0 as i64),
     )
-    .await?;
+    .await
+    .wrap_internal_err(
+        "inserting database records for `upsert_file_license`",
+    )?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
-    let files_map = fetch_linked_files(&pool, &[license_id]).await?;
+    let files_map = fetch_linked_files(&pool, &[license_id])
+        .await
+        .wrap_api_err("fetching linked files")?;
     let linked_files = files_map.get(&license_id).cloned().unwrap_or_default();
 
     Ok(web::Json(
@@ -636,7 +681,8 @@ pub async fn update_license(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let id = path.into_inner().0;
 
@@ -666,10 +712,13 @@ pub async fn update_license(
         user.id.0 as i64,
     )
     .fetch_optional(&**pool)
-    .await?
-    .ok_or(ApiError::NotFound)?;
+    .await
+    .wrap_internal_err("querying database for `update_license`")?
+    .wrap_not_found_err("resource not found")?;
 
-    let files_map = fetch_linked_files(&pool, &[id]).await?;
+    let files_map = fetch_linked_files(&pool, &[id])
+        .await
+        .wrap_api_err("fetching linked files")?;
     let linked_files = files_map.get(&id).cloned().unwrap_or_default();
 
     Ok(web::Json(

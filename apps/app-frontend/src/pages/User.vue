@@ -52,6 +52,8 @@ import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import {
 	block_user,
+	change_user_avatar,
+	delete_user_avatar,
 	get_blocked_users,
 	get_user_collections,
 	get_user_organizations,
@@ -119,6 +121,10 @@ const userProfile = provideUserProfile({
 	getOrganizations: get_user_organizations,
 	getCollections: get_user_collections,
 	patchUser: patch_user,
+	changeAvatar: async (userId, file, extension) => {
+		await change_user_avatar(userId, new Uint8Array(await file.arrayBuffer()), extension)
+	},
+	deleteAvatar: delete_user_avatar,
 	getBlockedUsers: get_blocked_users,
 	blockUser: block_user,
 	unblockUser: unblock_user,

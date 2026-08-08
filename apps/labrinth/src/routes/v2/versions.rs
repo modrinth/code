@@ -1,3 +1,5 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -138,7 +140,8 @@ pub async fn version_list(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Version>>(response).await {
@@ -191,7 +194,8 @@ pub async fn version_project_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -242,7 +246,8 @@ pub async fn versions_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Version>>(response).await {
@@ -294,7 +299,8 @@ pub async fn version_get(
     )
     .await
     .map(|b| HttpResponse::Ok().json(b))
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -396,7 +402,9 @@ pub async fn version_edit(
     .await
     {
         Ok(resp) => resp,
-        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(ApiError::NotFound(_)) => {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
         Err(err) => return Err(err),
     };
     let old_version = match v2_reroute::extract_ok_json::<Version>(
@@ -450,12 +458,16 @@ pub async fn version_edit(
         info,
         pool,
         redis,
-        web::Json(serde_json::to_value(new_version)?),
+        web::Json(
+            serde_json::to_value(new_version)
+                .wrap_request_err("serializing version edit")?,
+        ),
         session_queue,
         search_state,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("editing version through v3 route")?;
     Ok(response)
 }
 

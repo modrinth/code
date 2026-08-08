@@ -82,10 +82,8 @@
 
 	<div
 		v-if="selectedVersion && downloadDataLoaded"
-		:role="compatibleVersions.length > 1 ? 'radiogroup' : undefined"
-		:aria-label="
-			compatibleVersions.length > 1 ? formatMessage(messages.compatibleVersionTitle) : undefined
-		"
+		:role="showVersionSelector ? 'radiogroup' : undefined"
+		:aria-label="showVersionSelector ? formatMessage(messages.compatibleVersionTitle) : undefined"
 		class="flex flex-col gap-2.5"
 	>
 		<h3
@@ -102,26 +100,12 @@
 			:download-reason="downloadReason"
 			:current-game-version="currentGameVersion"
 			:current-platform="currentPlatform"
-			:selectable="compatibleVersions.length > 1"
+			:selectable="showVersionSelector"
 			:selected="compatibleVersion.id === selectedVersion.id"
-			:show-download="
-				compatibleVersions.length === 1 || compatibleVersion.id === selectedVersion.id
-			"
-			:color="
-				compatibleVersion.id === selectedVersion.id &&
-				compatibleVersions.length === 1 &&
-				!hasAdditionalDownloads
-					? 'brand'
-					: 'standard'
-			"
-			:type="
-				compatibleVersion.id === selectedVersion.id &&
-				compatibleVersions.length === 1 &&
-				!hasAdditionalDownloads
-					? 'standard'
-					: 'transparent'
-			"
-			:circular="hasAdditionalDownloads || compatibleVersions.length > 1"
+			:show-download="!showVersionSelector || compatibleVersion.id === selectedVersion.id"
+			:color="isPrimaryDownloadVersion(compatibleVersion) ? 'brand' : 'standard'"
+			:type="isPrimaryDownloadVersion(compatibleVersion) ? 'standard' : 'transparent'"
+			:circular="!isPrimaryDownloadVersion(compatibleVersion)"
 			@select="selectCompatibleVersion(compatibleVersion)"
 			@download="emit('download')"
 		/>
@@ -494,6 +478,10 @@ const hasAdditionalDownloads = computed(() => {
 	return hrefs.size > 1
 })
 
+const showVersionSelector = computed(
+	() => hasAdditionalDownloads.value && compatibleVersions.value.length > 1,
+)
+
 watch(
 	[currentGameVersion, currentPlatform, selectedVersion, selectedPrimaryFile],
 	() => {
@@ -537,6 +525,10 @@ function selectPlatform(platform?: string) {
 
 function selectCompatibleVersion(version: Labrinth.Versions.v3.Version) {
 	userSelectedCompatibleVersionId.value = version.id
+}
+
+function isPrimaryDownloadVersion(version: Labrinth.Versions.v3.Version) {
+	return !hasAdditionalDownloads.value && version.id === defaultSelectedVersion.value?.id
 }
 
 function latestVersionByType(type: Labrinth.Versions.v3.VersionChannel) {
