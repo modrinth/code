@@ -8,7 +8,20 @@
 	>
 		<div class="flex flex-col">
 			<p class="mb-4 mt-0 leading-normal">
-				{{ formatMessage(messages.body) }}
+				{{ formatMessage(messages.body1) }}
+			</p>
+			<p class="mb-4 mt-0 leading-normal">
+				<IntlFormatted :message-id="messages.body2">
+					<template #rules="{ children }">
+						<nuxt-link
+							to="/legal/rules#generative-ai"
+							target="_blank"
+							class="font-semibold text-orange hover:underline"
+						>
+							<component :is="() => normalizeChildren(children)" />
+						</nuxt-link>
+					</template>
+				</IntlFormatted>
 			</p>
 			<div class="flex justify-end">
 				<Button type="colored" color="brand" native-type="button" @click="hide">
@@ -22,7 +35,15 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon } from '@modrinth/assets'
-import { Button, commonMessages, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	NewModal,
+	normalizeChildren,
+	useVIntl,
+} from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
 
 const { formatMessage } = useVIntl()
@@ -33,10 +54,14 @@ const messages = defineMessages({
 		id: 'project.ai-image-warning-modal.title',
 		defaultMessage: 'AI-generated images not allowed',
 	},
-	body: {
-		id: 'project.ai-image-warning-modal.body',
+	body1: {
+		id: 'project.ai-image-warning-modal.body.1',
 		defaultMessage:
 			'Using AI-generated images to represent your project is not allowed. Attempting to work around detection may lead to your Modrinth account being suspended.',
+	},
+	body2: {
+		id: 'project.ai-image-warning-modal.body.2',
+		defaultMessage: `See section 6 of <rules>Modrinth's Content Rules</rules> for more information on our generative AI policy.`,
 	},
 })
 

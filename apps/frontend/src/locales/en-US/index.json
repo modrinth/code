@@ -3485,8 +3485,11 @@
   "project.actions.servers-promo.title": {
     "message": "Create a server"
   },
-  "project.ai-image-warning-modal.body": {
+  "project.ai-image-warning-modal.body.1": {
     "message": "Using AI-generated images to represent your project is not allowed. Attempting to work around detection may lead to your Modrinth account being suspended."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "See section 6 of <rules>Modrinth's Content Rules</rules> for more information on our generative AI policy."
   },
   "project.ai-image-warning-modal.title": {
     "message": "AI-generated images not allowed"
