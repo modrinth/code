@@ -149,6 +149,11 @@
 			which have diverged substantially from the original project.
 		</p>
 
+		<p>
+			When uploading content you have the necessary permissions to distribute but did not author yourself,
+			you must make a meaningful effort to credit each original source properly.
+		</p>
+
 		<h2 id="miscellaneous">5. Miscellaneous</h2>
 
 		<p>
