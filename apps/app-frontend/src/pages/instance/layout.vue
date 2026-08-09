@@ -180,7 +180,7 @@ const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_inst
 
 const online = useOnline()
 const offline = computed(() => !online.value)
-const instanceId = computed(() => String(route.params.id ?? ''))
+const instanceId = ref(String(route.params.id ?? ''))
 const instanceQuery = useQuery(
 	computed(() => ({
 		...instanceDetailQueryOptions(instanceId.value),
@@ -242,6 +242,7 @@ onBeforeRouteUpdate(async (to, from) => {
 
 	try {
 		await ensureCriticalInstanceData(targetInstanceId)
+		instanceId.value = targetInstanceId
 	} catch (error) {
 		if (isUnmanagedInstanceError(error)) return { path: '/' }
 		handleError(error)
