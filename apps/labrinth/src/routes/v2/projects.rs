@@ -658,6 +658,7 @@ pub async fn project_edit(
         redis.clone(),
         session_queue.clone(),
         search_state.clone(),
+        true,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;

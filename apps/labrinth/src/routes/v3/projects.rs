@@ -369,6 +369,7 @@ pub async fn project_edit(
         redis,
         session_queue,
         search_state,
+        false,
     )
     .await
 }
@@ -381,6 +382,7 @@ pub async fn project_edit_internal(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    sync_archival_disclosure: bool,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -675,13 +677,14 @@ pub async fn project_edit_internal(
             .execute(&mut transaction)
             .await?;
 
-            if has_archived_disclosure {
+            if sync_archival_disclosure && has_archived_disclosure {
                 db_models::DBProjectDisclosure::remove(
                     project_item.inner.id,
                     ProjectDisclosureType::Archived,
                     &mut transaction,
                 )
-                .await?;
+                .await
+                .wrap_internal_err("failed to remove archival disclosure")?;
             }
         }
     }
