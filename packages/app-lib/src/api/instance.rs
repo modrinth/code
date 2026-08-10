@@ -16,7 +16,7 @@ pub use self::content::{
     get_content_items, get_dependencies_as_content_items,
     get_install_candidates, get_installed_project_ids,
     get_linked_modpack_content, get_linked_modpack_info, get_projects,
-    list_content_sets, sync_content_files,
+    list_content_sets, refresh_content_updates, sync_content_files,
 };
 pub use self::export_mrpack::{
     PackExportCandidate, create_mrpack_json, export_mrpack,
