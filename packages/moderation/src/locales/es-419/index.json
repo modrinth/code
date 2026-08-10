@@ -269,9 +269,6 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Verificar los enlaces externos"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Ver la página de versiones"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Ver configuración de enlaces"
   }
