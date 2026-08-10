@@ -26,6 +26,7 @@ pub enum ProjectDisclosure {
     },
     SystemInteractions {
         note: Option<String>,
+        interactions: Vec<String>,
     },
     Telemetry {
         consent: TelemetryConsent,
