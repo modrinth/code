@@ -1,7 +1,6 @@
 export * from './builder'
 export * from './capabilities'
 export * from './collect'
-export * from './context'
 export * from './factories'
 export * from './fix'
 export * from './messages'
