@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Select accurate tags"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Make sure users are aware of any important details by filling in content disclosures that apply to your {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Check content disclosures"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Your description is {length, plural, one {# readable character} other {# readable characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create a clear and informative description."
   },
@@ -193,6 +199,9 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Visit description settings"
+  },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Visit disclosure settings"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Visit license settings"

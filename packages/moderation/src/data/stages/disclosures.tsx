@@ -1,6 +1,6 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
-import { group, option, stage, toggle } from '../../types/node'
+import { group, stage, toggle } from '../../types/node'
 
 export default function () {
 	return stage('disclosures', 'Disclosures')
