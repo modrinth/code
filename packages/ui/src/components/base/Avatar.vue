@@ -6,14 +6,16 @@
 		:style="`--_size: ${cssSize}`"
 		:class="{
 			circle: circle,
+			detecting: !hasDetectedCorners,
 			'no-shadow': noShadow,
+			padded: hasTransparentCorners,
 			raised: raised,
 			pixelated: pixelated,
 		}"
 		:src="src"
 		:alt="alt"
 		:loading="loading"
-		@load="updatePixelated"
+		@load="onLoad"
 		@error="onError"
 	/>
 	<svg
@@ -49,6 +51,8 @@
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 const pixelated = ref(false)
+const hasTransparentCorners = ref(false)
+const hasDetectedCorners = ref(false)
 const img = useTemplateRef<HTMLImageElement>('img')
 const failed = ref(false)
 
@@ -93,6 +97,8 @@ watch(
 	() => props.src,
 	() => {
 		failed.value = false
+		hasTransparentCorners.value = false
+		hasDetectedCorners.value = false
 	},
 )
 
@@ -101,11 +107,62 @@ function onError(e) {
 	failed.value = true
 }
 
-function updatePixelated() {
-	if (img.value && img.value.naturalWidth && img.value.naturalWidth < 32) {
+function onLoad() {
+	const image = img.value
+	if (!image) return
+
+	if (image.naturalWidth && image.naturalWidth < 32) {
 		pixelated.value = true
 	} else {
 		pixelated.value = false
+	}
+
+	const source = image.currentSrc
+	const transparentCorners = detectTransparentCorners(image)
+	if (transparentCorners !== null) {
+		hasTransparentCorners.value = transparentCorners
+		hasDetectedCorners.value = true
+		return
+	}
+
+	const probe = new Image()
+	probe.crossOrigin = 'anonymous'
+	probe.onload = () => {
+		if (img.value?.currentSrc !== source) return
+		hasTransparentCorners.value = detectTransparentCorners(probe) ?? false
+		hasDetectedCorners.value = true
+	}
+	probe.onerror = () => {
+		if (img.value?.currentSrc !== source) return
+		hasDetectedCorners.value = true
+	}
+	probe.src = source
+}
+
+function detectTransparentCorners(image: HTMLImageElement): boolean | null {
+	if (image.naturalWidth < 2 || image.naturalHeight < 2) return false
+
+	const canvas = document.createElement('canvas')
+	canvas.width = 4
+	canvas.height = 4
+	const context = canvas.getContext('2d', { willReadFrequently: true })
+	if (!context) return false
+
+	const right = image.naturalWidth - 2
+	const bottom = image.naturalHeight - 2
+	context.drawImage(image, 0, 0, 2, 2, 0, 0, 2, 2)
+	context.drawImage(image, right, 0, 2, 2, 2, 0, 2, 2)
+	context.drawImage(image, 0, bottom, 2, 2, 0, 2, 2, 2)
+	context.drawImage(image, right, bottom, 2, 2, 2, 2, 2, 2)
+
+	try {
+		const pixels = context.getImageData(0, 0, 4, 4).data
+		for (let alpha = 3; alpha < pixels.length; alpha += 4) {
+			if (pixels[alpha] !== 0) return false
+		}
+		return true
+	} catch {
+		return null
 	}
 }
 
@@ -156,6 +213,14 @@ function hash(str: string): number {
 
 	&.pixelated {
 		image-rendering: pixelated;
+	}
+
+	&.detecting {
+		visibility: hidden;
+	}
+
+	&.padded {
+		padding: calc(6 / 96 * var(--_override-size, var(--_size)));
 	}
 
 	&.raised {

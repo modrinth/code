@@ -36,7 +36,7 @@ const versionRef = ref<HTMLElement | null>(null)
 			class="relative flex aspect-square min-w-full shrink-0 items-center overflow-clip rounded-2xl"
 		>
 			<Avatar
-				class="pointer-events-none !rounded-2xl !border-none outline-none !p-0 !bg-transparent"
+				class="pointer-events-none !rounded-2xl outline-none"
 				size="100%"
 				:src="iconSrc"
 				:tint-by="instance.id"

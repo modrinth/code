@@ -53,11 +53,12 @@ const messages = defineMessages({
 	},
 	jumpBackIntoWorldsTitle: {
 		id: 'app.appearance-settings.jump-back-into-worlds.title',
-		defaultMessage: 'Jump back into worlds',
+		defaultMessage: 'Jump into worlds or instances',
 	},
 	jumpBackIntoWorldsDescription: {
 		id: 'app.appearance-settings.jump-back-into-worlds.description',
-		defaultMessage: 'Show recently played worlds in the "Jump back in" section on the Home page.',
+		defaultMessage:
+			'Show recently played worlds or instances in the "Jump in" section on the Home page.',
 	},
 	showPlayTimeTitle: {
 		id: 'app.appearance-settings.show-play-time.title',
