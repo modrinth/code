@@ -352,6 +352,9 @@ const effectiveLoaders = computed(() => {
 // Pre-select loader and game version from initial values
 onMounted(() => {
 	debug('mounted, initialLoader:', ctx.initialLoader, 'initialGameVersion:', ctx.initialGameVersion)
+	if (ctx.flowType === 'instance') {
+		void randomizeIcon()
+	}
 	if (!selectedLoader.value) {
 		if (ctx.initialLoader) {
 			selectedLoader.value = ctx.initialLoader
