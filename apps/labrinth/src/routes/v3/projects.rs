@@ -477,14 +477,21 @@ pub async fn project_edit_internal(
             ));
         }
 
-        let has_archived_disclosure =
-            db_models::DBProjectDisclosure::projects_with_type(
-                ProjectDisclosureType::Archived,
-                &[id],
+        let archival_disclosure =
+            db_models::DBProjectDisclosure::get_many_for_project(
+                project_item.inner.id,
                 &mut transaction,
             )
-            .await?
-            .contains(&id);
+            .await
+            .wrap_internal_err("failed to fetch project disclosures")?
+            .into_iter()
+            .find(|disclosure| {
+                matches!(
+                    disclosure.disclosure,
+                    ProjectDisclosure::Archived { .. }
+                )
+            });
+        let has_archived_disclosure = archival_disclosure.is_some();
 
         if status == &ProjectStatus::Archived {
             if !has_archived_disclosure {
@@ -678,6 +685,15 @@ pub async fn project_edit_internal(
             .await?;
 
             if sync_archival_disclosure && has_archived_disclosure {
+                if archival_disclosure
+                    .is_some_and(|disclosure| disclosure.set_by_moderator)
+                    && !user.role.is_mod()
+                {
+                    return Err(ApiError::Auth(eyre!(
+                        "you cannot modify a disclosure set by a moderator"
+                    )));
+                }
+
                 db_models::DBProjectDisclosure::remove(
                     project_item.inner.id,
                     ProjectDisclosureType::Archived,
