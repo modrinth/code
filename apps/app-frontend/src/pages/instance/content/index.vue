@@ -1385,14 +1385,14 @@ provideContentManager({
 				project: linkedModpackProject.value,
 				projectLink: {
 					path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}`,
-					query: { i: instance.value.id },
+					query: { i: instancePage.instanceId.value },
 				},
 				version: linkedModpackVersion.value ?? undefined,
 				versionLink:
 					linkedModpackProject.value && linkedModpackVersion.value
 						? {
 								path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`,
-								query: { i: instance.value.id },
+								query: { i: instancePage.instanceId.value },
 							}
 						: undefined,
 				owner: linkedModpackOwner.value
@@ -1479,7 +1479,7 @@ provideContentManager({
 			icon_url: null,
 		},
 		projectLink: item.project?.id
-			? { path: `/project/${item.project.id}`, query: { i: instance.value.id } }
+			? { path: `/project/${item.project.id}`, query: { i: instancePage.instanceId.value } }
 			: undefined,
 		version: item.version ?? {
 			id: item.file_name,
@@ -1490,7 +1490,7 @@ provideContentManager({
 			item.project?.id && item.version?.id
 				? {
 						path: `/project/${item.project.id}/version/${item.version.id}`,
-						query: { i: instance.value.id },
+						query: { i: instancePage.instanceId.value },
 					}
 				: undefined,
 		owner: item.owner

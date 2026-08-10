@@ -23,9 +23,8 @@
 		</IconButton>
 		<IconButton
 			type="quiet"
-			color="red"
 			label="Close window"
-			class="relative expanded-button close-button hover:!bg-red focus-visible:!bg-red"
+			class="relative expanded-button close-button"
 			@click="handleClose"
 		>
 			<XIcon />
