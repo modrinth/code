@@ -2,10 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import { Button } from '../../components/base/buttons'
-import ModpackContentModal from '../../layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
+import ManagedContentModal from '../../layouts/shared/content-tab/components/managed-content-modal/index.vue'
 import type { ContentItem } from '../../layouts/shared/content-tab/types'
 
-// Sample modpack content items (representing mods included in a modpack)
 const sodiumItem: ContentItem = {
 	file_name: 'sodium-fabric-0.8.2+mc1.21.1.jar',
 	file_path: '',
@@ -201,7 +200,6 @@ const entityTextureFeaturesItem: ContentItem = {
 	update_version_id: null,
 }
 
-// Shader pack item
 const complementaryShaderItem: ContentItem = {
 	file_name: 'ComplementaryReimagined_r5.3.zip',
 	file_path: '',
@@ -256,7 +254,6 @@ const bslShaderItem: ContentItem = {
 	update_version_id: null,
 }
 
-// Resource pack items
 const faithfulItem: ContentItem = {
 	file_name: 'Faithful 32x - 1.21.zip',
 	file_path: '',
@@ -339,7 +336,6 @@ const stayTrueItem: ContentItem = {
 	update_version_id: null,
 }
 
-// Mixed content (mods + shaders + resource packs)
 const mixedModpackContent: ContentItem[] = [
 	sodiumItem,
 	lithiumItem,
@@ -355,7 +351,6 @@ const mixedModpackContent: ContentItem[] = [
 	stayTrueItem,
 ]
 
-// Mods only
 const modsOnlyContent: ContentItem[] = [
 	sodiumItem,
 	lithiumItem,
@@ -366,7 +361,6 @@ const modsOnlyContent: ContentItem[] = [
 	entityTextureFeaturesItem,
 ]
 
-// Large modpack content (40+ items for testing scrolling)
 const largeModpackContent: ContentItem[] = [
 	...mixedModpackContent,
 	...Array.from({ length: 35 }, (_, i) => ({
@@ -393,35 +387,32 @@ const largeModpackContent: ContentItem[] = [
 ]
 
 const meta = {
-	title: 'Instances/ModpackContentModal',
-	component: ModpackContentModal,
+	title: 'Instances/ManagedContentModal',
+	component: ManagedContentModal,
 	parameters: {
 		layout: 'centered',
 	},
-} satisfies Meta<typeof ModpackContentModal>
+} satisfies Meta<typeof ManagedContentModal>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-// ============================================
-// Basic Examples
-// ============================================
 
 export const Default: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
 			return { modalRef, openModal }
 		},
 		template: /*html*/ `
 			<div>
 				<Button type="colored" color="brand" @click="openModal">View Modpack Content (Mixed)</Button>
-				<ModpackContentModal
+				<ManagedContentModal
 					ref="modalRef"
-					modpack-name="Cobblemon Official Modpack"
-					modpack-icon-url="https://cdn.modrinth.com/data/5FFgwNNP/icon.png"
+					source-name="Cobblemon Official Modpack"
+					source-icon-url="https://cdn.modrinth.com/data/5FFgwNNP/icon.png"
 				/>
 			</div>
 		`,
@@ -430,33 +421,29 @@ export const Default: Story = {
 
 export const ModsOnly: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(modsOnlyContent)
 			return { modalRef, openModal }
 		},
 		template: /*html*/ `
 			<div>
 				<Button type="colored" color="brand" @click="openModal">View Modpack Content (Mods Only)</Button>
-				<ModpackContentModal ref="modalRef" />
+				<ManagedContentModal ref="modalRef" />
 			</div>
 		`,
 	}),
 }
 
-// ============================================
-// Loading State
-// ============================================
 
 export const LoadingState: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const openModal = () => {
 				modalRef.value?.showLoading()
-				// Simulate loading delay
 				setTimeout(() => {
 					modalRef.value?.show(mixedModpackContent)
 				}, 2000)
@@ -466,71 +453,62 @@ export const LoadingState: Story = {
 		template: /*html*/ `
 			<div>
 				<Button type="colored" color="brand" @click="openModal">View Content (With Loading)</Button>
-				<ModpackContentModal
+				<ManagedContentModal
 					ref="modalRef"
-					modpack-name="Fabulously Optimized"
-					modpack-icon-url="https://cdn.modrinth.com/data/1KVo5zza/icon.png"
+					source-name="Fabulously Optimized"
+					source-icon-url="https://cdn.modrinth.com/data/1KVo5zza/icon.png"
 				/>
 			</div>
 		`,
 	}),
 }
 
-// ============================================
-// Empty State
-// ============================================
 
 export const EmptyContent: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show([])
 			return { modalRef, openModal }
 		},
 		template: /*html*/ `
 			<div>
 				<Button type="colored" color="brand" @click="openModal">View Empty Modpack</Button>
-				<ModpackContentModal ref="modalRef" />
+				<ManagedContentModal ref="modalRef" />
 			</div>
 		`,
 	}),
 }
 
-// ============================================
-// Large Content List
-// ============================================
 
 export const LargeModpack: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(largeModpackContent)
 			return { modalRef, openModal }
 		},
 		template: /*html*/ `
 			<div>
 				<Button type="colored" color="brand" @click="openModal">View Large Modpack (47 items)</Button>
-				<ModpackContentModal
+				<ManagedContentModal
 					ref="modalRef"
-					modpack-name="All the Mods 10"
-					modpack-icon-url="https://cdn.modrinth.com/data/1KVo5zza/icon.png"
+					source-name="All the Mods 10"
+					source-icon-url="https://cdn.modrinth.com/data/1KVo5zza/icon.png"
 				/>
 			</div>
 		`,
 	}),
 }
 
-// ============================================
-// Search Functionality
-// ============================================
 
 export const SearchDemo: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
 			return { modalRef, openModal }
 		},
@@ -540,21 +518,18 @@ export const SearchDemo: Story = {
 					Click the button and try searching for "sodium", "shader", or "faithful" to test the search functionality.
 				</p>
 				<Button type="colored" color="brand" @click="openModal">Test Search</Button>
-				<ModpackContentModal ref="modalRef" />
+				<ManagedContentModal ref="modalRef" />
 			</div>
 		`,
 	}),
 }
 
-// ============================================
-// Filter Demo
-// ============================================
 
 export const FilterDemo: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
 			return { modalRef, openModal }
 		},
@@ -564,22 +539,18 @@ export const FilterDemo: Story = {
 					Click the button and try the filter chips (Mods, Shaders, Resource Packs) to filter content by type.
 				</p>
 				<Button type="colored" color="brand" @click="openModal">Test Filters</Button>
-				<ModpackContentModal ref="modalRef" />
+				<ManagedContentModal ref="modalRef" />
 			</div>
 		`,
 	}),
 }
 
-// ============================================
-// Mixed Owner Types
-// ============================================
 
 export const MixedOwnerTypes: Story = {
 	render: () => ({
-		components: { ModpackContentModal, Button },
+		components: { ManagedContentModal, Button },
 		setup() {
-			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
-			// Mix of user and organization owners
+			const modalRef = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 			const mixedContent = [
 				sodiumItem, // User owner
 				fabricApiItem, // Organization owner
@@ -595,7 +566,7 @@ export const MixedOwnerTypes: Story = {
 					Shows content with different owner types: users (circular avatar) and organizations (rounded + icon).
 				</p>
 				<Button type="colored" color="brand" @click="openModal">View Mixed Owners</Button>
-				<ModpackContentModal ref="modalRef" />
+				<ManagedContentModal ref="modalRef" />
 			</div>
 		`,
 	}),

@@ -38,8 +38,8 @@ const pageContext = injectPageContext(null)
 
 interface Props {
 	header?: string
-	modpackName?: string
-	modpackIconUrl?: string
+	sourceName?: string
+	sourceIconUrl?: string
 	enableToggle?: boolean
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string | null
@@ -49,8 +49,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
 	header: undefined,
-	modpackName: undefined,
-	modpackIconUrl: undefined,
+	sourceName: undefined,
+	sourceIconUrl: undefined,
 	enableToggle: false,
 	actionDisabled: false,
 	actionDisabledTooltip: undefined,
@@ -67,44 +67,44 @@ const emit = defineEmits<{
 
 const messages = defineMessages({
 	header: {
-		id: 'instances.modpack-content-modal.header',
-		defaultMessage: 'Modpack content',
+		id: 'instances.managed-content-modal.header',
+		defaultMessage: 'Managed content',
 	},
 	searchPlaceholder: {
-		id: 'instances.modpack-content-modal.search-placeholder',
+		id: 'instances.managed-content-modal.search-placeholder',
 		defaultMessage: 'Search {count, number} {count, plural, one {project} other {projects}}',
 	},
 	loading: {
-		id: 'instances.modpack-content-modal.loading',
+		id: 'instances.managed-content-modal.loading',
 		defaultMessage: 'Loading content...',
 	},
 	emptyTitle: {
-		id: 'instances.modpack-content-modal.empty-title',
+		id: 'instances.managed-content-modal.empty-title',
 		defaultMessage: 'No content found',
 	},
 	emptyDescription: {
-		id: 'instances.modpack-content-modal.empty-description',
-		defaultMessage: 'This modpack does not include any additional content.',
+		id: 'instances.managed-content-modal.empty-description',
+		defaultMessage: 'This source does not include any managed content.',
 	},
 	noResults: {
-		id: 'instances.modpack-content-modal.no-results',
+		id: 'instances.managed-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
 	externalContent: {
-		id: 'instances.modpack-content-modal.external-content',
+		id: 'instances.managed-content-modal.external-content',
 		defaultMessage: 'External',
 	},
 	externalContentDescription: {
-		id: 'instances.modpack-content-modal.external-content-description',
+		id: 'instances.managed-content-modal.external-content-description',
 		defaultMessage: 'This file is not published on Modrinth.',
 	},
 	openInSlicer: {
-		id: 'instances.modpack-content-modal.open-in-slicer',
+		id: 'instances.managed-content-modal.open-in-slicer',
 		defaultMessage: 'Open in Slicer',
 	},
 })
 
-export interface ModpackContentModalState {
+export interface ManagedContentModalState {
 	items: ContentItem[]
 	searchQuery: string
 	selectedFilters: string[]
@@ -404,7 +404,7 @@ function handleHide() {
 	emit('hide')
 }
 
-function getState(): ModpackContentModalState | null {
+function getState(): ManagedContentModalState | null {
 	if (!items.value.length) return null
 	return {
 		items: items.value,
@@ -414,7 +414,7 @@ function getState(): ModpackContentModalState | null {
 	}
 }
 
-async function restore(state: ModpackContentModalState) {
+async function restore(state: ManagedContentModalState) {
 	items.value = state.items.map((item) => ({ ...item }))
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
@@ -466,10 +466,11 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 	>
 		<template #title>
 			<Avatar
-				v-if="props.modpackIconUrl"
-				:src="props.modpackIconUrl"
+				v-if="props.sourceIconUrl"
+				:src="props.sourceIconUrl"
+				:alt="props.sourceName"
 				size="3rem"
-				:tint-by="props.modpackName"
+				:tint-by="props.sourceName"
 			/>
 			<span class="text-lg font-extrabold text-contrast">
 				{{ props.header ?? formatMessage(messages.header) }}
@@ -484,7 +485,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					clearable
 				/>
 
-				<!-- Filters -->
 				<div v-if="filterOptions.length > 0" class="flex items-center gap-2">
 					<FilterIcon class="size-5 text-secondary shrink-0" />
 					<div class="flex flex-wrap items-center gap-1.5">
@@ -518,9 +518,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				</div>
 			</div>
 
-			<!-- Content area -->
 			<div class="flex-1 flex flex-col min-h-0 overflow-hidden">
-				<!-- Loading state -->
 				<div
 					v-if="loading"
 					class="flex flex-col items-center justify-center flex-1 gap-2 text-secondary"
@@ -529,7 +527,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-sm">{{ formatMessage(messages.loading) }}</span>
 				</div>
 
-				<!-- Empty state -->
 				<div
 					v-else-if="items.length === 0"
 					class="flex flex-col items-center justify-center flex-1 gap-2 text-center p-8"
@@ -540,7 +537,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-secondary">{{ formatMessage(messages.emptyDescription) }}</span>
 				</div>
 
-				<!-- No search results -->
 				<div
 					v-else-if="filteredItems.length === 0"
 					class="flex flex-col items-center justify-center flex-1 gap-2 text-center p-8"
@@ -548,7 +544,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-secondary">{{ formatMessage(messages.noResults) }}</span>
 				</div>
 
-				<!-- Content table -->
 				<div v-else class="@container flex-1 min-h-0 flex flex-col">
 					<div
 						class="flex h-12 shrink-0 items-center justify-between gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
@@ -630,11 +625,9 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				</div>
 			</div>
 
-			<!-- Footer -->
 			<div
 				class="flex items-center justify-between px-6 py-4 border-t border-solid border-0 border-surface-4 shrink-0"
 			>
-				<!-- Stats -->
 				<div class="flex items-center gap-2">
 					<template v-for="(count, type, idx) in stats" :key="type">
 						<BulletDivider v-if="idx > 0" />

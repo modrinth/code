@@ -128,6 +128,7 @@ export function createSharedInstanceContext(
 	const updatePreview = computed(() =>
 		unavailableReason.value ? null : (updatePreviewQuery.data.value ?? null),
 	)
+	const lastUpdateCheckAt = computed(() => updatePreviewQuery.dataUpdatedAt.value || undefined)
 
 	watch(
 		() => instance.value?.id,
@@ -162,6 +163,7 @@ export function createSharedInstanceContext(
 		unavailableManager,
 		manager,
 		updatePreview,
+		lastUpdateCheckAt,
 		expectedUserId,
 		wrongAccount,
 		signedOut,

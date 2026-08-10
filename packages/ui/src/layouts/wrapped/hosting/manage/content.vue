@@ -36,16 +36,12 @@ import {
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
-import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
+import ManagedContentModal from '../../../shared/content-tab/components/managed-content-modal/index.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
+import type { ManagedContentData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
-import type {
-	ContentItem,
-	ContentModpackCardCategory,
-	ContentModpackCardProject,
-	ContentModpackCardVersion,
-} from '../../../shared/content-tab/types'
+import type { ContentItem } from '../../../shared/content-tab/types'
+import { summarizeManagedContent } from '../../../shared/content-tab/utils/managed-content'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 type ContentOwnerAvatarSource = {
@@ -65,6 +61,10 @@ const props = withDefaults(
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	modpackContent: {
+		id: 'hosting.content.managed-content.modpack-header',
+		defaultMessage: 'Modpack content',
+	},
 	failedToRemoveContent: {
 		id: 'hosting.content.failed-to-remove',
 		defaultMessage: 'Failed to remove content',
@@ -256,54 +256,37 @@ const newestModpackUpdateVersion = computed(() => {
 	)
 })
 
-const modpack = computed<ContentModpackData | null>(() => {
+const managedContent = computed<ManagedContentData | null>(() => {
 	const mp = contentQuery.data.value?.modpack
 	if (!mp) return null
 	const isLocal = mp.spec.platform === 'local_file'
 	const project = projectQuery.data.value
 	const projectId = isLocal ? null : mp.spec.project_id
-	return {
-		project: {
-			id: projectId ?? mp.title ?? '',
-			slug: project?.slug ?? projectId ?? '',
-			title: mp.title ?? (isLocal ? mp.spec.name : projectId) ?? '',
-			icon_url: mp.icon_url ?? undefined,
-			description: mp.description ?? '',
-			downloads: mp.downloads,
-			followers: mp.followers,
-			filename: isLocal ? mp.spec.filename : undefined,
-		} as ContentModpackCardProject,
-		projectLink: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
-		version: isLocal
+	const addons = modpackContentQuery.data.value?.addons
+	const summary = addons
+		? summarizeManagedContent(addons.map(addonToContentItem))
+		: modpackContentQuery.isLoading.value
 			? undefined
-			: ({
-					id: mp.spec.version_id,
-					version_number: mp.version_number ?? '',
-					date_published: mp.date_published ?? '',
-				} as ContentModpackCardVersion),
-		versionLink:
-			projectId && !isLocal
-				? `/project/${project?.slug ?? projectId}/version/${mp.spec.version_id}`
-				: undefined,
-		owner: mp.owner
-			? {
-					id: mp.owner.id,
-					name: mp.owner.name,
-					type: mp.owner.type,
-					avatar_url: getContentOwnerAvatarUrl(mp.owner),
-					link:
-						mp.owner.type === 'organization'
-							? `/organization/${mp.owner.id}`
-							: `/user/${mp.owner.id}`,
-				}
-			: undefined,
-		categories: (project?.categories ?? []).map((name) => ({
-			name,
-			icon: name,
-			project_type: 'modpack',
-			header: 'categories',
-		})) as ContentModpackCardCategory[],
-		hasUpdate: !!mp.has_update || !!newestModpackUpdateVersion.value,
+			: []
+	const title = isLocal
+		? (mp.title ?? mp.spec.name)
+		: (project?.title ?? mp.title ?? projectId ?? '')
+	return {
+		card: {
+			kind: 'modpack',
+			manager: {
+				name: title,
+				iconUrl: (isLocal ? mp.icon_url : (project?.icon_url ?? mp.icon_url)) ?? undefined,
+				link: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
+			},
+			summary,
+			versionNumber: isLocal ? undefined : (mp.version_number ?? undefined),
+			versionLink:
+				projectId && mp.spec.platform === 'modrinth'
+					? `/project/${project?.slug ?? projectId}/version/${mp.spec.version_id}`
+					: undefined,
+			updatedAt: isLocal ? undefined : (mp.date_published ?? undefined),
+		},
 	}
 })
 
@@ -854,7 +837,7 @@ async function handleBulkDisable(items: ContentItem[]) {
 }
 
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
-const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
+const modpackContentModal = ref<InstanceType<typeof ManagedContentModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal>>()
 
 const updatingProject = ref<ContentItem | null>(null)
@@ -1378,7 +1361,7 @@ provideContentManager({
 	items: contentItems,
 	loading: computed(() => contentQuery.isLoading.value),
 	error: computed(() => contentQuery.error.value ?? null),
-	modpack,
+	managedContent,
 	isPackLocked: ref(false),
 	isBusy: setupActionDisabled,
 	busyMessage: setupActionBusyMessage,
@@ -1399,10 +1382,10 @@ provideContentManager({
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
 	bulkUpdateItems: handleBulkUpdate,
-	updateModpack: handleModpackUpdate,
-	viewModpackContent: handleViewModpackContent,
+	runManagedContentPrimaryAction: handleModpackUpdate,
+	viewManagedContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	openSettings: () => openServerSettings({ tabId: 'installation' }),
+	openManagedContentSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	getItemId: getContentItemId,
@@ -1448,10 +1431,11 @@ provideContentManager({
 					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
 					@unlink="handleModpackUnlinkConfirm"
 				/>
-				<ModpackContentModal
+				<ManagedContentModal
 					ref="modpackContentModal"
-					:modpack-name="modpack?.project.title"
-					:modpack-icon-url="modpack?.project.icon_url"
+					:source-name="managedContent?.card.manager.name"
+					:source-icon-url="managedContent?.card.manager.iconUrl"
+					:header="formatMessage(messages.modpackContent)"
 					enable-toggle
 					:action-disabled="setupActionDisabled"
 					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
@@ -1476,11 +1460,13 @@ provideContentManager({
 					:is-app="false"
 					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
 					:project-icon-url="
-						updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
+						updatingModpack
+							? managedContent?.card.manager.iconUrl
+							: updatingProject?.project?.icon_url
 					"
 					:project-name="
 						updatingModpack
-							? (modpack?.project.title ?? formatMessage(commonMessages.modpackLabel))
+							? (managedContent?.card.manager.name ?? formatMessage(commonMessages.modpackLabel))
 							: (updatingProject?.project?.title ?? updatingProject?.file_name)
 					"
 					:loading="loadingVersions"
@@ -1499,7 +1485,7 @@ provideContentManager({
 		ref="modpackUpdateModal"
 		:downgrade="isModpackUpdateDowngrade"
 		:backup-tip="
-			[modpack?.project.title, pendingModpackUpdateVersion?.version_number]
+			[managedContent?.card.manager.name, pendingModpackUpdateVersion?.version_number]
 				.filter(Boolean)
 				.join(' ')
 		"

@@ -96,20 +96,50 @@ export interface ContentItem extends Omit<
 	external_url?: string
 }
 
-export type ContentModpackCardProject = Pick<
+export type ManagedContentProject = Pick<
 	Labrinth.Projects.v2.Project,
-	'id' | 'slug' | 'title' | 'icon_url' | 'description'
+	'id' | 'slug' | 'title' | 'icon_url'
 > & {
-	downloads?: number | null
-	followers?: number | null
 	filename?: string | null
 }
 
-export type ContentModpackCardVersion = Pick<
+export type ManagedContentVersion = Pick<
 	Labrinth.Versions.v2.Version,
 	'id' | 'version_number' | 'date_published'
 >
 
-export type ContentModpackCardCategory = Labrinth.Tags.v2.Category & {
-	action?: (event: MouseEvent) => void
+export type ManagedContentSummaryType =
+	| 'mod'
+	| 'plugin'
+	| 'datapack'
+	| 'resourcepack'
+	| 'shader'
+
+export interface ManagedContentManager {
+	name: string
+	iconUrl?: string
+	link?: string | RouteLocationRaw
 }
+
+export interface ManagedContentSummaryItem {
+	type: ManagedContentSummaryType
+	count: number
+}
+
+interface ManagedContentCardBase {
+	manager: ManagedContentManager
+	summary?: ManagedContentSummaryItem[]
+}
+
+export type ManagedContentCardData =
+	| (ManagedContentCardBase & {
+			kind: 'modpack'
+			versionNumber?: string
+			versionLink?: string | RouteLocationRaw
+			updatedAt?: string
+	  })
+	| (ManagedContentCardBase & {
+			kind: 'server' | 'shared-instance'
+			syncedAt?: number
+			updateAvailable: boolean
+	  })

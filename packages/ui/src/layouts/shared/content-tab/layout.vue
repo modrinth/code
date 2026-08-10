@@ -28,7 +28,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
-import ContentModpackCard from './components/ContentModpackCard.vue'
+import ManagedContentCard from './components/managed-content-card/index.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
 import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.vue'
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
@@ -769,28 +769,22 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</div>
 
 			<template v-else>
-				<ContentModpackCard
-					v-if="ctx.modpack.value"
-					:project="ctx.modpack.value.project"
-					:project-link="ctx.modpack.value.projectLink"
-					:version="ctx.modpack.value.version"
-					:version-link="ctx.modpack.value.versionLink"
-					:owner="ctx.modpack.value.owner"
-					:categories="ctx.modpack.value.categories"
-					:has-update="ctx.modpack.value.hasUpdate"
-					:disabled="ctx.modpack.value.disabled"
-					:disabled-text="ctx.modpack.value.disabledText"
-					v-on="{
-						...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
-						...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
-						...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
-						...(ctx.openSettings ? { settings: () => ctx.openSettings?.() } : {}),
-					}"
+				<ManagedContentCard
+					v-if="ctx.managedContent.value"
+					:data="ctx.managedContent.value.card"
+					:disabled="ctx.managedContent.value.disabled"
+					:disabled-text="ctx.managedContent.value.disabledText"
+					:show-view-content="!!ctx.viewManagedContent"
+					:show-settings="!!ctx.openManagedContentSettings"
+					:show-primary-action="!!ctx.runManagedContentPrimaryAction"
+					@view-content="ctx.viewManagedContent?.()"
+					@settings="ctx.openManagedContentSettings?.()"
+					@primary-action="ctx.runManagedContentPrimaryAction?.($event)"
 				/>
 
 				<template v-if="ctx.items.value.length > 0">
 					<div class="flex flex-col gap-4">
-						<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
+						<span v-if="ctx.managedContent.value" class="text-xl font-semibold text-contrast">
 							{{ formatMessage(messages.additionalContent) }}
 						</span>
 
@@ -952,13 +946,15 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					<template #heading>
 						{{
 							formatMessage(
-								ctx.modpack.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
+								ctx.managedContent.value
+									? messages.noExtraContentInstalled
+									: messages.noContentInstalled,
 							)
 						}}
 					</template>
 					<template #description>
 						{{
-							ctx.modpack.value
+							ctx.managedContent.value
 								? formatMessage(messages.emptyModpackHint)
 								: formatMessage(messages.emptyHint, {
 										contentType: formatContentTypeSentence(
@@ -1146,7 +1142,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			v-if="ctx.unlinkModpack"
 			ref="confirmUnlinkModal"
 			:server="ctx.deletionContext === 'server'"
-			:backup-tip="ctx.modpack.value?.project.title"
+			:backup-tip="ctx.managedContent.value?.card.manager.name"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@unlink="ctx.unlinkModpack!()"

@@ -64,10 +64,8 @@
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
 				:shared-instance-signed-out="sharedInstanceSignedOut"
-				:shared-instance-update-available="showSharedInstanceUpdateAdmonition"
 				@published="refreshInstance"
 				@delete="requestInstanceDeletion"
-				@review-update="reviewSharedInstanceUpdate"
 			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
@@ -331,7 +329,7 @@ const sharedInstanceUpdateKey = computed(() => {
 	const latestVersion = sharedInstanceUpdatePreview.value?.latestVersion
 	return instanceId && latestVersion !== undefined ? `${instanceId}:${latestVersion}` : null
 })
-const showSharedInstanceUpdateAdmonition = computed(
+const sharedInstanceUpdateAvailable = computed(
 	() =>
 		sharedInstanceUpdatePreview.value?.updateAvailable === true &&
 		sharedInstanceUpdateKey.value !== hiddenSharedInstanceUpdateKey.value,
@@ -515,7 +513,7 @@ async function handleSharedInstanceUnavailable(
 	setSharedInstanceUnavailable(reason)
 }
 
-function reviewSharedInstanceUpdate(event: MouseEvent) {
+function reviewSharedInstanceUpdate(event?: MouseEvent) {
 	const currentInstance = instance.value
 	const preview = sharedInstanceUpdatePreview.value
 	if (
@@ -792,6 +790,7 @@ provideInstancePage({
 	instance: instance as ComputedRef<GameInstance>,
 	linkedProject: linkedProjectV3,
 	isServerInstance,
+	sharedInstanceUpdateAvailable,
 	offline,
 	playing,
 	loading,
@@ -804,6 +803,7 @@ provideInstancePage({
 	openSettings,
 	browseContent,
 	browseServers,
+	reviewSharedInstanceUpdate,
 })
 provideInstanceBackup(() => instance.value!)
 
