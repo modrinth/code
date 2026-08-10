@@ -115,6 +115,47 @@ export function flattenStaticVariables(): Record<string, string> {
 	const vars: Record<string, string> = {}
 
 	vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
+	vars[`R1`] =
+		`Per section 1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-content)`
+	const rule1subs = 12
+	for (let n = 1; n <= rule1subs; n++) {
+		vars[`R1.${n}`] =
+			`Per section 1.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-content)`
+	}
+	vars[`R2`] =
+		`Per section 2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#clear-and-honest-function)`
+	vars[`R2.1`] =
+		`Per section 2.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations)`
+	const rule2sub1subs = 3
+	for (let n = 1; n <= rule2sub1subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R2.1${l}`] =
+			`Per section 2.1${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations)`
+	}
+	vars[`R2.2`] =
+		`Per section 2.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#accessibility)`
+	vars[`R3`] =
+		`Per section 3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	const rule3subs = 3
+	for (let n = 1; n <= rule3subs; n++) {
+		vars[`R3.${n}`] =
+			`Per section 3.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	}
+	const rule3sub3subs = 6
+	for (let n = 1; n <= rule3sub3subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R3.3${l}`] =
+			`Per section 3.3${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	}
+	vars[`R4`] =
+		`Per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#copyright-and-legality-of-content)`
+	vars[`R5`] =
+		`Per section 5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
+	const rule5subs = 8
+	for (let n = 1; n <= rule5subs; n++) {
+		vars[`R5.${n}`] =
+			`Per section 5.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
+	}
 	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
 	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
 	vars[`SUPPORT`] =
