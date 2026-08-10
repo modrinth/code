@@ -168,10 +168,10 @@
     "message": "Hide nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Show recently played worlds in the \"Jump back in\" section on the Home page."
+    "message": "Show recently played worlds or instances in the \"Jump in\" section on the Home page."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Jump back into worlds"
+    "message": "Jump into worlds or instances"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimize Modrinth App when Minecraft starts."
@@ -410,8 +410,8 @@
   "app.instance.confirm-delete.header": {
     "message": "Delete instance"
   },
-  "app.instance.confirm-delete.instances-to-delete": {
-    "message": "These instances will be deleted:"
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {Instance} other {Instances ({count})}}"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "This modpack is already installed in the <bold>{instanceName}</bold> instance. Are you sure you want to duplicate it?"

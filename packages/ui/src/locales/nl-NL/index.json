@@ -884,9 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Alles wissen"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Een instantie is een Minecraft-installatie met een specifieke loader, versie en mods."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Begin helemaal opnieuw door een loader en een spelversie te kiezen."
   },

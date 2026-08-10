@@ -776,9 +776,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Zrušit vše"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Instance je nastavení Minecraftu s konkrétním loaderem, verzí a módy."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Začněte od začátku výběrem loaderu a verze hry."
   },

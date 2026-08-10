@@ -860,9 +860,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Deseleziona tutto"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Un'istanza è una combinazione di loader, versione e mod per Minecraft."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Parti da zero scegliendo il loader e la versione del gioco."
   },

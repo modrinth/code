@@ -28,10 +28,15 @@ const props = defineProps<{
 	instances: GameInstance[]
 }>()
 
+const GROUP_HOVER_OPEN_DELAY = 750
+
 const {
 	activeInstanceGroupDrag,
 	instanceGroupDragPointer,
 	instanceGroupDragStatus,
+	instanceGroupDragTarget,
+	isSectionCollapsed,
+	setSectionCollapsed,
 	startInstanceGroupDrag,
 	updateInstanceGroupDrag,
 	finishInstanceGroupDrag,
@@ -65,11 +70,26 @@ const {
 
 const instanceGroupDragStatusPopover = ref<HTMLElement>()
 let statusPopoverFrame: number | undefined
+let groupHoverOpenTimeout: ReturnType<typeof setTimeout> | undefined
 
 const instanceGroupDragStatusStyle = computed(() => ({
 	left: `${Math.min(instanceGroupDragPointer.value.x + 4, window.innerWidth - 220)}px`,
 	top: `${Math.min(instanceGroupDragPointer.value.y + 4, window.innerHeight - 48)}px`,
 }))
+
+const hoveredCollapsedGroupId = computed(() => {
+	const target = instanceGroupDragTarget.value
+	if (
+		!activeInstanceGroupDrag.value ||
+		!target ||
+		!isSectionCollapsed(target) ||
+		!getInstanceGroupDropState(target).canDrop
+	) {
+		return null
+	}
+
+	return target
+})
 
 watch(
 	activeInstanceGroupDrag,
@@ -98,10 +118,30 @@ watch(
 	{ flush: 'sync' },
 )
 
+function clearGroupHoverOpenTimeout() {
+	if (groupHoverOpenTimeout !== undefined) {
+		clearTimeout(groupHoverOpenTimeout)
+	}
+	groupHoverOpenTimeout = undefined
+}
+
+watch(hoveredCollapsedGroupId, (target) => {
+	clearGroupHoverOpenTimeout()
+	if (!target) return
+
+	groupHoverOpenTimeout = setTimeout(() => {
+		groupHoverOpenTimeout = undefined
+		if (hoveredCollapsedGroupId.value === target) {
+			setSectionCollapsed(target, false)
+		}
+	}, GROUP_HOVER_OPEN_DELAY)
+})
+
 onBeforeUnmount(() => {
 	if (statusPopoverFrame !== undefined) {
 		cancelAnimationFrame(statusPopoverFrame)
 	}
+	clearGroupHoverOpenTimeout()
 })
 
 function isAltKeyPressed(event?: Event) {
@@ -136,6 +176,7 @@ function handleDragOver(event: DragOverEvent) {
 }
 
 async function handleDragEnd(event: DragEndEvent) {
+	clearGroupHoverOpenTimeout()
 	const targetData = event.operation.target?.data as InstanceGroupDndDropData | undefined
 	let isMovingInstances = false
 	if (!event.canceled && targetData) {

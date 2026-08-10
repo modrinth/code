@@ -854,9 +854,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Пошук збірок"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Профіль — це налаштування Minecraft із певним завантажувачем, версією та модами."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Почніть з нуля, вибравши завантажувач і версію гри."
   },

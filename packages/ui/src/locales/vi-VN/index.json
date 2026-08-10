@@ -782,9 +782,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Xóa hết"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Cấu hình là một bản cài Minecraft với mod, phiên bản và loader của riêng nó."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Cài từ đầu bằng cách lựa chọn mod loader và phiên bản game."
   },

@@ -884,9 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "清除全部"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "實例是指具有特定載入器、版本及模組的 Minecraft 設定。"
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "從頭開始，先選擇載入器與遊戲版本。"
   },

@@ -860,9 +860,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Tümünü temizle"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Her bir 'kurulum', kendine has yükleyicisi (modloader), sürümü ve modları olan bir Minecraft kurulumudur."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Bir yükleyici ve sürüm seçerek başlayın."
   },

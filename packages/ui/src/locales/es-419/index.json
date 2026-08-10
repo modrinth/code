@@ -884,9 +884,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Limpiar todo"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Una instancia es una configuración de Minecraft con un loader, una versión y unos mods específicos."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Empieza desde cero eligiendo un loader y una versión del juego."
   },

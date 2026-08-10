@@ -809,9 +809,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Modcsomag keresése"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "A játékprofil egy külön Minecraft-környezet egy adott modbetöltővel, verzióval és modokkal."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Kezdés alapoktól: válassz betöltőt és játékverziót."
   },

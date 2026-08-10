@@ -920,9 +920,6 @@
   "creation-flow.modal.project.search.placeholder": {
     "defaultMessage": "Search mods, modpacks, and more..."
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "An instance is a Minecraft setup with a specific loader, version, and mods."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Start from scratch by picking a loader and game version."
   },
@@ -5413,6 +5410,9 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username}'s avatar"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Cancel"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Custom..."
