@@ -84,6 +84,8 @@ pub enum DelphiSeverity {
     High,
     #[serde(alias = "SEVERE")]
     Severe,
+    #[serde(alias = "MALWARE")]
+    Malware,
 }
 
 /// An issue found in a Delphi report. Every issue belongs to a report,

@@ -108,7 +108,7 @@ export interface Messageable {
 		this: this,
 		content: string | ((state: Record<string, NodeState>) => string | Promise<string>),
 	): this
-	collect(this: this, path?: string | (() => string) | GetVarsFn, getVars?: GetVarsFn): this
+	collect(this: this, fallback?: string | (() => string), prefix?: string | (() => string)): this
 }
 
 function splitPathAndVars(
@@ -151,17 +151,18 @@ export function withMessaging<T extends object>(node: T): T & Messageable {
 		},
 		collect(
 			this: Messageable,
-			pathOrGetVars?: string | (() => string) | GetVarsFn,
-			getVarsArg?: GetVarsFn,
+			fallbackPath?: string | (() => string),
+			prefixPath?: string | (() => string),
 		) {
-			const { path, getVars } = splitPathAndVars(pathOrGetVars, getVarsArg)
 			const fallback: MessageSegment | undefined =
-				path !== undefined || getVars !== undefined
-					? path === undefined
-						? { type: 'auto', ...(getVars && { getVars }) }
-						: { type: 'path', path, ...(getVars && { getVars }) }
-					: undefined
-			this._segments.push({ type: 'collect', ...(fallback && { fallback }) })
+				fallbackPath !== undefined ? { type: 'path', path: fallbackPath } : undefined
+			const prefix: MessageSegment | undefined =
+				prefixPath !== undefined ? { type: 'path', path: prefixPath } : undefined
+			this._segments.push({
+				type: 'collect',
+				...(fallback && { fallback }),
+				...(prefix && { prefix }),
+			})
 			return this
 		},
 	})

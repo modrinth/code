@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-08T19:10:34+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed action bar becoming very wide on larger displays.
+- Version upload failing to detect mrpack loader.`,
+	},
+	{
 		date: `2026-08-07T20:41:51+00:00`,
 		product: 'app',
 		version: '0.17.4',
