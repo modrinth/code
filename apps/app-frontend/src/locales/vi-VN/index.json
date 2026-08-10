@@ -617,9 +617,6 @@
   "app.world.world-item.offline": {
     "message": "Ngoại tuyến"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} đang trực tuyến"
-  },
   "friends.action.add-friend": {
     "message": "Thêm một người bạn"
   },

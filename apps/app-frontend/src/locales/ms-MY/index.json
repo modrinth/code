@@ -461,9 +461,6 @@
   "app.world.world-item.offline": {
     "message": "Luar Talian"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} dalam talian"
-  },
   "friends.action.add-friend": {
     "message": "Tambah rakan"
   },

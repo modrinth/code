@@ -1229,9 +1229,6 @@
   "app.world.world-item.offline": {
     "message": "Desconectado"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} en línea"
-  },
   "content.shared-instance.change-version-body": {
     "message": "Cambiar la versión solo cambiará tu copia local. Las actualizaciones futuras a la instancia pueden restablecerla o cambiarla de nuevo."
   },

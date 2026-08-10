@@ -1229,9 +1229,6 @@
   "app.world.world-item.offline": {
     "message": "Offline"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
-  },
   "content.shared-instance.change-version-body": {
     "message": "Als je de versie wijzigt, wordt alleen je lokale kopie aangepast. Bij toekomstige updates van de gedeelde instantie kan deze weer worden teruggezet of opnieuw worden gewijzigd."
   },

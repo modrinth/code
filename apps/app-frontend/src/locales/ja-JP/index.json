@@ -1229,9 +1229,6 @@
   "app.world.world-item.offline": {
     "message": "オフライン"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} 人がオンライン"
-  },
   "content.shared-instance.change-version-body": {
     "message": "バージョンの変更はローカルコピーにのみ影響します。今後共有された起動構成がアップデートされた際に、元の状態に戻ったり、別のバージョンに変更されたりする場合があります。"
   },

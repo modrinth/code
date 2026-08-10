@@ -154,11 +154,8 @@ onUnmounted(() => {
 				size="48px"
 			/>
 			<div class="flex flex-col col-span-2 justify-center gap-1 h-full">
-				<div class="flex items-center gap-2">
-					<div
-						class="text-contrast truncate"
-						:class="newlyAdded ? 'text-base font-semibold' : 'text-lg font-bold'"
-					>
+				<div class="flex items-center gap-1.5">
+					<div class="text-contrast truncate text-base font-semibold">
 						{{ instance.name }}
 					</div>
 					<TagItem

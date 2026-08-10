@@ -722,6 +722,9 @@
   "app.library.group.ungrouped": {
     "message": "Ungrouped"
   },
+  "app.library.search.no-results.title": {
+    "message": "No instances match your search."
+  },
   "app.library.selection.aria-label": {
     "message": "Selected instances"
   },
@@ -1330,9 +1333,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Changing the version only changes your local copy. Future shared instance updates may restore or change it again."

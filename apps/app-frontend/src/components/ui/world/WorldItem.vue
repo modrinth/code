@@ -9,7 +9,6 @@ import {
 	MoreVerticalIcon,
 	NoSignalIcon,
 	PlayIcon,
-	SignalIcon,
 	SkullIcon,
 	SpinnerIcon,
 	StopCircleIcon,
@@ -26,18 +25,16 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	ServerOnlinePlayers,
 	SmartClickable,
 	TagItem,
 	TeleportOverflowMenu,
 	useFormatDateTime,
-	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { getPingLevel } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -56,7 +53,6 @@ import { LockIcon } from '../../../../../../packages/assets/generated-icons'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
-const formatNumber = useFormatNumber()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
@@ -125,9 +121,6 @@ const props = withDefaults(
 )
 
 const playingOtherWorld = computed(() => props.playingInstance && !props.playingWorld)
-const hasPlayersTooltip = computed(
-	() => !!props.serverStatus?.players?.sample && props.serverStatus.players?.sample?.length > 0,
-)
 const serverIncompatible = computed(
 	() =>
 		!!props.serverStatus &&
@@ -232,10 +225,6 @@ const messages = defineMessages({
 		id: 'app.world.world-item.incompatible-version',
 		defaultMessage: 'Incompatible version {version}',
 	},
-	playersOnline: {
-		id: 'app.world.world-item.players-online',
-		defaultMessage: '{count} online',
-	},
 	offline: {
 		id: 'app.world.world-item.offline',
 		defaultMessage: 'Offline',
@@ -271,8 +260,8 @@ const messages = defineMessages({
 				class="!rounded-[14px]"
 			/>
 			<div class="flex flex-col justify-center gap-0.5 h-full">
-				<div class="flex items-center gap-2">
-					<div class="text-lg text-contrast font-bold truncate">
+				<div class="flex items-center gap-1.5">
+					<div class="text-base text-contrast font-semibold truncate">
 						{{ world.name }}
 					</div>
 					<TagItem
@@ -313,34 +302,13 @@ const messages = defineMessages({
 									}}
 								</span>
 							</template>
-							<template v-else>
-								<SignalIcon
-									v-tooltip="serverStatus ? `${serverStatus.ping}ms` : null"
-									aria-hidden="true"
-									:style="`--_signal-${getPingLevel(serverStatus.ping || 0)}: var(--color-green)`"
-									stroke-width="3px"
-									class="shrink-0"
-									:class="{
-										'smart-clickable:allow-pointer-events': serverStatus,
-									}"
+							<div v-else class="flex items-center gap-2">
+								<ServerOnlinePlayers
+									:online="serverStatus.players?.online ?? 0"
+									status-online
+									hide-label
 								/>
-								<Tooltip :disabled="!hasPlayersTooltip">
-									<span :class="{ 'cursor-help': hasPlayersTooltip }">
-										{{
-											formatMessage(messages.playersOnline, {
-												count: formatNumber(serverStatus.players?.online ?? 0),
-											})
-										}}
-									</span>
-									<template #popper>
-										<div class="flex flex-col gap-1">
-											<span v-for="player in serverStatus.players?.sample" :key="player.name">
-												{{ player.name }}
-											</span>
-										</div>
-									</template>
-								</Tooltip>
-							</template>
+							</div>
 						</template>
 						<template v-else>
 							<NoSignalIcon aria-hidden="true" stroke-width="3px" class="shrink-0" />

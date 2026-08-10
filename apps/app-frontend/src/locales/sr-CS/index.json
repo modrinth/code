@@ -698,9 +698,6 @@
   "app.world.world-item.offline": {
     "message": "Oflajn"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} onlajn"
-  },
   "friends.action.add-friend": {
     "message": "Dodaj prijatelja/prijateljicu"
   },

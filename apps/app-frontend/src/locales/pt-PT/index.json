@@ -566,9 +566,6 @@
   "app.world.world-item.offline": {
     "message": "Offline"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
-  },
   "friends.action.add-friend": {
     "message": "Adicionar um amigo"
   },

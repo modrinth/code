@@ -452,9 +452,6 @@
   "app.world.world-item.offline": {
     "message": "ออฟไลน์"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} ออนไลน์"
-  },
   "friends.action.add-friend": {
     "message": "เพิ่มเพื่อน"
   },

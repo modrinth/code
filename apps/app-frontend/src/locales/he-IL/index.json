@@ -212,9 +212,6 @@
   "app.world.world-item.offline": {
     "message": "לא מקוון"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} מחוברים"
-  },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
   },

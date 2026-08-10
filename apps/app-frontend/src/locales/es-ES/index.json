@@ -500,9 +500,6 @@
   "app.world.world-item.offline": {
     "message": "Desconectado"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} en línea"
-  },
   "friends.action.add-friend": {
     "message": "Agrega a un amigo"
   },

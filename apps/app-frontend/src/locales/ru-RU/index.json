@@ -1220,9 +1220,6 @@
   "app.world.world-item.offline": {
     "message": "Не в сети"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} в игре"
-  },
   "content.shared-instance.change-version-body": {
     "message": "Изменение версии затрагивает только локальную копию. В будущих обновлениях общего экземпляра она может быть восстановлена ​​или изменена снова."
   },

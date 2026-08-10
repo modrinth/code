@@ -1229,9 +1229,6 @@
   "app.world.world-item.offline": {
     "message": "Не в мережі"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} у мережі"
-  },
   "content.shared-instance.change-version-body": {
     "message": "Зміна версії впливає лише на вашу локальну копію. Майбутні оновлення спільної збірки можуть відновити або знову змінити її."
   },

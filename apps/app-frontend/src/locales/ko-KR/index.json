@@ -1223,9 +1223,6 @@
   "app.world.world-item.offline": {
     "message": "오프라인"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count}명 온라인"
-  },
   "content.shared-instance.change-version-body": {
     "message": "버전을 변경해도 로컬 사본만 변경됩니다. 향후 공유 인스턴스를 업데이트할 때 다시 복구되거나 변경될 수 있습니다."
   },

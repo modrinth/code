@@ -1,1499 +1,1496 @@
 {
-	"app.action-bar.downloading-java": {
-		"message": "Java {version} indiriliyor"
-	},
-	"app.action-bar.downloading-update": {
-		"message": "Güncelleme indiriliyor"
-	},
-	"app.action-bar.downloads": {
-		"message": "İndirmeler"
-	},
-	"app.action-bar.hide-more-running-instances": {
-		"message": "Diğer çalışan kurulumları gizle"
-	},
-	"app.action-bar.install.copied-details": {
-		"message": "Kopyalandı"
-	},
-	"app.action-bar.install.copy-details": {
-		"message": "Detayları kopyala"
-	},
-	"app.action-bar.install.dismiss": {
-		"message": "Reddet"
-	},
-	"app.action-bar.install.open-instance": {
-		"message": "Kurulumu aç"
-	},
-	"app.action-bar.install.retry": {
-		"message": "Yeniden Dene"
-	},
-	"app.action-bar.install.summary.app-closing": {
-		"message": "Uygulama kapatıldığı için iptal edildi"
-	},
-	"app.action-bar.install.summary.bad-modpack-file": {
-		"message": "Mod paketi okunamadı"
-	},
-	"app.action-bar.install.summary.canceled": {
-		"message": "İptal edildi"
-	},
-	"app.action-bar.install.summary.cleanup-incomplete": {
-		"message": "Temizleme bitmedi"
-	},
-	"app.action-bar.install.summary.content-download-failed": {
-		"message": "Dosyalar indirilemedi"
-	},
-	"app.action-bar.install.summary.corrupt-download": {
-		"message": "İndirilmiş dosya bozuk"
-	},
-	"app.action-bar.install.summary.could-not-save-files": {
-		"message": "Dosyalar kaydedilemedi"
-	},
-	"app.action-bar.install.summary.download-failed": {
-		"message": "İndirme tamamlanamadı"
-	},
-	"app.action-bar.install.summary.instance-not-found": {
-		"message": "Kurulum bulunamadı"
-	},
-	"app.action-bar.install.summary.invalid-file-path": {
-		"message": "Dosya yolu geçersiz"
-	},
-	"app.action-bar.install.summary.invalid-modpack": {
-		"message": "Mod paketi verileri geçersiz"
-	},
-	"app.action-bar.install.summary.invalid-modpack-files": {
-		"message": "Mod paketi dosyaları geçersiz meta verilere sahip"
-	},
-	"app.action-bar.install.summary.java-setup-failed": {
-		"message": "Java kurulumu bitirilemedi"
-	},
-	"app.action-bar.install.summary.loader-setup-failed": {
-		"message": "Yükleyici kurulumu başarısız oldu"
-	},
-	"app.action-bar.install.summary.local-data-error": {
-		"message": "Yerel veriler güncellenemedi"
-	},
-	"app.action-bar.install.summary.minecraft-setup-failed": {
-		"message": "Minecraft kurulumu başarısız oldu"
-	},
-	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Modrinth'e erişilemiyor"
-	},
-	"app.action-bar.install.summary.no-write-permission": {
-		"message": "Yazmak için yetkiniz yok"
-	},
-	"app.action-bar.install.summary.pack-download-failed": {
-		"message": "Paket indirilemedi"
-	},
-	"app.action-bar.install.summary.unexpected-error": {
-		"message": "Bir sorun oluştu"
-	},
-	"app.action-bar.install.unknown-instance": {
-		"message": "Bilinmeyen kurulum"
-	},
-	"app.action-bar.install.updating-shared-content": {
-		"message": "Paylaşılmış içerik güncelleniyor"
-	},
-	"app.action-bar.installs": {
-		"message": "Yüklenenler"
-	},
-	"app.action-bar.make-primary-instance": {
-		"message": "Birincil kurulum yap"
-	},
-	"app.action-bar.no-instances-running": {
-		"message": "Herhangi bir kurulum çalışmıyor"
-	},
-	"app.action-bar.offline": {
-		"message": "Çevrimdışı"
-	},
-	"app.action-bar.primary-instance": {
-		"message": "Birincil kurulum"
-	},
-	"app.action-bar.reload-to-update": {
-		"message": "Güncellemek için yeniden yükle"
-	},
-	"app.action-bar.show-more-running-instances": {
-		"message": "Daha fazla çalışan kurulum göster"
-	},
-	"app.action-bar.stop-instance": {
-		"message": "Kurulumu durdur"
-	},
-	"app.action-bar.update": {
-		"message": "Güncelleme"
-	},
-	"app.action-bar.view-active-downloads": {
-		"message": "Şu anda indirilienleri göster"
-	},
-	"app.action-bar.view-instance": {
-		"message": "Kurulumu göster"
-	},
-	"app.action-bar.view-logs": {
-		"message": "Günlükleri görüntüle"
-	},
-	"app.ads-consent.accept": {
-		"message": "Hepsini kabul et"
-	},
-	"app.ads-consent.body": {
-		"message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir."
-	},
-	"app.ads-consent.manage": {
-		"message": "Tercihleri yönet"
-	},
-	"app.ads-consent.reject": {
-		"message": "Hepsini reddet"
-	},
-	"app.ads-consent.title": {
-		"message": "Sizin mahremiyetiniz ve reklamlar Modrinth'i nasıl destekler"
-	},
-	"app.appearance-settings.advanced-rendering.description": {
-		"message": "Arka plan bulanıklığı gibi görsel efektleri etkinleştirin. Bu, donanım ivmelendirme yokken performansı etkileyebilir."
-	},
-	"app.appearance-settings.advanced-rendering.title": {
-		"message": "Gelişmiş işleme"
-	},
-	"app.appearance-settings.color-theme.description": {
-		"message": "Modrinth App tarafından kullanılacak renk şemasını seçin."
-	},
-	"app.appearance-settings.color-theme.title": {
-		"message": "Renk teması"
-	},
-	"app.appearance-settings.default-landing-page.home": {
-		"message": "Ana Sayfa"
-	},
-	"app.appearance-settings.default-landing-page.library": {
-		"message": "Kütüphane"
-	},
-	"app.appearance-settings.hide-nametag.description": {
-		"message": "Dış görünüm seçici sayfasında oyuncu önizlemesinin üzerindeki kullanıcı adınızı gizleyin."
-	},
-	"app.appearance-settings.hide-nametag.title": {
-		"message": "İsim etiketini gizle"
-	},
-	"app.appearance-settings.jump-back-into-worlds.description": {
-		"message": "Ana sayfadaki “Tekrar oyuna katıl” bölümünde son oynanan dünyaları göster."
-	},
-	"app.appearance-settings.jump-back-into-worlds.title": {
-		"message": "Dünyalara hızlıca geri dön"
-	},
-	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Minecraft başladığında Modrinth uygulamasını küçült."
-	},
-	"app.appearance-settings.minimize-launcher.title": {
-		"message": "Uygulamayı küçült"
-	},
-	"app.appearance-settings.native-decorations.description": {
-		"message": "İşletim sisteminizin başlık çubuğu ve pencere kontrollerini kullanın. Uygulamanın yeniden başlatılmasını gerektirir."
-	},
-	"app.appearance-settings.native-decorations.title": {
-		"message": "Sistem pencere çerçevesi"
-	},
-	"app.appearance-settings.show-play-time.description": {
-		"message": "Her bir örneği ne kadar süreyle oynadığını göster."
-	},
-	"app.appearance-settings.show-play-time.title": {
-		"message": "Oynama süresini göster"
-	},
-	"app.appearance-settings.skip-non-essential-warnings.description": {
-		"message": "Yinelenen yüklemeler, normal içerik silme, toplu güncellemeler, bağlantıların kaldırılması ve onarımlar gibi düşük riskli işlemlerde onay adımlarını atlayın. Tehlikeli işlemlerle ilgili uyarılar her zaman gösterilir."
-	},
-	"app.appearance-settings.skip-non-essential-warnings.title": {
-		"message": "Gerekli olmayan uyarıları atla"
-	},
-	"app.appearance-settings.toggle-sidebar.description": {
-		"message": "Sağ kenar çubuğunu varsayılan olarak gizleyin ve onu göstermek ya da gizlemek için bir düğme ekleyin."
-	},
-	"app.appearance-settings.toggle-sidebar.title": {
-		"message": "Sağ kenar çubuğunu gizle"
-	},
-	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Modrinth'te yayınlanmayan bir Modrinth Pack (.mrpack) kurulmadan önce bir güvenlik uyarısı göster."
-	},
-	"app.appearance-settings.unknown-pack-warning.title": {
-		"message": "Bilinmeyen mod paketlerini indirmeden önce beni uyar"
-	},
-	"app.auth-servers.unreachable.body": {
-		"message": "Minecraft doğrulama sunucuları kapalı olabilir. İnternet bağlantını kontrol et ve daha sonra tekrar dene."
-	},
-	"app.auth-servers.unreachable.header": {
-		"message": "Doğrulama sunucularına erişilemedi"
-	},
-	"app.behavior-settings.confirmations.title": {
-		"message": "Onaylamalar"
-	},
-	"app.behavior-settings.content.title": {
-		"message": "Ana sayfa ve içerik"
-	},
-	"app.behavior-settings.startup-and-navigation.title": {
-		"message": "Başlatma ve gezinme"
-	},
-	"app.browse.add-servers-to-instance": {
-		"message": "Sunucuyu kuruluma ekle"
-	},
-	"app.browse.add-to-an-instance": {
-		"message": "Bir kuruluma ekle"
-	},
-	"app.browse.add-to-instance": {
-		"message": "Kuruluma ekle"
-	},
-	"app.browse.add-to-instance-name": {
-		"message": "{instanceName}'a ekle"
-	},
-	"app.browse.added": {
-		"message": "Ekli"
-	},
-	"app.browse.already-added": {
-		"message": "Zaten ekli"
-	},
-	"app.browse.back-to-instance": {
-		"message": "Kuruluma dön"
-	},
-	"app.browse.discover-project-type": {
-		"message": "Keşfet {projectType}"
-	},
-	"app.browse.discover-servers": {
-		"message": "Sunucuları keşfet"
-	},
-	"app.browse.hide-added-servers": {
-		"message": "Zaten eklenmiş sunucuları gizle"
-	},
-	"app.browse.hide-installed-modpacks": {
-		"message": "Zaten yüklenmiş olanları gizle"
-	},
-	"app.browse.project-type.modpacks": {
-		"message": "Mod paketleri"
-	},
-	"app.browse.server-instance-content-warning": {
-		"message": "Yeni bir içerik eklemek sunucuya girerkenki uyumluluğu bozabilir. Herhangi eklenmiş içerik ise sunucu kurulumunu güncellemeye çalıştığınızda kaybolacaktır."
-	},
-	"app.browse.server.installing": {
-		"message": "Yükleniyor"
-	},
-	"app.content-install.no-compatible-versions": {
-		"message": "Kullanılabilir sürümler {compatibilityLabel} ile eşleşmiyor. Yine de kurulacak bir sürüm seçin. Bağımlılıklar otomatik olarak yüklenmeyecektir."
-	},
-	"app.export-modal.description-placeholder": {
-		"message": "Mod paketi açıklaması girin..."
-	},
-	"app.export-modal.export-button": {
-		"message": "Dışa aktar"
-	},
-	"app.export-modal.header": {
-		"message": "Mod paketini dışa aktar"
-	},
-	"app.export-modal.modpack-name-label": {
-		"message": "Mod paketi adı"
-	},
-	"app.export-modal.modpack-name-placeholder": {
-		"message": "Mod paketi adı"
-	},
-	"app.export-modal.version-number-label": {
-		"message": "Sürüm numarası"
-	},
-	"app.export-modal.version-number-placeholder": {
-		"message": "1.0.0"
-	},
-	"app.install.phase.downloading_content": {
-		"message": "İçerik indiriliyor"
-	},
-	"app.install.phase.downloading_minecraft": {
-		"message": "Minecraft yükleniyor"
-	},
-	"app.install.phase.downloading_pack_file": {
-		"message": "Paket dosyaları yükleniyor"
-	},
-	"app.install.phase.extracting_overrides": {
-		"message": "Geçersiz kılmalar ayıklanıyor"
-	},
-	"app.install.phase.finalizing": {
-		"message": "Tamamlanıyor"
-	},
-	"app.install.phase.preparing_instance": {
-		"message": "İndirmek için sıraya alındı"
-	},
-	"app.install.phase.preparing_java": {
-		"message": "Java Hazırlanıyor"
-	},
-	"app.install.phase.preparing_java.downloading": {
-		"message": "Java {version} İndiriliyor"
-	},
-	"app.install.phase.preparing_java.extracting": {
-		"message": "Java {version} ayıklanıyor"
-	},
-	"app.install.phase.preparing_java.fetching-metadata": {
-		"message": "Java {version} getiriliyor"
-	},
-	"app.install.phase.preparing_java.resolving": {
-		"message": "Java {version} Hazırlanıyor"
-	},
-	"app.install.phase.preparing_java.validating": {
-		"message": "Java {version} doğrulanıyor"
-	},
-	"app.install.phase.reading_pack_manifest": {
-		"message": "Paket manifesti okunuyor"
-	},
-	"app.install.phase.resolving_loader": {
-		"message": "Yükleyici çözümleniyor"
-	},
-	"app.install.phase.resolving_minecraft": {
-		"message": "Minecraft çözümleniyor"
-	},
-	"app.install.phase.resolving_pack": {
-		"message": "İçerik çözümleniyor"
-	},
-	"app.install.phase.rolling_back": {
-		"message": "Değişiklikler geri alınıyor"
-	},
-	"app.install.phase.running_loader_processors": {
-		"message": "Yükleyici işlemcileri çalıştırılıyor"
-	},
-	"app.instance.admonitions.shared-instance.added-label": {
-		"message": "Eklendi"
-	},
-	"app.instance.admonitions.shared-instance.changes-body": {
-		"message": "Yerel kurulumunuz paylaştığınız kullanıcılardan daha ileride."
-	},
-	"app.instance.admonitions.shared-instance.changes-header": {
-		"message": "Değişiklikler henüz paylaşılmadı"
-	},
-	"app.instance.admonitions.shared-instance.publish-button": {
-		"message": "Güncellemeyi gönder"
-	},
-	"app.instance.admonitions.shared-instance.publishing-button": {
-		"message": "Yayınlıyor..."
-	},
-	"app.instance.admonitions.shared-instance.removed-label": {
-		"message": "Kaldırıldı"
-	},
-	"app.instance.admonitions.shared-instance.review-admonition-header": {
-		"message": "Güncellemeyi yayınla"
-	},
-	"app.instance.admonitions.shared-instance.review-description": {
-		"message": "Bu kurulumu kullanan herkesle paylaşılacak içerik değişikliklerini gözden geçirin."
-	},
-	"app.instance.admonitions.shared-instance.review-header": {
-		"message": "Değişimleri inceleniyor"
-	},
-	"app.instance.admonitions.shared-instance.review-update-button": {
-		"message": "Güncellemeyi gözden geçir"
-	},
-	"app.instance.admonitions.shared-instance.reviewing-button": {
-		"message": "İnceleniyor..."
-	},
-	"app.instance.admonitions.shared-instance.update-available-body": {
-		"message": "{name}'i oynamak için bir güncelleme gerekli. Oyunu açabilmek için lütfen son sürüme güncelleyin."
-	},
-	"app.instance.admonitions.shared-instance.update-available-header": {
-		"message": "Bir güncelleme mevcut"
-	},
-	"app.instance.confirm-delete.admonition-body": {
-		"message": "Dünyalarınız, yapılandırmalarınız ve yüklü tüm içerikler ve tüm veriler kalıcı olarak silinecek."
-	},
-	"app.instance.confirm-delete.admonition-header": {
-		"message": "Bu eylem geri alınamaz"
-	},
-	"app.instance.confirm-delete.delete-button": {
-		"message": "Oturumu sil"
-	},
-	"app.instance.confirm-delete.header": {
-		"message": "Oturumu sil"
-	},
-	"app.instance.modpack-already-installed.body": {
-		"message": "Bu mod paketi zaten <bold>{instanceName}</bold> kurulumunda yüklü. Kopyalamak istediğinizden emin misiniz?"
-	},
-	"app.instance.modpack-already-installed.create": {
-		"message": "Oluştur"
-	},
-	"app.instance.modpack-already-installed.header": {
-		"message": "Modpaketi zaten yüklü"
-	},
-	"app.instance.modpack-already-installed.instance": {
-		"message": "Kurulum"
-	},
-	"app.instance.mods.bulk-update.downloading-projects": {
-		"message": "{current, number}/{total, number} proje indiriliyor..."
-	},
-	"app.instance.mods.bulk-update.finishing": {
-		"message": "Güncelleme tamamlanıyor..."
-	},
-	"app.instance.mods.bulk-update.resolving-versions": {
-		"message": "Sürümler çözümleniyor..."
-	},
-	"app.instance.mods.content-type-project": {
-		"message": "proje"
-	},
-	"app.instance.mods.locked-content": {
-		"message": "İnstance'ta kilitli olan içerikler değiştirilemez."
-	},
-	"app.instance.mods.project-was-added": {
-		"message": "\"{name}\" eklendi"
-	},
-	"app.instance.mods.projects-were-added": {
-		"message": "{count} projeler eklendi"
-	},
-	"app.instance.mods.share-text": {
-		"message": "Modpaketimde kullandığım projelere göz at!"
-	},
-	"app.instance.mods.share-title": {
-		"message": "Mod paketi içeriğini paylaşıyorsunuz"
-	},
-	"app.instance.mods.successfully-uploaded": {
-		"message": "Başarıyla yüklendi"
-	},
-	"app.instance.share.empty.description": {
-		"message": "Bu instance'ı arkadaşlarınla paylaşabilirsin!"
-	},
-	"app.instance.share.empty.heading": {
-		"message": "Henüz davet edilen arkadaş yok"
-	},
-	"app.instance.share.empty.invite-friends-button": {
-		"message": "Arkadaşlarını davet et"
-	},
-	"app.instance.share.invite-modal.heading": {
-		"message": "Paylaş {name}"
-	},
-	"app.instance.share.invite-modal.user-limit-reached": {
-		"message": "Bu örnek {limit} kullanıcı sınırına ulaştı."
-	},
-	"app.instance.share.locked.empty-description-prefix": {
-		"message": "Giriş yapmanız gerekiyor"
-	},
-	"app.instance.share.locked.empty-description-suffix": {
-		"message": "sayfaya giriş yapabilmeniz işin."
-	},
-	"app.instance.share.locked.linked-account-fallback": {
-		"message": "bağlı hesap"
-	},
-	"app.instance.share.locked.signed-out-heading": {
-		"message": "Giriş yapılmadı"
-	},
-	"app.instance.share.locked.switch-account-button": {
-		"message": "Hesap değiştir"
-	},
-	"app.instance.share.locked.wrong-account-heading": {
-		"message": "Hatalı hesap"
-	},
-	"app.instance.share.members.empty": {
-		"message": "Henüz katılan kullanıcı yok"
-	},
-	"app.instance.share.members.no-filter-results": {
-		"message": "Filtrelerinizle eşleşen kullanıcı yok."
-	},
-	"app.instance.share.remove-user-modal.effect-access": {
-		"message": "Artık bu paylaşılan kurulum için güncelleme almayacaklar"
-	},
-	"app.instance.share.remove-user-modal.effect-installed-copy": {
-		"message": "Daha önce yükledikleri kopyalar cihazlarında kalmaya devam edecek"
-	},
-	"app.instance.share.remove-user-modal.effect-invite-again": {
-		"message": "Onları sonradan tekrar davet edebilirsiniz"
-	},
-	"app.instance.share.remove-user-modal.effect-last-user": {
-		"message": "Bu son kullanıcıdır; bu örnek için paylaşım özelliği devre dışı bırakılacaktır"
-	},
-	"app.instance.share.remove-user-modal.effects-label": {
-		"message": "Ne olur?"
-	},
-	"app.instance.share.remove-user-modal.header": {
-		"message": "Erişimi geri çek"
-	},
-	"app.instance.share.remove-user-modal.remove-button": {
-		"message": "Erişimi geri çek"
-	},
-	"app.instance.share.remove-user-modal.user-avatar-alt": {
-		"message": "{username} nın avatarı"
-	},
-	"app.instance.share.remove-user-modal.warning-body": {
-		"message": "{username}'nın bu paylaşılan örneğe erişimini iptal ederseniz, bu kişinin güncellemeleri alabilmesi için onu yeniden davet etmeniz gerekecektir."
-	},
-	"app.instance.share.sign-in.button": {
-		"message": "Giriş yap"
-	},
-	"app.instance.share.unable-to-connect.heading": {
-		"message": "Bağlanılamıyor"
-	},
-	"app.instance.share.unlink.body": {
-		"message": "Örneğini paylaşmak için bu mod paketinin bağlantısını kaldırmalısın"
-	},
-	"app.instance.shared-instance-already-installed.install-anyway": {
-		"message": "Yine de kur"
-	},
-	"app.instance.shared-instance-already-installed.instance": {
-		"message": "Kurulum"
-	},
-	"app.instance.shared-instance-wrong-account.fallback-username": {
-		"message": "bağlı hesap"
-	},
-	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "Modrinth'e giriş yapmanız gerek"
-	},
-	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "Yanlış Modrinth hesabını kullanıyorsunuz"
-	},
-	"app.instance.worlds.add-server": {
-		"message": "Sunucu Ekle"
-	},
-	"app.instance.worlds.browse-servers": {
-		"message": "Sunucuları Keşfet"
-	},
-	"app.instance.worlds.delete-world-modal.delete-button": {
-		"message": "Dünya Sil"
-	},
-	"app.instance.worlds.delete-world-modal.title": {
-		"message": "Dünyayı sil"
-	},
-	"app.instance.worlds.delete-world-modal.warning-body": {
-		"message": "Bu dünya, bu profilden kalıcı olarak silinecek. Bu işlem geri alınamaz."
-	},
-	"app.instance.worlds.delete-world-modal.warning-header": {
-		"message": "{name} Siliniyor"
-	},
-	"app.instance.worlds.filter-modded": {
-		"message": "Modlu"
-	},
-	"app.instance.worlds.filter-offline": {
-		"message": "Çevrim dışı"
-	},
-	"app.instance.worlds.filter-online": {
-		"message": "Çevrim içi"
-	},
-	"app.instance.worlds.filter-vanilla": {
-		"message": "Vanilla"
-	},
-	"app.instance.worlds.no-worlds-description": {
-		"message": "Başlamak için bir sunucu ekleyin veya göz atın"
-	},
-	"app.instance.worlds.no-worlds-heading": {
-		"message": "Eklenmiş sunucu veya dünya yok"
-	},
-	"app.instance.worlds.remove-server-modal.remove-button": {
-		"message": "Sunucuyu kaldır"
-	},
-	"app.instance.worlds.remove-server-modal.title": {
-		"message": "Sunucuyu kaldır"
-	},
-	"app.instance.worlds.remove-server-modal.warning-body": {
-		"message": "Bu sunucu, sunucu listenizden ve oyun içi sunucu listesinden kaldırılacaktır. Adresini biliyorsanız daha sonra tekrar ekleyebilirsiniz."
-	},
-	"app.instance.worlds.remove-server-modal.warning-header": {
-		"message": "{name} kaldırılıyor"
-	},
-	"app.instance.worlds.search-worlds-placeholder": {
-		"message": "{count} dünya ara..."
-	},
-	"app.java-detection.cancel": {
-		"message": "İptal"
-	},
-	"app.java-detection.columns.actions": {
-		"message": "Eylemler"
-	},
-	"app.java-detection.columns.path": {
-		"message": "Yol"
-	},
-	"app.java-detection.columns.version": {
-		"message": "Sürüm"
-	},
-	"app.java-detection.no-installations-found": {
-		"message": "Java kurulumu bulunamadı."
-	},
-	"app.java-detection.select": {
-		"message": "Seç"
-	},
-	"app.java-detection.selected": {
-		"message": "Seçildi"
-	},
-	"app.java-detection.title": {
-		"message": "Java kurulumunu seç"
-	},
-	"app.java-selector.already-installed": {
-		"message": "Zaten kuruldu"
-	},
-	"app.java-selector.browse": {
-		"message": "Göz at"
-	},
-	"app.java-selector.detect": {
-		"message": "Tespit et"
-	},
-	"app.java-selector.install-recommended": {
-		"message": "Önerileni kur"
-	},
-	"app.java-selector.installing": {
-		"message": "Kuruluyor..."
-	},
-	"app.java-selector.path.placeholder": {
-		"message": "/java/kurulum/yolu"
-	},
-	"app.java-selector.test-installation": {
-		"message": "Java kurulumunu dene"
-	},
-	"app.modal.install-to-play.additional-context": {
-		"message": "Ek bağlam"
-	},
-	"app.modal.install-to-play.block-user": {
-		"message": "Kullanıcıyı engelle"
-	},
-	"app.modal.install-to-play.content-you-are-reporting": {
-		"message": "Raporladığınız kurulum"
-	},
-	"app.modal.install-to-play.delete-instance": {
-		"message": "Kurulumu sil"
-	},
-	"app.modal.install-to-play.external-files-dont-install": {
-		"message": "Kurma"
-	},
-	"app.modal.install-to-play.header": {
-		"message": "Oynamak için yükleyin"
-	},
-	"app.modal.install-to-play.install-anyway": {
-		"message": "Yine de indir"
-	},
-	"app.modal.install-to-play.install-button": {
-		"message": "Yükle"
-	},
-	"app.modal.install-to-play.invite-warning": {
-		"message": "Bu davetiye Modrinth tarafından değil, başka bir Modrinth kullanıcısı tarafından oluşturulmuştur. Sadece güvendiğiniz kişilerden gelen davetleri kabul edin."
-	},
-	"app.modal.install-to-play.mod-count": {
-		"message": "{count, plural, one {#mod} other {#mods}}"
-	},
-	"app.modal.install-to-play.report-image-invalid-type": {
-		"message": "Dosya kabul edilen bir resim türü değil"
-	},
-	"app.modal.install-to-play.report-image-too-large": {
-		"message": "Dosya 1 MiB boyut sınırını aşıyor"
-	},
-	"app.modal.install-to-play.report-reason.inappropriate": {
-		"message": "Uygunsuz"
-	},
-	"app.modal.install-to-play.report-reason.malicious": {
-		"message": "Kötü niyetli"
-	},
-	"app.modal.install-to-play.report-reason.spam": {
-		"message": "Spam"
-	},
-	"app.modal.install-to-play.report-submitted": {
-		"message": "Rapor sunuldu"
-	},
-	"app.modal.install-to-play.reviewed-files": {
-		"message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
-	},
-	"app.modal.install-to-play.shared-instance": {
-		"message": "Paylaşılan Kurulum"
-	},
-	"app.modal.install-to-play.shared-instance-content": {
-		"message": "Paylaşılan kurulum içeriği"
-	},
-	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
-	},
-	"app.modal.install-to-play.unknown-files-warning": {
-		"message": "Bilinmeyen dosya uyarısı"
-	},
-	"app.modal.install-to-play.unrecognized-files": {
-		"message": "Tanımlanamayan dosyalar"
-	},
-	"app.modal.install-to-play.user-blocked": {
-		"message": "Kullanıcı engellendi"
-	},
-	"app.modal.install-to-play.view-contents": {
-		"message": "İçeriği görüntüle"
-	},
-	"app.modal.update-to-play.header": {
-		"message": "Oynamak için güncelle"
-	},
-	"app.modal.update-to-play.removed": {
-		"message": "Silindi"
-	},
-	"app.modal.update-to-play.shared-instance-added-label": {
-		"message": "Eklendi"
-	},
-	"app.modal.update-to-play.shared-instance-removed-label": {
-		"message": "Kaldırıldı"
-	},
-	"app.modal.update-to-play.update-required": {
-		"message": "Güncelleme gerekiyor"
-	},
-	"app.nav.home": {
-		"message": "Ana Sayfa"
-	},
-	"app.nav.modrinth-account": {
-		"message": "Modrinth hesabı"
-	},
-	"app.nav.modrinth-hosting": {
-		"message": "Modrinth Hosting"
-	},
-	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Bir Modrinth hesabıyla oturum açın"
-	},
-	"app.nav.signed-in-as": {
-		"message": "<user>{username}</user> olarak oturum açıldı"
-	},
-	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Modrinth+'a yükselt"
-	},
-	"app.news.title": {
-		"message": "Haberler"
-	},
-	"app.news.view-all": {
-		"message": "Tüm haberleri göster"
-	},
-	"app.project.install-button.already-installed": {
-		"message": "Bu proje zaten kurulu"
-	},
-	"app.project.install-button.switch-version": {
-		"message": "Sürüm değiştir"
-	},
-	"app.project.install-context.back-to-browse": {
-		"message": "Keşfete geri dön"
-	},
-	"app.project.version.all-versions": {
-		"message": "Tüm sürümler"
-	},
-	"app.project.version.download-in-browser": {
-		"message": "Tarayıcıdan indir"
-	},
-	"app.project.version.installing": {
-		"message": "Yükleniyor"
-	},
-	"app.project.versions.already-installed": {
-		"message": "Zaten yüklenmiş"
-	},
-	"app.quick-instance-switcher.drag-tooltip": {
-		"message": "Yeniden boyutlandırmak için kaydırın"
-	},
-	"app.restarting": {
-		"message": "Yeniden Başlatılıyor..."
-	},
-	"app.settings.app-version": {
-		"message": "Modrinth Uygulaması {version}"
-	},
-	"app.settings.default-instance-options.height.title": {
-		"message": "Yükseklik"
-	},
-	"app.settings.default-instance-options.java-arguments.placeholder": {
-		"message": "Java Argümanları girin..."
-	},
-	"app.settings.default-instance-options.java-arguments.title": {
-		"message": "Java Argümanları"
-	},
-	"app.settings.default-instance-options.width.placeholder": {
-		"message": "Genişlik gir..."
-	},
-	"app.settings.default-instance-options.width.title": {
-		"message": "Genişlik"
-	},
-	"app.settings.developer-mode-enabled": {
-		"message": "Geliştirici modu açıldı."
-	},
-	"app.settings.downloading": {
-		"message": "v{version} indiriliyor"
-	},
-	"app.settings.operating-system.macos": {
-		"message": "macOS"
-	},
-	"app.settings.privacy.ads-consent.intro": {
-		"message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir. Aşağıdan tercihinizi yönetebilir veya vazgeçebilirsiniz."
-	},
-	"app.settings.privacy.telemetry.title": {
-		"message": "Telemetri"
-	},
-	"app.settings.tabs.appearance": {
-		"message": "Görünüm"
-	},
-	"app.settings.tabs.behavior": {
-		"message": "Davranış"
-	},
-	"app.settings.tabs.java-installations": {
-		"message": "Java kurulumları"
-	},
-	"app.settings.tabs.language": {
-		"message": "Dil"
-	},
-	"app.settings.tabs.privacy": {
-		"message": "Gizlilik"
-	},
-	"app.settings.tabs.resource-management": {
-		"message": "Kaynak yönetimi"
-	},
-	"app.skins.add-button": {
-		"message": "Dış görünüm ekle"
-	},
-	"app.skins.add-button.drag-and-drop": {
-		"message": "Sürükle ve bırak"
-	},
-	"app.skins.apply-button": {
-		"message": "Uygula"
-	},
-	"app.skins.delete-button": {
-		"message": "Dış görünümü sil"
-	},
-	"app.skins.delete-modal.description": {
-		"message": "Bu işlem seçili dış görünümü kalıcı olarak silecektir. Bu işlem geri alınamaz."
-	},
-	"app.skins.delete-modal.title": {
-		"message": "Bu dış görünümü silmek istediğinden emin misiniz?"
-	},
-	"app.skins.dropped-file-error.text": {
-		"message": "Bıraktığınız dosya okunamadı."
-	},
-	"app.skins.dropped-file-error.title": {
-		"message": "Dosya işlenirken hata oluştu"
-	},
-	"app.skins.ears-feature-notice": {
-		"message": "Bu dış görünüm {ears} modunun özelliklerini kullanıyor"
-	},
-	"app.skins.edit-button": {
-		"message": "Dış görünümü düzenle"
-	},
-	"app.skins.modal.add-skin-button": {
-		"message": "Dış görünüm ekle"
-	},
-	"app.skins.modal.add-title": {
-		"message": "Dış görünüm ekleniyor"
-	},
-	"app.skins.modal.arm-style-section": {
-		"message": "Kol stili"
-	},
-	"app.skins.modal.arm-style-slim": {
-		"message": "İnce"
-	},
-	"app.skins.modal.arm-style-wide": {
-		"message": "Klasik"
-	},
-	"app.skins.modal.cape-fallback-name": {
-		"message": "Pelerin"
-	},
-	"app.skins.modal.cape-section": {
-		"message": "Pelerin"
-	},
-	"app.skins.modal.edit-title": {
-		"message": "Dış görünüm düzenleniyor"
-	},
-	"app.skins.modal.make-edit-first-tooltip": {
-		"message": "Önce dış görünümde bir düzenleme yapın!"
-	},
-	"app.skins.modal.no-cape-tooltip": {
-		"message": "Pelerin yok"
-	},
-	"app.skins.modal.none-cape-option": {
-		"message": "Hiçbiri"
-	},
-	"app.skins.modal.replace-texture-button": {
-		"message": "Dokuyu değiştir"
-	},
-	"app.skins.modal.save-skin-button": {
-		"message": "Dış görünümü kaydet"
-	},
-	"app.skins.modal.saving-tooltip": {
-		"message": "Kaydediliyor..."
-	},
-	"app.skins.modal.texture-section": {
-		"message": "Doku"
-	},
-	"app.skins.modal.upload-skin-first-tooltip": {
-		"message": "Önce bir dış görünüm yükleyin!"
-	},
-	"app.skins.preview.edit-button": {
-		"message": "Dış görünümü düzenle"
-	},
-	"app.skins.previewing-badge": {
-		"message": "Önizleme"
-	},
-	"app.skins.rate-limit.text": {
-		"message": "Dış görünümünüzü çok sık değiştiriyorsunuz. Mojang sunucuları geçici olarak daha fazla isteği engelledi. Lütfen tekrar denemeden önce biraz bekleyin."
-	},
-	"app.skins.rate-limit.title": {
-		"message": "Yavaşla!"
-	},
-	"app.skins.reorder-error.text": {
-		"message": "Dış görünüm sıralamanız kaydedilemedi."
-	},
-	"app.skins.reorder-error.title": {
-		"message": "Dış görünümler sıralanamadı"
-	},
-	"app.skins.section.builders-and-biomes": {
-		"message": "İnşaatçılar & Biyomlar"
-	},
-	"app.skins.section.chaos-cubed": {
-		"message": "Kaos Küpü"
-	},
-	"app.skins.section.chase-the-skies": {
-		"message": "Gökyüzünü kovala"
-	},
-	"app.skins.section.default-skins": {
-		"message": "Varsayılan skinler"
-	},
-	"app.skins.section.minecon-earth-2017": {
-		"message": "MINECON Earth 2017"
-	},
-	"app.skins.section.modrinth": {
-		"message": "Modrinth"
-	},
-	"app.skins.section.modrinth-pride": {
-		"message": "Modrinth Onuru"
-	},
-	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Bu skinleri, Onur Ayı boyunca Modrinth'in düzenlediği bir bağış kampanyasına yaptığınız bağış karşılığında aldınız."
-	},
-	"app.skins.section.mounts-of-mayhem": {
-		"message": "Kaos Dağları"
-	},
-	"app.skins.section.saved-skins": {
-		"message": "Kaydedilen Skinler"
-	},
-	"app.skins.section.striding-hero": {
-		"message": "Yürüyen Kahraman"
-	},
-	"app.skins.section.the-copper-age": {
-		"message": "Bakır Çağı"
-	},
-	"app.skins.section.the-garden-awakens": {
-		"message": "Bahçe Uyanıyor"
-	},
-	"app.skins.section.tiny-takeover": {
-		"message": "Küçük Devralma"
-	},
-	"app.skins.sign-in.button": {
-		"message": "Giriş Yap"
-	},
-	"app.skins.title": {
-		"message": "Dış görünüm seçici"
-	},
-	"app.skins.toggle-ears-features-off": {
-		"message": "Kapat"
-	},
-	"app.skins.toggle-ears-features-on": {
-		"message": "Aç"
-	},
-	"app.survey.no-thanks": {
-		"message": "Hayır teşekkürler"
-	},
-	"app.update-popup.body.download-complete": {
-		"message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."
-	},
-	"app.update-popup.body.linux": {
-		"message": "Modrinth App v{version} yayımlandı. En yeni özellikler ve hata düzeltmeleri için paket yöneticin üzerinden güncelle!"
-	},
-	"app.update-popup.body.metered": {
-		"message": "Modrinth App v{version} mevcut! Kısıtlı bağlantıda olduğunuzdan otomatik olarak indirmedik."
-	},
-	"app.update-popup.changelog": {
-		"message": "Yama Notları"
-	},
-	"app.update-popup.download": {
-		"message": "İndir ({size})"
-	},
-	"app.update-popup.download-complete": {
-		"message": "İndirme tamamlandı"
-	},
-	"app.update-popup.reload": {
-		"message": "Güncellemek için yeniden yükle"
-	},
-	"app.update-popup.title": {
-		"message": "Güncelleme mevcut"
-	},
-	"app.update.complete-toast.text": {
-		"message": "Yama notlarını görüntülemek için buraya tıklayın."
-	},
-	"app.update.complete-toast.title": {
-		"message": "{version} sürümü başarıyla kuruldu!"
-	},
-	"app.world.server-modal.placeholder-address": {
-		"message": "example.modrinth.gg"
-	},
-	"app.world.server-modal.select-an-option": {
-		"message": "Bir seçenek seçin"
-	},
-	"app.world.world-item.incompatible-version": {
-		"message": "Uyumsuz sürüm {version}"
-	},
-	"app.world.world-item.not-played-yet": {
-		"message": "Henüz oynanmadı"
-	},
-	"app.world.world-item.offline": {
-		"message": "Çevrimdışı"
-	},
-	"app.world.world-item.players-online": {
-		"message": "{count} çevrimiçi"
-	},
-	"friends.action.add-friend": {
-		"message": "Bir arkadaş ekle"
-	},
-	"friends.action.view-friend-requests": {
-		"message": "{count} arkadaşlık isteği"
-	},
-	"friends.add-friend.submit": {
-		"message": "Arkadaşlık isteği gönder"
-	},
-	"friends.add-friend.title": {
-		"message": "Arkadaş ekleme"
-	},
-	"friends.add-friend.username.description": {
-		"message": "Minecraft kullanıcı adıyla aynı olmayabilir!"
-	},
-	"friends.add-friend.username.placeholder": {
-		"message": "Modrinth kullanıcı adını girin..."
-	},
-	"friends.add-friend.username.title": {
-		"message": "Arkadaşının Modrinth kullanıcı adı nedir?"
-	},
-	"friends.add-friends-to-share": {
-		"message": "<link>Arkadaş ekleyerek</link> ne oynadıklarını gör!"
-	},
-	"friends.friend.cancel-request": {
-		"message": "İsteği iptal et"
-	},
-	"friends.friend.remove-friend": {
-		"message": "Arkadaşı çıkar"
-	},
-	"friends.friend.request-sent": {
-		"message": "Arkadaşlık isteği gönderildi"
-	},
-	"friends.friend.view-profile": {
-		"message": "Profili görüntüle"
-	},
-	"friends.heading": {
-		"message": "Arkadaşlar"
-	},
-	"friends.heading.active": {
-		"message": "Çevrimiçi"
-	},
-	"friends.heading.offline": {
-		"message": "Çevrimdışı"
-	},
-	"friends.heading.online": {
-		"message": "Çevrim içi"
-	},
-	"friends.heading.pending": {
-		"message": "Bekleniyor"
-	},
-	"friends.no-friends-match": {
-		"message": "''{query}'' ile eşleşen arkadaş yok"
-	},
-	"friends.search-friends-placeholder": {
-		"message": "Arkadaşları ara..."
-	},
-	"friends.section.heading": {
-		"message": "{title} - {count}"
-	},
-	"friends.sign-in-to-add-friends": {
-		"message": "Arkadaş eklemek ve ne oynadıklarını görmek için bir <link>Modrinth hesabına giriş yap</link>!"
-	},
-	"instance.action.create-shortcut": {
-		"message": "Kısayol oluştur"
-	},
-	"instance.action.export-modpack": {
-		"message": "Mod paketini dışa aktar"
-	},
-	"instance.action.launch-instance": {
-		"message": "Kurulumu başlat"
-	},
-	"instance.action.more-actions": {
-		"message": "Daha fazla seçenek"
-	},
-	"instance.action.open-folder": {
-		"message": "Klasörü aç"
-	},
-	"instance.action.repair": {
-		"message": "Onar"
-	},
-	"instance.action.settings": {
-		"message": "Kurulum ayarları"
-	},
-	"instance.action.starting": {
-		"message": "Başlatılıyor..."
-	},
-	"instance.action.stopping": {
-		"message": "Durduruluyor..."
-	},
-	"instance.add-server.add-and-play": {
-		"message": "Ekle ve oyna"
-	},
-	"instance.add-server.add-server": {
-		"message": "Sunucu ekle"
-	},
-	"instance.add-server.resource-pack.disabled": {
-		"message": "Devre dışı"
-	},
-	"instance.add-server.resource-pack.enabled": {
-		"message": "Etkin"
-	},
-	"instance.add-server.resource-pack.prompt": {
-		"message": "Sor"
-	},
-	"instance.add-server.title": {
-		"message": "Sunucu ekle"
-	},
-	"instance.edit-server.title": {
-		"message": "Sunucuyu düzenle"
-	},
-	"instance.edit-world.hide-from-home": {
-		"message": "Ana Sayfadan gizle"
-	},
-	"instance.edit-world.name": {
-		"message": "Dünya Adı"
-	},
-	"instance.edit-world.placeholder-name": {
-		"message": "Minecraft Dünyası"
-	},
-	"instance.edit-world.reset-icon": {
-		"message": "Simgeyi sıfırla"
-	},
-	"instance.edit-world.title": {
-		"message": "Dünyayı düzenle"
-	},
-	"instance.files.adding-files": {
-		"message": "Dosyalar ekleniyor ({completed}/{total})"
-	},
-	"instance.files.save-as": {
-		"message": "Farklı kaydet..."
-	},
-	"instance.playtime.never-played": {
-		"message": "Hiç oynanmadı"
-	},
-	"instance.server-modal.address": {
-		"message": "Adres"
-	},
-	"instance.server-modal.name": {
-		"message": "Sunucu Adı"
-	},
-	"instance.server-modal.placeholder-name": {
-		"message": "Minecraft Sunucusu"
-	},
-	"instance.server-modal.resource-pack": {
-		"message": "Kaynak paketi"
-	},
-	"instance.settings.sharing.active-invites.actions": {
-		"message": "Eylemler"
-	},
-	"instance.settings.sharing.active-invites.code": {
-		"message": "Davet bağlantısı"
-	},
-	"instance.settings.tabs.general": {
-		"message": "Genel"
-	},
-	"instance.settings.tabs.general.delete": {
-		"message": "Kurulumu sil"
-	},
-	"instance.settings.tabs.general.delete.button": {
-		"message": "Kurulumu sil"
-	},
-	"instance.settings.tabs.general.delete.description": {
-		"message": "Profili, içindeki dünyaları, ayarları ve indirilen şeyleri cihazınızdan sonsuza kadar siler. Dikkatli olun, bir profil silindikten sonra geri alınamaz."
-	},
-	"instance.settings.tabs.general.deleting.button": {
-		"message": "Siliniyor..."
-	},
-	"instance.settings.tabs.general.duplicate-button": {
-		"message": "Çoğalt"
-	},
-	"instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-		"message": "Kurulurken çoğaltılamaz."
-	},
-	"instance.settings.tabs.general.duplicate-instance": {
-		"message": "Kurulumu çoğalt"
-	},
-	"instance.settings.tabs.general.duplicate-instance.description": {
-		"message": "Bu profilin dünyalarını, yapılandırmalarını, modlarını vb. içeren bir kopyasını oluşturur."
-	},
-	"instance.settings.tabs.general.edit-icon": {
-		"message": "Simgeyi düzenle"
-	},
-	"instance.settings.tabs.general.edit-icon.remove": {
-		"message": "Simgeyi kaldır"
-	},
-	"instance.settings.tabs.general.edit-icon.replace": {
-		"message": "Simgeyi değiştir"
-	},
-	"instance.settings.tabs.general.edit-icon.select": {
-		"message": "Simge seç"
-	},
-	"instance.settings.tabs.general.name": {
-		"message": "Ad"
-	},
-	"instance.settings.tabs.general.update-channel": {
-		"message": "Güncelleme kanalı"
-	},
-	"instance.settings.tabs.general.update-channel.alpha": {
-		"message": "Alfa"
-	},
-	"instance.settings.tabs.general.update-channel.alpha.description": {
-		"message": "Release, beta ve alpha versiyonları mevcut güncellemeler olarak gösterilecek."
-	},
-	"instance.settings.tabs.general.update-channel.beta": {
-		"message": "Beta"
-	},
-	"instance.settings.tabs.general.update-channel.beta.description": {
-		"message": "Release ve beta versiyonları mevcut güncellemeler olarak gösterilecek."
-	},
-	"instance.settings.tabs.general.update-channel.release": {
-		"message": "Yayın"
-	},
-	"instance.settings.tabs.general.update-channel.release.description": {
-		"message": "Yalnızca release versiyonları mevcut güncellemeler olarak gösterilecek."
-	},
-	"instance.settings.tabs.general.update-channel.select": {
-		"message": "Güncelleme kanalını seç"
-	},
-	"instance.settings.tabs.hooks": {
-		"message": "Başlatma kancaları"
-	},
-	"instance.settings.tabs.hooks.custom-hooks": {
-		"message": "Özel başlatma kancaları"
-	},
-	"instance.settings.tabs.hooks.description": {
-		"message": "Kancalar gelişmiş kullanıcıların oyunu başlattıktan önce ve sonra belirli sistem komutları çalıştırmasını sağlar."
-	},
-	"instance.settings.tabs.hooks.post-exit": {
-		"message": "Çıkış sonrası"
-	},
-	"instance.settings.tabs.hooks.post-exit.description": {
-		"message": "Oyun kapandıktan sonra çalışır."
-	},
-	"instance.settings.tabs.hooks.post-exit.enter": {
-		"message": "Çıkış sonrası komutu girin..."
-	},
-	"instance.settings.tabs.hooks.pre-launch": {
-		"message": "Başlatma öncesi"
-	},
-	"instance.settings.tabs.hooks.pre-launch.description": {
-		"message": "Oyun başlatılmadan önce çalıştırılır."
-	},
-	"instance.settings.tabs.hooks.pre-launch.enter": {
-		"message": "Başlatma öncesi komutu girin..."
-	},
-	"instance.settings.tabs.hooks.title": {
-		"message": "Oyun başlatma kancaları"
-	},
-	"instance.settings.tabs.hooks.wrapper": {
-		"message": "Paketleyici"
-	},
-	"instance.settings.tabs.hooks.wrapper.description": {
-		"message": "Minecraft'ı başlatmak için paketleyici komutu."
-	},
-	"instance.settings.tabs.hooks.wrapper.enter": {
-		"message": "Paketleyici komutu girin..."
-	},
-	"instance.settings.tabs.installation": {
-		"message": "Kurulum"
-	},
-	"instance.settings.tabs.installation.loader-version": {
-		"message": "{loader} sürümü"
-	},
-	"instance.settings.tabs.java": {
-		"message": "Java ve bellek"
-	},
-	"instance.settings.tabs.java.custom-environment-variables": {
-		"message": "Özel ortam değişkenleri"
-	},
-	"instance.settings.tabs.java.custom-java-arguments": {
-		"message": "Özel Java argümanları"
-	},
-	"instance.settings.tabs.java.custom-java-installation": {
-		"message": "Özel Java kurulumu"
-	},
-	"instance.settings.tabs.java.custom-memory-allocation": {
-		"message": "Özel bellek tahsisi"
-	},
-	"instance.settings.tabs.java.enter-environment-variables": {
-		"message": "Ortam değişkenlerini girin..."
-	},
-	"instance.settings.tabs.java.enter-java-arguments": {
-		"message": "Java argümanlarını girin..."
-	},
-	"instance.settings.tabs.java.environment-variables": {
-		"message": "Ortam değişkenleri"
-	},
-	"instance.settings.tabs.java.hooks": {
-		"message": "Bağlar"
-	},
-	"instance.settings.tabs.java.java-arguments": {
-		"message": "Java argümanları"
-	},
-	"instance.settings.tabs.java.java-installation": {
-		"message": "Java kurulumu"
-	},
-	"instance.settings.tabs.java.java-memory": {
-		"message": "Ayrılan bellek"
-	},
-	"instance.settings.tabs.java.java-path-placeholder": {
-		"message": "/java/kurulum/yolu"
-	},
-	"instance.settings.tabs.window": {
-		"message": "Pencere"
-	},
-	"instance.settings.tabs.window.custom-window-settings": {
-		"message": "Özel pencere ayarları"
-	},
-	"instance.settings.tabs.window.fullscreen": {
-		"message": "Tam Ekran"
-	},
-	"instance.settings.tabs.window.fullscreen.description": {
-		"message": "Oyunu tam ekran olarak başlat (options.txt kullanır)."
-	},
-	"instance.settings.tabs.window.height": {
-		"message": "Yükseklik"
-	},
-	"instance.settings.tabs.window.height.description": {
-		"message": "Oyun penceresinin yüksekliği."
-	},
-	"instance.settings.tabs.window.height.enter": {
-		"message": "Yükseklik gir..."
-	},
-	"instance.settings.tabs.window.width": {
-		"message": "Genişlik"
-	},
-	"instance.settings.tabs.window.width.description": {
-		"message": "Oyun penceresinin genişliği."
-	},
-	"instance.settings.tabs.window.width.enter": {
-		"message": "Genişlik gir..."
-	},
-	"instance.shared-instance.network-error.title": {
-		"message": "Bağlantı hatası"
-	},
-	"instance.shared-instance.owner-tooltip": {
-		"message": "Bu kurulumun içeriği diğer kullanıcılarla paylaşılıyor."
-	},
-	"instance.shared-instance.publish-review.added-label": {
-		"message": "Eklendi"
-	},
-	"instance.shared-instance.publish-review.admonition-header": {
-		"message": "Oyunculara güncellemeyi gönder"
-	},
-	"instance.shared-instance.publish-review.config-title-v2": {
-		"message": "Yapılandırma dosyalarını seç"
-	},
-	"instance.shared-instance.publish-review.description": {
-		"message": "İçerik değişikliklerini gözden geçirin ve bu güncellemeye dahil edilecek yapılandırma dosyalarını seçin."
-	},
-	"instance.shared-instance.publish-review.removed-label": {
-		"message": "Kaldırıldı"
-	},
-	"instance.shared-instance.tooltip": {
-		"message": "Bu kurulumun içeriği başka biri tarafından yönetiliyor."
-	},
-	"instance.worlds.a_minecraft_server": {
-		"message": "Minecraft Sunucusu"
-	},
-	"instance.worlds.cant_connect": {
-		"message": "Sunucuya bağlanılamıyor"
-	},
-	"instance.worlds.copy_address": {
-		"message": "Adresi kopyala"
-	},
-	"instance.worlds.create_shortcut": {
-		"message": "Kısayol yap"
-	},
-	"instance.worlds.dont_show_on_home": {
-		"message": "Ana sayfada gösterme"
-	},
-	"instance.worlds.game_already_open": {
-		"message": "Bu kurulum zaten açık"
-	},
-	"instance.worlds.hardcore": {
-		"message": "Hardcore modu"
-	},
-	"instance.worlds.incompatible_server": {
-		"message": "Sunucu uyumlu değil"
-	},
-	"instance.worlds.linked_server": {
-		"message": "Sunucu projesi tarafından yönetilmektedir"
-	},
-	"instance.worlds.no_contact": {
-		"message": "Sunucuya erişilemedi"
-	},
-	"instance.worlds.no_server_quick_play": {
-		"message": "Yalnızca Minecraft Alpha 1.0.5 veya daha yüksek sunuculara hızlıca girebilirsin"
-	},
-	"instance.worlds.no_singleplayer_quick_play": {
-		"message": "Yalnızca Minecraft 1.20+ sürümlerde tek oyunculu dünyalara doğrudan girebilirsin"
-	},
-	"instance.worlds.play_instance": {
-		"message": "Kurulumu oyna"
-	},
-	"instance.worlds.view_instance": {
-		"message": "Kurulumu gör"
-	},
-	"instance.worlds.world_in_use": {
-		"message": "Dünya şu anda kullanımda"
-	},
-	"minecraft-account.add-account": {
-		"message": "Hesap ekle"
-	},
-	"minecraft-account.label": {
-		"message": "Minecraft hesabı"
-	},
-	"minecraft-account.not-signed-in": {
-		"message": "Giriş yapılmadı"
-	},
-	"minecraft-account.remove-account": {
-		"message": "Hesabı kaldır"
-	},
-	"minecraft-account.select-account": {
-		"message": "Hesap seçin"
-	},
-	"minecraft-account.sign-in": {
-		"message": "Minecraft'a giriş yapın"
-	},
-	"minecraft-required.description": {
-		"message": "Oyunu başlatmak ve oynamak için Minecraft'a sahip olan bir Microsoft hesabına ihtiyaç vardır."
-	},
-	"minecraft-required.description-header": {
-		"message": "Bir Microsoft hesabına giriş yap"
-	},
-	"minecraft-required.dont-have-account": {
-		"message": "Hesabınız yok mu?"
-	},
-	"minecraft-required.get-minecraft": {
-		"message": "Minecraft al"
-	},
-	"minecraft-required.get-support": {
-		"message": "Destek al"
-	},
-	"minecraft-required.header": {
-		"message": "Minecraft gereklidir"
-	},
-	"minecraft-required.sign-in": {
-		"message": "Microsoft'a giriş yap"
-	},
-	"modal.modrinth-account-required.continue-in-browser-heading": {
-		"message": "Tarayıcında devam et"
-	},
-	"modal.modrinth-account-required.create-account-button": {
-		"message": "Bir hesap oluştur"
-	},
-	"modal.modrinth-account-required.open-browser-again-button": {
-		"message": "Tarayıcıyı yeniden aç"
-	},
-	"modal.modrinth-account-required.signing-in-header": {
-		"message": "Giriş yapılıyor"
-	},
-	"search.filter.locked.instance": {
-		"message": "Kurulum tarafından sağlanan"
-	},
-	"search.filter.locked.instance-game-version.title": {
-		"message": "Oyun sürümü veren kurulumlar"
-	},
-	"search.filter.locked.instance-loader.title": {
-		"message": "Yükleyici veren kurulumlar"
-	},
-	"search.filter.locked.instance.sync": {
-		"message": "Kurulum ile eşitle"
-	},
-	"search.filter.locked.server": {
-		"message": "Sunucu tarafından sağlanmıştır"
-	},
-	"search.filter.locked.server-environment.title": {
-		"message": "Sunucu örneğine yalnızca istemci tarafında çalışan modlar eklenebilir"
-	},
-	"search.filter.locked.server-game-version.title": {
-		"message": "Oyun sürümü sunucu tarafından sağlanıyor"
-	},
-	"search.filter.locked.server-loader.title": {
-		"message": "Yükleyici sunucu tarafından sağlanıyor"
-	},
-	"settings.sidebar.label.account": {
-		"message": "Hesap"
-	},
-	"settings.sidebar.label.display": {
-		"message": "Göster"
-	}
+  "app.action-bar.downloading-java": {
+    "message": "Java {version} indiriliyor"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "Güncelleme indiriliyor"
+  },
+  "app.action-bar.downloads": {
+    "message": "İndirmeler"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Diğer çalışan kurulumları gizle"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopyalandı"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Detayları kopyala"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Reddet"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Kurulumu aç"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Yeniden Dene"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Uygulama kapatıldığı için iptal edildi"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Mod paketi okunamadı"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "İptal edildi"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Temizleme bitmedi"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Dosyalar indirilemedi"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "İndirilmiş dosya bozuk"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Dosyalar kaydedilemedi"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "İndirme tamamlanamadı"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Kurulum bulunamadı"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Dosya yolu geçersiz"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Mod paketi verileri geçersiz"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Mod paketi dosyaları geçersiz meta verilere sahip"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java kurulumu bitirilemedi"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Yükleyici kurulumu başarısız oldu"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Yerel veriler güncellenemedi"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft kurulumu başarısız oldu"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Modrinth'e erişilemiyor"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Yazmak için yetkiniz yok"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Paket indirilemedi"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Bir sorun oluştu"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Bilinmeyen kurulum"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Paylaşılmış içerik güncelleniyor"
+  },
+  "app.action-bar.installs": {
+    "message": "Yüklenenler"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Birincil kurulum yap"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Herhangi bir kurulum çalışmıyor"
+  },
+  "app.action-bar.offline": {
+    "message": "Çevrimdışı"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Birincil kurulum"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Güncellemek için yeniden yükle"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Daha fazla çalışan kurulum göster"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Kurulumu durdur"
+  },
+  "app.action-bar.update": {
+    "message": "Güncelleme"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Şu anda indirilienleri göster"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Kurulumu göster"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Günlükleri görüntüle"
+  },
+  "app.ads-consent.accept": {
+    "message": "Hepsini kabul et"
+  },
+  "app.ads-consent.body": {
+    "message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir."
+  },
+  "app.ads-consent.manage": {
+    "message": "Tercihleri yönet"
+  },
+  "app.ads-consent.reject": {
+    "message": "Hepsini reddet"
+  },
+  "app.ads-consent.title": {
+    "message": "Sizin mahremiyetiniz ve reklamlar Modrinth'i nasıl destekler"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Arka plan bulanıklığı gibi görsel efektleri etkinleştirin. Bu, donanım ivmelendirme yokken performansı etkileyebilir."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Gelişmiş işleme"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Modrinth App tarafından kullanılacak renk şemasını seçin."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Renk teması"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Ana Sayfa"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Kütüphane"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Dış görünüm seçici sayfasında oyuncu önizlemesinin üzerindeki kullanıcı adınızı gizleyin."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "İsim etiketini gizle"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Ana sayfadaki “Tekrar oyuna katıl” bölümünde son oynanan dünyaları göster."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Dünyalara hızlıca geri dön"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minecraft başladığında Modrinth uygulamasını küçült."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Uygulamayı küçült"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "İşletim sisteminizin başlık çubuğu ve pencere kontrollerini kullanın. Uygulamanın yeniden başlatılmasını gerektirir."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Sistem pencere çerçevesi"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Her bir örneği ne kadar süreyle oynadığını göster."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Oynama süresini göster"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Yinelenen yüklemeler, normal içerik silme, toplu güncellemeler, bağlantıların kaldırılması ve onarımlar gibi düşük riskli işlemlerde onay adımlarını atlayın. Tehlikeli işlemlerle ilgili uyarılar her zaman gösterilir."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Gerekli olmayan uyarıları atla"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Sağ kenar çubuğunu varsayılan olarak gizleyin ve onu göstermek ya da gizlemek için bir düğme ekleyin."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Sağ kenar çubuğunu gizle"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Modrinth'te yayınlanmayan bir Modrinth Pack (.mrpack) kurulmadan önce bir güvenlik uyarısı göster."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Bilinmeyen mod paketlerini indirmeden önce beni uyar"
+  },
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft doğrulama sunucuları kapalı olabilir. İnternet bağlantını kontrol et ve daha sonra tekrar dene."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Doğrulama sunucularına erişilemedi"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Onaylamalar"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Ana sayfa ve içerik"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Başlatma ve gezinme"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Sunucuyu kuruluma ekle"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Bir kuruluma ekle"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Kuruluma ekle"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "{instanceName}'a ekle"
+  },
+  "app.browse.added": {
+    "message": "Ekli"
+  },
+  "app.browse.already-added": {
+    "message": "Zaten ekli"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Kuruluma dön"
+  },
+  "app.browse.discover-project-type": {
+    "message": "Keşfet {projectType}"
+  },
+  "app.browse.discover-servers": {
+    "message": "Sunucuları keşfet"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Zaten eklenmiş sunucuları gizle"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Zaten yüklenmiş olanları gizle"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Mod paketleri"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Yeni bir içerik eklemek sunucuya girerkenki uyumluluğu bozabilir. Herhangi eklenmiş içerik ise sunucu kurulumunu güncellemeye çalıştığınızda kaybolacaktır."
+  },
+  "app.browse.server.installing": {
+    "message": "Yükleniyor"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Kullanılabilir sürümler {compatibilityLabel} ile eşleşmiyor. Yine de kurulacak bir sürüm seçin. Bağımlılıklar otomatik olarak yüklenmeyecektir."
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Mod paketi açıklaması girin..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Dışa aktar"
+  },
+  "app.export-modal.header": {
+    "message": "Mod paketini dışa aktar"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Mod paketi adı"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Mod paketi adı"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Sürüm numarası"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "İçerik indiriliyor"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Minecraft yükleniyor"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Paket dosyaları yükleniyor"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Geçersiz kılmalar ayıklanıyor"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Tamamlanıyor"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "İndirmek için sıraya alındı"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Java Hazırlanıyor"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Java {version} İndiriliyor"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Java {version} ayıklanıyor"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Java {version} getiriliyor"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Java {version} Hazırlanıyor"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Java {version} doğrulanıyor"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Paket manifesti okunuyor"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Yükleyici çözümleniyor"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Minecraft çözümleniyor"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "İçerik çözümleniyor"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Değişiklikler geri alınıyor"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Yükleyici işlemcileri çalıştırılıyor"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Eklendi"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Yerel kurulumunuz paylaştığınız kullanıcılardan daha ileride."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Değişiklikler henüz paylaşılmadı"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Güncellemeyi gönder"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Yayınlıyor..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Kaldırıldı"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Güncellemeyi yayınla"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Bu kurulumu kullanan herkesle paylaşılacak içerik değişikliklerini gözden geçirin."
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Değişimleri inceleniyor"
+  },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Güncellemeyi gözden geçir"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "İnceleniyor..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "{name}'i oynamak için bir güncelleme gerekli. Oyunu açabilmek için lütfen son sürüme güncelleyin."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "Bir güncelleme mevcut"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Dünyalarınız, yapılandırmalarınız ve yüklü tüm içerikler ve tüm veriler kalıcı olarak silinecek."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Bu eylem geri alınamaz"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Oturumu sil"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Oturumu sil"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Bu mod paketi zaten <bold>{instanceName}</bold> kurulumunda yüklü. Kopyalamak istediğinizden emin misiniz?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Oluştur"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpaketi zaten yüklü"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Kurulum"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "{current, number}/{total, number} proje indiriliyor..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Güncelleme tamamlanıyor..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Sürümler çözümleniyor..."
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proje"
+  },
+  "app.instance.mods.locked-content": {
+    "message": "İnstance'ta kilitli olan içerikler değiştirilemez."
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" eklendi"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projeler eklendi"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Modpaketimde kullandığım projelere göz at!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Mod paketi içeriğini paylaşıyorsunuz"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Başarıyla yüklendi"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Bu instance'ı arkadaşlarınla paylaşabilirsin!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Henüz davet edilen arkadaş yok"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Arkadaşlarını davet et"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Paylaş {name}"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Bu örnek {limit} kullanıcı sınırına ulaştı."
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Giriş yapmanız gerekiyor"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "sayfaya giriş yapabilmeniz işin."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "bağlı hesap"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Giriş yapılmadı"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Hesap değiştir"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Hatalı hesap"
+  },
+  "app.instance.share.members.empty": {
+    "message": "Henüz katılan kullanıcı yok"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Filtrelerinizle eşleşen kullanıcı yok."
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "Artık bu paylaşılan kurulum için güncelleme almayacaklar"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Daha önce yükledikleri kopyalar cihazlarında kalmaya devam edecek"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Onları sonradan tekrar davet edebilirsiniz"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "Bu son kullanıcıdır; bu örnek için paylaşım özelliği devre dışı bırakılacaktır"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Ne olur?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Erişimi geri çek"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Erişimi geri çek"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "{username} nın avatarı"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "{username}'nın bu paylaşılan örneğe erişimini iptal ederseniz, bu kişinin güncellemeleri alabilmesi için onu yeniden davet etmeniz gerekecektir."
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Giriş yap"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Bağlanılamıyor"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Örneğini paylaşmak için bu mod paketinin bağlantısını kaldırmalısın"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Yine de kur"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Kurulum"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "bağlı hesap"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "Modrinth'e giriş yapmanız gerek"
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "Yanlış Modrinth hesabını kullanıyorsunuz"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Sunucu Ekle"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Sunucuları Keşfet"
+  },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Dünya Sil"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Dünyayı sil"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Bu dünya, bu profilden kalıcı olarak silinecek. Bu işlem geri alınamaz."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "{name} Siliniyor"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modlu"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Çevrim dışı"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Çevrim içi"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Başlamak için bir sunucu ekleyin veya göz atın"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Eklenmiş sunucu veya dünya yok"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Sunucuyu kaldır"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Sunucuyu kaldır"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Bu sunucu, sunucu listenizden ve oyun içi sunucu listesinden kaldırılacaktır. Adresini biliyorsanız daha sonra tekrar ekleyebilirsiniz."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "{name} kaldırılıyor"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "{count} dünya ara..."
+  },
+  "app.java-detection.cancel": {
+    "message": "İptal"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Eylemler"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Yol"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Sürüm"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Java kurulumu bulunamadı."
+  },
+  "app.java-detection.select": {
+    "message": "Seç"
+  },
+  "app.java-detection.selected": {
+    "message": "Seçildi"
+  },
+  "app.java-detection.title": {
+    "message": "Java kurulumunu seç"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Zaten kuruldu"
+  },
+  "app.java-selector.browse": {
+    "message": "Göz at"
+  },
+  "app.java-selector.detect": {
+    "message": "Tespit et"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Önerileni kur"
+  },
+  "app.java-selector.installing": {
+    "message": "Kuruluyor..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/java/kurulum/yolu"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Java kurulumunu dene"
+  },
+  "app.modal.install-to-play.additional-context": {
+    "message": "Ek bağlam"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Kullanıcıyı engelle"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Raporladığınız kurulum"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Kurulumu sil"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "Kurma"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Oynamak için yükleyin"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Yine de indir"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Yükle"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Bu davetiye Modrinth tarafından değil, başka bir Modrinth kullanıcısı tarafından oluşturulmuştur. Sadece güvendiğiniz kişilerden gelen davetleri kabul edin."
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {#mod} other {#mods}}"
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "Dosya kabul edilen bir resim türü değil"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "Dosya 1 MiB boyut sınırını aşıyor"
+  },
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "Uygunsuz"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "Kötü niyetli"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "Spam"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Rapor sunuldu"
+  },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Paylaşılan Kurulum"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Paylaşılan kurulum içeriği"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Bilinmeyen dosya uyarısı"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Tanımlanamayan dosyalar"
+  },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Kullanıcı engellendi"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "İçeriği görüntüle"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Oynamak için güncelle"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Silindi"
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Eklendi"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Kaldırıldı"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Güncelleme gerekiyor"
+  },
+  "app.nav.home": {
+    "message": "Ana Sayfa"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth hesabı"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Bir Modrinth hesabıyla oturum açın"
+  },
+  "app.nav.signed-in-as": {
+    "message": "<user>{username}</user> olarak oturum açıldı"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Modrinth+'a yükselt"
+  },
+  "app.news.title": {
+    "message": "Haberler"
+  },
+  "app.news.view-all": {
+    "message": "Tüm haberleri göster"
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Bu proje zaten kurulu"
+  },
+  "app.project.install-button.switch-version": {
+    "message": "Sürüm değiştir"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Keşfete geri dön"
+  },
+  "app.project.version.all-versions": {
+    "message": "Tüm sürümler"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Tarayıcıdan indir"
+  },
+  "app.project.version.installing": {
+    "message": "Yükleniyor"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Zaten yüklenmiş"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Yeniden boyutlandırmak için kaydırın"
+  },
+  "app.restarting": {
+    "message": "Yeniden Başlatılıyor..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth Uygulaması {version}"
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Yükseklik"
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Java Argümanları girin..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java Argümanları"
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Genişlik gir..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Genişlik"
+  },
+  "app.settings.developer-mode-enabled": {
+    "message": "Geliştirici modu açıldı."
+  },
+  "app.settings.downloading": {
+    "message": "v{version} indiriliyor"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir. Aşağıdan tercihinizi yönetebilir veya vazgeçebilirsiniz."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetri"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Görünüm"
+  },
+  "app.settings.tabs.behavior": {
+    "message": "Davranış"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java kurulumları"
+  },
+  "app.settings.tabs.language": {
+    "message": "Dil"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Gizlilik"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Kaynak yönetimi"
+  },
+  "app.skins.add-button": {
+    "message": "Dış görünüm ekle"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Sürükle ve bırak"
+  },
+  "app.skins.apply-button": {
+    "message": "Uygula"
+  },
+  "app.skins.delete-button": {
+    "message": "Dış görünümü sil"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Bu işlem seçili dış görünümü kalıcı olarak silecektir. Bu işlem geri alınamaz."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Bu dış görünümü silmek istediğinden emin misiniz?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Bıraktığınız dosya okunamadı."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Dosya işlenirken hata oluştu"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Bu dış görünüm {ears} modunun özelliklerini kullanıyor"
+  },
+  "app.skins.edit-button": {
+    "message": "Dış görünümü düzenle"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Dış görünüm ekle"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Dış görünüm ekleniyor"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Kol stili"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "İnce"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Klasik"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Pelerin"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Pelerin"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Dış görünüm düzenleniyor"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Önce dış görünümde bir düzenleme yapın!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Pelerin yok"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Hiçbiri"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Dokuyu değiştir"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Dış görünümü kaydet"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Kaydediliyor..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Doku"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Önce bir dış görünüm yükleyin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Dış görünümü düzenle"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Önizleme"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Dış görünümünüzü çok sık değiştiriyorsunuz. Mojang sunucuları geçici olarak daha fazla isteği engelledi. Lütfen tekrar denemeden önce biraz bekleyin."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Yavaşla!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "Dış görünüm sıralamanız kaydedilemedi."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Dış görünümler sıralanamadı"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "İnşaatçılar & Biyomlar"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Kaos Küpü"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Gökyüzünü kovala"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Varsayılan skinler"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Onuru"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Bu skinleri, Onur Ayı boyunca Modrinth'in düzenlediği bir bağış kampanyasına yaptığınız bağış karşılığında aldınız."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Kaos Dağları"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Kaydedilen Skinler"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Yürüyen Kahraman"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "Bakır Çağı"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "Bahçe Uyanıyor"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Küçük Devralma"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Giriş Yap"
+  },
+  "app.skins.title": {
+    "message": "Dış görünüm seçici"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Kapat"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Aç"
+  },
+  "app.survey.no-thanks": {
+    "message": "Hayır teşekkürler"
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} yayımlandı. En yeni özellikler ve hata düzeltmeleri için paket yöneticin üzerinden güncelle!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} mevcut! Kısıtlı bağlantıda olduğunuzdan otomatik olarak indirmedik."
+  },
+  "app.update-popup.changelog": {
+    "message": "Yama Notları"
+  },
+  "app.update-popup.download": {
+    "message": "İndir ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "İndirme tamamlandı"
+  },
+  "app.update-popup.reload": {
+    "message": "Güncellemek için yeniden yükle"
+  },
+  "app.update-popup.title": {
+    "message": "Güncelleme mevcut"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Yama notlarını görüntülemek için buraya tıklayın."
+  },
+  "app.update.complete-toast.title": {
+    "message": "{version} sürümü başarıyla kuruldu!"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Bir seçenek seçin"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Uyumsuz sürüm {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Henüz oynanmadı"
+  },
+  "app.world.world-item.offline": {
+    "message": "Çevrimdışı"
+  },
+  "friends.action.add-friend": {
+    "message": "Bir arkadaş ekle"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} arkadaşlık isteği"
+  },
+  "friends.add-friend.submit": {
+    "message": "Arkadaşlık isteği gönder"
+  },
+  "friends.add-friend.title": {
+    "message": "Arkadaş ekleme"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Minecraft kullanıcı adıyla aynı olmayabilir!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Modrinth kullanıcı adını girin..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Arkadaşının Modrinth kullanıcı adı nedir?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Arkadaş ekleyerek</link> ne oynadıklarını gör!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "İsteği iptal et"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Arkadaşı çıkar"
+  },
+  "friends.friend.request-sent": {
+    "message": "Arkadaşlık isteği gönderildi"
+  },
+  "friends.friend.view-profile": {
+    "message": "Profili görüntüle"
+  },
+  "friends.heading": {
+    "message": "Arkadaşlar"
+  },
+  "friends.heading.active": {
+    "message": "Çevrimiçi"
+  },
+  "friends.heading.offline": {
+    "message": "Çevrimdışı"
+  },
+  "friends.heading.online": {
+    "message": "Çevrim içi"
+  },
+  "friends.heading.pending": {
+    "message": "Bekleniyor"
+  },
+  "friends.no-friends-match": {
+    "message": "''{query}'' ile eşleşen arkadaş yok"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Arkadaşları ara..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "Arkadaş eklemek ve ne oynadıklarını görmek için bir <link>Modrinth hesabına giriş yap</link>!"
+  },
+  "instance.action.create-shortcut": {
+    "message": "Kısayol oluştur"
+  },
+  "instance.action.export-modpack": {
+    "message": "Mod paketini dışa aktar"
+  },
+  "instance.action.launch-instance": {
+    "message": "Kurulumu başlat"
+  },
+  "instance.action.more-actions": {
+    "message": "Daha fazla seçenek"
+  },
+  "instance.action.open-folder": {
+    "message": "Klasörü aç"
+  },
+  "instance.action.repair": {
+    "message": "Onar"
+  },
+  "instance.action.settings": {
+    "message": "Kurulum ayarları"
+  },
+  "instance.action.starting": {
+    "message": "Başlatılıyor..."
+  },
+  "instance.action.stopping": {
+    "message": "Durduruluyor..."
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Ekle ve oyna"
+  },
+  "instance.add-server.add-server": {
+    "message": "Sunucu ekle"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Devre dışı"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Etkin"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Sor"
+  },
+  "instance.add-server.title": {
+    "message": "Sunucu ekle"
+  },
+  "instance.edit-server.title": {
+    "message": "Sunucuyu düzenle"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Ana Sayfadan gizle"
+  },
+  "instance.edit-world.name": {
+    "message": "Dünya Adı"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Dünyası"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Simgeyi sıfırla"
+  },
+  "instance.edit-world.title": {
+    "message": "Dünyayı düzenle"
+  },
+  "instance.files.adding-files": {
+    "message": "Dosyalar ekleniyor ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Farklı kaydet..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Hiç oynanmadı"
+  },
+  "instance.server-modal.address": {
+    "message": "Adres"
+  },
+  "instance.server-modal.name": {
+    "message": "Sunucu Adı"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Sunucusu"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Kaynak paketi"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Eylemler"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Davet bağlantısı"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Genel"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Kurulumu sil"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Kurulumu sil"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Profili, içindeki dünyaları, ayarları ve indirilen şeyleri cihazınızdan sonsuza kadar siler. Dikkatli olun, bir profil silindikten sonra geri alınamaz."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Siliniyor..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Çoğalt"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Kurulurken çoğaltılamaz."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Kurulumu çoğalt"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Bu profilin dünyalarını, yapılandırmalarını, modlarını vb. içeren bir kopyasını oluşturur."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Simgeyi düzenle"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Simgeyi kaldır"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Simgeyi değiştir"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Simge seç"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Ad"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Güncelleme kanalı"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release, beta ve alpha versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release ve beta versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Yayın"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Yalnızca release versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Güncelleme kanalını seç"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Başlatma kancaları"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Özel başlatma kancaları"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Kancalar gelişmiş kullanıcıların oyunu başlattıktan önce ve sonra belirli sistem komutları çalıştırmasını sağlar."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Çıkış sonrası"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Oyun kapandıktan sonra çalışır."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Çıkış sonrası komutu girin..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Başlatma öncesi"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Oyun başlatılmadan önce çalıştırılır."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Başlatma öncesi komutu girin..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Oyun başlatma kancaları"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Paketleyici"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Minecraft'ı başlatmak için paketleyici komutu."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Paketleyici komutu girin..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Kurulum"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} sürümü"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java ve bellek"
+  },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Özel ortam değişkenleri"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Özel Java argümanları"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Özel Java kurulumu"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Özel bellek tahsisi"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Ortam değişkenlerini girin..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Java argümanlarını girin..."
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Ortam değişkenleri"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Bağlar"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java argümanları"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java kurulumu"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Ayrılan bellek"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/java/kurulum/yolu"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Pencere"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Özel pencere ayarları"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Tam Ekran"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Oyunu tam ekran olarak başlat (options.txt kullanır)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Yükseklik"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Oyun penceresinin yüksekliği."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Yükseklik gir..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Genişlik"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Oyun penceresinin genişliği."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Genişlik gir..."
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Bağlantı hatası"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "Bu kurulumun içeriği diğer kullanıcılarla paylaşılıyor."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Eklendi"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Oyunculara güncellemeyi gönder"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Yapılandırma dosyalarını seç"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "İçerik değişikliklerini gözden geçirin ve bu güncellemeye dahil edilecek yapılandırma dosyalarını seçin."
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Kaldırıldı"
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "Bu kurulumun içeriği başka biri tarafından yönetiliyor."
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Minecraft Sunucusu"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Sunucuya bağlanılamıyor"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Adresi kopyala"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Kısayol yap"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Ana sayfada gösterme"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Bu kurulum zaten açık"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hardcore modu"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Sunucu uyumlu değil"
+  },
+  "instance.worlds.linked_server": {
+    "message": "Sunucu projesi tarafından yönetilmektedir"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Sunucuya erişilemedi"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Yalnızca Minecraft Alpha 1.0.5 veya daha yüksek sunuculara hızlıca girebilirsin"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Yalnızca Minecraft 1.20+ sürümlerde tek oyunculu dünyalara doğrudan girebilirsin"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Kurulumu oyna"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Kurulumu gör"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Dünya şu anda kullanımda"
+  },
+  "minecraft-account.add-account": {
+    "message": "Hesap ekle"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft hesabı"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Giriş yapılmadı"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Hesabı kaldır"
+  },
+  "minecraft-account.select-account": {
+    "message": "Hesap seçin"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Minecraft'a giriş yapın"
+  },
+  "minecraft-required.description": {
+    "message": "Oyunu başlatmak ve oynamak için Minecraft'a sahip olan bir Microsoft hesabına ihtiyaç vardır."
+  },
+  "minecraft-required.description-header": {
+    "message": "Bir Microsoft hesabına giriş yap"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Hesabınız yok mu?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Minecraft al"
+  },
+  "minecraft-required.get-support": {
+    "message": "Destek al"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft gereklidir"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Microsoft'a giriş yap"
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Tarayıcında devam et"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Bir hesap oluştur"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Tarayıcıyı yeniden aç"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Giriş yapılıyor"
+  },
+  "search.filter.locked.instance": {
+    "message": "Kurulum tarafından sağlanan"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Oyun sürümü veren kurulumlar"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Yükleyici veren kurulumlar"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Kurulum ile eşitle"
+  },
+  "search.filter.locked.server": {
+    "message": "Sunucu tarafından sağlanmıştır"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Sunucu örneğine yalnızca istemci tarafında çalışan modlar eklenebilir"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Oyun sürümü sunucu tarafından sağlanıyor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Yükleyici sunucu tarafından sağlanıyor"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Hesap"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Göster"
+  }
 }

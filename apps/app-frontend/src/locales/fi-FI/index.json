@@ -575,9 +575,6 @@
   "app.world.world-item.offline": {
     "message": "Offline-tilassa"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} paikalla"
-  },
   "friends.action.add-friend": {
     "message": "Lisää ystävä"
   },

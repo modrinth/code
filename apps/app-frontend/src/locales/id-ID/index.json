@@ -443,9 +443,6 @@
   "app.world.world-item.offline": {
     "message": "Luring"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} orang daring"
-  },
   "friends.action.add-friend": {
     "message": "Tambah teman"
   },

@@ -671,9 +671,6 @@
   "app.world.world-item.offline": {
     "message": "مفصول"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} متصل حاليا"
-  },
   "friends.action.add-friend": {
     "message": "إضافة صديق"
   },

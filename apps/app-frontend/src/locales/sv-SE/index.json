@@ -1118,9 +1118,6 @@
   "app.world.world-item.offline": {
     "message": "Offline"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
-  },
   "content.shared-instance.change-version-body": {
     "message": "Att ändra versionen ändrar endast din lokala kopia. Framtida uppdateringar till den delade instansen kan återställa eller ändra den igen."
   },

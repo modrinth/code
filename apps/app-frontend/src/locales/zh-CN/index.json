@@ -1229,9 +1229,6 @@
   "app.world.world-item.offline": {
     "message": "离线"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} 人在线"
-  },
   "content.shared-instance.change-version-body": {
     "message": "更改版本只会修改你的本地副本。未来的共享实例更新可能会再次将其恢复或更改。"
   },
