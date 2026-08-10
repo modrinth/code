@@ -11,6 +11,8 @@ export const instanceKeys = {
 	detail: (instanceId: string) => [...instanceKeys.all, 'summary', instanceId] as const,
 	processes: (instanceId: string) => [...instanceKeys.all, 'processes', instanceId] as const,
 	content: (instanceId: string) => [...instanceKeys.all, 'content', instanceId] as const,
+	contentUpdateCheck: (instanceId: string) =>
+		[...instanceKeys.all, 'content-update-check', instanceId] as const,
 	rootPath: (instanceId: string) => [...instanceKeys.detail(instanceId), 'root-path'] as const,
 	files: (instanceId: string, path: string) =>
 		[...instanceKeys.detail(instanceId), 'files', path] as const,
