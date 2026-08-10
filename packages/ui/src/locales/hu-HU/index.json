@@ -1022,9 +1022,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "A fájl mentve"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Bezárás"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Keresés"
   },
@@ -1659,7 +1656,7 @@
     "defaultMessage": "{type} javítása"
   },
   "instance.confirm-repair.instance-label": {
-    "defaultMessage": "Játékprofil"
+    "defaultMessage": "Példány"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Javítás"
@@ -2531,9 +2528,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Projekt létrehozása"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Szerep szerkesztése"
-  },
   "profile.button.info": {
     "defaultMessage": "Felhasználói adatok megtekintése"
   },
@@ -2606,23 +2600,11 @@
   "profile.label.project-count": {
     "defaultMessage": "projekt"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Mentés..."
-  },
   "profile.official-account": {
     "defaultMessage": "Hivatalos Modrinth-fiók"
   },
   "profile.official-account.bio": {
     "defaultMessage": "A Modrinth hivatalos felhasználói fiókja. Támogatás a <support-link></support-link> oldalon kaphatsz vagy e-mailben a <email></email> címen."
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Válassz egy rangot"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Hiba történt a felhasználói szerepkör frissítése közben. Kérlek próbáld meg újra."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "A szerepkör frissítése nem sikerült"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Hiba történt a felhasználó letiltásának feloldása közben. Kérlek próbáld meg újra."
@@ -4534,12 +4516,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} avatárja"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Mégse"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Mégse"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Meghívólink szerkesztése."

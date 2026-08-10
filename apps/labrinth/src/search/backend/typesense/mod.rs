@@ -137,6 +137,7 @@
 //! enabled. This avoids repeating joins for popular queries at the cost of
 //! results remaining stale for Typesense's default 60-second cache lifetime.
 
+use crate::util::error::ApiContext as _;
 use std::sync::LazyLock;
 
 use async_trait::async_trait;
@@ -911,7 +912,8 @@ impl Typesense {
         new_filters: Option<&str>,
         request_config: &RequestConfig,
     ) -> Result<(String, String), ApiError> {
-        let sort = parse_search_index(index, new_filters)?;
+        let sort = parse_search_index(index, new_filters)
+            .wrap_api_err("executing `parse_search_index`")?;
         let alias = self.config.get_alias_name("projects");
         Ok((alias, self.get_sort_fields(sort.index, request_config)))
     }
@@ -1047,14 +1049,18 @@ impl SearchBackend for Typesense {
         &self,
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError> {
-        let parsed = parse_search_request(info)?;
-        let (collection_alias, sort_by) = self.get_sort_index(
-            parsed.index,
-            info.new_filters.as_deref(),
-            &info.typesense_config,
-        )?;
+        let parsed = parse_search_request(info)
+            .wrap_api_err("executing `parse_search_request`")?;
+        let (collection_alias, sort_by) = self
+            .get_sort_index(
+                parsed.index,
+                info.new_filters.as_deref(),
+                &info.typesense_config,
+            )
+            .wrap_api_err("fetching sort index")?;
         let versions_alias = self.config.get_alias_name("versions");
-        let filter_by = Self::build_filter(info, &versions_alias)?;
+        let filter_by = Self::build_filter(info, &versions_alias)
+            .wrap_api_err("executing `Self::build_filter`")?;
 
         let q = if parsed.query.is_empty() {
             "*"

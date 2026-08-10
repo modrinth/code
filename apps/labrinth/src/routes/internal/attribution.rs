@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, delete, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
@@ -125,7 +126,8 @@ pub async fn scan(
         &session_queue,
         Scopes::VERSION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let mut version_ids: Vec<i64> = body
@@ -155,7 +157,7 @@ pub async fn scan(
     .wrap_internal_err("failed to fetch versions for attribution scan")?;
 
     if versions.len() != version_ids.len() {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
     let mut project_ids: Vec<DBProjectId> =
@@ -170,7 +172,8 @@ pub async fn scan(
             &user,
             "you do not have permission to upload versions to this project",
         )
-        .await?;
+        .await
+        .wrap_api_err("validating can upload versions to project")?;
     }
 
     let project_ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
@@ -238,7 +241,8 @@ async fn force_scan_file(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let file_id: DBFileId = path.into_inner().into();
     let file = sqlx::query!(
@@ -256,7 +260,7 @@ async fn force_scan_file(
     .fetch_optional(pool.as_ref())
     .await
     .wrap_internal_err("failed to fetch attribution scan file")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     let mut transaction = pool.begin().await.wrap_internal_err(
         "failed to begin attribution file scan transaction",
@@ -320,13 +324,15 @@ pub async fn list(
         &session_queue,
         Scopes::VERSION_READ,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
     let requester_is_mod = user.role.is_mod();
 
     let project = DBProject::get_id(project_id, pool.as_ref(), redis.as_ref())
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_api_err("fetching attribution project")?
+        .wrap_not_found_err("resource not found")?;
     let (team_member, organization_team_member) =
         DBTeamMember::get_for_project_permissions(
             &project.inner,
@@ -651,13 +657,17 @@ pub async fn update_group(
         &session_queue,
         Scopes::VERSION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    if !can_edit_attribution_group(pool.as_ref(), group_id, &user).await? {
-        return Err(ApiError::CustomAuthentication(
-            "This attribution group cannot be edited".to_string(),
-        ));
+    if !can_edit_attribution_group(pool.as_ref(), group_id, &user)
+        .await
+        .wrap_api_err("checking edit attribution group")?
+    {
+        return Err(ApiError::Auth(eyre::eyre!(
+            "This attribution group cannot be edited",
+        )));
     }
 
     if matches!(
@@ -665,15 +675,15 @@ pub async fn update_group(
         AttributionResolutionKind::GloballyAllowed { .. }
     ) && !user.role.is_mod()
     {
-        return Err(ApiError::CustomAuthentication(
-            "Only moderators can set globally allowed attributions".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "Only moderators can set globally allowed attributions",
+        )));
     }
 
     if body.attribution.moderation_status.is_some() && !user.role.is_mod() {
-        return Err(ApiError::CustomAuthentication(
-            "Only moderators can set attribution moderation status".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "Only moderators can set attribution moderation status",
+        )));
     }
 
     let mut attribution = body.attribution;
@@ -698,11 +708,12 @@ pub async fn update_group(
     .wrap_internal_err("failed to update attribution group")?;
 
     if result.rows_affected() == 0 {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
     clear_group_version_cache(pool.as_ref(), redis.as_ref(), &[group_id])
-        .await?;
+        .await
+        .wrap_api_err("executing `clear_group_version_cache`")?;
 
     Ok(())
 }
@@ -734,7 +745,8 @@ pub async fn delete_groups(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("deleting database records for `delete_groups`")?;
 
     let group_ids = body
         .groups
@@ -772,7 +784,8 @@ pub async fn delete_all_groups(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("deleting database records for `delete_all_groups`")?;
 
     let project_id = DBProjectId::from(body.project_id).0;
     let group_ids = sqlx::query_scalar!(
@@ -849,7 +862,7 @@ async fn delete_attribution_groups(
     .wrap_internal_err("failed to delete attribution groups")?;
 
     if result.rows_affected() != group_ids.len() as u64 {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
     txn.commit().await.wrap_internal_err(
@@ -891,14 +904,13 @@ pub async fn assign(
         &session_queue,
         Scopes::VERSION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let sha1 = body.sha1.trim().to_lowercase();
     if hex_to_bytes(&sha1).is_none() {
-        return Err(ApiError::InvalidInput(
-            "invalid sha1 hex string".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!("invalid sha1 hex string",)));
     }
     let sha1_bytes = sha1.as_bytes().to_vec();
     let project_id: DBProjectId = body.project_id.into();
@@ -916,7 +928,7 @@ pub async fn assign(
     .fetch_optional(pool.as_ref())
     .await
     .wrap_internal_err("failed to fetch source attribution group")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     let target_group_exists = sqlx::query_scalar!(
         "
@@ -932,21 +944,23 @@ pub async fn assign(
     .wrap_internal_err("failed to check target attribution group")?;
 
     if !target_group_exists {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
     if !can_edit_attribution_group(pool.as_ref(), source_group_id, &user)
-        .await?
+        .await
+        .wrap_api_err("checking edit attribution group")?
         || !can_edit_attribution_group(
             pool.as_ref(),
             body.target_group_id,
             &user,
         )
-        .await?
+        .await
+        .wrap_api_err("checking edit attribution group")?
     {
-        return Err(ApiError::CustomAuthentication(
-            "This attribution group cannot be edited".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "This attribution group cannot be edited",
+        )));
     }
 
     let mut txn = pool.begin().await.wrap_internal_err(
@@ -986,7 +1000,7 @@ pub async fn assign(
     .wrap_internal_err("failed to insert assigned attribution file")?;
 
     if result.rows_affected() == 0 {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
     sqlx::query!(
@@ -1020,7 +1034,8 @@ pub async fn assign(
         project_id,
         &sha1_bytes,
     )
-    .await?;
+    .await
+    .wrap_api_err("executing `clear_project_sha1_version_cache`")?;
 
     Ok(())
 }
@@ -1052,14 +1067,13 @@ pub async fn split(
         &session_queue,
         Scopes::VERSION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let sha1 = body.sha1.trim().to_lowercase();
     if hex_to_bytes(&sha1).is_none() {
-        return Err(ApiError::InvalidInput(
-            "invalid sha1 hex string".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!("invalid sha1 hex string",)));
     }
     let sha1_bytes = sha1.as_bytes().to_vec();
     let project_id: DBProjectId = body.project_id.into();
@@ -1078,15 +1092,16 @@ pub async fn split(
     .wrap_internal_err("failed to fetch attribution file to split")?;
 
     let Some(existing) = existing else {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
     if !can_edit_attribution_group(pool.as_ref(), existing.group_id, &user)
-        .await?
+        .await
+        .wrap_api_err("checking edit attribution group")?
     {
-        return Err(ApiError::CustomAuthentication(
-            "This attribution group cannot be edited".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "This attribution group cannot be edited",
+        )));
     }
 
     let mut txn = pool
@@ -1138,7 +1153,8 @@ pub async fn split(
         project_id,
         &sha1_bytes,
     )
-    .await?;
+    .await
+    .wrap_api_err("executing `clear_project_sha1_version_cache`")?;
 
     Ok(())
 }
@@ -1217,7 +1233,7 @@ async fn can_edit_attribution_group(
     .fetch_optional(pool)
     .await
     .wrap_internal_err("failed to fetch attribution group")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     ensure_can_upload_versions_to_project(
         pool,
@@ -1225,7 +1241,8 @@ async fn can_edit_attribution_group(
         user,
         "you do not have permission to edit this attribution group",
     )
-    .await?;
+    .await
+    .wrap_api_err("validating can upload versions to project")?;
 
     let attribution: Option<AttributionResolution> = group
         .attribution

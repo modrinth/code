@@ -177,7 +177,7 @@
     "defaultMessage": "Nyelv kiválasztása"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Válaszd ki a licencet ami a te {type} -od alapján megfelelő."
+    "defaultMessage": "Válaszd ki a licencet ami a te {type}ed alapján megfelelő."
   },
   "nags.select-license.title": {
     "defaultMessage": "Válassz egy licenszet"
@@ -269,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Ellenőrizd a külső linkeket"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Látogasd meg a Verziók fület"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   }
 }
+

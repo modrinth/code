@@ -120,6 +120,7 @@ export type { SortDirection, TableColumn } from './Table.vue'
 export { default as Table } from './Table.vue'
 export type { TabsTab, TabsValue } from './Tabs.vue'
 export { default as Tabs } from './Tabs.vue'
+export { default as TagIcon } from './TagIcon.vue'
 export { default as TagItem } from './TagItem.vue'
 export { default as TagTagItem } from './TagTagItem.vue'
 export type {

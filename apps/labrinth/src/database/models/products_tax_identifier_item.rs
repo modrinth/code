@@ -1,6 +1,7 @@
 use crate::database::models::ids::{DBProductId, DBProductPriceId};
 use crate::models::billing::ProductMetadata;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 
 pub struct DBProductsTaxIdentifier {
     pub id: i32,
@@ -18,7 +19,8 @@ impl DBProductsTaxIdentifier {
             product_id.0,
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_internal_err("querying database for `get_product`")?;
 
         Ok(maybe_row.map(|row| DBProductsTaxIdentifier {
             id: row.id,
@@ -41,7 +43,8 @@ impl DBProductsTaxIdentifier {
             price_id.0,
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_internal_err("querying database for `get_price`")?;
 
         Ok(maybe_row.map(|row| DBProductsTaxIdentifier {
             id: row.id,
@@ -73,7 +76,7 @@ pub async fn product_info_by_product_price_id(
         product_price_id.0 as i64,
     )
     .fetch_optional(exec)
-    .await?;
+    .await.wrap_internal_err("querying database for `product_info_by_product_price_id`")?;
 
     match maybe_row {
         None => Ok(None),
@@ -83,7 +86,8 @@ pub async fn product_info_by_product_price_id(
                 tax_processor_id: row.tax_processor_id,
                 product_id: DBProductId(row.product_id),
             },
-            product_metadata: serde_json::from_value(row.product_metadata)?,
+            product_metadata: serde_json::from_value(row.product_metadata)
+                .wrap_request_err("deserializing JSON data")?,
         })),
     }
 }

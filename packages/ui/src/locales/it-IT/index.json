@@ -1155,7 +1155,7 @@
     "defaultMessage": "Elimina gruppo"
   },
   "external-files.permissions-card.remove-group-confirmation.description": {
-    "defaultMessage": "Questo gruppo di attribuzione sarà rimosso per sempre. Quest'azione non può essere annullata."
+    "defaultMessage": "Il gruppo di attribuzione e i suoi contenuti saranno eliminati per sempre. Questa azione è irreversibile."
   },
   "external-files.permissions-card.remove-group-confirmation.title": {
     "defaultMessage": "Eliminare {title}?"
@@ -1230,10 +1230,10 @@
     "defaultMessage": "Elimina file"
   },
   "files.delete-modal.warning.file": {
-    "defaultMessage": "Questo file verrà eliminato permanentemente. Questa azione non può essere annullata."
+    "defaultMessage": "Il file sarà eliminato per sempre. Questa azione è irreversibile."
   },
   "files.delete-modal.warning.folder": {
-    "defaultMessage": "Questa cartella e tutti i suoi contenuti verranno eliminati permanentemente. Questa azione non può essere annullata."
+    "defaultMessage": "La cartella e i suoi contenuti saranno eliminati per sempre. Questa azione è irreversibile."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Impossibile caricare i contenuti del file."
@@ -1252,9 +1252,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "File salvato"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Chiudi"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Trova"
@@ -2837,9 +2834,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Crea un progetto"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Modifica ruolo"
-  },
   "profile.button.info": {
     "defaultMessage": "Mostra info utente"
   },
@@ -2936,23 +2930,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {progetto} other {progetti}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Salvataggio..."
-  },
   "profile.official-account": {
     "defaultMessage": "Account Modrinth ufficiale"
   },
   "profile.official-account.bio": {
     "defaultMessage": "L'account ufficiale di Modrinth. Ricevi assistenza presso <support-link></support-link> o tramite mail presso <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Seleziona il ruolo"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Sì è verificato un errore nel salvataggio del ruolo utente. Riprova più tardi."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Impossibile salvare il ruolo"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Sì è verificato un errore nello sbloccare l'utente. Riprova più tardi."
@@ -5338,12 +5320,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Foto profilo di {username}"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Annulla"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Annulla"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Personalizzata..."

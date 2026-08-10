@@ -147,7 +147,7 @@ import {
 	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
-import { get_full_path, kill, remove, run } from '@/helpers/instance'
+import { get_full_path, kill, refresh_content_updates, remove, run } from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
@@ -209,6 +209,23 @@ useQuery(
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
+useQuery(
+	computed(() => ({
+		queryKey: instanceKeys.contentUpdateCheck(instanceId.value),
+		queryFn: async () => {
+			const targetInstanceId = instanceId.value
+			await refresh_content_updates(targetInstanceId)
+			await queryClient.invalidateQueries({
+				queryKey: instanceKeys.content(targetInstanceId),
+			})
+			return targetInstanceId
+		},
+		enabled: !!instanceId.value && !offline.value && instance.value?.install_stage === 'installed',
+		staleTime: 10 * 60_000,
+		gcTime: 30 * 60_000,
+		retry: false,
+	})),
+)
 const linkedProjectId = computed(() => instance.value?.link?.project_id ?? '')
 const linkedProjectQuery = useQuery(
 	computed(() => ({
@@ -257,6 +274,7 @@ onBeforeRouteUpdate(async (to, from) => {
 
 	try {
 		await ensureCriticalInstanceData(targetInstanceId)
+		instanceId.value = targetInstanceId
 	} catch (error) {
 		if (isUnmanagedInstanceError(error)) return { path: '/' }
 		handleError(toError(error))

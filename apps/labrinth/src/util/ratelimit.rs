@@ -178,10 +178,10 @@ pub async fn rate_limit_middleware(
 
             Ok(service_response.map_into_left_body())
         } else {
-            let mut response = ApiError::RateLimitError(
-                decision.retry_after_ms.unwrap_or(0) as u128,
-                decision.limit,
-            )
+            let retry_after_ms = decision.retry_after_ms.unwrap_or(0);
+            let mut response = ApiError::RateLimit(eyre::eyre!(
+                "rate limit exceeded; retry after {retry_after_ms} milliseconds"
+            ))
             .error_response();
 
             // Add rate limit headers
@@ -220,10 +220,9 @@ pub async fn rate_limit_middleware(
             Ok(req.into_response(response.map_into_right_body()))
         }
     } else {
-        let response = ApiError::CustomAuthentication(
-            "Unable to obtain user IP address!".to_string(),
-        )
-        .error_response();
+        let response =
+            ApiError::Auth(eyre::eyre!("Unable to obtain user IP address!",))
+                .error_response();
 
         Ok(req.into_response(response.map_into_right_body()))
     }

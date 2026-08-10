@@ -28,6 +28,8 @@ pub struct LegacyProject {
     pub server_side: LegacySideType,
     /// A list of game versions this project supports
     pub game_versions: Vec<String>,
+    /// The environments this project supports
+    pub environment: Vec<String>,
 
     // All other fields are the same as V3
     // If they change, or their constituent types change, we may need to
@@ -56,6 +58,7 @@ pub struct LegacyProject {
     pub loaders: Vec<String>,
     pub versions: Vec<VersionId>,
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub issues_url: Option<String>,
     pub source_url: Option<String>,
     pub wiki_url: Option<String>,
@@ -120,6 +123,14 @@ impl LegacyProject {
         let game_versions = data
             .fields
             .get("game_versions")
+            .unwrap_or(&Vec::new())
+            .iter()
+            .filter_map(|v| v.as_str())
+            .map(|v| v.to_string())
+            .collect();
+        let environment = data
+            .fields
+            .get("environment")
             .unwrap_or(&Vec::new())
             .iter()
             .filter_map(|v| v.as_str())
@@ -205,6 +216,7 @@ impl LegacyProject {
             loaders,
             versions: data.versions,
             icon_url: data.icon_url,
+            raw_icon_url: data.raw_icon_url,
             issues_url,
             source_url,
             wiki_url,
@@ -221,6 +233,7 @@ impl LegacyProject {
             client_side,
             server_side,
             game_versions,
+            environment,
         }
     }
 
@@ -302,6 +315,9 @@ pub struct LegacyVersion {
     /// A list of loaders this project supports (has a newtype struct)
     pub loaders: Vec<Loader>,
 
+    /// The environment this version supports
+    pub environment: String,
+
     pub id: VersionId,
     pub project_id: ProjectId,
     pub author_id: UserId,
@@ -332,6 +348,12 @@ impl From<Version> for LegacyVersion {
                 }
             }
         }
+        let environment = data
+            .fields
+            .get("environment")
+            .and_then(|value| value.as_str())
+            .unwrap_or("unknown")
+            .to_string();
 
         // - if loader is mrpack, this is a modpack
         // the v2 loaders are whatever the corresponding loader fields are
@@ -366,6 +388,7 @@ impl From<Version> for LegacyVersion {
             dependencies: data.dependencies,
             game_versions,
             loaders,
+            environment,
         }
     }
 }

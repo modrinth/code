@@ -319,7 +319,7 @@ pub struct FiatPayoutDetails {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde(tag = "type", rename_all = "kebab-case")]
+#[serde(tag = "type", rename_all = "camelCase")]
 pub enum FiatPayoutStatus {
     Created,
     #[serde(rename_all = "camelCase")]
@@ -998,4 +998,23 @@ pub struct CurrenciesBankDetails {
 #[serde(rename_all = "camelCase")]
 pub struct CurrencyBankDetails {
     pub bank_names: Vec<String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::FiatPayoutStatus;
+
+    #[test]
+    fn deserializes_refund_in_progress_status() -> Result<(), serde_json::Error>
+    {
+        let status = serde_json::from_value(serde_json::json!({
+            "type": "refundInProgress",
+            "errorCode": "UNKNOWN",
+            "failureReason": "The receiving bank rejected the payout",
+            "refundInitiatedAt": "2026-08-07T00:00:00Z"
+        }))?;
+
+        assert!(matches!(status, FiatPayoutStatus::RefundInProgress { .. }));
+        Ok(())
+    }
 }

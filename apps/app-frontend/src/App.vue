@@ -176,9 +176,12 @@ const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
 const credentials = ref()
 let credentialsRefreshId = 0
 const sidebarToggled = ref(true)
-const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
-	sidebarToggled.value = !themeStore.toggleSidebar
-})
+watch(
+	() => themeStore.toggleSidebar,
+	(toggleSidebar) => {
+		sidebarToggled.value = !toggleSidebar
+	},
+)
 const forceSidebar = computed(
 	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
 )
@@ -393,7 +396,6 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
-	unsubscribeSidebarToggle()
 	clearDelayedUpdatePopup()
 
 	await unlistenAdsConsent?.()

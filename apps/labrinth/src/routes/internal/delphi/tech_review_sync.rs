@@ -38,6 +38,7 @@
 //! to act as a single chokepoint which (correctly) syncs all the state, instead
 //! of having each mutation run its own ad-hoc update logic.
 
+use crate::util::error::ApiContext as _;
 use itertools::Itertools;
 
 use crate::{
@@ -170,7 +171,9 @@ pub async fn sync_project_tech_review_state(
             last_tech_review_message_type: row.last_tech_review_message_type,
         };
 
-        sync_one_project_tech_review_state(state, exit_reason, txn).await?;
+        sync_one_project_tech_review_state(state, exit_reason, txn)
+            .await
+            .wrap_api_err("executing `sync_one_project_tech_review_state`")?;
     }
 
     Ok(())
@@ -245,7 +248,8 @@ pub async fn sync_deleted_project_tech_review_exit(
         && should_send_exit(row.last_tech_review_message_type.as_deref())
     {
         insert_exit_message(thread_id, TechReviewExitReason::FileDeleted, txn)
-            .await?;
+            .await
+            .wrap_api_err("executing `insert_exit_message`")?;
     }
 
     Ok(())
@@ -275,7 +279,9 @@ async fn sync_one_project_tech_review_state(
             // an append-only project tech review event table where the latest
             // enter/exit event is the current state. Until then, this dummy
             // issue detail acts as the pending queue blocker.
-            ensure_dummy_issue_detail(report_id, txn).await?;
+            ensure_dummy_issue_detail(report_id, txn)
+                .await
+                .wrap_api_err("validating dummy issue detail")?;
         }
 
         if let Some(thread_id) = state.thread_id
@@ -301,7 +307,9 @@ async fn sync_one_project_tech_review_state(
             == Some(MessageBody::TechReviewEntered.as_ref())
     {
         if let Some(report_id) = state.report_id {
-            ensure_dummy_issue_detail(report_id, txn).await?;
+            ensure_dummy_issue_detail(report_id, txn)
+                .await
+                .wrap_api_err("validating dummy issue detail")?;
         }
 
         return Ok(());
@@ -310,7 +318,9 @@ async fn sync_one_project_tech_review_state(
     if let Some(thread_id) = state.thread_id
         && should_send_exit(state.last_tech_review_message_type.as_deref())
     {
-        insert_exit_message(thread_id, exit_reason, txn).await?;
+        insert_exit_message(thread_id, exit_reason, txn)
+            .await
+            .wrap_api_err("executing `insert_exit_message`")?;
     }
 
     Ok(())

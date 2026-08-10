@@ -1280,9 +1280,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Fichier sauvegardé"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Fermer"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Trouver"
   },
@@ -2873,9 +2870,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Créer un projet"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Modifier le rôle"
-  },
   "profile.button.info": {
     "defaultMessage": "Voir les détails de l'utilisateur"
   },
@@ -2894,6 +2888,15 @@
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural,one {# projet} other {# projets}}"
   },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Autorisez les pop-ups pour Modrinth, puis réessayez."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Le profil GitHub n'a pas pu être récupéré. Veuillez réessayer."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Impossible d'ouvrir le profil GitHub"
+  },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Fournisseurs d’authentification"
   },
@@ -2906,8 +2909,14 @@
   "profile.details.label.has-totp": {
     "defaultMessage": "Dispose d'un TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Chargement..."
+  },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Moyens de paiements"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Voir le profil"
   },
   "profile.details.title": {
     "defaultMessage": "Détails de l'utilisateur"
@@ -2957,23 +2966,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural,one {projet}other {projets}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Enregistrement..."
-  },
   "profile.official-account": {
     "defaultMessage": "Compte Modrinth officiel"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Le compte utilisateur officiel de Modrinth. Obtenez de l’aide via <support-link></support-link> ou par e-mail à <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Sélectionner un rôle"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Une erreur s'est produite lors de la mise à jour du rôle utilisateur. Veuillez réessayer."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Impossible de mettre à jour le rôle"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Une erreur s'est produite pendant le déblocage de cet utilisateur. Veuillez réessayer."
@@ -5356,12 +5353,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar de {username}"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Annuler"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Annuler"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Personnaliser..."

@@ -1283,9 +1283,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "파일 저장됨"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "닫다"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "찾다"
   },
@@ -2879,9 +2876,6 @@
   "profile.button.create-project": {
     "defaultMessage": "프로젝트 만들기"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "역할 수정"
-  },
   "profile.button.info": {
     "defaultMessage": "사용자 상세 정보 보기"
   },
@@ -2963,23 +2957,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, other {프로젝트}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "저장 중..."
-  },
   "profile.official-account": {
     "defaultMessage": "공식 Modrinth 계정"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Modrinth의 공식 사용자 계정입니다. <support-link></support-link> 또는 <email></email> 을 통해 문의해 주세요"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "역할 선택"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "사용자 역할을 업데이트하는 동안 오류가 발생했습니다. 다시 시도해 주세요."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "역할 업데이트 실패"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "이 사용자의 차단을 해제하는 동안 오류가 발생했습니다. 다시 시도해 주세요."
@@ -5362,12 +5344,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} 님의 아바타"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "취소"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "취소"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "커스텀..."

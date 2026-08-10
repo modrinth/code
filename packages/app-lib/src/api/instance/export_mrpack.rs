@@ -184,7 +184,7 @@ pub async fn export_mrpack(
     let mut file = File::create(&export_path)
         .await
         .map_err(|e| IOError::with_path(e, &export_path))?;
-    let mut writer = ZipFileWriter::with_tokio(&mut file);
+    let mut writer = ZipFileWriter::with_tokio(&mut file).force_no_zip64();
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
         create_mrpack_json(&metadata, version_id, description).await?;

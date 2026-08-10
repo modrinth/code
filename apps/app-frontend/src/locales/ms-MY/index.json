@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Sedang memuat turun Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Sedang memuat turun kemas kini"
+  },
   "app.action-bar.downloads": {
     "message": "Muat Turun"
   },
@@ -10,6 +13,9 @@
   },
   "app.action-bar.install.copied-details": {
     "message": "Disalin"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Salin butiran"
   },
   "app.action-bar.install.dismiss": {
     "message": "Ketepikan"

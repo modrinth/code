@@ -1358,9 +1358,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Son Güncellenen"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Kapat"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} İndirin"
   },
@@ -2648,9 +2645,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2773,9 +2767,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Taranıyor..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Başarılı"
   },
   "modpack-scan-modal.title": {
     "message": "Mod paketi taraması ({scanned}/{total} Dosyalar)"

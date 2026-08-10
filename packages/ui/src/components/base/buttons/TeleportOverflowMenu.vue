@@ -80,6 +80,19 @@ const { isOpen, panelStyle, anchorStyle, resolvedSide, open, close } = useAnchor
 	resolvedDistance,
 )
 
+const menuTransformOrigin = computed(() => {
+	switch (resolvedSide.value) {
+		case 'top':
+			return 'bottom center'
+		case 'left':
+			return 'right center'
+		case 'right':
+			return 'left center'
+		default:
+			return 'top center'
+	}
+})
+
 const menuItemClasses =
 	'overflow-menu-item flex min-h-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
 	'cursor-pointer whitespace-nowrap hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:outline-none ' +
@@ -294,20 +307,13 @@ defineExpose({ open: openMenu, close: closeMenu })
 	</component>
 
 	<Teleport to="body">
-		<Transition
-			enter-active-class="transition duration-125 ease-out"
-			enter-from-class="scale-95 opacity-0"
-			enter-to-class="scale-100 opacity-100"
-			leave-active-class="transition duration-100 ease-in"
-			leave-from-class="scale-100 opacity-100"
-			leave-to-class="scale-95 opacity-0"
-		>
+		<Transition name="floating-expand">
 			<div
 				v-if="isOpen"
 				:id="menuId"
 				ref="panelElement"
-				class="fixed isolate z-[9999] flex min-w-48 flex-col gap-1 rounded-[14px] bg-surface-3 p-2 shadow-lg ring-1 ring-surface-5"
-				:style="panelStyle"
+				class="fixed isolate z-[9999] rounded-[14px] bg-surface-3 shadow-lg ring-1 ring-surface-5"
+				:style="[panelStyle, { transformOrigin: menuTransformOrigin }]"
 				role="menu"
 				:aria-label="props.label"
 				@keydown="handleMenuKeydown"
@@ -320,76 +326,85 @@ defineExpose({ open: openMenu, close: closeMenu })
 					:data-side="resolvedSide"
 					:style="anchorStyle"
 				/>
-				<template v-for="(option, index) in visibleOptions" :key="option.id ?? `divider-${index}`">
-					<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
-
-					<RouterLink
-						v-else-if="isLink(option) && option.to !== undefined && !option.disabled"
-						v-tooltip="option.tooltip"
-						:to="option.to"
-						:class="menuItemClasses"
-						:style="getMenuItemStyle(option)"
-						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
-						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
-						:data-hover-filled-only="option.hoverFilledOnly || undefined"
-						role="menuitem"
-						tabindex="-1"
-						@click="handleLink(option, $event)"
-						@keydown="handleLinkKeydown(option, $event)"
-						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+				<div
+					data-anchored-scroll-region
+					class="flex min-w-48 flex-col gap-1 overflow-y-auto p-2"
+					:style="{ maxHeight: panelStyle.maxHeight }"
+				>
+					<template
+						v-for="(option, index) in visibleOptions"
+						:key="option.id ?? `divider-${index}`"
 					>
-						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
-							{{ option.label }}
-						</slot>
-					</RouterLink>
+						<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
 
-					<a
-						v-else-if="isLink(option)"
-						v-tooltip="option.tooltip"
-						:href="option.disabled ? undefined : option.href"
-						:target="option.target"
-						:rel="option.rel ?? (option.target === '_blank' ? 'noopener noreferrer' : undefined)"
-						:download="option.download"
-						:aria-disabled="option.disabled || undefined"
-						:class="menuItemClasses"
-						:style="getMenuItemStyle(option)"
-						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
-						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
-						:data-hover-filled-only="option.hoverFilledOnly || undefined"
-						role="menuitem"
-						tabindex="-1"
-						@click="handleLink(option, $event)"
-						@keydown="handleLinkKeydown(option, $event)"
-						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
-					>
-						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
-							{{ option.label }}
-						</slot>
-					</a>
+						<RouterLink
+							v-else-if="isLink(option) && option.to !== undefined && !option.disabled"
+							v-tooltip="option.tooltip"
+							:to="option.to"
+							:class="menuItemClasses"
+							:style="getMenuItemStyle(option)"
+							:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+							:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+							:data-hover-filled-only="option.hoverFilledOnly || undefined"
+							role="menuitem"
+							tabindex="-1"
+							@click="handleLink(option, $event)"
+							@keydown="handleLinkKeydown(option, $event)"
+							@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+						>
+							<slot :name="option.id" :option="option">
+								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								{{ option.label }}
+							</slot>
+						</RouterLink>
 
-					<button
-						v-else
-						v-tooltip="option.tooltip"
-						type="button"
-						:aria-disabled="option.disabled || undefined"
-						:class="menuItemClasses"
-						:style="getMenuItemStyle(option)"
-						:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
-						:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
-						:data-hover-filled-only="option.hoverFilledOnly || undefined"
-						role="menuitem"
-						tabindex="-1"
-						@click="handleAction(option, $event)"
-						@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
-					>
-						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
-							{{ option.label }}
-						</slot>
-					</button>
-				</template>
+						<a
+							v-else-if="isLink(option)"
+							v-tooltip="option.tooltip"
+							:href="option.disabled ? undefined : option.href"
+							:target="option.target"
+							:rel="option.rel ?? (option.target === '_blank' ? 'noopener noreferrer' : undefined)"
+							:download="option.download"
+							:aria-disabled="option.disabled || undefined"
+							:class="menuItemClasses"
+							:style="getMenuItemStyle(option)"
+							:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+							:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+							:data-hover-filled-only="option.hoverFilledOnly || undefined"
+							role="menuitem"
+							tabindex="-1"
+							@click="handleLink(option, $event)"
+							@keydown="handleLinkKeydown(option, $event)"
+							@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+						>
+							<slot :name="option.id" :option="option">
+								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								{{ option.label }}
+							</slot>
+						</a>
+
+						<button
+							v-else
+							v-tooltip="option.tooltip"
+							type="button"
+							:aria-disabled="option.disabled || undefined"
+							:class="menuItemClasses"
+							:style="getMenuItemStyle(option)"
+							:data-tone="option.tone && option.tone !== 'default' ? option.tone : undefined"
+							:data-hover-filled="option.hoverFilled || option.hoverFilledOnly || undefined"
+							:data-hover-filled-only="option.hoverFilledOnly || undefined"
+							role="menuitem"
+							tabindex="-1"
+							@click="handleAction(option, $event)"
+							@focus="selectedIndex = getMenuItems().indexOf($event.currentTarget as HTMLElement)"
+						>
+							<slot :name="option.id" :option="option">
+								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								{{ option.label }}
+							</slot>
+						</button>
+					</template>
+				</div>
 			</div>
 		</Transition>
 	</Teleport>

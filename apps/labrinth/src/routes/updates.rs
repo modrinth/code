@@ -1,3 +1,5 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use std::cmp::Reverse;
 use std::collections::HashMap;
 
@@ -55,8 +57,9 @@ pub async fn forge_updates(
     let (id,) = info.into_inner();
 
     let project = database::models::DBProject::get(&id, &**pool, &redis)
-        .await?
-        .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
+        .await
+        .wrap_api_err("fetching project from database")?
+        .wrap_request_err_with(|| ERROR.to_string())?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -69,8 +72,11 @@ pub async fn forge_updates(
     .map(|x| x.1)
     .ok();
 
-    if !is_visible_project(&project.inner, &user_option, &pool, false).await? {
-        return Err(ApiError::InvalidInput(ERROR.to_string()));
+    if !is_visible_project(&project.inner, &user_option, &pool, false)
+        .await
+        .wrap_api_err("checking project visibility")?
+    {
+        return Err(ApiError::Request(eyre::eyre!("{ERROR}")));
     }
 
     let versions = database::models::DBVersion::get_many(
@@ -78,7 +84,8 @@ pub async fn forge_updates(
         &***ro_pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching versions from database")?;
 
     let loaders = match &*neo.neoforge {
         "only" => |x: &String| *x == "neoforge",
@@ -96,7 +103,8 @@ pub async fn forge_updates(
         &ro_pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching compatible update versions")?;
 
     versions.sort_by_key(|b| Reverse(b.date_published));
 

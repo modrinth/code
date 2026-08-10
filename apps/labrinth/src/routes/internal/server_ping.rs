@@ -44,7 +44,8 @@ pub async fn ping_minecraft_java(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let timeout = request.timeout_ms.map(Duration::from_millis);
     server_ping::ping_server(&request.address, timeout)

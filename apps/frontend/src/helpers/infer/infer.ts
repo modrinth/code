@@ -19,6 +19,26 @@ export interface InferredVersionInfo {
 	game_versions?: string[]
 }
 
+async function readMrpackManifest(rawFile: RawFile): Promise<string> {
+	const { BlobReader, TextWriter, ZipReader } = await import('@zip.js/zip.js')
+	const reader = new ZipReader(new BlobReader(rawFile))
+
+	try {
+		const entries = await reader.getEntries()
+		const manifest = entries.find(
+			(entry) => !entry.directory && entry.filename === 'modrinth.index.json',
+		)
+
+		if (!manifest || manifest.directory) {
+			throw new Error('Missing modrinth.index.json')
+		}
+
+		return await manifest.getData(new TextWriter())
+	} finally {
+		await reader.close()
+	}
+}
+
 /**
  * Fills in missing version information from the filename if not already present.
  */
@@ -56,11 +76,18 @@ export const inferVersionInfo = async function (
 	const simplifiedGameVersions = gameVersions
 		.filter((it) => it.version_type === 'release')
 		.map((it) => it.version)
+	const loaderParsers = createLoaderParsers(project, gameVersions, simplifiedGameVersions)
+	const fileName = rawFile.name.toLowerCase()
+
+	if (fileName.endsWith('.mrpack') || fileName.endsWith('.mrpack-primary')) {
+		const manifest = await readMrpackManifest(rawFile)
+		const result = loaderParsers['modrinth.index.json'](manifest)
+		return fillMissingFromFilename(result, rawFile.name, project.title)
+	}
 
 	const zipReader = new JSZip()
 	const zip = await zipReader.loadAsync(rawFile)
 
-	const loaderParsers = createLoaderParsers(project, gameVersions, simplifiedGameVersions)
 	const packParser = createPackParser(project, gameVersions, rawFile)
 	const multiFileDetectors = createMultiFileDetectors(project, gameVersions, rawFile)
 

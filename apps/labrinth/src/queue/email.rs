@@ -10,6 +10,8 @@ use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
 };
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use chrono::Utc;
 use futures::stream::{FuturesUnordered, StreamExt};
 use lettre::message::Mailbox;
@@ -150,7 +152,13 @@ impl EmailQueue {
     /// Returns `Ok(false)` if no emails were processed, `Ok(true)` if some were processed.
     #[instrument(name = "EmailQueue::index", skip_all)]
     pub async fn index(&self, limit: i64) -> Result<bool, ApiError> {
-        let transport = self.mailer.lock().await.to_transport().await?;
+        let transport = self
+            .mailer
+            .lock()
+            .await
+            .to_transport()
+            .await
+            .wrap_internal_err("creating email transport")?;
 
         let begin = std::time::Instant::now();
 
@@ -159,7 +167,8 @@ impl EmailQueue {
             limit,
             &self.pg,
         )
-        .await?;
+        .await
+        .wrap_internal_err("creating email transport")?;
 
         if deliveries.is_empty() {
             return Ok(false);
@@ -171,7 +180,9 @@ impl EmailQueue {
         // ballooning the error rate.
         for d in deliveries.iter_mut().filter(|d| d.attempt_count >= 3) {
             d.status = NotificationDeliveryStatus::PermanentlyFailed;
-            d.update(&self.pg).await?;
+            d.update(&self.pg).await.wrap_internal_err(
+                "marking exhausted email delivery as failed",
+            )?;
         }
 
         // We hold a FOR UPDATE lock on the rows here, so no other workers are accessing them
@@ -183,7 +194,9 @@ impl EmailQueue {
             .map(|d| d.notification_id)
             .collect::<Vec<_>>();
         let notifications =
-            DBNotification::get_many(&notification_ids, &self.pg).await?;
+            DBNotification::get_many(&notification_ids, &self.pg)
+                .await
+                .wrap_internal_err("fetching notifications from database")?;
 
         // For all notifications we collected, fill out the template
         // and send it via SMTP in parallel.
@@ -201,11 +214,16 @@ impl EmailQueue {
             let seq = Arc::clone(&sequential_processing);
 
             futures.push(async move {
-                let mut txn = this.pg.begin().await?;
+                let mut txn = this
+                    .pg
+                    .begin()
+                    .await
+                    .wrap_internal_err("starting database transaction")?;
 
                 let maybe_user =
                     DBUser::get_id(notification.user_id, &mut txn, &this.redis)
-                        .await?;
+                        .await
+                        .wrap_internal_err("fetching user from database")?;
 
                 let Some(mailbox) = maybe_user
                     .and_then(|user| user.email)
@@ -268,7 +286,9 @@ impl EmailQueue {
                         };
 
                         delivery.attempt_count += 1;
-                        delivery.update(&self.pg).await?;
+                        delivery.update(&self.pg).await.wrap_internal_err(
+                            "updating processed email delivery",
+                        )?;
                     }
                 }
 
@@ -283,7 +303,10 @@ impl EmailQueue {
             delivery.next_attempt = Utc::now()
                 + chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS);
 
-            delivery.update(&self.pg).await?;
+            delivery
+                .update(&self.pg)
+                .await
+                .wrap_internal_err("scheduling email delivery retry")?;
         }
 
         info!(
@@ -302,7 +325,13 @@ impl EmailQueue {
         user_id: DBUserId,
         address: Mailbox,
     ) -> Result<NotificationDeliveryStatus, ApiError> {
-        let transport = self.mailer.lock().await.to_transport().await?;
+        let transport = self
+            .mailer
+            .lock()
+            .await
+            .to_transport()
+            .await
+            .wrap_internal_err("creating email transport")?;
         self.send_one_with_transport(
             txn,
             transport,
@@ -329,7 +358,8 @@ impl EmailQueue {
             &mut *txn,
             &self.redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("creating email transport")?
         .into_iter()
         .find(|t| t.notification_type == notification.notification_type()) else {
             return Ok(NotificationDeliveryStatus::SkippedDefault);
@@ -345,7 +375,8 @@ impl EmailQueue {
             self.identity.clone(),
             address,
         )
-        .await?;
+        .await
+        .wrap_api_err("executing `templates::build_email`")?;
 
         let send_result = transport.send(message).await;
 
