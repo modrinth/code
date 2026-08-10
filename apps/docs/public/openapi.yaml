@@ -429,6 +429,20 @@ components:
         - unknown
       example: client_and_server
       description: 'The environment a project or version supports. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
+    EnvironmentInputEnum:
+      type: string
+      enum:
+        - client_and_server
+        - client_only
+        - client_only_server_optional
+        - singleplayer_only
+        - server_only
+        - server_only_client_optional
+        - dedicated_server_only
+        - client_or_server
+        - client_or_server_prefers_both
+      example: client_and_server
+      description: 'The environment a version supports. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
     # https://github.com/modrinth/code/blob/main/apps/labrinth/src/routes/v2/version_creation.rs#L32-L76
     CreatableVersion:
       allOf:
@@ -448,7 +462,7 @@ components:
               type: string
               description: The multipart field name of the primary file
             environment:
-              $ref: '#/components/schemas/EnvironmentEnum'
+              $ref: '#/components/schemas/EnvironmentInputEnum'
             file_types:
               type: object
               additionalProperties:
@@ -864,13 +878,13 @@ components:
           description: A list of donation links for the project
         client_side:
           type: string
-          enum: [required, optional, unsupported, unknown]
+          enum: [required, optional, unsupported]
           description: Deprecated - use `environment` instead.
           example: required
           deprecated: true
         server_side:
           type: string
-          enum: [required, optional, unsupported, unknown]
+          enum: [required, optional, unsupported]
           description: Deprecated - use `environment` instead.
           example: optional
           deprecated: true
