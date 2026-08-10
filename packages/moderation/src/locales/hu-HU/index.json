@@ -177,7 +177,7 @@
     "defaultMessage": "Nyelv kiválasztása"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Válaszd ki a licencet ami a te {type} -od alapján megfelelő."
+    "defaultMessage": "Válaszd ki a licencet ami a te {type}ed alapján megfelelő."
   },
   "nags.select-license.title": {
     "defaultMessage": "Válassz egy licenszet"
@@ -273,3 +273,4 @@
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   }
 }
+

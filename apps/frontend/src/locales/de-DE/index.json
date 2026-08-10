@@ -1206,7 +1206,7 @@
     "message": "Details"
   },
   "create-project-version.create-modal.stage.metadata.detected-loaders": {
-    "message": "Erkannte Plattformen"
+    "message": "Erkannte Loader"
   },
   "create-project-version.create-modal.stage.metadata.detected-versions": {
     "message": "Erkannte Versionen"
@@ -1221,7 +1221,7 @@
     "message": "Dateien"
   },
   "create-project-version.create-modal.stage.metadata.loaders": {
-    "message": "Plattformen"
+    "message": "Loader"
   },
   "create-project-version.create-modal.stage.metadata.metadata-tab": {
     "message": "Metadaten"
@@ -1233,13 +1233,13 @@
     "message": "Modpack-Versionen können nicht bearbeitet werden"
   },
   "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
-    "message": "Es wurden keine Abhängigkeiten hinzugefügt."
+    "message": "Keine Abhängigkeiten hinzugefügt."
   },
   "create-project-version.create-modal.stage.metadata.no-environment-set": {
-    "message": "Es wurde keine Umgebung festgelegt."
+    "message": "Keine Umgebung wurde festgelegt."
   },
   "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
-    "message": "Es wurden keine Plattformen ausgewählt."
+    "message": "Keine Loader ausgewählt."
   },
   "create-project-version.create-modal.stage.metadata.no-mod-loader": {
     "message": "Kein Modloader"
@@ -3929,8 +3929,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Hervorgehobene Tags"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Du musst mindestens ein hervorgehobenes Tag haben."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Wähle deine relevantesten Tags aus. Diese werden vor den übrigen Tags angezeigt."
+  },
   "project.settings.tags.features-description": {
     "message": "Wähle alle Funktionen aus, die dein {type} nutzt."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} Kategorien} other {Kategorien}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} Funktionen} other {Funktionen}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} Auswirkungen auf die Leistung} other {Auswirkungen auf die Leistung}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} Auflösungen} other {Auflösungen}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Du hast {count} Auflösungs-Tags ({tags}) ausgewählt. Ressourcenpakete sollten in der Regel nur einen Auflösungs-Tag haben."
@@ -5007,7 +5025,7 @@
     "message": "Entwicklermodus deaktivieren"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "Der <strong>Entwicklermodus</strong> ist aktiviert. Damit kannst du die internen IDs verschiedener Elemente in Modrinth anzeigen, was für Entwickler, welche die Modrinth-API verwenden, hilfreich sein kann. Klickst du 5x auf das Modrinth-Logo unten auf der Seite, um den Entwicklermodus umzuschalten."
+    "message": "Der <strong>Entwicklermodus</strong> ist aktiviert. Damit kannst du die internen IDs verschiedener Elemente in Modrinth anzeigen, was für Entwickler, welche die Modrinth-API verwenden, hilfreich sein kann. Klick fünfmal auf das Modrinth-Logo unten auf der Seite, um den Entwicklermodus umzuschalten."
   },
   "settings.display.flags.description": {
     "message": "Bestimmte Funktionen auf diesem Gerät aktivieren oder deaktivieren."

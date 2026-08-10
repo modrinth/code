@@ -512,6 +512,9 @@
   "app.instance.share.sign-in.button": {
     "message": "Se connecter"
   },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "Le service d'instance partagées n'est pas disponible pour le moment, veuillez réessayer plus tard"
+  },
   "app.instance.share.unable-to-connect.heading": {
     "message": "Impossible de se connecter"
   },
@@ -586,6 +589,9 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Aucun serveur ou monde ajouté"
+  },
+  "app.instance.worlds.refreshing": {
+    "message": "Actualisation..."
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Supprimer le serveur"
@@ -833,6 +839,9 @@
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
   },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Variables d'environnement définies lors du lancement d'une instance."
+  },
   "app.settings.default-instance-options.environment-variables.placeholder": {
     "message": "Entrer les variables d'environnement..."
   },
@@ -854,6 +863,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Hauteur"
   },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Arguments transmis à Java lors du lancement d'une instance."
+  },
   "app.settings.default-instance-options.java-arguments.placeholder": {
     "message": "Entrer les arguments Java..."
   },
@@ -869,6 +881,21 @@
   "app.settings.default-instance-options.post-exit-hook.description": {
     "message": "S'exécute après que le jeu se ferme."
   },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Entrez la commande à exécuter après la fermeture..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Hook de post-fermeture"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "S'exécute avant que l'instance démarre."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Entrez la commande de pré-lancement..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Hook de pré-lancement"
+  },
   "app.settings.default-instance-options.width.description": {
     "message": "La largeur de la fenêtre de jeu lors du lancement."
   },
@@ -877,6 +904,15 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Largeur"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Commande utilisée pour encapsuler le processus de lancement de Minecraft."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Entrez la commande wrapper..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Wrapper hook"
   },
   "app.settings.developer-mode-button.label": {
     "message": "Basculer le mode développeur"
@@ -896,11 +932,32 @@
   "app.settings.privacy.ads-consent.intro": {
     "message": "Les publicités rendent Modrinth possible et financent les rémunérations des créateurs. Nos partenaires peuvent stocker des cookies ou y accéder au sein de l'application afin de personnaliser les publicités et de mesurer les performances. Vous pouvez refuser ou gérer vos préférences ci-dessous."
   },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Affiche Modrinth App en tant que votre activité actuelle sur Discord. Cela n'affecte pas Rich Presence ajouté à l'instance par les mods. Nécessite un redémarrage de l'application."
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth collecte des données d'analyse et d'utilisation anonymes afin d'améliorer l'expérience utilisateur et de personnaliser votre expérience. En désactivant cette option, vous choisissez de ne plus participer et vos données ne seront plus collectées."
+  },
   "app.settings.privacy.telemetry.title": {
     "message": "Télémétrie"
   },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Afficher l’action Copier les détails lorsqu’une installation est en attente ou en cours. Elle est toujours disponible pour les installations échouées ou interrompues."
+  },
   "app.settings.resource-management.always-show-copy-details.title": {
     "message": "Toujours afficher les détails de copie"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "L'application peut se charger plus lentement jusqu'à ce que le cache soit reconstruit."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Purger le cache de l'application ?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Nettoyer des données cachées et les télécharger de nouveau depuis Modrinth. L'application peut charger plus lentement jusqu'à ce que le cache soit de nouveau reconstitué."
   },
   "app.settings.resource-management.app-cache.purge": {
     "message": "Purger le cache"
@@ -908,14 +965,38 @@
   "app.settings.resource-management.app-cache.title": {
     "message": "Cache de l'application"
   },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Les sauvegardes de vos données de l'application les plus importantes sont enregistrées ici au cas où vous avez besoin de les récupérer plus tard."
+  },
   "app.settings.resource-management.app-database-backups.open-folder": {
     "message": "Ouvrir le dossier de sauvegardes"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Sauvegardes de la base de données de l’application"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Parcourir pour le répertoire de l'application"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Où Modrinth App stocke les instances et les autres fichiers. Changer prend effet après avoir redémarré l'application."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "Sélectionner un nouveau répertoire pour l'application"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Répertoire de l'application"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Nombre de fichiers que l'application peut télécharger simultanément. Baissez ceci si les téléchargements sont peu fiables sur votre connexion. Nécessite un redémarrage de l'application."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Nombre maximal de téléchargements simultanés"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Nombre de fichiers que l'application peut écrire sur le disque simultanément. Baissez ceci si vous rencontrez fréquemment des erreurs d'écriture / lecture. Nécessite un redémarrage de l'application."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Nombre maximal d'écritures simultanées"
   },
   "app.settings.sidebar.label.instances": {
     "message": "Instance"
@@ -1103,11 +1184,20 @@
   "app.skins.toggle-ears-features-on": {
     "message": "Activer"
   },
+  "app.survey.body": {
+    "message": "Cela vous dérangerait-il de répondre à quelques questions sur votre expérience avec l'application Modrinth ?"
+  },
+  "app.survey.footer": {
+    "message": "Ces retours seront transmis directement à l'équipe de Modrinth et aideront à orienter les futures mises à jour !"
+  },
   "app.survey.no-thanks": {
     "message": "Non merci"
   },
   "app.survey.take-survey": {
-    "message": "Participer au sondage"
+    "message": "Répondre au sondage"
+  },
+  "app.survey.title": {
+    "message": "Salut, utilisateur de Modrinth !"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
@@ -1138,6 +1228,9 @@
   },
   "app.update.complete-toast.title": {
     "message": "La version {version} a été téléchargée avec succès !"
+  },
+  "app.user.project.install-to-instance": {
+    "message": "Installer dans l'instance"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "exemple.modrinth.gg"
@@ -1388,6 +1481,9 @@
   "instance.settings.sharing.active-invites.code": {
     "message": "Lien d'invitation"
   },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "N'importe qui avec l'un de ces liens d'invitation peut rejoindre pendant qu'il reste actif."
+  },
   "instance.settings.sharing.active-invites.empty": {
     "message": "Il n'y a aucune invitation active."
   },
@@ -1405,6 +1501,9 @@
   },
   "instance.settings.sharing.active-invites.uses": {
     "message": "Utilisations"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "Le lien d'invitation <monospace>{code}</monospace> cessera de fonctionner immédiatement. Les personnes qui ont déjà rejoint conserveront leur accès."
   },
   "instance.settings.sharing.revoke-invite.admonition-header": {
     "message": "Cette action ne peut pas être annulée"
@@ -1518,10 +1617,31 @@
     "message": "Exécuté avant lancement."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Entrer commande de pré-lancement..."
+    "message": "Entrez la commande de pré-lancement..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Crochets de lancement"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Les hooks s’exécutent dans le répertoire de travail de l’instance et disposent des variables suivantes :"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: Chemin absolu vers le dossier de l'instance"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: Le nom du dossier de l'instance"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: Les arguments java fournis au jeu"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: Le chemin absolu vers le binaire Java"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Un alis de $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: Le nom de l'instance"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -1566,7 +1686,7 @@
     "message": "Variables d'environnement"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Crochets"
+    "message": "Hooks"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Arguments Java"
@@ -1615,6 +1735,9 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Quelque chose s'est mal passé"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "Impossible de se connecter à l'API des instances partagées"
   },
   "instance.shared-instance.network-error.title": {
     "message": "Erreur de réseau"

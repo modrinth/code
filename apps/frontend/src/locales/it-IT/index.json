@@ -972,7 +972,7 @@
     "message": "Smetti di seguire il progetto"
   },
   "collection.delete-modal.description": {
-    "message": "Questa raccolta sarà rimossa per sempre. Quest'azione non può essere annullata."
+    "message": "La raccolta sarà eliminata per sempre. Questa azione è irreversibile."
   },
   "collection.delete-modal.title": {
     "message": "Vuoi davvero eliminare questa raccolta?"
@@ -2967,7 +2967,7 @@
     "message": "Ammontare"
   },
   "modpack-scan-modal.delete-all-groups-confirmation.description": {
-    "message": "Questi gruppi di attribuzione e i file all'interno saranno rimossi per sempre da questo progetto. Quest'azione non può essere annullata."
+    "message": "Tutti i gruppi di attribuzione del progetto e i loro contenuti saranno eliminati per sempre. Questa azione è irreversibile."
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Errore nell'eliminazione dei gruppi: {error}"
@@ -3801,7 +3801,7 @@
     "message": "Elimina tutti i gruppi"
   },
   "project.settings.permissions.delete-all-groups-confirmation.description": {
-    "message": "{count, plural, one {Questo gruppo di attribuzione} other {Questi # gruppi di attribuzione}} e i file all'interno saranno rimossi per sempre da questo progetto. Quest'azione non può essere annullata."
+    "message": "{count, plural, one {Il gruppo di attribuzione del progetto e i suoi} other {# gruppi di attribuzione del progetto e i loro}} contenuti saranno eliminati per sempre. Questa azione è irreversibile."
   },
   "project.settings.permissions.delete-all-groups-confirmation.title": {
     "message": "Eliminare tutti i gruppi di attribuzione?"
@@ -3916,6 +3916,24 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Tag in evidenza"
+  },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Devi avere almeno un tag in evidenza."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Seleziona i tag più pertinenti. Questi sono mostrati prima degli altri tag."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types}: categorie} other {Categorie}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types}: caratteristiche} other {Caratteristiche}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types}: impatto} other {Impatto}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types}: risoluzioni} other {Risoluzioni}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero averne solo uno."
@@ -5190,7 +5208,7 @@
     "message": "Tutte le versioni"
   },
   "version.confirm-delete.description": {
-    "message": "Questa versione verrà eliminata permanentemente. Questa azione non può essere annullata."
+    "message": "La versione sarà eliminata per sempre. Questa azione è irreversibile."
   },
   "version.confirm-delete.proceed": {
     "message": "Elimina versione"

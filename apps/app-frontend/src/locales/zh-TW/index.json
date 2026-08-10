@@ -1089,7 +1089,7 @@
     "message": "無"
   },
   "app.skins.modal.replace-texture-button": {
-    "message": "取代材質"
+    "message": "取代紋理"
   },
   "app.skins.modal.save-skin-button": {
     "message": "儲存外觀"
@@ -1098,7 +1098,7 @@
     "message": "正在儲存..."
   },
   "app.skins.modal.texture-section": {
-    "message": "材質"
+    "message": "紋理"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
     "message": "請先上傳外觀檔案！"
@@ -1228,6 +1228,9 @@
   },
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安裝！"
+  },
+  "app.user.project.install-to-instance": {
+    "message": "安裝至實例"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1621,6 +1624,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "遊戲啟動掛勾"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "掛勾會在實例的工作目錄中執行，並具備以下變數："
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR：實例資料夾的絕對路徑"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID：實例資料夾的名稱"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS：提供給遊戲的 JVM 參數"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA：Java 二進位檔案的絕對路徑"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR：$INST_DIR 的別名"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME：實例的名稱"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "包裝指令"

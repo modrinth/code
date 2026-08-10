@@ -1662,7 +1662,7 @@
     "defaultMessage": "{type} javítása"
   },
   "instance.confirm-repair.instance-label": {
-    "defaultMessage": "Játékprofil"
+    "defaultMessage": "Példány"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Javítás"

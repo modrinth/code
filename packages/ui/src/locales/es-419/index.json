@@ -453,28 +453,28 @@
     "defaultMessage": "Archivos de configuración cambiados"
   },
   "content.diff-modal.diff-type.added": {
-    "defaultMessage": "Añadido (dependencia)"
+    "defaultMessage": "Se añadió (dependencia)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Desactivado"
+    "defaultMessage": "Se desactivó"
   },
   "content.diff-modal.diff-type.removed-disabled": {
-    "defaultMessage": "Eliminado (desactivado)"
+    "defaultMessage": "Se eliminó (desactivado)"
   },
   "content.diff-modal.diff-type.updated": {
-    "defaultMessage": "Actualizado"
+    "defaultMessage": "Se actualizó"
   },
   "content.diff-modal.dont-install": {
     "defaultMessage": "No instalar"
   },
   "content.diff-modal.external-diff-type.added": {
-    "defaultMessage": "Agregado"
+    "defaultMessage": "Se añadió"
   },
   "content.diff-modal.external-diff-type.removed": {
-    "defaultMessage": "Eliminado"
+    "defaultMessage": "Se eliminó"
   },
   "content.diff-modal.external-diff-type.updated": {
-    "defaultMessage": "Actualizado"
+    "defaultMessage": "Se actualizó"
   },
   "content.diff-modal.file-count": {
     "defaultMessage": "{count, plural, one {# archivo} other {# archivos}}"
@@ -1947,7 +1947,7 @@
     "defaultMessage": "Reinstalando modpack"
   },
   "installation-settings.removed-incompatible": {
-    "defaultMessage": "Eliminado (incompatible)"
+    "defaultMessage": "Se eliminó (incompatible)"
   },
   "installation-settings.repair.instance-description": {
     "defaultMessage": "Reinstala las dependencias de Minecraft y verifica si hay archivos corruptos. Esto puede solucionar problemas si tu juego no se inicia debido a errores relacionados con el launcher."
@@ -2997,7 +2997,7 @@
     "defaultMessage": "Cuenta oficial de Modrinth"
   },
   "profile.official-account.bio": {
-    "defaultMessage": "La cuenta oficial de Modrinth. Consigue ayuda en <support-link></support-link> o escríbenos a través de email: <email></email>"
+    "defaultMessage": "La cuenta oficial de Modrinth. Consigue ayuda en <support-link></support-link> o escríbenos por correo electrónico: <email></email>"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Ocurrió un error al desbloquear a este usuario. Por favor inténtalo otra vez."
@@ -3168,7 +3168,7 @@
     "defaultMessage": "Enviado {date}"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Actualizado {date}"
+    "defaultMessage": "Actualizado el {date}"
   },
   "project.about.links.discord": {
     "defaultMessage": "Únete al servidor de Discord"
@@ -5628,7 +5628,7 @@
     "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
-    "defaultMessage": "Librería"
+    "defaultMessage": "Biblioteca"
   },
   "tag.category.lifesteal": {
     "defaultMessage": "Lifesteal"
@@ -5892,7 +5892,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "Shader vanilla"
+    "defaultMessage": "Shader Vanilla"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"
@@ -6231,3 +6231,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

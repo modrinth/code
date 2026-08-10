@@ -183,7 +183,7 @@
     "message": "当 Minecraft 进程启动时，将 Modrinth App 最小化。"
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "最小化启动器"
+    "message": "最小化 App"
   },
   "app.appearance-settings.native-decorations.description": {
     "message": "使用操作系统的标题栏和窗口控件。需要重启应用。"
@@ -363,7 +363,7 @@
     "message": "推送更新"
   },
   "app.instance.admonitions.shared-instance.publishing-button": {
-    "message": "正在推送…"
+    "message": "正在推送……"
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "移除内容"
@@ -381,7 +381,7 @@
     "message": "查看更新"
   },
   "app.instance.admonitions.shared-instance.reviewing-button": {
-    "message": "正在审查…"
+    "message": "正在审查……"
   },
   "app.instance.admonitions.shared-instance.update-available-body": {
     "message": "{name}需要更新。请更新到最新版本以启动游戏。"
@@ -1229,6 +1229,9 @@
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安装！"
   },
+  "app.user.project.install-to-instance": {
+    "message": "在实例上安装"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -1621,6 +1624,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "游戏启动钩子"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "在此实例工作目录中的钩柄遵循以下这些变量："
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR:实例文件夹的绝对路径"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID:实例文件夹名称"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS:已为游戏提供的JVM参数"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA:Java核心文件的绝对路径"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR:的别名是 $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME:实例名"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "包装器命令"

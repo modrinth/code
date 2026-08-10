@@ -17,6 +17,9 @@
   "analytics.breakdown.project": {
     "message": "פּרוֹיֶקט"
   },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} שעות"
+  },
   "analytics.chart.legend.monetization-details.description": {
     "message": "רק צפיות והורדות שבוצעו דרך Modrinth נספרות לצורך מונטיזציה, והורדות מחייבות את המשתמשים להיות מחוברים לחשבונם."
   },

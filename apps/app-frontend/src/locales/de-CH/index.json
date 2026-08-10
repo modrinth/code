@@ -210,7 +210,7 @@
     "message": "Rechte Seitenleiste ausblenden"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Sicherheitswarnung vor der Installation eines Modrinth-Packs (.mrpack) anzeigen, das nicht auf Modrinth gehostet wird."
+    "message": "Zeige eine Sicherheitswarnung an, bevor ein Modrinth-Paket (.mrpack) installiert wird, welches nicht auf Modrinth gehostet wird."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Warne mich, bevor unbekannte Modpacks installiert werden"
@@ -590,6 +590,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Keine Server oder Welten hinzugefügt"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Wird aktualisiert..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Server entfernen"
   },
@@ -849,7 +852,7 @@
     "message": "Startet Instanzen im Vollbildmodus durch Aktualisieren ihrer options.txt-Datei."
   },
   "app.settings.default-instance-options.fullscreen.title": {
-    "message": "Vollbildschirm"
+    "message": "Vollbild"
   },
   "app.settings.default-instance-options.height.description": {
     "message": "Die Höhe des Spielfensters beim Starten"
@@ -981,7 +984,7 @@
     "message": "Neues App-Verzeichnis auswählen"
   },
   "app.settings.resource-management.app-directory.title": {
-    "message": "App Installation"
+    "message": "App-Verzeichnis"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Anzahl der Dateien, die die App auf einmal herunterladen kann. Senke dies, wenn downloads auf deiner Verbindung unzuverlässig sind. Benötigt einen App-Neustart."
@@ -1005,7 +1008,7 @@
     "message": "Verhalten"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Standard Spieleinstellungen"
+    "message": "Standard-Spieloptionen"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java Installationen"
@@ -1188,10 +1191,10 @@
     "message": "Das Feedback geht direkt an das Modrinth-Team und wird helfen, zukünftige Updates zu gestalten!"
   },
   "app.survey.no-thanks": {
-    "message": "Nein, danke"
+    "message": "Nein danke"
   },
   "app.survey.take-survey": {
-    "message": "Beantworten"
+    "message": "An Umfrage teilnehmen"
   },
   "app.survey.title": {
     "message": "Hey, Modrinth Nutzer!"
@@ -1225,6 +1228,9 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} wurde erfolgreich installiert!"
+  },
+  "app.user.project.install-to-instance": {
+    "message": "In Instanz installieren"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1618,6 +1624,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Spielstart Hooks"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Hooks werden im Arbeitsverzeichnis der Instanz mit den folgenden Variablen ausgeführt:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: Der absolute Pfad zum Ordner der Instanz"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: Der Name des Ordners der Instanz"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: Die JVM-Argumente, die dem Spiel zur Verfügung gestellt werden"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: Der absolute Pfad zur Java-Binärdatei"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Ein Alias für $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: Der Name der Instanz"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"

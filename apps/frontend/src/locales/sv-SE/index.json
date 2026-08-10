@@ -137,6 +137,18 @@
   "analytics.chart.render-limit.header": {
     "message": "Visa alla {count} linjer i grafen?"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Visar alla {itemType, select, project {{count, plural, one {projekt} other {projekt}}} country {{count, plural, one {länder} other {länder}}} monetization {{count, plural, one {intäktsvärden} other {intäktsvärden}}} downloadSource {{count, plural, one {nedladdningskälla} other {nedladdningskälla}}} downloadReason {{count, plural, one {nedladdningsanledningar} other {nedladdningsanledningar}}} member {{count, plural, one {medlemmar} other {medlemmar}}} projectVersion {{count, plural, one {projektversioner} other {projektversioner}}} loader {{count, plural, one {loaders} other {loaders}}} gameVersion {{count, plural, one {spelversioner} other {spelversioner}}} other {{count, plural, one {föremål} other {föremål}}}} från tabellen"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Visar {count} {itemType, select, project {{count, plural, one {projekt} other {projekt}}} country {{count, plural, one {land} other {länder}}} monetization {{count, plural, one {intäktsvärde} other {intäktsvärden}}} downloadSource {{count, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{count, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} member {{count, plural, one {medlem} other {medlemmar}}} projectVersion {{count, plural, one {projektversion} other {projektversioner}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {spelversion} other {spelversioner}}} other {{count, plural, one {föremål} other {föremål}}}} från tabellen"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "Visar {limit} {itemType, select, project {{limit, plural, one {projekt} other {projekt}}} country {{limit, plural, one {land} other {länder}}} monetization {{limit, plural, one {intäktsvärde} other {intäktsvärden}}} downloadSource {{limit, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{limit, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} member {{limit, plural, one {medlem} other {medlemmar}}} projectVersion {{limit, plural, one {projektversion} other {projektversioner}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {spelversion} other {spelversioner}}} other {{limit, plural, one {föremål} other {föremål}}}} från tabellen"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Visar topp {count} {itemType, select, project {{count, plural, one {projekt} other {projekt}}} country {{count, plural, one {land} other {länder}}} monetization {{count, plural, one {intäktsvärde} other {intäktsvärden}}} downloadSource {{count, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{count, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} member {{count, plural, one {medlem} other {medlemmar}}} projectVersion {{count, plural, one {projektversion} other {projektversioner}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {spelversion} other {spelversioner}}} other {{count, plural, one {föremål} other {föremål}}}} från tabellen"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dag} other {# dagar}}"
   },
@@ -148,6 +160,9 @@
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Visa {name} i grafen"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Ingen data"
   },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Fästa"
@@ -1054,6 +1069,9 @@
   },
   "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
     "message": "Ladda upp fil"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Dra och släpp filer eller klicka för att bläddra"
   },
   "create-project-version.create-modal.stage.details.details-tab": {
     "message": "Detaljer"
@@ -2627,6 +2645,18 @@
   "layout.publish.email-verification-required.title": {
     "message": "E-post verifikation behövs"
   },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Spela samma inntehåll som dina vänner"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Modrinth App kommer öppnas automatiskt..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Öppnar Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Varför använda Modrinth App"
+  },
   "moderation.moderate": {
     "message": "Moderera"
   },
@@ -3011,6 +3041,9 @@
   "project.description.title": {
     "message": "Beskrivning"
   },
+  "project.download.compatible-version-title": {
+    "message": "Kompatibla versioner"
+  },
   "project.download.dependency-download-file": {
     "message": "Ladda ner {filename}"
   },
@@ -3031,6 +3064,9 @@
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Installera med Modrinth App"
   },
   "project.download.manually": {
     "message": "Ladda ner manuellt"
@@ -3067,6 +3103,9 @@
   },
   "project.download.title": {
     "message": "Ladda ner {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "Okänd loader"
   },
   "project.download.zip-failed-text": {
     "message": "En eller fler filer kunde inte laddas ner. Vänligen försök igen."
@@ -3107,8 +3146,14 @@
   "project.moderation.admonition.approved.body.public": {
     "message": "Ditt projekt är publicerat och upptäckbart på Modrinth."
   },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Du kan ändra synligheten av ditt projekt i projektets <visibility-settings-link>synlighetsinställningar</visibility-settings-link>."
+  },
   "project.moderation.admonition.approved.header": {
     "message": "Projekt godkänt"
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Projektutkast"
   },
   "project.moderation.admonition.under-review.header": {
     "message": "Projekt under granskning"
@@ -3179,6 +3224,9 @@
   "project.settings.permissions.delete-all-groups": {
     "message": "Radera alla grupper"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "Utöka alla"
+  },
   "project.settings.permissions.learn-more": {
     "message": "Läs mer"
   },
@@ -3187,6 +3235,9 @@
   },
   "project.settings.permissions.search-placeholder": {
     "message": "Sök projekt..."
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Nekad"
   },
   "project.settings.permissions.sort.status": {
     "message": "Status"
@@ -3205,6 +3256,9 @@
   },
   "project.settings.server.languages-label": {
     "message": "Språk"
+  },
+  "project.settings.server.optional-label": {
+    "message": "valfri"
   },
   "project.settings.server.region-label": {
     "message": "Region"
@@ -3584,6 +3638,9 @@
   "servers.notice.level": {
     "message": "Nivå"
   },
+  "servers.notices.no-notices": {
+    "message": "Inga notiser"
+  },
   "servers.plan.large.description": {
     "message": "Perfekt för 15–25 spelare, modpaket, eller tungt moddande."
   },
@@ -3595,6 +3652,24 @@
   },
   "servers.purchase.step.plan.most-popular": {
     "message": "Populärast"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Ladda ner export"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Skapa export"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Skapar export..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Begär en kopia av all din personlig data som du har laddat upp till Modrinth. Det här kan ta flera minuter att göra."
+  },
+  "settings.account.data-export.title": {
+    "message": "Data export"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Du kommer **direkt att radera all din användar data och följande**. Det här kommer inte radera dina projekt. Kontoradering kan inte ångras.<br><br>Om du behöver hjälp med ditt konto kan du få hjälp på [Modrinth Discord](https://discord.modrinth.com)."
   },
   "settings.account.delete.confirm.proceed": {
     "message": "Radera kontot"
@@ -3728,6 +3803,9 @@
   "settings.account.security.password.title": {
     "message": "Lösenord"
   },
+  "settings.account.security.providers.action.manage": {
+    "message": "Hantera leverantörer"
+  },
   "settings.account.security.providers.description": {
     "message": "Lägg till eller ta bort inloggningsmetoder från ditt konto, inklusive GitHub, GitLab, Microsoft, Discord, Steam och Google."
   },
@@ -3815,8 +3893,14 @@
   "settings.applications.delete.confirm.button": {
     "message": "Radera applikationen"
   },
+  "settings.applications.delete.confirm.title": {
+    "message": "Är du säker på att du vill radera den här applikationen?"
+  },
   "settings.applications.field.description": {
     "message": "Beskrivning"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Ange applikationens beskrivning..."
   },
   "settings.applications.field.icon": {
     "message": "Ikon"
@@ -3871,6 +3955,9 @@
   },
   "settings.authorizations.head-title": {
     "message": "Autentiseringar"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Den här appen är gjord av ett officiellt Modrinth-konto."
   },
   "settings.authorizations.revoke.action": {
     "message": "Återkalla"
@@ -4280,6 +4367,9 @@
   "version.confirm-delete.proceed": {
     "message": "Radera version"
   },
+  "version.confirm-delete.title": {
+    "message": "Är du säker på att du vill radera den här versionen?"
+  },
   "version.dependency.view-project": {
     "message": "Visa projekt"
   },
@@ -4321,5 +4411,11 @@
   },
   "version.notification.deleted-title": {
     "message": "Version raderad"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Kopiera SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Kopiera SHA-512"
   }
 }
