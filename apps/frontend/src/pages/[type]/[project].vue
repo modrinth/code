@@ -589,7 +589,7 @@ import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } fro
 import { navigateTo } from '#app'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
-import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
+import ModerationChecklist from '~/components/ui/moderation/moderation-checklist/index.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'

@@ -548,9 +548,7 @@ function getModpackFiles(): {
 	}
 }
 
-defineExpose({
-	getModpackFiles,
-})
+defineExpose({ getModpackFiles })
 </script>
 
 <style scoped>

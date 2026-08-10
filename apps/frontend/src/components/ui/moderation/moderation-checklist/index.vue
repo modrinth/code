@@ -3,7 +3,7 @@
 		v-if="isLockedByOther"
 		ref="takeOverModal"
 		title="Override moderation lock"
-		description="Are you sure you want to override?"
+		description="Are you sure you want to take over moderation of this project?"
 		:has-to-type="false"
 		:markdown="false"
 		proceed-label="Take over"
@@ -35,6 +35,7 @@
 						<component
 							:is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)"
 							class="text-orange"
+							aria-hidden="true"
 						/>
 						{{ checklistTitleText }}
 						<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
@@ -43,6 +44,7 @@
 								v-if="opt.icon"
 								class="mr-2"
 								:class="{ 'opacity-50': opt.visited }"
+								aria-hidden="true"
 							/>
 							<span :class="{ 'opacity-50': opt.visited }">
 								{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
@@ -53,28 +55,28 @@
 							<span v-if="opt.fixes" class="pl-2 font-semibold text-blue">{{ opt.fixes }}</span>
 						</template>
 					</TeleportOverflowMenu>
-					<button
+					<span
 						v-else
-						disabled
 						class="inline-flex cursor-default items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
 					>
 						<component
 							:is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)"
 							class="text-orange"
+							aria-hidden="true"
 						/>
 						{{ checklistTitleText }}
-					</button>
+					</span>
 				</h1>
 				<IconButton
 					v-if="!isPseudoStage && stageNavigateTarget"
-					v-tooltip="`Navigate to ${stageNavigateLabel}`"
+					v-tooltip="stageNavigateButtonLabel"
 					type="quiet"
-					:label="`Navigate to ${stageNavigateLabel}`"
+					:label="stageNavigateButtonLabel"
 					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
 					:disabled="route.path === stageNavigateTarget"
 					@click="navigateToStagePage"
 				>
-					<MapPinIcon />
+					<MapPinIcon aria-hidden="true" />
 				</IconButton>
 				<ButtonLink
 					v-if="!isPseudoStage && currentStageObj._guidanceUrl"
@@ -84,32 +86,21 @@
 					:href="currentStageObj._guidanceUrl"
 					class="!w-9 !rounded-full !bg-button-bg !px-0 !text-primary ![box-shadow:var(--shadow-button)]"
 				>
-					<FileTextIcon />
+					<FileTextIcon aria-hidden="true" />
+					<span class="sr-only">Stage guidance</span>
 				</ButtonLink>
 				<IconButton
-					v-tooltip="
-						!isPseudoStage && currentStageHasState
-							? 'Reset Stage'
-							: !isPseudoStage && !checklistHasState
-								? 'Return to Start'
-								: 'Reset Checklist'
-					"
+					v-tooltip="resetLabel"
 					type="quiet"
 					interaction="filled"
 					:color="!isPseudoStage && currentStageHasState ? 'orange' : 'red'"
-					:label="
-						!isPseudoStage && currentStageHasState
-							? 'Reset Stage'
-							: !isPseudoStage && !checklistHasState
-								? 'Return to Start'
-								: 'Reset Checklist'
-					"
+					:label="resetLabel"
 					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
 					:disabled="!isPseudoStage && !checklistHasState && isOnFirstStage"
 					@click="resetProgress"
 				>
-					<UndoIcon v-if="!isPseudoStage && !checklistHasState" />
-					<BrushCleaningIcon v-else />
+					<UndoIcon v-if="!isPseudoStage && !checklistHasState" aria-hidden="true" />
+					<BrushCleaningIcon v-else aria-hidden="true" />
 				</IconButton>
 				<IconButton
 					v-tooltip="`Exit moderation`"
@@ -120,16 +111,20 @@
 					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
 					@click="handleExit"
 				>
-					<XIcon />
+					<XIcon aria-hidden="true" />
 				</IconButton>
 				<IconButton
-					v-tooltip="collapsed ? `Expand` : `Collapse`"
+					v-tooltip="collapseLabel"
 					type="quiet"
-					:label="collapsed ? `Expand` : `Collapse`"
+					:label="collapseLabel"
 					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
 					@click="emit('toggleCollapsed')"
 				>
-					<DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
+					<DropdownIcon
+						class="transition-transform"
+						:class="{ 'rotate-180': collapsed }"
+						aria-hidden="true"
+					/>
 				</IconButton>
 			</div>
 		</div>
@@ -148,12 +143,8 @@
 
 			<div v-if="isLockedByOther" class="flex flex-1 flex-col">
 				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
-					<LockIcon class="size-8 text-orange" />
-					<span class="text-secondary">
-						This project
-						{{ lockStatus.expired ? 'was being' : 'is currently being' }}
-						moderated<template v-if="lockStatus.lockedBy?.username"> by</template>
-					</span>
+					<LockIcon class="size-8 text-orange" aria-hidden="true" />
+					<span class="text-secondary">{{ lockDescription }}</span>
 					<span v-if="lockStatus.lockedBy?.username" class="inline-flex items-center gap-1">
 						<Avatar :src="lockStatus.lockedBy?.avatar_url" size="2rem" circle />
 						<strong class="text-contrast">@{{ lockStatus.lockedBy.username }}</strong>
@@ -189,8 +180,8 @@
 
 			<div v-else-if="alreadyReviewed" class="flex flex-1 flex-col">
 				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
-					<CheckIcon class="size-8 text-green" />
-					<span class="text-secondary"> This project was already moderated. </span>
+					<CheckIcon class="size-8 text-green" aria-hidden="true" />
+					<span class="text-secondary">This project was already moderated.</span>
 				</div>
 				<div class="mt-auto">
 					<div
@@ -220,13 +211,7 @@
 			<template v-else>
 				<div class="flex min-h-0 flex-1 flex-col">
 					<div v-if="done">
-						<p>
-							You are done moderating this project!
-							<template v-if="moderationQueue.hasItems">
-								There are
-								{{ moderationQueue.queueLength }} left.
-							</template>
-						</p>
+						<p>{{ completionMessage }}</p>
 					</div>
 					<div v-else-if="generatedMessage" class="flex min-h-0 flex-1 flex-col gap-2">
 						<Button class="shrink-0 self-start" @click="useSimpleEditor = !useSimpleEditor">
@@ -265,14 +250,13 @@
 							:nodes="stageNodes"
 							:state="stageState"
 							:write="stageWriter"
+							:meta="stageMeta"
 							:on-image-upload="onUploadHandler"
-							:app-components="appComponentsByKey"
 							:global-state="nodeStates"
 						/>
 					</div>
 				</div>
 
-				<!-- Stage control buttons -->
 				<div class="mt-auto">
 					<div
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
@@ -294,7 +278,7 @@
 								:options="stageOptions"
 								placement="bottom-end"
 							>
-								<ListBulletedIcon />
+								<ListBulletedIcon aria-hidden="true" />
 								<span class="sr-only">Stages</span>
 								<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
 									<component
@@ -302,6 +286,7 @@
 										v-if="opt.icon"
 										class="mr-2"
 										:class="{ 'opacity-50': opt.visited }"
+										aria-hidden="true"
 									/>
 									<span :class="{ 'opacity-50': opt.visited }">
 										{{ opt.text
@@ -336,61 +321,54 @@
 									type="colored"
 									color="red"
 									:disabled="loadingModerationDecision"
+									:loading="moderationDecision === 'rejected'"
 									@click="sendMessage('rejected')"
 								>
-									<SpinnerIcon
-										v-if="moderationDecision === 'rejected'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									<XIcon v-else aria-hidden="true" />
+									<XIcon aria-hidden="true" />
 									Reject
 								</Button>
 								<Button
 									type="colored"
 									color="orange"
 									:disabled="loadingModerationDecision"
+									:loading="moderationDecision === 'withheld'"
 									@click="sendMessage('withheld')"
 								>
-									<SpinnerIcon
-										v-if="moderationDecision === 'withheld'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									<LinkIcon v-else aria-hidden="true" />
+									<LinkIcon aria-hidden="true" />
 									Withhold
 								</Button>
 								<Button
 									type="colored"
 									color="green"
 									:disabled="loadingModerationDecision"
+									:loading="moderationDecision === approveSendStatus"
 									@click="sendMessage(approveSendStatus)"
 								>
-									<SpinnerIcon
-										v-if="moderationDecision === approveSendStatus"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									<CheckIcon v-else aria-hidden="true" />
+									<CheckIcon aria-hidden="true" />
 									Approve
 								</Button>
 							</div>
 
 							<div v-else class="flex items-center gap-2">
 								<Button :disabled="!hasValidPreviousStage" @click="previousStage">
-									<LeftArrowIcon aria-hidden="true" /> Previous
+									<LeftArrowIcon aria-hidden="true" />
+									Previous
 								</Button>
 								<Button
 									type="colored"
 									color="brand"
 									:disabled="isLastVisibleStage && loadingMessage"
+									:loading="isLastVisibleStage && loadingMessage"
 									@click="nextStage"
 								>
 									<template v-if="isLastVisibleStage">
 										<CheckIcon aria-hidden="true" />
-										{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
+										Generate message
 									</template>
-									<template v-else> <RightArrowIcon aria-hidden="true" /> Next </template>
+									<template v-else>
+										<RightArrowIcon aria-hidden="true" />
+										Next
+									</template>
 								</Button>
 							</div>
 						</div>
@@ -402,6 +380,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BrushCleaningIcon,
 	CheckIcon,
@@ -414,7 +393,6 @@ import {
 	MapPinIcon,
 	RightArrowIcon,
 	ScaleIcon,
-	SpinnerIcon,
 	ToggleLeftIcon,
 	ToggleRightIcon,
 	UndoIcon,
@@ -427,11 +405,14 @@ import {
 	moderationSettings,
 	useStages,
 } from '@modrinth/moderation'
-import type { ActiveAction, NodeState, StageNode } from '@modrinth/moderation/src/types/node'
+import type {
+	ActiveAction,
+	MessageSegment,
+	NodeState,
+	StageNode,
+} from '@modrinth/moderation/src/types/node'
 import {
-	CHECKLIST_META_KEY,
 	collectActiveActions,
-	collectMessageNodes,
 	computeAttentionMap,
 	computeNodeMeta,
 	createTrackedPatch,
@@ -442,9 +423,7 @@ import {
 	setMessageProject,
 	setMissingMdHandler,
 } from '@modrinth/moderation/src/types/node'
-import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
 import type { FixBuilder } from '@modrinth/moderation/src/types/node/fix'
-import type { Writer } from '@modrinth/moderation/src/types/node/mutate'
 import {
 	Avatar,
 	Button,
@@ -461,28 +440,15 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import type { ProjectStatus } from '@modrinth/utils'
-import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
-import type { Component } from 'vue'
-import { computed, nextTick, provide, ref, toRaw, watch, watchEffect } from 'vue'
+import { computed, nextTick, ref, watch, watchEffect } from 'vue'
 
-import LoaderPicker from '~/components/ui/create-project-version/components/LoaderPicker.vue'
-import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
-import {
-	clearSessionChecklistState,
-	getSessionChecklistState,
-	patchSessionChecklistState,
-} from '~/services/moderation/checklist-session-storage.ts'
-import {
-	clearChecklistState,
-	loadChecklistState,
-	saveChecklistState,
-} from '~/services/moderation/checklist-storage.ts'
-import type { LockAcquireResponse } from '~/services/moderation/queue.ts'
+import { clearSessionChecklistState } from '~/services/moderation/checklist-session-storage.ts'
+import { clearChecklistState } from '~/services/moderation/checklist-storage.ts'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
 import {
 	batchCheckQueueCandidates,
@@ -491,7 +457,12 @@ import {
 	type QueueCandidateCheck,
 } from '~/services/moderation/queue-eligibility.ts'
 
-import { type LiveNode, STATE_KEY } from './checklist-context'
+import NodeRenderer from './node-renderer/index.vue'
+import type { LiveNode } from './types'
+import { useChecklistLock } from './use-lock'
+import { useNodeRendererState } from './use-node-renderer-state'
+import { loadChecklistPersistence, useChecklistPersistence } from './use-persistence'
+import { useModerationSubmission } from './use-submission'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
@@ -505,6 +476,8 @@ const props = defineProps<{
 	collapsed: boolean
 }>()
 
+const collapseLabel = computed(() => (props.collapsed ? 'Expand' : 'Collapse'))
+
 const { projectV2, projectV3, versions, loadVersions, invalidate, thread } =
 	injectProjectPageContext()
 setMessageProject(projectV3, projectV2)
@@ -516,148 +489,31 @@ const resolvedStages = ref(useStages(nodeStates))
 const client = injectModrinthClient()
 
 const moderationQueue = useModerationQueue()
+const completionMessage = computed(() => {
+	const remaining = moderationQueue.queueLength
+	return moderationQueue.hasItems
+		? `You are done moderating this project! There ${remaining === 1 ? 'is' : 'are'} ${remaining} ${remaining === 1 ? 'project' : 'projects'} left.`
+		: 'You are done moderating this project!'
+})
 const queryClient = useQueryClient()
 const tags = useGeneratedState()
 const auth = await useAuth()
 
-const lockStatus = ref<{
-	locked: boolean
-	lockedBy?: { id: string; username: string; avatar_url?: string }
-	lockedAt?: Date
-	expiresAt?: Date
-	expired?: boolean
-	isOwnLock: boolean
-} | null>(null)
-const lockError = ref(false)
-const lockCheckInterval = ref<ReturnType<typeof setInterval> | null>(null)
-const lockCountdownInterval = ref<ReturnType<typeof setInterval> | null>(null)
-const lockTimeRemaining = ref<string | null>(null)
 const alreadyReviewed = ref(false)
 
-// Prefetch queue for parallel lock checking and instant navigation
 interface PrefetchedProject {
 	project: string
-	slug: string // For canonical URL navigation
-	projectType: string // For canonical URL navigation
+	slug: string
+	projectType: string
 	validatedAt: number
 }
 
 const prefetchQueue = ref<PrefetchedProject[]>([])
 const isPrefetching = ref(false)
 
-const PREFETCH_STALE_MS = 30_000 // 30 seconds
-const PREFETCH_TARGET_COUNT = 3 // Keep 3 unlocked projects ready
-const PREFETCH_BATCH_SIZE = 5 // Check 5 at a time in parallel
-
-async function handleVisibilityChange() {
-	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
-		// Immediately refresh the lock when returning to the tab
-		// This handles cases where the heartbeat was throttled while backgrounded
-		const refreshResult = await moderationQueue.refreshLock()
-		if (!refreshResult.success) {
-			handleLockLost(refreshResult)
-			return
-		}
-		// Refresh prefetch queue when tab becomes visible (not debounced)
-		maintainPrefetchQueue()
-	}
-}
-
-function updateLockCountdown() {
-	if (!lockStatus.value?.lockedAt || lockStatus.value?.isOwnLock) {
-		lockTimeRemaining.value = null
-		return
-	}
-
-	const lockedAt = new Date(lockStatus.value.lockedAt)
-	const expiresAt = lockStatus.value.expiresAt
-		? new Date(lockStatus.value.expiresAt)
-		: new Date(lockedAt.getTime() + 15 * 60 * 1000)
-	const now = new Date()
-	const remainingMs = expiresAt.getTime() - now.getTime()
-
-	if (remainingMs <= 0) {
-		lockTimeRemaining.value = null
-		lockStatus.value.expired = true
-		clearLockCountdown()
-		return
-	}
-
-	const minutes = Math.floor(remainingMs / 60000)
-	const seconds = Math.floor((remainingMs % 60000) / 1000)
-	lockTimeRemaining.value = `${minutes}:${seconds.toString().padStart(2, '0')}`
-}
-
-function clearLockCountdown() {
-	if (lockCountdownInterval.value) {
-		clearInterval(lockCountdownInterval.value)
-		lockCountdownInterval.value = null
-	}
-	lockTimeRemaining.value = null
-}
-
-function startLockHeartbeat() {
-	lockCheckInterval.value = setInterval(
-		async () => {
-			const result = await moderationQueue.refreshLock()
-			if (!result.success) {
-				handleLockLost(result)
-			}
-		},
-		5 * 60 * 1000,
-	)
-}
-
-function handleLockLost(result: LockAcquireResponse) {
-	clearInterval(lockCheckInterval.value!)
-	lockCheckInterval.value = null
-	clearLockCountdown()
-
-	lockStatus.value = {
-		locked: result.locked_by != null,
-		lockedBy: result.locked_by,
-		lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
-		expiresAt: result.expires_at ? new Date(result.expires_at) : undefined,
-		expired: result.expired,
-		isOwnLock: false,
-	}
-	lockError.value = false
-
-	if (result.locked_by) {
-		addNotification({
-			title: 'Lock taken over',
-			text: `@${result.locked_by.username} is now moderating this project.`,
-			type: 'warning',
-		})
-		updateLockCountdown()
-		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
-	} else {
-		addNotification({
-			title: 'Moderation lock lost',
-			text: 'Your lock on this project has expired. Acquire the lock again to continue.',
-			type: 'warning',
-		})
-	}
-}
-
-function handleLockAcquired() {
-	lockStatus.value = { locked: false, isOwnLock: true }
-	lockError.value = false
-	clearLockCountdown()
-	startLockHeartbeat()
-	maintainPrefetchQueue() // Start prefetching immediately (not debounced)
-}
-
-function handleLockUnavailable() {
-	lockError.value = true
-	lockStatus.value = { locked: false, isOwnLock: false }
-	clearLockCountdown()
-	addNotification({
-		title: 'Lock unavailable',
-		text: 'Could not acquire moderation lock. Others may also be moderating this project.',
-		type: 'warning',
-	})
-}
+const PREFETCH_STALE_MS = 30_000
+const PREFETCH_TARGET_COUNT = 3
+const PREFETCH_BATCH_SIZE = 5
 
 async function navigateToNextUnlockedProject(): Promise<boolean> {
 	const now = Date.now()
@@ -698,29 +554,15 @@ async function onUploadHandler(file: File) {
 
 const useSimpleEditor = ref(false)
 const checklistPersistenceProjectId = projectV2.value.id
-const persistedState = import.meta.client
-	? await loadChecklistState(checklistPersistenceProjectId)
-	: null
+const {
+	activatedStages,
+	markStageVisited,
+	message,
+	persistedState,
+	reviewedAnyway,
+	visitedStages,
+} = await loadChecklistPersistence(checklistPersistenceProjectId)
 nodeStates.value = persistedState?.state ?? {}
-const activatedStages = ref<Set<string>>(new Set(persistedState?.activatedStages ?? []))
-const visitedStages = ref<Set<string>>(
-	new Set(
-		import.meta.client
-			? (getSessionChecklistState(checklistPersistenceProjectId).visitedStages ?? [])
-			: [],
-	),
-)
-
-function markStageVisited(stageId: string | undefined) {
-	if (!stageId || visitedStages.value.has(stageId)) return
-	visitedStages.value.add(stageId)
-	patchSessionChecklistState(checklistPersistenceProjectId, {
-		visitedStages: [...visitedStages.value],
-	})
-}
-
-const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
-const message = ref<string | null>(persistedState?.message ?? null)
 const generatedActiveActions = ref<ActiveAction[] | null>(null)
 const resolvedMessageAvailability = ref<Map<object, boolean>>(new Map())
 const generatedMessage = computed(() => message.value !== null)
@@ -730,6 +572,11 @@ const loadingModerationDecision = computed(() => moderationDecision.value !== nu
 const approveSendStatus = computed<ProjectStatus>(() => {
 	const requested = projectV2.value.requested_status
 	return requested ?? 'approved'
+})
+const moderationSubmission = useModerationSubmission({
+	project: projectV3,
+	projectV2,
+	versions,
 })
 const done = ref(false)
 const messageText = computed({
@@ -758,8 +605,8 @@ async function handleExit() {
 			console.warn('Failed to release moderation lock for project:', projectId)
 		}
 	}
-	await persistStateImmediately(false, true)
-	persistenceEnabled = false
+	await persistImmediately(false, true)
+	disablePersistence()
 	emit('exit')
 }
 
@@ -767,45 +614,10 @@ function openTakeOverModal() {
 	takeOverModal.value?.show()
 }
 
-async function confirmTakeOverOverride() {
-	const projectId = projectV2.value?.id
-	if (!projectId) {
-		console.warn('[confirmTakeOverOverride] No project ID available')
-		return
-	}
-	const result = await moderationQueue.overrideLock(projectId)
-
-	if (result.success) {
-		addNotification({
-			title: 'Moderation lock overridden',
-			text: 'You are now moderating this project.',
-			type: 'success',
-		})
-		handleLockAcquired()
-	} else if (result.locked_by) {
-		lockStatus.value = {
-			locked: true,
-			lockedBy: result.locked_by,
-			lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
-			expiresAt: result.expires_at ? new Date(result.expires_at) : undefined,
-			expired: result.expired,
-			isOwnLock: false,
-		}
-		lockError.value = false
-
-		updateLockCountdown()
-		if (!lockCountdownInterval.value) {
-			lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
-		}
-	} else {
-		handleLockUnavailable()
-	}
-}
-
 function reviewAnyway() {
 	alreadyReviewed.value = false
 	reviewedAnyway.value = true
-	persistState()
+	persist()
 	maintainPrefetchQueue()
 }
 
@@ -835,7 +647,6 @@ function navigateToQueueProject(result: QueueCandidateCheck, projectId: string) 
 	}
 }
 
-// Maintain a queue of prefetched unlocked projects for instant navigation
 async function maintainPrefetchQueue() {
 	if (isPrefetching.value) return
 	if (!moderationQueue.isQueueMode) return
@@ -899,6 +710,29 @@ async function maintainPrefetchQueue() {
 }
 
 const debouncedPrefetch = useDebounceFn(maintainPrefetchQueue, 300)
+
+const {
+	acquire: acquireLock,
+	error: lockError,
+	handleVisibilityChange,
+	override: confirmTakeOverOverride,
+	status: lockStatus,
+	stop: stopLockMonitoring,
+	timeRemaining: lockTimeRemaining,
+} = useChecklistLock({
+	projectId: projectV2.value.id,
+	queue: moderationQueue,
+	addNotification,
+	refreshPrefetchQueue: () => void maintainPrefetchQueue(),
+})
+
+const lockDescription = computed(() => {
+	const hasModerator = Boolean(lockStatus.value?.lockedBy?.username)
+	if (lockStatus.value?.expired) {
+		return `This project was being moderated${hasModerator ? ' by' : ''}`
+	}
+	return `This project is currently being moderated${hasModerator ? ' by' : ''}`
+})
 
 async function goToNextEligibleProject(candidateIds: string[]): Promise<boolean> {
 	if (candidateIds.length === 0) return false
@@ -1002,9 +836,19 @@ const canOpenStageSelectorFromTitle = computed(
 	() => !alreadyReviewed.value && !done.value && !isLockedByOther.value,
 )
 
+const resetLabel = computed(() => {
+	if (!isPseudoStage.value && currentStageHasState.value) {
+		return 'Reset stage'
+	}
+	if (!isPseudoStage.value && !checklistHasState.value) {
+		return 'Return to start'
+	}
+	return 'Reset checklist'
+})
+
 const checklistTitleText = computed(() => {
 	if (alreadyReviewed.value || done.value) return 'Moderation'
-	if (generatedMessage.value) return 'Generated Message'
+	if (generatedMessage.value) return 'Generated message'
 
 	return currentStageObj.value.label ?? kebabToTitleCase(currentStageObj.value.id)
 })
@@ -1028,15 +872,19 @@ watchEffect(() => {
 function isFixActionable(fixes: FixBuilder[], state: Record<string, NodeState>): boolean {
 	return fixes.some((f) => {
 		if (f._projectFn) {
-			const { proxy, changes } = createTrackedPatch(projectV3.value as any)
-			f._projectFn(proxy as any, state)
+			const { proxy, changes } = createTrackedPatch(
+				projectV3.value as Labrinth.Projects.v3.EditProjectRequest,
+			)
+			f._projectFn(proxy, state)
 			return Object.keys(changes()).length > 0
 		}
 		if (f._versionFn) {
 			const version = versions.value?.[0]
 			if (!version) return true
-			const { proxy, changes } = createTrackedPatch(version as any)
-			f._versionFn(proxy as any, state)
+			const { proxy, changes } = createTrackedPatch(
+				version as Labrinth.Versions.v3.ModifyVersionRequest,
+			)
+			f._versionFn(proxy, state)
 			return Object.keys(changes()).length > 0
 		}
 		return false
@@ -1106,23 +954,11 @@ if (!persistedState) {
 			if (thread.value === undefined) return
 			if (currentStage.value === initialAutoStage) {
 				const firstValid = findFirstValidStage()
-				console.log('[DEBUG settle]', {
-					initialAutoStage,
-					currentStage: currentStage.value,
-					firstValid,
-					initialAutoStageId: resolvedStages.value[initialAutoStage]?.id,
-					firstValidId: resolvedStages.value[firstValid]?.id,
-				})
 				if (firstValid !== currentStage.value) {
 					currentStage.value = firstValid
 				} else if (needsInitialStageSettle) {
 					markStageVisited(currentStageObj.value.id)
 				}
-			} else {
-				console.log('[DEBUG settle] currentStage already changed before settle', {
-					initialAutoStage,
-					currentStage: currentStage.value,
-				})
 			}
 			hasSettledInitialStage.value = true
 		},
@@ -1144,7 +980,6 @@ const projectUrlType = computed(() =>
 let lastSyncedStageTarget: string | null = null
 function syncStageUrl(stage: StageNode | undefined) {
 	const navigate = stage?._navigate
-	console.log('[DEBUG syncStageUrl]', { stageId: stage?.id, navigate, lastSyncedStageTarget })
 	if (navigate === undefined) return
 	const target = `/${projectUrlType.value}/${projectV2.value.slug}${navigate}`
 	if (target === lastSyncedStageTarget) return
@@ -1169,75 +1004,34 @@ const stageNavigateTarget = computed(() => {
 
 const stageNavigateLabel = computed(() => {
 	const navigate = currentStageObj.value?._navigate
-	if (navigate === '') return 'Project Page'
+	if (navigate === '') return 'Project page'
 	const segment = navigate?.split('/').filter(Boolean).pop()
 	if (!segment) return ''
 	return segment.charAt(0).toUpperCase() + segment.slice(1)
 })
 
+const stageNavigateButtonLabel = computed(() => `Navigate to ${stageNavigateLabel.value}`)
+
 function navigateToStagePage() {
 	if (stageNavigateTarget.value) router.push(stageNavigateTarget.value)
 }
 
-let persistenceEnabled = true
-let persistenceTimer: ReturnType<typeof setTimeout> | null = null
-
-function cancelPendingPersistence() {
-	if (persistenceTimer === null) return
-	clearTimeout(persistenceTimer)
-	persistenceTimer = null
-}
-
-function savePersistedState(open: boolean, resetReviewAnyway = false) {
-	const rawState = toRaw(nodeStates.value)
-	const openVal = open || undefined
-	const reviewAnywayVal = resetReviewAnyway ? undefined : reviewedAnyway.value || undefined
-	const stageVal =
-		currentStage.value !== findFirstValidStage() ? currentStageObj.value.id : undefined
-	const messageVal = message.value ?? undefined
-	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
-	const activatedStagesVal = activatedStages.value.size > 0 ? [...activatedStages.value] : undefined
-	if (
-		!openVal &&
-		!reviewAnywayVal &&
-		!stageVal &&
-		!messageVal &&
-		!stateVal &&
-		!activatedStagesVal
-	) {
-		return clearChecklistState(checklistPersistenceProjectId)
-	}
-	return saveChecklistState(checklistPersistenceProjectId, {
-		...(openVal && { open: openVal }),
-		...(reviewAnywayVal && { reviewAnyway: reviewAnywayVal }),
-		...(stageVal && { stage: stageVal }),
-		...(messageVal && { message: messageVal }),
-		...(stateVal && { state: stateVal }),
-		...(activatedStagesVal && { activatedStages: activatedStagesVal }),
-	})
-}
-
-function persistState() {
-	if (!persistenceEnabled || !import.meta.client) return
-	cancelPendingPersistence()
-	persistenceTimer = setTimeout(() => {
-		persistenceTimer = null
-		void savePersistedState(true)
-	}, 150)
-}
-
-async function persistStateImmediately(open: boolean, resetReviewAnyway = false) {
-	if (!import.meta.client) return
-	cancelPendingPersistence()
-	await savePersistedState(open, resetReviewAnyway)
-}
-
-watch(currentStage, persistState)
-watch(nodeStates, persistState, { deep: true })
-watch(activatedStages, persistState, { deep: true })
-watch(message, persistState)
-watch(currentStageObj, (stage) => markStageVisited(stage.id), {
-	immediate: !needsInitialStageSettle,
+const {
+	disable: disablePersistence,
+	dispose: disposePersistence,
+	persist,
+	persistImmediately,
+} = useChecklistPersistence({
+	projectId: checklistPersistenceProjectId,
+	nodeStates,
+	activatedStages,
+	reviewedAnyway,
+	message,
+	currentStage,
+	currentStageNode: currentStageObj,
+	firstVisibleStage: findFirstValidStage,
+	markStageVisited,
+	visitCurrentStageImmediately: !needsInitialStageSettle,
 })
 
 watch(
@@ -1247,11 +1041,11 @@ watch(
 		const newMap = new Map<object, boolean>()
 		await Promise.all(
 			active
-				.filter((a) => (a.node as any)._segments.some((s: any) => s.type !== 'collect'))
+				.filter((action) => getSegments(action.node).some((segment) => segment.type !== 'collect'))
 				.map(async ({ node, state, statePath }) => {
 					try {
 						let hasContent = false
-						for (const seg of (node as any)._segments) {
+						for (const seg of getSegments(node)) {
 							if (seg.type === 'collect') continue
 							const text = await evalSegment(seg, state, statePath)
 							if (text?.trim()) {
@@ -1318,7 +1112,7 @@ watch(currentStage, () => {
 })
 
 onMounted(async () => {
-	void persistStateImmediately(true)
+	void persistImmediately(true)
 	window.addEventListener('keydown', handleKeybinds)
 	window.addEventListener('beforeunload', handleBeforeUnload)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -1328,26 +1122,7 @@ onMounted(async () => {
 
 	if (done.value || alreadyReviewed.value) return
 
-	const result = await moderationQueue.acquireLock(projectV2.value.id)
-
-	if (result.success) {
-		handleLockAcquired()
-	} else if (result.locked_by) {
-		lockStatus.value = {
-			locked: true,
-			lockedBy: result.locked_by,
-			lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
-			expiresAt: result.expires_at ? new Date(result.expires_at) : undefined,
-			expired: result.expired,
-			isOwnLock: false,
-		}
-		lockError.value = false
-
-		updateLockCountdown()
-		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
-	} else {
-		handleLockUnavailable()
-	}
+	await acquireLock()
 })
 
 function handleBeforeUnload() {
@@ -1359,8 +1134,8 @@ function handleBeforeUnload() {
 	const token = (auth as unknown as { value?: { token?: string } }).value?.token
 	if (!token) return
 
-	// sendBeacon is POST-only and cannot set Authorization. The internal POST /release endpoint
-	// accepts the same token as text/plain (matches useBaseFetch's Authorization value).
+	// sendBeacon is POST-only and cannot set Authorization. The internal release endpoint
+	// accepts the API bearer token as text/plain.
 	void navigator.sendBeacon(
 		`${base}moderation/lock/${projectId}/release`,
 		new Blob([token], { type: 'text/plain' }),
@@ -1368,19 +1143,13 @@ function handleBeforeUnload() {
 }
 
 onUnmounted(() => {
-	cancelPendingPersistence()
-	if (persistenceEnabled) {
-		void savePersistedState(true)
-	}
+	disposePersistence()
 	window.removeEventListener('beforeunload', handleBeforeUnload)
 	window.removeEventListener('keydown', handleKeybinds)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('right')
 
-	if (lockCheckInterval.value) {
-		clearInterval(lockCheckInterval.value)
-	}
-	clearLockCountdown()
+	stopLockMonitoring()
 
 	// Release lock if we own it (navigation away without explicit exit)
 	const projectId = projectV2.value?.id
@@ -1408,7 +1177,7 @@ function countStageActions(stage: StageNode): number {
 	const actions = checklistLive.value.get(stage)?.activeActions ?? []
 	const resolved = resolvedMessageAvailability.value
 	return actions.filter((a) => {
-		if ((a.node as any)._segments.every((s: any) => s.type === 'collect')) return false
+		if (getSegments(a.node).every((segment) => segment.type === 'collect')) return false
 		return resolved.get(a.node) ?? true
 	}).length
 }
@@ -1426,7 +1195,17 @@ function collectAllActiveActions(): ActiveAction[] {
 }
 
 function byPriority(a: ActiveAction, b: ActiveAction): number {
-	return ((a.node as any)._priority as Priority).compareTo((b.node as any)._priority as Priority)
+	return getPriority(a.node).compareTo(getPriority(b.node))
+}
+
+function getSegments(node: object): MessageSegment[] {
+	return '_segments' in node && Array.isArray(node._segments)
+		? (node._segments as MessageSegment[])
+		: []
+}
+
+function getPriority(node: object): Priority {
+	return (node as { _priority: Priority })._priority
 }
 
 async function assembleFullMessage() {
@@ -1456,68 +1235,18 @@ async function assembleFullMessage() {
 	)
 }
 
-const tooltipHtmlMap = ref(new Map<object, string>())
-
-watchEffect(async () => {
-	const stage = currentStageObj.value
-	const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
-	const stageChildren = resolveChildren(stage, stageState)
-	const actions = collectMessageNodes(stageChildren, stageState, [stage.id])
-
-	const newMap = new Map<object, string>()
-	await Promise.all(
-		actions.map(async (entry) => {
-			try {
-				const raw = await evalActiveAction(entry, actions, new Set())
-				const expanded = expandVariables(raw, projectV2.value, projectV3.value).trim()
-				newMap.set(
-					entry.node,
-					expanded
-						? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(expanded)}</div>`
-						: '',
-				)
-			} catch {
-				newMap.set(entry.node, '')
-			}
-		}),
-	)
-	tooltipHtmlMap.value = newMap
+const {
+	meta: stageMeta,
+	nodes: stageNodes,
+	state: stageState,
+	write: stageWriter,
+} = useNodeRendererState({
+	currentStage: currentStageObj,
+	nodeStates,
+	project: projectV3,
+	projectV2,
+	isFixActionable,
 })
-
-const stageMeta = computed(() => {
-	const stage = currentStageObj.value
-	const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
-	const stageChildren = resolveChildren(stage, stageState)
-	const metaMap = computeNodeMeta(stageChildren, stageState, isFixActionable)
-	const attentionMap = computeAttentionMap(stageChildren, stageState, metaMap)
-	return { metaMap, attentionMap, tooltipHtml: tooltipHtmlMap.value }
-})
-
-const appComponentsByKey: Record<string, Component> = {
-	'loader-picker': LoaderPicker,
-	'game-version-picker': McVersionPicker,
-}
-
-const stageState = computed(
-	() => (nodeStates.value[currentStageObj.value.id] ?? {}) as Record<string, NodeState>,
-)
-const stageNodes = computed(() => resolveChildren(currentStageObj.value, stageState.value))
-
-const stageWriter: Writer = (id, value) => {
-	const stageId = currentStageObj.value.id
-	const existing = nodeStates.value[stageId]
-	const next: Record<string, NodeState> = existing ? { ...existing } : {}
-	if (value === undefined) Reflect.deleteProperty(next, id)
-	else next[id] = value
-	if (Object.keys(next).length === 0) {
-		if (existing !== undefined) Reflect.deleteProperty(nodeStates.value, stageId)
-	} else {
-		nodeStates.value[stageId] = next
-	}
-}
-
-provide(CHECKLIST_META_KEY, stageMeta)
-provide(STATE_KEY, nodeStates)
 
 function shouldShowStage(stage: StageNode): boolean {
 	return checklistLive.value.get(stage)?.isVisible ?? false
@@ -1614,7 +1343,7 @@ async function generateMessage() {
 
 const hasNextProject = ref(false)
 
-const finishedId = localStorage.getItem('moderation-checklist-finished')
+const finishedId = import.meta.client ? localStorage.getItem('moderation-checklist-finished') : null
 if (finishedId === projectV2.value.id) {
 	localStorage.removeItem('moderation-checklist-finished')
 	hasNextProject.value = moderationQueue.queueLength > 0
@@ -1650,68 +1379,13 @@ async function sendMessage(status: ProjectStatus) {
 	}
 
 	const active = [...(generatedActiveActions.value ?? collectAllActiveActions())].sort(byPriority)
-	const shouldApplyFixes = active.some((a) => (a.node as any)._applyFixes)
-
 	moderationDecision.value = status
 	try {
-		await useBaseFetch(`project/${projectId}`, {
-			method: 'PATCH',
-			body: { status },
+		const projectFixChanges = await moderationSubmission.mutateAsync({
+			status,
+			message: message.value,
+			activeActions: active,
 		})
-
-		if (message.value && threadId) {
-			await useBaseFetch(`thread/${threadId}`, {
-				method: 'POST',
-				body: {
-					body: {
-						type: 'text',
-						body: message.value,
-					},
-				},
-			})
-		}
-
-		let projectFixChanges: Partial<typeof projectV3.value> = {}
-
-		if (shouldApplyFixes) {
-			const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
-				projectV3.value as any,
-			)
-			for (const { node, state } of active) {
-				if (!('_fixes' in (node as object))) continue
-				for (const f of (node as any)._fixes) {
-					f._projectFn?.(projectProxy, state)
-				}
-			}
-			projectFixChanges = projectChanges()
-			if (Object.keys(projectFixChanges).length > 0) {
-				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
-			}
-
-			if (versions.value) {
-				const versionFixes = active.flatMap(({ node, state }) =>
-					'_fixes' in (node as object)
-						? (node as any)._fixes
-								.filter((f: FixBuilder) => f._versionFn)
-								.map((f: FixBuilder) => ({ fix: f, state }))
-						: [],
-				)
-				if (versionFixes.length > 0) {
-					await Promise.all(
-						versions.value.map(async (version) => {
-							const { proxy, changes } = createTrackedPatch(version as any)
-							for (const { fix, state } of versionFixes) {
-								fix._versionFn!(proxy, state)
-							}
-							const changed = changes()
-							if (Object.keys(changed).length > 0) {
-								await client.labrinth.versions_v3.modifyVersion(version.id, changed)
-							}
-						}),
-					)
-				}
-			}
-		}
 
 		const willHaveNext = await moderationQueue.completeProject(projectId)
 		// Set both states together - hasNextProject MUST be set before done
@@ -1819,8 +1493,7 @@ async function skipCurrentProject() {
 }
 
 async function clearProjectLocalStorage() {
-	persistenceEnabled = false
-	cancelPendingPersistence()
+	disablePersistence()
 
 	nodeStates.value = {}
 	activatedStages.value = new Set()

@@ -8,9 +8,9 @@ Give each complex component its own folder:
 components/
 └── analytics-chart/
 	├── index.vue
-	├── analytics-chart-header.vue
-	├── analytics-chart-plot.vue
-	├── analytics-chart-data.ts
+	├── header.vue
+	├── plot.vue
+	├── data.ts
 	└── use-analytics-chart.ts
 ```
 
@@ -37,9 +37,9 @@ Keep files for only one component in that component's folder:
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-├── analytics-chart-plot.vue
-├── analytics-chart-tooltip.vue
+├── header.vue
+├── plot.vue
+├── tooltip.vue
 ├── chart-ranges.ts
 └── use-chart-hover-state.ts
 ```
@@ -84,22 +84,22 @@ Use this structure:
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-├── analytics-chart-plot.vue
+├── header.vue
+├── plot.vue
 ├── use-chart-hover-state.ts
 └── use-chart-selection.ts
 ```
 
-Do not use this structure unless a local area needs its own module boundary:
+Do not use this structure unless a local area needs its own module boundary, or for example it makes sense: e.g: for subpages
 
 ```
-analytics-chart/
+page-thing/
 ├── index.vue
-├── header/
+├── subpage-1/
 │	└── index.vue
-└── plot/
+└── subpage-2/
 	├── index.vue
-	└── use-plot-state.ts
+	└── use-something.ts
 ```
 
 Use subfolders when they reduce real complexity. Do not make a folder for each small subcomponent.
