@@ -14,6 +14,11 @@ export interface SkinPreviewFitPadding {
 	left: number
 }
 
+export interface SkinPreviewBounds {
+	min: SkinPreviewTuple
+	max: SkinPreviewTuple
+}
+
 export interface SkinPreviewFitLock {
 	containerSize: {
 		width: number
@@ -23,6 +28,7 @@ export interface SkinPreviewFitLock {
 	modelSize: SkinPreviewTuple
 	padding: SkinPreviewFitPadding
 	rotation: number
+	visibleBounds: SkinPreviewBounds
 }
 
 export type SkinPreviewTuple = [number, number, number]
