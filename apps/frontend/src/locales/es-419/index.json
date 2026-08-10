@@ -2919,10 +2919,10 @@
     "message": "Actualizar a Modrinth+"
   },
   "layout.publish.email-verification-required.description": {
-    "message": "Debes verificar tu email antes de empezar a publicar en Modrinth."
+    "message": "Debes verificar tu correo electrónico antes de empezar a publicar en Modrinth."
   },
   "layout.publish.email-verification-required.title": {
-    "message": "Verificación de email requerida"
+    "message": "Verificación de correo electrónico requerida"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Instala automáticamente todo lo que estén jugando"
@@ -2937,7 +2937,7 @@
     "message": "Obtener la App de Modrinth"
   },
   "modal.shared-instance.open-in-app.managed-by": {
-    "message": "Gestionado por"
+    "message": "Administrado por"
   },
   "modal.shared-instance.open-in-app.opening-automatically": {
     "message": "La App de Modrinth se abrirá automáticamente..."
@@ -3929,8 +3929,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas destacadas"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Debes seleccionar al menos una etiqueta destacada."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Selecciona las etiquetas más relevantes. Estas se mostrarán primero que las demás etiquetas."
+  },
   "project.settings.tags.features-description": {
     "message": "Selecciona todas las características que tu {type} usa."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} categorías} other {Categorías}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} características} other {Características}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} impacto al rendimiento} other {Impacto al rendimiento}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} resoluciones} other {Resoluciones}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Has seleccionado {count} etiquetas de resolución ({tags}). Típicamente los paquetes de recursos solo deberían de tener una."
@@ -4575,10 +4593,10 @@
     "message": "Administrar claves de acceso"
   },
   "settings.account.security.passkey.description": {
-    "message": "Administra tus claves de acceso registradas o agrega una nueva."
+    "message": "Administra tus claves de acceso registradas o añade una nueva."
   },
   "settings.account.security.passkey.modal.added": {
-    "message": "Agregado {ago}"
+    "message": "Añadido {ago}"
   },
   "settings.account.security.passkey.modal.last-used": {
     "message": "Último uso {ago}"
@@ -4629,7 +4647,7 @@
     "message": "Gestionar proveedores"
   },
   "settings.account.security.providers.description": {
-    "message": "Agrega o elimina métodos de inicio de sesión de tu cuenta, incluyendo GitHub, GitLab, Microsoft, Discord, Steam y Google."
+    "message": "Añade o elimina métodos de inicio de sesión de tu cuenta, incluyendo GitHub, GitLab, Microsoft, Discord, Steam y Google."
   },
   "settings.account.security.providers.title": {
     "message": "Administrar proveedores de autenticación"
@@ -4644,7 +4662,7 @@
     "message": "Configurar verificación en dos pasos"
   },
   "settings.account.security.two-factor.description": {
-    "message": "Agrega una capa adicional de seguridad a tu cuenta al iniciar sesión."
+    "message": "Añade una capa adicional de seguridad a tu cuenta al iniciar sesión."
   },
   "settings.account.security.two-factor.modal.remove.header": {
     "message": "Eliminar 2FA"

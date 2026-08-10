@@ -590,6 +590,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Noch servers noch werelden toegevoegd"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Verversen..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Server verwijderen"
   },
@@ -932,8 +935,77 @@
   "app.settings.privacy.discord-rich-presence.description": {
     "message": "Laat Modrinth als jouw activiteit op Discord. Dit verandert niet activiteiten toegevoegd door mods."
   },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth verzamelt geanonimiseerde analyse- en gebruiksgegevens om de gebruikerservaring te verbeteren en uw ervaring te personaliseren. Door deze optie uit te schakelen, meldt u zich af en worden uw gegevens niet langer verzameld."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetrie"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Geef de knop 'Details kopiëren' weer terwijl een installatie in de wachtrij staat of wordt uitgevoerd. Deze actie is altijd beschikbaar voor mislukte of onderbroken installaties."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Altijd 'Details kopiëren' laten zien"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "De cache van de app wissen?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Wis de gegevens in de cache en download ze opnieuw via Modrinth. De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Cache leegmaken"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "App-cache"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Hier worden back-ups van belangrijke app-gegevens opgeslagen voor het geval je ze later nodig hebt."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Open de map met back-ups"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Back-ups van de app-database"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Zoek naar een app-folder"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Hier slaat de Modrinth-app instanties en andere bestanden op. Wijzigingen worden pas van kracht nadat de app opnieuw is opgestart."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Kies een nieuwe app-folder"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "App-folder"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Het aantal bestanden dat de app tegelijkertijd kan downloaden. Verlaag dit aantal als downloads via je verbinding niet betrouwbaar zijn. Hiervoor moet de app opnieuw worden opgestart."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Maximaal aantal gelijktijdige downloads"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Het aantal bestanden dat de app tegelijkertijd naar de schijf kan schrijven. Verlaag deze waarde als je vaak I/O-fouten tegenkomt. Hiervoor moet de app opnieuw worden opgestart."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instanties"
+  },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
+  },
+  "app.settings.tabs.behavior": {
+    "message": "Gedrag"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Standaard spelopties"
@@ -1156,6 +1228,9 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versie {version} is succesvol geïnstalleerd!"
+  },
+  "app.user.project.install-to-instance": {
+    "message": "Op instantie installeren"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "voorbeeld.modrinth.gg"
@@ -1427,6 +1502,21 @@
   "instance.settings.sharing.active-invites.title": {
     "message": "Actieve uitnodigingen"
   },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Keren gebruikt"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "De uitnodigingslink <monospace>{code}</monospace> zal gelijk niet meer werken. Mensen die zich al hebben aangemeld, behouden hun toegang."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "Deze actie kan niet ongedaan worden gemaakt"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Uitnodiging intrekken"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Uitnodiging intrekken"
+  },
   "instance.settings.tabs.general": {
     "message": "Algemeen"
   },
@@ -1535,6 +1625,27 @@
   "instance.settings.tabs.hooks.title": {
     "message": "Game opstart haakjes"
   },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Hooks worden uitgevoerd in de werkfolder van de instantie, met de volgende variabelen:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: Het absolute pad naar de map van de instantie"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: De naam van de map van de instantie"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: De JVM-argumenten die aan het spel worden doorgegeven"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: Het absolute pad naar het Java-uitvoeringsbestand"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Een alias voor $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: De naam van de instantie"
+  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
@@ -1627,6 +1738,12 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Er is iets misgegaan"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "Kan geen verbinding maken met de API voor gedeelde instanties"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Netwerkfout"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "De inhoud van deze instantie wordt gedeeld met andere gebruikers."
@@ -1816,5 +1933,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is gegeven door de server"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Account"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Weergave"
   }
 }

@@ -36,7 +36,7 @@
     "message": "Cancelado"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "A limpeza não foi finalizada"
+    "message": "A limpeza não foi concluída"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "Não foi possível baixar os arquivos"
@@ -51,7 +51,7 @@
     "message": "O download não foi concluído"
   },
   "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instância não encontrada"
+    "message": "A instância não foi encontrada"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "O caminho do arquivo é inválido"
@@ -1229,6 +1229,9 @@
   "app.update.complete-toast.title": {
     "message": "Versão {version} instalada!"
   },
+  "app.user.project.install-to-instance": {
+    "message": "Instalar para instância"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "exemplo.modrinth.gg"
   },
@@ -1621,6 +1624,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Ações de inicialização do jogo"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Hooks são executados no diretório de trabalho da instância, com as seguintes variáveis:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: O caminho absoluto para a pasta da instância"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: O nome da pasta da instância"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: Os argumentos JVM fornecidos ao jogo"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: O caminho absoluto ao binário Java"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: um apelido de $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: O nome da instância"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Comando auxiliar"

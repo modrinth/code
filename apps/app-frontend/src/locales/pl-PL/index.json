@@ -461,8 +461,17 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Złe konto"
   },
+  "app.instance.share.members.empty": {
+    "message": "Żaden użytkownik jeszcze nie dołączył"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Nie znaleziono użytkowników pasujących do tych filtrów."
+  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Nie będzie w stanie otrzymywać aktualizacji dla tej udostępnionej instancji"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "To jest ostatni użytkownik, udostępnianie zostanie wyłączone dla tej instancji"
   },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Co się stanie?"
@@ -545,6 +554,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nie dodano żadnych światów ani serwerów"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Odświeżanie..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Usuń serwer"
   },
@@ -602,6 +614,9 @@
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
   },
+  "app.java-selector.test-installation": {
+    "message": "Testuj instalację Java"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Dodatkowy kontekst"
   },
@@ -631,6 +646,9 @@
   },
   "app.modal.install-to-play.invite-warning": {
     "message": "To zaproszenie zostało utworzone przez innego użytkownika Modrinth, nie przez firmę Modrinth. Tylko akceptuj zaproszenia od osób, którym ufasz."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "To zaproszenie zostało utworzone przez <creator>{username}</creator>, nie przez firmę Modrinth. Akceptuj zaproszenia tylko od osób, którym ufasz."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
@@ -677,6 +695,9 @@
   "app.modal.install-to-play.shared-instance-content": {
     "message": "Treści w przesłanej ci instalacji"
   },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Ta udostępniona instancja zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
   },
@@ -705,7 +726,7 @@
     "message": "Usunięto"
   },
   "app.modal.update-to-play.shared-instance-unknown-files-description": {
-    "message": "Ta aktualizacja przesłanej instancji zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie tych plików z źródła, któremu ufasz."
+    "message": "Ta aktualizacja udostępnionej instancji zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
   },
   "app.modal.update-to-play.update-required": {
     "message": "Wymagana jest aktualizacja"
@@ -862,6 +883,9 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Wygląd"
+  },
+  "app.settings.tabs.behavior": {
+    "message": "Zachowanie"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Domyślne opcje gry"
@@ -1079,6 +1103,9 @@
   "app.update.complete-toast.title": {
     "message": "Wersja {version} została pomyślnie zainstalowana!"
   },
+  "app.user.project.install-to-instance": {
+    "message": "Zainstaluj do instancji"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -1178,6 +1205,9 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Powiązana udostępniona instancja"
   },
+  "installation-settings.shared-instance.title": {
+    "message": "Wycofaj instancję"
+  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Odłącz udostępnioną instancję"
   },
@@ -1187,8 +1217,20 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Odłączanie..."
   },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Wycofaj udostępnioną instancję"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Usuń tę udostępnioną instancję z Modrinth i przestań wysyłać aktualizacje do użytkowników, którym jest udostępniona. Nie wpłynie to na twoją lokalną instancję."
+  },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Spowoduje to usunięcie przesyłanej instalacji z serwerów Modrith. Użytkownicy korzystający z niej na Modrinth App przestaną otrzymywać aktualizacje, ale twoja lokalna instalacja zostanie na tym urządzeniu."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Wycofywanie udostępnionej instancji"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Wycofaj udostępnioną instancję"
   },
   "instance.action.create-shortcut": {
     "message": "Utwórz skrót"
@@ -1258,6 +1300,9 @@
   },
   "instance.files.save-as": {
     "message": "Zapisz jako..."
+  },
+  "instance.locked.delete-button": {
+    "message": "Usuń instancję"
   },
   "instance.playtime.never-played": {
     "message": "Nigdy nie grano"

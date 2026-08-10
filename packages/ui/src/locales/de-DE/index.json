@@ -291,7 +291,7 @@
     "defaultMessage": "Registrieren"
   },
   "button.stop": {
-    "defaultMessage": "Stopp"
+    "defaultMessage": "Stoppen"
   },
   "button.switch-to-version": {
     "defaultMessage": "Zur Version wechseln"
@@ -2295,7 +2295,7 @@
     "defaultMessage": "Inhalt wird installiert"
   },
   "label.loading": {
-    "defaultMessage": "Lädt..."
+    "defaultMessage": "Wird geladen..."
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
@@ -2915,6 +2915,15 @@
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}}"
   },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Erlaube Pop-Ups für Modrinth und versuche es erneut."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Das GitHub-Profil konnte nicht abgerufen werden. Bitte versuche es erneut."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Das GitHub-Profil konnte nicht geöffnet werden"
+  },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Authentifizierungsanbieter"
   },
@@ -2927,8 +2936,14 @@
   "profile.details.label.has-totp": {
     "defaultMessage": "Hat TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Wird geladen..."
+  },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Zahlungsmethoden"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Profil anzeigen"
   },
   "profile.details.title": {
     "defaultMessage": "Nutzerdetails"
@@ -2994,7 +3009,7 @@
     "defaultMessage": "{username} wurde freigegeben."
   },
   "profile.unblock-user.success-title": {
-    "defaultMessage": "Nutzer Freigegeben"
+    "defaultMessage": "Benutzer freigegeben"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Veröffentlicht am {date}"
@@ -5265,7 +5280,7 @@
     "defaultMessage": "Profilbild"
   },
   "settings.profile.public-information.description": {
-    "defaultMessage": "Deine Profilinformationen sind öffentlich auf <profile-link>Modrinth sichtbar</profile-link> und durch die <docs-link>Modrinth API</docs-link>."
+    "defaultMessage": "Deine Profilinformationen sind öffentlich <profile-link>auf Modrinth</profile-link> und über die <docs-link>Modrinth-API</docs-link> sichtbar."
   },
   "settings.profile.save-error": {
     "defaultMessage": "Profil konnte nicht aktualisiert werden"
@@ -5292,7 +5307,7 @@
     "defaultMessage": "Nutzer"
   },
   "settings.social.blocked-users.description": {
-    "defaultMessage": "Das sind die Nutzer, die du auf Modrinth blockiert hast. Sie können nicht:"
+    "defaultMessage": "Dies sind die Benutzer, die du auf Modrinth blockiert hast. Diese können nicht:"
   },
   "settings.social.blocked-users.empty": {
     "defaultMessage": "Du hast niemanden blockiert."
@@ -5325,13 +5340,13 @@
     "defaultMessage": "Beim Freigeben dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
   },
   "settings.social.blocked-users.unblock-user": {
-    "defaultMessage": "Freigeben {username}"
+    "defaultMessage": "{username} freigeben"
   },
   "settings.social.blocked-users.user-avatar": {
-    "defaultMessage": "{username}'s Avatar"
+    "defaultMessage": "Avatar von {username}"
   },
   "settings.social.friend-requests.description": {
-    "defaultMessage": "Steuere wer dir auf Modrinth Freundschaftsanfragen senden kann."
+    "defaultMessage": "Lege fest, wer dir auf Modrinth Freundschaftsanfragen senden kann."
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "Freundschaftsanfragen"
@@ -5358,7 +5373,7 @@
     "defaultMessage": "Einladungen"
   },
   "settings.social.sign-in-required.description": {
-    "defaultMessage": "Du kannst mit einem Modrinth-Konto steuern wer mit dir interagieren kann, und geblockte Nutzer verwalten"
+    "defaultMessage": "Mit einem Modrinth-Konto kannst du festlegen, wer mit dir interagieren kann, und blockierte Nutzer verwalten"
   },
   "settings.social.sign-in-required.title": {
     "defaultMessage": "Modrinth-Konto benötigt"
@@ -6216,3 +6231,4 @@
     "defaultMessage": "Typ"
   }
 }
+

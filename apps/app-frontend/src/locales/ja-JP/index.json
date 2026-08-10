@@ -516,7 +516,7 @@
     "message": "インスタンスの共有は現在ご利用いただけません。しばらくしてからもう一度お試しください"
   },
   "app.instance.share.unable-to-connect.heading": {
-    "message": "接続できません"
+    "message": "接続エラー"
   },
   "app.instance.share.unlink.body": {
     "message": "この起動構成を共有するには、このmodpackのリンクを解除する必要があります"
@@ -589,6 +589,9 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "サーバー、ワールドは追加されていません"
+  },
+  "app.instance.worlds.refreshing": {
+    "message": "更新中…"
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "サーバーを削除"
@@ -1226,6 +1229,9 @@
   "app.update.complete-toast.title": {
     "message": "バージョン {version} が正常にインストールされました！"
   },
+  "app.user.project.install-to-instance": {
+    "message": "インスタンスにインストール"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -1618,6 +1624,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "ゲーム起動フック"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "フックはインスタンスのカレントディレクトリで実行され、以下の環境変数が利用可能です："
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: インスタンスのフォルダへの絶対パス"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: インスタンスのフォルダ名"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: ゲームに渡されるJVM引数"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: Javaの実行ファイルへの絶対パス"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR:$INST_DIR のエイリアス"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: インスタンスの名前"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "ラッパー"

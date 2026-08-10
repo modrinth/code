@@ -558,7 +558,7 @@
     "defaultMessage": "Утримуйте клавішу Shift під час натискання, щоб пропустити підтвердження."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "Ми рекомендуємо створити резервну копію перш ніж продовжувати, щоб ви могли відновити свій {type}, якщо щось піде не так."
+    "defaultMessage": "Радимо створити резервну копію перед тим, як продовжити, щоб ви могли відновити ваш {type}, якщо щось зламається."
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "світ"
@@ -1848,10 +1848,10 @@
     "defaultMessage": "Редагувати інсталяцію"
   },
   "installation-settings.edit.warning-instance": {
-    "defaultMessage": "Ми не рекомендуємо змінювати налаштування інсталяції після встановлення вмісту. Якщо ви все ж хочете їх змінити, будьте обережні, оскільки це може спричинити проблеми."
+    "defaultMessage": "Не радимо відміняти налаштування інсталяції після встановлення вмісту. Коли все ж бажаєте їх змінити, то будьте обережні, адже це може завдати вам клопоту."
   },
   "installation-settings.edit.warning-server": {
-    "defaultMessage": "Ми не рекомендуємо змінювати налаштування інсталяції після встановлення вмісту. Якщо ви все ж хочете їх змінити, скиньте ваш сервер."
+    "defaultMessage": "Не радимо змінювати налаштування інсталяції після встановлення вмісту. Коли все ж хочете їх змінити, то скиньте свій сервер."
   },
   "installation-settings.incompatible-content.auto-fix-button": {
     "defaultMessage": "Виправити автоматично"
@@ -2876,6 +2876,9 @@
   "profile.details.error.github-profile-message": {
     "defaultMessage": "Не вдалося отримати профіль GitHub. Спробуйте знову."
   },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Не вдалося відкрити профіль GitHub"
+  },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Сервіси автентифікації"
   },
@@ -2887,6 +2890,9 @@
   },
   "profile.details.label.has-totp": {
     "defaultMessage": "Має TOTP"
+  },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Завантаження…"
   },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Способи оплати"
@@ -5592,7 +5598,7 @@
     "defaultMessage": "Низьке"
   },
   "tag.category.magic": {
-    "defaultMessage": "Магія"
+    "defaultMessage": "Чаклунство"
   },
   "tag.category.management": {
     "defaultMessage": "Керування"
@@ -5616,7 +5622,7 @@
     "defaultMessage": "ММО"
   },
   "tag.category.mobs": {
-    "defaultMessage": "Моби"
+    "defaultMessage": "Сутності"
   },
   "tag.category.modded": {
     "defaultMessage": "Для модів"
@@ -5976,13 +5982,13 @@
     "defaultMessage": "Шкідливе програмне забезпечення часто поширюють через моди, які публікуються на таких платформах, як Discord."
   },
   "unknown-file-warning-modal.mod-warning-body": {
-    "defaultMessage": " не є опублікований на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+    "defaultMessage": " не викладено на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "unknown-file-warning-modal.mod-warning-title": {
     "defaultMessage": "Попередження про невідомий файл"
   },
   "unknown-file-warning-modal.modpack-warning-body": {
-    "defaultMessage": " містить файли, які не є опубліковані на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+    "defaultMessage": " містить файли, котрі не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "unknown-file-warning-modal.modpack-warning-title": {
     "defaultMessage": "Попередження про невідомі файли"

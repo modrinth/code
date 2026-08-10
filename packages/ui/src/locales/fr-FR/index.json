@@ -2909,6 +2909,15 @@
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural,one {# projet} other {# projets}}"
   },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Autorisez les pop-ups pour Modrinth, puis réessayez."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Le profil GitHub n'a pas pu être récupéré. Veuillez réessayer."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Impossible d'ouvrir le profil GitHub"
+  },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Fournisseurs d’authentification"
   },
@@ -2921,8 +2930,14 @@
   "profile.details.label.has-totp": {
     "defaultMessage": "Dispose d'un TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Chargement..."
+  },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Moyens de paiements"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Voir le profil"
   },
   "profile.details.title": {
     "defaultMessage": "Détails de l'utilisateur"
