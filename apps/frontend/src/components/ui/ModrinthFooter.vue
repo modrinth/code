@@ -2,10 +2,11 @@
 import {
 	BlueskyIcon,
 	DiscordIcon,
-	GithubIcon,
 	MastodonIcon,
+	RedditIcon,
 	ToggleRightIcon,
 	TwitterIcon,
+	YouTubeIcon,
 } from '@modrinth/assets'
 import { Button, ButtonLink } from '@modrinth/ui'
 import {
@@ -94,9 +95,14 @@ const socialLinks: {
 		icon: TwitterIcon,
 	},
 	{
-		label: defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
-		href: 'https://github.com/modrinth',
-		icon: GithubIcon,
+		label: defineMessage({ id: 'layout.footer.social.youtube', defaultMessage: 'YouTube' }),
+		href: 'https://www.youtube.com/@modrinth',
+		icon: YouTubeIcon,
+	},
+	{
+		label: defineMessage({ id: 'layout.footer.social.reddit', defaultMessage: 'Reddit' }),
+		href: 'https://www.reddit.com/r/Modrinth',
+		icon: RedditIcon,
 	},
 ]
 
