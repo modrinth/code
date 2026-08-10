@@ -2,6 +2,7 @@ use crate::database::models::DBProjectDisclosure;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeSet;
 use strum::{EnumDiscriminants, EnumString, IntoStaticStr};
 use utoipa::ToSchema;
 
@@ -15,7 +16,7 @@ use utoipa::ToSchema;
 pub enum ProjectDisclosure {
     AiContent {
         note: Option<String>,
-        uses: Vec<AiUsages>,
+        uses: BTreeSet<AiUsages>,
     },
     Advertisements {
         note: Option<String>,
@@ -102,7 +103,18 @@ impl ProjectDisclosureData {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    ToSchema,
+    IntoStaticStr,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+)]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum AiUsages {
