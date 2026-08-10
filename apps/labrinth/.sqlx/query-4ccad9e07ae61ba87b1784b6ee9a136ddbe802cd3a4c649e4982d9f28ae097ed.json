@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT project_id, type\n        FROM project_disclosures\n        WHERE project_id = ANY($1)\n        ",
+  "query": "\n        SELECT project_id, type, metadata\n        FROM project_disclosures\n        WHERE project_id = ANY($1)\n        ",
   "describe": {
     "columns": [
       {
@@ -12,6 +12,11 @@
         "ordinal": 1,
         "name": "type",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "metadata",
+        "type_info": "Jsonb"
       }
     ],
     "parameters": {
@@ -21,8 +26,9 @@
     },
     "nullable": [
       false,
+      false,
       false
     ]
   },
-  "hash": "74bf305377aa69ee03a5ef5f494f132a7f229b4d63cc3ebcd89dbc1dcebfd01e"
+  "hash": "4ccad9e07ae61ba87b1784b6ee9a136ddbe802cd3a4c649e4982d9f28ae097ed"
 }
