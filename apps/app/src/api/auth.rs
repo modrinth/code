@@ -1,7 +1,7 @@
 use crate::api::Result;
 use chrono::{Duration, Utc};
 use tauri::plugin::TauriPlugin;
-use tauri::{LogicalSize, Manager, Runtime, UserAttentionType};
+use tauri::{Manager, Runtime, UserAttentionType};
 use theseus::prelude::*;
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
@@ -52,13 +52,12 @@ pub async fn login<R: Runtime>(
     )
     .title("Sign into Modrinth")
     .always_on_top(true)
+    .min_inner_size(500.0, 500.0)
+    .inner_size(1000.0, 700.0)
+    .focused(true)
+    .center()
     .build()?;
 
-    let size = LogicalSize::new(1000.0, 700.0);
-    let min_size = LogicalSize::new(500.0, 500.0);
-    window.set_min_size(Some(min_size))?;
-    window.set_size(size)?;
-    window.center()?;
     window.request_user_attention(Some(UserAttentionType::Critical))?;
 
     while (Utc::now() - start) < Duration::minutes(10) {
