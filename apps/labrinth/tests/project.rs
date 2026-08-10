@@ -110,6 +110,32 @@ async fn test_get_project() {
 }
 
 #[actix_rt::test]
+async fn project_response_includes_raw_icon_url() {
+    with_test_environment_all(None, |test_env| async move {
+        let api = &test_env.api;
+        let project_id = &test_env.dummy.project_alpha.project_id;
+
+        let resp = api
+            .edit_project_icon(
+                project_id,
+                Some(DummyImage::SmallIcon.get_icon_data()),
+                USER_USER_PAT,
+            )
+            .await;
+        assert_status!(&resp, StatusCode::NO_CONTENT);
+
+        let project = api
+            .get_project_deserialized_common(project_id, USER_USER_PAT)
+            .await;
+        let icon_url = project.icon_url.unwrap();
+        let raw_icon_url = project.raw_icon_url.unwrap();
+
+        assert_ne!(icon_url, raw_icon_url);
+    })
+    .await;
+}
+
+#[actix_rt::test]
 async fn test_add_remove_project() {
     // Test setup and dummy data
     with_test_environment(
