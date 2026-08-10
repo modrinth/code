@@ -149,6 +149,11 @@
 			which have diverged substantially from the original project.
 		</p>
 
+		<p>
+			When uploading content you have the necessary permissions to distribute but did not author
+			yourself, you must make a meaningful effort to credit each original source properly.
+		</p>
+
 		<h2 id="miscellaneous">5. Miscellaneous</h2>
 
 		<p>
@@ -192,23 +197,27 @@
 			publication, and within the project itself. Projects cannot be entirely or primarily comprised
 			of content created or derived from generative AI output.
 		</p>
-		<p>Projects must abide by all of the following requirements:</p>
-		<ol>
-			<li>Apply the “Contains AI-generated content” content disclosure when:</li>
-			<ol type="a">
-				<li>a substantial portion of the project's code is a product of AI output.</li>
-				<li>
-					the project includes any assets that are primarily or entirely a product of AI output.
-				</li>
-				<li>the project's design or functionality relies on the use of generative AI.</li>
-				<li>
-					any element of the project's page such as description or publishing relies on generative
-					AI.
-				</li>
-			</ol>
+
+		<h3 id="disclosure-of-ai-generated-content">6.1. Disclosure of AI generated content</h3>
+
+		<p>You must apply the appropriate “Contains AI-generated content” content disclosure when:</p>
+		<ol type="a">
+			<li>a substantial portion of the project's code is a product of AI output.</li>
+			<li>
+				the project includes any assets that are primarily or entirely a product of AI output.
+			</li>
+			<li>the project's design or functionality relies on the use of generative AI.</li>
+			<li>
+				any element of the project's page such as description or publishing relies on generative AI.
+			</li>
+		</ol>
+
+		<h3 id="prohibited-usage-of-ai">6.2. Prohibited AI generated content</h3>
+
+		<ol type="a">
 			<li>
 				No images uploaded to a gallery, icon, description, or any other part of a project page may
-				be created or derived from generative AI output. Any such images will be removed.
+				be created or derived from generative AI output. Any such images may be removed.
 			</li>
 			<li>
 				Projects may not be published publicly if the contents are primarily or entirely a product
