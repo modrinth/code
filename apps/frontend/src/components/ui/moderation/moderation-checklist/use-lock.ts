@@ -1,10 +1,7 @@
 import type { AbstractWebNotificationManager } from '@modrinth/ui'
 import { ref } from 'vue'
 
-import type {
-	LockAcquireResponse,
-	ModerationQueueService,
-} from '~/services/moderation/queue.ts'
+import type { LockAcquireResponse, ModerationQueueService } from '~/services/moderation/queue.ts'
 
 interface ChecklistLockOptions {
 	projectId: string
@@ -110,10 +107,13 @@ export function useChecklistLock({
 
 	function startHeartbeat() {
 		if (heartbeat) clearInterval(heartbeat)
-		heartbeat = setInterval(async () => {
-			const result = await queue.refreshLock()
-			if (!result.success) handleLost(result)
-		}, 5 * 60 * 1000)
+		heartbeat = setInterval(
+			async () => {
+				const result = await queue.refreshLock()
+				if (!result.success) handleLost(result)
+			},
+			5 * 60 * 1000,
+		)
 	}
 
 	function handleAcquired() {

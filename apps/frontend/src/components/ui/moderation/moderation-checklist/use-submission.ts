@@ -20,9 +20,7 @@ interface ModerationSubmission {
 }
 
 function getFixes(node: object): FixBuilder[] {
-	return hasCap(node, '_fixes') && Array.isArray(node._fixes)
-		? (node._fixes as FixBuilder[])
-		: []
+	return hasCap(node, '_fixes') && Array.isArray(node._fixes) ? (node._fixes as FixBuilder[]) : []
 }
 
 function shouldApplyFixes(actions: ActiveAction[]): boolean {

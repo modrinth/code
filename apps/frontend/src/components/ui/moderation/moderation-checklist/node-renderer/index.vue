@@ -70,6 +70,7 @@ const {
 					</div>
 
 					<template v-if="hasChildrenCap(item) && !hasValueCap(item)">
+						<!-- eslint-disable-next-line vue/no-undef-components -- recursive component named via defineOptions -->
 						<NodeRenderer
 							:nodes="resolveChildren(item, containerScope(item).state)"
 							:state="containerScope(item).state"
@@ -90,7 +91,9 @@ const {
 							:[modelProp(item)]="
 								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
 							"
-							@[updateEvent(item)]="(value: unknown) => updateValue(item as RenderableValueNode, value)"
+							@[updateEvent(item)]="
+								(value: unknown) => updateValue(item as RenderableValueNode, value)
+							"
 						/>
 						<template
 							v-for="(tweak, tweakIndex) in (item as RenderableValueNode)._tweaks ?? []"
@@ -132,6 +135,7 @@ const {
 		</template>
 
 		<template v-for="(item, idx) in nodes" :key="`children-${nodeKey(item, idx)}`">
+			<!-- eslint-disable-next-line vue/no-undef-components -- recursive component named via defineOptions -->
 			<NodeRenderer
 				v-if="
 					typeof item === 'object' &&

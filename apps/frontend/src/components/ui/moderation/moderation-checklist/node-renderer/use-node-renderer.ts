@@ -25,8 +25,8 @@ import {
 	originScope,
 	resolve,
 	resolveChildren,
-	writeNodeValue,
 	withStateDefaults,
+	writeNodeValue,
 } from '@modrinth/moderation/src/types/node'
 import type { Component } from 'vue'
 import { computed, watchEffect } from 'vue'
@@ -122,9 +122,7 @@ export function useNodeRenderer(props: NodeRendererProps) {
 			? {
 					class: '!w-auto max-w-full',
 					style: {
-						minWidth: getDropdownMinWidth(
-							node._options as unknown as Array<{ label: string }>,
-						),
+						minWidth: getDropdownMinWidth(node._options as unknown as Array<{ label: string }>),
 					},
 				}
 			: undefined
@@ -211,9 +209,7 @@ export function useNodeRenderer(props: NodeRendererProps) {
 	}
 
 	function nodeKey(item: ChildNode, index: number): string {
-		return typeof item === 'object' && item !== null && hasIdCap(item)
-			? item.id
-			: `n-${index}`
+		return typeof item === 'object' && item !== null && hasIdCap(item) ? item.id : `n-${index}`
 	}
 
 	function modelProp(item: object): string {
@@ -229,7 +225,9 @@ export function useNodeRenderer(props: NodeRendererProps) {
 			? (item._onChange as OnChangeFn | undefined)
 			: undefined
 		if (onChange) {
-			const result = onChange(value as string, { override: (override) => ({ __override: override }) })
+			const result = onChange(value as string, {
+				override: (override) => ({ __override: override }),
+			})
 			if (result && typeof result === 'object' && '__override' in result) {
 				writeNodeValue(
 					item,

@@ -1,17 +1,12 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { expandVariables } from '@modrinth/moderation'
+import type { FixBuilder, NodeState, StageNode, Writer } from '@modrinth/moderation/src/types/node'
 import {
 	collectMessageNodes,
 	computeAttentionMap,
 	computeNodeMeta,
 	evalActiveAction,
 	resolveChildren,
-} from '@modrinth/moderation/src/types/node'
-import type {
-	FixBuilder,
-	NodeState,
-	StageNode,
-	Writer,
 } from '@modrinth/moderation/src/types/node'
 import { renderHighlightedString } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'

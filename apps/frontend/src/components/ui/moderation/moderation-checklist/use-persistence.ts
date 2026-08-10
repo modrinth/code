@@ -16,9 +16,7 @@ export async function loadChecklistPersistence(projectId: string) {
 	const persistedState = import.meta.client ? await loadChecklistState(projectId) : null
 	const activatedStages = ref<Set<string>>(new Set(persistedState?.activatedStages ?? []))
 	const visitedStages = ref<Set<string>>(
-		new Set(
-			import.meta.client ? (getSessionChecklistState(projectId).visitedStages ?? []) : [],
-		),
+		new Set(import.meta.client ? (getSessionChecklistState(projectId).visitedStages ?? []) : []),
 	)
 	const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 	const message = ref<string | null>(persistedState?.message ?? null)

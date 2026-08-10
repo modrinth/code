@@ -10,10 +10,7 @@ import type { RenderableValueNode, RendererPropsContext } from './types'
 
 interface RendererDefinition {
 	component: Component
-	props?: (
-		node: RenderableValueNode,
-		context: RendererPropsContext,
-	) => Record<string, unknown>
+	props?: (node: RenderableValueNode, context: RendererPropsContext) => Record<string, unknown>
 }
 
 const builtinRenderers = {

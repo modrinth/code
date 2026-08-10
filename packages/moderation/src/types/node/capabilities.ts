@@ -259,17 +259,9 @@ export interface NodePropsContext {
 	toggleSetValue?: (value: string) => void
 }
 
-export type BuiltinRendererKey =
-	| 'action'
-	| 'checkbox'
-	| 'toggle'
-	| 'dropdown'
-	| 'text'
-	| 'markdown'
+export type BuiltinRendererKey = 'action' | 'checkbox' | 'toggle' | 'dropdown' | 'text' | 'markdown'
 
-export type NodeRendererDescriptor =
-	| { type: BuiltinRendererKey }
-	| { type: 'custom'; key: string }
+export type NodeRendererDescriptor = { type: BuiltinRendererKey } | { type: 'custom'; key: string }
 
 export interface Renderable {
 	_renderer: NodeRendererDescriptor

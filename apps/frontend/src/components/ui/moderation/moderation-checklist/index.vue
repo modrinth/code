@@ -284,9 +284,9 @@
 									<component
 										:is="opt.icon"
 										v-if="opt.icon"
-									class="mr-2"
-									:class="{ 'opacity-50': opt.visited }"
-									aria-hidden="true"
+										class="mr-2"
+										:class="{ 'opacity-50': opt.visited }"
+										aria-hidden="true"
 									/>
 									<span :class="{ 'opacity-50': opt.visited }">
 										{{ opt.text
@@ -1343,9 +1343,7 @@ async function generateMessage() {
 
 const hasNextProject = ref(false)
 
-const finishedId = import.meta.client
-	? localStorage.getItem('moderation-checklist-finished')
-	: null
+const finishedId = import.meta.client ? localStorage.getItem('moderation-checklist-finished') : null
 if (finishedId === projectV2.value.id) {
 	localStorage.removeItem('moderation-checklist-finished')
 	hasNextProject.value = moderationQueue.queueLength > 0
