@@ -125,19 +125,9 @@ export const configuredXss = new FilterXSS({
 					!allowedHostnameSuffixes.some((suffix) => url.hostname.endsWith(suffix))
 				) {
 					const proxiedUrl = `https://wsrv.nl/?url=${encodeURIComponent(url.toString())}&n=-1`
-					return safeAttrValue(
-						tag,
-						name,
-						proxiedUrl.replaceAll('&', '&amp;'),
-						cssFilter,
-					)
+					return safeAttrValue(tag, name, proxiedUrl.replaceAll('&', '&amp;'), cssFilter)
 				}
-				return safeAttrValue(
-					tag,
-					name,
-					url.toString().replaceAll('&', '&amp;'),
-					cssFilter,
-				)
+				return safeAttrValue(tag, name, url.toString().replaceAll('&', '&amp;'), cssFilter)
 			} catch {
 				/* empty */
 			}
