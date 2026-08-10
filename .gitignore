@@ -5,6 +5,9 @@ dist
 tmp
 /out-tsc
 
+# generated checklist structure dump (packages/moderation/scripts/checklist-docs.ts)
+.checklist-docs
+
 # dependencies
 node_modules
 

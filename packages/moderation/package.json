@@ -7,7 +7,8 @@
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore \"node_modules/**/*\" --out-file src/locales/en-US/index.json --preserve-whitespace",
-		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope packages/moderation"
+		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope packages/moderation",
+		"docs:dump": "pnpx tsx scripts/checklist-docs.ts"
 	},
 	"dependencies": {
 		"@modrinth/assets": "workspace:*",
@@ -19,6 +20,7 @@
 		"@formatjs/cli": "^6.2.12",
 		"@modrinth/tooling-config": "workspace:*",
 		"@modrinth/ui": "workspace:*",
+		"ts-morph": "^24.0.0",
 		"typescript": "^5.4.5"
 	}
 }
