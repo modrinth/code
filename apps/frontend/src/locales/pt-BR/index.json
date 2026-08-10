@@ -3929,8 +3929,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas em destaque"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Você deve ter pelo menos uma marcação em destaque."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Selecione suas marcações mais relevantes. Estas serão exibidas antes das outras marcações."
+  },
   "project.settings.tags.features-description": {
     "message": "Selecione todas as funcionalidades que o seu {type} utiliza."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} categorias} other {Categorias}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} recursos} other {Recursos}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} impacto no desempenho} other {Impacto no desempenho}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} resoluções} other {Resoluções}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Você selecionou {count} etiquetas de resolução ({tags}). Os pacotes de recursos devem normalmente ter apenas uma etiqueta de resolução."

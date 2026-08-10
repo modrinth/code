@@ -218,6 +218,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Serveri za autentifikaciju su nedostupni"
   },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Potvrde"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "Dodavanje servera na instancu"
   },

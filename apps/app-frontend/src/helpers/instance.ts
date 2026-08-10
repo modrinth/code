@@ -77,6 +77,10 @@ export async function get_content_items(
 	return await invoke('plugin:instance|instance_get_content_items', { instanceId, cacheBehaviour })
 }
 
+export async function refresh_content_updates(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_refresh_content_updates', { instanceId })
+}
+
 // Linked modpack info returned from backend
 export interface LinkedModpackInfo {
 	project: Labrinth.Projects.v2.Project

@@ -3926,8 +3926,14 @@
   "project.settings.tags.featured-tags": {
     "message": "Основні теґи"
   },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Оберіть найдоречніші теґи. Вони показуватимуться першими."
+  },
   "project.settings.tags.features-description": {
     "message": "Оберіть увесь функціонал, який присутній у {type}."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} категорії} other {Категорії}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Ви обрали {count} теґів роздільної здатності ({tags}). Пакети ресурсів зазвичай повинні містити тільки один теґ роздільної здатності."

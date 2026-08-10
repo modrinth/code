@@ -251,6 +251,9 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Je vyžadován alespoň jeden obrázek v galerii pro zobrazení obsahu vašeho {type}."
   },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "K prezentaci obsahu vašeho shaderu v různých situacích a podmínkách jsou vyžadovány alespoň tři obrázky v galerii."
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Nahrajte obrázek do galerie"
   },
@@ -266,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Ověřte externí odkazy"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Přejděte na stránku verzí"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Přejděte do nastavení odkazů"
   }
 }
+

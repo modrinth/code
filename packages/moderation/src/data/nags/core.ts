@@ -42,10 +42,11 @@ export const coreNags: Nag[] = [
 		link: {
 			path: 'settings/versions',
 			title: defineMessage({
-				id: 'nags.versions.title',
-				defaultMessage: 'Visit versions page',
+				id: 'nags.settings.versions.title',
+				defaultMessage: 'Visit versions settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-versions',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-versions',
 		},
 	},
 	{

@@ -3926,8 +3926,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Uitgelichte tags"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Je moet minstens één uitgelichte tag hebben."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Kies je meest relevante tags. Deze worden vóór de overige tags weergegeven."
+  },
   "project.settings.tags.features-description": {
     "message": "Selecteer alle functies waarvan je {type} gebruikmaakt."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} categorieën} other {Categorieën}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} functies} other {Functies}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} invloed op de prestaties} other {Invloed op de prestaties}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} resoluties} other {Resoluties}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Je hebt {count} resolutietags ({tags}) geselecteerd. Bronpakketten zouden normaal gesproken slechts één resolutietag moeten hebben."

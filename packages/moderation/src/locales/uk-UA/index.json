@@ -269,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Перевірте зовнішні посилання"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Відвідайте сторінку з версіями"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Відвідайте налаштування посилань"
   }
 }
+

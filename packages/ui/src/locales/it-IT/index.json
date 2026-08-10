@@ -1176,7 +1176,7 @@
     "defaultMessage": "Elimina gruppo"
   },
   "external-files.permissions-card.remove-group-confirmation.description": {
-    "defaultMessage": "Questo gruppo di attribuzione sarà rimosso per sempre. Quest'azione non può essere annullata."
+    "defaultMessage": "Il gruppo di attribuzione e i suoi contenuti saranno eliminati per sempre. Questa azione è irreversibile."
   },
   "external-files.permissions-card.remove-group-confirmation.title": {
     "defaultMessage": "Eliminare {title}?"
@@ -1251,10 +1251,10 @@
     "defaultMessage": "Elimina file"
   },
   "files.delete-modal.warning.file": {
-    "defaultMessage": "Questo file verrà eliminato permanentemente. Questa azione non può essere annullata."
+    "defaultMessage": "Il file sarà eliminato per sempre. Questa azione è irreversibile."
   },
   "files.delete-modal.warning.folder": {
-    "defaultMessage": "Questa cartella e tutti i suoi contenuti verranno eliminati permanentemente. Questa azione non può essere annullata."
+    "defaultMessage": "La cartella e i suoi contenuti saranno eliminati per sempre. Questa azione è irreversibile."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Impossibile caricare i contenuti del file."

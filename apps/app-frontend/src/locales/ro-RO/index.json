@@ -1,9 +1,129 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Se descarcă Java {version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "Se descarcă actualizarea"
+  },
+  "app.action-bar.downloads": {
+    "message": "Descărcări"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Copiat"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copiază detaliile"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Ignoră"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Instanța nouă"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Reîncearcă"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Anulat"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Nu s-au putut salva fișierele"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.update": {
+    "message": "Actualizează"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Vezi descărcările active"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Vezi instanțele"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Vezi jurnalele"
+  },
+  "app.ads-consent.accept": {
+    "message": "Acceptă tot"
+  },
+  "app.ads-consent.reject": {
+    "message": "Refuză tot"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Serverele de autentificare Minecraft pot fi indisponibile în acest moment. Verificați conexiunea la internet și încercați din nou mai târziu."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Nu se pot accesa serverele de autentificare"
+  },
+  "app.browse.added": {
+    "message": "Adăugat"
+  },
+  "app.browse.already-added": {
+    "message": "Deja adăugat"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Înapoi la instanță"
+  },
+  "app.browse.discover-project-type": {
+    "message": "Descoperă {projectType}"
+  },
+  "app.browse.discover-servers": {
+    "message": "Descoperă servere"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Ascunde serverele deja adăugate"
+  },
+  "app.browse.server.installing": {
+    "message": "Se instalează"
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportă"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Se finalizează"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Adăugat"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Creează"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Conectează-te"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instanță"
+  },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Șterge lumea"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Șterge lumea"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Se șterge {name}"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.refreshing": {
+    "message": "Se reîmprospătează..."
+  },
+  "app.java-detection.cancel": {
+    "message": "Anulează"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Acțiuni"
   },
   "app.modal.install-to-play.header": {
     "message": "Instalați pentru a juca"

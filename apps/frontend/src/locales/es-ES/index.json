@@ -8,6 +8,18 @@
   "admin.billing.error.not-found": {
     "message": "Usuario no encontrado"
   },
+  "ads-consent.accept": {
+    "message": "Aceptar todos"
+  },
+  "ads-consent.body": {
+    "message": "Los anuncios hace Modrinth posible y financian pagos a creadores. Nuestros socios pueden almacenar o acceder cookies en el sitio para personalizar anuncios y medir el rendimiento."
+  },
+  "ads-consent.manage": {
+    "message": "Gestionar preferencias"
+  },
+  "ads-consent.reject": {
+    "message": "Rechazar todos"
+  },
   "ads-consent.title": {
     "message": "Tu privacidad y como anuncios soportan Modrinth"
   },

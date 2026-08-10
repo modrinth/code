@@ -3920,8 +3920,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Ключевые теги"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Необходим хотя бы один ключевой тег."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Выберите наиболее подходящие теги. Они видны первыми."
+  },
   "project.settings.tags.features-description": {
     "message": "Выберите все особенности, которые использует ваш {type}"
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types}: категории} other {Категории}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types}: особенности} other {Особенности}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types}: требования} other {Требования}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types}: разрешения} other {Разрешения}}"
   },
   "project.settings.tags.performance-impact-description": {
     "message": "Выберите реалистичное влияние на производительность вашего {type}. Выберите несколько, если {type} можно конфигурировать разными уровнями влияния на производительность."

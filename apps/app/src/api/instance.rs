@@ -30,6 +30,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_install_candidates,
             instance_content,
             instance_get_content_items,
+            instance_refresh_content_updates,
             instance_get_dependencies_as_content_items,
             instance_get_linked_modpack_info,
             instance_get_linked_modpack_content,
@@ -522,6 +523,11 @@ pub async fn instance_get_content_items(
         theseus::instance::get_content_items(instance_id, cache_behaviour)
             .await?,
     )
+}
+
+#[tauri::command]
+pub async fn instance_refresh_content_updates(instance_id: &str) -> Result<()> {
+    Ok(theseus::instance::refresh_content_updates(instance_id).await?)
 }
 
 #[tauri::command]

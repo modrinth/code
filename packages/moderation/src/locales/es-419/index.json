@@ -6,7 +6,7 @@
     "defaultMessage": "Agrega una descripción"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Añade un ícono único, relevante y atractivo hace que tu proyecto sea fácilmente identificable y destaque."
+    "defaultMessage": "Añade un ícono único, relevante y atractivo hace que tu proyecto destaque y sea fácilmente identificable."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Añade un ícono"
@@ -15,7 +15,7 @@
     "defaultMessage": "Agrega la dirección IP y el puerto que los jugadores de Java Edition pueden usar para unirse a tu servidor."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Agrega una dirección de Java"
+    "defaultMessage": "Añade una dirección de Java"
   },
   "nags.add-license-details.description": {
     "defaultMessage": "Añadir un URL y un nombre o identificador SPDX para tu licencia personalizada."
@@ -24,13 +24,13 @@
     "defaultMessage": "Añadir detalles de licencia"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Agrega cualquier enlace relevante que esté fuera de Modrinth, cómo un sitio web, tienda, o una invitación de Discord."
+    "defaultMessage": "Añade cualquier enlace relevante que esté fuera de Modrinth, cómo un sitio web, tienda, o una invitación de Discord."
   },
   "nags.add-links-server.title": {
-    "defaultMessage": "Agrega enlaces externos"
+    "defaultMessage": "Añade enlaces externos"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Agrega cualquier enlace relevante fuera de Modrinth, como el código fuente, un rastreador de incidencias o una invitación de Discord."
+    "defaultMessage": "Añade cualquier enlace relevante fuera de Modrinth, como el código fuente, un rastreador de incidencias o una invitación de Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Añadir enlaces externos"
@@ -105,7 +105,7 @@
     "defaultMessage": "La URL de tu licencia parece estar mal formada. Proporciona una URL válida para el texto de tu licencia."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "Agrega un enlace de licencia válido"
+    "defaultMessage": "Añade un enlace de licencia válido"
   },
   "nags.link-shortener-usage.description": {
     "defaultMessage": "Se prohíbe el uso de acortadores de enlaces u otros métodos para ocultar el destino de tus enlaces externos o de licencia. Usa únicamente enlaces completos."
@@ -254,6 +254,12 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
   },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Se necesita al menos una imagen para mostrar el contenido de tu paquete de recursos, excepto si es un paquete de audio o de localizaciones. Si esto describe tu paquete, por favor selecciona la etiqueta apropiada."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Se necesitan al menos tres imágenes para mostrar el contenido de tu shader en una variedad de situaciones y condiciones."
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"
   },
@@ -269,10 +275,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Verificar los enlaces externos"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Ver la página de versiones"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Ver configuración de enlaces"
   }
 }
+

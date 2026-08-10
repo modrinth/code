@@ -173,6 +173,9 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "İsim etiketini gizle"
   },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Ana sayfadaki “Tekrar oyuna katıl” bölümünde son oynanan dünyaları göster."
+  },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Dünyalara hızlıca geri dön"
   },
@@ -188,8 +191,14 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Sistem pencere çerçevesi"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Her bir örneği ne kadar süreyle oynadığını göster."
+  },
   "app.appearance-settings.show-play-time.title": {
     "message": "Oynama süresini göster"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Yinelenen yüklemeler, normal içerik silme, toplu güncellemeler, bağlantıların kaldırılması ve onarımlar gibi düşük riskli işlemlerde onay adımlarını atlayın. Tehlikeli işlemlerle ilgili uyarılar her zaman gösterilir."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Gerekli olmayan uyarıları atla"
@@ -214,6 +223,12 @@
   },
   "app.behavior-settings.confirmations.title": {
     "message": "Onaylamalar"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Ana sayfa ve içerik"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Başlatma ve gezinme"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Sunucuyu kuruluma ekle"
@@ -244,6 +259,9 @@
   },
   "app.browse.hide-added-servers": {
     "message": "Zaten eklenmiş sunucuları gizle"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Zaten yüklenmiş olanları gizle"
   },
   "app.browse.project-type.modpacks": {
     "message": "Mod paketleri"
@@ -473,6 +491,9 @@
   "app.instance.share.remove-user-modal.effect-invite-again": {
     "message": "Onları sonradan tekrar davet edebilirsiniz"
   },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "Bu son kullanıcıdır; bu örnek için paylaşım özelliği devre dışı bırakılacaktır"
+  },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Ne olur?"
   },
@@ -485,11 +506,17 @@
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "{username} nın avatarı"
   },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "{username}'nın bu paylaşılan örneğe erişimini iptal ederseniz, bu kişinin güncellemeleri alabilmesi için onu yeniden davet etmeniz gerekecektir."
+  },
   "app.instance.share.sign-in.button": {
     "message": "Giriş yap"
   },
   "app.instance.share.unable-to-connect.heading": {
     "message": "Bağlanılamıyor"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Örneğini paylaşmak için bu mod paketinin bağlantısını kaldırmalısın"
   },
   "app.instance.shared-instance-already-installed.install-anyway": {
     "message": "Yine de kur"

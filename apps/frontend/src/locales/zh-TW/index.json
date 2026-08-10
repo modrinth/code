@@ -3929,8 +3929,26 @@
   "project.settings.tags.featured-tags": {
     "message": "精選標籤"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "你必須選擇至少一個精選標籤。"
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "請選擇最相關的標籤。這些標籤會顯示在其他標籤之前。"
+  },
   "project.settings.tags.features-description": {
     "message": "請選擇你的{type}包含的功能。"
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types}類別} other {類別}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types}功能} other {功能}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types}效能影響} other {效能影響}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types}解析度} other {解析度}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "你選擇了 {count} 個解析度標籤（{tags}）。資源包通常應該只會有一個解析度標籤。"
