@@ -1,3 +1,11 @@
+Some of the external content in this project may include native code usage or binary files. \
+If the files listed are your own, please follow the instructions below, otherwise, we ask that you remove this content from your modpack.
+
+- %LIST_MODS_HERE%
+
+<details>
+<summary>Instructions</summary>
+
 ## Source Code Requested
 
 To ensure the safety of all Modrinth users, we ask that you provide the source code or equivalent origin for any native code or binary files in use by this project.
@@ -13,3 +21,5 @@ Remember to ensure your repository is up-to-date with the content being publishe
 If these files are third-party work:
 
 - Please provide a publicly available link to the origin of the files or source-code from a known safe source, including the exact version used if applicable.
+
+</details>
