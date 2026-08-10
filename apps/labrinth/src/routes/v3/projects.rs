@@ -684,16 +684,11 @@ pub async fn project_edit_internal(
             .execute(&mut transaction)
             .await?;
 
-            if sync_archival_disclosure && has_archived_disclosure {
-                if archival_disclosure
-                    .is_some_and(|disclosure| disclosure.set_by_moderator)
-                    && !user.role.is_mod()
-                {
-                    return Err(ApiError::Auth(eyre!(
-                        "you cannot modify a disclosure set by a moderator"
-                    )));
-                }
-
+            if sync_archival_disclosure
+                && archival_disclosure.is_some_and(|disclosure| {
+                    user.role.is_mod() || !disclosure.set_by_moderator
+                })
+            {
                 db_models::DBProjectDisclosure::remove(
                     project_item.inner.id,
                     ProjectDisclosureType::Archived,
