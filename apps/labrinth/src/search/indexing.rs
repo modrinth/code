@@ -18,7 +18,7 @@ use crate::database::models::{
     DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
     LoaderFieldEnumValueId, LoaderFieldId,
 };
-use crate::models::disclosures::{ProjectDisclosure, ProjectDisclosureType};
+use crate::models::disclosures::ProjectDisclosure;
 use crate::models::exp;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::{DependencyType, from_duplicate_version_fields};
@@ -319,38 +319,29 @@ async fn build_search_documents(
 
     info!("Indexing local disclosures!");
 
-    let project_disclosures: DashMap<DBProjectId, Vec<ProjectDisclosure>> =
-        sqlx::query!(
-            "
+    let project_disclosures: DashMap<
+        DBProjectId,
+        Vec<(String, serde_json::Value)>,
+    > = sqlx::query!(
+        "
         SELECT project_id, type, metadata
         FROM project_disclosures
         WHERE project_id = ANY($1)
         ",
-            &*project_ids,
-        )
-        .fetch(pool)
-        .try_fold(
-            DashMap::new(),
-            |acc: DashMap<DBProjectId, Vec<ProjectDisclosure>>, m| {
-                match ProjectDisclosure::from_parts(&m.r#type, m.metadata) {
-                    Ok(disclosure) => {
-                        acc.entry(DBProjectId(m.project_id))
-                            .or_default()
-                            .push(disclosure);
-                    }
-                    Err(e) => {
-                        warn!(
-                            project_id = m.project_id,
-                            disclosure_type = m.r#type,
-                            "skipping malformed project disclosure: {e}"
-                        );
-                    }
-                }
-                async move { Ok(acc) }
-            },
-        )
-        .await
-        .wrap_err("failed to fetch project disclosures")?;
+        &*project_ids,
+    )
+    .fetch(pool)
+    .try_fold(
+        DashMap::new(),
+        |acc: DashMap<DBProjectId, Vec<(String, serde_json::Value)>>, m| {
+            acc.entry(DBProjectId(m.project_id))
+                .or_default()
+                .push((m.r#type, m.metadata));
+            async move { Ok(acc) }
+        },
+    )
+    .await
+    .wrap_err("failed to fetch project disclosures")?;
 
     info!("Indexing local versions!");
     let mut versions = load_project_versions(pool, project_ids.clone()).await?;
@@ -539,23 +530,27 @@ async fn build_search_documents(
             .map(|(_, disclosures)| disclosures)
             .unwrap_or_default()
             .into_iter()
-            .flat_map(|disclosure| {
-                let kind: &'static str =
-                    ProjectDisclosureType::from(&disclosure).into();
-                let mut disclosure_type_tokens = vec![kind.to_string()];
+            .flat_map(|(kind, metadata)| {
+                let disclosure =
+                    match ProjectDisclosure::from_parts(&kind, metadata) {
+                        Ok(disclosure) => disclosure,
+                        Err(e) => {
+                            warn!(
+                                project_id = project.id.0,
+                                disclosure_type = kind,
+                                "indexing project disclosure without its metadata: {e}"
+                            );
+                            return vec![kind];
+                        }
+                    };
+
+                let mut disclosure_type_tokens = vec![kind.clone()];
+
                 match &disclosure {
                     ProjectDisclosure::AiContent { uses, .. } => {
-                        disclosure_type_tokens.append(
-                            &mut uses
-                                .iter()
-                                .map(|usage| {
-                                    format!(
-                                        "{kind}_{}",
-                                        <&'static str>::from(usage)
-                                    )
-                                })
-                                .collect_vec(),
-                        );
+                        disclosure_type_tokens.extend(uses.iter().map(|usage| {
+                            format!("{kind}_{}", <&'static str>::from(usage))
+                        }));
                     }
                     ProjectDisclosure::Telemetry { consent, .. } => {
                         disclosure_type_tokens.push(format!(
