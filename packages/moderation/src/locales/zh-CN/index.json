@@ -269,9 +269,6 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "验证外部链接"
   },
-  "nags.versions.title": {
-    "defaultMessage": "访问版本页面"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"
   }

@@ -269,9 +269,6 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Ellenőrizd a külső linkeket"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Látogasd meg a Verziók fület"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   }

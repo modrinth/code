@@ -266,9 +266,6 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Ověřte externí odkazy"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Přejděte na stránku verzí"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Přejděte do nastavení odkazů"
   }

@@ -269,9 +269,6 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Проверьте ссылки"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Открыть страницу версий"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Настроить ссылки"
   }
