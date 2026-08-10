@@ -3,7 +3,7 @@ import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { IconButton, injectNotificationManager } from '@modrinth/ui'
 import { useEventListener, useMagicKeys } from '@vueuse/core'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
@@ -23,6 +23,8 @@ type ProcessEventPayload = {
 	instance_id: string
 	event: ProcessEvent
 }
+
+const LOADING_INDICATOR_DELAY_MS = 100
 
 const instanceCardSensors = [
 	PointerSensor.configure({
@@ -62,6 +64,24 @@ const modLoading = computed(
 )
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
+const loadingIndicatorRequested = computed(
+	() => !playing.value && (modLoading.value || installing.value),
+)
+const loadingIndicatorVisible = ref(false)
+
+watch(
+	loadingIndicatorRequested,
+	(requested, _, onCleanup) => {
+		loadingIndicatorVisible.value = false
+		if (!requested) return
+
+		const timeout = setTimeout(() => {
+			loadingIndicatorVisible.value = true
+		}, LOADING_INDICATOR_DELAY_MS)
+		onCleanup(() => clearTimeout(timeout))
+	},
+	{ immediate: true },
+)
 const selectionKey = computed(() =>
 	getLibraryInstanceSelectionKey({
 		instanceId: props.instance.id,
@@ -262,6 +282,19 @@ onUnmounted(() => {
 		@mouseenter="checkProcess"
 		@pointerdown="handlePointerDown"
 	>
+		<template #loading>
+			<div
+				v-if="loadingIndicatorVisible"
+				class="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center"
+			>
+				<div class="absolute inset-0 bg-surface-1 opacity-30" />
+				<SpinnerIcon
+					v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
+					class="relative size-9 animate-spin text-contrast"
+					tabindex="-1"
+				/>
+			</div>
+		</template>
 		<template #leading>
 			<div class="relative flex size-12 shrink-0 items-center justify-center">
 				<div class="absolute inset-0 flex items-center justify-center">
@@ -277,14 +310,14 @@ onUnmounted(() => {
 					>
 						<StopCircleIcon />
 					</IconButton>
-					<SpinnerIcon
-						v-else-if="modLoading || installing"
-						v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
-						class="size-8 animate-spin"
-						tabindex="-1"
-					/>
 					<IconButton
-						v-else-if="!isLibraryInstanceSelectionActive && !installed && !instance.quarantined"
+						v-else-if="
+							!modLoading &&
+							!installing &&
+							!isLibraryInstanceSelectionActive &&
+							!installed &&
+							!instance.quarantined
+						"
 						v-tooltip="'Repair'"
 						label="Repair"
 						type="colored"
@@ -296,7 +329,12 @@ onUnmounted(() => {
 						<DownloadIcon />
 					</IconButton>
 					<IconButton
-						v-else-if="!isLibraryInstanceSelectionActive && !instance.quarantined"
+						v-else-if="
+							!modLoading &&
+							!installing &&
+							!isLibraryInstanceSelectionActive &&
+							!instance.quarantined
+						"
 						v-tooltip="'Play'"
 						label="Play"
 						type="colored"

@@ -43,6 +43,7 @@ const versionRef = ref<HTMLElement | null>(null)
 				alt=""
 				no-shadow
 			/>
+			<slot name="loading" />
 			<div class="absolute bottom-1.5 right-1.5 z-[1] flex size-12 items-center justify-center">
 				<slot name="leading" />
 			</div>
