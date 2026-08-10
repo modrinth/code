@@ -716,7 +716,9 @@ pub async fn project_edit_internal(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `project_edit_internal`")?;
+            .wrap_internal_err(
+                "querying database for `project_edit_internal`",
+            )?;
 
             if sync_archival_disclosure
                 && archival_disclosure.is_some_and(|disclosure| {
