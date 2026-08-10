@@ -1,111 +1,136 @@
 # Changelog Style Guide
 
-## The core rule
+## Core Rule
 
-**Each bullet describes one user-visible change, written from the user's perspective, in plain language, as a single sentence.**
+Each bullet describes one user-visible change. Write one plain-language sentence from the perspective of the user.
 
-If you can't explain the change without referencing internal code, components, or refactors, it probably doesn't belong in the changelog.
+Do not add a change that you can explain only with internal code, component, or refactor details.
 
-## Voice and tense
+## Voice and Tense
 
-- **Past tense, implied subject.** The section heading (`## Added`, `## Fixed`, `## Changed`) supplies the verb's mood - bullets read as a continuation of it.
-  - Good: `Fixed a missing gap between the project filter tabs and the project list.`
-  - Good: `Added support for Java 25.`
-  - Avoid: `We fixed...`, `This fixes...`, `Fixes...` (present tense), `Will fix...`
-- **No first person.** Don't say "we" or "our" inside a bullet. The exception is featured release callouts that link to a blog post (`We've overhauled the Content tab...`).
-- **No second person except for direct user actions.** "You" is fine when describing what the user can now do (`Joining a server from the app downloads the required content and launches you directly into the server.`), but don't address the user gratuitously.
+- Use the past tense with an implicit subject. The section heading supplies the context for the bullet.
+	- Correct: `Fixed a missing gap between the project filter tabs and the project list.`
+	- Correct: `Added support for Java 25.`
+	- Incorrect: `We fixed...`, `This fixes...`, `Fixes...`, or `Will fix...`.
+- Do not use the first person. A featured release that links to a blog post is an exception.
+- Use the second person only for a direct user action.
 
-## Section/verb agreement
+Example of a direct action: `Joining a server downloads the required content and opens the server.`
 
-The opening verb must match the section it lives under. Don't put "Fixed X" bullets inside `## Added`.
+## Section and Verb Agreement
 
-| Section       | Typical opening verbs                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| `## Added`    | Added, Introduced, New                                                          |
-| `## Changed`  | Refreshed, Redesigned, Moved, Renamed, Updated, Consolidated, Improved, Rebuilt |
-| `## Fixed`    | Fixed                                                                           |
-| `## Security` | Fixed (security framing)                                                        |
+Make the first verb agree with its section. Do not put a `Fixed` bullet in `## Added`.
 
-In `## Added`, the leading "Added" is often dropped because it's redundant with the heading:
+| Section       | Typical first words                                                        |
+| ------------- | -------------------------------------------------------------------------- |
+| `## Added`    | Added, Introduced, New                                                      |
+| `## Changed`  | Refreshed, Redesigned, Moved, Renamed, Updated, Consolidated, Improved     |
+| `## Fixed`    | Fixed                                                                      |
+| `## Security` | Fixed, with a clear security context                                       |
 
-- `- Server stats inside server settings modal, in info card.`
-- `- Confirmation modal for resubscribing to a server.`
+You can omit `Added` in the `## Added` section because the heading supplies it:
 
-In `## Fixed`, the leading "Fixed" is **kept** in most entries - it reads more clearly. Be consistent within a single entry.
+- `Server statistics in an information card inside the server settings modal.`
+- `Confirmation modal for server resubscription.`
 
-## What to write about
+Keep `Fixed` in most `## Fixed` bullets because it makes the text clear. Use one pattern in each entry.
 
-Describe the **observable behavior**, not the implementation.
+## Content
 
-- Good: `Server CPU and memory graphs no longer freeze on the last value after a hard crash or out-of-memory kill.`
-- Bad: `Refactored the metrics polling hook to clear stale state on socket disconnect.`
+Describe the result that the user can see. Do not describe the implementation.
 
-- Good: `Historical log files are now fetched in the background when opening the Logs page, so switching between them is instant.`
-- Bad: `Moved log file fetching into a background worker.`
+- Correct: `Server CPU and memory graphs no longer freeze after a hard crash or out-of-memory termination.`
+- Incorrect: `Refactored the metrics polling hook to clear stale state after a socket disconnection.`
 
-If a refactor has no user-visible effect, **don't list it**. Internal cleanup, dependency bumps, and code moves don't belong in the changelog unless they produce a noticeable difference (perf, reliability, consistency).
+- Correct: `Historical log files now load in the background, so selection between files is immediate.`
+- Incorrect: `Moved log file fetching into a background worker.`
 
-## Specificity
+Do not list a refactor that has no user-visible result.
 
-Be specific enough that a user reading the changelog can recognize the thing you're talking about.
+You can list an internal change when it gives a visible improvement in performance, reliability, or consistency.
+
+## Specific Terms
+
+Give sufficient detail for the user to identify the applicable item.
 
 - Vague: `Fixed a bug on the project page.`
-- Better: `Fixed project versions table overflowing outside of table. Version tags will now truncate.`
+- Specific: `Fixed project version rows that extended past the table. Version tags now truncate.`
 
 - Vague: `Improved the UI.`
-- Better: `Refreshed the server cards UI for consistency.`
+- Specific: `Refreshed the server cards for visual consistency.`
 
-Name the page, tab, modal, or feature you're talking about. "The Content tab", "the server panel header", "the Worlds tab", "the project page" - these give the reader a concrete anchor.
+Name the applicable page, tab, modal, or feature. Examples include the Content tab, server panel header, Worlds tab, and project page.
 
 ## Length
 
-- **One sentence per bullet.** If you need two sentences, you probably have two bullets, or one bullet plus a sub-bullet.
-- Aim for under ~25 words. Long bullets are usually a sign that the change is being over-explained or is actually multiple changes.
-- Sub-bullets (indented with a tab) are allowed when one change has several facets - see the `## Added` section in the v0.12.0 app release for a good example.
+- Write one sentence in each bullet.
+- Use a second bullet when the change needs a second sentence.
+- Use fewer than 25 words when possible.
+- Use tab-indented sub-bullets when one change has multiple related parts.
+
+Refer to the `## Added` section in the v0.12.0 app release for a sub-bullet example.
 
 ## Punctuation
 
-- **End every bullet with a period.** This is inconsistent in the historical file, but periods are the more common pattern and the one to follow going forward.
-- Use sentence case, not Title Case.
-- Use straight quotes, not curly quotes (`"foo"` not `"foo"`).
-- Use proper code formatting for filenames, flags, and literal strings: `` `.log` ``, `` `Restart` ``.
+- End each bullet with a period.
+- Use sentence case, not title case.
+- Use straight quotation marks, not curly quotation marks: `"foo"`.
+- Use code formatting for filenames, flags, and literal strings: `.log` and `Restart`.
 
-## Naming things
+Historical entries do not always use periods. Use periods in all new entries.
 
-- Use the public, branded name: **Modrinth App**, **Modrinth Hosting**, **Modrinth** - not "the app", "servers", "Modrinth Servers" (deprecated). Capitalize product names.
-- Refer to UI surfaces by the label the user sees: **Content tab**, **Worlds tab**, **Files tab**, **Logs page**, **server panel**, **project page**, **Discover page**.
-- Capitalize tab and page names when referring to them by name (`the Content tab`), but not when used generically (`browse content`).
+## Product and UI Names
 
-## Don't
+- Use the public names `Modrinth App`, `Modrinth Hosting`, and `Modrinth`.
+- Do not use deprecated names, such as `Modrinth Servers`.
+- Use the labels that appear in the UI.
+- Capitalize a tab or page name when you refer to its label.
+- Use lowercase when you refer to a generic action, such as `browse content`.
 
-- **Don't blame.** Avoid "fixed a regression introduced in v0.12.0" - just describe the fix.
-- **Don't reference PRs, issues, or commits.** The changelog is for users, not contributors - the exception is notable third-party contributions, where you should credit the contributor by linking their GitHub profile (e.g. `Added support for Java 25. Thanks to [@username](https://github.com/username)!`). Sharing credit for community contributions is encouraged.
-- **Don't reference internal team members or processes.** No "as requested by support", no "per the design review".
-- **Don't apologize or editorialize.** Skip "unfortunately", "finally", "long-awaited", "we know this has been a pain point". State the change.
-- **Don't use vague intensifiers.** "Significantly improved", "much better", "vastly faster" - quantify if you can, otherwise drop the adverb.
-- **Don't list every sub-fix of a bigger change separately.** If you redesigned the server panel header, write one bullet about the redesign rather than six bullets about each moved element.
-- **Don't use "issue with" / "issue where" as filler.** `Fixed an issue where buttons were misaligned` → `Fixed misaligned buttons.`
+Examples of UI labels include Content tab, Worlds tab, Files tab, Logs page, server panel, project page, and Discover page.
 
-## Examples - rewriting weak bullets
+## Prohibited Content
+
+- Do not assign blame. Describe the correction without the release that caused the problem.
+- Do not refer to pull requests, issues, or commits.
+- Do not refer to internal team members or processes.
+- Do not apologize or add an opinion about the change.
+- Do not use vague intensifiers. Give a measurement when possible, or remove the adverb.
+- Do not list each small correction from one larger change.
+- Do not use `issue with` or `issue where` as filler.
+
+You can credit a notable community contribution with a link to the contributor's GitHub profile.
+
+Example: `Added support for Java 25. Thanks to [@username](https://github.com/username)!`
+
+Replace `Fixed an issue with misaligned buttons` with `Fixed misaligned buttons.`
+
+## Weak-Bullet Rewrites
 
 | Weak                                                       | Better                                                                                |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `Fixed a bug.`                                             | `Fixed project icons becoming extremely bright on hover.`                             |
-| `Various improvements to the server panel.`                | Split into specific bullets, or drop entirely.                                        |
+| `Fixed a bug.`                                             | `Fixed excessive brightness on project icons during hover.`                           |
+| `Various improvements to the server panel.`                | Divide it into specific bullets, or remove it.                                        |
 | `Refactored the logs page to use a new component.`         | `Redesigned the Logs page to match the Modrinth Hosting server panel.`                |
-| `Fixed an issue where the server address wasn't copyable.` | `Server address in the panel header can now be clicked to copy it to your clipboard.` |
-| `Made some changes to the content tab.`                    | Either drop, or list each user-visible change as its own bullet.                      |
-| `Fixed UX issues.`                                         | Name the specific UX issue.                                                           |
+| `Fixed an issue where the server address was not copyable.` | `The server address in the panel header now copies to the clipboard when selected.`  |
+| `Made some changes to the Content tab.`                    | List each user-visible change, or remove the bullet.                                  |
+| `Fixed UX issues.`                                         | Name the specific user-experience problem.                                            |
 
-## Featured release bullets
+## Featured Release Bullets
 
-When an entry has a linked blog post heading (e.g. `## [Introducing Server Projects](/news/article/...)`), the bullets underneath summarize the *highlights* in 1–4 lines, then link out. They don't need to be exhaustive - that's what the blog post is for.
+A featured release has a linked blog-post heading, such as `## [Introducing Server Projects](/news/article/...)`.
 
-## Quick checklist before committing a bullet
+Use one to four lines below the heading to summarize the primary changes. Then, link to the blog post.
 
-1. Would a non-developer user understand it?
-2. Does it describe behavior, not implementation?
-3. Is the verb in the right tense for its section?
-4. Does it name the specific surface (tab/page/modal)?
-5. Is it one sentence, ending in a period?
-6. Is there a vague word ("issue", "bug", "various", "some") I can replace with something concrete?
+The bullets do not need to contain all details. The blog post contains the complete information.
+
+## Bullet Checklist
+
+Before you commit a bullet, make sure that it meets these requirements:
+
+1. A user who is not a developer can understand it.
+2. It describes behavior, not implementation.
+3. Its verb uses the correct tense for the section.
+4. It identifies the applicable tab, page, modal, or feature.
+5. It contains one sentence and ends with a period.
+6. It replaces vague words with specific terms.

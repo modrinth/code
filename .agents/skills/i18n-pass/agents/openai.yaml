@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run Internationalization Pass"
+  short_description: "Localize user-visible text in Vue files"
+  default_prompt: "Use $i18n-pass to localize the user-visible text in these changed Vue files."
