@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-10T18:17:39+00:00`,
+		product: 'web',
+		body: `## Added
+- Added official Modrinth subreddit and YouTube channel to footer, replacing GitHub which is already included below.`,
+	},
+	{
 		date: `2026-08-10T17:34:55+00:00`,
 		product: 'app',
 		version: '0.17.5',
