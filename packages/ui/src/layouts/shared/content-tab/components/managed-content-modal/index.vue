@@ -3,7 +3,6 @@ import {
 	ArrowLeftRightIcon,
 	BoxIcon,
 	ExternalIcon,
-	FilterIcon,
 	GlassesIcon,
 	PaintbrushIcon,
 	SearchIcon,
@@ -17,6 +16,7 @@ import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
+import FilterPills from '#ui/components/base/FilterPills.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -192,15 +192,6 @@ const stats = computed(() => {
 	}
 	return counts
 })
-
-function toggleFilter(filterId: string) {
-	const index = selectedFilters.value.indexOf(filterId)
-	if (index === -1) {
-		selectedFilters.value.push(filterId)
-	} else {
-		selectedFilters.value.splice(index, 1)
-	}
-}
 
 const attributeFilterIds = new Set(['disabled', 'warnings'])
 
@@ -485,37 +476,15 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					clearable
 				/>
 
-				<div v-if="filterOptions.length > 0" class="flex items-center gap-2">
-					<FilterIcon class="size-5 text-secondary shrink-0" />
-					<div class="flex flex-wrap items-center gap-1.5">
-						<button
-							:aria-pressed="selectedFilters.length === 0"
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
-							:class="
-								selectedFilters.length === 0
-									? 'border-brand bg-brand-highlight text-brand'
-									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-							"
-							@click="selectedFilters = []"
-						>
-							{{ formatMessage(commonMessages.allProjectType) }}
-						</button>
-						<button
-							v-for="option in filterOptions"
-							:key="option.id"
-							:aria-pressed="selectedFilters.includes(option.id)"
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
-							:class="
-								selectedFilters.includes(option.id)
-									? 'border-brand bg-brand-highlight text-brand'
-									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-							"
-							@click="toggleFilter(option.id)"
-						>
-							{{ option.label }}
-						</button>
-					</div>
-				</div>
+				<FilterPills
+					v-if="filterOptions.length > 0"
+					v-model="selectedFilters"
+					:options="filterOptions"
+				>
+					<template #all>
+						{{ formatMessage(commonMessages.allProjectType) }}
+					</template>
+				</FilterPills>
 			</div>
 
 			<div class="flex-1 flex flex-col min-h-0 overflow-hidden">

@@ -9,7 +9,6 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
-	FilterIcon,
 	FolderOpenIcon,
 	LinkIcon,
 	RefreshCwIcon,
@@ -22,6 +21,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 
 import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
+import FilterPills from '#ui/components/base/FilterPills.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -235,6 +235,18 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 		persistKey: ctx.filterPersistKey,
 	},
 )
+
+function updateFilterChips(nextFilters: string[]) {
+	if (nextFilters.length === 0) {
+		selectedFilters.value = []
+		return
+	}
+
+	const changedFilter =
+		nextFilters.find((filter) => !selectedFilters.value.includes(filter)) ??
+		selectedFilters.value.find((filter) => !nextFilters.includes(filter))
+	if (changedFilter) toggleFilter(changedFilter)
+}
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
@@ -843,33 +855,15 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 						<div class="@container flex flex-wrap items-center justify-between gap-2">
 							<div class="flex flex-wrap items-center gap-1.5">
-								<FilterIcon class="size-5 text-secondary" />
-								<button
-									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-									:class="
-										selectedFilters.length === 0
-											? 'border-brand bg-brand-highlight text-brand'
-											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-									"
-									:aria-pressed="selectedFilters.length === 0"
-									@click="selectedFilters = []"
+								<FilterPills
+									:model-value="selectedFilters"
+									:options="filterOptions"
+									@update:model-value="updateFilterChips"
 								>
-									{{ formatMessage(commonMessages.allProjectType) }}
-								</button>
-								<button
-									v-for="option in filterOptions"
-									:key="option.id"
-									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-									:class="
-										selectedFilters.includes(option.id)
-											? 'border-brand bg-brand-highlight text-brand'
-											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-									"
-									:aria-pressed="selectedFilters.includes(option.id)"
-									@click="toggleFilter(option.id)"
-								>
-									{{ option.label }}
-								</button>
+									<template #all>
+										{{ formatMessage(commonMessages.allProjectType) }}
+									</template>
+								</FilterPills>
 								<div class="hidden @[900px]:block">
 									<Button
 										type="quiet"
