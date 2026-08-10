@@ -1,6 +1,6 @@
 ## Showcase Clarity
 
-Per section 2 of %RULES%, it's important that your project page accurately and honestly represent the content of your project.
+%R2%, it's important that your project page accurately and honestly represent the content of your project.
 
 Currently, it looks like some images do not accurately represent the content of your %PROJECT_TYPE_FORMATTED_LOWER%.
 Please make sure you use authentic images such as in-game screenshots when showcasing the content or functionality of your work.
