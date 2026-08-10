@@ -11,6 +11,7 @@ import type { ManagedContentSummaryItem, ManagedContentSummaryType } from '../..
 
 const props = defineProps<{
 	summary?: ManagedContentSummaryItem[]
+	installing?: boolean
 }>()
 
 const { formatMessage } = useVIntl()
@@ -24,6 +25,10 @@ const messages = defineMessages({
 	empty: {
 		id: 'content.managed-card.summary.empty',
 		defaultMessage: 'No managed content',
+	},
+	installing: {
+		id: 'content.managed-card.summary.installing',
+		defaultMessage: 'Installing content...',
 	},
 })
 
@@ -61,7 +66,7 @@ const visibleSummary = computed(() => props.summary?.filter((item) => item.count
 
 <template>
 	<div
-		v-if="showLoading"
+		v-if="!installing && showLoading"
 		class="flex h-6 items-center gap-2"
 		role="status"
 		:aria-label="formatMessage(messages.loading)"
@@ -72,6 +77,10 @@ const visibleSummary = computed(() => props.summary?.filter((item) => item.count
 		<BulletDivider class="!mx-0" />
 		<div class="h-5 w-20 animate-pulse rounded bg-surface-4" />
 	</div>
+
+	<span v-else-if="installing" class="font-medium leading-6 text-secondary" role="status">
+		{{ formatMessage(messages.installing) }}
+	</span>
 
 	<div v-else-if="visibleSummary?.length" class="flex flex-wrap items-center gap-2 text-secondary">
 		<template v-for="(item, index) in visibleSummary" :key="item.type">

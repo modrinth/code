@@ -129,6 +129,7 @@ export interface ManagedContentSummaryItem {
 interface ManagedContentCardBase {
 	manager: ManagedContentManager
 	summary?: ManagedContentSummaryItem[]
+	installing?: boolean
 }
 
 export type ManagedContentCardData =

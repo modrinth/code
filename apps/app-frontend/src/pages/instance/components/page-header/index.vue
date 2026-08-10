@@ -33,8 +33,8 @@
 					:recent-plays="recentPlays"
 					:ping="ping"
 					:minecraft-server="minecraftServer"
-					:linked-project-v3="linkedProjectV3"
-					:instance-id="instance.id"
+					:show-instance-play-time="showInstancePlayTime"
+					:playtime-label="playtimeLabel"
 				/>
 				<PageHeaderMetadataItem v-if="sharedInstanceManager" :action="sharedInstanceManagerAction">
 					{{ sharedInstanceManagerLabel }}
@@ -294,7 +294,6 @@ const props = withDefaults(
 		recentPlays?: number
 		ping?: number
 		minecraftServer?: Labrinth.Projects.v3.Project['minecraft_server']
-		linkedProjectV3?: Labrinth.Projects.v3.Project
 		sharedInstanceManager?: {
 			type: 'user' | 'server'
 			name: string
@@ -316,7 +315,6 @@ const props = withDefaults(
 		recentPlays: undefined,
 		ping: undefined,
 		minecraftServer: undefined,
-		linkedProjectV3: undefined,
 		sharedInstanceManager: null,
 	},
 )

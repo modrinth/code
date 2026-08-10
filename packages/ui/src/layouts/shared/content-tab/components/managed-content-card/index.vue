@@ -69,7 +69,7 @@ const title = computed(() =>
 		>
 			<div class="flex min-w-0 flex-1 flex-col gap-1.5 pl-0.5">
 				<h2 class="m-0 text-2xl font-semibold leading-8 text-contrast">{{ title }}</h2>
-				<ManagedContentCardSummary :summary="data.summary" />
+				<ManagedContentCardSummary :summary="data.summary" :installing="data.installing" />
 			</div>
 
 			<div

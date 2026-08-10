@@ -40,7 +40,6 @@
 				:recent-plays="recentPlays"
 				:ping="ping"
 				:minecraft-server="minecraftServer"
-				:linked-project-v3="linkedProjectV3"
 				:shared-instance-manager="sharedInstanceManager"
 				@repair="() => repairInstance()"
 				@stop="() => stopInstance('InstancePage')"

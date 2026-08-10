@@ -20,30 +20,26 @@
 
 		<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
 
-		<div v-if="minecraftServer?.region || ping" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+		<div
+			v-if="showInstancePlayTime && playtimeLabel && (loadingServerPing || minecraftServer?.region || ping)"
+			class="h-1.5 w-1.5 rounded-full bg-surface-5"
+		></div>
 
-		<div v-if="linkedProjectV3" class="flex gap-1.5 items-center font-medium text-primary">
-			Linked to
-			<Avatar
-				:src="linkedProjectV3.icon_url"
-				:alt="linkedProjectV3.name"
-				:tint-by="instanceId"
-				size="24px"
-			/>
-			<router-link
-				:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-				class="hover:underline text-primary truncate"
-			>
-				{{ linkedProjectV3.name }}
-			</router-link>
+		<div
+			v-if="showInstancePlayTime && playtimeLabel"
+			v-tooltip="'Total playtime'"
+			class="flex items-center gap-1.5 font-medium text-secondary"
+		>
+			<TimerIcon aria-hidden="true" class="size-5 shrink-0 text-current" />
+			{{ playtimeLabel }}
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { TimerIcon } from '@modrinth/assets'
 import {
-	Avatar,
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRecentPlays,
@@ -57,7 +53,7 @@ defineProps<{
 	recentPlays?: number
 	ping?: number
 	minecraftServer?: Labrinth.Projects.v3.Project['minecraft_server']
-	linkedProjectV3?: Labrinth.Projects.v3.Project
-	instanceId?: string
+	showInstancePlayTime?: boolean
+	playtimeLabel?: string
 }>()
 </script>

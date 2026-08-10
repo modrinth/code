@@ -172,19 +172,21 @@ const modpackContentQuery = useQuery({
 })
 
 const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
-const setupActionBusyMessage = computed(() => {
-	if (!canSetup.value) return permissionDeniedMessage.value
-
-	const bannerCoversInstalling =
+const isInstallingContent = computed(
+	() =>
 		server.value?.status === 'installing' ||
 		isSyncingContent.value ||
 		busyReasons.value.some(
 			(r) =>
 				r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content',
-		)
+		),
+)
+const setupActionBusyMessage = computed(() => {
+	if (!canSetup.value) return permissionDeniedMessage.value
+
 	const filteredReasons = busyReasons.value.filter((r) => {
 		if (
-			bannerCoversInstalling &&
+			isInstallingContent.value &&
 			(r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content')
 		)
 			return false
@@ -274,6 +276,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 	return {
 		card: {
 			kind: 'modpack',
+			installing: isInstallingContent.value,
 			manager: {
 				name: title,
 				iconUrl: (isLocal ? mp.icon_url : (project?.icon_url ?? mp.icon_url)) ?? undefined,
