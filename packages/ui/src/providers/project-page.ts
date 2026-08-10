@@ -15,7 +15,7 @@ export interface ProjectPageContext {
 	allMembers: Ref<Labrinth.Projects.v3.TeamMember[]>
 	organization: Ref<Labrinth.Projects.v3.Organization | null>
 	// Lazy version loading (client-side only)
-	versions: Ref<Labrinth.Versions.v2.Version[] | null>
+	versions: Ref<Labrinth.Versions.v3.Version[] | null>
 	versionsLoading: Ref<boolean>
 	versionsLoaded: Ref<boolean>
 	// Lazy dependencies loading (client-side only)

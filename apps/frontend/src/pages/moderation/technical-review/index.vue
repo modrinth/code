@@ -32,6 +32,7 @@ useHead({ title: 'Tech review queue - Modrinth' })
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const keybinds = useModerationKeybinds()
 
 const currentPage = ref(1)
 const API_PAGE_SIZE = 50
@@ -571,6 +572,50 @@ watch(totalPages, (pages) => {
 // 		complete: 20,
 // 	}
 // })
+
+const CARD_BOTTOM_OFFSET = 210
+
+function handleKeybinds(event: KeyboardEvent) {
+	keybinds.value.handle(event, {
+		scope: 'tech-review',
+		actions: {
+			goToTop: () => {
+				Array.from(cardRefs.values())
+					.filter((card) => card.getBoundingClientRect().top <= 0)
+					.reduce((prev, curr) =>
+						curr.getBoundingClientRect().top > prev.getBoundingClientRect().top ? curr : prev,
+					)
+					?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+			},
+			goToBottom: () => {
+				const nearestCard = Array.from(cardRefs.values())
+					.filter((card) => card.getBoundingClientRect().bottom >= window.innerHeight)
+					.reduce((prev, curr) =>
+						curr.getBoundingClientRect().top < prev.getBoundingClientRect().top ? curr : prev,
+					)
+
+				if (nearestCard) {
+					window.scrollTo({
+						behavior: 'smooth',
+						top:
+							nearestCard.getBoundingClientRect().bottom +
+							window.scrollY -
+							window.innerHeight +
+							CARD_BOTTOM_OFFSET,
+					})
+				}
+			},
+		},
+	})
+}
+
+onMounted(() => {
+	window.addEventListener('keydown', handleKeybinds)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('keydown', handleKeybinds)
+})
 </script>
 
 <template>

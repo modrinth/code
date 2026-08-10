@@ -824,9 +824,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Berkas disimpan"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Tutup"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Cari"
   },

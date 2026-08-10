@@ -57,7 +57,15 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<ButtonLink v-if="isSelf" size="xl" :to="editProfileLink">
+				<Button
+					v-if="isSelf && typeof editProfileLink === 'function'"
+					size="xl"
+					@click="editProfileLink"
+				>
+					<EditIcon />
+					{{ formatMessage(commonMessages.editButton) }}
+				</Button>
+				<ButtonLink v-else-if="isSelf" size="xl" :to="editProfileLink">
 					<EditIcon />
 					{{ formatMessage(commonMessages.editButton) }}
 				</ButtonLink>
@@ -96,7 +104,7 @@ import { computed } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
-import { ButtonLink, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button, ButtonLink, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataNumberItem from '#ui/components/base/page-header/metadata/page-header-metadata-number-item.vue'
@@ -127,10 +135,6 @@ const messages = defineMessages({
 	unblockButton: {
 		id: 'profile.button.unblock',
 		defaultMessage: 'Unblock',
-	},
-	editRoleButton: {
-		id: 'profile.button.edit-role',
-		defaultMessage: 'Edit role',
 	},
 	infoButton: {
 		id: 'profile.button.info',
@@ -212,7 +216,7 @@ const emit = defineEmits<{
 	toggleAffiliate: []
 	openInfo: []
 	openAnalytics: []
-	editRole: []
+	editUser: []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -298,10 +302,10 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
-		id: 'edit-role',
-		label: formatMessage(messages.editRoleButton),
+		id: 'edit-user',
+		label: 'Edit user',
 		icon: EditIcon,
-		action: () => emit('editRole'),
+		action: () => emit('editUser'),
 		tone: 'orange',
 		shown: props.showStaffActions && props.isAdmin,
 	},

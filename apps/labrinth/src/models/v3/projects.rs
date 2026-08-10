@@ -79,6 +79,8 @@ pub struct Project {
     pub versions: Vec<VersionId>,
     /// The URL of the icon of the project
     pub icon_url: Option<String>,
+    /// The URL of the unoptimized icon of the project
+    pub raw_icon_url: Option<String>,
 
     /// A collection of links to the project's various pages.
     pub link_urls: HashMap<String, Link>,
@@ -193,6 +195,7 @@ impl From<ProjectQueryResult> for Project {
             loaders: m.loaders,
             versions: data.versions.into_iter().map(|v| v.into()).collect(),
             icon_url: m.icon_url,
+            raw_icon_url: m.raw_icon_url,
             link_urls: data
                 .urls
                 .into_iter()

@@ -245,6 +245,12 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
   },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "È necessaria almeno un'immagine che mostri il contenuto del tuo pacchetto di risorse, a meno che contenga solo audio o traduzioni. In tal caso seleziona il tag appropriato."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Sono necessarie almeno tre immagini che dimostrino le tue shader in varie situazioni e condizioni."
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Carica un'immagine"
   },
@@ -259,9 +265,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verifica link esterni"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Visita pagina delle versioni"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Vedi impostazioni dei link"

@@ -1478,9 +1478,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Нещодавно оновлені"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Закрити"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Завантажити {formType}"
   },
@@ -2846,9 +2843,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2981,9 +2975,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Не вдалося очистити всі групи: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Очистити"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Усі групи успішно очищено."
   },
@@ -3022,9 +3013,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Скануємо…"
-  },
-  "modpack-scan-modal.success": {
-    "message": "Успіх"
   },
   "modpack-scan-modal.title": {
     "message": "Сканування збірки ({scanned}/{total} файлів)"
@@ -3935,11 +3923,14 @@
   "project.settings.tags.featured-tags": {
     "message": "Основні теґи"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Ви можете обрати основними до 3 найбільш описових теґів. Інші теґи можуть стати основними, якщо не оберете всі 3."
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Оберіть найдоречніші теґи. Вони показуватимуться першими."
   },
   "project.settings.tags.features-description": {
     "message": "Оберіть увесь функціонал, який присутній у {type}."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} категорії} other {Категорії}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Ви обрали {count} теґів роздільної здатності ({tags}). Пакети ресурсів зазвичай повинні містити тільки один теґ роздільної здатності."
@@ -3952,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Виберіть хоча б одну категорію, щоб рекомендувати її."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Указання правильних теґів необхідне, щоб люди могли легше знайти ваш {type}. Переконайтеся, що ви обрали підхожі теґи."
   },
   "project.settings.tags.title": {
     "message": "Теґи"

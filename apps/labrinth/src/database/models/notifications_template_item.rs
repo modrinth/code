@@ -1,7 +1,8 @@
 use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use crate::routes::ApiError;
-use crate::util::error::Context;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -140,7 +141,11 @@ where
 
     drop(redis_conn);
 
-    let cached = HtmlBody { html: get().await? };
+    let cached = HtmlBody {
+        html: get()
+            .await
+            .wrap_api_err("generating notification template HTML")?,
+    };
     let mut redis_conn = redis.connect().await.wrap_internal_err(
         "connecting to redis for dynamic notification html",
     )?;

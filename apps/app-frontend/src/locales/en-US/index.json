@@ -723,7 +723,7 @@
     "message": "For support requests, contact our <support-link>support team</support-link>. For bug reports, open a <github-link>GitHub issue</github-link>."
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
+    "message": "Files that aren't published to Modrinth aren't reviewed."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
@@ -1879,9 +1879,6 @@
   },
   "modal.modrinth-account-required.browser-description": {
     "message": "A new tab opened to sign in. Complete the sign in there, then return to the app."
-  },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Cancel"
   },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Continue in your browser"

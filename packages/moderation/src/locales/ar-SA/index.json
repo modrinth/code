@@ -269,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "إثبات روابط خارجية"
   },
-  "nags.versions.title": {
-    "defaultMessage": "زيارة صفحة الإصدار"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "زيارة إعدادات الروابط"
   }
 }
+

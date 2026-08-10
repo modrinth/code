@@ -53,6 +53,21 @@
 					>
 						<DownloadIcon aria-hidden="true" />
 					</ButtonLink>
+					<ButtonLink
+						v-if="
+							!!getPrimaryFile(version) &&
+							isStaff(auth.user) &&
+							modSettings.get(moderationSettings.General.SlicerButtonInVersions)
+						"
+						v-tooltip="`Open in Slicer`"
+						type="quiet"
+						target="_blank"
+						:href="`https://slicer.run/?url=${encodeURIComponent(createDownloadUrl(version))}`"
+						class="!w-9 !rounded-full !px-0 hover:!bg-button-bg"
+						aria-label="Open in Slicer"
+					>
+						<ExternalIcon aria-hidden="true" />
+					</ButtonLink>
 					<TeleportOverflowMenu
 						v-if="currentMember"
 						type="quiet"
@@ -268,6 +283,7 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	ButtonLink,
 	ConfirmModal,
@@ -277,6 +293,7 @@ import {
 	ProjectPageVersions,
 	TeleportOverflowMenu,
 } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 import { onMounted, useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
@@ -289,6 +306,7 @@ const { createProjectDownloadUrl, updateVersionsFilterContext } = useCdnDownload
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
+const modSettings = useModerationSettings()
 const auth = await useAuth()
 
 const client = injectModrinthClient()

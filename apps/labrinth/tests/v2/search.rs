@@ -378,6 +378,7 @@ async fn search_projects() {
         for hit in client_side_optional_server_side_optional.hits {
             assert_eq!(hit.client_side, "optional".to_string());
             assert_eq!(hit.server_side, "optional".to_string());
+            assert_eq!(hit.environment, vec!["client_or_server".to_string()]);
         }
 
         // Ensure game_versions return correctly, but also correctly aggregated

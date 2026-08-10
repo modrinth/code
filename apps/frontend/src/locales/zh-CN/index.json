@@ -1481,9 +1481,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "最近更新"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "关闭"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下载{formType}"
   },
@@ -2849,9 +2846,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2984,9 +2978,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "未能清除所有组:{error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "清除"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "所有组均已成功清除。"
   },
@@ -3025,9 +3016,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "扫描中……"
-  },
-  "modpack-scan-modal.success": {
-    "message": "成功"
   },
   "modpack-scan-modal.title": {
     "message": "模组包扫描 ({scanned}/{total} 个文件)"
@@ -3938,11 +3926,26 @@
   "project.settings.tags.featured-tags": {
     "message": "精选标签"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "你可以设置最多 3 个精选标签，标示出最相关的特点。如果没有选完 3 个标签，其他标签也可能提升为精选标签。"
+  "project.settings.tags.featured-tags-required": {
+    "message": "您必须至少有一个精选标签。"
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "选择您最相关的标签，这些标签将显示在您其余标签之前。"
   },
   "project.settings.tags.features-description": {
     "message": "选择你的{type}作用于哪类特性。"
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} 类别} other {类别}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} 功能} other {功能}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} 性能影响} other {性能影响}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} 功能} other {功能}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "你选择了 {count} 个分辨率标签（{tags}）。资源包通常应仅保留一个标签。"
@@ -3955,9 +3958,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "请先至少选择一个分类，再设置精选分类。"
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "准确选好标签，能极大帮助别人找到你的{type}。请确保选择所有合适的标签。"
   },
   "project.settings.tags.title": {
     "message": "标签"

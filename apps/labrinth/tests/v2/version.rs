@@ -7,7 +7,7 @@ use futures::StreamExt;
 use labrinth::{
     models::ids::VersionId,
     models::projects::{Loader, VersionStatus, VersionType},
-    models::v2::projects::LegacySideType,
+    models::v2::projects::{LegacySideType, LegacyVersion},
     routes::v2::version_file::FileUpdateData,
 };
 use serde_json::json;
@@ -550,6 +550,8 @@ async fn add_version_accepts_environment_v2() {
                 )
                 .await;
             assert_status!(&resp, StatusCode::OK);
+            let version: LegacyVersion = test::read_body_json(resp).await;
+            assert_eq!(version.environment, "server_only_client_optional");
 
             let project = api
                 .get_project_deserialized(
@@ -559,6 +561,10 @@ async fn add_version_accepts_environment_v2() {
                 .await;
             assert_eq!(project.client_side, LegacySideType::Optional);
             assert_eq!(project.server_side, LegacySideType::Required);
+            assert_eq!(
+                project.environment,
+                vec!["server_only_client_optional".to_string()]
+            );
         },
     )
     .await;
@@ -589,6 +595,10 @@ async fn create_project_initial_version_accepts_environment_v2() {
                 api.get_project_deserialized(slug, USER_USER_PAT).await;
             assert_eq!(project.client_side, LegacySideType::Required);
             assert_eq!(project.server_side, LegacySideType::Optional);
+            assert_eq!(
+                project.environment,
+                vec!["client_only_server_optional".to_string()]
+            );
         },
     )
     .await;

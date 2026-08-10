@@ -1,5 +1,6 @@
 use crate::env::ENV;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 use actix_web::HttpRequest;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -26,7 +27,7 @@ pub async fn check_hcaptcha(
         conn_info.peer_addr()
     };
 
-    let ip_addr = ip_addr.ok_or(ApiError::Turnstile)?;
+    let ip_addr = ip_addr.wrap_request_err("captcha validation failed")?;
 
     let client = reqwest::Client::new();
 
@@ -46,10 +47,11 @@ pub async fn check_hcaptcha(
         .form(&form)
         .send()
         .await
-        .map_err(|_| ApiError::Turnstile)?
+        .wrap_request_err("captcha validation failed")?
         .json()
         .await
-        .map_err(|_| ApiError::Turnstile)?;
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("captcha validation failed")?;
 
     Ok(val.success)
 }

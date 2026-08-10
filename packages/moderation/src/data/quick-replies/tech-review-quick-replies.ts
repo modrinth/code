@@ -34,6 +34,20 @@ export default [
 		private: false,
 	},
 	{
+		label: '🔒 Request Source (Obf) - MODPACK',
+		message: async () =>
+			(await import('../messages/quick-replies/tech-review/request-source-obf-modpack.md?raw'))
+				.default,
+		private: false,
+	},
+	{
+		label: '📦 Request Source (Bin) - MODPACK',
+		message: async () =>
+			(await import('../messages/quick-replies/tech-review/request-source-bin-modpack.md?raw'))
+				.default,
+		private: false,
+	},
+	{
 		label: '🚫 Misused Obfuscation',
 		message: async () =>
 			(await import('../messages/quick-replies/tech-review/misused-obfuscation.md?raw')).default,

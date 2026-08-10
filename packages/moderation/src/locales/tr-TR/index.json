@@ -269,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Dış bağlantıları doğrula"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Sürümlere göz at"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bağlantı ayarlarına göz at"
   }
 }
+

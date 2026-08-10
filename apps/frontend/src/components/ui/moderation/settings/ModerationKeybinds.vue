@@ -12,7 +12,7 @@ const keybinds = useModerationKeybinds()
 				v-for="[id, keybind] in keybinds"
 				:key="id"
 				:title="keybind.description"
-				:global="keybind.scope === 'project'"
+				:scope="keybind.scope"
 				:definitions="keybind.keybind"
 				:default="keybind.defaultKeybind"
 				:on-change="

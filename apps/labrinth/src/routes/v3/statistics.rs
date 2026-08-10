@@ -1,5 +1,6 @@
 use crate::database::PgPool;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 use actix_web::{HttpResponse, get, web};
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -37,7 +38,8 @@ pub async fn get_stats(
             .collect::<Vec<String>>(),
     )
     .fetch_one(&**pool)
-    .await?;
+    .await
+    .wrap_internal_err("counting projects")?;
 
     let versions = sqlx::query!(
         "
@@ -56,7 +58,8 @@ pub async fn get_stats(
             .collect::<Vec<String>>(),
     )
     .fetch_one(&**pool)
-    .await?;
+    .await
+    .wrap_internal_err("counting versions")?;
 
     let authors = sqlx::query!(
         "
@@ -71,7 +74,8 @@ pub async fn get_stats(
             .collect::<Vec<String>>(),
     )
     .fetch_one(&**pool)
-    .await?;
+    .await
+    .wrap_internal_err("counting project authors")?;
 
     let files = sqlx::query!(
         "
@@ -89,7 +93,8 @@ pub async fn get_stats(
             .collect::<Vec<String>>(),
     )
     .fetch_one(&**pool)
-    .await?;
+    .await
+    .wrap_internal_err("counting version files")?;
 
     let v3_stats = V3Stats {
         projects: projects.count,

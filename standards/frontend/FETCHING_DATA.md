@@ -1,26 +1,32 @@
 - [TanStack Query](#tanstack-query)
 	- [Setup](#setup)
 	- [Queries](#queries)
-		- [Query Option Factories](#query-option-factories)
-		- [Conditional Queries](#conditional-queries)
+		- [Query-option factories](#query-option-factories)
+		- [Conditional queries](#conditional-queries)
 	- [Mutations](#mutations)
-		- [Optimistic Updates](#optimistic-updates)
-	- [Query Keys](#query-keys)
-	- [Key Files](#key-files)
+		- [Optimistic updates](#optimistic-updates)
+	- [Query keys](#query-keys)
+	- [Key files](#key-files)
 
 # TanStack Query
 
-TanStack Query (`@tanstack/vue-query` v5) is used for server state management — caching, background refetching, and cache invalidation. Use it instead of manual `ref()` + `await` patterns for any data that comes from an API.
+TanStack Query (`@tanstack/vue-query` v5) manages server state. It supplies caching, background refetches, and cache invalidation.
 
-A TanStack MCP server is available — use `tanstack_doc` and `tanstack_search_docs` tools to look up API details when needed.
+Use TanStack Query for all data that comes from an API. Do not use a manual `ref()` and `await` pattern.
+
+A TanStack MCP server is available. Use `tanstack_doc` or `tanstack_search_docs` when you need API details.
 
 ## Setup
 
-TanStack Query is configured in `apps/frontend/src/plugins/tanstack.ts` as a Nuxt plugin with SSR hydration support. Default stale time is 5 seconds. The `QueryClient` is available via `useQueryClient()` or `useAppQueryClient()` (which also works in middleware).
+`apps/frontend/src/plugins/tanstack.ts` configures TanStack Query as a Nuxt plugin. The plugin supports server-side rendering (SSR) hydration.
+
+The default stale time is 5 seconds. Get the `QueryClient` with `useQueryClient()` or `useAppQueryClient()`.
+
+`useAppQueryClient()` also operates in middleware.
 
 ## Queries
 
-Use `useQuery` with the api-client for data fetching:
+Use `useQuery` with `api-client` to get data:
 
 ```ts
 const client = injectModrinthClient()
@@ -32,7 +38,7 @@ const { data, isPending, isError, error } = useQuery({
 })
 ```
 
-In templates:
+Use the query state in templates:
 
 ```vue
 <span v-if="isPending">Loading...</span>
@@ -40,9 +46,9 @@ In templates:
 <div v-else>{{ data.title }}</div>
 ```
 
-### Query Option Factories
+### Query-Option Factories
 
-For queries used across multiple components, define reusable query option factories in `packages/ui/src/queries/`:
+For a query that multiple components use, define a query-option factory in `packages/ui/src/queries/`:
 
 ```ts
 // composables/queries/project.ts
@@ -64,7 +70,7 @@ export const projectQueryOptions = {
 }
 ```
 
-Then use them:
+Use the factory in each applicable component:
 
 ```ts
 const { data } = useQuery(projectQueryOptions.v3(projectId, client))
@@ -72,7 +78,7 @@ const { data } = useQuery(projectQueryOptions.v3(projectId, client))
 
 ### Conditional Queries
 
-Use `enabled` as a computed for queries that depend on other data:
+Use a computed `enabled` value when a query depends on other data:
 
 ```ts
 const { data: members } = useQuery({
@@ -84,7 +90,7 @@ const { data: members } = useQuery({
 
 ## Mutations
 
-Use `useMutation` for create/update/delete operations. Invalidate related queries on success:
+Use `useMutation` for create, update, and delete operations. Invalidate related queries after a successful operation:
 
 ```ts
 const queryClient = useQueryClient()
@@ -100,7 +106,7 @@ Use `createMutation.isPending.value` to disable buttons during submission.
 
 ### Optimistic Updates
 
-For mutations where responsiveness matters, use optimistic updates with rollback:
+Use an optimistic update and rollback when a mutation needs an immediate UI response:
 
 ```ts
 const patchMutation = useMutation({
@@ -135,30 +141,32 @@ const patchMutation = useMutation({
 
 ## Query Keys
 
-Keys use a hierarchical array pattern:
+Use hierarchical arrays for query keys:
 
 ```ts
-// Resource type → version/qualifier → ID
+// Resource type, version or qualifier, and ID.
 ['project', 'v3', projectId]
 
-// Resource type → ID → sub-resource
+// Resource type, ID, and subresource.
 ['project', projectId, 'members']
 ['project', projectId, 'versions', 'v3']
 
-// Domain → action → ID
+// Domain, action, and ID.
 ['backups', 'list', serverId]
 ['tech-reviews']
 ```
 
-Use `as const` for type safety. Put the resource ID last when possible — this makes partial key matching work for invalidation:
+Use `as const` for type safety. Put stable category segments before reactive parameters.
+
+TanStack Query uses key prefixes during invalidation:
 
 ```ts
-// Invalidates all project queries for this ID
-queryClient.invalidateQueries({ queryKey: ['project', projectId] })
+// Invalidate all v3 project queries.
+queryClient.invalidateQueries({ queryKey: ['project', 'v3'] })
 ```
 
 ## Key Files
 
-- `apps/frontend/src/plugins/tanstack.ts` — QueryClient setup + SSR hydration
-- `apps/frontend/src/composables/query-client.ts` — `useAppQueryClient()` helper
-- `apps/frontend/src/composables/queries/` — reusable query option factories
+- `apps/frontend/src/plugins/tanstack.ts`: Contains the `QueryClient` setup and SSR hydration.
+- `apps/frontend/src/composables/query-client.ts`: Contains the `useAppQueryClient()` helper.
+- `apps/frontend/src/composables/queries/`: Contains reusable query-option factories.

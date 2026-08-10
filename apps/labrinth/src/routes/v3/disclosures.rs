@@ -49,7 +49,7 @@ pub async fn get_project_disclosures(
     let project = db_models::DBProject::get(&string, &***ro_pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project")?
-        .ok_or(ApiError::NotFound)?;
+        .wrap_not_found_err("resource not found")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -66,7 +66,7 @@ pub async fn get_project_disclosures(
         .await
         .wrap_internal_err("failed to check project visibility")?
     {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre!("resource not found")));
     }
 
     let viewer_is_moderator =
@@ -127,13 +127,14 @@ pub async fn modify_project_disclosures(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project")?
-        .ok_or(ApiError::NotFound)?;
+        .wrap_not_found_err("resource not found")?;
 
     let (team_member, organization_team_member) =
         db_models::DBTeamMember::get_for_project_permissions(
@@ -182,7 +183,10 @@ pub async fn modify_project_disclosures(
         }
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     for disclosure in body.set {
         db_models::DBProjectDisclosure {
@@ -219,7 +223,8 @@ pub async fn modify_project_disclosures(
         .wrap_internal_err("failed to commit project disclosure changes")?;
 
     DBProject::clear_cache(project.inner.id, project.inner.slug, None, &redis)
-        .await?;
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
 
     search_state
         .queue

@@ -4,8 +4,10 @@ import { nextTick, onUnmounted, ref, watch } from 'vue'
 export type AnchoredTeleportPlacement =
 	| 'bottom-start'
 	| 'bottom-end'
+	| 'bottom-center'
 	| 'top-start'
 	| 'top-end'
+	| 'top-center'
 	| 'right-start'
 	| 'right-end'
 	| 'left-start'
@@ -37,12 +39,16 @@ export function useAnchoredTeleport(
 		if (!isOpen.value || !trigger.value || !panel.value) return
 
 		const triggerRect = trigger.value.getBoundingClientRect()
-		const panelRect = panel.value.getBoundingClientRect()
+		const scrollRegion =
+			panel.value.querySelector<HTMLElement>('[data-anchored-scroll-region]') ?? panel.value
+		const panelRect = { width: panel.value.offsetWidth, height: scrollRegion.scrollHeight }
 		const offset = distance.value
 		const alignsEnd = placement.value.endsWith('end')
+		const alignsCenter = placement.value.endsWith('center')
 		const isHorizontal = placement.value.startsWith('right') || placement.value.startsWith('left')
 		let idealTop: number
 		let idealLeft: number
+		let maxHeight: number | undefined
 
 		if (isHorizontal) {
 			const prefersRight = placement.value.startsWith('right')
@@ -66,16 +72,29 @@ export function useAnchoredTeleport(
 				: panelRect.height + offset > spaceBelow && spaceAbove > spaceBelow
 
 			resolvedSide.value = opensAbove ? 'top' : 'bottom'
+			const availableHeight = opensAbove ? spaceAbove : spaceBelow
+			if (panelRect.height + offset > availableHeight) {
+				maxHeight = Math.max(0, availableHeight - offset)
+			}
 			idealTop = opensAbove
-				? triggerRect.top - panelRect.height - offset
+				? triggerRect.top - (maxHeight ?? panelRect.height) - offset
 				: triggerRect.bottom + offset
-			idealLeft = alignsEnd ? triggerRect.right - panelRect.width : triggerRect.left
+			if (alignsCenter) {
+				const centered = triggerRect.left + triggerRect.width / 2 - panelRect.width / 2
+				if (centered < viewportPadding) {
+					idealLeft = triggerRect.left
+				} else if (centered + panelRect.width > window.innerWidth - viewportPadding) {
+					idealLeft = triggerRect.right - panelRect.width
+				} else {
+					idealLeft = centered
+				}
+			} else {
+				idealLeft = alignsEnd ? triggerRect.right - panelRect.width : triggerRect.left
+			}
 		}
 
-		const maxTop = Math.max(
-			viewportPadding,
-			window.innerHeight - panelRect.height - viewportPadding,
-		)
+		const effectiveHeight = maxHeight ?? panelRect.height
+		const maxTop = Math.max(viewportPadding, window.innerHeight - effectiveHeight - viewportPadding)
 		const maxLeft = Math.max(viewportPadding, window.innerWidth - panelRect.width - viewportPadding)
 		const panelTop = Math.min(Math.max(idealTop, viewportPadding), maxTop)
 		const panelLeft = Math.min(Math.max(idealLeft, viewportPadding), maxLeft)
@@ -84,6 +103,7 @@ export function useAnchoredTeleport(
 			top: `${panelTop}px`,
 			left: `${panelLeft}px`,
 			visibility: 'visible',
+			...(maxHeight !== undefined ? { maxHeight: `${maxHeight}px` } : {}),
 		}
 		anchorStyle.value = isHorizontal
 			? {

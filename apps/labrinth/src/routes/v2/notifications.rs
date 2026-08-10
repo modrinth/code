@@ -6,6 +6,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::v2_reroute;
 use crate::routes::v3;
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -65,7 +66,11 @@ pub async fn notifications_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error);
-    match v2_reroute::extract_ok_json::<Vec<Notification>>(resp?).await {
+    match v2_reroute::extract_ok_json::<Vec<Notification>>(
+        resp.wrap_api_err("extracting v2 response body")?,
+    )
+    .await
+    {
         Ok(notifications) => {
             let notifications: Vec<LegacyNotification> = notifications
                 .into_iter()
@@ -115,7 +120,8 @@ pub async fn notification_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
     match v2_reroute::extract_ok_json::<Notification>(response).await {
         Ok(notification) => {
             let notification = LegacyNotification::from(notification);

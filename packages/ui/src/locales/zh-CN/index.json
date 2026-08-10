@@ -1304,9 +1304,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "文件已保存"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "关闭"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "查找"
   },
@@ -2900,9 +2897,6 @@
   "profile.button.create-project": {
     "defaultMessage": "创建项目"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "编辑角色"
-  },
   "profile.button.info": {
     "defaultMessage": "查看用户详情"
   },
@@ -2999,23 +2993,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, other {项目}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "正在保存……"
-  },
   "profile.official-account": {
     "defaultMessage": "官方 Modrinth 账户"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Modrinth 的官方用户账号。可通过 <support-link></support-link> 或电子邮件 <email></email> 获取支持"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "选择角色"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "更新用户角色时发生了错误。请重试。"
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "更新角色失败"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "解除屏蔽该用户时发生了错误。请重试。"
@@ -5413,12 +5395,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} 的头像"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "取消"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "取消"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "自定义……"

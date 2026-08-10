@@ -6,6 +6,7 @@ use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -54,14 +55,16 @@ pub async fn notifications_get(
         &session_queue,
         Scopes::NOTIFICATION_READ,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     use database::models::DBNotificationId;
     use database::models::notification_item::DBNotification;
 
     let notification_ids: Vec<DBNotificationId> =
-        serde_json::from_str::<Vec<NotificationId>>(ids.ids.as_str())?
+        serde_json::from_str::<Vec<NotificationId>>(ids.ids.as_str())
+            .wrap_request_err("deserializing JSON data")?
             .into_iter()
             .map(DBNotificationId::from)
             .collect();
@@ -71,7 +74,8 @@ pub async fn notifications_get(
             &notification_ids,
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching notifications from database")?;
 
     let notifications: Vec<Notification> = notifications_data
         .into_iter()
@@ -108,7 +112,8 @@ pub async fn notification_get(
         &session_queue,
         Scopes::NOTIFICATION_READ,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let id = info.into_inner().0;
@@ -118,16 +123,17 @@ pub async fn notification_get(
             id.into(),
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching notification from database")?;
 
     if let Some(data) = notification_data {
         if user.id == data.user_id.into() || user.role.is_admin() {
             Ok(HttpResponse::Ok().json(Notification::from(data)))
         } else {
-            Err(ApiError::NotFound)
+            Err(ApiError::NotFound(eyre::eyre!("resource not found")))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -157,7 +163,8 @@ pub async fn notification_read(
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let id = info.into_inner().0;
@@ -167,29 +174,37 @@ pub async fn notification_read(
             id.into(),
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching notification from database")?;
 
     if let Some(data) = notification_data {
         if data.user_id == user.id.into() || user.role.is_admin() {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
 
             database::models::notification_item::DBNotification::read(
                 id.into(),
                 &mut transaction,
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("executing `DBNotification::read`")?;
 
-            transaction.commit().await?;
+            transaction
+                .commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You are not authorized to read this notification!".to_string(),
-            ))
+            Err(ApiError::Auth(eyre::eyre!(
+                "You are not authorized to read this notification!",
+            )))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -219,7 +234,8 @@ pub async fn notification_delete(
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let id = info.into_inner().0;
@@ -229,30 +245,37 @@ pub async fn notification_delete(
             id.into(),
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching notification from database")?;
 
     if let Some(data) = notification_data {
         if data.user_id == user.id.into() || user.role.is_admin() {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
 
             database::models::notification_item::DBNotification::remove(
                 id.into(),
                 &mut transaction,
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("deleting notification from database")?;
 
-            transaction.commit().await?;
+            transaction
+                .commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You are not authorized to delete this notification!"
-                    .to_string(),
-            ))
+            Err(ApiError::Auth(eyre::eyre!(
+                "You are not authorized to delete this notification!",
+            )))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -286,23 +309,29 @@ pub async fn notifications_read(
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let notification_ids =
-        serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
+        serde_json::from_str::<Vec<NotificationId>>(&ids.ids)
+            .wrap_request_err("deserializing JSON data")?
             .into_iter()
             .map(|x| x.into())
             .collect::<Vec<_>>();
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let notifications_data =
         database::models::notification_item::DBNotification::get_many(
             &notification_ids,
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching notifications from database")?;
 
     let mut notifications: Vec<database::models::ids::DBNotificationId> =
         Vec::new();
@@ -318,9 +347,13 @@ pub async fn notifications_read(
         &mut transaction,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("marking notifications as read")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -355,23 +388,29 @@ pub async fn notifications_delete(
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let notification_ids =
-        serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
+        serde_json::from_str::<Vec<NotificationId>>(&ids.ids)
+            .wrap_request_err("deserializing JSON data")?
             .into_iter()
             .map(|x| x.into())
             .collect::<Vec<_>>();
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let notifications_data =
         database::models::notification_item::DBNotification::get_many(
             &notification_ids,
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching notifications from database")?;
 
     let mut notifications: Vec<database::models::ids::DBNotificationId> =
         Vec::new();
@@ -387,9 +426,13 @@ pub async fn notifications_delete(
         &mut transaction,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("deleting notifications from database")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
