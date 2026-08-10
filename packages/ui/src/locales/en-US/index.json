@@ -507,7 +507,7 @@
     "defaultMessage": "{count} removed (disabled)"
   },
   "content.diff-modal.reviewed-files": {
-    "defaultMessage": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
+    "defaultMessage": "Files that aren't published to Modrinth aren't reviewed."
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
@@ -6039,7 +6039,7 @@
     "defaultMessage": "Unknown files warning"
   },
   "unknown-file-warning-modal.reviewed-files": {
-    "defaultMessage": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
+    "defaultMessage": "Files that aren't published to Modrinth aren't reviewed."
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Unrecognized files"

@@ -420,8 +420,7 @@ const messages = defineMessages({
 	},
 	reviewedFiles: {
 		id: 'content.diff-modal.reviewed-files',
-		defaultMessage:
-			'A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack).',
+		defaultMessage: "Files that aren't published to Modrinth aren't reviewed.",
 	},
 	installAnyway: {
 		id: 'content.diff-modal.install-anyway',
