@@ -1,30 +1,37 @@
 <template>
-	<Button
-		v-tooltip="tooltip"
+	<IconButton
+		v-if="icon"
 		:type="color === 'standard' ? 'base' : 'colored'"
 		:color="color === 'standard' ? undefined : color"
 		:disabled="disabled"
-		:aria-label="icon ? label : undefined"
+		:label="label"
 		@click="emit('update:modelValue', !modelValue)"
 	>
-		<component :is="icon" v-if="icon" />
-		<template v-else>{{ label }}</template>
+		<component :is="icon" aria-hidden="true" />
+	</IconButton>
+	<Button
+		v-else
+		:type="color === 'standard' ? 'base' : 'colored'"
+		:color="color === 'standard' ? undefined : color"
+		:disabled="disabled"
+		@click="emit('update:modelValue', !modelValue)"
+	>
+		{{ label }}
 	</Button>
 </template>
 
 <script lang="ts" setup>
-import { Button } from '@modrinth/ui'
+import { Button, IconButton } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
 	modelValue: boolean
-	label?: string
+	label: string
 	icon?: Component
 	disabled?: boolean
 	needsAttention?: boolean
 	fixActionable?: boolean
-	tooltip?: Record<string, unknown>
 }>()
 
 const emit = defineEmits<{

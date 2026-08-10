@@ -1,10 +1,6 @@
-import { Checkbox, Combobox, MarkdownEditor, StyledInput, Toggle } from '@modrinth/ui'
-import { markRaw } from 'vue'
-
 import { withAutoProps, withChildren } from './builder'
-import type { ComponentNodePropsContext, Configurable } from './capabilities'
+import type { Configurable, NodePropsContext } from './capabilities'
 import {
-	withComponent,
 	withEditable,
 	withEnabled,
 	withExtraProps,
@@ -17,6 +13,7 @@ import {
 	withOnClick,
 	withPriority,
 	withRequired,
+	withRenderer,
 	withSelectable,
 	withShown,
 	withStageMeta,
@@ -26,7 +23,6 @@ import {
 	withTweak,
 	withValue,
 } from './capabilities'
-import ActionButton from './components/ActionButton.vue'
 import { pipe } from './pipe'
 import type { NodeState, NodeStateWithChildren } from './state'
 
@@ -68,17 +64,7 @@ export function toggle(id: string, label: string) {
 		withFix,
 		withEnabled,
 		(n) => withValue(n, booleanValue),
-		(n) =>
-			withComponent(n, {
-				component: markRaw(ActionButton),
-				componentProps: (ctx) => ({
-					label: n.label,
-					icon: n._icon,
-					needsAttention: ctx.nodeFacts?.needsAttention ?? false,
-					fixActionable: ctx.nodeFacts?.fixActionable ?? false,
-					tooltip: ctx.tooltip,
-				}),
-			}),
+		(n) => withRenderer(n, { renderer: { type: 'action' } }),
 	)
 }
 
@@ -108,11 +94,7 @@ export function check(id: string, label: string) {
 			withFix,
 			withEnabled,
 			(n) => withValue(n, booleanValue),
-			(n) =>
-				withComponent(n, {
-					component: markRaw(Checkbox),
-					componentProps: () => ({ label }),
-				}),
+			(n) => withRenderer(n, { renderer: { type: 'checkbox' } }),
 			withExtraProps,
 		),
 	)
@@ -133,7 +115,7 @@ export function toggleSwitch(id: string, label: string) {
 			withFix,
 			withEnabled,
 			(n) => withValue(n, booleanValue),
-			(n) => withComponent(n, { component: markRaw(Toggle) }),
+			(n) => withRenderer(n, { renderer: { type: 'toggle' } }),
 			withExtraProps,
 		),
 	)
@@ -227,19 +209,7 @@ export function dropdown(id: string) {
 		(n) => withValue(n, dropdownValue),
 		withNoneLabel,
 		withOptions,
-		(n) =>
-			withComponent(n, {
-				component: markRaw(Combobox),
-				componentProps: () => ({
-					options: [
-						...(n._none !== undefined ? [{ value: '', label: n._none }] : []),
-						...n._options.map((o) => ({ value: o.value, label: o.label })),
-					],
-					triggerClass:
-						'!bg-[var(--color-button-bg)] !rounded-[var(--radius-md)] !shadow-[var(--shadow-inset-sm),0_0_0_0_transparent]',
-					dropdownClass: '!rounded-[var(--radius-md)] !bg-[var(--color-button-bg)] !border-0',
-				}),
-			}),
+		(n) => withRenderer(n, { renderer: { type: 'dropdown' } }),
 	)
 }
 
@@ -278,11 +248,7 @@ export function text(id: string) {
 			(n) => Object.assign(n, { _showTooltip: true, _imperativeSync: true }),
 			(n) => withValue(n, stringValue),
 			withTweak,
-			(n) =>
-				withComponent(n, {
-					component: markRaw(StyledInput),
-					componentProps: () => ({ class: 'min-w-40 flex-1', autocomplete: 'off' }),
-				}),
+			(n) => withRenderer(n, { renderer: { type: 'text' } }),
 			withExtraProps,
 		),
 	)
@@ -304,16 +270,7 @@ export function markdown(id: string) {
 			withEnabled,
 			withEditable,
 			(n) => withValue(n, stringValue),
-			(n) =>
-				withComponent(n, {
-					component: markRaw(MarkdownEditor),
-					componentProps: (ctx) => ({
-						maxHeight: 300,
-						disabled: false,
-						headingButtons: false,
-						onImageUpload: ctx.onImageUpload,
-					}),
-				}),
+			(n) => withRenderer(n, { renderer: { type: 'markdown' } }),
 			withExtraProps,
 		),
 	)
@@ -353,7 +310,7 @@ export function appComponent(id: string, rendererKey: string) {
 		withFix,
 		withEnabled,
 		(n) => withValue(n, stringValueBehavior),
-		(n) => withComponent(n, { rendererKey }),
+		(n) => withRenderer(n, { renderer: { type: 'custom', key: rendererKey } }),
 		withExtraProps,
 	)
 	return Object.assign(node, {
@@ -364,7 +321,7 @@ export function appComponent(id: string, rendererKey: string) {
 			)
 			return this
 		},
-		props(this: Configurable, fn: (ctx: ComponentNodePropsContext) => Record<string, unknown>) {
+		props(this: Configurable, fn: (ctx: NodePropsContext) => Record<string, unknown>) {
 			this._extraProps = fn
 			return this
 		},

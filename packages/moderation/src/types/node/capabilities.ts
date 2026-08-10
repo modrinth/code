@@ -1,4 +1,4 @@
-import type { Component, FunctionalComponent, SVGAttributes } from 'vue'
+import type { FunctionalComponent, SVGAttributes } from 'vue'
 import { markRaw } from 'vue'
 
 import { Priority } from '../priority.ts'
@@ -254,39 +254,43 @@ export function withOnClick<T extends object>(node: T): T & Clickable {
 	})
 }
 
-export interface ComponentNodePropsContext {
+export interface NodePropsContext {
 	onImageUpload?: (file: File) => Promise<string>
 	toggleSetValue?: (value: string) => void
-	nodeFacts?: { needsAttention: boolean; fixActionable: boolean }
-	tooltip?: Record<string, unknown>
 }
 
+export type BuiltinRendererKey =
+	| 'action'
+	| 'checkbox'
+	| 'toggle'
+	| 'dropdown'
+	| 'text'
+	| 'markdown'
+
+export type NodeRendererDescriptor =
+	| { type: BuiltinRendererKey }
+	| { type: 'custom'; key: string }
+
 export interface Renderable {
-	_component: Component | undefined
-	_rendererKey: string | undefined
-	_componentProps?: (ctx: ComponentNodePropsContext) => Record<string, unknown>
+	_renderer: NodeRendererDescriptor
 	_modelProp: string
 }
 
-export function withComponent<T extends object>(
+export function withRenderer<T extends object>(
 	node: T,
 	opts: {
-		component?: Component
-		rendererKey?: string
+		renderer: NodeRendererDescriptor
 		modelProp?: string
-		componentProps?: Renderable['_componentProps']
 	},
 ): T & Renderable {
 	return Object.assign(node, {
-		_component: opts.component,
-		_rendererKey: opts.rendererKey,
-		_componentProps: opts.componentProps,
+		_renderer: opts.renderer,
 		_modelProp: opts.modelProp ?? 'modelValue',
 	})
 }
 
 export interface Configurable {
-	_extraProps: ((ctx: ComponentNodePropsContext) => Record<string, unknown>) | undefined
+	_extraProps: ((ctx: NodePropsContext) => Record<string, unknown>) | undefined
 }
 
 export function withExtraProps<T extends object>(node: T): T & Configurable {
