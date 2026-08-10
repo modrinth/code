@@ -117,7 +117,12 @@ export default function () {
 						),
 
 					toggle('dependencies', 'Dependencies').suggestedStatus('flagged').message(),
-
+					// good enough for now.
+					toggle('game-versions', 'Game Versions').suggestedStatus('flagged').message(),
+					toggle('loaders', 'Loaders')
+						.suggestedStatus('rejected')
+						.shown(!project.value.minecraft_server)
+						.message(),
 					// toggle('loader', 'Loaders (WIP)')
 					// 	.suggestedStatus('flagged')
 					// 	.rawMessage(async (state) => {
