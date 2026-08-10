@@ -156,6 +156,24 @@ export function flattenStaticVariables(): Record<string, string> {
 		vars[`R5.${n}`] =
 			`Per section 5.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
 	}
+	vars[`R6`] =
+		`Per section 6 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#generative-ai)`
+	vars[`R6.1`] =
+		`Per section 6.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	const rule6sub1subs = 2
+	for (let n = 1; n <= rule6sub1subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.1${l}`] =
+			`Per section 6.1${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	}
+	vars[`R6.2`] =
+		`Per section 6.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
+	const rule6sub2subs = 4
+	for (let n = 1; n <= rule6sub2subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.2${l}`] =
+			`Per section 6.2${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
+	}
 	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
 	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
 	vars[`SUPPORT`] =
