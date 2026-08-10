@@ -52,6 +52,7 @@ const { addNotification } = injectNotificationManager()
 const {
 	isSectionCollapsed,
 	setSectionCollapsed,
+	isSearching,
 	deleteGroup,
 	renameGroup,
 	canMoveGroupUp,
@@ -85,7 +86,7 @@ const isCustomGroup = computed(
 )
 const groupContextMenuOpen = ref(false)
 const isGroupToggleBlocked = computed(
-	() => groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
+	() => isSearching.value || groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
 )
 let shouldSkipGroupToggle = false
 let groupToggleEventToSkip: MouseEvent | undefined
@@ -258,6 +259,7 @@ function toggleGroup(event: MouseEvent) {
 		groupToggleEventToSkip = undefined
 		return
 	}
+	if (isSearching.value) return
 
 	if (groupAccordion.value?.isOpen) {
 		groupAccordion.value.close()
@@ -450,6 +452,7 @@ onMounted(startInstanceGridResizeObserver)
 		<Accordion
 			ref="groupAccordion"
 			:open-by-default="hideHeader || !isSectionCollapsed(instanceGroup.id)"
+			:force-open="isSearching"
 			class="w-full"
 			@on-open="setSectionCollapsed(instanceGroup.id, false)"
 			@on-close="setSectionCollapsed(instanceGroup.id, true)"

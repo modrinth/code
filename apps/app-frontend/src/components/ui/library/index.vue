@@ -10,6 +10,7 @@ import {
 	StopCircleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
@@ -32,9 +33,18 @@ const props = defineProps<{
 	instances: GameInstance[]
 }>()
 
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	noSearchResults: {
+		id: 'app.library.search.no-results.title',
+		defaultMessage: 'No instances match your search.',
+	},
+})
+
 const {
 	instanceGroups,
 	libraryGroupsLoaded,
+	isSearching,
 	displayState,
 	filters,
 	reorderingGroups,
@@ -59,7 +69,7 @@ const visibleInstanceGroups = computed(() =>
 		instanceGroup.id === FAVORITES_GROUP_ID
 			? instanceGroup.instances.length > 0
 			: instanceGroup.instances.length > 0 ||
-				(!hasActiveFilters.value && instanceGroup.key !== 'None'),
+				(!isSearching.value && !hasActiveFilters.value && instanceGroup.key !== 'None'),
 	),
 )
 
@@ -239,10 +249,17 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 
 <template>
 	<InstanceGroupDnd :instances="instances">
-		<section data-library-page-background class="flex flex-col gap-3 pb-16">
+		<section data-library-page-background class="flex flex-col gap-3 pb-16 min-h-[500px]">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">Library</h2>
 			<LibraryToolbar />
+			<div
+				v-if="libraryGroupsLoaded && isSearching && visibleInstanceGroups.length === 0"
+				class="text-base text-primary"
+			>
+				{{ formatMessage(messages.noSearchResults) }}
+			</div>
 			<Transition
+				v-else
 				enter-active-class="transition-opacity duration-200 ease-out motion-reduce:transition-none"
 				enter-from-class="opacity-0"
 				enter-to-class="opacity-100"

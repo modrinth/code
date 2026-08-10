@@ -177,6 +177,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	}
 
 	const linkedInstances = computed(() => instances.value.filter((instance) => instance.link))
+	const isSearching = computed(() => search.value.length > 0)
 	const collapsedSectionKeys = computed(() => new Set(displayState.value.collapsedGroups))
 	const groupNames = computed(
 		() =>
@@ -447,9 +448,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const getSectionKey = (sectionId: string) => `${displayState.value.group}:${sectionId}`
 
 	const isSectionCollapsed = (sectionId: string) =>
-		collapsedSectionKeys.value.has(getSectionKey(sectionId))
+		!isSearching.value && collapsedSectionKeys.value.has(getSectionKey(sectionId))
 
 	const setSectionCollapsed = (sectionId: string, collapsed: boolean) => {
+		if (isSearching.value) return
+
 		const sectionKey = getSectionKey(sectionId)
 		const collapsedSections = new Set(displayState.value.collapsedGroups)
 
@@ -1140,6 +1143,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		libraryGroups,
 		libraryGroupsLoaded,
 		search,
+		isSearching,
 		filters,
 		displayState,
 		instanceGroups,
