@@ -14,6 +14,9 @@
   "app.action-bar.install.copied-details": {
     "message": "Zkopírováno"
   },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopírovat detaily"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Zavřít"
   },
@@ -25,6 +28,9 @@
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Zrušeno"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Čištění nebylo dokončeno"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Neznámá instance"
@@ -64,6 +70,9 @@
   },
   "app.action-bar.view-logs": {
     "message": "Zobrazit logy"
+  },
+  "app.ads-consent.title": {
+    "message": "Vaše soukromí a způsob, jakým reklamy podporují Modrinth"
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Pokročilé vykreslování"
@@ -211,6 +220,9 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "Spuštění loader procesů"
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Odstraněno"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Všechna data tvé instance budou trvale smazána, včetně světů, konfigurací a veškerého nainstalovaného obsahu."

@@ -1,6 +1,6 @@
 {
   "action.no-permission": {
-    "defaultMessage": "権限がありません"
+    "defaultMessage": "権限がありません。"
   },
   "affiliate.create.button": {
     "defaultMessage": "アフィリエイトリンクを作成"
@@ -449,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} 件追加されました"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "設定変更"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "追加 (依存関係)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "無効化済み"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "削除済み（無効）"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "アップデート済み"
@@ -470,11 +476,32 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "更新されました"
   },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "ゲームバージョン変更"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "それでもインストールする"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Modローダー変更"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "リンク済みモッドパック"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "未リンクのモッドパック"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Modパックのアップデート"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "変更点なし"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} 件削除されました"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count}件 削除済み（無効）"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "ファイルは、（.mrpackなどのファイル形式に関係なく）Modrinthに公開されたもののみ審査されます。"
@@ -535,6 +562,9 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "ワールド"
+  },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "インストール設定"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "追加のコンテンツ"
@@ -959,6 +989,9 @@
   "external-files.permissions-card.attribution.moderation-status.passed": {
     "defaultMessage": "審査を通りました"
   },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "証明が拒否されました"
+  },
   "external-files.permissions-card.badge.attributed": {
     "defaultMessage": "完了しました"
   },
@@ -982,6 +1015,9 @@
   },
   "external-files.permissions-card.editor.all-rights-reserved": {
     "defaultMessage": "無断転載禁止／ライセンスなし"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "ライセンスへのリンク"
   },
   "external-files.permissions-card.editor.custom-license-my-project-label": {
     "defaultMessage": "ライセンス名はSPDX識別子であることが望ましい"
@@ -1019,8 +1055,35 @@
   "external-files.permissions-card.editor.notes-placeholder": {
     "defaultMessage": "何かここに書いてください..."
   },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "証明のスクリーンショット {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "画像を削除"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "証明画像"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "ドラッグ＆ドロップしてアップロード、またはクリックして画像を選択"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "虚偽の申告や画像の改ざんが発覚した場合、プロジェクトの削除およびアカウントの停止措置が取られる可能性があります。"
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinthスタッフが提出された証明を確認・検証する場合があります"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "帰属情報を保存"
+  },
   "external-files.permissions-card.editor.select-license-label": {
     "defaultMessage": "ライセンスを選んでください…"
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "パーミッションの理由"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "ライセンスへのリンクを含めてください。ライセンスがない場合は、「All Rights Reserved / ライセンスなし」を選択することをお勧めします。"
   },
   "external-files.permissions-card.error.explanation-or-images-required": {
     "defaultMessage": "説明や根拠となる画像を少なくとも一枚提示してください。"
@@ -1130,11 +1193,29 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "あなたは、自身のModパックでこの作品を再配布するための特別な許可を得ています。"
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "グループを削除"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "この操作により、この帰属グループとグループ内のすべてのファイルが完全に削除されます。この操作を取り消すことはできません。"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "「{title}」を削除しますか？"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "グループを削除できませんでした"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Shiftキーを押しながらクリックすると確認をスキップします"
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "グループから削除する"
   },
   "external-files.permissions-card.split-file-error.title": {
     "defaultMessage": "ファイルの分割に失敗"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} ほか{count}件"
   },
   "external-files.permissions-card.updated-by-moderator": {
     "defaultMessage": "モデレーター"
@@ -2003,6 +2084,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "コンテンツが見つかりません"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "外部"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "このファイルは Modrinth 上で公開されていません"
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpackコンテンツ"
   },
@@ -2011,6 +2098,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "該当するプロジェクトがありません。"
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Slicer で開く"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "{count, number}件のプロジェクトを検索"
@@ -2147,6 +2237,9 @@
   "label.details": {
     "defaultMessage": "詳細"
   },
+  "label.discover-content": {
+    "defaultMessage": "コンテンツを探す"
+  },
   "label.done": {
     "defaultMessage": "完了"
   },
@@ -2224,6 +2317,9 @@
   },
   "label.password": {
     "defaultMessage": "パスワード"
+  },
+  "label.permissions": {
+    "defaultMessage": "権限"
   },
   "label.plan-custom": {
     "defaultMessage": "カスタム"
@@ -2756,8 +2852,89 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Modrinth クリエイター"
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Modrinth ユーザー"
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} はあなたにフレンドリクエストの送信、共有インスタンスへの招待、および Modrinth Hosting サーバーへの招待ができなくなります。"
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "このユーザーをブロックしてもよろしいですか？"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "このユーザーのブロック中にエラーが発生しました。もう一度お試しください。"
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "ユーザーのブロックに失敗しました"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} をブロックしました"
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "ユーザーをブロックしました"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "{username} をブロック"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "ユーザーアナリティクスを表示"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "ユーザーの請求情報を管理"
+  },
+  "profile.button.block": {
+    "defaultMessage": "ブロック"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "コレクションを作成"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "プロジェクトを作成"
+  },
+  "profile.button.info": {
+    "defaultMessage": "ユーザーの詳細を表示"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "プロジェクトを管理"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "アフィリエイトから削除"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "アフィリエイトに設定"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "ブロック解除"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Modrinth でのポップアップを許可してから、もう一度お試しください。"
+  },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "読み込み中…"
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "ユーザーが見つかりません"
+  },
   "profile.label.badges": {
     "defaultMessage": "バッジ"
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "このユーザーはまだプロジェクトがありません！"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "まだプロジェクトを何も持っていないようです。"
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "組織"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Modrinth 公式アカウント"
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "ユーザーのブロックを解除しました"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "{date}に公開済み"
@@ -2777,8 +2954,14 @@
   "project-card.environment.server": {
     "defaultMessage": "サーバー"
   },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "シングルプレイヤー"
+  },
   "project-type.all": {
     "defaultMessage": "すべて"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "コレクション"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "データパック"
@@ -3638,8 +3821,53 @@
   "servers.access-page.activity-log-filter.action-types": {
     "defaultMessage": "アクション"
   },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "無効化されたコンテンツ"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "有効化されたコンテンツ"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "更新されたコンテンツ"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "アップロードされたコンテンツ"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "バックアップを作成しました"
+  },
   "servers.access-page.activity-log-filter.action.backup-deleted": {
     "defaultMessage": "削除されたバックアップ"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "バックアップの名前を変更しました"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "バックアップを復元しました"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "サーバー名を変更しました"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "サーバーのサブドメインを変更しました"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "コンソールをクリアしました"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "コンソールコマンドを実行しました"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "ファイルを削除しました"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "ファイルを編集しました"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "ファイル名を変更しました"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "ファイルをアップロードしました"
   },
   "servers.access-page.activity-log-filter.action.game-version-edited": {
     "defaultMessage": "Minecraftのバージョンを変更しました"
@@ -3947,6 +4175,93 @@
   "servers.audit-log.event.config-changed": {
     "defaultMessage": "サーバーの設定が変更されました"
   },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "コンソールをクリアしました"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "コンソールコマンド「<command></command>」を実行しました"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "ファイル「<file></file>」を変更しました"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "ファイル「<file></file>」を削除しました"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "ファイル「<file></file>」を編集しました"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "「<from></from>」の名前を「<to></to>」に変更しました"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "<file></file>をアップロードしました"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Minecraftのバージョンを <version></version> に変更しました"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Javaの実行環境を <vendor></vendor> に変更しました"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Javaのバージョンを <java-version></java-version> に変更しました"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "ローダーを <loader></loader> <version></version> に変更しました"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "ローダーを <loader></loader> に変更しました"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "ローダーのバージョンを <version></version> に変更しました"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "ローダーのバージョン設定を消去しました"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "モッドパックを変更しました"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "モッドパックを <modpack></modpack> に変更しました"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "モッドパックのバージョンを <version></version> に変更しました"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "モッドパックの連携を解除しました"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "モッドパック <modpack></modpack> の連携を解除しました"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "モッドパックのバージョン <version></version> の連携を解除しました"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "ポート割り当て <port></port> を追加しました"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "ポート割り当て <port></port> を削除しました"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "サーバーを作成しました"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "サーバーを強制終了しました"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "サーバーのメタデータを変更しました"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "サーバー名を <name></name> に変更しました"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "プランを <specs></specs> に変更しました"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "新しいプラン"
+  },
   "servers.audit-log.event.server-plan.ram-gb": {
     "defaultMessage": "メモリ {amount, number} GB"
   },
@@ -3958,6 +4273,21 @@
   },
   "servers.audit-log.event.server-plan.storage-mb": {
     "defaultMessage": "ストレージ {amount, number} MB"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "サーバープロパティ <properties></properties> を変更しました"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "サーバープロパティを変更しました"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "サーバーの割り当てを変更しました"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "サーバーを修復しました"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "サーバーをリセットしました"
   },
   "servers.audit-log.scope.server": {
     "defaultMessage": "サーバー"
@@ -4289,14 +4619,65 @@
   "servers.listing.notice.pending-change": {
     "defaultMessage": "あなたのサーバーは <date>{formattedDate}</date>に {planSize} へと {verb, select, downgrade {ダウングレード} other {アップグレード}} されます。"
   },
+  "servers.listing.support-label": {
+    "defaultMessage": "サポート"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "新しいサーバー"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "サーバーは見つかりませんでした。"
+  },
   "servers.manage.reload-button": {
     "defaultMessage": "再読み込み"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "現在サーバーがキャンセルされている場合、再課金の試行までに最大10分ほどかかることがあります。"
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "再購読のリクエストを送信しました"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "サーバーのサブスクリプションが完了しました"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "成功"
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth ホスティング"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "こちらに移動しました！"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "次回から表示しない"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "サーバー設定の場所が移動しました"
+  },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "共有サーバー"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "あなたのサーバー"
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "新しいサーバー"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "Medalサーバーの試用期間が終了し、サーバーがサスペンド（停止）されました。サーバーを引き続き利用するにはアップグレードしてください。"
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "サーバーがサスペンド（停止）されました。請求情報を更新するか、詳細は Modrinth サポートにお問い合わせください。"
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "サーバーがサスペンド（停止）されました: {reason}。請求情報を更新するか、詳細は Modrinth サポートにお問い合わせください。"
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "サーバーのハードウェアをアップグレード中です。まもなくオンラインに戻ります。"
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username} のアバター"
   },
   "servers.medal-listing.owner-tooltip": {
     "defaultMessage": "{username}によって所有されています"
@@ -4352,8 +4733,14 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支払い方法"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "北米、ヨーロッパ、東南アジアでご利用いただけます。"
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "必要な仕様だけのカスタマイズされたプランを選択。"
+  },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "必要なものがお決まりですか？"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "始めましょう"
@@ -4384,6 +4771,9 @@
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "プラン"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "現在のプラン"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "地域"
@@ -4424,11 +4814,98 @@
   "servers.region.western-europe": {
     "defaultMessage": "西ヨーロッパ"
   },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "{time} に追加済み"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "招待を取り消す"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "このサーバーには追加されません"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "あとから再度招待を送ることもできます"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "招待を取り消す"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "この招待を取り消すと、{username} がこのサーバーに参加するには新しい招待が必要になります。"
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "アクセス権を取り消す"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "{time} に招待済み"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "保留中の招待"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "アクセス権を取り消す"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "サーバーパネルへのアクセス権が即座に無効化され、コンテンツの編集ができなくなります"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "個別に設定を変更しない限り、ユーザーは引き続きサーバーに参加してプレイすることができます"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "追加日不明"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username} のアバター"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "ユーザーのサーバーアクセス権を取り消した場合、アクセスを復元するには再度招待し直す必要があります。"
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "どうなるの？"
+  },
+  "servers.setup.onboarding.installation-failed.text": {
+    "defaultMessage": "インストール中に予期しないエラーが発生しました。時間をおいて再度お試しください。"
+  },
+  "servers.setup.onboarding.installation-failed.title": {
+    "defaultMessage": "インストールの失敗"
+  },
+  "servers.setup.onboarding.modpack-upload-failed.text": {
+    "defaultMessage": "アップロード中に予期しないエラーが発生しました。時間をおいて再度お試しください。"
+  },
+  "servers.setup.onboarding.modpack-upload-failed.title": {
+    "defaultMessage": "モッドパックのアップロード失敗"
+  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "サーバーをセットアップ"
   },
+  "servers.setup.onboarding.step.choose.description": {
+    "defaultMessage": "Modrinthからお気に入りのモッドパックを選ぶか、ローダーを選択して好きなModを追加してください"
+  },
+  "servers.setup.onboarding.step.choose.title": {
+    "defaultMessage": "プレイするものを選ぶ"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "シングルプレイと同じようにワールドを設定できます。ゲームモードとワールドシード値を選択してください"
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "ワールドを設定する"
+  },
+  "servers.setup.onboarding.step.invite-friends.description": {
+    "defaultMessage": "アドレスをコピーして友達に共有し、参加に必要なModを教えてあげましょう"
+  },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "フレンドを招待"
+  },
+  "servers.setup.onboarding.steps.heading": {
+    "defaultMessage": "サーバーをセットアップする（約2分）"
+  },
+  "servers.setup.onboarding.uploading.progress": {
+    "defaultMessage": "アップロード中 ({percent, number}%)"
+  },
+  "servers.setup.onboarding.welcome.description": {
+    "defaultMessage": "サーバーの準備が完了しました。プレイを開始する手順は以下の通りです！"
+  },
+  "servers.setup.onboarding.welcome.title": {
+    "defaultMessage": "Modrinth ホスティングへようこそ"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "レート制限に達しました。時間をおいて再試行してください。"
@@ -4490,6 +4967,9 @@
   "settings.display.theme.title": {
     "defaultMessage": "カラーテーマ"
   },
+  "settings.feature-flags.title": {
+    "defaultMessage": "機能フラグ"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "一般的な言語"
   },
@@ -4523,8 +5003,56 @@
   "settings.pats.title": {
     "defaultMessage": "個人用アクセストークン"
   },
+  "settings.profile.bio.title": {
+    "defaultMessage": "自己紹介"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "プロファイル"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "プロファイルアイコン"
+  },
   "settings.sessions.title": {
     "defaultMessage": "セッション"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "ブロックを解除"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "近日公開！"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "全員"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "フレンド"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "フレンドのフレンド"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "なし"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "追加"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "追加済み"
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "適用"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "カスタム…"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "あなたのフレンド - {count} 人"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "招待"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "保存"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -5047,6 +5575,9 @@
   },
   "version.section.content.search-placeholder": {
     "defaultMessage": "コンテンツを検索…"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "すべてのバージョン"
   },
   "version.section.files": {
     "defaultMessage": "ファイル"

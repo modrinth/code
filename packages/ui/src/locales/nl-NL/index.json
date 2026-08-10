@@ -566,6 +566,9 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "wereld"
   },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "Installatie-instellingen"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
   },
@@ -2228,6 +2231,9 @@
   "label.details": {
     "defaultMessage": "Details"
   },
+  "label.discover-content": {
+    "defaultMessage": "Ontdek inhoud"
+  },
   "label.done": {
     "defaultMessage": "Klaar"
   },
@@ -2846,11 +2852,35 @@
   "profile.bio.fallback.user": {
     "defaultMessage": "Een gebruiker van Modrinth."
   },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} zal je geen vriendschapsverzoeken kunnen sturen, je niet kunnen uitnodigen voor gedeelde instanties en je ook niet kunnen uitnodigen voor Modrinth Hosting-servers."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Weet je zeker dat je deze gebruiker wilt blokkeren?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het blokkeren van deze gebruiker. Probeer het nog eens."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Gebruiker blokkeren mislukt"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} is geblokkeerd."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Gebruiker geblokkeerd"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "{username} blokkeren"
+  },
   "profile.button.analytics": {
     "defaultMessage": "Gebruikersstatistieken bekijken"
   },
   "profile.button.billing": {
     "defaultMessage": "Gebruikersfacturering beheren"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Blokkeren"
   },
   "profile.button.create-collection": {
     "defaultMessage": "Een collectie aanmaken"
@@ -2870,8 +2900,20 @@
   "profile.button.set-affiliate": {
     "defaultMessage": "Als partner instellen"
   },
+  "profile.button.unblock": {
+    "defaultMessage": "Deblokkeren"
+  },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# project} other {# projecten}}"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Schakel pop-ups voor Modrinth in en probeer het vervolgens opnieuw."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Het GitHub-profiel kon niet worden opgehaald. Probeer het nog eens."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Kan GitHub-profiel niet openen"
   },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Authenticatieproviders"
@@ -2885,8 +2927,14 @@
   "profile.details.label.has-totp": {
     "defaultMessage": "Heeft TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Laden..."
+  },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Betaalmethoden"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Profiel bekijken"
   },
   "profile.details.title": {
     "defaultMessage": "Gebruikersgegevens"
@@ -2938,6 +2986,21 @@
   },
   "profile.official-account": {
     "defaultMessage": "Officieel Modrinth-account"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Het officiële gebruikersaccount van Modrinth. Neem contact op met het Helpcentrum via <support-link></support-link> of per e-mail via <email></email>"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het deblokkeren van deze gebruiker. Probeer het nog eens."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Kan gebruiker niet deblokkeren"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} is gedeblokkeerd."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "Gebruiker gedeblokkeerd"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Gepubliceerd op {date}"
@@ -5195,8 +5258,119 @@
   "settings.pats.title": {
     "defaultMessage": "Persoonlijke toegangstokens"
   },
+  "settings.profile.bio.description": {
+    "defaultMessage": "Een korte beschrijving om iedereen iets over jezelf te vertellen."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Bio"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Profiel"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Profielfoto"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "Je profielgegevens zijn openbaar <profile-link>te bekijken op Modrinth</profile-link> en via de <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Het bijwerken van het profiel is mislukt"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het bijwerken van je profiel. Probeer het nog eens."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Log in met een Modrinth-account om je openbare profiel aan te passen."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinth-account vereist"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "Een unieke, hoofdletterongevoelige naam waarmee je profiel wordt geïdentificeerd."
+  },
   "settings.sessions.title": {
     "defaultMessage": "Sessies"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Acties"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Gebruiker"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Dit zijn de gebruikers die je op Modrinth hebt geblokkeerd. Zij kunnen jou niet:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "Je hebt niemand geblokkeerd."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "De geblokkeerde gebruikers konden niet worden geladen."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Geblokkeerde gebruikers laden…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "Een vriendschapsverzoek sturen"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Uitnodigen om een Modrinth Hosting-server te beheren."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "Uitnodigen voor gedeelde instanties"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Geblokkeerde gebruikers"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Deblokkeren"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "Kan gebruiker niet deblokkeren"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het deblokkeren van deze gebruiker. Probeer het nog eens."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "{username} deblokkeren"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "Avatar van {username}"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Bepaal zelf wie je vriendschapsverzoeken kan sturen op Modrinth."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Vriendschapsverzoeken"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "Binnenkort beschikbaar!"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Iedereen"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Vrienden"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Vrienden van vrienden"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "Niemand"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Bepaal zelf wie je uitnodigingen kan sturen voor gedeelde instanties en Modrinth Hosting-panelen."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Uitnodigingen"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "Met een Modrinth-account kun je bepalen wie er contact met je kan opnemen en kun je geblokkeerde gebruikers beheren"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Modrinth-account vereist"
+  },
+  "settings.social.title": {
+    "defaultMessage": "Sociaal"
   },
   "sharing.invite-players-modal.add": {
     "defaultMessage": "Toevoegen"
@@ -5207,14 +5381,41 @@
   "sharing.invite-players-modal.already-invited": {
     "defaultMessage": "Deze gebruiker is al uitgenodigd."
   },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Toepassen"
+  },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar van {username}"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Aangepast..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Aangepast: {date}"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Uitnodigingslink bewerken."
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
     "defaultMessage": "Uitnodigingslink bewerken"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "Over 1 dag"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "Over 1 uur"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "Over 7 dagen"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "Over 6 uur"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "Over 3 dagen"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "Over 12 uur"
   },
   "sharing.invite-players-modal.expiry-label": {
     "defaultMessage": "Vervaldatum"

@@ -348,10 +348,10 @@
     "defaultMessage": "Выбрать {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Вы уверены, что хотите обновить {count, plural, one {# проект} few {# проекта} other {# проектов}} до их последней совместимой версии? Рекомендуется обновлять контент по отдельности."
+    "defaultMessage": "Вы точно хотите обновить {count, plural, one {# проект} few {# проекта} other {# проектов}} до {count, plural, =1 {последней совместимой версии} other {последних совместимых версий}}? Рекомендуется обновлять контент по очереди."
   },
   "content.confirm-bulk-update.admonition-header": {
-    "defaultMessage": "Предупреждение об обновлении"
+    "defaultMessage": "Предупреждение об обновлении"
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Обновление проектов"
@@ -363,10 +363,10 @@
     "defaultMessage": "Обновить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Удаление мода может необратимо повлиять на ваш мир, что приведет к потере контента или непредвиденным ошибкам при следующей загрузке."
+    "defaultMessage": "Удаление модов может повлиять на миры и привести к необратимой пропаже контента или ошибкам при следующей загрузке."
   },
   "content.confirm-deletion.admonition-header": {
-    "defaultMessage": "Предупреждение об удалении"
+    "defaultMessage": "Предупреждение об удалении"
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Удалить {itemType}"
@@ -375,10 +375,10 @@
     "defaultMessage": "Отключить {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "{action, select, downgrade {Понижение версии} other {Обновление}} может привести к проблемам с совместимостью. Моды или другой контент, который вы установили в сборку, сохранятся, но могут быть несовместимы с новой версией."
+    "defaultMessage": "{action, select, downgrade {Откат} other {Обновление}} может нарушить совместимость. Добавленные вами моды и контент останутся, но могут перестать работать в новой версии."
   },
   "content.confirm-modpack-update.admonition-header": {
-    "defaultMessage": "Предупреждение: {action, select, downgrade {откат} other {обновление}} версии"
+    "defaultMessage": "Предупреждение об {action, select, downgrade {откате} other {обновлении}}"
   },
   "content.confirm-modpack-update.confirm-button": {
     "defaultMessage": "{action, select, downgrade {Откатить} other {Обновить}} сборку"
@@ -387,7 +387,7 @@
     "defaultMessage": "{action, select, downgrade {Откат} other {Обновление}} сборки"
   },
   "content.confirm-unlink.admonition-body": {
-    "defaultMessage": "Моды и контент будут объединены с тем, что вы добавили в сборку. После этого сборка перестанет получать обновления."
+    "defaultMessage": "Моды и контент объединятся с вашими добавлениями, но сборка перестанет получать обновления."
   },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Отвязка сборки"
@@ -1809,52 +1809,52 @@
     "defaultMessage": "Настройка установки"
   },
   "installation-settings.edit.warning-instance": {
-    "defaultMessage": "Мы не рекомендуем изменять настройки сборки после установки контента. Если вы всё же хотите их изменить, будьте осторожны, так как это может вызвать проблемы."
+    "defaultMessage": "Не рекомендуется изменять установку после добавления контента. Это может привести к ошибкам."
   },
   "installation-settings.edit.warning-server": {
-    "defaultMessage": "Не рекомендуется менять настройки инсталляции после установки контента. Если вы всё же хотите изменить их, перезагрузите сервер."
+    "defaultMessage": "Не рекомендуется изменять установку после добавления контента. Лучше сразу переустановить сервер."
   },
   "installation-settings.incompatible-content.auto-fix-button": {
-    "defaultMessage": "Авто-исправление"
+    "defaultMessage": "Исправить"
   },
   "installation-settings.incompatible-content.change-loader-button": {
     "defaultMessage": "Сменить загрузчик"
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
-    "defaultMessage": "Отключить конфликты"
+    "defaultMessage": "Отключить"
   },
   "installation-settings.incompatible-content.game-version-warning-body": {
-    "defaultMessage": "При изменении версии игры вы можете либо отключить несовместимый контент, либо попытаться устранить несовместимости."
+    "defaultMessage": "При смене версии игры можно отключить несовместимый контент или попытаться исправить несовместимости автоматически."
   },
   "installation-settings.incompatible-content.game-version-warning-title": {
-    "defaultMessage": "Предупреждение о несовместимости"
+    "defaultMessage": "Предупреждение о несовместимости"
   },
   "installation-settings.incompatible-content.header": {
-    "defaultMessage": "Установлены несовместимые проекты"
+    "defaultMessage": "Нарушение совместимости"
   },
   "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "При смене загрузчика модов, все установленные проекты будут отключены. Вместо этого рекомендуется сбросить сервер."
+    "defaultMessage": "Смена загрузчика отключит установленный контент. Лучше сразу переустановить сервер."
   },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Смена загрузчика небезопасна"
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "Связанный {projectType}"
+    "defaultMessage": "Отвязка {projectType}"
   },
   "installation-settings.linked.modpack": {
-    "defaultMessage": "сборка"
+    "defaultMessage": "сборки"
   },
   "installation-settings.linked.server-project": {
-    "defaultMessage": "серверный проект"
+    "defaultMessage": "серверного проекта"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Версия {loader}"
   },
   "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Необходимо сбросить сервер для изменения загрузчика."
+    "defaultMessage": "Для смены загрузчика необходимо переустановить сервер."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Переустановка сборки сбросит контент, который использует {type}, до исходного состояния, удалив все добавленные вами моды и файлы."
+    "defaultMessage": "Переустановка сбросит {type} к исходному состоянию, удалив все добавленные вами моды и контент."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Переустановка сборки"
@@ -1884,31 +1884,31 @@
     "defaultMessage": "Поиск версии игры..."
   },
   "installation-settings.type.instance": {
-    "defaultMessage": "сборка"
+    "defaultMessage": "сборку"
   },
   "installation-settings.type.instance-possessive": {
-    "defaultMessage": "сборки"
+    "defaultMessage": "сборку"
   },
   "installation-settings.type.server": {
     "defaultMessage": "сервер"
   },
   "installation-settings.type.server-possessive": {
-    "defaultMessage": "серверы"
+    "defaultMessage": "сервер"
   },
   "installation-settings.unlink": {
     "defaultMessage": "Отвязать"
   },
   "installation-settings.unlink.description": {
-    "defaultMessage": "Отвязка навсегда отключит этот {type} от проекта {projectType}, что позволит вам изменить загрузчик и версию Minecraft, но вы больше не сможете получать обновления."
+    "defaultMessage": "Отвязка навсегда отключит {type} от исходного проекта. Это откроет доступ к смене версии игры и загрузчика, но получение обновлений прекратится."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Проверка..."
   },
   "instance.confirm-reinstall.admonition-body": {
-    "defaultMessage": "Переустановка сбросит весь установленный или изменённый контент к начальному состоянию, удалив моды и контент, добавленные поверх исходной установки."
+    "defaultMessage": "Переустановка сбросит установленное содержимое к исходному состоянию, удалив добавленные вами моды и контент."
   },
   "instance.confirm-reinstall.admonition-header": {
-    "defaultMessage": "Предупреждение переустановки"
+    "defaultMessage": "Предупреждение о переустановке"
   },
   "instance.confirm-reinstall.header": {
     "defaultMessage": "Переустановка сборки"
@@ -4452,7 +4452,7 @@
     "defaultMessage": "После удаления {count, plural, one {эта резервная копия не может быть восстановлена} other {эти резервные копии не могут быть восстановлены}}. Удаление необратимо."
   },
   "servers.backups.delete-modal.admonition-header": {
-    "defaultMessage": "Предупреждение об удалении"
+    "defaultMessage": "Предупреждение об удалении"
   },
   "servers.backups.delete-modal.backups-label": {
     "defaultMessage": "{count, plural, one {Резервная копия} other {Резервные копии ({count})}}"
@@ -5268,7 +5268,7 @@
     "defaultMessage": "Скоро будет!"
   },
   "settings.social.interaction-source.everyone": {
-    "defaultMessage": "Каждый"
+    "defaultMessage": "Все"
   },
   "settings.social.interaction-source.friends": {
     "defaultMessage": "Друзья"

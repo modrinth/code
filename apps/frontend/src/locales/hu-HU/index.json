@@ -177,13 +177,16 @@
     "message": "{count} nap"
   },
   "analytics.chart.tooltip.duration.hours": {
-    "message": "{count} óra"
+    "message": "{count, plural, one {#óra} other {# órák}}"
   },
   "analytics.chart.tooltip.duration.minutes": {
-    "message": "{count} perc"
+    "message": "{count, plural, one {# perc} other {# percek}}"
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "{name} elrejtése a grafikonon"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Nincs adat"
   },
   "analytics.chart.tooltip.pinned": {
     "message": "A diagram eszköztippje kitűzve"
@@ -426,7 +429,7 @@
     "message": "az elő. idősz. kép."
   },
   "analytics.stat.previous-period-comparison-short": {
-    "message": "az előzőhöz képest"
+    "message": "az elő. kép."
   },
   "analytics.stat.revenue": {
     "message": "Bevétel"
@@ -3088,6 +3091,15 @@
   },
   "organization.label.downloads": {
     "message": "letöltés"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "Azonosító"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Név"
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "A(z) {name} ikonja"
   },
   "organization.projects.none-with-create-prompt": {
     "message": "Ennek a szervezetnek még nincsenek projektjei. Szeretnél <create-link>létrehozni egyet</create-link>?"

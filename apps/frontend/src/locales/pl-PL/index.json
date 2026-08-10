@@ -3854,6 +3854,9 @@
   "project.settings.server.languages-label": {
     "message": "Języki"
   },
+  "project.settings.server.latency-label": {
+    "message": "Opóźnienie: {latency}ms"
+  },
   "project.settings.server.optional-label": {
     "message": "opcjonalne"
   },

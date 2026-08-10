@@ -234,7 +234,7 @@
     "message": "Modrinth App"
   },
   "analytics.download-source.website": {
-    "message": "Site web de Modrinth"
+    "message": "Site web Modrinth"
   },
   "analytics.downloads.suffix": {
     "message": "téléchargements"
@@ -1080,10 +1080,10 @@
     "message": "Ce fil est fermé et aucun message ne peut y être envoyé."
   },
   "conversation-thread.error.closing-report": {
-    "message": "Impossible de fermer le rapport"
+    "message": "Erreur lors de la fermeture du signalement"
   },
   "conversation-thread.error.reopening-report": {
-    "message": "Impossible de rouvrir le rapport"
+    "message": "Erreur lors de la réouverture du signalement"
   },
   "conversation-thread.error.sending-message": {
     "message": "Impossible d'envoyer le message"
@@ -2676,7 +2676,7 @@
     "message": "Publier"
   },
   "layout.action.reports": {
-    "message": "Rapports d'examen"
+    "message": "Examiner les signalements"
   },
   "layout.action.review-projects": {
     "message": "Revue de projet"
@@ -2874,7 +2874,7 @@
     "message": "Ouvrir le menu"
   },
   "layout.nav.active-reports": {
-    "message": "Rapports actifs"
+    "message": "Signalements actifs"
   },
   "layout.nav.discover": {
     "message": "Découvrir"
@@ -3929,8 +3929,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Tags mis en avant"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Vous devez au moins avoir un tag mis en avant."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Sélectionnez vos tags les plus pertinents. Ils sont affichés avant le reste de vos tags."
+  },
   "project.settings.tags.features-description": {
     "message": "Sélectionnez toutes les fonctionnalités que votre {type} utilise."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} catégories} other {Catégories}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} fonctionnalités} other {Fonctionnalités}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} impact sur les performances} other {Impact sur les performances}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} résolutions} other {Résolutions}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Vous avez sélectionné {count} tags de résolution ({tags}). Les packs de ressources ne devraient typiquement avoir qu'un seul tag de résolution."
