@@ -508,12 +508,7 @@ pub(crate) async fn dependencies_to_content_items(
                     .unwrap_or(0),
                 enabled: true,
                 project_type,
-                project: Some(ContentItemProject {
-                    id: project.id.clone(),
-                    slug: project.slug.clone(),
-                    title: project.title.clone(),
-                    icon_url: project.icon_url.clone(),
-                }),
+                project: Some(content_item_project(project)),
                 version: version.map(|version| ContentItemVersion {
                     id: version.id.clone(),
                     version_number: version.version_number.clone(),
@@ -886,12 +881,7 @@ async fn content_files_to_content_items(
                 size: file.size,
                 enabled: file.enabled,
                 project_type: file.project_type,
-                project: project.map(|project| ContentItemProject {
-                    id: project.id.clone(),
-                    slug: project.slug.clone(),
-                    title: project.title.clone(),
-                    icon_url: project.icon_url.clone(),
-                }),
+                project: project.map(content_item_project),
                 version: version.map(|version| ContentItemVersion {
                     id: version.id.clone(),
                     version_number: version.version_number.clone(),
@@ -1046,6 +1036,18 @@ fn resolve_owner(
                 avatar_url: member.user.avatar_url.clone(),
                 owner_type: OwnerType::User,
             })
+    }
+}
+
+fn content_item_project(project: &Project) -> ContentItemProject {
+    ContentItemProject {
+        id: project.id.clone(),
+        slug: project.slug.clone(),
+        title: project.title.clone(),
+        icon_url: project.icon_url.clone(),
+        license: project.license.clone(),
+        categories: project.categories.clone(),
+        additional_categories: project.additional_categories.clone(),
     }
 }
 

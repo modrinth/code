@@ -21,6 +21,7 @@ interface Props {
 	items: ContentCardTableItem[]
 	showSelection?: boolean
 	sortable?: boolean
+	sortableColumns?: ContentCardTableSortColumn[]
 	sortBy?: ContentCardTableSortColumn
 	sortDirection?: ContentCardTableSortDirection
 	virtualized?: boolean
@@ -33,6 +34,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
 	showSelection: false,
 	sortable: false,
+	sortableColumns: undefined,
 	sortBy: undefined,
 	sortDirection: 'asc',
 	virtualized: true,
@@ -153,12 +155,18 @@ function isItemSelected(itemId: string): boolean {
 }
 
 function handleSort(column: ContentCardTableSortColumn) {
-	if (!props.sortable) return
+	if (!isColumnSortable(column)) return
 
 	const newDirection: ContentCardTableSortDirection =
 		props.sortBy === column && props.sortDirection === 'asc' ? 'desc' : 'asc'
 
 	emit('sort', column, newDirection)
+}
+
+function isColumnSortable(column: ContentCardTableSortColumn) {
+	return (
+		props.sortable && (!props.sortableColumns || props.sortableColumns.includes(column))
+	)
 }
 </script>
 
@@ -197,12 +205,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 				/>
 
 				<button
-					v-if="sortable"
+					v-if="isColumnSortable('project')"
 					role="columnheader"
 					:aria-sort="
 						sortBy === 'project' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'
 					"
-					class="flex items-center gap-1.5 font-semibold text-secondary"
+					class="flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 font-semibold text-secondary transition-colors hover:text-contrast"
 					@click="handleSort('project')"
 				>
 					{{ formatMessage(commonMessages.projectLabel) }}
@@ -219,12 +227,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 			<div class="hidden @[800px]:flex" :class="hasAnyActions ? 'flex-1 min-w-0' : 'flex-1'">
 				<button
-					v-if="sortable"
+					v-if="isColumnSortable('version')"
 					role="columnheader"
 					:aria-sort="
 						sortBy === 'version' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'
 					"
-					class="flex items-center gap-1.5 font-semibold text-secondary"
+					class="flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 font-semibold text-secondary transition-colors hover:text-contrast"
 					@click="handleSort('version')"
 				>
 					{{ formatMessage(commonMessages.versionLabel) }}

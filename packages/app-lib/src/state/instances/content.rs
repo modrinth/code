@@ -1,5 +1,5 @@
 use super::ContentSourceKind;
-use crate::state::{Project, ProjectType, Version};
+use crate::state::{License, Project, ProjectType, Version};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -25,6 +25,9 @@ pub struct ContentItemProject {
     pub slug: Option<String>,
     pub title: String,
     pub icon_url: Option<String>,
+    pub license: License,
+    pub categories: Vec<String>,
+    pub additional_categories: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

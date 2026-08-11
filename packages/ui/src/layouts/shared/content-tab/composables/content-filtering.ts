@@ -29,6 +29,7 @@ export interface ContentFilterConfig {
 	showTypeFilters?: boolean
 	showUpdateFilter?: boolean
 	showWarningsFilter?: boolean
+	showStatusFilters?: boolean
 	isPackLocked?: Ref<boolean>
 	persistKey?: string
 }
@@ -92,11 +93,13 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 		}
 
-		for (const status of availableStatusFilters.value) {
-			options.push({
-				id: status,
-				label: formatMessage(status === 'enabled' ? messages.enabled : messages.disabled),
-			})
+		if (config?.showStatusFilters !== false) {
+			for (const status of availableStatusFilters.value) {
+				options.push({
+					id: status,
+					label: formatMessage(status === 'enabled' ? messages.enabled : messages.disabled),
+				})
+			}
 		}
 
 		return options

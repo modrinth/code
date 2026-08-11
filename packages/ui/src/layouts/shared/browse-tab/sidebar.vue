@@ -224,6 +224,9 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				<template v-if="lockedMessages?.modLoader" #locked-mod_loader>
 					{{ lockedMessages.modLoader }}
 				</template>
+				<template v-if="lockedMessages?.modLoader" #locked-shader_loader>
+					{{ lockedMessages.modLoader }}
+				</template>
 				<template v-if="lockedMessages?.environment" #locked-environment>
 					{{ lockedMessages.environment }}
 				</template>

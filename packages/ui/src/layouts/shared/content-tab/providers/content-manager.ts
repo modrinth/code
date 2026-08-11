@@ -100,6 +100,7 @@ export interface ContentManagerContext {
 
 	// Filter persistence key — when set, selected filters are saved/restored via sessionStorage
 	filterPersistKey?: string
+	showSharedContentFilter?: Ref<boolean> | ComputedRef<boolean>
 }
 
 export const [injectContentManager, provideContentManager] = createContext<ContentManagerContext>(

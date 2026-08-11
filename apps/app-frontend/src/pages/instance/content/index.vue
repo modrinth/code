@@ -328,6 +328,9 @@ watch(
 const isModpackUpdating = ref(false)
 const isBulkOperating = ref(false)
 const isInstanceBusy = computed(() => instance.value?.install_stage !== 'installed')
+const showSharedContentFilter = computed(
+	() => instance.value.shared_instance?.role === 'member',
+)
 const isPackLocked = computed(
 	() =>
 		instance.value.quarantined ||
@@ -1589,6 +1592,7 @@ provideContentManager({
 		hideSwitchVersion: !canMutateContent(item) || !item.project?.id || !item.version?.id,
 		hasUpdate: canUpdateProject(item),
 	}),
+	showSharedContentFilter,
 	filterPersistKey: instance.value.id,
 })
 

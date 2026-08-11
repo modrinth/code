@@ -6,7 +6,13 @@ import type { OverflowMenuOption } from '#ui/components/base/buttons'
 export type ContentCardProject = Pick<
 	Labrinth.Projects.v2.Project,
 	'id' | 'slug' | 'title' | 'icon_url'
->
+> &
+	Partial<
+		Pick<
+			Labrinth.Projects.v2.Project,
+			'license' | 'categories' | 'additional_categories'
+		>
+	>
 
 export type ContentCardVersion = Pick<Labrinth.Versions.v2.Version, 'id' | 'version_number'> & {
 	file_name: string

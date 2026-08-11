@@ -1,9 +1,5 @@
 <script setup lang="ts">
 import {
-	ArrowDownAZIcon,
-	ArrowUpZAIcon,
-	ClockArrowDownIcon,
-	ClockArrowUpIcon,
 	CodeIcon,
 	CompassIcon,
 	DownloadIcon,
@@ -11,18 +7,22 @@ import {
 	FileIcon,
 	FolderOpenIcon,
 	LinkIcon,
+	OrganizationIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
+	UserIcon,
 } from '@modrinth/assets'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import TagIcon from '#ui/components/base/TagIcon.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -41,6 +41,7 @@ import {
 	useBulkOperation,
 	useChangingItems,
 	useContentFilters,
+	useContentMetadataFilters,
 	useContentSearch,
 	useContentSelection,
 } from './composables'
@@ -49,6 +50,8 @@ import type {
 	BulkOperationStatus,
 	ContentActionWarning,
 	ContentCardTableItem,
+	ContentCardTableSortColumn,
+	ContentCardTableSortDirection,
 	ContentItem,
 } from './types'
 
@@ -89,17 +92,9 @@ const messages = defineMessages({
 		id: 'content.page-layout.upload-files',
 		defaultMessage: 'Upload files',
 	},
-	sortAlphabetical: {
-		id: 'content.page-layout.sort.alphabetical',
-		defaultMessage: 'Alphabetical',
-	},
-	sortDateAddedNewest: {
-		id: 'content.page-layout.sort.date-added-newest',
-		defaultMessage: 'Newest first',
-	},
-	sortDateAddedOldest: {
-		id: 'content.page-layout.sort.date-added-oldest',
-		defaultMessage: 'Oldest first',
+	filter: {
+		id: 'content.page-layout.filter.add',
+		defaultMessage: 'Filter',
 	},
 	updateAll: {
 		id: 'content.page-layout.update-all',
@@ -145,10 +140,6 @@ const messages = defineMessages({
 		id: 'content.page-layout.share.label',
 		defaultMessage: 'Share',
 	},
-	sortByLabel: {
-		id: 'content.page-layout.sort.label',
-		defaultMessage: 'Sort by {mode}',
-	},
 	pleaseWait: {
 		id: 'content.page-layout.please-wait',
 		defaultMessage: 'Please wait',
@@ -162,62 +153,27 @@ function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
-type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
-const sortMode = ref<SortMode>('alphabetical-asc')
-
-const sortLabels: Record<SortMode, () => string> = {
-	'alphabetical-asc': () => formatMessage(messages.sortAlphabetical),
-	'alphabetical-desc': () => formatMessage(messages.sortAlphabetical),
-	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
-	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
-}
-
-function cycleSortMode() {
-	const modes: SortMode[] = [
-		'alphabetical-asc',
-		'alphabetical-desc',
-		'date-added-newest',
-		'date-added-oldest',
-	]
-	const idx = modes.indexOf(sortMode.value)
-	sortMode.value = modes[(idx + 1) % modes.length]
-}
+const projectSortDirection = ref<ContentCardTableSortDirection>('asc')
+const sortableColumns: ContentCardTableSortColumn[] = ['project']
 
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
-	switch (sortMode.value) {
-		case 'alphabetical-desc':
-			return items.sort((a, b) => {
-				const nameA = a.project?.title ?? a.file_name
-				const nameB = b.project?.title ?? b.file_name
-				return (
-					nameB.toLowerCase().localeCompare(nameA.toLowerCase()) ||
-					a.file_name.localeCompare(b.file_name)
-				)
-			})
-		case 'date-added-newest':
-			return items.sort((a, b) => {
-				const dateA = a.date_added ?? ''
-				const dateB = b.date_added ?? ''
-				return dateB.localeCompare(dateA) || a.file_name.localeCompare(b.file_name)
-			})
-		case 'date-added-oldest':
-			return items.sort((a, b) => {
-				const dateA = a.date_added ?? ''
-				const dateB = b.date_added ?? ''
-				return dateA.localeCompare(dateB) || a.file_name.localeCompare(b.file_name)
-			})
-		default:
-			return items.sort((a, b) => {
-				const nameA = a.project?.title ?? a.file_name
-				const nameB = b.project?.title ?? b.file_name
-				return (
-					nameA.toLowerCase().localeCompare(nameB.toLowerCase()) ||
-					a.file_name.localeCompare(b.file_name)
-				)
-			})
-	}
+	return items.sort((a, b) => {
+		const nameA = a.project?.title ?? a.file_name
+		const nameB = b.project?.title ?? b.file_name
+		const comparison =
+			nameA.toLowerCase().localeCompare(nameB.toLowerCase()) ||
+			a.file_name.localeCompare(b.file_name)
+		return projectSortDirection.value === 'asc' ? comparison : -comparison
+	})
 })
+
+function handleTableSort(
+	column: ContentCardTableSortColumn,
+	direction: ContentCardTableSortDirection,
+) {
+	if (column === 'project') projectSortDirection.value = direction
+}
 
 const { searchQuery, search } = useContentSearch(sortedItems, [
 	'project.title',
@@ -229,12 +185,39 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 	ctx.items,
 	{
 		showTypeFilters: true,
-		showUpdateFilter: ctx.hasUpdateSupport,
-		showWarningsFilter: true,
+		showUpdateFilter: false,
+		showWarningsFilter: false,
+		showStatusFilters: false,
 		isPackLocked: ctx.isPackLocked,
 		persistKey: ctx.filterPersistKey,
 	},
 )
+
+const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
+	useContentMetadataFilters(ctx.items, ctx.filterPersistKey, {
+		showSharedContent: ctx.showSharedContentFilter,
+	})
+
+const metadataFilterAuthors = computed(() => {
+	const authors = new Map<string, NonNullable<ContentItem['owner']>>()
+	for (const item of ctx.items.value) {
+		if (!item.owner) continue
+		authors.set(`${item.owner.type}:${item.owner.id}`, item.owner)
+	}
+	return authors
+})
+
+function getMetadataFilterAuthor(value: string) {
+	return metadataFilterAuthors.value.get(value)
+}
+
+function getMetadataFilterCategory(value: string) {
+	const separatorIndex = value.indexOf(':')
+	return separatorIndex === -1 ? value : value.slice(separatorIndex + 1)
+}
+
+const metadataFilterTriggerClass =
+	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
 
 function updateFilterChips(nextFilters: string[]) {
 	if (nextFilters.length === 0) {
@@ -282,7 +265,7 @@ async function handleRefresh() {
 const filteredItems = computed(() => {
 	const sorted = sortedItems.value
 	const searched = search(sorted)
-	return applyFilters(searched)
+	return applyMetadataFilters(applyFilters(searched))
 })
 const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
@@ -854,7 +837,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						</div>
 
 						<div class="@container flex flex-wrap items-center justify-between gap-2">
-							<div class="flex flex-wrap items-center gap-1.5">
+							<div class="flex flex-wrap items-center gap-2">
 								<FilterPills
 									:model-value="selectedFilters"
 									:options="filterOptions"
@@ -864,42 +847,85 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										{{ formatMessage(commonMessages.allProjectType) }}
 									</template>
 								</FilterPills>
-								<div class="hidden @[900px]:block">
-									<Button
-										type="quiet"
-										:aria-label="
-											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-										"
-										@click="cycleSortMode"
+								<div
+									v-if="metadataFilterCategories.length > 0"
+									class="flex flex-wrap items-center gap-2"
+								>
+									<div class="h-6 w-px shrink-0 bg-surface-5" />
+									<DropdownFilterBar
+										v-model="selectedMetadataFilters"
+										:categories="metadataFilterCategories"
+										:show-label="false"
+										:add-label="formatMessage(messages.filter)"
+										:add-button-class="metadataFilterTriggerClass"
+										:preview-trigger-class="metadataFilterTriggerClass"
+										add-button-size="sm"
+										checkbox-position="right"
+										apply-immediately
 									>
-										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-											v-else-if="sortMode === 'date-added-newest'"
-										/><ClockArrowUpIcon
-											v-else-if="sortMode === 'date-added-oldest'"
-										/><ArrowDownAZIcon v-else />
-										{{ sortLabels[sortMode]() }}
-									</Button>
+										<template #option="{ category, option, selected }">
+											<div
+												v-if="category.key === 'author'"
+												class="flex min-w-0 flex-1 items-center gap-2"
+											>
+												<span
+													v-tooltip="option.label"
+													class="flex size-6 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-secondary"
+													:class="
+														getMetadataFilterAuthor(option.value)?.type === 'organization'
+															? 'rounded'
+															: 'rounded-full'
+													"
+												>
+													<img
+														v-if="getMetadataFilterAuthor(option.value)?.avatar_url"
+														:src="getMetadataFilterAuthor(option.value)?.avatar_url"
+														:alt="option.label"
+														class="size-full object-cover"
+													/>
+													<OrganizationIcon
+														v-else-if="getMetadataFilterAuthor(option.value)?.type === 'organization'"
+														class="size-5"
+													/>
+													<UserIcon v-else class="size-5" />
+												</span>
+												<span
+													v-tooltip="option.label"
+													class="min-w-0 truncate font-semibold leading-tight"
+													:class="selected ? 'text-contrast' : 'text-primary'"
+												>
+													{{ option.label }}
+												</span>
+											</div>
+											<div
+												v-else-if="category.key === 'category'"
+												class="flex min-w-0 flex-1 items-center gap-2"
+											>
+												<TagIcon
+													:tag="getMetadataFilterCategory(option.value)"
+													enforce-type="category"
+													class="size-5 shrink-0 text-secondary"
+												/>
+												<span
+													class="min-w-0 truncate font-semibold leading-tight"
+													:class="selected ? 'text-contrast' : 'text-primary'"
+												>
+													{{ option.label }}
+												</span>
+											</div>
+											<span
+												v-else
+												class="min-w-0 truncate font-semibold leading-tight"
+												:class="selected ? 'text-contrast' : 'text-primary'"
+											>
+												{{ option.label }}
+											</span>
+										</template>
+									</DropdownFilterBar>
 								</div>
 							</div>
 
 							<div class="flex items-center gap-2">
-								<div class="@[900px]:hidden">
-									<Button
-										type="quiet"
-										:aria-label="
-											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-										"
-										@click="cycleSortMode"
-									>
-										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-											v-else-if="sortMode === 'date-added-newest'"
-										/><ClockArrowUpIcon
-											v-else-if="sortMode === 'date-added-oldest'"
-										/><ArrowDownAZIcon v-else />
-										{{ sortLabels[sortMode]() }}
-									</Button>
-								</div>
-
 								<Button
 									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
 									v-tooltip="formatMessage(messages.updateAll)"
@@ -924,10 +950,15 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							v-model:selected-ids="selectedIds"
 							:items="tableItems"
 							:show-selection="true"
+							sortable
+							sort-by="project"
+							:sortable-columns="sortableColumns"
+							:sort-direction="projectSortDirection"
 							@update:enabled="handleToggleEnabledById"
 							@delete="handleDeleteById"
 							@update="handleUpdateById"
 							@switch-version="handleSwitchVersionById"
+							@sort="handleTableSort"
 						>
 							<template #empty>
 								<span>{{ formatMessage(messages.noContentFound) }}</span>

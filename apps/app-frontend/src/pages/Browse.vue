@@ -399,9 +399,11 @@ const hideInstalledModpacks = computed({
 const instanceFilters = computed(() => {
 	const filters = []
 
-	if (instance.value) {
+	if (instance.value && projectType.value !== 'resourcepack') {
+		const isVanillaShader =
+			projectType.value === 'shader' && instance.value.loader === 'vanilla'
 		const gameVersion = instance.value.game_version
-		if (gameVersion) {
+		if (gameVersion && !isVanillaShader) {
 			filters.push({ type: 'game_version', option: gameVersion })
 		}
 
@@ -410,6 +412,9 @@ const instanceFilters = computed(() => {
 
 		if (platform && projectType.value === 'mod' && supportedModLoaders.includes(platform)) {
 			filters.push({ type: 'mod_loader', option: platform })
+		}
+		if (isVanillaShader) {
+			filters.push({ type: 'shader_loader', option: 'vanilla' })
 		}
 
 		if (isServerInstance.value) {
@@ -550,10 +555,6 @@ const messages = defineMessages({
 		id: 'search.filter.locked.instance-game-version.title',
 		defaultMessage: 'Game version is provided by the instance',
 	},
-	gameVersionProvidedByServer: {
-		id: 'search.filter.locked.server-game-version.title',
-		defaultMessage: 'Game version is provided by the server',
-	},
 	hideAddedServers: {
 		id: 'app.browse.hide-added-servers',
 		defaultMessage: 'Hide servers already added',
@@ -573,7 +574,7 @@ const messages = defineMessages({
 	serverInstanceContentWarning: {
 		id: 'app.browse.server-instance-content-warning',
 		defaultMessage:
-			'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.',
+			'Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated.',
 	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
@@ -583,17 +584,9 @@ const messages = defineMessages({
 		id: 'app.browse.project-type.modpacks',
 		defaultMessage: 'Modpacks',
 	},
-	modLoaderProvidedByServer: {
-		id: 'search.filter.locked.server-loader.title',
-		defaultMessage: 'Loader is provided by the server',
-	},
 	providedByInstance: {
 		id: 'search.filter.locked.instance',
 		defaultMessage: 'Provided by the instance',
-	},
-	providedByServer: {
-		id: 'search.filter.locked.server',
-		defaultMessage: 'Provided by the server',
 	},
 	syncFilterButton: {
 		id: 'search.filter.locked.instance.sync',
@@ -743,7 +736,7 @@ const installContext = computed(() => {
 				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
 			),
 			warning:
-				isServerInstance.value && !isFromWorlds.value
+				isServerInstance.value && instance.value.loader !== 'vanilla' && !isFromWorlds.value
 					? formatMessage(messages.serverInstanceContentWarning)
 					: undefined,
 		}
@@ -1106,24 +1099,12 @@ async function search(requestParams: string) {
 	}
 }
 
-const isServerFilterContext = computed(() => isServerContext.value || isServerInstance.value)
-
 const lockedFilterMessages = computed(() => ({
-	gameVersion: formatMessage(
-		isServerFilterContext.value
-			? messages.gameVersionProvidedByServer
-			: messages.gameVersionProvidedByInstance,
-	),
-	modLoader: formatMessage(
-		isServerFilterContext.value
-			? messages.modLoaderProvidedByServer
-			: messages.modLoaderProvidedByInstance,
-	),
+	gameVersion: formatMessage(messages.gameVersionProvidedByInstance),
+	modLoader: formatMessage(messages.modLoaderProvidedByInstance),
 	environment: formatMessage(messages.environmentProvidedByServer),
 	syncButton: formatMessage(messages.syncFilterButton),
-	providedBy: formatMessage(
-		isServerFilterContext.value ? messages.providedByServer : messages.providedByInstance,
-	),
+	providedBy: formatMessage(messages.providedByInstance),
 }))
 
 const searchState = useBrowseSearch({

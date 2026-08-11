@@ -315,6 +315,38 @@ const addonLookup = computed(() => {
 })
 
 const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
+const projectMetadataBatchSize = 800
+const contentProjectIds = computed(() =>
+	[
+		...(contentQuery.data.value?.addons ?? []),
+		...modpackAddons.value,
+	]
+		.map((addon) => addon.project_id)
+		.concat(pendingServerContentInstalls.value.map((item) => item.projectId))
+		.filter((id): id is string => !!id)
+		.filter((id, index, ids) => ids.indexOf(id) === index)
+		.sort(),
+)
+const contentProjectsQuery = useQuery({
+	queryKey: computed(() => ['labrinth', 'projects', 'v2', contentProjectIds.value]),
+	queryFn: async () => {
+		const batches = []
+		for (
+			let index = 0;
+			index < contentProjectIds.value.length;
+			index += projectMetadataBatchSize
+		) {
+			batches.push(contentProjectIds.value.slice(index, index + projectMetadataBatchSize))
+		}
+		return (
+			await Promise.all(batches.map((ids) => client.labrinth.projects_v2.getMultiple(ids)))
+		).flat()
+	},
+	enabled: computed(() => contentProjectIds.value.length > 0),
+})
+const contentProjectsById = computed(
+	() => new Map((contentProjectsQuery.data.value ?? []).map((project) => [project.id, project])),
+)
 const lastStableContentKeys = ref<Set<string>>(new Set())
 const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
@@ -492,12 +524,14 @@ async function flushStoredServerInstalls() {
 }
 
 function pendingInstallToContentItem(item: PendingServerContentInstall): ContentItem {
+	const projectMetadata = contentProjectsById.value.get(item.projectId)
 	return {
 		project: {
+			...(projectMetadata ?? {}),
 			id: item.projectId,
-			slug: item.slug ?? item.projectId,
-			title: item.title,
-			icon_url: item.iconUrl ?? undefined,
+			slug: item.slug ?? projectMetadata?.slug ?? item.projectId,
+			title: projectMetadata?.title ?? item.title,
+			icon_url: item.iconUrl ?? projectMetadata?.icon_url ?? undefined,
 		},
 		version: {
 			id: item.versionId,
@@ -988,12 +1022,16 @@ function handleUnknownFileContinue(dontShowAgain: boolean) {
 }
 
 function addonToContentItem(addon: AddonWithUiState): ContentItem {
+	const projectMetadata = addon.project_id
+		? contentProjectsById.value.get(addon.project_id)
+		: undefined
 	return {
 		project: {
+			...(projectMetadata ?? {}),
 			id: addon.project_id ?? addon.filename,
-			slug: addon.project_id ?? addon.filename,
-			title: friendlyAddonName(addon),
-			icon_url: addon.icon_url ?? undefined,
+			slug: projectMetadata?.slug ?? addon.project_id ?? addon.filename,
+			title: projectMetadata?.title ?? friendlyAddonName(addon),
+			icon_url: addon.icon_url ?? projectMetadata?.icon_url ?? undefined,
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
