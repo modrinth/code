@@ -300,7 +300,7 @@ const {
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
-} = setupProviders(notificationManager, popupNotificationManager)
+} = setupProviders(tauriApiClient, notificationManager, popupNotificationManager)
 
 const news = ref([])
 const displayedServerInviteNotifications = new Set()
