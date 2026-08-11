@@ -301,7 +301,7 @@ const {
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
-} = setupProviders(notificationManager, popupNotificationManager)
+} = setupProviders(tauriApiClient, notificationManager, popupNotificationManager)
 const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
 const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
 const creationIconEditorModal = ref(null)
