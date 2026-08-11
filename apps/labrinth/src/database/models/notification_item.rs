@@ -10,7 +10,7 @@ use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v3";
+const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v4";
 
 pub struct NotificationBuilder {
     pub body: NotificationBody,

@@ -2,14 +2,15 @@
 import {
 	BlueskyIcon,
 	DiscordIcon,
-	GithubIcon,
 	MastodonIcon,
+	RedditIcon,
 	ToggleRightIcon,
 	TwitterIcon,
+	YouTubeIcon,
 } from '@modrinth/assets'
+import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	AutoLink,
-	ButtonStyled,
 	defineMessage,
 	defineMessages,
 	injectNotificationManager,
@@ -94,9 +95,14 @@ const socialLinks: {
 		icon: TwitterIcon,
 	},
 	{
-		label: defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
-		href: 'https://github.com/modrinth',
-		icon: GithubIcon,
+		label: defineMessage({ id: 'layout.footer.social.youtube', defaultMessage: 'YouTube' }),
+		href: 'https://www.youtube.com/@modrinth',
+		icon: YouTubeIcon,
+	},
+	{
+		label: defineMessage({ id: 'layout.footer.social.reddit', defaultMessage: 'Reddit' }),
+		href: 'https://www.reddit.com/r/Modrinth',
+		icon: RedditIcon,
 	},
 ]
 
@@ -266,36 +272,41 @@ function developerModeIncrement() {
 					:aria-label="formatMessage(messages.modrinthInformation)"
 				>
 					<div class="flex items-center gap-2">
-						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+						<Button
+							type="quiet"
+							interaction="none"
+							aria-label="Modrinth"
+							class="!h-auto !p-0"
 							@click="developerModeIncrement()"
-						/>
-						<ButtonStyled v-if="flags.developerMode" circular type="transparent" color="brand">
-							<nuxt-link
-								v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
-								to="/settings/flags"
-							>
-								<ToggleRightIcon />
-							</nuxt-link>
-						</ButtonStyled>
+						>
+							<span class="inline-flex">
+								<TextLogo aria-hidden="true" class="text-logo h-6 w-auto text-contrast lg:h-8" />
+							</span>
+						</Button>
+						<ButtonLink
+							v-if="flags.developerMode"
+							v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
+							type="quiet"
+							color="brand"
+							to="/settings/flags"
+							class="!w-9 !rounded-full !px-0"
+						>
+							<ToggleRightIcon />
+						</ButtonLink>
 					</div>
 					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-						<ButtonStyled
+						<ButtonLink
 							v-for="(social, index) in socialLinks"
 							:key="`footer-social-${index}`"
-							circular
-							type="transparent"
+							v-tooltip="formatMessage(social.label)"
+							type="quiet"
+							:href="social.href"
+							target="_blank"
+							:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
+							class="!w-9 !rounded-full !px-0"
 						>
-							<a
-								v-tooltip="formatMessage(social.label)"
-								:href="social.href"
-								target="_blank"
-								:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-							>
-								<component :is="social.icon" class="h-5 w-5" />
-							</a>
-						</ButtonStyled>
+							<component :is="social.icon" class="h-5 w-5" />
+						</ButtonLink>
 					</div>
 					<div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
 						<p class="m-0">

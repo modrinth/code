@@ -8,6 +8,7 @@ use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::{
     auth::{check_is_moderator_from_headers, get_user_from_bearer_token},
@@ -254,7 +255,8 @@ pub async fn get_projects_internal(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let request_opts = request_opts.into_inner();
     let query = normalize_optional_string(request_opts.query.as_deref());
@@ -334,7 +336,7 @@ pub async fn get_projects_internal(
                     search_organization.name AS organization_name,
                     search_owner.username AS owner_name,
                     CASE
-                        WHEN mp.components ? 'minecraft_server'
+                        WHEN jsonb_typeof(mp.components -> 'minecraft_server') = 'object'
                             THEN ARRAY_APPEND(
                                 ARRAY_REMOVE(
                                     COALESCE(vpt.project_types::text[], ARRAY[]::text[]),
@@ -519,7 +521,9 @@ pub async fn get_projects_internal(
                 row.owner_icon_url,
                 row.project_types,
                 row.external_dependencies_count,
-            )? {
+            )
+            .wrap_api_err("executing `row_to_queue_project`")?
+            {
                 projects.push(project);
             }
         }
@@ -605,7 +609,7 @@ pub async fn get_projects_internal(
                     owner.username AS owner_name,
                     owner.avatar_url AS owner_icon_url,
                     CASE
-                        WHEN m.components ? 'minecraft_server'
+                        WHEN jsonb_typeof(m.components -> 'minecraft_server') = 'object'
                             THEN ARRAY_APPEND(
                                 ARRAY_REMOVE(
                                     COALESCE(ppt.project_types::text[], ARRAY[]::text[]),
@@ -695,7 +699,9 @@ pub async fn get_projects_internal(
                 row.owner_icon_url,
                 row.project_types,
                 row.external_dependencies_count,
-            )? {
+            )
+            .wrap_api_err("executing `row_to_queue_project`")?
+            {
                 projects.push(project);
             }
         }
@@ -733,7 +739,8 @@ pub async fn get_project_ids(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let request_opts = request_opts.into_inner();
     let query = normalize_optional_string(request_opts.query.as_deref());
@@ -811,7 +818,7 @@ pub async fn get_project_ids(
                     search_organization.name AS organization_name,
                     search_owner.username AS owner_name,
                     CASE
-                        WHEN mp.components ? 'minecraft_server'
+                        WHEN jsonb_typeof(mp.components -> 'minecraft_server') = 'object'
                             THEN ARRAY_APPEND(
                                 ARRAY_REMOVE(
                                     COALESCE(vpt.project_types::text[], ARRAY[]::text[]),
@@ -982,7 +989,8 @@ fn row_to_queue_project(
         owner_id,
         owner_name,
         owner_icon_url,
-    )?;
+    )
+    .wrap_api_err("executing `row_to_ownership`")?;
 
     Ok(Some(ModerationQueueProject {
         id: project_id,
@@ -1080,11 +1088,14 @@ pub async fn get_project_meta(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let project_id = info.into_inner().0;
     let project =
-        database::models::DBProject::get(&project_id, &**pool, &redis).await?;
+        database::models::DBProject::get(&project_id, &**pool, &redis)
+            .await
+            .wrap_api_err("fetching project from database")?;
 
     if let Some(project) = project {
         let rows = sqlx::query!(
@@ -1098,7 +1109,8 @@ pub async fn get_project_meta(
             project.inner.id.0
         )
         .fetch_all(&**pool)
-        .await?;
+        .await
+        .wrap_internal_err("querying database for `get_project_meta`")?;
 
         let mut merged = MissingMetadata {
             identified: HashMap::new(),
@@ -1138,7 +1150,7 @@ pub async fn get_project_meta(
                 .collect::<Vec<_>>()
         )
         .fetch_all(&**pool)
-        .await?;
+        .await.wrap_internal_err("querying database for `get_project_meta`")?;
 
         for row in rows {
             if let Some(sha1) = row.sha1 {
@@ -1173,7 +1185,8 @@ pub async fn get_project_meta(
             &check_flames,
         )
         .fetch_all(&**pool)
-        .await?;
+        .await
+        .wrap_internal_err("querying database for `get_project_meta`")?;
 
         for row in rows {
             if let Some(sha1) = merged
@@ -1196,7 +1209,7 @@ pub async fn get_project_meta(
 
         Ok(web::Json(merged))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -1238,9 +1251,13 @@ pub async fn set_project_meta(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let mut licenses = Vec::new();
     let mut file_hashes = Vec::new();
@@ -1291,7 +1308,8 @@ pub async fn set_project_meta(
         &licenses,
         user_id,
     )
-    .await?;
+    .await
+    .wrap_internal_err("inserting database records for `set_project_meta`")?;
 
     moderation_external_item::ExternalLicense::insert_files(
         &mut transaction,
@@ -1303,9 +1321,13 @@ pub async fn set_project_meta(
         &file_license_ids,
         user_id,
     )
-    .await?;
+    .await
+    .wrap_internal_err("inserting database records for `set_project_meta`")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }
@@ -1335,18 +1357,23 @@ pub async fn acquire_lock(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
-            .await?
-            .ok_or(ApiError::NotFound)?;
+            .await
+            .wrap_api_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    match DBModerationLock::acquire(db_project_id, db_user_id, &pool).await? {
+    match DBModerationLock::acquire(db_project_id, db_user_id, &pool)
+        .await
+        .wrap_internal_err("executing `DBModerationLock::acquire`")?
+    {
         Ok(()) => Ok(web::Json(LockAcquireResponse {
             success: true,
             is_own_lock: true,
@@ -1394,18 +1421,22 @@ pub async fn override_lock(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
-            .await?
-            .ok_or(ApiError::NotFound)?;
+            .await
+            .wrap_api_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    DBModerationLock::force_acquire(db_project_id, db_user_id, &pool).await?;
+    DBModerationLock::force_acquire(db_project_id, db_user_id, &pool)
+        .await
+        .wrap_internal_err("executing `DBModerationLock::force_acquire`")?;
 
     Ok(web::Json(LockAcquireResponse {
         success: true,
@@ -1441,18 +1472,23 @@ pub async fn get_lock_status(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
-            .await?
-            .ok_or(ApiError::NotFound)?;
+            .await
+            .wrap_api_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    match DBModerationLock::get_with_user(db_project_id, &pool).await? {
+    match DBModerationLock::get_with_user(db_project_id, &pool)
+        .await
+        .wrap_internal_err("fetching moderation lock from database")?
+    {
         Some(lock) => {
             let is_own_lock = lock.moderator_id == db_user_id;
             Ok(web::Json(LockStatusResponse {
@@ -1503,19 +1539,22 @@ pub async fn release_lock(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
-            .await?
-            .ok_or(ApiError::NotFound)?;
+            .await
+            .wrap_api_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    let released =
-        DBModerationLock::release(db_project_id, db_user_id, &pool).await?;
+    let released = DBModerationLock::release(db_project_id, db_user_id, &pool)
+        .await
+        .wrap_internal_err("executing `DBModerationLock::release`")?;
 
     let _ = DBModerationLock::cleanup_expired(&pool).await;
 
@@ -1551,9 +1590,9 @@ pub async fn release_lock_beacon(
 ) -> Result<web::Json<LockReleaseResponse>, ApiError> {
     let token = body.trim();
     if token.is_empty() {
-        return Err(ApiError::InvalidInput(
-            "missing token in request body".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "missing token in request body",
+        )));
     }
     let token = token.strip_prefix("Bearer ").unwrap_or(token).trim();
 
@@ -1565,30 +1604,33 @@ pub async fn release_lock_beacon(
         &session_queue,
         false,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     if !scopes.contains(Scopes::PROJECT_WRITE) {
-        return Err(ApiError::CustomAuthentication(
-            "token is missing required scopes".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "token is missing required scopes",
+        )));
     }
     if !user.role.is_mod() {
-        return Err(ApiError::CustomAuthentication(
-            "only moderators may release moderation locks".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "only moderators may release moderation locks",
+        )));
     }
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
-            .await?
-            .ok_or(ApiError::NotFound)?;
+            .await
+            .wrap_api_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    let released =
-        DBModerationLock::release(db_project_id, db_user_id, &pool).await?;
+    let released = DBModerationLock::release(db_project_id, db_user_id, &pool)
+        .await
+        .wrap_internal_err("executing `DBModerationLock::release`")?;
 
     let _ = DBModerationLock::cleanup_expired(&pool).await;
 
@@ -1618,16 +1660,19 @@ pub async fn delete_all_locks(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You must be an admin to delete all locks".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You must be an admin to delete all locks",
+        )));
     }
 
-    let deleted_count = DBModerationLock::delete_all(&pool).await?;
+    let deleted_count = DBModerationLock::delete_all(&pool)
+        .await
+        .wrap_internal_err("deleting moderation locks from database")?;
 
     Ok(web::Json(DeleteAllLocksResponse { deleted_count }))
 }

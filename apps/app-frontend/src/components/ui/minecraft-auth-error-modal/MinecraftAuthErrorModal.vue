@@ -7,7 +7,7 @@ import {
 	MessagesSquareIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, Collapsible, NewModal } from '@modrinth/ui'
+import { Admonition, Button, ButtonLink, Collapsible, IconButton, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -137,16 +137,18 @@ async function copyToClipboard(text: string) {
 
 			<!-- Action buttons -->
 			<div class="flex items-center gap-2">
-				<ButtonStyled>
-					<a href="https://support.modrinth.com" class="!w-full" @click="modal?.hide()">
-						<MessagesSquareIcon /> Contact support
-					</a>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="loadingSignIn" class="!w-full" @click="signInAgain">
-						<LogInIcon /> Sign in again
-					</button>
-				</ButtonStyled>
+				<ButtonLink href="https://support.modrinth.com" class="!w-full" @click="modal?.hide()">
+					<MessagesSquareIcon /> Contact support
+				</ButtonLink>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="loadingSignIn"
+					class="!w-full"
+					@click="signInAgain"
+				>
+					<LogInIcon /> Sign in again
+				</Button>
 			</div>
 
 			<div class="flex flex-col gap-2">
@@ -176,16 +178,15 @@ async function copyToClipboard(text: string) {
 							>
 								{{ debugInfo }}
 							</div>
-							<ButtonStyled circular>
-								<button
-									v-tooltip="'Copy debug info'"
-									:disabled="copied"
-									@click="copyToClipboard(debugInfo)"
-								>
-									<template v-if="copied"> <CheckIcon class="text-green" /> </template>
-									<template v-else> <CopyIcon /> </template>
-								</button>
-							</ButtonStyled>
+							<IconButton
+								v-tooltip="'Copy debug info'"
+								:label="'Copy debug info'"
+								:disabled="copied"
+								@click="copyToClipboard(debugInfo)"
+							>
+								<template v-if="copied"> <CheckIcon class="text-green" /> </template>
+								<template v-else> <CopyIcon /> </template>
+							</IconButton>
 						</div>
 					</Collapsible>
 				</div>

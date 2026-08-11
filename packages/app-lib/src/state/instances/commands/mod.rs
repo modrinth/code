@@ -38,6 +38,7 @@ mod apply_content_install;
 pub(crate) use self::apply_content_install::*;
 
 mod check_content_updates;
+pub(crate) use self::check_content_updates::refresh_content_updates;
 
 mod apply_content_update;
 pub(crate) use self::apply_content_update::*;

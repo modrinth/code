@@ -21,9 +21,9 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
+import { Button, ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
-	ButtonStyled,
 	Collapsible,
 	CollapsibleRegion,
 	commonMessages,
@@ -31,7 +31,6 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	NavTabs,
-	OverflowMenu,
 	type OverflowMenuOption,
 	Toggle,
 	useFormatBytes,
@@ -120,29 +119,32 @@ const isLoadingStatusAction = ref(false)
 const projectStatusActions = computed<OverflowMenuOption[]>(() => [
 	{
 		id: 'approve',
-		color: 'green',
-		action: () => setStatus('approved'),
+		label: 'Approve',
+		tone: 'green',
 		hoverFilled: true,
+		action: () => setStatus('approved'),
 		disabled: isStatusActionDisabled('approved'),
 	},
 	{
 		id: 'withhold',
-		color: 'orange',
-		action: () => setStatus('withheld'),
+		label: 'Withhold',
+		tone: 'orange',
 		hoverFilled: true,
+		action: () => setStatus('withheld'),
 		disabled: isStatusActionDisabled('withheld'),
 	},
 	{
 		id: 'send-to-review',
+		label: 'Send to review',
 		action: () => setStatus('processing'),
-		hoverFilled: true,
 		disabled: isStatusActionDisabled('processing'),
 	},
 	{
 		id: 'reject',
-		color: 'red',
-		action: () => setStatus('rejected'),
+		label: 'Reject',
+		tone: 'red',
 		hoverFilled: true,
+		action: () => setStatus('rejected'),
 		disabled: isStatusActionDisabled('rejected'),
 	},
 ])
@@ -886,6 +888,10 @@ async function updateDetailStatus(
 
 	updatingDetails.add(detailId)
 
+	const previousMarkedCount = selectedFile.value
+		? getFileMarkedCount(selectedFile.value)
+		: undefined
+
 	try {
 		await updateIssueDetails([{ detail_id: detailId, verdict }])
 
@@ -910,7 +916,7 @@ async function updateDetailStatus(
 		if (verdict !== 'pending' && selectedFile.value) {
 			const markedCount = getFileMarkedCount(selectedFile.value)
 			const totalCount = getFileDetailCount(selectedFile.value)
-			if (markedCount === totalCount) {
+			if (previousMarkedCount != markedCount && markedCount === totalCount) {
 				backToFileList()
 			}
 		}
@@ -968,6 +974,10 @@ async function updateGlobalDetailStatus(
 
 	updatingGlobalDetailKeys.add(detail.key)
 
+	const previousMarkedCount = selectedFile.value
+		? getFileMarkedCount(selectedFile.value)
+		: undefined
+
 	try {
 		await updateGlobalIssueDetail(detail.key, verdict)
 
@@ -988,7 +998,7 @@ async function updateGlobalDetailStatus(
 		if (verdict !== 'pending' && selectedFile.value) {
 			const markedCount = getFileMarkedCount(selectedFile.value)
 			const totalCount = getFileDetailCount(selectedFile.value)
-			if (markedCount === totalCount) {
+			if (previousMarkedCount != markedCount && markedCount === totalCount) {
 				backToFileList()
 			}
 		}
@@ -1387,8 +1397,10 @@ const canSubmitReview = computed(() => {
 	if (totalIssues === 0) return true
 	return allIssuesResolved.value
 })
+const hasSubmittedPassReview = ref(false)
 
 async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
+	hasSubmittedPassReview.value = verdict === 'safe'
 	const editorContent = threadViewRef.value?.getReplyContent() || ''
 
 	let message: string | undefined
@@ -1529,42 +1541,65 @@ function copyId() {
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
 					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="props.item.project.link_urls?.['source']?.url" circular>
-							<a
-								v-tooltip="'Open sources in new tab'"
-								:href="props.item.project.link_urls?.['source']?.url"
-								target="_blank"
-							>
-								<CodeIcon />
-							</a>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<button v-tooltip="'Copy ID'" @click="copyId">
-								<ClipboardCopyIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<a
-								v-tooltip="'Open in new tab'"
-								:href="`/moderation/technical-review/${props.item.project.id}`"
-								target="_blank"
-							>
-								<ExternalIcon />
-							</a>
-						</ButtonStyled>
+						<ButtonLink
+							v-if="props.item.project.link_urls?.['source']?.url"
+							v-tooltip="'Open sources in new tab'"
+							:href="props.item.project.link_urls?.['source']?.url"
+							target="_blank"
+							class="!w-9 !rounded-full !px-0"
+						>
+							<CodeIcon />
+						</ButtonLink>
+						<IconButton v-tooltip="'Copy ID'" :label="'Copy ID'" @click="copyId">
+							<ClipboardCopyIcon />
+						</IconButton>
+						<ButtonLink
+							v-tooltip="'Open in new tab'"
+							:href="`/moderation/technical-review/${props.item.project.id}`"
+							target="_blank"
+							class="!w-9 !rounded-full !px-0"
+						>
+							<ExternalIcon />
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
 
 			<div class="h-px w-full bg-surface-5"></div>
 
-			<NavTabs
-				mode="local"
-				:links="navTabsLinks"
-				:active-index="activeTabIndex"
-				class="bg-surface-3! shadow-none!"
-				@tab-click="handleTabClick"
-			/>
+			<div class="flex flex-row justify-between">
+				<NavTabs
+					mode="local"
+					:links="navTabsLinks"
+					:active-index="activeTabIndex"
+					class="bg-surface-3! shadow-none!"
+					@tab-click="handleTabClick"
+				/>
+
+				<div v-if="selectedFile" class="flex flex-row items-end gap-2">
+					<ButtonLink
+						v-tooltip="`Download`"
+						type="outlined"
+						target="_blank"
+						:href="selectedFile.download_url"
+						:download="selectedFile.file_name"
+						class="!bg-surface-2"
+						aria-label="Download"
+					>
+						<DownloadIcon aria-hidden="true" />
+					</ButtonLink>
+					<ButtonLink
+						v-tooltip="`Open in Slicer`"
+						type="outlined"
+						target="_blank"
+						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
+						class="!bg-surface-2"
+						aria-label="Open in Slicer"
+					>
+						<ExternalIcon aria-hidden="true" /> Open
+					</ButtonLink>
+				</div>
+			</div>
 		</div>
 
 		<div class="border-t border-surface-3 bg-surface-2">
@@ -1586,58 +1621,66 @@ function copyId() {
 							@update-thread="handleThreadUpdate"
 						>
 							<template #additionalActions>
-								<ButtonStyled color="brand">
-									<button
-										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
-										:disabled="!canSubmitReview"
-										@click="handleSubmitReview('safe')"
-									>
-										<ShieldCheckIcon /> Pass
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="red">
-									<button
-										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
-										:disabled="!canSubmitReview"
-										@click="handleSubmitReview('unsafe')"
-									>
-										<BugIcon /> Fail
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="standard">
-									<OverflowMenu
-										class="btn-dropdown-animation"
-										:disabled="isLoadingStatusAction"
-										:options="projectStatusActions"
-									>
-										<SpinnerIcon
-											v-if="isLoadingStatusAction"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<ScaleIcon v-else aria-hidden="true" />
-										Set Status
-										<template #approve>
-											<CheckIcon aria-hidden="true" />
-											Approve
-										</template>
-										<template #withhold>
-											<EyeOffIcon aria-hidden="true" />
-											Withhold
-										</template>
-										<template #send-to-review>
-											<ScaleIcon aria-hidden="true" />
-											Send to review
-										</template>
-										<template #reject>
-											<XIcon aria-hidden="true" />
-											Reject
-										</template>
-									</OverflowMenu>
-								</ButtonStyled>
-								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug</button>
-								</ButtonStyled>
+								<Button
+									v-tooltip="
+										!canSubmitReview
+											? 'There are still pending flags!'
+											: hasSubmittedPassReview
+												? 'Project already passed!'
+												: undefined
+									"
+									type="colored"
+									color="brand"
+									:disabled="!canSubmitReview || hasSubmittedPassReview"
+									@click="handleSubmitReview('safe')"
+								>
+									<ShieldCheckIcon /> Pass
+								</Button>
+								<Button
+									v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+									type="colored"
+									color="red"
+									:disabled="!canSubmitReview"
+									@click="handleSubmitReview('unsafe')"
+								>
+									<BugIcon /> Fail
+								</Button>
+								<TeleportOverflowMenu
+									label="More options"
+									class="btn-dropdown-animation !w-auto !rounded-xl !px-2.5"
+									:disabled="isLoadingStatusAction"
+									:options="projectStatusActions"
+								>
+									<SpinnerIcon
+										v-if="isLoadingStatusAction"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<ScaleIcon v-else aria-hidden="true" />
+									Set Status
+									<template #approve>
+										<CheckIcon aria-hidden="true" />
+										Approve
+									</template>
+									<template #withhold>
+										<EyeOffIcon aria-hidden="true" />
+										Withhold
+									</template>
+									<template #send-to-review>
+										<ScaleIcon aria-hidden="true" />
+										Send to review
+									</template>
+									<template #reject>
+										<XIcon aria-hidden="true" />
+										Reject
+									</template>
+								</TeleportOverflowMenu>
+								<Button
+									v-if="featureFlags.developerMode"
+									type="outlined"
+									@click="emit('showMaliciousSummary', unsafeFiles)"
+									>Debug</Button
+								>
 							</template>
 						</ThreadView>
 					</div>
@@ -1708,19 +1751,25 @@ function copyId() {
 					</div>
 
 					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="getFileDetailCount(file) > 0">
-							<button @click="viewFileFlags(file)">Flags</button>
-						</ButtonStyled>
-						<ButtonStyled type="outlined">
-							<a
-								:href="file.download_url"
-								:title="`Download ${file.file_name}`"
-								:download="file.file_name"
-								tabindex="0"
-							>
-								<DownloadIcon /> Download
-							</a>
-						</ButtonStyled>
+						<Button v-if="getFileDetailCount(file) > 0" @click="viewFileFlags(file)">Flags</Button>
+						<ButtonLink
+							type="outlined"
+							:href="file.download_url"
+							:title="`Download ${file.file_name}`"
+							:download="file.file_name"
+							tabindex="0"
+						>
+							<DownloadIcon />
+						</ButtonLink>
+						<ButtonLink
+							v-tooltip="`Open in Slicer`"
+							type="outlined"
+							target="_blank"
+							:href="`https://slicer.run/?url=${encodeURIComponent(file.download_url)}`"
+							aria-label="Open in Slicer"
+						>
+							<ExternalIcon aria-hidden="true" /> Open
+						</ButtonLink>
 					</div>
 				</div>
 			</template>
@@ -1875,14 +1924,14 @@ function copyId() {
 							@click="toggleClass(classItem)"
 						>
 							<div class="my-auto flex items-center gap-2">
-								<ButtonStyled type="transparent" circular>
-									<button
-										class="transition-transform"
-										:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
-									>
-										<ChevronDownIcon class="h-5 w-5 text-contrast" />
-									</button>
-								</ButtonStyled>
+								<IconButton
+									type="quiet"
+									label="Toggle details"
+									class="transition-transform"
+									:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
+								>
+									<ChevronDownIcon class="h-5 w-5 text-contrast" />
+								</IconButton>
 
 								<IssueDetailPath
 									:segments="[classItem.jar, classItem.filePath]"
@@ -2100,16 +2149,16 @@ function copyId() {
 									v-if="getHighlightedClassSource(classItem).length > 0"
 									class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 								>
-									<ButtonStyled circular type="transparent">
-										<button
-											v-tooltip="`Copy code`"
-											class="absolute right-2 top-2 border-[1px]"
-											@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
-										>
-											<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
-											<CheckIcon v-else />
-										</button>
-									</ButtonStyled>
+									<IconButton
+										v-tooltip="`Copy code`"
+										type="quiet"
+										:label="`Copy code`"
+										class="!absolute right-2 top-2 border-[1px]"
+										@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
+									>
+										<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
+										<CheckIcon v-else />
+									</IconButton>
 
 									<div class="overflow-x-auto bg-surface-3 py-3">
 										<div

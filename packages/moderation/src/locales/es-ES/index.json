@@ -17,6 +17,9 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Añade una dirección Java"
   },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Agregar detalles de la licencia"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Añade cualquier enlace relevante, como un sitio web, tienda o una invitación de Discord."
   },
@@ -248,9 +251,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pack de recursos, excepto para audio o packs de localización. Si esto describe tu pack, por favor, seleccionar la etiqueta apropiada"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"
   },
@@ -265,9 +265,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verificar enlaces externos"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Visita la página de versiones"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar la configuración de enlaces"

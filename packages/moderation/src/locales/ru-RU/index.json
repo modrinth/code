@@ -254,8 +254,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Нужно минимум одно изображение, чтобы показать контент, входящий в {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "набор ресурсов, кроме наборов аудио и локализации. Если это описывает ваш набор, выберите подходящий тег"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "В галерее требуется хотя бы одно изображение, в котором показано содержимое набора ресурсов. Если он содержит только звуки или переводы, укажите это в тегах."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "В галерее требуется хотя бы три изображения, в которых показано содержимое шейдера в различных ситуациях и условиях."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Добавьте изображения"
@@ -271,9 +274,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Проверьте ссылки"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Открыть страницу версий"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Настроить ссылки"

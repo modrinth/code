@@ -1,0 +1,20 @@
+name: Slash Command Dispatch
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  dispatch-command:
+    if: ${{ github.event.sender.type == 'User' && contains(fromJSON('["OWNER", "MEMBER"]'), github.event.comment.author_association) }}
+    runs-on: namespace-profile-tiny-arm64
+    steps:
+      - name: Slash Command Dispatch
+        uses: peter-evans/slash-command-dispatch@9bdcd7914ec1b75590b790b844aa3b8eee7c683a # v5.0.2
+        with:
+          token: ${{ secrets.SLASH_CMD_GH_TOKEN }}
+          issue-type: pull-request
+          commands: |
+            deploy

@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { defineAsyncComponent, onMounted, ref } from 'vue'
 
 import { useFormatNumber } from '../../composables/index.ts'
-import Button from '../base/Button.vue'
+import { IconButton } from '../base/buttons'
 import Checkbox from '../base/Checkbox.vue'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
@@ -231,12 +231,16 @@ defineExpose({
 		<div class="title-bar">
 			<slot />
 			<div v-if="!hideToolbar" class="toolbar">
-				<Button v-tooltip="'Download data as CSV'" icon-only @click="downloadCSV">
+				<IconButton
+					v-tooltip="'Download data as CSV'"
+					label="Download data as CSV"
+					@click="downloadCSV"
+				>
 					<!-- <DownloadIcon /> -->
-				</Button>
-				<Button v-tooltip="'Reset chart'" icon-only @click="resetChart">
+				</IconButton>
+				<IconButton v-tooltip="'Reset chart'" label="Reset chart" @click="resetChart">
 					<!-- <UpdatedIcon /> -->
-				</Button>
+				</IconButton>
 				<slot name="toolbar" />
 			</div>
 		</div>

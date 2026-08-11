@@ -11,6 +11,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{DependencyType, Version};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
@@ -23,8 +24,8 @@ use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use xredis::RedisPool;
 
-const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v3";
-const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v3";
+const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v4";
+const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v4";
 const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v3";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
@@ -72,7 +73,8 @@ pub async fn resolve_content(
         modrinth_content_management::resolve_content(&mut provider, request)
             .await
     }
-    .map_err(resolve_error_to_api)?;
+    .map_err(resolve_error_to_api)
+    .wrap_api_err("executing `modrinth_content_management::resolve_content`")?;
 
     Ok(web::Json(plan))
 }

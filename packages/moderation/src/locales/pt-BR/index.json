@@ -254,8 +254,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Pelo menos uma imagem de galeria é necessária para mostrar o conteúdo do seu {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pacote de recursos, exceto pacotes de áudio ou localização. Se esta descrição se aplica ao seu pacote, selecione a etiqueta apropriada"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Pelo menos uma imagem da galeria é necessária para destacar o conteúdo do seu pacote de recursos, exceto por pacotes de áudio ou localização. Se isso descreve seu pacote, selecione a marcação apropriada."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Pelo menos três imagens são necessárias para destacar o conteúdo do seu shader em uma variedade de situações e condições."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Envie uma imagem para a galeria"
@@ -271,9 +274,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verificar links externos"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Visitar página de versões"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar página de links"

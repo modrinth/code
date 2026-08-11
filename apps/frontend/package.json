@@ -35,7 +35,7 @@
 		"vite-svg-loader": "^5.1.0",
 		"vue-component-type-helpers": "^3.1.8",
 		"vue-tsc": "^2.0.24",
-		"wrangler": "^4.54.0"
+		"wrangler": "^4.115.0"
 	},
 	"dependencies": {
 		"@formatjs/intl-localematcher": "^0.5.4",
@@ -53,6 +53,7 @@
 		"@vue-email/components": "^0.0.21",
 		"@vue-email/render": "^0.0.9",
 		"@vueuse/core": "^11.1.0",
+		"@zip.js/zip.js": "^2.8.34",
 		"ace-builds": "^1.36.2",
 		"ansi-to-html": "^0.7.2",
 		"chart.js": "^4.5.1",

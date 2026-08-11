@@ -107,6 +107,7 @@ impl ProcessManager {
         instance_name: &str,
         mut mc_command: Command,
         post_exit_command: Option<String>,
+        post_exit_env_vars: Vec<(String, String)>,
         logs_folder: PathBuf,
         xml_logging: bool,
         main_class_keep_alive: TempDir,
@@ -217,6 +218,7 @@ impl ProcessManager {
             instance_id.to_string(),
             instance_path.to_string(),
             post_exit_command,
+            post_exit_env_vars,
             metadata.uuid,
         ));
 
@@ -750,6 +752,7 @@ impl Process {
         instance_id: String,
         instance_path: String,
         post_exit_command: Option<String>,
+        post_exit_env_vars: Vec<(String, String)>,
         uuid: Uuid,
     ) -> crate::Result<()> {
         async fn update_playtime(
@@ -885,7 +888,7 @@ impl Process {
 
                 if let Some(command) = cmd.next() {
                     let mut command = Command::new(command);
-                    command.args(cmd).current_dir(
+                    command.args(cmd).envs(post_exit_env_vars).current_dir(
                         state.directories.instances_dir().join(&instance_path),
                     );
                     command.spawn().map_err(IOError::from)?;

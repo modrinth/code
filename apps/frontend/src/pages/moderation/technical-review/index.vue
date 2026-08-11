@@ -14,10 +14,10 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
-	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
 	StyledInput,
+	TeleportPopoutMenu,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -34,6 +34,7 @@ useHead({ title: 'Tech review queue - Modrinth' })
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const keybinds = useModerationKeybinds()
 
 const currentPage = ref(1)
 const API_PAGE_SIZE = 50
@@ -573,6 +574,50 @@ watch(totalPages, (pages) => {
 // 		complete: 20,
 // 	}
 // })
+
+const CARD_BOTTOM_OFFSET = 210
+
+function handleKeybinds(event: KeyboardEvent) {
+	keybinds.value.handle(event, {
+		scope: 'tech-review',
+		actions: {
+			goToTop: () => {
+				Array.from(cardRefs.values())
+					.filter((card) => card.getBoundingClientRect().top <= 0)
+					.reduce((prev, curr) =>
+						curr.getBoundingClientRect().top > prev.getBoundingClientRect().top ? curr : prev,
+					)
+					?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+			},
+			goToBottom: () => {
+				const nearestCard = Array.from(cardRefs.values())
+					.filter((card) => card.getBoundingClientRect().bottom >= window.innerHeight)
+					.reduce((prev, curr) =>
+						curr.getBoundingClientRect().top < prev.getBoundingClientRect().top ? curr : prev,
+					)
+
+				if (nearestCard) {
+					window.scrollTo({
+						behavior: 'smooth',
+						top:
+							nearestCard.getBoundingClientRect().bottom +
+							window.scrollY -
+							window.innerHeight +
+							CARD_BOTTOM_OFFSET,
+					})
+				}
+			},
+		},
+	})
+}
+
+onMounted(() => {
+	window.addEventListener('keydown', handleKeybinds)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('keydown', handleKeybinds)
+})
 </script>
 
 <template>
@@ -620,6 +665,8 @@ watch(totalPages, (pages) => {
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
 					:options="responseFilterTypes"
+					trigger-type="base"
+					trigger-size="lg"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -634,6 +681,8 @@ watch(totalPages, (pages) => {
 					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
 					:placeholder="formatMessage(commonMessages.sortByLabel)"
+					trigger-type="base"
+					trigger-size="lg"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -647,8 +696,11 @@ watch(totalPages, (pages) => {
 					</template>
 				</Combobox>
 
-				<FloatingPanel button-class="!h-10 !shadow-none !text-contrast">
-					<BlendIcon class="size-5" /> Advanced filters
+				<TeleportPopoutMenu label="Advanced filters" size="lg">
+					<template #trigger>
+						<BlendIcon aria-hidden="true" />
+						Advanced filters
+					</template>
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
@@ -693,7 +745,7 @@ watch(totalPages, (pages) => {
 							</div>
 						</div>
 					</template>
-				</FloatingPanel>
+				</TeleportPopoutMenu>
 			</div>
 		</div>
 

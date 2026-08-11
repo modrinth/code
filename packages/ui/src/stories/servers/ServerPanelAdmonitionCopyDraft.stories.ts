@@ -2,7 +2,7 @@ import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Admonition from '../../components/base/Admonition.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 
 type AdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 type ActionType = 'Cancel' | 'Retry' | 'Dismiss'
@@ -191,7 +191,7 @@ const sections: CopySection[] = [
 
 export const AllCopy: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled, RotateCounterClockwiseIcon },
+		components: { Admonition, RotateCounterClockwiseIcon, Button },
 		setup() {
 			return { sections }
 		},
@@ -221,19 +221,11 @@ export const AllCopy: Story = {
 									"
 									#top-right-actions
 								>
-									<ButtonStyled v-if="item.action === 'Cancel'" type="outlined" color="blue">
-										<button class="!border" type="button">Cancel</button>
-									</ButtonStyled>
-									<ButtonStyled
-										v-else
-										type="outlined"
-										color="red"
-									>
-										<button class="!border" type="button">
-											<RotateCounterClockwiseIcon class="size-5" />
-											Retry
-										</button>
-									</ButtonStyled>
+									<Button type="outlined" v-if="item.action === 'Cancel'" class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]" native-type="button">Cancel</Button>
+									<Button type="outlined" v-else class="!border !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]" native-type="button">
+										<RotateCounterClockwiseIcon class="size-5" />
+										Retry
+									</Button>
 								</template>
 							</Admonition>
 						</div>
@@ -246,7 +238,7 @@ export const AllCopy: Story = {
 
 export const TitleTreatmentExperiment: Story = {
 	render: () => ({
-		components: { Admonition, ButtonStyled, RotateCounterClockwiseIcon },
+		components: { Admonition, RotateCounterClockwiseIcon, Button },
 		template: /* html */ `
 			<div style="max-width: 840px;">
 				<Admonition
@@ -256,12 +248,10 @@ export const TitleTreatmentExperiment: Story = {
 				>
 					Something went wrong while creating World backup. Please try again or contact support if the issue continues.
 					<template #top-right-actions>
-						<ButtonStyled type="outlined" color="red">
-							<button class="!border" type="button">
-								<RotateCounterClockwiseIcon class="size-5" />
-								Retry
-							</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]" native-type="button">
+							<RotateCounterClockwiseIcon class="size-5" />
+							Retry
+						</Button>
 					</template>
 				</Admonition>
 			</div>

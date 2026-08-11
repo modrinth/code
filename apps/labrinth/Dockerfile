@@ -11,7 +11,7 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends ca-certificates dumb-init curl \
 	&& rm -rf /var/lib/apt/lists/*
 
-COPY labrinth /labrinth/labrinth
+COPY --chmod=0755 labrinth /labrinth/labrinth
 COPY migrations /labrinth/migrations
 COPY assets /labrinth/assets
 

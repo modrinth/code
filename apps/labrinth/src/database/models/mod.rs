@@ -77,8 +77,6 @@ pub enum DatabaseError {
     SerdeCacheError(#[from] serde_json::Error),
     #[error("error while encoding or decoding the cache: {0}")]
     PostcardCacheError(#[from] postcard::Error),
-    #[error(transparent)]
-    Redis(#[from] xredis::Error),
     #[error("Schema error: {0}")]
     SchemaError(String),
 }

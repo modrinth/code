@@ -1,0 +1,4 @@
+interface:
+  display_name: "Migrate to TanStack Query"
+  short_description: "Migrate Vue server state to TanStack Query"
+  default_prompt: "Use $tanstack-query to migrate this Vue component to TanStack Query."

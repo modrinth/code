@@ -1,12 +1,10 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div>
-			<ButtonStyled>
-				<NuxtLink to="/moderation/global-traces">
-					<ArrowLeftIcon aria-hidden="true" />
-					Back to global traces
-				</NuxtLink>
-			</ButtonStyled>
+			<ButtonLink to="/moderation/global-traces">
+				<ArrowLeftIcon aria-hidden="true" />
+				Back to global traces
+			</ButtonLink>
 		</div>
 
 		<EmptyState
@@ -49,12 +47,10 @@
 				</div>
 				<div class="flex shrink-0 flex-nowrap items-center gap-2">
 					<Badge :type="trace.verdict" />
-					<ButtonStyled color="red">
-						<button :disabled="isRemoving" @click="removeGlobalTrace">
-							<TrashIcon aria-hidden="true" />
-							Remove
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="red" :disabled="isRemoving" @click="removeGlobalTrace">
+						<TrashIcon aria-hidden="true" />
+						Remove
+					</Button>
 				</div>
 			</div>
 
@@ -95,7 +91,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftIcon, HashIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Badge,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,

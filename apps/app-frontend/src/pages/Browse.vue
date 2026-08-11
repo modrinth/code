@@ -32,7 +32,7 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
@@ -41,15 +41,9 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
-import {
-	get_project,
-	get_project_v3,
-	get_search_results_v3,
-	get_version_many,
-} from '@/helpers/cache.js'
+import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
 import { instance_listener } from '@/helpers/events.js'
 import {
-	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
 	list as listInstances,
 } from '@/helpers/instance'
@@ -58,10 +52,11 @@ import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_instance_worlds } from '@/helpers/worlds'
 import {
-	type BreadcrumbDefinition,
-	useBreadcrumb,
-	useRootBreadcrumb,
-} from '@/providers/breadcrumbs'
+	instanceDetailQueryOptions,
+	instanceKeys,
+	instanceLinkedProjectQueryOptions,
+} from '@/pages/instance/query-options'
+import { type BreadcrumbDefinition, injectBreadcrumbManager } from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {
@@ -154,70 +149,70 @@ const {
 	markServerProjectInstalled,
 } = serverInstallContent
 
-type Instance = {
-	game_version: string
-	loader: string
-	path: string
-	install_stage: string
-	icon_path?: string
-	name: string
-	link?: {
-		type: string
-		project_id: string
-		version_id: string
-	}
-}
-
-const initialInstanceId = String(route.query.i ?? '')
-const instance: Ref<Instance | null> = ref(
-	queryClient.getQueryData<Instance>(['instances', 'summary', initialInstanceId]) ?? null,
+const initialInstanceId = computed(() => String(route.query.i ?? ''))
+const instanceQuery = useQuery(
+	computed(() => ({
+		...instanceDetailQueryOptions(initialInstanceId.value),
+		enabled: !!initialInstanceId.value,
+	})),
+)
+const instance = computed(() => instanceQuery.data.value ?? null)
+const linkedInstanceProjectId = computed(() => instance.value?.link?.project_id ?? '')
+const linkedInstanceProjectQuery = useQuery(
+	computed(() => ({
+		...instanceLinkedProjectQueryOptions(linkedInstanceProjectId.value),
+		enabled: !!linkedInstanceProjectId.value,
+	})),
 )
 const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(route.query.ai === 'true')
 const newlyInstalled = ref<string[]>([])
 const hiddenInstanceProjectIds = ref<Set<string>>(new Set())
 const hiddenInstanceProjectIdsInitialized = ref(false)
-const isServerInstance = ref(false)
+const isServerInstance = computed(
+	() => linkedInstanceProjectQuery.data.value?.minecraft_server != null,
+)
 
-const instanceBreadcrumb = route.query.i
-	? useBreadcrumb({
-			slot: 'instance',
-			id: () => `instance:${String(displayedBrowseRoute.value.query.i ?? '')}`,
-			label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
-			visual: () => ({
-				type: 'image',
-				src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
-				alt: instance.value?.name,
-				tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
-			}),
-			to: () => {
-				const instancePath = `/instance/${encodeURIComponent(
-					String(displayedBrowseRoute.value.query.i ?? ''),
-				)}`
-				return displayedBrowseRoute.value.query.from === 'worlds'
-					? `${instancePath}/worlds`
-					: instancePath
-			},
-		})
-	: undefined
+const breadcrumbManager = injectBreadcrumbManager()
+const instanceBreadcrumbDefinition = {
+	slot: 'instance',
+	id: () => `instance:${String(displayedBrowseRoute.value.query.i ?? '')}`,
+	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: () => ({
+		type: 'image' as const,
+		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		alt: instance.value?.name,
+		tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
+	}),
+	to: () => {
+		const instancePath = `/instance/${encodeURIComponent(
+			String(displayedBrowseRoute.value.query.i ?? ''),
+		)}`
+		return displayedBrowseRoute.value.query.from === 'worlds'
+			? `${instancePath}/worlds`
+			: instancePath
+	},
+} satisfies BreadcrumbDefinition
+const serversBreadcrumbDefinition = {
+	slot: 'root',
+	id: 'servers',
+	label: () => formatMessage(commonMessages.serversLabel),
+	to: '/hosting/manage/',
+	visual: { type: 'icon', component: ServerStackIcon },
+} satisfies BreadcrumbDefinition
 const serverBreadcrumbTo = ref(serverBackUrl.value)
 watch(serverBackUrl, (value) => {
 	if (route.path.startsWith('/browse/')) {
 		serverBreadcrumbTo.value = value
 	}
 })
-const serverBreadcrumb =
-	!instanceBreadcrumb && serverIdQuery.value
-		? useBreadcrumb({
-				slot: 'server',
-				id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
-				label: () =>
-					serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
-				visual: { type: 'icon', component: ServerStackIcon },
-				to: serverBreadcrumbTo,
-			})
-		: undefined
-const breadcrumbParent = instanceBreadcrumb ?? serverBreadcrumb
+const serverBreadcrumbDefinition = {
+	slot: 'server',
+	id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
+	label: () => serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: { type: 'icon', component: ServerStackIcon },
+	to: serverBreadcrumbTo,
+} satisfies BreadcrumbDefinition
 const breadcrumbDefinition = {
 	slot: 'browse',
 	id: () =>
@@ -230,9 +225,27 @@ const breadcrumbDefinition = {
 	to: () => displayedBrowseRoute.value.fullPath,
 	visual: { type: 'icon', component: CompassIcon },
 } satisfies BreadcrumbDefinition
-const browseBreadcrumb = breadcrumbParent
-	? useBreadcrumb(breadcrumbDefinition, { parent: breadcrumbParent })
-	: useRootBreadcrumb(breadcrumbDefinition)
+
+function syncBreadcrumbs() {
+	if (displayedBrowseRoute.value.query.i) {
+		const instanceBreadcrumb = breadcrumbManager.reset(instanceBreadcrumbDefinition)
+		breadcrumbManager.push(breadcrumbDefinition, { parent: instanceBreadcrumb })
+		return
+	}
+
+	if (displayedBrowseRoute.value.query.sid) {
+		const serversBreadcrumb = breadcrumbManager.reset(serversBreadcrumbDefinition)
+		const serverBreadcrumb = breadcrumbManager.push(serverBreadcrumbDefinition, {
+			parent: serversBreadcrumb,
+		})
+		breadcrumbManager.push(breadcrumbDefinition, { parent: serverBreadcrumb })
+		return
+	}
+
+	breadcrumbManager.reset(breadcrumbDefinition)
+}
+
+watch(displayedBrowseRoute, syncBreadcrumbs, { immediate: true, flush: 'sync' })
 
 debugLog('fetching tags (categories, loaders, gameVersions)')
 const [categories, loaders, availableGameVersions] = await Promise.all([
@@ -291,7 +304,13 @@ await initInstanceContext()
 
 async function refreshInstalledProjectIds() {
 	if (!route.query.i) {
-		const instances = await listInstances().catch(handleError)
+		const instances = await queryClient
+			.fetchQuery({
+				queryKey: [...instanceKeys.all, 'installed-project-ids'],
+				queryFn: listInstances,
+				staleTime: 0,
+			})
+			.catch(handleError)
 		if (!instances) return
 
 		const ids = instances
@@ -303,7 +322,14 @@ async function refreshInstalledProjectIds() {
 	}
 
 	if (route.query.from === 'worlds') {
-		const worlds = await get_instance_worlds(route.query.i as string).catch(handleError)
+		const targetInstanceId = route.query.i as string
+		const worlds = await queryClient
+			.fetchQuery({
+				queryKey: instanceKeys.installedProjectIds(targetInstanceId, 'worlds'),
+				queryFn: () => get_instance_worlds(targetInstanceId),
+				staleTime: 0,
+			})
+			.catch(handleError)
 		if (!worlds) return
 
 		const serverProjectIds = worlds
@@ -314,7 +340,14 @@ async function refreshInstalledProjectIds() {
 		return
 	}
 
-	const ids = await getInstalledProjectIds(route.query.i as string).catch(handleError)
+	const targetInstanceId = route.query.i as string
+	const ids = await queryClient
+		.fetchQuery({
+			queryKey: instanceKeys.installedProjectIds(targetInstanceId, 'content'),
+			queryFn: () => getInstalledProjectIds(targetInstanceId),
+			staleTime: 0,
+		})
+		.catch(handleError)
 	if (!ids) return
 
 	debugLog('installedProjectIds loaded', { count: ids.length })
@@ -329,11 +362,13 @@ async function initInstanceContext() {
 		queryWid: route.query.wid,
 		queryFrom: route.query.from,
 	})
-	await initServerContext()
-	await refreshInstalledProjectIds()
+	await Promise.all([
+		initServerContext(),
+		refreshInstalledProjectIds(),
+		route.query.i ? instanceQuery.suspense().catch(handleError) : Promise.resolve(),
+	])
 
 	if (route.query.i) {
-		instance.value = (await getInstance(route.query.i as string).catch(handleError)) ?? null
 		debugLog('instance loaded', {
 			name: instance.value?.name,
 			loader: instance.value?.loader,
@@ -341,15 +376,7 @@ async function initInstanceContext() {
 		})
 
 		if (instance.value?.link?.project_id) {
-			debugLog('checking linked project for server status', instance.value.link.project_id)
-			const projectV3 = await get_project_v3(
-				instance.value.link.project_id,
-				'must_revalidate',
-			).catch(handleError)
-			if (projectV3?.minecraft_server != null) {
-				debugLog('instance is a server instance')
-				isServerInstance.value = true
-			}
+			await linkedInstanceProjectQuery.suspense().catch(handleError)
 		}
 	}
 }
@@ -577,10 +604,7 @@ const messages = defineMessages({
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
 
 function resetInstanceContext() {
-	if (!instance.value) return
-
 	debugLog('instance context removed, resetting')
-	instance.value = null
 	installedProjectIds.value = null
 	instanceHideInstalled.value = false
 	newlyInstalled.value = []
@@ -611,9 +635,18 @@ watch(
 
 watch(
 	() => route.query.i,
-	(instanceId) => {
-		if (!instanceId && route.path.startsWith('/browse')) {
+	async (nextInstanceId, previousInstanceId) => {
+		if (!route.path.startsWith('/browse') || nextInstanceId === previousInstanceId) return
+		if (!nextInstanceId) {
 			resetInstanceContext()
+			return
+		}
+
+		installedProjectIds.value = null
+		hiddenInstanceProjectIdsInitialized.value = false
+		await Promise.all([instanceQuery.suspense().catch(handleError), refreshInstalledProjectIds()])
+		if (instance.value?.link?.project_id) {
+			await linkedInstanceProjectQuery.suspense().catch(handleError)
 		}
 	},
 )

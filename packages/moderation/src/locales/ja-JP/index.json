@@ -254,8 +254,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "{type}の内容を展示するには、少なくとも１枚の画像が必要です。"
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "音声パックや翻訳パックを除くリソースパックに該当する場合は、適切なタグを選択してください"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "オーディオパックやローカライズパックを除き、リソースパックの内容を紹介するために少なくとも1枚のギャラリー画像が必要です。これらに該当するパックの場合は、適切なタグを選択してください。"
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "シェーダーの様々なシチュエーションや環境での仕上がりを紹介するため、少なくとも3枚のギャラリー画像が必要です。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "ギャラリー画像をアップロード"
@@ -271,9 +274,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "外部リンクの承認"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "バージョンページを表示"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "リンク設定を表示"

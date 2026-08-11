@@ -107,7 +107,7 @@ impl WriteDelphiRule {
         self.name = self.name.trim().to_string();
         self.rule = self.rule.trim().to_string();
         Validate::validate(&self).map_err(|error| {
-            ApiError::Validation(validation_errors_to_string(error, None))
+            ApiError::Request(eyre!(validation_errors_to_string(error, None)))
         })?;
 
         let expression = self.rule.clone();
@@ -149,12 +149,13 @@ pub async fn test_rule(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let mut request = body.into_inner();
     request.rule = request.rule.trim().to_string();
     request.validate().map_err(|error| {
-        ApiError::Validation(validation_errors_to_string(error, None))
+        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
     })?;
 
     let rule = request.rule;
@@ -202,7 +203,8 @@ pub async fn get_rules(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let rules = sqlx::query!(
         r#"
@@ -366,7 +368,8 @@ pub async fn get_rule_affected_details(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
     let (rule_id,) = path.into_inner();
 
     let details = sqlx::query!(
@@ -451,7 +454,8 @@ pub async fn create_rule(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
     let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
 
@@ -532,7 +536,8 @@ pub async fn update_rule(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
     let (id,) = path.into_inner();
     let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
@@ -570,7 +575,7 @@ pub async fn update_rule(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("failed to update delphi rule")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("delphi rule not found")?;
 
     Ok(web::Json(DelphiRule {
         id: rule.id,
@@ -609,7 +614,8 @@ pub async fn delete_rule(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
     let (id,) = path.into_inner();
 
     let deleted = sqlx::query!(
@@ -633,7 +639,7 @@ pub async fn delete_rule(
     .wrap_internal_err("failed to mark delphi rule for deletion")?;
 
     if deleted.is_none() {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre!("delphi rule not found")));
     }
 
     Ok(())

@@ -1,0 +1,157 @@
+name: Labrinth Build
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'prod'
+    paths:
+      - .github/workflows/labrinth-build.yml
+      - 'apps/labrinth/**'
+      - 'packages/**'
+      - '!packages/api-client/**'
+      - '!packages/app-lib/**'
+      - Cargo.toml
+      - Cargo.lock
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - .github/workflows/labrinth-build.yml
+      - 'apps/labrinth/**'
+      - 'packages/**'
+      - '!packages/api-client/**'
+      - '!packages/app-lib/**'
+      - Cargo.toml
+      - Cargo.lock
+  merge_group:
+    types: [checks_requested]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
+jobs:
+  skip-if-clean:
+    name: Skip if merge_queue produces no diff
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+      internal: ${{ steps.check-internal.outputs.internal }}
+    if: ${{ always() }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check if workflow runs on an internal branch
+        id: check-internal
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$EVENT_NAME" != "pull_request" ] || [ "$HEAD_REPO" = "$REPO" ]; then
+            echo "internal=true" >> $GITHUB_OUTPUT
+          else
+            echo "internal=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Merge Queue CI Check Skipper
+        id: merge-queue-ci-skipper
+        uses: ./.github/merge-queue-ci-skipper
+        with:
+          secret: ${{ secrets.GH_ACCESS_TOKEN }}
+
+      - name: Check merge_group synthetic commit
+        id: check
+        run: |
+          # PR mode: never skip
+          if [ "${{ github.event_name }}" != "merge_group" ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ "${{ steps.merge-queue-ci-skipper.outputs.skip-check }}" = "true" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    name: Build Labrinth
+    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-modrinth-labrinth' || 'ubuntu-latest' }}
+    needs: [skip-if-clean]
+    if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
+    env:
+      SQLX_OFFLINE: 'true'
+      GIT_HASH: ${{ github.sha }}
+      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '20G' || '' }}
+      RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
+      RUST_MIN_STACK: '16777216'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
+        with:
+          rustflags: ''
+          cache: false
+
+      - name: Setup mold
+        uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
+
+      - name: Set up caches
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        with:
+          cache: |
+            rust
+            apt
+
+      - name: Configure sccache
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake libcurl4-openssl-dev
+
+      - name: Build labrinth
+        run: cargo build --profile release-labrinth --package labrinth
+
+      - name: Stage Docker context
+        run: |
+          mkdir -p apps/labrinth/docker-stage
+          cp target/release-labrinth/labrinth apps/labrinth/docker-stage/labrinth
+          cp -r apps/labrinth/migrations apps/labrinth/docker-stage/migrations
+          cp -r apps/labrinth/assets apps/labrinth/docker-stage/assets
+
+      - name: Upload Docker context
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        uses: namespace-actions/upload-artifact@f6ccaacc655aec41b93af180d1d7eef21af862d2 # v1.0.3
+        with:
+          name: labrinth-docker-context
+          retention-days: 1
+          path: apps/labrinth/docker-stage
+
+  docker-build:
+    needs: [skip-if-clean, build]
+    if: ${{ needs.skip-if-clean.outputs.internal == 'true' }}
+    uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
+    with:
+      image-name: labrinth
+      dockerfile-path: apps/labrinth/Dockerfile
+      artifacts-name: labrinth-docker-context
+
+  deploy:
+    needs: [skip-if-clean, docker-build]
+    if: ${{ needs.skip-if-clean.outputs.internal == 'true' && github.ref == 'refs/heads/prod' }}
+    uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    secrets:
+      ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
+    with:
+      application-set: labrinth
+      branch: ${{ github.ref == 'refs/heads/prod' && 'main' || 'develop' }}
+      environment-name: ${{ github.ref == 'refs/heads/prod' && 'production' || 'staging' }}

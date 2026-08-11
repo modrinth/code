@@ -248,13 +248,12 @@ import { computed, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
-import { useGeneratedState } from '@/composables/generated'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
+import { muralBankDetails } from '~/generated/state.json'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()
-const generatedState = useGeneratedState()
 
 const selectedRail = computed(() => {
 	const railId = withdrawData.value.selection.method
@@ -285,7 +284,7 @@ const availableBankNames = computed(() => {
 	const rail = selectedRail.value
 	if (!rail || !rail.railCode) return []
 
-	const bankDetails = generatedState.value.muralBankDetails?.[rail.railCode]
+	const bankDetails = muralBankDetails?.[rail.railCode as keyof typeof muralBankDetails]
 	return bankDetails?.bankNames || []
 })
 

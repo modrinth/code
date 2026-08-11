@@ -1,11 +1,12 @@
 use std::time::Duration;
 
+use eyre::{Result, WrapErr};
 use futures::StreamExt;
 use redis::ToRedisArgs;
 use tokio::sync::mpsc;
 use tracing::{info, warn};
 
-use super::{Error, RedisPool};
+use super::RedisPool;
 
 const PUBSUB_BUFFER_SIZE: usize = 1024;
 const INITIAL_RECONNECT_BACKOFF: Duration = Duration::from_millis(250);
@@ -35,21 +36,20 @@ impl RedisPool {
         receiver
     }
 
-    pub async fn publish<M>(
-        &self,
-        channel: &str,
-        message: M,
-    ) -> Result<(), Error>
+    pub async fn publish<M>(&self, channel: &str, message: M) -> Result<()>
     where
         M: ToRedisArgs + Send + Sync,
     {
-        let mut connection = self.connect().await?;
+        let mut connection = self
+            .connect()
+            .await
+            .wrap_err("connecting to Redis for publishing")?;
         let _: usize = redis::cmd("PUBLISH")
             .arg(channel)
             .arg(message)
             .query_async(&mut connection)
             .await
-            .map_err(Error::from)?;
+            .wrap_err("publishing to Redis channel")?;
         Ok(())
     }
 }
@@ -111,10 +111,17 @@ async fn forward_from_seed(
     seed_url: &str,
     channel: &'static str,
     sender: &mpsc::Sender<Vec<u8>>,
-) -> redis::RedisResult<SubscriptionOutcome> {
-    let client = redis::Client::open(seed_url)?;
-    let mut pubsub = client.get_async_pubsub().await?;
-    pubsub.subscribe(channel).await?;
+) -> Result<SubscriptionOutcome> {
+    let client = redis::Client::open(seed_url)
+        .wrap_err("configuring Redis Pub/Sub client")?;
+    let mut pubsub = client
+        .get_async_pubsub()
+        .await
+        .wrap_err("connecting to Redis Pub/Sub")?;
+    pubsub
+        .subscribe(channel)
+        .await
+        .wrap_err("subscribing to Redis channel")?;
     info!(channel, "Established Redis Pub/Sub subscription");
 
     let mut stream = pubsub.into_on_message();

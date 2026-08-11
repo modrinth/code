@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
@@ -91,7 +92,12 @@ pub(crate) async fn fetch(
         &filter_affiliate_code_ids,
     )
     .fetch(pool);
-    while let Some(row) = rows.next().await.transpose()? {
+    while let Some(row) = rows
+        .next()
+        .await
+        .transpose()
+        .wrap_internal_err("fetching affiliate code conversions")?
+    {
         let bucket = row
             .bucket
             .wrap_internal_err("bucket should be non-null - query bug!")?;
@@ -116,7 +122,8 @@ pub(crate) async fn fetch(
                     AffiliateCodeConversions { conversions },
                 ),
             }),
-        )?;
+        )
+        .wrap_api_err("executing `AffiliateCodeMetrics::Conversions`")?;
     }
 
     Ok(())

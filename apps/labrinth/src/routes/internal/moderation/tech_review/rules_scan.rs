@@ -142,14 +142,17 @@ pub async fn get_rule_schema(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<DelphiRuleSchemaResponse>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
+    crate::util::error::Context::wrap_auth_err(
+        check_is_moderator_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Scopes::PROJECT_READ,
+        )
+        .await,
+        "authenticating API request",
+    )?;
 
     let mut schemas = Vec::new();
     <RuleInput as ToSchema>::schemas(&mut schemas);
@@ -186,19 +189,23 @@ pub async fn get_detail_rule_input(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiReportIssueDetailsId,)>,
 ) -> Result<web::Json<RuleInput>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
+    crate::util::error::Context::wrap_auth_err(
+        check_is_moderator_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Scopes::PROJECT_READ,
+        )
+        .await,
+        "authenticating API request",
+    )?;
 
     let (detail_id,) = path.into_inner();
-    let detail = crate::util::error::Context::wrap_internal_err(
-        sqlx::query!(
-            r#"
+    let detail = crate::util::error::Context::wrap_not_found_err(
+        crate::util::error::Context::wrap_internal_err(
+            sqlx::query!(
+                r#"
         SELECT
             detail.key,
             issue.issue_type,
@@ -250,13 +257,14 @@ pub async fn get_detail_rule_input(
         ) file_hashes ON TRUE
         WHERE detail.id = $1
         "#,
-            detail_id as DelphiReportIssueDetailsId,
-        )
-        .fetch_optional(&***ro_pool)
-        .await,
-        "failed to fetch delphi rule input",
-    )?
-    .ok_or(ApiError::NotFound)?;
+                detail_id as DelphiReportIssueDetailsId,
+            )
+            .fetch_optional(&***ro_pool)
+            .await,
+            "failed to fetch delphi rule input",
+        )?,
+        "delphi rule input not found",
+    )?;
 
     Ok(web::Json(RuleInput {
         schema_version: 1,
@@ -313,14 +321,17 @@ pub async fn scan_rules(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_WRITE,
-    )
-    .await?;
+    crate::util::error::Context::wrap_auth_err(
+        check_is_moderator_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Scopes::PROJECT_WRITE,
+        )
+        .await,
+        "authenticating API request",
+    )?;
 
     let mut transaction = crate::util::error::Context::wrap_internal_err(
         pool.begin().await,
@@ -351,9 +362,9 @@ pub async fn scan_rules(
     .unwrap_or(false);
 
     if !acquired {
-        return Err(ApiError::Conflict(
-            "a delphi rule scan is already running".to_string(),
-        ));
+        return Err(ApiError::Conflict(eyre!(
+            "a delphi rule scan is already running"
+        )));
     }
 
     let (sender, receiver) = mpsc::unbounded_channel();

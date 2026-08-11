@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::{
     collections::{HashMap, HashSet},
     sync::{
@@ -14,7 +15,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 use crate::{
     database::{
         PgPool,
-        models::{DBProjectId, DBVersion, DBVersionId},
+        models::{DBProjectId, DBVersionId},
     },
     models::{
         ids::{ProjectId, VersionId},
@@ -326,37 +327,28 @@ async fn fetch_dependent_version_projects(
         return Ok(HashMap::new());
     }
 
-    let dependent_on_version_ids =
-        dependent_on_version_ids.into_iter().collect::<Vec<_>>();
-    let versions =
-        DBVersion::get_many(&dependent_on_version_ids, cx.pool, cx.redis)
-            .await?;
-
-    let dependent_project_ids = versions
-        .iter()
-        .map(|version| version.inner.project_id.0)
+    let dependent_on_version_ids = dependent_on_version_ids
+        .into_iter()
+        .map(|version_id| version_id.0)
         .collect::<Vec<_>>();
-    let server_projects = sqlx::query!(
+    let versions = sqlx::query!(
         "
-        SELECT id FROM mods
-        WHERE id = ANY($1)
-            AND components ? 'minecraft_server'
+        SELECT v.id, v.mod_id
+        FROM versions v
+        INNER JOIN mods m ON m.id = v.mod_id
+        WHERE
+            v.id = ANY($1)
+            AND jsonb_typeof(m.components -> 'minecraft_server') IS DISTINCT FROM 'object'
         ",
-        &dependent_project_ids,
+        &dependent_on_version_ids,
     )
     .fetch_all(cx.pool)
     .await
-    .wrap_internal_err("failed to fetch server dependent projects")?
-    .into_iter()
-    .map(|project| DBProjectId(project.id))
-    .collect::<HashSet<_>>();
+    .wrap_internal_err("failed to fetch dependent version projects")?;
 
     Ok(versions
         .into_iter()
-        .filter_map(|version| {
-            (!server_projects.contains(&version.inner.project_id))
-                .then_some((version.inner.id, version.inner.project_id))
-        })
+        .map(|version| (DBVersionId(version.id), DBProjectId(version.mod_id)))
         .collect())
 }
 
@@ -367,7 +359,9 @@ pub(crate) async fn fetch(
     use ProjectDownloadsField as F;
     let uses = |field| metrics.bucket_by.contains(&field);
     let dependent_on_version_filter =
-        fetch_dependent_on_version_filter(metrics, cx.pool).await?;
+        fetch_dependent_on_version_filter(metrics, cx.pool)
+            .await
+            .wrap_api_err("fetching dependent on version filter")?;
     if !metrics.filter_by.dependent_project_id.is_empty()
         && dependent_on_version_filter.is_empty()
     {
@@ -442,15 +436,23 @@ pub(crate) async fn fetch(
             .iter()
             .any(|(column_name, used)| *column_name == name && *used)
     };
-    let mut cursor = query.fetch::<DownloadRow>()?;
+    let mut cursor = query
+        .fetch::<DownloadRow>()
+        .wrap_internal_err("fetching project-download pagination cursor")?;
     let mut rows = Vec::new();
 
-    while let Some(row) = cursor.next().await? {
+    while let Some(row) = cursor
+        .next()
+        .await
+        .wrap_internal_err("fetching project downloads")?
+    {
         rows.push(row);
     }
 
     let dependent_version_projects =
-        fetch_dependent_version_projects(&rows, cx).await?;
+        fetch_dependent_version_projects(&rows, cx)
+            .await
+            .wrap_api_err("fetching dependent version projects")?;
     let mut buckets = HashMap::<DownloadBucket, u64>::new();
 
     for row in rows {
@@ -576,7 +578,8 @@ pub(crate) async fn fetch(
                     downloads,
                 }),
             }),
-        )?;
+        )
+        .wrap_api_err("executing `ProjectMetrics::Downloads`")?;
     }
 
     Ok(())

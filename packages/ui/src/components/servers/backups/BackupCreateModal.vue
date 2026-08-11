@@ -46,22 +46,20 @@
 		</div>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hideModal">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						v-tooltip="createDisabledTooltip"
-						:disabled="createDisabled"
-						@click="createBackup"
-					>
-						<PlusIcon />
-						Create backup
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hideModal">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button
+					v-tooltip="createDisabledTooltip"
+					type="colored"
+					color="brand"
+					:disabled="createDisabled"
+					@click="createBackup"
+				>
+					<PlusIcon />
+					Create backup
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -73,6 +71,8 @@ import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { useVIntl } from '../../../composables/i18n'
 import {
 	injectModrinthClient,
@@ -80,7 +80,6 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 

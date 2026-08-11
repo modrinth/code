@@ -25,11 +25,9 @@
 		</div>
 
 		<div v-if="!hideRemove" class="flex shrink-0 items-center justify-end gap-1">
-			<ButtonStyled size="standard" :circular="true">
-				<button aria-label="Remove file" class="-mr-2 !shadow-none" @click="emitRemove">
-					<XIcon aria-hidden="true" />
-				</button>
-			</ButtonStyled>
+			<Button aria-label="Remove file" class="-mr-2" @click="emitRemove">
+				<XIcon aria-hidden="true" />
+			</Button>
 		</div>
 	</div>
 </template>
@@ -37,7 +35,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { XIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
+import { Avatar, Button, TagItem } from '@modrinth/ui'
 
 const emit = defineEmits<{
 	(e: 'fileTypeChange', type: string): void

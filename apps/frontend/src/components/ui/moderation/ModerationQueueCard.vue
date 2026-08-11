@@ -102,21 +102,21 @@
 				</span>
 
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular>
-						<button v-tooltip="'Copy ID'" @click="copyId">
-							<ClipboardCopyIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular>
-						<button v-tooltip="'Copy link'" @click="copyLink">
-							<LinkIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular color="orange">
-						<button v-tooltip="'Begin review'" @click="openProjectForReview">
-							<ScaleIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton v-tooltip="'Copy ID'" :label="'Copy ID'" @click="copyId">
+						<ClipboardCopyIcon />
+					</IconButton>
+					<IconButton v-tooltip="'Copy link'" :label="'Copy link'" @click="copyLink">
+						<LinkIcon />
+					</IconButton>
+					<IconButton
+						v-tooltip="'Begin review'"
+						type="colored"
+						color="orange"
+						:label="'Begin review'"
+						@click="openProjectForReview"
+					>
+						<ScaleIcon />
+					</IconButton>
 				</div>
 			</div>
 		</div>
@@ -128,8 +128,8 @@ import { ClipboardCopyIcon, FileIcon, LinkIcon, ScaleIcon } from '@modrinth/asse
 import {
 	Avatar,
 	Badge,
-	ButtonStyled,
 	getProjectTypeIcon,
+	IconButton,
 	injectNotificationManager,
 	useFormatDateTime,
 	useRelativeTime,

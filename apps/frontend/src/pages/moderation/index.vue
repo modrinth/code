@@ -18,7 +18,8 @@
 					<Combobox
 						v-model="currentFilterType"
 						class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="filterTypes"
 						:placeholder="formatMessage(commonMessages.filterByLabel)"
 						@select="goToPage(1)"
@@ -36,7 +37,8 @@
 					<Combobox
 						v-model="currentSortType"
 						class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="sortTypes"
 						:placeholder="formatMessage(commonMessages.sortByLabel)"
 						@select="goToPage(1)"
@@ -56,7 +58,8 @@
 					<Combobox
 						v-model="itemsPerPage"
 						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
-						trigger-class="!h-10"
+						trigger-type="base"
+						trigger-size="lg"
 						:options="itemsPerPageOptions"
 						placeholder="Items per page"
 						@select="goToPage(1)"
@@ -69,17 +72,17 @@
 					</Combobox>
 				</div>
 
-				<ButtonStyled color="orange">
-					<button
-						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
-						:disabled="pending || paginatedProjects?.length === 0"
-						@click="moderateAllInFilter()"
-					>
-						<ScaleIcon class="flex-shrink-0" />
-						<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
-						<span class="sm:hidden">Moderate</span>
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="orange"
+					class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+					:disabled="pending || paginatedProjects?.length === 0"
+					@click="moderateAllInFilter()"
+				>
+					<ScaleIcon class="flex-shrink-0" />
+					<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
+					<span class="sm:hidden">Moderate</span>
+				</Button>
 			</div>
 		</div>
 
@@ -105,6 +108,12 @@
 				@switch-page="goToPage"
 			/>
 			<ConfettiExplosion v-if="visible" />
+			<QueueSummaryModal
+				ref="queueSummaryModal"
+				:completed-ids="moderationQueue.currentQueue.completed"
+				:skipped-ids="moderationQueue.currentQueue.skipped"
+				@review-skipped="reviewSkippedQueue"
+			/>
 		</div>
 
 		<div class="flex flex-col gap-3">
@@ -139,8 +148,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -157,8 +166,11 @@ import { useQuery } from '@tanstack/vue-query'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
+import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
 import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
-import { useModerationQueue } from '~/services/moderation-queue.ts'
+import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
+import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
 
@@ -169,6 +181,8 @@ const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
 
+const queueSummaryModal = ref()
+
 const visible = ref(false)
 if (import.meta.client && history && history.state && history.state.confetti) {
 	setTimeout(async () => {
@@ -178,6 +192,14 @@ if (import.meta.client && history && history.state && history.state.confetti) {
 		setTimeout(() => {
 			visible.value = false
 		}, 5000)
+	}, 1000)
+}
+
+if (import.meta.client && history && history.state && history.state.queueSummary) {
+	setTimeout(async () => {
+		history.state.queueSummary = false
+		await nextTick()
+		queueSummaryModal.value?.show()
 	}, 1000)
 }
 
@@ -495,60 +517,36 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-function notifySkippedProjects(skippedCount: number) {
-	if (skippedCount <= 0) return
-	addNotification({
-		title: 'Skipped projects',
-		text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
-		type: 'info',
-		autoCloseMs: 2000,
-	})
-}
-
 async function findFirstEligibleProject(): Promise<string | null> {
-	let skippedCount = 0
+	const candidateIds = [...moderationQueue.currentQueue.items]
+	if (candidateIds.length === 0) return null
 
-	while (moderationQueue.hasItems) {
-		const currentId = moderationQueue.getCurrentProjectId()
-		if (!currentId) return null
+	const next = await findNextEligibleQueueProject(client, moderationQueue, candidateIds)
 
-		const project = projectsById.value.get(currentId)
-
-		if (project && project.project.status !== 'processing') {
-			await moderationQueue.completeCurrentProject(currentId, 'skipped')
-			skippedCount++
-			continue
-		}
-
-		try {
-			const lockStatus = await moderationQueue.checkLock(currentId)
-
-			if (!lockStatus.locked || lockStatus.expired || lockStatus.is_own_lock) {
-				notifySkippedProjects(skippedCount)
-				return currentId
-			}
-
-			await moderationQueue.completeCurrentProject(currentId, 'skipped')
-			skippedCount++
-		} catch {
-			return currentId
-		}
+	if (!next) {
+		await Promise.all(candidateIds.map((id) => moderationQueue.excludeProject(id)))
+		return null
 	}
 
-	notifySkippedProjects(skippedCount)
-
-	return null
+	await Promise.all(next.excluded.map((id) => moderationQueue.excludeProject(id)))
+	return next.project
 }
 
 function getProjectRouteParam(projectId: string): string {
 	return projectsById.value.get(projectId)?.project.slug || projectId
 }
 
+function getProjectRouteType(projectId: string): string {
+	const projectType = projectsById.value.get(projectId)?.project.project_types[0]
+	if (!projectType) return 'project'
+	return getProjectTypeForUrlShorthand(projectType, [])
+}
+
 async function navigateToModerationProject(projectId: string) {
 	await navigateTo({
 		name: 'type-project',
 		params: {
-			type: 'project',
+			type: getProjectRouteType(projectId),
 			project: getProjectRouteParam(projectId),
 		},
 		state: {
@@ -590,12 +588,8 @@ async function moderateAllInFilter() {
 async function startFromProject(projectId: string) {
 	const allFilteredProjectIds = await getFilteredProjectIds()
 	const projectIndex = allFilteredProjectIds.indexOf(projectId)
-	if (projectIndex === -1) {
-		await moderationQueue.setSingleProject(projectId)
-	} else {
-		const projectIds = allFilteredProjectIds.slice(projectIndex)
-		await moderationQueue.setQueue(projectIds)
-	}
+	const projectIds = projectIndex === -1 ? [projectId] : allFilteredProjectIds.slice(projectIndex)
+	await moderationQueue.setQueue(projectIds)
 
 	const targetProjectId = await findFirstEligibleProject()
 
@@ -603,6 +597,23 @@ async function startFromProject(projectId: string) {
 		addNotification({
 			title: 'No projects available',
 			text: 'All projects in queue are already moderated or locked by others.',
+			type: 'warning',
+		})
+		return
+	}
+
+	await navigateToModerationProject(targetProjectId)
+}
+
+async function reviewSkippedQueue() {
+	await moderationQueue.startSkippedReview()
+
+	const targetProjectId = await findFirstEligibleProject()
+
+	if (!targetProjectId) {
+		addNotification({
+			title: 'No projects available',
+			text: 'All previously skipped projects are already moderated or locked by others.',
 			type: 'warning',
 		})
 		return

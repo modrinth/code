@@ -1,12 +1,6 @@
 <script setup>
 import { CheckIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
-import {
-	Admonition,
-	Avatar,
-	ButtonStyled,
-	injectNotificationManager,
-	StyledInput,
-} from '@modrinth/ui'
+import { Admonition, Avatar, Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
@@ -15,6 +9,7 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { list } from '@/helpers/instance'
 import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 const { handleError } = injectNotificationManager()
 const queryClient = useQueryClient()
@@ -67,7 +62,7 @@ async function addServer(instance) {
 	try {
 		await add_server_to_instance(instance.id, serverName.value, serverAddress.value, 'prompt')
 		instance.added = true
-		await queryClient.invalidateQueries({ queryKey: ['worlds', instance.id] })
+		await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instance.id) })
 
 		trackEvent('AddServerToInstance', {
 			server_name: serverName.value,
@@ -109,19 +104,15 @@ async function addServer(instance) {
 						/>
 						{{ instance.name }}
 					</router-link>
-					<ButtonStyled>
-						<button :disabled="instance.added || instance.adding" @click="addServer(instance)">
-							<PlusIcon v-if="!instance.added && !instance.adding" />
-							<CheckIcon v-else-if="instance.added" />
-							{{ instance.adding ? 'Adding...' : instance.added ? 'Added' : 'Add' }}
-						</button>
-					</ButtonStyled>
+					<Button :disabled="instance.added || instance.adding" @click="addServer(instance)">
+						<PlusIcon v-if="!instance.added && !instance.adding" />
+						<CheckIcon v-else-if="instance.added" />
+						{{ instance.adding ? 'Adding...' : instance.added ? 'Added' : 'Add' }}
+					</Button>
 				</div>
 			</div>
 			<div class="input-group push-right">
-				<ButtonStyled>
-					<button @click="modal.hide()">Cancel</button>
-				</ButtonStyled>
+				<Button @click="modal.hide()">Cancel</Button>
 			</div>
 		</div>
 	</ModalWrapper>
