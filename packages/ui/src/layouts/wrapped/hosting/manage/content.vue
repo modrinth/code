@@ -32,6 +32,7 @@ import {
 	flushStoredServerAddonInstallQueue,
 	getStoredServerAddonInstallQueue,
 	getTargetInstallPreferences,
+	resolveServerAddonInstallPlans,
 } from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
@@ -157,7 +158,7 @@ const contentQuery = useQuery({
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
-	staleTime: 0,
+	staleTime: 30_000,
 })
 
 const isModpackContentModalOpen = ref(false)
@@ -168,7 +169,7 @@ const modpackContentQuery = useQuery({
 			from_modpack: true,
 		}),
 	enabled: computed(() => worldId.value !== null && !!contentQuery.data.value?.modpack),
-	staleTime: 0,
+	staleTime: 30_000,
 })
 
 const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
@@ -384,37 +385,32 @@ function toResolvePreferences(
 }
 
 async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
-	const existingProjectIds = getInstalledProjectIds()
-	const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
-
-	for (const plan of plans) {
-		const target = getTargetInstallPreferences(
-			{
-				gameVersion: server.value?.mc_version,
-				loader: server.value?.loader,
-			},
-			plan.contentType,
-		)
-		const resolved = await client.labrinth.content_v3.resolve({
-			project_id: plan.projectId,
-			version_id: plan.versionId,
-			content_type: plan.contentType as Labrinth.Content.v3.ContentType,
-			selected: toResolvePreferences(plan.preferences),
-			target: toResolvePreferences(target),
-			existing_project_ids: Array.from(existingProjectIds),
-		})
-
-		for (const item of [resolved.primary, ...resolved.dependencies]) {
-			if (existingProjectIds.has(item.project_id)) continue
-			existingProjectIds.add(item.project_id)
-			resolvedAddons.push({
-				project_id: item.project_id,
-				version_id: item.version_id,
+	return await resolveServerAddonInstallPlans({
+		plans,
+		existingProjectIds: getInstalledProjectIds(),
+		resolvePlan: async (plan, existingProjectIds) => {
+			const target = getTargetInstallPreferences(
+				{
+					gameVersion: server.value?.mc_version,
+					loader: server.value?.loader,
+				},
+				plan.contentType,
+			)
+			const resolved = await client.labrinth.content_v3.resolve({
+				project_id: plan.projectId,
+				version_id: plan.versionId,
+				content_type: plan.contentType as Labrinth.Content.v3.ContentType,
+				selected: toResolvePreferences(plan.preferences),
+				target: toResolvePreferences(target),
+				existing_project_ids: existingProjectIds,
 			})
-		}
-	}
 
-	return resolvedAddons
+			return [resolved.primary, ...resolved.dependencies].map((item) => ({
+				projectId: item.project_id,
+				versionId: item.version_id,
+			}))
+		},
+	})
 }
 
 function addonMatchesPendingInstall(

@@ -68,6 +68,7 @@ useQuery({
 			from_modpack: false,
 		}),
 	enabled: computed(() => !!worldId.value),
+	staleTime: 30_000,
 })
 
 const serverSettingsTabComponentMap = {

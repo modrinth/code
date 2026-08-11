@@ -161,6 +161,7 @@ const {
 	hideSelectedServerInstalls,
 	installingProjectIds,
 	optimisticallyInstalledProjectIds,
+	queuedServerInstallRootProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
 	isInstallingQueuedServerInstalls,
@@ -310,6 +311,7 @@ function getCardActions(
 
 	if (serverData.value) {
 		const isQueued = queuedServerInstallProjectIds.value.has(result.project_id)
+		const isQueuedRoot = queuedServerInstallRootProjectIds.value.has(result.project_id)
 		const isInstalled =
 			projectResult.installed ||
 			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
@@ -345,7 +347,11 @@ function getCardActions(
 							? CheckIcon
 							: DownloadIcon,
 				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
-				disabled: !!isInstalled || isInstalling || isInstallingSelection,
+				disabled:
+					!!isInstalled ||
+					isInstalling ||
+					isInstallingSelection ||
+					(isQueued && !isQueuedRoot),
 				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
