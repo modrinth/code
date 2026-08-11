@@ -2944,17 +2944,56 @@ pub async fn project_delete_internal(
     ) {
         let deleted_user: db_ids::DBUserId = DELETED_USER.into();
 
+        let deleted_slug = if let Some(slug) = &project.inner.slug {
+            let candidate = format!(
+                "{slug}--deleted-{}",
+                ProjectId::from(project.inner.id)
+            );
+            if candidate.len() <= 255 {
+                let taken = sqlx::query!(
+                    "
+                    SELECT EXISTS(
+                        SELECT 1 FROM mods
+                        WHERE
+                            (slug = LOWER($1) OR text_id_lower = LOWER($1))
+                            AND id != $2
+                    ) AS exists
+                    ",
+                    candidate,
+                    project.inner.id as db_ids::DBProjectId,
+                )
+                .fetch_one(&mut transaction)
+                .await
+                .wrap_internal_err("checking deleted slug availability")?
+                .exists
+                .unwrap_or(true);
+
+                if !taken {
+                    Some(candidate.to_lowercase())
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         sqlx::query!(
             "
             UPDATE mods
-            SET organization_id = NULL
-            WHERE id = $1
+            SET organization_id = NULL, slug = COALESCE($1, slug)
+            WHERE id = $2
             ",
+            deleted_slug,
             project.inner.id as db_ids::DBProjectId,
         )
         .execute(&mut transaction)
         .await
-        .wrap_internal_err("failed to detach project from organization")?;
+        .wrap_internal_err(
+            "failed to detach project from organization and update slug",
+        )?;
 
         let affected_user_ids = sqlx::query!(
             "
