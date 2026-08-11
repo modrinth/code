@@ -2,6 +2,7 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
@@ -43,6 +44,10 @@ const messages = defineMessages({
 		id: 'content.card.uploaded',
 		defaultMessage: 'Uploaded',
 	},
+	locked: {
+		id: 'content.card.locked',
+		defaultMessage: 'Locked',
+	},
 })
 
 interface Props {
@@ -54,6 +59,7 @@ interface Props {
 	source?: ContentSource
 	external?: boolean
 	enabled?: boolean
+	locked?: boolean
 	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean
@@ -64,6 +70,7 @@ interface Props {
 	disabledTooltip?: string | null
 	toggleDisabled?: boolean
 	toggleDisabledTooltip?: string | null
+	hideToggle?: boolean
 	showCheckbox?: boolean
 	hideDelete?: boolean
 	hideActions?: boolean
@@ -78,6 +85,7 @@ const props = withDefaults(defineProps<Props>(), {
 	source: undefined,
 	external: false,
 	enabled: undefined,
+	locked: false,
 	installing: false,
 	hasUpdate: false,
 	isClientOnly: false,
@@ -88,6 +96,7 @@ const props = withDefaults(defineProps<Props>(), {
 	disabledTooltip: undefined,
 	toggleDisabled: false,
 	toggleDisabledTooltip: undefined,
+	hideToggle: false,
 	showCheckbox: false,
 	hideDelete: false,
 	hideActions: false,
@@ -194,6 +203,14 @@ const deleteHovered = ref(false)
 							{{ project.title }}
 						</AutoLink>
 						<slot name="title-badges" />
+						<span
+							v-if="locked"
+							v-tooltip="formatMessage(messages.locked)"
+							class="inline-flex size-5 shrink-0 items-center justify-center text-secondary"
+							tabindex="0"
+						>
+							<LockIcon aria-hidden="true" class="size-4" />
+						</span>
 						<span
 							v-if="isClientOnly"
 							v-tooltip="formatMessage(clientWarningMessage)"
@@ -320,7 +337,10 @@ const deleteHovered = ref(false)
 
 			<!-- Fixed width container to reserve space for update/switch version button -->
 			<div
-				v-if="hasUpdateListener || hasSwitchVersionListener"
+				v-if="
+					(hasUpdateListener && hasUpdate) ||
+					(hasSwitchVersionListener && version && !hideSwitchVersion)
+				"
 				class="flex w-8 items-center justify-center"
 			>
 				<IconButton
@@ -364,7 +384,7 @@ const deleteHovered = ref(false)
 			</div>
 
 			<Toggle
-				v-if="enabled !== undefined"
+				v-if="enabled !== undefined && !hideToggle"
 				v-tooltip="
 					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
 						? (toggleDisabledTooltip ?? disabledTooltip)

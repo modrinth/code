@@ -9,6 +9,7 @@ pub struct ContentItem {
     pub id: String,
     pub size: u64,
     pub enabled: bool,
+    pub locked: bool,
     pub project_type: ProjectType,
     pub project: Option<ContentItemProject>,
     pub version: Option<ContentItemVersion>,

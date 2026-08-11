@@ -347,6 +347,9 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
+  "content.card.locked": {
+    "defaultMessage": "Locked"
+  },
   "content.card.select-project": {
     "defaultMessage": "Select {project}"
   },

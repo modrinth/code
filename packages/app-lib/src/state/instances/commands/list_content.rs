@@ -510,6 +510,7 @@ pub(crate) async fn dependencies_to_content_items(
                     .map(|file| file.size as u64)
                     .unwrap_or(0),
                 enabled: true,
+                locked: false,
                 project_type,
                 project: Some(content_item_project(project)),
                 version: version.map(|version| ContentItemVersion {
@@ -603,6 +604,11 @@ async fn content_projects_for_scope(
             entry.file_id.as_deref().map(|file_id| (file_id, entry))
         })
         .collect::<HashMap<_, _>>();
+    let locked_file_ids = sqlite::content_rows::get_locked_instance_file_ids(
+        &resolved.instance.id,
+        &state.pool,
+    )
+    .await?;
     let hashes = files
         .iter()
         .map(|file| file.sha1.as_str())
@@ -735,6 +741,7 @@ async fn content_projects_for_scope(
                 enabled: entry.map_or(file.enabled, |entry| {
                     entry.enabled && file.enabled
                 }),
+                locked: locked_file_ids.contains(&file.id),
                 size: file.size,
                 metadata: file_metadata_from_entry_or_cache(entry, metadata),
                 project_type,
@@ -890,6 +897,7 @@ async fn content_files_to_content_items(
                 id: file.hash.clone(),
                 size: file.size,
                 enabled: file.enabled,
+                locked: file.locked,
                 project_type: file.project_type,
                 project: project.map(content_item_project),
                 version: version.map(|version| ContentItemVersion {

@@ -288,6 +288,18 @@ export async function toggle_disable_project(
 	})
 }
 
+export async function set_project_locked(
+	instanceId: string,
+	projectPath: string,
+	locked: boolean,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_set_project_locked', {
+		instanceId,
+		projectPath,
+		locked,
+	})
+}
+
 // Remove a project
 export async function remove_project(instanceId: string, projectPath: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove_project', { instanceId, projectPath })

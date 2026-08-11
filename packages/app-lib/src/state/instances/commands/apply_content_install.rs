@@ -795,6 +795,37 @@ pub(crate) async fn content_source_kind_for_project_path(
     }))
 }
 
+pub(crate) async fn is_project_locked(
+    instance_id: &str,
+    project_path: &str,
+    state: &State,
+) -> crate::Result<bool> {
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    content_rows::is_instance_file_locked(
+        &scope.instance.id,
+        project_path,
+        &state.pool,
+    )
+    .await
+}
+
+pub(crate) async fn set_project_locked(
+    instance_id: &str,
+    project_path: &str,
+    locked: bool,
+    state: &State,
+) -> crate::Result<()> {
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    content_rows::set_instance_file_locked(
+        &scope.instance.id,
+        project_path,
+        locked,
+        &state.pool,
+    )
+    .await
+}
+
 pub(crate) async fn rename_project_companion_file(
     instance_id: &str,
     old_project_path: &str,

@@ -60,10 +60,12 @@ export interface ContentCardTableItem {
 	source?: ContentSource
 	external?: boolean
 	enabled?: boolean
+	locked?: boolean
 	disabled?: boolean
 	disabledTooltip?: string | null
 	toggleDisabled?: boolean
 	toggleDisabledTooltip?: string | null
+	hideToggle?: boolean
 	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean

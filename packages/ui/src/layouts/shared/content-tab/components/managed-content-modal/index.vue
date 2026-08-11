@@ -124,6 +124,7 @@ const selectedIds = ref<string[]>([])
 const selectedItems = computed(() =>
 	items.value.filter((item) => selectedIds.value.includes(item.id)),
 )
+const toggleableSelectedItems = computed(() => selectedItems.value.filter((item) => !item.locked))
 
 const allSelected = computed(() => {
 	if (filteredItems.value.length === 0) return false
@@ -271,6 +272,8 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		locked: item.locked,
+		hideToggle: item.locked,
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
@@ -283,7 +286,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
 		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		overflowOptions: [
-			...(props.switchVersion
+			...(props.switchVersion && !item.locked
 				? [
 						{
 							id: 'switch-version',
@@ -349,19 +352,19 @@ function sourceProjectLink(project: ContentCardProject) {
 function handleEnabledChange(id: string, value: boolean) {
 	if (props.actionDisabled) return
 	const item = items.value.find((item) => item.id === id)
-	if (!item) return
+	if (!item || item.locked) return
 	emit('update:enabled', item, value)
 }
 
 function bulkEnable() {
 	if (props.actionDisabled) return
-	emit('bulk:enable', [...selectedItems.value])
+	emit('bulk:enable', [...toggleableSelectedItems.value])
 	selectedIds.value = []
 }
 
 function bulkDisable() {
 	if (props.actionDisabled) return
-	emit('bulk:disable', [...selectedItems.value])
+	emit('bulk:disable', [...toggleableSelectedItems.value])
 	selectedIds.value = []
 }
 
@@ -629,6 +632,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		<ContentSelectionBar
 			v-if="props.enableToggle"
 			:selected-items="selectedItems"
+			:toggle-items="toggleableSelectedItems"
 			:is-busy="props.actionDisabled"
 			:busy-tooltip="props.actionDisabledTooltip"
 			:hide-when-modal-open="false"

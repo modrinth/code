@@ -429,14 +429,18 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
 		const id = getItemId(item)
+		const locked = base.locked ?? item.locked ?? false
 		return {
 			...base,
 			id,
+			locked,
 			disabled:
 				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
 			disabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
-			toggleDisabled: ctx.isBusy.value,
-			toggleDisabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
+			toggleDisabled: ctx.isBusy.value || base.toggleDisabled,
+			toggleDisabledTooltip: ctx.isBusy.value
+				? (ctx.busyMessage?.value ?? null)
+				: base.toggleDisabledTooltip,
 			installing: item.installing === true,
 			hasUpdate: base.hasUpdate ?? item.has_update,
 			isClientOnly:
@@ -463,7 +467,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 })
 
 const hasOutdatedProjects = computed(() => {
-	const outdated = ctx.items.value.filter((p) => p.has_update)
+	const outdated = ctx.items.value.filter((p) => p.has_update && !p.locked)
 	if (outdated.length > 0) {
 		debug('hasOutdatedProjects: raw items with has_update=true', {
 			count: outdated.length,
@@ -686,9 +690,10 @@ async function confirmDelete() {
 }
 
 async function promptDisableItems(items: ContentItem[]) {
-	if (items.length === 0) return
-	pendingDisableItems.value = items
-	const warning = ctx.getDisableWarning?.(items) ?? null
+	const toggleableItems = items.filter(canToggleItem)
+	if (toggleableItems.length === 0) return
+	pendingDisableItems.value = toggleableItems
+	const warning = ctx.getDisableWarning?.(toggleableItems) ?? null
 	if (warning) {
 		pendingDisableWarning.value = warning
 		confirmDisableModal.value?.show()
@@ -795,12 +800,14 @@ async function bulkDisable() {
 }
 
 function handleUpdateById(id: string) {
+	const item = ctx.items.value.find((item) => getItemId(item) === id)
+	if (item?.locked) return
 	ctx.updateItem?.(id)
 }
 
 function handleSwitchVersionById(id: string) {
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item) {
+	if (item && !item.locked) {
 		ctx.switchVersion?.(item)
 	}
 }
@@ -816,7 +823,7 @@ const hasBulkUpdateSupport = computed(
 
 function promptUpdateAll(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
-	const items = ctx.items.value.filter((item) => item.has_update)
+	const items = ctx.items.value.filter((item) => item.has_update && !item.locked)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
 	pendingBulkUpdateAll.value = true
@@ -829,7 +836,7 @@ function promptUpdateAll(event?: MouseEvent) {
 
 function promptUpdateSelected(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
-	const items = selectedItems.value.filter((item) => item.has_update)
+	const items = selectedItems.value.filter((item) => item.has_update && !item.locked)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
 	pendingBulkUpdateAll.value = false
@@ -1323,7 +1330,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		>
 			<template #actions>
 				<Button
-					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
+					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update && !m.locked)"
 					v-tooltip="formatMessage(commonMessages.updateButton)"
 					type="quiet"
 					color="green"
