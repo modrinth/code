@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT type AS \"disclosure_type!\", lock_status\n\t\t\tFROM project_disclosures\n\t\t\tWHERE project_id = $1 AND type = ANY($2)\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "disclosure_type!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "lock_status",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "60decf7fbabdebf749dba72cd7e339e87357ba1f464f8300aba713fcfda20d52"
+}

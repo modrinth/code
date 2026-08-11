@@ -10,7 +10,8 @@ use crate::auth::get_user_from_headers;
 use crate::database::{DBProject, models as db_models};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::disclosures::{
-    ProjectDisclosure, ProjectDisclosureData, ProjectDisclosureType,
+    DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureData,
+    ProjectDisclosureType,
 };
 use crate::models::pats::Scopes;
 use crate::models::teams::ProjectPermissions;
@@ -93,6 +94,8 @@ pub async fn get_project_disclosures(
 pub struct ModifyProjectDisclosures {
     pub set: Vec<ProjectDisclosure>,
     pub remove: Vec<String>,
+    #[serde(default)]
+    pub lock_status: Option<DisclosureLockStatus>,
 }
 
 #[utoipa::path(
@@ -158,28 +161,57 @@ pub async fn modify_project_disclosures(
         )));
     }
 
-    if !user.role.is_mod() {
-        let modified_types = body
-            .set
-            .iter()
-            .map(|disclosure| {
-                <&'static str>::from(ProjectDisclosureType::from(disclosure))
-                    .to_owned()
-            })
-            .chain(body.remove.iter().cloned())
-            .collect::<Vec<_>>();
+    let is_moderator = user.role.is_mod();
 
-        if db_models::DBProjectDisclosure::any_set_by_moderator(
+    if body.lock_status.is_some() && !is_moderator {
+        return Err(ApiError::Auth(eyre!(
+            "only moderators can set the lock status of a disclosure"
+        )));
+    }
+
+    let modified_types = body
+        .set
+        .iter()
+        .map(|disclosure| {
+            <&'static str>::from(ProjectDisclosureType::from(disclosure))
+                .to_owned()
+        })
+        .chain(body.remove.iter().cloned())
+        .collect::<Vec<_>>();
+
+    let lock_statuses =
+        db_models::DBProjectDisclosure::get_lock_statuses_for_project(
             project.inner.id,
             &modified_types,
             &**pool,
         )
         .await
-        .wrap_internal_err("failed to check moderator disclosures")?
-        {
-            return Err(ApiError::Auth(eyre!(
-                "you cannot modify a disclosure set by a moderator"
-            )));
+        .wrap_internal_err("failed to fetch disclosure lock statuses")?;
+
+    let lock_status_of = |disclosure_type: &str| {
+        lock_statuses
+            .get(disclosure_type)
+            .copied()
+            .unwrap_or_default()
+    };
+
+    if !is_moderator {
+        for disclosure in &body.set {
+            let disclosure_type =
+                <&'static str>::from(ProjectDisclosureType::from(disclosure));
+            if !lock_status_of(disclosure_type).allows_edit() {
+                return Err(ApiError::Auth(eyre!(
+                    "you cannot modify the `{disclosure_type}` disclosure, it is locked by a moderator"
+                )));
+            }
+        }
+
+        for disclosure_type in &body.remove {
+            if !lock_status_of(disclosure_type).allows_removal() {
+                return Err(ApiError::Auth(eyre!(
+                    "you cannot remove the `{disclosure_type}` disclosure, it is locked by a moderator"
+                )));
+            }
         }
     }
 
@@ -189,12 +221,19 @@ pub async fn modify_project_disclosures(
         .wrap_internal_err("starting database transaction")?;
 
     for disclosure in body.set {
+        let disclosure_type =
+            <&'static str>::from(ProjectDisclosureType::from(&disclosure));
+
+        let lock_status =
+            body.lock_status.unwrap_or(lock_status_of(disclosure_type));
+
         db_models::DBProjectDisclosure {
             project_id: project.inner.id,
             disclosure,
             updated_at: Utc::now(),
             updated_by: user.id.into(),
-            set_by_moderator: user.role.is_mod(),
+            set_by_moderator: is_moderator,
+            lock_status,
         }
         .upsert(&mut transaction)
         .await
