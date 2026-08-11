@@ -84,7 +84,9 @@
 						<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
 						<ChevronLeftIcon
 							class="size-5 shrink-0 text-secondary transition-transform duration-150"
-							:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
 						/>
 					</div>
 				</div>
@@ -1540,10 +1542,7 @@ function getAddMenuPosition({
 		0,
 		viewportBottom - triggerBottom - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN,
 	)
-	const spaceAbove = Math.max(
-		0,
-		triggerTop - viewportTop - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN,
-	)
+	const spaceAbove = Math.max(0, triggerTop - viewportTop - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN)
 	const hasSpaceBelow = dropdownHeight <= spaceBelow
 	const hasSpaceAbove = dropdownHeight <= spaceAbove
 	const opensUp = !hasSpaceBelow && (hasSpaceAbove || spaceAbove > spaceBelow)

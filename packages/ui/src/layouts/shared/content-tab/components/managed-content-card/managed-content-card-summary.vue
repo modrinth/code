@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BoxIcon, BracesIcon, GlassesIcon, PaintbrushIcon, PlugIcon } from '@modrinth/assets'
-import { computed, onBeforeUnmount, ref, type Component, watch } from 'vue'
+import { type Component, computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import { useFormatNumber } from '#ui/composables/format-number'

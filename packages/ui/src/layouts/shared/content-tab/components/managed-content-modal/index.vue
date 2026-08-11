@@ -235,19 +235,24 @@ const filteredItems = computed(() => {
 	return sortContentItems(result, !query)
 })
 
+function contentVersionLabel(item: ContentItem): string {
+	if (item.embedded_metadata?.version) return item.embedded_metadata.version
+	return formatMessage(commonMessages.unknownLabel)
+}
+
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
 		id: item.id,
 		project: item.project ?? {
 			id: item.id,
 			slug: null,
-			title: item.file_name,
-			icon_url: null,
+			title: item.embedded_metadata?.name ?? item.file_name,
+			icon_url: item.embedded_metadata?.icon_url ?? null,
 		},
 		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
 			id: item.id,
-			version_number: 'Unknown',
+			version_number: contentVersionLabel(item),
 			file_name: item.file_name,
 		},
 		owner: item.owner

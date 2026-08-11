@@ -397,7 +397,6 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-
 export const Default: Story = {
 	render: () => ({
 		components: { ManagedContentModal, Button },
@@ -436,7 +435,6 @@ export const ModsOnly: Story = {
 	}),
 }
 
-
 export const LoadingState: Story = {
 	render: () => ({
 		components: { ManagedContentModal, Button },
@@ -463,7 +461,6 @@ export const LoadingState: Story = {
 	}),
 }
 
-
 export const EmptyContent: Story = {
 	render: () => ({
 		components: { ManagedContentModal, Button },
@@ -480,7 +477,6 @@ export const EmptyContent: Story = {
 		`,
 	}),
 }
-
 
 export const LargeModpack: Story = {
 	render: () => ({
@@ -503,7 +499,6 @@ export const LargeModpack: Story = {
 	}),
 }
 
-
 export const SearchDemo: Story = {
 	render: () => ({
 		components: { ManagedContentModal, Button },
@@ -524,7 +519,6 @@ export const SearchDemo: Story = {
 	}),
 }
 
-
 export const FilterDemo: Story = {
 	render: () => ({
 		components: { ManagedContentModal, Button },
@@ -544,7 +538,6 @@ export const FilterDemo: Story = {
 		`,
 	}),
 }
-
 
 export const MixedOwnerTypes: Story = {
 	render: () => ({

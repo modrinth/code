@@ -247,6 +247,7 @@ pub(crate) async fn list_content(
 
     content_files_to_content_items(
         &resolved.instance,
+        resolved.content_set.loader,
         &files,
         cache_behaviour,
         state,
@@ -287,6 +288,7 @@ pub(crate) async fn list_linked_modpack_content(
 
         return content_files_to_content_items(
             &resolved.instance,
+            resolved.content_set.loader,
             &files,
             cache_behaviour,
             state,
@@ -322,6 +324,7 @@ pub(crate) async fn list_linked_modpack_content(
 
     content_files_to_content_items(
         &resolved.instance,
+        resolved.content_set.loader,
         &files,
         cache_behaviour,
         state,
@@ -524,6 +527,7 @@ pub(crate) async fn dependencies_to_content_items(
                 update_version_id: None,
                 date_added: None,
                 source_kind: None,
+                embedded_metadata: None,
             })
         })
         .collect::<Vec<_>>();
@@ -807,6 +811,7 @@ fn file_update_cache_key(
 
 async fn content_files_to_content_items(
     instance: &Instance,
+    loader: ModLoader,
     files: &[(String, ContentFile)],
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
@@ -835,6 +840,11 @@ async fn content_files_to_content_items(
         &state.api_semaphore,
     )
     .await?;
+    let embedded_metadata =
+        super::embedded_content_metadata::resolve_embedded_content_metadata(
+            instance, loader, files, state,
+        )
+        .await?;
     let instance_path = state.directories.instances_dir().join(&instance.path);
     let paths = files
         .iter()
@@ -896,6 +906,7 @@ async fn content_files_to_content_items(
                 update_version_id: file.update_version_id.clone(),
                 date_added: modification_times[index].clone(),
                 source_kind: file.source_kind,
+                embedded_metadata: embedded_metadata.get(&file.hash).cloned(),
             }
         })
         .collect::<Vec<_>>();

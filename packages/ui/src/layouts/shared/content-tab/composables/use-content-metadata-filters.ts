@@ -1,8 +1,8 @@
 import {
 	BoxIcon,
 	BracesIcon,
-	type IconComponent,
 	GlassesIcon,
+	type IconComponent,
 	PaintbrushIcon,
 	PlugIcon,
 } from '@modrinth/assets'
@@ -16,10 +16,7 @@ import type {
 	DropdownFilterBarOption,
 } from '#ui/components/base/DropdownFilterBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import {
-	getProjectTypeCategoryMessage,
-	normalizeProjectType,
-} from '#ui/utils/common-messages'
+import { getProjectTypeCategoryMessage, normalizeProjectType } from '#ui/utils/common-messages'
 import { formatCategory } from '#ui/utils/tag-messages'
 
 import type { ContentItem } from '../types'
@@ -243,12 +240,7 @@ export function useContentMetadataFilters(
 					...(item.project?.categories ?? []),
 					...(item.project?.additional_categories ?? []),
 				].map((value) =>
-					option(
-						`${section.key}:${value}`,
-						formatCategory(formatMessage, value),
-						[value],
-						section,
-					),
+					option(`${section.key}:${value}`, formatCategory(formatMessage, value), [value], section),
 				)
 			},
 		},
@@ -346,9 +338,7 @@ export function useContentMetadataFilters(
 					options: buildCategoryOptions(visibleOptions),
 				}
 			})
-			.filter((category) =>
-				category.options.some((option) => !('type' in option)),
-			),
+			.filter((category) => category.options.some((option) => !('type' in option))),
 	)
 
 	watch(

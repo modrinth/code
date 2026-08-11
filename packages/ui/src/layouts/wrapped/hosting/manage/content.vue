@@ -33,10 +33,10 @@ import {
 	getStoredServerAddonInstallQueue,
 	getTargetInstallPreferences,
 } from '../../../shared/browse-tab/composables/install-logic'
+import ManagedContentModal from '../../../shared/content-tab/components/managed-content-modal/index.vue'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
-import ManagedContentModal from '../../../shared/content-tab/components/managed-content-modal/index.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
 import type { ManagedContentData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
@@ -317,10 +317,7 @@ const addonLookup = computed(() => {
 const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
 const projectMetadataBatchSize = 800
 const contentProjectIds = computed(() =>
-	[
-		...(contentQuery.data.value?.addons ?? []),
-		...modpackAddons.value,
-	]
+	[...(contentQuery.data.value?.addons ?? []), ...modpackAddons.value]
 		.map((addon) => addon.project_id)
 		.concat(pendingServerContentInstalls.value.map((item) => item.projectId))
 		.filter((id): id is string => !!id)
@@ -331,11 +328,7 @@ const contentProjectsQuery = useQuery({
 	queryKey: computed(() => ['labrinth', 'projects', 'v2', contentProjectIds.value]),
 	queryFn: async () => {
 		const batches = []
-		for (
-			let index = 0;
-			index < contentProjectIds.value.length;
-			index += projectMetadataBatchSize
-		) {
+		for (let index = 0; index < contentProjectIds.value.length; index += projectMetadataBatchSize) {
 			batches.push(contentProjectIds.value.slice(index, index + projectMetadataBatchSize))
 		}
 		return (
@@ -1447,6 +1440,7 @@ provideContentManager({
 			owner: item.owner
 				? { ...item.owner, link: item.owner.link ?? `/${item.owner.type}/${item.owner.id}` }
 				: undefined,
+			external: item.external ?? !hasModrinthProject,
 			enabled: item.enabled,
 		}
 	},

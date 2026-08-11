@@ -7,6 +7,7 @@ import {
 	TrashExclamationIcon,
 	TrashIcon,
 	TriangleAlertIcon,
+	UploadIcon,
 } from '@modrinth/assets'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, getCurrentInstance, ref } from 'vue'
@@ -38,6 +39,10 @@ const messages = defineMessages({
 		id: 'content.card.select-project',
 		defaultMessage: 'Select {project}',
 	},
+	uploaded: {
+		id: 'content.card.uploaded',
+		defaultMessage: 'Uploaded',
+	},
 })
 
 interface Props {
@@ -47,6 +52,7 @@ interface Props {
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	source?: ContentSource
+	external?: boolean
 	enabled?: boolean
 	installing?: boolean
 	hasUpdate?: boolean
@@ -70,6 +76,7 @@ const props = withDefaults(defineProps<Props>(), {
 	versionLink: undefined,
 	owner: undefined,
 	source: undefined,
+	external: false,
 	enabled: undefined,
 	installing: false,
 	hasUpdate: false,
@@ -243,7 +250,11 @@ const deleteHovered = ref(false)
 							/>
 							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
-						<template v-if="version">
+						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
+							<UploadIcon class="size-4 shrink-0" />
+							<span class="text-sm leading-5">{{ formatMessage(messages.uploaded) }}</span>
+						</span>
+						<template v-if="version && !external">
 							<BulletDivider class="shrink-0 @[800px]:hidden" />
 							<AutoLink
 								:target="

@@ -15,7 +15,7 @@ import {
 	TrashIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
@@ -28,8 +28,8 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
-import ManagedContentCard from './components/managed-content-card/index.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
+import ManagedContentCard from './components/managed-content-card/index.vue'
 import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.vue'
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
 import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
@@ -218,6 +218,45 @@ function getMetadataFilterCategory(value: string) {
 
 const metadataFilterTriggerClass =
 	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
+
+const filterControlsRef = ref<HTMLElement | null>(null)
+const projectTypeFiltersRef = ref<HTMLElement | null>(null)
+const metadataFiltersRef = ref<HTMLElement | null>(null)
+const metadataFiltersWrapped = ref(false)
+let filterControlsResizeObserver: ResizeObserver | null = null
+
+function updateMetadataFiltersWrapped() {
+	metadataFiltersWrapped.value =
+		!!projectTypeFiltersRef.value &&
+		!!metadataFiltersRef.value &&
+		metadataFiltersRef.value.offsetTop > projectTypeFiltersRef.value.offsetTop
+}
+
+function observeFilterControls() {
+	filterControlsResizeObserver?.disconnect()
+	for (const element of [
+		filterControlsRef.value,
+		projectTypeFiltersRef.value,
+		metadataFiltersRef.value,
+	]) {
+		if (element) filterControlsResizeObserver?.observe(element)
+	}
+	updateMetadataFiltersWrapped()
+}
+
+onMounted(() => {
+	if (typeof ResizeObserver === 'undefined') return
+	filterControlsResizeObserver = new ResizeObserver(updateMetadataFiltersWrapped)
+	observeFilterControls()
+})
+
+watch([filterControlsRef, projectTypeFiltersRef, metadataFiltersRef], observeFilterControls, {
+	flush: 'post',
+})
+
+onBeforeUnmount(() => {
+	filterControlsResizeObserver?.disconnect()
+})
 
 function updateFilterChips(nextFilters: string[]) {
 	if (nextFilters.length === 0) {
@@ -836,22 +875,28 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							</div>
 						</div>
 
-						<div class="@container flex flex-wrap items-center justify-between gap-2">
-							<div class="flex flex-wrap items-center gap-2">
-								<FilterPills
-									:model-value="selectedFilters"
-									:options="filterOptions"
-									@update:model-value="updateFilterChips"
-								>
-									<template #all>
-										{{ formatMessage(commonMessages.allProjectType) }}
-									</template>
-								</FilterPills>
+						<div class="@container flex items-start gap-2">
+							<div ref="filterControlsRef" class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+								<div ref="projectTypeFiltersRef">
+									<FilterPills
+										:model-value="selectedFilters"
+										:options="filterOptions"
+										@update:model-value="updateFilterChips"
+									>
+										<template #all>
+											{{ formatMessage(commonMessages.allProjectType) }}
+										</template>
+									</FilterPills>
+								</div>
 								<div
 									v-if="metadataFilterCategories.length > 0"
-									class="flex flex-wrap items-center gap-2"
+									ref="metadataFiltersRef"
+									class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
 								>
-									<div class="h-6 w-px shrink-0 bg-surface-5" />
+									<div
+										class="h-6 w-px shrink-0 bg-surface-5"
+										:class="{ invisible: metadataFiltersWrapped }"
+									/>
 									<DropdownFilterBar
 										v-model="selectedMetadataFilters"
 										:categories="metadataFilterCategories"
@@ -884,7 +929,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 														class="size-full object-cover"
 													/>
 													<OrganizationIcon
-														v-else-if="getMetadataFilterAuthor(option.value)?.type === 'organization'"
+														v-else-if="
+															getMetadataFilterAuthor(option.value)?.type === 'organization'
+														"
 														class="size-5"
 													/>
 													<UserIcon v-else class="size-5" />
@@ -925,7 +972,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								</div>
 							</div>
 
-							<div class="flex items-center gap-2">
+							<div class="flex shrink-0 items-center gap-2">
 								<Button
 									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
 									v-tooltip="formatMessage(messages.updateAll)"

@@ -400,8 +400,7 @@ const instanceFilters = computed(() => {
 	const filters = []
 
 	if (instance.value && projectType.value !== 'resourcepack') {
-		const isVanillaShader =
-			projectType.value === 'shader' && instance.value.loader === 'vanilla'
+		const isVanillaShader = projectType.value === 'shader' && instance.value.loader === 'vanilla'
 		const gameVersion = instance.value.game_version
 		if (gameVersion && !isVanillaShader) {
 			filters.push({ type: 'game_version', option: gameVersion })

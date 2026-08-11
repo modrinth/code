@@ -21,7 +21,11 @@
 		<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
 
 		<div
-			v-if="showInstancePlayTime && playtimeLabel && (loadingServerPing || minecraftServer?.region || ping)"
+			v-if="
+				showInstancePlayTime &&
+				playtimeLabel &&
+				(loadingServerPing || minecraftServer?.region || ping)
+			"
 			class="h-1.5 w-1.5 rounded-full bg-surface-5"
 		></div>
 
@@ -39,12 +43,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { TimerIcon } from '@modrinth/assets'
-import {
-	ServerOnlinePlayers,
-	ServerPing,
-	ServerRecentPlays,
-	ServerRegion,
-} from '@modrinth/ui'
+import { ServerOnlinePlayers, ServerPing, ServerRecentPlays, ServerRegion } from '@modrinth/ui'
 
 defineProps<{
 	loadingServerPing?: boolean

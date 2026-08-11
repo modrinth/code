@@ -659,16 +659,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Maki-sync sa instansiya"
   },
-  "search.filter.locked.server": {
-    "message": "Handog ng server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Mga mod sa panig ng client lamang ang maidadaragdag sa instansiyang server"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Ang bersiyon ng laro ay handog ng server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Ang loader ay handog na ng server"
   }
 }

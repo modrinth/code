@@ -1073,16 +1073,7 @@
   "search.filter.locked.instance.sync": {
     "message": "مزامنة مع النسخة"
   },
-  "search.filter.locked.server": {
-    "message": "يقدمها الخادم"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "يمكن إضافة التعديلات **المحليه** فقط إلى نموذج الخادم"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "يتم توفير نسخة اللعبة من قبل الخادم"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "يتم توفير المحمّل من قبل الخادم"
   }
 }

@@ -7,12 +7,7 @@ export type ContentCardProject = Pick<
 	Labrinth.Projects.v2.Project,
 	'id' | 'slug' | 'title' | 'icon_url'
 > &
-	Partial<
-		Pick<
-			Labrinth.Projects.v2.Project,
-			'license' | 'categories' | 'additional_categories'
-		>
-	>
+	Partial<Pick<Labrinth.Projects.v2.Project, 'license' | 'categories' | 'additional_categories'>>
 
 export type ContentCardVersion = Pick<Labrinth.Versions.v2.Version, 'id' | 'version_number'> & {
 	file_name: string
@@ -48,6 +43,13 @@ export interface ContentActionWarning {
 	actionLabel: string
 }
 
+export interface EmbeddedContentMetadata {
+	name?: string | null
+	version?: string | null
+	icon_path?: string | null
+	icon_url?: string | null
+}
+
 export interface ContentCardTableItem {
 	id: string
 	project: ContentCardProject
@@ -56,6 +58,7 @@ export interface ContentCardTableItem {
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	source?: ContentSource
+	external?: boolean
 	enabled?: boolean
 	disabled?: boolean
 	disabledTooltip?: string | null
@@ -100,6 +103,7 @@ export interface ContentItem extends Omit<
 	source_kind?: ContentSourceKind | null
 	external?: boolean
 	external_url?: string
+	embedded_metadata?: EmbeddedContentMetadata | null
 }
 
 export type ManagedContentProject = Pick<
@@ -114,12 +118,7 @@ export type ManagedContentVersion = Pick<
 	'id' | 'version_number' | 'date_published'
 >
 
-export type ManagedContentSummaryType =
-	| 'mod'
-	| 'plugin'
-	| 'datapack'
-	| 'resourcepack'
-	| 'shader'
+export type ManagedContentSummaryType = 'mod' | 'plugin' | 'datapack' | 'resourcepack' | 'shader'
 
 export interface ManagedContentManager {
 	name: string

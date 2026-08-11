@@ -17,6 +17,22 @@ pub struct ContentItem {
     pub update_version_id: Option<String>,
     pub date_added: Option<String>,
     pub source_kind: Option<ContentSourceKind>,
+    pub embedded_metadata: Option<EmbeddedContentMetadata>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct EmbeddedContentMetadata {
+    pub name: Option<String>,
+    pub version: Option<String>,
+    pub icon_path: Option<String>,
+}
+
+impl EmbeddedContentMetadata {
+    pub fn is_empty(&self) -> bool {
+        self.name.is_none()
+            && self.version.is_none()
+            && self.icon_path.is_none()
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

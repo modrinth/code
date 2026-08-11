@@ -111,6 +111,7 @@ image = { version = "0.25.8", default-features = false, features = ["rayon"] }
 indexmap = "2.11.4"
 indicatif = "0.18.0"
 itertools = "0.14.0"
+json5 = "0.4.1"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
 lettre = { version = "0.11.19", default-features = false, features = [
@@ -224,6 +225,7 @@ tikv-jemallocator = "0.6.0"
 tokio = "1.47.1"
 tokio-stream = "0.1.17"
 tokio-util = "0.7.16"
+toml = "0.9.8"
 totp-rs = "5.7.0"
 tracing = "0.1.41"
 tracing-actix-web = { version = "0.7.19", default-features = false }

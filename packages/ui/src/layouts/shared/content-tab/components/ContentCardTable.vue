@@ -164,9 +164,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 }
 
 function isColumnSortable(column: ContentCardTableSortColumn) {
-	return (
-		props.sortable && (!props.sortableColumns || props.sortableColumns.includes(column))
-	)
+	return props.sortable && (!props.sortableColumns || props.sortableColumns.includes(column))
 }
 </script>
 
@@ -273,6 +271,7 @@ function isColumnSortable(column: ContentCardTableSortColumn) {
 					:version-link="item.versionLink"
 					:owner="item.owner"
 					:source="item.source"
+					:external="item.external"
 					:enabled="item.enabled"
 					:installing="item.installing"
 					:has-update="item.hasUpdate"
@@ -337,6 +336,7 @@ function isColumnSortable(column: ContentCardTableSortColumn) {
 				:version-link="item.versionLink"
 				:owner="item.owner"
 				:source="item.source"
+				:external="item.external"
 				:enabled="item.enabled"
 				:installing="item.installing"
 				:has-update="item.hasUpdate"

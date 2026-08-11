@@ -102,19 +102,19 @@ import {
 	dedupeManagedContentItems,
 	defineMessages,
 	injectNotificationManager,
-	ManagedContentModal,
 	type ManagedContentData,
+	ManagedContentModal,
 	type ManagedContentModalState,
 	type ManagedContentProject,
 	type ManagedContentVersion,
 	type OverflowMenuOption,
 	provideContentManager,
 	ReadyTransition,
+	summarizeManagedContent,
 	UnknownFileWarningModal,
 	useDebugLogger,
 	useVIntl,
 	versionChangesGameVersion,
-	summarizeManagedContent,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -328,9 +328,7 @@ watch(
 const isModpackUpdating = ref(false)
 const isBulkOperating = ref(false)
 const isInstanceBusy = computed(() => instance.value?.install_stage !== 'installed')
-const showSharedContentFilter = computed(
-	() => instance.value.shared_instance?.role === 'member',
-)
+const showSharedContentFilter = computed(() => instance.value.shared_instance?.role === 'member')
 const isPackLocked = computed(
 	() =>
 		instance.value.quarantined ||
@@ -1504,6 +1502,11 @@ function applyContentData(contentData: InstanceContentData) {
 	return true
 }
 
+function contentVersionLabel(item: ContentItem): string {
+	if (item.embedded_metadata?.version) return item.embedded_metadata.version
+	return formatMessage(commonMessages.unknownLabel)
+}
+
 provideContentManager({
 	items: mergedProjects,
 	loading,
@@ -1562,15 +1565,15 @@ provideContentManager({
 		project: item.project ?? {
 			id: item.file_name,
 			slug: null,
-			title: item.file_name.replace('.disabled', ''),
-			icon_url: null,
+			title: item.embedded_metadata?.name ?? item.file_name.replace('.disabled', ''),
+			icon_url: item.embedded_metadata?.icon_url ?? null,
 		},
 		projectLink: item.project?.id
 			? { path: `/project/${item.project.id}`, query: { i: instancePage.instanceId.value } }
 			: undefined,
 		version: item.version ?? {
 			id: item.file_name,
-			version_number: formatMessage(commonMessages.unknownLabel),
+			version_number: contentVersionLabel(item),
 			file_name: item.file_name,
 		},
 		versionLink:
@@ -1586,6 +1589,7 @@ provideContentManager({
 					link: contentOwnerLink(item.owner),
 				}
 			: undefined,
+		external: item.external ?? !item.project,
 		enabled: canMutateContent(item) ? item.enabled : undefined,
 		installing: item.installing,
 		hideDelete: !canDeleteContent(item),
