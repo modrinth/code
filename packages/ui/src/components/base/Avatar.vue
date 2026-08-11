@@ -149,12 +149,14 @@ function onLoad() {
 		pixelated.value = false
 	}
 
-	const transparentCorners = detectTransparentCorners(image)
-	if (transparentCorners !== null) {
-		detectingSource = undefined
-		hasTransparentCorners.value = transparentCorners
-		hasDetectedCorners.value = true
-		return
+	if (canReadImagePixels(source)) {
+		const transparentCorners = detectTransparentCorners(image)
+		if (transparentCorners !== null) {
+			detectingSource = undefined
+			hasTransparentCorners.value = transparentCorners
+			hasDetectedCorners.value = true
+			return
+		}
 	}
 
 	const probe = new Image()
@@ -183,6 +185,15 @@ function onLoad() {
 		hasDetectedCorners.value = true
 	}, DETECTION_TIMEOUT_MS)
 	probe.src = source
+}
+
+function canReadImagePixels(source: string): boolean {
+	try {
+		const url = new URL(source, window.location.href)
+		return url.protocol === 'data:' || url.origin === window.location.origin
+	} catch {
+		return false
+	}
 }
 
 function detectTransparentCorners(image: HTMLImageElement): boolean | null {
