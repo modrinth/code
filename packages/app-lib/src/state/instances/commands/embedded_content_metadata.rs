@@ -409,10 +409,10 @@ fn read_manifest<R: Read + Seek>(
     let mut current_key: Option<String> = None;
     for line in text.lines() {
         if let Some(continuation) = line.strip_prefix(' ') {
-            if let Some(key) = current_key.as_ref() {
-                if let Some(value) = attributes.get_mut(key) {
-                    value.push_str(continuation);
-                }
+            if let Some(key) = current_key.as_ref()
+                && let Some(value) = attributes.get_mut(key)
+            {
+                value.push_str(continuation);
             }
             continue;
         }
@@ -524,7 +524,7 @@ pub(crate) async fn resolve_embedded_content_metadata(
             .metadata
             .as_ref()
             .and_then(|metadata| metadata.icon_path.as_deref())
-            .map_or(true, |path| Path::new(path).is_file());
+            .is_none_or(|path| Path::new(path).is_file());
         if icon_exists {
             resolved_hashes.insert(cached.hash.clone());
             if let Some(metadata) = cached.metadata {
