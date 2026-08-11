@@ -40,10 +40,10 @@ defineProps<{
 
 function pillClass(active: boolean) {
 	return [
-		'cursor-pointer rounded-xl border border-solid bg-transparent px-3 py-1.5 text-sm font-medium leading-5 transition-all duration-100 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow',
+		'cursor-pointer rounded-xl border border-solid px-3 py-1.5 text-sm font-medium leading-5 transition-all duration-100 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow',
 		active
-			? 'filter-pills__chip--active text-brand'
-			: 'border-surface-5 text-primary hover:bg-surface-3',
+			? 'border-brand bg-brand-highlight text-brand'
+			: 'border-surface-5 bg-transparent text-primary hover:bg-surface-3',
 	]
 }
 
@@ -59,10 +59,5 @@ function toggle(id: string) {
 <style scoped>
 .filter-pills__chips {
 	filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.15));
-}
-
-.filter-pills__chip--active {
-	border-color: color-mix(in srgb, var(--color-brand) 60%, transparent);
-	background: color-mix(in srgb, var(--color-brand) 30%, var(--surface-3));
 }
 </style>

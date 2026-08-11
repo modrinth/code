@@ -68,10 +68,18 @@
 						class="size-5 shrink-0 text-primary"
 						aria-hidden="true"
 					/>
-					<span class="min-w-0 flex-1 truncate">
-						<span class="font-medium">{{ preview.label }}:</span>
-						<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
-					</span>
+					<slot
+						name="preview-content"
+						:category="preview.category"
+						:selected-values="getPreviewSelectedValues(preview.key)"
+						:label="preview.label"
+						:summary="preview.summary"
+					>
+						<span class="min-w-0 flex-1 truncate">
+							<span class="font-medium">{{ preview.label }}:</span>
+							<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
+						</span>
+					</slot>
 					<div class="flex shrink-0 items-center gap-1.5">
 						<button
 							type="button"
