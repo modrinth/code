@@ -2942,22 +2942,19 @@ pub async fn project_delete_internal(
         project.inner.status,
         ProjectStatus::Rejected | ProjectStatus::Withheld
     ) {
-        let old_slug = project.inner.slug.clone();
         let deleted_user: db_ids::DBUserId = DELETED_USER.into();
 
         sqlx::query!(
             "
             UPDATE mods
-            SET organization_id = NULL, slug = NULL
+            SET organization_id = NULL
             WHERE id = $1
             ",
             project.inner.id as db_ids::DBProjectId,
         )
         .execute(&mut transaction)
         .await
-        .wrap_internal_err(
-            "failed to detach project from organization and free slug",
-        )?;
+        .wrap_internal_err("failed to detach project from organization")?;
 
         let affected_user_ids = sqlx::query!(
             "
@@ -2973,10 +2970,9 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to remove project team members")?;
 
-        let new_member_id =
-            db_ids::generate_team_member_id(&mut transaction)
-                .await
-                .wrap_internal_err("failed to generate team member ID")?;
+        let new_member_id = db_ids::generate_team_member_id(&mut transaction)
+            .await
+            .wrap_internal_err("failed to generate team member ID")?;
         DBTeamMember {
             id: new_member_id,
             team_id: project.inner.team_id,
@@ -2991,9 +2987,7 @@ pub async fn project_delete_internal(
         }
         .insert(&mut transaction)
         .await
-        .wrap_internal_err(
-            "failed to transfer project ownership to ghost",
-        )?;
+        .wrap_internal_err("failed to transfer project ownership to ghost")?;
 
         sqlx::query!(
             "
@@ -3004,9 +2998,7 @@ pub async fn project_delete_internal(
         )
         .execute(&mut transaction)
         .await
-        .wrap_internal_err(
-            "failed to delete project from collections_mods",
-        )?;
+        .wrap_internal_err("failed to delete project from collections_mods")?;
 
         sqlx::query!(
             "
@@ -3034,7 +3026,7 @@ pub async fn project_delete_internal(
             .wrap_internal_err("clearing cached data from Redis")?;
         db_models::DBProject::clear_cache(
             project.inner.id,
-            old_slug,
+            project.inner.slug.clone(),
             None,
             &redis,
         )
