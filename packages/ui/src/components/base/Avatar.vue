@@ -48,13 +48,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 const pixelated = ref(false)
 const hasTransparentCorners = ref(false)
 const hasDetectedCorners = ref(false)
 const img = useTemplateRef<HTMLImageElement>('img')
 const failed = ref(false)
+let detectionTimeout: number | undefined
+let detectingSource: string | undefined
+
+const DETECTION_TIMEOUT_MS = 2000
 
 defineExpose({
 	failed,
@@ -96,13 +100,37 @@ const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
 watch(
 	() => props.src,
 	() => {
+		clearDetectionTimeout()
+		detectingSource = undefined
 		failed.value = false
 		hasTransparentCorners.value = false
 		hasDetectedCorners.value = false
 	},
 )
 
+onMounted(() => {
+	const image = img.value
+	if (!image?.complete || hasDetectedCorners.value) return
+
+	if (image.naturalWidth > 0) {
+		onLoad()
+	} else {
+		failed.value = true
+	}
+})
+
+onBeforeUnmount(clearDetectionTimeout)
+
+function clearDetectionTimeout() {
+	if (detectionTimeout !== undefined) {
+		window.clearTimeout(detectionTimeout)
+		detectionTimeout = undefined
+	}
+}
+
 function onError(e) {
+	clearDetectionTimeout()
+	detectingSource = undefined
 	console.log('Avatar image failed to load:', props.src, e)
 	failed.value = true
 }
@@ -110,6 +138,10 @@ function onError(e) {
 function onLoad() {
 	const image = img.value
 	if (!image) return
+	const source = image.currentSrc
+	if (detectingSource === source) return
+	detectingSource = source
+	clearDetectionTimeout()
 
 	if (image.naturalWidth && image.naturalWidth < 32) {
 		pixelated.value = true
@@ -117,25 +149,39 @@ function onLoad() {
 		pixelated.value = false
 	}
 
-	const source = image.currentSrc
 	const transparentCorners = detectTransparentCorners(image)
 	if (transparentCorners !== null) {
+		detectingSource = undefined
 		hasTransparentCorners.value = transparentCorners
 		hasDetectedCorners.value = true
 		return
 	}
 
 	const probe = new Image()
+	let detectionFinished = false
 	probe.crossOrigin = 'anonymous'
 	probe.onload = () => {
-		if (img.value?.currentSrc !== source) return
+		if (detectionFinished || img.value?.currentSrc !== source) return
+		detectionFinished = true
+		detectingSource = undefined
+		clearDetectionTimeout()
 		hasTransparentCorners.value = detectTransparentCorners(probe) ?? false
 		hasDetectedCorners.value = true
 	}
 	probe.onerror = () => {
-		if (img.value?.currentSrc !== source) return
+		if (detectionFinished || img.value?.currentSrc !== source) return
+		detectionFinished = true
+		detectingSource = undefined
+		clearDetectionTimeout()
 		hasDetectedCorners.value = true
 	}
+	detectionTimeout = window.setTimeout(() => {
+		if (img.value?.currentSrc !== source) return
+		detectionFinished = true
+		detectingSource = undefined
+		detectionTimeout = undefined
+		hasDetectedCorners.value = true
+	}, DETECTION_TIMEOUT_MS)
 	probe.src = source
 }
 
@@ -150,12 +196,12 @@ function detectTransparentCorners(image: HTMLImageElement): boolean | null {
 
 	const right = image.naturalWidth - 2
 	const bottom = image.naturalHeight - 2
-	context.drawImage(image, 0, 0, 2, 2, 0, 0, 2, 2)
-	context.drawImage(image, right, 0, 2, 2, 2, 0, 2, 2)
-	context.drawImage(image, 0, bottom, 2, 2, 0, 2, 2, 2)
-	context.drawImage(image, right, bottom, 2, 2, 2, 2, 2, 2)
 
 	try {
+		context.drawImage(image, 0, 0, 2, 2, 0, 0, 2, 2)
+		context.drawImage(image, right, 0, 2, 2, 2, 0, 2, 2)
+		context.drawImage(image, 0, bottom, 2, 2, 0, 2, 2, 2)
+		context.drawImage(image, right, bottom, 2, 2, 2, 2, 2, 2)
 		const pixels = context.getImageData(0, 0, 4, 4).data
 		for (let alpha = 3; alpha < pixels.length; alpha += 4) {
 			if (pixels[alpha] !== 0) return false
