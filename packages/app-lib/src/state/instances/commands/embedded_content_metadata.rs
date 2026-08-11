@@ -534,56 +534,56 @@ pub(crate) async fn resolve_embedded_content_metadata(
         .into_iter()
         .filter(|(hash, _)| !resolved_hashes.contains(hash))
         .collect::<Vec<_>>();
-    let inspections = stream::iter(pending)
+    let inspected_metadata = stream::iter(pending)
         .map(|(hash, path)| async move {
             let inspection = tokio::task::spawn_blocking(move || {
                 inspect_content_file(&path, loader)
             })
             .await;
-            (hash, inspection)
-        })
-        .buffer_unordered(8)
-        .collect::<Vec<_>>()
-        .await;
-    let mut entries = Vec::with_capacity(inspections.len());
-    for (hash, inspection) in inspections {
-        let (mut metadata, icon) = match inspection {
-            Ok(Ok(inspection)) => {
-                (inspection.metadata.unwrap_or_default(), inspection.icon)
-            }
-            Ok(Err(error)) => {
-                tracing::debug!(
-                    hash,
-                    error = %error,
-                    "Could not inspect content metadata"
-                );
-                (EmbeddedContentMetadata::default(), None)
-            }
-            Err(error) => {
-                tracing::debug!(
-                    hash,
-                    error = %error,
-                    "Content metadata inspection task failed"
-                );
-                (EmbeddedContentMetadata::default(), None)
-            }
-        };
-        if let Some(icon) = icon {
-            match crate::api::instance::cache_icon(icon, state).await {
-                Ok(path) => {
-                    metadata.icon_path =
-                        Some(path.to_string_lossy().to_string());
+            let (mut metadata, icon) = match inspection {
+                Ok(Ok(inspection)) => {
+                    (inspection.metadata.unwrap_or_default(), inspection.icon)
+                }
+                Ok(Err(error)) => {
+                    tracing::debug!(
+                        hash,
+                        error = %error,
+                        "Could not inspect content metadata"
+                    );
+                    (EmbeddedContentMetadata::default(), None)
                 }
                 Err(error) => {
                     tracing::debug!(
                         hash,
                         error = %error,
-                        "Could not cache embedded content icon"
+                        "Content metadata inspection task failed"
                     );
+                    (EmbeddedContentMetadata::default(), None)
+                }
+            };
+            if let Some(icon) = icon {
+                match crate::api::instance::cache_icon(icon, state).await {
+                    Ok(path) => {
+                        metadata.icon_path =
+                            Some(path.to_string_lossy().to_string());
+                    }
+                    Err(error) => {
+                        tracing::debug!(
+                            hash,
+                            error = %error,
+                            "Could not cache embedded content icon"
+                        );
+                    }
                 }
             }
-        }
-        let metadata = (!metadata.is_empty()).then_some(metadata);
+            let metadata = (!metadata.is_empty()).then_some(metadata);
+            (hash, metadata)
+        })
+        .buffer_unordered(8)
+        .collect::<Vec<_>>()
+        .await;
+    let mut entries = Vec::with_capacity(inspected_metadata.len());
+    for (hash, metadata) in inspected_metadata {
         if let Some(metadata) = metadata.as_ref() {
             resolved.insert(hash.clone(), metadata.clone());
         }

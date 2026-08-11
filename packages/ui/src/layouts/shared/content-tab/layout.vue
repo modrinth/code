@@ -895,7 +895,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								>
 									<div
 										class="h-6 w-px shrink-0 bg-surface-5"
-										:class="{ invisible: metadataFiltersWrapped }"
+										:class="{ invisible: metadataFiltersWrapped, 'mr-0.5': !metadataFiltersWrapped }"
 									/>
 									<DropdownFilterBar
 										v-model="selectedMetadataFilters"
