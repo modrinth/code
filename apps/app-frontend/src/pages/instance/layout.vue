@@ -37,10 +37,8 @@
 				:loading-server-ping="loadingServerPing"
 				:players-online="playersOnline"
 				:status-online="statusOnline"
-				:recent-plays="recentPlays"
 				:ping="ping"
 				:minecraft-server="minecraftServer"
-				:shared-instance-manager="sharedInstanceManager"
 				@repair="() => repairInstance()"
 				@stop="() => stopInstance('InstancePage')"
 				@play="() => startInstance('InstancePage')"
@@ -301,9 +299,6 @@ const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
 const liveServerStatusOnline = ref(false)
 const statusOnline = computed(() => liveServerStatusOnline.value || !!javaServerPingData.value)
-const recentPlays = computed(
-	() => linkedProjectV3.value?.minecraft_java_server?.verified_plays_2w ?? undefined,
-)
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
@@ -316,7 +311,6 @@ provideSharedInstance(sharedInstanceState)
 const {
 	actionsLocked: sharedInstanceActionsLocked,
 	expectedUserId: sharedInstanceExpectedUserId,
-	manager: sharedInstanceManager,
 	refreshUpdatePreview: refreshSharedInstanceUpdatePreview,
 	setUnavailable: setSharedInstanceUnavailable,
 	signedOut: sharedInstanceSignedOut,

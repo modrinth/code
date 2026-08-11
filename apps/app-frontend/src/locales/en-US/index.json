@@ -1457,6 +1457,9 @@
   "instance.files.save-as": {
     "message": "Save as..."
   },
+  "instance.last-played": {
+    "message": "Last played"
+  },
   "instance.locked.delete-button": {
     "message": "Delete instance"
   },
