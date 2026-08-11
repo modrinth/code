@@ -441,7 +441,7 @@ fn get_mrpack_environment(
         | VersionEnvironment::ClientOrServerPrefersBoth => {
             (SideType::Optional, SideType::Optional)
         }
-        VersionEnvironment::Unknown => (SideType::Unknown, SideType::Unknown),
+        VersionEnvironment::Unknown => (SideType::Optional, SideType::Optional),
     };
 
     HashMap::from([(EnvType::Client, client), (EnvType::Server, server)])

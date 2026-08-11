@@ -460,12 +460,15 @@ fn read_entry<R: Read + Seek>(
     path: &str,
     max_bytes: u64,
 ) -> Option<Vec<u8>> {
-    let mut entry = archive.by_name(path).ok()?;
+    let entry = archive.by_name(path).ok()?;
     if entry.size() > max_bytes {
         return None;
     }
     let mut bytes = Vec::with_capacity(entry.size() as usize);
-    entry.read_to_end(&mut bytes).ok()?;
+    entry
+        .take(max_bytes.saturating_add(1))
+        .read_to_end(&mut bytes)
+        .ok()?;
     (bytes.len() as u64 <= max_bytes).then_some(bytes)
 }
 
@@ -550,7 +553,7 @@ pub(crate) async fn resolve_embedded_content_metadata(
                         error = %error,
                         "Could not inspect content metadata"
                     );
-                    (EmbeddedContentMetadata::default(), None)
+                    return None;
                 }
                 Err(error) => {
                     tracing::debug!(
@@ -558,7 +561,7 @@ pub(crate) async fn resolve_embedded_content_metadata(
                         error = %error,
                         "Content metadata inspection task failed"
                     );
-                    (EmbeddedContentMetadata::default(), None)
+                    return None;
                 }
             };
             if let Some(icon) = icon {
@@ -577,13 +580,13 @@ pub(crate) async fn resolve_embedded_content_metadata(
                 }
             }
             let metadata = (!metadata.is_empty()).then_some(metadata);
-            (hash, metadata)
+            Some((hash, metadata))
         })
         .buffer_unordered(8)
         .collect::<Vec<_>>()
         .await;
     let mut entries = Vec::with_capacity(inspected_metadata.len());
-    for (hash, metadata) in inspected_metadata {
+    for (hash, metadata) in inspected_metadata.into_iter().flatten() {
         if let Some(metadata) = metadata.as_ref() {
             resolved.insert(hash.clone(), metadata.clone());
         }

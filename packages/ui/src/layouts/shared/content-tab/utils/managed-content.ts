@@ -25,21 +25,16 @@ function normalizeSummaryType(type: string): ManagedContentSummaryType | null {
 }
 
 export function dedupeManagedContentItems(items: ContentItem[]): ContentItem[] {
-	const seenPaths = new Set<string>()
-	const seenNames = new Set<string>()
-	const seenIds = new Set<string>()
+	const seenKeys = new Set<string>()
 	return items.filter((item) => {
-		if (
-			(item.file_path && seenPaths.has(item.file_path)) ||
-			(item.file_name && seenNames.has(item.file_name)) ||
-			(!item.file_path && !item.file_name && seenIds.has(item.id))
-		) {
-			return false
-		}
+		const key = item.file_path
+			? `path:${item.file_path}`
+			: item.file_name
+				? `name:${item.file_name}`
+				: `id:${item.id}`
+		if (seenKeys.has(key)) return false
 
-		if (item.file_path) seenPaths.add(item.file_path)
-		if (item.file_name) seenNames.add(item.file_name)
-		seenIds.add(item.id)
+		seenKeys.add(key)
 		return true
 	})
 }

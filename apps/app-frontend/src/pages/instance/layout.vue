@@ -208,7 +208,9 @@ useQuery(
 		retry: false,
 	})),
 )
-const linkedProjectId = computed(() => instance.value?.link?.project_id ?? '')
+const linkedProjectId = computed(
+	() => instance.value?.link?.server_project_id ?? instance.value?.link?.project_id ?? '',
+)
 const linkedProjectQuery = useQuery(
 	computed(() => ({
 		...instanceLinkedProjectQueryOptions(linkedProjectId.value),

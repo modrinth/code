@@ -407,7 +407,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 		const managerName = serverManaged
 			? (sharedManager?.name ??
 				attachment?.server_manager_name ??
-				linkedProject?.title ??
+				linkedProject?.name ??
 				instance.value.name)
 			: (sharedManager?.name ?? instance.value.name)
 		const managerIcon = serverManaged
@@ -431,6 +431,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 		return {
 			card: {
 				kind: serverManaged ? 'server' : 'shared-instance',
+				installing: isInstanceBusy.value,
 				manager: {
 					name: managerName,
 					iconUrl: managerIcon,
@@ -451,6 +452,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 	return {
 		card: {
 			kind: 'modpack',
+			installing: isInstanceBusy.value,
 			manager: {
 				name: project.title,
 				iconUrl: project.icon_url ?? undefined,

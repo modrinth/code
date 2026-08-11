@@ -99,6 +99,7 @@ export function createSharedInstanceContext(
 		enabled: computed(
 			() =>
 				!!instance.value?.id &&
+				instance.value.install_stage === 'installed' &&
 				!!instance.value.shared_instance &&
 				!actionsLocked.value &&
 				!offline.value &&
