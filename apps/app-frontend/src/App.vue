@@ -306,6 +306,7 @@ const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboard
 const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
 const creationIconEditorModal = ref(null)
 const creationIconRecipe = ref(null)
+const creationIconTarget = ref('creation-flow')
 
 async function randomizeCreationIcon() {
 	const generated = await creationIconEditorModal.value?.randomizeAndSave()
@@ -319,11 +320,22 @@ async function randomizeCreationIcon() {
 }
 
 function customizeCreationIcon() {
+	creationIconTarget.value = 'creation-flow'
+	creationIconEditorModal.value?.show()
+}
+
+function customizeContentInstallIcon() {
+	creationIconTarget.value = 'content-install'
 	creationIconEditorModal.value?.show()
 }
 
 function onCreationIconSaved(iconPath, recipe) {
 	creationIconRecipe.value = recipe
+	if (creationIconTarget.value === 'content-install') {
+		modInstallModal.value?.setIcon(iconPath, convertFileSrc(iconPath))
+		return
+	}
+
 	const context = installationModal.value?.ctx
 	if (!context) return
 
@@ -1915,6 +1927,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		:preferred-game-version="contentInstallPreferredGameVersion"
 		:release-game-versions="contentInstallReleaseGameVersions"
 		:project-info="contentInstallProjectInfo"
+		:randomize-icon="randomizeCreationIcon"
+		:customize-icon="customizeContentInstallIcon"
 		@install="handleInstallToInstance"
 		@create-and-install="handleCreateAndInstall"
 		@navigate="handleContentInstallNavigate"
