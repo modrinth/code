@@ -11,6 +11,7 @@ import {
 	type ModpackSearchResult,
 	readStoredServerInstallQueue,
 	useServerContextRuntime,
+	useServerPanelSync,
 	waitForServerContextRuntimeReady,
 	writeStoredServerInstallQueue,
 } from '@modrinth/ui'
@@ -127,6 +128,10 @@ export function createServerInstallContent(opts: {
 	const isInstallingQueuedServerInstalls = ref(false)
 	const queuedInstallProgress = ref({ completed: 0, total: 0 })
 	const effectiveServerWorldId = computed(() => worldIdQuery.value ?? serverContextWorldId.value)
+	useServerPanelSync({
+		serverId: serverIdQuery,
+		worldId: effectiveServerWorldId,
+	})
 	const serverBackUrl = computed(() => {
 		const sid = serverIdQuery.value
 		if (!sid) return '/hosting/manage'

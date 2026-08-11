@@ -301,6 +301,15 @@ export namespace Archon {
 				environment?: Labrinth.Projects.v3.Environment | null
 			}
 
+			export type AddonStatus =
+				| 'pending'
+				| 'installed'
+				| {
+						failed: {
+							error: string
+						}
+				  }
+
 			export type Addon = {
 				id: string
 				filename: string
@@ -308,6 +317,7 @@ export namespace Archon {
 				disabled: boolean
 				kind: AddonKind
 				from_modpack: boolean
+				status: AddonStatus
 				pack_client_retained: boolean
 				pack_client_depends: boolean
 				has_update: string | null
@@ -323,6 +333,10 @@ export namespace Archon {
 				modloader_version: string | null
 				game_version: string | null
 				modpack: ModpackFields | null
+				installing?: 'loader' | 'modpack'
+				error?: {
+					message: string
+				}
 				addons: Addon[] | null
 			}
 
@@ -989,6 +1003,77 @@ export namespace Archon {
 				world_id: string
 				spec: Archon.Content.v1.Addons
 			}
+			export type WorldContentPlatform =
+				| 'forge'
+				| 'neoforge'
+				| 'fabric'
+				| 'quilt'
+				| 'paper'
+				| 'purpur'
+				| 'vanilla'
+			export type WorldContentPlatformData = {
+				platform: WorldContentPlatform
+				game_version: string
+				platform_version: string | null
+			}
+			export type WorldContentModpackSource =
+				| 'CurseForge'
+				| {
+						Modrinth: {
+							version_id: string
+							project_id: string
+							mrpack_sha1: string | null
+						}
+				  }
+				| {
+						LocalMrPackFile: {
+							path: string
+							name: string
+							description: string | null
+							version_name: string | null
+						}
+				  }
+			export type WorldContentModpack = {
+				spec: WorldContentModpackSource
+				downloads: number | null
+				followers: number | null
+				icon_url: string | null
+				owner: Archon.Content.v1.ContentOwner | null
+				title: string | null
+				description: string | null
+				version_number: string | null
+				date_published: string | null
+				environment: Labrinth.Projects.v3.Environment | null
+				has_update: string | null
+			}
+			export type WorldContentItem = {
+				parent_directory: string
+				file_sha1: string | null
+				filename: string
+				from_modpack: boolean
+				version_id: string | null
+				project_id: string | null
+				pack_client_retained: boolean
+				pack_client_depends: boolean
+				status: Archon.Content.v1.AddonStatus
+				filesize: number | null
+				name: string | null
+				version: Archon.Content.v1.AddonVersion | null
+				owner: Archon.Content.v1.ContentOwner | null
+				has_update: string | null
+				icon_url: string | null
+			}
+			export type WorldContentUpdateEvent = {
+				type: 'world.content.update'
+				world_id: string
+				platform_data: WorldContentPlatformData | null
+				linked_modpack: WorldContentModpack | null
+				installing?: 'loader' | 'modpack'
+				error?: {
+					message: string
+				}
+				content: WorldContentItem[]
+			}
 
 			export type SyncEvent =
 				| ProtocolResetEvent
@@ -1007,6 +1092,7 @@ export namespace Archon {
 				| WorldStartupPatchEvent
 				| WorldContentAddonPatchEvent
 				| WorldContentBaseUpdateEvent
+				| WorldContentUpdateEvent
 		}
 	}
 

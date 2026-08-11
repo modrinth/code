@@ -20,6 +20,7 @@ import {
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
 	useServerContextRuntime,
+	useServerPanelSync,
 	useVIntl,
 	waitForServerContextRuntimeReady,
 	writeStoredServerInstallQueue,
@@ -104,6 +105,10 @@ export function useServerInstallContent({
 	const fromContext = computed(() => queryAsString(route.query.from) || null)
 	const currentWorldId = computed(() => queryAsString(route.query.wid) || null)
 	useServerContextRuntime(currentServerId)
+	useServerPanelSync({
+		serverId: currentServerId,
+		worldId: currentWorldId,
+	})
 
 	const {
 		data: serverData,
