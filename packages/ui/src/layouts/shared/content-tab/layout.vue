@@ -22,7 +22,7 @@ import {
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import { Button, TeleportOverflowMenu, type OverflowMenuOption } from '#ui/components/base/buttons'
+import { Button, type OverflowMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
@@ -1053,7 +1053,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 													<span
 														class="flex size-5 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-brand"
 														:class="
-															getMetadataFilterPreviewAuthor(selectedValues)?.type === 'organization'
+															getMetadataFilterPreviewAuthor(selectedValues)?.type ===
+															'organization'
 																? 'rounded'
 																: 'rounded-full'
 														"
@@ -1062,13 +1063,17 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 															v-if="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
 															:src="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
 															size="100%"
-															:circle="getMetadataFilterPreviewAuthor(selectedValues)?.type !== 'organization'"
+															:circle="
+																getMetadataFilterPreviewAuthor(selectedValues)?.type !==
+																'organization'
+															"
 															no-shadow
 															class="!border-0"
 														/>
 														<OrganizationIcon
 															v-else-if="
-																getMetadataFilterPreviewAuthor(selectedValues)?.type === 'organization'
+																getMetadataFilterPreviewAuthor(selectedValues)?.type ===
+																'organization'
 															"
 															class="size-4"
 														/>
@@ -1093,11 +1098,14 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 															)"
 															:key="value"
 															class="absolute top-0 flex size-5 items-center justify-center overflow-hidden border border-solid border-surface-3 bg-surface-4 text-brand"
-															:class="isMetadataFilterOrganization(value) ? 'rounded' : 'rounded-full'"
+															:class="
+																isMetadataFilterOrganization(value) ? 'rounded' : 'rounded-full'
+															"
 															:style="{
 																left: `${index * metadataFilterPreviewAuthorOffset}px`,
 																zIndex:
-																	getMetadataFilterPreviewAuthorValues(selectedValues).length - index,
+																	getMetadataFilterPreviewAuthorValues(selectedValues).length -
+																	index,
 															}"
 														>
 															<Avatar
@@ -1125,7 +1133,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 														</div>
 													</div>
 													<span class="min-w-0 truncate font-semibold text-contrast">
-														{{ formatMessage(messages.authorCount, { count: selectedValues.length }) }}
+														{{
+															formatMessage(messages.authorCount, { count: selectedValues.length })
+														}}
 													</span>
 												</template>
 											</div>

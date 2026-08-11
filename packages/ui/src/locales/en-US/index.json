@@ -686,6 +686,9 @@
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },
+  "content.page-layout.filter.author-count": {
+    "defaultMessage": "{count, plural, one {# author} other {# authors}}"
+  },
   "content.page-layout.loading": {
     "defaultMessage": "Loading content..."
   },
@@ -712,6 +715,24 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Project names"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Alphabetical"
+  },
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Alphabetical (A–Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Alphabetical (Z–A)"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Newest first"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Oldest first"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sort by {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Update all"

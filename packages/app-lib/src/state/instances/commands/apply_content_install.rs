@@ -513,9 +513,9 @@ pub(crate) async fn add_project_bytes(
     let scope = resolve_content_scope(instance_id, None, state).await?;
     let project_type = match project_type {
         Some(project_type) => project_type,
-        None => super::embedded_content_metadata::infer_project_type_bytes(
-            &bytes,
-        )?,
+        None => {
+            super::embedded_content_metadata::infer_project_type_bytes(&bytes)?
+        }
     };
     let relative_path = format!("{}/{}", project_type.get_folder(), file_name);
     let full_path =
