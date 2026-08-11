@@ -423,7 +423,7 @@
     "message": "project"
   },
   "app.instance.mods.freeze-content": {
-    "message": "Freeze"
+    "message": "Freeze version"
   },
   "app.instance.mods.locked-content": {
     "message": "Content in locked instances cannot be changed."
@@ -444,7 +444,7 @@
     "message": "Successfully uploaded"
   },
   "app.instance.mods.unfreeze-content": {
-    "message": "Unfreeze"
+    "message": "Unfreeze version"
   },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"

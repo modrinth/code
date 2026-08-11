@@ -2,8 +2,8 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
+	LockIcon,
 	MoreVerticalIcon,
-	SnowflakeIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
 	TrashIcon,
@@ -46,7 +46,7 @@ const messages = defineMessages({
 	},
 	frozen: {
 		id: 'content.card.frozen',
-		defaultMessage: 'Version frozen',
+		defaultMessage: 'This project is locked to its current version until unfrozen.',
 	},
 })
 
@@ -204,14 +204,6 @@ const deleteHovered = ref(false)
 						</AutoLink>
 						<slot name="title-badges" />
 						<span
-							v-if="locked"
-							v-tooltip="formatMessage(messages.frozen)"
-							class="inline-flex size-5 shrink-0 items-center justify-center text-secondary"
-							tabindex="0"
-						>
-							<SnowflakeIcon aria-hidden="true" class="size-4" />
-						</span>
-						<span
 							v-if="isClientOnly"
 							v-tooltip="formatMessage(clientWarningMessage)"
 							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
@@ -338,13 +330,23 @@ const deleteHovered = ref(false)
 			<!-- Fixed width container to reserve space for update/switch version button -->
 			<div
 				v-if="
+					locked ||
 					(hasUpdateListener && hasUpdate) ||
 					(hasSwitchVersionListener && version && !hideSwitchVersion)
 				"
 				class="flex w-8 items-center justify-center"
 			>
 				<IconButton
-					v-if="hasUpdate"
+					v-if="locked"
+					v-tooltip="formatMessage(messages.frozen)"
+					type="quiet"
+					:label="formatMessage(messages.frozen)"
+					disabled
+				>
+					<LockIcon class="size-5" />
+				</IconButton>
+				<IconButton
+					v-else-if="hasUpdate"
 					v-tooltip="
 						isDisabled && disabledTooltip
 							? disabledTooltip

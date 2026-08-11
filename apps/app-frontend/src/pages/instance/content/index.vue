@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, FolderOpenIcon, SnowflakeIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon, LockIcon, LockOpenIcon } from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
 	commonMessages,
@@ -138,6 +138,7 @@ import {
 	add_project_from_path,
 	edit,
 	get_linked_modpack_content,
+	get_shared_instance_publish_preview,
 	is_file_on_modrinth,
 	remove_project,
 	set_project_locked,
@@ -193,11 +194,11 @@ const messages = defineMessages({
 	},
 	freezeContent: {
 		id: 'app.instance.mods.freeze-content',
-		defaultMessage: 'Freeze',
+		defaultMessage: 'Freeze version',
 	},
 	unfreezeContent: {
 		id: 'app.instance.mods.unfreeze-content',
-		defaultMessage: 'Unfreeze',
+		defaultMessage: 'Unfreeze version',
 	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
@@ -573,6 +574,14 @@ function canChangeContentVersion(item: ContentItem) {
 	return canMutateContent(item) && !item.locked
 }
 
+async function reconcileSharedInstancePublishState() {
+	if (instance.value.shared_instance?.role !== 'owner') return
+
+	await get_shared_instance_publish_preview(instance.value.id).catch((error) => {
+		debug('Failed to reconcile shared instance publish state', { error })
+	})
+}
+
 function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
 	item.installing = busy
 	managedContentModal.value?.updateItem(originalFileName, {
@@ -782,7 +791,11 @@ async function handleUnknownFileContinue(dontShowAgain: boolean) {
 	resolveUnknownFileWarning(true)
 }
 
-async function toggleDisableMod(mod: ContentItem, desiredEnabled?: boolean) {
+async function toggleDisableMod(
+	mod: ContentItem,
+	desiredEnabled?: boolean,
+	reconcileSharedState = true,
+) {
 	if (!mod.file_path || !canToggleContent(mod)) return
 	const operation = beginContentOperation(mod)
 	if (!operation) return
@@ -814,6 +827,10 @@ async function toggleDisableMod(mod: ContentItem, desiredEnabled?: boolean) {
 			project_type: mod.project_type,
 			disabled: !enabled,
 		})
+
+		if (reconcileSharedState) {
+			await reconcileSharedInstancePublishState()
+		}
 	} catch (err) {
 		handleError(err as Error)
 	} finally {
@@ -1176,7 +1193,8 @@ async function confirmPendingManagedContentDisable() {
 }
 
 async function setManagedContentEnabled(items: ContentItem[], enabled: boolean) {
-	await Promise.all(items.map((item) => toggleDisableMod(item, enabled)))
+	await Promise.all(items.map((item) => toggleDisableMod(item, enabled, false)))
+	await reconcileSharedInstancePublishState()
 }
 
 async function handleManagedContent() {
@@ -1485,7 +1503,7 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 			{
 				id: item.locked ? 'unfreeze-content' : 'freeze-content',
 				label: formatMessage(item.locked ? messages.unfreezeContent : messages.freezeContent),
-				icon: SnowflakeIcon,
+				icon: item.locked ? LockOpenIcon : LockIcon,
 				action: () => handleContentFreeze(item, !item.locked),
 			},
 		)
@@ -1572,18 +1590,22 @@ provideContentManager({
 	skipNonEssentialWarnings,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableDebounced,
-	bulkEnableItems: (items: ContentItem[]) =>
-		Promise.all(
+	bulkEnableItems: async (items: ContentItem[]) => {
+		await Promise.all(
 			items
 				.filter((item) => canToggleContent(item) && !item.enabled)
-				.map((item) => toggleDisableMod(item, true)),
-		).then(() => {}),
-	bulkDisableItems: (items: ContentItem[]) =>
-		Promise.all(
+				.map((item) => toggleDisableMod(item, true, false)),
+		)
+		await reconcileSharedInstancePublishState()
+	},
+	bulkDisableItems: async (items: ContentItem[]) => {
+		await Promise.all(
 			items
 				.filter((item) => canToggleContent(item) && item.enabled)
-				.map((item) => toggleDisableMod(item, false)),
-		).then(() => {}),
+				.map((item) => toggleDisableMod(item, false, false)),
+		)
+		await reconcileSharedInstancePublishState()
+	},
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
 		Promise.all(items.filter(canDeleteContent).map((item) => removeMod(item))).then(() => {}),

@@ -348,7 +348,7 @@
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
   "content.card.frozen": {
-    "defaultMessage": "Version frozen"
+    "defaultMessage": "This project is locked to its current version until unfrozen."
   },
   "content.card.select-project": {
     "defaultMessage": "Select {project}"
