@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import {
+	ArrowDownAZIcon,
+	ArrowUpZAIcon,
+	ClockArrowDownIcon,
+	ClockArrowUpIcon,
 	CodeIcon,
 	CompassIcon,
 	DownloadIcon,
@@ -17,7 +21,7 @@ import {
 } from '@modrinth/assets'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button, TeleportOverflowMenu, type OverflowMenuOption } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
@@ -50,8 +54,6 @@ import type {
 	BulkOperationStatus,
 	ContentActionWarning,
 	ContentCardTableItem,
-	ContentCardTableSortColumn,
-	ContentCardTableSortDirection,
 	ContentItem,
 } from './types'
 
@@ -91,6 +93,26 @@ const messages = defineMessages({
 	uploadFiles: {
 		id: 'content.page-layout.upload-files',
 		defaultMessage: 'Upload files',
+	},
+	sortAlphabetical: {
+		id: 'content.page-layout.sort.alphabetical',
+		defaultMessage: 'Alphabetical',
+	},
+	sortAlphabeticalAscending: {
+		id: 'content.page-layout.sort.alphabetical-ascending',
+		defaultMessage: 'Alphabetical (A–Z)',
+	},
+	sortAlphabeticalDescending: {
+		id: 'content.page-layout.sort.alphabetical-descending',
+		defaultMessage: 'Alphabetical (Z–A)',
+	},
+	sortDateAddedNewest: {
+		id: 'content.page-layout.sort.date-added-newest',
+		defaultMessage: 'Newest first',
+	},
+	sortDateAddedOldest: {
+		id: 'content.page-layout.sort.date-added-oldest',
+		defaultMessage: 'Oldest first',
 	},
 	filter: {
 		id: 'content.page-layout.filter.add',
@@ -140,6 +162,10 @@ const messages = defineMessages({
 		id: 'content.page-layout.share.label',
 		defaultMessage: 'Share',
 	},
+	sortByLabel: {
+		id: 'content.page-layout.sort.label',
+		defaultMessage: 'Sort by {mode}',
+	},
 	pleaseWait: {
 		id: 'content.page-layout.please-wait',
 		defaultMessage: 'Please wait',
@@ -153,27 +179,78 @@ function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
-const projectSortDirection = ref<ContentCardTableSortDirection>('asc')
-const sortableColumns: ContentCardTableSortColumn[] = ['project']
+type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
+const sortMode = ref<SortMode>('alphabetical-asc')
+
+const sortLabels: Record<SortMode, () => string> = {
+	'alphabetical-asc': () => formatMessage(messages.sortAlphabetical),
+	'alphabetical-desc': () => formatMessage(messages.sortAlphabetical),
+	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
+	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
+}
+
+const sortOptions = computed<OverflowMenuOption[]>(() => [
+	{
+		id: 'alphabetical-asc',
+		label: formatMessage(messages.sortAlphabeticalAscending),
+		icon: ArrowDownAZIcon,
+		action: () => (sortMode.value = 'alphabetical-asc'),
+	},
+	{
+		id: 'alphabetical-desc',
+		label: formatMessage(messages.sortAlphabeticalDescending),
+		icon: ArrowUpZAIcon,
+		action: () => (sortMode.value = 'alphabetical-desc'),
+	},
+	{
+		id: 'date-added-newest',
+		label: formatMessage(messages.sortDateAddedNewest),
+		icon: ClockArrowDownIcon,
+		action: () => (sortMode.value = 'date-added-newest'),
+	},
+	{
+		id: 'date-added-oldest',
+		label: formatMessage(messages.sortDateAddedOldest),
+		icon: ClockArrowUpIcon,
+		action: () => (sortMode.value = 'date-added-oldest'),
+	},
+])
 
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
-	return items.sort((a, b) => {
-		const nameA = a.project?.title ?? a.file_name
-		const nameB = b.project?.title ?? b.file_name
-		const comparison =
-			nameA.toLowerCase().localeCompare(nameB.toLowerCase()) ||
-			a.file_name.localeCompare(b.file_name)
-		return projectSortDirection.value === 'asc' ? comparison : -comparison
-	})
+	switch (sortMode.value) {
+		case 'alphabetical-desc':
+			return items.sort((a, b) => {
+				const nameA = a.project?.title ?? a.file_name
+				const nameB = b.project?.title ?? b.file_name
+				return (
+					nameB.toLowerCase().localeCompare(nameA.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
+			})
+		case 'date-added-newest':
+			return items.sort((a, b) => {
+				const dateA = a.date_added ?? ''
+				const dateB = b.date_added ?? ''
+				return dateB.localeCompare(dateA) || a.file_name.localeCompare(b.file_name)
+			})
+		case 'date-added-oldest':
+			return items.sort((a, b) => {
+				const dateA = a.date_added ?? ''
+				const dateB = b.date_added ?? ''
+				return dateA.localeCompare(dateB) || a.file_name.localeCompare(b.file_name)
+			})
+		default:
+			return items.sort((a, b) => {
+				const nameA = a.project?.title ?? a.file_name
+				const nameB = b.project?.title ?? b.file_name
+				return (
+					nameA.toLowerCase().localeCompare(nameB.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
+			})
+	}
 })
-
-function handleTableSort(
-	column: ContentCardTableSortColumn,
-	direction: ContentCardTableSortDirection,
-) {
-	if (column === 'project') projectSortDirection.value = direction
-}
 
 const { searchQuery, search } = useContentSearch(sortedItems, [
 	'project.title',
@@ -877,7 +954,21 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 						<div class="@container flex items-start gap-2">
 							<div ref="filterControlsRef" class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-								<div ref="projectTypeFiltersRef">
+								<div ref="projectTypeFiltersRef" class="flex items-center gap-2">
+									<TeleportOverflowMenu
+										class="!h-[34px]"
+										:icon-only="false"
+										:label="formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })"
+										:options="sortOptions"
+									>
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" />
+										<ClockArrowDownIcon v-else-if="sortMode === 'date-added-newest'" />
+										<ClockArrowUpIcon v-else-if="sortMode === 'date-added-oldest'" />
+										<ArrowDownAZIcon v-else />
+										{{ sortLabels[sortMode]() }}
+										<DropdownIcon />
+									</TeleportOverflowMenu>
+									<div class="h-6 w-px shrink-0 bg-surface-5" />
 									<FilterPills
 										:model-value="selectedFilters"
 										:options="filterOptions"
@@ -895,7 +986,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								>
 									<div
 										class="h-6 w-px shrink-0 bg-surface-5"
-										:class="{ invisible: metadataFiltersWrapped, 'mr-0.5': !metadataFiltersWrapped }"
+										:class="{
+											hidden: metadataFiltersWrapped,
+											'mr-0.5': !metadataFiltersWrapped,
+										}"
 									/>
 									<DropdownFilterBar
 										v-model="selectedMetadataFilters"
@@ -997,15 +1091,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							v-model:selected-ids="selectedIds"
 							:items="tableItems"
 							:show-selection="true"
-							sortable
-							sort-by="project"
-							:sortable-columns="sortableColumns"
-							:sort-direction="projectSortDirection"
 							@update:enabled="handleToggleEnabledById"
 							@delete="handleDeleteById"
 							@update="handleUpdateById"
 							@switch-version="handleSwitchVersionById"
-							@sort="handleTableSort"
 						>
 							<template #empty>
 								<span>{{ formatMessage(messages.noContentFound) }}</span>
