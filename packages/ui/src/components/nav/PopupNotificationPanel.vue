@@ -16,8 +16,8 @@
 				@mouseleave="setNotificationTimer(item)"
 			>
 				<NotificationToast
-					class="min-w-full"
 					v-if="item.toast"
+					class="min-w-full"
 					:type="item.toast.type"
 					:action-loading="toastActionLoading(item.id)"
 					:actor-name="item.toast.actorName"
