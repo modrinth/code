@@ -111,9 +111,9 @@ image = { version = "0.25.8", default-features = false, features = ["rayon"] }
 indexmap = "2.11.4"
 indicatif = "0.18.0"
 itertools = "0.14.0"
-json5 = "1.3.1"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
+json5 = "1.3.1"
 lettre = { version = "0.11.19", default-features = false, features = [
   "aws-lc-rs",
   "builder",
