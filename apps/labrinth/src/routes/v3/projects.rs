@@ -2951,22 +2951,21 @@ pub async fn project_delete_internal(
             );
             if candidate.len() <= 255 {
                 let taken = sqlx::query!(
-                    "
+                    r#"
                     SELECT EXISTS(
                         SELECT 1 FROM mods
                         WHERE
                             (slug = LOWER($1) OR text_id_lower = LOWER($1))
                             AND id != $2
-                    ) AS exists
-                    ",
+                    ) AS "exists!"
+                    "#,
                     candidate,
                     project.inner.id as db_ids::DBProjectId,
                 )
                 .fetch_one(&mut transaction)
                 .await
                 .wrap_internal_err("checking deleted slug availability")?
-                .exists
-                .unwrap_or(true);
+                .exists;
 
                 if !taken {
                     Some(candidate.to_lowercase())
@@ -3027,6 +3026,27 @@ pub async fn project_delete_internal(
         .insert(&mut transaction)
         .await
         .wrap_internal_err("failed to transfer project ownership to ghost")?;
+
+        ThreadMessageBuilder {
+            author_id: Some(deleted_user),
+            body: MessageBody::Text {
+                body: format!(
+                    "Project transferred to Ghost when user account `{}` (`{}`) deleted this project",
+                    user.username,
+                    user.id
+                ),
+                private: true,
+                replying_to: None,
+                associated_images: Vec::new(),
+            },
+            thread_id: project.thread_id,
+            hide_identity: false,
+        }
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err(
+            "failed to insert project transfer thread message",
+        )?;
 
         sqlx::query!(
             "
