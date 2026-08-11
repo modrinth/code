@@ -2,8 +2,8 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
-	LockIcon,
 	MoreVerticalIcon,
+	SnowflakeIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
 	TrashIcon,
@@ -44,9 +44,9 @@ const messages = defineMessages({
 		id: 'content.card.uploaded',
 		defaultMessage: 'Uploaded',
 	},
-	locked: {
-		id: 'content.card.locked',
-		defaultMessage: 'Locked',
+	frozen: {
+		id: 'content.card.frozen',
+		defaultMessage: 'Version frozen',
 	},
 })
 
@@ -205,11 +205,11 @@ const deleteHovered = ref(false)
 						<slot name="title-badges" />
 						<span
 							v-if="locked"
-							v-tooltip="formatMessage(messages.locked)"
+							v-tooltip="formatMessage(messages.frozen)"
 							class="inline-flex size-5 shrink-0 items-center justify-center text-secondary"
 							tabindex="0"
 						>
-							<LockIcon aria-hidden="true" class="size-4" />
+							<SnowflakeIcon aria-hidden="true" class="size-4" />
 						</span>
 						<span
 							v-if="isClientOnly"
@@ -305,7 +305,7 @@ const deleteHovered = ref(false)
 						typeof versionLink === 'string' && versionLink.startsWith('http') ? '_blank' : undefined
 					"
 					:to="versionLink"
-					class="inline-flex min-w-0 font-medium leading-6 text-contrast !decoration-contrast"
+					class="inline-flex min-w-0 font-semibold leading-6 text-contrast !decoration-contrast"
 					:class="{ 'hover:underline': versionLink, 'cursor-pointer': versionLink }"
 				>
 					<span ref="versionNumberRef" class="truncate">{{

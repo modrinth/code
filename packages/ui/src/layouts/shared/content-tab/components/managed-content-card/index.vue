@@ -74,7 +74,7 @@ const title = computed(() =>
 
 			<div
 				v-if="showViewContent || showSettings"
-				class="flex shrink-0 items-center gap-2 self-start @[700px]:self-auto"
+				class="flex shrink-0 items-center gap-2 self-start"
 			>
 				<Button
 					v-if="showViewContent"

@@ -44,7 +44,7 @@
 					{{ loaderLabel }}
 				</PageHeaderMetadataItem>
 				<PageHeaderMetadataItem
-					v-if="showInstancePlayTime"
+					v-if="showInstancePlayTime && playtimeLabel"
 					:icon="TimerIcon"
 					tooltip="Total playtime"
 				>
@@ -327,17 +327,21 @@ const sharedInstanceTooltip = computed(() =>
 	),
 )
 const playtimeLabel = computed(() => {
-	const hours = Math.floor(props.timePlayed / 3600)
+	const seconds = Math.floor(props.timePlayed)
+	if (seconds <= 0) {
+		return undefined
+	}
+
+	const hours = Math.floor(seconds / 3600)
 	if (hours >= 1) {
 		return `${hours} hour${hours > 1 ? 's' : ''}`
 	}
 
-	const minutes = Math.floor(props.timePlayed / 60)
+	const minutes = Math.floor(seconds / 60)
 	if (minutes >= 1) {
 		return `${minutes} minute${minutes > 1 ? 's' : ''}`
 	}
 
-	const seconds = Math.floor(props.timePlayed)
 	return `${seconds} second${seconds === 1 ? '' : 's'}`
 })
 const serverPlayOptions = computed<OverflowMenuOption[]>(() => [

@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, FolderOpenIcon, LockIcon, LockOpenIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon, SnowflakeIcon } from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
 	commonMessages,
@@ -191,13 +191,13 @@ const messages = defineMessages({
 		id: 'app.instance.mods.locked-content',
 		defaultMessage: 'Content in locked instances cannot be changed.',
 	},
-	lockContent: {
-		id: 'app.instance.mods.lock-content',
-		defaultMessage: 'Lock',
+	freezeContent: {
+		id: 'app.instance.mods.freeze-content',
+		defaultMessage: 'Freeze',
 	},
-	unlockContent: {
-		id: 'app.instance.mods.unlock-content',
-		defaultMessage: 'Unlock',
+	unfreezeContent: {
+		id: 'app.instance.mods.unfreeze-content',
+		defaultMessage: 'Unfreeze',
 	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
@@ -562,10 +562,14 @@ function hasContentOperation(item: ContentItem) {
 }
 
 function canDeleteContent(item: ContentItem) {
-	return canMutateContent(item) && !item.locked
+	return canMutateContent(item)
 }
 
-function canChangeContent(item: ContentItem) {
+function canToggleContent(item: ContentItem) {
+	return canMutateContent(item)
+}
+
+function canChangeContentVersion(item: ContentItem) {
 	return canMutateContent(item) && !item.locked
 }
 
@@ -779,7 +783,7 @@ async function handleUnknownFileContinue(dontShowAgain: boolean) {
 }
 
 async function toggleDisableMod(mod: ContentItem, desiredEnabled?: boolean) {
-	if (!mod.file_path || !canChangeContent(mod)) return
+	if (!mod.file_path || !canToggleContent(mod)) return
 	const operation = beginContentOperation(mod)
 	if (!operation) return
 	const originalFilePath = mod.file_path
@@ -980,7 +984,7 @@ async function updateProject(mod: ContentItem) {
 }
 
 async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions.v2.Version) {
-	if (!canChangeContent(mod)) return
+	if (!canChangeContentVersion(mod)) return
 	if (!mod.file_path) return
 	const operation = beginContentOperation(mod)
 	if (!operation) return
@@ -1118,7 +1122,7 @@ async function handleUpdate(id: string) {
 }
 
 async function handleSwitchVersion(item: ContentItem) {
-	if (!canChangeContent(item)) return
+	if (!canChangeContentVersion(item)) return
 	if (!item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
@@ -1479,10 +1483,10 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 		options.push(
 			{ type: 'divider' },
 			{
-				id: item.locked ? 'unlock-content' : 'lock-content',
-				label: formatMessage(item.locked ? messages.unlockContent : messages.lockContent),
-				icon: item.locked ? LockOpenIcon : LockIcon,
-				action: () => handleContentLock(item, !item.locked),
+				id: item.locked ? 'unfreeze-content' : 'freeze-content',
+				label: formatMessage(item.locked ? messages.unfreezeContent : messages.freezeContent),
+				icon: SnowflakeIcon,
+				action: () => handleContentFreeze(item, !item.locked),
 			},
 		)
 	}
@@ -1490,17 +1494,19 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	return options
 }
 
-async function handleContentLock(item: ContentItem, locked: boolean) {
+async function handleContentFreeze(item: ContentItem, frozen: boolean) {
 	if (!item.file_path || !canMutateContent(item)) return
 	const operation = beginContentOperation(item)
 	if (!operation) return
 	const originalFilePath = item.file_path
 
 	try {
-		await set_project_locked(instance.value.id, item.file_path, locked)
-		item.locked = locked
-		managedContentModal.value?.updateItem(operation.originalFileName, { locked })
-		updateLinkedModpackContentCache(item, operation.originalFileName, originalFilePath, { locked })
+		await set_project_locked(instance.value.id, item.file_path, frozen)
+		item.locked = frozen
+		managedContentModal.value?.updateItem(operation.originalFileName, { locked: frozen })
+		updateLinkedModpackContentCache(item, operation.originalFileName, originalFilePath, {
+			locked: frozen,
+		})
 	} catch (err) {
 		handleError(err as Error)
 	} finally {
@@ -1569,20 +1575,20 @@ provideContentManager({
 	bulkEnableItems: (items: ContentItem[]) =>
 		Promise.all(
 			items
-				.filter((item) => canChangeContent(item) && !item.enabled)
+				.filter((item) => canToggleContent(item) && !item.enabled)
 				.map((item) => toggleDisableMod(item, true)),
 		).then(() => {}),
 	bulkDisableItems: (items: ContentItem[]) =>
 		Promise.all(
 			items
-				.filter((item) => canChangeContent(item) && item.enabled)
+				.filter((item) => canToggleContent(item) && item.enabled)
 				.map((item) => toggleDisableMod(item, false)),
 		).then(() => {}),
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
 		Promise.all(items.filter(canDeleteContent).map((item) => removeMod(item))).then(() => {}),
 	canDeleteItem: canDeleteContent,
-	canToggleItem: canChangeContent,
+	canToggleItem: canToggleContent,
 	getDeleteWarning: managedContentPolicy.deleteWarning,
 	getDisableWarning: managedContentPolicy.disableWarning,
 	getDeleteDependencyWarning,
@@ -1638,10 +1644,9 @@ provideContentManager({
 		external: item.external ?? !item.project,
 		enabled: canMutateContent(item) ? item.enabled : undefined,
 		locked: item.locked,
-		hideToggle: item.locked,
 		installing: item.installing,
 		hideDelete: !canDeleteContent(item),
-		hideSwitchVersion: !canChangeContent(item) || !item.project?.id || !item.version?.id,
+		hideSwitchVersion: !canChangeContentVersion(item) || !item.project?.id || !item.version?.id,
 		hasUpdate: canUpdateProject(item) && !item.locked,
 	}),
 	showSharedContentFilter,

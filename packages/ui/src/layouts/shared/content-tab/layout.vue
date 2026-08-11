@@ -95,17 +95,13 @@ const messages = defineMessages({
 		id: 'content.page-layout.upload-files',
 		defaultMessage: 'Upload files',
 	},
-	sortAlphabetical: {
-		id: 'content.page-layout.sort.alphabetical',
-		defaultMessage: 'Alphabetical',
-	},
 	sortAlphabeticalAscending: {
 		id: 'content.page-layout.sort.alphabetical-ascending',
-		defaultMessage: 'Alphabetical (A–Z)',
+		defaultMessage: 'Name (A-Z)',
 	},
 	sortAlphabeticalDescending: {
 		id: 'content.page-layout.sort.alphabetical-descending',
-		defaultMessage: 'Alphabetical (Z–A)',
+		defaultMessage: 'Name (Z-A)',
 	},
 	sortDateAddedNewest: {
 		id: 'content.page-layout.sort.date-added-newest',
@@ -188,8 +184,8 @@ type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' |
 const sortMode = ref<SortMode>('alphabetical-asc')
 
 const sortLabels: Record<SortMode, () => string> = {
-	'alphabetical-asc': () => formatMessage(messages.sortAlphabetical),
-	'alphabetical-desc': () => formatMessage(messages.sortAlphabetical),
+	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
+	'alphabetical-desc': () => formatMessage(messages.sortAlphabeticalDescending),
 	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
 }
@@ -1005,7 +1001,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<div ref="filterControlsRef" class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
 								<div ref="projectTypeFiltersRef" class="flex items-center gap-2">
 									<TeleportOverflowMenu
-										class="!h-[34px]"
+										class="!h-[34px] !text-sm !font-medium"
 										:icon-only="false"
 										:label="formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })"
 										:options="sortOptions"
@@ -1222,14 +1218,19 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									type="quiet"
 									color="green"
 									:disabled="isBulkOperating"
-									class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+									class="!text-sm !font-medium hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 									@click="promptUpdateAll"
 								>
 									<DownloadIcon />
 									{{ formatMessage(messages.updateAll) }}
 								</Button>
 
-								<Button type="quiet" :disabled="refreshing" @click="handleRefresh">
+								<Button
+									type="quiet"
+									:disabled="refreshing"
+									class="!text-sm !font-medium"
+									@click="handleRefresh"
+								>
 									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
 									{{ formatMessage(commonMessages.refreshButton) }}
 								</Button>

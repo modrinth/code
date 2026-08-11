@@ -103,18 +103,18 @@ const showAction = computed(
 
 <template>
 	<div
-		class="flex min-h-14 flex-col items-start justify-between gap-x-4 gap-y-3 bg-surface-2 px-[18px] py-4 text-secondary @[700px]:flex-row @[700px]:items-center"
+		class="flex min-h-14 flex-col items-start justify-between gap-x-4 gap-y-3 bg-surface-2 px-[18px] py-4 !font-semibold text-secondary @[700px]:flex-row @[700px]:items-center"
 	>
 		<div class="flex min-w-0 flex-wrap items-center gap-2">
 			<div class="flex min-w-0 flex-wrap items-center gap-1.5 @[700px]:flex-nowrap">
 				<LockIcon aria-hidden="true" class="size-5 shrink-0" />
 				<div class="flex min-w-0 flex-wrap items-center gap-[5px] @[700px]:flex-nowrap">
-					<span class="whitespace-nowrap font-medium">
+					<span class="whitespace-nowrap">
 						{{ formatMessage(messages.managedBy) }}
 					</span>
 					<AutoLink
 						:to="data.manager.link"
-						class="flex min-w-0 items-center gap-1.5 font-medium text-secondary"
+						class="flex min-w-0 items-center gap-1.5 text-secondary"
 						:class="data.manager.link ? 'hover:underline' : ''"
 					>
 						<Avatar
@@ -130,7 +130,7 @@ const showAction = computed(
 							{{ data.manager.name }}
 						</span>
 					</AutoLink>
-					<span v-if="data.kind === 'server'" class="whitespace-nowrap font-medium">
+					<span v-if="data.kind === 'server'" class="whitespace-nowrap">
 						{{ formatMessage(messages.server) }}
 					</span>
 				</div>
@@ -140,7 +140,7 @@ const showAction = computed(
 				<BulletDivider class="!mx-0" />
 				<AutoLink
 					:to="data.versionLink"
-					class="whitespace-nowrap font-medium text-secondary !decoration-secondary"
+					class="whitespace-nowrap text-secondary !decoration-secondary"
 					:class="data.versionLink ? 'hover:underline' : ''"
 				>
 					{{ data.versionNumber }}
@@ -151,7 +151,7 @@ const showAction = computed(
 				<BulletDivider class="!mx-0" />
 				<div
 					v-tooltip="timestampTooltip"
-					class="flex items-center whitespace-nowrap font-medium"
+					class="flex items-center whitespace-nowrap"
 					:class="[data.kind === 'modpack' ? 'gap-2' : 'gap-1.5', 'cursor-help']"
 				>
 					<ClockIcon aria-hidden="true" class="size-5 shrink-0" />
@@ -165,6 +165,7 @@ const showAction = computed(
 			type="quiet"
 			:color="data.kind === 'modpack' ? undefined : 'green'"
 			:disabled="disabled"
+			class=""
 			@click="emit('primary-action', $event)"
 		>
 			<SpinnerIcon v-if="disabled" aria-hidden="true" class="animate-spin" />

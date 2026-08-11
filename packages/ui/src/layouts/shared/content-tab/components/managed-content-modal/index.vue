@@ -124,7 +124,7 @@ const selectedIds = ref<string[]>([])
 const selectedItems = computed(() =>
 	items.value.filter((item) => selectedIds.value.includes(item.id)),
 )
-const toggleableSelectedItems = computed(() => selectedItems.value.filter((item) => !item.locked))
+const toggleableSelectedItems = computed(() => selectedItems.value)
 
 const allSelected = computed(() => {
 	if (filteredItems.value.length === 0) return false
@@ -273,7 +273,6 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
 		locked: item.locked,
-		hideToggle: item.locked,
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
@@ -352,7 +351,7 @@ function sourceProjectLink(project: ContentCardProject) {
 function handleEnabledChange(id: string, value: boolean) {
 	if (props.actionDisabled) return
 	const item = items.value.find((item) => item.id === id)
-	if (!item || item.locked) return
+	if (!item) return
 	emit('update:enabled', item, value)
 }
 

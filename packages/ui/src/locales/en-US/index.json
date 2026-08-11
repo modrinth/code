@@ -347,8 +347,8 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
-  "content.card.locked": {
-    "defaultMessage": "Locked"
+  "content.card.frozen": {
+    "defaultMessage": "Version frozen"
   },
   "content.card.select-project": {
     "defaultMessage": "Select {project}"
@@ -719,14 +719,11 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Project names"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alphabetical"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Alphabetical (A–Z)"
+    "defaultMessage": "Name (A-Z)"
   },
   "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Alphabetical (Z–A)"
+    "defaultMessage": "Name (Z-A)"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Newest first"

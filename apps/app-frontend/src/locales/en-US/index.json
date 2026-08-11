@@ -422,8 +422,8 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
-  "app.instance.mods.lock-content": {
-    "message": "Lock"
+  "app.instance.mods.freeze-content": {
+    "message": "Freeze"
   },
   "app.instance.mods.locked-content": {
     "message": "Content in locked instances cannot be changed."
@@ -443,8 +443,8 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
   },
-  "app.instance.mods.unlock-content": {
-    "message": "Unlock"
+  "app.instance.mods.unfreeze-content": {
+    "message": "Unfreeze"
   },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"

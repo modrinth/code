@@ -60,7 +60,7 @@ pub async fn update_project(
         &state,
     )
     .await?;
-    ensure_project_unlocked(instance_id, project_path, &state).await?;
+    ensure_project_not_frozen(instance_id, project_path, &state).await?;
     let path = crate::state::instances::commands::update_project(
         instance_id,
         project_path,
@@ -198,7 +198,7 @@ pub async fn switch_project_version_with_dependencies(
         &state,
     )
     .await?;
-    ensure_project_unlocked(instance_id, project_path, &state).await?;
+    ensure_project_not_frozen(instance_id, project_path, &state).await?;
     let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
@@ -260,7 +260,6 @@ pub async fn toggle_disable_project(
     let state = State::get().await?;
     ensure_shared_instance_can_modify_project(instance_id, project, &state)
         .await?;
-    ensure_project_unlocked(instance_id, project, &state).await?;
     let res = crate::state::instances::commands::toggle_disable_project(
         instance_id,
         project,
@@ -281,7 +280,6 @@ pub async fn remove_project(
     let state = State::get().await?;
     ensure_shared_instance_can_modify_project(instance_id, project, &state)
         .await?;
-    ensure_project_unlocked(instance_id, project, &state).await?;
     crate::state::instances::commands::remove_project(
         instance_id,
         project,
@@ -353,7 +351,7 @@ async fn ensure_shared_instance_can_modify_project(
     Ok(())
 }
 
-async fn ensure_project_unlocked(
+async fn ensure_project_not_frozen(
     instance_id: &str,
     project_path: &str,
     state: &State,
@@ -366,7 +364,8 @@ async fn ensure_project_unlocked(
     .await?
     {
         return Err(crate::ErrorKind::InputError(
-            "Locked content cannot be changed. Unlock it first.".to_string(),
+            "Frozen content cannot change versions. Unfreeze it first."
+                .to_string(),
         )
         .into());
     }
