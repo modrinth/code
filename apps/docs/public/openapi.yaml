@@ -414,6 +414,35 @@ components:
         - unknown
         - signature
       example: required-resource-pack
+    EnvironmentEnum:
+      type: string
+      enum:
+        - client_and_server
+        - client_only
+        - client_only_server_optional
+        - singleplayer_only
+        - server_only
+        - server_only_client_optional
+        - dedicated_server_only
+        - client_or_server
+        - client_or_server_prefers_both
+        - unknown
+      example: client_and_server
+      description: 'The environment a project or version supports. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
+    EnvironmentInputEnum:
+      type: string
+      enum:
+        - client_and_server
+        - client_only
+        - client_only_server_optional
+        - singleplayer_only
+        - server_only
+        - server_only_client_optional
+        - dedicated_server_only
+        - client_or_server
+        - client_or_server_prefers_both
+      example: client_and_server
+      description: 'The environment a version supports. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
     # https://github.com/modrinth/code/blob/main/apps/labrinth/src/routes/v2/version_creation.rs#L32-L76
     CreatableVersion:
       allOf:
@@ -433,19 +462,7 @@ components:
               type: string
               description: The multipart field name of the primary file
             environment:
-              type: string
-              enum:
-                - client_and_server
-                - client_only
-                - client_only_server_optional
-                - singleplayer_only
-                - server_only
-                - server_only_client_optional
-                - dedicated_server_only
-                - client_or_server
-                - client_or_server_prefers_both
-                - unknown
-              description: The environment that this version is for.
+              $ref: '#/components/schemas/EnvironmentInputEnum'
             file_types:
               type: object
               additionalProperties:
@@ -496,6 +513,8 @@ components:
               deprecated: true
               example: null
               nullable: true
+            environment:
+              $ref: '#/components/schemas/EnvironmentEnum'
             files:
               type: array
               items:
@@ -514,6 +533,7 @@ components:
             - version_type
             - loaders
             - featured
+            - environment
     VersionFile:
       type: object
       properties:
@@ -627,9 +647,160 @@ components:
           required:
             - loaders
             - game_versions
-    # Project
-    # Fields that can be used in everything. Search, direct project lookup, project editing, you name it.
-    BaseProject:
+    # Search hit from GET /search
+    ProjectResult:
+      type: object
+      properties:
+        project_id:
+          type: string
+          description: The ID of the project, encoded as a base62 string
+          example: AABBCCDD
+        project_type:
+          type: string
+          enum: [mod, modpack, resourcepack, shader]
+          description: The project type of the project
+          example: mod
+        all_project_types:
+          type: array
+          items:
+            type: string
+            enum: [mod, resourcepack, datapack, shader, modpack, plugin]
+          description: All project types across every version of the project, unlike `project_type` which only reflects a version-specific type
+          example: [mod, plugin, datapack]
+        title:
+          type: string
+          description: The title or name of the project
+        description:
+          type: string
+          description: A short sentence summarizing the project, no more than a sentence or two.
+        author:
+          type: string
+          description: The username of the project's author
+          example: my_user
+        categories:
+          type: array
+          items:
+            type: string
+          example: [technology, adventure, fabric]
+          description: A list of the featured categories that the project has.
+        display_categories:
+          type: array
+          items:
+            type: string
+          description: A list of the featured categories that the project has. Equivalent to `categories` on the project itself.
+          example: ['technology', 'fabric']
+        versions:
+          type: array
+          items:
+            type: string
+          description: A list of the minecraft versions supported by the project
+          example: ['1.8', '1.8.9']
+        downloads:
+          type: integer
+          description: The total number of downloads of the project
+        follows:
+          type: integer
+          description: The total number of users following the project
+        icon_url:
+          type: string
+          example: https://cdn.modrinth.com/data/AABBCCDD/b46513nd83hb4792a9a0e1fn28fgi6090c1842639.png
+          description: The URL of the project's icon
+        date_created:
+          type: string
+          format: ISO-8601
+          description: The date the project was created
+        date_modified:
+          type: string
+          format: ISO-8601
+          description: The date the latest version of the project was created
+        latest_version:
+          type: string
+          description: The ID of the latest version of the project
+          example: IIJJKKLL
+        license:
+          type: string
+          description: The SPDX license ID of a project
+          example: MIT
+        environment:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvironmentEnum'
+          description: 'All the environments that versions of this project support. Not in any particular order, we recommend using the environment information on a version instead. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
+          example: [client_and_server]
+        gallery:
+          type: array
+          description: A list of images that have been uploaded to the project's gallery
+          example:
+            [
+              'https://cdn.modrinth.com/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png',
+              'https://cdn.modrinth.com/data/AABBCCDD/images/c21776867afb6046fdc3c21dbcf5cc50ae27a236.png',
+            ]
+          items:
+            type: string
+        slug:
+          type: string
+          description: "The slug of a project, used for vanity URLs. Regex: ```^[\\w!@$()`.+,\"\\-']{3,64}$```"
+          example: my_project
+          nullable: true
+        author_id:
+          type: string
+          description: The ID of the project's author
+          example: EEFFGGHH
+          nullable: true
+        organization:
+          type: string
+          description: The name of the organization that owns this project
+          example: my_org
+          nullable: true
+        organization_id:
+          type: string
+          description: The ID of the organization that owns this project
+          example: AABBCCDD
+          nullable: true
+        featured_gallery:
+          type: string
+          description: The featured gallery image of the project
+          nullable: true
+        color:
+          type: integer
+          example: 8703084
+          description: The RGB color of the project, automatically generated from the project icon
+          nullable: true
+        client_side:
+          type: string
+          enum: [required, optional, unsupported, unknown]
+          description: Deprecated - use `environment` instead. The client side support of the project
+          example: required
+          deprecated: true
+        server_side:
+          type: string
+          enum: [required, optional, unsupported, unknown]
+          description: Deprecated - use `environment` instead. The server side support of the project
+          example: optional
+          deprecated: true
+      required:
+        - project_id
+        - project_type
+        - all_project_types
+        - title
+        - description
+        - author
+        - categories
+        - display_categories
+        - versions
+        - downloads
+        - follows
+        - icon_url
+        - date_created
+        - date_modified
+        - latest_version
+        - license
+        - environment
+        - gallery
+        - client_side
+        - server_side
+    # Fields shared by create/edit project request bodies
+    NonSearchProject:
       type: object
       properties:
         slug:
@@ -639,203 +810,84 @@ components:
         title:
           type: string
           description: The title or name of the project
-          example: My Project
         description:
           type: string
-          description: A short description of the project
-          example: A short description
+          description: A short sentence summarizing the project, no more than a sentence or two.
+        body:
+          type: string
+          description: A long form description of the project
+          example: A long body describing my project in detail
         categories:
           type: array
           items:
             type: string
           example: [technology, adventure, fabric]
-          description: A list of the categories that the project has
+          description: A list of the featured categories that the project has.
+        additional_categories:
+          type: array
+          items:
+            type: string
+          description: A list of additional categories that the project also has. These are supplementary to the featured categories, and does not include them again.
+          example: [technology, adventure, fabric]
+        status:
+          type: string
+          enum:
+            [
+              approved,
+              archived,
+              rejected,
+              draft,
+              unlisted,
+              processing,
+              withheld,
+              scheduled,
+              private,
+              unknown,
+            ]
+          description: The status of the project
+          example: approved
+        requested_status:
+          type: string
+          enum: [approved, archived, unlisted, private, draft]
+          description: The requested status when submitting for review or scheduling the project for release. Approved status refers to "Public" visibility.
+          nullable: true
+        issues_url:
+          type: string
+          description: An optional link to where to submit bugs or issues with the project
+          example: https://github.com/modrinth/code/issues
+          nullable: true
+        source_url:
+          type: string
+          description: An optional link to the source code of the project
+          example: https://github.com/modrinth/code
+          nullable: true
+        wiki_url:
+          type: string
+          description: An optional link to the project's wiki page or other relevant information
+          example: https://github.com/modrinth/code/wiki
+          nullable: true
+        discord_url:
+          type: string
+          description: An optional invite link to the project's discord.
+          example: https://discord.gg/modrinth
+          nullable: true
+        donation_urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectDonationURL'
+          description: A list of donation links for the project
         client_side:
           type: string
-          enum: [required, optional, unsupported, unknown]
-          description: The client side support of the project
+          enum: [required, optional, unsupported]
+          description: Deprecated - use `environment` instead.
           example: required
+          deprecated: true
         server_side:
           type: string
-          enum: [required, optional, unsupported, unknown]
-          description: The server side support of the project
+          enum: [required, optional, unsupported]
+          description: Deprecated - use `environment` instead.
           example: optional
-    # Fields added to search results and direct project lookups that cannot be edited.
-    ServerRenderedProject:
-      allOf:
-        - $ref: '#/components/schemas/BaseProject'
-        - type: object
-          properties:
-            project_type:
-              type: string
-              enum: [mod, modpack, resourcepack, shader]
-              description: The project type of the project
-              example: mod
-            downloads:
-              type: integer
-              description: The total number of downloads of the project
-            icon_url:
-              type: string
-              example: https://cdn.modrinth.com/data/AABBCCDD/b46513nd83hb4792a9a0e1fn28fgi6090c1842639.png
-              description: The URL of the project's icon
-              nullable: true
-            color:
-              type: integer
-              example: 8703084
-              description: The RGB color of the project, automatically generated from the project icon
-              nullable: true
-            thread_id:
-              type: string
-              example: TTUUVVWW
-              description: The ID of the moderation thread associated with this project
-            monetization_status:
-              type: string
-              enum: [monetized, demonetized, force-demonetized]
-          required:
-            - project_type
-            - downloads
-    # The actual result in search.
-    ProjectResult:
-      allOf:
-        - $ref: '#/components/schemas/ServerRenderedProject'
-        - type: object
-          properties:
-            project_id:
-              type: string
-              description: The ID of the project
-              example: AABBCCDD
-            all_project_types:
-              type: array
-              items:
-                type: string
-              description: All project types across every version of the project, unlike `project_type` which only reflects a version-specific type
-              example: [mod, plugin, datapack]
-            author:
-              type: string
-              description: The username of the project's author
-              example: my_user
-            display_categories:
-              type: array
-              items:
-                type: string
-              description: A list of the categories that the project has which are not secondary
-              example: ['technology', 'fabric']
-            versions:
-              type: array
-              items:
-                type: string
-              description: A list of the minecraft versions supported by the project
-              example: ['1.8', '1.8.9']
-            follows:
-              type: integer
-              description: The total number of users following the project
-            date_created:
-              type: string
-              format: ISO-8601
-              description: The date the project was added to search
-            date_modified:
-              type: string
-              format: ISO-8601
-              description: The date the project was last modified
-            latest_version:
-              type: string
-              description: The latest version of minecraft that this project supports
-              example: 1.8.9
-            license:
-              type: string
-              description: The SPDX license ID of a project
-              example: MIT
-            gallery:
-              type: array
-              description: All gallery images attached to the project
-              example:
-                [
-                  'https://cdn.modrinth.com/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png',
-                  'https://cdn.modrinth.com/data/AABBCCDD/images/c21776867afb6046fdc3c21dbcf5cc50ae27a236.png',
-                ]
-              items:
-                type: string
-            featured_gallery:
-              type: string
-              description: The featured gallery image of the project
-              nullable: true
-          required:
-            - slug
-            - title
-            - description
-            - client_side
-            - server_side
-            - project_id
-            - all_project_types
-            - author
-            - versions
-            - follows
-            - date_created
-            - date_modified
-            - license
-    # Fields that appear everywhere EXCEPT search.
-    NonSearchProject:
-      allOf:
-        - $ref: '#/components/schemas/BaseProject'
-        - type: object
-          properties:
-            body:
-              type: string
-              description: A long form description of the project
-              example: A long body describing my project in detail
-            status:
-              type: string
-              enum:
-                [
-                  approved,
-                  archived,
-                  rejected,
-                  draft,
-                  unlisted,
-                  processing,
-                  withheld,
-                  scheduled,
-                  private,
-                  unknown,
-                ]
-              description: The status of the project
-              example: approved
-            requested_status:
-              type: string
-              enum: [approved, archived, unlisted, private, draft]
-              description: The requested status when submitting for review or scheduling the project for release
-              nullable: true
-            additional_categories:
-              type: array
-              items:
-                type: string
-              description: A list of categories which are searchable but non-primary
-              example: [technology, adventure, fabric]
-            issues_url:
-              type: string
-              description: An optional link to where to submit bugs or issues with the project
-              example: https://github.com/my_user/my_project/issues
-              nullable: true
-            source_url:
-              type: string
-              description: An optional link to the source code of the project
-              example: https://github.com/my_user/my_project
-              nullable: true
-            wiki_url:
-              type: string
-              description: An optional link to the project's wiki page or other relevant information
-              example: https://github.com/my_user/my_project/wiki
-              nullable: true
-            discord_url:
-              type: string
-              description: An optional invite link to the project's discord
-              example: https://discord.gg/AaBbCcDd
-              nullable: true
-            donation_urls:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProjectDonationURL'
-              description: A list of donation links for the project
+          deprecated: true
     ProjectDonationURL:
       type: object
       properties:
@@ -888,6 +940,7 @@ components:
             project_type:
               type: string
               enum: [mod, modpack]
+              description: The project type of the project
               example: modpack
             initial_versions:
               type: array
@@ -941,89 +994,225 @@ components:
           type: integer
           description: The order of the gallery image. Gallery images are sorted by this field and then alphabetically by title.
           example: 0
+    # GET /project response. Fields ordered: required, then optional, then deprecated.
     Project:
-      allOf:
-        - $ref: '#/components/schemas/NonSearchProject'
-        - $ref: '#/components/schemas/ServerRenderedProject'
-        - type: object
-          properties:
-            id:
-              type: string
-              example: AABBCCDD
-              description: The ID of the project, encoded as a base62 string
-            team:
-              type: string
-              example: MMNNOOPP
-              description: The ID of the team that has ownership of this project
-            body_url:
-              type: string
-              deprecated: true
-              default: null
-              description: The link to the long description of the project. Always null, only kept for legacy compatibility.
-              example: null
-              nullable: true
-            moderator_message:
-              $ref: '#/components/schemas/ModeratorMessage'
-            published:
-              type: string
-              format: ISO-8601
-              description: The date the project was published
-            updated:
-              type: string
-              format: ISO-8601
-              description: The date the project was last updated
-            approved:
-              type: string
-              format: ISO-8601
-              description: The date the project's status was set to an approved status
-              nullable: true
-            queued:
-              type: string
-              format: ISO-8601
-              description: The date the project's status was submitted to moderators for review
-              nullable: true
-            followers:
-              type: integer
-              description: The total number of users following the project
-            license:
-              $ref: '#/components/schemas/ProjectLicense'
-            versions:
-              type: array
-              items:
-                type: string
-              example: [IIJJKKLL, QQRRSSTT]
-              description: A list of the version IDs of the project (will never be empty unless `draft` status)
-            game_versions:
-              type: array
-              items:
-                type: string
-              example: ['1.19', '1.19.1', '1.19.2', '1.19.3']
-              description: A list of all of the game versions supported by the project
-            loaders:
-              type: array
-              items:
-                type: string
-              example: ['forge', 'fabric', 'quilt']
-              description: A list of all of the loaders supported by the project
-            gallery:
-              type: array
-              items:
-                $ref: '#/components/schemas/GalleryImage'
-              description: A list of images that have been uploaded to the project's gallery
-          required:
-            - id
-            - team
-            - published
-            - updated
-            - followers
-            - title
-            - description
-            - categories
-            - client_side
-            - server_side
-            - slug
-            - body
-            - status
+      type: object
+      properties:
+        id:
+          type: string
+          example: AABBCCDD
+          description: The ID of the project, encoded as a base62 string
+        team:
+          type: string
+          example: MMNNOOPP
+          description: The ID of the team that has ownership of this project
+        title:
+          type: string
+          description: The title or name of the project
+        description:
+          type: string
+          description: A short sentence summarizing the project, no more than a sentence or two.
+        body:
+          type: string
+          description: A long form description of the project
+          example: A long body describing my project in detail
+        status:
+          type: string
+          enum:
+            [
+              approved,
+              archived,
+              rejected,
+              draft,
+              unlisted,
+              processing,
+              withheld,
+              scheduled,
+              private,
+              unknown,
+            ]
+          description: The status of the project
+          example: approved
+        project_type:
+          type: string
+          enum: [mod, modpack, resourcepack, shader]
+          description: The project type of the project
+          example: mod
+        categories:
+          type: array
+          items:
+            type: string
+          example: [technology, adventure, fabric]
+          description: A list of the featured categories that the project has.
+        additional_categories:
+          type: array
+          items:
+            type: string
+          description: A list of additional categories that the project also has. These are supplementary to the featured categories, and does not include them again.
+          example: [technology, adventure, fabric]
+        environment:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvironmentEnum'
+          description: 'All the environments that versions of this project support. Not in any particular order, we recommend using the environment information on a version instead. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
+          example: [client_and_server]
+        game_versions:
+          type: array
+          items:
+            type: string
+          example: ['1.19', '1.19.1', '1.19.2', '1.19.3']
+          description: A list of all of the game versions supported by the project
+        loaders:
+          type: array
+          items:
+            type: string
+          example: ['neoforge', 'fabric']
+          description: A list of all of the loaders supported by the project. These vary based on project type.
+        versions:
+          type: array
+          items:
+            type: string
+          example: [IIJJKKLL, QQRRSSTT]
+          description: A list of the version IDs of the project
+        license:
+          $ref: '#/components/schemas/ProjectLicense'
+        published:
+          type: string
+          format: ISO-8601
+          description: The date the project was created
+        updated:
+          type: string
+          format: ISO-8601
+          description: The date the latest version of the project was created
+        downloads:
+          type: integer
+          description: The total number of downloads of the project
+        followers:
+          type: integer
+          description: The total number of users following the project
+        gallery:
+          type: array
+          items:
+            $ref: '#/components/schemas/GalleryImage'
+          description: A list of images that have been uploaded to the project's gallery
+        thread_id:
+          type: string
+          example: TTUUVVWW
+          description: The ID of the moderation thread associated with this project
+        monetization_status:
+          type: string
+          enum: [monetized, demonetized, force-demonetized]
+        slug:
+          type: string
+          description: "The slug of a project, used for vanity URLs. Regex: ```^[\\w!@$()`.+,\"\\-']{3,64}$```"
+          example: my_project
+          nullable: true
+        organization:
+          type: string
+          description: The ID of the organization that owns this project
+          example: AABBCCDD
+          nullable: true
+        requested_status:
+          type: string
+          enum: [approved, archived, unlisted, private, draft]
+          description: The requested status when submitting for review or scheduling the project for release. Approved status refers to "Public" visibility.
+          nullable: true
+        approved:
+          type: string
+          format: ISO-8601
+          description: The date the project was first published
+          nullable: true
+        queued:
+          type: string
+          format: ISO-8601
+          description: The date the project's status was submitted to moderators for review
+          nullable: true
+        icon_url:
+          type: string
+          example: https://cdn.modrinth.com/data/AABBCCDD/b46513nd83hb4792a9a0e1fn28fgi6090c1842639.png
+          description: The URL of the project's icon
+          nullable: true
+        raw_icon_url:
+          type: string
+          example: https://cdn.modrinth.com/data/AABBCCDD/b46513nd83hb4792a9a0e1fn28fgi6090c1842639-raw.png
+          description: The URL of the project's icon without CDN transforms applied
+          nullable: true
+        color:
+          type: integer
+          example: 8703084
+          description: The RGB color of the project, automatically generated from the project icon
+          nullable: true
+        issues_url:
+          type: string
+          description: An optional link to where to submit bugs or issues with the project
+          example: https://github.com/modrinth/code/issues
+          nullable: true
+        source_url:
+          type: string
+          description: An optional link to the source code of the project
+          example: https://github.com/modrinth/code
+          nullable: true
+        wiki_url:
+          type: string
+          description: An optional link to the project's wiki page or other relevant information
+          example: https://github.com/modrinth/code/wiki
+          nullable: true
+        discord_url:
+          type: string
+          description: An optional invite link to the project's discord.
+          example: https://discord.gg/modrinth
+          nullable: true
+        donation_urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectDonationURL'
+          description: A list of donation links for the project
+          nullable: true
+        client_side:
+          type: string
+          enum: [required, optional, unsupported, unknown]
+          description: Deprecated - use `environment` instead.
+          example: required
+          deprecated: true
+        server_side:
+          type: string
+          enum: [required, optional, unsupported, unknown]
+          description: Deprecated - use `environment` instead.
+          example: optional
+          deprecated: true
+        body_url:
+          type: string
+          deprecated: true
+          default: null
+          description: Deprecated - The link to the long description of the project. Always null, only kept for legacy compatibility.
+          example: null
+          nullable: true
+        moderator_message:
+          $ref: '#/components/schemas/ModeratorMessage'
+      required:
+        - id
+        - team
+        - title
+        - description
+        - body
+        - status
+        - project_type
+        - categories
+        - additional_categories
+        - environment
+        - game_versions
+        - loaders
+        - versions
+        - license
+        - published
+        - updated
+        - downloads
+        - followers
+        - gallery
+        - thread_id
+        - monetization_status
+        - client_side
+        - server_side
     ModeratorMessage:
       deprecated: true
       type: object
@@ -1037,7 +1226,7 @@ components:
           nullable: true
       nullable: true
       example: null
-      description: A message that a moderator sent regarding the project
+      description: Deprecated - A message that a moderator sent regarding the project
     ProjectLicense:
       type: object
       properties:
@@ -1970,9 +2159,10 @@ paths:
             - `all_project_types` (matches against every project type across all of the project's versions, not just the primary/version-specific type)
             - `categories` (loaders are lumped in with categories in search)
             - `versions`
-            - `client_side`
-            - `server_side`
             - `open_source`
+            - `environment`
+            - `client_side` (deprecated - use `environment` instead)
+            - `server_side` (deprecated - use `environment` instead)
 
             Several others are also available for use, though these should not be used outside very specific use cases.
             - `title`
