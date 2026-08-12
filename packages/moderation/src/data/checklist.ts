@@ -30,6 +30,7 @@ export function useStages(
 		useSummaryStage(),
 		useDescriptionStage(),
 		useGalleryStage(),
+		useDisclosuresStage(),
 		useLinksStage(),
 		useLicenseStage(),
 		useCategoriesStage(),
@@ -38,7 +39,6 @@ export function useStages(
 		useReuploadsStage(),
 		usePermissionsStage(),
 		useRulesStage(),
-		useDisclosuresStage(),
 	]
 	return [...mainStages, useStatusAlertsStage(mainStages, globalState)]
 }
