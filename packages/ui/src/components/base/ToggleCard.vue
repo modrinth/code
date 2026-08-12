@@ -4,15 +4,17 @@ import { computed, useId } from 'vue'
 
 const props = defineProps<{
 	disabled?: boolean
+	toggleDisabled?: boolean
 }>()
 
 const value = defineModel<boolean>({ required: true })
 
 const baseId = useId()
 const toggleId = computed(() => `toggle-card-toggle-${baseId}`)
+const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisabled && value.value))
 
 function toggle() {
-	if (props.disabled) return
+	if (isToggleLocked.value) return
 	value.value = !value.value
 }
 </script>
@@ -20,15 +22,15 @@ function toggle() {
 <template>
 	<SmartClickable
 		class="flex w-full flex-col overflow-clip rounded-2xl border border-solid border-surface-4 bg-surface-3"
-		:disabled="disabled"
+		:disabled="isToggleLocked"
 	>
 		<template #clickable>
 			<button
 				aria-hidden="true"
 				tabindex="-1"
-				:disabled="disabled"
+				:disabled="isToggleLocked"
 				class="flex h-full w-full"
-				:class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
+				:class="isToggleLocked ? 'cursor-not-allowed' : 'cursor-pointer'"
 				@click="toggle"
 			/>
 		</template>
@@ -37,11 +39,11 @@ function toggle() {
 				<slot :toggle-id="toggleId" />
 			</div>
 			<div>
-				<slot name="toggle" :disabled="disabled">
+				<slot name="toggle" :disabled="isToggleLocked">
 					<Toggle
 						:id="toggleId"
 						v-model="value"
-						:disabled="disabled"
+						:disabled="isToggleLocked"
 						class="smart-clickable:allow-pointer-events"
 					/>
 				</slot>
@@ -56,6 +58,12 @@ function toggle() {
 				</div>
 			</div>
 		</Transition>
+		<div
+			v-if="$slots.footer"
+			class="smart-clickable:allow-pointer-events border-0 border-t bg-surface-3 border-solid border-surface-4 px-4 py-3"
+		>
+			<slot name="footer" />
+		</div>
 	</SmartClickable>
 </template>
 <style scoped>

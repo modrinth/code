@@ -5,6 +5,7 @@ import {
 	injectModrinthClient,
 	injectProjectPageContext,
 	IntlFormatted,
+	isDisclosureCompatibleWithProjectTypes,
 	type MessageDescriptor,
 	normalizeChildren,
 	UnsavedChangesPopup,
@@ -12,7 +13,7 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { TeamMemberPermission } from '@modrinth/utils'
+import { isStaff, TeamMemberPermission } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 
@@ -22,22 +23,38 @@ import {
 	ArchivedDisclosureCard,
 	DerivativeDisclosureCard,
 	type DisclosureFormIssue,
+	type DisclosureLockStatus,
 	disclosuresToForm,
+	type DisclosureType,
+	findDisclosureData,
+	formToDisclosures,
 	getDisclosureFormIssues,
+	getDisclosureFormSnapshot,
 	PaidFeaturesDisclosureCard,
 	PhotosensitivityDisclosureCard,
 	SystemInteractionsDisclosureCard,
 	TelemetryDisclosureCard,
 	toCachedDisclosures,
-	toModifyRequest,
+	toModifyRequests,
 } from '~/components/ui/project-settings/disclosures'
 
 const DISCLOSURE_QUERY_STALE_TIME = 1000 * 60 * 5
 
 const { formatMessage } = useVIntl()
 const { labrinth } = injectModrinthClient()
-const { projectV2: project, currentMember } = injectProjectPageContext()
+const { projectV2: project, projectV3, currentMember } = injectProjectPageContext()
 const queryClient = useQueryClient()
+const flags = useFeatureFlags()
+
+const projectTypes = computed(() => projectV3.value?.project_types ?? [project.value.project_type])
+
+function isDisclosureVisible(type: DisclosureType) {
+	return isDisclosureCompatibleWithProjectTypes(type, projectTypes.value)
+}
+
+const isActingAsModerator = computed(
+	() => isStaff(currentMember.value?.user) && !flags.value.showModeratorProjectMemberUi,
+)
 
 const messages = defineMessages({
 	title: {
@@ -97,11 +114,42 @@ const { data: disclosuresResponse } = useQuery({
 	staleTime: DISCLOSURE_QUERY_STALE_TIME,
 })
 
+const updaterUserIds = computed(() => {
+	const ids = new Set<string>()
+	for (const disclosure of disclosuresResponse.value?.disclosures ?? []) {
+		if (disclosure.updated_by) {
+			ids.add(disclosure.updated_by)
+		}
+	}
+	return [...ids]
+})
+
+const { data: updaterUsers } = useQuery({
+	queryKey: computed(() => ['users', 'disclosures', updaterUserIds.value] as const),
+	queryFn: () => labrinth.users_v2.getMultiple(updaterUserIds.value),
+	enabled: computed(() => updaterUserIds.value.length > 0),
+	staleTime: DISCLOSURE_QUERY_STALE_TIME,
+})
+
+const updaterUsersById = computed(() => {
+	const map = new Map<string, NonNullable<typeof updaterUsers.value>[number]>()
+	for (const user of updaterUsers.value ?? []) {
+		map.set(user.id, user)
+	}
+	return map
+})
+
 const hasPermission = computed(
 	() => !!((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
 )
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	reset,
+	save: saveForm,
+} = useSavable(
 	() => disclosuresToForm(disclosuresResponse.value?.disclosures ?? []),
 	async () => {
 		if (!hasPermission.value || !canSave.value) {
@@ -109,13 +157,58 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 		}
 
 		const previous = disclosuresToForm(disclosuresResponse.value?.disclosures ?? [])
-		const request = toModifyRequest(current.value, previous)
-		await labrinth.projects_v3.modifyDisclosures(project.value.id, request)
+		const previousDisclosures = disclosuresResponse.value?.disclosures ?? []
+		const requests = toModifyRequests(current.value, previous)
+
+		for (const request of requests) {
+			await labrinth.projects_v3.modifyDisclosures(project.value.id, request)
+		}
+
 		queryClient.setQueryData(disclosuresQueryKey.value, {
-			disclosures: toCachedDisclosures(request.set),
+			disclosures: toCachedDisclosures(formToDisclosures(current.value), previousDisclosures, {
+				setByModerator: isActingAsModerator.value,
+				lockStatuses: current.value.lockStatuses,
+			}),
 		})
 	},
 )
+
+const savedSnapshot = computed(() => getDisclosureFormSnapshot(saved.value))
+const currentSnapshot = computed(() => getDisclosureFormSnapshot(current.value))
+const hasChanges = computed(
+	() => JSON.stringify(savedSnapshot.value) !== JSON.stringify(currentSnapshot.value),
+)
+
+async function save() {
+	if (!hasChanges.value) return
+	await saveForm()
+}
+
+function disclosureUpdateProps(type: DisclosureType) {
+	const disclosure = findDisclosureData(disclosuresResponse.value?.disclosures, type)
+	const savedLockStatus = disclosure?.lock_status ?? 'unlocked'
+	const lockStatus = current.value.lockStatuses[type] ?? savedLockStatus
+	const lockedForAuthor = !isActingAsModerator.value
+
+	return {
+		disabled: !hasPermission.value || (lockedForAuthor && savedLockStatus === 'fully_locked'),
+		toggleDisabled: lockedForAuthor && savedLockStatus !== 'unlocked',
+		updatedAt: disclosure?.updated_at,
+		updatedBy: disclosure?.updated_by
+			? (updaterUsersById.value.get(disclosure.updated_by) ?? null)
+			: null,
+		setByModerator: !!disclosure?.set_by_moderator,
+		lockStatus,
+		showLockControls: isActingAsModerator.value,
+	}
+}
+
+function setDisclosureLockStatus(type: DisclosureType, lockStatus: DisclosureLockStatus) {
+	current.value.lockStatuses = {
+		...current.value.lockStatuses,
+		[type]: lockStatus,
+	}
+}
 
 watch(
 	() => disclosuresResponse.value,
@@ -126,7 +219,7 @@ watch(
 	},
 )
 
-const issues = computed(() => getDisclosureFormIssues(current.value))
+const issues = computed(() => getDisclosureFormIssues(current.value, projectTypes.value))
 
 const canSave = computed(() => hasPermission.value && issues.value.length === 0)
 
@@ -157,28 +250,75 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 			</IntlFormatted>
 		</p>
 		<div class="flex flex-col gap-4">
-			<AiDisclosureCard v-model="current.ai" :disabled="!hasPermission" />
-			<AdvertisingDisclosureCard v-model="current.advertising" :disabled="!hasPermission" />
-			<PaidFeaturesDisclosureCard v-model="current.paidFeatures" :disabled="!hasPermission" />
-			<TelemetryDisclosureCard v-model="current.telemetry" :disabled="!hasPermission" />
-			<DerivativeDisclosureCard v-model="current.derivative" :disabled="!hasPermission" />
+			<AiDisclosureCard
+				v-if="isDisclosureVisible('ai_content')"
+				v-model="current.ai"
+				v-bind="disclosureUpdateProps('ai_content')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_content', status)
+				"
+			/>
+			<AdvertisingDisclosureCard
+				v-if="isDisclosureVisible('advertisements')"
+				v-model="current.advertising"
+				v-bind="disclosureUpdateProps('advertisements')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('advertisements', status)
+				"
+			/>
+			<PaidFeaturesDisclosureCard
+				v-if="isDisclosureVisible('paid_features')"
+				v-model="current.paidFeatures"
+				v-bind="disclosureUpdateProps('paid_features')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('paid_features', status)
+				"
+			/>
+			<TelemetryDisclosureCard
+				v-if="isDisclosureVisible('telemetry')"
+				v-model="current.telemetry"
+				v-bind="disclosureUpdateProps('telemetry')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('telemetry', status)
+				"
+			/>
+			<DerivativeDisclosureCard
+				v-if="isDisclosureVisible('derivative_work')"
+				v-model="current.derivative"
+				v-bind="disclosureUpdateProps('derivative_work')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('derivative_work', status)
+				"
+			/>
 			<PhotosensitivityDisclosureCard
+				v-if="isDisclosureVisible('epilepsy_triggers')"
 				v-model="current.photosensitivity"
-				:disabled="!hasPermission"
+				v-bind="disclosureUpdateProps('epilepsy_triggers')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('epilepsy_triggers', status)
+				"
 			/>
 			<SystemInteractionsDisclosureCard
+				v-if="isDisclosureVisible('system_interactions')"
 				v-model="current.systemInteractions"
-				:disabled="!hasPermission"
+				v-bind="disclosureUpdateProps('system_interactions')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('system_interactions', status)
+				"
 			/>
 			<ArchivedDisclosureCard
+				v-if="isDisclosureVisible('archived')"
 				v-model="current.archived"
-				:disabled="!hasPermission"
 				:project-title="project.title"
+				v-bind="disclosureUpdateProps('archived')"
+				@set-lock-status="
+					(status: DisclosureLockStatus) => setDisclosureLockStatus('archived', status)
+				"
 			/>
 		</div>
 		<UnsavedChangesPopup
-			:original="saved"
-			:modified="current"
+			:original="savedSnapshot"
+			:modified="currentSnapshot"
 			:saving="saving"
 			:can-save="canSave"
 			:save-disabled-reason="saveDisabledReason"

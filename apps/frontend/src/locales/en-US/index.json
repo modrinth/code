@@ -3869,6 +3869,18 @@
   "project.settings.disclosures.description": {
     "message": "You must add any applicable content disclosures to your project in compliance with <rules>Modrinth's Content Rules</rules>."
   },
+  "project.settings.disclosures.last-updated": {
+    "message": "Last updated on {date} by {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Moderator"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be removed."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be edited or removed."
+  },
   "project.settings.disclosures.paid-features.description": {
     "message": "You must enable this if your project contains features that can be obtained by spending real-world money."
   },

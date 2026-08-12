@@ -24,9 +24,10 @@
 				"
 				:on-image-upload="onUploadHandler"
 			/>
-			<div v-if="descriptionWarning" class="flex items-center gap-1.5 text-orange">
-				<TriangleAlertIcon class="my-auto" />
-				{{ descriptionWarning }}
+			<div v-if="descriptionWarning" class="mt-2">
+				<SettingsInlineWarning>
+					{{ descriptionWarning }}
+				</SettingsInlineWarning>
 			</div>
 		</div>
 		<UnsavedChangesPopup
@@ -40,13 +41,13 @@
 </template>
 
 <script lang="ts" setup>
-import { TriangleAlertIcon } from '@modrinth/assets'
 import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
 import {
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	injectProjectPageContext,
 	MarkdownEditor,
+	SettingsInlineWarning,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,

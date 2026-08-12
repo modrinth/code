@@ -1,6 +1,7 @@
 export { createAttributionGroupTitle } from '../components/external_files/external-project-utils'
 export * from './auto-icons'
 export * from './common-messages'
+export * from './disclosures'
 export * from './events'
 export * from './file-extensions'
 export * from './game-modes'

@@ -1306,6 +1306,8 @@ export namespace Labrinth {
 
 			export type AiUsage = 'code' | 'assets' | 'text' | 'functionality'
 
+			export type DisclosureLockStatus = 'unlocked' | 'cannot_disable' | 'fully_locked'
+
 			export type DerivativeSource = {
 				label: string
 				link?: string | null
@@ -1328,6 +1330,7 @@ export namespace Labrinth {
 				  }
 				| {
 						type: 'system_interactions'
+						interactions: string[]
 						note?: string | null
 				  }
 				| {
@@ -1350,6 +1353,7 @@ export namespace Labrinth {
 
 			export type ProjectDisclosureData = ProjectDisclosure & {
 				set_by_moderator: boolean
+				lock_status: DisclosureLockStatus
 				updated_at: string
 				updated_by?: string | null
 			}
@@ -1368,6 +1372,7 @@ export namespace Labrinth {
 			export type ModifyProjectDisclosures = {
 				set: ProjectDisclosure[]
 				remove: ProjectDisclosureType[]
+				lock_status?: DisclosureLockStatus | null
 			}
 		}
 	}

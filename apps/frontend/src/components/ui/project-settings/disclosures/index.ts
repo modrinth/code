@@ -2,6 +2,8 @@ export { default as AdvertisingDisclosureCard } from './AdvertisingDisclosureCar
 export { default as AiDisclosureCard } from './AiDisclosureCard.vue'
 export { default as ArchivedDisclosureCard } from './ArchivedDisclosureCard.vue'
 export { default as DerivativeDisclosureCard } from './DerivativeDisclosureCard.vue'
+export { default as DisclosureToggleCard } from './DisclosureToggleCard.vue'
+export { default as DisclosureUpdatedBy } from './DisclosureUpdatedBy.vue'
 export * from './form'
 export { default as PaidFeaturesDisclosureCard } from './PaidFeaturesDisclosureCard.vue'
 export { default as PhotosensitivityDisclosureCard } from './PhotosensitivityDisclosureCard.vue'

@@ -5,18 +5,23 @@ import {
 	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
-	SettingsToggleCard,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 
-import type { NoteDisclosure } from './types'
+import DisclosureToggleCard from './DisclosureToggleCard.vue'
+import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
 
 const model = defineModel<NoteDisclosure>({ required: true })
 
-defineProps<{
-	disabled?: boolean
-	projectTitle: string
+const props = defineProps<
+	DisclosureCardMetaProps & {
+		projectTitle: string
+	}
+>()
+
+const emit = defineEmits<{
+	setLockStatus: [status: DisclosureLockStatus]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -48,11 +53,12 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<SettingsToggleCard
+	<DisclosureToggleCard
+		v-bind="props"
 		v-model="model.enabled"
-		:disabled="disabled"
 		:icon="ArchiveIcon"
 		:title="formatMessage(messages.title)"
+		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<p>{{ formatMessage(messages.description1) }}</p>
 		<p>{{ formatMessage(messages.description2) }}</p>
@@ -76,5 +82,5 @@ const messages = defineMessages({
 				<ArchivedProjectBanner :title="projectTitle" :reason="model.note" />
 			</SettingsFormGroup>
 		</template>
-	</SettingsToggleCard>
+	</DisclosureToggleCard>
 </template>

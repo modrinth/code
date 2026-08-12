@@ -7,18 +7,25 @@ import {
 	defineMessages,
 	IconButton,
 	SettingsFormGroup,
-	SettingsToggleCard,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
 
-import type { TelemetryConsent, TelemetryDisclosure } from './types'
+import DisclosureToggleCard from './DisclosureToggleCard.vue'
+import type {
+	DisclosureCardMetaProps,
+	DisclosureLockStatus,
+	TelemetryConsent,
+	TelemetryDisclosure,
+} from './types'
 
 const model = defineModel<TelemetryDisclosure>({ required: true })
 
-defineProps<{
-	disabled?: boolean
+const props = defineProps<DisclosureCardMetaProps>()
+
+const emit = defineEmits<{
+	setLockStatus: [status: DisclosureLockStatus]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -90,12 +97,13 @@ function removeEntry(index: number) {
 </script>
 
 <template>
-	<SettingsToggleCard
+	<DisclosureToggleCard
+		v-bind="props"
 		v-model="model.enabled"
-		:disabled="disabled"
 		:icon="RadioTowerIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
 			<SettingsFormGroup :title="formatMessage(messages.consentDescription)">
@@ -132,5 +140,5 @@ function removeEntry(index: number) {
 				{{ formatMessage(commonMessages.addAnotherButton) }}
 			</Button>
 		</template>
-	</SettingsToggleCard>
+	</DisclosureToggleCard>
 </template>

@@ -60,9 +60,10 @@
 						:disabled="!hasPermission"
 						resize="vertical"
 					/>
-					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
-						<TriangleAlertIcon class="my-auto" />
-						{{ summaryWarning }}
+					<div v-if="summaryWarning" class="my-2">
+						<SettingsInlineWarning>
+							{{ summaryWarning }}
+						</SettingsInlineWarning>
 					</div>
 				</div>
 
@@ -221,9 +222,8 @@
 						</template>
 					</IntlFormatted>
 				</p>
-				<div v-if="isForceDemonetized" class="mt-2 flex flex-wrap items-center gap-1.5 text-orange">
-					<TriangleAlertIcon aria-hidden="true" class="size-4" />
-					<span>
+				<div v-if="isForceDemonetized" class="mt-2">
+					<SettingsInlineWarning>
 						<IntlFormatted :message-id="messages.monetizationDisabledDescription">
 							<template #contact-support-link="{ children }">
 								<a
@@ -236,7 +236,7 @@
 								</a>
 							</template>
 						</IntlFormatted>
-					</span>
+					</SettingsInlineWarning>
 				</div>
 				<div v-if="isStaff" class="smart-clickable:allow-pointer-events mt-2">
 					<Button
@@ -297,7 +297,7 @@
 </template>
 
 <script setup>
-import { ImageIcon, ScaleIcon, TrashIcon, TriangleAlertIcon, UploadIcon } from '@modrinth/assets'
+import { ImageIcon, ScaleIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
@@ -313,6 +313,7 @@ import {
 	injectProjectPageContext,
 	IntlFormatted,
 	normalizeChildren,
+	SettingsInlineWarning,
 	SettingsOptionCard,
 	SettingsToggleCard,
 	StyledInput,

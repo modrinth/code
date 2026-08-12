@@ -1,0 +1,48 @@
+import type { Labrinth } from '@modrinth/api-client'
+
+export const PROJECT_DISCLOSURE_TYPES = [
+	'ai_content',
+	'advertisements',
+	'epilepsy_triggers',
+	'system_interactions',
+	'telemetry',
+	'derivative_work',
+	'paid_features',
+	'archived',
+] as const satisfies readonly Labrinth.Projects.v3.ProjectDisclosureType[]
+
+const ALL_CONTENT_PROJECT_TYPES = [
+	'mod',
+	'resourcepack',
+	'datapack',
+	'shader',
+	'modpack',
+	'plugin',
+	'server',
+] as const
+
+export const DISCLOSURE_SUPPORTED_PROJECT_TYPES: Record<
+	Labrinth.Projects.v3.ProjectDisclosureType,
+	readonly (typeof ALL_CONTENT_PROJECT_TYPES)[number][]
+> = {
+	ai_content: ALL_CONTENT_PROJECT_TYPES,
+	advertisements: ALL_CONTENT_PROJECT_TYPES,
+	epilepsy_triggers: ALL_CONTENT_PROJECT_TYPES,
+	derivative_work: ALL_CONTENT_PROJECT_TYPES,
+	paid_features: ALL_CONTENT_PROJECT_TYPES,
+	archived: ALL_CONTENT_PROJECT_TYPES,
+	telemetry: ['mod', 'plugin', 'modpack', 'server'],
+	system_interactions: ['mod', 'plugin', 'modpack'],
+}
+
+function normalizeProjectType(type: string): string {
+	return type === 'minecraft_java_server' ? 'server' : type
+}
+
+export function isDisclosureCompatibleWithProjectTypes(
+	disclosureType: Labrinth.Projects.v3.ProjectDisclosureType,
+	projectTypes: readonly string[],
+): boolean {
+	const types = projectTypes.map(normalizeProjectType)
+	return DISCLOSURE_SUPPORTED_PROJECT_TYPES[disclosureType].some((type) => types.includes(type))
+}

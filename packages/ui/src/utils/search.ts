@@ -20,6 +20,7 @@ import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-ro
 import { defineMessage, useVIntl } from '../composables/i18n'
 import { getProjectTypeIcon } from './auto-icons'
 import { getProjectTypeCategoryMessage } from './common-messages'
+import { isDisclosureCompatibleWithProjectTypes, PROJECT_DISCLOSURE_TYPES } from './disclosures'
 import {
 	DEFAULT_MOD_LOADERS,
 	DEFAULT_PLUGIN_LOADERS,
@@ -135,32 +136,7 @@ const PROJECT_TYPE_EXCLUSION_FILTERS: Partial<Record<ProjectType, ProjectType[]>
 	datapack: ['mod', 'plugin'],
 }
 
-const DISCLOSURE_TYPE_FILTERS = [
-	'ai_content',
-	'advertisements',
-	'epilepsy_triggers',
-	'system_interactions',
-	'telemetry',
-	'derivative_work',
-	'paid_features',
-	'archived',
-] as const
-
-export type DisclosureTypeFilter = (typeof DISCLOSURE_TYPE_FILTERS)[number]
-
-const DISCLOSURE_TYPE_SUPPORTED_PROJECT_TYPES: Record<
-	DisclosureTypeFilter,
-	readonly ProjectType[]
-> = {
-	ai_content: ALL_PROJECT_TYPES,
-	advertisements: ALL_PROJECT_TYPES,
-	epilepsy_triggers: ALL_PROJECT_TYPES,
-	derivative_work: ALL_PROJECT_TYPES,
-	paid_features: ALL_PROJECT_TYPES,
-	archived: ALL_PROJECT_TYPES,
-	telemetry: ['mod', 'plugin', 'modpack', 'server'],
-	system_interactions: ['mod', 'plugin', 'modpack'],
-}
+export type DisclosureTypeFilter = Labrinth.Projects.v3.ProjectDisclosureType
 
 const DISCLOSURE_TYPE_ICONS: Record<DisclosureTypeFilter, Component> = {
 	ai_content: SparklesIcon,
@@ -250,10 +226,8 @@ export function createDisclosureFilterOptions(
 	formatMessage: FormatMessage,
 	projectTypes: readonly ProjectType[],
 ): FilterOption[] {
-	return DISCLOSURE_TYPE_FILTERS.filter((disclosureType) =>
-		DISCLOSURE_TYPE_SUPPORTED_PROJECT_TYPES[disclosureType].some((projectType) =>
-			projectTypes.includes(projectType),
-		),
+	return PROJECT_DISCLOSURE_TYPES.filter((disclosureType) =>
+		isDisclosureCompatibleWithProjectTypes(disclosureType, projectTypes),
 	).map((disclosureType) => ({
 		id: disclosureType,
 		formatted_name: formatDisclosureTypeLabel(formatMessage, disclosureType),

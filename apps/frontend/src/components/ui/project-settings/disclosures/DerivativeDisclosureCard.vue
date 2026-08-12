@@ -5,18 +5,25 @@ import {
 	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
-	SettingsToggleCard,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
 
-import type { DerivativeDisclosure, DerivativeSource } from './types'
+import DisclosureToggleCard from './DisclosureToggleCard.vue'
+import type {
+	DerivativeDisclosure,
+	DerivativeSource,
+	DisclosureCardMetaProps,
+	DisclosureLockStatus,
+} from './types'
 
 const model = defineModel<DerivativeDisclosure>({ required: true })
 
-defineProps<{
-	disabled?: boolean
+const props = defineProps<DisclosureCardMetaProps>()
+
+const emit = defineEmits<{
+	setLockStatus: [status: DisclosureLockStatus]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -93,12 +100,13 @@ function setOptionalField(
 </script>
 
 <template>
-	<SettingsToggleCard
+	<DisclosureToggleCard
+		v-bind="props"
 		v-model="model.enabled"
-		:disabled="disabled"
 		:icon="GitForkIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
 			<div
@@ -167,5 +175,5 @@ function setOptionalField(
 				{{ formatMessage(commonMessages.addAnotherButton) }}
 			</Button>
 		</template>
-	</SettingsToggleCard>
+	</DisclosureToggleCard>
 </template>

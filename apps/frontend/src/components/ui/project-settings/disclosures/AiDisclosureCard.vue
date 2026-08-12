@@ -7,17 +7,19 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	SettingsFormGroup,
-	SettingsToggleCard,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 
-import type { AiDisclosure, AiUsage } from './types'
+import DisclosureToggleCard from './DisclosureToggleCard.vue'
+import type { AiDisclosure, AiUsage, DisclosureCardMetaProps, DisclosureLockStatus } from './types'
 
 const model = defineModel<AiDisclosure>({ required: true })
 
-defineProps<{
-	disabled?: boolean
+const props = defineProps<DisclosureCardMetaProps>()
+
+const emit = defineEmits<{
+	setLockStatus: [status: DisclosureLockStatus]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -90,12 +92,13 @@ function setUse(use: AiUsage, enabled: boolean) {
 </script>
 
 <template>
-	<SettingsToggleCard
+	<DisclosureToggleCard
+		v-bind="props"
 		v-model="model.enabled"
-		:disabled="disabled"
 		:icon="SparklesIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<p class="text-secondary">
 			<IntlFormatted :message-id="messages.contentRules">
@@ -140,5 +143,5 @@ function setUse(use: AiUsage, enabled: boolean) {
 				/>
 			</SettingsFormGroup>
 		</template>
-	</SettingsToggleCard>
+	</DisclosureToggleCard>
 </template>
