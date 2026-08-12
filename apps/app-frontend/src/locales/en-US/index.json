@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Hide active downloads"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Hide more running instances"
   },
@@ -109,6 +112,9 @@
   },
   "app.action-bar.reload-to-update": {
     "message": "Reload to update"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Show active downloads"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Show more running instances"

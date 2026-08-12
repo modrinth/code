@@ -1,15 +1,16 @@
 <template>
 	<div class="flex gap-2 items-center">
-		<IconButton
-			v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts"
-			v-tooltip="formatMessage(messages.viewActiveDownloads)"
-			type="quiet"
-			color="brand"
-			:label="formatMessage(messages.viewActiveDownloads)"
-			@click="openDownloadToast()"
-		>
-			<DownloadIcon />
-		</IconButton>
+		<div v-if="downloadState.total > 0 || hasActiveLoadingBars" class="relative">
+			<IconButton
+				v-tooltip="downloadToggleLabel"
+				:color="downloadState.hidden > 0 ? 'brand' : undefined"
+				type="quiet"
+				:label="downloadToggleLabel"
+				@click="toggleDownloadNotifications"
+			>
+				<DownloadIcon />
+			</IconButton>
+		</div>
 		<div v-if="offline" class="flex items-center gap-1">
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
@@ -219,7 +220,34 @@ const messages = defineMessages({
 		id: 'app.action-bar.view-active-downloads',
 		defaultMessage: 'View active downloads',
 	},
+	hideDownloads: {
+		id: 'app.action-bar.hide-downloads',
+		defaultMessage: 'Hide active downloads',
+	},
+	showDownloads: {
+		id: 'app.action-bar.show-downloads',
+		defaultMessage: 'Show active downloads',
+	},
 })
+
+const downloadState = computed(() => popupNotificationManager.getDownloadState())
+const downloadToggleLabel = computed(() =>
+	formatMessage(
+		downloadState.value.hidden > 0
+			? messages.showDownloads
+			: downloadState.value.total > 0
+				? messages.hideDownloads
+				: messages.viewActiveDownloads,
+	),
+)
+
+function toggleDownloadNotifications(): void {
+	if (downloadState.value.total > 0) {
+		popupNotificationManager.toggleDownloadNotifications()
+	} else if (hasActiveLoadingBars.value) {
+		openDownloadToast()
+	}
+}
 
 const currentProcesses = ref<RunningProcess[]>([])
 const selectedProcess = ref<RunningProcess | undefined>()
@@ -297,6 +325,7 @@ function goToTerminal(instanceId?: string) {
 const currentLoadingBars = ref<LoadingBar[]>([])
 const currentLoadingBarIconUrls = ref<Record<string, string | null>>({})
 const notificationId = ref<string | number | null>(null)
+const terminalNotificationIds = new Map<string, string | number>()
 const dismissed = ref(false)
 
 function getLoadingBarKey(loadingBar: LoadingBar): string {
@@ -344,6 +373,50 @@ function removeNotification(): void {
 	notificationId.value = null
 }
 
+function syncTerminalNotifications(): void {
+	const terminalNotifications = installJobNotifications.terminalNotifications.value
+	const currentJobIds = new Set(terminalNotifications.map((notification) => notification.id))
+
+	for (const terminal of terminalNotifications) {
+		const popupId = terminalNotificationIds.get(terminal.id)
+		let notification = popupId
+			? popupNotificationManager
+					.getNotifications()
+					.find(
+						(candidate): candidate is PopupNotificationStandard =>
+							candidate.id === popupId && candidate.contentType === 'standard',
+					)
+			: undefined
+
+		if (!notification) {
+			notification = popupNotificationManager.addPopupNotification({
+				contentType: 'standard',
+				title: terminal.title,
+				text: terminal.text,
+				type: terminal.type,
+				buttons: terminal.buttons,
+				onDismiss: terminal.onDismiss,
+				autoCloseMs: null,
+			})
+			terminalNotificationIds.set(terminal.id, notification.id)
+			continue
+		}
+
+		notification.title = terminal.title
+		notification.text = terminal.text
+		notification.type = terminal.type
+		notification.buttons = terminal.buttons
+		notification.onDismiss = terminal.onDismiss
+	}
+
+	for (const [jobId, popupId] of terminalNotificationIds) {
+		if (!currentJobIds.has(jobId)) {
+			popupNotificationManager.removeNotification(popupId)
+			terminalNotificationIds.delete(jobId)
+		}
+	}
+}
+
 function buildDownloadItems(): PopupNotificationProgressItem[] {
 	return [
 		...installJobNotifications.progressItems.value,
@@ -361,12 +434,13 @@ function buildDownloadItems(): PopupNotificationProgressItem[] {
 	]
 }
 
-const hasVisibleActiveDownloadToasts = computed(() => !!getNotification())
 const hasActiveLoadingBars = computed(
 	() => currentLoadingBars.value.length > 0 || installJobNotifications.active.value,
 )
 
 function updateNotification(resummon = false): void {
+	syncTerminalNotifications()
+
 	if (resummon) {
 		dismissed.value = false
 	}
@@ -395,7 +469,6 @@ function updateNotification(resummon = false): void {
 			: formatMessage(messages.downloads)
 		notif.text = undefined
 		notif.progressItems = progressItems
-		notif.buttons = installJobNotifications.buttons.value
 		notif.progress = undefined
 		notif.waiting = undefined
 	} else {
@@ -407,7 +480,6 @@ function updateNotification(resummon = false): void {
 			type: 'download',
 			autoCloseMs: null,
 			progressItems,
-			buttons: installJobNotifications.buttons.value,
 		})
 		notificationId.value = notification.id
 	}
@@ -506,6 +578,8 @@ function selectProcess(process: RunningProcess) {
 
 onBeforeUnmount(() => {
 	removeNotification()
+	terminalNotificationIds.forEach((id) => popupNotificationManager.removeNotification(id))
+	terminalNotificationIds.clear()
 	dismissed.value = false
 	window.removeEventListener('offline', handleOffline)
 	window.removeEventListener('online', handleOnline)
