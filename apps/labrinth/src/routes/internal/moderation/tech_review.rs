@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::{collections::HashMap, fmt};
 use xredis::RedisPool;
 
@@ -225,7 +226,8 @@ pub async fn get_issue(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (issue_id,) = path.into_inner();
     let row = sqlx::query!(
@@ -261,7 +263,7 @@ pub async fn get_issue(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("failed to fetch issue from database")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     Ok(web::Json(row.data.0))
 }
@@ -288,7 +290,8 @@ pub async fn get_report(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (report_id,) = path.into_inner();
 
@@ -348,7 +351,7 @@ pub async fn get_report(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("failed to fetch report from database")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     Ok(web::Json(row.data.0))
 }
@@ -703,7 +706,8 @@ pub async fn search_projects(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let sort_by = search_req.sort_by.to_string();
     let limit = search_req.limit.max(50);
@@ -819,8 +823,9 @@ pub async fn search_projects(
         thread_ids.push(row.thread_id);
     }
 
-    let project_reports =
-        fetch_project_reports(&project_ids, &pool, &redis).await?;
+    let project_reports = fetch_project_reports(&project_ids, &pool, &redis)
+        .await
+        .wrap_api_err("fetching project reports")?;
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
         .await
@@ -913,7 +918,8 @@ pub async fn get_project_report(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (project_id,) = path.into_inner();
     let db_project_id = DBProjectId::from(project_id);
@@ -929,10 +935,12 @@ pub async fn get_project_report(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("failed to fetch thread")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     let project_reports =
-        fetch_project_reports(&[db_project_id], &pool, &redis).await?;
+        fetch_project_reports(&[db_project_id], &pool, &redis)
+            .await
+            .wrap_api_err("fetching project reports")?;
 
     let project_report = project_reports.into_iter().next();
 
@@ -966,7 +974,7 @@ pub async fn get_project_report(
     let thread = threads
         .get(&row.thread_id.into())
         .cloned()
-        .ok_or(ApiError::NotFound)?;
+        .wrap_not_found_err("resource not found")?;
 
     Ok(web::Json(ProjectReportResponse {
         project_report,
@@ -988,8 +996,8 @@ pub struct SubmitReport {
 ///
 /// Before this is called, all issues for this project's reports must have been
 /// marked as either safe or unsafe. Otherwise, this will error with
-/// [`ApiError::TechReviewIssuesWithNoVerdict`], providing the issue IDs which
-/// are still unmarked.
+/// A request error is returned with the issue detail IDs which are still
+/// unmarked.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -1013,7 +1021,8 @@ pub async fn submit_report(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
     let (project_id,) = path.into_inner();
     let project_id = DBProjectId::from(project_id);
 
@@ -1045,14 +1054,13 @@ pub async fn submit_report(
     .wrap_internal_err("failed to fetch pending issues")?;
 
     if !pending_issue_details.is_empty() {
-        return Err(ApiError::TechReviewDetailsWithNoVerdict {
-            details: pending_issue_details
-                .into_iter()
-                .map(|record| {
-                    DelphiReportIssueDetailsId(record.issue_detail_id)
-                })
-                .collect(),
-        });
+        let details = pending_issue_details
+            .into_iter()
+            .map(|record| DelphiReportIssueDetailsId(record.issue_detail_id))
+            .collect_vec();
+        return Err(ApiError::Request(eyre::eyre!(
+            "report still has issue details with no verdict: {details:?}"
+        )));
     }
 
     sqlx::query!(
@@ -1171,7 +1179,10 @@ pub async fn submit_report(
             None,
             None,
         )
-        .await?;
+        .await
+        .wrap_api_err(
+            "executing `projects::clear_project_cache_and_queue_search`",
+        )?;
     }
 
     Ok(())
@@ -1224,7 +1235,8 @@ pub async fn update_issue_details(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("updating database records for `update_issue_details`")?;
 
     let mut txn = pool
         .begin()
@@ -1288,16 +1300,20 @@ pub async fn update_issue_details(
             INSERT INTO delphi_issue_detail_verdicts (
                 project_id,
                 detail_key,
-                verdict
+                verdict,
+                updated_at
             )
             SELECT
                 project_id,
                 detail_key,
-                verdict::delphi_report_issue_status
+                verdict::delphi_report_issue_status,
+                NOW()
             FROM latest
             WHERE verdict != 'pending'
             ON CONFLICT (project_id, detail_key)
-            DO UPDATE SET verdict = EXCLUDED.verdict
+            DO UPDATE SET
+                verdict = EXCLUDED.verdict,
+                updated_at = EXCLUDED.updated_at
             RETURNING 1
         )
         SELECT
@@ -1343,7 +1359,10 @@ pub async fn update_issue_details(
         TechReviewExitReason::Resolved,
         &mut txn,
     )
-    .await?;
+    .await
+    .wrap_api_err(
+        "executing `tech_review_sync::sync_project_tech_review_state`",
+    )?;
 
     txn.commit()
         .await
@@ -1377,7 +1396,10 @@ pub async fn update_global_issue_details(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err(
+        "updating database records for `update_global_issue_details`",
+    )?;
 
     let updates = update_reqs.into_inner();
 
@@ -1431,15 +1453,19 @@ pub async fn update_global_issue_details(
         )
         INSERT INTO delphi_global_detail_verdicts (
             detail_key,
-            verdict
+            verdict,
+            updated_at
         )
         SELECT
             detail_key,
-            verdict::delphi_report_issue_status
+            verdict::delphi_report_issue_status,
+            NOW()
         FROM latest
         WHERE verdict != 'pending'
         ON CONFLICT (detail_key)
-        DO UPDATE SET verdict = EXCLUDED.verdict
+        DO UPDATE SET
+            verdict = EXCLUDED.verdict,
+            updated_at = EXCLUDED.updated_at
         "#,
         &detail_keys,
         &verdicts,
@@ -1453,7 +1479,10 @@ pub async fn update_global_issue_details(
         TechReviewExitReason::Resolved,
         &mut txn,
     )
-    .await?;
+    .await
+    .wrap_api_err(
+        "executing `tech_review_sync::sync_detail_key_tech_review_state`",
+    )?;
 
     txn.commit()
         .await
@@ -1490,7 +1519,8 @@ pub async fn add_report(
         &session_queue,
         Scopes::PROJECT_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("inserting database records for `add_report`")?;
     let file_id = add_report.file_id;
 
     let mut txn = pool

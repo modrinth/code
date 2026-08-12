@@ -1,5 +1,5 @@
 <template>
-	<div class="w-full px-2 pt-2">
+	<div class="w-full p-2">
 		<UserProfilePageLayout
 			:user-id="userId"
 			:project-type="projectType"
@@ -8,19 +8,52 @@
 			project-link-mode="app"
 			:edit-profile-link="openProfileSettings"
 			external-navigation
-		/>
+		>
+			<template #project-actions="{ project }">
+				<Button
+					type="outlined"
+					class="!text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
+					:disabled="isProjectInstalling(project.id)"
+					@click.stop="installProject(project)"
+				>
+					<SpinnerIcon v-if="isProjectInstalling(project.id)" class="animate-spin" />
+					<DownloadIcon v-else-if="project.project_type === 'modpack'" />
+					<PlusIcon v-else />
+					{{
+						formatMessage(
+							isProjectInstalling(project.id)
+								? commonMessages.installingLabel
+								: project.project_type === 'modpack'
+									? commonMessages.installButton
+									: messages.installToInstance,
+						)
+					}}
+				</Button>
+			</template>
+		</UserProfilePageLayout>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
+import { DownloadIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
+import {
+	Button,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	provideUserProfile,
+	UserProfilePageLayout,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref, watch } from 'vue'
-import { onBeforeRouteUpdate, useRoute } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import {
 	block_user,
+	change_user_avatar,
+	delete_user_avatar,
 	get_blocked_users,
 	get_user_collections,
 	get_user_organizations,
@@ -31,16 +64,67 @@ import {
 } from '@/helpers/users'
 import { appSettingsModalOpenProfileKey } from '@/providers/app-settings-modal'
 import { useBreadcrumb } from '@/providers/breadcrumbs'
+import { injectContentInstall } from '@/providers/content-install'
 
 const route = useRoute()
+const router = useRouter()
 const openProfileSettings = inject(appSettingsModalOpenProfileKey, () => {})
 const queryClient = useQueryClient()
+const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
+const { install: installVersion } = injectContentInstall()
+const installingProjectIds = ref(new Set<string>())
+
+const messages = defineMessages({
+	installToInstance: {
+		id: 'app.user.project.install-to-instance',
+		defaultMessage: 'Install to instance',
+	},
+})
+
+function isProjectInstalling(projectId: string): boolean {
+	return installingProjectIds.value.has(projectId)
+}
+
+function setProjectInstalling(projectId: string, installing: boolean): void {
+	const next = new Set(installingProjectIds.value)
+	if (installing) {
+		next.add(projectId)
+	} else {
+		next.delete(projectId)
+	}
+	installingProjectIds.value = next
+}
+
+async function installProject(project: Labrinth.Projects.v2.Project): Promise<void> {
+	if (isProjectInstalling(project.id)) return
+
+	setProjectInstalling(project.id, true)
+	try {
+		await installVersion(
+			project.id,
+			null,
+			null,
+			'UserPage',
+			() => setProjectInstalling(project.id, false),
+			(instanceId) => router.push(`/instance/${encodeURIComponent(instanceId)}`),
+		)
+	} catch (error) {
+		setProjectInstalling(project.id, false)
+		handleError(error)
+	}
+}
+
 const userProfile = provideUserProfile({
 	getUser: get_user_profile,
 	getProjects: get_user_projects,
 	getOrganizations: get_user_organizations,
 	getCollections: get_user_collections,
 	patchUser: patch_user,
+	changeAvatar: async (userId, file, extension) => {
+		await change_user_avatar(userId, new Uint8Array(await file.arrayBuffer()), extension)
+	},
+	deleteAvatar: delete_user_avatar,
 	getBlockedUsers: get_blocked_users,
 	blockUser: block_user,
 	unblockUser: unblock_user,

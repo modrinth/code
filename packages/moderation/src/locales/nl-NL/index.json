@@ -69,13 +69,13 @@
     "defaultMessage": "Pas de titel aan"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "De uitgelichte galerij foto is hoe vaak je project zijn eerste indruk maakt."
+    "defaultMessage": "De uitgelichte afbeelding in de galerij is vaak de eerste indruk die je project achterlaat."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Licht een foto uit"
+    "defaultMessage": "Afbeelding uit de galerij uitlichten"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Bezoek de galerij pagina"
+    "defaultMessage": "Bezoek de galerijpagina"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "Je {type} maakt gebruik van een licentie die vereist dat de broncode beschikbaar is. Geef voor elke extra versie een link naar de broncode of het bronbestand op, of overweeg om een andere licentie te gebruiken."
@@ -254,11 +254,14 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Er is minstens één afbeelding in de galerij vereist om de inhoud van je {type} te tonen."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "bronpakket, met uitzondering van audio- of lokalisatiepakketten. Als dit op jouw pakket van toepassing is, selecteer dan de juiste tag"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Er is minstens één afbeelding in de galerij vereist om de inhoud van je bronpakket te laten zien, met uitzondering van audio- of lokalisatiepakketten. Als dit op jouw pakket van toepassing is, selecteer dan de juiste tag."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Er zijn minstens drie afbeeldingen in de galerij nodig om de werking van je shader in verschillende situaties en omstandigheden te laten zien."
   },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "Upload een galerijafbeelding"
+    "defaultMessage": "Afbeelding uit de galerij uploaden"
   },
   "nags.upload-version.description": {
     "defaultMessage": "Minimaal één versie is nodig om een project in te dienen voor beoordeling."
@@ -271,9 +274,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verifieer externe links"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Bezoek versies pagina"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bezoek linkjes instellingen"

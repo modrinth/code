@@ -467,8 +467,20 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Güncellendi"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural,one {# dosya}other {# dosya}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Oyun sürümü"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Yine de indir"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Yükleyici"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Bağlantılı mod paketi"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} kaldırıldı"
@@ -1160,6 +1172,15 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Bu çalışmayı mod paketinizde yeniden dağıtmak için özel izin alınmıştır."
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Grubu sil"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "{title} silinsin mi?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Grup silinemedi"
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Gruptan kaldır"
   },
@@ -1252,9 +1273,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Dosya kaydedildi"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Kapat"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Bul"
@@ -2039,6 +2057,9 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "İçerik bulunamadı"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Harici"
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Mod paketi içeriği"
   },
@@ -2791,6 +2812,42 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Bir Modrinth kullanıcısı."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Bu kullanıcıyı engellemek istediğinize emin misiniz?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Kullanıcıyı engellerken bir sorun oluştu. Lütfen tekrar deneyin."
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} engellendi."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Kullanıcı engellendi"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "{username}'i engelle"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Kullanıcı analizlerini göster"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Engelle"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Kullanıcı detaylarını göster"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Engellemeyi kaldır"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural,one{# proje} other{# proje}}"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Kullanıcı profili yüklenemedi."
   },
   "profile.label.badges": {
     "defaultMessage": "Rozetler"

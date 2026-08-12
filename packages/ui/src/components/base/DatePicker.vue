@@ -14,33 +14,43 @@
 			rangeEndpointMoveState ? 'is-moving-range-end' : '',
 		]"
 	>
-		<CalendarIcon
-			v-if="showIcon && !calendarOnly"
-			class="pointer-events-none absolute left-3 z-[1] h-5 w-5 text-secondary opacity-60 transition-colors"
-			aria-hidden="true"
-		/>
-		<input
-			:id="id"
-			ref="inputRef"
-			:name="name"
-			:placeholder="placeholder"
-			:disabled="disabled"
-			:readonly="readonly"
-			:autocomplete="autocomplete"
-			:class="inputClasses"
-			:tabindex="calendarOnly ? -1 : undefined"
-			:aria-hidden="calendarOnly ? 'true' : undefined"
-			type="text"
-		/>
-		<button
-			v-if="hasClearButton"
-			type="button"
-			class="absolute right-0.5 top-px z-[1] touch-manipulation cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
-			aria-label="Clear date"
-			@click.stop="clearValue"
+		<ButtonFrame
+			as="span"
+			:class="[
+				calendarOnly
+					? '!block !h-auto !min-w-0 !bg-transparent !p-0 !shadow-none hover:!brightness-100'
+					: 'w-full !justify-start !p-0',
+				disabled ? '!cursor-not-allowed' : '',
+			]"
 		>
-			<XIcon class="h-5 w-5" aria-hidden="true" />
-		</button>
+			<CalendarIcon
+				v-if="showIcon && !calendarOnly"
+				class="pointer-events-none absolute left-3 z-[1] h-5 w-5 text-secondary opacity-60 transition-colors"
+				aria-hidden="true"
+			/>
+			<input
+				:id="id"
+				ref="inputRef"
+				:name="name"
+				:placeholder="placeholder"
+				:disabled="disabled"
+				:readonly="readonly"
+				:autocomplete="autocomplete"
+				:class="inputClasses"
+				:tabindex="calendarOnly ? -1 : undefined"
+				:aria-hidden="calendarOnly ? 'true' : undefined"
+				type="text"
+			/>
+			<button
+				v-if="hasClearButton"
+				type="button"
+				class="absolute right-0.5 top-px z-[1] touch-manipulation cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
+				aria-label="Clear date"
+				@click.stop="clearValue"
+			>
+				<XIcon class="h-5 w-5" aria-hidden="true" />
+			</button>
+		</ButtonFrame>
 	</div>
 </template>
 
@@ -54,6 +64,8 @@ import flatpickr from 'flatpickr'
 import type { Instance } from 'flatpickr/dist/types/instance'
 import type { Options } from 'flatpickr/dist/types/options'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
+import ButtonFrame from './buttons/ButtonFrame.vue'
 
 type DatePickerValue = string | Date | null | undefined
 type RangeEdge = 'start' | 'end'
@@ -1188,11 +1200,11 @@ const hasClearButton = computed(
 const inputClasses = computed(() => [
 	props.calendarOnly
 		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
-		: 'w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
+		: 'h-full w-full touch-manipulation appearance-none bg-transparent font-semibold text-primary shadow-none transition-[shadow,color] placeholder:text-secondary focus:text-contrast focus:ring-4 focus:ring-brand-shadow !outline-0',
 	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
 	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
 	!props.calendarOnly
-		? `${hasClearButton.value ? 'pr-10' : 'pr-3'} h-9 py-2 text-base outline-none bg-surface-4 border-none rounded-xl`
+		? `${hasClearButton.value ? 'pr-10' : 'pr-3'} rounded-xl border-none py-2 text-base outline-none`
 		: '',
 	props.disabled && !props.calendarOnly ? 'cursor-not-allowed' : '',
 	props.inputClass,

@@ -254,8 +254,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "需要至少一張圖庫圖片來展示你的{type}。"
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "資源包（音效包或在地化語言包除外）。如果你的資源包屬於上述類型，請選擇對應的標籤"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "需要至少一張圖庫圖片來展示你的資源包內容（音效包或在地化語言包除外）。如果你的資源包屬於此類，請選擇對應的標籤。"
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "需要至少三張圖庫圖片來展示你的光影包在各種情境與條件下的效果。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"
@@ -271,9 +274,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "驗證外部連結"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "前往版本頁面"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "前往連結設定"

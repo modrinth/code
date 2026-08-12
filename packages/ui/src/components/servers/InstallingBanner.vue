@@ -13,18 +13,17 @@
 		</template>
 		{{ installation.status === 'failed' ? errorLabel : descriptionLabel }}
 		<template v-if="installation.status === 'failed'" #top-right-actions>
-			<ButtonStyled color="red" type="outlined">
-				<button
-					v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
-					class="!border"
-					type="button"
-					:disabled="retryDisabled"
-					@click="emit('retry')"
-				>
-					<RotateCounterClockwiseIcon class="size-5" />
-					{{ formatMessage(commonMessages.retryButton) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
+				type="outlined"
+				class="!border !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+				native-type="button"
+				:disabled="retryDisabled"
+				@click="emit('retry')"
+			>
+				<RotateCounterClockwiseIcon class="size-5" />
+				{{ formatMessage(commonMessages.retryButton) }}
+			</Button>
 		</template>
 	</Admonition>
 </template>
@@ -33,13 +32,13 @@
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import Admonition from '../base/Admonition.vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
 
 defineProps<{
 	retryDisabled?: boolean

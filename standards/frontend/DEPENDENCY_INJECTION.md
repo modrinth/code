@@ -1,26 +1,30 @@
-- [Dependency Injection](#dependency-injection)
-	- [The `createContext` Factory](#the-createcontext-factory)
-	- [When to Use DI](#when-to-use-di)
-		- [Platform Abstraction (Primary Use Case)](#platform-abstraction-primary-use-case)
-		- [Page-Level Context](#page-level-context)
-	- [Creating a New Provider](#creating-a-new-provider)
-		- [1. Define the interface in `packages/ui/src/providers/`](#1-define-the-interface-in-packagesuisrcproviders)
-		- [2. For complex platform-specific logic, use an abstract class](#2-for-complex-platform-specific-logic-use-an-abstract-class)
-	- [Wiring Up Providers](#wiring-up-providers)
-		- [App Frontend (Tauri)](#app-frontend-tauri)
-		- [Website Frontend (Nuxt)](#website-frontend-nuxt)
-	- [Consuming Providers](#consuming-providers)
-	- [When NOT to Use DI](#when-not-to-use-di)
-	- [Existing Providers](#existing-providers)
-	- [Key Files](#key-files)
+- [Dependency injection](#dependency-injection)
+	- [The `createContext` factory](#the-createcontext-factory)
+	- [When to use DI](#when-to-use-di)
+		- [Platform abstraction](#platform-abstraction)
+		- [Page context](#page-context)
+	- [Create a provider](#create-a-provider)
+		- [1. Define the interface](#1-define-the-interface)
+		- [2. Use an abstract class for complex logic](#2-use-an-abstract-class-for-complex-logic)
+	- [Connect providers](#connect-providers)
+		- [App frontend](#app-frontend)
+		- [Website frontend](#website-frontend)
+	- [Use providers](#use-providers)
+	- [When not to use DI](#when-not-to-use-di)
+	- [Existing providers](#existing-providers)
+	- [Key files](#key-files)
 
 # Dependency Injection
 
-Modrinth uses a lightweight DI layer built on Vue's `provide`/`inject` for sharing platform-specific capabilities and page-level state across shared UI components.
+Modrinth uses a small dependency-injection (DI) layer that uses Vue `provide` and `inject`.
+
+This layer shares platform capabilities and page state with common UI components.
 
 ## The `createContext` Factory
 
-All providers are defined using `createContext` from `packages/ui/src/providers/index.ts` (adapted from Reka UI). It produces a typed `[inject, provide]` tuple:
+Define all providers with `createContext` from `packages/ui/src/providers/index.ts`. This factory comes from the Reka UI pattern.
+
+The factory returns a typed `[inject, provide]` tuple:
 
 ```ts
 import { createContext } from '@modrinth/ui'
@@ -33,35 +37,38 @@ interface MyContext {
 export const [injectMyContext, provideMyContext] = createContext<MyContext>('MyComponent')
 ```
 
-- **`provideMyContext(value)`** — call in a parent component's `setup()`.
-- **`injectMyContext()`** — call in any descendant's `setup()`. Throws if never provided.
-- **`injectMyContext(null)`** — returns `null` instead of throwing (for optional contexts).
+- Call `provideMyContext(value)` in the `setup()` function of a parent component.
+- Call `injectMyContext()` in the `setup()` function of a descendant. It throws an error when no provider exists.
+- Call `injectMyContext(null)` to return `null` when the context is optional.
 
 ## When to Use DI
 
-Use DI when:
-- **The same interface needs different implementations** depending on the platform (web vs desktop app).
-- **Deeply nested components** need access to shared page-level state without prop drilling through 3+ levels.
+Use DI in these conditions:
 
-### Platform Abstraction (Primary Use Case)
+- The same interface needs different implementations on the website and the desktop app.
+- Deep descendant components need the same page state, and props must pass through three or more levels.
 
-`packages/ui` components need capabilities that each frontend fulfils differently:
+### Platform Abstraction
 
-| Provider      | App Frontend                     | Website Frontend               |
-| ------------- | -------------------------------- | ------------------------------ |
-| API client    | Tauri IPC client                 | REST fetch client              |
-| Notifications | `ref()` state + app window mgmt  | `useState()` for SSR hydration |
-| File picker   | Native Tauri dialogs             | Browser file inputs            |
-| Tags          | Tauri commands                   | Nuxt server state              |
-| Page context  | `sidebar: true`, ad window hooks | `sidebar: false`, no ads       |
+Components in `packages/ui` can need capabilities that each frontend implements differently:
 
-### Page-Level Context
+| Provider      | App frontend                       | Website frontend                |
+| ------------- | ---------------------------------- | ------------------------------- |
+| API client    | Tauri IPC client                   | REST fetch client               |
+| Notifications | `ref()` state and window control   | `useState()` for SSR hydration  |
+| File picker   | Native Tauri dialogs               | Browser file inputs             |
+| Tags          | Tauri commands                     | Nuxt server state               |
+| Page context  | Sidebar and advertisement hooks    | No sidebar and no advertisements |
 
-Sharing data between a page and deeply nested children — e.g. project page data consumed by sidebar, header, and version components.
+### Page Context
 
-## Creating a New Provider
+Use DI to share page data with deep descendants. Examples include the project sidebar, header, and version components.
 
-### 1. Define the interface in `packages/ui/src/providers/`
+## Create a Provider
+
+### 1. Define the Interface
+
+Define the interface in `packages/ui/src/providers/`:
 
 ```ts
 // packages/ui/src/providers/my-feature.ts
@@ -77,16 +84,18 @@ export interface MyFeatureContext {
 export const [injectMyFeature, provideMyFeature] = createContext<MyFeatureContext>('MyFeature')
 ```
 
-Re-export from the barrel file (`packages/ui/src/providers/index.ts`).
+Export the provider from `packages/ui/src/providers/index.ts`.
 
-### 2. For complex platform-specific logic, use an abstract class
+### 2. Use an Abstract Class for Complex Logic
+
+Use an abstract class when the provider has complex platform logic:
 
 ```ts
 export abstract class AbstractMyFeatureManager {
 	abstract items: Ref<Item[]>
 	abstract addItem(item: Item): Promise<void>
 
-	// Shared logic lives on the base class
+	// Put common logic in the base class.
 	handleError(err: unknown) {
 		console.error(err)
 	}
@@ -96,13 +105,13 @@ export const [injectMyFeature, provideMyFeature] =
 	createContext<AbstractMyFeatureManager>('MyFeature')
 ```
 
-See `AbstractWebNotificationManager` in `packages/ui/src/providers/web-notifications.ts` for a real example.
+Refer to `AbstractWebNotificationManager` in `packages/ui/src/providers/web-notifications.ts` for an example.
 
-## Wiring Up Providers
+## Connect Providers
 
-### App Frontend (Tauri)
+### App Frontend
 
-Create a setup function in `apps/app-frontend/src/providers/setup/`:
+Make a setup function in `apps/app-frontend/src/providers/setup/`:
 
 ```ts
 // apps/app-frontend/src/providers/setup/my-feature.ts
@@ -126,11 +135,11 @@ export function setupMyFeatureProvider() {
 }
 ```
 
-Register it in `apps/app-frontend/src/providers/setup.ts`, which is called from `App.vue`'s `setup()`.
+Register the function in `apps/app-frontend/src/providers/setup.ts`. `App.vue` calls this setup file from its `setup()` function.
 
-### Website Frontend (Nuxt)
+### Website Frontend
 
-Provide directly in `apps/frontend/src/app.vue`, using Nuxt's `useState()` where SSR hydration is needed:
+Provide the context in `apps/frontend/src/app.vue`. Use Nuxt `useState()` when the state needs SSR hydration:
 
 ```ts
 provideMyFeature({
@@ -144,9 +153,9 @@ provideMyFeature({
 })
 ```
 
-## Consuming Providers
+## Use Providers
 
-In any component across `packages/ui`, `apps/frontend`, or `apps/app-frontend`:
+Inject the provider in a component in `packages/ui`, `apps/frontend`, or `apps/app-frontend`:
 
 ```vue
 <script setup lang="ts">
@@ -161,30 +170,30 @@ const { items, addItem } = injectMyFeature()
 </template>
 ```
 
-## When NOT to Use DI
+## When Not to Use DI
 
-Default to props and emits. DI adds indirection — only use it with a concrete reason.
+Use props and emits by default. DI adds an indirect layer, so use it only for a specific reason.
 
-- **Parent to direct child** — use props.
-- **Data only exists in one frontend** — keep context local to that app, not in `packages/ui`.
-- **Shallow prop drilling (1–2 levels)** — passing through one intermediate is fine.
-- **Component-local state** — use `ref()` / `reactive()` locally.
+- Use props from a parent to its direct child.
+- Keep data in one frontend when only that frontend uses it.
+- Use props through one or two intermediate levels.
+- Use `ref()` or `reactive()` for component state.
 
 ## Existing Providers
 
-| Provider                     | File                             | Purpose                        |
-| ---------------------------- | -------------------------------- | ------------------------------ |
-| `provideModrinthClient`      | `providers/api-client.ts`        | API client instance            |
-| `provideNotificationManager` | `providers/web-notifications.ts` | Notification management        |
-| `providePageContext`         | `providers/page-context.ts`      | Page config (sidebar, ads)     |
-| `provideProjectPageContext`  | `providers/project-page.ts`      | Project page state + mutations |
-| `provideServerContext`       | `providers/server-context.ts`    | Server hosting state           |
-| `provideUserPageContext`     | `providers/user-page.ts`         | User page state                |
+| Provider                     | File                             | Purpose                       |
+| ---------------------------- | -------------------------------- | ----------------------------- |
+| `provideModrinthClient`      | `providers/api-client.ts`        | Supplies the API client.      |
+| `provideNotificationManager` | `providers/web-notifications.ts` | Manages notifications.        |
+| `providePageContext`         | `providers/page-context.ts`      | Supplies page configuration.  |
+| `provideProjectPageContext`  | `providers/project-page.ts`      | Manages project page state.   |
+| `provideServerContext`       | `providers/server-context.ts`    | Manages server hosting state. |
+| `provideUserPageContext`     | `providers/user-page.ts`         | Manages user page state.      |
 
 ## Key Files
 
-- `packages/ui/src/providers/index.ts` — `createContext` factory + barrel exports
-- `packages/ui/src/providers/*.ts` — Provider definitions
-- `apps/frontend/src/app.vue` — Nuxt root provider setup
-- `apps/app-frontend/src/App.vue` — Tauri root provider setup
-- `apps/app-frontend/src/providers/setup/` — App provider setup functions
+- `packages/ui/src/providers/index.ts`: Contains the `createContext` factory and provider exports.
+- `packages/ui/src/providers/*.ts`: Contains provider definitions.
+- `apps/frontend/src/app.vue`: Contains the Nuxt root-provider setup.
+- `apps/app-frontend/src/App.vue`: Contains the Tauri root-provider setup.
+- `apps/app-frontend/src/providers/setup/`: Contains the app provider setup functions.

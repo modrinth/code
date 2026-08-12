@@ -15,24 +15,23 @@ export default function () {
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e',
 		)
 		.icon(LibraryIcon)
-		.navigate('/')
+		.navigate()
 		.children(
 			group()
 				.title('Description Issues?')
 				.children(
 					toggle('insufficient', 'Insufficient')
 						.suggestedStatus('flagged')
-						.severity('medium')
-						.message('insufficient/header', (s) => ({ CUSTOM_ADVICE: s.custom?.explainer }))
+						.message('insufficient/header')
 						.children(
 							group()
 								.title('Why is this Description Insufficient?')
-								.multiSelect('reason')
 								.children(
 									toggle('custom', 'Custom').children(
 										markdown('explainer')
 											.title('How can the author improve their description?')
-											.required(),
+											.required()
+											.rawMessage((state) => `${state.value}\n\n`),
 									),
 									toggle('fork', 'Fork').message('piece/fork'),
 									toggle('unfinished', 'Unfinished').message('piece/unfinished'),
@@ -44,15 +43,13 @@ export default function () {
 								`insufficient/default/${project.value?.minecraft_java_server ? 'servers' : project.value?.project_types?.includes('modpack') ? 'packs' : 'projects'}`,
 						)
 						.rawMessage(async (state) => {
-							const reasons = state?.reason instanceof Set ? state.reason : new Set<string>()
-							return SHOW_SPOILER_ADVICE.some((reason) => reasons.has(reason))
+							return SHOW_SPOILER_ADVICE.some((reason) => state?.[reason] === true)
 								? await md('checklist/messages/description/insufficient/piece/spoiler-guide')(state)
 								: ''
 						}),
 
 					toggle('non-english', 'Non-english')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message(() => `non-english${project.value.minecraft_java_server ? '-server' : ''}`)
 						.shown(
 							computed(() => {
@@ -63,25 +60,13 @@ export default function () {
 							}),
 						),
 
-					toggle('headers-as-body', 'Headers as body text')
-						.suggestedStatus('flagged')
-						.severity('low')
-						.message(),
+					toggle('headers-as-body', 'Headers as body text').suggestedStatus('flagged').message(),
 
-					toggle('image-only', 'Image-only')
-						.suggestedStatus('flagged')
-						.severity('medium')
-						.message(),
+					toggle('image-only', 'Image-only').suggestedStatus('flagged').message(),
 
-					toggle('non-standard-text', 'Non-standard text')
-						.suggestedStatus('flagged')
-						.severity('medium')
-						.message(),
+					toggle('non-standard-text', 'Non-standard text').suggestedStatus('flagged').message(),
 
-					toggle('clarity', 'Unclear / Misleading')
-						.suggestedStatus('rejected')
-						.severity('high')
-						.message(),
+					toggle('clarity', 'Unclear / Misleading').suggestedStatus('rejected').message(),
 				),
 		)
 }

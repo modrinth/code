@@ -4,7 +4,7 @@
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
 		<template v-if="isSettings">
-			<div v-if="canAccessSettings" class="normal-page no-sidebar">
+			<div v-if="canAccessSettings" class="normal-page no-sidebar" :class="`align-${marginTarget}`">
 				<div class="normal-page__header">
 					<div
 						class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
@@ -21,11 +21,9 @@
 							formatMessage(messages.settingsTitle)
 						}}</span>
 						<div class="flex gap-2">
-							<ButtonStyled>
-								<nuxt-link to="/dashboard/projects"
-									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink to="/dashboard/projects"
+								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+							</ButtonLink>
 						</div>
 					</div>
 					<ProjectMemberHeader
@@ -96,17 +94,20 @@
 			/>
 			<div
 				class="new-page sidebar"
-				:class="{
-					'alt-layout': cosmetics.leftContentLayout,
-					'checklist-open':
-						showModerationChecklist &&
-						!collapsedModerationChecklist &&
-						!flags.alwaysShowChecklistAsPopup,
-					'checklist-collapsed':
-						showModerationChecklist &&
-						collapsedModerationChecklist &&
-						!flags.alwaysShowChecklistAsPopup,
-				}"
+				:class="[
+					{
+						'alt-layout': cosmetics.leftContentLayout,
+						'checklist-open':
+							showModerationChecklist &&
+							!collapsedModerationChecklist &&
+							!flags.alwaysShowChecklistAsPopup,
+						'checklist-collapsed':
+							showModerationChecklist &&
+							collapsedModerationChecklist &&
+							!flags.alwaysShowChecklistAsPopup,
+					},
+					`align-${marginTarget}`,
+				]"
 			>
 				<div
 					class="normal-page__header relative mb-4"
@@ -138,93 +139,97 @@
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					>
 						<template #actions>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand" circular>
-								<nuxt-link
-									v-tooltip="formatMessage(messages.editProject)"
-									:to="`${projectPath}/settings`"
-									class="!font-bold lg:!hidden"
-								>
-									<SettingsIcon />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
-								<nuxt-link :to="`${projectPath}/settings`" class="!font-bold max-lg:!hidden">
-									<SettingsIcon />
-									{{ formatMessage(messages.editProject) }}
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								v-if="auth.user && currentMember"
+								v-tooltip="formatMessage(messages.editProject)"
+								type="colored"
+								color="brand"
+								size="xl"
+								:to="`${projectPath}/settings`"
+								class="!w-12 !rounded-full !px-0 !font-bold lg:!hidden"
+							>
+								<SettingsIcon />
+							</ButtonLink>
+							<ButtonLink
+								v-if="auth.user && currentMember"
+								type="colored"
+								color="brand"
+								size="xl"
+								:to="`${projectPath}/settings`"
+								class="!font-bold max-lg:!hidden"
+							>
+								<SettingsIcon />
+								{{ formatMessage(messages.editProject) }}
+							</ButtonLink>
 
 							<div class="hidden sm:contents">
-								<ButtonStyled
-									v-if="!isServerProject"
-									size="large"
-									:color="projectHeaderPrimaryColor"
-									:circular="!!auth.user && !!currentMember"
+								<IconButton
+									v-if="!isServerProject && auth.user && currentMember"
+									v-tooltip="formatMessage(commonMessages.downloadButton)"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.downloadButton)"
+									@click="handleProjectHeaderPrimary"
 								>
-									<button
-										v-tooltip="
-											auth.user && currentMember
-												? formatMessage(commonMessages.downloadButton)
-												: undefined
-										"
-										type="button"
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										@click="handleProjectHeaderPrimary"
-									>
-										<DownloadIcon />
-										{{
-											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
-										}}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-else
-									size="large"
-									:color="projectHeaderPrimaryColor"
-									:circular="!!auth.user && !!currentMember"
+									<DownloadIcon />
+								</IconButton>
+								<Button
+									v-else-if="!isServerProject"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									@click="handleProjectHeaderPrimary"
 								>
-									<button
-										v-tooltip="
-											auth.user && currentMember
-												? formatMessage(commonMessages.playButton)
-												: undefined
-										"
-										type="button"
-										:aria-label="formatMessage(commonMessages.playButton)"
-										@click="handleProjectHeaderPrimary"
-									>
-										<PlayIcon />
-										{{ auth.user && currentMember ? '' : formatMessage(commonMessages.playButton) }}
-									</button>
-								</ButtonStyled>
+									<DownloadIcon />
+									{{ formatMessage(commonMessages.downloadButton) }}
+								</Button>
+								<IconButton
+									v-if="isServerProject && auth.user && currentMember"
+									v-tooltip="formatMessage(commonMessages.playButton)"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.playButton)"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon />
+								</IconButton>
+								<Button
+									v-else-if="isServerProject"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon />
+									{{ formatMessage(commonMessages.playButton) }}
+								</Button>
 							</div>
 
 							<div class="contents sm:hidden">
-								<ButtonStyled
+								<IconButton
 									v-if="!isServerProject"
-									size="large"
-									circular
-									:color="projectHeaderPrimaryColor"
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.downloadButton)"
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
 								>
-									<button
-										type="button"
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
-										<DownloadIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled v-else size="large" circular :color="projectHeaderPrimaryColor">
-									<button
-										type="button"
-										:aria-label="formatMessage(commonMessages.playButton)"
-										class="flex sm:hidden"
-										@click="handleProjectHeaderPrimary"
-									>
-										<PlayIcon />
-									</button>
-								</ButtonStyled>
+									<DownloadIcon />
+								</IconButton>
+								<IconButton
+									v-else
+									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
+									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
+									size="xl"
+									:label="formatMessage(commonMessages.playButton)"
+									class="flex sm:hidden"
+									@click="handleProjectHeaderPrimary"
+								>
+									<PlayIcon />
+								</IconButton>
 							</div>
 
 							<Tooltip
@@ -238,16 +243,16 @@
 								:auto-hide="false"
 								placement="bottom-start"
 							>
-								<ButtonStyled circular size="large">
-									<nuxt-link
-										v-tooltip="formatMessage(messages.createServerTooltip)"
-										:to="projectHeaderCreateServerTo"
-										:aria-label="formatMessage(messages.serversPromoTitle)"
-										@click="dismissProjectHeaderCreateServerPrompt"
-									>
-										<ServerPlusIcon />
-									</nuxt-link>
-								</ButtonStyled>
+								<ButtonLink
+									v-tooltip="formatMessage(messages.createServerTooltip)"
+									size="xl"
+									:to="projectHeaderCreateServerTo"
+									:aria-label="formatMessage(messages.serversPromoTitle)"
+									class="!w-12 !rounded-full !px-0"
+									@click="dismissProjectHeaderCreateServerPrompt"
+								>
+									<ServerPlusIcon />
+								</ButtonLink>
 								<template #popper>
 									<div class="grid max-w-[18rem] gap-2">
 										<div class="flex items-center justify-between gap-4">
@@ -261,14 +266,15 @@
 													{{ formatMessage(commonMessages.newBadge) }}
 												</span>
 											</div>
-											<ButtonStyled size="small" circular>
-												<button
-													v-tooltip="formatMessage(messages.dontShowAgain)"
-													@click="dismissProjectHeaderCreateServerPrompt"
-												>
-													<XIcon aria-hidden="true" />
-												</button>
-											</ButtonStyled>
+											<IconButton
+												v-tooltip="formatMessage(messages.dontShowAgain)"
+												class="!size-6"
+												size="xs"
+												:label="formatMessage(messages.dontShowAgain)"
+												@click="dismissProjectHeaderCreateServerPrompt"
+											>
+												<XIcon aria-hidden="true" />
+											</IconButton>
 										</div>
 										<p class="m-0 text-sm font-medium leading-tight text-secondary">
 											{{ formatMessage(messages.serversPromoDescription) }}
@@ -286,55 +292,58 @@
 									</div>
 								</template>
 							</Tooltip>
-							<ButtonStyled v-else-if="showProjectHeaderCreateServerAction" circular size="large">
-								<nuxt-link
-									v-tooltip="formatMessage(messages.createServerTooltip)"
-									:to="projectHeaderCreateServerTo"
-									:aria-label="formatMessage(messages.serversPromoTitle)"
-									@click="dismissProjectHeaderCreateServerPrompt"
-								>
-									<ServerPlusIcon />
-								</nuxt-link>
-							</ButtonStyled>
+							<ButtonLink
+								v-else-if="showProjectHeaderCreateServerAction"
+								v-tooltip="formatMessage(messages.createServerTooltip)"
+								size="xl"
+								:to="projectHeaderCreateServerTo"
+								:aria-label="formatMessage(messages.serversPromoTitle)"
+								class="!w-12 !rounded-full !px-0"
+								@click="dismissProjectHeaderCreateServerPrompt"
+							>
+								<ServerPlusIcon />
+							</ButtonLink>
 
-							<ButtonStyled circular size="large">
-								<ClientOnly>
-									<button
-										v-if="auth.user"
-										v-tooltip="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										type="button"
-										:aria-label="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										@click="followProjectFromHeader"
-									>
-										<HeartIcon :fill="following ? 'currentColor' : 'none'" />
-									</button>
-									<nuxt-link
-										v-else
+							<ClientOnly>
+								<IconButton
+									v-if="auth.user"
+									v-tooltip="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									size="xl"
+									:label="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									@click="followProjectFromHeader"
+								>
+									<HeartIcon :fill="following ? 'currentColor' : 'none'" />
+								</IconButton>
+								<ButtonLink
+									v-else
+									v-tooltip="formatMessage(commonMessages.followButton)"
+									size="xl"
+									:to="signInRouteObj"
+									:aria-label="formatMessage(commonMessages.followButton)"
+									class="!w-12 !rounded-full !px-0"
+								>
+									<HeartIcon aria-hidden="true" />
+								</ButtonLink>
+								<template #fallback>
+									<ButtonLink
 										v-tooltip="formatMessage(commonMessages.followButton)"
+										size="xl"
 										:to="signInRouteObj"
 										:aria-label="formatMessage(commonMessages.followButton)"
+										class="!w-12 !rounded-full !px-0"
 									>
 										<HeartIcon aria-hidden="true" />
-									</nuxt-link>
-									<template #fallback>
-										<nuxt-link
-											v-tooltip="formatMessage(commonMessages.followButton)"
-											:to="signInRouteObj"
-											:aria-label="formatMessage(commonMessages.followButton)"
-										>
-											<HeartIcon aria-hidden="true" />
-										</nuxt-link>
-									</template>
-								</ClientOnly>
-							</ButtonStyled>
+									</ButtonLink>
+								</template>
+							</ClientOnly>
 
 							<ProjectCollectionSaveButton
 								:auth-user="auth.user"
@@ -349,15 +358,15 @@
 								:create-collection="(event) => modalCollection?.show(event)"
 							/>
 
-							<ButtonStyled circular size="large" type="transparent">
-								<TeleportOverflowMenu
-									:options="projectHeaderMoreActions"
-									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-									:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-								>
-									<MoreVerticalIcon />
-								</TeleportOverflowMenu>
-							</ButtonStyled>
+							<TeleportOverflowMenu
+								type="quiet"
+								size="xl"
+								:label="formatMessage(commonMessages.moreOptionsButton)"
+								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+								:options="projectHeaderMoreActions"
+							>
+								<MoreVerticalIcon />
+							</TeleportOverflowMenu>
 						</template>
 					</ProjectPageHeader>
 					<ProjectMemberHeader
@@ -406,11 +415,15 @@
 						>
 							{{ formatMessage(messages.environmentMigrationLink) }}
 						</nuxt-link>
-						<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
-							<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
-								<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							v-if="hasEditDetailsPermission"
+							type="colored"
+							color="orange"
+							class="mt-3 w-fit"
+							@click="() => projectEnvironmentModal.show()"
+						>
+							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
+						</Button>
 					</Admonition>
 					<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
 						{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
@@ -419,7 +432,8 @@
 
 				<div class="normal-page__sidebar">
 					<ProjectSidebarServerInfo
-						v-if="isServerProject && serverDataLoaded"
+						v-if="isServerProject"
+						:loading="!serverDataLoaded"
 						:project-v3="projectV3"
 						:tags="tags"
 						:required-content="serverRequiredContent"
@@ -449,6 +463,7 @@
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
+						:loading="creatorsLoading"
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
@@ -456,6 +471,7 @@
 					<ProjectSidebarDetails
 						:project="project"
 						:link-target="$external()"
+						:hide-license="isServerProject"
 						:show-followers="isServerProject"
 						class="card flex-card"
 					/>
@@ -501,14 +517,16 @@ import {
 	SettingsIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { moderationSettings } from '@modrinth/moderation'
+import { getMarginTarget, moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
 	Avatar,
 	BrowseInstallHeader,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
@@ -555,8 +573,8 @@ import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
-import { loadChecklistState } from '~/services/moderation-checklist-storage.ts'
-import { useModerationQueue } from '~/services/moderation-queue.ts'
+import { loadChecklistState } from '~/services/moderation/checklist-storage.ts'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -571,6 +589,7 @@ const config = useRuntimeConfig()
 const moderationQueue = useModerationQueue()
 const keybinds = useModerationKeybinds()
 const modSettings = useModerationSettings()
+const marginTarget = computed(() => getMarginTarget(modSettings.value))
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
@@ -1006,7 +1025,11 @@ watch(serverModpackVersionId, (versionId) => {
 })
 
 // Members
-const { data: allMembersRaw, error: _membersError } = useQuery({
+const {
+	data: allMembersRaw,
+	error: _membersError,
+	isPending: membersPending,
+} = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'members']),
 	queryFn: () => client.labrinth.projects_v3.getMembers(projectId.value),
 	staleTime: STALE_TIME,
@@ -1057,7 +1080,7 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organizationRaw } = useQuery({
+const { data: organizationRaw, isPending: organizationPending } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
@@ -1068,6 +1091,13 @@ const { data: organizationRaw } = useQuery({
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
+const creatorsLoading = computed(
+	() =>
+		!projectRaw.value ||
+		membersPending.value ||
+		(!!projectRaw.value.organization && organizationPending.value),
+)
+
 const { data: thread } = useQuery({
 	queryKey: computed(() => ['thread', projectRaw.value?.thread_id]),
 	queryFn: () => client.labrinth.threads_v3.getThread(projectRaw.value.thread_id),
@@ -1076,7 +1106,7 @@ const { data: thread } = useQuery({
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
 
-// Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
+// Jank modpack loaders fix
 const versionsRaw = computed(() => {
 	return (versionsV3.value ?? []).map((version) => {
 		const files = Array.isArray(version.files) ? version.files : []
@@ -1589,27 +1619,26 @@ const projectHeaderMoreActions = computed(() => {
 			id: 'analytics',
 			label: formatMessage(commonMessages.analyticsButton),
 			icon: ChartIcon,
-			link: `${projectPath.value}/settings/analytics`,
+			type: 'link',
+			to: `${projectPath.value}/settings/analytics`,
 			shown: !!auth.value.user && !!currentMember.value,
 		},
-		{
-			divider: true,
-			shown: !!auth.value.user && !!currentMember.value,
-		},
+		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value },
 		{
 			id: 'moderation-checklist',
 			label: formatMessage(messages.reviewProject),
 			icon: ScaleIcon,
 			action: openModerationChecklistFromMenu,
-			color: 'orange',
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff && !showModerationChecklist.value,
 		},
 		{
 			id: 'tech-review',
 			label: 'Tech review',
 			icon: ScanEyeIcon,
-			link: `/moderation/technical-review/${project.value?.id}`,
-			color: 'orange',
+			type: 'link',
+			to: `/moderation/technical-review/${project.value?.id}`,
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff,
 		},
 		{
@@ -1617,19 +1646,16 @@ const projectHeaderMoreActions = computed(() => {
 			label: formatMessage(messages.rescanModpack),
 			icon: FolderSearchIcon,
 			action: () => scanModal.value?.show(),
-			color: 'orange',
+			tone: 'orange',
 			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
 		},
-		{
-			divider: true,
-			shown: !!auth.value.user && isStaff,
-		},
+		{ type: 'divider', shown: !!auth.value.user && isStaff },
 		{
 			id: 'report',
 			label: formatMessage(commonMessages.reportButton),
 			icon: ReportIcon,
 			action: reportProjectFromHeader,
-			color: 'red',
+			tone: 'red',
 			shown: !isMember.value,
 		},
 		{
@@ -1867,23 +1893,11 @@ function setModerationChecklistOpen(open) {
 	showModerationChecklist.value = open
 }
 
-function isProjectInActiveModerationQueue(projectId = project.value?.id) {
-	return (
-		!!projectId &&
-		moderationQueue.isQueueMode &&
-		moderationQueue.currentQueue.items.includes(projectId)
-	)
-}
-
 async function openModerationChecklistFromMenu() {
 	const projectId = project.value?.id
 	if (!projectId) return
 
 	await moderationQueue.ready
-	if (!isProjectInActiveModerationQueue(projectId)) {
-		await moderationQueue.setSingleProject(projectId)
-	}
-
 	setModerationChecklistOpen(true)
 }
 
@@ -2006,9 +2020,7 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.changelogTab),
 			href: withInstallContextQuery(`${projectUrl}/changelog`),
 			shown:
-				hasVersions.value &&
-				projectV3Loaded.value &&
-				projectV3.value?.minecraft_server === undefined,
+				hasVersions.value && projectV3Loaded.value && projectV3.value?.minecraft_server == null,
 			onHover: loadVersions,
 		},
 		{
@@ -2017,7 +2029,7 @@ const navLinks = computed(() => {
 			shown:
 				(hasVersions.value || !!currentMember.value) &&
 				projectV3Loaded.value &&
-				projectV3.value?.minecraft_server === undefined,
+				projectV3.value?.minecraft_server == null,
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
 		},
@@ -2180,7 +2192,7 @@ provideProjectPageContext({
 
 .servers-popup {
 	box-shadow:
-		0 0 12px 1px rgba(0, 175, 92, 0.6),
+		0 0 12px 1px color-mix(in srgb, var(--color-brand) 60%, transparent),
 		var(--shadow-floating);
 
 	&::before {

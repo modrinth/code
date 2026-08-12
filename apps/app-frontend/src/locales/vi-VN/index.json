@@ -134,20 +134,11 @@
   "app.ads-consent.title": {
     "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Kích hoạt các tính năng dựng hình nâng cao như hiệu ứng làm mờ, có thể gây giảm hiệu năng nếu không có chế độ tăng tốc phần cứng."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Dựng hình nâng cao"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Chọn màu nền ưu thích của bạn cho Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Màu chủ đề"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Thay đổi trang hiển thị khi khởi chạy launcher."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Trang chủ"
@@ -158,50 +149,17 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Trang mặc định"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Tắt hiển thị thẻ tên phía trên người chơi ở trang skin."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ẩn thẻ tên"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Hiển thị các thế giới gần đây trong mục \"Tiếp tục chơi\" ở Trang chủ."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Tiếp tục chơi"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Thu nhỏ launcher khi game Minecraft bắt đầu chạy."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Thu nhỏ launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Sử dụng khung cửa sổ hệ thống (yêu cầu khởi động lại ứng dụng)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Giao diện cửa sổ hệ thống"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Hiển thị thời gian bạn đã dành để chơi bằng một cấu hình."
-  },
   "app.appearance-settings.show-play-time.title": {
     "message": "Hiện thời gian chơi"
   },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Tự động bỏ qua các bước xác nhận rủi ro thấp như cài đặt gói mod trùng lặp, xóa nội dung thông thường, cập nhật hàng loạt, hủy liên kết gói mod và lời nhắc sửa chữa. Các cảnh báo nguy hiểm vẫn sẽ được hiển thị."
-  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Bỏ qua các cảnh báo không quan trọng"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Bật tính năng ẩn hiển thị thanh menu bên."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Ẩn/hiện thanh bên"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Nếu bạn cố gắng cài đặt tệp Modrinth Pack (.mrpack) không được lưu trữ trên máy chủ Modrinth, chúng tôi sẽ đảm bảo bạn hiểu rõ các rủi ro trước khi cài đặt."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Cảnh báo tôi trước khi cài đặt các modpacks không rõ nguồn gốc"
@@ -445,9 +403,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Giao diện"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Tuỳ chọn hồ sơ khởi chạy mặc định"
   },
   "app.settings.tabs.java-installations": {
     "message": "Các bản cài Java"

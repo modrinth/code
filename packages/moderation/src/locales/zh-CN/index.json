@@ -252,10 +252,13 @@
     "defaultMessage": "选择准确的标签"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "至少需要一个图像来展示你的 {type}的内容。"
+    "defaultMessage": "至少需提供一张图库图片，展示你的{type}内容。"
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "资源包，但不包括音频包或本地化包。如果你的内容符合这一描述，请选择相应的标签"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "至少需提供一张图库图片，展示你的资源包内容。音频包或本地化包不在此限，若你的资源包属于此类，请选择相应标签。"
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "至少需提供 3 张图库图片，展示你的光影包在不同场景和条件下的效果。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上传图片至项目图库"
@@ -271,9 +274,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "验证外部链接"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "访问版本页面"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"

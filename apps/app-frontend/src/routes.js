@@ -141,7 +141,6 @@ export default new createRouter({
 			path: '/instance/:id',
 			name: 'Instance',
 			component: Instance.Index,
-			props: true,
 			children: [
 				{
 					path: 'worlds',
@@ -155,22 +154,22 @@ export default new createRouter({
 				},
 				{
 					path: '',
-					name: 'Mods',
-					component: Instance.Mods,
+					name: 'InstanceContent',
+					component: Instance.Content,
 				},
 				{
 					path: 'projects/:type',
-					name: 'ModsFilter',
-					component: Instance.Mods,
+					name: 'InstanceContentFilter',
+					component: Instance.Content,
 				},
 				{
 					path: 'files',
-					name: 'Files',
+					name: 'InstanceFiles',
 					component: Instance.Files,
 				},
 				{
 					path: 'logs',
-					name: 'Logs',
+					name: 'InstanceLogs',
 					component: Instance.Logs,
 					meta: {
 						renderMode: 'fixed',

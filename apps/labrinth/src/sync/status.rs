@@ -5,7 +5,7 @@ use redis::AsyncCommands;
 use xredis::RedisPool;
 
 const EXPIRY_TIME_SECONDS: i64 = 60;
-const USER_STATUS_NAMESPACE: &str = "user_status:v3";
+const USER_STATUS_NAMESPACE: &str = "user_status:v4";
 
 pub async fn get_user_status(
     user: UserId,

@@ -20,6 +20,8 @@
 		:fit-content="true"
 		:searchable="preview.category.searchable"
 		:search-placeholder="preview.category.searchPlaceholder"
+		trigger-type="base"
+		trigger-size="lg"
 		:trigger-class="effectivePreviewTriggerClass"
 		:dropdown-width="getPreviewDropdownWidth(preview.category)"
 		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
@@ -105,33 +107,28 @@
 	</MultiSelect>
 
 	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
-		<ButtonStyled type="outlined">
-			<button
-				ref="addMenuTrigger"
-				type="button"
-				:class="addButtonClass ?? '!border'"
-				:aria-expanded="isAddMenuOpen"
-				aria-haspopup="menu"
-				@click="handleAddMenuTriggerClick"
-				@keydown="handleAddMenuTriggerKeydown"
-			>
-				<PlusIcon />
-				{{ addLabel }}
-			</button>
-		</ButtonStyled>
+		<Button
+			ref="addMenuTrigger"
+			type="outlined"
+			native-type="button"
+			:size="addButtonSize"
+			:class="addButtonClass ?? '!border'"
+			:aria-expanded="isAddMenuOpen"
+			aria-haspopup="menu"
+			@click="handleAddMenuTriggerClick"
+			@keydown="handleAddMenuTriggerKeydown"
+		>
+			<PlusIcon />
+			{{ addLabel }}
+		</Button>
 
-		<ButtonStyled v-if="shouldShowClear" type="transparent">
-			<button type="button" @click="clearAllFilters">{{ clearLabel }}</button>
-		</ButtonStyled>
+		<Button v-if="shouldShowClear" type="quiet" native-type="button" @click="clearAllFilters">{{
+			clearLabel
+		}}</Button>
 	</div>
 
 	<Teleport to="#teleports">
-		<Transition
-			:enter-active-class="addMenuTransitionEnterActiveClass"
-			leave-active-class="transition-none duration-0"
-			:enter-from-class="addMenuTransitionEnterFromClass"
-			leave-to-class="opacity-0"
-		>
+		<Transition name="floating-expand" :css="!isMobileAddMenuLayout">
 			<div
 				v-if="isAddMenuOpen && !isMobileActiveSubmenu"
 				ref="menuContainer"
@@ -164,207 +161,214 @@
 	</Teleport>
 
 	<Teleport to="#teleports">
-		<div
-			v-if="isAddMenuOpen && activeCategory && (isMobileAddMenuLayout || hasSubmenuPosition)"
-			ref="submenu"
-			class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
-			:class="activeCategory.submenuClass ?? DEFAULT_SUBMENU_CLASS"
-			:style="submenuStyle"
-			@mouseenter="handleSubmenuMouseEnter"
-			@mouseleave="handleSubmenuMouseLeave"
-			@keydown="handleAddMenuKeydown"
-			@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
-		>
+		<Transition name="floating-expand" :css="!isMobileAddMenuLayout">
 			<div
-				v-if="isMobileAddMenuLayout"
-				class="flex items-center border-0 border-b border-solid border-b-surface-5 bg-surface-4"
-			>
-				<button
-					type="button"
-					class="flex h-12 w-full items-center gap-2 border-0 bg-transparent px-4 text-left text-base font-semibold text-primary shadow-none transition-all hover:brightness-110 focus-visible:brightness-110"
-					@click="returnToCategoryMenu"
-				>
-					<ChevronLeftIcon class="size-5 shrink-0 text-secondary" />
-					<span class="min-w-0 truncate">{{ activeCategory.label }}</span>
-				</button>
-			</div>
-			<div
-				v-if="activeCategory.searchable"
-				class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 w-full"
-			>
-				<StyledInput
-					v-model="categorySearchQuery"
-					:icon="SearchIcon"
-					type="text"
-					:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
-					wrapper-class="grow bg-surface-4 mx-1"
-					input-class="ps-9 mx-1.5"
-				/>
-				<slot
-					name="search-actions"
-					:category="activeCategory"
-					:selected-values="activeCategorySelectedValues"
-					:set-selected-values="setActiveCategorySelectedValues"
-					:close-menu="closeAddMenu"
-				></slot>
-			</div>
-
-			<div v-if="$slots['category-top']" class="border-0 border-b border-solid border-b-surface-5">
-				<slot
-					name="category-top"
-					:category="activeCategory"
-					:selected-values="activeCategorySelectedValues"
-					:set-selected-values="setActiveCategorySelectedValues"
-					:close-menu="closeAddMenu"
-				></slot>
-			</div>
-
-			<div
-				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-4 py-2.5 text-sm"
-			>
-				<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
-				<button
-					type="button"
-					class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors"
-					:class="
-						hasActiveCategorySelection
-							? 'hover:bg-transparent hover:text-contrast'
-							: 'cursor-not-allowed opacity-50'
-					"
-					:disabled="!hasActiveCategorySelection"
-					@click="clearActiveCategorySelection"
-					@keydown.enter.stop
-					@keydown.space.stop
-				>
-					Clear
-				</button>
-			</div>
-			<div
-				ref="activeCategoryOptionsScrollbar"
-				class="dropdown-filter-bar-options-scrollbar min-h-0 flex-1 bg-surface-4"
-				data-overlayscrollbars-initialize
+				v-if="isAddMenuOpen && activeCategory && (isMobileAddMenuLayout || hasSubmenuPosition)"
+				ref="submenu"
+				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
+				:class="activeCategory.submenuClass ?? DEFAULT_SUBMENU_CLASS"
+				:style="submenuStyle"
+				@mouseenter="handleSubmenuMouseEnter"
+				@mouseleave="handleSubmenuMouseLeave"
+				@keydown="handleAddMenuKeydown"
+				@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
 			>
 				<div
-					ref="activeCategoryOptionsContainer"
-					class="h-full min-h-0 overflow-y-auto"
-					data-overlayscrollbars-viewport
+					v-if="isMobileAddMenuLayout"
+					class="flex items-center border-0 border-b border-solid border-b-surface-5 bg-surface-4"
+				>
+					<button
+						type="button"
+						class="flex h-12 w-full items-center gap-2 border-0 bg-transparent px-4 text-left text-base font-semibold text-primary shadow-none transition-all hover:brightness-110 focus-visible:brightness-110"
+						@click="returnToCategoryMenu"
+					>
+						<ChevronLeftIcon class="size-5 shrink-0 text-secondary" />
+						<span class="min-w-0 truncate">{{ activeCategory.label }}</span>
+					</button>
+				</div>
+				<div
+					v-if="activeCategory.searchable"
+					class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 w-full"
+				>
+					<StyledInput
+						v-model="categorySearchQuery"
+						:icon="SearchIcon"
+						type="text"
+						:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
+						wrapper-class="grow bg-surface-4 mx-1"
+						input-class="ps-9 mx-1.5"
+					/>
+					<slot
+						name="search-actions"
+						:category="activeCategory"
+						:selected-values="activeCategorySelectedValues"
+						:set-selected-values="setActiveCategorySelectedValues"
+						:close-menu="closeAddMenu"
+					></slot>
+				</div>
+
+				<div
+					v-if="$slots['category-top']"
+					class="border-0 border-b border-solid border-b-surface-5"
+				>
+					<slot
+						name="category-top"
+						:category="activeCategory"
+						:selected-values="activeCategorySelectedValues"
+						:set-selected-values="setActiveCategorySelectedValues"
+						:close-menu="closeAddMenu"
+					></slot>
+				</div>
+
+				<div
+					class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-4 py-2.5 text-sm"
+				>
+					<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
+					<button
+						type="button"
+						class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors"
+						:class="
+							hasActiveCategorySelection
+								? 'hover:bg-transparent hover:text-contrast'
+								: 'cursor-not-allowed opacity-50'
+						"
+						:disabled="!hasActiveCategorySelection"
+						@click="clearActiveCategorySelection"
+						@keydown.enter.stop
+						@keydown.space.stop
+					>
+						Clear
+					</button>
+				</div>
+				<div
+					ref="activeCategoryOptionsScrollbar"
+					class="dropdown-filter-bar-options-scrollbar min-h-0 flex-1 bg-surface-4"
+					data-overlayscrollbars-initialize
 				>
 					<div
-						v-if="filteredActiveCategoryOptions.length === 0"
-						class="px-4 py-3.5 text-base font-medium text-secondary"
-					>
-						{{ activeCategoryEmptyStateLabel }}
-					</div>
-					<div
-						v-else
-						ref="activeCategoryOptionsListContainer"
-						:class="shouldVirtualizeActiveCategoryOptions ? 'relative' : 'flex flex-col'"
-						:style="activeCategoryOptionsListStyle"
+						ref="activeCategoryOptionsContainer"
+						class="h-full min-h-0 overflow-y-auto"
+						data-overlayscrollbars-viewport
 					>
 						<div
-							v-for="{ item, index } in renderedVisibleActiveCategoryOptions"
-							:key="getActiveCategoryItemKey(item, index)"
-							:class="shouldVirtualizeActiveCategoryOptions ? 'absolute left-0 right-0' : undefined"
-							:style="getActiveCategoryOptionWrapperStyle(index)"
+							v-if="filteredActiveCategoryOptions.length === 0"
+							class="px-4 py-3.5 text-base font-medium text-secondary"
+						>
+							{{ activeCategoryEmptyStateLabel }}
+						</div>
+						<div
+							v-else
+							ref="activeCategoryOptionsListContainer"
+							:class="shouldVirtualizeActiveCategoryOptions ? 'relative' : 'flex flex-col'"
+							:style="activeCategoryOptionsListStyle"
 						>
 							<div
-								v-if="isDropdownFilterSectionHeader(item)"
-								class="flex items-center justify-between gap-3 border-0 px-4 py-2.5 text-sm font-semibold text-secondary"
-								:class="[
-									item.class,
-									item.dividerBefore && index > 0
-										? 'border-t border-solid border-surface-5'
-										: undefined,
-								]"
+								v-for="{ item, index } in renderedVisibleActiveCategoryOptions"
+								:key="getActiveCategoryItemKey(item, index)"
+								:class="
+									shouldVirtualizeActiveCategoryOptions ? 'absolute left-0 right-0' : undefined
+								"
+								:style="getActiveCategoryOptionWrapperStyle(index)"
 							>
-								<span class="flex min-w-0 items-center gap-2">
-									<component
-										:is="item.icon"
-										v-if="item.icon"
-										class="size-4 shrink-0"
-										aria-hidden="true"
-									/>
-									<span class="min-w-0 truncate">{{ item.label }}</span>
-								</span>
+								<div
+									v-if="isDropdownFilterSectionHeader(item)"
+									class="flex items-center justify-between gap-3 border-0 px-4 py-2.5 text-sm font-semibold text-secondary"
+									:class="[
+										item.class,
+										item.dividerBefore && index > 0
+											? 'border-t border-solid border-surface-5'
+											: undefined,
+									]"
+								>
+									<span class="flex min-w-0 items-center gap-2">
+										<component
+											:is="item.icon"
+											v-if="item.icon"
+											class="size-4 shrink-0"
+											aria-hidden="true"
+										/>
+										<span class="min-w-0 truncate">{{ item.label }}</span>
+									</span>
+									<button
+										v-if="hasSelectableSectionHeaderOptions(item)"
+										type="button"
+										class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:text-contrast"
+										@click="toggleSectionHeaderOptions(item)"
+									>
+										{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
+									</button>
+								</div>
 								<button
-									v-if="hasSelectableSectionHeaderOptions(item)"
+									v-else
 									type="button"
-									class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:text-contrast"
-									@click="toggleSectionHeaderOptions(item)"
+									class="flex w-full cursor-pointer items-center gap-2.5 border-0 px-4 py-3.5 text-left text-contrast shadow-none transition-all duration-150 bg-surface-4 hover:brightness-[115%] focus-visible:brightness-[115%] focus-visible:outline-none"
+									:class="[
+										shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
+										{
+											'brightness-[115%]': item.selected,
+											'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
+										},
+									]"
+									:aria-disabled="item.disabled || undefined"
+									:aria-checked="item.selected"
+									role="checkbox"
+									@click="toggleFilterOption(activeCategory.key, item)"
 								>
-									{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
-								</button>
-							</div>
-							<button
-								v-else
-								type="button"
-								class="flex w-full cursor-pointer items-center gap-2.5 border-0 px-4 py-3.5 text-left text-contrast shadow-none transition-all duration-150 bg-surface-4 hover:brightness-[115%] focus-visible:brightness-[115%] focus-visible:outline-none"
-								:class="[
-									shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
-									{
-										'brightness-[115%]': item.selected,
-										'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
-									},
-								]"
-								:aria-disabled="item.disabled || undefined"
-								:aria-checked="item.selected"
-								role="checkbox"
-								@click="toggleFilterOption(activeCategory.key, item)"
-							>
-								<span
-									v-if="checkboxPosition === 'left'"
-									class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-									:class="
-										item.selected
-											? 'border-button-border bg-brand text-brand-inverted'
-											: 'border-surface-5 bg-surface-2'
-									"
-								>
-									<CheckIcon v-if="item.selected" aria-hidden="true" stroke-width="3" />
-								</span>
-								<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
-									<slot
-										v-if="$slots.option"
-										name="option"
-										:category="activeCategory"
-										:option="item"
-										:selected="item.selected"
-										:index="index"
-									></slot>
-									<template v-else>
-										<span
-											class="min-w-0 truncate font-semibold leading-tight"
-											:class="item.selected ? 'text-contrast' : 'text-primary'"
-										>
-											{{ item.label }}
-										</span>
+									<span
+										v-if="checkboxPosition === 'left'"
+										class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+										:class="
+											item.selected
+												? 'border-button-border bg-brand text-brand-inverted'
+												: 'border-surface-5 bg-surface-2'
+										"
+									>
+										<CheckIcon v-if="item.selected" aria-hidden="true" stroke-width="3" />
+									</span>
+									<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
 										<slot
-											name="option-right"
+											v-if="$slots.option"
+											name="option"
 											:category="activeCategory"
 											:option="item"
 											:selected="item.selected"
+											:index="index"
 										></slot>
-									</template>
-								</div>
-								<span
-									v-if="checkboxPosition === 'right'"
-									class="flex shrink-0 items-center justify-center text-brand"
-								>
-									<CheckIcon v-if="item.selected" aria-hidden="true" class="size-5" />
-								</span>
-							</button>
+										<template v-else>
+											<span
+												class="min-w-0 truncate font-semibold leading-tight"
+												:class="item.selected ? 'text-contrast' : 'text-primary'"
+											>
+												{{ item.label }}
+											</span>
+											<slot
+												name="option-right"
+												:category="activeCategory"
+												:option="item"
+												:selected="item.selected"
+											></slot>
+										</template>
+									</div>
+									<span
+										v-if="checkboxPosition === 'right'"
+										class="flex shrink-0 items-center justify-center text-brand"
+									>
+										<CheckIcon v-if="item.selected" aria-hidden="true" class="size-5" />
+									</span>
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
+				<slot
+					name="category-footer"
+					:category="activeCategory"
+					:selected-values="activeCategorySelectedValues"
+					:set-selected-values="setActiveCategorySelectedValues"
+					:close-menu="closeAddMenu"
+				></slot>
 			</div>
-			<slot
-				name="category-footer"
-				:category="activeCategory"
-				:selected-values="activeCategorySelectedValues"
-				:set-selected-values="setActiveCategorySelectedValues"
-				:close-menu="closeAddMenu"
-			></slot>
-		</div>
+		</Transition>
 	</Teleport>
 </template>
 
@@ -385,8 +389,9 @@ import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
+import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/components/base/buttons'
+
 import { useVirtualScroll } from '../../composables/virtual-scroll'
-import ButtonStyled from './ButtonStyled.vue'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 import StyledInput from './StyledInput.vue'
 
@@ -514,6 +519,7 @@ const props = withDefaults(
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
 		addButtonClass?: string
+		addButtonSize?: ButtonSize
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
@@ -525,6 +531,7 @@ const props = withDefaults(
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
+		addButtonSize: 'md',
 		applyImmediately: false,
 		showPreviewFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',
@@ -549,7 +556,7 @@ const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
 const isMobileAddMenuLayout = ref(false)
 const submenuOpenDirection = ref<SubmenuOpenDirection>('right')
-const addMenuTrigger = ref<HTMLElement | null>(null)
+const addMenuTrigger = ref<ButtonElementHandle | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
 const activeCategoryOptionsScrollbar = ref<HTMLElement | null>(null)
@@ -721,14 +728,9 @@ const isMobileActiveSubmenu = computed(
 	() =>
 		isMobileAddMenuLayout.value && activeCategory.value !== undefined && hasSubmenuPosition.value,
 )
-const addMenuTransitionEnterActiveClass = computed(() =>
-	isMobileAddMenuLayout.value ? 'transition-none duration-0' : 'transition-opacity duration-150',
-)
-const addMenuTransitionEnterFromClass = computed(() =>
-	isMobileAddMenuLayout.value ? 'opacity-100' : 'opacity-0',
-)
+const addMenuTriggerElement = computed(() => addMenuTrigger.value?.element ?? null)
 const addMenuOutsideClickTarget = computed(() => menuContainer.value ?? submenu.value)
-const addMenuOutsideClickIgnore = computed(() => [addMenuTrigger, menuContainer, submenu])
+const addMenuOutsideClickIgnore = computed(() => [addMenuTriggerElement, menuContainer, submenu])
 
 const appliedFilterPreviews = computed(() =>
 	Object.entries(props.modelValue)
@@ -752,8 +754,7 @@ const appliedFilterPreviews = computed(() =>
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
-const DEFAULT_PREVIEW_TRIGGER_CLASS =
-	'h-10 max-w-[16rem] bg-surface-4 px-4 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
+const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem]'
 const effectivePreviewTriggerClass = computed(
 	() => props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS,
 )
@@ -980,7 +981,7 @@ function handleAddMenuKeydown(event: KeyboardEvent) {
 
 	event.preventDefault()
 	closeAddMenu()
-	nextTick(() => addMenuTrigger.value?.focus())
+	nextTick(() => addMenuTriggerElement.value?.focus())
 }
 
 function setCategoryButtonRef(
@@ -1581,11 +1582,12 @@ function triangleArea(a: Point, b: Point, c: Point): number {
 function updateAddMenuPosition(): boolean {
 	const positioningElement =
 		menuContainer.value ?? (isMobileActiveSubmenu.value ? submenu.value : null)
-	if (typeof window === 'undefined' || !addMenuTrigger.value || !positioningElement) {
+	const triggerElement = addMenuTriggerElement.value
+	if (typeof window === 'undefined' || !triggerElement || !positioningElement) {
 		return false
 	}
 
-	const triggerRect = addMenuTrigger.value.getBoundingClientRect()
+	const triggerRect = triggerElement.getBoundingClientRect()
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
 
 	addMenuStyle.value = {

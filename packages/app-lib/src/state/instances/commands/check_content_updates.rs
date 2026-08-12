@@ -31,6 +31,36 @@ pub(crate) async fn check_content_updates(
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
 ) -> crate::Result<Vec<ContentUpdate>> {
+    check_content_updates_with_cache_behaviours(
+        instance_id,
+        cache_behaviour,
+        cache_behaviour,
+        state,
+    )
+    .await
+}
+
+pub(crate) async fn refresh_content_updates(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    check_content_updates_with_cache_behaviours(
+        instance_id,
+        None,
+        Some(CacheBehaviour::Bypass),
+        state,
+    )
+    .await?;
+
+    Ok(())
+}
+
+async fn check_content_updates_with_cache_behaviours(
+    instance_id: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+    update_cache_behaviour: Option<CacheBehaviour>,
+    state: &State,
+) -> crate::Result<Vec<ContentUpdate>> {
     let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
@@ -113,7 +143,7 @@ pub(crate) async fn check_content_updates(
         .collect::<Vec<_>>();
     let updates = CachedEntry::get_file_update_many(
         &update_key_refs,
-        cache_behaviour,
+        update_cache_behaviour,
         &state.pool,
         &state.api_semaphore,
     )

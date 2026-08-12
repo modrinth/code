@@ -228,6 +228,19 @@ function parseSearchParams(requestParams: string): Labrinth.Search.SearchParams 
 	}
 }
 
+// Search returns expanded dependency data that no card renders and that isn't part of
+// ResultSearchProject. On modpacks it is ~90% of the response, and everything cached here
+// is serialized into the SSR payload, so drop it before it reaches the query cache.
+function stripUnrenderedFields(
+	hits: Labrinth.Search.v3.ResultSearchProject[],
+): Labrinth.Search.v3.ResultSearchProject[] {
+	return hits.map((hit) => {
+		const { dependencies, dependency_project_ids, compatible_dependency_project_ids, ...rendered } =
+			hit as Labrinth.Search.v3.ResultSearchProject & Record<string, unknown>
+		return rendered as Labrinth.Search.v3.ResultSearchProject
+	})
+}
+
 async function fetchSearch(requestParams: string) {
 	debug('search() called', {
 		requestParams: requestParams.substring(0, 100),
@@ -241,17 +254,19 @@ async function fetchSearch(requestParams: string) {
 
 	debug('search() response', { total_hits: raw.total_hits, hitCount: raw.hits?.length })
 
+	const hits = stripUnrenderedFields(raw.hits ?? [])
+
 	if (isServerType.value) {
 		return {
 			projectHits: [],
-			serverHits: raw.hits,
+			serverHits: hits,
 			total_hits: raw.total_hits,
 			per_page: raw.hits_per_page,
 		}
 	}
 
 	return {
-		projectHits: raw.hits,
+		projectHits: hits,
 		serverHits: [],
 		total_hits: raw.total_hits,
 		per_page: raw.hits_per_page,

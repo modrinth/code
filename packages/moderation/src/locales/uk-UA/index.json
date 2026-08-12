@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Потрібно щонайменше одне зображення з галереї, щоб показати вміст вашого {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "пакет ресурсів, окрім аудіопакетів або пакетів локалізації. Якщо це відповідає вашому пакету, будь ласка, оберіть відповідний теґ"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Завантажте зображення до галереї"
   },
@@ -271,9 +268,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Перевірте зовнішні посилання"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Відвідайте сторінку з версіями"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Відвідайте налаштування посилань"

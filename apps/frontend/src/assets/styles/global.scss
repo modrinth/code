@@ -475,18 +475,6 @@ input {
 	outline: 2px solid transparent !important;
 }
 
-.button-animation {
-	transition:
-		opacity 0.5s ease-in-out,
-		filter 0.2s ease-in-out,
-		transform 0.05s ease-in-out,
-		outline-width 0.2s ease-in-out;
-}
-
-.button-transparent {
-	box-shadow: none;
-}
-
 .qc-cmp2-close-tooltip {
 	background-color: transparent;
 	color: hsl(145, 78%, 28%);

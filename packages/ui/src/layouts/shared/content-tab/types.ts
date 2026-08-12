@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { RouteLocationRaw } from 'vue-router'
 
-import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
 
 export type ContentCardProject = Pick<
 	Labrinth.Projects.v2.Project,

@@ -6,6 +6,7 @@ use std::hash::Hash;
 use std::sync::Arc;
 
 use dashmap::DashMap;
+use eyre::{Result, WrapErr};
 use prometheus::Registry;
 use redis::aio::ConnectionLike;
 use redis::{FromRedisValue, ToRedisArgs};
@@ -35,25 +36,7 @@ pub use config::{
     RedisConfigError, RedisConnectionType, RedisTopology,
 };
 use connection::RedisBackend;
-pub use connection::RedisBackendBuildError;
 pub use key::KeyBuilder;
-use thiserror::Error as ThisError;
-
-#[derive(Debug, ThisError)]
-pub enum Error {
-    #[error("error while interacting with Redis: {0}")]
-    Redis(#[from] redis::RedisError),
-    #[error("Redis pool error: {0}")]
-    Pool(#[from] deadpool_redis::PoolError),
-    #[error("error while serializing a Redis cache value: {0}")]
-    Serialization(#[from] serde_json::Error),
-    #[error("Redis blocking timeout must be greater than zero")]
-    InvalidBlockingTimeout,
-    #[error(
-        "timeout waiting on local cache lock ({released}/{total} released)"
-    )]
-    LocalCacheTimeout { released: usize, total: usize },
-}
 
 #[derive(Clone)]
 pub struct RedisPool {
@@ -75,15 +58,19 @@ impl RedisPool {
         meta_namespace: impl Into<Arc<str>>,
         config: RedisConfig,
         cache_settings: CacheSettings,
-    ) -> Result<Self, RedisBackendBuildError> {
+    ) -> Result<Self> {
         tracing::info!(
             strategy = %config.cache_locking_strategy(),
             "configured Redis cache locking"
         );
 
-        let backend = RedisBackend::new(&config).await?;
+        let backend = RedisBackend::new(&config)
+            .await
+            .wrap_err("creating Redis command backend")?;
 
-        let blocking = blocking::RedisBlockingPool::new(&config).await?;
+        let blocking = blocking::RedisBlockingPool::new(&config)
+            .await
+            .wrap_err("creating Redis blocking pool")?;
         let key_builder = KeyBuilder::new(meta_namespace, config.topology());
         let cache = CacheManager::new(key_builder.clone(), cache_settings);
 
@@ -102,9 +89,13 @@ impl RedisPool {
 }
 
 impl RedisPool {
-    pub async fn connect(&self) -> Result<RedisConnection, Error> {
+    pub async fn connect(&self) -> Result<RedisConnection> {
         Ok(RedisConnection {
-            inner: self.backend.connect().await?,
+            inner: self
+                .backend
+                .connect()
+                .await
+                .wrap_err("connecting to Redis")?,
             key_builder: self.key_builder.clone(),
             settings: self.cache.settings().clone(),
         })
@@ -113,9 +104,13 @@ impl RedisPool {
     pub async fn register_and_set_metrics(
         &self,
         registry: &Registry,
-    ) -> Result<(), prometheus::Error> {
-        self.backend.register_metrics(registry)?;
-        self.blocking.register_metrics(registry)
+    ) -> Result<()> {
+        self.backend
+            .register_metrics(registry)
+            .wrap_err("registering Redis command pool metrics")?;
+        self.blocking
+            .register_metrics(registry)
+            .wrap_err("registering Redis blocking pool metrics")
     }
 
     pub async fn get_cached_keys<F, Fut, T, K, E>(
@@ -123,11 +118,11 @@ impl RedisPool {
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<Vec<T>, E>
+    ) -> Result<Vec<T>>
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -148,11 +143,11 @@ impl RedisPool {
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<std::collections::HashMap<K, T>, E>
+    ) -> Result<std::collections::HashMap<K, T>>
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -175,11 +170,11 @@ impl RedisPool {
         case_sensitive: bool,
         keys: &[I],
         closure: F,
-    ) -> Result<Vec<T>, E>
+    ) -> Result<Vec<T>>
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -210,11 +205,11 @@ impl RedisPool {
         case_sensitive: bool,
         keys: &[I],
         closure: F,
-    ) -> Result<std::collections::HashMap<K, T>, E>
+    ) -> Result<std::collections::HashMap<K, T>>
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -242,9 +237,7 @@ impl RedisPool {
 impl ConnectionProvider for RedisPool {
     type Connection = RedisConnection;
 
-    fn connect(
-        &self,
-    ) -> impl Future<Output = Result<Self::Connection, Error>> + Send {
+    fn connect(&self) -> impl Future<Output = Result<Self::Connection>> + Send {
         RedisPool::connect(self)
     }
 }
@@ -259,7 +252,7 @@ impl RedisConnection {
         key: &str,
         data: D,
         expiry: Option<i64>,
-    ) -> Result<(), Error>
+    ) -> Result<()>
     where
         D: ToRedisArgs + Send + Sync + Debug,
     {
@@ -277,7 +270,7 @@ impl RedisConnection {
         key: &str,
         data: D,
         expiry: Option<i64>,
-    ) -> Result<(), Error>
+    ) -> Result<()>
     where
         D: Serialize,
     {
@@ -291,31 +284,28 @@ impl RedisConnection {
         .await
     }
 
-    pub async fn get(&mut self, key: &str) -> Result<Option<String>, Error> {
+    pub async fn get(&mut self, key: &str) -> Result<Option<String>> {
         commands::get(&mut self.inner, key).await
     }
 
     pub async fn get_many(
         &mut self,
         keys: &[String],
-    ) -> Result<Vec<Option<Vec<u8>>>, Error> {
+    ) -> Result<Vec<Option<Vec<u8>>>> {
         commands::get_many(&mut self.inner, keys).await
     }
 
     pub async fn get_many_typed<R>(
         &mut self,
         keys: &[String],
-    ) -> Result<Vec<Option<R>>, Error>
+    ) -> Result<Vec<Option<R>>>
     where
         R: FromRedisValue,
     {
         commands::get_many_as(&mut self.inner, keys).await
     }
 
-    pub async fn get_deserialized<R>(
-        &mut self,
-        key: &str,
-    ) -> Result<Option<R>, Error>
+    pub async fn get_deserialized<R>(&mut self, key: &str) -> Result<Option<R>>
     where
         R: for<'a> serde::Deserialize<'a>,
     {
@@ -325,7 +315,7 @@ impl RedisConnection {
     pub async fn get_many_deserialized<R>(
         &mut self,
         keys: &[String],
-    ) -> Result<Vec<Option<R>>, Error>
+    ) -> Result<Vec<Option<R>>>
     where
         R: for<'a> serde::Deserialize<'a>,
     {
@@ -333,22 +323,22 @@ impl RedisConnection {
             .await
     }
 
-    pub async fn delete(&mut self, key: &str) -> Result<(), Error> {
+    pub async fn delete(&mut self, key: &str) -> Result<()> {
         commands::delete(&mut self.inner, key).await
     }
 
-    pub async fn delete_many(&mut self, keys: &[String]) -> Result<(), Error> {
+    pub async fn delete_many(&mut self, keys: &[String]) -> Result<()> {
         commands::delete_many(&mut self.inner, keys).await
     }
 
-    pub async fn lpush<D>(&mut self, key: &str, value: D) -> Result<(), Error>
+    pub async fn lpush<D>(&mut self, key: &str, value: D) -> Result<()>
     where
         D: ToRedisArgs + Send + Sync + Debug,
     {
         commands::lpush(&mut self.inner, key, value).await
     }
 
-    pub async fn incr(&mut self, key: &str) -> Result<Option<u64>, Error> {
+    pub async fn incr(&mut self, key: &str) -> Result<Option<u64>> {
         commands::incr(&mut self.inner, key).await
     }
 }
