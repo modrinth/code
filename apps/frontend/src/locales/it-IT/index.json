@@ -3950,9 +3950,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Hai selezionato {count} tag. Dovresti tenerne al massimo 12, così che il tuo server rimanga più facile da individuare."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Carica una vesione prima di selezionare i tag!"
-  },
   "project.versions.copy-id-option": {
     "message": "Copia ID"
   },

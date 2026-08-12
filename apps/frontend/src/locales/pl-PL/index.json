@@ -3884,9 +3884,6 @@
   "project.settings.tags.title": {
     "message": "Tagi"
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Prześlij wersję, by móc wybierać tagi!"
-  },
   "project.versions.copy-id-option": {
     "message": "Kopiuj ID"
   },

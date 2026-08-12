@@ -3971,9 +3971,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 12 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Por favor, ¡sube una versión primero para poder seleccionar etiquetas!"
-  },
   "project.versions.copy-id-option": {
     "message": "Copiar ID"
   },

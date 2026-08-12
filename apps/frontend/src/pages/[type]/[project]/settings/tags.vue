@@ -2,8 +2,10 @@
 import {
 	Admonition,
 	Checkbox,
+	commonMessages,
 	ConfirmLeaveModal,
 	defineMessages,
+	EmptyState,
 	formatCategory,
 	formatCategoryHeader,
 	formatProjectTypeSentence,
@@ -51,9 +53,9 @@ const messages = defineMessages({
 		id: 'project.settings.tags.title',
 		defaultMessage: 'Tags',
 	},
-	uploadVersionFirst: {
-		id: 'project.settings.tags.upload-version-first',
-		defaultMessage: 'Please upload a version first in order to select tags!',
+	uploadVersionFirstHeading: {
+		id: 'project.settings.tags.upload-version-first.heading',
+		defaultMessage: 'Upload versions before adding tags',
 	},
 	categoriesDescription: {
 		id: 'project.settings.tags.categories-description',
@@ -375,9 +377,12 @@ const toggleFeatured = (tag: string) => {
 		<h2 class="mb-4 mt-0 text-2xl font-semibold">
 			{{ formatMessage(messages.title) }}
 		</h2>
-		<p v-if="!canSelectTags" class="known-errors">
-			{{ formatMessage(messages.uploadVersionFirst) }}
-		</p>
+		<EmptyState
+			v-if="!canSelectTags"
+			type="no-documents"
+			:heading="formatMessage(messages.uploadVersionFirstHeading)"
+			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
+		/>
 		<div v-else class="flex flex-col gap-4">
 			<Admonition v-if="allTagsSelectedWarning" type="critical" :body="allTagsSelectedWarning" />
 			<Admonition v-else-if="tooManyTagsWarning" type="warning" :body="tooManyTagsWarning" />

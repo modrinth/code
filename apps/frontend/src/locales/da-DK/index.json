@@ -2480,9 +2480,6 @@
   "project.settings.tags.title": {
     "message": "Tags"
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Upload venligst en version først for at kunne vælge tags!"
-  },
   "project.versions.copy-id-option": {
     "message": "Kopier ID"
   },

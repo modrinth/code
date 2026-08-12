@@ -3953,9 +3953,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 12개 이하로 줄이는 것이 좋습니다."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "먼저 버전을 업로드해야 태그를 선택할 수 있습니다!"
-  },
   "project.versions.copy-id-option": {
     "message": "ID 복사"
   },

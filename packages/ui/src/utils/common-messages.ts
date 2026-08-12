@@ -590,6 +590,10 @@ export const commonMessages = defineMessages({
 		id: 'label.upload-failed',
 		defaultMessage: 'Upload failed',
 	},
+	uploadVersionsEmptyStateDescription: {
+		id: 'empty-state.upload-versions.description',
+		defaultMessage: `Come back once you've uploaded your versions.`,
+	},
 	renameFailedLabel: {
 		id: 'label.rename-failed',
 		defaultMessage: 'Rename failed',

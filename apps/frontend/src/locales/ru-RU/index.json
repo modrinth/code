@@ -3950,9 +3950,6 @@
   "project.settings.tags.title": {
     "message": "Теги"
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Загрузите версию перед тем, как выбрать теги!"
-  },
   "project.versions.copy-id-option": {
     "message": "Копировать ID"
   },

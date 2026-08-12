@@ -3971,9 +3971,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "你選擇了 {count} 個標籤。請考慮減少到 12 個或更少，以確保你的伺服器主題更明確，並更容易被搜尋到。"
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "請先上傳一個版本再選擇標籤！"
-  },
   "project.versions.copy-id-option": {
     "message": "複製 ID"
   },

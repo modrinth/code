@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {
+	commonMessages,
 	ConfirmLeaveModal,
 	defineMessages,
+	EmptyState,
 	injectModrinthClient,
 	injectProjectPageContext,
 	IntlFormatted,
@@ -48,6 +50,12 @@ const flags = useFeatureFlags()
 
 const projectTypes = computed(() => projectV3.value?.project_types ?? [project.value.project_type])
 
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
+const canEditDisclosures = computed(
+	() => project.value.versions.length > 0 || isServerProject.value,
+)
+
 function isDisclosureVisible(type: DisclosureType) {
 	return isDisclosureCompatibleWithProjectTypes(type, projectTypes.value)
 }
@@ -68,6 +76,10 @@ const messages = defineMessages({
 	noPermission: {
 		id: 'project.settings.disclosures.save-blocked.no-permission',
 		defaultMessage: `You don't have permission to edit this project's disclosures.`,
+	},
+	uploadVersionFirstHeading: {
+		id: 'project.settings.disclosures.upload-version-first.heading',
+		defaultMessage: 'Upload versions before adding disclosures',
 	},
 })
 
@@ -249,81 +261,89 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 				</template>
 			</IntlFormatted>
 		</p>
-		<div class="flex flex-col gap-4">
-			<AiDisclosureCard
-				v-if="isDisclosureVisible('ai_content')"
-				v-model="current.ai"
-				v-bind="disclosureUpdateProps('ai_content')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_content', status)
-				"
-			/>
-			<AdvertisingDisclosureCard
-				v-if="isDisclosureVisible('advertisements')"
-				v-model="current.advertising"
-				v-bind="disclosureUpdateProps('advertisements')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('advertisements', status)
-				"
-			/>
-			<PaidFeaturesDisclosureCard
-				v-if="isDisclosureVisible('paid_features')"
-				v-model="current.paidFeatures"
-				v-bind="disclosureUpdateProps('paid_features')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('paid_features', status)
-				"
-			/>
-			<TelemetryDisclosureCard
-				v-if="isDisclosureVisible('telemetry')"
-				v-model="current.telemetry"
-				v-bind="disclosureUpdateProps('telemetry')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('telemetry', status)
-				"
-			/>
-			<DerivativeDisclosureCard
-				v-if="isDisclosureVisible('derivative_work')"
-				v-model="current.derivative"
-				v-bind="disclosureUpdateProps('derivative_work')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('derivative_work', status)
-				"
-			/>
-			<PhotosensitivityDisclosureCard
-				v-if="isDisclosureVisible('epilepsy_triggers')"
-				v-model="current.photosensitivity"
-				v-bind="disclosureUpdateProps('epilepsy_triggers')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('epilepsy_triggers', status)
-				"
-			/>
-			<SystemInteractionsDisclosureCard
-				v-if="isDisclosureVisible('system_interactions')"
-				v-model="current.systemInteractions"
-				v-bind="disclosureUpdateProps('system_interactions')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('system_interactions', status)
-				"
-			/>
-			<ArchivedDisclosureCard
-				v-if="isDisclosureVisible('archived')"
-				v-model="current.archived"
-				:project-title="project.title"
-				v-bind="disclosureUpdateProps('archived')"
-				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('archived', status)
-				"
-			/>
-		</div>
-		<UnsavedChangesPopup
-			:original="savedSnapshot"
-			:modified="currentSnapshot"
-			:saving="saving"
-			:can-save="canSave"
-			:save-disabled-reason="saveDisabledReason"
-			@reset="reset"
-			@save="save"
+		<EmptyState
+			v-if="!canEditDisclosures"
+			type="no-documents"
+			:heading="formatMessage(messages.uploadVersionFirstHeading)"
+			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
 		/>
+		<template v-else>
+			<div class="flex flex-col gap-4">
+				<AiDisclosureCard
+					v-if="isDisclosureVisible('ai_content')"
+					v-model="current.ai"
+					v-bind="disclosureUpdateProps('ai_content')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_content', status)
+					"
+				/>
+				<AdvertisingDisclosureCard
+					v-if="isDisclosureVisible('advertisements')"
+					v-model="current.advertising"
+					v-bind="disclosureUpdateProps('advertisements')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('advertisements', status)
+					"
+				/>
+				<PaidFeaturesDisclosureCard
+					v-if="isDisclosureVisible('paid_features')"
+					v-model="current.paidFeatures"
+					v-bind="disclosureUpdateProps('paid_features')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('paid_features', status)
+					"
+				/>
+				<TelemetryDisclosureCard
+					v-if="isDisclosureVisible('telemetry')"
+					v-model="current.telemetry"
+					v-bind="disclosureUpdateProps('telemetry')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('telemetry', status)
+					"
+				/>
+				<DerivativeDisclosureCard
+					v-if="isDisclosureVisible('derivative_work')"
+					v-model="current.derivative"
+					v-bind="disclosureUpdateProps('derivative_work')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('derivative_work', status)
+					"
+				/>
+				<PhotosensitivityDisclosureCard
+					v-if="isDisclosureVisible('epilepsy_triggers')"
+					v-model="current.photosensitivity"
+					v-bind="disclosureUpdateProps('epilepsy_triggers')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('epilepsy_triggers', status)
+					"
+				/>
+				<SystemInteractionsDisclosureCard
+					v-if="isDisclosureVisible('system_interactions')"
+					v-model="current.systemInteractions"
+					v-bind="disclosureUpdateProps('system_interactions')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('system_interactions', status)
+					"
+				/>
+				<ArchivedDisclosureCard
+					v-if="isDisclosureVisible('archived')"
+					v-model="current.archived"
+					:project-title="project.title"
+					v-bind="disclosureUpdateProps('archived')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('archived', status)
+					"
+				/>
+			</div>
+			<UnsavedChangesPopup
+				:original="savedSnapshot"
+				:modified="currentSnapshot"
+				:saving="saving"
+				:can-save="canSave"
+				:save-disabled-reason="saveDisabledReason"
+				@reset="reset"
+				@save="save"
+			/>
+		</template>
 	</div>
 </template>

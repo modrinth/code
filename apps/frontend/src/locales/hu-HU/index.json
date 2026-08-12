@@ -3677,9 +3677,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "{count} címkét választottál ki. Fontold meg, hogy 12-re vagy annál kevesebbre csökkentsd a számukat, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "A címkék kiválasztásához előbb tölts fel egy verziót!"
-  },
   "project.versions.copy-id-option": {
     "message": "Azonosító másolása"
   },

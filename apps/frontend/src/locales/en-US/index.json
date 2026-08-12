@@ -3944,6 +3944,9 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Contains telemetry"
   },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "Upload versions before adding disclosures"
+  },
   "project.settings.editing-project": {
     "message": "Editing {projectType} project"
   },
@@ -4196,8 +4199,8 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Please upload a version first in order to select tags!"
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Upload versions before adding tags"
   },
   "project.versions.copy-id-option": {
     "message": "Copy ID"

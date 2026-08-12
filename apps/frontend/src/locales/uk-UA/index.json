@@ -3956,9 +3956,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Ви вибрали {count} теґів. Ми рекомендуємо зменшити їхню кількість до 12, щоб ваш сервер можна було легше знайти."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Спершу завантажте версію, щоб обирати теґи!"
-  },
   "project.versions.copy-id-option": {
     "message": "Копіювати ID"
   },

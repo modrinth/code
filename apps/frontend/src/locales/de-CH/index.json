@@ -3971,9 +3971,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Du hast {count} Tags ausgewählt. Wir empfehlen dir, die Anzahl auf 12 oder weniger zu reduzieren, damit dein Server übersichtlich bleibt und leichter gefunden werden kann."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Bitte lade zuerst eine Version hoch, um Tags auswählen zu können!"
-  },
   "project.versions.copy-id-option": {
     "message": "ID kopieren"
   },
