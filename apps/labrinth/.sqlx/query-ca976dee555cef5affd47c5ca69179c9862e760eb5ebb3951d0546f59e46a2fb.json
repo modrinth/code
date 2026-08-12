@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tUPDATE project_disclosures\n\t\t\tSET deleted_at = now(), updated_at = now(), updated_by = $3, set_by_moderator = $4\n\t\t\tWHERE project_id = $1 AND type = $2 AND deleted_at IS NULL\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Int8",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ca976dee555cef5affd47c5ca69179c9862e760eb5ebb3951d0546f59e46a2fb"
+}

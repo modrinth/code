@@ -730,6 +730,8 @@ pub async fn project_edit_internal(
                 db_models::DBProjectDisclosure::remove(
                     project_item.inner.id,
                     ProjectDisclosureType::Archived,
+                    user.id.into(),
+                    user.role.is_mod(),
                     &mut transaction,
                 )
                 .await

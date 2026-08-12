@@ -218,6 +218,8 @@ pub async fn modify_project_disclosures(
         db_models::DBProjectDisclosure::remove(
             project.inner.id,
             disclosure_type,
+            user.id.into(),
+            user.role.is_mod(),
             &mut transaction,
         )
         .await

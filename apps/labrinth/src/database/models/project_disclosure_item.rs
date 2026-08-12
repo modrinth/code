@@ -138,16 +138,20 @@ impl DBProjectDisclosure {
     pub async fn remove(
         project_id: DBProjectId,
         disclosure_type: ProjectDisclosureType,
+        updated_by: DBUserId,
+        set_by_moderator: bool,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<bool, DatabaseError> {
         let result = sqlx::query!(
             r#"
 			UPDATE project_disclosures
-			SET deleted_at = now()
+			SET deleted_at = now(), updated_at = now(), updated_by = $3, set_by_moderator = $4
 			WHERE project_id = $1 AND type = $2 AND deleted_at IS NULL
 			"#,
             project_id as DBProjectId,
             <&'static str>::from(disclosure_type),
+            updated_by as DBUserId,
+            set_by_moderator,
         )
         .execute(exec)
         .await?;
