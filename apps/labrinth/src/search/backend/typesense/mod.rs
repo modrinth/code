@@ -723,6 +723,40 @@ impl SearchField {
                 optional: true,
                 token_separators: &["_"],
             },
+            SearchField::RequiredDependencyProjectIds => TypesenseFieldSpec {
+                path: "required_dependency_project_ids",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: &["-"],
+            },
+            SearchField::OptionalDependencyProjectIds => TypesenseFieldSpec {
+                path: "optional_dependency_project_ids",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: &["-"],
+            },
+            SearchField::EmbeddedDependencyProjectIds => TypesenseFieldSpec {
+                path: "embedded_dependency_project_ids",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: &["-"],
+            },
+            SearchField::IncompatibleDependencyProjectIds => {
+                TypesenseFieldSpec {
+                    path: "incompatible_dependency_project_ids",
+                    ty: "string[]",
+                    facet: true,
+                    sort: false,
+                    optional: true,
+                    token_separators: &["-"],
+                }
+            }
         }
     }
 }

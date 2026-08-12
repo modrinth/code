@@ -219,6 +219,10 @@ pub enum SearchField {
     DependencyProjectIds,
     CompatibleDependencyProjectIds,
     DisclosureTypes,
+    RequiredDependencyProjectIds,
+    OptionalDependencyProjectIds,
+    EmbeddedDependencyProjectIds,
+    IncompatibleDependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -289,6 +293,14 @@ pub struct UploadSearchProject {
     pub dependency_project_ids: Vec<String>,
     #[serde(default)]
     pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub required_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub optional_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub embedded_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub incompatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
     #[serde(default)]
@@ -390,6 +402,14 @@ pub struct ResultSearchProject {
     #[serde(default)]
     pub compatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub required_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub optional_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub embedded_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub incompatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
     #[serde(default)]
     pub disclosure_types: Vec<String>,
@@ -434,6 +454,14 @@ impl From<UploadSearchProject> for ResultSearchProject {
             dependency_project_ids: source.dependency_project_ids,
             compatible_dependency_project_ids: source
                 .compatible_dependency_project_ids,
+            required_dependency_project_ids: source
+                .required_dependency_project_ids,
+            optional_dependency_project_ids: source
+                .optional_dependency_project_ids,
+            embedded_dependency_project_ids: source
+                .embedded_dependency_project_ids,
+            incompatible_dependency_project_ids: source
+                .incompatible_dependency_project_ids,
             dependencies: source.dependencies,
             disclosure_types: source.disclosure_types,
             loaders: source.loaders,
