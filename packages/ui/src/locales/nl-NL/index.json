@@ -2045,14 +2045,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Er zijn geen compatibele instanties gevonden"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Pictogram verwijderen"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Zoek instantie"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selecteer pictogram"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Deze modpack bevat geen extra inhoud."

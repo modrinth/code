@@ -23,14 +23,13 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
-import { kill, run } from '@/helpers/instance'
+import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { showInstanceInFolder } from '@/helpers/utils'
@@ -147,7 +146,7 @@ onUnmounted(() => {
 			:class="newlyAdded ? 'border-dashed bg-surface-2' : 'bg-bg-raised border-solid'"
 		>
 			<Avatar
-				:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
+				:src="getInstanceIconUrl(instanceIcon)"
 				:tint-by="instance.id"
 				no-shadow
 				class="!rounded-[14px]"

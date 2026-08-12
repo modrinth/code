@@ -6,7 +6,6 @@ import {
 	getLatestMatchingInstallVersion,
 	useVIntl,
 } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { nextTick, type Ref, ref } from 'vue'
@@ -31,6 +30,7 @@ import {
 	get,
 	get_install_candidates,
 	get_projects,
+	getInstanceIconUrl,
 	install_project_with_dependencies,
 	list,
 	remove_project,
@@ -556,7 +556,7 @@ export function createContentInstall(opts: {
 				return {
 					id: instance.id,
 					name: instance.name,
-					iconUrl: instance.icon_path ? convertFileSrc(instance.icon_path) : null,
+					iconUrl: getInstanceIconUrl(instance.icon_path),
 					installed: instance.installed,
 					compatible: instance.compatible,
 					installing: false,

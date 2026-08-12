@@ -33,7 +33,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
@@ -45,6 +44,7 @@ import { get_project, get_search_results_v3, get_version_many } from '@/helpers/
 import { instance_listener } from '@/helpers/events.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
+	getInstanceIconUrl,
 	list as listInstances,
 } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
@@ -180,7 +180,7 @@ const instanceBreadcrumbDefinition = {
 	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
 	visual: () => ({
 		type: 'image' as const,
-		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		src: getInstanceIconUrl(instance.value?.icon_path),
 		alt: instance.value?.name,
 		tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
 	}),
@@ -736,7 +736,7 @@ const installContext = computed(() => {
 			name: instance.value.name,
 			loader: instance.value.loader,
 			gameVersion: instance.value.game_version,
-			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+			iconSrc: getInstanceIconUrl(instance.value.icon_path),
 			backUrl: `/instance/${encodeURIComponent(instance.value.id)}${isFromWorlds.value ? '/worlds' : ''}`,
 			backLabel: formatMessage(messages.backToInstance),
 			heading: formatMessage(

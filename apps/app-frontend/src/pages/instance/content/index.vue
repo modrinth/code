@@ -114,7 +114,6 @@ import {
 	versionChangesGameVersion,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -135,6 +134,7 @@ import {
 	add_project_from_path,
 	edit,
 	get_linked_modpack_content,
+	getInstanceIconUrl,
 	is_file_on_modrinth,
 	remove_project,
 	switch_project_version_with_dependencies,
@@ -299,7 +299,7 @@ const localImportedModpackProject = computed<ContentModpackCardProject | null>((
 		id: link.filename ?? instance.value.id,
 		slug: link.filename ?? instance.value.id,
 		title: link.name ?? instance.value.name,
-		icon_url: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		icon_url: getInstanceIconUrl(instance.value.icon_path) ?? undefined,
 		description: '',
 		filename: link.filename ?? undefined,
 	}

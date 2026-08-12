@@ -33,12 +33,12 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { getInstanceIconUrl } from '@/helpers/instance'
 import { copyToClipboard, createInstanceShortcut } from '@/helpers/utils'
 import type {
 	ProtocolVersion,
@@ -324,7 +324,7 @@ const messages = defineMessages({
 							:to="`/instance/${instanceId}`"
 						>
 							<Avatar
-								:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
+								:src="getInstanceIconUrl(instanceIcon)"
 								size="16px"
 								:tint-by="instanceId"
 								class="shrink-0"

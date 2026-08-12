@@ -159,7 +159,20 @@ async function randomizeAndSave() {
 	}
 }
 
-defineExpose({ show, hide, randomizeAndSave })
+async function applyGeneratedIcon(instanceId: string, recipe: InstanceIconRecipe) {
+	try {
+		const symbol = symbolOption(recipe.symbol)
+		if (!backgroundOption(recipe.background) || !symbol) return false
+
+		await edit_generated_icon(instanceId, recipe, await loadSymbolBytes(symbol.asset))
+		return true
+	} catch (error) {
+		handleError(toError(error))
+		return false
+	}
+}
+
+defineExpose({ show, hide, randomize: randomizeAndSave, randomizeAndSave, applyGeneratedIcon })
 
 const messages = defineMessages({
 	title: {

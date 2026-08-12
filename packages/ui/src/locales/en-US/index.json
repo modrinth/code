@@ -2090,14 +2090,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "No compatible instances found"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Remove icon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Search instance"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Select icon"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "This modpack does not include any additional content."

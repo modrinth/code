@@ -2,12 +2,11 @@
 import { CheckIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import { Admonition, Avatar, Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { list } from '@/helpers/instance'
+import { getInstanceIconUrl, list } from '@/helpers/instance'
 import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
 import { instanceKeys } from '@/pages/instance/query-options'
 
@@ -98,10 +97,7 @@ async function addServer(instance) {
 						:to="`/instance/${encodeURIComponent(instance.id)}`"
 						@click="modal.hide()"
 					>
-						<Avatar
-							:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-							class="mr-2 [--size:2rem]"
-						/>
+						<Avatar :src="getInstanceIconUrl(instance.icon_path)" class="mr-2 [--size:2rem]" />
 						{{ instance.name }}
 					</router-link>
 					<Button :disabled="instance.added || instance.adding" @click="addServer(instance)">

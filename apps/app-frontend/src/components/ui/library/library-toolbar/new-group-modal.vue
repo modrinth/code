@@ -51,7 +51,7 @@
 				>
 					<div class="flex min-w-0 items-center gap-2.5">
 						<Avatar
-							:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
+							:src="getInstanceIconUrl(instance.icon_path)"
 							:tint-by="instance.id"
 							:alt="instance.name"
 							size="2rem"
@@ -94,10 +94,10 @@
 <script setup lang="ts">
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { Avatar, Button, NewModal, StyledInput, TagItem } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
+import { getInstanceIconUrl } from '@/helpers/instance'
 
 const {
 	isNewGroupModalOpen,

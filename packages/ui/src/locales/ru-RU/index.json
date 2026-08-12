@@ -1964,14 +1964,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Совместимые сборки не найдены"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Удалить иконку"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Поиск сборки"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Выбрать иконку"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "В сборке нет дополнительного контента."

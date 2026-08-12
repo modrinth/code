@@ -18,7 +18,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -27,7 +26,7 @@ import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
-import { edit, edit_icon, remove } from '@/helpers/instance'
+import { edit, edit_icon, getInstanceIconUrl, remove } from '@/helpers/instance'
 import type { GameInstance, InstanceIconRecipe } from '@/helpers/types'
 
 import { injectInstanceSettings } from './instance-settings-context'
@@ -334,7 +333,7 @@ const messages = defineMessages({
 						]"
 					>
 						<Avatar
-							:src="icon ? convertFileSrc(icon) : icon"
+							:src="getInstanceIconUrl(icon)"
 							size="108px"
 							class="transition-[filter] group-hover:brightness-75"
 							:tint-by="instance.id"

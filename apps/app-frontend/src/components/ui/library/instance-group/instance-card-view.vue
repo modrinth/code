@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Avatar, truncatedTooltip } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
+import { getInstanceIconUrl } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
 const props = withDefaults(
@@ -15,9 +15,7 @@ const props = withDefaults(
 	},
 )
 
-const iconSrc = computed(() =>
-	props.instance.icon_path ? convertFileSrc(props.instance.icon_path) : undefined,
-)
+const iconSrc = computed(() => getInstanceIconUrl(props.instance.icon_path))
 
 const nameRef = ref<HTMLElement | null>(null)
 const versionRef = ref<HTMLElement | null>(null)

@@ -118,7 +118,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { useOnline } from '@vueuse/core'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -147,7 +146,14 @@ import {
 	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
-import { get_full_path, kill, refresh_content_updates, remove, run } from '@/helpers/instance'
+import {
+	get_full_path,
+	getInstanceIconUrl,
+	kill,
+	refresh_content_updates,
+	remove,
+	run,
+} from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
@@ -288,7 +294,7 @@ useRootBreadcrumb({
 	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
 	visual: () => ({
 		type: 'image',
-		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		src: getInstanceIconUrl(instance.value?.icon_path),
 		alt: instance.value?.name,
 		tintBy: instance.value?.id ?? instanceId.value,
 	}),
@@ -869,9 +875,7 @@ onMounted(() => {
 		.catch((error) => handleError(toError(error)))
 })
 
-const icon = computed(() =>
-	instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : null,
-)
+const icon = computed(() => getInstanceIconUrl(instance.value?.icon_path))
 
 const timePlayed = computed(() => {
 	return instance.value

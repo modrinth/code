@@ -1997,14 +1997,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nema pronađenih kompatibilnih instanca"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Smakni ikonu"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Pretraži instancu"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Izaberi ikonu"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Ovaj modpack ne uključuje nikakav dodatni sadržaj."

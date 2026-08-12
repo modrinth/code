@@ -788,14 +788,8 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "Ny instans"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Fjern ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søg efter instanser"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Vælg ikon"
   },
   "instances.modpack-content-modal.external-content": {
     "defaultMessage": "Ekstern"

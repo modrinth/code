@@ -1676,14 +1676,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Không tìm thấy phiên chơi tương thích"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Xoá biểu tượng"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Tìm phiên chơi"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Chọn biểu tượng"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Gói modpack này không bao gồm các nội dung bổ sung nào."

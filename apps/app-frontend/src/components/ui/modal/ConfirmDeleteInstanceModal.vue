@@ -34,7 +34,7 @@
 							class="flex min-w-0 items-center gap-2.5 rounded-[20px] border border-solid border-transparent bg-surface-2 p-3"
 						>
 							<Avatar
-								:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
+								:src="getInstanceIconUrl(instance.icon_path)"
 								:tint-by="instance.id"
 								size="40px"
 								class="!rounded-xl"
@@ -95,9 +95,9 @@ import {
 	useScrollIndicator,
 	useVIntl,
 } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, nextTick, ref } from 'vue'
 
+import { getInstanceIconUrl } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
 const { formatMessage } = useVIntl()

@@ -1799,14 +1799,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nebyly nalezeny žádné kompatibilní instance"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Odebrat ikonu"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Hledat instance"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Vybrat ikonu"
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nebyl nalezen obsah"

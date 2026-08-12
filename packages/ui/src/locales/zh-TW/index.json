@@ -2048,14 +2048,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "找不到相容的實例"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "移除圖示"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜尋實例"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "選擇圖示"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "這個模組包不包含任何額外內容。"

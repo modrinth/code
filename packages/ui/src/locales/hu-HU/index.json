@@ -1715,14 +1715,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nem található kompatibilis profil"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Ikon eltávolítása"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Profilok keresése"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Ikon feltöltése"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Ez a modcsomag nem tartalmaz további tartalmakat."

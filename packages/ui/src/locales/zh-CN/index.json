@@ -2048,14 +2048,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "未找到相关的实例"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "移除图标"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜索实例"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "选择图标"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "这个整合包不包含任何额外内容。"

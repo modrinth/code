@@ -2048,14 +2048,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nenhuma instância compatível encontrada"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Remover ícone"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Buscar instância"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selecionar ícone"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Este pacote de mods não inclui nenhum conteúdo adicional."

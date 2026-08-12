@@ -280,7 +280,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -306,6 +305,7 @@ import { process_listener } from '@/helpers/events'
 import {
 	get as getInstance,
 	get_projects as getInstanceProjects,
+	getInstanceIconUrl,
 	kill,
 	list as listInstances,
 } from '@/helpers/instance'
@@ -530,7 +530,7 @@ const projectInstallContext = computed(() => {
 			name: instance.value.name,
 			loader: instance.value.loader,
 			gameVersion: instance.value.game_version,
-			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+			iconSrc: getInstanceIconUrl(instance.value.icon_path),
 			backUrl: projectBrowseBackUrl.value,
 			backLabel: projectBackLabel.value,
 			heading: formatMessage(commonMessages.installingContentLabel),

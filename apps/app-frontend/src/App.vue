@@ -81,6 +81,8 @@ import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyIn
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
+import NewIconEditorNotification from '@/components/ui/new-icon-editor-notification/index.vue'
+import { shouldShowNewIconEditorNotification } from '@/components/ui/new-icon-editor-notification/show-notification'
 import OnboardingChecklist from '@/components/ui/onboarding-checklist/index.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
@@ -323,6 +325,16 @@ function customizeCreationIcon() {
 	creationIconTarget.value = 'creation-flow'
 	creationIconEditorModal.value?.show()
 }
+
+onMounted(async () => {
+	if (!shouldShowNewIconEditorNotification()) return
+
+	addPopupNotification({
+		contentType: 'custom',
+		component: NewIconEditorNotification,
+		autoCloseMs: null,
+	})
+})
 
 function customizeContentInstallIcon() {
 	creationIconTarget.value = 'content-install'

@@ -1,4 +1,5 @@
-import type { Component } from 'vue'
+import { type Component, markRaw } from 'vue'
+import type { ComponentProps } from 'vue-component-type-helpers'
 
 import type { ButtonColor } from '#ui/components/base/buttons/types.ts'
 
@@ -40,14 +41,22 @@ export type PopupNotificationToastType =
 
 interface PopupNotificationBase {
 	id: string | number
-	title: string
 	dismissible?: boolean
 	autoCloseMs?: number | null
 	timer?: NodeJS.Timeout
 }
 
+export interface PopupNotificationCustom<
+	TComponent extends Component = Component,
+> extends PopupNotificationBase {
+	contentType: 'custom'
+	component: TComponent
+	componentProps?: ComponentProps<TComponent>
+}
+
 export interface PopupNotificationStandard extends PopupNotificationBase {
 	contentType: 'standard'
+	title: string
 	type: 'error' | 'warning' | 'success' | 'info' | 'download'
 	titleLogo?: Component
 	text?: string
@@ -61,6 +70,7 @@ export interface PopupNotificationStandard extends PopupNotificationBase {
 
 export interface PopupNotificationToast extends PopupNotificationBase {
 	contentType: 'toast'
+	title: string
 	type: PopupNotificationToastType
 	actorName?: string | null
 	actorAvatarUrl?: string | null
@@ -81,7 +91,10 @@ export interface PopupNotificationToast extends PopupNotificationBase {
 	onOpenInstance?: () => void | Promise<void>
 }
 
-export type PopupNotification = PopupNotificationStandard | PopupNotificationToast
+export type PopupNotification =
+	| PopupNotificationCustom
+	| PopupNotificationStandard
+	| PopupNotificationToast
 
 type PopupNotificationInput = PopupNotification extends infer Notification
 	? Notification extends PopupNotification
@@ -89,8 +102,26 @@ type PopupNotificationInput = PopupNotification extends infer Notification
 		: never
 	: never
 
+type PopupNotificationCustomInput<TComponent extends Component> = Omit<
+	PopupNotificationCustom<TComponent>,
+	'id' | 'timer'
+>
+
+type PopupNotificationNonCustomInput =
+	| Omit<PopupNotificationStandard, 'id' | 'timer'>
+	| Omit<PopupNotificationToast, 'id' | 'timer'>
+
 type StoredPopupNotification<Input extends PopupNotificationInput> = Input &
 	Pick<PopupNotificationBase, 'id' | 'timer'>
+
+interface AddPopupNotification {
+	<TComponent extends Component>(
+		notification: PopupNotificationCustomInput<TComponent>,
+	): StoredPopupNotification<PopupNotificationCustomInput<TComponent>>
+	<Input extends PopupNotificationNonCustomInput>(
+		notification: Input,
+	): StoredPopupNotification<Input>
+}
 
 export abstract class AbstractPopupNotificationManager {
 	protected readonly DEFAULT_AUTO_CLOSE_MS = 30 * 1000
@@ -101,17 +132,18 @@ export abstract class AbstractPopupNotificationManager {
 	protected abstract removeNotificationFromStorage(id: string | number): void
 	protected abstract clearAllNotificationsFromStorage(): void
 
-	addPopupNotification = <Input extends PopupNotificationInput>(
-		notification: Input,
-	): StoredPopupNotification<Input> => {
+	addPopupNotification = ((notification: PopupNotificationInput) => {
 		const newNotification = {
 			...notification,
+			...(notification.contentType === 'custom'
+				? { component: markRaw(notification.component) }
+				: {}),
 			id: Date.now() + Math.random(),
-		} as StoredPopupNotification<Input>
+		} as StoredPopupNotification<PopupNotificationInput>
 		this.setNotificationTimer(newNotification)
 		this.addNotificationToStorage(newNotification)
 		return newNotification
-	}
+	}) as AddPopupNotification
 
 	removeNotification = (id: string | number): void => {
 		const notifications = this.getNotifications()

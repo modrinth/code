@@ -43,7 +43,7 @@
 				>
 					<div class="flex min-w-0 items-center gap-2.5">
 						<Avatar
-							:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
+							:src="getInstanceIconUrl(instance.icon_path)"
 							:tint-by="instance.id"
 							:alt="instance.name"
 							size="2rem"
@@ -93,10 +93,10 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
+import { getInstanceIconUrl } from '@/helpers/instance'
 
 const { formatMessage } = useVIntl()
 const messages = defineMessages({

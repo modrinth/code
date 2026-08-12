@@ -1,0 +1,164 @@
+<script setup lang="ts">
+import { XIcon } from '@modrinth/assets'
+import { Button, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
+import { ref, useTemplateRef } from 'vue'
+
+import ApplyNewIconsModal from './apply-new-icons-modal.vue'
+import icon01 from './assets/01.png'
+import icon02 from './assets/02.png'
+import icon03 from './assets/03.png'
+import icon04 from './assets/04.png'
+import icon05 from './assets/05.png'
+import icon06 from './assets/06.png'
+import icon07 from './assets/07.png'
+import icon08 from './assets/08.png'
+import icon09 from './assets/09.png'
+
+const emit = defineEmits<{
+	dismiss: []
+}>()
+
+const { formatMessage } = useVIntl()
+const applyNewIconsModal =
+	useTemplateRef<InstanceType<typeof ApplyNewIconsModal>>('applyNewIconsModal')
+const modalOpen = ref(false)
+const icons = [icon01, icon02, icon03, icon04, icon05, icon06, icon07, icon08, icon09]
+
+const messages = defineMessages({
+	title: {
+		id: 'app.icon-editor.notification.title',
+		defaultMessage: 'New icon editor',
+	},
+	description: {
+		id: 'app.icon-editor.notification.description',
+		defaultMessage: 'Personalize your instances!',
+	},
+	viewUpdate: {
+		id: 'app.icon-editor.notification.view-update',
+		defaultMessage: 'View update',
+	},
+	dismiss: {
+		id: 'app.icon-editor.notification.dismiss',
+		defaultMessage: 'Dismiss',
+	},
+	close: {
+		id: 'app.icon-editor.notification.close',
+		defaultMessage: 'Close',
+	},
+})
+
+function viewUpdate() {
+	modalOpen.value = true
+	applyNewIconsModal.value?.show()
+}
+
+function handleModalClose() {
+	modalOpen.value = false
+	emit('dismiss')
+}
+</script>
+
+<template>
+	<section
+		v-show="!modalOpen"
+		class="new-icon-editor-notification ml-auto w-[360px] max-w-full overflow-hidden rounded-[20px] border border-solid border-surface-5 bg-surface-3 px-3.5 pb-4 pt-3.5"
+		:aria-label="formatMessage(messages.title)"
+	>
+		<div class="icon-grid" aria-hidden="true">
+			<div v-for="(icon, index) in icons" :key="index" class="icon-tile">
+				<img :src="icon" alt="" />
+			</div>
+		</div>
+		<div class="icon-fade" />
+
+		<div class="relative z-[1] flex w-full flex-col items-start gap-2.5">
+			<div class="flex w-full items-start gap-1">
+				<div class="min-w-0 flex-1 grow leading-5">
+					<div class="font-semibold text-contrast">
+						{{ formatMessage(messages.title) }}
+					</div>
+					<div class="whitespace-nowrap text-primary">
+						{{ formatMessage(messages.description) }}
+					</div>
+				</div>
+				<IconButton
+					class="-m-1"
+					type="quiet"
+					size="sm"
+					:label="formatMessage(messages.close)"
+					@click="emit('dismiss')"
+				>
+					<XIcon />
+				</IconButton>
+			</div>
+
+			<div class="flex items-center gap-2">
+				<Button
+					type="colored"
+					color="brand"
+					size="sm"
+					class="!rounded-xl !px-3 !font-medium !leading-4"
+					@click="viewUpdate"
+				>
+					{{ formatMessage(messages.viewUpdate) }}
+				</Button>
+				<Button
+					type="outlined"
+					size="sm"
+					class="!rounded-xl !px-3 !font-medium !leading-4"
+					@click="emit('dismiss')"
+				>
+					{{ formatMessage(messages.dismiss) }}
+				</Button>
+			</div>
+		</div>
+	</section>
+	<ApplyNewIconsModal ref="applyNewIconsModal" @close="handleModalClose" />
+</template>
+
+<style scoped>
+.new-icon-editor-notification {
+	position: relative;
+	box-shadow:
+		0 2px 4px rgba(0, 0, 0, 0.04),
+		0 5px 8px rgba(0, 0, 0, 0.04),
+		0 10px 18px rgba(0, 0, 0, 0.03),
+		0 24px 48px rgba(0, 0, 0, 0.03);
+}
+
+.icon-grid {
+	position: absolute;
+	top: -20px;
+	left: 220px;
+	display: grid;
+	width: 160px;
+	height: 160px;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: 8px;
+	transform: rotate(23.89deg);
+}
+
+.icon-tile {
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 16px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
+}
+
+.icon-tile img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.icon-fade {
+	position: absolute;
+	inset: 0 auto 0 150px;
+	width: 120px;
+	background: linear-gradient(90deg, var(--surface-3) 25%, transparent 100%);
+}
+</style>

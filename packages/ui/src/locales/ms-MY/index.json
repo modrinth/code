@@ -1649,14 +1649,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Tiada pemasangan yang serasi dijumpai"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Alih keluar ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Cari pemasangan"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Pilih ikon"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Pek mod ini tidak menyertakan sebarang kandungan tambahan."

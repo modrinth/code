@@ -2039,14 +2039,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nie znaleziono kompatybilnych instancji"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Usuń ikonę"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Szukaj instancji"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Wybierz ikonę"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Ta paczka modów nie zawiera żadnych innych treści."

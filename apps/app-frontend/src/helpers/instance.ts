@@ -5,7 +5,7 @@
  */
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
-import { invoke } from '@tauri-apps/api/core'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot, SharedInstanceUpdateDiff } from './install'
 import type {
@@ -17,6 +17,12 @@ import type {
 	InstanceLoader,
 	SharedInstanceAttachment,
 } from './types'
+
+export function getInstanceIconUrl(iconPath: string | null | undefined): string | null {
+	if (!iconPath) return null
+	if (iconPath.startsWith('http://') || iconPath.startsWith('https://')) return iconPath
+	return convertFileSrc(iconPath)
+}
 
 export async function remove(instanceId: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove', { instanceId })

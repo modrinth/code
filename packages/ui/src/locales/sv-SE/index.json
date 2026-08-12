@@ -1769,14 +1769,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Inga kompatibla instanser hittades"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Radera ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Sök för instans"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Välj ikon"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Modpaketet innehåller inget ytterligare innehåll."

@@ -58,6 +58,12 @@
 						/>
 					</div>
 				</div>
+				<component
+					:is="item.component"
+					v-else-if="item.contentType === 'custom'"
+					v-bind="item.componentProps"
+					@dismiss="dismiss(item.id)"
+				/>
 				<div
 					v-else
 					class="flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"

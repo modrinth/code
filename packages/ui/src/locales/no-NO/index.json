@@ -854,14 +854,8 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "Ny instans"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Fjern ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søk etter instans"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Velg ikon"
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Ingen innhold funnet"

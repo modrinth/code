@@ -296,6 +296,45 @@
   "app.home.jump-back-in.new-instance": {
     "message": "New instance"
   },
+  "app.icon-editor.apply-icons-modal.apply-error": {
+    "message": "Failed to apply random icons to instances."
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "New this update"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "Close"
+  },
+  "app.icon-editor.apply-icons-modal.description": {
+    "message": "Create custom icons for your instances right in the Modrinth App. Mix and match backgrounds with symbols from Minecraft and popular mods!"
+  },
+  "app.icon-editor.apply-icons-modal.instances-without-icons": {
+    "message": "{count, plural, one {# instance doesn’t} other {# instances don’t}} have icons yet. Want us to give {count, plural, one {it} other {them}} random ones to get started?"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "Random icons"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "Skip"
+  },
+  "app.icon-editor.apply-icons-modal.title": {
+    "message": "Custom icon editor"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "Close"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "Personalize your instances!"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "Dismiss"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "New icon editor"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "View update"
+  },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
   },

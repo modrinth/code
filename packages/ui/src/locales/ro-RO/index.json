@@ -1013,14 +1013,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nu s-au găsit instanțe compatibile"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Înlăturare iconiță"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Căutare instanță"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selectează iconița"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Acest modpack nu include niciun conținut suplimentar."

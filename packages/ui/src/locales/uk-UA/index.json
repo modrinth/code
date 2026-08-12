@@ -2018,14 +2018,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Не знайдено сумісних профілів"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Прибрати значок"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Пошук профілів"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Вибрати значок"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Збірка не включає додатковий уміст."

@@ -2045,14 +2045,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "互換性のあるインスタンスが見つかりませんでした"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "アイコンを削除"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "インスタンスを検索"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "アイコンを選択"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "このModパックに追加コンテンツは一切含まれていません。"

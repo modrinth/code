@@ -2048,14 +2048,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "호환가능한 인스턴스 없음"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "아이콘 제거"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "인스턴스 검색"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "아이콘 선택"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "이 모드팩에는 추가 콘텐츠가 포함되어 있지 않습니다."

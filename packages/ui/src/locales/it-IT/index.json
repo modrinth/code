@@ -2006,14 +2006,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nessuna istanza compatibile trovata"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Rimuovi icona"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Cerca istanza"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Scegli un'icona"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Questo pacchetto di mod non include alcun contenuto aggiuntivo."
