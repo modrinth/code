@@ -152,18 +152,47 @@ export const Modpack: Story = {
 	}),
 }
 
-export const Failed: Story = {
+export const PlatformFailed: Story = {
 	render: renderInstallation({
-		id: 'platform:fabric:0.16.14:1.21.1',
+		id: 'platform:quilt:0.30.1-beta.2:1.14.4',
 		key: {
 			type: 'platform',
-			platform: 'fabric',
-			platform_version: '0.16.14',
-			game_version: '1.21.1',
+			platform: 'quilt',
+			platform_version: '0.30.1-beta.2',
+			game_version: '1.14.4',
 		},
 		status: 'failed',
 		progress: null,
-		error: 'The specified version may be incorrect',
+		error: 'Platform installer failed',
+		source: 'websocket',
+	}),
+}
+
+export const ModpackFailed: Story = {
+	render: renderInstallation({
+		id: 'modrinth-modpack:project:version',
+		key: {
+			type: 'modrinth_modpack',
+			project_id: 'project',
+			version_id: 'version',
+		},
+		status: 'failed',
+		progress: null,
+		error: 'The modpack does not include a downloadable file',
+		source: 'websocket',
+	}),
+}
+
+export const LocalModpackFailed: Story = {
+	render: renderInstallation({
+		id: 'local-modpack:example.mrpack',
+		key: {
+			type: 'local_modpack',
+			filename: 'example.mrpack',
+		},
+		status: 'failed',
+		progress: null,
+		error: 'The modpack could not be read',
 		source: 'websocket',
 	}),
 }

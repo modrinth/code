@@ -398,10 +398,7 @@ export function useServerInstallContent({
 				total: result.flushedPlans.length,
 			}
 			if (result.flushedPlans.length > 0) {
-				await Promise.all([
-					queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
-					queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
-				])
+				await queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 			}
 
 			return true

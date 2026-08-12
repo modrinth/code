@@ -58,6 +58,26 @@ const messages = defineMessages({
 		id: 'servers.installing-banner.error.header',
 		defaultMessage: 'Installation failed',
 	},
+	platformErrorHeader: {
+		id: 'servers.installing-banner.error.header.platform',
+		defaultMessage: 'Failed to install {loader} {loaderVersion} for Minecraft {gameVersion}',
+	},
+	platformWithoutVersionErrorHeader: {
+		id: 'servers.installing-banner.error.header.platform-without-version',
+		defaultMessage: 'Failed to install {loader} for Minecraft {gameVersion}',
+	},
+	minecraftErrorHeader: {
+		id: 'servers.installing-banner.error.header.minecraft',
+		defaultMessage: 'Failed to install Minecraft {version}',
+	},
+	modpackErrorHeader: {
+		id: 'servers.installing-banner.error.header.modpack',
+		defaultMessage: 'Failed to install modpack',
+	},
+	localModpackErrorHeader: {
+		id: 'servers.installing-banner.error.header.local-modpack',
+		defaultMessage: 'Failed to install {filename}',
+	},
 	unknownError: {
 		id: 'servers.installing-banner.error.unknown',
 		defaultMessage: 'An unexpected error occurred during installation.',
@@ -107,13 +127,30 @@ const messages = defineMessages({
 const headerLabel = computed(() => {
 	const current = installation.value
 	if (!current) return ''
-	if (current.status === 'failed') return formatMessage(messages.errorHeader)
 
 	switch (current.key.type) {
 		case 'platform': {
 			if (current.key.platform === 'vanilla') {
+				if (current.status === 'failed') {
+					return formatMessage(messages.minecraftErrorHeader, {
+						version: current.key.game_version,
+					})
+				}
 				return formatMessage(messages.installingMinecraft, {
 					version: current.key.game_version,
+				})
+			}
+			if (current.status === 'failed') {
+				if (!current.key.platform_version) {
+					return formatMessage(messages.platformWithoutVersionErrorHeader, {
+						loader: formatLoaderLabel(current.key.platform),
+						gameVersion: current.key.game_version,
+					})
+				}
+				return formatMessage(messages.platformErrorHeader, {
+					loader: formatLoaderLabel(current.key.platform),
+					loaderVersion: current.key.platform_version,
+					gameVersion: current.key.game_version,
 				})
 			}
 			return formatMessage(messages.installingPlatform, {
@@ -122,13 +159,22 @@ const headerLabel = computed(() => {
 			})
 		}
 		case 'modrinth_modpack':
-			return formatMessage(messages.installingModpack)
+			return formatMessage(
+				current.status === 'failed' ? messages.modpackErrorHeader : messages.installingModpack,
+			)
 		case 'local_modpack':
-			return formatMessage(messages.installingLocalModpack, {
-				filename: current.key.filename,
-			})
+			return formatMessage(
+				current.status === 'failed'
+					? messages.localModpackErrorHeader
+					: messages.installingLocalModpack,
+				{
+					filename: current.key.filename,
+				},
+			)
 		case 'unknown':
-			return formatMessage(messages.preparingHeader)
+			return formatMessage(
+				current.status === 'failed' ? messages.errorHeader : messages.preparingHeader,
+			)
 	}
 
 	return formatMessage(messages.preparingHeader)

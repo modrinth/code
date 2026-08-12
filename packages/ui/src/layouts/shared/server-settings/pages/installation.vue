@@ -245,6 +245,10 @@ const addonsQuery = useQuery({
 	enabled: computed(() => worldId.value !== null),
 })
 
+const requiresInstallation = computed(
+	() => installation.value?.status === 'failed' || addonsQuery.data.value?.error != null,
+)
+
 const modpack = computed(() => addonsQuery.data.value?.modpack ?? null)
 
 const modpackProjectId = computed(() => {
@@ -566,6 +570,7 @@ provideInstallationSettings({
 	currentPlatform: computed(() => server.value?.loader?.toLowerCase() ?? 'vanilla'),
 	currentGameVersion: computed(() => server.value?.mc_version ?? ''),
 	currentLoaderVersion: computed(() => server.value?.loader_version ?? ''),
+	requiresInstallation,
 	availablePlatforms: ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur'],
 
 	editingPlatformRef: editingPlatform,
@@ -640,7 +645,9 @@ provideInstallationSettings({
 		const gameVersionChanged = gameVersion !== (server.value?.mc_version ?? '')
 		const loaderVersionChanged =
 			loaderVersionId !== null && loaderVersionId !== (server.value?.loader_version ?? '')
-		if (!platformChanged && !gameVersionChanged && !loaderVersionChanged) return
+		const shouldInstallContent =
+			requiresInstallation.value || platformChanged || loaderVersionChanged
+		if (!shouldInstallContent && !gameVersionChanged) return
 
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -652,20 +659,20 @@ provideInstallationSettings({
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
-			platformChanged || loaderVersionChanged
+			shouldInstallContent
 				? { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion }
 				: { mVersion: gameVersion },
 		)
 		try {
-			if (platformChanged || loaderVersionChanged) {
+			if (shouldInstallContent) {
 				const request: Archon.Content.v1.InstallWorldContent = {
 					content_variant: 'bare',
 					loader: toApiLoader(platform),
 					version: resolvedLoaderVersion ?? '',
-					game_version: gameVersion || undefined,
+					game_version: gameVersion,
 					soft_override: true,
 				}
-				debug('save: platform/loader version changed, calling installContent', request)
+				debug('save: calling installContent', request)
 				await client.archon.content_v1.installContent(serverId, worldId.value!, request)
 			} else if (gameVersionChanged) {
 				debug('save: game version only, calling applyGameVersionUpdate', gameVersion)
