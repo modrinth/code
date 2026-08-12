@@ -7,14 +7,17 @@ import Toggle from '#ui/components/base/Toggle.vue'
 import PhotosensitivityWarningModal from '#ui/components/modal/PhotosensitivityWarningModal.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 import { useVIntl } from '#ui/composables/i18n'
+import { useAdvancedPrefs } from '#ui/utils/advanced-filter-preferences'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import AdvancedFiltersPersistenceNote from './components/AdvancedFiltersPersistenceNote.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
 const PHOTOSENSITIVITY_FILTER_OPTION = 'epilepsy_triggers'
 
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
+const advancedPrefs = useAdvancedPrefs()
 
 const isApp = computed(() => ctx.variant === 'app')
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
@@ -36,16 +39,25 @@ function isPhotosensitivityExclusionSelected(filters: { type: string; option: st
 }
 
 watch(
-	() =>
-		isPhotosensitivityExclusionSelected(
+	() => ({
+		selected: isPhotosensitivityExclusionSelected(
 			ctx.isServerType.value ? ctx.serverCurrentFilters.value : ctx.currentFilters.value,
 		),
-	(isSelected, wasSelected) => {
-		if (isSelected && !wasSelected && !ctx.dismissedPhotosensitivityFilterWarning?.value) {
+		saved: advancedPrefs.value.includes(PHOTOSENSITIVITY_FILTER_OPTION),
+	}),
+	(current, previous) => {
+		if (!previous) {
+			return
+		}
+
+		const selected = current.selected && !previous.selected
+		const alreadySaved = previous.saved
+		const dismissed = ctx.dismissedPhotosensitivityFilterWarning?.value
+
+		if (selected && !alreadySaved && !dismissed) {
 			nextTick(() => photosensitivityWarningModal.value?.show())
 		}
 	},
-	{ immediate: true },
 )
 
 function onPhotosensitivityWarningDismiss(dontShowAgain: boolean) {
@@ -215,6 +227,9 @@ function getFilterOpenByDefault(filterId: string): boolean {
 						{{ filterType.formatted_name }}
 					</h3>
 				</template>
+				<template v-if="filterType.id === 'advanced'" #prefix>
+					<AdvancedFiltersPersistenceNote />
+				</template>
 			</SearchSidebarFilter>
 		</template>
 		<template v-else>
@@ -241,8 +256,11 @@ function getFilterOpenByDefault(filterId: string): boolean {
 						{{ filter.formatted_name }}
 					</h3>
 				</template>
+				<template v-if="filter.id === 'advanced'" #prefix>
+					<AdvancedFiltersPersistenceNote />
+				</template>
 				<template
-					v-if="
+					v-else-if="
 						lockedMessages?.gameVersionShaderMessage &&
 						ctx.projectType.value === 'shader' &&
 						filter.id === 'game_version'
@@ -251,7 +269,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				>
 					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
 						<InfoIcon class="mt-1 size-4" />
-						<span>{{ lockedMessages.gameVersionShaderMessage }}</span>
+						<span>{{ lockedMessages?.gameVersionShaderMessage }}</span>
 					</div>
 				</template>
 				<template v-if="lockedMessages?.gameVersion" #locked-game_version>

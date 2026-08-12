@@ -270,7 +270,13 @@ export function formatAiUsageFilterLabel(
 	formatMessage: FormatMessage,
 	usage: Labrinth.Projects.v3.AiUsage,
 ): string {
-	return formatMessage(disclosureAiUsageMessages[usage])
+	return formatMessage(
+		defineMessage({
+			id: 'search.filter_type.advanced.disclosure.ai_content.usage',
+			defaultMessage: 'AI {usage}',
+		}),
+		{ usage: formatMessage(disclosureAiUsageMessages[usage]) },
+	)
 }
 
 export function formatTelemetryConsentFilterLabel(

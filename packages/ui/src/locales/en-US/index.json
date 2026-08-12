@@ -92,6 +92,15 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resubscribe to Server"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Apply saved preferences"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "This link's filters differ from your saved advanced exclusions"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Advanced exclusions are saved across sessions. Opening a shared link with filters will override them."
+  },
   "browse.filter-results": {
     "defaultMessage": "Filter results..."
   },
@@ -3940,6 +3949,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content": {
     "defaultMessage": "AI-generated content"
+  },
+  "search.filter_type.advanced.disclosure.ai_content.usage": {
+    "defaultMessage": "AI {usage}"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Archived"

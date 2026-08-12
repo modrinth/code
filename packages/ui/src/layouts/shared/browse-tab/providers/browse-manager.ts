@@ -45,6 +45,8 @@ export interface BrowseManagerContext {
 	setPage: (page: number) => Promise<void>
 	clearSearch: () => void
 	onFilterChange: () => void
+	linkOverridesAdvancedPrefs: Ref<boolean>
+	applySavedAdvancedPrefs: () => void
 
 	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => string | RouteLocationRaw
 	getServerProjectLink: (
