@@ -734,7 +734,7 @@ pub async fn show_ads_consent_ui<R: Runtime>(
 ) -> crate::api::Result<()> {
     let mut show_notification = false;
 
-    if app.webviews().get("ads-window").is_some() {
+    if app.webviews().contains_key("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
 
@@ -762,7 +762,7 @@ pub async fn show_ads_consent_ui<R: Runtime>(
 pub async fn expand_ads_consent_webview<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> crate::api::Result<()> {
-    if app.webviews().get("ads-window").is_some() {
+    if app.webviews().contains_key("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
 
