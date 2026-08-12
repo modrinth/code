@@ -1,60 +1,30 @@
-import {
-	BoxIcon,
-	BracesIcon,
-	GlassesIcon,
-	type IconComponent,
-	PaintbrushIcon,
-	PlugIcon,
-} from '@modrinth/assets'
 import { useSessionStorage } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 
 import type {
 	DropdownFilterBarCategory,
-	DropdownFilterBarItem,
 	DropdownFilterBarOption,
 } from '#ui/components/base/DropdownFilterBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { getProjectTypeCategoryMessage, normalizeProjectType } from '#ui/utils/common-messages'
-import { formatCategory } from '#ui/utils/tag-messages'
 
 import type { ContentItem } from '../types'
 import { getClientWarningType } from './content-filtering'
 
 export type ContentMetadataFilterValue = Record<string, string[]>
 
-interface MetadataFilterSection {
-	key: string
-	label: string
-	icon: IconComponent
-	order: number
-}
-
-interface ResolvedFilterValue extends DropdownFilterBarOption {
-	section?: MetadataFilterSection
-}
-
 interface MetadataFilterDefinition {
 	key: string
 	label: string
 	searchable?: boolean
 	direct?: boolean
-	values: (item: ContentItem) => ResolvedFilterValue[]
+	options?: DropdownFilterBarOption[]
+	values: (item: ContentItem) => DropdownFilterBarOption[]
 }
 
 interface ContentMetadataFilterConfig {
 	showSharedContent?: Ref<boolean> | Readonly<Ref<boolean>>
-}
-
-const projectTypeOrder = ['mod', 'plugin', 'datapack', 'resourcepack', 'shader', 'project']
-const projectTypeIcons: Record<string, IconComponent> = {
-	mod: BoxIcon,
-	plugin: PlugIcon,
-	datapack: BracesIcon,
-	resourcepack: PaintbrushIcon,
-	shader: GlassesIcon,
-	project: BoxIcon,
+	showEnvironmentWarnings?: boolean
 }
 
 const openSourceLicenseIds = new Set([
@@ -88,6 +58,30 @@ const openSourceLicenseIds = new Set([
 	'Zlib',
 ])
 
+type EnvironmentFilterValue = 'client' | 'server' | 'client_and_server' | 'singleplayer'
+
+function getEnvironmentFilterValue(
+	environment?: ContentItem['environment'],
+): EnvironmentFilterValue | undefined {
+	switch (environment) {
+		case 'client_only':
+			return 'client'
+		case 'server_only':
+		case 'dedicated_server_only':
+			return 'server'
+		case 'client_and_server':
+		case 'client_only_server_optional':
+		case 'server_only_client_optional':
+		case 'client_or_server':
+		case 'client_or_server_prefers_both':
+			return 'client_and_server'
+		case 'singleplayer_only':
+			return 'singleplayer'
+		default:
+			return undefined
+	}
+}
+
 const messages = defineMessages({
 	author: {
 		id: 'content.metadata-filter.author',
@@ -97,9 +91,25 @@ const messages = defineMessages({
 		id: 'content.metadata-filter.open-source',
 		defaultMessage: 'Open source',
 	},
-	category: {
-		id: 'content.metadata-filter.category',
-		defaultMessage: 'Category',
+	environment: {
+		id: 'content.metadata-filter.environment',
+		defaultMessage: 'Environment',
+	},
+	clientSideOnly: {
+		id: 'project.settings.environment.client_only.title',
+		defaultMessage: 'Client-side only',
+	},
+	serverSideOnly: {
+		id: 'project.settings.environment.server_only.title',
+		defaultMessage: 'Server-side only',
+	},
+	clientAndServer: {
+		id: 'project.settings.environment.client_and_server.title',
+		defaultMessage: 'Client and server',
+	},
+	singleplayerOnly: {
+		id: 'project.settings.environment.singleplayer.title',
+		defaultMessage: 'Singleplayer only',
 	},
 	state: {
 		id: 'content.metadata-filter.state',
@@ -165,13 +175,8 @@ export function useContentMetadataFilters(
 		? useSessionStorage<ContentMetadataFilterValue>(`content-metadata-filters:${persistKey}`, {})
 		: ref<ContentMetadataFilterValue>({})
 
-	function option(
-		value: string,
-		label: string,
-		searchTerms?: string[],
-		section?: MetadataFilterSection,
-	): ResolvedFilterValue {
-		return { value, label, searchTerms, section }
+	function option(value: string, label: string, searchTerms?: string[]): DropdownFilterBarOption {
+		return { value, label, searchTerms }
 	}
 
 	function isOpenSource(item: ContentItem) {
@@ -183,41 +188,17 @@ export function useContentMetadataFilters(
 		return item.external || !item.project?.license
 	}
 
-	function getCategorySection(item: ContentItem): MetadataFilterSection {
-		const normalizedType = normalizeProjectType(item.project_type)
-		const key = projectTypeIcons[normalizedType] ? normalizedType : 'project'
-		return {
-			key,
-			label: formatMessage(getProjectTypeCategoryMessage(key)),
-			icon: projectTypeIcons[key],
-			order: projectTypeOrder.indexOf(key),
+	function getEnvironmentFilterLabel(value: EnvironmentFilterValue) {
+		switch (value) {
+			case 'client':
+				return formatMessage(messages.clientSideOnly)
+			case 'server':
+				return formatMessage(messages.serverSideOnly)
+			case 'client_and_server':
+				return formatMessage(messages.clientAndServer)
+			case 'singleplayer':
+				return formatMessage(messages.singleplayerOnly)
 		}
-	}
-
-	function buildCategoryOptions(options: ResolvedFilterValue[]): DropdownFilterBarItem[] {
-		if (!options.some((option) => option.section)) {
-			return options.map(({ section: _section, ...option }) => option)
-		}
-
-		const sections = new Map<string, MetadataFilterSection>()
-		for (const option of options) {
-			if (option.section) sections.set(option.section.key, option.section)
-		}
-
-		return [...sections.values()]
-			.sort((a, b) => a.order - b.order)
-			.flatMap((section, index) => [
-				{
-					type: 'section-header' as const,
-					key: section.key,
-					label: section.label,
-					icon: section.icon,
-					dividerBefore: index > 0,
-				},
-				...options
-					.filter((option) => option.section?.key === section.key)
-					.map(({ section: _section, ...option }) => option),
-			])
 	}
 
 	const definitions = computed<MetadataFilterDefinition[]>(() => [
@@ -231,17 +212,17 @@ export function useContentMetadataFilters(
 					: [],
 		},
 		{
-			key: 'category',
-			label: formatMessage(messages.category),
-			searchable: true,
+			key: 'environment',
+			label: formatMessage(messages.environment),
+			options: [
+				option('client', getEnvironmentFilterLabel('client')),
+				option('server', getEnvironmentFilterLabel('server')),
+				option('client_and_server', getEnvironmentFilterLabel('client_and_server')),
+				option('singleplayer', getEnvironmentFilterLabel('singleplayer')),
+			],
 			values: (item) => {
-				const section = getCategorySection(item)
-				return [
-					...(item.project?.categories ?? []),
-					...(item.project?.additional_categories ?? []),
-				].map((value) =>
-					option(`${section.key}:${value}`, formatCategory(formatMessage, value), [value], section),
-				)
+				const value = getEnvironmentFilterValue(item.environment)
+				return value ? [option(value, getEnvironmentFilterLabel(value))] : []
 			},
 		},
 		{
@@ -269,7 +250,7 @@ export function useContentMetadataFilters(
 			key: 'warnings',
 			label: formatMessage(messages.warnings),
 			values: (item) => {
-				const warning = getClientWarningType(item)
+				const warning = getClientWarningType(item, config?.showEnvironmentWarnings)
 				switch (warning) {
 					case 'retained':
 						return [option(warning, formatMessage(messages.clientRetained))]
@@ -314,28 +295,31 @@ export function useContentMetadataFilters(
 	const metadataFilterCategories = computed<DropdownFilterBarCategory[]>(() =>
 		definitions.value
 			.map((definition) => {
-				const options = new Map<string, ResolvedFilterValue>()
-				const optionMatchCounts = new Map<string, number>()
-				for (const item of items.value) {
-					const itemValues = new Map(
-						definition.values(item).map((value) => [value.value, value] as const),
-					)
-					for (const value of itemValues.values()) {
-						if (!options.has(value.value)) options.set(value.value, value)
-						optionMatchCounts.set(value.value, (optionMatchCounts.get(value.value) ?? 0) + 1)
+				let visibleOptions = definition.options
+				if (!visibleOptions) {
+					const options = new Map<string, DropdownFilterBarOption>()
+					const optionMatchCounts = new Map<string, number>()
+					for (const item of items.value) {
+						const itemValues = new Map(
+							definition.values(item).map((value) => [value.value, value] as const),
+						)
+						for (const value of itemValues.values()) {
+							if (!options.has(value.value)) options.set(value.value, value)
+							optionMatchCounts.set(value.value, (optionMatchCounts.get(value.value) ?? 0) + 1)
+						}
 					}
-				}
 
-				const visibleOptions = [...options.values()]
-					.filter((option) => optionMatchCounts.get(option.value) !== items.value.length)
-					.sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
+					visibleOptions = [...options.values()]
+						.filter((option) => optionMatchCounts.get(option.value) !== items.value.length)
+						.sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
+				}
 
 				return {
 					key: definition.key,
 					label: definition.label,
 					direct: definition.direct,
 					searchable: definition.searchable,
-					options: buildCategoryOptions(visibleOptions),
+					options: visibleOptions,
 				}
 			})
 			.filter((category) => category.options.some((option) => !('type' in option))),

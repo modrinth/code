@@ -94,6 +94,7 @@ export interface ContentManagerContext {
 
 	// Deletion context (controls modal variant)
 	deletionContext?: 'instance' | 'server'
+	showEnvironmentWarnings?: boolean
 
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem

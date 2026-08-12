@@ -1,5 +1,7 @@
 use super::ContentSourceKind;
-use crate::state::{License, Project, ProjectType, Version};
+use crate::state::{
+    License, Project, ProjectType, Version, VersionEnvironment,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -13,6 +15,7 @@ pub struct ContentItem {
     pub project_type: ProjectType,
     pub project: Option<ContentItemProject>,
     pub version: Option<ContentItemVersion>,
+    pub environment: Option<VersionEnvironment>,
     pub owner: Option<ContentItemOwner>,
     pub has_update: bool,
     pub update_version_id: Option<String>,

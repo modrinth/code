@@ -1413,6 +1413,7 @@ provideContentManager({
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
 	deletionContext: 'server',
+	showEnvironmentWarnings: true,
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
 	bulkUpdateItems: handleBulkUpdate,
@@ -1472,6 +1473,7 @@ provideContentManager({
 					:source-icon-url="managedContent?.card.manager.iconUrl"
 					:header="formatMessage(messages.modpackContent)"
 					enable-toggle
+					show-environment-warnings
 					:action-disabled="setupActionDisabled"
 					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
 					@update:enabled="handleModpackContentToggle"

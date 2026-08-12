@@ -27,7 +27,6 @@ import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import TagIcon from '#ui/components/base/TagIcon.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -42,7 +41,6 @@ import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
 import {
 	getClientWarningType,
-	isClientOnlyEnvironment,
 	useBulkOperation,
 	useChangingItems,
 	useContentFilters,
@@ -266,6 +264,7 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 		showUpdateFilter: false,
 		showWarningsFilter: false,
 		showStatusFilters: false,
+		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 		isPackLocked: ctx.isPackLocked,
 		persistKey: ctx.filterPersistKey,
 	},
@@ -274,6 +273,7 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
 	useContentMetadataFilters(ctx.items, ctx.filterPersistKey, {
 		showSharedContent: ctx.showSharedContentFilter,
+		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 	})
 
 const metadataFilterAuthors = computed(() => {
@@ -322,11 +322,6 @@ function isMetadataFilterOrganization(value: string) {
 	return (
 		getMetadataFilterAuthor(value)?.type === 'organization' || value.startsWith('organization:')
 	)
-}
-
-function getMetadataFilterCategory(value: string) {
-	const separatorIndex = value.indexOf(':')
-	return separatorIndex === -1 ? value : value.slice(separatorIndex + 1)
 }
 
 const metadataFilterTriggerClass =
@@ -426,6 +421,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 		const base = ctx.mapToTableItem(item)
 		const id = getItemId(item)
 		const locked = base.locked ?? item.locked ?? false
+		const clientWarning = getClientWarningType(item, ctx.showEnvironmentWarnings)
 		return {
 			...base,
 			id,
@@ -439,11 +435,8 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 				: base.toggleDisabledTooltip,
 			installing: item.installing === true,
 			hasUpdate: base.hasUpdate ?? item.has_update,
-			isClientOnly:
-				isClientOnlyEnvironment(item.environment) ||
-				!!item.pack_client_retained ||
-				!!item.pack_client_depends,
-			clientWarning: getClientWarningType(item),
+			isClientOnly: clientWarning !== null,
+			clientWarning,
 			hideDelete: base.hideDelete,
 			hideSwitchVersion: base.hideSwitchVersion ?? !base.versionLink,
 			overflowOptions: ctx.getOverflowOptions?.(item),
@@ -1177,22 +1170,6 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 												</span>
 												<span
 													v-tooltip="option.label"
-													class="min-w-0 truncate font-semibold leading-tight"
-													:class="selected ? 'text-contrast' : 'text-primary'"
-												>
-													{{ option.label }}
-												</span>
-											</div>
-											<div
-												v-else-if="category.key === 'category'"
-												class="flex min-w-0 flex-1 items-center gap-2"
-											>
-												<TagIcon
-													:tag="getMetadataFilterCategory(option.value)"
-													enforce-type="category"
-													class="size-5 shrink-0 text-secondary"
-												/>
-												<span
 													class="min-w-0 truncate font-semibold leading-tight"
 													:class="selected ? 'text-contrast' : 'text-primary'"
 												>

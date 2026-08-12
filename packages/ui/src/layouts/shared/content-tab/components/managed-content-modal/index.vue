@@ -28,7 +28,7 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { getClientWarningType, isClientOnlyEnvironment } from '../../composables/content-filtering'
+import { getClientWarningType } from '../../composables/content-filtering'
 import type { ContentCardProject, ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
@@ -45,6 +45,7 @@ interface Props {
 	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 	switchVersion?: (item: ContentItem) => void
+	showEnvironmentWarnings?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -56,6 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
 	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
 	switchVersion: undefined,
+	showEnvironmentWarnings: false,
 })
 
 const emit = defineEmits<{
@@ -174,7 +176,9 @@ const filterOptions = computed(() => {
 			}
 		})
 
-	if (items.value.some((item) => getClientWarningType(item) !== null)) {
+	if (
+		items.value.some((item) => getClientWarningType(item, props.showEnvironmentWarnings) !== null)
+	) {
 		options.push({ id: 'warnings', label: 'Warnings' })
 	}
 
@@ -205,7 +209,8 @@ const typeFilteredCount = computed(() => {
 		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
 			return false
 		if (hasDisabledFilter && item.enabled) return false
-		if (hasWarningsFilter && getClientWarningType(item) === null) return false
+		if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
+			return false
 		return true
 	}).length
 })
@@ -228,7 +233,8 @@ const filteredItems = computed(() => {
 			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
 				return false
 			if (hasDisabledFilter && item.enabled) return false
-			if (hasWarningsFilter && getClientWarningType(item) === null) return false
+			if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
+				return false
 			return true
 		})
 	}
@@ -276,11 +282,8 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
-		isClientOnly:
-			isClientOnlyEnvironment(item.environment) ||
-			!!item.pack_client_retained ||
-			!!item.pack_client_depends,
-		clientWarning: getClientWarningType(item),
+		isClientOnly: getClientWarningType(item, props.showEnvironmentWarnings) !== null,
+		clientWarning: getClientWarningType(item, props.showEnvironmentWarnings),
 		disabled:
 			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
 		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,

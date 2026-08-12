@@ -98,7 +98,7 @@ export interface ContentItem extends Omit<
 	has_update: boolean
 	update_version_id: string | null
 	date_added?: string
-	environment?: string
+	environment?: Labrinth.Projects.v3.Environment
 	pack_client_retained?: boolean
 	pack_client_depends?: boolean
 	installing?: boolean

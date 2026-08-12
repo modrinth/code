@@ -617,8 +617,8 @@
   "content.metadata-filter.author": {
     "defaultMessage": "Author"
   },
-  "content.metadata-filter.category": {
-    "defaultMessage": "Category"
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Environment"
   },
   "content.metadata-filter.open-source": {
     "defaultMessage": "Open source"

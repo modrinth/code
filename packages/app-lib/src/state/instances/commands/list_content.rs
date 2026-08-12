@@ -12,7 +12,8 @@ use crate::state::{
     CacheBehaviour, CachedEntry, CachedFile, ContentFile, ContentItem,
     ContentItemOwner, ContentItemProject, ContentItemVersion, Dependency,
     LinkedModpackInfo, ModLoader, Organization, OwnerType, Project,
-    ProjectType, ReleaseChannel, TeamMember, Version,
+    ProjectType, ReleaseChannel, TeamMember, Version, VersionEnvironment,
+    VersionV3,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
@@ -523,6 +524,10 @@ pub(crate) async fn dependencies_to_content_items(
                         .unwrap_or_default(),
                     date_published: Some(version.date_published.to_rfc3339()),
                 }),
+                environment: resolve_environment(
+                    dependency.version_id.as_deref(),
+                    &meta.versions_v3,
+                ),
                 owner,
                 has_update: false,
                 update_version_id: None,
@@ -906,6 +911,12 @@ async fn content_files_to_content_items(
                     file_name: file.file_name.clone(),
                     date_published: Some(version.date_published.to_rfc3339()),
                 }),
+                environment: resolve_environment(
+                    file.metadata
+                        .as_ref()
+                        .map(|metadata| metadata.version_id.as_str()),
+                    &meta.versions_v3,
+                ),
                 owner,
                 has_update: file.update_version_id.is_some()
                     && !file.source_kind.is_some_and(
@@ -926,6 +937,7 @@ async fn content_files_to_content_items(
 struct ResolvedMetadata {
     projects: Vec<Project>,
     versions: Vec<Version>,
+    versions_v3: Vec<VersionV3>,
     teams: Vec<Vec<TeamMember>>,
     organizations: Vec<Organization>,
 }
@@ -941,7 +953,7 @@ async fn resolve_metadata(
         project_ids.iter().map(String::as_str).collect::<Vec<_>>();
     let version_id_refs =
         version_ids.iter().map(String::as_str).collect::<Vec<_>>();
-    let (projects, versions) =
+    let (projects, versions, versions_v3) =
         if !project_ids.is_empty() || !version_ids.is_empty() {
             tokio::try_join!(
                 async {
@@ -969,10 +981,23 @@ async fn resolve_metadata(
                         )
                         .await
                     }
+                },
+                async {
+                    if version_ids.is_empty() {
+                        Ok(Vec::new())
+                    } else {
+                        CachedEntry::get_version_v3_many(
+                            &version_id_refs,
+                            cache_behaviour,
+                            pool,
+                            fetch_semaphore,
+                        )
+                        .await
+                    }
                 }
             )?
         } else {
-            (Vec::new(), Vec::new())
+            (Vec::new(), Vec::new(), Vec::new())
         };
     let team_ids = projects
         .iter()
@@ -1021,9 +1046,21 @@ async fn resolve_metadata(
     Ok(ResolvedMetadata {
         projects,
         versions,
+        versions_v3,
         teams,
         organizations,
     })
+}
+
+fn resolve_environment(
+    version_id: Option<&str>,
+    versions: &[VersionV3],
+) -> Option<VersionEnvironment> {
+    let version_id = version_id?;
+    versions
+        .iter()
+        .find(|version| version.id == version_id)
+        .and_then(|version| version.environment)
 }
 
 fn resolve_owner(
