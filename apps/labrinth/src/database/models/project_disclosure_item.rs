@@ -15,6 +15,7 @@ pub struct DBProjectDisclosure {
     pub updated_at: DateTime<Utc>,
     pub updated_by: DBUserId,
     pub set_by_moderator: bool,
+    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl DBProjectDisclosure {
@@ -37,7 +38,8 @@ impl DBProjectDisclosure {
 				metadata = $3,
 				updated_at = now(),
 				updated_by = $4,
-				set_by_moderator = $5
+				set_by_moderator = $5,
+				deleted_at = NULL
 			"#,
             self.project_id as DBProjectId,
             disclosure_type,
@@ -53,16 +55,18 @@ impl DBProjectDisclosure {
 
     pub async fn get_many_for_project(
         project_id: DBProjectId,
+        include_deleted: bool,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProjectDisclosure>, DatabaseError> {
         let rows = sqlx::query!(
             r#"
-			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator
+			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator, deleted_at
 			FROM project_disclosures
-			WHERE project_id = $1
+			WHERE project_id = $1 AND ($2 OR deleted_at IS NULL)
 			ORDER BY updated_at DESC
 			"#,
             project_id as DBProjectId,
+            include_deleted,
         )
         .fetch_all(exec)
         .await?;
@@ -83,6 +87,7 @@ impl DBProjectDisclosure {
                     updated_at: row.updated_at,
                     updated_by: DBUserId(row.updated_by),
                     set_by_moderator: row.set_by_moderator,
+                    deleted_at: row.deleted_at,
                 })
             })
             .collect()
@@ -99,7 +104,7 @@ impl DBProjectDisclosure {
             r#"
 			SELECT project_id
 			FROM project_disclosures
-			WHERE type = $1 AND project_id = ANY($2)
+			WHERE type = $1 AND project_id = ANY($2) AND deleted_at IS NULL
 			"#,
             <&'static str>::from(disclosure_type),
             &ids,
@@ -118,7 +123,7 @@ impl DBProjectDisclosure {
         let existing = sqlx::query_scalar!(
             r#"
 			SELECT 1 FROM project_disclosures
-			WHERE project_id = $1 AND type = ANY($2) AND set_by_moderator
+			WHERE project_id = $1 AND type = ANY($2) AND set_by_moderator AND deleted_at IS NULL
 			LIMIT 1
 			"#,
             project_id as DBProjectId,
@@ -137,8 +142,9 @@ impl DBProjectDisclosure {
     ) -> Result<bool, DatabaseError> {
         let result = sqlx::query!(
             r#"
-			DELETE FROM project_disclosures
-			WHERE project_id = $1 AND type = $2
+			UPDATE project_disclosures
+			SET deleted_at = now()
+			WHERE project_id = $1 AND type = $2 AND deleted_at IS NULL
 			"#,
             project_id as DBProjectId,
             <&'static str>::from(disclosure_type),

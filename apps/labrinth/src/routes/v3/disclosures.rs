@@ -74,6 +74,7 @@ pub async fn get_project_disclosures(
 
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         project.inner.id,
+        false,
         &***ro_pool,
     )
     .await
@@ -195,6 +196,7 @@ pub async fn modify_project_disclosures(
             updated_at: Utc::now(),
             updated_by: user.id.into(),
             set_by_moderator: user.role.is_mod(),
+            deleted_at: None,
         }
         .upsert(&mut transaction)
         .await

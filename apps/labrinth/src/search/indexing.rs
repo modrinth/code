@@ -326,7 +326,7 @@ async fn build_search_documents(
         "
         SELECT project_id, type, metadata
         FROM project_disclosures
-        WHERE project_id = ANY($1)
+        WHERE project_id = ANY($1) AND deleted_at IS NULL
         ",
         &*project_ids,
     )

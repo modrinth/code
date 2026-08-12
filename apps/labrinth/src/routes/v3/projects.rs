@@ -492,6 +492,7 @@ pub async fn project_edit_internal(
         let archival_disclosure =
             db_models::DBProjectDisclosure::get_many_for_project(
                 project_item.inner.id,
+                false,
                 &mut transaction,
             )
             .await
@@ -513,6 +514,7 @@ pub async fn project_edit_internal(
                     updated_at: Utc::now(),
                     updated_by: user.id.into(),
                     set_by_moderator: user.role.is_mod(),
+                    deleted_at: None,
                 }
                 .upsert(&mut transaction)
                 .await

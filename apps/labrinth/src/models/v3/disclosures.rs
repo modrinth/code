@@ -85,6 +85,8 @@ pub struct ProjectDisclosureData {
     pub updated_at: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_by: Option<UserId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl ProjectDisclosureData {
@@ -100,6 +102,7 @@ impl ProjectDisclosureData {
             set_by_moderator: value.set_by_moderator,
             updated_at: value.updated_at,
             updated_by,
+            deleted_at: value.deleted_at,
         }
     }
 }
