@@ -190,7 +190,7 @@ async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
     drop(state);
 
     if let Some(webview) = app.webviews().get("ads-window") {
-        set_webview_visible_for_window(app, webview, visible);
+        set_webview_visible(webview, visible);
     }
 }
 
