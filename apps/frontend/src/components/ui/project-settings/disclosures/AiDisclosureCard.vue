@@ -93,7 +93,7 @@ function setUse(use: AiUsage, enabled: boolean) {
 		</p>
 		<template #expanded>
 			<SettingsFormGroup :title="formatMessage(messages.typesDescription)">
-				<div class="grid gap-2 sm:grid-cols-4">
+				<div class="flex flex-col gap-2">
 					<Checkbox
 						v-for="use in AI_USES"
 						:key="use"
