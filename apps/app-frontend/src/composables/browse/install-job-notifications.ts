@@ -404,8 +404,6 @@ export async function useInstallJobNotifications(opts: {
 	}
 
 	function getProgress(job: InstallJobSnapshot): number {
-		if (job.status === 'succeeded') return 1
-		if (job.status === 'failed' || job.status === 'interrupted') return 0
 		const progress = getEffectiveProgress(job)
 		if (!progress || progress.total <= 0) return 0
 		return Math.max(0, Math.min(1, progress.current / progress.total))
@@ -526,8 +524,12 @@ export async function useInstallJobNotifications(opts: {
 		)
 	}
 
+	const activeJobs = computed(() =>
+		jobs.value.filter((job) => job.status === 'queued' || job.status === 'running'),
+	)
+
 	const progressItems = computed<PopupNotificationProgressItem[]>(() =>
-		jobs.value.map((job) => {
+		activeJobs.value.map((job) => {
 			const progress = getEffectiveProgress(job)
 
 			return {
@@ -536,20 +538,26 @@ export async function useInstallJobNotifications(opts: {
 				text: getText(job),
 				iconUrl: iconUrls.value[job.job_id] ?? null,
 				progress: getProgress(job),
-				waiting: !job.progress && ['queued', 'running'].includes(job.status),
-				showProgress: !isTerminalJob(job),
-				wrapText: isTerminalJob(job),
-				progressType: isTerminalJob(job) ? undefined : getProgressType(job),
-				progressCurrent: isTerminalJob(job) ? undefined : progress?.current,
-				progressTotal: isTerminalJob(job) ? undefined : progress?.total,
+				waiting: !job.progress && job.status === 'running',
+				showProgress: job.status === 'running',
+				progressType: getProgressType(job),
+				progressCurrent: progress?.current,
+				progressTotal: progress?.total,
 				buttons: getButtons(job),
-				dismissible: isTerminalJob(job),
-				onDismiss: getDismissHandler(job),
 			}
 		}),
 	)
 
-	const buttons = computed<PopupNotificationButton[] | undefined>(() => undefined)
+	const terminalNotifications = computed(() =>
+		jobs.value.filter(isTerminalJob).map((job) => ({
+			id: job.job_id,
+			title: getTitle(job),
+			text: getText(job),
+			type: job.status === 'failed' ? ('error' as const) : ('warning' as const),
+			buttons: getButtons(job),
+			onDismiss: getDismissHandler(job),
+		})),
+	)
 
 	async function refreshMetadata(notify = true) {
 		const request = ++metadataRequest
@@ -631,10 +639,10 @@ export async function useInstallJobNotifications(opts: {
 	await refresh(false)
 
 	return {
-		active: computed(() => jobs.value.length > 0),
+		active: computed(() => activeJobs.value.length > 0),
 		title: computed(() => formatMessage(messages.installs)),
 		progressItems,
-		buttons,
+		terminalNotifications,
 		refresh,
 		dispose: () => {
 			for (const timeout of copiedResetTimeouts.values()) {
