@@ -38,7 +38,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/v3/payout")
             .wrap(default_cors())
-            .configure(payouts::config),
+            .configure(payouts::config)
+            .service(payouts::paypal_webhook)
+            .service(payouts::tremendous_webhook),
     );
     cfg.service(
         web::scope("/v3/project")
@@ -56,8 +58,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(notifications::config)
             .configure(oauth_clients::config)
             .configure(organizations::config)
-            .service(payouts::paypal_webhook)
-            .service(payouts::tremendous_webhook)
             .configure(projects::config)
             .configure(reports::config)
             .configure(statistics::config)
