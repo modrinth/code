@@ -35,7 +35,25 @@ export default function () {
 
 								toggle('paid-features', 'Paid Features').suggestedStatus('flagged').message(),
 
-								toggle('telemetry', 'Telemetry').suggestedStatus('rejected').message(),
+								toggle('telemetry', 'Telemetry')
+									.suggestedStatus('rejected')
+									.message()
+									.children(
+										group()
+											.title("What is the telemetry's consent model?")
+											.children(
+												toggle('opt-in', 'Opt In')
+													.message('consent-model/opt-in')
+													.enabled((state) => !state?.['opt-out'] && !state?.['always']),
+												toggle('opt-out', 'Opt Out')
+													.message('consent-model/opt-out')
+													.enabled((state) => !state?.['opt-in'] && !state?.['always']),
+												toggle('always', 'Always Online')
+													.message('consent-model/always')
+													.enabled((state) => !state?.['opt-out'] && !state?.['opt-in']),
+											),
+									)
+									.collect(),
 
 								toggle('derivative-content', 'Derivative Content')
 									.suggestedStatus('rejected')
