@@ -17,6 +17,7 @@
 			>
 				<NotificationToast
 					v-if="item.toast"
+					class="min-w-full"
 					:type="item.toast.type"
 					:action-loading="toastActionLoading(item.id)"
 					:actor-name="item.toast.actorName"
@@ -37,9 +38,15 @@
 					@open-actor="item.toast.onOpenActor?.()"
 					@open-instance="handleToastAction(item, item.toast.onOpenInstance)"
 				/>
-				<div v-else-if="isDownloadNotification(item)" class="flex flex-col gap-4">
+				<TransitionGroup
+					v-else-if="isDownloadNotification(item)"
+					name="popup-downloads"
+					tag="div"
+					class="flex flex-col gap-3"
+				>
 					<div v-for="progressItem in downloadToastItems(item)" :key="progressItem.id">
 						<NotificationToast
+							class="min-w-full"
 							type="instance-download"
 							:entity-name="progressItem.title || item.title"
 							:entity-icon-url="progressItem.iconUrl ?? item.iconUrl ?? MinecraftServerIcon"
@@ -54,10 +61,10 @@
 							:actions="progressItem.buttons"
 							:dismissible="progressItem.dismissible"
 							@dismiss="handleProgressItemDismiss(item, progressItem)"
-							@action="(index) => handleProgressItemAction(progressItem, index)"
+							@action="(index) => handleProgressItemAction(item, progressItem, index)"
 						/>
 					</div>
-				</div>
+				</TransitionGroup>
 				<div
 					v-else
 					class="flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"
@@ -100,7 +107,7 @@
 								type="quiet"
 								label="Close"
 								class="-m-1.5"
-								@click="dismiss(item.id)"
+								@click="handleNotificationDismiss(item)"
 							>
 								<XIcon />
 							</IconButton>
@@ -201,7 +208,7 @@ import NotificationToast from '../notifications/NotificationToast.vue'
 
 const popupNotificationManager = injectPopupNotificationManager()
 const notifications = computed<PopupNotification[]>(() =>
-	popupNotificationManager.getNotifications(),
+	popupNotificationManager.getVisibleNotifications(),
 )
 const { stackCount } = useModalStack()
 const hasModalActive = computed(() => stackCount.value > 0)
@@ -213,7 +220,6 @@ const activeToastActions = ref<Record<string, 'accept'>>({})
 const stopTimer = (n: PopupNotification) => popupNotificationManager.stopNotificationTimer(n)
 const setNotificationTimer = (n: PopupNotification) =>
 	popupNotificationManager.setNotificationTimer(n)
-const dismiss = (id: string | number) => popupNotificationManager.removeNotification(id)
 const toastActionLoading = (id: string | number) => activeToastActions.value[String(id)] ?? null
 
 function isDownloadNotification(item: PopupNotification) {
@@ -225,7 +231,7 @@ function isDownloadNotification(item: PopupNotification) {
 
 function downloadToastItems(item: PopupNotification): PopupNotificationProgressItem[] {
 	if (item.progressItems?.length) {
-		return item.progressItems
+		return popupNotificationManager.getVisibleDownloadProgressItems(item)
 	}
 
 	return [
@@ -242,35 +248,32 @@ function downloadToastItems(item: PopupNotification): PopupNotificationProgressI
 	]
 }
 
-async function handleProgressItemDismiss(
+function handleProgressItemDismiss(
 	item: PopupNotification,
 	progressItem: PopupNotificationProgressItem,
 ) {
-	if (progressItem.onDismiss) {
-		await progressItem.onDismiss()
-		return
-	}
-
-	dismiss(item.id)
+	popupNotificationManager.hideDownloadItem(item.id, progressItem.id)
 }
 
 async function handleProgressItemAction(
+	item: PopupNotification,
 	progressItem: PopupNotificationProgressItem,
 	index: number,
 ) {
 	const button = progressItem.buttons?.[index]
 	if (button) {
-		await handleProgressItemButtonClick(progressItem, button)
+		await handleProgressItemButtonClick(item, progressItem, button)
 	}
 }
 
 async function handleProgressItemButtonClick(
+	item: PopupNotification,
 	progressItem: PopupNotificationProgressItem,
 	btn: PopupNotificationButton,
 ) {
 	await btn.action()
 	if (!btn.keepOpen) {
-		await progressItem.onDismiss?.()
+		popupNotificationManager.hideDownloadItem(item.id, progressItem.id)
 	}
 }
 
@@ -279,6 +282,11 @@ async function handleButtonClick(id: string | number, btn: PopupNotificationButt
 	if (!btn.keepOpen) {
 		popupNotificationManager.removeNotification(id)
 	}
+}
+
+async function handleNotificationDismiss(item: PopupNotification) {
+	await item.onDismiss?.()
+	popupNotificationManager.removeNotification(item.id)
 }
 
 async function handleToastAction(item: PopupNotification, action?: () => void | Promise<void>) {
@@ -381,6 +389,21 @@ withDefaults(
 
 .popup-notifs-leave-to {
 	opacity: 0;
-	transform: translateX(100%) scale(0.8);
+	transform: translateX(100%);
+}
+
+.popup-downloads-move {
+	transition: transform 0.3s ease-in-out;
+}
+
+.popup-downloads-leave-active {
+	transition:
+		opacity 0.3s ease-in-out,
+		transform 0.3s ease-in-out;
+}
+
+.popup-downloads-leave-to {
+	opacity: 0;
+	transform: translateX(100%);
 }
 </style>
