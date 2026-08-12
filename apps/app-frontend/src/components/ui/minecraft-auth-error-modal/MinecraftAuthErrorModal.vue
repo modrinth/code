@@ -10,7 +10,6 @@ import {
 import { Admonition, Button, ButtonLink, Collapsible, IconButton, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleSevereError } from '@/store/error.js'
 
@@ -29,17 +28,11 @@ function show(errorVal: { message?: string }) {
 	matchedError.value = findMinecraftAuthError(rawError.value)
 
 	debugCollapsed.value = true
-	hide_ads_window()
 	modal.value?.show()
 }
 
 function hide() {
-	onModalHide()
 	modal.value?.hide()
-}
-
-function onModalHide() {
-	show_ads_window()
 }
 
 defineExpose({
@@ -74,7 +67,7 @@ async function copyToClipboard(text: string) {
 </script>
 
 <template>
-	<NewModal ref="modal" header="Sign in Failed" :max-width="'548px'" @hide="onModalHide">
+	<NewModal ref="modal" header="Sign in Failed" :max-width="'548px'">
 		<div class="flex flex-col gap-6">
 			<Admonition
 				type="warning"
