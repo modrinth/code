@@ -158,8 +158,8 @@
 
 		<p>
 			There are certain other small aspects to creating projects that all authors should attempt to
-			abide by. These will not necessarily always be enforced, but abiding by all will result in a
-			faster review with fewer potential issues.
+			abide by. These will not be enforced as strictly, but abiding by all will result fewer
+			potential issues during project review, and a better project with more potential reach.
 		</p>
 		<ol>
 			<li>
@@ -183,6 +183,12 @@
 				"Additional files" are only used for special designated purposes, such as source JAR files.
 				In other words, separate versions and/or projects are used where appropriate instead of
 				additional files.
+			</li>
+			<li>
+				Files uploaded to a project should be directly related to the content of the initial project
+				page or a direct linear upgrade. Files with different functionality should not be uploaded
+				as new versions within a single project; instead, they should be published as separate
+				projects.
 			</li>
 			<li>
 				All applicable content disclosures are filled out accurately and maintained with up-to-date

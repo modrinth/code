@@ -151,7 +151,7 @@ export function flattenStaticVariables(): Record<string, string> {
 		`Per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#copyright-and-legality-of-content)`
 	vars[`R5`] =
 		`Per section 5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
-	const rule5subs = 8
+	const rule5subs = 9
 	for (let n = 1; n <= rule5subs; n++) {
 		vars[`R5.${n}`] =
 			`Per section 5.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
