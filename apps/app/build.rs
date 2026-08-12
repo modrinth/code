@@ -318,7 +318,7 @@ fn main() {
                     .commands(&[
                         "init_ads_window",
                         "hide_ads_window",
-                        "show_ads_window",
+                        "update_ads_window_hold",
                         "show_ads_consent_ui",
                         "expand_ads_consent_webview",
                         "open_ads_consent_preferences",
