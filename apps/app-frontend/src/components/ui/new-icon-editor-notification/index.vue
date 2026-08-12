@@ -73,7 +73,7 @@ function handleModalClose() {
 
 		<div class="relative z-[1] flex w-full flex-col items-start gap-2.5">
 			<div class="flex w-full items-start gap-1">
-				<div class="min-w-0 flex-1 grow leading-5">
+				<div class="min-w-0 flex-1 grow leading-5 flex flex-col gap-1">
 					<div class="font-semibold text-contrast">
 						{{ formatMessage(messages.title) }}
 					</div>
@@ -128,8 +128,8 @@ function handleModalClose() {
 
 .icon-grid {
 	position: absolute;
-	top: -20px;
-	left: 220px;
+	top: -4px;
+	left: 232px;
 	display: grid;
 	width: 160px;
 	height: 160px;
@@ -157,8 +157,8 @@ function handleModalClose() {
 
 .icon-fade {
 	position: absolute;
-	inset: 0 auto 0 150px;
-	width: 120px;
-	background: linear-gradient(90deg, var(--surface-3) 25%, transparent 100%);
+	inset: 0 auto 0 210px;
+	width: 110px;
+	background: linear-gradient(90deg, var(--surface-3) 0%, transparent 100%);
 }
 </style>
