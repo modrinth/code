@@ -60,8 +60,11 @@ impl EventState {
             .cloned()
     }
 
-    pub fn get() -> crate::Result<Arc<Self>> {
-        Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
+    pub fn get() -> Arc<Self> {
+        EVENT_STATE
+            .get()
+            .expect("should be initialized when used")
+            .clone()
     }
 
     #[cfg(feature = "tauri")]
@@ -78,7 +81,7 @@ impl EventState {
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
     pub async fn list_progress_bars() -> crate::Result<DashMap<Uuid, LoadingBar>>
     {
-        let value = Self::get()?;
+        let value = Self::get();
         Ok(value.loading_bars.clone())
     }
 
@@ -86,7 +89,7 @@ impl EventState {
     pub async fn get_main_window() -> crate::Result<Option<tauri::WebviewWindow>>
     {
         use tauri::Manager;
-        let value = Self::get()?;
+        let value = Self::get();
         Ok(value.app.get_webview_window("main"))
     }
 }
@@ -225,42 +228,40 @@ impl Drop for LoadingBarId {
     fn drop(&mut self) {
         let loader_uuid = self.0;
         tokio::spawn(async move {
-            if let Ok(event_state) = EventState::get() {
-                #[cfg(any(feature = "tauri", feature = "cli"))]
-                if let Some((_, bar)) =
-                    event_state.loading_bars.remove(&loader_uuid)
+            let event_state = EventState::get();
+            #[cfg(any(feature = "tauri", feature = "cli"))]
+            if let Some((_, bar)) =
+                event_state.loading_bars.remove(&loader_uuid)
+            {
+                #[cfg(feature = "tauri")]
                 {
-                    #[cfg(feature = "tauri")]
-                    {
-                        let loader_uuid = bar.loading_bar_uuid;
-                        let event = bar.bar_type.clone();
-                        let fraction = bar.current / bar.total;
+                    let loader_uuid = bar.loading_bar_uuid;
+                    let event = bar.bar_type.clone();
+                    let fraction = bar.current / bar.total;
 
-                        let _ = event_state.send(AppEvent::Loading(
-                            LoadingPayload {
-                                fraction: None,
-                                message: "Completed".to_string(),
-                                event,
-                                loader_uuid: loader_uuid.to_string(),
-                            },
-                        ));
-                        tracing::trace!(
-                            "Exited at {fraction} for loading bar: {:?}",
-                            loader_uuid
-                        );
-                    }
-
-                    // Emit event to indicatif progress bar arc
-                    #[cfg(feature = "cli")]
-                    {
-                        let cli_progress_bar = bar.cli_progress_bar;
-                        cli_progress_bar.finish();
-                    }
+                    let _ =
+                        event_state.send(AppEvent::Loading(LoadingPayload {
+                            fraction: None,
+                            message: "Completed".to_string(),
+                            event,
+                            loader_uuid: loader_uuid.to_string(),
+                        }));
+                    tracing::trace!(
+                        "Exited at {fraction} for loading bar: {:?}",
+                        loader_uuid
+                    );
                 }
 
-                #[cfg(not(any(feature = "tauri", feature = "cli")))]
-                event_state.loading_bars.remove(&loader_uuid);
+                // Emit event to indicatif progress bar arc
+                #[cfg(feature = "cli")]
+                {
+                    let cli_progress_bar = bar.cli_progress_bar;
+                    cli_progress_bar.finish();
+                }
             }
+
+            #[cfg(not(any(feature = "tauri", feature = "cli")))]
+            event_state.loading_bars.remove(&loader_uuid);
         });
     }
 }
@@ -546,9 +547,6 @@ mod log_types {
 
 #[derive(Debug, thiserror::Error)]
 pub enum EventError {
-    #[error("Event state was not properly initialized")]
-    NotInitialized,
-
     #[error("Non-existent loading bar of key: {0}")]
     NoLoadingBar(Uuid),
 

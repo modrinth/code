@@ -61,7 +61,7 @@ pub async fn init_loading_unsafe(
     total: f64,
     title: &str,
 ) -> crate::Result<LoadingBarId> {
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get();
     let key = LoadingBarId(Uuid::new_v4());
 
     event_state.loading_bars.insert(
@@ -105,7 +105,7 @@ pub fn emit_loading(
     increment_frac: f64,
     message: Option<&str>,
 ) -> crate::Result<()> {
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get();
 
     let Some(mut loading_bar) = event_state.loading_bars.get_mut(&key.0) else {
         return Err(EventError::NoLoadingBar(key.0).into());
@@ -156,7 +156,7 @@ pub fn emit_loading(
 pub async fn emit_warning(message: &str) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state.send(AppEvent::Warning(WarningPayload {
             message: message.to_string(),
         }))?;
@@ -171,7 +171,7 @@ pub async fn emit_instance_bulk_update_progress(
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state.send(AppEvent::InstanceBulkUpdateProgress(payload))?;
     }
     Ok(())
@@ -184,7 +184,7 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
     tracing::debug!("Command: {}", serde_json::to_string(&command)?);
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state.send(AppEvent::Command(command))?;
 
         if let Some(window) = event_state.app.get_window("main") {
@@ -204,7 +204,7 @@ pub async fn emit_process(
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state.send(AppEvent::Process(ProcessPayload {
             instance_id: instance_id.to_string(),
             uuid: uuid.to_string(),
@@ -223,7 +223,7 @@ pub async fn emit_instance(
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state.send(AppEvent::Instance(InstancePayload {
             instance_id: instance_id.to_string(),
             event,
@@ -236,7 +236,7 @@ pub async fn emit_instance(
 pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state.send(AppEvent::Friend(payload))?;
     }
 
@@ -247,7 +247,7 @@ pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
 pub async fn emit_notification(payload: Value) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state
             .send(AppEvent::Notification(serde_json::to_string(&payload)?))?;
     }

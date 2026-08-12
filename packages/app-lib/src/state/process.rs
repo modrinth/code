@@ -608,13 +608,11 @@ impl Process {
 
         #[cfg(feature = "tauri")]
         {
-            if let Ok(event_state) = crate::EventState::get() {
-                let _ =
-                    event_state.send(crate::event::AppEvent::Log(LogPayload {
-                        instance_id: instance_id.to_string(),
-                        event: LogEvent::Log4j(event.clone()),
-                    }));
-            }
+            let event_state = crate::EventState::get();
+            let _ = event_state.send(crate::event::AppEvent::Log(LogPayload {
+                instance_id: instance_id.to_string(),
+                event: LogEvent::Log4j(event.clone()),
+            }));
         }
         #[cfg(not(feature = "tauri"))]
         {
@@ -627,15 +625,13 @@ impl Process {
 
         #[cfg(feature = "tauri")]
         {
-            if let Ok(event_state) = crate::EventState::get() {
-                let _ =
-                    event_state.send(crate::event::AppEvent::Log(LogPayload {
-                        instance_id: instance_id.to_string(),
-                        event: LogEvent::Legacy {
-                            message: message.to_string(),
-                        },
-                    }));
-            }
+            let event_state = crate::EventState::get();
+            let _ = event_state.send(crate::event::AppEvent::Log(LogPayload {
+                instance_id: instance_id.to_string(),
+                event: LogEvent::Legacy {
+                    message: message.to_string(),
+                },
+            }));
         }
         #[cfg(not(feature = "tauri"))]
         {

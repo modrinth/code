@@ -201,7 +201,7 @@ pub async fn emit_install_job(
     #[cfg(feature = "tauri")]
     {
         let result: crate::Result<()> = (|| {
-            let event_state = crate::EventState::get()?;
+            let event_state = crate::EventState::get();
             event_state.send(crate::event::AppEvent::InstallJob(
                 std::sync::Arc::new(snapshot.clone()),
             ))?;

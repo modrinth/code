@@ -33,9 +33,9 @@ const ADS_USER_AGENT: &str = concat!(
 );
 
 fn emit_ads_consent_required(required: bool) {
-    if let Ok(events) = EventState::get() {
-        events.send(AppEvent::AdsConsentRequired(required)).ok();
-    }
+    EventState::get()
+        .send(AppEvent::AdsConsentRequired(required))
+        .ok();
 }
 
 #[cfg(windows)]
