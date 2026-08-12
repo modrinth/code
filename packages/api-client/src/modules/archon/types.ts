@@ -314,6 +314,7 @@ export namespace Archon {
 				id: string
 				filename: string
 				filesize: number
+				btime?: string
 				disabled: boolean
 				kind: AddonKind
 				from_modpack: boolean
@@ -1050,6 +1051,7 @@ export namespace Archon {
 				parent_directory: string
 				file_sha1: string | null
 				filename: string
+				btime?: string
 				from_modpack: boolean
 				version_id: string | null
 				project_id: string | null

@@ -1,6 +1,6 @@
 import type { Archon } from '@modrinth/api-client'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 
@@ -26,7 +26,13 @@ type OptimisticInstallation = {
 type UseServerInstallationTrackerOptions = {
 	worldId: ReadableRef<string | null>
 	server: ReadableRef<Archon.Servers.v0.Server | null | undefined>
+	content?: ReadableRef<Archon.Content.v1.Addons | null | undefined>
 }
+
+type ServerInstallationPlatform = Extract<
+	ServerInstallationKey,
+	{ type: 'platform' }
+>['platform']
 
 function installationKeyId(key: ServerInstallationKey) {
 	switch (key.type) {
@@ -47,6 +53,54 @@ function itemStatus(
 	if (item.error != null) return 'failed'
 	if (item.progress === 100) return 'complete'
 	return 'installing'
+}
+
+function contentPlatform(modloader: string | null): ServerInstallationPlatform | null {
+	const platform = modloader === 'neo_forge' ? 'neoforge' : modloader
+	switch (platform) {
+		case 'forge':
+		case 'neoforge':
+		case 'fabric':
+		case 'quilt':
+		case 'paper':
+		case 'purpur':
+		case 'vanilla':
+			return platform
+		default:
+			return null
+	}
+}
+
+function contentInstallationKey(content: Archon.Content.v1.Addons): ServerInstallationKey {
+	if (content.installing === 'modpack' || (content.error && content.modpack)) {
+		const spec = content.modpack?.spec
+		if (spec?.platform === 'modrinth') {
+			return {
+				type: 'modrinth_modpack',
+				project_id: spec.project_id,
+				version_id: spec.version_id,
+			}
+		}
+		if (spec?.platform === 'local_file') {
+			return {
+				type: 'local_modpack',
+				filename: spec.filename,
+			}
+		}
+		return { type: 'unknown' }
+	}
+
+	const platform = contentPlatform(content.modloader)
+	if (platform && content.game_version) {
+		return {
+			type: 'platform',
+			platform,
+			platform_version: content.modloader_version ?? '',
+			game_version: content.game_version,
+		}
+	}
+
+	return { type: 'unknown' }
 }
 
 export function useServerInstallationTracker(options: UseServerInstallationTrackerOptions) {
@@ -102,6 +156,36 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 		return null
 	})
 
+	const persistedInstallation = computed<ServerInstallationState | null>(() => {
+		const content = options.content?.value
+		if (!content || (!content.installing && !content.error)) return null
+
+		const key = contentInstallationKey(content)
+		const id = installationKeyId(key)
+		if (dismissedIds.value.has(id)) return null
+
+		return {
+			id,
+			key,
+			status: content.error ? 'failed' : 'installing',
+			progress: null,
+			error: content.error?.message ?? null,
+			source: 'server',
+		}
+	})
+
+	watch(
+		() => options.content?.value,
+		(content) => {
+			if (!content?.installing || content.error) return
+			const id = installationKeyId(contentInstallationKey(content))
+			if (dismissedIds.value.has(id)) {
+				dismissedIds.value = new Set([...dismissedIds.value].filter((item) => item !== id))
+			}
+			optimisticInstallation.value = null
+		},
+	)
+
 	const installation = computed<ServerInstallationState | null>(() => {
 		if (websocketInstallation.value) return websocketInstallation.value
 
@@ -116,6 +200,9 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 				source: 'optimistic',
 			}
 		}
+
+		if (persistedInstallation.value) return persistedInstallation.value
+		if (options.content?.value?.error) return null
 
 		if (options.server.value?.status !== 'installing' || receivedProgressSnapshot.value) return null
 
@@ -138,6 +225,9 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 		receivedProgressSnapshot.value = true
 		installProgressItems.value = items
 
+		const optimistic = optimisticInstallation.value
+		const isPostOptimisticSnapshot =
+			optimistic !== null && snapshotRevision.value > optimistic.startRevision
 		const nextSeenActiveIds = new Set(seenActiveIds.value)
 		const nextDismissedIds = new Set(dismissedIds.value)
 		let hasAuthoritativeInstallation = false
@@ -145,6 +235,9 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 			if (item.world_id !== options.worldId.value || item.key.type === 'file') continue
 			hasAuthoritativeInstallation = true
 			const id = installationKeyId(item.key)
+			if (isPostOptimisticSnapshot) {
+				nextDismissedIds.delete(id)
+			}
 			if (item.error == null && item.progress != null && item.progress < 100) {
 				nextSeenActiveIds.add(id)
 				nextDismissedIds.delete(id)

@@ -527,6 +527,13 @@ const worldId = computed(() => {
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
+const { data: serverContent } = useQuery({
+	queryKey: ['content', 'list', 'v1', props.serverId],
+	queryFn: () =>
+		client.archon.content_v1.getAddons(props.serverId, worldId.value!, { from_modpack: false }),
+	enabled: computed(() => worldId.value !== null),
+})
+
 const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
 	computed(() => props.serverId),
 	worldId,
@@ -573,6 +580,7 @@ const {
 	worldId,
 	server: serverData,
 	serverFull,
+	content: serverContent,
 	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,
 	syncUptimeFromState: true,
@@ -1117,6 +1125,7 @@ watch(
 		if (current.status === 'failed') {
 			if (handledFailedInstallationId === current.id) return
 			handledFailedInstallationId = current.id
+			if (current.source === 'server') return
 			onReinstallFailed()
 			void invalidateAfterInstall()
 			return

@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -282,6 +282,8 @@ function showResetToOnboardingModal() {
 }
 
 const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
+const loaderGameVersionPlaceholder = '${modrinth.gameVersion}'
+const minecraftServerDownloadsStartTime = Date.parse('2012-04-04T00:00:00Z')
 
 function toApiLoaderName(loader: string): string {
 	return loader === 'neoforge' ? 'neo' : loader
@@ -290,10 +292,17 @@ function toApiLoaderName(loader: string): string {
 const apiLoaderName = computed(() =>
 	modLoaders.includes(editingPlatform.value) ? toApiLoaderName(editingPlatform.value) : null,
 )
+const manifestFormatVersion = computed(() => (apiLoaderName.value === 'quilt' ? 1 : 0))
 
 const manifestQuery = useQuery({
-	queryKey: computed(() => ['loader-manifest', apiLoaderName.value] as const),
-	queryFn: () => client.launchermeta.manifest_v0.getManifest(apiLoaderName.value!),
+	queryKey: computed(
+		() => ['loader-manifest', apiLoaderName.value, manifestFormatVersion.value] as const,
+	),
+	queryFn: () =>
+		client.launchermeta.manifest_v0.getManifest(
+			apiLoaderName.value!,
+			manifestFormatVersion.value,
+		),
 	enabled: computed(() => !!apiLoaderName.value),
 	staleTime: 5 * 60 * 1000,
 })
@@ -377,15 +386,33 @@ function getLoaderVersionsForGameVersion(
 	const versionGroups = manifestQuery.data.value?.versionGroups
 	if (!manifest) return []
 
-	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
-	if (placeholder) return placeholder.loaders
-
 	const entry = manifest.find((x) => x.id === gameVersion)
+	if (!entry) return []
 	if (entry?.versionGroup) {
 		return versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
 	}
 
+	const placeholder = manifest.find((x) => x.id === loaderGameVersionPlaceholder)
+	if (placeholder) return placeholder.loaders
+
 	return entry?.loaders ?? []
+}
+
+function supportsMinecraftServer(version: Labrinth.Tags.v2.GameVersion): boolean {
+	return Date.parse(version.date) >= minecraftServerDownloadsStartTime
+}
+
+function getSupportedManifestGameVersions(): Set<string> | null {
+	const manifest = manifestQuery.data.value?.gameVersions
+	if (!manifest) return null
+
+	const hasPlaceholder = manifest.some((entry) => entry.id === loaderGameVersionPlaceholder)
+	return new Set(
+		manifest
+			.filter((entry) => entry.id !== loaderGameVersionPlaceholder)
+			.filter((entry) => hasPlaceholder || entry.loaders.length > 0 || !!entry.versionGroup)
+			.map((entry) => entry.id),
+	)
 }
 
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
@@ -547,38 +574,30 @@ provideInstallationSettings({
 	editingGameVersionRef: editingGameVersion,
 
 	resolveGameVersions(loader, showSnapshots) {
+		const serverVersions = tags.gameVersions.value.filter(supportsMinecraftServer)
 		const versions = showSnapshots
-			? tags.gameVersions.value
-			: tags.gameVersions.value.filter((v) => v.version_type === 'release')
+			? serverVersions
+			: serverVersions.filter((v) => v.version_type === 'release')
 
 		if (loader && loader !== 'vanilla') {
 			if (loader === 'paper') {
 				const supported = paperSupportedVersionsQuery.data.value
-				if (supported) {
-					return versions
-						.filter((v) => supported.has(v.version))
-						.map((v) => ({ value: v.version, label: v.version }))
-				}
+				if (!supported) return []
+				return versions
+					.filter((v) => supported.has(v.version))
+					.map((v) => ({ value: v.version, label: v.version }))
 			} else if (loader === 'purpur') {
 				const supported = purpurSupportedVersionsQuery.data.value
-				if (supported) {
-					return versions
-						.filter((v) => supported.has(v.version))
-						.map((v) => ({ value: v.version, label: v.version }))
-				}
+				if (!supported) return []
+				return versions
+					.filter((v) => supported.has(v.version))
+					.map((v) => ({ value: v.version, label: v.version }))
 			} else {
-				const manifest = manifestQuery.data.value?.gameVersions
-				if (manifest) {
-					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
-					if (!hasPlaceholder) {
-						const supportedVersions = new Set(
-							manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
-						)
-						return versions
-							.filter((v) => supportedVersions.has(v.version))
-							.map((v) => ({ value: v.version, label: v.version }))
-					}
-				}
+				const supportedVersions = getSupportedManifestGameVersions()
+				if (!supportedVersions) return []
+				return versions
+					.filter((v) => supportedVersions.has(v.version))
+					.map((v) => ({ value: v.version, label: v.version }))
 			}
 		}
 
@@ -591,33 +610,27 @@ provideInstallationSettings({
 	},
 
 	resolveHasSnapshots(loader) {
+		const serverVersions = tags.gameVersions.value.filter(supportsMinecraftServer)
 		if (loader === 'vanilla') {
-			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
+			return serverVersions.some((v) => v.version_type !== 'release')
 		}
 		if (loader === 'paper') {
 			const supported = paperSupportedVersionsQuery.data.value
 			if (!supported) return false
-			return tags.gameVersions.value.some(
+			return serverVersions.some(
 				(v) => v.version_type !== 'release' && supported.has(v.version),
 			)
 		}
 		if (loader === 'purpur') {
 			const supported = purpurSupportedVersionsQuery.data.value
 			if (!supported) return false
-			return tags.gameVersions.value.some(
+			return serverVersions.some(
 				(v) => v.version_type !== 'release' && supported.has(v.version),
 			)
 		}
-		const manifest = manifestQuery.data.value?.gameVersions
-		if (!manifest) return false
-		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
-		if (hasPlaceholder) {
-			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
-		}
-		const supportedVersions = new Set(
-			manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
-		)
-		const supported = tags.gameVersions.value.filter((v) => supportedVersions.has(v.version))
+		const supportedVersions = getSupportedManifestGameVersions()
+		if (!supportedVersions) return false
+		const supported = serverVersions.filter((v) => supportedVersions.has(v.version))
 		return supported.some((v) => v.version_type !== 'release')
 	},
 
@@ -661,6 +674,7 @@ provideInstallationSettings({
 				await client.archon.content_v1.applyGameVersionUpdate(serverId, worldId.value!, gameVersion)
 			}
 			debug('save: succeeded')
+			serverSettings.closeModal?.()
 		} catch (err) {
 			debug('save: failed, emitting reinstall-failed', err)
 			rollbackOptimisticInstallation(snapshot)

@@ -20,11 +20,9 @@ import {
 import { commonMessages } from '#ui/utils/common-messages'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
-import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
 import {
 	flushStoredServerAddonInstallQueue,
 	getStoredServerAddonInstallQueue,
-	getTargetInstallPreferences,
 } from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
@@ -381,57 +379,6 @@ function decorateContentItemWithInstallProgress(
 
 const isFlushingStoredServerInstalls = ref(false)
 
-function getInstalledProjectIds() {
-	return new Set(
-		(contentQuery.data.value?.addons ?? [])
-			.map((addon) => addon.project_id)
-			.filter((projectId): projectId is string => !!projectId),
-	)
-}
-
-function toResolvePreferences(
-	preferences?: BrowseInstallPlan['preferences'],
-): Labrinth.Content.v3.ResolutionPreferences {
-	return {
-		game_versions: preferences?.gameVersions,
-		loaders: preferences?.loaders,
-	}
-}
-
-async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
-	const existingProjectIds = getInstalledProjectIds()
-	const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
-
-	for (const plan of plans) {
-		const target = getTargetInstallPreferences(
-			{
-				gameVersion: server.value?.mc_version,
-				loader: server.value?.loader,
-			},
-			plan.contentType,
-		)
-		const resolved = await client.labrinth.content_v3.resolve({
-			project_id: plan.projectId,
-			version_id: plan.versionId,
-			content_type: plan.contentType as Labrinth.Content.v3.ContentType,
-			selected: toResolvePreferences(plan.preferences),
-			target: toResolvePreferences(target),
-			existing_project_ids: Array.from(existingProjectIds),
-		})
-
-		for (const item of [resolved.primary, ...resolved.dependencies]) {
-			if (existingProjectIds.has(item.project_id)) continue
-			existingProjectIds.add(item.project_id)
-			resolvedAddons.push({
-				project_id: item.project_id,
-				version_id: item.version_id,
-			})
-		}
-	}
-
-	return resolvedAddons
-}
-
 async function flushStoredServerInstalls() {
 	const wid = worldId.value
 	if (!wid || isFlushingStoredServerInstalls.value) return
@@ -456,10 +403,14 @@ async function flushStoredServerInstalls() {
 			serverId,
 			worldId: wid,
 			install: async (plans) => {
-				const addons = await resolveStoredServerAddonPlans(plans)
-				if (addons.length > 0) {
-					await client.archon.content_v1.addAddons(serverId, wid, addons)
-				}
+				await client.archon.content_v1.addAddons(
+					serverId,
+					wid,
+					plans.map((plan) => ({
+						project_id: plan.projectId,
+						version_id: plan.versionId,
+					})),
+				)
 			},
 		})
 
@@ -820,6 +771,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		id: addon.id ?? addon.filename,
 		enabled: !addon.disabled,
 		file_name: addon.filename,
+		date_added: addon.btime,
 		project_type: addon.kind,
 		has_update: !!addon.has_update,
 		update_version_id: addon.has_update,

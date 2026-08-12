@@ -30,6 +30,7 @@ type UseServerManageCoreRuntimeOptions = {
 	worldId: ReadableRef<string | null>
 	server: ReadableRef<Archon.Servers.v0.Server | null | undefined>
 	serverFull?: ReadableRef<Archon.Servers.v1.ServerFull | null | undefined>
+	content?: ReadableRef<Archon.Content.v1.Addons | null | undefined>
 	extraBusyReasons?: ComputedRef<BusyReason[]>
 	setDisconnectedOnAuthIncorrect?: boolean
 	syncUptimeFromState?: boolean
@@ -111,6 +112,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	} = useServerInstallationTracker({
 		worldId: options.worldId,
 		server: options.server,
+		content: options.content,
 	})
 	const connectedSocketServerId = ref<string | null>(null)
 	const socketUnsubscribers = ref<SocketUnsubscriber[]>([])
