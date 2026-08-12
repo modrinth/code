@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router'
 
 import { defineMessage, LOCALES, useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
-import { createDisclosureFilterOptions, formatSearchFilterValue } from './search'
+import { createDisclosureFilterOptions, findFilterOption, formatSearchFilterValue } from './search'
 import { formatCategory, formatCategoryHeader } from './tag-messages'
 
 export const SERVER_REGIONS = {
@@ -368,7 +368,7 @@ export function useServerSearch(opts: {
 			if (filterType.id === 'advanced') {
 				const disclosureValues = matched
 					.map((filterValue) => {
-						const option = filterType.options.find((option) => option.id === filterValue.option)
+						const option = findFilterOption(filterType.options, filterValue.option)
 						if (!option || !('value' in option)) return null
 						const [, val] = option.value.split(':')
 						return val
@@ -475,7 +475,7 @@ export function useServerSearch(opts: {
 			for (const value of values) {
 				const isNegative = value.startsWith('!')
 				const cleanValue = isNegative ? value.slice(1) : value
-				const option = filterType.options.find((o) => o.id === cleanValue)
+				const option = findFilterOption(filterType.options, cleanValue)
 				if (option) {
 					serverCurrentFilters.value.push({
 						type: filterType.id,

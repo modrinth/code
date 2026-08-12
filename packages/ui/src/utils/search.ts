@@ -19,8 +19,17 @@ import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-ro
 
 import { defineMessage, useVIntl } from '../composables/i18n'
 import { getProjectTypeIcon } from './auto-icons'
-import { getProjectTypeCategoryMessage } from './common-messages'
-import { isDisclosureCompatibleWithProjectTypes, PROJECT_DISCLOSURE_TYPES } from './disclosures'
+import {
+	disclosureAiUsageMessages,
+	disclosureTelemetryConsentMessages,
+	getProjectTypeCategoryMessage,
+} from './common-messages'
+import {
+	AI_USAGE_TYPES,
+	isDisclosureCompatibleWithProjectTypes,
+	PROJECT_DISCLOSURE_TYPES,
+	TELEMETRY_CONSENT_TYPES,
+} from './disclosures'
 import {
 	DEFAULT_MOD_LOADERS,
 	DEFAULT_PLUGIN_LOADERS,
@@ -37,6 +46,7 @@ type BaseOption = {
 	icon?: string | Component
 	query_value?: string
 	group?: string
+	sub_options?: FilterOption[]
 }
 
 export type FilterOption = BaseOption &
@@ -44,6 +54,40 @@ export type FilterOption = BaseOption &
 		| { method: 'or' | 'and'; value: string }
 		| { method: 'environment'; environment: 'client' | 'server' }
 	)
+
+export function flattenFilterOptions(options: readonly FilterOption[]): FilterOption[] {
+	return options.flatMap((option) => [
+		option,
+		...(option.sub_options ? flattenFilterOptions(option.sub_options) : []),
+	])
+}
+
+export function findFilterOption(
+	options: readonly FilterOption[],
+	optionId: string,
+): FilterOption | undefined {
+	for (const option of options) {
+		if (option.id === optionId) {
+			return option
+		}
+		if (option.sub_options) {
+			const nested = findFilterOption(option.sub_options, optionId)
+			if (nested) {
+				return nested
+			}
+		}
+	}
+	return undefined
+}
+
+export function findParentFilterOption(
+	options: readonly FilterOption[],
+	optionId: string,
+): FilterOption | undefined {
+	return options.find((option) =>
+		option.sub_options?.some((subOption) => subOption.id === optionId),
+	)
+}
 
 export type FilterMode = 'include' | 'exclude'
 
@@ -222,6 +266,44 @@ export function formatDisclosureTypeLabel(
 	}
 }
 
+export function formatAiUsageFilterLabel(
+	formatMessage: FormatMessage,
+	usage: Labrinth.Projects.v3.AiUsage,
+): string {
+	return formatMessage(disclosureAiUsageMessages[usage])
+}
+
+export function formatTelemetryConsentFilterLabel(
+	formatMessage: FormatMessage,
+	consent: Labrinth.Projects.v3.TelemetryConsent,
+): string {
+	return formatMessage(disclosureTelemetryConsentMessages[consent])
+}
+
+function createDisclosureSubOptions(
+	formatMessage: FormatMessage,
+	disclosureType: DisclosureTypeFilter,
+): FilterOption[] | undefined {
+	switch (disclosureType) {
+		case 'ai_content':
+			return AI_USAGE_TYPES.map((usage) => ({
+				id: `${disclosureType}_${usage}`,
+				formatted_name: formatAiUsageFilterLabel(formatMessage, usage),
+				method: 'or' as const,
+				value: `disclosure_types:${disclosureType}_${usage}`,
+			}))
+		case 'telemetry':
+			return TELEMETRY_CONSENT_TYPES.map((consent) => ({
+				id: `${disclosureType}_${consent}`,
+				formatted_name: formatTelemetryConsentFilterLabel(formatMessage, consent),
+				method: 'or' as const,
+				value: `disclosure_types:${disclosureType}_${consent}`,
+			}))
+		default:
+			return undefined
+	}
+}
+
 export function createDisclosureFilterOptions(
 	formatMessage: FormatMessage,
 	projectTypes: readonly ProjectType[],
@@ -234,6 +316,7 @@ export function createDisclosureFilterOptions(
 		icon: DISCLOSURE_TYPE_ICONS[disclosureType],
 		method: 'or' as const,
 		value: `disclosure_types:${disclosureType}`,
+		sub_options: createDisclosureSubOptions(formatMessage, disclosureType),
 	}))
 }
 
@@ -623,7 +706,7 @@ export function useSearch(
 			if (type.id === 'advanced' && isProjectTypeExclusionOption(filterValue.option)) {
 				continue
 			}
-			let option = type?.options.find((option) => option.id === filterValue.option)
+			let option = type ? findFilterOption(type.options, filterValue.option) : undefined
 			if (!option && type.allows_custom_options) {
 				option = {
 					id: filterValue.option,
@@ -772,7 +855,7 @@ export function useSearch(
 			const set = typeof filter === 'string' ? new Set([filter]) : new Set(filter)
 
 			typesLoop: for (const type of filters.value) {
-				for (const option of type.options) {
+				for (const option of flattenFilterOptions(type.options)) {
 					const value = getOptionValue(option, false)
 					if (
 						set.has(value) &&
@@ -831,7 +914,9 @@ export function useSearch(
 				let matched = false
 
 				for (const type of types) {
-					const option = type.options.find((option) => getOptionValue(option, negative) === value)
+					const option = flattenFilterOptions(type.options).find(
+						(option) => getOptionValue(option, negative) === value,
+					)
 					if (!option) {
 						continue
 					}
@@ -870,7 +955,7 @@ export function useSearch(
 
 		currentFilters.value.forEach((filterValue) => {
 			const type = filters.value.find((type) => type.id === filterValue.type)
-			const option = type?.options.find((option) => option.id === filterValue.option)
+			const option = type ? findFilterOption(type.options, filterValue.option) : undefined
 			if (type && option) {
 				const value = getOptionValue(option, filterValue.negative)
 				if (items[type.query_param]) {

@@ -11,6 +11,19 @@ export const PROJECT_DISCLOSURE_TYPES = [
 	'archived',
 ] as const satisfies readonly Labrinth.Projects.v3.ProjectDisclosureType[]
 
+export const AI_USAGE_TYPES = [
+	'code',
+	'assets',
+	'text',
+	'functionality',
+] as const satisfies readonly Labrinth.Projects.v3.AiUsage[]
+
+export const TELEMETRY_CONSENT_TYPES = [
+	'opt_in',
+	'opt_out',
+	'always_active',
+] as const satisfies readonly Labrinth.Projects.v3.TelemetryConsent[]
+
 const ALL_CONTENT_PROJECT_TYPES = [
 	'mod',
 	'resourcepack',

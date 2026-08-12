@@ -4,6 +4,7 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	disclosureAiUsageMessages,
 	IntlFormatted,
 	normalizeChildren,
 	SettingsFormGroup,
@@ -47,34 +48,11 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.ai.types-description',
 		defaultMessage: 'What is generative AI being used for?',
 	},
-	typeCode: {
-		id: 'project.settings.disclosures.ai.types-code',
-		defaultMessage: 'Code',
-	},
-	typeAssets: {
-		id: 'project.settings.disclosures.ai.types-assets',
-		defaultMessage: 'Assets',
-	},
-	typeText: {
-		id: 'project.settings.disclosures.ai.types-text',
-		defaultMessage: 'Text',
-	},
-	typeFunctionality: {
-		id: 'project.settings.disclosures.ai.types-functionality',
-		defaultMessage: 'Functionality',
-	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.ai.note-placeholder',
 		defaultMessage: 'e.g. The Chinese and Arabic translations are AI-generated.',
 	},
 })
-
-const useLabels = {
-	code: messages.typeCode,
-	assets: messages.typeAssets,
-	text: messages.typeText,
-	functionality: messages.typeFunctionality,
-} as const
 
 function hasUse(use: AiUsage): boolean {
 	return model.value.uses.includes(use)
@@ -123,7 +101,7 @@ function setUse(use: AiUsage, enabled: boolean) {
 						:disabled="disabled"
 						@update:model-value="(enabled) => setUse(use, enabled)"
 					>
-						{{ formatMessage(useLabels[use]) }}
+						{{ formatMessage(disclosureAiUsageMessages[use]) }}
 					</Checkbox>
 				</div>
 			</SettingsFormGroup>

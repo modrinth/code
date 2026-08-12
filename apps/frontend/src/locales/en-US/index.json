@@ -3812,20 +3812,8 @@
   "project.settings.disclosures.ai.title": {
     "message": "Contains AI-generated content"
   },
-  "project.settings.disclosures.ai.types-assets": {
-    "message": "Assets"
-  },
-  "project.settings.disclosures.ai.types-code": {
-    "message": "Code"
-  },
   "project.settings.disclosures.ai.types-description": {
     "message": "What is generative AI being used for?"
-  },
-  "project.settings.disclosures.ai.types-functionality": {
-    "message": "Functionality"
-  },
-  "project.settings.disclosures.ai.types-text": {
-    "message": "Text"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Banner preview"
@@ -3938,17 +3926,8 @@
   "project.settings.disclosures.system-interactions.title": {
     "message": "External system interactions"
   },
-  "project.settings.disclosures.telemetry.consent-always-active": {
-    "message": "Always active"
-  },
   "project.settings.disclosures.telemetry.consent-description": {
     "message": "What is the consent model of your telemetry?"
-  },
-  "project.settings.disclosures.telemetry.consent-opt-in": {
-    "message": "Opt-in"
-  },
-  "project.settings.disclosures.telemetry.consent-opt-out": {
-    "message": "Opt-out"
   },
   "project.settings.disclosures.telemetry.data-description": {
     "message": "You can either add a privacy policy, or a list of types of data that are collected. Remember to mention if it is anonymous or contains personally identifiable information (PII)."

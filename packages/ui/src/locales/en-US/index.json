@@ -3647,6 +3647,27 @@
   "project.settings.description.title": {
     "defaultMessage": "Description"
   },
+  "project.settings.disclosures.ai.types-assets": {
+    "defaultMessage": "Assets"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "defaultMessage": "Code"
+  },
+  "project.settings.disclosures.ai.types-functionality": {
+    "defaultMessage": "Functionality"
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "defaultMessage": "Text"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "Always active"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-in": {
+    "defaultMessage": "Opt-in"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-out": {
+    "defaultMessage": "Opt-out"
+  },
   "project.settings.disclosures.title": {
     "defaultMessage": "Disclosures"
   },
@@ -3901,6 +3922,12 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Show more"
+  },
+  "search.filter.option.sub_options.collapse.tooltip": {
+    "defaultMessage": "Hide more options"
+  },
+  "search.filter.option.sub_options.expand.tooltip": {
+    "defaultMessage": "Show more options"
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Advanced exclusions"

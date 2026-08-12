@@ -5,6 +5,7 @@ import {
 	Chips,
 	commonMessages,
 	defineMessages,
+	disclosureTelemetryConsentMessages,
 	IconButton,
 	SettingsFormGroup,
 	StyledInput,
@@ -31,21 +32,6 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 
 const CONSENT_MODELS: TelemetryConsent[] = ['opt_in', 'opt_out', 'always_active']
-
-const consentMessages = defineMessages({
-	opt_in: {
-		id: 'project.settings.disclosures.telemetry.consent-opt-in',
-		defaultMessage: 'Opt-in',
-	},
-	opt_out: {
-		id: 'project.settings.disclosures.telemetry.consent-opt-out',
-		defaultMessage: 'Opt-out',
-	},
-	always_active: {
-		id: 'project.settings.disclosures.telemetry.consent-always-active',
-		defaultMessage: 'Always active',
-	},
-})
 
 const messages = defineMessages({
 	title: {
@@ -111,7 +97,9 @@ function removeEntry(index: number) {
 					v-model="model.consent"
 					:items="CONSENT_MODELS"
 					:capitalize="false"
-					:format-label="(item: TelemetryConsent) => formatMessage(consentMessages[item])"
+					:format-label="
+						(item: TelemetryConsent) => formatMessage(disclosureTelemetryConsentMessages[item])
+					"
 				/>
 			</SettingsFormGroup>
 			<SettingsFormGroup

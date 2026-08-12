@@ -1214,6 +1214,40 @@ export const commonProjectSettingsMessages = defineMessages({
 	},
 })
 
+export const disclosureAiUsageMessages = defineMessages({
+	code: {
+		id: 'project.settings.disclosures.ai.types-code',
+		defaultMessage: 'Code',
+	},
+	assets: {
+		id: 'project.settings.disclosures.ai.types-assets',
+		defaultMessage: 'Assets',
+	},
+	text: {
+		id: 'project.settings.disclosures.ai.types-text',
+		defaultMessage: 'Text',
+	},
+	functionality: {
+		id: 'project.settings.disclosures.ai.types-functionality',
+		defaultMessage: 'Functionality',
+	},
+})
+
+export const disclosureTelemetryConsentMessages = defineMessages({
+	opt_in: {
+		id: 'project.settings.disclosures.telemetry.consent-opt-in',
+		defaultMessage: 'Opt-in',
+	},
+	opt_out: {
+		id: 'project.settings.disclosures.telemetry.consent-opt-out',
+		defaultMessage: 'Opt-out',
+	},
+	always_active: {
+		id: 'project.settings.disclosures.telemetry.consent-always-active',
+		defaultMessage: 'Always active',
+	},
+})
+
 export const languageSelectorMessages = defineMessages({
 	platformApp: {
 		id: 'settings.language.platform.app',
