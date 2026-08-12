@@ -172,6 +172,10 @@ pub enum LoadingBarType {
         instance_id: String,
         instance_name: String,
     },
+    PackExport {
+        instance_id: String,
+        instance_name: String,
+    },
     ConfigChange {
         new_path: PathBuf,
     },

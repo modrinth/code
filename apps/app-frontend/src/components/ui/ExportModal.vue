@@ -1,11 +1,12 @@
 <script setup>
-import { XIcon } from '@modrinth/assets'
+import { FolderOpenIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
 	defineMessages,
 	FileTreeSelect,
 	injectNotificationManager,
+	injectPopupNotificationManager,
 	NewModal,
 	StyledInput,
 	useVIntl,
@@ -15,8 +16,10 @@ import { ref, shallowRef } from 'vue'
 
 import { PackageIcon } from '@/assets/icons'
 import { export_instance_mrpack, get_pack_export_candidates } from '@/helpers/instance'
+import { highlightInFolder } from '@/helpers/utils'
 
 const { handleError } = injectNotificationManager()
+const popupNotificationManager = injectPopupNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -39,6 +42,14 @@ const messages = defineMessages({
 		defaultMessage: 'Enter modpack description...',
 	},
 	exportButton: { id: 'app.export-modal.export-button', defaultMessage: 'Export' },
+	exportComplete: {
+		id: 'app.export-modal.export-complete',
+		defaultMessage: 'Export complete',
+	},
+	exportCompleteDescription: {
+		id: 'app.export-modal.export-complete-description',
+		defaultMessage: '{name} was exported successfully.',
+	},
 })
 
 const props = defineProps({
@@ -93,16 +104,35 @@ const exportPack = async () => {
 	})
 
 	if (outputPath) {
-		export_instance_mrpack(
-			props.instance.id,
-			outputPath,
-			includedFilePaths.value,
-			excludedFilePaths.value,
-			versionInput.value,
-			exportDescription.value,
-			nameInput.value,
-		).catch((err) => handleError(err))
 		exportModal.value.hide()
+
+		try {
+			await export_instance_mrpack(
+				props.instance.id,
+				outputPath,
+				includedFilePaths.value,
+				excludedFilePaths.value,
+				versionInput.value,
+				exportDescription.value,
+				nameInput.value,
+			)
+
+			const fileName = outputPath.split(/[\\/]/).pop() ?? outputPath
+			popupNotificationManager.addPopupNotification({
+				title: formatMessage(messages.exportComplete),
+				text: formatMessage(messages.exportCompleteDescription, { name: fileName }),
+				type: 'success',
+				buttons: [
+					{
+						label: formatMessage(commonMessages.openInFolderButton),
+						icon: FolderOpenIcon,
+						action: () => highlightInFolder(outputPath).catch(handleError),
+					},
+				],
+			})
+		} catch (error) {
+			handleError(error)
+		}
 	}
 }
 

@@ -287,6 +287,12 @@
   "app.export-modal.export-button": {
     "message": "Export"
   },
+  "app.export-modal.export-complete": {
+    "message": "Export complete"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} was exported successfully."
+  },
   "app.export-modal.header": {
     "message": "Export modpack"
   },

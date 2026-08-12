@@ -19,6 +19,7 @@ use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::time::UNIX_EPOCH;
 use tokio::fs::File;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 
 const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
@@ -29,6 +30,7 @@ const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
     "config",
 ];
 const EXPORT_CANDIDATE_METADATA_CONCURRENCY: usize = 32;
+const EXPORT_COPY_BUFFER_SIZE: usize = 256 * 1024;
 
 const NEVER_EXPORTABLE_PATH_PREFIXES: &[&str] = &[
     "profile.json",
@@ -196,16 +198,8 @@ pub async fn export_mrpack(
         .iter()
         .map(|file| file.path.as_str().to_string())
         .collect::<HashSet<_>>();
-    let loading_bar = init_loading(
-        LoadingBarType::ZipExtract {
-            instance_id: metadata.instance.id.clone(),
-            instance_name: metadata.instance.name.clone(),
-        },
-        1.0,
-        "Exporting instance to .mrpack",
-    )
-    .await?;
 
+    let mut override_files = Vec::new();
     let mut directories = vec![instance_base_path.clone()];
     while let Some(directory) = directories.pop() {
         let mut read_dir = io::read_dir(&directory).await?;
@@ -238,24 +232,57 @@ pub async fn export_mrpack(
                 continue;
             }
 
-            let mut stream = writer
-                .write_entry_stream(
-                    ZipEntryBuilder::new(
-                        format!("overrides/{relative_path}").into(),
-                        Compression::Deflate,
-                    )
-                    .build(),
+            let size = entry
+                .metadata()
+                .await
+                .map_err(|e| IOError::with_path(e, &path))?
+                .len();
+            override_files.push((path, relative_path, size));
+        }
+    }
+
+    let total_bytes = override_files
+        .iter()
+        .fold(1_u64, |total, (_, _, size)| total.saturating_add(*size));
+    let loading_bar = init_loading(
+        LoadingBarType::PackExport {
+            instance_id: metadata.instance.id.clone(),
+            instance_name: metadata.instance.name.clone(),
+        },
+        total_bytes as f64,
+        "Exporting instance to .mrpack",
+    )
+    .await?;
+    let mut buffer = vec![0_u8; EXPORT_COPY_BUFFER_SIZE];
+    for (path, relative_path, _) in override_files {
+        let mut stream = writer
+            .write_entry_stream(
+                ZipEntryBuilder::new(
+                    format!("overrides/{relative_path}").into(),
+                    Compression::Deflate,
                 )
-                .await?
-                .compat_write();
-            let mut source = File::open(&path)
+                .build(),
+            )
+            .await?
+            .compat_write();
+        let mut source = File::open(&path)
+            .await
+            .map_err(|e| IOError::with_path(e, &path))?;
+        loop {
+            let bytes_read = source
+                .read(&mut buffer)
                 .await
                 .map_err(|e| IOError::with_path(e, &path))?;
-            tokio::io::copy(&mut source, &mut stream)
+            if bytes_read == 0 {
+                break;
+            }
+            stream
+                .write_all(&buffer[..bytes_read])
                 .await
                 .map_err(IOError::from)?;
-            stream.into_inner().close().await?;
+            emit_loading(&loading_bar, bytes_read as f64, None)?;
         }
+        stream.into_inner().close().await?;
     }
 
     let data = serde_json::to_vec_pretty(&packfile)?;
