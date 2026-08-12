@@ -150,6 +150,7 @@ export function createServerInstall(opts: {
 
 	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
 			title: 'Install complete',
 			text: `${project.name} is installed and ready to play.`,
 			type: 'success',
@@ -185,6 +186,7 @@ export function createServerInstall(opts: {
 
 	function showUpdateSuccess(instance: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
 			title: 'Update complete',
 			text: `${instance.name} has been updated and is ready to play.`,
 			type: 'success',

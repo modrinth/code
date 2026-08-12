@@ -519,6 +519,7 @@ function handleAdsConsentRequired(required) {
 	}
 
 	const notification = addPopupNotification({
+		contentType: 'standard',
 		title: formatMessage(messages.adsConsentTitle),
 		text: formatMessage(messages.adsConsentBody),
 		type: 'info',
@@ -1106,17 +1107,16 @@ async function handleLiveNotification(notification) {
 		if (generation !== liveNotificationGeneration) return
 
 		const popupNotification = addPopupNotification({
+			contentType: 'toast',
 			title: serverName,
+			type: 'server-invite',
+			actorName: invitedBy?.username ?? null,
+			actorAvatarUrl: invitedBy?.avatar_url ?? null,
+			entityName: serverName,
 			autoCloseMs: null,
-			toast: {
-				type: 'server-invite',
-				actorName: invitedBy?.username ?? null,
-				actorAvatarUrl: invitedBy?.avatar_url ?? null,
-				entityName: serverName,
-				onAccept: () => acceptServerInviteNotification(notification),
-				onDecline: () => declineServerInviteNotification(notification),
-				onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
-			},
+			onAccept: () => acceptServerInviteNotification(notification),
+			onDecline: () => declineServerInviteNotification(notification),
+			onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
 		})
 		serverInvitePopupNotificationIds.add(popupNotification.id)
 	}
@@ -1293,6 +1293,7 @@ function showDelayedUpdatePopup() {
 
 	if (metered.value && !finishedDownloading.value) {
 		addPopupNotification({
+			contentType: 'standard',
 			title: formatMessage(updatePopupMessages.updateAvailable),
 			text: formatMessage(updatePopupMessages.meteredBody, { version: update.version }),
 			type: 'info',
@@ -1314,6 +1315,7 @@ function showDelayedUpdatePopup() {
 		})
 	} else if (finishedDownloading.value) {
 		addPopupNotification({
+			contentType: 'standard',
 			title: formatMessage(updatePopupMessages.downloadComplete),
 			text: formatMessage(updatePopupMessages.downloadedBody, {
 				version: update.version,
@@ -1412,6 +1414,7 @@ async function checkLinuxUpdates() {
 			const nextPopupTime = getNextAppUpdatePopupTime(latestVersion)
 			if (nextPopupTime !== null && Date.now() >= nextPopupTime) {
 				addPopupNotification({
+					contentType: 'standard',
 					title: formatMessage(updatePopupMessages.updateAvailable),
 					text: formatMessage(updatePopupMessages.linuxBody, { version: latestVersion }),
 					type: 'info',

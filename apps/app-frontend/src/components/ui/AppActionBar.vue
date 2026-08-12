@@ -136,8 +136,8 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	injectPopupNotificationManager,
-	type PopupNotification,
 	type PopupNotificationProgressItem,
+	type PopupNotificationStandard,
 	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -148,6 +148,7 @@ import { useRouter } from 'vue-router'
 import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
 import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
 import { trackEvent } from '@/helpers/analytics'
+import { toError } from '@/helpers/errors'
 import { loading_listener, process_listener } from '@/helpers/events'
 import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
@@ -323,14 +324,16 @@ function getDisplayIconUrl(icon: string | null | undefined): string | null {
 	return convertFileSrc(icon)
 }
 
-function getNotification(): PopupNotification | null {
+function getNotification(): PopupNotificationStandard | null {
 	if (!notificationId.value) {
 		return null
 	}
 	const notification = popupNotificationManager
 		.getNotifications()
 		.find((notification) => notification.id === notificationId.value)
-	return notification ?? null
+	return notification?.contentType === 'standard' && notification.type === 'download'
+		? notification
+		: null
 }
 
 function removeNotification(): void {
@@ -344,7 +347,7 @@ function removeNotification(): void {
 function buildDownloadItems(): PopupNotificationProgressItem[] {
 	return [
 		...installJobNotifications.progressItems.value,
-		...currentLoadingBars.value.map((bar) => ({
+		...currentLoadingBars.value.map<PopupNotificationProgressItem>((bar) => ({
 			id: getLoadingBarKey(bar),
 			title: bar.title ?? '',
 			text: getLoadingText(bar),
@@ -383,7 +386,7 @@ function updateNotification(resummon = false): void {
 		return
 	}
 
-	let notif = getNotification()
+	const notif = getNotification()
 	const progressItems = buildDownloadItems()
 
 	if (notif) {
@@ -396,7 +399,8 @@ function updateNotification(resummon = false): void {
 		notif.progress = undefined
 		notif.waiting = undefined
 	} else {
-		notif = popupNotificationManager.addPopupNotification({
+		const notification = popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
 			title: installJobNotifications.active.value
 				? installJobNotifications.title.value
 				: formatMessage(messages.downloads),
@@ -405,7 +409,7 @@ function updateNotification(resummon = false): void {
 			progressItems,
 			buttons: installJobNotifications.buttons.value,
 		})
-		notificationId.value = notif.id
+		notificationId.value = notification.id
 	}
 }
 
@@ -482,7 +486,7 @@ async function refreshLoadingBars() {
 
 const installJobNotifications = await useInstallJobNotifications({
 	router,
-	handleError,
+	handleError: (error) => handleError(toError(error)),
 	onChange: updateNotification,
 })
 

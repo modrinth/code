@@ -147,20 +147,8 @@
 					<Button
 						v-for="(action, index) in actions"
 						:key="index"
-						:type="
-							(action.color || (index === 0 ? 'brand' : undefined)) &&
-							(action.color || (index === 0 ? 'brand' : undefined)) !== 'standard'
-								? 'colored'
-								: 'base'
-						"
-						:color="
-							(action.color || (index === 0 ? 'brand' : undefined)) &&
-							(action.color || (index === 0 ? 'brand' : undefined)) !== 'standard'
-								? (action.color || (index === 0 ? 'brand' : undefined)) === 'medal-promo'
-									? 'medal_promotion'
-									: action.color || (index === 0 ? 'brand' : undefined)
-								: undefined
-						"
+						:type="notificationButtonColor(action, index) ? 'colored' : 'base'"
+						:color="notificationButtonColor(action, index)"
 						@click="$emit('action', index)"
 					>
 						<component :is="action.icon" v-if="action.icon" />
@@ -193,7 +181,7 @@
 import { CheckIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Button, IconButton } from '#ui/components/base/buttons'
+import { Button, type ButtonColor, IconButton } from '#ui/components/base/buttons'
 
 import { useFormatBytes, useFormatNumber } from '../../composables'
 import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'
@@ -257,6 +245,14 @@ const isInviteNotification = computed(
 		props.type === 'server-invite' ||
 		props.type === 'instance-invite',
 )
+
+function notificationButtonColor(
+	button: PopupNotificationButton,
+	index: number,
+): ButtonColor | undefined {
+	const color = button.color ?? (index === 0 ? 'brand' : undefined)
+	return color === 'standard' ? undefined : color
+}
 
 const actorLabel = computed(() => props.actorName || 'Someone')
 const entityLabel = computed(() => props.entityName || '')

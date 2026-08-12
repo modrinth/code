@@ -16,26 +16,26 @@
 				@mouseleave="setNotificationTimer(item)"
 			>
 				<NotificationToast
-					v-if="item.toast"
-					:type="item.toast.type"
+					v-if="item.contentType === 'toast'"
+					:type="item.type"
 					:action-loading="toastActionLoading(item.id)"
-					:actor-name="item.toast.actorName"
-					:actor-avatar-url="item.toast.actorAvatarUrl"
-					:entity-name="item.toast.entityName"
-					:entity-icon-url="item.toast.entityIconUrl"
-					:status-text="item.toast.statusText"
-					:progress="item.toast.progress"
-					:waiting="item.toast.waiting"
-					:show-progress="item.toast.showProgress"
-					:progress-type="item.toast.progressType"
-					:progress-current="item.toast.progressCurrent"
-					:progress-total="item.toast.progressTotal"
-					@accept="handleToastAccept(item, item.toast.onAccept)"
-					@decline="handleToastAction(item, item.toast.onDecline)"
-					@dismiss="handleToastAction(item, item.toast.onDismiss)"
-					@launch="handleToastAction(item, item.toast.onLaunch)"
-					@open-actor="item.toast.onOpenActor?.()"
-					@open-instance="handleToastAction(item, item.toast.onOpenInstance)"
+					:actor-name="item.actorName"
+					:actor-avatar-url="item.actorAvatarUrl"
+					:entity-name="item.entityName"
+					:entity-icon-url="item.entityIconUrl"
+					:status-text="item.statusText"
+					:progress="item.progress"
+					:waiting="item.waiting"
+					:show-progress="item.showProgress"
+					:progress-type="item.progressType"
+					:progress-current="item.progressCurrent"
+					:progress-total="item.progressTotal"
+					@accept="handleToastAccept(item, item.onAccept)"
+					@decline="handleToastAction(item, item.onDecline)"
+					@dismiss="handleToastAction(item, item.onDismiss)"
+					@launch="handleToastAction(item, item.onLaunch)"
+					@open-actor="item.onOpenActor?.()"
+					@open-instance="handleToastAction(item, item.onOpenInstance)"
 				/>
 				<div v-else-if="isDownloadNotification(item)" class="flex flex-col gap-4">
 					<div v-for="progressItem in downloadToastItems(item)" :key="progressItem.id">
@@ -108,11 +108,6 @@
 						<span v-if="item.text" class="text-primary">
 							{{ item.text }}
 						</span>
-						<component
-							:is="item.bodyComponent"
-							v-if="item.bodyComponent"
-							v-bind="item.bodyProps ?? {}"
-						/>
 					</div>
 					<div v-if="item.progressItems?.length" class="flex flex-col gap-3">
 						<div
@@ -149,20 +144,8 @@
 						<Button
 							v-for="(btn, idx) in item.buttons"
 							:key="idx"
-							:type="
-								(btn.color || (idx === 0 ? 'brand' : undefined)) &&
-								(btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard'
-									? 'colored'
-									: 'base'
-							"
-							:color="
-								(btn.color || (idx === 0 ? 'brand' : undefined)) &&
-								(btn.color || (idx === 0 ? 'brand' : undefined)) !== 'standard'
-									? (btn.color || (idx === 0 ? 'brand' : undefined)) === 'medal-promo'
-										? 'medal_promotion'
-										: btn.color || (idx === 0 ? 'brand' : undefined)
-									: undefined
-							"
+							:type="notificationButtonColor(btn, idx) ? 'colored' : 'base'"
+							:color="notificationButtonColor(btn, idx)"
 							@click="handleButtonClick(item.id, btn)"
 						>
 							<component :is="btn.icon" v-if="btn.icon" />
@@ -187,7 +170,7 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Button, IconButton } from '#ui/components/base/buttons'
+import { Button, type ButtonColor, IconButton } from '#ui/components/base/buttons'
 
 import { useModalStack } from '../../composables/modal-stack'
 import {
@@ -195,6 +178,7 @@ import {
 	type PopupNotification,
 	type PopupNotificationButton,
 	type PopupNotificationProgressItem,
+	type PopupNotificationStandard,
 } from '../../providers'
 import ProgressBar from '../base/ProgressBar.vue'
 import NotificationToast from '../notifications/NotificationToast.vue'
@@ -216,14 +200,25 @@ const setNotificationTimer = (n: PopupNotification) =>
 const dismiss = (id: string | number) => popupNotificationManager.removeNotification(id)
 const toastActionLoading = (id: string | number) => activeToastActions.value[String(id)] ?? null
 
-function isDownloadNotification(item: PopupNotification) {
-	return (
+function notificationButtonColor(
+	button: PopupNotificationButton,
+	index: number,
+): ButtonColor | undefined {
+	const color = button.color ?? (index === 0 ? 'brand' : undefined)
+	return color === 'standard' ? undefined : color
+}
+
+function isDownloadNotification(
+	item: PopupNotification,
+): item is PopupNotificationStandard & { type: 'download' } {
+	return !!(
+		item.contentType === 'standard' &&
 		item.type === 'download' &&
 		(!!item.progressItems?.length || item.progress != null || item.waiting)
 	)
 }
 
-function downloadToastItems(item: PopupNotification): PopupNotificationProgressItem[] {
+function downloadToastItems(item: PopupNotificationStandard): PopupNotificationProgressItem[] {
 	if (item.progressItems?.length) {
 		return item.progressItems
 	}
@@ -306,7 +301,7 @@ async function handleToastAccept(item: PopupNotification, action?: () => void | 
 	}
 }
 
-function progressColorForType(type: PopupNotification['type']) {
+function progressColorForType(type: PopupNotificationStandard['type']) {
 	if (type === 'error') {
 		return 'red'
 	} else if (type === 'warning') {

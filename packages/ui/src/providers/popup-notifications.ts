@@ -1,12 +1,14 @@
 import type { Component } from 'vue'
 
+import type { ButtonColor } from '#ui/components/base/buttons/types.ts'
+
 import { createContext } from '.'
 
 export interface PopupNotificationButton {
 	label: string
 	action: () => void | Promise<void>
 	icon?: Component
-	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
+	color?: ButtonColor | 'standard'
 	keepOpen?: boolean
 }
 
@@ -36,7 +38,29 @@ export type PopupNotificationToastType =
 	| 'instance-download'
 	| 'instance-ready'
 
-export interface PopupNotificationToast {
+interface PopupNotificationBase {
+	id: string | number
+	title: string
+	dismissible?: boolean
+	autoCloseMs?: number | null
+	timer?: NodeJS.Timeout
+}
+
+export interface PopupNotificationStandard extends PopupNotificationBase {
+	contentType: 'standard'
+	type: 'error' | 'warning' | 'success' | 'info' | 'download'
+	titleLogo?: Component
+	text?: string
+	iconUrl?: string | null
+	hideIcon?: boolean
+	progress?: number
+	waiting?: boolean
+	progressItems?: PopupNotificationProgressItem[]
+	buttons?: PopupNotificationButton[]
+}
+
+export interface PopupNotificationToast extends PopupNotificationBase {
+	contentType: 'toast'
 	type: PopupNotificationToastType
 	actorName?: string | null
 	actorAvatarUrl?: string | null
@@ -57,25 +81,16 @@ export interface PopupNotificationToast {
 	onOpenInstance?: () => void | Promise<void>
 }
 
-export interface PopupNotification {
-	id: string | number
-	title: string
-	titleLogo?: Component
-	bodyComponent?: Component
-	bodyProps?: Record<string, unknown>
-	text?: string
-	iconUrl?: string | null
-	hideIcon?: boolean
-	type?: 'error' | 'warning' | 'success' | 'info' | 'download'
-	progress?: number
-	waiting?: boolean
-	progressItems?: PopupNotificationProgressItem[]
-	buttons?: PopupNotificationButton[]
-	toast?: PopupNotificationToast
-	dismissible?: boolean
-	autoCloseMs?: number | null
-	timer?: NodeJS.Timeout
-}
+export type PopupNotification = PopupNotificationStandard | PopupNotificationToast
+
+type PopupNotificationInput = PopupNotification extends infer Notification
+	? Notification extends PopupNotification
+		? Omit<Notification, 'id' | 'timer'>
+		: never
+	: never
+
+type StoredPopupNotification<Input extends PopupNotificationInput> = Input &
+	Pick<PopupNotificationBase, 'id' | 'timer'>
 
 export abstract class AbstractPopupNotificationManager {
 	protected readonly DEFAULT_AUTO_CLOSE_MS = 30 * 1000
@@ -86,13 +101,13 @@ export abstract class AbstractPopupNotificationManager {
 	protected abstract removeNotificationFromStorage(id: string | number): void
 	protected abstract clearAllNotificationsFromStorage(): void
 
-	addPopupNotification = (
-		notification: Omit<PopupNotification, 'id' | 'timer'>,
-	): PopupNotification => {
-		const newNotification: PopupNotification = {
+	addPopupNotification = <Input extends PopupNotificationInput>(
+		notification: Input,
+	): StoredPopupNotification<Input> => {
+		const newNotification = {
 			...notification,
 			id: Date.now() + Math.random(),
-		}
+		} as StoredPopupNotification<Input>
 		this.setNotificationTimer(newNotification)
 		this.addNotificationToStorage(newNotification)
 		return newNotification
