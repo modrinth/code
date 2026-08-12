@@ -2273,6 +2273,7 @@ export namespace Labrinth {
 				rule: string
 				priority: number
 				revision: number
+				current_revision?: number
 				created_at: string
 				updated_at: string
 				created_by: number | null

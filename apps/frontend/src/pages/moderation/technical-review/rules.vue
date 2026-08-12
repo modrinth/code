@@ -269,9 +269,20 @@
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div>
 						<h2 class="m-0 text-lg font-bold text-contrast">{{ rule.name }}</h2>
-						<p class="m-0 text-sm text-secondary">
-							Priority {{ rule.priority }} · Revision {{ rule.revision }}
-						</p>
+						<div class="mt-1 flex items-center gap-2 text-sm text-secondary">
+							<span>Priority {{ rule.priority }}</span>
+							<span aria-hidden="true">·</span>
+							<span
+								class="rounded-full border px-2 py-0.5 text-xs font-semibold"
+								:class="
+									isRuleLive(rule)
+										? 'border-green/60 bg-highlight-green text-green'
+										: 'border-orange/60 bg-highlight-orange text-orange'
+								"
+							>
+								{{ isRuleLive(rule) ? 'Live' : 'Outdated' }}
+							</span>
+						</div>
 					</div>
 					<div class="flex gap-2">
 						<Button :disabled="isScanning" @click="openEditModal(rule)">
@@ -585,6 +596,10 @@ const previewExamples = computed(() =>
 		}
 	}),
 )
+
+function isRuleLive(rule: Labrinth.TechReview.Internal.DelphiRule): boolean {
+	return rule.current_revision === undefined || rule.revision === rule.current_revision
+}
 
 function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
 	switch (severity) {
