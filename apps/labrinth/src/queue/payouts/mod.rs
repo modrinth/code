@@ -231,6 +231,15 @@ impl PayoutsQueue {
         Ok(new_creds)
     }
 
+    pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
+        &self,
+        method: Method,
+        path: &str,
+        body: Option<T>,
+    ) -> Result<X, ApiError> {
+        make_tremendous_request(method, path, body).await
+    }
+
     pub async fn make_paypal_request<T: Serialize, X: DeserializeOwned>(
         &self,
         method: Method,
@@ -342,75 +351,6 @@ impl PayoutsQueue {
 
             return Err(ApiError::FailedDependency(eyre::eyre!(
                 "could not retrieve PayPal error body",
-            )));
-        }
-
-        serde_json::from_value(value)
-            .wrap_request_err("deserializing JSON data")
-    }
-
-    pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
-        &self,
-        method: Method,
-        path: &str,
-        body: Option<T>,
-    ) -> Result<X, ApiError> {
-        let client = reqwest::Client::new();
-        let mut request = client
-            .request(method, format!("{}{path}", ENV.TREMENDOUS_API_URL))
-            .header(
-                "Authorization",
-                format!("Bearer {}", ENV.TREMENDOUS_API_KEY),
-            );
-
-        if let Some(body) = body {
-            request = request.json(&body);
-        }
-
-        let resp = request
-            .send()
-            .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
-                "could not communicate with Tremendous".to_string(),
-            )?;
-
-        let status = resp.status();
-
-        let value = resp
-            .json::<Value>()
-            .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
-                "could not retrieve Tremendous response body".to_string(),
-            )?;
-
-        if !status.is_success()
-            && let Some(obj) = value.as_object()
-        {
-            if let Some(array) = obj.get("errors") {
-                #[derive(Deserialize)]
-                struct TremendousError {
-                    message: String,
-                    payload: Option<serde_json::Value>,
-                }
-
-                let err =
-                    serde_json::from_value::<TremendousError>(array.clone())
-                        .map_err(|err| eyre::eyre!(err))
-                        .wrap_failed_dependency_err(
-                            "could not retrieve Tremendous error json body"
-                                .to_string(),
-                        )?;
-
-                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
-                    "Tremendous error: {} ({:?})",
-                    err.message, err.payload
-                ))));
-            }
-
-            return Err(ApiError::FailedDependency(eyre::eyre!(
-                "could not retrieve Tremendous error body",
             )));
         }
 
@@ -634,6 +574,71 @@ impl PayoutsQueue {
             ) / Decimal::from(100),
         })
     }
+}
+
+pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
+    method: Method,
+    path: &str,
+    body: Option<T>,
+) -> Result<X, ApiError> {
+    let client = reqwest::Client::new();
+    let mut request = client
+        .request(method, format!("{}{path}", ENV.TREMENDOUS_API_URL))
+        .header(
+            "Authorization",
+            format!("Bearer {}", ENV.TREMENDOUS_API_KEY),
+        );
+
+    if let Some(body) = body {
+        request = request.json(&body);
+    }
+
+    let resp = request
+        .send()
+        .await
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_failed_dependency_err(
+            "could not communicate with Tremendous".to_string(),
+        )?;
+
+    let status = resp.status();
+
+    let value = resp
+        .json::<Value>()
+        .await
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_failed_dependency_err(
+            "could not retrieve Tremendous response body".to_string(),
+        )?;
+
+    if !status.is_success()
+        && let Some(obj) = value.as_object()
+    {
+        if let Some(array) = obj.get("errors") {
+            #[derive(Deserialize)]
+            struct TremendousError {
+                message: String,
+                payload: Option<serde_json::Value>,
+            }
+
+            let err = serde_json::from_value::<TremendousError>(array.clone())
+                .map_err(|err| eyre::eyre!(err))
+                .wrap_failed_dependency_err(
+                    "could not retrieve Tremendous error json body".to_string(),
+                )?;
+
+            return Err(ApiError::FailedDependency(eyre::eyre!(format!(
+                "Tremendous error: {} ({:?})",
+                err.message, err.payload
+            ))));
+        }
+
+        return Err(ApiError::FailedDependency(eyre::eyre!(
+            "could not retrieve Tremendous error body",
+        )));
+    }
+
+    serde_json::from_value(value).wrap_request_err("deserializing JSON data")
 }
 
 #[derive(Debug, Clone, Copy)]
