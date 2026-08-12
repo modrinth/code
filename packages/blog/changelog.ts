@@ -11,6 +11,45 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-10T18:17:39+00:00`,
+		product: 'web',
+		body: `## Added
+- Added official Modrinth subreddit and YouTube channel to footer, replacing GitHub which is already included below.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'app',
+		version: '0.17.5',
+		body: `## Changed
+- Common config file formats and RPO files are now hidden from the external modpack file warning modal.
+- Updated text in unknown file warning.
+- When viewing an instance's content in the app, content updates will now be checked immediately, rather than waiting for cache to be invalidated. It may take up to 10 minutes for updates to be shown in the content tab.
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed issue with animated GIFs sometimes not working in project page descriptions.
+- Fixed issue on Windows and Linux where the window close button was incorrectly coloured.
+- Fixed an issue when clicking content in the content tab of an instance it show a "Instance not found" notification
+- Fixed issue with the file information (name + file size) on the download button on project version pages not showing up.
+- Fixed broken buttons on the "Minecraft account required" modal on Windows.
+- Fixed the right sidebar closing when collapsing friend list sections when using the "Hide right sidebar" option.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations. Want to help translate the Modrinth website? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed issue with animated GIFs sometimes not working in project page descriptions.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)`,
+	},
+	{
 		date: `2026-08-08T19:10:34+00:00`,
 		product: 'web',
 		body: `## Fixed

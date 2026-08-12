@@ -90,7 +90,7 @@ export const configuredXss = new FilterXSS({
 			!value.startsWith('data:')
 		) {
 			try {
-				const url = new URL(value)
+				const url = new URL(value.replaceAll('&amp;', '&'))
 
 				if (url.hostname.includes('wsrv.nl')) {
 					url.searchParams.delete('errorredirect')
@@ -124,16 +124,10 @@ export const configuredXss = new FilterXSS({
 					!allowedHostnames.includes(url.hostname) &&
 					!allowedHostnameSuffixes.some((suffix) => url.hostname.endsWith(suffix))
 				) {
-					return safeAttrValue(
-						tag,
-						name,
-						`https://wsrv.nl/?url=${encodeURIComponent(
-							url.toString().replaceAll('&amp;', '&'),
-						)}&n=-1`,
-						cssFilter,
-					)
+					const proxiedUrl = `https://wsrv.nl/?url=${encodeURIComponent(url.toString())}&n=-1`
+					return safeAttrValue(tag, name, proxiedUrl.replaceAll('&', '&amp;'), cssFilter)
 				}
-				return safeAttrValue(tag, name, url.toString(), cssFilter)
+				return safeAttrValue(tag, name, url.toString().replaceAll('&', '&amp;'), cssFilter)
 			} catch {
 				/* empty */
 			}

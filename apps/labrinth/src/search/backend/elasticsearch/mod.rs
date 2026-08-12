@@ -688,6 +688,7 @@ impl Elasticsearch {
                     "compatible_dependency_project_ids": {
                         "type": "keyword"
                     },
+                    "disclosure_types": {"type": "keyword"},
                     "project_loader_fields": {
                         "type": "object",
                         "enabled": false

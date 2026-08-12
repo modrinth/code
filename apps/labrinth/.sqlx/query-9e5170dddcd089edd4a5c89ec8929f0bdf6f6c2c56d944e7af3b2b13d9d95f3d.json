@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT tm.user_id id\n                FROM team_members tm\n                WHERE tm.team_id = $1 AND tm.accepted\n                ",
+  "query": "\n                    SELECT tm.user_id id\n                    FROM team_members tm\n                    WHERE tm.team_id = $1 AND tm.accepted\n                    ",
   "describe": {
     "columns": [
       {
@@ -18,5 +18,5 @@
       false
     ]
   },
-  "hash": "d5ad5a67fe53351b760335b80501f09a2799bf575af90beeac94193fe8c4388b"
+  "hash": "9e5170dddcd089edd4a5c89ec8929f0bdf6f6c2c56d944e7af3b2b13d9d95f3d"
 }

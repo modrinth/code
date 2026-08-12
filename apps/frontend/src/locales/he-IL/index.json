@@ -1568,9 +1568,6 @@
   "layout.footer.social.discord": {
     "message": "דיסקורד"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "מסטודון"
   },

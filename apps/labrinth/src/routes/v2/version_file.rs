@@ -364,7 +364,7 @@ pub async fn get_projects_from_hashes(
                 .collect::<HashMap<_, _>>();
             let legacy_projects = LegacyProject::from_many(
                 projects_hashes.into_values().collect(),
-                &**pool,
+                &pool,
                 &redis,
             )
             .await
