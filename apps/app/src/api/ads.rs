@@ -187,10 +187,19 @@ async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
 
     state.occluded = occluded;
     let visible = should_show_ads_webview(&state);
+    let consent_overlay_shown = state.consent_overlay_shown;
     drop(state);
 
     if let Some(webview) = app.webviews().get("ads-window") {
-        set_webview_visible_for_window(app, webview, visible);
+        let is_minimized = app
+            .get_window("main")
+            .and_then(|window| window.is_minimized().ok())
+            .unwrap_or(false);
+
+        set_webview_visible(
+            webview,
+            visible && !is_minimized && (!occluded || consent_overlay_shown),
+        );
     }
 }
 
