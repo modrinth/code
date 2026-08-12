@@ -2013,23 +2013,20 @@ function copyId() {
 										</div>
 
 										<div class="detail-verdict-action-groups">
-											<ButtonStyled>
-												<button
-													type="button"
-													:disabled="copyingCelDetails.has(flag.detail.id)"
-													@click="copyDetailCelInput(flag.detail.id)"
-												>
-													<LoaderCircleIcon
-														v-if="copyingCelDetails.has(flag.detail.id)"
-														class="animate-spin"
-														aria-hidden="true"
-													/>
-													<ClipboardCopyIcon v-else aria-hidden="true" />
-													<span aria-live="polite">
-														{{ copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL' }}
-													</span>
-												</button>
-											</ButtonStyled>
+											<Button
+												:disabled="copyingCelDetails.has(flag.detail.id)"
+												@click="copyDetailCelInput(flag.detail.id)"
+											>
+												<LoaderCircleIcon
+													v-if="copyingCelDetails.has(flag.detail.id)"
+													class="animate-spin"
+													aria-hidden="true"
+												/>
+												<ClipboardCopyIcon v-else aria-hidden="true" />
+												<span aria-live="polite">
+													{{ copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL' }}
+												</span>
+											</Button>
 											<div
 												class="detail-verdict-buttons"
 												role="group"

@@ -10,7 +10,7 @@ import {
 	SortDescIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	ButtonLink,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -654,12 +654,10 @@ onUnmounted(() => {
 			<div
 				class="flex flex-col items-stretch justify-end gap-2 sm:flex-row sm:items-center lg:flex-shrink-0"
 			>
-				<ButtonStyled>
-					<NuxtLink to="/moderation/technical-review/rules">
-						<SettingsIcon class="size-5" />
-						Rules
-					</NuxtLink>
-				</ButtonStyled>
+				<ButtonLink to="/moderation/technical-review/rules">
+					<SettingsIcon class="size-5" />
+					Rules
+				</ButtonLink>
 
 				<Combobox
 					v-model="currentResponseFilter"

@@ -94,9 +94,19 @@
 
 				<div
 					v-if="ruleTestError"
-					class="border-red/40 rounded-lg border bg-highlight-red p-3 text-sm text-red"
+					role="alert"
+					class="border-red/40 max-h-64 overflow-auto rounded-lg border bg-highlight-red p-3 text-red"
 				>
-					{{ ruleTestError }}
+					<code class="rule-test-error">
+						<span>{{ ruleTestError.summary }}</span>
+						<span
+							v-for="(detail, index) in ruleTestError.details"
+							:key="index"
+							class="rule-test-error-detail"
+						>
+							{{ detail }}
+						</span>
+					</code>
 				</div>
 
 				<div
@@ -160,14 +170,10 @@
 			</section>
 
 			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<button type="button" @click="closeRuleModal">Cancel</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button type="submit" :disabled="isSaving">
-						{{ isSaving ? 'Saving...' : 'Save rule' }}
-					</button>
-				</ButtonStyled>
+				<Button @click="closeRuleModal">Cancel</Button>
+				<Button type="colored" color="brand" native-type="submit" :disabled="isSaving">
+					{{ isSaving ? 'Saving...' : 'Save rule' }}
+				</Button>
 			</div>
 		</form>
 	</NewModal>
@@ -192,11 +198,14 @@
 	<div class="flex flex-col gap-6">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
-				<ButtonStyled circular type="transparent">
-					<NuxtLink to="/moderation/technical-review" aria-label="Back to tech review queue">
-						<ArrowLeftIcon />
-					</NuxtLink>
-				</ButtonStyled>
+				<ButtonLink
+					to="/moderation/technical-review"
+					type="quiet"
+					class="!size-10 !rounded-full !p-0"
+					aria-label="Back to tech review queue"
+				>
+					<ArrowLeftIcon />
+				</ButtonLink>
 				<div>
 					<h1 class="m-0 text-2xl font-bold text-contrast">Delphi rules</h1>
 					<p class="m-0 text-secondary">Transform or hide Delphi issue traces.</p>
@@ -204,18 +213,14 @@
 			</div>
 
 			<div class="flex flex-wrap gap-2">
-				<ButtonStyled>
-					<button type="button" :disabled="isScanning" @click="scanModal?.show()">
-						<PlayIcon />
-						{{ isScanning ? 'Scanning...' : 'Run full scan' }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button type="button" :disabled="isScanning" @click="openCreateModal">
-						<PlusIcon />
-						Create rule
-					</button>
-				</ButtonStyled>
+				<Button :disabled="isScanning" @click="scanModal?.show()">
+					<PlayIcon />
+					{{ isScanning ? 'Scanning...' : 'Run full scan' }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="isScanning" @click="openCreateModal">
+					<PlusIcon />
+					Create rule
+				</Button>
 			</div>
 		</div>
 
@@ -247,9 +252,7 @@
 		</div>
 		<div v-else-if="loadFailed" class="universal-card flex flex-col items-center gap-3 py-8">
 			<p class="m-0 text-secondary">Failed to load Delphi rules.</p>
-			<ButtonStyled>
-				<button type="button" @click="loadRules">Try again</button>
-			</ButtonStyled>
+			<Button @click="loadRules">Try again</Button>
 		</div>
 		<EmptyState
 			v-else-if="rules.length === 0"
@@ -271,18 +274,19 @@
 						</p>
 					</div>
 					<div class="flex gap-2">
-						<ButtonStyled>
-							<button type="button" :disabled="isScanning" @click="openEditModal(rule)">
-								<EditIcon />
-								Edit
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button type="button" :disabled="isScanning" @click="openDeleteModal(rule)">
-								<TrashIcon />
-								Delete
-							</button>
-						</ButtonStyled>
+						<Button :disabled="isScanning" @click="openEditModal(rule)">
+							<EditIcon />
+							Edit
+						</Button>
+						<Button
+							type="colored"
+							color="red"
+							:disabled="isScanning"
+							@click="openDeleteModal(rule)"
+						>
+							<TrashIcon />
+							Delete
+						</Button>
 					</div>
 				</div>
 				<pre
@@ -352,40 +356,28 @@
 									/>
 								</p>
 							</div>
-							<ButtonStyled>
-								<NuxtLink v-if="detail.project_id" :to="getAffectedDetailLink(detail)">
-									<ExternalIcon />
-									View
-								</NuxtLink>
-								<button
-									v-else
-									type="button"
-									disabled
-									title="This trace is not attached to a project"
-								>
-									<ExternalIcon />
-									View
-								</button>
-							</ButtonStyled>
+							<ButtonLink v-if="detail.project_id" :to="getAffectedDetailLink(detail)">
+								<ExternalIcon />
+								View
+							</ButtonLink>
+							<Button v-else disabled title="This trace is not attached to a project">
+								<ExternalIcon />
+								View
+							</Button>
 						</div>
 
 						<div
 							v-if="rule.affected_details_count > 3"
 							class="relative z-20 mt-1 flex justify-center"
 						>
-							<ButtonStyled circular type="transparent">
-								<button
-									type="button"
-									:disabled="loadingAffectedRuleIds.has(rule.id)"
-									@click="toggleAffectedDetails(rule)"
-								>
-									<LoaderCircleIcon
-										v-if="loadingAffectedRuleIds.has(rule.id)"
-										class="animate-spin"
-									/>
-									{{ expandedAffectedDetails.has(rule.id) ? 'Show less' : 'Show more' }}
-								</button>
-							</ButtonStyled>
+							<Button
+								type="quiet"
+								:disabled="loadingAffectedRuleIds.has(rule.id)"
+								@click="toggleAffectedDetails(rule)"
+							>
+								<LoaderCircleIcon v-if="loadingAffectedRuleIds.has(rule.id)" class="animate-spin" />
+								{{ expandedAffectedDetails.has(rule.id) ? 'Show less' : 'Show more' }}
+							</Button>
 						</div>
 					</div>
 				</section>
@@ -400,7 +392,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Labrinth, SseParser } from '@modrinth/api-client'
+import { type Labrinth, ModrinthServerError, SseParser } from '@modrinth/api-client'
 import {
 	ArrowLeftIcon,
 	EditIcon,
@@ -413,7 +405,8 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	ConfirmModal,
 	EmptyState,
 	injectModrinthClient,
@@ -435,6 +428,11 @@ const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
 	useWorker: false,
 	tabSize: 2,
 	useSoftTabs: true,
+}
+
+type RuleTestError = {
+	summary: string
+	details: string[]
 }
 
 const TEST_INPUTS: Labrinth.TechReview.Internal.RuleInput[] = [
@@ -532,7 +530,7 @@ const ruleSchema = ref<Labrinth.TechReview.Internal.DelphiRuleSchemaResponse | n
 const editingRuleId = ref<number | null>(null)
 const ruleToDelete = ref<Labrinth.TechReview.Internal.DelphiRule | null>(null)
 const ruleTestEffects = ref<Array<Labrinth.TechReview.Internal.DelphiRuleEffect | null>>([])
-const ruleTestError = ref<string | null>(null)
+const ruleTestError = ref<RuleTestError | null>(null)
 const scanProgress = ref<Labrinth.TechReview.Internal.DelphiRuleScanEvent | null>(null)
 const expandedAffectedDetails = reactive(
 	new Map<number, Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]>(),
@@ -711,7 +709,10 @@ async function testRule() {
 
 	if (!rule) {
 		isTestingRule.value = false
-		ruleTestError.value = 'Enter a CEL expression to test it.'
+		ruleTestError.value = {
+			summary: 'Enter a CEL expression to test it.',
+			details: [],
+		}
 		return
 	}
 
@@ -727,7 +728,14 @@ async function testRule() {
 	} catch (error) {
 		if (requestId !== ruleTestRequestId) return
 
-		ruleTestError.value = error instanceof Error ? error.message : 'The rule could not be tested.'
+		const details =
+			error instanceof ModrinthServerError && Array.isArray(error.v1Error?.details)
+				? error.v1Error.details.filter((detail): detail is string => typeof detail === 'string')
+				: []
+		ruleTestError.value = {
+			summary: error instanceof Error ? error.message : 'The rule could not be tested.',
+			details,
+		}
 	} finally {
 		if (requestId === ruleTestRequestId) {
 			isTestingRule.value = false
@@ -1009,3 +1017,22 @@ async function runFullScan() {
 onMounted(loadRules)
 onUnmounted(() => scanAbortController?.abort())
 </script>
+
+<style scoped>
+.rule-test-error {
+	display: block;
+	font-family: monospace;
+	font-size: 0.75rem;
+	line-height: 1.625;
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
+}
+
+.rule-test-error > span {
+	display: block;
+}
+
+.rule-test-error-detail {
+	margin-inline-start: 1rem;
+}
+</style>

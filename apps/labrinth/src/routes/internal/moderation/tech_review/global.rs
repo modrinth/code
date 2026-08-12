@@ -133,7 +133,7 @@ pub struct GlobalIssueDetailTrace {
     security(("bearer_auth" = [])),
 	responses((status = OK, body = SearchGlobalIssueDetailsResponse))
 )]
-#[post("/global-issue-detail/search")]
+#[post("/global-traces/search")]
 pub async fn search_global_issue_details(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -357,7 +357,7 @@ pub async fn search_global_issue_details(
     security(("bearer_auth" = [])),
 	responses((status = OK, body = GetGlobalIssueDetailResponse))
 )]
-#[post("/global-issue-detail/local-traces")]
+#[post("/global-traces/local-traces")]
 pub async fn get_global_issue_detail(
     req: HttpRequest,
     pool: web::Data<PgPool>,

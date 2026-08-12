@@ -115,7 +115,9 @@ impl WriteDelphiRule {
             .await
             .wrap_internal_err("failed to join cel compilation task")?
             .map_err(|error| {
-                ApiError::Request(eyre!("invalid cel expression: {error}"))
+                ApiError::Request(
+                    eyre!(error).wrap_err("invalid cel expression"),
+                )
             })?;
 
         Ok(ValidatedRule {
@@ -165,7 +167,9 @@ pub async fn test_rule(
             .await
             .wrap_internal_err("failed to join cel compilation task")?
             .map_err(|error| {
-                ApiError::Request(eyre!("invalid cel expression: {error}"))
+                ApiError::Request(
+                    eyre!(error).wrap_err("invalid cel expression"),
+                )
             })?;
     let mut effects = Vec::with_capacity(request.inputs.len());
 

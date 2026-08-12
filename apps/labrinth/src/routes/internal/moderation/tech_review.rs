@@ -1417,7 +1417,7 @@ pub async fn update_issue_details(
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
-#[post("/global-issue-detail")]
+#[post("/global-traces")]
 pub async fn update_global_issue_details(
     req: HttpRequest,
     pool: web::Data<PgPool>,
