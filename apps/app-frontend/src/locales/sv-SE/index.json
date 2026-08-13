@@ -359,17 +359,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Granskar ändringar"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Granska uppdatering"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Granskar..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till den senaste verisoner för att köra spelet."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "En uppdatering finns tillgänglig"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data från din instans kommer permanent raderas, däribland dina världar, konfigurationer samt allt installerat innehåll."
@@ -682,15 +673,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Vilken regel bryter instansen mot?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Olämplig"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Skadlig"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Rapportera delad instans"
@@ -1718,17 +1700,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Synkronisera med instansen"
   },
-  "search.filter.locked.server": {
-    "message": "Tillhandahållet av servern"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Endast klient-sido moddar kan läggas till i serverinstansen"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Spelversion tillhandahålls av servern"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader tillhandahålls av servern"
   },
   "settings.sidebar.label.account": {
     "message": "Konto"

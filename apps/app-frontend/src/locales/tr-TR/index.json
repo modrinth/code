@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Değişimleri inceleniyor"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Güncellemeyi gözden geçir"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "İnceleniyor..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "{name}'i oynamak için bir güncelleme gerekli. Oyunu açabilmek için lütfen son sürüme güncelleyin."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Bir güncelleme mevcut"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Dünyalarınız, yapılandırmalarınız ve yüklü tüm içerikler ve tüm veriler kalıcı olarak silinecek."
@@ -664,15 +655,6 @@
   },
   "app.modal.install-to-play.report-image-too-large": {
     "message": "Dosya 1 MiB boyut sınırını aşıyor"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Uygunsuz"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Kötü niyetli"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-submitted": {
     "message": "Rapor sunuldu"
@@ -1508,17 +1490,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Kurulum ile eşitle"
   },
-  "search.filter.locked.server": {
-    "message": "Sunucu tarafından sağlanmıştır"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Sunucu örneğine yalnızca istemci tarafında çalışan modlar eklenebilir"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Oyun sürümü sunucu tarafından sağlanıyor"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Yükleyici sunucu tarafından sağlanıyor"
   },
   "settings.sidebar.label.account": {
     "message": "Hesap"

@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Examiner les modifications"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Télécharger la mise à jour"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Examination..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Une mise à jour est nécessaire pour jouer à {name}. Veuillez mettre à jour vers la dernière version pour lancer le jeu."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Une mise à jour est disponible"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Toutes les données pour votre instance seront supprimées à jamais, y compris vos mondes, vos configurations, et le contenu installé."
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Quelle règle cette instance enfreint-elle ?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Inapproprié"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Malicieux"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Signaler une instance partagée"
@@ -1919,17 +1901,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchroniser avec l'instance"
   },
-  "search.filter.locked.server": {
-    "message": "Fournis par le serveur"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Seuls les mods client peuvent être ajoutés à l'instance du serveur"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Version du jeu est procurée par le serveur"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Le loader est procuré par le serveur"
   },
   "settings.sidebar.label.account": {
     "message": "Compte"

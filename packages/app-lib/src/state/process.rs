@@ -18,8 +18,6 @@ use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::sync::LazyLock;
 use std::time::Instant;
-#[cfg(feature = "tauri")]
-use tauri::Emitter;
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
@@ -298,7 +296,11 @@ struct Process {
     rpc_server: RpcServer,
 }
 
-#[derive(Debug, Default, Serialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 pub struct Log4jEvent {
     pub timestamp_millis: Option<i64>,
     pub logger_name: Option<String>,
@@ -606,15 +608,11 @@ impl Process {
 
         #[cfg(feature = "tauri")]
         {
-            if let Ok(event_state) = crate::EventState::get() {
-                let _ = event_state.app.emit(
-                    "log",
-                    LogPayload {
-                        instance_id: instance_id.to_string(),
-                        event: LogEvent::Log4j(event.clone()),
-                    },
-                );
-            }
+            let event_state = crate::EventState::get();
+            let _ = event_state.send(crate::event::AppEvent::Log(LogPayload {
+                instance_id: instance_id.to_string(),
+                event: LogEvent::Log4j(event.clone()),
+            }));
         }
         #[cfg(not(feature = "tauri"))]
         {
@@ -627,17 +625,13 @@ impl Process {
 
         #[cfg(feature = "tauri")]
         {
-            if let Ok(event_state) = crate::EventState::get() {
-                let _ = event_state.app.emit(
-                    "log",
-                    LogPayload {
-                        instance_id: instance_id.to_string(),
-                        event: LogEvent::Legacy {
-                            message: message.to_string(),
-                        },
-                    },
-                );
-            }
+            let event_state = crate::EventState::get();
+            let _ = event_state.send(crate::event::AppEvent::Log(LogPayload {
+                instance_id: instance_id.to_string(),
+                event: LogEvent::Legacy {
+                    message: message.to_string(),
+                },
+            }));
         }
         #[cfg(not(feature = "tauri"))]
         {
@@ -735,7 +729,7 @@ impl Process {
                     InstancePayloadType::ServerJoined {
                         host,
                         port,
-                        timestamp,
+                        timestamp: timestamp.to_rfc3339(),
                     },
                 )
                 .await;

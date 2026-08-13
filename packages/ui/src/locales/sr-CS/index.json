@@ -584,18 +584,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Imena projekata"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetski"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Najnovije prvo"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Najstarije prvo"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortiraj so {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Ažuiraj sve"
   },
@@ -2029,24 +2017,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Izaberi ikonu"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ovaj modpack ne uključuje nikakav dodatni sadržaj."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nema pronađenog sadržaja"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Sadržaj modpacka"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Učitavanje sadržaja..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nijedan projekat ne odgovara tvojoj pretrazi."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Pretraga {count, number} {count, plural, one {projekta} few {projekta} other {projekata}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Upravo"
@@ -3589,15 +3559,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Napredno"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Isključi data pakete"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Isključi modove"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Isključi plugine"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Okruže"
@@ -5781,4 +5742,3 @@
     "defaultMessage": "Tip"
   }
 }
-

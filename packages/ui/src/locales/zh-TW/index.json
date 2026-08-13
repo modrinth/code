@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "安裝設定"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "專案名稱"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "字母順序"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "最新在前"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "最舊在前"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "排序依據：{mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新全部"
@@ -2080,33 +2065,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "選擇圖示"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "這個模組包不包含任何額外內容。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "找不到內容"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "外部"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "這個檔案未在 Modrinth 上發布。"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "模組包內容"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "正在載入內容..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "沒有專案符合你的搜尋字詞。"
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "在 Slicer 中開啟"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
@@ -3832,15 +3790,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "進階篩選"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "排除資料包"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "排除模組"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "排除插件"
   },
   "search.filter_type.environment": {
     "defaultMessage": "環境"
@@ -6231,4 +6180,3 @@
     "defaultMessage": "類型"
   }
 }
-

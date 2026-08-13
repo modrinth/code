@@ -82,18 +82,20 @@ fn parse_server_address_inner(
     address: &str,
 ) -> std::result::Result<(&str, u16), String> {
     let (host, port_str) = if address.starts_with("[") {
-        let colon_index = address.find(':');
-        let close_bracket_index = address.rfind(']');
-        if colon_index.is_none() || close_bracket_index.is_none() {
+        let (Some(colon_index), Some(close_bracket_index)) =
+            (address.find(':'), address.rfind(']'))
+        else {
+            return Err(format!("Invalid bracketed host/port: {address}"));
+        };
+        if close_bracket_index <= colon_index {
             return Err(format!("Invalid bracketed host/port: {address}"));
         }
-        let close_bracket_index = close_bracket_index.unwrap();
 
         let host = &address[1..close_bracket_index];
         if close_bracket_index + 1 == address.len() {
             (host, "")
         } else {
-            if address.as_bytes().get(close_bracket_index).copied()
+            if address.as_bytes().get(close_bracket_index + 1).copied()
                 != Some(b':')
             {
                 return Err(format!(
@@ -109,9 +111,10 @@ fn parse_server_address_inner(
             (host, port_str)
         }
     } else {
-        let colon_pos = address.find(':');
-        if let Some(colon_pos) = colon_pos {
-            (&address[..colon_pos], &address[colon_pos + 1..])
+        if let Some((host, port)) = address.split_once(':')
+            && !port.contains(':')
+        {
+            (host, port)
         } else {
             (address, "")
         }
@@ -163,4 +166,30 @@ pub async fn resolve_server_address(
         }
         .unwrap_or_else(|| (host.to_owned(), port)),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_server_address_inner;
+
+    #[test]
+    fn parses_ipv4_server_addresses() {
+        for (address, expected) in [
+            ("192.0.2.1", ("192.0.2.1", 25565)),
+            ("192.0.2.1:25566", ("192.0.2.1", 25566)),
+        ] {
+            assert_eq!(parse_server_address_inner(address), Ok(expected));
+        }
+    }
+
+    #[test]
+    fn parses_ipv6_server_addresses() {
+        for (address, expected) in [
+            ("2001:db8::1", ("2001:db8::1", 25565)),
+            ("[2001:db8::1]", ("2001:db8::1", 25565)),
+            ("[2001:db8::1]:25566", ("2001:db8::1", 25566)),
+        ] {
+            assert_eq!(parse_server_address_inner(address), Ok(expected));
+        }
+    }
 }

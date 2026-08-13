@@ -1,6 +1,7 @@
 <template>
 	<div class="markdown-body">
 		<h1>Content Rules</h1>
+		<p><em>Last modified: August 12, 2026</em></p>
 
 		<p>
 			These Content Rules are to be considered part of our
@@ -72,8 +73,12 @@
 
 		<p>
 			Projects, a form of Content, must make a clear and honest attempt to describe their purpose in
-			designated areas on the project page. Necessary information must not be obscured in any way.
-			Using confusing language or technical jargon when it is not necessary constitutes a violation.
+			designated areas on the project page. Necessary information must not be obscured in any way or
+			use confusing language or technical jargon when it is unnecessary.
+		</p>
+		<p>
+			Important information like content disclosures must always be described accurately and
+			appropriately.
 		</p>
 
 		<h3 id="general-expectations">2.1. General Expectations</h3>
@@ -144,17 +149,22 @@
 			which have diverged substantially from the original project.
 		</p>
 
+		<p>
+			When uploading content you have the necessary permissions to distribute but did not author
+			yourself, you must make a meaningful effort to credit each original source properly.
+		</p>
+
 		<h2 id="miscellaneous">5. Miscellaneous</h2>
 
 		<p>
 			There are certain other small aspects to creating projects that all authors should attempt to
-			abide by. These will not necessarily always be enforced, but abiding by all will result in a
-			faster review with fewer potential issues.
+			abide by. These will not be enforced as strictly, but abiding by all will result fewer
+			potential issues during project review, and a better project with more potential reach.
 		</p>
 		<ol>
 			<li>
-				All metadata, including license, client/server-side information, tags, etc. are filled out
-				correctly and are consistent with information found elsewhere.
+				All metadata, including license, environment information, tags, content disclosures, etc.
+				are filled out correctly and are consistent with information found elsewhere.
 			</li>
 			<li>
 				Project titles are only the name of the project, without any other unnecessary filler data.
@@ -164,12 +174,60 @@
 				repeating the project title.
 			</li>
 			<li>All external links lead to public resources that are relevant.</li>
-			<li>Gallery images are relevant to the project and each contain a title.</li>
+			<li>
+				Gallery images are relevant to the project and do not give a false impression of the
+				project's contents.
+			</li>
 			<li>All dependencies must be specified in the Dependencies section of each version.</li>
 			<li>
 				"Additional files" are only used for special designated purposes, such as source JAR files.
 				In other words, separate versions and/or projects are used where appropriate instead of
 				additional files.
+			</li>
+			<li>
+				Files uploaded to a project should be directly related to the content of the initial project
+				page or a direct linear upgrade. Files with different functionality should not be uploaded
+				as new versions within a single project; instead, they should be published as separate
+				projects.
+			</li>
+			<li>
+				All applicable content disclosures are filled out accurately and maintained with up-to-date
+				information.
+			</li>
+		</ol>
+
+		<h2 id="generative-ai">6. Usage of Generative "AI"</h2>
+
+		<p>
+			Projects must be forthright and honest about the usage of generative AI in their production,
+			publication, and within the project itself. Projects cannot be entirely or primarily comprised
+			of content created or derived from generative AI output.
+		</p>
+
+		<h3 id="disclosure-of-ai-generated-content">6.1. Disclosure of AI generated content</h3>
+
+		<p>You must apply the appropriate “Contains AI-generated content” content disclosure when:</p>
+		<ol type="a">
+			<li>a substantial portion of the project's code is a product of AI output.</li>
+			<li>
+				the project includes any assets that are primarily or entirely a product of AI output.
+			</li>
+			<li>the project's design or functionality relies on the use of generative AI.</li>
+			<li>
+				any element of the project's page such as description or publishing relies on generative AI.
+			</li>
+		</ol>
+
+		<h3 id="prohibited-usage-of-ai">6.2. Prohibited AI generated content</h3>
+
+		<ol type="a">
+			<li>
+				No images uploaded to a gallery, icon, description, or any other part of a project page may
+				be created or derived from generative AI output. Any such images may be removed.
+			</li>
+			<li>
+				Projects may not be published publicly if the contents are primarily or entirely a product
+				of AI output.
 			</li>
 		</ol>
 	</div>
@@ -186,3 +244,32 @@ useSeoMeta({
 	ogDescription: description,
 })
 </script>
+
+<style scoped>
+.markdown-body h2 {
+	@apply mb-3 mt-5 pb-1 pt-0 text-xl font-semibold text-contrast;
+}
+.markdown-body h3 {
+	@apply mb-1 mt-5 p-0 text-lg font-semibold text-contrast;
+}
+
+.markdown-body a {
+	@apply !font-semibold !text-brand !no-underline hover:!text-brand hover:!underline;
+}
+
+.markdown-body p {
+	@apply leading-normal;
+}
+
+.markdown-body ol {
+	@apply mb-3;
+}
+
+.markdown-body ol ol {
+	@apply mb-2;
+}
+
+.markdown-body li {
+	@apply mb-1;
+}
+</style>

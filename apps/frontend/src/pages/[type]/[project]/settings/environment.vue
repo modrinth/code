@@ -28,6 +28,7 @@
 import { SettingsIcon } from '@modrinth/assets'
 import {
 	ButtonLink,
+	commonProjectSettingsMessages,
 	EnvironmentMigration,
 	injectProjectPageContext,
 	LoadingIndicator,
@@ -35,6 +36,8 @@ import {
 import { isStaff } from '@modrinth/utils'
 
 const { currentMember, projectV2, projectV3 } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.environment)
 
 const showEnvironmentMigration = computed(() => {
 	return isStaff(currentMember.value?.user)

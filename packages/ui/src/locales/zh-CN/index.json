@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "安装设置"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "附加内容"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "项目名称"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "按字母顺序"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "按从新到旧顺序"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "按从旧到新顺序"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "按{mode}排序"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新所有"
@@ -2080,33 +2065,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "选择图标"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "这个整合包不包含任何额外内容。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "未找到内容"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "外部来源"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "此文件未发布于 Modrinth 平台。"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "整合包内容"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "加载内容……"
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "没有符合搜索条件的项目。"
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "在 Slicer 中打开"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
@@ -3832,15 +3790,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "高级"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "排除数据包"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "排除模组"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "排除插件"
   },
   "search.filter_type.environment": {
     "defaultMessage": "运行环境"
@@ -6231,4 +6180,3 @@
     "defaultMessage": "类型"
   }
 }
-

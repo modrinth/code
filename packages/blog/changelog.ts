@@ -11,6 +11,32 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'app',
+		version: '0.17.6',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.`,
+	},
+	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.
+- Updated parts of "General" settings for projects; moved the Monetization setting into the "Danger zone" with "Delete project"
+- Updated design of project settings header. Now has a dynamic back button to take you back to where you came from.
+
+## Fixed
+- Fixed changing slugs sometimes not redirecting properly.`,
+	},
+	{
 		date: `2026-08-10T18:17:39+00:00`,
 		product: 'web',
 		body: `## Added

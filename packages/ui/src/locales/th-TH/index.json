@@ -317,15 +317,6 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "เลือกไอคอน"
   },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "ไม่พบเนื้อหา"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "เนื้อหาม็อดแพ็ค"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "กำลังโหลดเนื้อหา"
-  },
   "label.available": {
     "defaultMessage": "ว่างอยู่ {amount}"
   },
@@ -663,4 +654,3 @@
     "defaultMessage": "ภาษา"
   }
 }
-

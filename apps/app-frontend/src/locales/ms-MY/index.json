@@ -245,9 +245,6 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
   },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Pemasangan yang dikongsi"
   },
@@ -818,16 +815,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Selaraskan dengan pemasangan"
   },
-  "search.filter.locked.server": {
-    "message": "Disediakan oleh pelayan"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Hanya mod bahagian pelanggan sahaja yang boleh ditambah pada pemasangan pelayan"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Versi permainan adalah disediakan oleh pelayan"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Pemuat adalah disediakan oleh pelayan"
   }
 }

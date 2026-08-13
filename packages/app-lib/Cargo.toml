@@ -50,6 +50,7 @@ httpdate = { workspace = true }
 image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
+json5 = { workspace = true }
 modrinth-content-management = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
@@ -59,6 +60,8 @@ paste = { workspace = true }
 path-util = { workspace = true }
 phf = { workspace = true }
 png = { workspace = true }
+postcard = { workspace = true, optional = true }
+postcard-bindgen = { workspace = true, features = ["generating", "std"], optional = true }
 quartz_nbt = { workspace = true, features = ["serde"] }
 quick-xml = { workspace = true, features = ["async-tokio"] }
 rand = { workspace = true }
@@ -76,7 +79,8 @@ reqwest = { workspace = true, features = [
   "stream",
 ] }
 rgb = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["derive", "rc"] }
+serde-binhum = { workspace = true }
 serde_ini = { workspace = true }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
@@ -105,9 +109,15 @@ tokio = { workspace = true, features = [
   "time",
 ] }
 tokio-util = { workspace = true, features = ["compat", "io", "io-util", "time"] }
+toml = { workspace = true }
 tracing = { workspace = true }
 tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
+ts-rs = { workspace = true, features = [
+  "chrono-impl",
+  "no-serde-warnings",
+  "uuid-impl"
+], optional = true }
 url = { workspace = true, features = ["serde"] }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
@@ -129,7 +139,8 @@ winreg = { workspace = true }
 
 [features]
 cli = ["dep:indicatif"]
-tauri = ["dep:tauri"]
+export-ts = ["dep:postcard-bindgen", "dep:ts-rs"]
+tauri = ["dep:postcard", "dep:tauri"]
 
 [lints]
 workspace = true

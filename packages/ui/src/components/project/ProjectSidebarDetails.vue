@@ -13,7 +13,89 @@
 			<div class="markdown-body" v-html="licenseHtml" />
 		</NewModal>
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
-		<div class="flex flex-col gap-3 [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
+		<div
+			class="flex flex-col gap-3 [&>div>svg]:shrink-0 [&>div>svg]:mt-[1px] [&>div]:flex [&>div]:gap-2 [&>div]:items-start"
+		>
+			<div v-if="photosensitivityDisclosure" class="text-orange">
+				<EyeIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.photosensitivityTitle)) }}
+					</span>
+					<span v-if="photosensitivityDisclosure.note" class="text-sm text-secondary">
+						{{ photosensitivityDisclosure.note }}
+					</span>
+				</div>
+			</div>
+			<div v-if="aiDisclosure">
+				<SparklesIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(aiGeneratedLabel) }}
+					</span>
+					<span v-if="aiDisclosure.note" class="text-sm text-secondary">
+						{{ aiDisclosure.note }}
+					</span>
+				</div>
+			</div>
+			<div v-if="advertisingDisclosure">
+				<MegaphoneIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.advertisingTitle)) }}
+					</span>
+					<span v-if="advertisingDisclosure.note" class="text-sm text-secondary">
+						{{ advertisingDisclosure.note }}
+					</span>
+				</div>
+			</div>
+			<div v-if="paidFeaturesDisclosure">
+				<CircleDollarSignIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.paidFeatures)) }}
+					</span>
+					<span
+						v-for="(feature, index) in paidFeaturesDisclosure.features"
+						:key="`${feature}-${index}`"
+						class="text-sm text-secondary"
+					>
+						{{ feature }}
+					</span>
+				</div>
+			</div>
+			<div v-if="telemetryDisclosure">
+				<RadioTowerIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{
+							capitalizeString(
+								formatMessage(messages.telemetryTitle, {
+									consent: telemetryDisclosure.consent,
+								}),
+							)
+						}}
+					</span>
+					<span
+						v-for="(entry, index) in telemetryDisclosure.data_collected"
+						:key="`${entry}-${index}`"
+						class="text-sm text-secondary"
+					>
+						{{ entry }}
+					</span>
+				</div>
+			</div>
+			<div v-if="systemInteractionsDisclosure">
+				<CircuitBoardIcon aria-hidden="true" />
+				<div class="flex flex-col gap-1">
+					<span>
+						{{ capitalizeString(formatMessage(messages.systemInteractionsTitle)) }}
+					</span>
+					<span v-if="systemInteractionsDisclosure.note" class="text-sm text-secondary">
+						{{ systemInteractionsDisclosure.note }}
+					</span>
+				</div>
+			</div>
 			<div v-if="!hideLicense">
 				<BookTextIcon aria-hidden="true" />
 				<div>
@@ -39,6 +121,32 @@
 							<span v-else>{{ licenseIdDisplay }}</span>
 						</template>
 					</IntlFormatted>
+				</div>
+			</div>
+			<div v-if="derivativeWorkDisclosure">
+				<GitForkIcon aria-hidden="true" />
+				<div class="flex flex-col gap-2">
+					<span>
+						{{ capitalizeString(formatMessage(messages.derivativeWork)) }}
+					</span>
+					<div
+						v-for="(source, index) in derivativeWorkDisclosure.sources"
+						:key="`${source.label}-${index}`"
+						class="flex flex-col gap-1"
+					>
+						<a
+							v-if="source.link"
+							:href="source.link"
+							:target="linkTarget"
+							rel="noopener nofollow ugc"
+							class="text-blue text-sm flex items-center gap-1 hover:underline"
+						>
+							{{ source.label }}
+							<ExternalIcon />
+						</a>
+						<span v-else class="text-sm">{{ source.label }}</span>
+						<span v-if="source.note" class="text-sm text-secondary">{{ source.note }}</span>
+					</div>
 				</div>
 			</div>
 			<div v-if="showFollowers">
@@ -94,27 +202,45 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BookTextIcon, CalendarIcon, HeartIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
+import {
+	BookTextIcon,
+	CalendarIcon,
+	CircleDollarSignIcon,
+	CircuitBoardIcon,
+	ExternalIcon,
+	EyeIcon,
+	GitForkIcon,
+	HeartIcon,
+	MegaphoneIcon,
+	RadioTowerIcon,
+	ScaleIcon,
+	SparklesIcon,
+	VersionIcon,
+} from '@modrinth/assets'
 import { capitalizeString, renderString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../composables'
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
+import { getActiveDisclosures } from '../../utils/disclosures'
 import { Avatar, IntlFormatted } from '../base'
 import { NewModal } from '../modal'
 
 const LICENSE_STALE_TIME = 1000 * 60 * 10
+const DISCLOSURE_STALE_TIME = 1000 * 60 * 5
 
-const { formatMessage } = useVIntl()
+const { formatMessage, locale } = useVIntl()
 const { labrinth } = injectModrinthClient()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
+
+const AI_USE_ORDER: Labrinth.Projects.v3.AiUsage[] = ['code', 'assets', 'text', 'functionality']
 
 const props = defineProps<{
 	project: Labrinth.Projects.v2.Project
@@ -143,6 +269,98 @@ const messages = defineMessages({
 		id: 'project.license.loading',
 		defaultMessage: 'Loading license text...',
 	},
+	advertisingTitle: {
+		id: 'project.disclosure.advertising.title',
+		defaultMessage: 'Contains advertising',
+	},
+	paidFeatures: {
+		id: 'project.disclosure.paid-features.title',
+		defaultMessage: 'Contains paid features',
+	},
+	aiGeneratedContent: {
+		id: 'project.disclosure.ai-generated-content.title',
+		defaultMessage: 'Contains AI-generated {types}',
+	},
+	derivativeWork: {
+		id: 'project.disclosure.derivative-work.title',
+		defaultMessage: 'This is a derivative work of:',
+	},
+	telemetryTitle: {
+		id: 'project.disclosure.telemetry.title',
+		defaultMessage:
+			'Contains {consent, select, opt_in {opt-in telemetry} opt_out {opt-out telemetry} always_active {always-active telemetry} other {telemetry}}',
+	},
+	photosensitivityTitle: {
+		id: 'project.disclosure.photosensitivity.title',
+		defaultMessage: 'Photosensitivity warning',
+	},
+	systemInteractionsTitle: {
+		id: 'project.disclosure.system-interactions.title',
+		defaultMessage: 'Contains external system interactions',
+	},
+})
+
+const { data: disclosuresResponse } = useQuery({
+	queryKey: computed(() => ['project', 'disclosures', 'v3', props.project.id] as const),
+	queryFn: () => labrinth.projects_v3.getDisclosures(props.project.id),
+	staleTime: DISCLOSURE_STALE_TIME,
+})
+
+const disclosures = computed(() => getActiveDisclosures(disclosuresResponse.value?.disclosures))
+
+function findDisclosure<T extends Labrinth.Projects.v3.ProjectDisclosureType>(type: T) {
+	return disclosures.value.find(
+		(d): d is Labrinth.Projects.v3.ProjectDisclosureOf<T> => d.type === type,
+	)
+}
+
+const aiDisclosure = computed(() => findDisclosure('ai_content'))
+const advertisingDisclosure = computed(() => findDisclosure('advertisements'))
+const paidFeaturesDisclosure = computed(() => findDisclosure('paid_features'))
+const telemetryDisclosure = computed(() => findDisclosure('telemetry'))
+const derivativeWorkDisclosure = computed(() => findDisclosure('derivative_work'))
+const photosensitivityDisclosure = computed(() => findDisclosure('epilepsy_triggers'))
+const systemInteractionsDisclosure = computed(() => findDisclosure('system_interactions'))
+
+const aiUseLabels = {
+	code: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.code',
+		defaultMessage: 'code',
+	}),
+	assets: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.assets',
+		defaultMessage: 'assets',
+	}),
+	text: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.text',
+		defaultMessage: 'text',
+	}),
+	functionality: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.functionality',
+		defaultMessage: 'functionality',
+	}),
+	content: defineMessage({
+		id: 'project.disclosure.ai-generated-content.use.content',
+		defaultMessage: 'content',
+	}),
+} as const
+
+const aiGeneratedLabel = computed(() => {
+	const disclosure = aiDisclosure.value
+	if (!disclosure) {
+		return ''
+	}
+
+	const orderedUses = AI_USE_ORDER.filter((use) => disclosure.uses.includes(use))
+	const types =
+		orderedUses.length === 0
+			? formatMessage(aiUseLabels.content)
+			: new Intl.ListFormat(locale.value, {
+					style: 'long',
+					type: 'conjunction',
+				}).format(orderedUses.map((use) => formatMessage(aiUseLabels[use])))
+
+	return formatMessage(messages.aiGeneratedContent, { types })
 })
 
 const createdDate = computed(() =>

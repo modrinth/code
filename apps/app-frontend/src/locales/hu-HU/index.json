@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Változtatások áttekintése"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Frissítés áttekintése"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Áttekintés..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Egy frssítés szükséges a(z) {name} példányhoz. Kérjük, frissítsd a játékot a legújabb verzióra az indításhoz."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Frissítés érhető el"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "A példányodhoz tartozó összes adat véglegesen törlődik, beleértve a világjaidat, a beállításaidat és az összes telepített tartalmat."
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Melyik szabályt sérti ez az adott példány?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Nem megfelelő"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Káros"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Megosztott példány jelentése"
@@ -1907,17 +1889,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Szinkronizálás a példánnyal"
   },
-  "search.filter.locked.server": {
-    "message": "A szerver által van megadva"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Szerverpéldányokhoz csak szerveroldali modok adhatók hozzá"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "A játékverzió a szerver által van megadva"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "A betöltőt az adott szerver biztosítja"
   },
   "settings.sidebar.label.account": {
     "message": "Fiók"

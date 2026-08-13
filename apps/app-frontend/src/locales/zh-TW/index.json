@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "檢視變更"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "檢視更新"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "正在檢視..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "需要更新才能遊玩「{name}」。請更新至最新版本以啟動遊戲。"
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "有可用的更新"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你實例中的所有資料將被永久刪除，包含你的世界、設定檔以及所有已安裝的內容。"
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "這個實例違反了哪一條規則？"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "不當內容"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "惡意內容"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "垃圾內容"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "檢舉共用實例"
@@ -1922,17 +1904,8 @@
   "search.filter.locked.instance.sync": {
     "message": "與實例同步"
   },
-  "search.filter.locked.server": {
-    "message": "由伺服器提供"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "只有用戶端模組可以被加到伺服器實例"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "遊戲版本由伺服器提供"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "載入器由伺服器提供"
   },
   "settings.sidebar.label.account": {
     "message": "帳號"

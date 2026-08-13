@@ -99,6 +99,7 @@ export function createSharedInstanceContext(
 		enabled: computed(
 			() =>
 				!!instance.value?.id &&
+				instance.value.install_stage === 'installed' &&
 				!!instance.value.shared_instance &&
 				!actionsLocked.value &&
 				!offline.value &&
@@ -128,6 +129,7 @@ export function createSharedInstanceContext(
 	const updatePreview = computed(() =>
 		unavailableReason.value ? null : (updatePreviewQuery.data.value ?? null),
 	)
+	const lastUpdateCheckAt = computed(() => updatePreviewQuery.dataUpdatedAt.value || undefined)
 
 	watch(
 		() => instance.value?.id,
@@ -162,6 +164,7 @@ export function createSharedInstanceContext(
 		unavailableManager,
 		manager,
 		updatePreview,
+		lastUpdateCheckAt,
 		expectedUserId,
 		wrongAccount,
 		signedOut,

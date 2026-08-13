@@ -570,11 +570,13 @@ impl ProjectStatus {
     pub fn can_be_requested(&self) -> bool {
         match self {
             ProjectStatus::Approved => true,
-            ProjectStatus::Archived => true,
             ProjectStatus::Unlisted => true,
             ProjectStatus::Private => true,
             ProjectStatus::Draft => true,
 
+            // `archived` is represented by a disclosure, not a status, so it
+            // can no longer be requested or set as a status.
+            ProjectStatus::Archived => false,
             ProjectStatus::Rejected => false,
             ProjectStatus::Processing => false,
             ProjectStatus::Unknown => false,

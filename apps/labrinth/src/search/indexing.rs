@@ -18,6 +18,7 @@ use crate::database::models::{
     DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
     LoaderFieldEnumValueId, LoaderFieldId,
 };
+use crate::models::disclosures::ProjectDisclosure;
 use crate::models::exp;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::{DependencyType, from_duplicate_version_fields};
@@ -316,6 +317,32 @@ async fn build_search_documents(
     )
     .await?;
 
+    info!("Indexing local disclosures!");
+
+    let project_disclosures: DashMap<
+        DBProjectId,
+        Vec<(String, serde_json::Value)>,
+    > = sqlx::query!(
+        "
+        SELECT project_id, type, metadata
+        FROM project_disclosures
+        WHERE project_id = ANY($1) AND deleted_at IS NULL
+        ",
+        &*project_ids,
+    )
+    .fetch(pool)
+    .try_fold(
+        DashMap::new(),
+        |acc: DashMap<DBProjectId, Vec<(String, serde_json::Value)>>, m| {
+            acc.entry(DBProjectId(m.project_id))
+                .or_default()
+                .push((m.r#type, m.metadata));
+            async move { Ok(acc) }
+        },
+    )
+    .await
+    .wrap_err("failed to fetch project disclosures")?;
+
     info!("Indexing local versions!");
     let mut versions = load_project_versions(pool, project_ids.clone()).await?;
 
@@ -497,6 +524,45 @@ async fn build_search_documents(
         let mut project_categories = categories;
         project_categories.sort();
         project_categories.dedup();
+
+        let disclosure_types = project_disclosures
+            .remove(&project.id)
+            .map(|(_, disclosures)| disclosures)
+            .unwrap_or_default()
+            .into_iter()
+            .flat_map(|(kind, metadata)| {
+                let disclosure =
+                    match ProjectDisclosure::from_parts(&kind, metadata) {
+                        Ok(disclosure) => disclosure,
+                        Err(e) => {
+                            warn!(
+                                project_id = project.id.0,
+                                disclosure_type = kind,
+                                "indexing project disclosure without its metadata: {e}"
+                            );
+                            return vec![kind];
+                        }
+                    };
+
+                let mut disclosure_type_tokens = vec![kind.clone()];
+
+                match &disclosure {
+                    ProjectDisclosure::AiContent { uses, .. } => {
+                        disclosure_type_tokens.extend(uses.iter().map(|usage| {
+                            format!("{kind}_{}", <&'static str>::from(usage))
+                        }));
+                    }
+                    ProjectDisclosure::Telemetry { consent, .. } => {
+                        disclosure_type_tokens.push(format!(
+                            "{kind}_{}",
+                            <&'static str>::from(consent)
+                        ));
+                    }
+                    _ => {}
+                }
+                disclosure_type_tokens
+            })
+            .collect::<Vec<_>>();
         let dependencies = dependencies
             .get(&project.id)
             .map(|x| x.clone())
@@ -514,6 +580,34 @@ async fn build_search_documents(
                         | DependencyType::Optional
                         | DependencyType::Embedded
                 )
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let required_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Required
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let optional_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Optional
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let embedded_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Embedded
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let incompatible_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Incompatible
             })
             .map(|dependency| dependency.project_id.clone())
             .collect::<Vec<_>>();
@@ -731,7 +825,12 @@ async fn build_search_documents(
                 color: project.color.map(|x| x as u32),
                 dependency_project_ids,
                 compatible_dependency_project_ids,
+                required_dependency_project_ids,
+                optional_dependency_project_ids,
+                embedded_dependency_project_ids,
+                incompatible_dependency_project_ids,
                 dependencies,
+                disclosure_types,
                 project_loader_fields,
                 loader_fields,
                 loaders: project_loaders,

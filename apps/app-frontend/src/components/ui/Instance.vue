@@ -10,11 +10,11 @@ import {
 import { Avatar, IconButton, injectNotificationManager, useRelativeTime } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { process_listener } from '@/helpers/events'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
 import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
@@ -136,7 +136,7 @@ defineExpose({
 
 const currentEvent = ref(null)
 
-const unlisten = await process_listener((e) => {
+useAppEvent('process', (e) => {
 	if (e.instance_id === props.instance.id) {
 		currentEvent.value = e.event
 		if (e.event === 'finished') {
@@ -148,7 +148,6 @@ const unlisten = await process_listener((e) => {
 onMounted(() => {
 	checkProcess()
 })
-onUnmounted(() => unlisten())
 </script>
 
 <template>

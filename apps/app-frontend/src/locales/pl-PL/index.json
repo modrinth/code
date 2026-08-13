@@ -371,14 +371,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Sprawdź zmiany"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Sprawdź aktualizację"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Trwa przegląd..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Dostępna aktualizacja"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
@@ -667,15 +661,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Którą zasadę narusza ta instancja?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Treści nieodpowiednie"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Zawiera Złośliwy kod"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Zgłoś przesłaną Instalacje"
@@ -1703,17 +1688,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchronizuj z instancją"
   },
-  "search.filter.locked.server": {
-    "message": "Dostarczone przez serwer"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Tylko mody po stronie klienta mogą być dodane do instancji serwera"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Wersja gry jest dostarczona przez serwer"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader jest dostarczony przez serwer"
   },
   "settings.sidebar.label.account": {
     "message": "Konto"

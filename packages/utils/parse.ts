@@ -4,6 +4,39 @@ import xss from 'xss'
 // @ts-expect-error xss types don't reflect CJS default export shape
 const { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } = xss
 
+// Imgur is blocked in UK and Indonesia
+const imgurProxyCountries = new Set(['GB', 'ID'])
+
+type MarkdownUserCountryResolver = () => string | null | undefined
+
+let resolveMarkdownUserCountry: MarkdownUserCountryResolver = () => undefined
+
+export const setMarkdownUserCountryResolver = (resolver: MarkdownUserCountryResolver) => {
+	resolveMarkdownUserCountry = resolver
+}
+
+const shouldProxyImgur = () => {
+	try {
+		const country = resolveMarkdownUserCountry()
+		return country ? imgurProxyCountries.has(country.toUpperCase()) : false
+	} catch {
+		return false
+	}
+}
+
+const getImgurProxyUrl = (value: string) => {
+	try {
+		const url = new URL(value.replaceAll('&amp;', '&'))
+		if (url.hostname !== 'imgur.com' && !url.hostname.endsWith('.imgur.com')) {
+			return undefined
+		}
+
+		return `https://external-content.duckduckgo.com/iu/?u=${encodeURIComponent(url.toString())}.png`
+	} catch {
+		return undefined
+	}
+}
+
 export const configuredXss = new FilterXSS({
 	whiteList: {
 		...whiteList,
@@ -84,6 +117,18 @@ export const configuredXss = new FilterXSS({
 		}
 	},
 	safeAttrValue(tag, name, value, cssFilter) {
+		if (
+			shouldProxyImgur() &&
+			((tag === 'a' && name === 'href') ||
+				((tag === 'img' || tag === 'video' || tag === 'audio' || tag === 'source') &&
+					(name === 'src' || name === 'srcset' || name === 'poster')))
+		) {
+			const proxiedUrl = getImgurProxyUrl(value)
+			if (proxiedUrl) {
+				return safeAttrValue(tag, name, proxiedUrl, cssFilter)
+			}
+		}
+
 		if (
 			(tag === 'img' || tag === 'video' || tag === 'audio' || tag === 'source') &&
 			(name === 'src' || name === 'srcset' || name === 'poster') &&

@@ -563,9 +563,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "світ"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Налаштування інсталяції"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Додатковий уміст"
   },
@@ -610,18 +607,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Назви проєктів"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "За абеткою"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Спочатку новіші"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Спочатку старіші"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Сортування: {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Оновити все"
@@ -2035,33 +2020,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Вибрати значок"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Збірка не включає додатковий уміст."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Умісту не знайдено"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Зовнішні"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Цей файл не опубліковано на Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Уміст збірки"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Завантаження вмісту…"
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "За вашим запитом не знайдено жодного проєкту."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Відкрити в Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Пошук {count, number} {count, plural, one {проєкту} other {проєктів}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Поточна"
@@ -3787,15 +3745,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Більше"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Виключити пакети даних"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Виключити моди"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Виключити плаґіни"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Середовище"

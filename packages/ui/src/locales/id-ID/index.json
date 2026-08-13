@@ -503,18 +503,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nama proyek"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Menurut abjad"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Terbaru dahulu"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Tertua dahulu"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Urutkan berdasarkan {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Perbarui semua"
   },
@@ -1171,24 +1159,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode permainan tak dikenal"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Paket mod ini tidak termasuk konten tambahan."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Konten tidak ditemukan"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Konten paket mod"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Sedang memuat konten..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Tidak ada proyek yang cocok dengan pencarian Anda."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Cari {count, number} {count, plural, other {proyek}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Saat ini"
@@ -2982,4 +2952,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

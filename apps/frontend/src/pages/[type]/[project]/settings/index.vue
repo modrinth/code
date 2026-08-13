@@ -1,12 +1,13 @@
 <template>
 	<div>
+		<AiImageWarningModal ref="aiImageWarningModal" />
 		<ConfirmModal
 			ref="modal_confirm"
-			title="Are you sure you want to delete this project?"
-			description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
+			:title="formatMessage(messages.deleteConfirmationTitle)"
+			:description="formatMessage(messages.deleteConfirmationDescription)"
 			:has-to-type="true"
-			:confirmation-text="project.title"
-			proceed-label="Delete"
+			:confirmation-text="project.name"
+			:proceed-label="formatMessage(messages.deleteConfirmationProceedText)"
 			@proceed="deleteProject"
 		/>
 		<section class="universal-card">
@@ -35,9 +36,7 @@
 					</label>
 					<div class="text-input-wrapper !w-full">
 						<div class="text-input-wrapper__before">
-							<span class="hidden sm:inline">https://modrinth.com</span>/{{
-								$getProjectTypeForUrl(project.project_type, project.loaders)
-							}}/
+							<span class="hidden sm:inline">https://modrinth.com</span>/{{ projectTypeForUrl }}/
 						</div>
 						<StyledInput
 							id="project-slug"
@@ -61,9 +60,10 @@
 						:disabled="!hasPermission"
 						resize="vertical"
 					/>
-					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
-						<TriangleAlertIcon class="my-auto" />
-						{{ summaryWarning }}
+					<div v-if="summaryWarning" class="my-2">
+						<SettingsInlineWarning>
+							{{ summaryWarning }}
+						</SettingsInlineWarning>
 					</div>
 				</div>
 
@@ -77,7 +77,7 @@
 					<div class="input-group">
 						<Avatar
 							:src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
-							:alt="project.title"
+							:alt="project.name"
 							size="md"
 							class="project__icon"
 						/>
@@ -182,52 +182,6 @@
 					</div>
 				</template>
 
-				<template
-					v-if="
-						!isServerProject &&
-						!flags.newProjectEnvironmentSettings &&
-						project.versions?.length !== 0 &&
-						project.project_type !== 'resourcepack' &&
-						project.project_type !== 'plugin' &&
-						project.project_type !== 'shader' &&
-						project.project_type !== 'datapack'
-					"
-				>
-					<div class="adjacent-input">
-						<label for="project-env-client">
-							<span class="label__title">Client-side</span>
-							<span class="label__description">
-								Select based on if the
-								{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-								client side. Just because a mod works in Singleplayer doesn't mean it has actual
-								client-side functionality.
-							</span>
-						</label>
-						<Combobox
-							v-model="clientSide"
-							:options="sideTypeOptions"
-							placeholder="Select one"
-							:disabled="!hasPermission"
-						/>
-					</div>
-					<div class="adjacent-input">
-						<label for="project-env-server">
-							<span class="label__title">Server-side</span>
-							<span class="label__description">
-								Select based on if the
-								{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-								<strong>logical</strong> server. Remember that Singleplayer contains an integrated
-								server.
-							</span>
-						</label>
-						<Combobox
-							v-model="serverSide"
-							:options="sideTypeOptions"
-							placeholder="Select one"
-							:disabled="!hasPermission"
-						/>
-					</div>
-				</template>
 				<div id="visibility">
 					<label>
 						<span class="label__title">Visibility</span>
@@ -243,40 +197,48 @@
 					</div>
 				</div>
 			</div>
+		</section>
 
-			<div v-if="!isServerProject" class="mt-4 flex flex-col gap-2">
-				<div class="grid grid-cols-[1fr_auto] items-center gap-6">
-					<label for="project-monetization-toggle">
-						<span class="mb-1 block text-lg font-semibold text-contrast">Monetization</span>
-						<span class="block">
-							When enabled, this project can earn revenue through Modrinth's
-							<nuxt-link to="/legal/cmp-info" target="_blank" class="text-link"
-								>Rewards Program</nuxt-link
-							>. If you don't want to (or can't for legal reasons) earn revenue from this project,
-							you can turn it off here.
-						</span>
-					</label>
-					<Toggle
-						id="project-monetization-toggle"
-						v-model="monetizationEnabled"
-						:disabled="monetizationToggleDisabled"
-					/>
+		<div class="mt-6 flex flex-col gap-4">
+			<h2 class="m-0 text-2xl font-semibold">
+				{{ formatMessage(messages.dangerZone) }}
+			</h2>
+			<SettingsToggleCard
+				v-if="!isServerProject"
+				v-model="monetizationEnabled"
+				:disabled="monetizationToggleDisabled"
+				:title="formatMessage(messages.monetizationTitle)"
+			>
+				<p>
+					<IntlFormatted :message-id="messages.monetizationDescription">
+						<template #rewards-program-link="{ children }">
+							<nuxt-link
+								to="/legal/cmp-info"
+								target="_blank"
+								class="smart-clickable:allow-pointer-events text-link"
+							>
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+					</IntlFormatted>
+				</p>
+				<div v-if="isForceDemonetized" class="mt-2">
+					<SettingsInlineWarning>
+						<IntlFormatted :message-id="messages.monetizationDisabledDescription">
+							<template #contact-support-link="{ children }">
+								<a
+									class="smart-clickable:allow-pointer-events text-orange underline hover:brightness-110"
+									href="https://support.modrinth.com"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<component :is="() => normalizeChildren(children)" />
+								</a>
+							</template>
+						</IntlFormatted>
+					</SettingsInlineWarning>
 				</div>
-				<div v-if="isForceDemonetized" class="mt-2 flex flex-wrap items-center gap-2 text-orange">
-					<TriangleAlertIcon aria-hidden="true" />
-					<span>
-						Your project is not eligible for monetization. If you think this is a mistake, please
-						<a
-							class="text-orange underline hover:brightness-110"
-							href="https://support.modrinth.com"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							contact support</a
-						>.
-					</span>
-				</div>
-				<div v-if="isStaff" class="mt-2">
+				<div v-if="isStaff" class="smart-clickable:allow-pointer-events mt-2">
 					<Button
 						v-if="!isForceDemonetized"
 						type="colored"
@@ -296,29 +258,33 @@
 						Allow monetization
 					</Button>
 				</div>
-			</div>
-		</section>
-
-		<section class="universal-card">
-			<div class="label">
-				<h3>
-					<span class="label__title size-card-header">Delete project</span>
-				</h3>
-			</div>
-			<p>
-				Removes your project from Modrinth's servers and search. Clicking on this will delete your
-				project, so be extra careful!
-			</p>
-			<Button
-				type="colored"
-				color="red"
-				:disabled="!hasDeletePermission"
-				@click="$refs.modal_confirm.show()"
-			>
-				<TrashIcon aria-hidden="true" />
-				Delete project
-			</Button>
-		</section>
+			</SettingsToggleCard>
+			<SettingsOptionCard :title="formatMessage(messages.deleteProjectTitle)">
+				<p>
+					<IntlFormatted :message-id="messages.deleteProjectDescription1">
+						<template #emphasis="{ children }">
+							<span class="font-medium text-red"
+								><component :is="() => normalizeChildren(children)"
+							/></span>
+						</template>
+					</IntlFormatted>
+				</p>
+				<p>
+					{{ formatMessage(messages.deleteProjectDescription2) }}
+				</p>
+				<template #actions>
+					<Button
+						type="colored"
+						color="red"
+						:disabled="!hasDeletePermission"
+						@click="$refs.modal_confirm.show()"
+					>
+						<TrashIcon aria-hidden="true" />
+						{{ formatMessage(messages.deleteProjectButton) }}
+					</Button>
+				</template>
+			</SettingsOptionCard>
+		</div>
 		<UnsavedChangesPopup
 			:original="original"
 			:modified="modified"
@@ -331,56 +297,64 @@
 </template>
 
 <script setup>
-import { ImageIcon, ScaleIcon, TrashIcon, TriangleAlertIcon, UploadIcon } from '@modrinth/assets'
+import { ImageIcon, ScaleIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
 	Button,
 	Combobox,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	ConfirmModal,
+	defineMessages,
 	FileButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	IntlFormatted,
+	normalizeChildren,
+	SettingsInlineWarning,
+	SettingsOptionCard,
+	SettingsToggleCard,
 	StyledInput,
-	Toggle,
 	UnsavedChangesPopup,
 	useFormatBytes,
 	usePageLeaveSafety,
+	useVIntl,
 } from '@modrinth/ui'
-import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
+import { fileIsValid, formatProjectStatus } from '@modrinth/utils'
 
+import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import { useAuth } from '~/composables/auth.js'
-import { useFeatureFlags } from '~/composables/featureFlags.ts'
+import { fileDeclaresAi } from '~/helpers/c2pa'
+import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 const auth = await useAuth()
+const { formatMessage } = useVIntl()
 
 const { addNotification } = injectNotificationManager()
 const {
-	projectV2: project,
-	projectV3,
+	projectV3: project,
 	currentMember,
-	patchProject,
+	patchProjectV3,
 	patchIcon,
 	invalidate,
 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
+const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
 
-const flags = useFeatureFlags()
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
 const tags = useGeneratedState()
 const router = useNativeRouter()
 
 const formatBytes = useFormatBytes()
 
-const name = ref(project.value.title)
-const slug = ref(project.value.slug)
-const summary = ref(project.value.description)
+const name = ref(project.value.name)
+const slug = ref(project.value.slug ?? '')
+const summary = ref(project.value.summary)
 const icon = ref(null)
 const previewImage = ref(null)
-const clientSide = ref(project.value.client_side)
-const serverSide = ref(project.value.server_side)
 const deletedIcon = ref(false)
 const visibility = ref(
 	tags.value.approvedStatuses.includes(project.value.status)
@@ -406,12 +380,17 @@ const isForceDemonetized = computed(() => project.value.monetization_status === 
 
 // Server project specific refs
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
-const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+const isServerProject = computed(() => project.value?.minecraft_server != null)
+const projectTypeForUrl = computed(() => {
+	if (isServerProject.value) return 'server'
+	const type = project.value.project_types?.[0] ?? 'mod'
+	return getProjectTypeForUrl(type, project.value.loaders)
+})
 const bannerPreview = ref(null)
 const deletedBanner = ref(false)
 const bannerFile = ref(null)
 const bannerGalleryImage = computed(() =>
-	project.value.gallery?.find((img) => img.title === MC_SERVER_BANNER_NAME),
+	project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME),
 )
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
@@ -436,53 +415,41 @@ const summaryWarning = computed(() => {
 	return null
 })
 
-const sideTypeOptions = [
-	{ value: 'required', label: 'Required' },
-	{ value: 'optional', label: 'Optional' },
-	{ value: 'unsupported', label: 'Unsupported' },
-]
-
 const visibilityOptions = computed(() =>
-	tags.value.approvedStatuses.map((status) => {
-		const subLabel = () => {
-			switch (status) {
-				case 'approved':
-					return 'Visible via URL, on your profile, and in search.'
-				case 'archived':
-					return 'Visible via URL, on your profile, and in search, but marked as archived.'
-				case 'unlisted':
-					return 'Visible via URL only. Not shown on your profile or in search.'
-				case 'private':
-					return 'Not publicly visible. Only accessible to project members.'
-				default:
-					return ''
+	tags.value.approvedStatuses
+		.filter((status) => status !== 'archived')
+		.map((status) => {
+			const subLabel = () => {
+				switch (status) {
+					case 'approved':
+						return 'Visible via URL, on your profile, and in search.'
+					case 'unlisted':
+						return 'Visible via URL only. Not shown on your profile or in search.'
+					case 'private':
+						return 'Not publicly visible. Only accessible to project members.'
+					default:
+						return ''
+				}
 			}
-		}
-		return {
-			value: status,
-			label: formatProjectStatus(status),
-			subLabel: subLabel(),
-		}
-	}),
+			return {
+				value: status,
+				label: formatProjectStatus(status),
+				subLabel: subLabel(),
+			}
+		}),
 )
 
 const basePatchData = computed(() => {
 	const data = {}
 
-	if (name.value !== project.value.title) {
-		data.title = name.value.trim()
+	if (name.value !== project.value.name) {
+		data.name = name.value.trim()
 	}
-	if (slug.value !== project.value.slug) {
+	if (slug.value !== (project.value.slug ?? '')) {
 		data.slug = slug.value.trim()
 	}
-	if (summary.value !== project.value.description) {
-		data.description = summary.value.trim()
-	}
-	if (clientSide.value !== project.value.client_side) {
-		data.client_side = clientSide.value
-	}
-	if (serverSide.value !== project.value.server_side) {
-		data.server_side = serverSide.value
+	if (summary.value !== project.value.summary) {
+		data.summary = summary.value.trim()
 	}
 	if (tags.value.approvedStatuses.includes(project.value.status)) {
 		if (visibility.value !== project.value.status) {
@@ -505,11 +472,9 @@ const basePatchData = computed(() => {
 const saving = ref(false)
 
 const original = computed(() => ({
-	name: project.value.title,
-	slug: project.value.slug,
-	summary: project.value.description,
-	clientSide: project.value.client_side,
-	serverSide: project.value.server_side,
+	name: project.value.name,
+	slug: project.value.slug ?? '',
+	summary: project.value.summary,
 	visibility: tags.value.approvedStatuses.includes(project.value.status)
 		? project.value.status
 		: project.value.requested_status,
@@ -524,8 +489,6 @@ const modified = computed(() => ({
 	name: name.value,
 	slug: slug.value,
 	summary: summary.value,
-	clientSide: clientSide.value,
-	serverSide: serverSide.value,
 	visibility: visibility.value,
 	icon: icon.value,
 	deletedIcon: deletedIcon.value,
@@ -541,11 +504,9 @@ const hasChanges = computed(() =>
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 function resetChanges() {
-	name.value = project.value.title
-	slug.value = project.value.slug
-	summary.value = project.value.description
-	clientSide.value = project.value.client_side
-	serverSide.value = project.value.server_side
+	name.value = project.value.name
+	slug.value = project.value.slug ?? ''
+	summary.value = project.value.summary
 	visibility.value = tags.value.approvedStatuses.includes(project.value.status)
 		? project.value.status
 		: project.value.requested_status
@@ -561,7 +522,7 @@ function resetChanges() {
 async function updateMonetizationStatus(status) {
 	loadingModeratorMonetization.value = true
 	try {
-		await patchProject({ monetization_status: status })
+		await patchProjectV3({ monetization_status: status })
 	} finally {
 		loadingModeratorMonetization.value = false
 	}
@@ -570,10 +531,10 @@ async function updateMonetizationStatus(status) {
 async function handleSave() {
 	saving.value = true
 	try {
-		const hasV2Changes = Object.keys(basePatchData.value).length > 0
+		const hasPatchChanges = Object.keys(basePatchData.value).length > 0
 
-		if (hasV2Changes) {
-			await patchProject(basePatchData.value)
+		if (hasPatchChanges) {
+			await patchProjectV3(basePatchData.value)
 		}
 
 		if (deletedIcon.value) {
@@ -597,9 +558,17 @@ async function handleSave() {
 	}
 }
 
-const showPreviewImage = (files) => {
+const showPreviewImage = async (files) => {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
 	const reader = new FileReader()
-	icon.value = files[0]
+	icon.value = file
 	deletedIcon.value = false
 	reader.readAsDataURL(icon.value)
 	reader.onload = (event) => {
@@ -630,18 +599,16 @@ const uploadBanner = async () => {
 	if (!bannerFile.value) return
 
 	try {
-		// First, delete existing banner image if there is one
-		const existingBanner = project.value.gallery?.find((img) => img.title === MC_SERVER_BANNER_NAME)
+		const existingBanner = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (existingBanner) {
-			await labrinth.projects_v2.deleteGalleryImage(project.value.id, existingBanner.url)
+			await labrinth.projects_v3.deleteGalleryImage(project.value.id, existingBanner.url)
 		}
 
-		// Upload new banner as gallery image with special title
 		const ext = bannerFile.value.type.split('/').pop() ?? 'png'
-		await labrinth.projects_v2.createGalleryImage(project.value.id, bannerFile.value, {
+		await labrinth.projects_v3.createGalleryImage(project.value.id, bannerFile.value, {
 			ext,
 			featured: false,
-			title: MC_SERVER_BANNER_NAME,
+			name: MC_SERVER_BANNER_NAME,
 		})
 
 		await invalidate()
@@ -661,9 +628,9 @@ const uploadBanner = async () => {
 
 const deleteBanner = async () => {
 	try {
-		const bannerImage = project.value.gallery?.find((img) => img.title === MC_SERVER_BANNER_NAME)
+		const bannerImage = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (bannerImage) {
-			await labrinth.projects_v2.deleteGalleryImage(project.value.id, bannerImage.url)
+			await labrinth.projects_v3.deleteGalleryImage(project.value.id, bannerImage.url)
 			await invalidate()
 			addNotification({
 				title: 'Banner removed',
@@ -681,9 +648,7 @@ const deleteBanner = async () => {
 }
 
 const deleteProject = async () => {
-	await useBaseFetch(`project/${project.value.id}`, {
-		method: 'DELETE',
-	})
+	await labrinth.projects_v3.deleteProject(project.value.id)
 	await initUserProjects()
 	await router.push('/dashboard/projects')
 	addNotification({
@@ -700,9 +665,7 @@ const markIconForDeletion = () => {
 }
 
 const deleteIcon = async () => {
-	await useBaseFetch(`project/${project.value.id}/icon`, {
-		method: 'DELETE',
-	})
+	await labrinth.projects_v3.deleteIcon(project.value.id)
 	await invalidate()
 	addNotification({
 		title: 'Project icon removed',
@@ -710,6 +673,55 @@ const deleteIcon = async () => {
 		type: 'success',
 	})
 }
+
+const messages = defineMessages({
+	dangerZone: {
+		id: 'project.settings.danger-zone',
+		defaultMessage: 'Danger zone',
+	},
+	monetizationTitle: {
+		id: 'project.settings.monetization.title',
+		defaultMessage: 'Monetization',
+	},
+	monetizationDescription: {
+		id: 'project.settings.monetization.description',
+		defaultMessage: `Projects on Modrinth are automatically enrolled in the <rewards-program-link>Rewards Program</rewards-program-link>. If you don't want to (or can't for legal reasons) earn revenue from this project, you can turn it off here.`,
+	},
+	monetizationDisabledDescription: {
+		id: 'project.settings.monetization.disabled-description',
+		defaultMessage: `This project is not eligible for monetization. If you think this is a mistake, please <contact-support-link>contact support</contact-support-link>.`,
+	},
+	deleteProjectTitle: {
+		id: 'project.settings.delete-project.title',
+		defaultMessage: 'Delete project',
+	},
+	deleteProjectButton: {
+		id: 'project.settings.delete-project.button',
+		defaultMessage: 'Delete project',
+	},
+	deleteProjectDescription1: {
+		id: 'project.settings.delete-project.description.1',
+		defaultMessage:
+			'Permanently deletes this project from Modrinth. Deleted projects <emphasis>cannot be recovered</emphasis> by Modrinth staff or support.',
+	},
+	deleteProjectDescription2: {
+		id: 'project.settings.delete-project.description.2',
+		defaultMessage:
+			'Files uploaded to this project that are actively used in Modpacks hosted on Modrinth may continue to exist.',
+	},
+	deleteConfirmationTitle: {
+		id: 'project.settings.delete-project.confirmation.title',
+		defaultMessage: 'Are you sure you want to delete this project?',
+	},
+	deleteConfirmationDescription: {
+		id: 'project.settings.delete-project.confirmation.description',
+		defaultMessage: `If you proceed, all of this project's information and all of its versions will be immediately deleted from our database. None of it is recoverable later if you change your mind. Consider just setting your project to be Private for a less permanent option.`,
+	},
+	deleteConfirmationProceedText: {
+		id: 'project.settings.delete-project.confirmation.proceed-text',
+		defaultMessage: 'Permanently delete project',
+	},
+})
 </script>
 
 <style lang="scss" scoped>

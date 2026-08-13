@@ -3,7 +3,9 @@
  * So, for example, addDefaultInstance creates a blank instance object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import { invoke } from '@tauri-apps/api/core'
+import { type Channel, invoke } from '@tauri-apps/api/core'
+
+import type { AppEvent } from '@/generated/app-events/AppEvent'
 
 export interface LoadingBarType {
 	type?: string
@@ -24,24 +26,12 @@ export interface LoadingBar {
 	bar_type?: LoadingBarType
 }
 
-export type OpeningCommandEvent =
-	| 'RunMRPack'
-	| 'InstallServer'
-	| 'InstallVersion'
-	| 'InstallMod'
-	| 'InstallModpack'
-	| string
-
-export interface OpeningCommand {
-	event: OpeningCommandEvent
-	id?: string
-	path?: string
-}
+export type OpeningCommand = Extract<AppEvent, { type: 'command' }>['payload']
 
 // Initialize the theseus API state
 // This should be called during the initializion/opening of the launcher
-export async function initialize_state() {
-	return await invoke<void>('initialize_state')
+export async function initialize_state(events: Channel<ArrayBuffer>) {
+	return await invoke<void>('initialize_state', { events })
 }
 
 // Gets active progress bars
