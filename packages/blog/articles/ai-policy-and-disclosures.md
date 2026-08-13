@@ -5,11 +5,13 @@ date: 2026-08-13T09:00:00-07:00
 authors: ['Dc7EYhxG', 'vNcGR3Fd', 'o2Dd4mrX', 'AJfd8YH6']
 ---
 
-This year, nearly fully AI-generated garbage content has begun _flooding_ Modrinth. Project submissions have gone up from about 2,500 per week at the start of the year to over 5,000 per week now.
+This year, fully AI-generated content has begun _flooding_ Modrinth. Project submissions have gone up from about 2,500 per week at the start of the year to over 5,000 per week now.
 
 We’ve never had a quality threshold for uploading to Modrinth, and we continue to believe that you should not need to make professional, perfect work in order to publish on Modrinth. But we do believe that it has to be _your_ work, and generating it completely with AI is not your work. Modrinth is a community of creators. In order to be creators, you need to actually create something.
 
 Today, we’re announcing a set of new features and policies aimed at informing users about things they may want to know about a project before downloading, eliminating fully AI-generated content, and enforcing transparency for content that has been made in part with generative AI.
+
+In addition, we have made a very minor update to our [Terms of Use](/legal/terms), to prohibit the use of data on Modrinth to train AI models.
 
 ## Content disclosures
 
@@ -75,6 +77,17 @@ Obviously, this is a big change and creators will need to take some time to upda
 During this grace period, we will not be accepting reports for projects in violation of the new AI policy or for missing content disclosures to give them a fair chance to update them. The 30-day grace period ends on **September 12, 2026**.
 
 In addition, we will not tolerate witch-hunting on the Modrinth platform. These disclosures are to inform users and provide transparency between user and creator. Anyone using them to shame, insult, belittle, or harass others will be swiftly and permanently removed from the Modrinth platform and community Discord server. Be kind to each other.
+
+## Terms of Use update
+
+Modrinth's [Terms of Use](/legal/terms) have been updated in a very minor way to prohibit the use of data on Modrinth to train AI models. The exact change is as follows:
+
+> Additionally, you agree not to:
+>
+> - [...]
+> - Use any data, content, or materials available on or through the Service to train, develop, or improve any artificial intelligence or machine learning models.
+
+A larger TOU update will be coming in the future to address other issues since the last update was in 2023, but we felt it was important to address this sooner rather than later.
 
 —
 
