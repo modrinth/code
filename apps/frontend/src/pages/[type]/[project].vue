@@ -551,6 +551,7 @@ import {
 	ButtonLink,
 	commonMessages,
 	defineMessages,
+	getActiveDisclosures,
 	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -1173,7 +1174,9 @@ const { data: disclosuresResponse } = useQuery({
 })
 
 const archivedDisclosure = computed(() =>
-	disclosuresResponse.value?.disclosures?.find((disclosure) => disclosure.type === 'archived'),
+	getActiveDisclosures(disclosuresResponse.value?.disclosures).find(
+		(disclosure) => disclosure.type === 'archived',
+	),
 )
 const isArchived = computed(() => !!archivedDisclosure.value)
 

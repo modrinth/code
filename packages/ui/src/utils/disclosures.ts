@@ -59,3 +59,15 @@ export function isDisclosureCompatibleWithProjectTypes(
 	const types = projectTypes.map(normalizeProjectType)
 	return DISCLOSURE_SUPPORTED_PROJECT_TYPES[disclosureType].some((type) => types.includes(type))
 }
+
+export function isActiveDisclosure(
+	disclosure: { deleted_at?: string | null } | null | undefined,
+): boolean {
+	return !!disclosure && disclosure.deleted_at == null
+}
+
+export function getActiveDisclosures<T extends { deleted_at?: string | null }>(
+	disclosures: readonly T[] | null | undefined,
+): T[] {
+	return (disclosures ?? []).filter((disclosure) => isActiveDisclosure(disclosure))
+}

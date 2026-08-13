@@ -1356,6 +1356,7 @@ export namespace Labrinth {
 				lock_status: DisclosureLockStatus
 				updated_at: string
 				updated_by?: string | null
+				deleted_at?: string | null
 			}
 
 			export type ProjectDisclosureType = ProjectDisclosure['type']

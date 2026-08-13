@@ -1,5 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { isDisclosureCompatibleWithProjectTypes, PROJECT_DISCLOSURE_TYPES } from '@modrinth/ui'
+import {
+	isActiveDisclosure,
+	isDisclosureCompatibleWithProjectTypes,
+	PROJECT_DISCLOSURE_TYPES,
+} from '@modrinth/ui'
 
 import type {
 	DisclosureFormState,
@@ -26,7 +30,7 @@ function createNoteModel(
 ): NoteDisclosure {
 	const disclosure = findDisclosure(disclosures, type)
 	return {
-		enabled: !!disclosure,
+		enabled: isActiveDisclosure(disclosure),
 		note: disclosure?.note ?? '',
 	}
 }
@@ -58,27 +62,27 @@ export function disclosuresToForm(disclosures: ProjectDisclosureData[]): Disclos
 
 	return {
 		ai: {
-			enabled: !!ai,
+			enabled: isActiveDisclosure(ai),
 			uses: ai ? [...(ai.uses ?? [])] : [],
 			note: ai?.note ?? '',
 		},
 		advertising: createNoteModel(disclosures, 'advertisements'),
 		paidFeatures: {
-			enabled: !!paidFeatures,
+			enabled: isActiveDisclosure(paidFeatures),
 			features: paidFeatures ? nonemptyOrPlaceholder(paidFeatures.features) : [],
 		},
 		telemetry: {
-			enabled: !!telemetry,
+			enabled: isActiveDisclosure(telemetry),
 			consent: telemetry?.consent ?? 'opt_in',
 			entries: telemetry ? nonemptyOrPlaceholder(telemetry.data_collected) : [],
 		},
 		derivative: {
-			enabled: !!derivative,
+			enabled: isActiveDisclosure(derivative),
 			sources: derivative ? derivative.sources.map((source) => ({ ...source })) : [],
 		},
 		photosensitivity: createNoteModel(disclosures, 'epilepsy_triggers'),
 		systemInteractions: {
-			enabled: !!systemInteractions,
+			enabled: isActiveDisclosure(systemInteractions),
 			note: systemInteractions?.note ?? '',
 			interactions: systemInteractions ? [...systemInteractions.interactions] : [],
 		},
@@ -95,61 +99,78 @@ export function findDisclosureData<T extends DisclosureType>(
 	return findDisclosure(disclosures, type)
 }
 
+export function formToDisclosure(
+	form: DisclosureFormState,
+	type: DisclosureType,
+): ProjectDisclosure {
+	switch (type) {
+		case 'ai_content':
+			return {
+				type: 'ai_content',
+				uses: [...form.ai.uses],
+				note: form.ai.note.trim() || null,
+			}
+		case 'advertisements':
+			return { type: 'advertisements', note: form.advertising.note.trim() || null }
+		case 'paid_features':
+			return {
+				type: 'paid_features',
+				features: form.paidFeatures.features.map((feature) => feature.trim()).filter(Boolean),
+			}
+		case 'telemetry':
+			return {
+				type: 'telemetry',
+				consent: form.telemetry.consent,
+				data_collected: form.telemetry.entries.map((entry) => entry.trim()).filter(Boolean),
+			}
+		case 'derivative_work':
+			return {
+				type: 'derivative_work',
+				sources: form.derivative.sources.map((source) => ({
+					label: source.label.trim(),
+					link: source.link?.trim() || null,
+					note: source.note?.trim() || null,
+				})),
+			}
+		case 'epilepsy_triggers':
+			return { type: 'epilepsy_triggers', note: form.photosensitivity.note.trim() || null }
+		case 'system_interactions':
+			return {
+				type: 'system_interactions',
+				interactions: [...form.systemInteractions.interactions],
+				note: form.systemInteractions.note.trim() || null,
+			}
+		case 'archived':
+			return { type: 'archived', note: form.archived.note.trim() || null }
+	}
+}
+
 export function formToDisclosures(form: DisclosureFormState): ProjectDisclosure[] {
 	const set: ProjectDisclosure[] = []
 
 	if (form.ai.enabled) {
-		set.push({
-			type: 'ai_content',
-			uses: [...form.ai.uses],
-			note: form.ai.note.trim() || null,
-		})
+		set.push(formToDisclosure(form, 'ai_content'))
 	}
-
 	if (form.advertising.enabled) {
-		set.push({ type: 'advertisements', note: form.advertising.note.trim() || null })
+		set.push(formToDisclosure(form, 'advertisements'))
 	}
-
 	if (form.paidFeatures.enabled) {
-		set.push({
-			type: 'paid_features',
-			features: form.paidFeatures.features.map((feature) => feature.trim()).filter(Boolean),
-		})
+		set.push(formToDisclosure(form, 'paid_features'))
 	}
-
 	if (form.telemetry.enabled) {
-		set.push({
-			type: 'telemetry',
-			consent: form.telemetry.consent,
-			data_collected: form.telemetry.entries.map((entry) => entry.trim()).filter(Boolean),
-		})
+		set.push(formToDisclosure(form, 'telemetry'))
 	}
-
 	if (form.derivative.enabled) {
-		set.push({
-			type: 'derivative_work',
-			sources: form.derivative.sources.map((source) => ({
-				label: source.label.trim(),
-				link: source.link?.trim() || null,
-				note: source.note?.trim() || null,
-			})),
-		})
+		set.push(formToDisclosure(form, 'derivative_work'))
 	}
-
 	if (form.photosensitivity.enabled) {
-		set.push({ type: 'epilepsy_triggers', note: form.photosensitivity.note.trim() || null })
+		set.push(formToDisclosure(form, 'epilepsy_triggers'))
 	}
-
 	if (form.systemInteractions.enabled) {
-		set.push({
-			type: 'system_interactions',
-			interactions: [...form.systemInteractions.interactions],
-			note: form.systemInteractions.note.trim() || null,
-		})
+		set.push(formToDisclosure(form, 'system_interactions'))
 	}
-
 	if (form.archived.enabled) {
-		set.push({ type: 'archived', note: form.archived.note.trim() || null })
+		set.push(formToDisclosure(form, 'archived'))
 	}
 
 	return set
@@ -166,12 +187,10 @@ export function toModifyRequests(
 	)
 	const nextTypes = new Set(next.map((disclosure) => disclosure.type))
 
-	const remove = previousDisclosures
-		.map((disclosure) => disclosure.type)
-		.filter((type) => !nextTypes.has(type))
-
+	const remove: DisclosureType[] = []
 	const contentOnly: ProjectDisclosure[] = []
 	const lockChangeGroups = new Map<DisclosureLockStatus, ProjectDisclosure[]>()
+	const disabledLockGroups = new Map<DisclosureLockStatus, ProjectDisclosure[]>()
 
 	for (const disclosure of next) {
 		const existing = previousByType.get(disclosure.type)
@@ -193,6 +212,30 @@ export function toModifyRequests(
 		}
 	}
 
+	for (const type of PROJECT_DISCLOSURE_TYPES) {
+		if (nextTypes.has(type)) {
+			continue
+		}
+
+		const previousLock = previous.lockStatuses[type] ?? 'unlocked'
+		const nextLock = form.lockStatuses[type] ?? 'unlocked'
+		const lockChanged = previousLock !== nextLock
+		const wasEnabled = previousByType.has(type)
+
+		if (wasEnabled && !lockChanged) {
+			remove.push(type)
+			continue
+		}
+
+		if (!lockChanged) {
+			continue
+		}
+
+		const group = disabledLockGroups.get(nextLock) ?? []
+		group.push(formToDisclosure(form, type))
+		disabledLockGroups.set(nextLock, group)
+	}
+
 	const requests: Labrinth.Projects.v3.ModifyProjectDisclosures[] = []
 
 	if (remove.length > 0) {
@@ -207,19 +250,18 @@ export function toModifyRequests(
 		requests.push({ set, remove: [], lock_status: lockStatus })
 	}
 
+	for (const [lockStatus, set] of disabledLockGroups) {
+		requests.push({ set, remove: [], lock_status: lockStatus })
+		requests.push({ set: [], remove: set.map((disclosure) => disclosure.type) })
+	}
+
 	return requests
 }
 
 export function getDisclosureFormSnapshot(form: DisclosureFormState) {
-	const disclosures = formToDisclosures(form)
 	return {
-		disclosures,
-		lockStatuses: Object.fromEntries(
-			disclosures.map((disclosure) => [
-				disclosure.type,
-				form.lockStatuses[disclosure.type] ?? 'unlocked',
-			]),
-		) as Partial<Record<DisclosureType, DisclosureLockStatus>>,
+		disclosures: formToDisclosures(form),
+		lockStatuses: { ...form.lockStatuses },
 	}
 }
 
@@ -229,12 +271,14 @@ export function toCachedDisclosures(
 	defaults?: {
 		setByModerator?: boolean
 		lockStatuses?: Partial<Record<DisclosureType, DisclosureLockStatus>>
+		form?: DisclosureFormState
 	},
 ): ProjectDisclosureData[] {
 	const previousByType = new Map(previous.map((disclosure) => [disclosure.type, disclosure]))
 	const now = new Date().toISOString()
+	const setTypes = new Set(set.map((disclosure) => disclosure.type))
 
-	return set.map((disclosure) => {
+	const active = set.map((disclosure) => {
 		const existing = previousByType.get(disclosure.type)
 		return {
 			...disclosure,
@@ -242,8 +286,55 @@ export function toCachedDisclosures(
 			lock_status: defaults?.lockStatuses?.[disclosure.type] ?? existing?.lock_status ?? 'unlocked',
 			updated_at: now,
 			updated_by: existing?.updated_by ?? null,
+			deleted_at: null,
 		}
 	})
+
+	const softDeleted = previous
+		.filter((disclosure) => !setTypes.has(disclosure.type))
+		.map((disclosure) => {
+			const wasActive = isActiveDisclosure(disclosure)
+			const lockChanged =
+				!!defaults?.lockStatuses &&
+				defaults.lockStatuses[disclosure.type] !== undefined &&
+				defaults.lockStatuses[disclosure.type] !== disclosure.lock_status
+			return {
+				...disclosure,
+				set_by_moderator:
+					wasActive || lockChanged
+						? (defaults?.setByModerator ?? disclosure.set_by_moderator)
+						: disclosure.set_by_moderator,
+				lock_status:
+					defaults?.lockStatuses?.[disclosure.type] ?? disclosure.lock_status ?? 'unlocked',
+				updated_at: wasActive || lockChanged ? now : disclosure.updated_at,
+				deleted_at: wasActive ? now : (disclosure.deleted_at ?? now),
+			}
+		})
+
+	const presentTypes = new Set([...active, ...softDeleted].map((disclosure) => disclosure.type))
+	const form = defaults?.form
+	if (form) {
+		const enabledTypes = new Set(formToDisclosures(form).map((disclosure) => disclosure.type))
+		for (const type of PROJECT_DISCLOSURE_TYPES) {
+			if (presentTypes.has(type) || enabledTypes.has(type)) {
+				continue
+			}
+			const lockStatus = form.lockStatuses[type] ?? 'unlocked'
+			if (lockStatus === 'unlocked') {
+				continue
+			}
+			softDeleted.push({
+				...formToDisclosure(form, type),
+				set_by_moderator: defaults?.setByModerator ?? false,
+				lock_status: lockStatus,
+				updated_at: now,
+				updated_by: null,
+				deleted_at: now,
+			})
+		}
+	}
+
+	return [...active, ...softDeleted]
 }
 
 export type DisclosureFormIssue =

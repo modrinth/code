@@ -50,21 +50,26 @@ const messages = defineMessages({
 		defaultMessage:
 			'Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be edited or removed.',
 	},
+	disabledLockedWarning: {
+		id: 'project.settings.disclosures.lock-status.disabled.warning',
+		defaultMessage:
+			'This disclosure has been locked by the moderators. Please <contact-support-link>contact support</contact-support-link> if you believe this is in error.',
+	},
 })
-
-const showLockWarning = computed(() => enabled.value && resolvedLockStatus.value !== 'unlocked')
 
 const lockWarningMessage = computed(() => {
 	if (resolvedLockStatus.value === 'cannot_disable') {
-		return messages.cannotDisableWarning
+		return enabled.value ? messages.cannotDisableWarning : null
 	}
 	if (resolvedLockStatus.value === 'fully_locked') {
-		return messages.fullyLockedWarning
+		return enabled.value ? messages.fullyLockedWarning : messages.disabledLockedWarning
 	}
 	return null
 })
 
-const showModeratorLockControls = computed(() => enabled.value && !!props.showLockControls)
+const showLockWarning = computed(() => !!lockWarningMessage.value)
+
+const showModeratorLockControls = computed(() => !!props.showLockControls)
 
 const showFooter = computed(
 	() => !!props.updatedAt || showModeratorLockControls.value || showLockWarning.value,
@@ -91,7 +96,7 @@ function setLockStatus(status: DisclosureLockStatus) {
 		</template>
 		<template v-if="showFooter" #footer>
 			<div class="flex flex-col gap-3">
-				<SettingsInlineWarning v-if="lockWarningMessage">
+				<SettingsInlineWarning v-if="showLockWarning && lockWarningMessage">
 					<IntlFormatted :message-id="lockWarningMessage">
 						<template #contact-support-link="{ children }">
 							<a
@@ -117,10 +122,14 @@ function setLockStatus(status: DisclosureLockStatus) {
 						<Button
 							v-for="{ status, label } in LOCK_STATUSES"
 							:key="status"
-							:class="{
-								'text-orange [&>svg]:text-orange': status === 'cannot_disable',
-								'text-red [&>svg]:text-red': status === 'fully_locked',
-							}"
+							:color="
+								status === 'cannot_disable'
+									? 'orange'
+									: status === 'fully_locked'
+										? 'red'
+										: undefined
+							"
+							:type="status !== 'unlocked' ? 'colored-text' : undefined"
 							:disabled="resolvedLockStatus === status"
 							@click="setLockStatus(status)"
 						>

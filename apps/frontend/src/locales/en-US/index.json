@@ -3866,6 +3866,9 @@
   "project.settings.disclosures.lock-status.cannot-disable.warning": {
     "message": "Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be removed."
   },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "This disclosure has been locked by the moderators. Please <contact-support-link>contact support</contact-support-link> if you believe this is in error."
+  },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be edited or removed."
   },

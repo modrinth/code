@@ -225,6 +225,7 @@ import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
+import { getActiveDisclosures } from '../../utils/disclosures'
 import { Avatar, IntlFormatted } from '../base'
 import { NewModal } from '../modal'
 
@@ -305,7 +306,7 @@ const { data: disclosuresResponse } = useQuery({
 	staleTime: DISCLOSURE_STALE_TIME,
 })
 
-const disclosures = computed(() => disclosuresResponse.value?.disclosures ?? [])
+const disclosures = computed(() => getActiveDisclosures(disclosuresResponse.value?.disclosures))
 
 function findDisclosure<T extends Labrinth.Projects.v3.ProjectDisclosureType>(type: T) {
 	return disclosures.value.find(

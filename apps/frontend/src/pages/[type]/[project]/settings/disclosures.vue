@@ -180,6 +180,7 @@ const {
 			disclosures: toCachedDisclosures(formToDisclosures(current.value), previousDisclosures, {
 				setByModerator: isActingAsModerator.value,
 				lockStatuses: current.value.lockStatuses,
+				form: current.value,
 			}),
 		})
 	},
