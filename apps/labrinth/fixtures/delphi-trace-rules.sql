@@ -216,7 +216,7 @@ INSERT INTO delphi_rules (name, rule, priority, revision)
 VALUES
 	(
 		'[DEV trace-rule fixture] Escalate known malware host',
-		'trace.issue_type == "SUSPICIOUS_NETWORK_ACCESS" && trace.data.host == "evil.example" ? {"severity": "malware"} : null',
+		'trace.issue_type == "SUSPICIOUS_NETWORK_ACCESS" && trace.data.host == "evil.example" ? "malware" : null',
 		1000,
 		(SELECT revision FROM delphi_rule_revisions LIMIT 1)
 	),
@@ -234,7 +234,7 @@ VALUES
 	),
 	(
 		'[DEV trace-rule fixture] Hide known-safe obfuscation',
-		'trace.issue_type == "OBFUSCATED_NAMES" && trace.data.confidence >= 0.95 ? {"severity": "hidden"} : null',
+		'trace.issue_type == "OBFUSCATED_NAMES" && trace.data.confidence >= 0.95 ? "hidden" : null',
 		700,
 		(SELECT revision FROM delphi_rule_revisions LIMIT 1)
 	),
@@ -252,7 +252,7 @@ VALUES
 	),
 	(
 		'[DEV trace-rule fixture] Downgrade bundled libraries',
-		'trace.issue_type == "BUNDLED_LIBRARY" ? {"severity": "low"} : null',
+		'trace.issue_type == "BUNDLED_LIBRARY" ? "low" : null',
 		400,
 		(SELECT revision FROM delphi_rule_revisions LIMIT 1)
 	),

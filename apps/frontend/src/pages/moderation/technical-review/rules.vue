@@ -46,8 +46,8 @@
 				</div>
 			</div>
 			<p class="m-0 text-sm text-secondary">
-				Return <code>null</code> when the rule does not match, or a map containing
-				<code>severity</code> when it does.
+				Return <code>null</code> when the rule does not match, or return a severity string such as
+				<code>"low"</code>. A map containing <code>severity</code> is also supported.
 			</p>
 
 			<details class="rounded-xl border border-divider bg-bg-raised p-3">
@@ -433,7 +433,7 @@ import type { Component } from 'vue'
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 const DEFAULT_RULE = `trace.issue_type == "OBFUSCATED_NAMES"
-	? {"severity": "low"}
+	? "low"
 	: null`
 const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
 	useWorker: false,

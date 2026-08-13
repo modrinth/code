@@ -12,7 +12,7 @@ use tokio_stream::wrappers::UnboundedReceiverStream;
 use utoipa::{PartialSchema, ToSchema};
 use xredis::RedisPool;
 
-use super::rules::DelphiRuleEffect;
+use super::rules::{DelphiRuleEffect, DelphiRuleOutput};
 use crate::routes::internal::delphi::tech_review_queue::{
     self, TechReviewRemovalReason,
 };
@@ -156,12 +156,12 @@ pub async fn get_rule_schema(
 
     let mut schemas = Vec::new();
     <RuleInput as ToSchema>::schemas(&mut schemas);
-    <Option<DelphiRuleEffect> as ToSchema>::schemas(&mut schemas);
+    <Option<DelphiRuleOutput> as ToSchema>::schemas(&mut schemas);
 
     Ok(web::Json(DelphiRuleSchemaResponse {
         input: schema_to_value(<RuleInput as PartialSchema>::schema())?,
         output: schema_to_value(
-            <Option<DelphiRuleEffect> as PartialSchema>::schema(),
+            <Option<DelphiRuleOutput> as PartialSchema>::schema(),
         )?,
         components: schemas
             .into_iter()
@@ -972,6 +972,12 @@ fn evaluate_rule_inner(
 
     match value {
         serde_json::Value::Null => Ok(None),
+        serde_json::Value::String(severity) => {
+            let severity =
+                serde_json::from_value(serde_json::Value::String(severity))
+                    .wrap_err("cel expression returned an invalid severity")?;
+            Ok(Some(DelphiRuleEffect { severity }))
+        }
         value => serde_json::from_value(value)
             .map(Some)
             .wrap_err("cel expression returned an invalid rule effect"),

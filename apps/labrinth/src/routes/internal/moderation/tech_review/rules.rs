@@ -97,6 +97,13 @@ pub struct DelphiRuleEffect {
     pub severity: DelphiSeverity,
 }
 
+#[derive(Serialize, utoipa::ToSchema)]
+#[serde(untagged)]
+pub enum DelphiRuleOutput {
+    Severity(DelphiSeverity),
+    Effect(DelphiRuleEffect),
+}
+
 struct ValidatedRule {
     name: String,
     rule: String,
