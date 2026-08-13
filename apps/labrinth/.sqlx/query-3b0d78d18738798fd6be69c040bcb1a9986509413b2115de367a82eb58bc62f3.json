@@ -76,10 +76,12 @@
             "name": "delphi_severity",
             "kind": {
               "Enum": [
+                "hidden",
                 "low",
                 "medium",
                 "high",
-                "severe"
+                "severe",
+                "malware"
               ]
             }
           }
