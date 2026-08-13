@@ -478,7 +478,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="mb-3 overflow-visible">
+					<div class="mb-3 overflow-x-auto lg:overflow-visible">
 						<NavTabs :links="navLinks" replace class="mb-1" />
 					</div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
