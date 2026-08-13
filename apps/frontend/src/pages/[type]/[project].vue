@@ -1196,7 +1196,7 @@ const {
 
 const dependencies = computed(() => dependenciesRaw.value ?? null)
 
-// V3 Versions - lazy loaded client-side only
+// V3 Versions - lazy loaded client-side only (except for staff, who need v3 versions for moderation)
 const versionsEnabled = ref(false)
 const {
 	data: versionsV3,
@@ -1210,7 +1210,7 @@ const {
 			apiVersion: 3,
 		}),
 	staleTime: STALE_TIME_LONG,
-	enabled: computed(() => !!projectId.value && versionsEnabled.value),
+	enabled: computed(() => !!projectId.value && (versionsEnabled.value || isStaff(auth.value.user))),
 })
 
 // Organization
@@ -1811,8 +1811,8 @@ const projectHeaderCreateServerTo = computed(() =>
 	project.value ? `/hosting?project=${project.value.id}#plan` : '/hosting',
 )
 
-const MRPACK_ARCHIVE_WARNING_START = new Date('2026-08-10T11:34:00-06:00').getTime()
-const MRPACK_ARCHIVE_WARNING_END = new Date('2026-08-13T10:01:59.999-06:00').getTime()
+const MRPACK_ARCHIVE_WARNING_START = new Date('2026-08-10T17:00:00.000Z').getTime()
+const MRPACK_ARCHIVE_WARNING_END = new Date('2026-08-13T20:00:00.000Z').getTime()
 const hasModpackArchiveInWarningWindow = computed(() =>
 	(versionsV3.value ?? []).some((version) => {
 		const publishedAt = new Date(version.date_published).getTime()
