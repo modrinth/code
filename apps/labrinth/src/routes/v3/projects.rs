@@ -15,7 +15,9 @@ use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models::disclosures::{ProjectDisclosure, ProjectDisclosureType};
+use crate::models::disclosures::{
+    DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureType,
+};
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
@@ -517,6 +519,7 @@ pub async fn project_edit_internal(
                     updated_by: user.id.into(),
                     set_by_moderator: user.role.is_mod(),
                     deleted_at: None,
+                    lock_status: DisclosureLockStatus::Unlocked,
                 }
                 .upsert(&mut transaction)
                 .await
@@ -726,7 +729,8 @@ pub async fn project_edit_internal(
 
             if sync_archival_disclosure
                 && archival_disclosure.is_some_and(|disclosure| {
-                    user.role.is_mod() || !disclosure.set_by_moderator
+                    user.role.is_mod()
+                        || disclosure.lock_status.allows_removal()
                 })
             {
                 db_models::DBProjectDisclosure::remove(

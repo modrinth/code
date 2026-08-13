@@ -77,11 +77,42 @@ impl ProjectDisclosure {
     }
 }
 
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    Serialize,
+    Deserialize,
+    ToSchema,
+    IntoStaticStr,
+    EnumString,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+pub enum DisclosureLockStatus {
+    #[default]
+    Unlocked,
+    CannotDisable,
+    FullyLocked,
+}
+
+impl DisclosureLockStatus {
+    pub fn allows_edit(self) -> bool {
+        !matches!(self, Self::FullyLocked)
+    }
+
+    pub fn allows_removal(self) -> bool {
+        matches!(self, Self::Unlocked)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ProjectDisclosureData {
     #[serde(flatten)]
     pub disclosure: ProjectDisclosure,
     pub set_by_moderator: bool,
+    pub lock_status: DisclosureLockStatus,
     pub updated_at: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_by: Option<UserId>,
@@ -100,6 +131,7 @@ impl ProjectDisclosureData {
         Self {
             disclosure: value.disclosure,
             set_by_moderator: value.set_by_moderator,
+            lock_status: value.lock_status,
             updated_at: value.updated_at,
             updated_by,
             deleted_at: value.deleted_at,

@@ -1,11 +1,14 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     database::models::{DBProjectId, DBUserId, DatabaseError},
-    models::v3::disclosures::{ProjectDisclosure, ProjectDisclosureType},
+    models::v3::disclosures::{
+        DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureType,
+    },
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -16,6 +19,7 @@ pub struct DBProjectDisclosure {
     pub updated_by: DBUserId,
     pub set_by_moderator: bool,
     pub deleted_at: Option<DateTime<Utc>>,
+    pub lock_status: DisclosureLockStatus,
 }
 
 impl DBProjectDisclosure {
@@ -32,20 +36,22 @@ impl DBProjectDisclosure {
 
         sqlx::query!(
             r#"
-			INSERT INTO project_disclosures (project_id, type, metadata, updated_by, set_by_moderator)
-			VALUES ($1, $2, $3, $4, $5)
+			INSERT INTO project_disclosures (project_id, type, metadata, updated_by, set_by_moderator, lock_status)
+			VALUES ($1, $2, $3, $4, $5, $6)
 			ON CONFLICT (project_id, type) DO UPDATE SET
 				metadata = $3,
 				updated_at = now(),
 				updated_by = $4,
 				set_by_moderator = $5,
-				deleted_at = NULL
+				deleted_at = NULL,
+				lock_status = $6
 			"#,
             self.project_id as DBProjectId,
             disclosure_type,
             metadata,
             self.updated_by as DBUserId,
             self.set_by_moderator,
+            <&'static str>::from(self.lock_status),
         )
         .execute(exec)
         .await?;
@@ -60,7 +66,7 @@ impl DBProjectDisclosure {
     ) -> Result<Vec<DBProjectDisclosure>, DatabaseError> {
         let rows = sqlx::query!(
             r#"
-			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator, deleted_at
+			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator, deleted_at, lock_status
 			FROM project_disclosures
 			WHERE project_id = $1 AND ($2 OR deleted_at IS NULL)
 			ORDER BY updated_at DESC
@@ -88,6 +94,14 @@ impl DBProjectDisclosure {
                     updated_by: DBUserId(row.updated_by),
                     set_by_moderator: row.set_by_moderator,
                     deleted_at: row.deleted_at,
+                    lock_status: DisclosureLockStatus::from_str(
+                        &row.lock_status,
+                    )
+                    .map_err(|e| {
+                        DatabaseError::Internal(eyre::Report::new(e).wrap_err(
+                            "failed to parse project disclosure lock status",
+                        ))
+                    })?,
                 })
             })
             .collect()
@@ -115,24 +129,37 @@ impl DBProjectDisclosure {
         Ok(rows.into_iter().map(DBProjectId).collect())
     }
 
-    pub async fn any_set_by_moderator(
+    pub async fn get_lock_statuses_for_project(
         project_id: DBProjectId,
         types: &[String],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<bool, DatabaseError> {
-        let existing = sqlx::query_scalar!(
+    ) -> Result<HashMap<String, DisclosureLockStatus>, DatabaseError> {
+        let rows = sqlx::query!(
             r#"
-			SELECT 1 FROM project_disclosures
-			WHERE project_id = $1 AND type = ANY($2) AND set_by_moderator AND deleted_at IS NULL
-			LIMIT 1
+			SELECT type AS "disclosure_type!", lock_status
+			FROM project_disclosures
+			WHERE project_id = $1 AND type = ANY($2)
 			"#,
             project_id as DBProjectId,
             types,
         )
-        .fetch_optional(exec)
+        .fetch_all(exec)
         .await?;
 
-        Ok(existing.is_some())
+        rows.into_iter()
+            .map(|row| {
+                let lock_status = DisclosureLockStatus::from_str(
+                    &row.lock_status,
+                )
+                .map_err(|e| {
+                    DatabaseError::Internal(eyre::Report::new(e).wrap_err(
+                        "failed to parse project disclosure lock status",
+                    ))
+                })?;
+
+                Ok((row.disclosure_type, lock_status))
+            })
+            .collect()
     }
 
     pub async fn remove(
