@@ -88,6 +88,13 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     .is_some_and(|x| *x == "servers.dat")
                                 {
                                     Some(InstancePayloadType::ServersUpdated)
+                                } else if first_file_name
+                                    .as_ref()
+                                    .is_some_and(|x| *x == "screenshots")
+                                {
+                                    Some(
+                                        InstancePayloadType::ScreenshotsUpdated,
+                                    )
                                 } else if first_file_name.as_ref().is_some_and(
                                     |x| {
                                         *x == "saves"
@@ -222,6 +229,7 @@ pub(crate) async fn watch_instance_folder(
     for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
         "crash-reports",
         "saves",
+        "screenshots",
         CONFIG_DIRECTORY,
     ]) {
         let full_path = full_instance_path.join(sub_path);

@@ -4,6 +4,9 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use tauri::{AppHandle, Manager, Runtime};
+use tauri_plugin_fs::FsExt;
+use tauri_plugin_opener::OpenerExt;
 use theseus::DownloadReason;
 use theseus::data::{
     AppliedContentSetPatch, ContentItem, Dependency,
@@ -37,6 +40,10 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_optimal_jre_key,
             instance_get_full_path,
             instance_get_mod_full_path,
+            instance_list_screenshots,
+            instance_delete_screenshot,
+            instance_export_screenshots,
+            instance_open_screenshot,
             instance_check_installed,
             instance_update_all,
             instance_update_project,
@@ -68,6 +75,14 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_pack_export_candidates,
         ])
         .build()
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub struct InstanceScreenshot {
+    pub file_name: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub path: PathBuf,
+    pub url: url::Url,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -579,6 +594,72 @@ pub async fn instance_get_mod_full_path(
     project_path: &str,
 ) -> Result<PathBuf> {
     Ok(theseus::instance::get_mod_full_path(instance_id, project_path).await?)
+}
+
+#[tauri::command]
+pub async fn instance_list_screenshots<R: Runtime>(
+    app_handle: AppHandle<R>,
+    instance_id: &str,
+) -> Result<Vec<InstanceScreenshot>> {
+    let screenshots = theseus::instance::list_screenshots(instance_id).await?;
+    let mut result = Vec::with_capacity(screenshots.len());
+
+    for screenshot in screenshots {
+        app_handle
+            .asset_protocol_scope()
+            .allow_file(&screenshot.path)
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
+        app_handle
+            .fs_scope()
+            .allow_file(&screenshot.path)
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
+        let url = super::utils::tauri_convert_file_src(&screenshot.path)?;
+        result.push(InstanceScreenshot {
+            file_name: screenshot.file_name,
+            created_at: screenshot.created_at,
+            path: screenshot.path,
+            url,
+        });
+    }
+
+    Ok(result)
+}
+
+#[tauri::command]
+pub async fn instance_delete_screenshot(
+    instance_id: &str,
+    file_name: &str,
+) -> Result<()> {
+    Ok(theseus::instance::delete_screenshot(instance_id, file_name).await?)
+}
+
+#[tauri::command]
+pub async fn instance_export_screenshots(
+    instance_id: &str,
+    file_names: Vec<String>,
+    export_path: PathBuf,
+) -> Result<()> {
+    Ok(theseus::instance::export_screenshots(
+        instance_id,
+        &file_names,
+        export_path,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_open_screenshot<R: Runtime>(
+    app_handle: AppHandle<R>,
+    instance_id: &str,
+    file_name: &str,
+) -> Result<()> {
+    let path =
+        theseus::instance::get_screenshot_path(instance_id, file_name).await?;
+    app_handle
+        .opener()
+        .reveal_item_in_dir(path)
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    Ok(())
 }
 
 #[tauri::command]

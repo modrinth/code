@@ -10,6 +10,7 @@ mod lifecycle;
 mod paths;
 mod projects;
 mod run;
+mod screenshots;
 mod shared;
 
 pub use self::content::{
@@ -40,6 +41,10 @@ pub use self::projects::{
 };
 pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,
+};
+pub use self::screenshots::{
+    InstanceScreenshot, delete_screenshot, export_screenshots,
+    get_screenshot_path, list_screenshots,
 };
 pub(crate) use self::shared::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,

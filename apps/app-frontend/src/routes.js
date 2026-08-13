@@ -148,6 +148,11 @@ export default new createRouter({
 					component: Instance.Worlds,
 				},
 				{
+					path: 'screenshots',
+					name: 'InstanceScreenshots',
+					component: Instance.Screenshots,
+				},
+				{
 					path: 'share',
 					name: 'InstanceShare',
 					component: Instance.Share,

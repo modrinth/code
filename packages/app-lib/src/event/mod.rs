@@ -276,6 +276,7 @@ pub enum InstancePayloadType {
     Created,
     Synced,
     ServersUpdated,
+    ScreenshotsUpdated,
     WorldUpdated {
         world: String,
     },

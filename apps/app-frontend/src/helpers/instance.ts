@@ -136,6 +136,37 @@ export async function get_mod_full_path(instanceId: string, projectPath: string)
 	return await invoke('plugin:instance|instance_get_mod_full_path', { instanceId, projectPath })
 }
 
+export interface InstanceScreenshot {
+	file_name: string
+	created_at: string
+	path: string
+	url: string
+}
+
+export async function list_screenshots(instanceId: string): Promise<InstanceScreenshot[]> {
+	return await invoke('plugin:instance|instance_list_screenshots', { instanceId })
+}
+
+export async function delete_screenshot(instanceId: string, fileName: string): Promise<void> {
+	return await invoke('plugin:instance|instance_delete_screenshot', { instanceId, fileName })
+}
+
+export async function export_screenshots(
+	instanceId: string,
+	fileNames: string[],
+	exportPath: string,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_export_screenshots', {
+		instanceId,
+		fileNames,
+		exportPath,
+	})
+}
+
+export async function open_screenshot(instanceId: string, fileName: string): Promise<void> {
+	return await invoke('plugin:instance|instance_open_screenshot', { instanceId, fileName })
+}
+
 export interface JavaVersion {
 	parsed_version: number
 	version: string

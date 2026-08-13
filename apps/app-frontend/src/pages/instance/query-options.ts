@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/vue-query'
 
 import { get_project_v3 } from '@/helpers/cache.js'
-import { get as getInstance } from '@/helpers/instance'
+import { get as getInstance, list_screenshots } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import { refreshWorlds } from '@/helpers/worlds'
@@ -22,6 +22,8 @@ export const instanceKeys = {
 		[...instanceKeys.detail(instanceId), 'installed-project-ids', source] as const,
 	linkedContent: (instanceId: string) => ['linkedModpackContent', instanceId] as const,
 	worlds: (instanceId: string) => ['worlds', instanceId] as const,
+	screenshots: (instanceId: string) =>
+		[...instanceKeys.detail(instanceId), 'screenshots'] as const,
 	linkedProject: (projectId: string) => ['project', 'v3', projectId] as const,
 	sharedEligibility: (userId: string | null | undefined) =>
 		['shared-instance-eligibility', userId] as const,
@@ -76,6 +78,14 @@ export function instanceWorldsQueryOptions(instanceId: string) {
 	return queryOptions({
 		queryKey: instanceKeys.worlds(instanceId),
 		queryFn: () => refreshWorlds(instanceId),
+		staleTime: 0,
+	})
+}
+
+export function instanceScreenshotsQueryOptions(instanceId: string) {
+	return queryOptions({
+		queryKey: instanceKeys.screenshots(instanceId),
+		queryFn: () => list_screenshots(instanceId),
 		staleTime: 0,
 	})
 }
