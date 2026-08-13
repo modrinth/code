@@ -2,7 +2,11 @@
 	<div
 		data-pyro-server-list-root
 		class="relative mx-auto flex w-full flex-col p-6"
-		:class="serverList.length ? 'min-h-screen mb-6' : 'min-h-[calc(100vh-14.5rem)] h-full py-0'"
+		:class="
+			serverList.length && !showEmptyState
+				? 'min-h-screen mb-6'
+				: 'min-h-[calc(100vh-14.5rem)] h-full py-0'
+		"
 	>
 		<ServersGuestPlanModal
 			ref="guestPlanModal"
