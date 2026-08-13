@@ -10,12 +10,10 @@
 				clearable
 				wrapper-class="flex-1 w-full"
 			/>
-			<ButtonStyled color="brand">
-				<button type="submit" :disabled="isLoading">
-					<SearchIcon aria-hidden="true" />
-					Search
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" native-type="submit" :disabled="isLoading">
+				<SearchIcon aria-hidden="true" />
+				Search
+			</Button>
 		</form>
 
 		<div
@@ -71,15 +69,15 @@
 					</div>
 					<div class="flex shrink-0 flex-nowrap items-center gap-2">
 						<Badge :type="trace.verdict" />
-						<ButtonStyled color="red">
-							<button
-								:disabled="removingTraceKeys.has(trace.detail_key)"
-								@click="removeGlobalTrace(trace)"
-							>
-								<TrashIcon aria-hidden="true" />
-								Remove
-							</button>
-						</ButtonStyled>
+						<Button
+							type="colored"
+							color="red"
+							:disabled="removingTraceKeys.has(trace.detail_key)"
+							@click="removeGlobalTrace(trace)"
+						>
+							<TrashIcon aria-hidden="true" />
+							Remove
+						</Button>
 					</div>
 				</div>
 
@@ -89,14 +87,13 @@
 							Showing {{ getPreviewLocalTraces(trace).length }} of
 							{{ formatTraceCount(getVisibleLocalTraceTotal(trace)) }}
 						</p>
-						<ButtonStyled
+						<ButtonLink
 							v-if="getVisibleLocalTraceTotal(trace) > getPreviewLocalTraces(trace).length"
+							:to="getGlobalTraceLink(trace)"
 						>
-							<NuxtLink :to="getGlobalTraceLink(trace)">
-								<ListIcon aria-hidden="true" />
-								View all
-							</NuxtLink>
-						</ButtonStyled>
+							<ListIcon aria-hidden="true" />
+							View all
+						</ButtonLink>
 					</div>
 					<GlobalDetailLocalTraceCard
 						v-for="localTrace in getPreviewLocalTraces(trace)"
@@ -124,7 +121,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { HashIcon, ListIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Badge,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,

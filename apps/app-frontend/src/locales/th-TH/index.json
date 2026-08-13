@@ -59,20 +59,11 @@
   "app.action-bar.view-logs": {
     "message": "ดู Log"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "เปิดการใช้งานการเรนเดอร์ขั้นสูง เช่น เอฟเฟคการเบลอ อาจทำให้เกมเกิดปัญหาด้านประสิทธิภาพได้หากไม่มีอุปกรณ์ฮาร์ดแวร์ที่สามารถรองรับการเรนเดอร์ได้"
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "การเรนเดอร์ขั้นสูง"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "เลือกธีมสีที่คุณต้องการสำหรับ Modrinth App"
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "ธีมสี"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "เปลี่ยนหน้าไปหน้าต่างที่ลันเชอร์เปิดขึ้นมา"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "หน้าหลัก"
@@ -83,44 +74,14 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "หน้าเริ่มต้น"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "ซ่อนป้ายชื่อบนศีรษะของผู้เล่นในหน้าแสดงสกิน"
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "ซ่อนป้ายชื่อ"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "แสดงโลกที่เล่นล่าสุดในส่วน \"เล่นต่อ\" บนหน้าหลัก"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "เล่นต่อ"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "ย่อลันเชอร์เมื่อกระบวนการการรัน Minecraft เริ่มต้นแล้ว"
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "ย่อลันเชอร์"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "ใช้กรอบหน้าต่างระบบ (ต้องรีสตาร์ทแอป)"
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "ของตกแต่งดั้งเดิม"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "แสดงเวลาที่คุณใช้เล่นในแต่ละอินสแตนซ์"
-  },
   "app.appearance-settings.show-play-time.title": {
     "message": "แสดงระยะเวลาที่เล่น"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "เปิดใช้งานตัวเลือกในการเลือกย่อหรือขยายแถบด้านข้าง"
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "ย่อแถบด้านข้าง"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "หากคุณกำลังติดตั้งไฟล์แพ็กของ Modrinth (.mrpack) ที่ไม่ได้โฮสต์โดยตรงบน Modrinth เราจะแจ้งให้คุณตรวจสอบให้มั่นใจก่อนที่จะติดตั้งไฟล์แพ็กดังกล่าว"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "เตือนฉันก่อนติดตั้งแพ็กม็อดที่ไม่รู้จัก"
@@ -286,9 +247,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "หน้าตา"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "ตั้งค่าโปรแกรมเริ่มต้น"
   },
   "app.settings.tabs.java-installations": {
     "message": "การจัดการ Java ที่ติดตั้ง"

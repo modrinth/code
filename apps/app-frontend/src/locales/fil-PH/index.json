@@ -47,20 +47,11 @@
   "app.action-bar.view-logs": {
     "message": "Tignan ang logs"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Pagpapagana ng masalimuot na pagrerender katulad ng paglalabo na maaaring magdudulot ng mga isyu sa performance kapag walang hardware-acceleration."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Masalimuot na pagrerender"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Piliin ang iyong mas gustong kulay para sa Modrinth app."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema ng kulay"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Pagpapalit ng pahina na bubuksan ng launcher."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Tahanan"
@@ -71,41 +62,11 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Panimulang pahina ng paglapag"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Pagtatago ng nametag na nasa itaas ng iyong manlalaro sa loob ng pahina ng mga skin."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Itago ang nametag"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Pagsasali ng mga kamakailang mundo sa seksiyong \"Jump back in\" sa pahina ng Tahanan."
-  },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Bumalik sa mga mundo"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Liitan ang launcher kung nag-start ang isang proseso ng Minecraft."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Liitin ang launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gamitin ang system window frame (kailangan i-restart ang app)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Native decorations"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Magpapakita ang katagal ng iyong paglalaro sa isang instansiya."
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Pagpapagana na mata-toggle ang sidebar."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "I-toggle ang sidebar"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Kung susubukan mong mag-install ng Modrinth Pack file (.mrpack) na hindi naka-host sa Modrinth, titiyakin namin na nakaaalam ka sa mga panganib bago ito ma-install."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Pakipaalala bago ko ma-install ang mga di-kilalang modpack"
@@ -268,9 +229,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Itsura"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Mga pagpipilian sa default na instansiya"
   },
   "app.settings.tabs.java-installations": {
     "message": "Mga instalasyon ng Java"

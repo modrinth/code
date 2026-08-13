@@ -25,33 +25,37 @@
 			<h2>
 				{{ formatMessage(messages.discoverHeading) }}
 			</h2>
-			<div class="button-group">
-				<ButtonStyled color="brand" size="large">
-					<nuxt-link to="/discover/mods">
-						<CompassIcon aria-hidden="true" />
-						{{ formatMessage(messages.discoverMods) }}
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled size="large" type="outlined">
-					<nuxt-link v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.signUpButton) }}
-					</nuxt-link>
-					<nuxt-link v-else to="/dashboard/projects">
-						<DashboardIcon aria-hidden="true" />
-						{{ formatMessage(messages.goToDashboard) }}
-					</nuxt-link>
-				</ButtonStyled>
+			<div class="mx-auto mb-20 flex w-fit flex-wrap justify-center gap-5">
+				<ButtonLink type="colored" color="brand" size="xl" to="/discover/mods">
+					<CompassIcon aria-hidden="true" />
+					{{ formatMessage(messages.discoverMods) }}
+				</ButtonLink>
+				<ButtonLink
+					v-if="!auth.user"
+					type="outlined"
+					size="xl"
+					to="/auth/sign-up"
+					rel="noopener nofollow"
+				>
+					<LogInIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.signUpButton) }}
+				</ButtonLink>
+				<ButtonLink v-else type="outlined" size="xl" to="/dashboard/projects">
+					<DashboardIcon aria-hidden="true" />
+					{{ formatMessage(messages.goToDashboard) }}
+				</ButtonLink>
 			</div>
 		</div>
 		<div class="users-section-outer">
 			<div v-if="rows" class="projects-showcase">
 				<div v-for="(row, index) in rows" :key="index" class="row">
 					<div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
-						<nuxt-link
+						<ButtonLink
 							v-for="project in row"
 							:key="project.id"
-							class="project button-animation"
+							type="quiet"
+							interaction="none"
+							class="project !h-auto !shrink !items-stretch !justify-start !whitespace-normal !p-4 !font-normal !leading-normal"
 							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
 						>
 							<Avatar :src="project.icon_url" :alt="project.title" size="sm" loading="lazy" />
@@ -63,7 +67,7 @@
 									{{ project.description }}
 								</span>
 							</div>
-						</nuxt-link>
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -444,7 +448,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
@@ -735,13 +739,6 @@ const creatorFeatureMessages = defineMessages({
 		line-break: loose;
 		color: var(--landing-color-subheading);
 		max-width: 50rem;
-	}
-
-	.button-group {
-		width: fit-content;
-		gap: 1.25rem;
-		margin: 0 auto 5rem;
-		justify-content: center;
 	}
 }
 

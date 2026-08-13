@@ -3,10 +3,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use dashmap::DashMap;
 use dashmap::mapref::entry::Entry;
+use eyre::{Result, WrapErr};
 use tokio::sync::Notify;
 use tokio::time::{Instant, timeout_at};
-
-use crate::Error;
 
 #[derive(Clone)]
 pub(in crate::cache) struct LockCoordinator {
@@ -76,10 +75,7 @@ pub(in crate::cache) struct LockWaiter {
 }
 
 impl LockWaiter {
-    pub(in crate::cache) async fn wait(
-        self,
-        deadline: Instant,
-    ) -> Result<(), Error> {
+    pub(in crate::cache) async fn wait(self, deadline: Instant) -> Result<()> {
         loop {
             if self.state.released.load(Ordering::Acquire) {
                 return Ok(());
@@ -94,7 +90,7 @@ impl LockWaiter {
 
             timeout_at(deadline, notified)
                 .await
-                .map_err(|_| lock_timeout())?;
+                .wrap_err("waiting for local Redis cache lock")?;
         }
     }
 }
@@ -110,12 +106,5 @@ impl LockState {
             released: AtomicBool::new(false),
             notify: Notify::new(),
         }
-    }
-}
-
-fn lock_timeout() -> Error {
-    Error::LocalCacheTimeout {
-        released: 0,
-        total: 1,
     }
 }

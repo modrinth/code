@@ -200,6 +200,7 @@ fn main() {
                         "instance_get_install_candidates",
                         "instance_content",
                         "instance_get_content_items",
+                        "instance_refresh_content_updates",
                         "instance_get_dependencies_as_content_items",
                         "instance_get_linked_modpack_info",
                         "instance_get_linked_modpack_content",
@@ -317,7 +318,7 @@ fn main() {
                     .commands(&[
                         "init_ads_window",
                         "hide_ads_window",
-                        "show_ads_window",
+                        "update_ads_window_hold",
                         "show_ads_consent_ui",
                         "expand_ads_consent_webview",
                         "open_ads_consent_preferences",

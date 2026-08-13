@@ -41,29 +41,45 @@
 				class="mt-4 flex flex-col items-stretch justify-between gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:gap-2"
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-					<ButtonStyled v-if="sortedMessages.length > 0" color="brand">
-						<button :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
-							<ReplyIcon class="size-4" />
-							Reply
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
-							<SendIcon class="size-4" />
-							Send
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="isStaff(auth.user)">
-						<button :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
-							Add note
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="visibleQuickReplies.length > 0">
-						<OverflowMenu :options="visibleQuickReplies">
-							Quick reply
-							<ChevronDownIcon />
-						</OverflowMenu>
-					</ButtonStyled>
+					<Button
+						v-if="sortedMessages.length > 0"
+						type="colored"
+						color="brand"
+						:disabled="!replyBody"
+						class="w-full gap-2 sm:w-auto"
+						@click="sendReply()"
+					>
+						<ReplyIcon class="size-4" />
+						Reply
+					</Button>
+					<Button
+						v-else
+						type="colored"
+						color="brand"
+						:disabled="!replyBody"
+						class="w-full gap-2 sm:w-auto"
+						@click="sendReply()"
+					>
+						<SendIcon class="size-4" />
+						Send
+					</Button>
+					<Button
+						v-if="isStaff(auth.user)"
+						:disabled="!replyBody"
+						class="w-full sm:w-auto"
+						@click="sendReply(true)"
+					>
+						Add note
+					</Button>
+					<TeleportOverflowMenu
+						v-if="visibleQuickReplies.length > 0"
+						label="More options"
+						:options="visibleQuickReplies"
+						class="!w-auto !rounded-xl !px-2.5"
+					>
+						Quick reply
+						<ChevronDownIcon />
+					</TeleportOverflowMenu>
 				</div>
 
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
@@ -77,12 +93,11 @@
 <script setup lang="ts" generic="T">
 import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
 import type { QuickReply } from '@modrinth/moderation'
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	CopyCode,
 	injectNotificationManager,
 	MarkdownEditor,
-	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
 import type { Thread, User } from '@modrinth/utils'
@@ -110,6 +125,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 			(reply) =>
 				({
 					id: reply.label,
+					label: reply.label,
 					action: () => handleQuickReply(reply, context),
 				}) as OverflowMenuOption,
 		)

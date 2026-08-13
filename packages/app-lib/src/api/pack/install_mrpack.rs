@@ -1,4 +1,5 @@
 use crate::State;
+use crate::api::instance::CONFIG_FILE_EXTENSIONS;
 use crate::event::emit::loading_try_for_each_concurrent;
 use crate::install::{
     InstallErrorContext, InstallJobEventKind, InstallPhaseDetails,
@@ -41,7 +42,21 @@ use tokio::sync::Mutex;
 type ExtractProgressFn<'a> = dyn FnMut(u64) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
     + Send
     + 'a;
+type HashProgressFn<'a> = dyn FnMut(u64) -> crate::Result<()> + Send + 'a;
 const MODPACK_CONTENT_DOWNLOAD_CONCURRENCY: usize = 4;
+const MRPACK_WARNING_IGNORED_EXTENSIONS: &[&str] = &["rpo"];
+
+fn is_ignored_mrpack_warning_file(path: &str) -> bool {
+    Path::new(path)
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            CONFIG_FILE_EXTENSIONS
+                .iter()
+                .chain(MRPACK_WARNING_IGNORED_EXTENSIONS)
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
+}
 
 #[derive(Clone)]
 struct ModpackContentInstallContext {
@@ -166,13 +181,16 @@ impl MrpackZipReader {
     async fn hash_entry(
         &mut self,
         index: usize,
+        progress: Option<&mut HashProgressFn<'_>>,
     ) -> crate::Result<(u64, String)> {
         match self {
             Self::Memory(reader) => {
-                hash_zip_entry(reader.reader_with_entry(index).await?).await
+                hash_zip_entry(reader.reader_with_entry(index).await?, progress)
+                    .await
             }
             Self::File(reader) => {
-                hash_zip_entry(reader.reader_with_entry(index).await?).await
+                hash_zip_entry(reader.reader_with_entry(index).await?, progress)
+                    .await
             }
         }
     }
@@ -209,6 +227,7 @@ impl MrpackZipReader {
 
 async fn hash_zip_entry<R>(
     mut reader: ZipEntryReader<'_, R, WithEntry<'_>>,
+    mut progress: Option<&mut HashProgressFn<'_>>,
 ) -> crate::Result<(u64, String)>
 where
     R: futures_lite::io::AsyncBufRead + Unpin,
@@ -228,6 +247,9 @@ where
 
         hasher.update(&buffer[..bytes_read]);
         size += bytes_read as u64;
+        if let Some(progress) = progress.as_mut() {
+            progress(bytes_read as u64)?;
+        }
     }
 
     if reader.compute_hash() != expected_crc32 {
@@ -239,6 +261,7 @@ where
 
 pub(crate) async fn get_external_files_from_mrpack(
     file: &CreatePackFile,
+    mut progress: impl FnMut(u64, u64) -> crate::Result<()> + Send,
 ) -> crate::Result<Vec<String>> {
     let mut zip_reader = MrpackZipReader::new(file).await?;
     let Some(manifest_idx) =
@@ -258,6 +281,9 @@ pub(crate) async fn get_external_files_from_mrpack(
         .into_iter()
         .filter_map(|file| {
             let path = file.path.as_str();
+            if is_ignored_mrpack_warning_file(path) {
+                return None;
+            }
             let hash = file.hashes.get(&PackFileHash::Sha1)?.clone();
             let file_name = path.rsplit('/').next()?.to_string();
             Some((file_name, hash))
@@ -271,21 +297,35 @@ pub(crate) async fn get_external_files_from_mrpack(
         .enumerate()
         .filter_map(|(index, entry)| {
             let path = entry.filename().as_str().ok()?;
-            let relative_path = path
-                .strip_prefix("overrides/")
-                .or_else(|| path.strip_prefix("client-overrides/"))?;
-            if path.ends_with('/')
-                || ProjectType::get_from_parent_folder(relative_path).is_none()
-            {
-                return None;
-            }
+            let relative_path = external_override_relative_path(path)?;
             let file_name = relative_path.rsplit('/').next()?.to_string();
-            Some((index, file_name))
+            Some((index, file_name, entry.uncompressed_size()))
         })
         .collect::<Vec<_>>();
 
-    for (index, file_name) in override_entries {
-        let (_, hash) = zip_reader.hash_entry(index).await?;
+    let total_bytes = override_entries
+        .iter()
+        .map(|(_, _, size)| size)
+        .sum::<u64>();
+    let min_delta = (total_bytes / 200).max(256 * 1024);
+    let mut current_bytes = 0_u64;
+    let mut last_reported_bytes = 0_u64;
+    let mut report_progress = |bytes_read: u64| {
+        current_bytes = current_bytes.saturating_add(bytes_read);
+        if current_bytes >= total_bytes
+            || current_bytes.saturating_sub(last_reported_bytes) < min_delta
+        {
+            return Ok(());
+        }
+
+        last_reported_bytes = current_bytes;
+        progress(current_bytes.min(total_bytes), total_bytes)
+    };
+
+    for (index, file_name, _) in override_entries {
+        let (_, hash) = zip_reader
+            .hash_entry(index, Some(&mut report_progress))
+            .await?;
         candidates.push((file_name, hash));
     }
 
@@ -325,6 +365,32 @@ pub(crate) async fn get_external_files_from_mrpack(
     external_files.sort();
     external_files.dedup();
     Ok(external_files)
+}
+
+pub(crate) async fn get_external_file_hashing_size_from_mrpack(
+    file: &CreatePackFile,
+) -> crate::Result<u64> {
+    let zip_reader = MrpackZipReader::new(file).await?;
+    Ok(zip_reader
+        .file()
+        .entries()
+        .iter()
+        .filter_map(|entry| {
+            let path = entry.filename().as_str().ok()?;
+            external_override_relative_path(path)
+                .map(|_| entry.uncompressed_size())
+        })
+        .sum())
+}
+
+fn external_override_relative_path(path: &str) -> Option<&str> {
+    let relative_path = path
+        .strip_prefix("overrides/")
+        .or_else(|| path.strip_prefix("client-overrides/"))?;
+    (!path.ends_with('/')
+        && !is_ignored_mrpack_warning_file(relative_path)
+        && ProjectType::get_from_parent_folder(relative_path).is_some())
+    .then_some(relative_path)
 }
 
 async fn extract_zip_entry<R>(
@@ -527,7 +593,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             .collect();
 
         for index in override_entries {
-            let (_, hash) = zip_reader.hash_entry(index).await?;
+            let (_, hash) = zip_reader.hash_entry(index, None).await?;
             file_hashes.push(hash);
         }
 

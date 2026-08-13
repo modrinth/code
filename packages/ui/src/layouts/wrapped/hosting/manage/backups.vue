@@ -19,9 +19,9 @@
 					<p>
 						<span class="break-all font-mono">{{ error.message }}</span>
 					</p>
-					<ButtonStyled size="large" color="brand" @click="refetch">
-						<button class="mt-6 !w-full">Retry</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" size="xl" class="mt-6 !w-full" @click="refetch"
+						>Retry</Button
+					>
 				</div>
 			</div>
 		</div>
@@ -71,16 +71,16 @@
 							<template #all>{{ formatMessage(commonMessages.allProjectType) }}</template>
 						</FilterPills>
 					</div>
-					<ButtonStyled color="brand">
-						<button
-							v-tooltip="backupCreationDisabled"
-							:disabled="!!backupCreationDisabled"
-							@click="showCreateModel"
-						>
-							<PlusIcon class="size-5" />
-							{{ formatMessage(messages.createBackup) }}
-						</button>
-					</ButtonStyled>
+					<Button
+						v-tooltip="backupCreationDisabled"
+						type="colored"
+						color="brand"
+						:disabled="!!backupCreationDisabled"
+						@click="showCreateModel"
+					>
+						<PlusIcon class="size-5" />
+						{{ formatMessage(messages.createBackup) }}
+					</Button>
 				</div>
 
 				<div class="flex w-full flex-col gap-1.5">
@@ -95,17 +95,17 @@
 							:description="formatMessage(messages.emptyDescription)"
 						>
 							<template #actions>
-								<ButtonStyled color="brand">
-									<button
-										v-tooltip="backupCreationDisabled"
-										:disabled="!!backupCreationDisabled"
-										class="mx-auto w-min"
-										@click="showCreateModel"
-									>
-										<PlusIcon class="size-5" />
-										{{ formatMessage(messages.createBackup) }}
-									</button>
-								</ButtonStyled>
+								<Button
+									v-tooltip="backupCreationDisabled"
+									type="colored"
+									color="brand"
+									:disabled="!!backupCreationDisabled"
+									class="mx-auto w-min"
+									@click="showCreateModel"
+								>
+									<PlusIcon class="size-5" />
+									{{ formatMessage(messages.createBackup) }}
+								</Button>
 							</template>
 						</EmptyState>
 						<EmptyState
@@ -115,11 +115,9 @@
 							:description="formatMessage(messages.filteredEmptyDescription)"
 						>
 							<template #actions>
-								<ButtonStyled type="outlined">
-									<button @click="clearBackupFilters">
-										{{ formatMessage(messages.clearFilters) }}
-									</button>
-								</ButtonStyled>
+								<Button type="outlined" @click="clearBackupFilters">
+									{{ formatMessage(messages.clearFilters) }}
+								</Button>
 							</template>
 						</EmptyState>
 					</div>
@@ -198,30 +196,30 @@
 							}}
 						</span>
 						<div class="mx-1 h-6 w-px bg-surface-5" />
-						<ButtonStyled type="transparent">
-							<button
-								type="button"
-								:disabled="isBulkOperating"
-								:class="{ 'pointer-events-none opacity-60': isBulkOperating }"
-								@click="deselectAll"
-							>
-								{{ formatMessage(commonMessages.clearButton) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							type="quiet"
+							native-type="button"
+							:disabled="isBulkOperating"
+							:class="{ 'pointer-events-none opacity-60': isBulkOperating }"
+							@click="deselectAll"
+						>
+							{{ formatMessage(commonMessages.clearButton) }}
+						</Button>
 					</div>
 
 					<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
-						<ButtonStyled type="transparent" color="red" hover-color-fill="background">
-							<button
-								v-tooltip="!canManageBackups ? permissionDeniedMessage : undefined"
-								type="button"
-								:disabled="!canManageBackups"
-								@click="confirmBulkDelete"
-							>
-								<TrashIcon />
-								<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-							</button>
-						</ButtonStyled>
+						<Button
+							v-tooltip="!canManageBackups ? permissionDeniedMessage : undefined"
+							type="quiet"
+							color="red"
+							native-type="button"
+							:disabled="!canManageBackups"
+							class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+							@click="confirmBulkDelete"
+						>
+							<TrashIcon />
+							<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+						</Button>
 					</div>
 
 					<div v-else class="ml-auto flex items-center" aria-live="polite">
@@ -236,7 +234,9 @@
 							role="progressbar"
 							:aria-valuemin="0"
 							:aria-valuemax="bulkTotal"
-							style="box-shadow: 0px -2px 4px 0px rgba(27, 217, 106, 0.1)"
+							style="
+								box-shadow: 0px -2px 4px 0px color-mix(in srgb, var(--color-brand) 10%, transparent);
+							"
 						/>
 					</div>
 				</FloatingActionBar>
@@ -273,7 +273,7 @@ import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills, { type FilterPillOption } from '#ui/components/base/FilterPills.vue'

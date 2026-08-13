@@ -193,53 +193,39 @@
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 			<div v-if="!reportMode" class="flex w-full items-center justify-between gap-2">
-				<ButtonStyled color="red" type="transparent">
-					<button @click="reportMode = true">
-						<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="quiet" color="red" @click="reportMode = true">
+					<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
+				</Button>
 				<div class="flex items-center gap-2">
 					<template v-if="hasExternalFiles">
-						<ButtonStyled type="transparent" color="orange">
-							<button @click="accept">
-								{{ formatMessage(messages.installAnyway) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button @click="handleCancel">
-								<BanIcon />{{ formatMessage(messages.dontInstall) }}
-							</button>
-						</ButtonStyled>
+						<Button type="quiet" color="orange" @click="accept">
+							{{ formatMessage(messages.installAnyway) }}
+						</Button>
+						<Button type="colored" color="brand" @click="handleCancel">
+							<BanIcon />{{ formatMessage(messages.dontInstall) }}
+						</Button>
 					</template>
 					<template v-else>
-						<ButtonStyled type="outlined">
-							<button class="!border" @click="handleCancel">
-								<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button @click="accept">
-								<DownloadIcon />{{ formatMessage(messages.installButton) }}
-							</button>
-						</ButtonStyled>
+						<Button type="outlined" class="!border" @click="handleCancel">
+							<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+						</Button>
+						<Button type="colored" color="brand" @click="accept">
+							<DownloadIcon />{{ formatMessage(messages.installButton) }}
+						</Button>
 					</template>
 				</div>
 			</div>
 		</div>
 		<template v-if="reportMode" #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button class="!border" :disabled="submitLoading" @click="handleCancel">
-						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!canSubmitReport" @click="submitReport">
-						<SpinnerIcon v-if="submitLoading" class="animate-spin" />
-						<SendIcon v-else />
-						{{ formatMessage(commonMessages.reportButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" class="!border" :disabled="submitLoading" @click="handleCancel">
+					<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="!canSubmitReport" @click="submitReport">
+					<SpinnerIcon v-if="submitLoading" class="animate-spin" />
+					<SendIcon v-else />
+					{{ formatMessage(commonMessages.reportButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -254,12 +240,12 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { BanIcon, DownloadIcon, ReportIcon, SendIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
 	Admonition,
 	AutoLink,
 	Avatar,
 	blockedUsersQueryKey,
-	ButtonStyled,
 	Checkbox,
 	Combobox,
 	type ComboboxOption,
@@ -282,7 +268,6 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
 import { config } from '@/config'
-import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { toError } from '@/helpers/errors'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
 import { create_report } from '@/helpers/reports'
@@ -462,7 +447,6 @@ function handleCancel() {
 function handleHide() {
 	resetReportState()
 	creator.value = null
-	show_ads_window()
 }
 function resetReportState() {
 	reportMode.value = false
@@ -502,7 +486,6 @@ function showReport(
 }
 function showPreview(previewValue: SharedInstanceInstallPreview, event?: MouseEvent) {
 	preview.value = previewValue
-	hide_ads_window()
 	modal.value?.show(event)
 	void nextTick(() => forceCheckTableScroll())
 }
@@ -612,8 +595,7 @@ const messages = defineMessages({
 	},
 	reviewedFiles: {
 		id: 'app.modal.install-to-play.reviewed-files',
-		defaultMessage:
-			'A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack).',
+		defaultMessage: "Files that aren't published to Modrinth aren't reviewed.",
 	},
 	installAnyway: {
 		id: 'app.modal.install-to-play.install-anyway',

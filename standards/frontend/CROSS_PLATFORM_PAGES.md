@@ -1,27 +1,35 @@
 # Cross-Platform Pages
 
-Pages that need to exist in both the Modrinth Website (`apps/frontend`) and the Modrinth App (`apps/app-frontend`) live in `packages/ui/src/layouts/`. There are two categories based on whether the page logic differs between platforms.
+Put pages for both Modrinth Website and Modrinth App in `packages/ui/src/layouts/`.
+
+Use one of two layout types. Select the type from the differences between the platform logic.
 
 ## Shared Layouts (`layouts/shared/`)
 
-For pages where the **logic differs** between the website and app (e.g. the app fetches data via Tauri `invoke` while the website uses `api-client`). Each shared layout is a self-contained module:
+Use a shared layout when the website and app use different logic.
+
+For example, the app can use Tauri `invoke`, and the website can use `api-client`.
+
+Make each shared layout a self-contained module:
 
 ```
 shared/content-tab/
 ├── layout.vue            # Main layout component
 ├── types.ts              # TypeScript types
 ├── components/           # Internal UI components
-├── composables/          # Stateful logic (search, filtering, selection)
+├── composables/          # State logic for search, filters, and selection
 └── providers/            # DI context definitions
 ```
 
-### How it works
+### Structure
 
-1. A **DI contract** in `providers/` defines all platform-specific operations as an interface.
-2. The **layout component** injects that context and handles all UI logic (search, filtering, selection, bulk operations, modals) without knowing the platform.
-3. Each **platform provides its own implementation** of the contract.
+1. Define all platform operations in a dependency-injection (DI) contract in `providers/`.
+2. Inject the contract into the layout component. Keep all common UI logic in this component.
+3. Provide a different contract implementation from each platform.
 
-### DI contract example
+Common UI logic can include search, filters, selection, bulk operations, and modals.
+
+### DI Contract Example
 
 ```ts
 // shared/content-tab/providers/content-manager.ts
@@ -29,12 +37,12 @@ export interface ContentManagerContext {
 	items: Ref<ContentItem[]> | ComputedRef<ContentItem[]>
 	loading: Ref<boolean> | ComputedRef<boolean>
 
-	// Platform-abstracted operations
+	// Operations that have platform-specific implementations.
 	toggleEnabled: (item: ContentItem) => Promise<void>
 	deleteItem: (item: ContentItem) => Promise<void>
 	refresh: () => Promise<void>
 
-	// Optional capabilities — not every platform supports everything
+	// Optional capabilities are not available on all platforms.
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void
 	bulkDeleteItems?: (items: ContentItem[]) => Promise<void>
@@ -46,9 +54,9 @@ export const [injectContentManager, provideContentManager] =
 	createContext<ContentManagerContext>('ContentPageLayout', 'contentManagerContext')
 ```
 
-### Platform implementations
+### Platform Implementations
 
-**Website** — uses `api-client` and TanStack Query:
+The website uses `api-client` and TanStack Query:
 
 ```vue
 <!-- apps/frontend/src/pages/instance/content.vue -->
@@ -65,7 +73,7 @@ provideContentManager({
 	deleteItem: async (item) => {
 		await client.content_v1.deleteAddon(instanceId, item.id)
 	},
-	// ... rest of the contract
+	// Implement the remaining contract fields.
 })
 </script>
 
@@ -74,7 +82,7 @@ provideContentManager({
 </template>
 ```
 
-**App** — uses Tauri `invoke`:
+The app uses Tauri `invoke`:
 
 ```vue
 <!-- apps/app-frontend/src/pages/instance/Mods.vue -->
@@ -83,14 +91,14 @@ import { provideContentManager, ContentPageLayout } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 const items = ref<ContentItem[]>([])
-await invoke('get_instance_content', { instanceId }).then(/* map to ContentItem[] */)
+await invoke('get_instance_content', { instanceId }).then(/* Map the result to ContentItem[]. */)
 
 provideContentManager({
 	items,
 	deleteItem: async (item) => {
 		await invoke('delete_content', { instanceId, path: item.file_path })
 	},
-	// ... rest of the contract
+	// Implement the remaining contract fields.
 })
 </script>
 
@@ -99,29 +107,33 @@ provideContentManager({
 </template>
 ```
 
-### Optional capabilities
+### Optional Capabilities
 
-The DI contract uses optional fields for features that not every platform supports. The layout checks for them before rendering the corresponding UI:
+Use optional contract fields for capabilities that are not available on all platforms.
+
+Check that an optional field exists before you show its UI:
 
 ```ts
-// Contract
+// Contract fields.
 bulkUpdateItems?: (items: ContentItem[]) => Promise<void>
 shareItems?: (items: ContentItem[], format: string) => void
 
-// Layout checks before showing UI
+// Show the UI only when the capability exists.
 v-if="ctx.bulkUpdateItems && hasOutdatedProjects"
 ```
 
-### Props vs DI
+### Props and DI
 
-| Use       | When                                                                                       |
-| --------- | ------------------------------------------------------------------------------------------ |
-| **DI**    | Data depends on _how_ it's fetched — API calls, file operations, navigation (per-platform) |
-| **Props** | Data is the same regardless of platform — configuration flags, display options              |
+| Use   | Condition                                                                  |
+| ----- | -------------------------------------------------------------------------- |
+| DI    | Use when API calls, file operations, or navigation differ by platform.     |
+| Props | Use when configuration and display data are the same on all platforms.      |
 
 ## Wrapped Pages (`layouts/wrapped/`)
 
-For pages where the **logic is identical** on both platforms — same API source, same data fetching, same state management. These are full page-level Vue components that directly implement routes:
+Use a wrapped page when both platforms use the same API source, data logic, and state logic.
+
+A wrapped page is a complete page-level Vue component. Its directory structure matches the route structure:
 
 ```
 wrapped/hosting/manage/
@@ -132,7 +144,9 @@ wrapped/hosting/manage/
 └── [id]/onboarding.vue
 ```
 
-Wrapped pages handle their own data fetching (typically via TanStack Query and `api-client`) and are consumed as simple component imports in both frontends:
+Wrapped pages get their own data. They usually use TanStack Query and `api-client`.
+
+Import the wrapped page as a simple component in both frontends:
 
 ```vue
 <!-- apps/frontend/src/pages/hosting/manage/[id]/content.vue -->
@@ -145,32 +159,48 @@ import { ServersManageContentPage } from '@modrinth/ui'
 </template>
 ```
 
-### Platform route shells: prefetch with `ensureQueryData`
+### Prefetch Data in Platform Route Shells
 
-#### Wrapped layout: `ReadyTransition` and `useReadyState`
+#### `ReadyTransition` and `useReadyState`
 
-Many wrapped pages wrap the main UI in [`ReadyTransition`](../../packages/ui/src/components/base/ReadyTransition.vue) with `:pending` driven by [`useReadyState`](../../packages/ui/src/composables/use-ready-state.ts) on the **primary** TanStack query (true only on the first load while that query has no cached data yet—background refetches stay “ready”). That avoids flashing empty content before data exists.
+Many wrapped pages put the main UI in [`ReadyTransition`](../../packages/ui/src/components/base/ReadyTransition.vue).
+
+The `:pending` prop usually comes from [`useReadyState`](../../packages/ui/src/composables/use-ready-state.ts) for the primary TanStack query.
+
+The state is true only during the first load when the cache has no data. Background refetches keep the page ready.
+
+This behavior prevents empty content from appearing before the data exists.
 
 ```vue
-<!-- Conceptual: inside packages/ui wrapped layout -->
+<!-- This code is in a packages/ui wrapped layout. -->
 <ReadyTransition :pending="readyPending">
 	<SomePageLayout />
 </ReadyTransition>
 ```
 
 ```ts
-const primaryQuery = useQuery({ /* ... */ })
+const primaryQuery = useQuery({ /* Query options. */ })
 const readyPending = useReadyState(primaryQuery)
-// or useReadyState({ isLoading, data }) when not using the full query object
+
+// Use this form when the complete query object is not available.
+const readyPendingFromState = useReadyState({ isLoading, data })
 ```
 
-Shell prefetch (below) warms the cache so that on navigation the query often **already has data** when the layout mounts; `pending` stays false and `ReadyTransition` can skip the enter animation on that fast path (see `ReadyTransition` docs and stories).
+Shell prefetch adds data to the cache before the layout mounts. On this fast path, `pending` stays false.
 
-#### Rule: `ensureQueryData` in each platform route shell
+`ReadyTransition` can then omit its enter animation. Refer to the `ReadyTransition` documentation and stories for details.
 
-When a wrapped layout uses that pattern, the **thin platform page** that imports the layout must **prefetch the same primary query** in `<script setup>` so the cache is warm before the layout mounts and `ReadyTransition`/`useReadyState` behave as intended.
+#### Use `ensureQueryData` in Each Route Shell
 
-**Rule:** For each primary `useQuery` in the wrapped layout that gates first paint (and thus `useReadyState` / `ReadyTransition`), the website and app route shells must call `queryClient.ensureQueryData` with the **same** `queryKey`, `queryFn`, and `staleTime` as that query. Wrap the call in `try/catch` and swallow errors so navigation does not fail during setup; the mounted layout’s `useQuery` still runs and surfaces errors to the user.
+When a wrapped layout uses this ready-state pattern, prefetch the primary query in each thin platform page.
+
+For each query that controls the first paint, call `queryClient.ensureQueryData` in the website and app route shells.
+
+Use the same `queryKey`, `queryFn`, and `staleTime` that the wrapped layout uses.
+
+Put the call in a `try` block. Catch the error so that route setup can continue.
+
+The mounted layout runs its `useQuery` call and shows the error to the user.
 
 ```ts
 import { injectModrinthClient, injectModrinthServerContext, ServersManageFilesPage } from '@modrinth/ui'
@@ -187,21 +217,23 @@ try {
 		staleTime: 30_000,
 	})
 } catch {
-	// Let the mounted layout’s useQuery surface errors; do not fail route setup.
+	// Let the mounted layout show the query error. Do not stop route setup.
 }
 ```
 
-If a route parameter is required for the query (e.g. `worldId`), only call `ensureQueryData` when that value is present, matching the layout’s `enabled` logic.
+If the query needs a route parameter, call `ensureQueryData` only when the parameter exists.
 
-Duplicating the query definition in the shell is intentional until a shared query-options module exists; keep keys and fetchers aligned when editing the layout or the shell.
+Make this condition match the `enabled` condition in the layout query.
 
-A wrapped page may still compose shared layouts internally — for example, the hosting content page uses the shared `content-tab` layout, providing its own `ContentManagerContext` with web API calls.
+Duplicate query definitions in the shell until a shared query-option module exists. Keep the keys and fetch functions the same.
+
+A wrapped page can contain shared layouts. For example, a hosting page can provide a `ContentManagerContext` to the shared content layout.
 
 ## Composables
 
-Reusable stateful logic lives in `packages/ui/src/layouts/shared/*/composables/`. These are consumed internally by the shared layout:
+Put reusable state logic in `packages/ui/src/layouts/shared/*/composables/`. The shared layout uses these composables:
 
-- **Search** — Fuse.js fuzzy search over items
-- **Filtering** — Dynamic filter pills
-- **Selection** — Multi-select with bulk operation support
-- **Bulk operations** — Sequential execution with progress tracking
+- Search: Uses Fuse.js to search items.
+- Filters: Supplies dynamic filter pills.
+- Selection: Supplies item selection for bulk operations.
+- Bulk operations: Runs operations in sequence and tracks progress.

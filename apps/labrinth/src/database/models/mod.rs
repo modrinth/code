@@ -30,6 +30,7 @@ pub mod payout_item;
 pub mod payouts_values_notifications;
 pub mod product_item;
 pub mod products_tax_identifier_item;
+pub mod project_disclosure_item;
 pub mod project_item;
 pub mod report_item;
 pub mod session_item;
@@ -53,6 +54,7 @@ pub use image_item::DBImage;
 pub use oauth_client_item::DBOAuthClient;
 pub use organization_item::DBOrganization;
 pub use passkey_item::DBPasskey;
+pub use project_disclosure_item::DBProjectDisclosure;
 pub use project_item::DBProject;
 pub use team_item::DBTeam;
 pub use team_item::DBTeamMember;
@@ -77,8 +79,6 @@ pub enum DatabaseError {
     SerdeCacheError(#[from] serde_json::Error),
     #[error("error while encoding or decoding the cache: {0}")]
     PostcardCacheError(#[from] postcard::Error),
-    #[error(transparent)]
-    Redis(#[from] xredis::Error),
     #[error("Schema error: {0}")]
     SchemaError(String),
 }

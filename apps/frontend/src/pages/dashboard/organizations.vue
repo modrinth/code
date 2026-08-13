@@ -5,21 +5,21 @@
 			<div class="header__row">
 				<h2 class="header__title text-2xl">{{ formatMessage(messages.organizationsTitle) }}</h2>
 				<div class="input-group">
-					<ButtonStyled color="brand">
-						<button @click="openCreateOrgModal">
-							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(messages.createOrganization) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="openCreateOrgModal">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createOrganization) }}
+					</Button>
 				</div>
 			</div>
 			<template v-if="orgs?.length > 0">
 				<div class="orgs-grid">
-					<nuxt-link
+					<ButtonLink
 						v-for="org in sortedOrgs"
 						:key="org.id"
+						type="quiet"
+						interaction="none"
 						:to="`/organization/${org.slug}`"
-						class="universal-card button-base recessed org"
+						class="universal-card recessed org !h-auto !w-full !shrink !items-stretch !justify-start !whitespace-normal !p-[var(--spacing-card-bg)]"
 						:class="{ 'is-disabled': onlyAcceptedMembers(org.members).length === 0 }"
 					>
 						<Avatar :src="org.icon_url" :alt="org.name" class="icon" />
@@ -43,7 +43,7 @@
 								</div>
 							</span>
 						</div>
-					</nuxt-link>
+					</ButtonLink>
 				</div>
 			</template>
 			<template v-else> {{ formatMessage(messages.makeOrganization) }} </template>
@@ -53,7 +53,14 @@
 
 <script setup>
 import { PlusIcon, UsersIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	ButtonLink,
+	defineMessages,
+	injectModrinthClient,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'

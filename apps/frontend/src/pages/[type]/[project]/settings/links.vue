@@ -104,13 +104,16 @@
 					:disabled="!hasPermission"
 				/>
 			</div>
-			<div class="button-group">
-				<ButtonStyled color="brand">
-					<button :disabled="!hasServerChanges" @click="saveServerChanges()">
-						<SaveIcon />
-						Save changes
-					</button>
-				</ButtonStyled>
+			<div class="mt-3 flex flex-wrap justify-start gap-2">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!hasServerChanges"
+					@click="saveServerChanges()"
+				>
+					<SaveIcon />
+					Save changes
+				</Button>
 			</div>
 		</section>
 
@@ -258,26 +261,22 @@
 					:disabled="!hasPermission"
 					@update:model-value="updateDonationLinks"
 				/>
-				<DropdownSelect
+				<Combobox
 					v-model="donationLink.id"
-					name="Donation platform selector"
-					:options="tags.donationPlatforms.map((x) => x.short)"
-					:display-name="
-						(option) => tags.donationPlatforms.find((platform) => platform.short === option)?.name
-					"
+					:options="donationPlatformOptions"
 					placeholder="Select platform"
-					render-up
-					class="platform-selector"
+					:disabled="!hasPermission"
+					force-direction="up"
+					trigger-type="base"
+					class="platform-selector !w-80"
 					@update:model-value="updateDonationLinks"
 				/>
 			</div>
-			<div class="button-group">
-				<ButtonStyled color="brand">
-					<button :disabled="!hasChanges" @click="saveChanges()">
-						<SaveIcon />
-						Save changes
-					</button>
-				</ButtonStyled>
+			<div class="mt-3 flex flex-wrap justify-start gap-2">
+				<Button type="colored" color="brand" :disabled="!hasChanges" @click="saveChanges()">
+					<SaveIcon />
+					Save changes
+				</Button>
 			</div>
 		</section>
 	</div>
@@ -287,8 +286,8 @@
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
 import {
-	ButtonStyled,
-	DropdownSelect,
+	Button,
+	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -296,6 +295,13 @@ import {
 } from '@modrinth/ui'
 
 const tags = useGeneratedState()
+
+const donationPlatformOptions = computed(() =>
+	tags.value.donationPlatforms.map((platform) => ({
+		value: platform.short,
+		label: platform.name,
+	})),
+)
 
 const {
 	projectV2: project,
@@ -553,13 +559,5 @@ function checkDifference(newLink, existingLink) {
 		flex-grow: 2;
 		max-width: 26rem;
 	}
-
-	:deep(.animated-dropdown .selected) {
-		height: 40px;
-	}
-}
-
-.button-group {
-	justify-content: flex-start;
 }
 </style>

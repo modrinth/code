@@ -1,3 +1,5 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use const_format::formatcp;
@@ -227,10 +229,16 @@ pub(crate) async fn fetch(
         query = filter_param.bind(query);
     }
 
-    let mut cursor = query.fetch::<PlaytimeRow>()?;
+    let mut cursor = query
+        .fetch::<PlaytimeRow>()
+        .wrap_internal_err("fetching project-playtime pagination cursor")?;
     let mut buckets = HashMap::<PlaytimeBucket, u64>::new();
 
-    while let Some(row) = cursor.next().await? {
+    while let Some(row) = cursor
+        .next()
+        .await
+        .wrap_internal_err("fetching project playtime")?
+    {
         let project_id =
             if uses_column("use_project_id") && row.project_id.0 == 0 {
                 parent_version_projects
@@ -308,7 +316,8 @@ pub(crate) async fn fetch(
                     seconds,
                 }),
             }),
-        )?;
+        )
+        .wrap_api_err("executing `ProjectMetrics::Playtime`")?;
     }
 
     Ok(())

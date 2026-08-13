@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import ModpackContentModal from '../../layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
 import type { ContentItem } from '../../layouts/shared/content-tab/types'
 
@@ -409,7 +409,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
@@ -417,9 +417,7 @@ export const Default: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Modpack Content (Mixed)</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">View Modpack Content (Mixed)</Button>
 				<ModpackContentModal
 					ref="modalRef"
 					modpack-name="Cobblemon Official Modpack"
@@ -432,7 +430,7 @@ export const Default: Story = {
 
 export const ModsOnly: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(modsOnlyContent)
@@ -440,9 +438,7 @@ export const ModsOnly: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Modpack Content (Mods Only)</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">View Modpack Content (Mods Only)</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -455,7 +451,7 @@ export const ModsOnly: Story = {
 
 export const LoadingState: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => {
@@ -469,9 +465,7 @@ export const LoadingState: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Content (With Loading)</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">View Content (With Loading)</Button>
 				<ModpackContentModal
 					ref="modalRef"
 					modpack-name="Fabulously Optimized"
@@ -488,7 +482,7 @@ export const LoadingState: Story = {
 
 export const EmptyContent: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show([])
@@ -496,9 +490,7 @@ export const EmptyContent: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Empty Modpack</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">View Empty Modpack</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -511,7 +503,7 @@ export const EmptyContent: Story = {
 
 export const LargeModpack: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(largeModpackContent)
@@ -519,9 +511,7 @@ export const LargeModpack: Story = {
 		},
 		template: /*html*/ `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Large Modpack (47 items)</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">View Large Modpack (47 items)</Button>
 				<ModpackContentModal
 					ref="modalRef"
 					modpack-name="All the Mods 10"
@@ -538,7 +528,7 @@ export const LargeModpack: Story = {
 
 export const SearchDemo: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
@@ -549,9 +539,7 @@ export const SearchDemo: Story = {
 				<p class="text-sm text-secondary max-w-md text-center">
 					Click the button and try searching for "sodium", "shader", or "faithful" to test the search functionality.
 				</p>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Test Search</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">Test Search</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -564,7 +552,7 @@ export const SearchDemo: Story = {
 
 export const FilterDemo: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			const openModal = () => modalRef.value?.show(mixedModpackContent)
@@ -575,9 +563,7 @@ export const FilterDemo: Story = {
 				<p class="text-sm text-secondary max-w-md text-center">
 					Click the button and try the filter chips (Mods, Shaders, Resource Packs) to filter content by type.
 				</p>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Test Filters</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">Test Filters</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,
@@ -590,7 +576,7 @@ export const FilterDemo: Story = {
 
 export const MixedOwnerTypes: Story = {
 	render: () => ({
-		components: { ModpackContentModal, ButtonStyled },
+		components: { ModpackContentModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 			// Mix of user and organization owners
@@ -608,9 +594,7 @@ export const MixedOwnerTypes: Story = {
 				<p class="text-sm text-secondary max-w-md text-center">
 					Shows content with different owner types: users (circular avatar) and organizations (rounded + icon).
 				</p>
-				<ButtonStyled color="brand">
-					<button @click="openModal">View Mixed Owners</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">View Mixed Owners</Button>
 				<ModpackContentModal ref="modalRef" />
 			</div>
 		`,

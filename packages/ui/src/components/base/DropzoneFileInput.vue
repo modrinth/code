@@ -13,7 +13,7 @@
 	>
 		<div
 			:class="[
-				'grid place-content-center  text-brand border-brand border-solid border bg-highlight-green',
+				'grid place-content-center  text-brand border-brand border-solid border bg-brand-highlight',
 				size === 'small' ? 'w-10 h-10' : 'h-14 w-14',
 				size === 'small' ? 'rounded-xl' : 'rounded-2xl',
 			]"

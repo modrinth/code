@@ -81,16 +81,12 @@
 					</div>
 				</Transition>
 				<div class="mt-4 flex justify-end gap-3">
-					<ButtonStyled @click="handleCancel">
-						<button><XIcon /> {{ formatMessage(messages.cancel) }}</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button :disabled="!canContinue || loading" @click="continueForm">
-							{{ formatMessage(messages.continue) }}
-							<RightArrowIcon v-if="!loading" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
+					<Button @click="handleCancel"><XIcon /> {{ formatMessage(messages.cancel) }}</Button>
+					<Button :disabled="!canContinue || loading" @click="continueForm">
+						{{ formatMessage(messages.continue) }}
+						<RightArrowIcon v-if="!loading" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</Button>
 				</div>
 			</div>
 
@@ -136,18 +132,19 @@
 					</span>
 				</div>
 				<div class="flex w-full flex-row justify-stretch gap-2">
-					<ButtonStyled>
-						<button class="w-full text-contrast" @click="handleClose">
-							{{ props.closeButtonText ?? formatMessage(messages.closeButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="green">
-						<button class="w-full text-contrast" @click="downloadTaxForm">
-							<DownloadIcon />{{
-								formatMessage(messages.downloadButton, { formType: determinedFormType })
-							}}
-						</button>
-					</ButtonStyled>
+					<Button class="w-full text-contrast" @click="handleClose">
+						{{ props.closeButtonText ?? formatMessage(commonMessages.closeButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="green"
+						class="w-full text-contrast"
+						@click="downloadTaxForm"
+					>
+						<DownloadIcon />{{
+							formatMessage(messages.downloadButton, { formType: determinedFormType })
+						}}
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -165,7 +162,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
+	Button,
 	Chips,
 	commonMessages,
 	defineMessages,
@@ -269,10 +266,6 @@ const messages = defineMessages({
 	downloadButton: {
 		id: 'dashboard.creator-tax-form-modal.confirmation.download-button',
 		defaultMessage: 'Download {formType}',
-	},
-	closeButton: {
-		id: 'dashboard.creator-tax-form-modal.close-button',
-		defaultMessage: 'Close',
 	},
 	incompleteTitle: {
 		id: 'dashboard.creator-tax-form-modal.incomplete.title',

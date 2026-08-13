@@ -27,12 +27,10 @@
 					placeholder="Search affiliates..."
 					clearable
 				/>
-				<ButtonStyled color="brand">
-					<button @click="createModal?.show">
-						<PlusIcon />
-						Create affiliate code
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="createModal?.show">
+					<PlusIcon />
+					Create affiliate code
+				</Button>
 			</div>
 		</div>
 		<Admonition v-if="error" type="critical">
@@ -90,7 +88,7 @@ import {
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
 	Avatar,
-	ButtonStyled,
+	Button,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,

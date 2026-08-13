@@ -9,7 +9,7 @@ use std::convert::TryFrom;
 use std::convert::TryInto;
 use xredis::RedisPool;
 
-const PRODUCTS_NAMESPACE: &str = "products:v3";
+const PRODUCTS_NAMESPACE: &str = "products:v4";
 
 pub struct DBProduct {
     pub id: DBProductId,
@@ -136,7 +136,7 @@ pub struct QueryProductWithPrices {
     pub id: DBProductId,
     pub metadata: ProductMetadata,
     pub unitary: bool,
-    #[serde(skip_serializing_if = "Option::is_none", default)]
+    #[serde(default)]
     pub name: Option<String>,
     pub prices: Vec<DBProductPrice>,
 }

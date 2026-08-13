@@ -215,9 +215,6 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "אשר קישורים חיצוניים"
   },
-  "nags.versions.title": {
-    "defaultMessage": "בקר בדף הגרסאות"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "בקר בהגדרות הקישורים"
   }

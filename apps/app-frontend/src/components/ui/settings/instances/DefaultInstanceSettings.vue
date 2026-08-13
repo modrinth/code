@@ -116,6 +116,35 @@ const messages = defineMessages({
 		id: 'app.settings.default-instance-options.post-exit-hook.description',
 		defaultMessage: 'Runs after the game closes.',
 	},
+	hookVariablesDescription: {
+		id: 'instance.settings.tabs.hooks.variables.description',
+		defaultMessage:
+			'Hooks run in the working directory of the instance, with the following variables:',
+	},
+	instanceNameDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-name.description',
+		defaultMessage: '$INST_NAME: The name of the instance',
+	},
+	instanceIdDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-id.description',
+		defaultMessage: "$INST_ID: The name of the instance's folder",
+	},
+	instanceDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-dir.description',
+		defaultMessage: "$INST_DIR: The absolute path to the instance's folder",
+	},
+	instanceMcDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-mc-dir.description',
+		defaultMessage: '$INST_MC_DIR: An alias for $INST_DIR',
+	},
+	instanceJavaDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java.description',
+		defaultMessage: '$INST_JAVA: The absolute path to the java binary',
+	},
+	instanceJavaArgsDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java-args.description',
+		defaultMessage: '$INST_JAVA_ARGS: The JVM Arguments provided to the game',
+	},
 })
 
 const fetchSettings = await get()
@@ -327,6 +356,18 @@ watch(
 				<p class="m-0 leading-tight">
 					{{ formatMessage(messages.postExitHookDescription) }}
 				</p>
+			</div>
+
+			<div class="m-0 leading-tight">
+				{{ formatMessage(messages.hookVariablesDescription) }}
+				<ul>
+					<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
+				</ul>
 			</div>
 		</div>
 	</div>

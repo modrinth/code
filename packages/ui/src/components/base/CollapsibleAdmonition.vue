@@ -17,24 +17,26 @@
 					</span>
 				</div>
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular type="highlight-colored-text" :color="buttonColors[type]">
-						<button aria-label="Toggle" @click.stop="expanded = !expanded">
-							<ChevronDownIcon
-								class="h-4 w-4 transition-transform duration-300"
-								:class="expanded && 'rotate-180'"
-							/>
-						</button>
-					</ButtonStyled>
-					<ButtonStyled
-						v-if="dismissible"
-						circular
-						type="highlight-colored-text"
+					<IconButton
+						type="quiet"
 						:color="buttonColors[type]"
+						label="Toggle"
+						@click.stop="expanded = !expanded"
 					>
-						<button aria-label="Dismiss" @click.stop="handleDismiss">
-							<XIcon class="h-4 w-4" />
-						</button>
-					</ButtonStyled>
+						<ChevronDownIcon
+							class="h-4 w-4 transition-transform duration-300"
+							:class="expanded && 'rotate-180'"
+						/>
+					</IconButton>
+					<IconButton
+						v-if="dismissible"
+						type="quiet"
+						:color="buttonColors[type]"
+						label="Dismiss"
+						@click.stop="handleDismiss"
+					>
+						<XIcon class="h-4 w-4" />
+					</IconButton>
 				</div>
 			</div>
 
@@ -72,7 +74,7 @@
 import { ChevronDownIcon, LightBulbIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import ButtonStyled from './ButtonStyled.vue'
+import { IconButton } from '#ui/components/base/buttons'
 
 export interface CollapsibleAdmonitionItem {
 	title: string
@@ -130,51 +132,51 @@ const buttonColors: Record<string, 'blue' | 'orange' | 'red' | 'green'> = {
 
 <style scoped>
 .collapsible-admonition[data-type='critical'] {
-	border-color: rgba(255, 73, 110, 0.6);
+	border-color: color-mix(in srgb, var(--color-red) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='critical'] .collapsible-admonition__item {
-	background: rgba(255, 73, 110, 0.1);
+	background: var(--color-red-bg);
 }
 
 .collapsible-admonition[data-type='critical'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(255, 73, 110, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-red) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='info'] {
-	border-color: rgba(47, 158, 255, 0.6);
+	border-color: color-mix(in srgb, var(--color-blue) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='info'] .collapsible-admonition__item {
-	background: rgba(47, 158, 255, 0.1);
+	background: var(--color-blue-bg);
 }
 
 .collapsible-admonition[data-type='info'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(47, 158, 255, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-blue) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='warning'] {
-	border-color: rgba(255, 163, 71, 0.6);
+	border-color: color-mix(in srgb, var(--color-orange) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='warning'] .collapsible-admonition__item {
-	background: rgba(255, 163, 71, 0.1);
+	background: var(--color-orange-bg);
 }
 
 .collapsible-admonition[data-type='warning'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(255, 163, 71, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-orange) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='success'] {
-	border-color: rgba(27, 217, 106, 0.6);
+	border-color: color-mix(in srgb, var(--color-green) 60%, transparent);
 }
 
 .collapsible-admonition[data-type='success'] .collapsible-admonition__item {
-	background: rgba(27, 217, 106, 0.1);
+	background: var(--color-green-bg);
 }
 
 .collapsible-admonition[data-type='success'] .collapsible-admonition__item--bordered {
-	border-top: 1px solid rgba(27, 217, 106, 0.6);
+	border-top: 1px solid color-mix(in srgb, var(--color-green) 60%, transparent);
 }
 
 .collapsible-admonition-enter-active,

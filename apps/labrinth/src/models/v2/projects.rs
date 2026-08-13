@@ -3,7 +3,10 @@ use std::convert::TryFrom;
 use std::collections::HashMap;
 
 use super::super::ids::OrganizationId;
-use crate::database::models::{DatabaseError, version_item};
+use crate::database::models::{
+    DBProjectDisclosure, DBProjectId, DatabaseError, version_item,
+};
+use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
@@ -28,6 +31,8 @@ pub struct LegacyProject {
     pub server_side: LegacySideType,
     /// A list of game versions this project supports
     pub game_versions: Vec<String>,
+    /// The environments this project supports
+    pub environment: Vec<String>,
 
     // All other fields are the same as V3
     // If they change, or their constituent types change, we may need to
@@ -56,6 +61,7 @@ pub struct LegacyProject {
     pub loaders: Vec<String>,
     pub versions: Vec<VersionId>,
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub issues_url: Option<String>,
     pub source_url: Option<String>,
     pub wiki_url: Option<String>,
@@ -120,6 +126,14 @@ impl LegacyProject {
         let game_versions = data
             .fields
             .get("game_versions")
+            .unwrap_or(&Vec::new())
+            .iter()
+            .filter_map(|v| v.as_str())
+            .map(|v| v.to_string())
+            .collect();
+        let environment = data
+            .fields
+            .get("environment")
             .unwrap_or(&Vec::new())
             .iter()
             .filter_map(|v| v.as_str())
@@ -205,6 +219,7 @@ impl LegacyProject {
             loaders,
             versions: data.versions,
             icon_url: data.icon_url,
+            raw_icon_url: data.raw_icon_url,
             issues_url,
             source_url,
             wiki_url,
@@ -221,32 +236,47 @@ impl LegacyProject {
             client_side,
             server_side,
             game_versions,
+            environment,
         }
     }
 
     // Because from needs a version_item, this is a helper function to get many from one db query.
-    pub async fn from_many<'a, E>(
+    pub async fn from_many(
         data: Vec<Project>,
-        exec: E,
+        pool: &crate::database::PgPool,
         redis: &RedisPool,
-    ) -> Result<Vec<Self>, DatabaseError>
-    where
-        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
-    {
+    ) -> Result<Vec<Self>, DatabaseError> {
         let version_ids: Vec<_> = data
             .iter()
             .filter_map(|p| p.versions.first().map(|i| (*i).into()))
             .collect();
+        let project_ids: Vec<DBProjectId> =
+            data.iter().map(|p| p.id.into()).collect();
+
         let example_versions =
-            version_item::DBVersion::get_many(&version_ids, exec, redis)
+            version_item::DBVersion::get_many(&version_ids, pool, redis)
                 .await?;
+        let archived_disclosure_ids = DBProjectDisclosure::projects_with_type(
+            ProjectDisclosureType::Archived,
+            &project_ids,
+            pool,
+        )
+        .await?;
+
         let mut legacy_projects = Vec::new();
         for project in data {
             let version_item = example_versions
                 .iter()
                 .find(|v| v.inner.project_id == project.id.into())
                 .cloned();
-            let project = LegacyProject::from(project, version_item);
+            let has_archived_disclosure =
+                archived_disclosure_ids.contains(&project.id.into());
+            let mut project = LegacyProject::from(project, version_item);
+            if has_archived_disclosure
+                && project.status == ProjectStatus::Approved
+            {
+                project.status = ProjectStatus::Archived;
+            }
             legacy_projects.push(project);
         }
         Ok(legacy_projects)
@@ -302,6 +332,9 @@ pub struct LegacyVersion {
     /// A list of loaders this project supports (has a newtype struct)
     pub loaders: Vec<Loader>,
 
+    /// The environment this version supports
+    pub environment: String,
+
     pub id: VersionId,
     pub project_id: ProjectId,
     pub author_id: UserId,
@@ -332,6 +365,12 @@ impl From<Version> for LegacyVersion {
                 }
             }
         }
+        let environment = data
+            .fields
+            .get("environment")
+            .and_then(|value| value.as_str())
+            .unwrap_or("unknown")
+            .to_string();
 
         // - if loader is mrpack, this is a modpack
         // the v2 loaders are whatever the corresponding loader fields are
@@ -366,6 +405,7 @@ impl From<Version> for LegacyVersion {
             dependencies: data.dependencies,
             game_versions,
             loaders,
+            environment,
         }
     }
 }

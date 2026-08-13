@@ -7,10 +7,11 @@ import {
 	StarIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { Button, IconButton } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
+	commonMessages,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
@@ -61,10 +62,6 @@ const messages = defineMessages({
 		id: 'modpack-scan-modal.scanning',
 		defaultMessage: 'Scanning...',
 	},
-	success: {
-		id: 'modpack-scan-modal.success',
-		defaultMessage: 'Success',
-	},
 	failed: {
 		id: 'modpack-scan-modal.failed',
 		defaultMessage: 'Failed',
@@ -101,10 +98,6 @@ const messages = defineMessages({
 		id: 'modpack-scan-modal.delete-all-groups-confirmation.description',
 		defaultMessage:
 			'This will permanently delete all attribution groups for this project and all files inside them. This action cannot be undone.',
-	},
-	deleteAllGroupsConfirmationProceed: {
-		id: 'modpack-scan-modal.delete-all-groups.proceed',
-		defaultMessage: 'Clear',
 	},
 	deleteAllGroupsSuccess: {
 		id: 'modpack-scan-modal.delete-all-groups.success',
@@ -344,7 +337,7 @@ async function clearAllGroups() {
 	if (!failed) {
 		addNotification({
 			type: 'success',
-			title: formatMessage(messages.success),
+			title: formatMessage(commonMessages.successLabel),
 			text: formatMessage(messages.deleteAllGroupsSuccess),
 		})
 	}
@@ -369,7 +362,7 @@ defineExpose({ show, hide })
 		ref="clearModalRef"
 		:title="formatMessage(messages.deleteAllGroupsConfirmationTitle)"
 		:description="formatMessage(messages.deleteAllGroupsConfirmationDescription)"
-		:proceed-label="formatMessage(messages.deleteAllGroupsConfirmationProceed)"
+		:proceed-label="formatMessage(commonMessages.clearButton)"
 		@proceed="clearAllGroups"
 	/>
 
@@ -405,26 +398,26 @@ defineExpose({ show, hide })
 							</span>
 						</template>
 					</Combobox>
-					<ButtonStyled circular color="red" color-fill="none">
-						<button
-							v-tooltip="formatMessage(messages.deleteAllGroups)"
-							:disabled="titleButtonsDisabled"
-							@click="showConfirmClearGroups"
-						>
-							<TrashIcon v-if="!isClearing" aria-hidden="true" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular>
-						<button
-							v-tooltip="formatMessage(messages.scanAllFiles)"
-							:disabled="titleButtonsDisabled"
-							@click="fetchAllScans"
-						>
-							<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-tooltip="formatMessage(messages.deleteAllGroups)"
+						type="quiet"
+						color="red"
+						:label="formatMessage(messages.deleteAllGroups)"
+						:disabled="titleButtonsDisabled"
+						@click="showConfirmClearGroups"
+					>
+						<TrashIcon v-if="!isClearing" aria-hidden="true" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</IconButton>
+					<IconButton
+						v-tooltip="formatMessage(messages.scanAllFiles)"
+						:label="formatMessage(messages.scanAllFiles)"
+						:disabled="titleButtonsDisabled"
+						@click="fetchAllScans"
+					>
+						<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</IconButton>
 				</div>
 			</div>
 		</template>
@@ -454,17 +447,15 @@ defineExpose({ show, hide })
 				<template #cell-newFiles="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<ButtonStyled
-							class="justify-self-center"
-							color="red"
+						<Button
 							type="outlined"
-							hover-color-fill="background"
+							:disabled="rescanButtonsDisabled"
+							class="justify-self-center !text-red !shadow-[inset_0_0_0_1px_var(--color-red)] hover:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!bg-red focus-visible:!text-[var(--color-accent-contrast)] [&>svg]:!text-red"
+							@click="() => fetchScan(row.id)"
 						>
-							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
-								<RotateCounterClockwiseIcon />
-								{{ formatMessage(messages.failed) }}
-							</button>
-						</ButtonStyled>
+							<RotateCounterClockwiseIcon />
+							{{ formatMessage(messages.failed) }}
+						</Button>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_files }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>
@@ -472,17 +463,15 @@ defineExpose({ show, hide })
 				<template #cell-newGroups="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
 					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
-						<ButtonStyled
-							class="justify-self-center"
-							color="red"
+						<Button
 							type="outlined"
-							hover-color-fill="background"
+							:disabled="rescanButtonsDisabled"
+							class="justify-self-center !text-red !shadow-[inset_0_0_0_1px_var(--color-red)] hover:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!bg-red focus-visible:!text-[var(--color-accent-contrast)] [&>svg]:!text-red"
+							@click="() => fetchScan(row.id)"
 						>
-							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
-								<RotateCounterClockwiseIcon />
-								{{ formatMessage(messages.failed) }}
-							</button>
-						</ButtonStyled>
+							<RotateCounterClockwiseIcon />
+							{{ formatMessage(messages.failed) }}
+						</Button>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_groups }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>

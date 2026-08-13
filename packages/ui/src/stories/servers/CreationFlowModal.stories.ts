@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import type { CreationFlowContextValue } from '../../components/flows/creation-flow-modal/creation-flow-context'
 import CreationFlowModal from '../../components/flows/creation-flow-modal/index.vue'
 
@@ -23,7 +23,7 @@ type Story = StoryObj<typeof meta>
 export const CreateWorld: Story = {
 	name: 'Create World (Hosting)',
 	render: () => ({
-		components: { CreationFlowModal, ButtonStyled },
+		components: { CreationFlowModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 			const lastEvent = ref('')
@@ -36,9 +36,7 @@ export const CreateWorld: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4 items-center">
-				<ButtonStyled color="brand">
-					<button @click="openModal">Create World</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">Create World</Button>
 				<p v-if="lastEvent" class="text-sm text-secondary mt-2">Last event: {{ lastEvent }}</p>
 				<CreationFlowModal
 					ref="modalRef"
@@ -60,7 +58,7 @@ export const CreateWorld: Story = {
 export const ServerOnboarding: Story = {
 	name: 'Server Setup (Legacy) (Hosting)',
 	render: () => ({
-		components: { CreationFlowModal, ButtonStyled },
+		components: { CreationFlowModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 			const lastEvent = ref('')
@@ -73,9 +71,7 @@ export const ServerOnboarding: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4 items-center">
-				<ButtonStyled color="brand">
-					<button @click="openModal">Set Up Server</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">Set Up Server</Button>
 				<p v-if="lastEvent" class="text-sm text-secondary mt-2">Last event: {{ lastEvent }}</p>
 				<CreationFlowModal
 					ref="modalRef"
@@ -97,7 +93,7 @@ export const ServerOnboarding: Story = {
 export const Instance: Story = {
 	name: 'Create Instance (App)',
 	render: () => ({
-		components: { CreationFlowModal, ButtonStyled },
+		components: { CreationFlowModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 			const lastEvent = ref('')
@@ -110,9 +106,7 @@ export const Instance: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4 items-center">
-				<ButtonStyled color="brand">
-					<button @click="openModal">Create Instance</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">Create Instance</Button>
 				<p v-if="lastEvent" class="text-sm text-secondary mt-2">Last event: {{ lastEvent }}</p>
 				<CreationFlowModal
 					ref="modalRef"

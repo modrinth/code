@@ -1,25 +1,25 @@
-- [Adding a New API Module](#adding-a-new-api-module)
-	- [Steps](#steps)
-		- [1. Define types in the module's `types.ts`](#1-define-types-in-the-modules-typests)
+- [Add an API module](#add-an-api-module)
+	- [Procedure](#procedure)
+		- [1. Define types in `types.ts`](#1-define-types-in-typests)
 		- [2. Create the module class](#2-create-the-module-class)
 			- [Request options](#request-options)
-			- [For uploads](#for-uploads)
-		- [3. Register in the MODULE\_REGISTRY](#3-register-in-the-module_registry)
+			- [File uploads](#file-uploads)
+		- [3. Register the module](#3-register-the-module)
 		- [4. Export types](#4-export-types)
-	- [Naming Conventions](#naming-conventions)
-	- [Key Files](#key-files)
+	- [Naming conventions](#naming-conventions)
+	- [Key files](#key-files)
 
-# Adding a New API Module
+# Add an API Module
 
-How to add a new API endpoint module to `packages/api-client`.
+Use this procedure to add an API endpoint module to `packages/api-client`.
 
-## Steps
+## Procedure
 
-### 1. Define types in the module's `types.ts`
+### 1. Define Types in `types.ts`
 
-Types must match 1:1 with the backend API response. Do not reshape, rename, or omit fields.
+Make the types match the backend API response exactly. Do not change, rename, or remove fields.
 
-Add to an existing namespace or create a new one:
+Add the types to an existing namespace, or make a new namespace:
 
 ```ts
 // modules/labrinth/types.ts (existing namespace)
@@ -30,7 +30,7 @@ export namespace Labrinth {
 				id: string
 				name: string
 				created: string
-				// ... matches API response exactly
+				// Match the API response exactly.
 			}
 
 			export type CreateThingRequest = {
@@ -41,11 +41,11 @@ export namespace Labrinth {
 }
 ```
 
-For a new API service, create `modules/<service>/types.ts` with a new top-level namespace and re-export it from `modules/types.ts`.
+For a new API service, make `modules/<service>/types.ts` with a new top-level namespace. Export it from `modules/types.ts`.
 
-### 2. Create the module class
+### 2. Create the Module Class
 
-Create `modules/<api>/<domain>/v<N>.ts`:
+Make `modules/<api>/<domain>/v<N>.ts`:
 
 ```ts
 // modules/labrinth/things/v3.ts
@@ -84,21 +84,21 @@ export class LabrinthThingsV3Module extends AbstractModule {
 }
 ```
 
-#### Request options
+#### Request Options
 
-| Field         | Values                                            | Purpose                            |
-| ------------- | ------------------------------------------------- | ---------------------------------- |
-| `api`         | `'labrinth'`, `'archon'`, or a full URL           | Which base URL to use              |
-| `version`     | `2`, `3`, `'internal'`, `'modrinth/v0'`, etc.     | URL version segment                |
-| `method`      | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'` | HTTP method                        |
-| `body`        | object                                            | JSON request body                  |
-| `params`      | `Record<string, string>`                          | Query parameters                   |
-| `skipAuth`    | `boolean`                                         | Skip auth feature for this request |
-| `useNodeAuth` | `boolean`                                         | Use node-level auth (kyros)        |
-| `timeout`     | `number`                                          | Request timeout in ms              |
-| `retry`       | `boolean \| number`                               | Override retry behavior            |
+| Field         | Values                                            | Purpose                                |
+| ------------- | ------------------------------------------------- | -------------------------------------- |
+| `api`         | `'labrinth'`, `'archon'`, or a full URL           | Select the base URL.                   |
+| `version`     | `2`, `3`, `'internal'`, `'modrinth/v0'`, and more | Set the URL version segment.           |
+| `method`      | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'` | Set the HTTP method.                   |
+| `body`        | object                                            | Set the JSON request body.             |
+| `params`      | `Record<string, string>`                          | Set the query parameters.              |
+| `skipAuth`    | `boolean`                                         | Bypass the authentication feature.     |
+| `useNodeAuth` | `boolean`                                         | Use node-level Kyros authentication.   |
+| `timeout`     | `number`                                          | Set the request timeout in milliseconds. |
+| `retry`       | `boolean \| number`                               | Override the retry behavior.           |
 
-#### For uploads
+#### File Uploads
 
 Return an `UploadHandle` instead of a `Promise`:
 
@@ -111,7 +111,7 @@ public uploadThing(id: string, file: File): UploadHandle<void> {
 	})
 }
 
-// Or with FormData for multipart:
+// Use FormData for a multipart upload.
 public createWithFiles(data: CreateRequest, files: File[]): UploadHandle<Thing> {
 	const formData = new FormData()
 	formData.append('data', JSON.stringify(data))
@@ -121,29 +121,29 @@ public createWithFiles(data: CreateRequest, files: File[]): UploadHandle<Thing> 
 		api: 'labrinth',
 		version: 3,
 		formData,
-		timeout: 60 * 5 * 1000,  // longer timeout for uploads
+		timeout: 60 * 5 * 1000, // Use a longer upload timeout.
 	})
 }
 ```
 
-### 3. Register in the MODULE_REGISTRY
+### 3. Register the Module
 
-Add to `modules/index.ts`:
+Add the module to `MODULE_REGISTRY` in `modules/index.ts`:
 
 ```ts
 import { LabrinthThingsV3Module } from './labrinth/things/v3'
 
 export const MODULE_REGISTRY = {
-	// ... existing modules
+	// Existing modules.
 	labrinth_things_v3: LabrinthThingsV3Module,
 } as const
 ```
 
-The naming convention is `<api>_<domain>_<version>`. This flat key gets transformed into nested access: `client.labrinth.things_v3`.
+Use `<api>_<domain>_<version>` for the key. The client converts this flat key to `client.labrinth.things_v3`.
 
-### 4. Export types
+### 4. Export Types
 
-If you added to an existing namespace, types are already re-exported. If you created a new `types.ts`, add it to `modules/types.ts`:
+Types in an existing namespace already have an export. For a new `types.ts`, add this export to `modules/types.ts`:
 
 ```ts
 export * from './<service>/types'
@@ -151,17 +151,17 @@ export * from './<service>/types'
 
 ## Naming Conventions
 
-| Convention     | Example                                              |
-| -------------- | ---------------------------------------------------- |
-| Module class   | `LabrinthThingsV3Module` — `{Api}{Domain}V{N}Module` |
-| Module ID      | `labrinth_things_v3` — `{api}_{domain}_v{n}`         |
-| Type namespace | `Labrinth.MyDomain.v3.Thing`                         |
-| File path      | `modules/labrinth/things/v3.ts`                      |
+| Item           | Example                         | Pattern                     |
+| -------------- | ------------------------------- | --------------------------- |
+| Module class   | `LabrinthThingsV3Module`        | `{Api}{Domain}V{N}Module`   |
+| Module ID      | `labrinth_things_v3`            | `{api}_{domain}_v{n}`       |
+| Type namespace | `Labrinth.MyDomain.v3.Thing`    | `Api.Domain.version.Type`   |
+| File path      | `modules/labrinth/things/v3.ts` | `modules/api/domain/vN.ts`  |
 
 ## Key Files
 
-- `src/core/abstract-module.ts` — base class all modules extend
-- `src/core/abstract-client.ts` — `request()` and `upload()` methods
-- `src/modules/index.ts` — `MODULE_REGISTRY` and `buildModuleStructure()`
-- `src/modules/<api>/types.ts` — type definitions per API
-- `src/types/upload.ts` — `UploadHandle`, `UploadProgress`, `UploadRequestOptions`
+- `src/core/abstract-module.ts`: Base class for all modules.
+- `src/core/abstract-client.ts`: Contains the `request()` and `upload()` methods.
+- `src/modules/index.ts`: Contains `MODULE_REGISTRY` and `buildModuleStructure()`.
+- `src/modules/<api>/types.ts`: Contains the types for each API.
+- `src/types/upload.ts`: Contains `UploadHandle`, `UploadProgress`, and `UploadRequestOptions`.
