@@ -204,6 +204,8 @@ onUnmounted(() => {
 					"
 					:disabled="instance.quarantined || playing || loading"
 					@click="play"
+					type="colored"
+					color="green"
 				>
 					<SpinnerIcon v-if="loading" class="animate-spin" />
 					<PlayIcon v-else aria-hidden="true" />

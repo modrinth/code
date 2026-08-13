@@ -112,7 +112,8 @@
 								v-if="item.dismissible !== false"
 								type="quiet"
 								label="Close"
-								class="-m-1.5"
+								size="sm"
+								class="-m-1.5 -mx-2"
 								@click="handleStandardNotificationDismiss(item)"
 							>
 								<XIcon />

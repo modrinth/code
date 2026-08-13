@@ -418,6 +418,8 @@ const messages = defineMessages({
 						(world.type == 'server' && !supportsServerQuickPlay) ||
 						(world.type == 'singleplayer' && !supportsWorldQuickPlay)
 					"
+					type="colored"
+					color="brand"
 					@click="emit('play')"
 				>
 					<SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />

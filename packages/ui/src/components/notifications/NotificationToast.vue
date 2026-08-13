@@ -52,10 +52,10 @@
 					<IconButton
 						v-if="dismissible"
 						type="quiet"
-						size="xs"
+						size="sm"
 						label="Dismiss notification"
 						native-type="button"
-						class="notification-toast-dismiss !size-6"
+						class="notification-toast-dismiss -m-1.5"
 						@click="$emit('dismiss')"
 					>
 						<XIcon />
@@ -101,10 +101,10 @@
 					<IconButton
 						v-if="dismissible"
 						type="quiet"
-						size="xs"
+						size="sm"
 						label="Dismiss notification"
 						native-type="button"
-						class="notification-toast-dismiss !size-6"
+						class="notification-toast-dismiss -m-1.5"
 						@click="$emit('dismiss')"
 					>
 						<XIcon />
