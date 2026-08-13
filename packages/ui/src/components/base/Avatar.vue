@@ -246,7 +246,8 @@ function hash(str: string): number {
 .avatar {
 	--_size: 2rem;
 
-	border: 1px solid var(--surface-5);
+	outline: 1px solid rgb(255 255 255 / 15%);
+	outline-offset: -1px;
 	background-color: var(--color-button-bg);
 	object-fit: contain;
 	border-radius: calc(16 / 96 * var(--_override-size, var(--_size)));
