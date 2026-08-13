@@ -100,7 +100,7 @@ impl BackgroundTask {
             }
             IncrementalIndexSearch => {
                 crate::search::incremental::consume::run(
-                    ro_pool,
+                    pool,
                     redis_pool,
                     search_backend,
                     kafka_client,
