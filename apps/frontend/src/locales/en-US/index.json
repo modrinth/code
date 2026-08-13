@@ -3458,6 +3458,12 @@
   "project.actions.back-to-project-page": {
     "message": "Back to project page"
   },
+  "project.actions.check-modpack-archives": {
+    "message": "Check modpack unzip"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "Checking..."
+  },
   "project.actions.create-server": {
     "message": "Create a server"
   },
@@ -3743,8 +3749,23 @@
   "project.moderation.title": {
     "message": "Moderation"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "Importing this .mrpack might be broken."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "This modpack was published during export bug"
+  },
   "project.navigation.changelog": {
     "message": "Changelog"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Some modpack files could not be unzipped"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "No .mrpack files were found for this project."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {The modpack file can be unzipped.} other {All # modpack files can be unzipped.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "Your project's icon has been updated."
