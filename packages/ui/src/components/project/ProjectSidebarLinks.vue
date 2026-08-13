@@ -13,7 +13,7 @@
 	>
 		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<div
-			class="flex flex-col gap-3 font-semibold [&>a]:flex [&>a]:gap-2 [&>a]:items-center [&>a]:w-fit [&>a]:text-primary [&>a]:leading-[1.2] [&>a:hover]:underline"
+			class="flex flex-col gap-3 font-normal [&>a]:flex [&>a]:gap-2 [&>a]:items-center [&>a]:w-fit [&>a]:text-primary [&>a]:leading-[1.2] [&>a:hover]:underline"
 		>
 			<a
 				v-if="project.issues_url"
@@ -21,7 +21,7 @@
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
 			>
-				<IssuesIcon aria-hidden="true" />
+				<BugIcon aria-hidden="true" />
 				{{ formatMessage(messages.issues) }}
 				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
@@ -117,6 +117,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BugIcon,
 	BuyMeACoffeeIcon,
 	CodeIcon,
 	CurrencyIcon,
@@ -124,7 +125,6 @@ import {
 	ExternalIcon,
 	GlobeIcon,
 	HeartIcon,
-	IssuesIcon,
 	KoFiIcon,
 	OpenCollectiveIcon,
 	PatreonIcon,
@@ -173,7 +173,7 @@ const messages = defineMessages({
 	},
 	discord: {
 		id: 'project.about.links.discord',
-		defaultMessage: 'Join Discord server',
+		defaultMessage: 'Discord server',
 	},
 	site: {
 		id: 'project.about.links.site',

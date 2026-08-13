@@ -42,7 +42,7 @@
 					</h1>
 				</div>
 				<h2
-					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
+					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-primary md:text-[1.2rem]"
 				>
 					{{ formatMessage(messages.hostingDescription) }}
 				</h2>
@@ -118,7 +118,7 @@
 					{{ formatMessage(messages.whyHeading) }}
 				</h1>
 				<h2
-					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-primary md:text-[18px]"
 				>
 					{{ formatMessage(messages.whyDescription) }}
 				</h2>
@@ -148,7 +148,7 @@
 							<circle cx="17.5" cy="17.5" r="3.5" />
 						</svg>
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.whereModsAre) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.whereModsAreDescription) }}
 						</h3>
 					</div>
@@ -156,7 +156,7 @@
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<TagIcon tag="fabric" enforce-type="loader" class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.yourFavoriteMods) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.yourFavoriteModsDescription) }}
 						</h3>
 					</div>
@@ -188,7 +188,7 @@
 							<path d="M14 8h.01" />
 						</svg>
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.allOnModrinth) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.allOnModrinthDescription) }}
 						</h3>
 					</div>
@@ -212,7 +212,7 @@
 						<h2 class="m-0 text-lg font-bold">
 							{{ formatMessage(messages.modernReliableHosting) }}
 						</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							<IntlFormatted :message-id="messages.modernReliableHostingDescription">
 								<template #contrast="{ children }">
 									<span class="text-contrast"><component :is="() => children" /></span>
@@ -224,7 +224,7 @@
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<ServerIcon class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.consistentlyFast) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.consistentlyFastDescription) }}
 						</h3>
 					</div>
@@ -246,7 +246,7 @@
 					{{ formatMessage(messages.includedHeading) }}
 				</h1>
 				<h2
-					class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+					class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-primary md:text-[18px]"
 				>
 					{{ formatMessage(messages.includedDescription) }}
 				</h2>
@@ -275,7 +275,7 @@
 								<path d="M2 12h20" />
 							</svg>
 							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.customUrl) }}</h2>
-							<h3 class="m-0 text-base font-normal text-secondary">
+							<h3 class="m-0 text-base font-normal text-primary">
 								<IntlFormatted :message-id="messages.customUrlDescription">
 									<template #contrast="{ children }">
 										<span class="text-contrast"><component :is="() => children" /></span>
@@ -308,7 +308,7 @@
 								<path d="m8 17 4-4 4 4" />
 							</svg>
 							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.backupsIncluded) }}</h2>
-							<h3 class="m-0 text-base font-normal text-secondary">
+							<h3 class="m-0 text-base font-normal text-primary">
 								{{ formatMessage(messages.backupsIncludedDescription) }}
 							</h3>
 						</div>
@@ -343,7 +343,7 @@
 						<h2 class="m-0 text-lg font-bold">
 							{{ formatMessage(messages.powerfulConsole) }}
 						</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.powerfulConsoleDescription) }}
 						</h3>
 					</div>
@@ -370,7 +370,7 @@
 							<path d="m15 18-2-2" />
 						</svg>
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.help) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.helpDescription) }}
 						</h3>
 					</div>
@@ -380,14 +380,14 @@
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<TransferIcon class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.sftpAccess) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.sftpAccessDescription) }}
 						</h3>
 					</div>
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<VersionIcon class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.advancedNetworking) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
+						<h3 class="m-0 text-base font-normal text-primary">
 							{{ formatMessage(messages.advancedNetworkingDescription) }}
 						</h3>
 					</div>

@@ -88,19 +88,19 @@
 			</div>
 			<div
 				class="col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
-				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
+				:class="{ 'gap-4': !flags.projectTypesPrimaryNav, 'gap-1': flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonLink
 						type="quiet"
 						to="/discover/mods"
+						size="sm"
 						:class="
-							route.name === 'discover-mods' || route.path.startsWith('/mod/')
-								? (route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary') ===
-									'main-nav-primary'
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: '!bg-[var(--color-button-bg)] !text-contrast'
-								: ''
+							route.path.startsWith('/discover/mods')
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+								: route.path.startsWith('/mod/')
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: ''
 						"
 					>
 						<BoxIcon aria-hidden="true" />
@@ -109,14 +109,13 @@
 					<ButtonLink
 						type="quiet"
 						to="/discover/resourcepacks"
+						size="sm"
 						:class="
-							route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
-								? (route.name === 'discover-resourcepacks'
-										? 'main-nav-primary'
-										: 'main-nav-secondary') === 'main-nav-primary'
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: '!bg-[var(--color-button-bg)] !text-contrast'
-								: ''
+							route.path.startsWith('/discover/resourcepacks')
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+								: route.path.startsWith('/resourcepack/')
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: ''
 						"
 					>
 						<PaintbrushIcon aria-hidden="true" />
@@ -125,14 +124,13 @@
 					<ButtonLink
 						type="quiet"
 						to="/discover/datapacks"
+						size="sm"
 						:class="
-							route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
-								? (route.name === 'discover-datapacks'
-										? 'main-nav-primary'
-										: 'main-nav-secondary') === 'main-nav-primary'
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: '!bg-[var(--color-button-bg)] !text-contrast'
-								: ''
+							route.path.startsWith('/discover/datapacks')
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+								: route.path.startsWith('/datapack/')
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: ''
 						"
 					>
 						<BracesIcon aria-hidden="true" />
@@ -140,15 +138,14 @@
 					</ButtonLink>
 					<ButtonLink
 						type="quiet"
+						size="sm"
 						to="/discover/shaders"
 						:class="
-							route.name === 'discover-shaders' || route.path.startsWith('/shader/')
-								? (route.name === 'discover-shaders'
-										? 'main-nav-primary'
-										: 'main-nav-secondary') === 'main-nav-primary'
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: '!bg-[var(--color-button-bg)] !text-contrast'
-								: ''
+							route.path.startsWith('/discover/shaders')
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+								: route.path.startsWith('/shader/')
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: ''
 						"
 					>
 						<GlassesIcon aria-hidden="true" />
@@ -173,14 +170,13 @@
 					<ButtonLink
 						type="quiet"
 						to="/discover/plugins"
+						size="sm"
 						:class="
-							route.name === 'discover-plugins' || route.path.startsWith('/plugin/')
-								? (route.name === 'discover-plugins'
-										? 'main-nav-primary'
-										: 'main-nav-secondary') === 'main-nav-primary'
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: '!bg-[var(--color-button-bg)] !text-contrast'
-								: ''
+							route.path.startsWith('/discover/plugins')
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+								: route.path.startsWith('/plugin/')
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: ''
 						"
 					>
 						<PlugIcon aria-hidden="true" />
@@ -189,14 +185,13 @@
 					<ButtonLink
 						type="quiet"
 						to="/discover/servers"
+						size="sm"
 						:class="
-							route.name === 'discover-servers' || route.path.startsWith('/server/')
-								? (route.name === 'discover-servers'
-										? 'main-nav-primary'
-										: 'main-nav-secondary') === 'main-nav-primary'
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: '!bg-[var(--color-button-bg)] !text-contrast'
-								: ''
+							route.path.startsWith('/discover/servers')
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
+								: route.path.startsWith('/server/')
+									? '!bg-[var(--color-button-bg)] !text-contrast'
+									: ''
 						"
 					>
 						<ServerIcon aria-hidden="true" />
@@ -208,6 +203,7 @@
 						type="quiet"
 						:label="formatMessage(commonMessages.moreOptionsButton)"
 						hoverable
+						:icon-only="false"
 						:options="[
 							{
 								id: 'mods',
@@ -253,7 +249,6 @@
 							},
 						]"
 						:class="[
-							'!w-auto !rounded-xl !px-2.5',
 							isDiscovering
 								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 								: isDiscoveringSubpage
@@ -368,7 +363,7 @@
 					type="quiet"
 					:icon-only="false"
 					:label="formatMessage(messages.createNew)"
-					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
+					class="btn-dropdown-animation"
 					:options="[
 						{
 							id: 'review-projects',
@@ -501,7 +496,7 @@
 					type="quiet"
 					:icon-only="false"
 					:label="formatMessage(messages.createNew)"
-					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
+					class="btn-dropdown-animation"
 					:options="[
 						{
 							id: 'new-project',
@@ -614,7 +609,7 @@
 					<ButtonLink
 						v-tooltip="formatMessage(commonMessages.settingsLabel)"
 						to="/settings"
-						class="!w-9 !rounded-full !px-0"
+						icon-only
 					>
 						<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
 					</ButtonLink>

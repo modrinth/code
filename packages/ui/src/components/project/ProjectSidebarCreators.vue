@@ -23,11 +23,11 @@
 					>
 						<Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
 						<div class="flex flex-col flex-nowrap justify-center">
-							<span class="group-hover:underline font-medium">
+							<span class="group-hover:underline text-contrast font-base">
 								{{ organization.name }}
 							</span>
-							<span class="text-sm font-normal text-secondary flex items-center gap-1"
-								><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
+							<span class="text-sm font-normal text-primary flex items-center gap-1">
+								<OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
 							>
 						</div>
 					</AutoLink>
@@ -36,13 +36,15 @@
 				<AutoLink
 					v-for="member in sortedMembers"
 					:key="`member-${member.id}`"
-					class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
+					class="flex gap-2 items-center w-fit leading-[1.2] group"
 					:to="userLink(member.user.username)"
 					:target="resolveLinkTarget(userLinkTarget)"
 				>
 					<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
 					<div class="flex flex-col">
-						<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
+						<span
+							class="flex w-full flex-nowrap items-center gap-1 text-contrast font-normal group-hover:underline"
+						>
 							<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
 							<CrownIcon
 								v-if="member.is_owner"
@@ -51,7 +53,7 @@
 							/>
 							<ExternalIcon v-if="resolveLinkTarget(userLinkTarget) === '_blank'" />
 						</span>
-						<span class="text-sm font-normal text-secondary">{{ member.role }}</span>
+						<span class="text-sm font-normal">{{ member.role }}</span>
 					</div>
 				</AutoLink>
 			</template>

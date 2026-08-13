@@ -63,6 +63,7 @@ import _BoxesIcon from './icons/boxes.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
 import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
 import _BugIcon from './icons/bug.svg?component'
+import _BulletListIcon from './icons/bullet-list.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CalendarArrowDownIcon from './icons/calendar-arrow-down.svg?component'
 import _CardIcon from './icons/card.svg?component'
@@ -77,6 +78,8 @@ import _ChevronDownIcon from './icons/chevron-down.svg?component'
 import _ChevronLeftIcon from './icons/chevron-left.svg?component'
 import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _ChevronUpIcon from './icons/chevron-up.svg?component'
+import _ChevronsDownUpIcon from './icons/chevrons-down-up.svg?component'
+import _ChevronsUpDownIcon from './icons/chevrons-up-down.svg?component'
 import _CircleAlertIcon from './icons/circle-alert.svg?component'
 import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleDashedIcon from './icons/circle-dashed.svg?component'
@@ -496,6 +499,7 @@ export const BoxesIcon = _BoxesIcon
 export const BracesIcon = _BracesIcon
 export const BrushCleaningIcon = _BrushCleaningIcon
 export const BugIcon = _BugIcon
+export const BulletListIcon = _BulletListIcon
 export const CalendarIcon = _CalendarIcon
 export const CalendarArrowDownIcon = _CalendarArrowDownIcon
 export const CardIcon = _CardIcon
@@ -510,6 +514,8 @@ export const ChevronDownIcon = _ChevronDownIcon
 export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
 export const ChevronUpIcon = _ChevronUpIcon
+export const ChevronsDownUpIcon = _ChevronsDownUpIcon
+export const ChevronsUpDownIcon = _ChevronsUpDownIcon
 export const CircleAlertIcon = _CircleAlertIcon
 export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleDashedIcon = _CircleDashedIcon

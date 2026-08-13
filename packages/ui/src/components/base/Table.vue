@@ -102,7 +102,7 @@
 								<td
 									v-for="column in columns"
 									:key="column.key"
-									class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
+									class="text-primary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
 									:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
 								>
 									<slot
@@ -169,7 +169,7 @@
 								<td
 									v-for="column in columns"
 									:key="column.key"
-									class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
+									class="text-primary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
 									:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
 								>
 									<slot

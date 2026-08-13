@@ -310,9 +310,9 @@ html {
 	--color-gray-950: #303136;
 	--color-gray: var(--color-gray-500);
 
-	--color-text-primary: #ffffff;
+	--color-text-primary: #ebebeb;
 	--color-text-default: #b0bac5;
-	--color-text-tertiary: #96a2b0;
+	--color-text-tertiary: #80878f;
 
 	// ===
 
@@ -330,7 +330,7 @@ html {
 	--color-base: var(--color-text-default);
 	--color-secondary: var(--color-text-tertiary);
 	--color-contrast: var(--color-text-primary);
-	--color-accent-contrast: #000000;
+	--color-accent-contrast: rgba(0, 0, 0, 0.9);
 
 	--color-red-highlight: rgba(255, 73, 110, 0.25);
 	--color-orange-highlight: rgba(255, 163, 71, 0.25);
@@ -346,7 +346,7 @@ html {
 	--color-purple-bg: rgba(199, 138, 255, 0.2);
 
 	--color-brand: var(--color-green);
-	--color-brand-highlight: rgba(27, 217, 106, 0.25);
+	--color-brand-highlight: rgba(27, 217, 106, 0.3);
 	--color-brand-shadow: rgba(27, 217, 106, 0.7);
 
 	--shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 11%, 0.1);
