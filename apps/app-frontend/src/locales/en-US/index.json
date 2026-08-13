@@ -273,7 +273,7 @@
     "message": "Modpacks"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content."
+    "message": "Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated."
   },
   "app.browse.server.installing": {
     "message": "Installing"
@@ -395,17 +395,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Review changes"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Review update"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Reviewing..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "An update is required to play {name}. Please update to latest version to launch the game."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "An update is available"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
@@ -418,6 +409,12 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Delete instance"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Modpack content"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Shared content"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "This modpack is already installed in the <bold>{instanceName}</bold> instance. Are you sure you want to duplicate it?"
@@ -443,6 +440,9 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "Freeze version"
+  },
   "app.instance.mods.locked-content": {
     "message": "Content in locked instances cannot be changed."
   },
@@ -460,6 +460,9 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Unfreeze version"
   },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"
@@ -703,6 +706,9 @@
   },
   "app.modal.install-to-play.invite-warning-with-creator": {
     "message": "This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust."
+  },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "Modpack content"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
@@ -1475,6 +1481,9 @@
   "instance.files.save-as": {
     "message": "Save as..."
   },
+  "instance.last-played": {
+    "message": "Last played"
+  },
   "instance.locked.delete-button": {
     "message": "Delete instance"
   },
@@ -1940,17 +1949,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Sync with instance"
   },
-  "search.filter.locked.server": {
-    "message": "Provided by the server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Only client-side mods can be added to the server instance"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Game version is provided by the server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader is provided by the server"
   },
   "settings.sidebar.label.account": {
     "message": "Account"

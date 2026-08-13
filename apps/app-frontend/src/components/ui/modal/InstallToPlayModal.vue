@@ -140,10 +140,11 @@
 		</div>
 	</NewModal>
 
-	<ModpackContentModal
-		ref="modpackContentModal"
-		:modpack-name="project?.name ?? ''"
-		:modpack-icon-url="project?.icon_url ?? undefined"
+	<ManagedContentModal
+		ref="managedContentModal"
+		:header="formatMessage(messages.modpackContent)"
+		:source-name="project?.name ?? ''"
+		:source-icon-url="project?.icon_url ?? undefined"
 	/>
 </template>
 
@@ -158,7 +159,7 @@ import {
 	type ContentItem,
 	defineMessages,
 	formatLoader,
-	ModpackContentModal,
+	ManagedContentModal,
 	NewModal,
 	Table,
 	type TableColumn,
@@ -267,10 +268,10 @@ function handleReport() {
 	}
 }
 
-const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
+const managedContentModal = ref<InstanceType<typeof ManagedContentModal>>()
 
 async function openViewContents() {
-	modpackContentModal.value?.showLoading()
+	managedContentModal.value?.showLoading()
 	try {
 		// Ensure version data is available — the useQuery may not have resolved yet
 		const versionId = modpackVersionId.value
@@ -328,10 +329,10 @@ async function openViewContents() {
 				}
 			},
 		)
-		modpackContentModal.value?.show(contentItems)
+		managedContentModal.value?.show(contentItems)
 	} catch (err) {
 		console.error('Failed to load modpack contents:', err)
-		modpackContentModal.value?.show([])
+		managedContentModal.value?.show([])
 	}
 }
 
@@ -360,6 +361,10 @@ function hide() {
 }
 
 const messages = defineMessages({
+	modpackContent: {
+		id: 'app.modal.install-to-play.managed-content.modpack-header',
+		defaultMessage: 'Modpack content',
+	},
 	installToPlay: {
 		id: 'app.modal.install-to-play.header',
 		defaultMessage: 'Install to play',

@@ -965,16 +965,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchronizováno s instancí"
   },
-  "search.filter.locked.server": {
-    "message": "Poskytováno serverem"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Pouze módy ze strany klientu mohou být přidány na server"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Verze hry je poskytována serverem"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader zprostředkovává server"
   }
 }

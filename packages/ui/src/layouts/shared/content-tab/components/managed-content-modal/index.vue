@@ -3,7 +3,6 @@ import {
 	ArrowLeftRightIcon,
 	BoxIcon,
 	ExternalIcon,
-	FilterIcon,
 	GlassesIcon,
 	PaintbrushIcon,
 	SearchIcon,
@@ -17,6 +16,7 @@ import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
+import FilterPills from '#ui/components/base/FilterPills.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -28,7 +28,7 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { getClientWarningType, isClientOnlyEnvironment } from '../../composables/content-filtering'
+import { getClientWarningType } from '../../composables/content-filtering'
 import type { ContentCardProject, ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
@@ -38,24 +38,26 @@ const pageContext = injectPageContext(null)
 
 interface Props {
 	header?: string
-	modpackName?: string
-	modpackIconUrl?: string
+	sourceName?: string
+	sourceIconUrl?: string
 	enableToggle?: boolean
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 	switchVersion?: (item: ContentItem) => void
+	showEnvironmentWarnings?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	header: undefined,
-	modpackName: undefined,
-	modpackIconUrl: undefined,
+	sourceName: undefined,
+	sourceIconUrl: undefined,
 	enableToggle: false,
 	actionDisabled: false,
 	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
 	switchVersion: undefined,
+	showEnvironmentWarnings: false,
 })
 
 const emit = defineEmits<{
@@ -67,44 +69,44 @@ const emit = defineEmits<{
 
 const messages = defineMessages({
 	header: {
-		id: 'instances.modpack-content-modal.header',
-		defaultMessage: 'Modpack content',
+		id: 'instances.managed-content-modal.header',
+		defaultMessage: 'Managed content',
 	},
 	searchPlaceholder: {
-		id: 'instances.modpack-content-modal.search-placeholder',
+		id: 'instances.managed-content-modal.search-placeholder',
 		defaultMessage: 'Search {count, number} {count, plural, one {project} other {projects}}',
 	},
 	loading: {
-		id: 'instances.modpack-content-modal.loading',
+		id: 'instances.managed-content-modal.loading',
 		defaultMessage: 'Loading content...',
 	},
 	emptyTitle: {
-		id: 'instances.modpack-content-modal.empty-title',
+		id: 'instances.managed-content-modal.empty-title',
 		defaultMessage: 'No content found',
 	},
 	emptyDescription: {
-		id: 'instances.modpack-content-modal.empty-description',
-		defaultMessage: 'This modpack does not include any additional content.',
+		id: 'instances.managed-content-modal.empty-description',
+		defaultMessage: 'This source does not include any managed content.',
 	},
 	noResults: {
-		id: 'instances.modpack-content-modal.no-results',
+		id: 'instances.managed-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
 	externalContent: {
-		id: 'instances.modpack-content-modal.external-content',
+		id: 'instances.managed-content-modal.external-content',
 		defaultMessage: 'External',
 	},
 	externalContentDescription: {
-		id: 'instances.modpack-content-modal.external-content-description',
+		id: 'instances.managed-content-modal.external-content-description',
 		defaultMessage: 'This file is not published on Modrinth.',
 	},
 	openInSlicer: {
-		id: 'instances.modpack-content-modal.open-in-slicer',
+		id: 'instances.managed-content-modal.open-in-slicer',
 		defaultMessage: 'Open in Slicer',
 	},
 })
 
-export interface ModpackContentModalState {
+export interface ManagedContentModalState {
 	items: ContentItem[]
 	searchQuery: string
 	selectedFilters: string[]
@@ -124,6 +126,7 @@ const selectedIds = ref<string[]>([])
 const selectedItems = computed(() =>
 	items.value.filter((item) => selectedIds.value.includes(item.id)),
 )
+const toggleableSelectedItems = computed(() => selectedItems.value)
 
 const allSelected = computed(() => {
 	if (filteredItems.value.length === 0) return false
@@ -173,7 +176,9 @@ const filterOptions = computed(() => {
 			}
 		})
 
-	if (items.value.some((item) => getClientWarningType(item) !== null)) {
+	if (
+		items.value.some((item) => getClientWarningType(item, props.showEnvironmentWarnings) !== null)
+	) {
 		options.push({ id: 'warnings', label: 'Warnings' })
 	}
 
@@ -193,15 +198,6 @@ const stats = computed(() => {
 	return counts
 })
 
-function toggleFilter(filterId: string) {
-	const index = selectedFilters.value.indexOf(filterId)
-	if (index === -1) {
-		selectedFilters.value.push(filterId)
-	} else {
-		selectedFilters.value.splice(index, 1)
-	}
-}
-
 const attributeFilterIds = new Set(['disabled', 'warnings'])
 
 const typeFilteredCount = computed(() => {
@@ -213,7 +209,8 @@ const typeFilteredCount = computed(() => {
 		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
 			return false
 		if (hasDisabledFilter && item.enabled) return false
-		if (hasWarningsFilter && getClientWarningType(item) === null) return false
+		if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
+			return false
 		return true
 	}).length
 })
@@ -236,7 +233,8 @@ const filteredItems = computed(() => {
 			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
 				return false
 			if (hasDisabledFilter && item.enabled) return false
-			if (hasWarningsFilter && getClientWarningType(item) === null) return false
+			if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
+				return false
 			return true
 		})
 	}
@@ -244,19 +242,24 @@ const filteredItems = computed(() => {
 	return sortContentItems(result, !query)
 })
 
+function contentVersionLabel(item: ContentItem): string {
+	if (item.embedded_metadata?.version) return item.embedded_metadata.version
+	return formatMessage(commonMessages.unknownLabel)
+}
+
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
 		id: item.id,
 		project: item.project ?? {
 			id: item.id,
 			slug: null,
-			title: item.file_name,
-			icon_url: null,
+			title: item.embedded_metadata?.name ?? item.file_name,
+			icon_url: item.embedded_metadata?.icon_url ?? null,
 		},
 		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
 			id: item.id,
-			version_number: 'Unknown',
+			version_number: contentVersionLabel(item),
 			file_name: item.file_name,
 		},
 		owner: item.owner
@@ -275,19 +278,17 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		locked: item.locked,
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
-		isClientOnly:
-			isClientOnlyEnvironment(item.environment) ||
-			!!item.pack_client_retained ||
-			!!item.pack_client_depends,
-		clientWarning: getClientWarningType(item),
+		isClientOnly: getClientWarningType(item, props.showEnvironmentWarnings) !== null,
+		clientWarning: getClientWarningType(item, props.showEnvironmentWarnings),
 		disabled:
 			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
 		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		overflowOptions: [
-			...(props.switchVersion
+			...(props.switchVersion && !item.locked
 				? [
 						{
 							id: 'switch-version',
@@ -359,13 +360,13 @@ function handleEnabledChange(id: string, value: boolean) {
 
 function bulkEnable() {
 	if (props.actionDisabled) return
-	emit('bulk:enable', [...selectedItems.value])
+	emit('bulk:enable', [...toggleableSelectedItems.value])
 	selectedIds.value = []
 }
 
 function bulkDisable() {
 	if (props.actionDisabled) return
-	emit('bulk:disable', [...selectedItems.value])
+	emit('bulk:disable', [...toggleableSelectedItems.value])
 	selectedIds.value = []
 }
 
@@ -404,7 +405,7 @@ function handleHide() {
 	emit('hide')
 }
 
-function getState(): ModpackContentModalState | null {
+function getState(): ManagedContentModalState | null {
 	if (!items.value.length) return null
 	return {
 		items: items.value,
@@ -414,7 +415,7 @@ function getState(): ModpackContentModalState | null {
 	}
 }
 
-async function restore(state: ModpackContentModalState) {
+async function restore(state: ManagedContentModalState) {
 	items.value = state.items.map((item) => ({ ...item }))
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
@@ -466,10 +467,11 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 	>
 		<template #title>
 			<Avatar
-				v-if="props.modpackIconUrl"
-				:src="props.modpackIconUrl"
+				v-if="props.sourceIconUrl"
+				:src="props.sourceIconUrl"
+				:alt="props.sourceName"
 				size="3rem"
-				:tint-by="props.modpackName"
+				:tint-by="props.sourceName"
 			/>
 			<span class="text-lg font-extrabold text-contrast">
 				{{ props.header ?? formatMessage(messages.header) }}
@@ -484,43 +486,18 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					clearable
 				/>
 
-				<!-- Filters -->
-				<div v-if="filterOptions.length > 0" class="flex items-center gap-2">
-					<FilterIcon class="size-5 text-secondary shrink-0" />
-					<div class="flex flex-wrap items-center gap-1.5">
-						<button
-							:aria-pressed="selectedFilters.length === 0"
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
-							:class="
-								selectedFilters.length === 0
-									? 'border-brand bg-brand-highlight text-brand'
-									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-							"
-							@click="selectedFilters = []"
-						>
-							{{ formatMessage(commonMessages.allProjectType) }}
-						</button>
-						<button
-							v-for="option in filterOptions"
-							:key="option.id"
-							:aria-pressed="selectedFilters.includes(option.id)"
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
-							:class="
-								selectedFilters.includes(option.id)
-									? 'border-brand bg-brand-highlight text-brand'
-									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-							"
-							@click="toggleFilter(option.id)"
-						>
-							{{ option.label }}
-						</button>
-					</div>
-				</div>
+				<FilterPills
+					v-if="filterOptions.length > 0"
+					v-model="selectedFilters"
+					:options="filterOptions"
+				>
+					<template #all>
+						{{ formatMessage(commonMessages.allProjectType) }}
+					</template>
+				</FilterPills>
 			</div>
 
-			<!-- Content area -->
 			<div class="flex-1 flex flex-col min-h-0 overflow-hidden">
-				<!-- Loading state -->
 				<div
 					v-if="loading"
 					class="flex flex-col items-center justify-center flex-1 gap-2 text-secondary"
@@ -529,7 +506,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-sm">{{ formatMessage(messages.loading) }}</span>
 				</div>
 
-				<!-- Empty state -->
 				<div
 					v-else-if="items.length === 0"
 					class="flex flex-col items-center justify-center flex-1 gap-2 text-center p-8"
@@ -540,7 +516,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-secondary">{{ formatMessage(messages.emptyDescription) }}</span>
 				</div>
 
-				<!-- No search results -->
 				<div
 					v-else-if="filteredItems.length === 0"
 					class="flex flex-col items-center justify-center flex-1 gap-2 text-center p-8"
@@ -548,7 +523,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-secondary">{{ formatMessage(messages.noResults) }}</span>
 				</div>
 
-				<!-- Content table -->
 				<div v-else class="@container flex-1 min-h-0 flex flex-col">
 					<div
 						class="flex h-12 shrink-0 items-center justify-between gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
@@ -630,11 +604,9 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				</div>
 			</div>
 
-			<!-- Footer -->
 			<div
 				class="flex items-center justify-between px-6 py-4 border-t border-solid border-0 border-surface-4 shrink-0"
 			>
-				<!-- Stats -->
 				<div class="flex items-center gap-2">
 					<template v-for="(count, type, idx) in stats" :key="type">
 						<BulletDivider v-if="idx > 0" />
@@ -662,6 +634,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		<ContentSelectionBar
 			v-if="props.enableToggle"
 			:selected-items="selectedItems"
+			:toggle-items="toggleableSelectedItems"
 			:is-busy="props.actionDisabled"
 			:busy-tooltip="props.actionDisabledTooltip"
 			:hide-when-modal-open="false"

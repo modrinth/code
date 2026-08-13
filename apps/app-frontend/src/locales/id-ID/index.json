@@ -821,16 +821,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Sinkronkan dengan instans"
   },
-  "search.filter.locked.server": {
-    "message": "Disediakan oleh server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Anda hanya dapat menambahkan mod sisi klien pada instans server"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Versi permainan disediakan oleh server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Pemuat disediakan oleh server"
   }
 }

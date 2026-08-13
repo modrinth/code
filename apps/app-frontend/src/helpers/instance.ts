@@ -5,7 +5,7 @@
  */
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
-import { invoke } from '@tauri-apps/api/core'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot, SharedInstanceUpdateDiff } from './install'
 import type {
@@ -74,7 +74,11 @@ export async function get_content_items(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_content_items', { instanceId, cacheBehaviour })
+	const items = await invoke<ContentItem[]>('plugin:instance|instance_get_content_items', {
+		instanceId,
+		cacheBehaviour,
+	})
+	return adaptContentItems(items)
 }
 
 export async function refresh_content_updates(instanceId: string): Promise<void> {
@@ -111,10 +115,11 @@ export async function get_linked_modpack_content(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_linked_modpack_content', {
+	const items = await invoke<ContentItem[]>('plugin:instance|instance_get_linked_modpack_content', {
 		instanceId,
 		cacheBehaviour,
 	})
+	return adaptContentItems(items)
 }
 
 // Convert a list of dependencies into ContentItems with rich metadata
@@ -122,9 +127,28 @@ export async function get_dependencies_as_content_items(
 	dependencies: Labrinth.Versions.v3.Dependency[],
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_dependencies_as_content_items', {
-		dependencies,
-		cacheBehaviour,
+	const items = await invoke<ContentItem[]>(
+		'plugin:instance|instance_get_dependencies_as_content_items',
+		{
+			dependencies,
+			cacheBehaviour,
+		},
+	)
+	return adaptContentItems(items)
+}
+
+function adaptContentItems(items: ContentItem[]): ContentItem[] {
+	return items.map((item) => {
+		const embeddedMetadata = item.embedded_metadata
+		if (!embeddedMetadata?.icon_path) return item
+
+		return {
+			...item,
+			embedded_metadata: {
+				...embeddedMetadata,
+				icon_url: convertFileSrc(embeddedMetadata.icon_path),
+			},
+		}
 	})
 }
 
@@ -261,6 +285,18 @@ export async function toggle_disable_project(
 		instanceId,
 		projectPath,
 		desiredEnabled,
+	})
+}
+
+export async function set_project_locked(
+	instanceId: string,
+	projectPath: string,
+	locked: boolean,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_set_project_locked', {
+		instanceId,
+		projectPath,
+		locked,
 	})
 }
 

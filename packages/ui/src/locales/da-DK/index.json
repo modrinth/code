@@ -395,12 +395,6 @@
   "content.page-layout.share.label": {
     "defaultMessage": "Del"
   },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Ældst først"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter efter {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Opdater alle"
   },
@@ -805,9 +799,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Vælg ikon"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Ekstern"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuværrende"
@@ -2250,4 +2241,3 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
-

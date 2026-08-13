@@ -13,10 +13,13 @@ export function isClientOnlyEnvironment(env?: string | null): boolean {
 	return !!env && CLIENT_ONLY_ENVIRONMENTS.has(env)
 }
 
-export function getClientWarningType(item: ContentItem): ClientWarningType | null {
+export function getClientWarningType(
+	item: ContentItem,
+	showEnvironmentWarnings = false,
+): ClientWarningType | null {
 	if (item.pack_client_retained) return 'retained'
 	if (item.pack_client_depends) return 'depends'
-	if (isClientOnlyEnvironment(item.environment)) return 'environment'
+	if (showEnvironmentWarnings && isClientOnlyEnvironment(item.environment)) return 'environment'
 	return null
 }
 
@@ -29,6 +32,8 @@ export interface ContentFilterConfig {
 	showTypeFilters?: boolean
 	showUpdateFilter?: boolean
 	showWarningsFilter?: boolean
+	showStatusFilters?: boolean
+	showEnvironmentWarnings?: boolean
 	isPackLocked?: Ref<boolean>
 	persistKey?: string
 }
@@ -88,15 +93,22 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			options.push({ id: 'updates', label: formatMessage(messages.updates) })
 		}
 
-		if (config?.showWarningsFilter && items.value.some((m) => getClientWarningType(m) !== null)) {
+		if (
+			config?.showWarningsFilter &&
+			items.value.some(
+				(item) => getClientWarningType(item, config.showEnvironmentWarnings) !== null,
+			)
+		) {
 			options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 		}
 
-		for (const status of availableStatusFilters.value) {
-			options.push({
-				id: status,
-				label: formatMessage(status === 'enabled' ? messages.enabled : messages.disabled),
-			})
+		if (config?.showStatusFilters !== false) {
+			for (const status of availableStatusFilters.value) {
+				options.push({
+					id: status,
+					label: formatMessage(status === 'enabled' ? messages.enabled : messages.disabled),
+				})
+			}
 		}
 
 		return options
@@ -154,7 +166,11 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 				if (filter === 'updates' && !item.has_update) return false
 				if (filter === 'enabled' && !item.enabled) return false
 				if (filter === 'disabled' && item.enabled) return false
-				if (filter === 'warnings' && getClientWarningType(item) === null) return false
+				if (
+					filter === 'warnings' &&
+					getClientWarningType(item, config?.showEnvironmentWarnings) === null
+				)
+					return false
 			}
 
 			return true

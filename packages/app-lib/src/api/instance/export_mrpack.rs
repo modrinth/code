@@ -8,6 +8,7 @@ use crate::pack::install_from::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, InstanceMetadata, ModLoader, SideType, State,
+    VersionEnvironment,
 };
 use crate::util::io::{self, IOError};
 use async_zip::tokio::write::ZipFileWriter;
@@ -413,6 +414,39 @@ fn pack_get_relative_path(
     )?)
 }
 
+fn get_mrpack_environment(
+    environment: Option<VersionEnvironment>,
+) -> HashMap<EnvType, SideType> {
+    let (client, server) = match environment
+        .unwrap_or(VersionEnvironment::Unknown)
+    {
+        VersionEnvironment::ClientAndServer
+        | VersionEnvironment::SingleplayerOnly => {
+            (SideType::Required, SideType::Required)
+        }
+        VersionEnvironment::ClientOnly => {
+            (SideType::Required, SideType::Unsupported)
+        }
+        VersionEnvironment::ClientOnlyServerOptional => {
+            (SideType::Required, SideType::Optional)
+        }
+        VersionEnvironment::ServerOnly
+        | VersionEnvironment::DedicatedServerOnly => {
+            (SideType::Unsupported, SideType::Required)
+        }
+        VersionEnvironment::ServerOnlyClientOptional => {
+            (SideType::Optional, SideType::Required)
+        }
+        VersionEnvironment::ClientOrServer
+        | VersionEnvironment::ClientOrServerPrefersBoth => {
+            (SideType::Optional, SideType::Optional)
+        }
+        VersionEnvironment::Unknown => (SideType::Optional, SideType::Optional),
+    };
+
+    HashMap::from([(EnvType::Client, client), (EnvType::Server, server)])
+}
+
 #[tracing::instrument(skip_all)]
 pub async fn create_mrpack_json(
     metadata: &InstanceMetadata,
@@ -461,9 +495,10 @@ pub async fn create_mrpack_json(
         _ => None,
     })
     .collect::<Vec<_>>();
-    let versions = CachedEntry::get_version_many(
-        &projects.iter().map(|x| &*x.1).collect::<Vec<_>>(),
-        None,
+    let version_ids = projects.iter().map(|x| &*x.1).collect::<Vec<_>>();
+    let versions = CachedEntry::get_version_v3_many(
+        &version_ids,
+        Some(CacheBehaviour::MustRevalidate),
         &state.pool,
         &state.api_semaphore,
     )
@@ -473,9 +508,7 @@ pub async fn create_mrpack_json(
         .filter_map(|(path, version_id)| {
             if let Some(version) = versions.iter().find(|x| x.id == version_id)
             {
-                let mut env = HashMap::new();
-                env.insert(EnvType::Client, SideType::Required);
-                env.insert(EnvType::Server, SideType::Required);
+                let env = get_mrpack_environment(version.environment);
                 let Some(primary_file) = version.files.first() else {
                     return Some(Err(crate::ErrorKind::OtherError(format!(
                         "No primary file found for mod at: {path}"

@@ -9,6 +9,7 @@ use crate::state::instances::{
 use crate::state::{ModLoader, ProjectType, ReleaseChannel};
 use chrono::{DateTime, TimeZone, Utc};
 use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
+use std::collections::HashSet;
 use uuid::Uuid;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -527,6 +528,89 @@ where
     .await?;
 
     rows.into_iter().map(TryInto::try_into).collect()
+}
+
+pub(crate) async fn get_locked_instance_file_ids(
+    instance_id: &str,
+    pool: &SqlitePool,
+) -> crate::Result<HashSet<String>> {
+    let file_ids = sqlx::query_scalar::<_, String>(
+        "
+		SELECT content_lock.file_id
+		FROM instance_content_locks content_lock
+		INNER JOIN instance_files file ON file.id = content_lock.file_id
+		WHERE file.instance_id = ?
+		",
+    )
+    .bind(instance_id)
+    .fetch_all(pool)
+    .await?;
+
+    Ok(file_ids.into_iter().collect())
+}
+
+pub(crate) async fn is_instance_file_locked(
+    instance_id: &str,
+    relative_path: &str,
+    pool: &SqlitePool,
+) -> crate::Result<bool> {
+    let locked = sqlx::query_scalar::<_, i64>(
+        "
+		SELECT EXISTS (
+			SELECT 1
+			FROM instance_content_locks content_lock
+			INNER JOIN instance_files file ON file.id = content_lock.file_id
+			WHERE file.instance_id = ? AND file.relative_path = ?
+		)
+		",
+    )
+    .bind(instance_id)
+    .bind(relative_path)
+    .fetch_one(pool)
+    .await?;
+
+    Ok(locked != 0)
+}
+
+pub(crate) async fn set_instance_file_locked(
+    instance_id: &str,
+    relative_path: &str,
+    locked: bool,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let file =
+        get_instance_file_by_relative_path(instance_id, relative_path, pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Unknown content file {relative_path}"
+                ))
+            })?;
+
+    if locked {
+        sqlx::query(
+            "
+			INSERT INTO instance_content_locks (file_id)
+			VALUES (?)
+			ON CONFLICT (file_id) DO NOTHING
+			",
+        )
+        .bind(&file.id)
+        .execute(pool)
+        .await?;
+    } else {
+        sqlx::query(
+            "
+			DELETE FROM instance_content_locks
+			WHERE file_id = ?
+			",
+        )
+        .bind(&file.id)
+        .execute(pool)
+        .await?;
+    }
+
+    Ok(())
 }
 
 pub(crate) async fn set_instance_file_missing(

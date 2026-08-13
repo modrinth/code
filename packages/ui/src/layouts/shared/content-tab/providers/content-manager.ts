@@ -1,5 +1,4 @@
 import type { ComputedRef, Ref } from 'vue'
-import type { RouteLocationRaw } from 'vue-router'
 
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { createContext } from '#ui/providers/create-context'
@@ -9,20 +8,11 @@ import type {
 	ContentActionWarning,
 	ContentCardTableItem,
 	ContentItem,
-	ContentModpackCardCategory,
-	ContentModpackCardProject,
-	ContentModpackCardVersion,
-	ContentOwner,
+	ManagedContentCardData,
 } from '../types'
 
-export interface ContentModpackData {
-	project: ContentModpackCardProject
-	projectLink?: string | RouteLocationRaw
-	version?: ContentModpackCardVersion
-	versionLink?: string | RouteLocationRaw
-	owner?: ContentOwner
-	categories: ContentModpackCardCategory[]
-	hasUpdate: boolean
+export interface ManagedContentData {
+	card: ManagedContentCardData
 	disabled?: boolean
 	disabledText?: string
 }
@@ -41,8 +31,8 @@ export interface ContentManagerContext {
 	loading: Ref<boolean>
 	error: Ref<Error | null>
 
-	// Modpack
-	modpack: Ref<ContentModpackData | null> | ComputedRef<ContentModpackData | null>
+	// Managed content
+	managedContent: Ref<ManagedContentData | null> | ComputedRef<ManagedContentData | null>
 	isPackLocked: Ref<boolean> | ComputedRef<boolean>
 
 	// Guards
@@ -81,11 +71,11 @@ export interface ContentManagerContext {
 	bulkUpdateItem?: (item: ContentItem) => Promise<void>
 	bulkUpdateItems?: (items: ContentItem[]) => Promise<void>
 
-	// Modpack actions (optional)
-	updateModpack?: () => void
-	viewModpackContent?: () => void
+	// Managed-content actions (optional)
+	runManagedContentPrimaryAction?: (event?: MouseEvent) => void
+	viewManagedContent?: () => void
 	unlinkModpack?: () => void
-	openSettings?: () => void
+	openManagedContentSettings?: () => void
 
 	// Switch version (optional)
 	switchVersion?: (item: ContentItem) => void
@@ -104,12 +94,14 @@ export interface ContentManagerContext {
 
 	// Deletion context (controls modal variant)
 	deletionContext?: 'instance' | 'server'
+	showEnvironmentWarnings?: boolean
 
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem
 
 	// Filter persistence key — when set, selected filters are saved/restored via sessionStorage
 	filterPersistKey?: string
+	showSharedContentFilter?: Ref<boolean> | ComputedRef<boolean>
 }
 
 export const [injectContentManager, provideContentManager] = createContext<ContentManagerContext>(

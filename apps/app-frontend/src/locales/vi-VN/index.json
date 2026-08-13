@@ -998,16 +998,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Đồng bộ với phiên bản"
   },
-  "search.filter.locked.server": {
-    "message": "Do máy chủ cung cấp"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Chỉ các mod chạy phía client mới có thể thêm hồ sơ máy chủ"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Phiên bản trò chơi được cung cấp bởi máy chủ"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader được cung cấp bởi máy chủ"
   }
 }
