@@ -873,7 +873,7 @@ const messages = defineMessages({
 	},
 	modpackArchiveWarningTitle: {
 		id: 'project.modpack-archive-warning.title',
-		defaultMessage: 'This modpack was pubished during export bug',
+		defaultMessage: 'This modpack was published during export bug',
 	},
 	modpackArchiveWarningDescription: {
 		id: 'project.modpack-archive-warning.description',
