@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type MaybeRefOrGetter, onUnmounted, toValue } from 'vue'
+import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { toError } from '@/helpers/errors'
-import { friend_listener } from '@/helpers/events.js'
 import {
 	acceptCachedFriend,
 	add_friend,
@@ -127,13 +127,9 @@ export function useFriends(options: {
 		)
 	}
 
-	let unlisten: (() => void) | undefined
-	void friend_listener(() => {
+	useAppEvent('friend', () => {
 		void queryClient.invalidateQueries({ queryKey: queryKey.value })
-	}).then((listener) => {
-		unlisten = listener
 	})
-	onUnmounted(() => unlisten?.())
 
 	return {
 		query,

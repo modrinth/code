@@ -12,10 +12,10 @@ import {
 	provideConsoleManager,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, onUnmounted, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
+import { computed, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
-import { log_listener, process_listener } from '@/helpers/events.js'
 import { delete_logs_by_filename, get_output_by_filename } from '@/helpers/logs.js'
 
 import { injectInstancePage } from '../instance-context'
@@ -191,7 +191,7 @@ if (!instancePage.playing.value) {
 	void analyseForCrash()
 }
 
-const unlistenLog = await log_listener((payload) => {
+useAppEvent('log', (payload) => {
 	if (payload.instance_id !== instanceId.value) return
 
 	if (payload.type === 'log4j') {
@@ -201,7 +201,7 @@ const unlistenLog = await log_listener((payload) => {
 	}
 })
 
-const unlistenProcesses = await process_listener(async (e) => {
+useAppEvent('process', async (e) => {
 	if (e.instance_id !== instanceId.value) return
 	if (e.event === 'launched') {
 		liveConsole.clear()
@@ -215,10 +215,5 @@ const unlistenProcesses = await process_listener(async (e) => {
 		if (data) logs.value = buildLogList(data)
 		void analyseForCrash()
 	}
-})
-
-onUnmounted(() => {
-	unlistenLog()
-	unlistenProcesses()
 })
 </script>

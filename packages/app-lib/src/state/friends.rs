@@ -192,11 +192,11 @@ impl FriendsSocket {
                                         match server_message {
                                             ServerToClientMessage::StatusUpdate { status } => {
                                                 statuses.insert(status.user_id, status.clone());
-                                                let _ = emit_friend(FriendPayload::StatusUpdate { user_status: status }).await;
+                                                let _ = emit_friend(FriendPayload::StatusUpdate { user_status: status.into() }).await;
                                             },
                                             ServerToClientMessage::UserOffline { id } => {
                                                 statuses.remove(&id);
-                                                let _ = emit_friend(FriendPayload::UserOffline { id }).await;
+                                                let _ = emit_friend(FriendPayload::UserOffline { id: id.to_string() }).await;
                                             }
                                             ServerToClientMessage::FriendStatuses { statuses: new_statuses } => {
                                                 statuses.clear();
@@ -206,7 +206,7 @@ impl FriendsSocket {
                                                 let _ = emit_friend(FriendPayload::StatusSync).await;
                                             }
                                             ServerToClientMessage::FriendRequest { from } => {
-                                                let _ = emit_friend(FriendPayload::FriendRequest { from }).await;
+                                                let _ = emit_friend(FriendPayload::FriendRequest { from: from.to_string() }).await;
                                             }
                                             ServerToClientMessage::FriendRequestRejected { .. } => {}, // TODO
 
