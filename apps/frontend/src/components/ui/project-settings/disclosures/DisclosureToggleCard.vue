@@ -130,7 +130,7 @@ function setLockStatus(status: DisclosureLockStatus) {
 										: undefined
 							"
 							:type="status !== 'unlocked' ? 'colored-text' : undefined"
-							:disabled="resolvedLockStatus === status"
+							:disabled="disabled || resolvedLockStatus === status"
 							@click="setLockStatus(status)"
 						>
 							<LockOpenIcon v-if="status === 'unlocked'" />

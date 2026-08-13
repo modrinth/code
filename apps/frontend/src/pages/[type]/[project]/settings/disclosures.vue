@@ -28,17 +28,17 @@ import {
 	type DisclosureLockStatus,
 	disclosuresToForm,
 	type DisclosureType,
+	type DisclosureUpdatedByUser,
 	findDisclosureData,
-	formToDisclosures,
 	getDisclosureFormIssues,
 	getDisclosureFormSnapshot,
 	PaidFeaturesDisclosureCard,
 	PhotosensitivityDisclosureCard,
 	SystemInteractionsDisclosureCard,
 	TelemetryDisclosureCard,
-	toCachedDisclosures,
 	toModifyRequests,
 } from '~/components/ui/project-settings/disclosures'
+import { useAuth } from '~/composables/auth'
 
 const DISCLOSURE_QUERY_STALE_TIME = 1000 * 60 * 5
 
@@ -47,6 +47,7 @@ const { labrinth } = injectModrinthClient()
 const { projectV2: project, projectV3, currentMember } = injectProjectPageContext()
 const queryClient = useQueryClient()
 const flags = useFeatureFlags()
+const auth = await useAuth()
 
 const projectTypes = computed(() => projectV3.value?.project_types ?? [project.value.project_type])
 
@@ -151,6 +152,26 @@ const updaterUsersById = computed(() => {
 	return map
 })
 
+const currentUser = computed((): DisclosureUpdatedByUser | null => {
+	const user = auth.value?.user
+	if (!user?.id || !user.username) {
+		return null
+	}
+	return {
+		id: user.id,
+		username: user.username,
+		avatar_url: user.avatar_url,
+	}
+})
+
+function resolveUpdatedBy(userId: string | null | undefined): DisclosureUpdatedByUser | null {
+	if (!userId) return null
+	return (
+		updaterUsersById.value.get(userId) ??
+		(currentUser.value?.id === userId ? currentUser.value : null)
+	)
+}
+
 const hasPermission = computed(
 	() => !!((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
 )
@@ -169,20 +190,13 @@ const {
 		}
 
 		const previous = disclosuresToForm(disclosuresResponse.value?.disclosures ?? [])
-		const previousDisclosures = disclosuresResponse.value?.disclosures ?? []
 		const requests = toModifyRequests(current.value, previous)
 
 		for (const request of requests) {
 			await labrinth.projects_v3.modifyDisclosures(project.value.id, request)
 		}
 
-		queryClient.setQueryData(disclosuresQueryKey.value, {
-			disclosures: toCachedDisclosures(formToDisclosures(current.value), previousDisclosures, {
-				setByModerator: isActingAsModerator.value,
-				lockStatuses: current.value.lockStatuses,
-				form: current.value,
-			}),
-		})
+		await queryClient.invalidateQueries({ queryKey: disclosuresQueryKey.value })
 	},
 )
 
@@ -204,12 +218,13 @@ function disclosureUpdateProps(type: DisclosureType) {
 	const lockedForAuthor = !isActingAsModerator.value
 
 	return {
-		disabled: !hasPermission.value || (lockedForAuthor && savedLockStatus === 'fully_locked'),
-		toggleDisabled: lockedForAuthor && savedLockStatus !== 'unlocked',
+		disabled:
+			saving.value ||
+			!hasPermission.value ||
+			(lockedForAuthor && savedLockStatus === 'fully_locked'),
+		toggleDisabled: saving.value || (lockedForAuthor && savedLockStatus !== 'unlocked'),
 		updatedAt: disclosure?.updated_at,
-		updatedBy: disclosure?.updated_by
-			? (updaterUsersById.value.get(disclosure.updated_by) ?? null)
-			: null,
+		updatedBy: resolveUpdatedBy(disclosure?.updated_by),
 		setByModerator: !!disclosure?.set_by_moderator,
 		lockStatus,
 		showLockControls: isActingAsModerator.value,
