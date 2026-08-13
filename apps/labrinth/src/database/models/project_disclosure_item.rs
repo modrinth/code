@@ -18,6 +18,7 @@ pub struct DBProjectDisclosure {
     pub updated_at: DateTime<Utc>,
     pub updated_by: DBUserId,
     pub set_by_moderator: bool,
+    pub deleted_at: Option<DateTime<Utc>>,
     pub lock_status: DisclosureLockStatus,
 }
 
@@ -42,6 +43,7 @@ impl DBProjectDisclosure {
 				updated_at = now(),
 				updated_by = $4,
 				set_by_moderator = $5,
+				deleted_at = NULL,
 				lock_status = $6
 			"#,
             self.project_id as DBProjectId,
@@ -59,16 +61,18 @@ impl DBProjectDisclosure {
 
     pub async fn get_many_for_project(
         project_id: DBProjectId,
+        include_deleted: bool,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProjectDisclosure>, DatabaseError> {
         let rows = sqlx::query!(
             r#"
-			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator, lock_status
+			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator, deleted_at, lock_status
 			FROM project_disclosures
-			WHERE project_id = $1
+			WHERE project_id = $1 AND ($2 OR deleted_at IS NULL)
 			ORDER BY updated_at DESC
 			"#,
             project_id as DBProjectId,
+            include_deleted,
         )
         .fetch_all(exec)
         .await?;
@@ -89,6 +93,7 @@ impl DBProjectDisclosure {
                     updated_at: row.updated_at,
                     updated_by: DBUserId(row.updated_by),
                     set_by_moderator: row.set_by_moderator,
+                    deleted_at: row.deleted_at,
                     lock_status: DisclosureLockStatus::from_str(
                         &row.lock_status,
                     )
@@ -113,7 +118,7 @@ impl DBProjectDisclosure {
             r#"
 			SELECT project_id
 			FROM project_disclosures
-			WHERE type = $1 AND project_id = ANY($2)
+			WHERE type = $1 AND project_id = ANY($2) AND deleted_at IS NULL
 			"#,
             <&'static str>::from(disclosure_type),
             &ids,
@@ -160,15 +165,20 @@ impl DBProjectDisclosure {
     pub async fn remove(
         project_id: DBProjectId,
         disclosure_type: ProjectDisclosureType,
+        updated_by: DBUserId,
+        set_by_moderator: bool,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<bool, DatabaseError> {
         let result = sqlx::query!(
             r#"
-			DELETE FROM project_disclosures
-			WHERE project_id = $1 AND type = $2
+			UPDATE project_disclosures
+			SET deleted_at = now(), updated_at = now(), updated_by = $3, set_by_moderator = $4
+			WHERE project_id = $1 AND type = $2 AND deleted_at IS NULL
 			"#,
             project_id as DBProjectId,
             <&'static str>::from(disclosure_type),
+            updated_by as DBUserId,
+            set_by_moderator,
         )
         .execute(exec)
         .await?;

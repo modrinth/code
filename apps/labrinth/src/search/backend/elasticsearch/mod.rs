@@ -689,6 +689,10 @@ impl Elasticsearch {
                         "type": "keyword"
                     },
                     "disclosure_types": {"type": "keyword"},
+                    "required_dependency_project_ids": {"type": "keyword"},
+                    "optional_dependency_project_ids": {"type": "keyword"},
+                    "embedded_dependency_project_ids": {"type": "keyword"},
+                    "incompatible_dependency_project_ids": {"type": "keyword"},
                     "project_loader_fields": {
                         "type": "object",
                         "enabled": false

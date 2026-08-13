@@ -25,8 +25,9 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{
     MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
 };
-use crate::models::teams::ProjectPermissions;
+use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
+use crate::models::users::DELETED_USER;
 use crate::models::{self, exp};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -43,6 +44,7 @@ use chrono::Utc;
 use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
@@ -219,7 +221,7 @@ pub async fn projects_get(
     Ok(HttpResponse::Ok().json(projects))
 }
 
-/// Get a project.  
+/// Get a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = Project))
@@ -354,7 +356,7 @@ pub struct EditProject {
 }
 
 #[allow(clippy::too_many_arguments)]
-/// Update a project.  
+/// Update a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -494,6 +496,7 @@ pub async fn project_edit_internal(
         let archival_disclosure =
             db_models::DBProjectDisclosure::get_many_for_project(
                 project_item.inner.id,
+                false,
                 &mut transaction,
             )
             .await
@@ -515,6 +518,7 @@ pub async fn project_edit_internal(
                     updated_at: Utc::now(),
                     updated_by: user.id.into(),
                     set_by_moderator: user.role.is_mod(),
+                    deleted_at: None,
                     lock_status: DisclosureLockStatus::Unlocked,
                 }
                 .upsert(&mut transaction)
@@ -732,6 +736,8 @@ pub async fn project_edit_internal(
                 db_models::DBProjectDisclosure::remove(
                     project_item.inner.id,
                     ProjectDisclosureType::Archived,
+                    user.id.into(),
+                    user.role.is_mod(),
                     &mut transaction,
                 )
                 .await
@@ -1371,7 +1377,7 @@ pub async fn edit_project_categories(
 //     pub total_hits: usize,
 // }
 
-/// Search projects.  
+/// Search projects.
 #[utoipa::path(
 	tag = "search",
     get,
@@ -1418,7 +1424,7 @@ pub async fn project_search(
 }
 
 // for more complicated search queries
-/// Search projects.  
+/// Search projects.
 #[utoipa::path(
 	tag = "search",
 	request_body = serde_json::Value,
@@ -1438,7 +1444,7 @@ pub async fn project_search_post(
 }
 
 //checks the validity of a project id or slug
-/// Check project availability.  
+/// Check project availability.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = ProjectCheckResponse))
@@ -1478,7 +1484,7 @@ pub struct DependencyInfo {
     pub versions: Vec<models::projects::Version>,
 }
 
-/// List project dependencies.  
+/// List project dependencies.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = DependencyInfo))
@@ -2002,7 +2008,7 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-/// Update a project icon.  
+/// Update a project icon.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2166,7 +2172,7 @@ pub async fn project_icon_edit_internal(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-/// Delete a project icon.  
+/// Delete a project icon.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -2307,7 +2313,7 @@ pub struct GalleryCreateQuery {
 }
 
 #[allow(clippy::too_many_arguments)]
-/// Add a gallery item.  
+/// Add a gallery item.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2530,7 +2536,7 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
-/// Update a gallery item.  
+/// Update a gallery item.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2752,7 +2758,7 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
-/// Delete a gallery item.  
+/// Delete a gallery item.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2907,7 +2913,7 @@ pub async fn delete_gallery_item_internal(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-/// Delete a project.  
+/// Delete a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -2992,6 +2998,169 @@ pub async fn project_delete_internal(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
+
+    // rejected & withheld projects are transferred to ghost so moderation data is preserved
+    if matches!(
+        project.inner.status,
+        ProjectStatus::Rejected | ProjectStatus::Withheld
+    ) {
+        let deleted_user: db_ids::DBUserId = DELETED_USER.into();
+
+        let deleted_slug = if let Some(slug) = &project.inner.slug {
+            let candidate = format!(
+                "{slug}--deleted-{}",
+                ProjectId::from(project.inner.id)
+            );
+            if candidate.len() <= 255 {
+                let taken = sqlx::query!(
+                    r#"
+                    SELECT EXISTS(
+                        SELECT 1 FROM mods
+                        WHERE
+                            (slug = LOWER($1) OR text_id_lower = LOWER($1))
+                            AND id != $2
+                    ) AS "exists!"
+                    "#,
+                    candidate,
+                    project.inner.id as db_ids::DBProjectId,
+                )
+                .fetch_one(&mut transaction)
+                .await
+                .wrap_internal_err("checking deleted slug availability")?
+                .exists;
+
+                if !taken {
+                    Some(candidate.to_lowercase())
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET organization_id = NULL, slug = COALESCE($1, slug)
+            WHERE id = $2
+            ",
+            deleted_slug,
+            project.inner.id as db_ids::DBProjectId,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err(
+            "failed to detach project from organization and update slug",
+        )?;
+
+        let affected_user_ids = sqlx::query!(
+            "
+            DELETE FROM team_members
+            WHERE team_id = $1
+            RETURNING user_id
+            ",
+            project.inner.team_id as db_ids::DBTeamId,
+        )
+        .fetch(&mut transaction)
+        .map_ok(|x| db_ids::DBUserId(x.user_id))
+        .try_collect::<Vec<_>>()
+        .await
+        .wrap_internal_err("failed to remove project team members")?;
+
+        let new_member_id = db_ids::generate_team_member_id(&mut transaction)
+            .await
+            .wrap_internal_err("failed to generate team member ID")?;
+        DBTeamMember {
+            id: new_member_id,
+            team_id: project.inner.team_id,
+            user_id: deleted_user,
+            role: DEFAULT_ROLE.to_owned(),
+            is_owner: true,
+            permissions: ProjectPermissions::all(),
+            organization_permissions: None,
+            accepted: true,
+            payouts_split: Decimal::ZERO,
+            ordering: 0,
+        }
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err("failed to transfer project ownership to ghost")?;
+
+        ThreadMessageBuilder {
+            author_id: Some(deleted_user),
+            body: MessageBody::Text {
+                body: format!(
+                    "Project transferred to Ghost when user account `{}` (`{}`) deleted this project",
+                    user.username,
+                    user.id
+                ),
+                private: true,
+                replying_to: None,
+                associated_images: Vec::new(),
+            },
+            thread_id: project.thread_id,
+            hide_identity: false,
+        }
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err(
+            "failed to insert project transfer thread message",
+        )?;
+
+        sqlx::query!(
+            "
+            DELETE FROM collections_mods
+            WHERE mod_id = $1
+            ",
+            project.inner.id as db_ids::DBProjectId,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err("failed to delete project from collections_mods")?;
+
+        sqlx::query!(
+            "
+            DELETE FROM mod_follows
+            WHERE mod_id = $1
+            ",
+            project.inner.id as db_ids::DBProjectId,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err("failed to delete project followers")?;
+
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("failed to commit transaction")?;
+
+        let mut cache_user_ids = affected_user_ids;
+        cache_user_ids.push(deleted_user);
+        db_models::DBUser::clear_project_cache(&cache_user_ids, &redis)
+            .await
+            .wrap_internal_err("failed to clear user project cache")?;
+        DBTeamMember::clear_cache(project.inner.team_id, &redis)
+            .await
+            .wrap_internal_err("clearing cached data from Redis")?;
+        db_models::DBProject::clear_cache(
+            project.inner.id,
+            project.inner.slug.clone(),
+            None,
+            &redis,
+        )
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
+        search_state
+            .queue
+            .push_project_removal(project.inner.id.into())
+            .await;
+
+        return Ok(());
+    }
+
     delphi::tech_review_sync::sync_deleted_project_tech_review_exit(
         project.inner.id,
         &mut transaction,
@@ -3059,7 +3228,7 @@ pub async fn project_delete_internal(
     }
 }
 
-/// Follow a project.  
+/// Follow a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -3166,7 +3335,7 @@ pub async fn project_follow_internal(
     }
 }
 
-/// Unfollow a project.  
+/// Unfollow a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -3270,7 +3439,7 @@ pub async fn project_unfollow_internal(
     }
 }
 
-/// Get a project's organization.  
+/// Get a project's organization.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = models::organizations::Organization))

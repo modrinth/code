@@ -326,7 +326,7 @@ async fn build_search_documents(
         "
         SELECT project_id, type, metadata
         FROM project_disclosures
-        WHERE project_id = ANY($1)
+        WHERE project_id = ANY($1) AND deleted_at IS NULL
         ",
         &*project_ids,
     )
@@ -583,6 +583,34 @@ async fn build_search_documents(
             })
             .map(|dependency| dependency.project_id.clone())
             .collect::<Vec<_>>();
+        let required_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Required
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let optional_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Optional
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let embedded_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Embedded
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let incompatible_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                dependency.dependency_type == DependencyType::Incompatible
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
 
         if let Some(versions) = versions.remove(&project.id) {
             let Some(latest_version) = versions.iter().max_by(|a, b| {
@@ -797,6 +825,10 @@ async fn build_search_documents(
                 color: project.color.map(|x| x as u32),
                 dependency_project_ids,
                 compatible_dependency_project_ids,
+                required_dependency_project_ids,
+                optional_dependency_project_ids,
+                embedded_dependency_project_ids,
+                incompatible_dependency_project_ids,
                 dependencies,
                 disclosure_types,
                 project_loader_fields,

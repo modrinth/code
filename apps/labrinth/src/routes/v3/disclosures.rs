@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use xredis::RedisPool;
 
-use crate::auth::checks::is_visible_project;
+use crate::auth::checks::{is_team_member_project, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database::{DBProject, models as db_models};
 use crate::database::{PgPool, ReadOnlyPgPool};
@@ -71,10 +71,16 @@ pub async fn get_project_disclosures(
     }
 
     let viewer_is_moderator =
-        user_option.is_some_and(|user| user.role.is_mod());
+        user_option.as_ref().is_some_and(|user| user.role.is_mod());
+
+    let include_deleted = viewer_is_moderator
+        || is_team_member_project(&project.inner, &user_option, &pool)
+            .await
+            .wrap_internal_err("failed to check project team membership")?;
 
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         project.inner.id,
+        include_deleted,
         &***ro_pool,
     )
     .await
@@ -233,6 +239,7 @@ pub async fn modify_project_disclosures(
             updated_at: Utc::now(),
             updated_by: user.id.into(),
             set_by_moderator: is_moderator,
+            deleted_at: None,
             lock_status,
         }
         .upsert(&mut transaction)
@@ -250,6 +257,8 @@ pub async fn modify_project_disclosures(
         db_models::DBProjectDisclosure::remove(
             project.inner.id,
             disclosure_type,
+            user.id.into(),
+            user.role.is_mod(),
             &mut transaction,
         )
         .await
