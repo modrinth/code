@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import Input from '../../components/base/inputs/Input.vue'
 
 const meta = {
-	title: 'Base/Input',
+	title: 'Inputs/Input',
 	component: Input,
 	argTypes: {
 		size: {

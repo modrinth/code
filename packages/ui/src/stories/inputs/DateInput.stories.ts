@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import DateInput from '../../components/base/inputs/DateInput.vue'
 
 const meta = {
-	title: 'Base/DateInput',
+	title: 'Inputs/DateInput',
 	component: DateInput,
 } satisfies Meta<typeof DateInput>
 

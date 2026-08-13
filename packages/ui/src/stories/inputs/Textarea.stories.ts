@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import Textarea from '../../components/base/inputs/Textarea.vue'
 
 const meta = {
-	title: 'Base/Textarea',
+	title: 'Inputs/Textarea',
 	component: Textarea,
 	argTypes: {
 		resize: {
