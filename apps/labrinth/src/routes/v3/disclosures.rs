@@ -168,6 +168,8 @@ pub async fn modify_project_disclosures(
     }
 
     let is_moderator = user.role.is_mod();
+    let is_project_member =
+        team_member.is_some() || organization_team_member.is_some();
 
     if body.lock_status.is_some() && !is_moderator {
         return Err(ApiError::Auth(eyre!(
@@ -233,12 +235,15 @@ pub async fn modify_project_disclosures(
         let lock_status =
             body.lock_status.unwrap_or(lock_status_of(disclosure_type));
 
+        let set_by_moderator =
+            is_moderator && (!is_project_member || !lock_status.allows_edit());
+
         db_models::DBProjectDisclosure {
             project_id: project.inner.id,
             disclosure,
             updated_at: Utc::now(),
             updated_by: user.id.into(),
-            set_by_moderator: is_moderator,
+            set_by_moderator,
             deleted_at: None,
             lock_status,
         }
@@ -248,6 +253,10 @@ pub async fn modify_project_disclosures(
     }
 
     for disclosure_type in &body.remove {
+        let set_by_moderator = is_moderator
+            && (!is_project_member
+                || !lock_status_of(disclosure_type).allows_removal());
+
         let disclosure_type = ProjectDisclosureType::from_str(disclosure_type)
             .map_err(|_| {
                 ApiError::Request(eyre!(
@@ -258,7 +267,7 @@ pub async fn modify_project_disclosures(
             project.inner.id,
             disclosure_type,
             user.id.into(),
-            user.role.is_mod(),
+            set_by_moderator,
             &mut transaction,
         )
         .await
