@@ -10,17 +10,15 @@ use crate::state::{
     CacheBehaviour, CachedEntry, InstanceMetadata, ModLoader, SideType, State,
 };
 use crate::util::io::{self, IOError};
-use async_zip::tokio::write::ZipFileWriter;
-use async_zip::{Compression, ZipEntryBuilder};
 use futures::{StreamExt, stream};
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
+use std::io::{Read, Seek, Write};
 use std::path::PathBuf;
 use std::time::UNIX_EPOCH;
-use tokio::fs::File;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio_util::compat::FuturesAsyncWriteCompatExt;
+use zip::write::SimpleFileOptions;
+use zip::{CompressionMethod, ZipWriter};
 
 const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
     "mods",
@@ -31,6 +29,7 @@ const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
 ];
 const EXPORT_CANDIDATE_METADATA_CONCURRENCY: usize = 32;
 const EXPORT_COPY_BUFFER_SIZE: usize = 256 * 1024;
+const STANDARD_ZIP_FILE_SIZE_ERROR: &str = "Your modpack cannot be exported as it contains a file over the size limit of 4 GB";
 
 const NEVER_EXPORTABLE_PATH_PREFIXES: &[&str] = &[
     "profile.json",
@@ -183,10 +182,6 @@ pub async fn export_mrpack(
     );
 
     let instance_base_path = get_full_path(instance_id).await?;
-    let mut file = File::create(&export_path)
-        .await
-        .map_err(|e| IOError::with_path(e, &export_path))?;
-    let mut writer = ZipFileWriter::with_tokio(&mut file);
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
         create_mrpack_json(&metadata, version_id, description).await?;
@@ -237,6 +232,7 @@ pub async fn export_mrpack(
                 .await
                 .map_err(|e| IOError::with_path(e, &path))?
                 .len();
+            ensure_standard_zip_file_size(size)?;
             override_files.push((path, relative_path, size));
         }
     }
@@ -253,46 +249,69 @@ pub async fn export_mrpack(
         "Exporting instance to .mrpack",
     )
     .await?;
+    let data = serde_json::to_vec_pretty(&packfile)?;
+    tokio::task::spawn_blocking(move || {
+        let file = std::fs::File::create(&export_path)
+            .map_err(|error| IOError::with_path(error, &export_path))?;
+        write_mrpack_archive(file, override_files, &data, |bytes_written| {
+            emit_loading(&loading_bar, bytes_written as f64, None)
+        })
+    })
+    .await??;
+
+    Ok(())
+}
+
+fn ensure_standard_zip_file_size(size: u64) -> crate::Result<()> {
+    if size > zip::ZIP64_BYTES_THR {
+        return Err(crate::ErrorKind::OtherError(
+            STANDARD_ZIP_FILE_SIZE_ERROR.to_string(),
+        )
+        .into());
+    }
+
+    Ok(())
+}
+
+fn write_mrpack_archive<W, F>(
+    writer: W,
+    override_files: Vec<(PathBuf, SafeRelativeUtf8UnixPathBuf, u64)>,
+    packfile_data: &[u8],
+    mut emit_progress: F,
+) -> crate::Result<()>
+where
+    W: Write + Seek,
+    F: FnMut(u64) -> crate::Result<()>,
+{
+    let options = SimpleFileOptions::default()
+        .compression_method(CompressionMethod::Deflated);
+    let mut writer = ZipWriter::new(writer);
     let mut buffer = vec![0_u8; EXPORT_COPY_BUFFER_SIZE];
+
     for (path, relative_path, _) in override_files {
-        let mut stream = writer
-            .write_entry_stream(
-                ZipEntryBuilder::new(
-                    format!("overrides/{relative_path}").into(),
-                    Compression::Deflate,
-                )
-                .build(),
-            )
-            .await?
-            .compat_write();
-        let mut source = File::open(&path)
-            .await
-            .map_err(|e| IOError::with_path(e, &path))?;
+        writer
+            .start_file(format!("overrides/{relative_path}"), options)
+            .map_err(std::io::Error::from)?;
+        let mut source = std::fs::File::open(&path)
+            .map_err(|error| IOError::with_path(error, &path))?;
         loop {
             let bytes_read = source
                 .read(&mut buffer)
-                .await
-                .map_err(|e| IOError::with_path(e, &path))?;
+                .map_err(|error| IOError::with_path(error, &path))?;
             if bytes_read == 0 {
                 break;
             }
-            stream
-                .write_all(&buffer[..bytes_read])
-                .await
-                .map_err(IOError::from)?;
-            emit_loading(&loading_bar, bytes_read as f64, None)?;
+            writer.write_all(&buffer[..bytes_read])?;
+            emit_progress(bytes_read as u64)?;
         }
-        stream.into_inner().close().await?;
     }
 
-    let data = serde_json::to_vec_pretty(&packfile)?;
-    let builder = ZipEntryBuilder::new(
-        "modrinth.index.json".to_string().into(),
-        Compression::Deflate,
-    );
-    writer.write_entry_whole(builder, &data).await?;
-    writer.close().await?;
-    emit_loading(&loading_bar, 1.0, None)?;
+    writer
+        .start_file("modrinth.index.json", options)
+        .map_err(std::io::Error::from)?;
+    writer.write_all(packfile_data)?;
+    writer.finish().map_err(std::io::Error::from)?;
+    emit_progress(1)?;
 
     Ok(())
 }
@@ -548,4 +567,57 @@ pub async fn create_mrpack_json(
         files,
         dependencies,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn writes_mrpack_archive_with_deflated_entries_and_progress()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let temp_dir = tempfile::tempdir()?;
+        let override_path = temp_dir.path().join("options.txt");
+        let override_data = b"renderDistance:12";
+        std::fs::write(&override_path, override_data)?;
+        let relative_path = SafeRelativeUtf8UnixPathBuf::try_from(
+            "config/options.txt".to_string(),
+        )?;
+        let manifest_data = br#"{"formatVersion":1}"#;
+        let mut archive_data = Cursor::new(Vec::new());
+        let mut progress = 0;
+
+        write_mrpack_archive(
+            &mut archive_data,
+            vec![(override_path, relative_path, override_data.len() as u64)],
+            manifest_data,
+            |increment| {
+                progress += increment;
+                Ok(())
+            },
+        )?;
+
+        assert_eq!(progress, override_data.len() as u64 + 1);
+        archive_data.set_position(0);
+        let mut archive = zip::ZipArchive::new(archive_data)?;
+        assert_eq!(archive.len(), 2);
+
+        {
+            let mut entry = archive.by_name("overrides/config/options.txt")?;
+            assert_eq!(entry.compression(), CompressionMethod::Deflated);
+            let mut data = Vec::new();
+            entry.read_to_end(&mut data)?;
+            assert_eq!(data, override_data);
+        }
+        {
+            let mut entry = archive.by_name("modrinth.index.json")?;
+            assert_eq!(entry.compression(), CompressionMethod::Deflated);
+            let mut data = Vec::new();
+            entry.read_to_end(&mut data)?;
+            assert_eq!(data, manifest_data);
+        }
+
+        Ok(())
+    }
 }
