@@ -17,6 +17,7 @@ import { edit, get, list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import { start_join_server } from '@/helpers/worlds.ts'
+import type { AppEvents } from '@/providers/app-events'
 import { handleSevereError } from '@/store/error.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,6 +75,7 @@ export function createServerInstall(opts: {
 	router: Router
 	handleError: (err: unknown) => void
 	popupNotificationManager: AbstractPopupNotificationManager
+	appEvents: AppEvents
 }): ServerInstallContext {
 	const installingServerProjects = ref<string[]>([])
 
@@ -134,7 +136,7 @@ export function createServerInstall(opts: {
 		const instanceId = installJobInstanceId(job)
 		if (!instanceId) return null
 
-		await wait_for_install_job(job.job_id)
+		await wait_for_install_job(opts.appEvents, job.job_id)
 		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 
 		return instanceId
@@ -145,7 +147,7 @@ export function createServerInstall(opts: {
 
 		await edit(instance.id, { game_version: targetGameVersion })
 		const job = await install_existing_instance(instance.id, false)
-		await wait_for_install_job(job.job_id)
+		await wait_for_install_job(opts.appEvents, job.job_id)
 	}
 
 	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
@@ -261,7 +263,7 @@ export function createServerInstall(opts: {
 		const instanceId = installJobInstanceId(createJob)
 		if (!instanceId) return
 
-		await wait_for_install_job(createJob.job_id)
+		await wait_for_install_job(opts.appEvents, createJob.job_id)
 		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 	}
 

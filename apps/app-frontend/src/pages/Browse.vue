@@ -35,14 +35,14 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
+import { useAppEvent } from '@/composables/use-app-event'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
-import { instance_listener } from '@/helpers/events.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
 	list as listInstances,
@@ -1158,44 +1158,23 @@ if (instance.value?.game_version) {
 
 void searchState.refreshSearch()
 
-type UnlistenFn = () => void
-
-let isUnmounted = false
-let unlistenInstances: UnlistenFn | null = null
-
-onMounted(() => {
-	instance_listener(async (event: { event: string; instance_id: string }) => {
-		if (event.event === 'added' || event.event === 'created' || event.event === 'removed') {
-			if (!route.query.i) {
-				await refreshInstalledProjectIds()
-				if (projectType.value === 'modpack') {
-					if (event.event === 'removed') {
-						syncHiddenInstanceProjectIds()
-					}
-					await searchState.refreshSearch()
-				}
-			}
-		}
-
-		if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+useAppEvent('instance', async (event) => {
+	if (event.event === 'created' || event.event === 'removed') {
+		if (!route.query.i) {
 			await refreshInstalledProjectIds()
-			await searchState.refreshSearch()
-		}
-	})
-		.then((unlisten) => {
-			if (isUnmounted) {
-				unlisten()
-				return
+			if (projectType.value === 'modpack') {
+				if (event.event === 'removed') {
+					syncHiddenInstanceProjectIds()
+				}
+				await searchState.refreshSearch()
 			}
+		}
+	}
 
-			unlistenInstances = unlisten
-		})
-		.catch(handleError)
-})
-
-onUnmounted(() => {
-	isUnmounted = true
-	unlistenInstances?.()
+	if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+		await refreshInstalledProjectIds()
+		await searchState.refreshSearch()
+	}
 })
 
 function getProjectBrowseQuery() {

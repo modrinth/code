@@ -20,7 +20,6 @@ import {
 	get_team,
 	get_version_many,
 } from '@/helpers/cache.js'
-import { instance_listener } from '@/helpers/events.js'
 import {
 	install_create_instance,
 	install_create_modpack_instance,
@@ -38,6 +37,7 @@ import {
 } from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
+import type { AppEvents } from '@/providers/app-events'
 import { useTheming } from '@/store/state'
 interface ModalRef {
 	show: (initialVersionId?: string) => void
@@ -60,13 +60,6 @@ type InstallingProjectDisplay = {
 	organization?: string | null
 	team?: string
 }
-type ContentInstallInstanceEvent = {
-	event: string
-	instance_id: string
-	project_ids?: string[]
-	message?: string
-}
-
 const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
 const SUPPORTED_LOADERS: Set<string> = new Set(['vanilla', 'forge', 'fabric', 'quilt', 'neoforge'])
 const VANILLA_COMPATIBLE_LOADERS: Set<string> = new Set(['minecraft', 'datapack'])
@@ -191,6 +184,7 @@ export const [injectContentInstall, provideContentInstall] = createContext<Conte
 export function createContentInstall(opts: {
 	router: Router
 	handleError: (err: unknown) => void
+	appEvents: AppEvents
 }): ContentInstallContext {
 	const { formatMessage } = useVIntl()
 	const themeStore = useTheming()
@@ -394,17 +388,17 @@ export function createContentInstall(opts: {
 		installFailureRevisionByInstance.value = next
 	}
 
-	void instance_listener((event: ContentInstallInstanceEvent) => {
+	opts.appEvents.on('instance', (event) => {
 		if (event.event === 'content_install_finished') {
 			markInstanceContentChanged(event.instance_id)
-			removeInstallingItems(event.instance_id, event.project_ids ?? [])
+			removeInstallingItems(event.instance_id, event.project_ids)
 		} else if (event.event === 'content_install_failed') {
-			removeInstallingItems(event.instance_id, event.project_ids ?? [])
+			removeInstallingItems(event.instance_id, event.project_ids)
 			markInstanceContentInstallFailed(event.instance_id)
 			markInstanceContentChanged(event.instance_id)
-			opts.handleError(event.message ?? 'Failed to install content')
+			opts.handleError(event.message)
 		}
-	}).catch(opts.handleError)
+	})
 
 	let modalRef: ModalRef | null = null
 	let modpackAlreadyInstalledModalRef: ModpackAlreadyInstalledModalRef | null = null

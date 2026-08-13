@@ -2,3 +2,7 @@
 *.gltf
 src/locales/
 src/assets/**/*.svg
+
+# Generated app-event bindings
+src/generated/app-events/*.ts
+src/generated/app-events/postcard/**

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { LibraryIcon, PlusIcon } from '@modrinth/assets'
 import { Button, injectNotificationManager, NavTabs } from '@modrinth/ui'
-import { inject, onUnmounted, ref, shallowRef } from 'vue'
+import { inject, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
-import { instance_listener } from '@/helpers/events.js'
+import { useAppEvent } from '@/composables/use-app-event'
 import { list } from '@/helpers/instance'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
@@ -31,11 +31,8 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const unlistenInstance = await instance_listener(async () => {
+useAppEvent('instance', async () => {
 	instances.value = await list().catch(handleError)
-})
-onUnmounted(() => {
-	unlistenInstance()
 })
 </script>
 
