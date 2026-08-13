@@ -72,9 +72,9 @@ To summarize:
 
 ## Enforcement
 
-Obviously, this is a big change and creators will need to take some time to update their projects to have all necessary disclosures or take down projects that are no longer allowed. For this reason, we will have a 30 day grace period to give everyone enough time to get their projects in order.
+Obviously, this is a big change and creators will need to take some time to update their projects to have all necessary disclosures or take down projects that are no longer allowed. For this reason, we will have a 45 day grace period to give everyone enough time to get their projects in order.
 
-During this grace period, we will not be accepting reports for projects in violation of the new AI policy or for missing content disclosures to give them a fair chance to update them. The 30-day grace period ends on **September 12, 2026**.
+During this grace period, we will not be accepting reports for projects in violation of the new AI policy or for missing content disclosures to give them a fair chance to update them. The 45-day grace period ends on **September 27, 2026**.
 
 In addition, we will not tolerate witch-hunting on the Modrinth platform. These disclosures are to inform users and provide transparency between user and creator. Anyone using them to shame, insult, belittle, or harass others will be swiftly and permanently removed from the Modrinth platform and community Discord server. Be kind to each other.
 
