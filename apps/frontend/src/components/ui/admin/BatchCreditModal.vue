@@ -36,12 +36,7 @@
 						<span class="text-lg font-semibold text-contrast"> Node hostnames </span>
 					</label>
 					<div class="flex items-center gap-2">
-						<Input
-							id="node-input"
-							v-model="nodeInput"
-							wrapper-class="w-32"
-							autocomplete="off"
-						/>
+						<Input id="node-input" v-model="nodeInput" wrapper-class="w-32" autocomplete="off" />
 						<Button
 							type="quiet"
 							color="blue"

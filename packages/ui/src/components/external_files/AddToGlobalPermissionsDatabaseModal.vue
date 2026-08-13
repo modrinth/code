@@ -4,14 +4,7 @@ import { PlusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import {
-	Accordion,
-	Combobox,
-	type ComboboxOption,
-	Input,
-	NewModal,
-	Textarea,
-} from '#ui/components'
+import { Accordion, Combobox, type ComboboxOption, Input, NewModal, Textarea } from '#ui/components'
 import { Button } from '#ui/components/base/buttons'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'

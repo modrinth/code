@@ -98,13 +98,7 @@ import {
 	SpinnerIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import {
-	Button,
-	defineMessages,
-	injectNotificationManager,
-	Input,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, defineMessages, injectNotificationManager, Input, useVIntl } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 

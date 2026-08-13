@@ -167,12 +167,7 @@ defineExpose({
 						<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
 					</IconButton>
 				</div>
-				<Textarea
-					v-else
-					v-model="content"
-					resize="vertical"
-					wrapper-class="h-full w-[30rem]"
-				>
+				<Textarea v-else v-model="content" resize="vertical" wrapper-class="h-full w-[30rem]">
 					<template #right>
 						<IconButton
 							v-tooltip="'Copy Text'"

@@ -455,8 +455,8 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	MarkdownEditor,
-	Textarea,
 	TeleportOverflowMenu,
+	Textarea,
 	useDebugLogger,
 } from '@modrinth/ui'
 import type { ProjectStatus } from '@modrinth/utils'
