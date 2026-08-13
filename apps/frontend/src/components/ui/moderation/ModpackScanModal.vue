@@ -400,10 +400,10 @@ defineExpose({ show, hide })
 					</Combobox>
 					<IconButton
 						v-tooltip="formatMessage(messages.deleteAllGroups)"
-						type="quiet"
-						color="red"
+						type="base"
 						:label="formatMessage(messages.deleteAllGroups)"
 						:disabled="titleButtonsDisabled"
+						class="[&:not(:disabled):focus-visible>svg]:!text-red [&:not(:disabled):hover>svg]:!text-red"
 						@click="showConfirmClearGroups"
 					>
 						<TrashIcon v-if="!isClearing" aria-hidden="true" />
