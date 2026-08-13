@@ -1,11 +1,11 @@
 ---
-title: '[DRAFT] New AI rules and project disclosures'
+title: 'New AI rules and project disclosures'
 summary: An update to Modrinth’s Content Rules and our new mandatory content disclosures.
-date: 2026-08-13T08:00:00-07:00
+date: 2026-08-13T09:00:00-07:00
 authors: ['Dc7EYhxG', 'vNcGR3Fd', 'o2Dd4mrX', 'AJfd8YH6']
 ---
 
-This year, nearly fully AI-generated garbage content has begun _flooding_ Modrinth. Project submissions have gone up from about 2,500 per week at the start of the year to over 5,000 per week now. As many of you know, if you browse newly published projects on Modrinth, there areso many of them!
+This year, nearly fully AI-generated garbage content has begun _flooding_ Modrinth. Project submissions have gone up from about 2,500 per week at the start of the year to over 5,000 per week now.
 
 We’ve never had a quality threshold for uploading to Modrinth, and we continue to believe that you should not need to make professional, perfect work in order to publish on Modrinth. But we do believe that it has to be _your_ work, and generating it completely with AI is not your work. Modrinth is a community of creators. In order to be creators, you need to actually create something.
 
@@ -14,6 +14,8 @@ Today, we’re announcing a set of new features and policies aimed at informing 
 ## Content disclosures
 
 We have introduced content disclosures to provide a standardized place for certain things that we feel it is important for users to understand before downloading a project on Modrinth.
+
+![In the Details panel on the sidebar of a project, a couple disclosures are listed as an example. Contains paid features: Cosmetic items are purchaseable with Mod Coins; Contains opt-out telemetry: Anonymous launch analytics about game version and mod loaders.](./details.webp)
 
 Here’s the current list of content disclosures available at this time:
 
@@ -48,29 +50,17 @@ Here’s the current list of content disclosures available at this time:
   - This will allow you to have an Unlisted project also be archived, previously archived projects were always Public.
   - You can also include a note to explain why your project has been archived.
 
-Projects with disclosures you’d like to avoid can be filtered out in search under the “Advanced exclusions” options. When filtering out projects with photosensitivity warnings, we will warn the user that not all projects without the warning are guaranteed to be safe for users with photosensitivities.
+![In project settings, there is a new Disclosures tab. On it, you can toggle disclosures on and off, and some of them have additional fields you need to fill out.](./settings.webp)
+
+Projects with disclosures you’d like to avoid can be filtered out in search under the “Advanced exclusions” options. When filtering out projects with photosensitivity warnings, we will warn the user that not all projects without the warning are guaranteed to be safe for users with photosensitivities. Advanced exclusion filters will be persistent across searches in your browser so that you don't have to apply them every time you search.
+
+![At the bottom of the search filters, there is an "Advanced exclusions" section. You can select different disclosures to exclude from your search results.](./filters.webp)
 
 ## New AI policy
 
 We’ve added Section 6 to the [Content Rules](/legal/rules), which is as follows:
 
-> ### **6. Usage of Generative "AI"**
->
-> Projects must be forthright and honest about the usage of generative AI in their production, publication, and within the project itself. Projects cannot be entirely or primarily comprised of content created or derived from generative AI output.
->
-> #### 6.1. Disclosure of AI generated content
->
-> You must apply the appropriate “Contains AI-generated content” content disclosure when:
->
-> 1. a substantial portion of the project's code is a product of AI output.
-> 2. the project includes any assets that are primarily or entirely a product of AI output.
-> 3. the project's design or functionality relies on the use of generative AI.
-> 4. any element of the project's page such as description or publishing relies on generative AI.
->
-> #### 6.2. Prohibited AI generated content
->
-> 1. No images uploaded to a gallery, icon, description, or any other part of a project page may be created or derived from generative AI output. Any such images may be removed.
-> 2. Projects may not be published publicly if the contents are primarily or entirely a product of AI output.
+<div id="rule-6"></div>
 
 To summarize:
 
