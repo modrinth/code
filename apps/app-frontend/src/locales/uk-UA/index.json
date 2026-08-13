@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Огляд змін"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Переглянути оновлення"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Оглядаємо…"
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Для гри в {name} потрібне оновлення. Будь ласка, оновіть до найновішої версії, щоб запустити гру."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Доступне оновлення"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Усі дані вашого профілю будуть видалені назавжди, включно з вашими світами, налаштуваннями та всім установленим умістом."
@@ -1922,17 +1913,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Синхронізувати з профілем"
   },
-  "search.filter.locked.server": {
-    "message": "Надано сервером"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "До профілю сервера можна додавати лише клієнтські моди"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Версія гри надана сервером"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Завантажувач наданий сервером"
   },
   "settings.sidebar.label.account": {
     "message": "Обліковий запис"

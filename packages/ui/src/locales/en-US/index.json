@@ -347,8 +347,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
+  "content.card.frozen": {
+    "defaultMessage": "This project is locked to its current version until unfrozen."
+  },
   "content.card.select-project": {
     "defaultMessage": "Select {project}"
+  },
+  "content.card.uploaded": {
+    "defaultMessage": "Uploaded"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
@@ -566,8 +572,95 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "world"
   },
-  "content.modpack-card.installation-settings": {
+  "content.managed-card.managed-by": {
+    "defaultMessage": "Managed by"
+  },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Modpack content"
+  },
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "server"
+  },
+  "content.managed-card.settings": {
     "defaultMessage": "Installation settings"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "Shared content"
+  },
+  "content.managed-card.summary.empty": {
+    "defaultMessage": "No managed content"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "Installing content..."
+  },
+  "content.managed-card.summary.loading": {
+    "defaultMessage": "Loading managed content summary"
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Switch version"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "Synced {time}"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "Update available"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "Updated {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "Updating..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "View content"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "Author"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Environment"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "Open source"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "Shared content"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "External"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "State"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "Disabled"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "Enabled"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "Update available"
+  },
+  "content.metadata-filter.update.up-to-date": {
+    "defaultMessage": "Up to date"
+  },
+  "content.metadata-filter.updates": {
+    "defaultMessage": "Updates"
+  },
+  "content.metadata-filter.warning.client-depends": {
+    "defaultMessage": "Client depends on file"
+  },
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "Client-only content"
+  },
+  "content.metadata-filter.warning.client-retained": {
+    "defaultMessage": "Client file retained"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "No warnings"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "Warnings"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
@@ -592,6 +685,12 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Failed to load content"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "Filter"
+  },
+  "content.page-layout.filter.author-count": {
+    "defaultMessage": "{count, plural, one {# author} other {# authors}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Loading content..."
@@ -620,8 +719,11 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Project names"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alphabetical"
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Name (A-Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Name (Z-A)"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Newest first"
@@ -1772,6 +1874,9 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Failed to upload file"
   },
+  "hosting.content.managed-content.modpack-header": {
+    "defaultMessage": "Modpack content"
+  },
   "hosting.loader.failed-to-change-version": {
     "defaultMessage": "Failed to change modpack version"
   },
@@ -2081,31 +2186,31 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Select icon"
   },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "This modpack does not include any additional content."
+  "instances.managed-content-modal.empty-description": {
+    "defaultMessage": "This source does not include any managed content."
   },
-  "instances.modpack-content-modal.empty-title": {
+  "instances.managed-content-modal.empty-title": {
     "defaultMessage": "No content found"
   },
-  "instances.modpack-content-modal.external-content": {
+  "instances.managed-content-modal.external-content": {
     "defaultMessage": "External"
   },
-  "instances.modpack-content-modal.external-content-description": {
+  "instances.managed-content-modal.external-content-description": {
     "defaultMessage": "This file is not published on Modrinth."
   },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpack content"
+  "instances.managed-content-modal.header": {
+    "defaultMessage": "Managed content"
   },
-  "instances.modpack-content-modal.loading": {
+  "instances.managed-content-modal.loading": {
     "defaultMessage": "Loading content..."
   },
-  "instances.modpack-content-modal.no-results": {
+  "instances.managed-content-modal.no-results": {
     "defaultMessage": "No projects match your search."
   },
-  "instances.modpack-content-modal.open-in-slicer": {
+  "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Open in Slicer"
   },
-  "instances.modpack-content-modal.search-placeholder": {
+  "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
   },
   "instances.updater-modal.badge.current": {

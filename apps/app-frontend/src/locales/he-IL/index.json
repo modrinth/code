@@ -533,16 +533,7 @@
   "search.filter.locked.instance.sync": {
     "message": "סנכרן עם התקנה"
   },
-  "search.filter.locked.server": {
-    "message": "מסופק על ידי השרת"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "ניתן להוסיף רק מודים בצד הלקוח לשרת"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "גרסת המשחק מסופקת על ידי השרת"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "הטוען מסופק על ידי השרת"
   }
 }
