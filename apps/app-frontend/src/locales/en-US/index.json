@@ -302,6 +302,18 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.hosting.update-required.description": {
+    "message": "You need to update to use Modrinth Hosting through the Modrinth App"
+  },
+  "app.hosting.update-required.download": {
+    "message": "Download to update"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Excited Modrinth Bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Modrinth App update required"
+  },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
   },
