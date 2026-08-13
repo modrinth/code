@@ -30,14 +30,14 @@
 			<div class="flex gap-1 flex-wrap">
 				<div
 					v-for="option in selectedFilterOptions"
-					:key="`selected-filter-${filterType.id}-${option}`"
+					:key="`selected-filter-${filterType.id}-${option.id}`"
 					class="flex gap-1 text-xs bg-button-bg px-2 py-0.5 rounded-full font-bold text-secondary w-fit shrink-0 items-center"
 				>
 					{{ option.formatted_name ?? option.id }}
 				</div>
 				<div
 					v-for="option in selectedNegativeFilterOptions"
-					:key="`excluded-filter-${filterType.id}-${option}`"
+					:key="`excluded-filter-${filterType.id}-${option.id}`"
 					class="flex gap-1 text-xs bg-button-bg px-2 py-0.5 rounded-full font-bold text-secondary w-fit shrink-0 items-center"
 				>
 					<BanIcon class="text-brand-red" /> {{ option.formatted_name ?? option.id }}
@@ -98,37 +98,62 @@
 						/>
 					</template>
 					<template v-else>
-						<SearchFilterOption
-							v-for="option in visibleOptions"
-							:key="`${filterType.id}-${option}`"
-							:option="option"
-							:included="isIncluded(option)"
-							:excluded="isExcluded(option)"
-							:supports="filterType.supports"
-							:class="{
-								'mr-3': scrollable,
-							}"
-							@toggle="toggleFilter"
-							@toggle-exclude="toggleNegativeFilter"
-						>
-							<slot name="option" :filter="filterType" :option="option">
-								<span
-									v-if="option.icon"
-									class="inline-flex items-center justify-center shrink-0 h-4 w-4"
-									:style="iconStyle(option)"
+						<template v-for="option in visibleOptions" :key="`${filterType.id}-${option.id}`">
+							<SearchFilterOption
+								:option="option"
+								:included="isIncluded(option)"
+								:excluded="isExcluded(option)"
+								:supports="filterType.supports"
+								:has-sub-options="!!option.sub_options?.length"
+								:expanded="isExpanded(option)"
+								:class="{
+									'mr-3': scrollable,
+								}"
+								@toggle="toggleFilter"
+								@toggle-exclude="toggleNegativeFilter"
+								@toggle-expand="toggleExpand(option)"
+							>
+								<slot name="option" :filter="filterType" :option="option">
+									<span
+										v-if="option.icon"
+										class="inline-flex items-center justify-center shrink-0 h-4 w-4"
+										:style="iconStyle(option)"
+									>
+										<div
+											v-if="typeof option.icon === 'string'"
+											class="h-4 w-4"
+											v-html="option.icon"
+										/>
+										<component :is="option.icon" v-else class="h-4 w-4" />
+									</span>
+									<span class="truncate text-sm" :style="iconStyle(option)">
+										{{ option.formatted_name ?? option.id }}
+									</span>
+								</slot>
+							</SearchFilterOption>
+							<div
+								v-if="option.sub_options?.length && isExpanded(option)"
+								class="ml-4 flex flex-col gap-1"
+								:class="{ 'mr-3': scrollable }"
+							>
+								<SearchFilterOption
+									v-for="subOption in option.sub_options"
+									:key="`${filterType.id}-${subOption.id}`"
+									:option="subOption"
+									:included="isIncluded(subOption)"
+									:excluded="isExcluded(subOption)"
+									:supports="filterType.supports"
+									@toggle="toggleFilter"
+									@toggle-exclude="toggleNegativeFilter"
 								>
-									<div
-										v-if="typeof option.icon === 'string'"
-										class="h-4 w-4"
-										v-html="option.icon"
-									/>
-									<component :is="option.icon" v-else class="h-4 w-4" />
-								</span>
-								<span class="truncate text-sm" :style="iconStyle(option)">
-									{{ option.formatted_name ?? option.id }}
-								</span>
-							</slot>
-						</SearchFilterOption>
+									<slot name="option" :filter="filterType" :option="subOption">
+										<span class="truncate text-sm">
+											{{ subOption.formatted_name ?? subOption.id }}
+										</span>
+									</slot>
+								</SearchFilterOption>
+							</div>
+						</template>
 					</template>
 					<button
 						v-if="filterType.display === 'expandable'"
@@ -180,12 +205,18 @@
 
 <script setup lang="ts">
 import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
+import {
+	type FilterOption,
+	type FilterType,
+	type FilterValue,
+	findParentFilterOption,
+	flattenFilterOptions,
+} from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
 import SearchFilterGroup from './SearchFilterGroup.vue'
@@ -215,22 +246,31 @@ defineOptions({
 
 const query = ref('')
 const showMore = ref(false)
+const expandedOptionIds = ref<string[]>([])
 
 const accordion = ref<InstanceType<typeof Accordion> | null>()
 
+const allOptions = computed(() => flattenFilterOptions(props.filterType.options))
+
 const selectedFilterOptions = computed(() =>
-	props.filterType.options.filter((option) =>
+	allOptions.value.filter((option) =>
 		locked.value ? isProvided(option, false) : isIncluded(option),
 	),
 )
 const selectedNegativeFilterOptions = computed(() =>
-	props.filterType.options.filter((option) =>
+	allOptions.value.filter((option) =>
 		locked.value ? isProvided(option, true) : isExcluded(option),
 	),
 )
 const visibleOptions = computed(() =>
 	props.filterType.options
-		.filter((option) => isVisible(option) || isIncluded(option) || isExcluded(option))
+		.filter(
+			(option) =>
+				isVisible(option) ||
+				isIncluded(option) ||
+				isExcluded(option) ||
+				hasSelectedSubOption(option),
+		)
 		.slice()
 		.sort((a, b) => {
 			if (props.filterType.display === 'expandable') {
@@ -309,6 +349,24 @@ function isExcluded(filter: FilterOption) {
 	return selectedFilters.value.some((value) => value.option === filter.id && value.negative)
 }
 
+function hasSelectedSubOption(filter: FilterOption) {
+	return (
+		filter.sub_options?.some((subOption) => isIncluded(subOption) || isExcluded(subOption)) ?? false
+	)
+}
+
+function isExpanded(filter: FilterOption) {
+	return expandedOptionIds.value.includes(filter.id)
+}
+
+function toggleExpand(filter: FilterOption) {
+	if (isExpanded(filter)) {
+		expandedOptionIds.value = expandedOptionIds.value.filter((id) => id !== filter.id)
+	} else {
+		expandedOptionIds.value = [...expandedOptionIds.value, filter.id]
+	}
+}
+
 function isVisible(filter: FilterOption) {
 	const filterKey = filter.formatted_name?.toLowerCase() ?? filter.id.toLowerCase()
 	const matchesQuery = !query.value || filterKey.includes(query.value.toLowerCase())
@@ -341,7 +399,22 @@ function toggleNegativeFilter(filter: FilterOption) {
 }
 
 function setFilter(filter: FilterOption, state: FilterState) {
-	const newFilters = selectedFilters.value.filter((selected) => selected.option !== filter.id)
+	let newFilters = selectedFilters.value.filter((selected) => selected.option !== filter.id)
+
+	if (state !== 'ignore') {
+		const subOptionIds = new Set(filter.sub_options?.map((subOption) => subOption.id) ?? [])
+		if (subOptionIds.size > 0) {
+			newFilters = newFilters.filter((selected) => !subOptionIds.has(selected.option))
+		}
+
+		const parent = findParentFilterOption(props.filterType.options, filter.id)
+		if (parent) {
+			newFilters = newFilters.filter((selected) => selected.option !== parent.id)
+			if (!expandedOptionIds.value.includes(parent.id)) {
+				expandedOptionIds.value = [...expandedOptionIds.value, parent.id]
+			}
+		}
+	}
 
 	const baseValues = {
 		type: props.filterType.id,
@@ -368,6 +441,18 @@ function clearFilters() {
 		(filter) => filter.type !== props.filterType.id,
 	)
 }
+
+watch(
+	selectedFilters,
+	() => {
+		for (const option of props.filterType.options) {
+			if (hasSelectedSubOption(option) && !expandedOptionIds.value.includes(option.id)) {
+				expandedOptionIds.value = [...expandedOptionIds.value, option.id]
+			}
+		}
+	},
+	{ deep: true, immediate: true },
+)
 
 const messages = defineMessages({
 	searchPlaceholder: {

@@ -2885,15 +2885,6 @@
   "project.settings.permissions.sort.status": {
     "message": "Status"
   },
-  "project.settings.title": {
-    "message": "Innstillinger"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Besøk prosjekt-dashbordet"
-  },
-  "project.status.archived.message": {
-    "message": "{title} har blitt arkivert. {title} kommer ikke til å få noen nye oppdateringer, hvis ikke forfatteren bestemmer seg for å dearkivere prosjektet."
-  },
   "project.versions.title": {
     "message": "Versjoner"
   },

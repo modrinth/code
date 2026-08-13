@@ -106,7 +106,7 @@
 				<div class="card-shadow flex flex-col gap-4 rounded-xl bg-bg-raised p-6">
 					<template v-if="!prefilled || !currentItemValid">
 						<div class="flex flex-col gap-2">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{ formatMessage(messages.whatContentType) }}
 							</span>
 							<RadioButtons
@@ -124,7 +124,7 @@
 							</RadioButtons>
 						</div>
 						<div class="flex flex-col gap-2" :class="{ hidden: !reportItem }">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{
 									formatMessage(messages.whatContentId, {
 										item: formatReportItemType(formatMessage, reportItem),
@@ -160,7 +160,7 @@
 										<AutoLink
 											:to="itemLink"
 											target="_blank"
-											class="flex items-center gap-1 font-bold text-contrast hover:underline"
+											class="flex items-center gap-1 font-semibold text-contrast hover:underline"
 										>
 											<Avatar
 												v-if="typeof itemIcon === 'string'"
@@ -203,7 +203,7 @@
 					</template>
 					<template v-else>
 						<div class="flex flex-col gap-2" :class="{ hidden: !reportItemID }">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{
 									formatMessage(messages.whatReportReason, {
 										item: formatReportItemType(formatMessage, reportItem),
@@ -211,7 +211,7 @@
 								}}
 							</span>
 							<RadioButtons v-slot="{ item }" v-model="reportType" :items="reportTypes">
-								{{ item === 'copyright' ? 'Reuploaded work' : capitalizeString(item) }}
+								{{ formatReportType(formatMessage, item) }}
 							</RadioButtons>
 						</div>
 						<div
@@ -236,7 +236,7 @@
 							</div>
 						</div>
 						<div :class="{ hidden: !reportType }">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{ formatMessage(messages.reportBodyTitle) }}
 							</span>
 							<p class="m-0 leading-tight text-secondary">
@@ -247,6 +247,7 @@
 							<MarkdownEditor
 								v-model="reportBody"
 								placeholder=""
+								:disabled="disableReporting"
 								:on-image-upload="onImageUpload"
 							/>
 						</div>
@@ -255,7 +256,7 @@
 								id="submit-button"
 								type="colored"
 								color="brand"
-								:disabled="submitLoading || !canSubmit"
+								:disabled="submitLoading || !canSubmit || disableReporting"
 								@click="submitReport"
 							>
 								<SendIcon aria-hidden="true" />
@@ -291,6 +292,7 @@ import {
 	defineMessage,
 	defineMessages,
 	formatReportItemType,
+	formatReportType,
 	injectNotificationManager,
 	IntlFormatted,
 	MarkdownEditor,
@@ -410,10 +412,18 @@ async function fetchItem() {
 }
 
 const reportItems = ['project', 'version', 'user']
-const reportTypes = computed(() => tags.value.reportTypes)
+const reportTypes = computed(() => {
+	const types = [...tags.value.reportTypes]
+	if (reportItem.value === 'project') {
+		types.push('missing-disclosure')
+	}
+	return types
+})
+const disableReporting = computed(() => reportType.value === 'missing-disclosure')
 
 const canSubmit = computed(() => {
 	return (
+		!disableReporting.value &&
 		reportItem.value !== '' &&
 		reportItemID.value !== '' &&
 		reportType.value !== '' &&
@@ -544,6 +554,17 @@ const warnings: Record<string, MessageDescriptor[]> = {
 			id: 'report.note.malicious.2',
 			defaultMessage:
 				'Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted.',
+		}),
+	],
+	'missing-disclosure': [
+		defineMessage({
+			id: 'report.note.missing-disclosure.1',
+			defaultMessage: `Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures.`,
+		}),
+		defineMessage({
+			id: 'report.note.missing-disclosure.2',
+			defaultMessage:
+				'Check back later once the grace period has ended. Reports of this type are not being accepted at this time.',
 		}),
 	],
 }

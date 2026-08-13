@@ -695,15 +695,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Gegen welche Regel verstößt diese Instanz?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Unangemessen"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Bösartig"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Geteilte Instanz melden"
   },

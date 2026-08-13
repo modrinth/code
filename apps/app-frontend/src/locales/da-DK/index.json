@@ -461,9 +461,6 @@
   "app.modal.install-to-play.report-image-too-large": {
     "message": "Filen overskrider 1MiB størrelse begrænsning"
   },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Delt instance"
   },

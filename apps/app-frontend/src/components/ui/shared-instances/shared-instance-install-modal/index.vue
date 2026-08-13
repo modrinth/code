@@ -251,6 +251,7 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	formatReportType,
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -328,9 +329,9 @@ const externalFileRows = computed<ExternalFileRow[]>(() =>
 		.sort((left, right) => left.name.localeCompare(right.name)),
 )
 const reportReasonOptions = computed<ComboboxOption<ReportReason>[]>(() => [
-	{ value: 'malicious', label: formatMessage(messages.maliciousReason) },
-	{ value: 'inappropriate', label: formatMessage(messages.inappropriateReason) },
-	{ value: 'spam', label: formatMessage(messages.spamReason) },
+	{ value: 'malicious', label: formatReportType(formatMessage, 'malicious') },
+	{ value: 'inappropriate', label: formatReportType(formatMessage, 'inappropriate') },
+	{ value: 'spam', label: formatReportType(formatMessage, 'spam') },
 ])
 const canSubmitReport = computed(
 	() => Boolean(preview.value && additionalContext.value.trim()) && !submitLoading.value,
@@ -539,18 +540,6 @@ const messages = defineMessages({
 	reportReason: {
 		id: 'app.modal.install-to-play.report-reason',
 		defaultMessage: 'Which rule does this instance violate?',
-	},
-	maliciousReason: {
-		id: 'app.modal.install-to-play.report-reason.malicious',
-		defaultMessage: 'Malicious',
-	},
-	inappropriateReason: {
-		id: 'app.modal.install-to-play.report-reason.inappropriate',
-		defaultMessage: 'Inappropriate',
-	},
-	spamReason: {
-		id: 'app.modal.install-to-play.report-reason.spam',
-		defaultMessage: 'Spam',
 	},
 	additionalContext: {
 		id: 'app.modal.install-to-play.additional-context',

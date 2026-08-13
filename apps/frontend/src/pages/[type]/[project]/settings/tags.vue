@@ -2,8 +2,10 @@
 import {
 	Admonition,
 	Checkbox,
+	commonMessages,
 	ConfirmLeaveModal,
 	defineMessages,
+	EmptyState,
 	formatCategory,
 	formatCategoryHeader,
 	formatProjectTypeSentence,
@@ -51,9 +53,9 @@ const messages = defineMessages({
 		id: 'project.settings.tags.title',
 		defaultMessage: 'Tags',
 	},
-	uploadVersionFirst: {
-		id: 'project.settings.tags.upload-version-first',
-		defaultMessage: 'Please upload a version first in order to select tags!',
+	uploadVersionFirstHeading: {
+		id: 'project.settings.tags.upload-version-first.heading',
+		defaultMessage: 'Upload versions before adding tags',
 	},
 	categoriesDescription: {
 		id: 'project.settings.tags.categories-description',
@@ -144,6 +146,8 @@ const groupDescriptionMessages: Record<string, MessageDescriptor> = {
 }
 
 const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(messages.title)
 
 const formatCategoryName = (categoryName: string) => formatCategory(formatMessage, categoryName)
 
@@ -373,9 +377,12 @@ const toggleFeatured = (tag: string) => {
 		<h2 class="mb-4 mt-0 text-2xl font-semibold">
 			{{ formatMessage(messages.title) }}
 		</h2>
-		<p v-if="!canSelectTags" class="known-errors">
-			{{ formatMessage(messages.uploadVersionFirst) }}
-		</p>
+		<EmptyState
+			v-if="!canSelectTags"
+			type="no-documents"
+			:heading="formatMessage(messages.uploadVersionFirstHeading)"
+			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
+		/>
 		<div v-else class="flex flex-col gap-4">
 			<Admonition v-if="allTagsSelectedWarning" type="critical" :body="allTagsSelectedWarning" />
 			<Admonition v-else-if="tooManyTagsWarning" type="warning" :body="tooManyTagsWarning" />
@@ -390,10 +397,10 @@ const toggleFeatured = (tag: string) => {
 				:key="group.id"
 				class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
 			>
-				<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+				<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 					{{ group.title }}
 				</h3>
-				<p v-if="group.description" class="mb-3 mt-0 text-sm">
+				<p v-if="group.description" class="mb-3 mt-0">
 					{{ group.description }}
 				</p>
 				<div class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
@@ -413,7 +420,7 @@ const toggleFeatured = (tag: string) => {
 
 			<div class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
 				<div class="mb-1 flex items-center gap-2">
-					<h3 class="m-0 text-base font-semibold text-contrast">
+					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.featuredTags) }}
 					</h3>
 					<TagItem
@@ -427,10 +434,10 @@ const toggleFeatured = (tag: string) => {
 						{{ current.featuredTags.length }}/{{ MAX_FEATURED_TAGS }}
 					</TagItem>
 				</div>
-				<p class="mb-3 mt-0 text-sm">
+				<p class="mb-3 mt-0">
 					{{ formatMessage(messages.featuredTagsDescription) }}
 				</p>
-				<p v-if="current.selectedTags.length < 1" class="m-0 text-sm text-secondary">
+				<p v-if="current.selectedTags.length < 1" class="m-0 text-secondary">
 					{{ formatMessage(messages.selectAtLeastOneCategory) }}
 				</p>
 				<div v-else class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">

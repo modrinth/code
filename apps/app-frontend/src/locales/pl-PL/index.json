@@ -662,15 +662,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Którą zasadę narusza ta instancja?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Treści nieodpowiednie"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Zawiera Złośliwy kod"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Zgłoś przesłaną Instalacje"
   },

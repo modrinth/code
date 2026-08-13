@@ -3788,15 +3788,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Avanzado"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Excluir paquetes de datos"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Excluir mods"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Excluir plugins"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Entorno"
   },

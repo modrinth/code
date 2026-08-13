@@ -40,7 +40,12 @@ import { BanIcon, LockIcon, XCircleIcon, XIcon } from '@modrinth/assets'
 import { computed, type ComputedRef } from 'vue'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
-import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
+import {
+	type FilterOption,
+	type FilterType,
+	type FilterValue,
+	flattenFilterOptions,
+} from '../../utils/search'
 import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()
@@ -73,7 +78,7 @@ function filterMatches(type: FilterType, option: FilterOption, list: FilterValue
 
 const items: ComputedRef<Item[]> = computed(() => {
 	return props.filters.flatMap((type) =>
-		type.options
+		flattenFilterOptions(type.options)
 			.filter(
 				(option) =>
 					filterMatches(type, option, selectedFilters.value) ||

@@ -88,6 +88,13 @@ export default function () {
 						OVERRIDES: state.overrides,
 					}))
 					.children(markdown('overrides').title('Forbidden overrides list').required()),
+
+				toggle('missing-attribution', 'Missing Attribution')
+					.suggestedStatus('rejected')
+					.message((state) => ({
+						MISSING_CREDITS: state.missing_credits,
+					})),
+				//.children(markdown('missing_credits').title('Add list of missing credits.')),
 			),
 		)
 }

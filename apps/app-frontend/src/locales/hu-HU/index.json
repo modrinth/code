@@ -695,15 +695,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Melyik szabályt sérti ez az adott példány?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Nem megfelelő"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Káros"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Megosztott példány jelentése"
   },

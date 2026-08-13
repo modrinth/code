@@ -695,15 +695,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "この起動構成はどの規則に違反していますか？"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "不適切なコンテンツ"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "悪意がある"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "スパム"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "共有された起動構成を通報する"
   },

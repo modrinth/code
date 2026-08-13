@@ -48,8 +48,10 @@ const props = withDefaults(
 	},
 )
 
-const shown = computed(() =>
-	Object.keys(props.modified).some((key) => !isEqual(props.original[key], props.modified[key])),
+const shown = computed(
+	() =>
+		props.saving ||
+		Object.keys(props.modified).some((key) => !isEqual(props.original[key], props.modified[key])),
 )
 
 function localizeIfPossible(message: MessageDescriptor | string) {

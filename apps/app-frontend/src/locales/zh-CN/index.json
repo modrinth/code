@@ -695,15 +695,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "该实例违反了哪项规则？"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "不当内容"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "恶意内容"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "垃圾内容"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "举报共享实例"
   },
