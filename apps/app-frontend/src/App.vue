@@ -71,6 +71,7 @@ import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
@@ -202,10 +203,19 @@ watch(
 	},
 )
 const forceSidebar = computed(
-	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
+	() =>
+		route.path.startsWith('/browse') ||
+		route.path.startsWith('/project') ||
+		route.path.startsWith('/user'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
+const hostingUpdateRequired = computed(
+	() =>
+		hostingRouteActive.value &&
+		!!appUpdateState.availableUpdate.value &&
+		appUpdateState.updatesEnabled.value,
+)
 const prideFundraiserEnabled = computed(
 	() => themeStore.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
 )
@@ -216,7 +226,9 @@ const hostingIntercomIdentityKey = computed(() => {
 	return `${userId}:${serverId ?? 'hosting'}`
 })
 const hostingIntercom = useHostingIntercom({
-	enabled: computed(() => hostingRouteActive.value && !!credentials.value?.session),
+	enabled: computed(
+		() => hostingRouteActive.value && !hostingUpdateRequired.value && !!credentials.value?.session,
+	),
 	appId: 'ykeritl9',
 	fetchToken: fetchIntercomToken,
 	identityKey: hostingIntercomIdentityKey,
@@ -1784,7 +1796,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				{{ formatMessage(messages.authUnreachableBody) }}
 			</Admonition>
-			<RouterView v-slot="{ Component }">
+			<HostingUpdateRequired v-if="hostingUpdateRequired" />
+			<RouterView v-else v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
 						<component :is="Component"></component>

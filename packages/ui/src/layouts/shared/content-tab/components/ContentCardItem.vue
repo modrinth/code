@@ -2,11 +2,13 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
 	TrashIcon,
 	TriangleAlertIcon,
+	UploadIcon,
 } from '@modrinth/assets'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, getCurrentInstance, ref } from 'vue'
@@ -38,6 +40,14 @@ const messages = defineMessages({
 		id: 'content.card.select-project',
 		defaultMessage: 'Select {project}',
 	},
+	uploaded: {
+		id: 'content.card.uploaded',
+		defaultMessage: 'Uploaded',
+	},
+	frozen: {
+		id: 'content.card.frozen',
+		defaultMessage: 'This project is locked to its current version until unfrozen.',
+	},
 })
 
 interface Props {
@@ -47,7 +57,9 @@ interface Props {
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	source?: ContentSource
+	external?: boolean
 	enabled?: boolean
+	locked?: boolean
 	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean
@@ -58,6 +70,7 @@ interface Props {
 	disabledTooltip?: string | null
 	toggleDisabled?: boolean
 	toggleDisabledTooltip?: string | null
+	hideToggle?: boolean
 	showCheckbox?: boolean
 	hideDelete?: boolean
 	hideActions?: boolean
@@ -70,7 +83,9 @@ const props = withDefaults(defineProps<Props>(), {
 	versionLink: undefined,
 	owner: undefined,
 	source: undefined,
+	external: false,
 	enabled: undefined,
+	locked: false,
 	installing: false,
 	hasUpdate: false,
 	isClientOnly: false,
@@ -81,6 +96,7 @@ const props = withDefaults(defineProps<Props>(), {
 	disabledTooltip: undefined,
 	toggleDisabled: false,
 	toggleDisabledTooltip: undefined,
+	hideToggle: false,
 	showCheckbox: false,
 	hideDelete: false,
 	hideActions: false,
@@ -243,7 +259,11 @@ const deleteHovered = ref(false)
 							/>
 							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
-						<template v-if="version">
+						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
+							<UploadIcon class="size-4 shrink-0" />
+							<span class="text-sm leading-5">{{ formatMessage(messages.uploaded) }}</span>
+						</span>
+						<template v-if="version && !external">
 							<BulletDivider class="shrink-0 @[800px]:hidden" />
 							<AutoLink
 								:target="
@@ -277,7 +297,7 @@ const deleteHovered = ref(false)
 						typeof versionLink === 'string' && versionLink.startsWith('http') ? '_blank' : undefined
 					"
 					:to="versionLink"
-					class="inline-flex min-w-0 font-medium leading-6 text-contrast !decoration-contrast"
+					class="inline-flex min-w-0 font-semibold leading-6 text-contrast !decoration-contrast"
 					:class="{ 'hover:underline': versionLink, 'cursor-pointer': versionLink }"
 				>
 					<span ref="versionNumberRef" class="truncate">{{
@@ -309,11 +329,24 @@ const deleteHovered = ref(false)
 
 			<!-- Fixed width container to reserve space for update/switch version button -->
 			<div
-				v-if="hasUpdateListener || hasSwitchVersionListener"
+				v-if="
+					locked ||
+					(hasUpdateListener && hasUpdate) ||
+					(hasSwitchVersionListener && version && !hideSwitchVersion)
+				"
 				class="flex w-8 items-center justify-center"
 			>
 				<IconButton
-					v-if="hasUpdate"
+					v-if="locked"
+					v-tooltip="formatMessage(messages.frozen)"
+					type="quiet"
+					:label="formatMessage(messages.frozen)"
+					disabled
+				>
+					<LockIcon class="size-5" />
+				</IconButton>
+				<IconButton
+					v-else-if="hasUpdate"
 					v-tooltip="
 						isDisabled && disabledTooltip
 							? disabledTooltip
@@ -353,7 +386,7 @@ const deleteHovered = ref(false)
 			</div>
 
 			<Toggle
-				v-if="enabled !== undefined"
+				v-if="enabled !== undefined && !hideToggle"
 				v-tooltip="
 					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
 						? (toggleDisabledTooltip ?? disabledTooltip)

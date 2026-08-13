@@ -229,11 +229,11 @@
 			</div>
 		</template>
 	</NewModal>
-	<ModpackContentModal
+	<ManagedContentModal
 		ref="contentModal"
 		:header="formatMessage(messages.sharedInstanceContent)"
-		:modpack-name="preview?.name ?? ''"
-		:modpack-icon-url="preview?.iconUrl ?? undefined"
+		:source-name="preview?.name ?? ''"
+		:source-icon-url="preview?.iconUrl ?? undefined"
 	/>
 </template>
 
@@ -255,8 +255,8 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	ManagedContentModal,
 	MarkdownEditor,
-	ModpackContentModal,
 	NewModal,
 	Table,
 	type TableColumn,
@@ -288,7 +288,7 @@ type SharedInstanceCreator = {
 }
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const contentModal = ref<InstanceType<typeof ModpackContentModal>>()
+const contentModal = ref<InstanceType<typeof ManagedContentModal>>()
 const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
 const creator = ref<SharedInstanceCreator | null>(null)

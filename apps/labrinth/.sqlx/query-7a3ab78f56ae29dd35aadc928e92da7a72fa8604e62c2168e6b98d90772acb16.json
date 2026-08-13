@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT\n                    m.id AS \"id!\",\n                    m.status AS \"status!\",\n                    m.slug,\n                    t.id AS \"thread_id!\"\n                FROM mods m\n                INNER JOIN team_members tm\n                    ON tm.team_id = m.team_id\n                    AND tm.user_id = $1\n                    AND tm.is_owner = TRUE\n                INNER JOIN threads t ON t.mod_id = m.id\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "status!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "thread_id!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "7a3ab78f56ae29dd35aadc928e92da7a72fa8604e62c2168e6b98d90772acb16"
+}

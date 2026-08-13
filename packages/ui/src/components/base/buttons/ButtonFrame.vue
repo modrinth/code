@@ -46,7 +46,7 @@ const typeClasses: Record<ButtonType, string> = {
 	colored:
 		'button-frame--colored bg-[--button-color] text-[var(--color-accent-contrast)] [&>svg]:text-inherit',
 	outlined:
-		'button-frame--outlined bg-transparent text-[var(--button-color,var(--color-contrast))] [&>svg]:text-inherit',
+		'button-frame--outlined bg-transparent text-[var(--button-color,var(--color-contrast))] [&>svg]:text-[var(--button-color,var(--color-base))]',
 	quiet: 'button-frame--quiet bg-transparent [&>svg]:text-inherit',
 }
 

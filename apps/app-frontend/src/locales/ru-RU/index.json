@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Проверьте изменения"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Обзор обновления"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Проверка..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Необходимо обновление для игры в {name}. Обновитесь до последней версии и запустите игру."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Доступно обновление"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Все данные сборки будут удалены навсегда, в том числе миры, настройки и весь установленный контент."
@@ -1910,17 +1901,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Использовать из сборки"
   },
-  "search.filter.locked.server": {
-    "message": "Управляется сервером"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "В серверной сборке доступны только клиентские моды"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Версия игры управляется сервером"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Загрузчик управляется сервером"
   },
   "settings.sidebar.label.account": {
     "message": "Аккаунт"

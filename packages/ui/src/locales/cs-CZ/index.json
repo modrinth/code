@@ -548,18 +548,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Názvy projektů"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Abecedně"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Od nejnovějších"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Od nejstarších"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Seřadit {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Aktualizovat vše"
   },
@@ -1831,18 +1819,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Vybrat ikonu"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nebyl nalezen obsah"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Obsah modpacku"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Načítání obsahu..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Žádné projekty neodpovídají tvému vyhledávání."
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Mometálně"
@@ -4554,4 +4530,3 @@
     "defaultMessage": "Typ"
   }
 }
-
