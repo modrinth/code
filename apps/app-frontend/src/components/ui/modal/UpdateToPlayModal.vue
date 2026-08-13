@@ -34,6 +34,7 @@ import { get_project_many, get_version, get_version_many } from '@/helpers/cache
 import { wait_for_install_job } from '@/helpers/install'
 import { update_managed_modrinth_version } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
+import { injectAppEvents } from '@/providers/app-events'
 import { injectServerInstall } from '@/providers/server-install'
 
 type Dependency = Labrinth.Versions.v3.Dependency
@@ -74,6 +75,7 @@ type ProjectInfo = {
 }
 
 const { formatMessage } = useVIntl()
+const appEvents = injectAppEvents()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
@@ -253,7 +255,7 @@ async function handleUpdate() {
 	try {
 		if (modpackVersionId.value && instance.value) {
 			const job = await update_managed_modrinth_version(instance.value.id, modpackVersionId.value)
-			await wait_for_install_job(job.job_id)
+			await wait_for_install_job(appEvents, job.job_id)
 			await onUpdateComplete.value()
 		}
 	} catch (error) {

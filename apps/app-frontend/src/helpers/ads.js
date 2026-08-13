@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'
 
 export async function init_ads_window(overrideShown = false) {
 	return await invoke('plugin:ads|init_ads_window', {
@@ -45,10 +44,6 @@ export async function perform_ads_consent_action(action) {
 
 export async function open_ads_consent_preferences() {
 	return await invoke('plugin:ads|open_ads_consent_preferences')
-}
-
-export async function ads_consent_listener(callback) {
-	return await listen('ads-consent-required', (event) => callback(event.payload))
 }
 
 export async function record_ads_click() {

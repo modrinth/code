@@ -10,7 +10,6 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 import type { Router } from 'vue-router'
 
-import { install_job_listener } from '@/helpers/events'
 import {
 	install_job_dismiss,
 	install_job_list,
@@ -23,6 +22,7 @@ import {
 	type InstallProgress,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
+import { injectAppEvents } from '@/providers/app-events'
 import { useTheming } from '@/store/state'
 
 const messages = defineMessages({
@@ -234,6 +234,7 @@ export async function useInstallJobNotifications(opts: {
 	handleError: (err: unknown) => void
 	onChange: () => void
 }) {
+	const appEvents = injectAppEvents()
 	const { formatMessage } = useVIntl()
 	const themeStore = useTheming()
 	const jobs = ref<InstallJobSnapshot[]>([])
@@ -635,7 +636,7 @@ export async function useInstallJobNotifications(opts: {
 		void refreshMetadata()
 	}
 
-	const unlisten = await install_job_listener((job: InstallJobSnapshot) => applyJobUpdate(job))
+	const unlisten = appEvents.on('install_job', applyJobUpdate)
 	await refresh(false)
 
 	return {
