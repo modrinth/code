@@ -8,103 +8,126 @@
 		<template v-else>{{ label }}</template>
 	</span>
 
-	<MultiSelect
-		v-for="preview in appliedFilterPreviews"
-		:key="preview.key"
-		class="min-w-0 max-w-full"
-		:model-value="getPreviewSelectedValues(preview.key)"
-		:options="preview.options"
-		:max-height="500"
-		:clearable="false"
-		:show-chevron="false"
-		:fit-content="true"
-		:searchable="preview.category.searchable"
-		:search-placeholder="preview.category.searchPlaceholder"
-		trigger-type="base"
-		trigger-size="lg"
-		:trigger-class="effectivePreviewTriggerClass"
-		:dropdown-width="getPreviewDropdownWidth(preview.category)"
-		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
-		:checkbox-position="checkboxPosition"
-		show-selection-actions
-		@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
-		@open="openPreviewFilterDraft(preview.key)"
-		@close="commitPreviewFilterDraft(preview.key)"
-	>
-		<template v-if="$slots['preview-top'] && preview.category.syntheticOptions?.length" #top>
-			<slot
-				name="preview-top"
-				:category="preview.category"
-				:selected-values="getPreviewSelectedValues(preview.key)"
-				:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
-				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
-			></slot>
-		</template>
-		<template v-if="$slots['search-actions']" #search-actions>
-			<slot
-				name="search-actions"
-				:category="preview.category"
-				:selected-values="getPreviewSelectedValues(preview.key)"
-				:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
-				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
-			></slot>
-		</template>
-		<template #input-content="{ isOpen, openDirection }">
-			<div class="flex min-h-8 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
-				<FilterIcon
-					v-if="showPreviewFilterIcon"
-					class="size-5 shrink-0 text-primary"
-					aria-hidden="true"
-				/>
-				<span class="min-w-0 flex-1 truncate">
-					<span class="font-medium">{{ preview.label }}:</span>
-					<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
-				</span>
-				<div class="flex shrink-0 items-center gap-1.5">
-					<button
-						type="button"
-						class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-						:aria-label="`Clear ${preview.label} filter`"
-						@click.stop="clearFilterCategory(preview.key)"
-					>
-						<XIcon class="size-4 text-primary" />
-					</button>
-					<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-					<ChevronLeftIcon
-						class="size-5 shrink-0 text-secondary transition-transform duration-150"
-						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
+	<template v-for="preview in appliedFilterPreviews" :key="preview.key">
+		<Button
+			v-if="preview.category.direct"
+			type="outlined"
+			native-type="button"
+			size="lg"
+			:class="effectivePreviewTriggerClass"
+			:aria-label="`Clear ${preview.label} filter`"
+			@click="clearFilterCategory(preview.key)"
+		>
+			<span class="font-semibold">{{ preview.label }}</span>
+			<XIcon class="size-4" />
+		</Button>
+		<MultiSelect
+			v-else
+			class="min-w-0 max-w-full"
+			:model-value="getPreviewSelectedValues(preview.key)"
+			:options="preview.options"
+			:max-height="500"
+			:clearable="false"
+			:show-chevron="false"
+			:fit-content="true"
+			:searchable="preview.category.searchable"
+			:search-placeholder="preview.category.searchPlaceholder"
+			trigger-type="base"
+			trigger-size="lg"
+			:trigger-class="effectivePreviewTriggerClass"
+			:dropdown-width="getPreviewDropdownWidth(preview.category)"
+			:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
+			:checkbox-position="checkboxPosition"
+			show-selection-actions
+			@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
+			@open="openPreviewFilterDraft(preview.key)"
+			@close="commitPreviewFilterDraft(preview.key)"
+		>
+			<template v-if="$slots['preview-top'] && preview.category.syntheticOptions?.length" #top>
+				<slot
+					name="preview-top"
+					:category="preview.category"
+					:selected-values="getPreviewSelectedValues(preview.key)"
+					:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
+					:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
+				></slot>
+			</template>
+			<template v-if="$slots['search-actions']" #search-actions>
+				<slot
+					name="search-actions"
+					:category="preview.category"
+					:selected-values="getPreviewSelectedValues(preview.key)"
+					:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
+					:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
+				></slot>
+			</template>
+			<template #input-content="{ isOpen, openDirection }">
+				<div class="flex min-h-8 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
+					<FilterIcon
+						v-if="showPreviewFilterIcon"
+						class="size-5 shrink-0 text-primary"
+						aria-hidden="true"
 					/>
+					<slot
+						name="preview-content"
+						:category="preview.category"
+						:selected-values="getPreviewSelectedValues(preview.key)"
+						:label="preview.label"
+						:summary="preview.summary"
+					>
+						<span class="min-w-0 flex-1 truncate">
+							<span class="font-medium">{{ preview.label }}:</span>
+							<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
+						</span>
+					</slot>
+					<div class="flex shrink-0 items-center gap-1.5">
+						<button
+							type="button"
+							class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+							:aria-label="`Clear ${preview.label} filter`"
+							@click.stop="clearFilterCategory(preview.key)"
+						>
+							<XIcon class="size-4 text-primary" />
+						</button>
+						<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+						<ChevronLeftIcon
+							class="size-5 shrink-0 text-secondary transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+						/>
+					</div>
 				</div>
-			</div>
-		</template>
-		<template v-if="$slots['preview-footer']" #bottom>
-			<slot
-				name="preview-footer"
-				:category="preview.category"
-				:selected-values="getPreviewSelectedValues(preview.key)"
-				:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
-				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
-			></slot>
-		</template>
-		<template v-if="$slots.option" #option="{ item, selected, index }">
-			<slot
-				name="option"
-				:category="preview.category"
-				:option="item"
-				:selected="selected"
-				:index="index"
-			></slot>
-		</template>
-		<template v-else-if="$slots['option-right']" #option-right="{ item, selected, index }">
-			<slot
-				name="option-right"
-				:category="preview.category"
-				:option="item"
-				:selected="selected"
-				:index="index"
-			></slot>
-		</template>
-	</MultiSelect>
+			</template>
+			<template v-if="$slots['preview-footer']" #bottom>
+				<slot
+					name="preview-footer"
+					:category="preview.category"
+					:selected-values="getPreviewSelectedValues(preview.key)"
+					:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
+					:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
+				></slot>
+			</template>
+			<template v-if="$slots.option" #option="{ item, selected, index }">
+				<slot
+					name="option"
+					:category="preview.category"
+					:option="item"
+					:selected="selected"
+					:index="index"
+				></slot>
+			</template>
+			<template v-else-if="$slots['option-right']" #option-right="{ item, selected, index }">
+				<slot
+					name="option-right"
+					:category="preview.category"
+					:option="item"
+					:selected="selected"
+					:index="index"
+				></slot>
+			</template>
+		</MultiSelect>
+	</template>
 
 	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
 		<Button
@@ -132,7 +155,7 @@
 			<div
 				v-if="isAddMenuOpen && !isMobileActiveSubmenu"
 				ref="menuContainer"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
+				class="fixed z-[9999] flex flex-col overflow-x-hidden overflow-y-auto rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
 				:style="addMenuStyle"
 				role="menu"
 				@mousedown.stop
@@ -145,15 +168,24 @@
 					:ref="(element) => setCategoryButtonRef(category.key, element)"
 					type="button"
 					class="group/filter-menu-button flex h-12 w-full appearance-none items-center justify-between gap-1 border-0 px-4 text-left text-base font-semibold text-primary shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110 bg-surface-4"
-					:class="category.key === activeCategoryKey ? '!brightness-110' : ''"
-					role="menuitem"
-					@click="activateCategory(category.key)"
-					@mouseenter="handleCategoryMouseEnter(category.key)"
-					@focus="handleCategoryFocus(category.key)"
+					:class="
+						category.key === activeCategoryKey || isDirectCategorySelected(category)
+							? '!brightness-110'
+							: ''
+					"
+					:role="category.direct ? 'menuitemcheckbox' : 'menuitem'"
+					:aria-checked="category.direct ? isDirectCategorySelected(category) : undefined"
+					@click="handleCategoryClick(category)"
+					@mouseenter="handleCategoryMouseEnter(category)"
+					@focus="handleCategoryFocus(category)"
 				>
 					<span>{{ category.label }}</span>
 					<div class="flex items-center gap-1">
-						<ChevronRightIcon class="size-5 text-secondary" />
+						<CheckIcon
+							v-if="category.direct && isDirectCategorySelected(category)"
+							class="size-5 text-brand"
+						/>
+						<ChevronRightIcon v-else-if="!category.direct" class="size-5 text-secondary" />
 					</div>
 				</button>
 			</div>
@@ -417,6 +449,7 @@ export type DropdownFilterBarCategory = {
 	key: string
 	label: string
 	options: DropdownFilterBarItem[]
+	direct?: boolean
 	syntheticOptions?: DropdownFilterBarOption[]
 	searchable?: boolean
 	disableLocalOptionsFilter?: boolean
@@ -461,6 +494,7 @@ type ViewportRect = {
 type MenuPositionOptions = {
 	triggerRect: DOMRect
 	dropdownRect: DOMRect
+	dropdownHeight: number
 	viewport: ViewportRect
 }
 
@@ -1341,7 +1375,42 @@ function getSubmenuWidthInPixels(category: DropdownFilterBarCategory): number {
 }
 
 function getWidestSubmenuWidthInPixels(categories: DropdownFilterBarCategory[]): number {
-	return Math.max(...categories.map((category) => getSubmenuWidthInPixels(category)), 0)
+	return Math.max(
+		...categories
+			.filter((category) => !category.direct)
+			.map((category) => getSubmenuWidthInPixels(category)),
+		0,
+	)
+}
+
+function getDirectCategoryOption(category: DropdownFilterBarCategory) {
+	if (!category.direct) return undefined
+	return category.options.find(isDropdownFilterOption)
+}
+
+function isDirectCategorySelected(category: DropdownFilterBarCategory) {
+	const option = getDirectCategoryOption(category)
+	return !!option && isFilterValueSelected(category.key, option.value)
+}
+
+function deactivateCategory() {
+	clearPendingCategoryTimeout()
+	pendingCategoryKey.value = null
+	activeCategoryKey.value = null
+	categorySearchQuery.value = ''
+	hasSubmenuPosition.value = false
+}
+
+function handleCategoryClick(category: DropdownFilterBarCategory) {
+	const option = getDirectCategoryOption(category)
+	if (!option) {
+		activateCategory(category.key)
+		return
+	}
+
+	deactivateCategory()
+	toggleFilterOption(category.key, option)
+	scheduleAddMenuPositionUpdate()
 }
 
 function activateCategory(categoryKey: string) {
@@ -1357,18 +1426,27 @@ function activateCategory(categoryKey: string) {
 	}
 }
 
-function handleCategoryFocus(categoryKey: string) {
+function handleCategoryFocus(category: DropdownFilterBarCategory) {
+	if (category.direct) {
+		deactivateCategory()
+		return
+	}
 	if (isMobileAddMenuLayout.value) {
 		return
 	}
 
-	activateCategory(categoryKey)
+	activateCategory(category.key)
 }
 
-function handleCategoryMouseEnter(categoryKey: string) {
+function handleCategoryMouseEnter(category: DropdownFilterBarCategory) {
+	if (category.direct) {
+		deactivateCategory()
+		return
+	}
 	if (isMobileAddMenuLayout.value) {
 		return
 	}
+	const categoryKey = category.key
 
 	if (!activeCategoryKey.value) {
 		activateCategory(categoryKey)
@@ -1448,7 +1526,12 @@ function getViewportRect(): ViewportRect {
 	}
 }
 
-function getAddMenuPosition({ triggerRect, dropdownRect, viewport }: MenuPositionOptions) {
+function getAddMenuPosition({
+	triggerRect,
+	dropdownRect,
+	dropdownHeight,
+	viewport,
+}: MenuPositionOptions) {
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
 	const positionedDropdownWidth = Math.max(dropdownRect.width, dropdownWidth)
 	const triggerTop = triggerRect.top + viewport.offsetTop
@@ -1463,18 +1546,24 @@ function getAddMenuPosition({ triggerRect, dropdownRect, viewport }: MenuPositio
 		minLeft,
 		viewportRight - positionedDropdownWidth - DROPDOWN_VIEWPORT_MARGIN,
 	)
-	const hasSpaceBelow =
-		triggerBottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <= viewportBottom
-	const hasSpaceAbove =
-		triggerTop - dropdownRect.height - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN > viewportTop
-	const opensUp = !hasSpaceBelow && hasSpaceAbove
+	const spaceBelow = Math.max(
+		0,
+		viewportBottom - triggerBottom - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN,
+	)
+	const spaceAbove = Math.max(0, triggerTop - viewportTop - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN)
+	const hasSpaceBelow = dropdownHeight <= spaceBelow
+	const hasSpaceAbove = dropdownHeight <= spaceAbove
+	const opensUp = !hasSpaceBelow && (hasSpaceAbove || spaceAbove > spaceBelow)
+	const availableHeight = opensUp ? spaceAbove : spaceBelow
+	const positionedDropdownHeight = Math.min(dropdownHeight, availableHeight)
 	const top = opensUp
-		? triggerTop - dropdownRect.height - DROPDOWN_GAP
+		? triggerTop - positionedDropdownHeight - DROPDOWN_GAP
 		: triggerBottom + DROPDOWN_GAP
 	const left = Math.min(Math.max(minLeft, triggerLeft), maxLeft)
 
 	return {
 		left: `${left}px`,
+		maxHeight: `${availableHeight}px`,
 		minWidth: `${triggerRect.width}px`,
 		top: `${Math.max(viewportTop + DROPDOWN_VIEWPORT_MARGIN, top)}px`,
 		width: `${dropdownWidth}px`,
@@ -1601,6 +1690,7 @@ function updateAddMenuPosition(): boolean {
 	addMenuStyle.value = getAddMenuPosition({
 		triggerRect,
 		dropdownRect,
+		dropdownHeight: positioningElement.scrollHeight,
 		viewport,
 	})
 	return true

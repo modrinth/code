@@ -785,16 +785,7 @@
   "search.filter.locked.instance.sync": {
     "message": "เชื่อมต่อกับโปรแกรม"
   },
-  "search.filter.locked.server": {
-    "message": "เซิร์ฟเวอร์เป็นผู้กำหนด"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "มีเพียงม็อดสำหรับฝั่งเครื่องของผู้เล่นเท่านั้นที่สามารถเพิ่มลงในโปรแกรมเซิร์ฟเวอร์ดังกล่าวได้"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "เวอร์ชันเกมถูกกำหนดโดยเซิร์ฟเวอร์แล้ว"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "ตัวรันถูกกำหนดโดยเซิร์ฟเวอร์แล้ว"
   }
 }

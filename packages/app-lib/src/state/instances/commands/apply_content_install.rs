@@ -513,7 +513,9 @@ pub(crate) async fn add_project_bytes(
     let scope = resolve_content_scope(instance_id, None, state).await?;
     let project_type = match project_type {
         Some(project_type) => project_type,
-        None => infer_project_type(&bytes)?,
+        None => {
+            super::embedded_content_metadata::infer_project_type_bytes(&bytes)?
+        }
     };
     let relative_path = format!("{}/{}", project_type.get_folder(), file_name);
     let full_path =
@@ -793,6 +795,37 @@ pub(crate) async fn content_source_kind_for_project_path(
     }))
 }
 
+pub(crate) async fn is_project_locked(
+    instance_id: &str,
+    project_path: &str,
+    state: &State,
+) -> crate::Result<bool> {
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    content_rows::is_instance_file_locked(
+        &scope.instance.id,
+        project_path,
+        &state.pool,
+    )
+    .await
+}
+
+pub(crate) async fn set_project_locked(
+    instance_id: &str,
+    project_path: &str,
+    locked: bool,
+    state: &State,
+) -> crate::Result<()> {
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    content_rows::set_instance_file_locked(
+        &scope.instance.id,
+        project_path,
+        locked,
+        &state.pool,
+    )
+    .await
+}
+
 pub(crate) async fn rename_project_companion_file(
     instance_id: &str,
     old_project_path: &str,
@@ -939,38 +972,4 @@ async fn upsert_entry_for_file(
     .await?;
 
     Ok(())
-}
-
-fn infer_project_type(bytes: &Bytes) -> crate::Result<ProjectType> {
-    let cursor = std::io::Cursor::new(&**bytes);
-    let mut archive = zip::ZipArchive::new(cursor).map_err(|_| {
-        crate::ErrorKind::InputError(
-            "Unable to infer project type for input file".to_string(),
-        )
-    })?;
-
-    if archive.by_name("fabric.mod.json").is_ok()
-        || archive.by_name("quilt.mod.json").is_ok()
-        || archive.by_name("META-INF/neoforge.mods.toml").is_ok()
-        || archive.by_name("META-INF/mods.toml").is_ok()
-        || archive.by_name("mcmod.info").is_ok()
-    {
-        Ok(ProjectType::Mod)
-    } else if archive.by_name("pack.mcmeta").is_ok() {
-        if archive.file_names().any(|name| name.starts_with("data/")) {
-            Ok(ProjectType::DataPack)
-        } else {
-            Ok(ProjectType::ResourcePack)
-        }
-    } else if archive
-        .file_names()
-        .any(|name| name.starts_with("shaders/"))
-    {
-        Ok(ProjectType::ShaderPack)
-    } else {
-        Err(crate::ErrorKind::InputError(
-            "Unable to infer project type for input file".to_string(),
-        )
-        .into())
-    }
 }

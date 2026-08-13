@@ -506,16 +506,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizează cu instanța"
   },
-  "search.filter.locked.server": {
-    "message": "Furnizat de server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Numai modurile de pe partea clientului pot fi adăugate la instanța serverului"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Versiunea jocului este furnizată de server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Încărcătorul este furnizat de server"
   }
 }

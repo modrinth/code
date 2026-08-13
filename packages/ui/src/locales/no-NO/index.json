@@ -413,18 +413,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Prosjektnavn"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisk"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyeste først"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Eldste først"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter etter {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"
   },
@@ -871,18 +859,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Velg ikon"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Ingen innhold funnet"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Laster inn innhold..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Ingen prosjekter samsvarte med søket ditt."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Søk etter {count, number} {count, plural, one {prosjekt} other {prosjekter}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nåværende"
@@ -2778,4 +2754,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-
