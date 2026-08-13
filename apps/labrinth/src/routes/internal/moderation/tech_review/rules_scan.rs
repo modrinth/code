@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use ariadne::ids::base62_impl::to_base62;
 use bytes::Bytes;
-use eyre::{Context as _, Result, eyre};
+use eyre::{Result, eyre};
 use futures_util::{StreamExt, TryStreamExt};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
@@ -28,6 +28,7 @@ use crate::{
     models::pats::Scopes,
     queue::session::AuthQueue,
     routes::ApiError,
+    util::error::Context,
 };
 
 const RULE_SCAN_LOCK_ID: i64 = 0x6465_6c70_6869_7275;
@@ -142,17 +143,15 @@ pub async fn get_rule_schema(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<DelphiRuleSchemaResponse>, ApiError> {
-    crate::util::error::Context::wrap_auth_err(
-        check_is_moderator_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Scopes::PROJECT_READ,
-        )
-        .await,
-        "authenticating API request",
-    )?;
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let mut schemas = Vec::new();
     <RuleInput as ToSchema>::schemas(&mut schemas);
@@ -189,22 +188,18 @@ pub async fn get_detail_rule_input(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiReportIssueDetailsId,)>,
 ) -> Result<web::Json<RuleInput>, ApiError> {
-    crate::util::error::Context::wrap_auth_err(
-        check_is_moderator_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Scopes::PROJECT_READ,
-        )
-        .await,
-        "authenticating API request",
-    )?;
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (detail_id,) = path.into_inner();
-    let detail = crate::util::error::Context::wrap_not_found_err(
-        crate::util::error::Context::wrap_internal_err(
-            sqlx::query!(
+    let detail = sqlx::query!(
                 r#"
         SELECT
             detail.key,
@@ -257,14 +252,12 @@ pub async fn get_detail_rule_input(
         ) file_hashes ON TRUE
         WHERE detail.id = $1
         "#,
-                detail_id as DelphiReportIssueDetailsId,
-            )
-            .fetch_optional(&***ro_pool)
-            .await,
-            "failed to fetch delphi rule input",
-        )?,
-        "delphi rule input not found",
-    )?;
+        detail_id as DelphiReportIssueDetailsId,
+    )
+    .fetch_optional(&***ro_pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi rule input")?
+    .wrap_not_found_err("delphi rule input not found")?;
 
     Ok(web::Json(RuleInput {
         schema_version: 1,
@@ -321,22 +314,20 @@ pub async fn scan_rules(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    crate::util::error::Context::wrap_auth_err(
-        check_is_moderator_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Scopes::PROJECT_WRITE,
-        )
-        .await,
-        "authenticating API request",
-    )?;
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let mut transaction = crate::util::error::Context::wrap_internal_err(
-        pool.begin().await,
-        "failed to begin delphi rule scan",
-    )?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin delphi rule scan")?;
 
     sqlx::query!("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
         .execute(&mut transaction)
