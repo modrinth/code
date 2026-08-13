@@ -11,6 +11,26 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'app',
+		version: '0.17.7',
+		body: `## Added
+- Added a notification to indicate when modpack export is done.
+
+## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.
+
+## Fixed
+- Fixed modpack export appears to work but fails when imported as an instance.
+- Fixed modpack export progress bar.`,
+	},
+	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.`,
+	},
+	{
 		date: `2026-08-13T16:01:54+00:00`,
 		product: 'app',
 		version: '0.17.6',
