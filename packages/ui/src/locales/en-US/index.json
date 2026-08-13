@@ -3386,6 +3386,12 @@
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "text"
   },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "Show fewer"
+  },
+  "project.disclosure.derivative-work.show-more": {
+    "defaultMessage": "Show {count} more"
+  },
   "project.disclosure.derivative-work.title": {
     "defaultMessage": "This is a derivative work of:"
   },
