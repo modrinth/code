@@ -1,27 +1,68 @@
 <script setup lang="ts">
 import { InfoIcon, XIcon } from '@modrinth/assets'
-import { computed, toValue } from 'vue'
+import { computed, nextTick, toValue, useTemplateRef, watch } from 'vue'
 
 import { IconButton } from '#ui/components/base/buttons'
 import Toggle from '#ui/components/base/Toggle.vue'
+import PhotosensitivityWarningModal from '#ui/components/modal/PhotosensitivityWarningModal.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 import { useVIntl } from '#ui/composables/i18n'
+import { useAdvancedPrefs } from '#ui/utils/advanced-filter-preferences'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import AdvancedFiltersPersistenceNote from './components/AdvancedFiltersPersistenceNote.vue'
 import { injectBrowseManager } from './providers/browse-manager'
+
+const PHOTOSENSITIVITY_FILTER_OPTION = 'epilepsy_triggers'
 
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
+const advancedPrefs = useAdvancedPrefs()
 
 const isApp = computed(() => ctx.variant === 'app')
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 const hiddenFilterTypes = computed(() => ctx.hiddenFilterTypes?.value ?? [])
 
 const advancedFiltersCollapsed = computed(() => ctx.advancedFiltersCollapsed?.value ?? true)
+const photosensitivityWarningModal = useTemplateRef('photosensitivityWarningModal')
 
 function setAdvancedFiltersCollapsed(collapsed: boolean) {
 	if (ctx.advancedFiltersCollapsed) {
 		ctx.advancedFiltersCollapsed.value = collapsed
+	}
+}
+
+function isPhotosensitivityExclusionSelected(filters: { type: string; option: string }[]) {
+	return filters.some(
+		(filter) => filter.type === 'advanced' && filter.option === PHOTOSENSITIVITY_FILTER_OPTION,
+	)
+}
+
+watch(
+	() => ({
+		selected: isPhotosensitivityExclusionSelected(
+			ctx.isServerType.value ? ctx.serverCurrentFilters.value : ctx.currentFilters.value,
+		),
+		saved: advancedPrefs.value.includes(PHOTOSENSITIVITY_FILTER_OPTION),
+	}),
+	(current, previous) => {
+		if (!previous) {
+			return
+		}
+
+		const selected = current.selected && !previous.selected
+		const alreadySaved = previous.saved
+		const dismissed = ctx.dismissedPhotosensitivityFilterWarning?.value
+
+		if (selected && !alreadySaved && !dismissed) {
+			nextTick(() => photosensitivityWarningModal.value?.show())
+		}
+	},
+)
+
+function onPhotosensitivityWarningDismiss(dontShowAgain: boolean) {
+	if (dontShowAgain && ctx.dismissedPhotosensitivityFilterWarning) {
+		ctx.dismissedPhotosensitivityFilterWarning.value = true
 	}
 }
 
@@ -87,6 +128,11 @@ function getFilterOpenByDefault(filterId: string): boolean {
 
 <template>
 	<slot name="prepend" />
+
+	<PhotosensitivityWarningModal
+		ref="photosensitivityWarningModal"
+		@dismiss="onPhotosensitivityWarningDismiss"
+	/>
 
 	<div v-if="ctx.filtersMenuOpen?.value" class="fixed inset-0 z-40 bg-bg" />
 
@@ -173,11 +219,16 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:content-class="contentClass"
 				:inner-panel-class="innerPanelClass"
 				:open-by-default="getFilterOpenByDefault(filterType.id)"
+				@on-open="() => filterType.id === 'advanced' && setAdvancedFiltersCollapsed(false)"
+				@on-close="() => filterType.id === 'advanced' && setAdvancedFiltersCollapsed(true)"
 			>
 				<template #header>
 					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-base font-semibold'">
 						{{ filterType.formatted_name }}
 					</h3>
+				</template>
+				<template v-if="filterType.id === 'advanced'" #prefix>
+					<AdvancedFiltersPersistenceNote />
 				</template>
 			</SearchSidebarFilter>
 		</template>
@@ -205,8 +256,11 @@ function getFilterOpenByDefault(filterId: string): boolean {
 						{{ filter.formatted_name }}
 					</h3>
 				</template>
+				<template v-if="filter.id === 'advanced'" #prefix>
+					<AdvancedFiltersPersistenceNote />
+				</template>
 				<template
-					v-if="
+					v-else-if="
 						lockedMessages?.gameVersionShaderMessage &&
 						ctx.projectType.value === 'shader' &&
 						filter.id === 'game_version'
@@ -215,13 +269,16 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				>
 					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
 						<InfoIcon class="mt-1 size-4" />
-						<span>{{ lockedMessages.gameVersionShaderMessage }}</span>
+						<span>{{ lockedMessages?.gameVersionShaderMessage }}</span>
 					</div>
 				</template>
 				<template v-if="lockedMessages?.gameVersion" #locked-game_version>
 					{{ lockedMessages.gameVersion }}
 				</template>
 				<template v-if="lockedMessages?.modLoader" #locked-mod_loader>
+					{{ lockedMessages.modLoader }}
+				</template>
+				<template v-if="lockedMessages?.modLoader" #locked-shader_loader>
 					{{ lockedMessages.modLoader }}
 				</template>
 				<template v-if="lockedMessages?.environment" #locked-environment>

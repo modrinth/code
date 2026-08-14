@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Review changes"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "업데이트 검토"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "검토중..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "{name} 플레이를 위해 업데이트가 필요합니다. 게임을 실행하려면 최신 버전 업데이트를 진행하세요."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "업데이트가 있습니다"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "인스턴스의 모든 데이터가 삭제됩니다. 세계 폴더, 설정 폴더 등 설치된 모든 컨텐츠가 포함됩니다."
@@ -700,15 +691,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "이 인스턴스가 위반한 규칙은 무엇인가요?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "부적절함"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "악성/유해함"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "스팸"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "공유 인스턴스 신고"
@@ -1895,17 +1877,8 @@
   "search.filter.locked.instance.sync": {
     "message": "인스턴스와 동기화"
   },
-  "search.filter.locked.server": {
-    "message": "서버에 의해 관리됨"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "서버 인스턴스에는 클라이언트 전용 모드만 추가할 수 있습니다"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "게임 버전이 서버에 의해 제공됩니다"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "로더가 서버에 의해 제공됩니다"
   },
   "settings.sidebar.label.account": {
     "message": "계정"

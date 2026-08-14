@@ -536,9 +536,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "мир"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Настройки установки"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Дополнительный контент"
   },
@@ -586,18 +583,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Названия проектов"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "По алфавиту"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Сначала новые"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Сначала старые"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Сортировка: {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Обновить всё"
@@ -1996,33 +1981,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Выбрать иконку"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "В сборке нет дополнительного контента."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Сборка пуста"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Сторонний"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Файл не опубликован на Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Содержимое сборки"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Загрузка содержимого..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Не найдены проекты, соответствующие запросу."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Открыть в Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"
@@ -3745,15 +3703,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Расширенные"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Исключать наборы данных"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Исключать моды"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Исключать плагины"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Среда"

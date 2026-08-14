@@ -1,4 +1,4 @@
-import { TriangleAlertIcon } from '@modrinth/assets'
+import { MegaphoneIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
@@ -28,7 +28,7 @@ export default function (
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
 		)
-		.icon(TriangleAlertIcon)
+		.icon(MegaphoneIcon)
 		.navigate('/moderation')
 		.children(
 			() => (

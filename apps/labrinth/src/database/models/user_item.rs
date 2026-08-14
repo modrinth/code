@@ -1,15 +1,19 @@
 use super::ids::{DBProjectId, DBUserId};
 use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models::charge_item::DBCharge;
+use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
+use crate::models::projects::ProjectStatus;
+use crate::models::threads::MessageBody;
 use crate::models::users::Badges;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
@@ -593,12 +597,120 @@ impl DBUser {
             .wrap_err("failed to get user by ID")?;
 
         if let Some(delete_user) = user {
+            let username = delete_user.username.clone();
             DBUser::clear_caches(&[(id, Some(delete_user.username))], redis)
                 .await
                 .wrap_err("failed to clear caches")?;
 
             let deleted_user: DBUserId =
                 crate::models::users::DELETED_USER.into();
+            let user_id_str = ariadne::ids::UserId::from(id).to_string();
+
+            let owned_projects = sqlx::query!(
+                r#"
+                SELECT
+                    m.id AS "id!",
+                    m.status AS "status!",
+                    m.slug,
+                    t.id AS "thread_id!"
+                FROM mods m
+                INNER JOIN team_members tm
+                    ON tm.team_id = m.team_id
+                    AND tm.user_id = $1
+                    AND tm.is_owner = TRUE
+                INNER JOIN threads t ON t.mod_id = m.id
+                "#,
+                id as DBUserId,
+            )
+            .fetch(&mut *transaction)
+            .try_collect::<Vec<_>>()
+            .await
+            .wrap_err("failed to fetch projects owned by deleted user")?;
+
+            for project in &owned_projects {
+                let thread_id = DBThreadId(project.thread_id);
+
+                ThreadMessageBuilder {
+                    author_id: Some(deleted_user),
+                    body: MessageBody::Text {
+                        body: format!(
+                            "Project transferred to Ghost when user account `{username}` (`{user_id_str}`) was deleted"
+                        ),
+                        private: true,
+                        replying_to: None,
+                        associated_images: Vec::new(),
+                    },
+                    thread_id,
+                    hide_identity: false,
+                }
+                .insert(&mut *transaction)
+                .await
+                .wrap_err(
+                    "failed to insert project transfer thread message",
+                )?;
+
+                if ProjectStatus::from_string(&project.status)
+                    == ProjectStatus::Processing
+                {
+                    ThreadMessageBuilder {
+                        author_id: Some(deleted_user),
+                        body: MessageBody::Text {
+                            body: format!(
+                                "Automatically rejected when user account `{username}` (`{user_id_str}`) was deleted"
+                            ),
+                            private: true,
+                            replying_to: None,
+                            associated_images: Vec::new(),
+                        },
+                        thread_id,
+                        hide_identity: false,
+                    }
+                    .insert(&mut *transaction)
+                    .await
+                    .wrap_err(
+                        "failed to insert automatic rejection thread message",
+                    )?;
+
+                    ThreadMessageBuilder {
+                        author_id: Some(deleted_user),
+                        body: MessageBody::StatusChange {
+                            new_status: ProjectStatus::Rejected,
+                            old_status: ProjectStatus::Processing,
+                        },
+                        thread_id,
+                        hide_identity: false,
+                    }
+                    .insert(&mut *transaction)
+                    .await
+                    .wrap_err(
+                        "failed to insert automatic rejection status change",
+                    )?;
+
+                    sqlx::query!(
+                        r#"
+                        UPDATE mods
+                        SET status = $1
+                        WHERE id = $2
+                        "#,
+                        ProjectStatus::Rejected.as_str(),
+                        project.id,
+                    )
+                    .execute(&mut *transaction)
+                    .await
+                    .wrap_err(
+                        "failed to reject processing project owned by deleted user",
+                    )?;
+                }
+
+                models::DBProject::clear_cache(
+                    DBProjectId(project.id),
+                    project.slug.clone(),
+                    None,
+                    redis,
+                )
+                .await
+                .wrap_err("failed to clear project cache")?;
+            }
 
             sqlx::query!(
                 "
@@ -626,7 +738,6 @@ impl DBUser {
             .await
             .wrap_err("failed to update versions author_id")?;
 
-            use futures::TryStreamExt;
             let notifications: Vec<i64> = sqlx::query!(
                 "
                 SELECT n.id FROM notifications n

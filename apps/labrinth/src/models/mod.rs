@@ -6,6 +6,7 @@ pub mod v3;
 pub use v3::analytics;
 pub use v3::billing;
 pub use v3::collections;
+pub use v3::disclosures;
 pub use v3::ids;
 pub use v3::images;
 pub use v3::moderation_notes;

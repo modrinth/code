@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Wijzigingen bekijken"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Update bekijken"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Controleren..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Er is een update nodig om {name} te kunnen spelen. Werk het spel bij naar de nieuwste versie om het te kunnen starten."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Update is beschikbaar"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Alle gegevens van je instantie worden definitief verwijderd, inclusief je werelden, configuraties en alle geïnstalleerde inhoud."
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Welke regel wordt in deze instantie overtreden?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Ongepast"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Kwaadaardig"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Gedeelde instantie melden"
@@ -1922,17 +1904,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchroniseer installatie"
   },
-  "search.filter.locked.server": {
-    "message": "Aangeleverd door de server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Alleen client-side mods kunnen toegevoegd worden aan de server instantie"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Spel versie is gegeven door de server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader is gegeven door de server"
   },
   "settings.sidebar.label.account": {
     "message": "Account"

@@ -45,8 +45,10 @@ const typeClasses: Record<ButtonType, string> = {
 	base: 'button-frame--base bg-surface-4 text-contrast [&>svg]:text-primary',
 	colored:
 		'button-frame--colored bg-[--button-color] text-[var(--color-accent-contrast)] [&>svg]:text-inherit',
+	'colored-text':
+		'button-frame--colored-text bg-surface-4 text-[--button-color] [&>svg]:text-inherit',
 	outlined:
-		'button-frame--outlined bg-transparent text-[var(--button-color,var(--color-contrast))] [&>svg]:text-inherit',
+		'button-frame--outlined bg-transparent text-[var(--button-color,var(--color-contrast))] [&>svg]:text-[var(--button-color,var(--color-base))]',
 	quiet: 'button-frame--quiet bg-transparent [&>svg]:text-inherit',
 }
 
@@ -100,7 +102,12 @@ const classes = computed(() => [
 ])
 const style = computed((): CSSProperties | undefined => {
 	if ((props.type === 'outlined' || props.type === 'quiet') && !props.color) return undefined
-	if (props.type !== 'colored' && props.type !== 'outlined' && props.type !== 'quiet')
+	if (
+		props.type !== 'colored' &&
+		props.type !== 'colored-text' &&
+		props.type !== 'outlined' &&
+		props.type !== 'quiet'
+	)
 		return undefined
 
 	return {
@@ -125,7 +132,8 @@ defineExpose({ element })
 </template>
 
 <style scoped>
-.button-frame--base {
+.button-frame--base,
+.button-frame--colored-text {
 	box-shadow:
 		inset 0 0 0 1px var(--surface-5),
 		0 1px 1px rgba(0, 0, 0, 0.12);

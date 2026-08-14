@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "查看变更"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "查看更新"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "正在审查……"
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "{name}需要更新。请更新到最新版本以启动游戏。"
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "有更新可用"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你实例的所有数据将被永久删除，包括你的世界、配置和所有已安装的内容。"
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "该实例违反了哪项规则？"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "不当内容"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "恶意内容"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "垃圾内容"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "举报共享实例"
@@ -1922,17 +1904,8 @@
   "search.filter.locked.instance.sync": {
     "message": "与实例同步"
   },
-  "search.filter.locked.server": {
-    "message": "由该服务器提供"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "只能将客户端模组添加到服务器实例中"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "游戏版本由服务器提供"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "加载器由服务器提供"
   },
   "settings.sidebar.label.account": {
     "message": "账户"

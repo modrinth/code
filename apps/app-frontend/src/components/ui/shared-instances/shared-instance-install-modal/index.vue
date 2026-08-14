@@ -229,11 +229,11 @@
 			</div>
 		</template>
 	</NewModal>
-	<ModpackContentModal
+	<ManagedContentModal
 		ref="contentModal"
 		:header="formatMessage(messages.sharedInstanceContent)"
-		:modpack-name="preview?.name ?? ''"
-		:modpack-icon-url="preview?.iconUrl ?? undefined"
+		:source-name="preview?.name ?? ''"
+		:source-icon-url="preview?.iconUrl ?? undefined"
 	/>
 </template>
 
@@ -251,12 +251,13 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	formatReportType,
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	ManagedContentModal,
 	MarkdownEditor,
-	ModpackContentModal,
 	NewModal,
 	Table,
 	type TableColumn,
@@ -268,7 +269,6 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
 import { config } from '@/config'
-import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { toError } from '@/helpers/errors'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
 import { create_report } from '@/helpers/reports'
@@ -289,7 +289,7 @@ type SharedInstanceCreator = {
 }
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const contentModal = ref<InstanceType<typeof ModpackContentModal>>()
+const contentModal = ref<InstanceType<typeof ManagedContentModal>>()
 const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
 const creator = ref<SharedInstanceCreator | null>(null)
@@ -329,9 +329,9 @@ const externalFileRows = computed<ExternalFileRow[]>(() =>
 		.sort((left, right) => left.name.localeCompare(right.name)),
 )
 const reportReasonOptions = computed<ComboboxOption<ReportReason>[]>(() => [
-	{ value: 'malicious', label: formatMessage(messages.maliciousReason) },
-	{ value: 'inappropriate', label: formatMessage(messages.inappropriateReason) },
-	{ value: 'spam', label: formatMessage(messages.spamReason) },
+	{ value: 'malicious', label: formatReportType(formatMessage, 'malicious') },
+	{ value: 'inappropriate', label: formatReportType(formatMessage, 'inappropriate') },
+	{ value: 'spam', label: formatReportType(formatMessage, 'spam') },
 ])
 const canSubmitReport = computed(
 	() => Boolean(preview.value && additionalContext.value.trim()) && !submitLoading.value,
@@ -448,7 +448,6 @@ function handleCancel() {
 function handleHide() {
 	resetReportState()
 	creator.value = null
-	show_ads_window()
 }
 function resetReportState() {
 	reportMode.value = false
@@ -488,7 +487,6 @@ function showReport(
 }
 function showPreview(previewValue: SharedInstanceInstallPreview, event?: MouseEvent) {
 	preview.value = previewValue
-	hide_ads_window()
 	modal.value?.show(event)
 	void nextTick(() => forceCheckTableScroll())
 }
@@ -542,18 +540,6 @@ const messages = defineMessages({
 	reportReason: {
 		id: 'app.modal.install-to-play.report-reason',
 		defaultMessage: 'Which rule does this instance violate?',
-	},
-	maliciousReason: {
-		id: 'app.modal.install-to-play.report-reason.malicious',
-		defaultMessage: 'Malicious',
-	},
-	inappropriateReason: {
-		id: 'app.modal.install-to-play.report-reason.inappropriate',
-		defaultMessage: 'Inappropriate',
-	},
-	spamReason: {
-		id: 'app.modal.install-to-play.report-reason.spam',
-		defaultMessage: 'Spam',
 	},
 	additionalContext: {
 		id: 'app.modal.install-to-play.additional-context',

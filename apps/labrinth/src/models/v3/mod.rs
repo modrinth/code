@@ -3,6 +3,7 @@ pub mod analytics;
 pub mod analytics_event;
 pub mod billing;
 pub mod collections;
+pub mod disclosures;
 pub mod ids;
 pub mod images;
 pub mod moderation_notes;

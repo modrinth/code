@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "wereld"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Installatie-instellingen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projectnamen"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisch"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nieuwste eerst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Oudste eerst"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorteer op {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Werk alles bij"
@@ -2077,33 +2062,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Selecteer pictogram"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Deze modpack bevat geen extra inhoud."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Geen inhoud gevonden"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Dit bestand is niet gepubliceerd op Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Inhoud van modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Inhoud aan het laden..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Geen projecten voldoen aan je zoekopdracht."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "In Slicer openen"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Zoek naar {count, number} {count, plural, one {project} other {projecten}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
@@ -3823,15 +3781,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Gevorderd"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Gegevenspakketten uitsluiten"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Mods uitsluiten"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Plug-ins uitsluiten"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Omgeving"

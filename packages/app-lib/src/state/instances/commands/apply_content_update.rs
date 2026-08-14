@@ -461,10 +461,11 @@ async fn bulk_updateable_project_paths(
     Ok(items
         .into_iter()
         .filter(|item| {
-            !shared_instance_member
-                || !item
-                    .source_kind
-                    .is_some_and(ContentSourceKind::is_shared_instance_managed)
+            !item.locked
+                && (!shared_instance_member
+                    || !item.source_kind.is_some_and(
+                        ContentSourceKind::is_shared_instance_managed,
+                    ))
         })
         .map(|item| item.file_path)
         .collect())

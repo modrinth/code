@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Änderungen überprüfen"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Update überprüfen"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Wird überprüft..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Ein Update ist erforderlich, um {name} zu spielen. Bitte aktualisiere auf die neueste Version, um das Spiel zu starten."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Ein Update ist verfügbar"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Alle Daten deiner Instanz werden permanent gelöscht, einschließlich deiner Welten, Konfigurationen und allen installierten Inhalten."
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Gegen welche Regel verstößt diese Instanz?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Unangemessen"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Bösartig"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Geteilte Instanz melden"
@@ -1922,17 +1904,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Mit Instanz synchronisieren"
   },
-  "search.filter.locked.server": {
-    "message": "Vom Server vorgegeben"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Nur clientseitige Mods können der Serverinstanz hinzugefügt werden"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Spielversion vom Server vorgegeben"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader vom Server vorgegeben"
   },
   "settings.sidebar.label.account": {
     "message": "Konto"

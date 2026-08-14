@@ -878,16 +878,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar con la instancia"
   },
-  "search.filter.locked.server": {
-    "message": "Proporcionado por el servidor"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Solo se pueden añadir a la instancia del servidor modificaciones del lado del cliente"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "La versión del juego es proporcionada por el servidor"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader proporcionado por el servidor"
   }
 }

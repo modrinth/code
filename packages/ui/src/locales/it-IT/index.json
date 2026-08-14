@@ -545,9 +545,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "mondo"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Impostazioni installazione"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenuto aggiuntivo"
   },
@@ -598,18 +595,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nomi dei progetti"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetico"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Più recenti prima"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Meno recenti prima"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordina per {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Aggiorna tutto"
@@ -2038,33 +2023,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Scegli un'icona"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Questo pacchetto di mod non include alcun contenuto aggiuntivo."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nessun contenuto trovato"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Esterno"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Questo file non è su Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Contenuto del pacchetto"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Caricamento contenuto..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nessun progetto corrisponde alla tua ricerca."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Apri con Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Cerca tra {count, number} {count, plural, one {progetto} other {progetti}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Attuale"
@@ -3790,15 +3748,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Avanzate"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Escludi pacchetti di dati"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Escludi mod"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Escludi plugin"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ambiente"

@@ -35,14 +35,14 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
+import { useAppEvent } from '@/composables/use-app-event'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
-import { instance_listener } from '@/helpers/events.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
 	list as listInstances,
@@ -399,9 +399,10 @@ const hideInstalledModpacks = computed({
 const instanceFilters = computed(() => {
 	const filters = []
 
-	if (instance.value) {
+	if (instance.value && projectType.value !== 'resourcepack') {
+		const isVanillaShader = projectType.value === 'shader' && instance.value.loader === 'vanilla'
 		const gameVersion = instance.value.game_version
-		if (gameVersion) {
+		if (gameVersion && !isVanillaShader) {
 			filters.push({ type: 'game_version', option: gameVersion })
 		}
 
@@ -410,6 +411,9 @@ const instanceFilters = computed(() => {
 
 		if (platform && projectType.value === 'mod' && supportedModLoaders.includes(platform)) {
 			filters.push({ type: 'mod_loader', option: platform })
+		}
+		if (isVanillaShader) {
+			filters.push({ type: 'shader_loader', option: 'vanilla' })
 		}
 
 		if (isServerInstance.value) {
@@ -550,10 +554,6 @@ const messages = defineMessages({
 		id: 'search.filter.locked.instance-game-version.title',
 		defaultMessage: 'Game version is provided by the instance',
 	},
-	gameVersionProvidedByServer: {
-		id: 'search.filter.locked.server-game-version.title',
-		defaultMessage: 'Game version is provided by the server',
-	},
 	hideAddedServers: {
 		id: 'app.browse.hide-added-servers',
 		defaultMessage: 'Hide servers already added',
@@ -573,7 +573,7 @@ const messages = defineMessages({
 	serverInstanceContentWarning: {
 		id: 'app.browse.server-instance-content-warning',
 		defaultMessage:
-			'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.',
+			'Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated.',
 	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
@@ -583,17 +583,9 @@ const messages = defineMessages({
 		id: 'app.browse.project-type.modpacks',
 		defaultMessage: 'Modpacks',
 	},
-	modLoaderProvidedByServer: {
-		id: 'search.filter.locked.server-loader.title',
-		defaultMessage: 'Loader is provided by the server',
-	},
 	providedByInstance: {
 		id: 'search.filter.locked.instance',
 		defaultMessage: 'Provided by the instance',
-	},
-	providedByServer: {
-		id: 'search.filter.locked.server',
-		defaultMessage: 'Provided by the server',
 	},
 	syncFilterButton: {
 		id: 'search.filter.locked.instance.sync',
@@ -743,7 +735,7 @@ const installContext = computed(() => {
 				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
 			),
 			warning:
-				isServerInstance.value && !isFromWorlds.value
+				isServerInstance.value && instance.value.loader !== 'vanilla' && !isFromWorlds.value
 					? formatMessage(messages.serverInstanceContentWarning)
 					: undefined,
 		}
@@ -1106,24 +1098,12 @@ async function search(requestParams: string) {
 	}
 }
 
-const isServerFilterContext = computed(() => isServerContext.value || isServerInstance.value)
-
 const lockedFilterMessages = computed(() => ({
-	gameVersion: formatMessage(
-		isServerFilterContext.value
-			? messages.gameVersionProvidedByServer
-			: messages.gameVersionProvidedByInstance,
-	),
-	modLoader: formatMessage(
-		isServerFilterContext.value
-			? messages.modLoaderProvidedByServer
-			: messages.modLoaderProvidedByInstance,
-	),
+	gameVersion: formatMessage(messages.gameVersionProvidedByInstance),
+	modLoader: formatMessage(messages.modLoaderProvidedByInstance),
 	environment: formatMessage(messages.environmentProvidedByServer),
 	syncButton: formatMessage(messages.syncFilterButton),
-	providedBy: formatMessage(
-		isServerFilterContext.value ? messages.providedByServer : messages.providedByInstance,
-	),
+	providedBy: formatMessage(messages.providedByInstance),
 }))
 
 const searchState = useBrowseSearch({
@@ -1178,44 +1158,23 @@ if (instance.value?.game_version) {
 
 void searchState.refreshSearch()
 
-type UnlistenFn = () => void
-
-let isUnmounted = false
-let unlistenInstances: UnlistenFn | null = null
-
-onMounted(() => {
-	instance_listener(async (event: { event: string; instance_id: string }) => {
-		if (event.event === 'added' || event.event === 'created' || event.event === 'removed') {
-			if (!route.query.i) {
-				await refreshInstalledProjectIds()
-				if (projectType.value === 'modpack') {
-					if (event.event === 'removed') {
-						syncHiddenInstanceProjectIds()
-					}
-					await searchState.refreshSearch()
-				}
-			}
-		}
-
-		if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+useAppEvent('instance', async (event) => {
+	if (event.event === 'created' || event.event === 'removed') {
+		if (!route.query.i) {
 			await refreshInstalledProjectIds()
-			await searchState.refreshSearch()
-		}
-	})
-		.then((unlisten) => {
-			if (isUnmounted) {
-				unlisten()
-				return
+			if (projectType.value === 'modpack') {
+				if (event.event === 'removed') {
+					syncHiddenInstanceProjectIds()
+				}
+				await searchState.refreshSearch()
 			}
+		}
+	}
 
-			unlistenInstances = unlisten
-		})
-		.catch(handleError)
-})
-
-onUnmounted(() => {
-	isUnmounted = true
-	unlistenInstances?.()
+	if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+		await refreshInstalledProjectIds()
+		await searchState.refreshSearch()
+	}
 })
 
 function getProjectBrowseQuery() {
@@ -1242,11 +1201,25 @@ const advancedFiltersCollapsed = computed({
 	},
 })
 
+const dismissedPhotosensitivityFilterWarning = computed({
+	get: () => themeStore.getFeatureFlag('dismissed_photosensitivity_filter_warning'),
+	set: (value) => {
+		themeStore.featureFlags['dismissed_photosensitivity_filter_warning'] = value
+		getSettings()
+			.then((settings) => {
+				settings.feature_flags['dismissed_photosensitivity_filter_warning'] = value
+				return setSettings(settings)
+			})
+			.catch(handleError)
+	},
+})
+
 provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
 	advancedFiltersCollapsed,
+	dismissedPhotosensitivityFilterWarning,
 	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: getProjectBrowseQuery(),

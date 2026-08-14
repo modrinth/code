@@ -151,10 +151,28 @@ export function flattenStaticVariables(): Record<string, string> {
 		`Per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#copyright-and-legality-of-content)`
 	vars[`R5`] =
 		`Per section 5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
-	const rule5subs = 8
+	const rule5subs = 9
 	for (let n = 1; n <= rule5subs; n++) {
 		vars[`R5.${n}`] =
 			`Per section 5.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
+	}
+	vars[`R6`] =
+		`Per section 6 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#generative-ai)`
+	vars[`R6.1`] =
+		`Per section 6.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	const rule6sub1subs = 2
+	for (let n = 1; n <= rule6sub1subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.1${l}`] =
+			`Per section 6.1${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	}
+	vars[`R6.2`] =
+		`Per section 6.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
+	const rule6sub2subs = 4
+	for (let n = 1; n <= rule6sub2subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.2${l}`] =
+			`Per section 6.2${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
 	}
 	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
 	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
@@ -287,6 +305,10 @@ export function flattenProjectVariables(
 	vars[`PROJECT_MONETIZATION_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
 	vars[`PROJECT_MONETIZATION_SETTINGS_FLINK`] =
 		`[Monetization settings](https://modrinth.com/project/${project.id}/settings)`
+	vars[`PROJECT_CONTENT_DISCLOSURES_LINK`] =
+		`https://modrinth.com/project/${project.id}/settings/disclosures`
+	vars[`PROJECT_CONTENT_DISCLOSURES_FLINK`] =
+		`[Content Disclosures](https://modrinth.com/project/${project.id}/settings/disclosures)`
 
 	return vars
 }

@@ -563,9 +563,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "ワールド"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "インストール設定"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "追加のコンテンツ"
   },
@@ -616,18 +613,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "プロジェクト名"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "名前順"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "新しい順"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "古い順"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "{mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "すべて更新"
@@ -2077,33 +2062,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "アイコンを選択"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "このModパックに追加コンテンツは一切含まれていません。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "コンテンツが見つかりません"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "外部"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "このファイルは Modrinth 上で公開されていません"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpackコンテンツ"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "コンテンツを読み込み中…"
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "該当するプロジェクトがありません。"
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Slicer で開く"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "{count, number}件のプロジェクトを検索"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "現在"
@@ -3751,9 +3709,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "もっと見る"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "データパックを除く"
   },
   "search.filter_type.environment": {
     "defaultMessage": "環境"

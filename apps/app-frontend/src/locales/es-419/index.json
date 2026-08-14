@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Revisar cambios"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Actualizar"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Actualizando..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Se necesita una actualización para jugar a {name}. Por favor actualiza a la versión más reciente para iniciar el juego."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Hay una actualización disponible"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Todos los datos de tu instancia se eliminarán permanentemente, incluidos tus mundos, configuraciones y todo el contenido instalado."
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "¿Qué regla rompe esta instancia?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Inapropiado"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Malicioso"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Reportar instancia compartida"
@@ -1922,17 +1904,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar con la instancia"
   },
-  "search.filter.locked.server": {
-    "message": "Proporcionado por el servidor"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Solo se pueden añadir mods que sean del lado del cliente a la instancia del servidor"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "La versión del juego es proporcionada por el servidor"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "El loader es proporcionado por el servidor"
   },
   "settings.sidebar.label.account": {
     "message": "Cuenta"

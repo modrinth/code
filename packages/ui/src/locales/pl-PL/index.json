@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "Twój świat"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Ustawienia instalacji"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatkowa zawartość"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nazwy projektów"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetycznie"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Od najnowszych"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Od najstarszych"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortuj według: {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Zaktualizuj wszystko"
@@ -2071,30 +2056,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Wybierz ikonę"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ta paczka modów nie zawiera żadnych innych treści."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nie znaleziono treści"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Zewnętrzne"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Ten plik nie jest opublikowany na Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Zawartość paczki modów"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Ładowanie treści..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nie znaleziono żadnego projektu pasującego do Twojego wyszukiwania."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Szukaj wśród {count, number} {count, plural, one {projektu} other {projektów}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktualny"
@@ -3796,15 +3757,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Zaawansowane"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Wyklucz paczki danych"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Wyklucz mody"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Wyklucz pluginy"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Środowisko"
