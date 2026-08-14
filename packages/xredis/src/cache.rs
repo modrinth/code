@@ -254,6 +254,48 @@ impl CacheManager {
             None,
             false,
             keys,
+            None,
+            |ids| async move {
+                Ok(closure(ids)
+                    .await?
+                    .into_iter()
+                    .map(|(key, value)| (key, (None::<String>, value)))
+                    .collect())
+            },
+        )
+        .await
+    }
+
+    pub async fn get_cached_keys_raw_with_expiry<P, F, Fut, T, K, E>(
+        &self,
+        provider: &P,
+        namespace: &str,
+        keys: &[K],
+        expiry: i64,
+        closure: F,
+    ) -> Result<HashMap<K, T>, E>
+    where
+        P: ConnectionProvider,
+        F: FnOnce(Vec<K>) -> Fut,
+        Fut: Future<Output = Result<DashMap<K, T>, E>>,
+        E: From<Error>,
+        T: Serialize + DeserializeOwned,
+        K: Display
+            + Hash
+            + Eq
+            + PartialEq
+            + Clone
+            + DeserializeOwned
+            + Serialize
+            + Debug,
+    {
+        self.get_cached_keys_raw_with_slug(
+            provider,
+            namespace,
+            None,
+            false,
+            keys,
+            Some((expiry, expiry)),
             |ids| async move {
                 Ok(closure(ids)
                     .await?
@@ -298,6 +340,7 @@ impl CacheManager {
                 Some(slug_namespace),
                 case_sensitive,
                 keys,
+                None,
                 closure,
             )
             .await?
@@ -313,6 +356,7 @@ impl CacheManager {
         slug_namespace: Option<&str>,
         case_sensitive: bool,
         keys: &[I],
+        expiry_override: Option<(i64, i64)>,
         closure: F,
     ) -> Result<HashMap<K, T>, E>
     where
@@ -430,7 +474,8 @@ impl CacheManager {
                 .instrument(info_span!("get_cached_values_closure"))
             };
 
-        let (default_expiry, actual_expiry) = self.settings.expiries(namespace);
+        let (default_expiry, actual_expiry) = expiry_override
+            .unwrap_or_else(|| self.settings.expiries(namespace));
         let current_time = Utc::now();
         let mut expired_values = HashMap::new();
         let mut expired_identities = HashMap::new();

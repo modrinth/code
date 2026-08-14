@@ -8,7 +8,11 @@ use crate::auth::get_user_from_headers;
 use crate::database::models::DBUserId;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::pats::Scopes;
-use crate::models::payout_runs::{Adjustment, PayoutRun, PayoutRunStatus};
+use crate::models::payout_runs::{
+    Adjustment, PayoutRun, PayoutRunCompletion, PayoutRunReport,
+    PayoutRunRevenue, PayoutRunStatus,
+};
+use crate::queue::payouts::get_cached_aditude_month_estimates;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context;
@@ -49,6 +53,7 @@ pub async fn get(
             started_at,
             started_by,
             completed_at,
+            completed_result AS "completed_result?: sqlx::types::Json<PayoutRunCompletion>",
             adjustments AS "adjustments!: sqlx::types::Json<Vec<Adjustment>>"
         FROM payouts_runs
         ORDER BY period_start DESC
@@ -71,19 +76,48 @@ pub async fn get(
     .wrap_internal_err("failed to fetch newest payout value")?;
 
     let mut stored_periods = HashSet::with_capacity(stored_runs.len());
+    let mut estimate_periods = HashSet::new();
     let mut runs = Vec::with_capacity(stored_runs.len());
     for run in stored_runs {
         let period_start = YearMonth::from_day1(run.period_start.date_naive());
-        let status = if run.completed_at.is_some() {
-            PayoutRunStatus::Done
+        let (status, report) = if run.completed_at.is_some() {
+            let amount_usd = run
+                .completed_result
+                .map(|completion| completion.revenue_usd)
+                .wrap_internal_err(
+                    "paid payout run is missing its completion result",
+                )?;
+            (
+                PayoutRunStatus::Paid,
+                PayoutRunReport {
+                    revenue: PayoutRunRevenue::Actual { amount_usd },
+					fees_deducted_usd: todo!(),
+					variance_adjustment_usd: todo!(),
+					net_estimated_revenue_usd: todo!(),
+					creator_net_estimated_revenue_usd: todo!(),
+					modrinth_net_estimated_revenue_usd: todo!(),
+                },
+            )
         } else {
-            PayoutRunStatus::Running
+            estimate_periods.insert(period_start);
+            (
+                PayoutRunStatus::Review,
+                PayoutRunReport {
+                    revenue: PayoutRunRevenue::Estimated { days: Vec::new() },
+					fees_deducted_usd: todo!(),
+					variance_adjustment_usd: todo!(),
+					net_estimated_revenue_usd: todo!(),
+					creator_net_estimated_revenue_usd: todo!(),
+					modrinth_net_estimated_revenue_usd: todo!(),
+                },
+            )
         };
 
         stored_periods.insert(period_start);
         runs.push(PayoutRun {
             period_start,
             status,
+            report,
             started_at: is_admin.then_some(run.started_at),
             started_by: is_admin
                 .then_some(run.started_by.map(|id| DBUserId(id).into()))
@@ -100,19 +134,32 @@ pub async fn get(
 
         while period <= newest_period {
             if !stored_periods.contains(&period) {
-                let status =
-                    if net_60_payout_available_at(period).wrap_internal_err(
-                        "failed to calculate payout review date",
-                    )? <= newest_created
-                    {
-                        PayoutRunStatus::InReview
-                    } else {
-                        PayoutRunStatus::Pending
-                    };
+                let status = if period == newest_period {
+                    PayoutRunStatus::Open
+                } else if net_60_payout_available_at(period).wrap_internal_err(
+                    "failed to calculate payout review date",
+                )? <= newest_created
+                {
+                    PayoutRunStatus::Review
+                } else {
+                    PayoutRunStatus::Pending
+                };
+
+                estimate_periods.insert(period);
 
                 runs.push(PayoutRun {
                     period_start: period,
                     status,
+                    report: PayoutRunReport {
+                        revenue: PayoutRunRevenue::Estimated {
+                            days: Vec::new(),
+                        },
+						fees_deducted_usd: todo!(),
+						variance_adjustment_usd: todo!(),
+						net_estimated_revenue_usd: todo!(),
+						creator_net_estimated_revenue_usd: todo!(),
+						modrinth_net_estimated_revenue_usd: todo!(),
+                    },
                     started_at: None,
                     started_by: None,
                     completed_at: None,
@@ -131,6 +178,18 @@ pub async fn get(
                 "failed to calculate next payout month",
             )?;
             period = YearMonth::from_day1(next_month);
+        }
+    }
+
+    let estimate_periods = estimate_periods.into_iter().collect::<Vec<_>>();
+    let estimates =
+        get_cached_aditude_month_estimates(&estimate_periods, &redis).await?;
+    for run in &mut runs {
+        if let Some(days) = estimates.get(&run.period_start) {
+            run.report.net_estimated_revenue_usd =
+                days.iter().map(|day| day.amount_usd).sum();
+            run.report.revenue =
+                PayoutRunRevenue::Estimated { days: days.clone() };
         }
     }
 

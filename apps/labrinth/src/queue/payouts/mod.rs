@@ -2,6 +2,7 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
+use crate::models::payout_runs::DayRevenue;
 use crate::models::payouts::{
     PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodType,
     TremendousForexResponse,
@@ -15,7 +16,7 @@ use crate::util::webhook::{
 };
 use arc_swap::ArcSwapOption;
 use base64::Engine;
-use chrono::{DateTime, Duration, NaiveTime, Utc};
+use chrono::{DateTime, Duration, Months, NaiveTime, Utc};
 use dashmap::DashMap;
 use eyre::Result;
 use futures::TryStreamExt;
@@ -885,6 +886,106 @@ pub async fn make_aditude_request(
     let json: Vec<AditudePoints> = serde_json::from_str(&text)?;
 
     Ok(json)
+}
+
+const ADITUDE_MONTH_ESTIMATE_CACHE_NAMESPACE: &str = "aditude_month_estimates";
+const ADITUDE_MONTH_ESTIMATE_CACHE_EXPIRY: i64 = 60 * 60 * 24;
+
+pub async fn get_cached_aditude_month_estimates(
+    periods: &[YearMonth],
+    redis: &RedisPool,
+) -> Result<HashMap<YearMonth, Vec<DayRevenue>>, ApiError> {
+    redis
+        .get_cached_keys_raw_with_expiry(
+            ADITUDE_MONTH_ESTIMATE_CACHE_NAMESPACE,
+            periods,
+            ADITUDE_MONTH_ESTIMATE_CACHE_EXPIRY,
+            fetch_aditude_month_estimates,
+        )
+        .await
+}
+
+async fn fetch_aditude_month_estimates(
+    periods: Vec<YearMonth>,
+) -> Result<DashMap<YearMonth, Vec<DayRevenue>>, ApiError> {
+    let first_period = periods
+        .iter()
+        .min()
+        .copied()
+        .wrap_internal_err("missing first Aditude estimate period")?;
+    let last_period = periods
+        .iter()
+        .max()
+        .copied()
+        .wrap_internal_err("missing last Aditude estimate period")?;
+    let range_end = last_period
+        .date()
+        .checked_add_months(Months::new(1))
+        .wrap_internal_err("failed to calculate payout period end")?;
+    let range = format!(
+        "{}/{}",
+        first_period.date().format("%Y-%m-%d"),
+        range_end.format("%Y-%m-%d")
+    );
+    let estimates = periods
+        .into_iter()
+        .map(|period| {
+            let period_end = period
+                .date()
+                .checked_add_months(Months::new(1))
+                .wrap_internal_err(
+                "failed to calculate payout period end",
+            )?;
+            let day_count = usize::try_from(
+                period_end.signed_duration_since(period.date()).num_days(),
+            )
+            .wrap_internal_err("failed to calculate payout period day count")?;
+            let days = (0..day_count)
+                .map(|day| {
+                    let day = i64::try_from(day).wrap_internal_err(
+                        "failed to calculate payout period day",
+                    )?;
+                    let date = period
+                        .date()
+                        .checked_add_signed(Duration::days(day))
+                        .wrap_internal_err(
+                            "failed to calculate payout period day",
+                        )?;
+                    Ok(DayRevenue {
+                        date,
+                        amount_usd: Decimal::ZERO,
+                    })
+                })
+                .collect::<Result<Vec<_>, ApiError>>()?;
+            Ok((period, days))
+        })
+        .collect::<Result<DashMap<_, _>, ApiError>>()?;
+
+    let response =
+        make_aditude_request(&["METRIC_REVENUE"], &range, "1d").await?;
+    for point in response.into_iter().flat_map(|points| points.points_list) {
+        let Some(revenue) = point.metric.revenue else {
+            continue;
+        };
+        let timestamp = i64::try_from(point.time.seconds)
+            .ok()
+            .and_then(|seconds| DateTime::from_timestamp(seconds, 0))
+            .wrap_internal_err("invalid Aditude estimate timestamp")?;
+        let date = timestamp.date_naive();
+        let period = YearMonth::from_day1(date);
+        let Some(mut days) = estimates.get_mut(&period) else {
+            continue;
+        };
+
+        let day_index = usize::try_from(
+            date.signed_duration_since(period.date()).num_days(),
+        )
+        .wrap_internal_err("invalid Aditude estimate day")?;
+        days[day_index].date = date;
+        days[day_index].amount_usd += revenue;
+    }
+
+    Ok(estimates)
 }
 
 pub async fn process_payout(

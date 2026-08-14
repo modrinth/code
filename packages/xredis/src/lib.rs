@@ -168,6 +168,34 @@ impl RedisPool {
             .await
     }
 
+    pub async fn get_cached_keys_raw_with_expiry<F, Fut, T, K, E>(
+        &self,
+        namespace: &str,
+        keys: &[K],
+        expiry: i64,
+        closure: F,
+    ) -> Result<std::collections::HashMap<K, T>, E>
+    where
+        F: FnOnce(Vec<K>) -> Fut,
+        Fut: Future<Output = Result<DashMap<K, T>, E>>,
+        E: From<Error>,
+        T: Serialize + DeserializeOwned,
+        K: Display
+            + Hash
+            + Eq
+            + PartialEq
+            + Clone
+            + DeserializeOwned
+            + Serialize
+            + Debug,
+    {
+        self.cache
+            .get_cached_keys_raw_with_expiry(
+                self, namespace, keys, expiry, closure,
+            )
+            .await
+    }
+
     pub async fn get_cached_keys_with_slug<F, Fut, T, I, K, S, E>(
         &self,
         namespace: &str,
@@ -233,6 +261,7 @@ impl RedisPool {
                 slug_namespace,
                 case_sensitive,
                 keys,
+                None,
                 closure,
             )
             .await

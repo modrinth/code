@@ -1,5 +1,6 @@
 use ariadne::ids::UserId;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 use crate::util::time::YearMonth;
@@ -13,6 +14,8 @@ pub struct PayoutRun {
     pub period_start: YearMonth,
     /// What state this run is in.
     pub status: PayoutRunStatus,
+    #[serde(flatten)]
+    pub report: PayoutRunReport,
     /// When this run started running.
     ///
     /// Only accessible to admins.
@@ -36,15 +39,55 @@ pub struct PayoutRun {
 )]
 #[serde(rename_all = "snake_case")]
 pub enum PayoutRunStatus {
-    /// We are still waiting on the ad provider to issue payouts to us.
+    /// The payout period is still receiving revenue estimates.
+    Open,
+    /// The payout period is closed, but is still within Net-60 terms.
     Pending,
     /// The ad provider should have issued payouts to us by now, and we will
     /// soon run the payouts.
-    InReview,
-    /// Payouts run is currently being performed.
-    Running,
+    Review,
     /// Payouts run is complete and payouts have been distributed to users.
-    Done,
+    Paid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct PayoutRunReport {
+    pub revenue: PayoutRunRevenue,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub fees_deducted_usd: Decimal,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub variance_adjustment_usd: Decimal,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub net_estimated_revenue_usd: Decimal,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub creator_net_estimated_revenue_usd: Decimal,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub modrinth_net_estimated_revenue_usd: Decimal,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct PayoutRunCompletion {
+    #[serde(with = "rust_decimal::serde::float")]
+    pub revenue_usd: Decimal,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum PayoutRunRevenue {
+    Estimated {
+        days: Vec<DayRevenue>,
+    },
+    Actual {
+        #[serde(with = "rust_decimal::serde::float")]
+        amount_usd: Decimal,
+    },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct DayRevenue {
+    pub date: NaiveDate,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub amount_usd: Decimal,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
