@@ -11,6 +11,27 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-14T18:44:06+00:00`,
+		product: 'app',
+		version: '0.17.10',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T18:44:06+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
 		date: `2026-08-14T17:47:21+00:00`,
 		product: 'app',
 		version: '0.17.9',
