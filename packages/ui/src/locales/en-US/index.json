@@ -4049,6 +4049,9 @@
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Search for a project..."
   },
+  "search.filter.excluded_projects": {
+    "defaultMessage": "Excludes: {projects}"
+  },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Exclude"
   },

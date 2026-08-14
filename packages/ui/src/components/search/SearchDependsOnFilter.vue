@@ -186,14 +186,14 @@ const dependencyProjectIds = computed(() => [
 	),
 ])
 const pendingProjectId = ref<string>()
-const excludedProjectIds = ref(new Set<string>())
-
-watch(dependencyProjectIds, (projectIds) => {
-	const selectedProjectIds = new Set(projectIds)
-	excludedProjectIds.value = new Set(
-		[...excludedProjectIds.value].filter((projectId) => selectedProjectIds.has(projectId)),
-	)
-})
+const excludedProjectIds = computed(
+	() =>
+		new Set(
+			selectedFilters.value
+				.filter((filter) => filter.type === FILTER_TYPE_ID && filter.negative)
+				.map((filter) => parseDependencyProjectFilterOption(filter.option).projectId),
+		),
+)
 
 const { data: dependentProjects } = useQuery({
 	queryKey: computed(() => [
@@ -226,7 +226,9 @@ const selectedProjectId = computed(() =>
 		? parseDependencyProjectFilterOption(selectedDependencyFilter.value.option).projectId
 		: undefined,
 )
-const showSelectedProject = computed(() => Boolean(selectedProjectId.value && selectedProject.value))
+const showSelectedProject = computed(() =>
+	Boolean(selectedProjectId.value && selectedProject.value),
+)
 
 const dependencyTypes = computed<DependencyType[]>(() =>
 	selectedDependencyFilter.value
@@ -294,19 +296,15 @@ function removeIncludedProject(projectId: string) {
 			filter.type !== FILTER_TYPE_ID ||
 			parseDependencyProjectFilterOption(filter.option).projectId !== projectId,
 	)
-	const nextExcludedProjectIds = new Set(excludedProjectIds.value)
-	nextExcludedProjectIds.delete(projectId)
-	excludedProjectIds.value = nextExcludedProjectIds
 }
 
 function toggleProjectExcluded(projectId: string) {
-	const nextExcludedProjectIds = new Set(excludedProjectIds.value)
-	if (nextExcludedProjectIds.has(projectId)) {
-		nextExcludedProjectIds.delete(projectId)
-	} else {
-		nextExcludedProjectIds.add(projectId)
-	}
-	excludedProjectIds.value = nextExcludedProjectIds
+	selectedFilters.value = selectedFilters.value.map((filter) =>
+		filter.type === FILTER_TYPE_ID &&
+		parseDependencyProjectFilterOption(filter.option).projectId === projectId
+			? { ...filter, negative: !filter.negative }
+			: filter,
+	)
 }
 
 function resetDraftDependencyTypes() {

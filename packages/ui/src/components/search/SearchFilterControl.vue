@@ -12,9 +12,16 @@
 			<XIcon />
 			{{
 				formatMessage(includedProjectsMessage, {
-					projects: selectedIncludedProjectItems
-						.map((item) => dependentProjectNames.get(item.option) ?? item.option)
-						.join(', '),
+					projects: formatProjectNames(selectedIncludedProjectItems),
+				})
+			}}
+		</TagItem>
+		<TagItem v-if="selectedExcludedProjectItems.length > 0" :action="removeExcludedProjectFilters">
+			<XIcon />
+			<BanIcon class="text-brand-red" />
+			{{
+				formatMessage(excludedProjectsMessage, {
+					projects: formatProjectNames(selectedExcludedProjectItems),
 				})
 			}}
 		</TagItem>
@@ -85,6 +92,10 @@ const dependentProjectMessage = defineMessage({
 const includedProjectsMessage = defineMessage({
 	id: 'search.filter.included_projects',
 	defaultMessage: 'Includes: {projects}',
+})
+const excludedProjectsMessage = defineMessage({
+	id: 'search.filter.excluded_projects',
+	defaultMessage: 'Excludes: {projects}',
 })
 
 type Item = {
@@ -172,7 +183,16 @@ const items: ComputedRef<Item[]> = computed(() => {
 const selectedItems = computed(() => items.value.filter((x) => !x.provided))
 const selectedIncludedProjectItems = computed(() =>
 	props.projectType === 'modpack'
-		? selectedItems.value.filter((item) => item.type === 'compatible_dependency_project_ids')
+		? selectedItems.value.filter(
+				(item) => item.type === 'compatible_dependency_project_ids' && !item.negative,
+			)
+		: [],
+)
+const selectedExcludedProjectItems = computed(() =>
+	props.projectType === 'modpack'
+		? selectedItems.value.filter(
+				(item) => item.type === 'compatible_dependency_project_ids' && item.negative,
+			)
 		: [],
 )
 const otherSelectedItems = computed(() =>
@@ -181,8 +201,20 @@ const otherSelectedItems = computed(() =>
 		: selectedItems.value,
 )
 const selectedTagCount = computed(
-	() => otherSelectedItems.value.length + (selectedIncludedProjectItems.value.length > 0 ? 1 : 0),
+	() =>
+		otherSelectedItems.value.length +
+		(selectedIncludedProjectItems.value.length > 0 ? 1 : 0) +
+		(selectedExcludedProjectItems.value.length > 0 ? 1 : 0),
 )
+
+function formatProjectNames(items: Item[]) {
+	return items
+		.map((item) => {
+			const projectId = parseDependencyProjectFilterOption(item.option).projectId
+			return dependentProjectNames.value.get(projectId) ?? projectId
+		})
+		.join(', ')
+}
 
 function removeFilter(filter: Item) {
 	selectedFilters.value = selectedFilters.value.filter(
@@ -192,7 +224,13 @@ function removeFilter(filter: Item) {
 
 function removeIncludedProjectFilters() {
 	selectedFilters.value = selectedFilters.value.filter(
-		(filter) => filter.type !== 'compatible_dependency_project_ids',
+		(filter) => filter.type !== 'compatible_dependency_project_ids' || filter.negative,
+	)
+}
+
+function removeExcludedProjectFilters() {
+	selectedFilters.value = selectedFilters.value.filter(
+		(filter) => filter.type !== 'compatible_dependency_project_ids' || !filter.negative,
 	)
 }
 
