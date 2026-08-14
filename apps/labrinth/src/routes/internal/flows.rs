@@ -1847,9 +1847,35 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
-/// The bundled disposable domain list is checked first. Environment blacklist
-/// entries are matched literally, unless they begin with `*.`, in which case
-/// they match any subdomain of the remaining suffix.
+#[derive(PartialEq, Eq)]
+enum EmailDomainStatus {
+    Whitelisted,
+    Neutral,
+}
+
+/// Environment list entries are matched literally, unless they begin with `*.`,
+/// in which case they match any subdomain of the remaining suffix.
+fn matches_domain_entry(domain: &str, entry: &str) -> bool {
+    let entry = entry.trim().to_ascii_lowercase();
+
+    match entry.strip_prefix("*.") {
+        Some(suffix) => domain
+            .strip_suffix(suffix)
+            .is_some_and(|subdomain| subdomain.ends_with('.')),
+        None => entry == domain,
+    }
+}
+
+fn is_whitelisted_domain(domain: &str) -> bool {
+    let domain = domain.to_ascii_lowercase();
+
+    ENV.EMAIL_DOMAIN_WHITELIST
+        .iter()
+        .any(|entry| matches_domain_entry(&domain, entry))
+}
+
+/// The bundled disposable domain list is checked first, then the environment
+/// blacklist.
 fn is_blacklisted_domain(domain: &str) -> bool {
     let domain = domain.to_ascii_lowercase();
 
@@ -1863,34 +1889,38 @@ fn is_blacklisted_domain(domain: &str) -> bool {
         return true;
     }
 
-    ENV.EMAIL_DOMAIN_BLACKLIST.iter().any(|entry| {
-        let entry = entry.trim().to_ascii_lowercase();
-
-        match entry.strip_prefix("*.") {
-            Some(suffix) => domain
-                .strip_suffix(suffix)
-                .is_some_and(|subdomain| subdomain.ends_with('.')),
-            None => entry == domain,
-        }
-    })
+    ENV.EMAIL_DOMAIN_BLACKLIST
+        .iter()
+        .any(|entry| matches_domain_entry(&domain, entry))
 }
 
-fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
+fn ensure_email_domain_is_allowed(
+    email: &str,
+) -> Result<EmailDomainStatus, ApiError> {
     let Some((_, domain)) = email.rsplit_once('@') else {
         return Err(ApiError::Request(email_check_error_generic()));
     };
+
+    if is_whitelisted_domain(domain) {
+        info!(email.domain = domain, "whitelisted email domain, allowing");
+        return Ok(EmailDomainStatus::Whitelisted);
+    }
 
     if is_blacklisted_domain(domain) {
         info!(email.domain = domain, "blacklisted email domain, denying");
         return Err(ApiError::Request(email_check_error_generic()));
     }
 
-    Ok(())
+    Ok(EmailDomainStatus::Neutral)
 }
 
 async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
-    ensure_email_domain_is_allowed(email)
+    let status = ensure_email_domain_is_allowed(email)
         .wrap_api_err("validating email domain is allowed")?;
+
+    if status == EmailDomainStatus::Whitelisted {
+        return Ok(());
+    }
 
     let result = check_email(email)
         .await

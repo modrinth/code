@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "New AI rules and project disclosures",
+			"summary": "An update to Modrinth’s Content Rules and our new mandatory content disclosures.",
+			"thumbnail": "https://modrinth.com/news/article/ai-policy-and-disclosures/thumbnail.webp",
+			"date": "2026-08-13T16:00:00.000Z",
+			"link": "https://modrinth.com/news/article/ai-policy-and-disclosures"
+		},
+		{
 			"title": "Share instances with friends",
 			"summary": "Play more easily with friends without having to share .mrpack files.",
 			"thumbnail": "https://modrinth.com/news/article/shared-instances/thumbnail.webp",

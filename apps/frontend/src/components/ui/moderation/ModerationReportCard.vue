@@ -278,11 +278,13 @@ import {
 	CollapsibleRegion,
 	type ContentItem,
 	CopyCode,
+	formatReportType,
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
 	useFormatDateTime,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
@@ -297,6 +299,7 @@ import SharedInstanceReportContext, {
 } from './SharedInstanceReportContext.vue'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const auth = await useAuth()
 
@@ -787,13 +790,9 @@ const reportItemUrl = computed(() => {
 	}
 })
 
-const formattedReportType = computed(() => {
-	const reportType = props.report.report_type
-
-	// some are split by -, some are split by " "
-	const words = reportType.includes('-') ? reportType.split('-') : reportType.split(' ')
-	return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-})
+const formattedReportType = computed(() =>
+	formatReportType(formatMessage, props.report.report_type),
+)
 
 function copyId() {
 	navigator.clipboard.writeText(props.report.id).then(() => {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	defineMessages,
 	IconSelect,
@@ -16,6 +17,8 @@ import {
 const { formatMessage } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
 const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({

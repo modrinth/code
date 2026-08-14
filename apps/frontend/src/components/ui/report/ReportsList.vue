@@ -1,13 +1,20 @@
 <template>
 	<template v-if="moderation">
-		<Chips v-model="reasonFilter" :items="reasons" />
+		<Chips
+			v-model="reasonFilter"
+			:items="reasons"
+			:format-label="formatReasonLabel"
+			:capitalize="false"
+		/>
 		<p v-if="reports.length === MAX_REPORTS" class="text-red">
 			There are at least {{ MAX_REPORTS }} open reports. This page is at its max reports and will
 			not show any more recent ones.
 		</p>
 		<p v-else-if="reasonFilter === 'All'">There are {{ filteredReports.length }} open reports.</p>
 		<p v-else>
-			There are {{ filteredReports.length }}/{{ reports.length }} open '{{ reasonFilter }}' reports.
+			There are {{ filteredReports.length }}/{{ reports.length }} open '{{
+				formatReportType(formatMessage, reasonFilter)
+			}}' reports.
 		</p>
 	</template>
 	<ReportInfo
@@ -24,7 +31,7 @@
 	<p v-if="filteredReports.length === 0">You don't have any active reports.</p>
 </template>
 <script setup>
-import { Chips, injectModrinthClient } from '@modrinth/ui'
+import { Chips, formatReportType, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -43,9 +50,15 @@ const props = defineProps({
 	},
 })
 
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const viewMode = ref('open')
 const reasonFilter = ref('All')
+
+const formatReasonLabel = (reason) => {
+	if (reason === 'All') return reason
+	return formatReportType(formatMessage, reason)
+}
 
 const MAX_REPORTS = 1500
 

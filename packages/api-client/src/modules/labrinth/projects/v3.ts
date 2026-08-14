@@ -222,4 +222,116 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 			method: 'DELETE',
 		})
 	}
+
+	/**
+	 * Create a gallery image for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param file - Image file to upload
+	 * @param options - Gallery image options
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v3.createGalleryImage('sodium', imageFile, {
+	 *   featured: true,
+	 *   name: 'Screenshot 1',
+	 *   description: 'Main menu with Sodium enabled'
+	 * })
+	 * ```
+	 */
+	public async createGalleryImage(
+		id: string,
+		file: Blob,
+		options: {
+			ext: string
+			featured: boolean
+			name?: string
+			description?: string
+			ordering?: number
+		},
+	): Promise<void> {
+		const params: Record<string, string> = {
+			ext: options.ext,
+			featured: String(options.featured),
+		}
+		if (options.name) params.name = options.name
+		if (options.description) params.description = options.description
+		if (options.ordering !== undefined) params.ordering = String(options.ordering)
+
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+			params,
+			body: file,
+		})
+	}
+
+	/**
+	 * Delete a gallery image from a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param url - URL of the gallery image to delete
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v3.deleteGalleryImage('sodium', 'https://cdn.modrinth.com/...')
+	 * ```
+	 */
+	public async deleteGalleryImage(id: string, url: string): Promise<void> {
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'DELETE',
+			params: { url },
+		})
+	}
+
+	/**
+	 * Get content disclosures for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @returns Promise resolving to the project's disclosures
+	 *
+	 * @example
+	 * ```typescript
+	 * const { disclosures } = await client.labrinth.projects_v3.getDisclosures('sodium')
+	 * ```
+	 */
+	public async getDisclosures(id: string): Promise<Labrinth.Projects.v3.GetProjectDisclosures> {
+		return this.client.request<Labrinth.Projects.v3.GetProjectDisclosures>(
+			`/project/${id}/disclosures`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Modify content disclosures for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param data - Disclosures to set and types to remove
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v3.modifyDisclosures('sodium', {
+	 *   set: [{ type: 'ai_content', uses: ['text'], note: 'Translations are AI-generated.' }],
+	 *   remove: ['advertisements'],
+	 * })
+	 * ```
+	 */
+	public async modifyDisclosures(
+		id: string,
+		data: Labrinth.Projects.v3.ModifyProjectDisclosures,
+	): Promise<void> {
+		return this.client.request(`/project/${id}/disclosures`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PATCH',
+			body: data,
+		})
+	}
 }

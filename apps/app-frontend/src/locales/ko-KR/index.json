@@ -692,15 +692,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "이 인스턴스가 위반한 규칙은 무엇인가요?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "부적절함"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "악성/유해함"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "스팸"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "공유 인스턴스 신고"
   },

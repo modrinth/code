@@ -3758,15 +3758,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Zaawansowane"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Wyklucz paczki danych"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Wyklucz mody"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Wyklucz pluginy"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Środowisko"
   },

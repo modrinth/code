@@ -674,15 +674,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Vilken regel bryter instansen mot?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Olämplig"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Skadlig"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Rapportera delad instans"
   },

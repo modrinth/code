@@ -3704,15 +3704,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Расширенные"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Исключать наборы данных"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Исключать моды"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Исключать плагины"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Среда"
   },

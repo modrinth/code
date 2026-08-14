@@ -287,6 +287,12 @@
   "app.export-modal.export-button": {
     "message": "Export"
   },
+  "app.export-modal.export-complete": {
+    "message": "Export complete"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} was exported successfully."
+  },
   "app.export-modal.header": {
     "message": "Export modpack"
   },
@@ -727,15 +733,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Which rule does this instance violate?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Inappropriate"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Malicious"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Report shared instance"

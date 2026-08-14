@@ -1,4 +1,4 @@
-import { createTextVNode, isVNode, toDisplayString, type VNode } from 'vue'
+import { createTextVNode, createVNode, Fragment, isVNode, toDisplayString, type VNode } from 'vue'
 
 /**
  * Checks whether a specific child is a VNode. If not, converts it to a display
@@ -18,8 +18,20 @@ function normalizeChild(child: unknown): VNode {
  * that string.
  *
  * @param children Children to normalize.
- * @returns Children with all of non-VNodes converted to display strings.
+ * @returns A single VNode (or Fragment VNode when there are multiple children).
  */
-export function normalizeChildren(children: unknown | unknown[]): VNode[] {
-	return Array.isArray(children) ? children.map(normalizeChild) : [normalizeChild(children)]
+export function normalizeChildren(children: unknown | unknown[]): VNode {
+	const normalized = Array.isArray(children)
+		? children.map(normalizeChild)
+		: [normalizeChild(children)]
+
+	if (normalized.length === 0) {
+		return createTextVNode('')
+	}
+
+	if (normalized.length === 1) {
+		return normalized[0]!
+	}
+
+	return createVNode(Fragment, null, normalized)
 }

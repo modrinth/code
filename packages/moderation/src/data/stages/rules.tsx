@@ -77,6 +77,8 @@ export default function () {
 					.suggestedStatus('flagged')
 					.message(),
 
+				toggle('ai-generated', 'AI Generated').suggestedStatus('flagged').message(),
+
 				toggle('rule-breaking-other', 'Other')
 					.suggestedStatus('rejected')
 					.message((state) => ({ MESSAGE: state.message }))

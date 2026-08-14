@@ -34,7 +34,7 @@ struct InstallJobRow {
 impl InstallJobRecord {
     pub fn snapshot(&self) -> InstallJobSnapshot {
         InstallJobSnapshot {
-            job_id: self.id,
+            job_id: self.id.to_string(),
             instance_id: self.instance_id.clone(),
             kind: self.kind,
             status: self.status,
@@ -45,9 +45,9 @@ impl InstallJobRecord {
             display: self.state.display.clone(),
             error: self.state.error.clone(),
             rollback_error: self.state.rollback_error.clone(),
-            created: self.created,
-            modified: self.modified,
-            finished: self.finished,
+            created: self.created.to_rfc3339(),
+            modified: self.modified.to_rfc3339(),
+            finished: self.finished.map(|finished| finished.to_rfc3339()),
         }
     }
 }

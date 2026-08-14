@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<AiImageWarningModal ref="aiImageWarningModal" />
 		<Modal
 			v-if="currentMember"
 			ref="modal_edit_item"
@@ -18,12 +19,7 @@
 							:accept="acceptFileTypes"
 							:max-size="5242880"
 							aria-label="Replace image"
-							@change="
-								(x) => {
-									editFile = x[0]
-									showPreviewImage()
-								}
-							"
+							@change="replaceEditFile"
 						>
 							<TransferIcon aria-hidden="true" />
 						</FileButton>
@@ -315,6 +311,8 @@ import {
 } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 
+import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
 const formatDate = useFormatDateTime({
@@ -333,6 +331,7 @@ const {
 } = injectProjectPageContext()
 
 // Template refs
+const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
 const modalEditItem = useTemplateRef('modal_edit_item')
 const modalConfirm = useTemplateRef('modal_confirm')
 
@@ -439,12 +438,33 @@ function resetEdit() {
 	previewImage.value = null
 }
 
-function handleFiles(files: File[]) {
+async function handleFiles(files: File[]) {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
 	resetEdit()
-	editFile.value = files[0]
+	editFile.value = file
 
 	showPreviewImage()
 	modalEditItem.value?.show()
+}
+
+async function replaceEditFile(files: File[]) {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
+	editFile.value = file
+	showPreviewImage()
 }
 
 function showPreviewImage() {

@@ -113,7 +113,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { useOnline } from '@vueuse/core'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, type ComputedRef, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, type ComputedRef, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -126,9 +126,9 @@ import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
+import { useAppEvent } from '@/composables/use-app-event'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
-import { instance_listener, process_listener } from '@/helpers/events'
 import {
 	getSharedInstanceUnavailableReason,
 	install_existing_instance,
@@ -776,10 +776,6 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 	}
 }
 
-let unlistenInstances: (() => void) | null = null
-let unlistenProcesses: (() => void) | null = null
-let instancePageAlive = true
-
 provideInstancePage({
 	instanceId,
 	instance: instance as ComputedRef<GameInstance>,
@@ -812,39 +808,27 @@ watch(instanceId, (currentInstanceId, previousInstanceId) => {
 	destroyInstanceConsole(previousInstanceId)
 })
 
-onMounted(() => {
-	void instance_listener(async (event: { instance_id: string; event: string }) => {
-		if (event.instance_id !== instanceId.value) return
-		if (event.event === 'removed' || route.path === '/') {
-			if (route.path !== '/') await router.push({ path: '/' })
-			return
-		}
-		await queryClient.invalidateQueries({
-			queryKey: instanceKeys.detail(event.instance_id),
-			exact: true,
-		})
+useAppEvent('instance', async (event) => {
+	if (event.instance_id !== instanceId.value) return
+	if (event.event === 'removed' || route.path === '/') {
+		if (route.path !== '/') await router.push({ path: '/' })
+		return
+	}
+	await queryClient.invalidateQueries({
+		queryKey: instanceKeys.detail(event.instance_id),
+		exact: true,
 	})
-		.then((unlisten) => {
-			if (instancePageAlive) unlistenInstances = unlisten
-			else unlisten()
-		})
-		.catch(handleError)
+})
 
-	void process_listener((event: { event: string; instance_id: string }) => {
-		if (event.instance_id !== instanceId.value) return
-		if (event.event === 'finished') {
-			queryClient.setQueryData(instanceKeys.processes(event.instance_id), [])
-			useInstanceConsole(event.instance_id).invalidate()
-			void queryClient.invalidateQueries({ queryKey: instanceKeys.logs(event.instance_id) })
-		} else if (event.event === 'launched') {
-			queryClient.setQueryData(instanceKeys.processes(event.instance_id), [true])
-		}
-	})
-		.then((unlisten) => {
-			if (instancePageAlive) unlistenProcesses = unlisten
-			else unlisten()
-		})
-		.catch(handleError)
+useAppEvent('process', (event) => {
+	if (event.instance_id !== instanceId.value) return
+	if (event.event === 'finished') {
+		queryClient.setQueryData(instanceKeys.processes(event.instance_id), [])
+		useInstanceConsole(event.instance_id).invalidate()
+		void queryClient.invalidateQueries({ queryKey: instanceKeys.logs(event.instance_id) })
+	} else if (event.event === 'launched') {
+		queryClient.setQueryData(instanceKeys.processes(event.instance_id), [true])
+	}
 })
 
 const icon = computed(() =>
@@ -858,9 +842,6 @@ const timePlayed = computed(() => {
 })
 
 onUnmounted(() => {
-	instancePageAlive = false
-	unlistenProcesses?.()
-	unlistenInstances?.()
 	if (instanceId.value) {
 		destroyInstanceConsole(instanceId.value)
 	}

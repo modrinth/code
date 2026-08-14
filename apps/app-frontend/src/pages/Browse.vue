@@ -35,14 +35,14 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
+import { useAppEvent } from '@/composables/use-app-event'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
-import { instance_listener } from '@/helpers/events.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
 	list as listInstances,
@@ -123,6 +123,7 @@ const {
 	effectiveServerWorldId,
 	serverContextServerData,
 	serverContentProjectIds,
+	queuedServerInstallRootProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
 	selectedServerInstallProjects,
@@ -143,6 +144,7 @@ const {
 	enforceSetupModpackRoute,
 	getQueuedServerInstallPlans,
 	setQueuedServerInstallPlans,
+	resolveQueuedServerInstallPlan,
 	openServerModpackInstallFlow,
 	onServerFlowBack,
 	handleServerModpackFlowCreate,
@@ -870,6 +872,7 @@ function getCardActions(
 		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
 	) {
 		const isQueued = queuedServerInstallProjectIds.value.has(projectResult.project_id)
+		const isQueuedRoot = queuedServerInstallRootProjectIds.value.has(projectResult.project_id)
 		const isInstallingSelection = isInstallingQueuedServerInstalls.value
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
@@ -897,14 +900,16 @@ function getCardActions(
 							? CheckIcon
 							: PlusIcon,
 				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
-				disabled: showAsInstalled || isInstalling || isInstallingSelection,
+				disabled:
+					showAsInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
 				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					if (isQueued) {
+					if (isQueuedRoot) {
 						removeQueuedServerInstall(projectResult.project_id)
 						return
 					}
+					if (isQueued) return
 
 					const contentType = currentProjectType as BrowseInstallContentType
 					const isModpack = contentType === 'modpack'
@@ -913,7 +918,7 @@ function getCardActions(
 						setProjectInstalling(projectResult.project_id, true)
 					}
 					try {
-						await requestInstall({
+						const plan = await requestInstall({
 							project: projectResult,
 							contentType,
 							mode: isModpack ? 'immediate' : 'queue',
@@ -937,7 +942,9 @@ function getCardActions(
 									iconUrl: plan.project.icon_url ?? undefined,
 								}),
 						})
+						if (!isModpack) await resolveQueuedServerInstallPlan(plan)
 					} catch (err) {
+						if (!isModpack) removeQueuedServerInstall(projectResult.project_id)
 						handleError(err as Error)
 					} finally {
 						if (shouldShowInstalling) {
@@ -1158,44 +1165,23 @@ if (instance.value?.game_version) {
 
 void searchState.refreshSearch()
 
-type UnlistenFn = () => void
-
-let isUnmounted = false
-let unlistenInstances: UnlistenFn | null = null
-
-onMounted(() => {
-	instance_listener(async (event: { event: string; instance_id: string }) => {
-		if (event.event === 'added' || event.event === 'created' || event.event === 'removed') {
-			if (!route.query.i) {
-				await refreshInstalledProjectIds()
-				if (projectType.value === 'modpack') {
-					if (event.event === 'removed') {
-						syncHiddenInstanceProjectIds()
-					}
-					await searchState.refreshSearch()
-				}
-			}
-		}
-
-		if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+useAppEvent('instance', async (event) => {
+	if (event.event === 'created' || event.event === 'removed') {
+		if (!route.query.i) {
 			await refreshInstalledProjectIds()
-			await searchState.refreshSearch()
-		}
-	})
-		.then((unlisten) => {
-			if (isUnmounted) {
-				unlisten()
-				return
+			if (projectType.value === 'modpack') {
+				if (event.event === 'removed') {
+					syncHiddenInstanceProjectIds()
+				}
+				await searchState.refreshSearch()
 			}
+		}
+	}
 
-			unlistenInstances = unlisten
-		})
-		.catch(handleError)
-})
-
-onUnmounted(() => {
-	isUnmounted = true
-	unlistenInstances?.()
+	if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+		await refreshInstalledProjectIds()
+		await searchState.refreshSearch()
+	}
 })
 
 function getProjectBrowseQuery() {
@@ -1222,11 +1208,25 @@ const advancedFiltersCollapsed = computed({
 	},
 })
 
+const dismissedPhotosensitivityFilterWarning = computed({
+	get: () => themeStore.getFeatureFlag('dismissed_photosensitivity_filter_warning'),
+	set: (value) => {
+		themeStore.featureFlags['dismissed_photosensitivity_filter_warning'] = value
+		getSettings()
+			.then((settings) => {
+				settings.feature_flags['dismissed_photosensitivity_filter_warning'] = value
+				return setSettings(settings)
+			})
+			.catch(handleError)
+	},
+})
+
 provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
 	advancedFiltersCollapsed,
+	dismissedPhotosensitivityFilterWarning,
 	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: getProjectBrowseQuery(),

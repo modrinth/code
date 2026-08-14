@@ -92,6 +92,15 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resubscribe to Server"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Apply saved preferences"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "This link's filters differ from your saved advanced exclusions"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Advanced exclusions are saved across sessions. Opening a shared link with filters will override them."
+  },
   "browse.filter-results": {
     "defaultMessage": "Filter results..."
   },
@@ -130,6 +139,9 @@
   },
   "button.accept": {
     "defaultMessage": "Accept"
+  },
+  "button.add-another": {
+    "defaultMessage": "Add another"
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Add server to instance"
@@ -202,6 +214,9 @@
   },
   "button.hide-snapshots": {
     "defaultMessage": "Hide snapshots"
+  },
+  "button.i-understand": {
+    "defaultMessage": "I understand"
   },
   "button.install": {
     "defaultMessage": "Install"
@@ -1057,6 +1072,9 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
+  },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "Come back once you've uploaded your versions."
   },
   "external-files.permissions-card.add-files-modal.confirm": {
     "defaultMessage": "{count, plural, one {Add file} other {Add files}}"
@@ -2363,6 +2381,9 @@
   "label.error": {
     "defaultMessage": "Error"
   },
+  "label.explanation": {
+    "defaultMessage": "Explanation"
+  },
   "label.extract-failed": {
     "defaultMessage": "Extract failed"
   },
@@ -3344,6 +3365,48 @@
   "project.about.tags.title": {
     "defaultMessage": "Tags"
   },
+  "project.disclosure.advertising.title": {
+    "defaultMessage": "Contains advertising"
+  },
+  "project.disclosure.ai-generated-content.title": {
+    "defaultMessage": "Contains AI-generated {types}"
+  },
+  "project.disclosure.ai-generated-content.use.assets": {
+    "defaultMessage": "assets"
+  },
+  "project.disclosure.ai-generated-content.use.code": {
+    "defaultMessage": "code"
+  },
+  "project.disclosure.ai-generated-content.use.content": {
+    "defaultMessage": "content"
+  },
+  "project.disclosure.ai-generated-content.use.functionality": {
+    "defaultMessage": "functionality"
+  },
+  "project.disclosure.ai-generated-content.use.text": {
+    "defaultMessage": "text"
+  },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "Show fewer"
+  },
+  "project.disclosure.derivative-work.show-more": {
+    "defaultMessage": "Show {count} more"
+  },
+  "project.disclosure.derivative-work.title": {
+    "defaultMessage": "This is a derivative work of:"
+  },
+  "project.disclosure.paid-features.title": {
+    "defaultMessage": "Contains paid features"
+  },
+  "project.disclosure.photosensitivity.title": {
+    "defaultMessage": "Photosensitivity warning"
+  },
+  "project.disclosure.system-interactions.title": {
+    "defaultMessage": "Contains external system interactions"
+  },
+  "project.disclosure.telemetry.title": {
+    "defaultMessage": "Contains {consent, select, opt_in {opt-in telemetry} opt_out {opt-out telemetry} always_active {always-active telemetry} other {telemetry}}"
+  },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {download} other {downloads}}"
   },
@@ -3707,6 +3770,30 @@
   "project.settings.description.title": {
     "defaultMessage": "Description"
   },
+  "project.settings.disclosures.ai.types-assets": {
+    "defaultMessage": "Assets"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "defaultMessage": "Code"
+  },
+  "project.settings.disclosures.ai.types-functionality": {
+    "defaultMessage": "Functionality"
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "defaultMessage": "Text"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "Always active"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-in": {
+    "defaultMessage": "Opt-in"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-out": {
+    "defaultMessage": "Opt-out"
+  },
+  "project.settings.disclosures.title": {
+    "defaultMessage": "Disclosures"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
@@ -3836,6 +3923,12 @@
   "project.stats.followers-label": {
     "defaultMessage": "{count, plural, one {follower} other {followers}}"
   },
+  "project.status.archived.body": {
+    "defaultMessage": "{title} will not receive any further updates unless the author decides to unarchive the project."
+  },
+  "project.status.archived.header": {
+    "defaultMessage": "{title} has been archived"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3902,6 +3995,24 @@
   "report.item-type.version": {
     "defaultMessage": "version"
   },
+  "report.type.copyright": {
+    "defaultMessage": "Reuploaded work"
+  },
+  "report.type.inappropriate": {
+    "defaultMessage": "Inappropriate"
+  },
+  "report.type.malicious": {
+    "defaultMessage": "Malicious"
+  },
+  "report.type.missing-disclosure": {
+    "defaultMessage": "Missing or incorrect disclosure"
+  },
+  "report.type.name-squatting": {
+    "defaultMessage": "Name squatting"
+  },
+  "report.type.spam": {
+    "defaultMessage": "Spam"
+  },
   "s.bg": {
     "defaultMessage": "Background task running"
   },
@@ -3935,17 +4046,41 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Show more"
   },
+  "search.filter.option.sub_options.collapse.tooltip": {
+    "defaultMessage": "Hide more options"
+  },
+  "search.filter.option.sub_options.expand.tooltip": {
+    "defaultMessage": "Show more options"
+  },
   "search.filter_type.advanced": {
-    "defaultMessage": "Advanced"
+    "defaultMessage": "Advanced exclusions"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Exclude data packs"
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "Advertisements"
   },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Exclude mods"
+  "search.filter_type.advanced.disclosure.ai_content": {
+    "defaultMessage": "AI-generated content"
   },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Exclude plugins"
+  "search.filter_type.advanced.disclosure.ai_content.usage": {
+    "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.archived": {
+    "defaultMessage": "Archived"
+  },
+  "search.filter_type.advanced.disclosure.derivative_work": {
+    "defaultMessage": "Derivative content"
+  },
+  "search.filter_type.advanced.disclosure.epilepsy_triggers": {
+    "defaultMessage": "Photosensitivity triggers"
+  },
+  "search.filter_type.advanced.disclosure.paid_features": {
+    "defaultMessage": "Paid features"
+  },
+  "search.filter_type.advanced.disclosure.system_interactions": {
+    "defaultMessage": "External system interactions"
+  },
+  "search.filter_type.advanced.disclosure.telemetry": {
+    "defaultMessage": "Telemetry"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
@@ -3997,6 +4132,21 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "search.photosensitivity-warning-modal.body.1": {
+    "defaultMessage": "We cannot guarantee that all content on Modrinth has been labeled appropriately."
+  },
+  "search.photosensitivity-warning-modal.body.2": {
+    "defaultMessage": "Content labels for photosensitivity triggers are self-assigned by the creators who upload their content to Modrinth. These projects have not gone through any safety testing."
+  },
+  "search.photosensitivity-warning-modal.body.3": {
+    "defaultMessage": "Using any content on Modrinth is at your own risk. Please stay safe! 💚"
+  },
+  "search.photosensitivity-warning-modal.dont-show-again": {
+    "defaultMessage": "Don't show this again"
+  },
+  "search.photosensitivity-warning-modal.title": {
+    "defaultMessage": "Results are not guaranteed to be safe"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modded"
@@ -5338,6 +5488,9 @@
   },
   "settings.feature-flags.title": {
     "defaultMessage": "Feature flags"
+  },
+  "settings.form.group.optional": {
+    "defaultMessage": "(optional)"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Standard languages"

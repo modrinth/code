@@ -3791,15 +3791,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Erweitert"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Datenpakete ausschließen"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Mods ausschließen"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Plugins ausschließen"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Umgebung"
   },

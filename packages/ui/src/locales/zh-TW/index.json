@@ -3791,15 +3791,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "進階篩選"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "排除資料包"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "排除模組"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "排除插件"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "環境"
   },

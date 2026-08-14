@@ -3560,15 +3560,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Napredno"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Isključi data pakete"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Isključi modove"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Isključi plugine"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Okruže"
   },

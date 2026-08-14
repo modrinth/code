@@ -7,6 +7,10 @@ export type UploadSessionFile = {
 	filename: string
 }
 
+function getUploadSessionPath(scope: Kyros.UploadSessions.v1.Scope, worldId: string) {
+	return `/worlds/${worldId}/${scope}/upload-session`
+}
+
 export class KyrosUploadSessionsV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'kyros_upload_sessions_v1'
@@ -17,7 +21,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		worldId: string,
 	): Promise<Kyros.UploadSessions.v1.UploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/files/upload-session`,
+			getUploadSessionPath(scope, worldId),
 			{
 				api: '',
 				version: 'v1',
@@ -32,7 +36,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		worldId: string,
 	): Promise<Kyros.UploadSessions.v1.GetUploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.GetUploadSessionResponse>(
-			`/worlds/${worldId}/files/upload-session`,
+			getUploadSessionPath(scope, worldId),
 			{
 				api: '',
 				version: 'v1',
@@ -58,7 +62,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		}
 
 		return this.client.upload<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/files/upload-session/${uploadId}/files`,
+			`${getUploadSessionPath(scope, worldId)}/${uploadId}/files`,
 			{
 				api: '',
 				version: 'v1',
@@ -76,7 +80,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		uploadId: string,
 	): Promise<Kyros.UploadSessions.v1.UploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/files/upload-session/${uploadId}/finalize`,
+			`${getUploadSessionPath(scope, worldId)}/${uploadId}/finalize`,
 			{
 				api: '',
 				version: 'v1',
@@ -92,7 +96,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		uploadId: string,
 	): Promise<Kyros.UploadSessions.v1.UploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/files/upload-session/${uploadId}`,
+			`${getUploadSessionPath(scope, worldId)}/${uploadId}`,
 			{
 				api: '',
 				version: 'v1',

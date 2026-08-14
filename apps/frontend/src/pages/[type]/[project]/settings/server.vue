@@ -169,6 +169,7 @@
 import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Combobox,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	defineMessages,
 	IconButton,
@@ -270,6 +271,8 @@ const messages = defineMessages({
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.server)
 
 const javaAddress = ref('')
 const bedrockAddress = ref('')

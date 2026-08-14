@@ -241,13 +241,14 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 import OrganizationPageHeader from '~/components/ui/OrganizationPageHeader.vue'
+import { warmProjectCheckCaches } from '~/composables/queries/project'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,
@@ -296,6 +297,7 @@ if (route.path.includes('settings')) {
 const routeHasSettings = computed(() => route.path.includes('settings'))
 
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
 const {
 	data: organization,
@@ -345,6 +347,14 @@ const {
 	},
 	placeholderData: [],
 })
+
+watch(
+	projects,
+	(list) => {
+		warmProjectCheckCaches(queryClient, list)
+	},
+	{ immediate: true },
+)
 
 const refresh = async () => {
 	await Promise.all([refreshOrganization(), refreshProjects()])

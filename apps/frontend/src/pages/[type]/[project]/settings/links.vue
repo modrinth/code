@@ -288,6 +288,7 @@ import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@
 import {
 	Button,
 	Combobox,
+	commonProjectSettingsMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -312,6 +313,8 @@ const {
 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.links)
 
 const issuesUrl = ref(project.value.issues_url)
 const sourceUrl = ref(project.value.source_url)

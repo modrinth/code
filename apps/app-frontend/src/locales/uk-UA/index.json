@@ -695,15 +695,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Яке правило порушує цей профіль?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Неприпустимий уміст"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Шкідливий уміст"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Спам"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Скарга на спільний профіль"
   },
