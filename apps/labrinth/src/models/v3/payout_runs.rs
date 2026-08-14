@@ -50,11 +50,13 @@ pub enum PayoutRunStatus {
     Paid,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct PayoutRunReport {
-	pub days: Vec<DayRevenue>,
-	#[serde(with = "rust_decimal::serde::float")]
-	pub fees_deducted_usd: Decimal,
+    pub days: Vec<DayRevenue>,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub raw_estimated_revenue_usd: Decimal,
+    #[serde(with = "rust_decimal::serde::float")]
+    pub fees_deducted_usd: Decimal,
     #[serde(with = "rust_decimal::serde::float")]
     pub variance_adjustment_usd: Decimal,
     #[serde(with = "rust_decimal::serde::float")]

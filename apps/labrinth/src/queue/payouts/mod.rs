@@ -882,20 +882,28 @@ pub struct AditudeTime {
 
 #[derive(Deserialize)]
 struct AditudeMetricsV2Response {
-	responses: Vec<AditudeMetricsV2Table>,
+    responses: Vec<AditudeMetricsV2Table>,
 }
 
 #[derive(Deserialize)]
 struct AditudeMetricsV2Table {
-	rows: Vec<AditudeRevenueRow>,
+    rows: Vec<AditudeMetricRow>,
 }
 
 #[derive(Deserialize)]
-struct AditudeRevenueRow {
-	#[serde(rename = "_TIME")]
-	time_millis: i64,
-	#[serde(rename = "REVENUE")]
-	revenue: Decimal,
+struct AditudeMetricRow {
+    #[serde(rename = "_TIME")]
+    time_millis: i64,
+    #[serde(rename = "REVENUE")]
+    revenue: Option<Decimal>,
+    #[serde(rename = "IMPRESSIONS")]
+    impressions: Option<u128>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AditudeDayEstimate {
+    pub revenue: DayRevenue,
+    pub impressions: u128,
 }
 
 pub async fn make_aditude_request(
@@ -929,37 +937,37 @@ pub async fn make_aditude_request(
 }
 
 async fn make_aditude_revenue_request(
-	start_time: i64,
-	end_time: i64,
+    start_time: i64,
+    end_time: i64,
 ) -> Result<AditudeMetricsV2Response, ApiError> {
-	reqwest::Client::new()
-		.post("https://cloud.aditude.io/api/public/insights/metrics/v2")
-		.bearer_auth(&ENV.ADITUDE_API_KEY)
-		.json(&serde_json::json!({
-			"metrics": ["REVENUE"],
-			"range": "custom",
-			"startTime": start_time,
-			"endTime": end_time,
-			"interval": "1d"
-		}))
-		.send()
-		.await
-		.wrap_internal_err("failed to request Aditude revenue estimates")?
-		.error_for_status()
-		.wrap_internal_err("Aditude revenue estimate request failed")?
-		.json()
-		.await
-		.wrap_internal_err("failed to deserialize Aditude revenue estimates")
+    reqwest::Client::new()
+        .post("https://cloud.aditude.io/api/public/insights/metrics/v2")
+        .bearer_auth(&ENV.ADITUDE_API_KEY)
+        .json(&serde_json::json!({
+            "metrics": ["REVENUE", "IMPRESSIONS"],
+            "range": "custom",
+            "startTime": start_time,
+            "endTime": end_time,
+            "interval": "1d"
+        }))
+        .send()
+        .await
+        .wrap_internal_err("failed to request Aditude revenue estimates")?
+        .error_for_status()
+        .wrap_internal_err("Aditude revenue estimate request failed")?
+        .json()
+        .await
+        .wrap_internal_err("failed to deserialize Aditude revenue estimates")
 }
 
 const ADITUDE_MONTH_ESTIMATE_CACHE_NAMESPACE: &str =
-	"aditude_month_estimates_v2";
+    "aditude_month_estimates_v1";
 const ADITUDE_MONTH_ESTIMATE_CACHE_EXPIRY: i64 = 60 * 60 * 24;
 
 pub async fn get_cached_aditude_month_estimates(
     periods: &[YearMonth],
     redis: &RedisPool,
-) -> Result<HashMap<YearMonth, Vec<DayRevenue>>, ApiError> {
+) -> Result<HashMap<YearMonth, Vec<AditudeDayEstimate>>, ApiError> {
     redis
         .get_cached_keys_raw_with_expiry(
             ADITUDE_MONTH_ESTIMATE_CACHE_NAMESPACE,
@@ -973,7 +981,7 @@ pub async fn get_cached_aditude_month_estimates(
 
 async fn fetch_aditude_month_estimates(
     periods: Vec<YearMonth>,
-) -> Result<DashMap<YearMonth, Vec<DayRevenue>>, ApiError> {
+) -> Result<DashMap<YearMonth, Vec<AditudeDayEstimate>>, ApiError> {
     let first_period = periods
         .iter()
         .min()
@@ -988,19 +996,19 @@ async fn fetch_aditude_month_estimates(
         .date()
         .checked_add_months(Months::new(1))
         .wrap_internal_err("failed to calculate payout period end")?;
-	let range_start_time = first_period
-		.date()
-		.and_hms_opt(0, 0, 0)
-		.wrap_internal_err("failed to calculate payout period start")?
-		.and_utc()
-		.timestamp_millis();
-	let range_end_time = range_end
-		.and_hms_opt(0, 0, 0)
-		.wrap_internal_err("failed to calculate payout period end")?
-		.and_utc()
-		.timestamp_millis()
-		.checked_sub(1)
-		.wrap_internal_err("failed to calculate inclusive payout period end")?;
+    let range_start_time = first_period
+        .date()
+        .and_hms_opt(0, 0, 0)
+        .wrap_internal_err("failed to calculate payout period start")?
+        .and_utc()
+        .timestamp_millis();
+    let range_end_time = range_end
+        .and_hms_opt(0, 0, 0)
+        .wrap_internal_err("failed to calculate payout period end")?
+        .and_utc()
+        .timestamp_millis()
+        .checked_sub(1)
+        .wrap_internal_err("failed to calculate inclusive payout period end")?;
     let estimates = periods
         .into_iter()
         .map(|period| {
@@ -1025,9 +1033,12 @@ async fn fetch_aditude_month_estimates(
                         .wrap_internal_err(
                             "failed to calculate payout period day",
                         )?;
-                    Ok(DayRevenue {
-                        date,
-                        amount_usd: Decimal::ZERO,
+                    Ok(AditudeDayEstimate {
+                        revenue: DayRevenue {
+                            date,
+                            amount_usd: Decimal::ZERO,
+                        },
+                        impressions: 0,
                     })
                 })
                 .collect::<Result<Vec<_>, ApiError>>()?;
@@ -1035,15 +1046,15 @@ async fn fetch_aditude_month_estimates(
         })
         .collect::<Result<DashMap<_, _>, ApiError>>()?;
 
-	let response =
-		make_aditude_revenue_request(range_start_time, range_end_time).await?;
-	for row in response
-		.responses
-		.into_iter()
-		.flat_map(|response| response.rows)
-	{
-		let timestamp = DateTime::from_timestamp_millis(row.time_millis)
-			.wrap_internal_err("invalid Aditude estimate timestamp")?;
+    let response =
+        make_aditude_revenue_request(range_start_time, range_end_time).await?;
+    for row in response
+        .responses
+        .into_iter()
+        .flat_map(|response| response.rows)
+    {
+        let timestamp = DateTime::from_timestamp_millis(row.time_millis)
+            .wrap_internal_err("invalid Aditude estimate timestamp")?;
         let date = timestamp.date_naive();
         let period = YearMonth::from_day1(date);
         let Some(mut days) = estimates.get_mut(&period) else {
@@ -1054,11 +1065,21 @@ async fn fetch_aditude_month_estimates(
             date.signed_duration_since(period.date()).num_days(),
         )
         .wrap_internal_err("invalid Aditude estimate day")?;
-        days[day_index].date = date;
-		days[day_index].amount_usd += row.revenue;
+        days[day_index].revenue.date = date;
+        if let Some(revenue) = row.revenue {
+            days[day_index].revenue.amount_usd += revenue;
+        }
+        if let Some(impressions) = row.impressions {
+            days[day_index].impressions += impressions;
+        }
     }
 
     Ok(estimates)
+}
+
+pub fn clean_io_fee_usd(impressions: u128) -> Decimal {
+    let clean_io_cpm = Decimal::from(8) / Decimal::from(1000);
+    clean_io_cpm * Decimal::from(impressions) / Decimal::from(1000)
 }
 
 pub async fn process_payout(
@@ -1303,13 +1324,13 @@ pub async fn process_payout(
     // Modrinth's share of ad revenue
     let modrinth_cut = Decimal::from(1) / Decimal::from(4);
     // Clean.io fee (ad antimalware). Per 1000 impressions. 0.008 CPM
-    let clean_io_fee = Decimal::from(8) / Decimal::from(1000);
+    let clean_io_fee = clean_io_fee_usd(aditude_impressions);
     // Google Ad Manager fee. Per 1000 impressions. 0.015400 CPM
     let gam_fee = Decimal::from(154) / Decimal::from(10000);
 
     let net_revenue = aditude_amount
-        - ((clean_io_fee + gam_fee) * Decimal::from(aditude_impressions)
-            / Decimal::from(1000));
+        - clean_io_fee
+        - (gam_fee * Decimal::from(aditude_impressions) / Decimal::from(1000));
 
     let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
 
