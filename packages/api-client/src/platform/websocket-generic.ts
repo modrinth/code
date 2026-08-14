@@ -19,35 +19,59 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 		}
 
 		return new Promise((resolve, reject) => {
+			let settled = false
+			let authenticationTimeout: ReturnType<typeof setTimeout> | null = null
+			const resolveConnection = () => {
+				if (settled) return
+				settled = true
+				if (authenticationTimeout) clearTimeout(authenticationTimeout)
+				resolve()
+			}
+			const rejectConnection = (error: unknown) => {
+				if (settled) return
+				settled = true
+				if (authenticationTimeout) clearTimeout(authenticationTimeout)
+				reject(error)
+			}
 			try {
 				const ws = new WebSocket(getNodeWebSocketUrl(auth.url))
 
 				const connection: WebSocketConnection = {
 					serverId,
 					socket: ws,
+					authenticated: false,
 					reconnectAttempts: 0,
 					reconnectTimer: undefined,
 					isReconnecting: false,
 				}
 
 				this.connections.set(serverId, connection)
+				authenticationTimeout = setTimeout(() => {
+					rejectConnection(new Error(`WebSocket authentication timed out for server ${serverId}`))
+					if (this.connections.get(serverId) === connection) this.closeConnection(serverId)
+				}, this.AUTHENTICATION_TIMEOUT)
 
 				ws.onopen = () => {
 					ws.send(JSON.stringify({ event: 'auth', jwt: auth.token }))
 
 					connection.reconnectAttempts = 0
 					connection.isReconnecting = false
-
-					resolve()
 				}
 
 				ws.onmessage = (messageEvent) => {
 					try {
 						const data = JSON.parse(messageEvent.data) as Archon.Websocket.v0.WSEvent
+						if (data.event === 'auth-ok') {
+							connection.authenticated = true
+						} else if (data.event === 'auth-incorrect') {
+							connection.authenticated = false
+						}
 
 						const eventKey = `${serverId}:${data.event}` as keyof WSEventMap
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 						this.emitter.emit(eventKey, data as any)
+
+						if (data.event === 'auth-ok') resolveConnection()
 
 						if (data.event === 'auth-expiring' || data.event === 'auth-incorrect') {
 							this.handleAuthExpiring(serverId).catch(console.error)
@@ -58,11 +82,17 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 				}
 
 				ws.onclose = (event) => {
+					connection.authenticated = false
 					console.debug(`[WebSocket] Closed for server ${serverId}:`, {
 						code: event.code,
 						reason: event.reason,
 						wasClean: event.wasClean,
 					})
+					rejectConnection(
+						new Error(
+							`WebSocket closed before authentication for server ${serverId} (code: ${event.code})`,
+						),
+					)
 					if (event.code !== NORMAL_CLOSURE) {
 						this.scheduleReconnect(serverId, auth)
 					}
@@ -77,14 +107,14 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 						readyStateLabel: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][readyState],
 						type: (event as Event).type,
 					})
-					reject(
+					rejectConnection(
 						new Error(
 							`WebSocket connection failed for server ${serverId} (readyState: ${readyState})`,
 						),
 					)
 				}
 			} catch (error) {
-				reject(error)
+				rejectConnection(error)
 			}
 		})
 	}
