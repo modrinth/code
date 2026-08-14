@@ -300,7 +300,7 @@ pub(crate) async fn list_linked_modpack_content(
     let Some((_, version_id)) = linked_modpack_ids(&link) else {
         return Ok(Vec::new());
     };
-    let ids = match get_modpack_identifiers(
+    let modpack_ids = match get_modpack_identifiers(
         &version_id,
         &resolved.content_set,
         &state.pool,
@@ -308,19 +308,25 @@ pub(crate) async fn list_linked_modpack_content(
     )
     .await
     {
-        Ok(ids) => ids,
+        Ok(ids) => Some(ids),
         Err(err) => {
             tracing::warn!("Failed to fetch modpack identifiers: {}", err);
-            return Ok(Vec::new());
+            None
         }
     };
-    let files = content_projects_for_scope(
-        &resolved,
-        cache_behaviour,
-        state,
-        ContentFilter::OnlyModpack(&ids),
-    )
-    .await?;
+    let filter = if let Some(ids) = modpack_ids.as_ref() {
+        ContentFilter::OnlyModpack(ids)
+    } else if let Some(source_kind) = linked_modpack_source_kind(&link) {
+        ContentFilter::OnlySourceKind {
+            source_kind,
+            include_untracked: true,
+        }
+    } else {
+        return Ok(Vec::new());
+    };
+    let files =
+        content_projects_for_scope(&resolved, cache_behaviour, state, filter)
+            .await?;
     let files = files.into_iter().collect::<Vec<_>>();
 
     content_files_to_content_items(
@@ -371,30 +377,30 @@ pub(crate) async fn get_linked_modpack_info(
             &state.api_semaphore,
         ),
     )?;
-    let version = version.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Linked modpack version {version_id} not found"
-        ))
-    })?;
-    let (project, all_versions) = if version.project_id != project_id {
-        let (modpack_project, modpack_versions) = tokio::try_join!(
-            CachedEntry::get_project(
-                &version.project_id,
-                cache_behaviour,
-                &state.pool,
-                &state.api_semaphore,
-            ),
-            CachedEntry::get_project_versions(
-                &version.project_id,
-                cache_behaviour,
-                &state.pool,
-                &state.api_semaphore,
-            ),
-        )?;
-        (modpack_project.or(project), modpack_versions)
-    } else {
-        (project, all_versions)
-    };
+    let version_project_id = version
+        .as_ref()
+        .filter(|version| version.project_id != project_id)
+        .map(|version| version.project_id.clone());
+    let (project, all_versions) =
+        if let Some(version_project_id) = version_project_id {
+            let (modpack_project, modpack_versions) = tokio::try_join!(
+                CachedEntry::get_project(
+                    &version_project_id,
+                    cache_behaviour,
+                    &state.pool,
+                    &state.api_semaphore,
+                ),
+                CachedEntry::get_project_versions(
+                    &version_project_id,
+                    cache_behaviour,
+                    &state.pool,
+                    &state.api_semaphore,
+                ),
+            )?;
+            (modpack_project.or(project), modpack_versions)
+        } else {
+            (project, all_versions)
+        };
     let project = project.ok_or_else(|| {
         crate::ErrorKind::InputError(format!(
             "Linked modpack project {project_id} not found"
@@ -433,12 +439,17 @@ pub(crate) async fn get_linked_modpack_info(
                 })
         })
     };
-    let (has_update, update_version_id, update_version) = check_modpack_update(
-        &version_id,
-        &version,
-        all_versions,
-        resolved.instance.update_channel,
-    );
+    let (has_update, update_version_id, update_version) = version
+        .as_ref()
+        .map(|version| {
+            check_modpack_update(
+                &version_id,
+                version,
+                all_versions,
+                resolved.instance.update_channel,
+            )
+        })
+        .unwrap_or((false, None, None));
 
     Ok(Some(LinkedModpackInfo {
         project,
