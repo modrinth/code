@@ -6,6 +6,7 @@
 		@click="onCanvasClick"
 	>
 		<div
+			data-skin-preview-debug="controls"
 			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
 			:style="previewControlsPositionStyle"
 		>
@@ -18,6 +19,7 @@
 		</div>
 		<div
 			v-if="$slots.subtitle"
+			data-skin-preview-debug="subtitle"
 			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
 			:style="subtitlePositionStyle"
 		>
@@ -27,6 +29,7 @@
 		</div>
 		<div
 			v-if="nametag || $slots['nametag-badge']"
+			data-skin-preview-debug="nametag"
 			class="absolute left-1/2 pointer-events-none z-10"
 			:style="nametagStyle"
 		>
@@ -267,16 +270,23 @@ const {
 	},
 })
 
-const { hasEarsFeatures, isModelLoaded, isTextureLoaded, modelCenter, modelSize, scene } =
-	useSkinPreviewScene({
-		selectedModelSrc,
-		textureSrc: toRef(props, 'textureSrc'),
-		earsTextureSrc: toRef(props, 'earsTextureSrc'),
-		capeSrc: toRef(props, 'capeSrc'),
-		earsEnabled: toRef(props, 'earsEnabled'),
-		initializeAnimations,
-		cleanupAnimationState,
-	})
+const {
+	hasEarsFeatures,
+	isModelLoaded,
+	isTextureLoaded,
+	modelCenter,
+	modelSize,
+	scene,
+	visibleBounds,
+} = useSkinPreviewScene({
+	selectedModelSrc,
+	textureSrc: toRef(props, 'textureSrc'),
+	earsTextureSrc: toRef(props, 'earsTextureSrc'),
+	capeSrc: toRef(props, 'capeSrc'),
+	earsEnabled: toRef(props, 'earsEnabled'),
+	initializeAnimations,
+	cleanupAnimationState,
+})
 
 function syncDamageFlashShaderMaterials() {
 	syncDamageFlashShader(scene.value, damageFlashIntensity.value)
@@ -310,6 +320,8 @@ const {
 	subtitleWrapped: isSubtitleWrapped,
 	modelCenter,
 	modelSize,
+	scene,
+	visibleBounds,
 	isModelLoaded,
 })
 
