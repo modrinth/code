@@ -467,27 +467,21 @@ fn get_mrpack_environment(
         .unwrap_or(VersionEnvironment::Unknown)
     {
         VersionEnvironment::ClientAndServer
-        | VersionEnvironment::ServerOnly => {
+        | VersionEnvironment::ClientOnlyServerOptional
+        | VersionEnvironment::ServerOnly
+        | VersionEnvironment::ServerOnlyClientOptional
+        | VersionEnvironment::ClientOrServer
+        | VersionEnvironment::ClientOrServerPrefersBoth
+        | VersionEnvironment::Unknown => {
             (SideType::Required, SideType::Required)
         }
         VersionEnvironment::ClientOnly
         | VersionEnvironment::SingleplayerOnly => {
             (SideType::Required, SideType::Unsupported)
         }
-        VersionEnvironment::ClientOnlyServerOptional => {
-            (SideType::Required, SideType::Optional)
-        }
         VersionEnvironment::DedicatedServerOnly => {
             (SideType::Unsupported, SideType::Required)
         }
-        VersionEnvironment::ServerOnlyClientOptional => {
-            (SideType::Optional, SideType::Required)
-        }
-        VersionEnvironment::ClientOrServer
-        | VersionEnvironment::ClientOrServerPrefersBoth => {
-            (SideType::Optional, SideType::Optional)
-        }
-        VersionEnvironment::Unknown => (SideType::Optional, SideType::Optional),
     };
 
     HashMap::from([(EnvType::Client, client), (EnvType::Server, server)])
