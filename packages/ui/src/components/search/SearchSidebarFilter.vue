@@ -118,10 +118,7 @@
 							/>
 						</template>
 						<template v-else>
-							<template
-								v-for="option in visibleOptions"
-								:key="`${filterType.id}-${option.id}`"
-							>
+							<template v-for="option in visibleOptions" :key="`${filterType.id}-${option.id}`">
 								<SearchFilterOption
 									:option="option"
 									:included="isIncluded(option)"
