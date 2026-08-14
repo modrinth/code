@@ -8,6 +8,7 @@
 		:no-options-message="searchLoading ? loadingMessage : noResultsMessage"
 		:disable-search-filter="true"
 		:disabled="disabled"
+		:clearable="clearable"
 		show-icon-in-selected
 		@search-input="(query) => handleSearch(query)"
 	/>
@@ -55,6 +56,8 @@ const props = withDefaults(
 		noResultsMessage?: string
 		/** Whether the combobox is disabled */
 		disabled?: boolean
+		/** Whether to show a button for clearing the search input */
+		clearable?: boolean
 		/** Maximum number of results to show */
 		limit?: number
 		/** Project IDs to exclude from results */

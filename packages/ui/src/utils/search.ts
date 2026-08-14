@@ -123,6 +123,45 @@ export type FilterValue = {
 	negative?: boolean
 }
 
+export type DependencyType = 'required' | 'optional' | 'embedded'
+
+const DEPENDENCY_TYPE_FIELDS: Record<DependencyType, string> = {
+	required: 'required_dependency_project_ids',
+	optional: 'optional_dependency_project_ids',
+	embedded: 'embedded_dependency_project_ids',
+}
+
+const DEPENDENCY_TYPES = Object.keys(DEPENDENCY_TYPE_FIELDS) as DependencyType[]
+
+export function formatDependencyProjectFilterOption(
+	projectId: string,
+	dependencyTypes: readonly DependencyType[],
+): string {
+	return `${dependencyTypes.join(',')}:${projectId}`
+}
+
+export function parseDependencyProjectFilterOption(option: string): {
+	projectId: string
+	dependencyTypes: DependencyType[]
+} {
+	const separatorIndex = option.indexOf(':')
+	if (separatorIndex === -1) {
+		return { projectId: option, dependencyTypes: ['required'] }
+	}
+
+	const dependencyTypes = option
+		.slice(0, separatorIndex)
+		.split(',')
+		.filter((type): type is DependencyType => DEPENDENCY_TYPES.includes(type as DependencyType))
+	const projectId = option.slice(separatorIndex + 1)
+
+	if (dependencyTypes.length === 0 || !projectId) {
+		return { projectId: option, dependencyTypes: ['required'] }
+	}
+
+	return { projectId, dependencyTypes }
+}
+
 export type EnvironmentSearchOverride =
 	| { mode: 'include'; values: string[] }
 	| { mode: 'exclude'; values: string[] }
@@ -728,6 +767,26 @@ export function useSearch(
 		const negativeByType: Record<string, string[]> = {}
 
 		for (const filterValue of filterValues) {
+			if (filterValue.type === 'compatible_dependency_project_ids') {
+				const { projectId, dependencyTypes } = parseDependencyProjectFilterOption(
+					filterValue.option,
+				)
+				const fields = projectTypes.value.includes('modpack')
+					? ['compatible_dependency_project_ids']
+					: dependencyTypes.map((type) => DEPENDENCY_TYPE_FIELDS[type])
+				const operator = filterValue.negative ? '!=' : '='
+				const conditions = fields.map(
+					(field) => `${field} ${operator} ${formatSearchFilterValue(projectId)}`,
+				)
+
+				if (conditions.length === 1) {
+					parts.push(conditions[0])
+				} else {
+					parts.push(`(${conditions.join(filterValue.negative ? ' AND ' : ' OR ')})`)
+				}
+				continue
+			}
+
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			if (!type) {
 				console.error(`Filter type ${filterValue.type} not found`)

@@ -249,6 +249,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:filter-type="filter"
 				:project-type="ctx.projectType.value"
 				:result-count="ctx.totalHits.value"
+				:loading="ctx.loading.value"
 				:refreshing="ctx.refreshing.value"
 				:class="filterClass"
 				:button-class="buttonClass"

@@ -57,6 +57,7 @@ import {
 	type FilterType,
 	type FilterValue,
 	flattenFilterOptions,
+	parseDependencyProjectFilterOption,
 } from '../../utils/search'
 import TagItem from '../base/TagItem.vue'
 
@@ -99,7 +100,7 @@ const dependentProjectIds = computed(() =>
 		...new Set(
 			[...selectedFilters.value, ...props.providedFilters]
 				.filter((filter) => filter.type === 'compatible_dependency_project_ids')
-				.map((filter) => filter.option),
+				.map((filter) => parseDependencyProjectFilterOption(filter.option).projectId),
 		),
 	].sort(),
 )
@@ -150,17 +151,20 @@ const items: ComputedRef<Item[]> = computed(() => {
 		)
 		return [
 			...optionItems,
-			...customValues.map((filter) => ({
-				type: type.id,
-				option: filter.option,
-				negative: filter.negative,
-				provided: props.providedFilters.some(
-					(provided) => provided.type === type.id && provided.option === filter.option,
-				),
-				formatted_name: formatMessage(dependentProjectMessage, {
-					project: dependentProjectNames.value.get(filter.option) ?? filter.option,
-				}),
-			})),
+			...customValues.map((filter) => {
+				const projectId = parseDependencyProjectFilterOption(filter.option).projectId
+				return {
+					type: type.id,
+					option: filter.option,
+					negative: filter.negative,
+					provided: props.providedFilters.some(
+						(provided) => provided.type === type.id && provided.option === filter.option,
+					),
+					formatted_name: formatMessage(dependentProjectMessage, {
+						project: dependentProjectNames.value.get(projectId) ?? projectId,
+					}),
+				}
+			}),
 		]
 	})
 })

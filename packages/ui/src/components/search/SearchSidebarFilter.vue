@@ -75,6 +75,7 @@
 				:project-type="projectType"
 				:inner-panel-class="innerPanelClass"
 				:result-count="resultCount"
+				:loading="loading"
 				:refreshing="refreshing"
 			/>
 			<template v-if="filterType.display !== 'depends-on-project'">
@@ -253,6 +254,7 @@ const props = defineProps<{
 	openByDefault?: boolean
 	providedFilters: FilterValue[]
 	resultCount?: number
+	loading?: boolean
 	refreshing?: boolean
 }>()
 
