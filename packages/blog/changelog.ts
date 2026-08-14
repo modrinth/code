@@ -11,6 +11,25 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'app',
+		version: '0.17.9',
+		body: `## Fixed
+- Reverted server panel change that wasn't meant to go out yet.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Reverted server panel change that wasn't meant to go out yet.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project pages failing to load when user is not logged in.`,
+	},
+	{
 		date: `2026-08-14T17:04:48+00:00`,
 		product: 'hosting',
 		body: `## Changed
