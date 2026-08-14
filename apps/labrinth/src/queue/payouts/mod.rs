@@ -925,6 +925,7 @@ pub async fn get_cached_aditude_month_estimates(
             fetch_aditude_month_estimates,
         )
         .await
+        .wrap_internal_err("failed to fetch cached Aditude month estimates")
 }
 
 async fn fetch_aditude_month_estimates(

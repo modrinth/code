@@ -260,11 +260,13 @@ impl CacheManager {
             keys,
             None,
             |ids| async move {
-                Ok(closure(ids)
-                    .await?
-                    .into_iter()
-                    .map(|(key, value)| (key, (None::<String>, value)))
-                    .collect())
+                Ok::<_, E>(
+                    closure(ids)
+                        .await?
+                        .into_iter()
+                        .map(|(key, value)| (key, (None::<String>, value)))
+                        .collect(),
+                )
             },
         )
         .await
@@ -277,12 +279,12 @@ impl CacheManager {
         keys: &[K],
         expiry: i64,
         closure: F,
-    ) -> Result<HashMap<K, T>, E>
+    ) -> Result<HashMap<K, T>>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash

@@ -1,16 +1,17 @@
 use std::cmp::Reverse;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use actix_web::{HttpRequest, get, web};
 use chrono::{Months, Utc};
+use rust_decimal::Decimal;
 
 use crate::auth::get_user_from_headers;
 use crate::database::models::DBUserId;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::pats::Scopes;
 use crate::models::payout_runs::{
-    Adjustment, PayoutRun, PayoutRunCompletion, PayoutRunReport,
-    PayoutRunRevenue, PayoutRunStatus,
+	Adjustment, DayRevenue, PayoutRun, PayoutRunCompletion, PayoutRunReport,
+	PayoutRunStatus,
 };
 use crate::queue::payouts::get_cached_aditude_month_estimates;
 use crate::queue::session::AuthQueue;
@@ -18,6 +19,12 @@ use crate::routes::ApiError;
 use crate::util::error::Context;
 use crate::util::time::{YearMonth, net_60_payout_available_at};
 use xredis::RedisPool;
+
+#[derive(Debug, Clone, Copy)]
+enum DayRevenueEstimate {
+	Raw,
+	AdjustedToActual { actual_revenue_usd: Decimal },
+}
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get);
@@ -76,48 +83,40 @@ pub async fn get(
     .wrap_internal_err("failed to fetch newest payout value")?;
 
     let mut stored_periods = HashSet::with_capacity(stored_runs.len());
-    let mut estimate_periods = HashSet::new();
-    let mut runs = Vec::with_capacity(stored_runs.len());
-    for run in stored_runs {
-        let period_start = YearMonth::from_day1(run.period_start.date_naive());
-        let (status, report) = if run.completed_at.is_some() {
-            let amount_usd = run
-                .completed_result
+	let mut revenue_estimates = HashMap::new();
+	let mut runs = Vec::with_capacity(stored_runs.len());
+	for run in stored_runs {
+		let period_start = YearMonth::from_day1(run.period_start.date_naive());
+		let (status, revenue_estimate) = if run.completed_at.is_some() {
+			let amount_usd = run
+				.completed_result
                 .map(|completion| completion.revenue_usd)
                 .wrap_internal_err(
                     "paid payout run is missing its completion result",
                 )?;
-            (
-                PayoutRunStatus::Paid,
-                PayoutRunReport {
-                    revenue: PayoutRunRevenue::Actual { amount_usd },
-					fees_deducted_usd: todo!(),
-					variance_adjustment_usd: todo!(),
-					net_estimated_revenue_usd: todo!(),
-					creator_net_estimated_revenue_usd: todo!(),
-					modrinth_net_estimated_revenue_usd: todo!(),
-                },
-            )
-        } else {
-            estimate_periods.insert(period_start);
-            (
-                PayoutRunStatus::Review,
-                PayoutRunReport {
-                    revenue: PayoutRunRevenue::Estimated { days: Vec::new() },
-					fees_deducted_usd: todo!(),
-					variance_adjustment_usd: todo!(),
-					net_estimated_revenue_usd: todo!(),
-					creator_net_estimated_revenue_usd: todo!(),
-					modrinth_net_estimated_revenue_usd: todo!(),
-                },
-            )
-        };
+			(
+				PayoutRunStatus::Paid,
+				DayRevenueEstimate::AdjustedToActual {
+					actual_revenue_usd: amount_usd,
+				},
+			)
+		} else {
+			(PayoutRunStatus::Review, DayRevenueEstimate::Raw)
+		};
 
-        stored_periods.insert(period_start);
-        runs.push(PayoutRun {
-            period_start,
-            status,
-            report,
+		stored_periods.insert(period_start);
+		revenue_estimates.insert(period_start, revenue_estimate);
+		runs.push(PayoutRun {
+			period_start,
+			status,
+			report: PayoutRunReport {
+				days: Vec::new(),
+				fees_deducted_usd: todo!(),
+				variance_adjustment_usd: todo!(),
+				net_estimated_revenue_usd: todo!(),
+				creator_net_estimated_revenue_usd: todo!(),
+				modrinth_net_estimated_revenue_usd: todo!(),
+			},
             started_at: is_admin.then_some(run.started_at),
             started_by: is_admin
                 .then_some(run.started_by.map(|id| DBUserId(id).into()))
@@ -145,15 +144,13 @@ pub async fn get(
                     PayoutRunStatus::Pending
                 };
 
-                estimate_periods.insert(period);
+				revenue_estimates.insert(period, DayRevenueEstimate::Raw);
 
                 runs.push(PayoutRun {
                     period_start: period,
                     status,
-                    report: PayoutRunReport {
-                        revenue: PayoutRunRevenue::Estimated {
-                            days: Vec::new(),
-                        },
+					report: PayoutRunReport {
+						days: Vec::new(),
 						fees_deducted_usd: todo!(),
 						variance_adjustment_usd: todo!(),
 						net_estimated_revenue_usd: todo!(),
@@ -181,19 +178,60 @@ pub async fn get(
         }
     }
 
-    let estimate_periods = estimate_periods.into_iter().collect::<Vec<_>>();
-    let estimates =
-        get_cached_aditude_month_estimates(&estimate_periods, &redis).await?;
-    for run in &mut runs {
-        if let Some(days) = estimates.get(&run.period_start) {
-            run.report.net_estimated_revenue_usd =
-                days.iter().map(|day| day.amount_usd).sum();
-            run.report.revenue =
-                PayoutRunRevenue::Estimated { days: days.clone() };
-        }
+	let estimate_periods = revenue_estimates.keys().copied().collect::<Vec<_>>();
+	let estimates =
+		get_cached_aditude_month_estimates(&estimate_periods, &redis).await?;
+	for run in &mut runs {
+		if let Some(days) = estimates.get(&run.period_start) {
+			let days = match revenue_estimates.get(&run.period_start) {
+				Some(DayRevenueEstimate::Raw) | None => days.clone(),
+				Some(DayRevenueEstimate::AdjustedToActual {
+					actual_revenue_usd,
+				}) => adjust_estimates_to_actual(days, *actual_revenue_usd)?,
+			};
+			run.report.net_estimated_revenue_usd =
+				days.iter().map(|day| day.amount_usd).sum();
+			run.report.days = days;
+		}
     }
 
     runs.sort_by_key(|run| Reverse(run.period_start));
 
-    Ok(web::Json(runs))
+	Ok(web::Json(runs))
+}
+
+fn adjust_estimates_to_actual(
+	days: &[DayRevenue],
+	actual_revenue_usd: Decimal,
+) -> Result<Vec<DayRevenue>, ApiError> {
+	if days.is_empty() {
+		return Ok(Vec::new());
+	}
+
+	let estimated_revenue_usd =
+		days.iter().map(|day| day.amount_usd).sum::<Decimal>();
+	let day_count = u64::try_from(days.len())
+		.wrap_internal_err("failed to calculate payout period day count")?;
+	let mut allocated_revenue_usd = Decimal::ZERO;
+	let last_day = days.len() - 1;
+
+	Ok(days
+		.iter()
+		.enumerate()
+		.map(|(index, day)| {
+			let amount_usd = if index == last_day {
+				actual_revenue_usd - allocated_revenue_usd
+			} else if estimated_revenue_usd.is_zero() {
+				actual_revenue_usd / Decimal::from(day_count)
+			} else {
+				day.amount_usd * actual_revenue_usd / estimated_revenue_usd
+			};
+			allocated_revenue_usd += amount_usd;
+
+			DayRevenue {
+				date: day.date,
+				amount_usd,
+			}
+		})
+		.collect())
 }

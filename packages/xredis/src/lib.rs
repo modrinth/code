@@ -169,11 +169,11 @@ impl RedisPool {
         keys: &[K],
         expiry: i64,
         closure: F,
-    ) -> Result<std::collections::HashMap<K, T>, E>
+    ) -> Result<std::collections::HashMap<K, T>>
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
