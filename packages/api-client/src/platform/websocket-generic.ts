@@ -20,6 +20,19 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 
 		return new Promise((resolve, reject) => {
 			let settled = false
+			let authenticationTimeout: ReturnType<typeof setTimeout> | null = null
+			const resolveConnection = () => {
+				if (settled) return
+				settled = true
+				if (authenticationTimeout) clearTimeout(authenticationTimeout)
+				resolve()
+			}
+			const rejectConnection = (error: unknown) => {
+				if (settled) return
+				settled = true
+				if (authenticationTimeout) clearTimeout(authenticationTimeout)
+				reject(error)
+			}
 			try {
 				const ws = new WebSocket(getNodeWebSocketUrl(auth.url))
 
@@ -33,6 +46,10 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 				}
 
 				this.connections.set(serverId, connection)
+				authenticationTimeout = setTimeout(() => {
+					rejectConnection(new Error(`WebSocket authentication timed out for server ${serverId}`))
+					if (this.connections.get(serverId) === connection) this.closeConnection(serverId)
+				}, this.AUTHENTICATION_TIMEOUT)
 
 				ws.onopen = () => {
 					ws.send(JSON.stringify({ event: 'auth', jwt: auth.token }))
@@ -54,10 +71,7 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 						this.emitter.emit(eventKey, data as any)
 
-						if (data.event === 'auth-ok' && !settled) {
-							settled = true
-							resolve()
-						}
+						if (data.event === 'auth-ok') resolveConnection()
 
 						if (data.event === 'auth-expiring' || data.event === 'auth-incorrect') {
 							this.handleAuthExpiring(serverId).catch(console.error)
@@ -74,14 +88,11 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 						reason: event.reason,
 						wasClean: event.wasClean,
 					})
-					if (!settled) {
-						settled = true
-						reject(
-							new Error(
-								`WebSocket closed before authentication for server ${serverId} (code: ${event.code})`,
-							),
-						)
-					}
+					rejectConnection(
+						new Error(
+							`WebSocket closed before authentication for server ${serverId} (code: ${event.code})`,
+						),
+					)
 					if (event.code !== NORMAL_CLOSURE) {
 						this.scheduleReconnect(serverId, auth)
 					}
@@ -96,18 +107,14 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 						readyStateLabel: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][readyState],
 						type: (event as Event).type,
 					})
-					if (!settled) {
-						settled = true
-						reject(
-							new Error(
-								`WebSocket connection failed for server ${serverId} (readyState: ${readyState})`,
-							),
-						)
-					}
+					rejectConnection(
+						new Error(
+							`WebSocket connection failed for server ${serverId} (readyState: ${readyState})`,
+						),
+					)
 				}
 			} catch (error) {
-				settled = true
-				reject(error)
+				rejectConnection(error)
 			}
 		})
 	}

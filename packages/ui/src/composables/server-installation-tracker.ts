@@ -100,6 +100,14 @@ function contentInstallationKey(content: Archon.Content.v1.Addons): ServerInstal
 	return { type: 'unknown' }
 }
 
+function addonFailureId(addon: Archon.Content.v1.Addon) {
+	return `addon:${addon.id}:${addon.filename}`
+}
+
+function addonFailureError(addon: Archon.Content.v1.Addon) {
+	return typeof addon.status === 'object' ? addon.status.failed.error : null
+}
+
 export function useServerInstallationTracker(options: UseServerInstallationTrackerOptions) {
 	const installProgressItems = ref<Archon.Websocket.v0.InstallProgressItem[]>([])
 	const optimisticInstallation = ref<OptimisticInstallation | null>(null)
@@ -153,6 +161,23 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 		return null
 	})
 
+	const persistedAddonFailure = computed<ServerInstallationState | null>(() => {
+		const addon = options.content?.value?.addons?.find((addon) => {
+			const id = addonFailureId(addon)
+			return addonFailureError(addon) != null && !dismissedIds.value.has(id)
+		})
+		if (!addon) return null
+
+		return {
+			id: addonFailureId(addon),
+			key: { type: 'unknown' },
+			status: 'failed',
+			progress: null,
+			error: addonFailureError(addon),
+			source: 'server',
+		}
+	})
+
 	const persistedInstallation = computed<ServerInstallationState | null>(() => {
 		const content = options.content?.value
 		if (!content || (!content.installing && !content.error)) return null
@@ -174,12 +199,34 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 	watch(
 		() => options.content?.value,
 		(content) => {
-			if (!content?.installing || content.error) return
+			if (!content) return
+			if (content.error) {
+				optimisticInstallation.value = null
+				return
+			}
+			if (!content.installing) return
 			const id = installationKeyId(contentInstallationKey(content))
 			if (dismissedIds.value.has(id)) {
 				dismissedIds.value = new Set([...dismissedIds.value].filter((item) => item !== id))
 			}
 			optimisticInstallation.value = null
+		},
+	)
+
+	watch(
+		() => options.content?.value?.addons,
+		(addons) => {
+			const currentFailureIds = new Set(
+				(addons ?? []).filter((addon) => addonFailureError(addon) != null).map(addonFailureId),
+			)
+			const nextDismissedIds = new Set(
+				[...dismissedIds.value].filter(
+					(id) => !id.startsWith('addon:') || currentFailureIds.has(id),
+				),
+			)
+			if (nextDismissedIds.size !== dismissedIds.value.size) {
+				dismissedIds.value = nextDismissedIds
+			}
 		},
 	)
 
@@ -199,6 +246,7 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 		}
 
 		if (persistedInstallation.value) return persistedInstallation.value
+		if (persistedAddonFailure.value) return persistedAddonFailure.value
 		if (options.content?.value?.error) return null
 
 		if (options.server.value?.status !== 'installing' || receivedProgressSnapshot.value) return null
