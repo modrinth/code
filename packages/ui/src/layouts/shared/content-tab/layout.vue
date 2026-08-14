@@ -434,7 +434,6 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 				? (ctx.busyMessage?.value ?? null)
 				: base.toggleDisabledTooltip,
 			installing: item.installing === true,
-			installProgress: item.installProgress,
 			hasUpdate: base.hasUpdate ?? item.has_update,
 			isClientOnly: clientWarning !== null,
 			clientWarning,

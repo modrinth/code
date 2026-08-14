@@ -6,8 +6,11 @@ import type {
 	CreationFlowContextValue,
 	EnvironmentSearchOverride,
 	FilterValue,
+	PendingServerContentInstall,
+	PendingServerContentInstallType,
 } from '@modrinth/ui'
 import {
+	addPendingServerContentInstalls,
 	commonMessages,
 	defineMessages,
 	flushStoredServerAddonInstallQueue,
@@ -17,14 +20,13 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	readStoredServerInstallQueue,
+	removePendingServerContentInstall,
 	requestInstall,
 	resolveServerAddonInstallPlans,
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
-	useServerContextRuntime,
-	useServerPanelSync,
 	useVIntl,
-	waitForServerContextRuntimeReady,
+	writePendingServerContentInstallBaseline,
 	writeStoredServerInstallQueue,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -34,6 +36,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { navigateTo, useRoute } from '#app'
 import { queryAsString } from '~/utils/router'
 
+type PendingServerContentInstallInput = Omit<PendingServerContentInstall, 'createdAt'>
 type ServerInstallBrowseSearchState = Pick<
 	BrowseSearchState,
 	'currentFilters' | 'overriddenProvidedFilterTypes'
@@ -86,6 +89,34 @@ const messages = defineMessages({
 	},
 })
 
+function getQueuedInstallOwnerFallback(project: ServerInstallSearchResult) {
+	if (project.organization) {
+		const ownerId = project.organization_id ?? project.organization
+		return {
+			id: ownerId,
+			name: project.organization,
+			type: 'organization' as const,
+			link: `/organization/${ownerId}`,
+		}
+	}
+
+	if (!project.author) return null
+
+	const ownerId = project.author_id ?? project.author
+	return {
+		id: ownerId,
+		name: project.author,
+		type: 'user' as const,
+		link: `/user/${ownerId}`,
+	}
+}
+
+function getQueuedAddonInstallPlans(
+	plans: Map<string, BrowseInstallPlan<ServerInstallSearchResult>>,
+) {
+	return Array.from(plans.values()).filter((plan) => plan.contentType !== 'modpack')
+}
+
 export function useServerInstallContent({
 	projectType,
 	onboardingModalRef,
@@ -106,11 +137,6 @@ export function useServerInstallContent({
 	const currentServerId = computed(() => queryAsString(route.query.sid) || null)
 	const fromContext = computed(() => queryAsString(route.query.from) || null)
 	const currentWorldId = computed(() => queryAsString(route.query.wid) || null)
-	useServerContextRuntime(currentServerId)
-	useServerPanelSync({
-		serverId: currentServerId,
-		worldId: currentWorldId,
-	})
 
 	const {
 		data: serverData,
@@ -199,6 +225,32 @@ export function useServerInstallContent({
 		writeStoredServerInstallQueue(serverId, worldId, plans)
 	}
 
+	function getQueuedInstallPlaceholder(
+		plan: BrowseInstallPlan<ServerInstallSearchResult>,
+		owner: PendingServerContentInstallInput['owner'],
+	): PendingServerContentInstallInput {
+		return {
+			projectId: plan.projectId,
+			versionId: plan.versionId,
+			contentType: plan.contentType as PendingServerContentInstallType,
+			title: getInstallProjectName(plan.project),
+			versionName: plan.versionName ?? null,
+			versionNumber: plan.versionNumber ?? null,
+			fileName: plan.fileName ?? null,
+			owner,
+			slug: plan.project.slug ?? plan.projectId,
+			iconUrl: plan.project.icon_url ?? null,
+		}
+	}
+
+	function getQueuedInstallPlaceholderFallbacks(
+		plans: Map<string, BrowseInstallPlan<ServerInstallSearchResult>>,
+	) {
+		return getQueuedAddonInstallPlans(plans).map((plan) =>
+			getQueuedInstallPlaceholder(plan, getQueuedInstallOwnerFallback(plan.project)),
+		)
+	}
+
 	function setProjectInstalling(projectId: string, installing: boolean) {
 		const next = new Set(installingProjectIds.value)
 		if (installing) {
@@ -222,6 +274,10 @@ export function useServerInstallContent({
 				.map((addon) => addon.project_id)
 				.filter((projectId): projectId is string => !!projectId),
 		)
+	}
+
+	function getServerInstalledContentKeys(data = serverContentData.value) {
+		return new Set((data?.addons ?? []).map((addon) => addon.project_id ?? addon.filename))
 	}
 
 	function syncHiddenInstalledProjectIds() {
@@ -410,13 +466,6 @@ export function useServerInstallContent({
 		)
 		if (queuedPlans.size === 0) return true
 
-		try {
-			await waitForServerContextRuntimeReady(client, serverId)
-		} catch (error) {
-			handleError(error as Error)
-			return false
-		}
-
 		isInstallingQueuedServerInstalls.value = true
 		queuedInstallProgress.value = {
 			completed: 0,
@@ -437,6 +486,9 @@ export function useServerInstallContent({
 			})
 
 			if (!result.ok) {
+				for (const plan of result.attemptedPlans) {
+					removePendingServerContentInstall(serverId, worldId, plan.projectId)
+				}
 				handleError(result.error as Error)
 				return false
 			}
@@ -449,7 +501,9 @@ export function useServerInstallContent({
 				total: result.flushedPlans.length,
 			}
 			if (result.flushedPlans.length > 0) {
-				await queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+				await queryClient.invalidateQueries({
+					queryKey: ['content', 'list', 'v1', serverId],
+				})
 			}
 
 			return true
@@ -472,6 +526,11 @@ export function useServerInstallContent({
 
 		if (sid && wid) {
 			writeStoredServerInstallQueue(sid, wid, plans)
+			writePendingServerContentInstallBaseline(sid, wid, [
+				...getServerInstalledContentKeys(),
+				...optimisticallyInstalledProjectIds.value,
+			])
+			addPendingServerContentInstalls(sid, wid, getQueuedInstallPlaceholderFallbacks(plans))
 		}
 		const installed = await flushQueuedServerInstalls(sid, wid)
 		if (!installed) return false

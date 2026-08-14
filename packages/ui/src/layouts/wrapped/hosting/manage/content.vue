@@ -2,14 +2,14 @@
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { useIntervalFn } from '@vueuse/core'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
@@ -18,6 +18,13 @@ import {
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
+import {
+	type PendingServerContentInstall,
+	pendingServerContentInstallsEvent,
+	readPendingServerContentInstallBaseline,
+	readPendingServerContentInstalls,
+	removePendingServerContentInstall,
+} from '#ui/utils/server-content-installing'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
@@ -110,7 +117,7 @@ const messages = defineMessages({
 })
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, installProgressItems, uploadState, cancelUpload } =
+const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
 	injectModrinthServerContext()
 const contentUploadSession = useUploadSessionUpload({
 	client,
@@ -169,6 +176,7 @@ const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.
 const isInstallingContent = computed(
 	() =>
 		server.value?.status === 'installing' ||
+		isSyncingContent.value ||
 		busyReasons.value.some(
 			(r) =>
 				r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content',
@@ -191,15 +199,6 @@ const setupActionBusyMessage = computed(() => {
 		return true
 	})
 	return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
-})
-
-const currentWorldInstallProgressItems = computed(() =>
-	installProgressItems.value.filter((item) => item.world_id === worldId.value),
-)
-const contentActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
-const contentActionBusyMessage = computed(() => {
-	if (!canSetup.value) return permissionDeniedMessage.value
-	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : null
 })
 
 const modpackProjectId = computed(() => {
@@ -292,8 +291,6 @@ const managedContent = computed<ManagedContentData | null>(() => {
 					: undefined,
 			updatedAt: isLocal ? undefined : (mp.date_published ?? undefined),
 		},
-		disabled: setupActionDisabled.value,
-		disabledText: setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
 	}
 })
 
@@ -318,10 +315,12 @@ const addonLookup = computed(() => {
 	return map
 })
 
+const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
 const projectMetadataBatchSize = 800
 const contentProjectIds = computed(() =>
 	[...(contentQuery.data.value?.addons ?? []), ...modpackAddons.value]
 		.map((addon) => addon.project_id)
+		.concat(pendingServerContentInstalls.value.map((item) => item.projectId))
 		.filter((id): id is string => !!id)
 		.filter((id, index, ids) => ids.indexOf(id) === index)
 		.sort(),
@@ -342,63 +341,42 @@ const contentProjectsQuery = useQuery({
 const contentProjectsById = computed(
 	() => new Map((contentProjectsQuery.data.value ?? []).map((project) => [project.id, project])),
 )
-
-function normalizeInstallFilename(filename: string) {
-	const normalized = filename.endsWith('.disabled')
-		? filename.slice(0, -'.disabled'.length)
-		: filename
-	return normalized.toLowerCase()
-}
-
-type FileInstallProgressItem = Archon.Websocket.v0.InstallProgressItem & {
-	key: Archon.Websocket.v0.InstallProgressFileKey
-}
-
-const fileInstallProgressItems = computed<FileInstallProgressItem[]>(() =>
-	currentWorldInstallProgressItems.value.filter(
-		(item): item is FileInstallProgressItem => item.key.type === 'file',
-	),
+const lastStableContentKeys = ref<Set<string>>(new Set())
+const contentInstallBaselineKeys = ref<Set<string> | null>(null)
+const contentInstallAddedKeys = ref<Set<string>>(new Set())
+const isFlushingStoredServerInstalls = ref(false)
+const { pause: pausePendingInstallPoll, resume: resumePendingInstallPoll } = useIntervalFn(
+	() => {
+		if (pendingServerContentInstalls.value.length === 0 || contentQuery.isFetching.value) return
+		void contentQuery.refetch()
+	},
+	5000,
+	{ immediate: false },
 )
 
-function getFileInstallFilenames(key: Archon.Websocket.v0.InstallProgressFileKey) {
-	return [key.source_filename, key.target_filename]
-		.filter((filename): filename is string => !!filename)
-		.map(normalizeInstallFilename)
+function syncPendingServerContentInstalls() {
+	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
 }
 
-function isFileInstallActive(item: FileInstallProgressItem) {
-	return item.error == null && item.progress !== 100
+function handlePendingServerContentInstallsChanged(event: Event) {
+	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>)
+		.detail
+	if (detail?.serverId !== serverId || detail?.worldId !== worldId.value) return
+	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
 }
 
-function getContentItemInstallFilename(item: ContentItem) {
-	const filename = item.version?.file_name || item.file_name
-	return normalizeInstallFilename(filename)
+function getAddonInstallKey(addon: Archon.Content.v1.Addon) {
+	return addon.project_id ?? addon.filename
 }
 
-function getContentItemInstallProgress(item: ContentItem): FileInstallProgressItem | undefined {
-	const projectId = item.project?.id
-	const versionId = item.version?.id
-	const filename = getContentItemInstallFilename(item)
-
-	return fileInstallProgressItems.value.find((progressItem) => {
-		const key = progressItem.key
-		if (key.project_id === projectId) return true
-		if (key.version_id === versionId) return true
-		return getFileInstallFilenames(key).includes(filename)
-	})
-}
-
-function decorateContentItemWithInstallProgress(
-	contentItem: ContentItem,
-	installProgress: FileInstallProgressItem,
-): ContentItem {
-	return {
-		...contentItem,
-		installProgress: isFileInstallActive(installProgress) ? installProgress.progress : undefined,
+function getAddonInstallKeys(addons: Archon.Content.v1.Addon[]) {
+	const keys = new Set<string>()
+	for (const addon of addons) {
+		keys.add(getAddonInstallKey(addon))
 	}
+	return keys
 }
-
-const isFlushingStoredServerInstalls = ref(false)
 
 function getInstalledProjectIds() {
 	return new Set(
@@ -446,23 +424,59 @@ async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
 	})
 }
 
+function addonMatchesPendingInstall(
+	addon: Archon.Content.v1.Addon,
+	pendingInstall: PendingServerContentInstall,
+) {
+	return (
+		addon.project_id === pendingInstall.projectId ||
+		addon.version?.id === pendingInstall.versionId ||
+		(!!pendingInstall.fileName && addon.filename === pendingInstall.fileName)
+	)
+}
+
+function removeResolvedPendingServerContentInstalls(addons: Archon.Content.v1.Addon[]) {
+	if (addons.length === 0 || pendingServerContentInstalls.value.length === 0) return
+
+	for (const pendingInstall of pendingServerContentInstalls.value) {
+		if (addons.some((addon) => addonMatchesPendingInstall(addon, pendingInstall))) {
+			removePendingServerContentInstall(serverId, worldId.value, pendingInstall.projectId)
+		}
+	}
+}
+
+function syncContentInstallKeys(
+	addons: Archon.Content.v1.Addon[] = contentQuery.data.value?.addons ?? [],
+) {
+	const currentKeys = getAddonInstallKeys(addons)
+	if (isSyncingContent.value) {
+		if (!contentInstallBaselineKeys.value) {
+			contentInstallBaselineKeys.value =
+				readPendingServerContentInstallBaseline(serverId, worldId.value) ??
+				new Set(lastStableContentKeys.value)
+		}
+
+		const nextAddedKeys = new Set(contentInstallAddedKeys.value)
+		for (const key of currentKeys) {
+			if (!contentInstallBaselineKeys.value.has(key)) {
+				nextAddedKeys.add(key)
+			}
+		}
+		contentInstallAddedKeys.value = nextAddedKeys
+		return
+	}
+
+	lastStableContentKeys.value = currentKeys
+	contentInstallBaselineKeys.value = null
+	contentInstallAddedKeys.value = new Set()
+}
+
 async function flushStoredServerInstalls() {
 	const wid = worldId.value
 	if (!wid || isFlushingStoredServerInstalls.value) return
 
 	const queuedPlans = getStoredServerAddonInstallQueue(serverId, wid)
 	if (queuedPlans.size === 0) return
-
-	try {
-		await waitForServerContextRuntimeReady(client, serverId)
-	} catch (error) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToInstallContent),
-			text: error instanceof Error ? error.message : undefined,
-		})
-		return
-	}
 
 	isFlushingStoredServerInstalls.value = true
 	try {
@@ -478,6 +492,9 @@ async function flushStoredServerInstalls() {
 		})
 
 		if (!result.ok) {
+			for (const plan of result.attemptedPlans) {
+				removePendingServerContentInstall(serverId, wid, plan.projectId)
+			}
 			addNotification({
 				type: 'error',
 				title: formatMessage(messages.failedToInstallContent),
@@ -491,38 +508,223 @@ async function flushStoredServerInstalls() {
 		}
 	} finally {
 		isFlushingStoredServerInstalls.value = false
+		syncPendingServerContentInstalls()
 	}
 }
 
-const contentItems = computed<ContentItem[]>(() =>
-	(contentQuery.data.value?.addons ?? []).map((addon) => {
-		const contentItem = addonToContentItem(addon)
-		if (!contentItem.installing) return contentItem
+function pendingInstallToContentItem(item: PendingServerContentInstall): ContentItem {
+	const projectMetadata = contentProjectsById.value.get(item.projectId)
+	return {
+		project: {
+			...(projectMetadata ?? {}),
+			id: item.projectId,
+			slug: item.slug ?? projectMetadata?.slug ?? item.projectId,
+			title: projectMetadata?.title ?? item.title,
+			icon_url: item.iconUrl ?? projectMetadata?.icon_url ?? undefined,
+		},
+		version: {
+			id: item.versionId,
+			version_number:
+				item.versionName ?? item.versionNumber ?? formatMessage(commonMessages.installingLabel),
+			file_name: item.fileName ?? formatMessage(commonMessages.installingLabel),
+		},
+		owner: item.owner
+			? {
+					id: item.owner.id,
+					name: item.owner.name,
+					type: item.owner.type,
+					avatar_url: getContentOwnerAvatarUrl(item.owner),
+					link: item.owner.link,
+				}
+			: undefined,
+		id: `installing:${item.projectId}`,
+		enabled: true,
+		file_name: `installing:${item.projectId}`,
+		project_type: item.contentType,
+		has_update: false,
+		update_version_id: null,
+		installing: true,
+	}
+}
 
-		const installProgress = getContentItemInstallProgress(contentItem)
-		return installProgress
-			? decorateContentItemWithInstallProgress(contentItem, installProgress)
-			: contentItem
-	}),
-)
+const rawContentItems = computed<ContentItem[]>(() => {
+	const addons = contentQuery.data.value?.addons ?? []
+	const pendingProjectIds = new Set(
+		pendingServerContentInstalls.value.map((item) => item.projectId),
+	)
+	const pendingInstallByProjectId = new Map(
+		pendingServerContentInstalls.value.map((item) => [item.projectId, item]),
+	)
+	const pendingInstallByVersionId = new Map(
+		pendingServerContentInstalls.value.map((item) => [item.versionId, item]),
+	)
+	const pendingInstallByFileName = new Map<string, PendingServerContentInstall>()
+	for (const item of pendingServerContentInstalls.value) {
+		if (item.fileName) {
+			pendingInstallByFileName.set(item.fileName, item)
+		}
+	}
+	const installingContentKeys = new Set([...pendingProjectIds, ...contentInstallAddedKeys.value])
+	const resolvedPendingProjectIds = new Set(
+		pendingServerContentInstalls.value
+			.filter((item) => addons.some((addon) => addonMatchesPendingInstall(addon, item)))
+			.map((item) => item.projectId),
+	)
+	const pendingItems = pendingServerContentInstalls.value
+		.filter((item) => !resolvedPendingProjectIds.has(item.projectId))
+		.map(pendingInstallToContentItem)
+	const addonItems = addons.map((addon) => {
+		const contentItem = addonToContentItem(addon)
+		const pendingItem =
+			(addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null) ??
+			(addon.version?.id ? pendingInstallByVersionId.get(addon.version.id) : null) ??
+			pendingInstallByFileName.get(addon.filename) ??
+			null
+		const installing = !!pendingItem || installingContentKeys.has(getAddonInstallKey(addon))
+
+		if (!installing || !pendingItem) {
+			return {
+				...contentItem,
+				installing,
+			}
+		}
+
+		const pendingContentItem = pendingInstallToContentItem(pendingItem)
+		return {
+			...contentItem,
+			project: {
+				...contentItem.project,
+				slug: pendingContentItem.project.slug,
+				title: pendingContentItem.project.title,
+				icon_url: contentItem.project.icon_url ?? pendingContentItem.project.icon_url,
+			},
+			version: {
+				id: pendingContentItem.version?.id ?? contentItem.version?.id ?? contentItem.file_name,
+				version_number:
+					pendingContentItem.version?.version_number ??
+					contentItem.version?.version_number ??
+					formatMessage(commonMessages.installingLabel),
+				file_name:
+					pendingContentItem.version?.file_name ??
+					contentItem.version?.file_name ??
+					contentItem.file_name,
+			},
+			owner: pendingContentItem.owner ?? contentItem.owner,
+			installing,
+		}
+	})
+
+	return [...addonItems, ...pendingItems]
+})
+
+const displayedContentItems = ref<ContentItem[]>([])
+const contentItems = computed<ContentItem[]>(() => displayedContentItems.value)
 const contentReadyPending = computed(
 	() =>
 		contentQuery.isLoading.value &&
 		contentQuery.data.value === undefined &&
-		contentItems.value.length === 0,
+		pendingServerContentInstalls.value.length === 0 &&
+		displayedContentItems.value.length === 0,
 )
+
+function getContentItemDisplayKey(item: ContentItem) {
+	return item.project?.id ?? item.file_name ?? item.id
+}
 
 function getContentItemId(item: ContentItem) {
 	return item.file_name ?? item.id
 }
 
+function mergeFragileContentItems(items: ContentItem[]) {
+	const nextItems = new Map(items.map((item) => [getContentItemDisplayKey(item), item]))
+	const mergedItems = displayedContentItems.value.map((item) => {
+		const key = getContentItemDisplayKey(item)
+		const nextItem = nextItems.get(key)
+		if (!nextItem) return item
+
+		nextItems.delete(key)
+		return nextItem
+	})
+
+	return [...mergedItems, ...nextItems.values()]
+}
+
+watch(
+	[
+		rawContentItems,
+		isSyncingContent,
+		() => contentQuery.isFetching.value,
+		() => contentQuery.isLoading.value,
+	],
+	([items, syncing, isFetching, isLoading]) => {
+		if (syncing) {
+			if (items.length > 0) {
+				displayedContentItems.value = mergeFragileContentItems(items)
+			}
+			return
+		}
+
+		if (items.length > 0 || (!isFetching && !isLoading)) {
+			displayedContentItems.value = items
+		}
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	[isSyncingContent, () => contentQuery.data.value?.addons],
+	([, addons]) => {
+		syncContentInstallKeys(addons ?? [])
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	[() => contentQuery.data.value?.addons, pendingServerContentInstalls],
+	([addons]) => {
+		removeResolvedPendingServerContentInstalls(addons ?? [])
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	() => pendingServerContentInstalls.value.length > 0,
+	(hasPendingInstalls) => {
+		if (hasPendingInstalls) {
+			resumePendingInstallPoll()
+		} else {
+			pausePendingInstallPoll()
+		}
+	},
+	{ immediate: true },
+)
+
 watch(
 	worldId,
 	() => {
+		syncPendingServerContentInstalls()
+		syncContentInstallKeys()
 		void flushStoredServerInstalls()
 	},
 	{ immediate: true },
 )
+
+onMounted(() => {
+	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
+	window.addEventListener(
+		pendingServerContentInstallsEvent,
+		handlePendingServerContentInstallsChanged,
+	)
+})
+
+onUnmounted(() => {
+	pausePendingInstallPoll()
+	window.removeEventListener(
+		pendingServerContentInstallsEvent,
+		handlePendingServerContentInstallsChanged,
+	)
+})
 
 const deleteMutation = useMutation({
 	mutationFn: ({ addon }: { addon: Archon.Content.v1.Addon }) =>
@@ -591,14 +793,14 @@ const toggleMutation = useMutation({
 })
 
 async function handleToggleEnabled(item: ContentItem) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const addon = addonLookup.value.get(item.file_name)
 	if (!addon) return
 	await toggleMutation.mutateAsync({ addon })
 }
 
 async function handleDeleteItem(item: ContentItem) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const addon = addonLookup.value.get(item.file_name)
 	if (!addon) return
 	await deleteMutation.mutateAsync({ addon })
@@ -606,7 +808,6 @@ async function handleDeleteItem(item: ContentItem) {
 
 function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAddonRequest[] {
 	return items.flatMap((item) => {
-		if (item.installing) return []
 		const addon = addonLookup.value.get(item.file_name)
 		if (!addon) return []
 		return [{ filename: addon.filename, kind: addon.kind }]
@@ -614,7 +815,7 @@ function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAdd
 }
 
 async function handleBulkDelete(items: ContentItem[]) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 	try {
@@ -630,7 +831,7 @@ async function handleBulkDelete(items: ContentItem[]) {
 }
 
 async function handleBulkEnable(items: ContentItem[]) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 	try {
@@ -646,7 +847,7 @@ async function handleBulkEnable(items: ContentItem[]) {
 }
 
 async function handleBulkDisable(items: ContentItem[]) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 	try {
@@ -715,7 +916,7 @@ const currentLoader = computed(
 )
 
 function handleBrowseContent() {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const contentType = type.value
 	if (browseServerContent && ['mod', 'plugin', 'datapack'].includes(contentType)) {
 		browseServerContent({
@@ -733,7 +934,7 @@ function handleBrowseContent() {
 }
 
 function handleUploadFiles() {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.multiple = true
@@ -838,14 +1039,13 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		id: addon.id ?? addon.filename,
 		enabled: !addon.disabled,
 		file_name: addon.filename,
-		date_added: addon.btime,
 		project_type: addon.kind,
 		has_update: !!addon.has_update,
 		update_version_id: addon.has_update,
 		environment: addon.version?.environment ?? undefined,
 		pack_client_retained: addon.pack_client_retained,
 		pack_client_depends: addon.pack_client_depends,
-		installing: addon.installing ?? addon.status === 'pending',
+		installing: addon.installing,
 	}
 }
 
@@ -878,7 +1078,7 @@ async function handleViewModpackContent() {
 }
 
 async function handleModpackContentToggle(item: ContentItem) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const addon = addonLookup.value.get(item.file_name)
 	if (!addon) return
 	modpackContentModal.value?.updateItem(item.file_name, { disabled: true })
@@ -909,7 +1109,7 @@ async function handleModpackContentToggle(item: ContentItem) {
 }
 
 async function handleModpackBulkToggle(items: ContentItem[], enable: boolean) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 
@@ -976,9 +1176,9 @@ async function handleModpackUnlinkConfirm() {
 }
 
 async function handleBulkUpdate(items: ContentItem[]) {
-	if (contentActionDisabled.value) return
+	if (setupActionDisabled.value) return
 	const addons = items
-		.filter((item) => item.has_update && !item.installing)
+		.filter((item) => item.has_update)
 		.map((item) => ({
 			filename: item.file_name,
 			version_id: item.update_version_id ?? undefined,
@@ -1022,7 +1222,6 @@ async function handleSwitchVersion(item: ContentItem) {
 }
 
 async function handleModpackUpdate() {
-	if (setupActionDisabled.value) return
 	const mp = contentQuery.data.value?.modpack
 	if (!mp || mp.spec.platform !== 'modrinth') return
 
@@ -1077,8 +1276,8 @@ function resetUpdateState() {
 }
 
 function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?: MouseEvent) {
+	if (setupActionDisabled.value) return
 	if (updatingModpack.value) {
-		if (setupActionDisabled.value) return
 		pendingModpackUpdateVersion.value = selectedVersion
 
 		const mpSpec = contentQuery.data.value?.modpack?.spec
@@ -1099,7 +1298,6 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 		return
 	}
 
-	if (contentActionDisabled.value) return
 	performUpdate(selectedVersion)
 }
 
@@ -1116,11 +1314,7 @@ function setAddonInstalling(filename: string, installing: boolean) {
 }
 
 async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
-	if (
-		(updatingModpack.value && setupActionDisabled.value) ||
-		(!updatingModpack.value && contentActionDisabled.value)
-	)
-		return
+	if (setupActionDisabled.value) return
 	const item = updatingProject.value
 	if (item) {
 		setAddonInstalling(item.file_name, true)
@@ -1199,8 +1393,8 @@ provideContentManager({
 	error: computed(() => contentQuery.error.value ?? null),
 	managedContent,
 	isPackLocked: ref(false),
-	isBusy: contentActionDisabled,
-	busyMessage: contentActionBusyMessage,
+	isBusy: setupActionDisabled,
+	busyMessage: setupActionBusyMessage,
 	disableAddContent: computed(() => !canSetup.value),
 	disableAddContentTooltip: permissionDeniedMessage.value,
 	contentTypeLabel: type,
@@ -1276,8 +1470,8 @@ provideContentManager({
 					:header="formatMessage(messages.modpackContent)"
 					enable-toggle
 					show-environment-warnings
-					:action-disabled="contentActionDisabled"
-					:action-disabled-tooltip="contentActionBusyMessage ?? undefined"
+					:action-disabled="setupActionDisabled"
+					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="handleModpackBulkToggle($event, true)"
 					@bulk:disable="handleModpackBulkToggle($event, false)"
@@ -1310,10 +1504,8 @@ provideContentManager({
 					"
 					:loading="loadingVersions"
 					:loading-changelog="loadingChangelog"
-					:action-disabled="updatingModpack ? setupActionDisabled : contentActionDisabled"
-					:action-disabled-tooltip="
-						(updatingModpack ? setupActionBusyMessage : contentActionBusyMessage) ?? undefined
-					"
+					:action-disabled="setupActionDisabled"
+					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
 					@update="handleModalUpdate"
 					@cancel="resetUpdateState"
 					@version-select="handleVersionSelect"

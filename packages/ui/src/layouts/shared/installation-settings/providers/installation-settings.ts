@@ -24,7 +24,6 @@ export interface InstallationSettingsContext {
 	currentPlatform: ComputedRef<string>
 	currentGameVersion: ComputedRef<string>
 	currentLoaderVersion: ComputedRef<string>
-	requiresInstallation?: Ref<boolean> | ComputedRef<boolean>
 
 	availablePlatforms: string[] | ComputedRef<string[]>
 

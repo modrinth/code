@@ -67,7 +67,6 @@ export interface ContentCardTableItem {
 	toggleDisabledTooltip?: string | null
 	hideToggle?: boolean
 	installing?: boolean
-	installProgress?: number | null
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
@@ -103,7 +102,6 @@ export interface ContentItem extends Omit<
 	pack_client_retained?: boolean
 	pack_client_depends?: boolean
 	installing?: boolean
-	installProgress?: number | null
 	source_kind?: ContentSourceKind | null
 	external?: boolean
 	external_url?: string

@@ -13,12 +13,20 @@ export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
 export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { formatMessage } = useVIntl()
 	const client = injectModrinthClient()
-	const { serverId, powerState, busyReasons } = injectModrinthServerContext()
+	const { serverId, server, powerState, isSyncingContent, busyReasons } =
+		injectModrinthServerContext()
 	const { addNotification } = injectNotificationManager()
 	const { canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
 
-	const isInstalling = computed(() =>
-		busyReasons.value.some((reason) => reason.reason.id === 'servers.busy.installing'),
+	const isInstalling = computed(
+		() =>
+			server.value.status === 'installing' ||
+			isSyncingContent.value ||
+			busyReasons.value.some(
+				(r) =>
+					r.reason.id === 'servers.busy.installing' ||
+					r.reason.id === 'servers.busy.syncing-content',
+			),
 	)
 	const isRunning = computed(() => powerState.value === 'running')
 	const isStopping = computed(() => powerState.value === 'stopping')
