@@ -61,13 +61,17 @@ const customer = ref<any>(null)
 const paymentMethods = ref<any[]>([])
 const selectedCurrency = ref<string>('USD')
 
-const pyroProducts = (props.products as Labrinth.Billing.Internal.Product[])
-	.filter((p) => p?.metadata?.type === 'pyro' || p?.metadata?.type === 'medal')
-	.sort((a, b) => {
-		const aRam = a?.metadata?.type === 'pyro' || a?.metadata?.type === 'medal' ? a.metadata.ram : 0
-		const bRam = b?.metadata?.type === 'pyro' || b?.metadata?.type === 'medal' ? b.metadata.ram : 0
-		return aRam - bRam
-	})
+const pyroProducts = computed(() =>
+	(props.products as Labrinth.Billing.Internal.Product[])
+		.filter((p) => p?.metadata?.type === 'pyro' || p?.metadata?.type === 'medal')
+		.sort((a, b) => {
+			const aRam =
+				a?.metadata?.type === 'pyro' || a?.metadata?.type === 'medal' ? a.metadata.ram : 0
+			const bRam =
+				b?.metadata?.type === 'pyro' || b?.metadata?.type === 'medal' ? b.metadata.ram : 0
+			return aRam - bRam
+		}),
+)
 
 function handleError(err: unknown) {
 	debug('Purchase modal error:', err)
@@ -120,7 +124,7 @@ const subscription = ref<Labrinth.Billing.Internal.UserSubscription | null>(null
 const pendingDowngradeBody = ref<Labrinth.Billing.Internal.EditSubscriptionRequest | null>(null)
 const currentPlanFromSubscription = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return subscription.value
-		? (pyroProducts.find((p) =>
+		? (pyroProducts.value.find((p) =>
 				p.prices.some((price) => price.id === subscription.value?.price_id),
 			) ?? undefined)
 		: undefined
