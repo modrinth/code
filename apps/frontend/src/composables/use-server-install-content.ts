@@ -11,12 +11,14 @@ import {
 	commonMessages,
 	defineMessages,
 	flushStoredServerAddonInstallQueue,
+	getServerAddonInstallPlanProjectIds,
 	getStoredServerAddonInstallQueue,
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
 	readStoredServerInstallQueue,
 	requestInstall,
+	resolveServerAddonInstallPlans,
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
 	useServerContextRuntime,
@@ -150,7 +152,12 @@ export function useServerInstallContent({
 	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<ServerInstallSearchResult>>>(
 		readStoredServerInstallQueue(currentServerId.value, currentWorldId.value),
 	)
-	const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
+	const queuedServerInstallRootProjectIds = computed(
+		() => new Set(queuedServerInstalls.value.keys()),
+	)
+	const queuedServerInstallProjectIds = computed(() =>
+		getServerAddonInstallPlanProjectIds(queuedServerInstalls.value.values()),
+	)
 	const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
 	const selectedServerInstallProjects = computed(() =>
 		Array.from(queuedServerInstalls.value.values()).map((plan) => ({
@@ -322,6 +329,54 @@ export function useServerInstallContent({
 		)
 	}
 
+	function toResolvePreferences(
+		preferences?: BrowseInstallPlan<ServerInstallSearchResult>['preferences'],
+	): Labrinth.Content.v3.ResolutionPreferences {
+		return {
+			game_versions: preferences?.gameVersions,
+			loaders: preferences?.loaders,
+		}
+	}
+
+	async function resolveAddonPlan(
+		plan: BrowseInstallPlan<ServerInstallSearchResult>,
+		existingProjectIds: string[],
+	) {
+		const resolved = await client.labrinth.content_v3.resolve({
+			project_id: plan.projectId,
+			version_id: plan.versionId,
+			content_type: plan.contentType as Labrinth.Content.v3.ContentType,
+			selected: toResolvePreferences(plan.preferences),
+			target: toResolvePreferences(getServerInstallTargetPreferences(plan.contentType)),
+			existing_project_ids: existingProjectIds,
+		})
+
+		return [resolved.primary, ...resolved.dependencies].map((item) => ({
+			projectId: item.project_id,
+			versionId: item.version_id,
+		}))
+	}
+
+	async function resolveAndStoreQueuedAddonPlan(
+		plan: BrowseInstallPlan<ServerInstallSearchResult>,
+	) {
+		const resolvedContent = await resolveAddonPlan(plan, Array.from(getServerInstalledProjectIds()))
+		const storedPlan = queuedServerInstalls.value.get(plan.projectId)
+		if (!storedPlan || storedPlan.versionId !== plan.versionId) return
+
+		const nextPlans = new Map(queuedServerInstalls.value)
+		nextPlans.set(plan.projectId, { ...storedPlan, resolvedContent })
+		serverInstallQueue.set(nextPlans)
+	}
+
+	async function resolveQueuedAddonPlans(plans: BrowseInstallPlan<ServerInstallSearchResult>[]) {
+		return await resolveServerAddonInstallPlans({
+			plans,
+			existingProjectIds: getServerInstalledProjectIds(),
+			resolvePlan: resolveAddonPlan,
+		})
+	}
+
 	function getInstallProjectVersions(projectId: string) {
 		return client.labrinth.versions_v2.getProjectVersions(projectId, {
 			include_changelog: false,
@@ -422,8 +477,9 @@ export function useServerInstallContent({
 		if (sid && wid) {
 			writeStoredServerInstallQueue(sid, wid, plans)
 		}
+		const installed = await flushQueuedServerInstalls(sid, wid)
+		if (!installed) return false
 		await navigateTo(backUrl)
-		void flushQueuedServerInstalls(sid, wid)
 
 		return true
 	}
@@ -443,16 +499,17 @@ export function useServerInstallContent({
 		const isModpack = contentType === 'modpack'
 
 		try {
-			if (!isModpack && queuedServerInstallProjectIds.value.has(project.project_id)) {
+			if (!isModpack && queuedServerInstallRootProjectIds.value.has(project.project_id)) {
 				removeQueuedServerInstall(project.project_id)
 				return
 			}
+			if (!isModpack && queuedServerInstallProjectIds.value.has(project.project_id)) return
 
 			if (isModpack || !queuedServerInstallProjectIds.value.has(project.project_id)) {
 				setProjectInstalling(project.project_id, true)
 			}
 
-			await requestInstall({
+			const plan = await requestInstall({
 				project,
 				contentType,
 				mode: isModpack ? 'immediate' : 'queue',
@@ -491,10 +548,13 @@ export function useServerInstallContent({
 					ctx.modal.value?.setStage('final-config')
 				},
 			})
+			if (!isModpack) await resolveAndStoreQueuedAddonPlan(plan)
 		} catch (e) {
 			console.error(e)
 			if (isModpack) {
 				setProjectInstalling(project.project_id, false)
+			} else {
+				removeQueuedServerInstall(project.project_id)
 			}
 			handleError(e instanceof Error ? e : new Error(`Error installing content ${e}`))
 		} finally {
@@ -649,6 +709,7 @@ export function useServerInstallContent({
 		hideSelectedServerInstalls,
 		installingProjectIds,
 		optimisticallyInstalledProjectIds,
+		queuedServerInstallRootProjectIds,
 		queuedServerInstallProjectIds,
 		queuedServerInstallCount,
 		isInstallingQueuedServerInstalls,

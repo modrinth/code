@@ -243,6 +243,7 @@ const addonsQuery = useQuery({
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
+	staleTime: 30_000,
 })
 
 const requiresInstallation = computed(
@@ -504,6 +505,9 @@ async function uploadLocalModpackWithSoftOverride() {
 
 provideInstallationSettings({
 	closeSettings: serverSettings.closeModal,
+	afterSave: async () => {
+		serverSettings.closeModal?.()
+	},
 	onGameVersionHover: handleGameVersionHover,
 	loading: computed(() => !server.value || addonsQuery.isLoading.value),
 	installationInfo: computed(() => {

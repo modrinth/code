@@ -206,7 +206,6 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 					}
 				: current,
 		)
-		void queryClient.invalidateQueries({ queryKey: contentListKey(serverId) })
 	}
 
 	function handleWorldContentBaseUpdate(
