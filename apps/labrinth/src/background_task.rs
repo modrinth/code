@@ -100,7 +100,7 @@ impl BackgroundTask {
             }
             IncrementalIndexSearch => {
                 crate::search::incremental::consume::run(
-                    ro_pool,
+                    pool,
                     redis_pool,
                     search_backend,
                     kafka_client,
@@ -168,6 +168,9 @@ pub async fn update_bank_balances(pool: PgPool) -> eyre::Result<()> {
 
 pub async fn run_migrations() -> eyre::Result<()> {
     database::check_for_migrations().await?;
+    crate::clickhouse::run_migrations()
+        .await
+        .wrap_err("failed to run ClickHouse migrations")?;
     Ok(())
 }
 

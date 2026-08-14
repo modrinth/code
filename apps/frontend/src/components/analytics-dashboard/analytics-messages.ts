@@ -688,6 +688,10 @@ export const analyticsChartMessages = defineMessages({
 		id: 'analytics.chart.tooltip.hide-entry',
 		defaultMessage: 'Hide {name} in graph',
 	},
+	noData: {
+		id: 'analytics.chart.tooltip.no-data',
+		defaultMessage: 'No data',
+	},
 	durationDays: {
 		id: 'analytics.chart.tooltip.duration.days',
 		defaultMessage: '{count, plural, one {# day} other {# days}}',

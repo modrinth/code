@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	commonMessages,
-	defineMessages,
-	PagewideBanner,
-	useVIntl,
-} from '@modrinth/ui'
+import { commonMessages, defineMessages, IconButton, PagewideBanner, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 const cosmetics = useCosmetics()
@@ -38,11 +32,13 @@ function hideStagingBanner() {
 			{{ formatMessage(messages.description) }}
 		</template>
 		<template #actions_top_right>
-			<ButtonStyled type="transparent" circular>
-				<button :aria-label="formatMessage(commonMessages.closeButton)" @click="hideStagingBanner">
-					<XIcon aria-hidden="true" />
-				</button>
-			</ButtonStyled>
+			<IconButton
+				type="quiet"
+				:label="formatMessage(commonMessages.closeButton)"
+				@click="hideStagingBanner"
+			>
+				<XIcon aria-hidden="true" />
+			</IconButton>
 		</template>
 	</PagewideBanner>
 </template>

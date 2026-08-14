@@ -1811,9 +1811,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -1840,9 +1837,6 @@
   },
   "layout.nav.discover": {
     "message": "Temukan"
-  },
-  "layout.nav.discover-content": {
-    "message": "Temukan konten"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
@@ -2417,15 +2411,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.title": {
-    "message": "Pengaturan"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Kunjungi dasbor proyek"
-  },
-  "project.status.archived.message": {
-    "message": "{title} telah diarsip. {title} tidak akan menerima pembaruan di masa mendatang kecuali pembuat memutuskan untuk membuka arsip proyek ini."
-  },
   "project.versions.title": {
     "message": "Versi"
   },
@@ -2921,23 +2906,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Tambah URI pengarahan ulang"
   },
-  "settings.applications.button.cancel": {
-    "message": "Batal"
-  },
   "settings.applications.button.create": {
     "message": "Buat aplikasi"
   },
   "settings.applications.button.delete": {
     "message": "Hapus"
   },
-  "settings.applications.button.edit": {
-    "message": "Sunting"
-  },
   "settings.applications.button.new": {
     "message": "Aplikasi baru"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Simpan perubahan"
   },
   "settings.applications.button.upload-icon": {
     "message": "Unggah ikon"
@@ -3187,24 +3163,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Tidak pernah digunakan"
-  },
-  "settings.profile.bio.description": {
-    "message": "Keterangan singkat untuk mengenalkan sedikit tentang diri Anda."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Informasi profil Anda dapat dilihat secara publik di Modrinth dan melalui <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.profile-info": {
-    "message": "Informasi profil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Foto profil"
-  },
-  "settings.profile.username.description": {
-    "message": "Nama unik yang tidak peka huruf besar-kecil untuk mengidentifikasi profil Anda."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Cabut sesi"

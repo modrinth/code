@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -54,7 +55,9 @@ pub async fn category_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::tags::category_list(pool, redis).await?;
+    let response = v3::tags::category_list(pool, redis)
+        .await
+        .wrap_api_err("executing `tags::category_list`")?;
 
     // Convert to V2 format
     match v2_reroute::extract_ok_json::<Vec<v3::tags::CategoryData>>(response)
@@ -102,7 +105,9 @@ pub async fn loader_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::tags::loader_list(pool, redis).await?;
+    let response = v3::tags::loader_list(pool, redis)
+        .await
+        .wrap_api_err("executing `tags::loader_list`")?;
 
     // Convert to V2 format
     match v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(response)
@@ -198,7 +203,8 @@ pub async fn game_version_list(
         }),
         redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching game versions")?;
 
     // Convert to V2 format
     Ok(
@@ -210,18 +216,9 @@ pub async fn game_version_list(
                     .into_iter()
                     .map(|f| GameVersionQueryData {
                         version: f.value,
-                        version_type: f
-                            .metadata
-                            .get("type")
-                            .and_then(|m| m.as_str())
-                            .unwrap_or_default()
-                            .to_string(),
+                        version_type: f.ty.unwrap_or_default(),
                         date: f.created,
-                        major: f
-                            .metadata
-                            .get("major")
-                            .and_then(|m| m.as_bool())
-                            .unwrap_or_default(),
+                        major: f.major.unwrap_or_default(),
                     })
                     .collect::<Vec<_>>();
                 HttpResponse::Ok().json(fields)
@@ -302,7 +299,8 @@ pub async fn license_text(
 ) -> Result<HttpResponse, ApiError> {
     let license = v3::tags::license_text(params)
         .await
-        .or_else(v2_reroute::flatten_404_error)?;
+        .or_else(v2_reroute::flatten_404_error)
+        .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2 format
     Ok(
@@ -348,7 +346,9 @@ pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::tags::link_platform_list(pool, redis).await?;
+    let response = v3::tags::link_platform_list(pool, redis)
+        .await
+        .wrap_api_err("executing `tags::link_platform_list`")?;
 
     // Convert to V2 format
     Ok(

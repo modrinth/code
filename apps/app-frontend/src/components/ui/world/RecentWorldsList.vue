@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { LoaderCircleIcon } from '@modrinth/assets'
 import type { GameVersion } from '@modrinth/ui'
-import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
+import { GAME_MODES, injectNotificationManager } from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { instance_listener, process_listener } from '@/helpers/events'
 import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
 import { get_game_versions } from '@/helpers/tags'
@@ -215,11 +215,11 @@ async function stopInstance(path: string) {
 const currentInstance = ref<string>()
 const currentWorld = ref<string>()
 
-const unlistenProcesses = await process_listener(async () => {
+useAppEvent('process', async () => {
 	await checkProcesses()
 })
 
-const unlistenInstances = await instance_listener(async () => {
+useAppEvent('instance', async () => {
 	await populateJumpBackIn().catch(() => {
 		console.error('Failed to populate jump back in')
 	})
@@ -251,11 +251,6 @@ onMounted(() => {
 	checkProcesses()
 	linuxPopulateCount.value = 0
 })
-
-onUnmounted(() => {
-	unlistenProcesses()
-	unlistenInstances()
-})
 </script>
 
 <template>
@@ -268,13 +263,7 @@ onUnmounted(() => {
 		</div>
 	</div>
 	<div v-else-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-		<HeadingLink v-if="theme.getFeatureFlag('worlds_tab')" to="/worlds" class="mt-1">
-			Jump back in
-		</HeadingLink>
-		<span
-			v-else
-			class="flex mt-1 mb-3 leading-none items-center gap-1 text-primary text-lg font-bold"
-		>
+		<span class="flex mt-1 mb-3 leading-none items-center gap-1 text-primary text-lg font-bold">
 			Jump back in
 		</span>
 		<div class="grid-when-huge flex flex-col w-full gap-2">

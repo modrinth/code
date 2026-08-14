@@ -19,13 +19,14 @@ use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v3";
-pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v3";
-const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v3";
+pub const PROJECTS_NAMESPACE: &str = "projects:v4";
+pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v4";
+const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
@@ -657,12 +658,14 @@ impl DBProject {
                     .await?;
 
                 let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
-                    "
-                    SELECT DISTINCT id, enum_id, value, ordering, created, metadata
+                    r#"
+                    SELECT DISTINCT id, enum_id, value, ordering, created,
+                    metadata->>'type' AS "ty?",
+                    (metadata->>'major')::boolean AS "major?"
                     FROM loader_field_enum_values lfev
                     WHERE id = ANY($1)
                     ORDER BY enum_id, ordering, created DESC
-                    ",
+                    "#,
                     &loader_field_enum_value_ids
                         .iter()
                         .map(|x| x.0)
@@ -675,7 +678,8 @@ impl DBProject {
                         value: m.value,
                         ordering: m.ordering,
                         created: m.created,
-                        metadata: m.metadata,
+                        ty: m.ty,
+                        major: m.major,
                     })
                     .try_collect()
                     .await?;
@@ -946,7 +950,7 @@ impl DBProject {
             },
         )
         .await
-        .wrap_internal_err("failed to fetch cached projects")?;
+        .wrap_internal_err("fetching cached projects")?;
 
         Ok(val)
     }
@@ -1041,8 +1045,10 @@ impl DBProject {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde_binhum]
+#[derive(Clone, Debug)]
 pub struct ProjectQueryResult {
+    #[serde(flatten)]
     pub inner: DBProject,
     pub categories: Vec<String>,
     pub additional_categories: Vec<String>,
@@ -1053,6 +1059,5 @@ pub struct ProjectQueryResult {
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
-    #[serde(flatten)]
     pub components: exp::ProjectQuery,
 }

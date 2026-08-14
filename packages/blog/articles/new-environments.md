@@ -29,7 +29,7 @@ Originally, Modrinth's environment metadata came in the form of two fields for C
 4. **Not all real-world combinations even could be represented** by this old system. There are some mods that only make sense in a singleplayer environment, or some that only make sense on dedicated servers and _not_ in Singleplayer.
 5. **Conflicting information is out there** on what exactly these terms meant. The website told creators to treat the client and server as the _logical_ client and servers, but some other people's guides and tooling treated them as referring to the _physical_ client and server. This includes the Modrinth Pack (.mrpack) specification, which confusingly uses the same required/optional/unsupported terminology to refer to the physical sides when defining which files should be installed in the client and server distributions.
 
-## How does the new system work?
+<h2 id="new-system">How does the new system work?</h2>
 
 The new system enumerates all expected use-cases into distinct options that can be handled in unique ways by tools like launchers, mod managers, and modpack assemblers.
 

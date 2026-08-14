@@ -3,6 +3,7 @@ import { injectPageContext } from '@modrinth/ui'
 
 defineProps<{
 	sidebar?: 'right' | 'left'
+	fullWidth?: boolean
 }>()
 const { hierarchicalSidebarAvailable } = injectPageContext()
 </script>
@@ -12,6 +13,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 		:class="{
 			'ui-normal-page--sidebar-left': sidebar === 'left' && !hierarchicalSidebarAvailable,
 			'ui-normal-page--sidebar-right': sidebar === 'right' && !hierarchicalSidebarAvailable,
+			'ui-normal-page--full-width': fullWidth,
 		}"
 	>
 		<div class="ui-normal-page__header">
@@ -44,6 +46,10 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 		'content'
 		'sidebar'
 		/ 100%;
+}
+
+.ui-normal-page--full-width {
+	width: calc(100% - 2rem);
 }
 
 @media (width >= 64rem) {

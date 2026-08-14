@@ -59,7 +59,9 @@
 				<span class="font-medium text-primary">
 					{{ formatMessage(analyticsChartMessages.total) }}
 				</span>
-				<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
+				<span class="font-semibold" :class="totalHasData ? 'text-contrast' : 'text-primary'">
+					{{ formattedTotal }}
+				</span>
 			</div>
 			<div
 				v-for="entry in entries"
@@ -111,7 +113,11 @@
 					:class="[
 						'shrink-0',
 						entry.isPreviousPeriod ? 'font-medium text-secondary' : 'font-semibold',
-						entry.hidden ? 'text-primary line-through opacity-70' : 'text-contrast',
+						entry.hidden
+							? 'text-primary line-through opacity-70'
+							: entry.noData
+								? 'text-primary'
+								: 'text-contrast',
 					]"
 				>
 					{{ entry.formattedValue }}
@@ -148,6 +154,7 @@ export type AnalyticsChartTooltipEntry = {
 	tooltip?: string
 	color: string
 	formattedValue: string
+	noData: boolean
 	hidden: boolean
 	toggleDisabled: boolean
 	isPreviousPeriod?: boolean
@@ -164,6 +171,7 @@ const props = defineProps<{
 	chartStart: Date | null
 	chartEnd: Date | null
 	formattedTotal: string
+	totalHasData: boolean
 	entries: AnalyticsChartTooltipEntry[]
 	containerWidth: number
 	containerHeight: number

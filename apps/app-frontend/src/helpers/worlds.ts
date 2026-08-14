@@ -3,6 +3,7 @@ import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 
+import type { InstancePayload } from '@/generated/app-events/InstancePayload'
 import { get_full_path } from '@/helpers/instance'
 import { openPath } from '@/helpers/utils'
 
@@ -435,11 +436,12 @@ export async function refreshServerData(
 	}
 }
 
-export function refreshServers(
+export async function refreshServers(
 	worlds: World[],
 	serverData: Record<string, ServerData>,
 	protocolVersion: ProtocolVersion | null,
-) {
+	ping = true,
+): Promise<void> {
 	const servers = worlds.filter(isServerWorld)
 	servers.forEach((server) => {
 		if (!serverData[server.address]) {
@@ -451,9 +453,14 @@ export function refreshServers(
 		}
 	})
 
-	// noinspection ES6MissingAwait - handled by refreshServerData
-	Object.keys(serverData).forEach((address) =>
-		refreshServerData(serverData[address], protocolVersion, address),
+	if (!ping) {
+		return
+	}
+
+	await Promise.all(
+		Object.keys(serverData).map((address) =>
+			refreshServerData(serverData[address], protocolVersion, address),
+		),
 	)
 }
 
@@ -526,18 +533,4 @@ export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVer
 	return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 }
 
-export type InstanceEvent = { instance_id: string } & (
-	| {
-			event: 'servers_updated'
-	  }
-	| {
-			event: 'world_updated'
-			world: string
-	  }
-	| {
-			event: 'server_joined'
-			host: string
-			port: number
-			timestamp: string
-	  }
-)
+export type InstanceEvent = InstancePayload

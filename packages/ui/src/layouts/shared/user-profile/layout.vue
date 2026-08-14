@@ -1,42 +1,43 @@
 <template>
 	<template v-if="user">
 		<NewModal
-			v-if="variant === 'web'"
-			ref="editRoleModal"
-			:header="formatMessage(messages.editRoleButton)"
+			ref="blockUserModal"
+			:header="formatMessage(messages.blockUserTitle, { username: user.username })"
+			:closable="!isBlockingUser"
+			fade="danger"
+			max-width="500px"
 		>
-			<div class="flex w-80 flex-col gap-4">
-				<Combobox
-					v-model="selectedRole"
-					:options="roleOptions"
-					:placeholder="formatMessage(messages.selectRolePlaceholder)"
-				/>
+			<Admonition type="critical" :header="formatMessage(messages.blockUserAdmonitionTitle)">
+				{{ formatMessage(messages.blockUserAdmonitionBody, { username: user.username }) }}
+			</Admonition>
+
+			<template #actions>
 				<div class="flex justify-end gap-2">
-					<ButtonStyled>
-						<button type="button" @click="cancelRoleEdit">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button
-							type="button"
-							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
-							@click="saveRoleEdit"
-						>
-							<template v-if="isSavingRole">
-								<SpinnerIcon class="animate-spin" />
-								{{ formatMessage(messages.savingLabel) }}
-							</template>
-							<template v-else>
-								<SaveIcon />
-								{{ formatMessage(commonMessages.saveChangesButton) }}
-							</template>
-						</button>
-					</ButtonStyled>
+					<Button
+						type="outlined"
+						native-type="button"
+						:disabled="isBlockingUser"
+						@click="blockUserModal?.hide()"
+					>
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="red"
+						native-type="button"
+						:disabled="isBlockingUser"
+						@click="confirmBlockUser"
+					>
+						<SpinnerIcon v-if="isBlockingUser" class="animate-spin" />
+						<BanIcon v-else />
+						{{ formatMessage(messages.blockButton) }}
+					</Button>
 				</div>
-			</div>
+			</template>
 		</NewModal>
+
+		<EditUserModal v-if="variant === 'web'" ref="editUserModal" :user="user" :user-id="userId" />
 
 		<NewModal
 			v-if="variant === 'web' && isStaffViewing"
@@ -81,7 +82,33 @@
 					<span class="text-lg font-bold text-primary">
 						{{ formatMessage(messages.authProvidersLabel) }}
 					</span>
-					<span>{{ user.auth_providers?.join(', ') || '—' }}</span>
+					<ul class="flex flex-col gap-1 pl-4 leading-normal m-0">
+						<li v-for="provider in user.auth_providers ?? []" :key="provider">
+							<span>{{ authProviderNames[provider] ?? provider }}</span>
+							<span v-if="provider === 'discord' && user.discord_id" class="ml-1">
+								({{ user.discord_id }})
+							</span>
+							<template v-else-if="provider === 'github' && user.github_id">
+								<span class="ml-1">(</span>
+								<button
+									type="button"
+									class="m-0 appearance-none border-0 bg-transparent p-0 font-[inherit] text-link disabled:cursor-wait disabled:opacity-70"
+									:disabled="isLoadingGithubProfile"
+									@click="openGithubProfile"
+								>
+									{{
+										isLoadingGithubProfile
+											? formatMessage(messages.loadingGithubProfileLabel)
+											: formatMessage(messages.viewGithubProfileLabel)
+									}}
+								</button>
+								<span>)</span>
+							</template>
+							<span v-else-if="provider === 'steam' && user.steam_id" class="ml-1">
+								({{ user.steam_id }})
+							</span>
+						</li>
+					</ul>
 				</div>
 
 				<div v-if="isAdminViewing" class="flex flex-col gap-1">
@@ -136,7 +163,7 @@
 			</div>
 		</NewModal>
 
-		<NormalPage :sidebar="sidebarPosition">
+		<NormalPage :sidebar="sidebarPosition" :full-width="variant === 'app'">
 			<template #header>
 				<UserPageHeader
 					:user="user"
@@ -151,10 +178,12 @@
 					:is-admin="isAdminViewing"
 					:is-staff="isStaffViewing"
 					:show-staff-actions="variant === 'web'"
+					:is-blocked="isBlocked"
 					:projects-count="projects.length"
 					:downloads="sumDownloads"
 					@manage-projects="openPath('/dashboard/projects')"
 					@report="reportProfile"
+					@block="handleBlockAction"
 					@copy-id="copyId"
 					@copy-permalink="copyPermalink"
 					@open-billing="openPath(`/admin/billing/${user.id}`)"
@@ -163,7 +192,7 @@
 					@open-analytics="
 						openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
 					"
-					@edit-role="openRoleEditModal"
+					@edit-user="editUserModal?.show()"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -226,7 +255,11 @@
 							}"
 							:layout="displayMode === 'list' ? 'list' : 'grid'"
 							:status="project.status"
-						/>
+						>
+							<template v-if="$slots['project-actions']" #actions>
+								<slot name="project-actions" :project="project" />
+							</template>
+						</ProjectCard>
 					</ProjectCardList>
 
 					<EmptyState
@@ -238,11 +271,9 @@
 						"
 					>
 						<template v-if="isSelf" #actions>
-							<ButtonStyled color="brand">
-								<button type="button" @click="createProject">
-									{{ formatMessage(messages.createProjectButton) }}
-								</button>
-							</ButtonStyled>
+							<Button type="colored" color="brand" native-type="button" @click="createProject">
+								{{ formatMessage(messages.createProjectButton) }}
+							</Button>
 						</template>
 					</EmptyState>
 
@@ -322,11 +353,9 @@
 						"
 					>
 						<template v-if="isSelf" #actions>
-							<ButtonStyled color="brand">
-								<button type="button" @click="createCollection">
-									{{ formatMessage(messages.createCollectionButton) }}
-								</button>
-							</ButtonStyled>
+							<Button type="colored" color="brand" native-type="button" @click="createCollection">
+								{{ formatMessage(messages.createCollectionButton) }}
+							</Button>
 						</template>
 					</EmptyState>
 				</div>
@@ -379,11 +408,9 @@
 			:description="formatMessage(messages.userLoadErrorDescription)"
 		>
 			<template #actions>
-				<ButtonStyled color="brand">
-					<button type="button" @click="retryQueries">
-						{{ formatMessage(commonMessages.retryButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" native-type="button" @click="retryQueries">
+					{{ formatMessage(commonMessages.retryButton) }}
+				</Button>
 			</template>
 		</EmptyState>
 	</div>
@@ -392,25 +419,29 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BanIcon,
 	BoxIcon,
 	CheckIcon,
 	GlobeIcon,
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
-	SaveIcon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { UserBadge } from '@modrinth/utils'
+import {
+	isModrinthUser as checkIsModrinthUser,
+	isOfficialAccount as checkIsOfficialAccount,
+	UserBadge,
+} from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import Combobox from '#ui/components/base/Combobox.vue'
+import { Button } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -422,10 +453,17 @@ import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import UserBadges from '#ui/components/user/UserBadges.vue'
 import UserPageHeader from '#ui/components/user/UserPageHeader.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
-import { injectAuth, injectNotificationManager, injectPageContext, injectTags } from '#ui/providers'
-import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils'
+import {
+	injectAuth,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectPageContext,
+	injectTags,
+} from '#ui/providers'
+import { commonMessages, getProjectTypeTitleMessage, sortProjectTypes } from '#ui/utils'
 
-import { injectUserProfile } from './providers'
+import EditUserModal from './components/edit-user-modal.vue'
+import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import {
 	hasActivePride26Midas,
 	hasPride26Badge,
@@ -459,6 +497,7 @@ const props = withDefaults(
 		siteUrl?: string
 		externalNavigation?: boolean
 		projectLinkMode?: 'website' | 'app'
+		editProfileLink?: string | (() => void)
 		onCreateProject?: (event?: MouseEvent) => void
 		onCreateCollection?: (event?: MouseEvent) => void
 	}>(),
@@ -470,6 +509,7 @@ const props = withDefaults(
 		siteUrl: 'https://modrinth.com',
 		externalNavigation: false,
 		projectLinkMode: 'website',
+		editProfileLink: undefined,
 		onCreateProject: undefined,
 		onCreateCollection: undefined,
 	},
@@ -480,6 +520,7 @@ const auth = injectAuth()
 const tags = injectTags(null)
 const pageContext = injectPageContext()
 const notificationManager = injectNotificationManager()
+const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -494,18 +535,6 @@ const messages = defineMessages({
 	collectionProjectsCount: {
 		id: 'profile.collection.projects-count',
 		defaultMessage: '{count, plural, one {# project} other {# projects}}',
-	},
-	savingLabel: {
-		id: 'profile.label.saving',
-		defaultMessage: 'Saving...',
-	},
-	editRoleButton: {
-		id: 'profile.button.edit-role',
-		defaultMessage: 'Edit role',
-	},
-	selectRolePlaceholder: {
-		id: 'profile.role.select-placeholder',
-		defaultMessage: 'Select a role',
 	},
 	userDetailsTitle: {
 		id: 'profile.details.title',
@@ -526,6 +555,26 @@ const messages = defineMessages({
 	authProvidersLabel: {
 		id: 'profile.details.label.auth-providers',
 		defaultMessage: 'Auth providers',
+	},
+	viewGithubProfileLabel: {
+		id: 'profile.details.label.view-github-profile',
+		defaultMessage: 'View profile',
+	},
+	loadingGithubProfileLabel: {
+		id: 'profile.details.label.loading-github-profile',
+		defaultMessage: 'Loading...',
+	},
+	githubProfileErrorTitle: {
+		id: 'profile.details.error.github-profile-title',
+		defaultMessage: 'Unable to open GitHub profile',
+	},
+	githubProfileErrorMessage: {
+		id: 'profile.details.error.github-profile-message',
+		defaultMessage: 'The GitHub profile could not be retrieved. Please try again.',
+	},
+	githubPopupBlockedMessage: {
+		id: 'profile.details.error.github-popup-blocked',
+		defaultMessage: 'Allow pop-ups for Modrinth, then try again.',
 	},
 	paymentMethodsLabel: {
 		id: 'profile.details.label.payment-methods',
@@ -596,13 +645,54 @@ const messages = defineMessages({
 		defaultMessage:
 			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
 	},
-	roleUpdateErrorTitle: {
-		id: 'profile.role.update-error-title',
-		defaultMessage: 'Failed to update role',
+	blockButton: {
+		id: 'profile.button.block',
+		defaultMessage: 'Block',
 	},
-	roleUpdateErrorDescription: {
-		id: 'profile.role.update-error-description',
-		defaultMessage: 'An error occurred while updating the user role. Please try again.',
+	unblockUserSuccessTitle: {
+		id: 'profile.unblock-user.success-title',
+		defaultMessage: 'User unblocked',
+	},
+	unblockUserSuccessDescription: {
+		id: 'profile.unblock-user.success-description',
+		defaultMessage: '{username} has been unblocked.',
+	},
+	unblockUserErrorTitle: {
+		id: 'profile.unblock-user.error-title',
+		defaultMessage: 'Failed to unblock user',
+	},
+	unblockUserErrorDescription: {
+		id: 'profile.unblock-user.error-description',
+		defaultMessage: 'An error occurred while unblocking this user. Please try again.',
+	},
+	blockUserTitle: {
+		id: 'profile.block-user.title',
+		defaultMessage: 'Block {username}',
+	},
+	blockUserAdmonitionTitle: {
+		id: 'profile.block-user.admonition-title',
+		defaultMessage: 'Are you sure you want to block this user?',
+	},
+	blockUserAdmonitionBody: {
+		id: 'profile.block-user.admonition-body',
+		defaultMessage:
+			'{username} will not be able to send you friend requests, invite you to shared instances or invite you to Modrinth Hosting servers.',
+	},
+	blockUserSuccessTitle: {
+		id: 'profile.block-user.success-title',
+		defaultMessage: 'User blocked',
+	},
+	blockUserSuccessDescription: {
+		id: 'profile.block-user.success-description',
+		defaultMessage: '{username} has been blocked.',
+	},
+	blockUserErrorTitle: {
+		id: 'profile.block-user.error-title',
+		defaultMessage: 'Failed to block user',
+	},
+	blockUserErrorDescription: {
+		id: 'profile.block-user.error-description',
+		defaultMessage: 'An error occurred while blocking this user. Please try again.',
 	},
 })
 
@@ -630,6 +720,12 @@ const collectionsQuery = useQuery({
 	enabled: computed(() => Boolean(props.userId)),
 	staleTime: 30_000,
 })
+const blockedUsersQuery = useQuery({
+	queryKey: computed(() => blockedUsersQueryKey(auth.user.value?.id)),
+	queryFn: userProfile.getBlockedUsers,
+	enabled: computed(() => Boolean(auth.user.value)),
+	staleTime: 30_000,
+})
 
 const user = computed(() => userQuery.data.value)
 const projects = computed<ResolvedProject[]>(() =>
@@ -638,8 +734,26 @@ const projects = computed<ResolvedProject[]>(() =>
 		resolvedProjectType: resolveProjectType(project, tags?.loaders.value ?? []),
 	})),
 )
+watch(
+	() => projectsQuery.data.value,
+	(projects) => {
+		if (props.projectLinkMode !== 'app') return
+
+		for (const project of projects ?? []) {
+			for (const identifier of [project.id, project.slug]) {
+				if (identifier) {
+					queryClient.setQueryData(['projects', 'summary', identifier], project)
+				}
+			}
+		}
+	},
+	{ immediate: true },
+)
 const organizations = computed(() => organizationsQuery.data.value ?? [])
 const collections = computed(() => collectionsQuery.data.value ?? [])
+const isBlocked = computed(() =>
+	user.value ? (blockedUsersQuery.data.value ?? []).includes(user.value.id) : false,
+)
 
 const selectedProjectType = computed(() => {
 	const projectType = props.projectType
@@ -671,7 +785,7 @@ const projectTypes = computed(() => {
 	const types = new Set(projects.value.map((project) => project.resolvedProjectType))
 	if (collections.value.length > 0) types.add('collection')
 	types.delete('project')
-	return [...types]
+	return sortProjectTypes(types)
 })
 
 const navLinks = computed(() => {
@@ -682,15 +796,13 @@ const navLinks = computed(() => {
 			label: formatMessage(commonMessages.allProjectType),
 			href: profilePath,
 		},
-		...projectTypes.value
-			.map((projectType) => ({
-				label:
-					projectType === 'collection'
-						? formatMessage(messages.collectionsLabel)
-						: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
-				href: `${profilePath}/${projectType}s`,
-			}))
-			.sort((first, second) => first.label.localeCompare(second.label)),
+		...projectTypes.value.map((projectType) => ({
+			label:
+				projectType === 'collection'
+					? formatMessage(messages.collectionsLabel)
+					: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
+			href: `${profilePath}/${projectType}s`,
+		})),
 	]
 })
 
@@ -716,8 +828,8 @@ const earliestProjectByType = computed(() => {
 	return earliest
 })
 
-const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
-const isOfficialAccount = computed(() => isModrinthUser.value || user.value?.id === 'GVFjtWTf')
+const isModrinthUser = computed(() => checkIsModrinthUser(user.value?.id))
+const isOfficialAccount = computed(() => checkIsOfficialAccount(user.value?.id))
 const isSelf = computed(() => auth.user.value?.id === user.value?.id)
 const isAdminViewing = computed(() => auth.user.value?.role === 'admin')
 const isStaffViewing = computed(
@@ -738,7 +850,18 @@ const showCollectionsEmptyState = computed(
 )
 
 const normalizedSiteUrl = computed(() => props.siteUrl.replace(/\/$/, ''))
-const editProfileLink = computed(() => linkTarget('/settings/profile'))
+const editProfileLink = computed(() => props.editProfileLink ?? linkTarget('/settings/profile'))
+
+const authProviderNames = {
+	github: 'GitHub',
+	discord: 'Discord',
+	microsoft: 'Microsoft',
+	gitlab: 'GitLab',
+	google: 'Google',
+	steam: 'Steam',
+	paypal: 'PayPal',
+}
+const isLoadingGithubProfile = ref(false)
 
 function externalUrl(path: string): string {
 	return `${normalizedSiteUrl.value}${path.startsWith('/') ? path : `/${path}`}`
@@ -783,6 +906,50 @@ async function copyPermalink(): Promise<void> {
 	}
 }
 
+async function openGithubProfile() {
+	const githubId = user.value?.github_id
+	if (!githubId || isLoadingGithubProfile.value) return
+
+	const profileWindow = window.open('about:blank', '_blank')
+	if (!profileWindow) {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.githubProfileErrorTitle),
+			text: formatMessage(messages.githubPopupBlockedMessage),
+		})
+		return
+	}
+
+	profileWindow.opener = null
+	isLoadingGithubProfile.value = true
+
+	try {
+		const githubUser = await client.request<{ login?: string }>(`/${githubId}`, {
+			api: 'https://api.github.com',
+			version: 'user',
+			method: 'GET',
+			headers: { 'Content-Type': '' },
+			skipAuth: true,
+		})
+
+		if (!githubUser?.login) {
+			throw new Error('GitHub user response did not include a login')
+		}
+
+		profileWindow.location.replace(`https://github.com/${encodeURIComponent(githubUser.login)}`)
+	} catch (error) {
+		profileWindow.close()
+		console.error('Failed to retrieve GitHub profile:', error)
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.githubProfileErrorTitle),
+			text: formatMessage(messages.githubProfileErrorMessage),
+		})
+	} finally {
+		isLoadingGithubProfile.value = false
+	}
+}
+
 function reportProfile(): void {
 	if (!user.value) return
 	const reportPath = `/report?item=user&itemID=${encodeURIComponent(user.value.id)}`
@@ -821,35 +988,89 @@ async function retryQueries(): Promise<void> {
 }
 
 const userDetailsModal = ref<ModalRef | null>(null)
-const editRoleModal = ref<ModalRef | null>(null)
-const selectedRole = ref<Labrinth.Users.v3.Role | null>(null)
-const isSavingRole = ref(false)
-const roleOptions = [
-	{ value: 'developer', label: 'Developer' },
-	{ value: 'moderator', label: 'Moderator' },
-	{ value: 'admin', label: 'Admin' },
-] satisfies { value: Labrinth.Users.v3.Role; label: string }[]
-
-watch(
-	user,
-	(currentUser) => {
-		selectedRole.value = currentUser?.role ?? null
-	},
-	{ immediate: true },
-)
+const editUserModal = ref<InstanceType<typeof EditUserModal> | null>(null)
+const blockUserModal = ref<ModalRef | null>(null)
+const isBlockingUser = ref(false)
+const isUnblockingUser = ref(false)
 
 function openUserDetails(): void {
 	userDetailsModal.value?.show()
 }
 
-function openRoleEditModal(): void {
-	selectedRole.value = user.value?.role ?? null
-	editRoleModal.value?.show()
+async function handleBlockAction(): Promise<void> {
+	if (!auth.user.value) {
+		await auth.requestSignIn(route.fullPath)
+		return
+	}
+
+	if (isBlocked.value) {
+		await unblockCurrentUser()
+		return
+	}
+
+	blockUserModal.value?.show()
 }
 
-function cancelRoleEdit(): void {
-	selectedRole.value = user.value?.role ?? null
-	editRoleModal.value?.hide()
+async function confirmBlockUser(): Promise<void> {
+	if (!user.value || isBlockingUser.value) return
+
+	const blockedUser = user.value
+	const authUserId = auth.user.value?.id
+	isBlockingUser.value = true
+	try {
+		await userProfile.blockUser(blockedUser.id)
+		queryClient.setQueryData<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
+			blockedUsersQueryKey(authUserId),
+			(blockedUsers = []) =>
+				blockedUsers.includes(blockedUser.id) ? blockedUsers : [...blockedUsers, blockedUser.id],
+		)
+		blockUserModal.value?.hide()
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.blockUserSuccessTitle),
+			text: formatMessage(messages.blockUserSuccessDescription, {
+				username: blockedUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.blockUserErrorTitle),
+			text: formatMessage(messages.blockUserErrorDescription),
+		})
+	} finally {
+		isBlockingUser.value = false
+	}
+}
+
+async function unblockCurrentUser(): Promise<void> {
+	if (!user.value || isUnblockingUser.value) return
+
+	const blockedUser = user.value
+	const authUserId = auth.user.value?.id
+	isUnblockingUser.value = true
+	try {
+		await userProfile.unblockUser(blockedUser.id)
+		queryClient.setQueryData<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
+			blockedUsersQueryKey(authUserId),
+			(blockedUsers = []) => blockedUsers.filter((userId) => userId !== blockedUser.id),
+		)
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.unblockUserSuccessTitle),
+			text: formatMessage(messages.unblockUserSuccessDescription, {
+				username: blockedUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.unblockUserErrorTitle),
+			text: formatMessage(messages.unblockUserErrorDescription),
+		})
+	} finally {
+		isUnblockingUser.value = false
+	}
 }
 
 async function toggleAffiliate(): Promise<void> {
@@ -858,24 +1079,5 @@ async function toggleAffiliate(): Promise<void> {
 		badges: user.value.badges ^ UserBadge.AFFILIATE,
 	})
 	await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
-}
-
-async function saveRoleEdit(): Promise<void> {
-	if (!user.value || !selectedRole.value || selectedRole.value === user.value.role) return
-
-	isSavingRole.value = true
-	try {
-		await userProfile.patchUser(user.value.id, { role: selectedRole.value })
-		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
-		editRoleModal.value?.hide()
-	} catch {
-		notificationManager.addNotification({
-			type: 'error',
-			title: formatMessage(messages.roleUpdateErrorTitle),
-			text: formatMessage(messages.roleUpdateErrorDescription),
-		})
-	} finally {
-		isSavingRole.value = false
-	}
 }
 </script>

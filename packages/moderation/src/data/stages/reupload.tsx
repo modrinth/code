@@ -20,14 +20,13 @@ export default function () {
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080d1a0a2cda3ff2ce997',
 		)
 		.icon(CopyrightIcon)
-		.navigate('/')
+		.navigate()
 		.children(
 			group().children(
 				toggle('reupload', 'Re-upload')
 					.shown(computed(() => !project.value.minecraft_server))
 					.suggestedStatus('rejected')
-					.severity('high')
-					.message(undefined, (state) => ({
+					.message((state) => ({
 						ORIGINAL_PROJECT: state['original-project'],
 						ORIGINAL_AUTHOR: state['original-author'],
 					}))
@@ -39,25 +38,19 @@ export default function () {
 				toggle('unclear-fork', 'Unclear Fork')
 					.shown(computed(() => !project.value.minecraft_server))
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 
 				toggle('insufficient-fork', 'Insufficient Fork')
 					.shown(computed(() => !project.value.minecraft_server))
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 
-				toggle('request-proof', 'Proof of permissions')
-					.suggestedStatus('rejected')
-					.severity('high')
-					.message(),
+				toggle('request-proof', 'Proof of permissions').suggestedStatus('rejected').message(),
 
 				toggle('identity-verification', 'Verify Identity')
 					.shown(computed(() => !project.value.minecraft_server))
 					.suggestedStatus('rejected')
-					.severity('high')
-					.message(undefined, (state) => ({
+					.message((state) => ({
 						PLATFORM: state.platform,
 					}))
 					.children(text('platform').title('Where else can the project be found?').required()),
@@ -65,8 +58,7 @@ export default function () {
 				toggle('identity-verification-server', 'Verify Identity')
 					.shown(computed(() => !!project.value.minecraft_server))
 					.suggestedStatus('rejected')
-					.severity('high')
-					.message(undefined, (state) => ({
+					.message((state) => ({
 						CONTACT: state.contact,
 					}))
 					.children(text('contact').title('Known public contact method').required()),
@@ -74,17 +66,15 @@ export default function () {
 				toggle('request-proof-server', 'Reuploaded pack')
 					.shown(isServerModpack)
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 
 				toggle('custom-pack-verification', 'Override verification')
 					.shown(isServerModpack)
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message()
 					.children(
 						check('list', 'List overrides?')
-							.message(undefined, (state) => ({
+							.message((state) => ({
 								OVERRIDES: state.overrides,
 							}))
 							.children(markdown('overrides').title('Add list of overrides.')),
@@ -94,11 +84,17 @@ export default function () {
 				toggle('custom-pack-prohibited', 'Forbidden Overrides')
 					.shown(isServerModpack)
 					.suggestedStatus('rejected')
-					.severity('high')
-					.message(undefined, (state) => ({
+					.message((state) => ({
 						OVERRIDES: state.overrides,
 					}))
 					.children(markdown('overrides').title('Forbidden overrides list').required()),
+
+				toggle('missing-attribution', 'Missing Attribution')
+					.suggestedStatus('rejected')
+					.message((state) => ({
+						MISSING_CREDITS: state.missing_credits,
+					})),
+				//.children(markdown('missing_credits').title('Add list of missing credits.')),
 			),
 		)
 }

@@ -3,7 +3,16 @@ import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { dropdown, fix, group, md, option, stage, toggle } from '../../types/node'
+import {
+	appComponent as _appComponent,
+	dropdown,
+	fix,
+	group,
+	md,
+	option,
+	stage,
+	toggle,
+} from '../../types/node'
 import { requiresEnvironmentInfo } from '../../utils'
 
 const loaderLabels: Record<string, string> = {
@@ -13,7 +22,7 @@ const loaderLabels: Record<string, string> = {
 	resourcepack: 'Resource Pack',
 }
 
-function formatLoaderLabel(id: string): string {
+function _formatLoaderLabel(id: string): string {
 	return (
 		loaderLabels[id] ??
 		id
@@ -25,7 +34,11 @@ function formatLoaderLabel(id: string): string {
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
-	const { loaders } = injectTags()
+	const { loaders: _loaders, gameVersions: _gameVersions } = injectTags()
+
+	const _currentGameVersions = computed(
+		() => (project.value.game_versions as string[] | undefined) ?? [],
+	)
 
 	return (
 		stage('metadata', 'Metadata')
@@ -64,7 +77,6 @@ export default function () {
 					toggle('environment', 'Environment')
 						.shown(computed(() => requiresEnvironmentInfo(project.value.project_types)))
 						.suggestedStatus('flagged')
-						.severity('low')
 						.rawMessage(async (state) => {
 							const correctEnvironment = state?.['correct-environment'] as string | undefined
 
@@ -94,7 +106,7 @@ export default function () {
 								.title('Correct Environment')
 								.children(
 									dropdown('correct-environment')
-										.children(
+										.options(
 											...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
 												.filter((id) => id !== 'unknown')
 												.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
@@ -103,67 +115,101 @@ export default function () {
 										.none('Unknown'),
 								),
 						),
-					// TODO: chyz, fix pls (make into single set of buttons where current loaders start selected and non current start non selected
-					//					toggle('loader', `Loader${project.value.loaders.length > 1 ? 's' : ''}`).children(
-					//						group()
-					//							.title('Loader Issues?')
-					//							.action(
-					//								action()
-					//									.suggestedStatus('flagged')
-					//									.severity('medium')
-					//									.message(async (state) => {
-					//										//TODO: chyz
-					//										//TODO: coolbot this one is a bit of a doozy
-					//										const header = await md('checklist/messages/metadata/loader/incorrect')(state)
-					//										const selected = state.loaders
-					//										if (selected instanceof Set && selected.size > 0) {
-					//											const list = [...selected]
-					//												.map((id) => `- ${formatLoaderLabel(id)}`)
-					//												.join('\n')
-					//											return `${header}\n${list}`
-					//										}
-					//										return header
-					//									}),
-					//							)
-					//							.children(
-					//								toggle('incorrect', 'Incorrect').children(
-					//									group()
-					//										.title('Incorrect Loaders')
-					//										.multiSelect('loaders')
-					//										.children(
-					//											...project.value.loaders.map((id) => option(id, formatLoaderLabel(id))),
-					//										),
-					//								),
-					// TODO: chyz, this should be the same interface as incorrect, as a corrections scheme, with selected loaders default on.
-					//								toggle('missing', 'Missing').children(
-					//									group()
-					//										.title('Missing Loaders')
-					//										.multiSelect('loaders')
-					//										.children(
-					//											...(() => {
-					//												//TODO: chyz maybe this can be done better
-					//												// (plugin loaders and datapack are marked as valid for mods which makes this suck)
-					//												const existingTypes = new Set(
-					//													loaders.value
-					//														.filter((l) => project.value.loaders.includes(l.name))
-					//														.flatMap((l) => l.supported_project_types),
-					//												)
-					//												const referenceTypes =
-					//													existingTypes.size > 0
-					//														? existingTypes
-					//														: new Set(project.value.project_types)
-					//												return loaders.value
-					//													.filter(
-					//														(loader) =>
-					//															loader.supported_project_types.every((t) => referenceTypes.has(t)) &&
-					//															!project.value.loaders.includes(loader.name),
-					//													)
-					//													.map((loader) => option(loader.name, formatLoaderLabel(loader.name)))
-					//											})(),
-					//									)/
-					// ),
-					//							),
-					//					),
+
+					toggle('dependencies', 'Dependencies').suggestedStatus('flagged').message(),
+					// good enough for now.
+					toggle('game-versions', 'Game Versions').suggestedStatus('flagged').message(),
+					toggle('loaders', 'Loaders')
+						.suggestedStatus('rejected')
+						.shown(!project.value.minecraft_server)
+						.message(),
+					// toggle('loader', 'Loaders (WIP)')
+					// 	.suggestedStatus('flagged')
+					// 	.rawMessage(async (state) => {
+					// 		const selected =
+					// 			state.loaders instanceof Set ? state.loaders : new Set(project.value.loaders)
+					// 		const current = new Set(project.value.loaders)
+					// 		const isCorrected =
+					// 			selected.size !== current.size || [...selected].some((id) => !current.has(id))
+					//
+					// 		let correct = ''
+					// 		if (isCorrected) {
+					// 			const list = [...selected].map((id) => formatLoaderLabel(id)).join(', ')
+					// 			correct = await md('checklist/messages/metadata/loader/correction', () => ({
+					// 				LOADERS: list || 'none',
+					// 			}))(state)
+					// 		}
+					//
+					// 		return md('checklist/messages/metadata/loader/inaccurate', () => ({
+					// 			CORRECT: correct,
+					// 		}))(state)
+					// 	})
+					// 	.fix(
+					// 		fix().project((patch, state) => {
+					// 			const selected =
+					// 				state.loaders instanceof Set ? state.loaders : new Set(project.value.loaders)
+					// 			const next = [...selected]
+					// 			const current = project.value.loaders
+					// 			if (next.length === current.length && next.every((id) => current.includes(id)))
+					// 				return
+					// 			patch.loaders = next
+					// 		}),
+					// 	)
+					// 	.children(
+					// 		appComponent('loaders', 'loader-picker')
+					// 			.valueKind('set')
+					// 			.initial(() => new Set(project.value.loaders))
+					// 			.props((ctx) => ({
+					// 				loaders: loaders.value,
+					// 				toggleLoader: ctx.toggleSetValue,
+					// 			})),
+					// 	),
+					//
+					// toggle('game-version', 'Game Versions (WIP)')
+					// 	.suggestedStatus('flagged')
+					// 	.rawMessage(async (state) => {
+					// 		const selected =
+					// 			state['game-versions'] instanceof Set
+					// 				? state['game-versions']
+					// 				: new Set(currentGameVersions.value)
+					// 		const current = new Set(currentGameVersions.value)
+					// 		const isCorrected =
+					// 			selected.size !== current.size || [...selected].some((id) => !current.has(id))
+					//
+					// 		let correct = ''
+					// 		if (isCorrected) {
+					// 			const list = [...selected].join(', ')
+					// 			correct = await md('checklist/messages/metadata/game-version/correction', () => ({
+					// 				GAME_VERSIONS: list || 'none',
+					// 			}))(state)
+					// 		}
+					//
+					// 		return md('checklist/messages/metadata/game-version/inaccurate', () => ({
+					// 			CORRECT: correct,
+					// 		}))(state)
+					// 	})
+					// 	.fix(
+					// 		fix().project((patch, state) => {
+					// 			const selected =
+					// 				state['game-versions'] instanceof Set
+					// 					? state['game-versions']
+					// 					: new Set(currentGameVersions.value)
+					// 			const next = [...selected]
+					// 			const current = currentGameVersions.value
+					// 			if (next.length === current.length && next.every((id) => current.includes(id)))
+					// 				return
+					// 			patch.game_versions = next
+					// 		}),
+					// 	)
+					// 	.children(
+					// 		appComponent('game-versions', 'game-version-picker')
+					// 			.valueKind('set')
+					// 			.initial(() => new Set(currentGameVersions.value))
+					// 			.props(() => ({
+					// 				gameVersions: gameVersions.value,
+					// 				noHeader: true,
+					// 			})),
+					// 	),
 				),
 			)
 	)

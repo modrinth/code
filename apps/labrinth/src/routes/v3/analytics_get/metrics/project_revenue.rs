@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -95,7 +96,12 @@ pub(crate) async fn fetch(
         user_id_bucket_project_ids,
     )
     .fetch(pool);
-    while let Some(row) = rows.next().await.transpose()? {
+    while let Some(row) = rows
+        .next()
+        .await
+        .transpose()
+        .wrap_internal_err("fetching project revenue")?
+    {
         let bucket = row
             .bucket
             .wrap_internal_err("bucket should be non-null - query bug!")?;
@@ -123,7 +129,8 @@ pub(crate) async fn fetch(
                         revenue,
                     }),
                 }),
-            )?;
+            )
+            .wrap_api_err("adding project revenue to time slice")?;
         }
     }
 

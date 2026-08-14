@@ -10,26 +10,24 @@
 
 		<div v-if="backup.available" class="flex items-center gap-2">
 			<!-- Button / Loading state -->
-			<ButtonStyled v-if="!backup.backupComplete.value && !backup.backupFailed.value">
-				<button
-					v-tooltip="
-						!canManageBackups
-							? permissionDeniedMessage
-							: backup.externalBackupInProgress.value
-								? formatMessage(messages.backupInProgress)
-								: undefined
-					"
-					class="!shadow-none"
-					:disabled="
-						!canManageBackups || backup.isBackingUp.value || backup.externalBackupInProgress.value
-					"
-					@click="startBackup"
-				>
-					<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
-					<PlusIcon v-else class="size-5" />
-					{{ formatMessage(backup.isBackingUp.value ? messages.backingUp : messages.createBackup) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="!backup.backupComplete.value && !backup.backupFailed.value"
+				v-tooltip="
+					!canManageBackups
+						? permissionDeniedMessage
+						: backup.externalBackupInProgress.value
+							? formatMessage(messages.backupInProgress)
+							: undefined
+				"
+				:disabled="
+					!canManageBackups || backup.isBackingUp.value || backup.externalBackupInProgress.value
+				"
+				@click="startBackup"
+			>
+				<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
+				<PlusIcon v-else class="size-5" />
+				{{ formatMessage(backup.isBackingUp.value ? messages.backingUp : messages.createBackup) }}
+			</Button>
 
 			<!-- Success -->
 			<div
@@ -61,7 +59,7 @@
 import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { computed, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { hasServerPermission } from '#ui/composables/server-permissions'
 import { injectModrinthServerContext } from '#ui/providers'

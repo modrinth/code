@@ -11,6 +11,267 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-14T17:04:48+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T17:04:48+00:00`,
+		product: 'app',
+		version: '0.17.8',
+		body: `## Fixed
+- Fixed some issues rendering Ears skins
+- Fixed mrpack exports setting the wrong environment inclusion values.
+- Fixed issue where if your instance was linked to a modpack version that has been deleted from Modrinth the Managed content card on the content tab would not show up`,
+	},
+	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'app',
+		version: '0.17.7',
+		body: `## Added
+- Added a notification to indicate when modpack export is done.
+
+## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.
+
+## Fixed
+- Fixed modpack export appears to work but fails when imported as an instance.
+- Fixed modpack export progress bar.`,
+	},
+	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.`,
+	},
+	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'app',
+		version: '0.17.6',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.`,
+	},
+	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.
+- Updated parts of "General" settings for projects; moved the Monetization setting into the "Danger zone" with "Delete project"
+- Updated design of project settings header. Now has a dynamic back button to take you back to where you came from.
+
+## Fixed
+- Fixed changing slugs sometimes not redirecting properly.`,
+	},
+	{
+		date: `2026-08-10T18:17:39+00:00`,
+		product: 'web',
+		body: `## Added
+- Added official Modrinth subreddit and YouTube channel to footer, replacing GitHub which is already included below.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'app',
+		version: '0.17.5',
+		body: `## Changed
+- Common config file formats and RPO files are now hidden from the external modpack file warning modal.
+- Updated text in unknown file warning.
+- When viewing an instance's content in the app, content updates will now be checked immediately, rather than waiting for cache to be invalidated. It may take up to 10 minutes for updates to be shown in the content tab.
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed issue with animated GIFs sometimes not working in project page descriptions.
+- Fixed issue on Windows and Linux where the window close button was incorrectly coloured.
+- Fixed an issue when clicking content in the content tab of an instance it show a "Instance not found" notification
+- Fixed issue with the file information (name + file size) on the download button on project version pages not showing up.
+- Fixed broken buttons on the "Minecraft account required" modal on Windows.
+- Fixed the right sidebar closing when collapsing friend list sections when using the "Hide right sidebar" option.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations. Want to help translate the Modrinth website? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed issue with animated GIFs sometimes not working in project page descriptions.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)`,
+	},
+	{
+		date: `2026-08-08T19:10:34+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed action bar becoming very wide on larger displays.
+- Version upload failing to detect mrpack loader.`,
+	},
+	{
+		date: `2026-08-07T20:41:51+00:00`,
+		product: 'app',
+		version: '0.17.4',
+		body: `## Changed
+- Added loading states for project members and server details, to make it feel smoother.
+- Improved popout menu animations.
+- Updated NeoForge icon to be closer to the actual logo and look more like a fox.
+- Updated design of buttons.
+
+## Fixed
+- Fixed "Licensed Unknown" showing up under details on server projects.
+- Fixed project types sometimes appearing in random orders on some pages.`,
+	},
+	{
+		date: `2026-08-07T20:41:51+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added loading states for project members and server details, to make it feel smoother.
+- Improved popout menu animations.
+- Updated project tag settings page to new design.
+- Updated NeoForge icon to be closer to the actual logo and look more like a fox.
+
+## Fixed
+- Fixed "Licensed Unknown" showing up under details on server projects.
+- Fixed tags settings page being broken.
+- Fixed project types sometimes appearing in random orders on some pages.
+- Fixed when the project download UI has two compatible versions and no additional content, it showed as radio buttons.`,
+	},
+	{
+		date: `2026-07-31T06:10:23+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed randomly getting signed out of Modrinth account due to random non-auth related errors.`,
+	},
+	{
+		date: `2026-07-29T21:32:06+00:00`,
+		product: 'app',
+		version: '0.17.3',
+		body: `## Added
+- Added button to create a new instance on the Library page.
+
+## Changed
+- Added a toggle to hide modpacks that are already installed.
+- Added tooltip to installation settings button in installed modpack card.
+
+## Fixed
+- Improved error when shared instances reach a config file limit.
+- When pushing updates to shared instances, will now scroll to the top when entering a sub-page.
+- Fixed instance installations getting stuck when the instance is deleted.
+- Fixed error when failing to fetch a shared instance icon.
+- Installing content from Discover content will now install the latest that matches the game version and loader filters, not the absolute latest.`,
+	},
+	{
+		date: `2026-07-29T21:32:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Incomplete current day revenue hides that day's line segment instead of showing a dip to \$0.
+- Updated the modal for creating OAuth applications.
+
+## Fixed
+- Fixed dependencies in project download modal could give dependency with wrong Minecraft version.
+- Fixed PATS page new generated tokens invalidating in the same session.`,
+	},
+	{
+		date: `2026-07-28T23:36:10+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added message to legacy moderation threads showing that there may be undocumented moderation history.
+
+## Fixed
+- Fixed OAuth application icon upload not working.
+- Fixed moderation messages not showing.`,
+	},
+	{
+		date: `2026-07-28T23:36:10+00:00`,
+		product: 'app',
+		version: '0.17.2',
+		body: `## Fixed
+- Fixed broken shared instances invite management table.`,
+	},
+	{
+		date: `2026-07-28T20:40:11+00:00`,
+		product: 'app',
+		version: '0.17.1',
+		body: `## Added
+- Added user pages.
+- Added a banner for users of a shared instance which let's them know that they need to review an update to play the instance - alongside the existing checks when you click Play.
+- Added a way to see and manage the invite links you have created for a shared instance in the Sharing tab of the Instance Settings modal.
+- Added a way to see where a shared instance content is coming from when in the Install to play modal, either the linked modpack or if it was added on top. Content which is a part of the linked modpack will show the modpack information underneath it's name.
+- Added user blocking
+- You can block users on their profile page.
+- You can block users when reporting a shared instance. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
+- You can manage who you've blocked in the new Social settings in the app's Settings menu, or on the Modrinth website.
+- Added the ability to edit your Modrinth profile in the app's Settings menu.
+- Added the ability to adjust the amount of quick instances shown in the sidebar by dragging the divider up and down.
+- Added an option to always show "Copy details" on the installation job notifications, rather than just on failed and interrupted instance install jobs.
+- Clicking on friends in the friends list will take you to their profile page.
+
+## Changed
+
+- More than three instances now show up in the left sidebar's quick instance selection area for larger window sizes.
+- Updated Modrinth App logo to just use the standard Modrinth logo to save space.
+- Updated the design of the back/forward buttons.
+- Limited shared instances to 50 users.
+- Changed the expiry date picker in the shared instance invite edit modal to be a dropdown of common dates, rather than a complicated date picker. You can still use the fine-grained date picker by choosing "Custom"
+- Instance icons must now be smaller than 4MB - any existing instances will have their icons compressed to 512x512px size to conform to the new limit. This will break any instances which have .GIF icons.
+- Split up the App Settings modal into categories.
+- Moved out behavioural settings into it's own subpage, rather than being in Appearance settings.
+- Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
+- Re-aligned the traffic light buttons on macOS with the top bar.
+- Updated translations. Want to help translate the Modrinth App? [Click here](https://translate.modrinth.com)
+- **Modrinth Hosting:** Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)
+
+## Fixed
+
+- **Modrinth Hosting:** Fixed issue where when browsing content for your server panel, when visiting a project page and going back to search, it would reset the page back to one.
+- Fixed issue where when browsing content for an instance, when visiting a project page and going back to search, it would reset the page back to one.
+- Refactored how breadcrumbs work in the app, this should solve many issues you might have encountered using the back and forward navigation buttons in the app header.
+- Fixed error spam when the shared instances API is not accessible, it will cleanly provide feedback that the app cannot connect.`,
+	},
+	{
+		date: `2026-07-28T20:40:11+00:00`,
+		product: 'web',
+		body: `## Added
+- You can now block users on their profile page. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
+- Added new social settings page, where you can manage users you have blocked and in the future set who can send you friend requests and invitations to shared instances and Modrinth Hosting server panels.
+
+## Changed
+- Cleaned up the layout of and renamed the Public profile settings page to Profile settings.
+- Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
+- Updated translations. Want to help translate Modrinth's website? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed profile pictures still being deleted after resetting a pending removal in Profile settings.
+- Fixed shared instance reports not showing up in the dashboard's Reports page.
+- Fixed shared instance report emails saying "Unknown" rather than the shared instance's name.
+- Fixed the settings page for Authorized apps being broken.
+- Broken Retro theme colors
+- Improved vertical alignment of status indicators in notifications.`,
+	},
+	{
+		date: `2026-07-28T20:40:11+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed issue where when browsing content for your server panel, when visiting a project page and going back to search, it would reset the page back to one.`,
+	},
+	{
 		date: `2026-07-26T19:06:47+00:00`,
 		product: 'web',
 		body: `## Changed

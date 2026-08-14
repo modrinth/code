@@ -18,6 +18,7 @@
 	"devDependencies": {
 		"@formatjs/cli": "^6.2.12",
 		"@modrinth/tooling-config": "workspace:*",
-		"@modrinth/ui": "workspace:*"
+		"@modrinth/ui": "workspace:*",
+		"typescript": "^5.4.5"
 	}
 }

@@ -2,6 +2,7 @@ export * from './server'
 export * from './settings'
 
 // Other
+export { default as ArchivedProjectBanner } from './ArchivedProjectBanner.vue'
 export { default as ProjectCard } from './card/ProjectCard.vue'
 export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradient.vue'
 export { default as ProjectCardList } from './ProjectCardList.vue'
@@ -16,4 +17,5 @@ export { default as ProjectSidebarLinks } from './ProjectSidebarLinks.vue'
 export { default as ProjectSidebarServerInfo } from './ProjectSidebarServerInfo.vue'
 export { default as ProjectSidebarTags } from './ProjectSidebarTags.vue'
 export { default as ProjectStatusBadge } from './ProjectStatusBadge.vue'
+export { default as ProjectStatusLink } from './ProjectStatusLink.vue'
 export { default as TagsOverflow } from './TagsOverflow.vue'

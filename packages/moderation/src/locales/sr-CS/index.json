@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Barem jedna slika u geliriji je potrebna da bi se predstavio sadržaj tvog {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "resurs paket, osim za audio ili paket za lokalizacije. Ako to opisuje tvoj paket, molimo izaberi tačnu oznaku"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Postavi sliku za geleriju"
   },
@@ -271,9 +268,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Proveri spoljne linkove"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Posjeti stranu verzija"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Posjeti podešavanja linkova"

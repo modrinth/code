@@ -38,7 +38,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showProjectPageCreateServersTooltip: true,
 	showProjectPageQuickServerButton: false,
 	newProjectGeneralSettings: false,
-	newProjectEnvironmentSettings: true,
 	serverRamAsBytesAlwaysOn: false,
 	archonSentryCapture: false,
 	hideRussiaCensorshipBanner: false,
@@ -53,12 +52,12 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	alwaysIgnoreErrorBanner: false,
 	showViewProdRouteBanner: false,
 	showModeratorProjectMemberUi: false,
-	showModeratorPrivateMessageHighlight: true,
 	archonApiStaging: false,
 	showHostingAccessInstanceAuditLog: false,
 	versionDevInfoCollapsed: true,
 	alwaysShowVersionDevInfo: false,
 	advancedFiltersCollapsed: true,
+	dismissedPhotosensitivityFilterWarning: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

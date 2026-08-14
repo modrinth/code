@@ -1,14 +1,16 @@
 use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const TEMPLATES_NAMESPACE: &str = "notifications_templates:v3";
+const TEMPLATES_NAMESPACE: &str = "notifications_templates:v4";
 const TEMPLATES_HTML_DATA_NAMESPACE: &str =
-    "notifications_templates_html_data:v3";
+    "notifications_templates_html_data:v4";
 const TEMPLATES_DYNAMIC_HTML_NAMESPACE: &str =
-    "notifications_templates_dynamic_html:v3";
+    "notifications_templates_dynamic_html:v4";
 
 const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
 const TEMPLATES_CACHE_EXPIRY: i64 = 60 * 30; // 30 minutes
@@ -123,27 +125,38 @@ where
         html: String,
     }
 
-    let mut redis_conn = redis.connect().await?;
+    let mut redis_conn = redis.connect().await.wrap_internal_err(
+        "connecting to redis for dynamic notification html",
+    )?;
     let redis_key = redis_conn
         .key()
         .metadata(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key);
-    if let Some(body) =
-        redis_conn.get_deserialized::<HtmlBody>(&redis_key).await?
+    if let Some(body) = redis_conn
+        .get_deserialized::<HtmlBody>(&redis_key)
+        .await
+        .wrap_internal_err("fetching dynamic notification html from redis")?
     {
         return Ok(body.html);
     }
 
     drop(redis_conn);
 
-    let cached = HtmlBody { html: get().await? };
-    let mut redis_conn = redis.connect().await?;
+    let cached = HtmlBody {
+        html: get()
+            .await
+            .wrap_api_err("generating notification template HTML")?,
+    };
+    let mut redis_conn = redis.connect().await.wrap_internal_err(
+        "connecting to redis for dynamic notification html",
+    )?;
     let redis_key = redis_conn
         .key()
         .metadata(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key);
 
     redis_conn
         .set_serialized(&redis_key, &cached, Some(HTML_DATA_CACHE_EXPIRY))
-        .await?;
+        .await
+        .wrap_internal_err("writing dynamic notification html to redis")?;
 
     Ok(cached.html)
 }

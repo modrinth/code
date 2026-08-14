@@ -590,6 +590,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
+<template><div></div></template>
 <style>
 html.modrinth-cmp-summary-hidden .qc-cmp2-container,
 html.modrinth-cmp-summary-hidden #qc-cmp2-container,

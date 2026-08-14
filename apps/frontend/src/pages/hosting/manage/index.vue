@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { ServersManagePageIndex } from '@modrinth/ui'
 
-import { useGeneratedState } from '~/composables/generated'
+import { products } from '~/generated/state.json'
 
 definePageMeta({
 	middleware: 'auth',
@@ -12,14 +13,13 @@ useHead({
 })
 
 const config = useRuntimeConfig()
-const generatedState = useGeneratedState()
 </script>
 
 <template>
 	<ServersManagePageIndex
 		:stripe-publishable-key="config.public.stripePublishableKey"
 		:site-url="config.public.siteUrl"
-		:products="generatedState.products || []"
+		:products="(products ?? []) as Labrinth.Billing.Internal.Product[]"
 		class="max-w-[1280px] py-0"
 	/>
 </template>

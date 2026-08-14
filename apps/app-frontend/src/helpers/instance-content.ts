@@ -1,17 +1,10 @@
-import type {
-	ContentItem,
-	ContentModpackCardCategory,
-	ContentModpackCardProject,
-	ContentModpackCardVersion,
-	ContentOwner,
-} from '@modrinth/ui'
+import type { ContentItem, ManagedContentProject, ManagedContentVersion } from '@modrinth/ui'
 
 import {
 	get_content_items,
 	get_linked_modpack_info,
 	type LinkedModpackInfo,
 } from '@/helpers/instance'
-import { get_categories } from '@/helpers/tags.js'
 import type { CacheBehaviour } from '@/helpers/types'
 
 export type InstanceContentData = {
@@ -21,11 +14,8 @@ export type InstanceContentData = {
 }
 
 export type InstanceContentModpackData = {
-	project: ContentModpackCardProject
-	version: ContentModpackCardVersion
-	owner: ContentOwner | null
-	categories: ContentModpackCardCategory[]
-	hasUpdate: boolean
+	project: ManagedContentProject
+	version: ManagedContentVersion | null
 	updateVersionId: string | null
 }
 
@@ -34,30 +24,26 @@ export async function loadInstanceContentData(
 	cacheBehaviour?: CacheBehaviour,
 	onError?: (error: Error) => unknown,
 ): Promise<InstanceContentData> {
-	const [contentItems, modpackInfo, allCategories] = await Promise.all([
+	const [contentItems, modpackInfo] = await Promise.all([
 		get_content_items(path, cacheBehaviour).catch((error) => handleLoadError(error, onError)),
 		get_linked_modpack_info(path, cacheBehaviour).catch((error) => handleLoadError(error, onError)),
-		get_categories().catch((error) => handleLoadError(error, onError)),
 	])
 
 	return {
 		path,
 		contentItems: (contentItems as ContentItem[] | null | undefined) ?? null,
-		modpack: normalizeLinkedModpackInfo(
-			modpackInfo as LinkedModpackInfo | null | undefined,
-			allCategories as ContentModpackCardCategory[] | null | undefined,
-		),
+		modpack: normalizeLinkedModpackInfo(modpackInfo as LinkedModpackInfo | null | undefined),
 	}
 }
 
 function handleLoadError(error: unknown, onError?: (error: Error) => unknown) {
-	onError?.(error as Error)
+	if (!onError) throw error
+	onError(error as Error)
 	return null
 }
 
 function normalizeLinkedModpackInfo(
 	modpackInfo: LinkedModpackInfo | null | undefined,
-	allCategories: ContentModpackCardCategory[] | null | undefined,
 ): InstanceContentModpackData | null {
 	if (!modpackInfo) return null
 
@@ -67,34 +53,12 @@ function normalizeLinkedModpackInfo(
 			slug: modpackInfo.project.slug ?? modpackInfo.project.id,
 			icon_url: modpackInfo.project.icon_url ?? undefined,
 		},
-		version: {
-			...modpackInfo.version,
-			date_published: modpackInfo.version.date_published.toString(),
-		},
-		owner: modpackInfo.owner
+		version: modpackInfo.version
 			? {
-					...modpackInfo.owner,
-					avatar_url: modpackInfo.owner.avatar_url ?? undefined,
+					...modpackInfo.version,
+					date_published: modpackInfo.version.date_published.toString(),
 				}
 			: null,
-		categories: resolveLinkedModpackCategories(modpackInfo, allCategories),
-		hasUpdate: modpackInfo.has_update,
 		updateVersionId: modpackInfo.update_version_id,
 	}
-}
-
-function resolveLinkedModpackCategories(
-	modpackInfo: LinkedModpackInfo,
-	allCategories: ContentModpackCardCategory[] | null | undefined,
-) {
-	if (!allCategories || !modpackInfo.project.categories) return []
-
-	const seen = new Set<string>()
-	return allCategories.filter((category) => {
-		if (modpackInfo.project.categories.includes(category.name) && !seen.has(category.name)) {
-			seen.add(category.name)
-			return true
-		}
-		return false
-	})
 }

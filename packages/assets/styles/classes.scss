@@ -45,7 +45,7 @@
 		margin-block-start: var(--gap-md);
 	}
 
-	:where(button, .button, .btn) {
+	:where(button:not([data-button]), .button, .btn) {
 		width: fit-content;
 	}
 

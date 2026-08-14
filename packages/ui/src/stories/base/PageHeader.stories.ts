@@ -20,9 +20,13 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import AutoLink from '../../components/base/AutoLink.vue'
 import Avatar from '../../components/base/Avatar.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import {
+	Button,
+	IconButton,
+	SplitButton,
+	TeleportOverflowMenu,
+} from '../../components/base/buttons'
 import FormattedTag from '../../components/base/FormattedTag.vue'
-import JoinedButtons from '../../components/base/JoinedButtons.vue'
 import PageHeader from '../../components/base/page-header/index.vue'
 import PageHeaderMetadata from '../../components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '../../components/base/page-header/metadata/page-header-metadata-item.vue'
@@ -31,9 +35,8 @@ import PageHeaderMetadataTagsItem from '../../components/base/page-header/metada
 import PageHeaderMetadataTimeItem from '../../components/base/page-header/metadata/page-header-metadata-time-item.vue'
 import PageHeaderActions from '../../components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '../../components/base/page-header/page-header-badge-item.vue'
+import TagIcon from '../../components/base/TagIcon.vue'
 import TagItem from '../../components/base/TagItem.vue'
-import TeleportOverflowMenu from '../../components/base/TeleportOverflowMenu.vue'
-import LoaderIcon from '../../components/servers/icons/LoaderIcon.vue'
 import ServerIcon from '../../components/servers/icons/ServerIcon.vue'
 
 const noop = () => undefined
@@ -87,9 +90,10 @@ const pageHeaderIcons = {
 const pageHeaderComponents = {
 	AutoLink,
 	Avatar,
-	ButtonStyled,
+	Button,
 	FormattedTag,
-	JoinedButtons,
+	IconButton,
+	SplitButton,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
@@ -111,7 +115,7 @@ const meta = {
 	},
 	decorators: [
 		(story) => ({
-			components: { story },
+			components: { story, TeleportOverflowMenu },
 			template: '<div class="w-full"><story /></div>',
 		}),
 	],
@@ -157,17 +161,13 @@ export const ProjectHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<DownloadIcon />
-								Download
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large" type="transparent">
-							<TeleportOverflowMenu :options="menuActions" aria-label="More actions">
-								<MoreVerticalIcon />
-							</TeleportOverflowMenu>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" native-type="button" @click="noop">
+							<DownloadIcon />
+							Download
+						</Button>
+						<TeleportOverflowMenu type="quiet" size="xl" label="More actions" :options="menuActions">
+							<MoreVerticalIcon />
+						</TeleportOverflowMenu>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -207,12 +207,10 @@ export const CreatorHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<HeartIcon />
-								Follow
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" native-type="button" @click="noop">
+							<HeartIcon />
+							Follow
+						</Button>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -222,14 +220,11 @@ export const CreatorHeader: Story = {
 
 export const AppInstanceHeader: Story = {
 	render: () => ({
-		components: {
-			...pageHeaderComponents,
-			LoaderIcon,
-		},
+		components: { ...pageHeaderComponents, TagIcon, TeleportOverflowMenu },
 		setup() {
 			return {
 				...pageHeaderIcons,
-				LoaderIcon,
+				TagIcon,
 				menuActions,
 				noop,
 			}
@@ -243,7 +238,7 @@ export const AppInstanceHeader: Story = {
 				<template #metadata>
 					<PageHeaderMetadata>
 						<PageHeaderMetadataItem :icon="Gamepad2Icon" tooltip="Minecraft version">Minecraft 1.20.1</PageHeaderMetadataItem>
-						<PageHeaderMetadataItem :icon="LoaderIcon" :icon-props="{ loader: 'Fabric' }" tooltip="Mod loader">
+						<PageHeaderMetadataItem :icon="TagIcon" :icon-props="{ tag: 'Fabric', enforceType: 'loader' }" tooltip="Mod loader">
 							Fabric 0.16.14
 						</PageHeaderMetadataItem>
 						<PageHeaderMetadataItem :icon="TimerIcon" tooltip="Total playtime">12 hours</PageHeaderMetadataItem>
@@ -252,22 +247,16 @@ export const AppInstanceHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<PlayIcon />
-								Play
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large">
-							<button type="button" aria-label="Instance settings" @click="noop">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large" type="transparent">
-							<TeleportOverflowMenu :options="menuActions" aria-label="More actions">
-								<MoreVerticalIcon />
-							</TeleportOverflowMenu>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" native-type="button" @click="noop">
+							<PlayIcon />
+							Play
+						</Button>
+						<IconButton size="xl" label="Instance settings" native-type="button" @click="noop">
+							<SettingsIcon />
+						</IconButton>
+						<TeleportOverflowMenu type="quiet" size="xl" label="More actions" :options="menuActions">
+							<MoreVerticalIcon />
+						</TeleportOverflowMenu>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -277,25 +266,20 @@ export const AppInstanceHeader: Story = {
 
 export const BrowseHeader: Story = {
 	render: () => ({
-		components: {
-			...pageHeaderComponents,
-			LoaderIcon,
-		},
+		components: { ...pageHeaderComponents, TagIcon, TeleportOverflowMenu },
 		setup() {
 			return {
 				...pageHeaderIcons,
-				LoaderIcon,
+				TagIcon,
 				noop,
 			}
 		},
 		template: `
 			<PageHeader title="Survival SMP" :divider="false" :bottom-padding="false" main-class="items-center" title-class="leading-8" truncate-title>
 				<template #leading>
-					<ButtonStyled circular size="large">
-						<button type="button" aria-label="Back to instance" @click="noop">
-							<LeftArrowIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton size="xl" label="Back to instance" native-type="button" @click="noop">
+						<LeftArrowIcon />
+					</IconButton>
 					<Avatar src="" alt="Survival SMP" size="48px" tint-by="survival-smp" />
 				</template>
 
@@ -305,7 +289,7 @@ export const BrowseHeader: Story = {
 						<PageHeaderMetadataItem class="!text-primary" :icon="Gamepad2Icon" tooltip="Minecraft version">
 							Minecraft 1.20.1
 						</PageHeaderMetadataItem>
-						<PageHeaderMetadataItem class="!text-primary" :icon="LoaderIcon" :icon-props="{ loader: 'Fabric' }" tooltip="Mod loader">
+						<PageHeaderMetadataItem class="!text-primary" :icon="TagIcon" :icon-props="{ tag: 'Fabric', enforceType: 'loader' }" tooltip="Mod loader">
 							Fabric
 						</PageHeaderMetadataItem>
 					</PageHeaderMetadata>
@@ -317,10 +301,7 @@ export const BrowseHeader: Story = {
 
 export const ServerPanelRootHeader: Story = {
 	render: () => ({
-		components: {
-			...pageHeaderComponents,
-			ServerIcon,
-		},
+		components: { ...pageHeaderComponents, ServerIcon, TeleportOverflowMenu },
 		setup() {
 			return {
 				...pageHeaderIcons,
@@ -346,17 +327,13 @@ export const ServerPanelRootHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<PlayIcon />
-								Start server
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large">
-							<button type="button" aria-label="Server settings" @click="noop">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" native-type="button" @click="noop">
+							<PlayIcon />
+							Start server
+						</Button>
+						<IconButton size="xl" label="Server settings" native-type="button" @click="noop">
+							<SettingsIcon />
+						</IconButton>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>
@@ -366,32 +343,27 @@ export const ServerPanelRootHeader: Story = {
 
 export const ServerPanelInstanceHeader: Story = {
 	render: () => ({
-		components: {
-			...pageHeaderComponents,
-			LoaderIcon,
-		},
+		components: { ...pageHeaderComponents, TagIcon, TeleportOverflowMenu },
 		setup() {
 			return {
 				...pageHeaderIcons,
 				joinedActions,
-				LoaderIcon,
+				TagIcon,
 				noop,
 			}
 		},
 		template: `
 			<PageHeader title="My World">
 				<template #leading>
-					<ButtonStyled circular size="large">
-						<button type="button" aria-label="All instances" @click="noop">
-							<LeftArrowIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton size="xl" label="All instances" native-type="button" @click="noop">
+						<LeftArrowIcon />
+					</IconButton>
 				</template>
 
 				<template #metadata>
 					<PageHeaderMetadata>
 						<PageHeaderMetadataItem :icon="Gamepad2Icon" tooltip="Minecraft version">Minecraft 1.20.1</PageHeaderMetadataItem>
-						<PageHeaderMetadataItem :icon="LoaderIcon" :icon-props="{ loader: 'Fabric' }" tooltip="Mod loader">
+						<PageHeaderMetadataItem :icon="TagIcon" :icon-props="{ tag: 'Fabric', enforceType: 'loader' }" tooltip="Mod loader">
 							Fabric 0.19.2
 						</PageHeaderMetadataItem>
 						<PageHeaderMetadataItem :icon="TimerIcon" tooltip="Last activity">Last active 2 weeks ago</PageHeaderMetadataItem>
@@ -400,18 +372,24 @@ export const ServerPanelInstanceHeader: Story = {
 
 				<template #actions>
 					<PageHeaderActions>
-						<ButtonStyled color="brand" size="large">
-							<button type="button" @click="noop">
-								<PlayIcon />
-								Start instance
-							</button>
-						</ButtonStyled>
-						<JoinedButtons :actions="joinedActions" color="red" size="large" />
-						<ButtonStyled circular size="large">
-							<button type="button" aria-label="Instance settings" @click="noop">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" size="xl" native-type="button" @click="noop">
+							<PlayIcon />
+							Start instance
+						</Button>
+						<SplitButton
+							type="colored"
+							color="red"
+							size="xl"
+							:options="joinedActions.slice(1)"
+							menu-label="Force stop options"
+							@click="noop"
+						>
+							<StopCircleIcon />
+							Stop
+						</SplitButton>
+						<IconButton size="xl" label="Instance settings" native-type="button" @click="noop">
+							<SettingsIcon />
+						</IconButton>
 					</PageHeaderActions>
 				</template>
 			</PageHeader>

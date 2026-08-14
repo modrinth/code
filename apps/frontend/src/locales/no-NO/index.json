@@ -2255,9 +2255,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "Github"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2284,9 +2281,6 @@
   },
   "layout.nav.discover": {
     "message": "Utforsk"
-  },
-  "layout.nav.discover-content": {
-    "message": "Utforsk innhold"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Skaff deg Modrinth App-en"
@@ -2890,15 +2884,6 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Status"
-  },
-  "project.settings.title": {
-    "message": "Innstillinger"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Besøk prosjekt-dashbordet"
-  },
-  "project.status.archived.message": {
-    "message": "{title} har blitt arkivert. {title} kommer ikke til å få noen nye oppdateringer, hvis ikke forfatteren bestemmer seg for å dearkivere prosjektet."
   },
   "project.versions.title": {
     "message": "Versjoner"
@@ -3542,23 +3527,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Legg til en omdirings-URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Avbryt"
-  },
   "settings.applications.button.create": {
     "message": "Lag app"
   },
   "settings.applications.button.delete": {
     "message": "Slett"
   },
-  "settings.applications.button.edit": {
-    "message": "Regiser"
-  },
   "settings.applications.button.new": {
     "message": "Ny søknad"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Lagre endringer"
   },
   "settings.applications.button.upload-icon": {
     "message": "Last opp ikon"
@@ -3632,14 +3608,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Om denne appen"
   },
-  "settings.authorizations.by": {
-    "message": "fra"
-  },
   "settings.authorizations.description": {
     "message": "Når du autoriserer en applikasjon med Modrinth-kontoen din, så gir du tilgang til kontoen din. Du kan handere og gå gjennom tilgang til kontoen din her når som helst."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Vi kan ikke vise de autoriserte appene dine akkurat nå, vi jobber med å fikse det. Vær så snill å besøk denne sida seinere!"
   },
   "settings.authorizations.head-title": {
     "message": "Autoriseringer"
@@ -3982,27 +3952,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Aldri brukt"
-  },
-  "settings.profile.bio.description": {
-    "message": "En kort beskrivelse sånn at alle veit litt om deg."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Profilinformasjonen din er offentlig lesbar på Modrinth og gjennom <docs-link>Modrinth API</docs-link>-en."
-  },
-  "settings.profile.head-title": {
-    "message": "Profilinnstillinger"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profilinformasjon"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilbilde"
-  },
-  "settings.profile.username.description": {
-    "message": "Et unikt navn (som ikke skiller mellom store og små bokstaver) for å identifisere profilen din."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Tilbakekall økta"

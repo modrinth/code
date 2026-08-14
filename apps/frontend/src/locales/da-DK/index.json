@@ -1952,9 +1952,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -1984,9 +1981,6 @@
   },
   "layout.nav.discover": {
     "message": "Opdag"
-  },
-  "layout.nav.discover-content": {
-    "message": "Opdag indhold"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Hent Modrinth-app"
@@ -2486,18 +2480,6 @@
   "project.settings.tags.title": {
     "message": "Tags"
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Upload venligst en version først for at kunne vælge tags!"
-  },
-  "project.settings.title": {
-    "message": "Indstillinger"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Gå til projekt kontrolpanel"
-  },
-  "project.status.archived.message": {
-    "message": "{title} er blevet arkiveret. {title} vil ikke modtage flere opdateringer medmindre forfatteren beslutter sig for at fjerne projektet fra arkivet."
-  },
   "project.versions.copy-id-option": {
     "message": "Kopier ID"
   },
@@ -2948,23 +2930,14 @@
   "settings.applications.button.add-more": {
     "message": "Tilføj mere"
   },
-  "settings.applications.button.cancel": {
-    "message": "Annuller"
-  },
   "settings.applications.button.create": {
     "message": "Opret app"
   },
   "settings.applications.button.delete": {
     "message": "Slet"
   },
-  "settings.applications.button.edit": {
-    "message": "Rediger"
-  },
   "settings.applications.button.new": {
     "message": "Ny applikation"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Gem ændringer"
   },
   "settings.applications.button.upload-icon": {
     "message": "Upload ikon"
@@ -2998,9 +2971,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "Omkring denne app"
-  },
-  "settings.authorizations.by": {
-    "message": "af"
   },
   "settings.billing.charges.product.midas": {
     "message": "Modrinth Plus"
@@ -3205,27 +3175,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Aldrig brugt"
-  },
-  "settings.profile.bio.description": {
-    "message": "En kort beskrivelse, der fortæller alle lidt om dig selv."
-  },
-  "settings.profile.bio.title": {
-    "message": "Om dig"
-  },
-  "settings.profile.description": {
-    "message": "Dine profiloplysninger kan ses offentligt på Modrinth og via <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Profil indstillinger"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profiloplysninger"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilbillede"
-  },
-  "settings.profile.username.description": {
-    "message": "Et unikt, ikke-versalfølsomt navn til at identificere din profil."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Inddrag adgang"

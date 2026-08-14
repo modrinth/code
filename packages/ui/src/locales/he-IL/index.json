@@ -1127,9 +1127,6 @@
   "settings.pats.title": {
     "defaultMessage": "מפתחות גישה אישיים"
   },
-  "settings.profile.title": {
-    "defaultMessage": "פרופיל ציבורי"
-  },
   "settings.sessions.title": {
     "defaultMessage": "חיבורים פעילים"
   },

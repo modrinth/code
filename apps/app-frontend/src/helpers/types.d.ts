@@ -128,6 +128,7 @@ export type ContentSourceKind =
 
 type ContentFile = {
 	enabled: boolean
+	locked: boolean
 	source_kind?: ContentSourceKind | null
 	metadata?: {
 		project_id: string
@@ -189,7 +190,7 @@ type AppSettings = {
 	max_concurrent_downloads: number
 	max_concurrent_writes: number
 
-	theme: 'dark' | 'light' | 'oled'
+	theme: 'dark' | 'light' | 'oled' | 'retro' | 'system'
 	default_page: 'Home' | 'Library'
 	collapsed_navigation: boolean
 	advanced_rendering: boolean

@@ -4,9 +4,7 @@
 		<div v-if="draftVersion.game_versions.length" class="space-y-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Added versions </span>
-				<ButtonStyled type="transparent" size="standard">
-					<button @click="clearAllVersions()">Clear all</button>
-				</ButtonStyled>
+				<Button type="quiet" @click="clearAllVersions()">Clear all</Button>
 			</div>
 			<div
 				class="flex max-h-56 flex-col gap-1.5 gap-y-4 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
@@ -34,7 +32,7 @@
 
 <script lang="ts" setup>
 import { XIcon } from '@modrinth/assets'
-import { ButtonStyled, TagItem } from '@modrinth/ui'
+import { Button, TagItem } from '@modrinth/ui'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

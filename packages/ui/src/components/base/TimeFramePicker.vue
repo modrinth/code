@@ -5,6 +5,9 @@
 		:display-value="selectedTimeframeLabel"
 		:max-height="maxHeight"
 		:trigger-class="triggerClass"
+		:trigger-type="triggerType"
+		:trigger-size="triggerSize"
+		:trigger-interaction="triggerInteraction"
 		:dropdown-min-width="timeframeDropdownMinWidth"
 		:outside-click-ignore="timeframeDropdownOutsideClickIgnore"
 		:dropdown-class="
@@ -103,16 +106,18 @@
 						</div>
 
 						<div class="flex items-center gap-2">
-							<ButtonStyled type="outlined">
-								<button type="button" @click="handleCustomRangeCancel">
-									{{ formatMessage(messages.cancel) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand">
-								<button type="button" :disabled="!hasCompleteRange" @click="handleCustomRangeApply">
-									{{ formatMessage(messages.apply) }}
-								</button>
-							</ButtonStyled>
+							<Button type="outlined" native-type="button" @click="handleCustomRangeCancel">
+								{{ formatMessage(messages.cancel) }}
+							</Button>
+							<Button
+								type="colored"
+								color="brand"
+								native-type="button"
+								:disabled="!hasCompleteRange"
+								@click="handleCustomRangeApply"
+							>
+								{{ formatMessage(messages.apply) }}
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -196,8 +201,14 @@
 import { MinusIcon, PlusIcon } from '@modrinth/assets'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import {
+	Button,
+	type ButtonInteraction,
+	type ButtonSize,
+	type ButtonType,
+} from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import ButtonStyled from './ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from './Combobox.vue'
 import DatePicker from './DatePicker.vue'
 
@@ -391,11 +402,17 @@ const props = withDefaults(
 		nowTimestamp?: number
 		maxHeight?: number
 		triggerClass?: string
+		triggerType?: ButtonType
+		triggerSize?: ButtonSize
+		triggerInteraction?: ButtonInteraction
 		dropdownMinWidth?: string | number
 		customRangeDropdownMinWidth?: string | number
 	}>(),
 	{
 		maxHeight: TIMEFRAME_DROPDOWN_MAX_HEIGHT,
+		triggerType: 'base',
+		triggerSize: 'md',
+		triggerInteraction: 'surface',
 		dropdownMinWidth: TIMEFRAME_DROPDOWN_MIN_WIDTH,
 		customRangeDropdownMinWidth: CUSTOM_RANGE_DROPDOWN_MIN_WIDTH,
 	},

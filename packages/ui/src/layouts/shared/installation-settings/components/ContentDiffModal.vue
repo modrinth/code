@@ -138,25 +138,29 @@
 				<p class="m-0 text-primary">{{ formatMessage(messages.reviewedFiles) }}</p>
 				<div class="flex justify-between gap-2">
 					<div>
-						<ButtonStyled v-if="showReportButton" color="red" type="transparent">
-							<button @click="emit('report', $event)">
-								<ReportIcon />
-								{{ formatMessage(commonMessages.reportButton) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							v-if="showReportButton"
+							type="quiet"
+							color="red"
+							@click="emit('report', $event)"
+						>
+							<ReportIcon />
+							{{ formatMessage(commonMessages.reportButton) }}
+						</Button>
 					</div>
 					<div class="flex gap-2">
-						<ButtonStyled type="transparent" color="orange">
-							<button :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
-								{{ formatMessage(messages.installAnyway) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button @click="handleCancel">
-								<BanIcon />
-								{{ formatMessage(messages.dontInstall) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							type="quiet"
+							color="orange"
+							:disabled="buttonsDisabled || confirmDisabled"
+							@click="handleConfirm"
+						>
+							{{ formatMessage(messages.installAnyway) }}
+						</Button>
+						<Button type="colored" color="brand" @click="handleCancel">
+							<BanIcon />
+							{{ formatMessage(messages.dontInstall) }}
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -166,26 +170,25 @@
 				:class="{ 'pt-4': !$slots['additional-content'] }"
 			>
 				<div>
-					<ButtonStyled v-if="showReportButton" color="red" type="transparent">
-						<button @click="emit('report', $event)">
-							<ReportIcon />
-							{{ formatMessage(commonMessages.reportButton) }}
-						</button>
-					</ButtonStyled>
+					<Button v-if="showReportButton" type="quiet" color="red" @click="emit('report', $event)">
+						<ReportIcon />
+						{{ formatMessage(commonMessages.reportButton) }}
+					</Button>
 				</div>
 				<div class="flex gap-2">
-					<ButtonStyled type="outlined">
-						<button class="!border" @click="handleCancel">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
-							<component :is="confirmIcon" v-if="confirmIcon" />
-							{{ confirmLabel || formatMessage(commonMessages.confirmButton) }}
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" class="!border" @click="handleCancel">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="buttonsDisabled || confirmDisabled"
+						@click="handleConfirm"
+					>
+						<component :is="confirmIcon" v-if="confirmIcon" />
+						{{ confirmLabel || formatMessage(commonMessages.confirmButton) }}
+					</Button>
 				</div>
 			</div>
 		</template>
@@ -205,7 +208,7 @@ import {
 import { type Component, computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -417,8 +420,7 @@ const messages = defineMessages({
 	},
 	reviewedFiles: {
 		id: 'content.diff-modal.reviewed-files',
-		defaultMessage:
-			'A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack).',
+		defaultMessage: "Files that aren't published to Modrinth aren't reviewed.",
 	},
 	installAnyway: {
 		id: 'content.diff-modal.install-anyway',

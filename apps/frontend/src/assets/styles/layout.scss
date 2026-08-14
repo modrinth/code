@@ -111,6 +111,18 @@
 				max-width: 100%;
 			}
 		}
+
+		&.align-x {
+			margin: 0 auto;
+		}
+
+		&.align-l {
+			margin: 0 0 0 auto;
+		}
+
+		&.align-r {
+			margin: 0 auto 0 0;
+		}
 	}
 
 	.normal-page__sidebar {
@@ -139,6 +151,18 @@
 		'content'
 		'sidebar'
 		/ 100%;
+
+	&.align-x {
+		margin: 0 auto;
+	}
+
+	&.align-l {
+		margin: 0 0 0 auto;
+	}
+
+	&.align-r {
+		margin: 0 auto 0 0;
+	}
 
 	@media screen and (min-width: 1024px) {
 		&.sidebar {

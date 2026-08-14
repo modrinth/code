@@ -161,6 +161,9 @@
   "button.enable": {
     "defaultMessage": "Aktiver"
   },
+  "button.extract": {
+    "defaultMessage": "Pak ud"
+  },
   "button.follow": {
     "defaultMessage": "Følg"
   },
@@ -272,11 +275,23 @@
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
   },
+  "changelog.product.web": {
+    "defaultMessage": "Platform"
+  },
   "collection-widget.loading-projects": {
     "defaultMessage": "Indlæser projekter..."
   },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Søg efter projekter"
+  },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "indhold"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {genstand} other {genstande}}"
   },
   "content.card.select-project": {
     "defaultMessage": "Vælg {project}"
@@ -379,12 +394,6 @@
   },
   "content.page-layout.share.label": {
     "defaultMessage": "Del"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Ældst først"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter efter {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Opdater alle"
@@ -541,9 +550,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Fil gemt"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Luk"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Find"
@@ -793,9 +799,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Vælg ikon"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Ekstern"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuværrende"
@@ -1958,9 +1961,6 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installering fejlede"
   },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurer server..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du allerede en server?"
   },
@@ -2150,9 +2150,6 @@
   "settings.pats.title": {
     "defaultMessage": "Personlige adgangstokens"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Offentlig profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessioner"
   },
@@ -2241,4 +2238,3 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
-

@@ -2,6 +2,7 @@ use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::blocked_user_item::DBBlockedUser;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 use crate::util::guards::admin_key_guard;
 use actix_web::{get, web};
 use ariadne::ids::base62_impl::parse_base62;
@@ -25,17 +26,20 @@ pub async fn block_status(
 ) -> Result<web::Json<BlockStatus>, ApiError> {
     let (user_id, target_id) = info.into_inner();
 
-    let user_id =
-        DBUserId(parse_base62(&user_id).map_err(|_| {
-            ApiError::InvalidInput("invalid user_id".to_string())
-        })? as i64);
-    let target_id =
-        DBUserId(parse_base62(&target_id).map_err(|_| {
-            ApiError::InvalidInput("invalid target_id".to_string())
-        })? as i64);
+    let user_id = DBUserId(
+        parse_base62(&user_id)
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_request_err("invalid user_id".to_string())? as i64,
+    );
+    let target_id = DBUserId(
+        parse_base62(&target_id)
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_request_err("invalid target_id".to_string())? as i64,
+    );
 
-    let blocked =
-        DBBlockedUser::is_blocked(user_id, target_id, &**pool).await?;
+    let blocked = DBBlockedUser::is_blocked(user_id, target_id, &**pool)
+        .await
+        .wrap_internal_err("checking whether user is blocked")?;
 
     Ok(web::Json(BlockStatus { blocked }))
 }

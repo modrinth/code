@@ -39,30 +39,37 @@ export const ModpackExport: StoryObj = {
 	render: () => ({
 		components: { FileTreeSelect },
 		setup() {
-			const selected = ref([
-				'config/fabric_loader_dependencies.json',
-				'config/crash_assistant/settings.toml',
-				'config/defaultoptions/options.txt',
-				'mods/sodium-fabric-0.6.13+mc1.21.6.jar',
-				'mods/iris-fabric-1.8.8+mc1.21.6.jar',
-				'resourcepacks/FreshAnimations_v1.9.3.zip',
-				'shaderpacks/ComplementaryUnbound_r5.5.1.zip',
-			])
-			const selectedLabel = computed(() => `${selected.value.length} selected`)
+			const included = ref(['config', 'mods'])
+			const excluded = ref(['config/defaultoptions'])
+			const selectedLabel = computed(
+				() => `${included.value.length} includes, ${excluded.value.length} exclusions`,
+			)
 
 			return {
+				excluded,
+				included,
 				items: MODPACK_FILES,
-				selected,
 				selectedLabel,
 			}
 		},
 		template: /*html*/ `
 			<div class="max-w-2xl">
-				<FileTreeSelect v-model="selected" :items="items" />
+				<FileTreeSelect
+					v-model="included"
+					v-model:excluded-paths="excluded"
+					:items="items"
+				/>
 				<div class="mt-4 rounded-[20px] bg-surface-3 p-4 text-sm text-secondary">
 					<div class="font-semibold text-contrast">{{ selectedLabel }}</div>
-					<div class="mt-2 flex flex-col gap-1">
-						<span v-for="path in selected" :key="path" class="truncate">{{ path }}</span>
+					<div class="mt-2 grid grid-cols-2 gap-4">
+						<div class="flex flex-col gap-1">
+							<span class="font-semibold text-contrast">Included</span>
+							<span v-for="path in included" :key="path" class="truncate">{{ path }}</span>
+						</div>
+						<div class="flex flex-col gap-1">
+							<span class="font-semibold text-contrast">Excluded</span>
+							<span v-for="path in excluded" :key="path" class="truncate">{{ path }}</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -74,12 +81,17 @@ export const EmptyRoot: StoryObj = {
 	render: () => ({
 		components: { FileTreeSelect },
 		setup() {
-			const selected = ref<string[]>([])
-			return { selected }
+			const excluded = ref<string[]>([])
+			const included = ref<string[]>([])
+			return { excluded, included }
 		},
 		template: /*html*/ `
 			<div class="max-w-2xl">
-				<FileTreeSelect v-model="selected" :items="[]" />
+				<FileTreeSelect
+					v-model="included"
+					v-model:excluded-paths="excluded"
+					:items="[]"
+				/>
 			</div>
 		`,
 	}),

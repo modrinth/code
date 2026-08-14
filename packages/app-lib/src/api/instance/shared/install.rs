@@ -244,13 +244,7 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
     let availability =
         match get_remote_instance_access(&attachment.id, state).await {
             Ok(availability) => availability,
-            Err(error)
-                if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::NoCredentialsError
-                        | crate::ErrorKind::FetchError(_)
-                ) =>
-            {
+            Err(error) => {
                 tracing::warn!(
                     instance_id,
                     shared_instance_id = %attachment.id,
@@ -259,7 +253,6 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
                 );
                 return Ok(());
             }
-            Err(error) => return Err(error),
         };
 
     if let SharedInstanceRemoteResponse::Unavailable(reason) = availability {

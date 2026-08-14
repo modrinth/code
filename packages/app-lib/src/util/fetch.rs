@@ -14,10 +14,9 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use std::ffi::OsStr;
 use std::future::Future;
 use std::num::NonZeroU32;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::pin::Pin;
 use std::sync::{Arc, LazyLock};
 use std::time::{self, Duration, Instant, SystemTime};
@@ -429,6 +428,7 @@ pub async fn fetch_with_client_progress(
         sha1,
         None,
         None,
+        None,
         download_meta,
         None,
         uri_path,
@@ -494,6 +494,35 @@ pub async fn fetch_advanced(
     .await
 }
 
+#[tracing::instrument(skip(body, semaphore))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_bytes(
+    method: Method,
+    url: &str,
+    body: Bytes,
+    header: Option<(&str, &str)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        None,
+        None,
+        Some(body),
+        header,
+        None,
+        None,
+        uri_path,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+        None,
+    )
+    .await
+}
+
 #[tracing::instrument(skip(json_body, semaphore, progress))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced_with_progress(
@@ -514,6 +543,7 @@ pub async fn fetch_advanced_with_progress(
         url,
         sha1,
         json_body,
+        None,
         header,
         download_meta,
         loading_bar,
@@ -547,6 +577,7 @@ pub async fn fetch_advanced_with_client(
         url,
         sha1,
         json_body,
+        None,
         header,
         download_meta,
         loading_bar,
@@ -559,13 +590,16 @@ pub async fn fetch_advanced_with_client(
     .await
 }
 
-#[tracing::instrument(skip(json_body, semaphore, client, progress))]
+#[tracing::instrument(skip(
+    json_body, bytes_body, semaphore, client, progress
+))]
 #[allow(clippy::too_many_arguments)]
 async fn fetch_advanced_with_client_and_progress(
     method: Method,
     url: &str,
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
+    bytes_body: Option<Bytes>,
     header: Option<(&str, &str)>,
     download_meta: Option<&DownloadMeta>,
     loading_bar: Option<(&LoadingBarId, f64)>,
@@ -612,6 +646,8 @@ async fn fetch_advanced_with_client_and_progress(
 
         if let Some(body) = json_body.clone() {
             req = req.json(&body);
+        } else if let Some(body) = bytes_body.clone() {
+            req = req.body(body);
         }
 
         if let Some(header) = header {
@@ -907,33 +943,6 @@ pub async fn copy(
     Ok(())
 }
 
-// Writes a icon to the cache and returns the absolute path of the icon within the cache directory
-#[tracing::instrument(skip(bytes, semaphore))]
-pub async fn write_cached_icon(
-    icon_path: &str,
-    cache_dir: &Path,
-    bytes: Bytes,
-    semaphore: &IoSemaphore,
-) -> crate::Result<PathBuf> {
-    let hash = sha1_async(bytes.clone()).await?;
-    let path = cache_dir
-        .join("icons")
-        .join(cached_icon_file_name(icon_path, &hash));
-
-    write(&path, &bytes, semaphore).await?;
-
-    let path = io::canonicalize(path)?;
-    Ok(path)
-}
-
-fn cached_icon_file_name(icon_path: &str, hash: &str) -> String {
-    let path = icon_path.split(['?', '#']).next().unwrap_or(icon_path);
-    match Path::new(path).extension().and_then(OsStr::to_str) {
-        Some(extension) => format!("{hash}.{extension}"),
-        None => hash.to_string(),
-    }
-}
-
 pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     let hash = tokio::task::spawn_blocking(move || {
         sha1_smol::Sha1::from(bytes).hexdigest()
@@ -946,11 +955,23 @@ pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
 pub async fn sha1_file_async(
     path: impl AsRef<Path>,
 ) -> crate::Result<(u64, String)> {
+    sha1_file_async_with_progress(path, |_, _| Ok(())).await
+}
+
+pub async fn sha1_file_async_with_progress(
+    path: impl AsRef<Path>,
+    mut progress: impl FnMut(u64, u64) -> crate::Result<()>,
+) -> crate::Result<(u64, String)> {
     let path = path.as_ref();
     // Local files can be multi-gigabyte .mrpacks, so hash them without materializing bytes.
     let mut file = File::open(path)
         .await
         .map_err(|e| IOError::with_path(e, path))?;
+    let total = file
+        .metadata()
+        .await
+        .map_err(|e| IOError::with_path(e, path))?
+        .len();
     let mut hasher = sha1_smol::Sha1::new();
     let mut size = 0;
     let mut buffer = vec![0; 262144];
@@ -966,6 +987,7 @@ pub async fn sha1_file_async(
 
         hasher.update(&buffer[..bytes_read]);
         size += bytes_read as u64;
+        progress(size, total)?;
     }
 
     Ok((size, hasher.digest().to_string()))

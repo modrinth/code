@@ -39,12 +39,14 @@ import {
 } from '@/helpers/install'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
+import { injectAppEvents } from '@/providers/app-events'
 
 type UpdateCompleteCallback = () => void | Promise<void>
 
 const emit = defineEmits<{
+	accepted: []
 	cancel: []
-	complete: []
+	complete: [successful: boolean]
 	report: [event?: MouseEvent]
 	sharedInstanceUnavailable: [reason: SharedInstanceUnavailableReason | null]
 }>()
@@ -53,6 +55,7 @@ const instance = ref<GameInstance | null>(null)
 const preview = ref<SharedInstanceUpdatePreview | null>(null)
 const onComplete = ref<UpdateCompleteCallback>(() => {})
 const { formatMessage } = useVIntl()
+const appEvents = injectAppEvents()
 const { notifySharedInstanceError } = useSharedInstanceErrors()
 const diffs = computed<ContentDiffItem[]>(
 	() =>
@@ -72,11 +75,14 @@ const diffs = computed<ContentDiffItem[]>(
 )
 
 async function update() {
+	let successful = false
+	emit('accepted')
 	try {
 		if (instance.value) {
 			const job = await install_update_shared_instance(instance.value.id)
-			await wait_for_install_job(job.job_id)
+			await wait_for_install_job(appEvents, job.job_id)
 			await onComplete.value()
+			successful = true
 		}
 	} catch (error) {
 		if (isSharedInstanceUnavailableError(error)) {
@@ -85,7 +91,7 @@ async function update() {
 		}
 		notifySharedInstanceError(error)
 	} finally {
-		emit('complete')
+		emit('complete', successful)
 	}
 }
 

@@ -548,18 +548,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Názvy projektů"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Abecedně"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Od nejnovějších"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Od nejstarších"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Seřadit {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Aktualizovat vše"
   },
@@ -1129,9 +1117,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Soubor uložen"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Zavřít"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Najít"
@@ -1834,18 +1819,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Vybrat ikonu"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nebyl nalezen obsah"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Obsah modpacku"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Načítání obsahu..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Žádné projekty neodpovídají tvému vyhledávání."
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Mometálně"
@@ -3686,35 +3659,8 @@
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Vyhledávání..."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Modrinth Hosting tuto verzi Minecraftu nebo loaderu zatím nepodporuje."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Instalování addonů..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Instalování modpacku..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Instalování platformy..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Připravujeme váš server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Přidávání Javy..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurování serveru..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Stahování módů..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizování souborů..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Nastavování prostředí..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Už máte server?"
@@ -4075,9 +4021,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Osobní přístupové tokeny"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Veřejný profil"
   },
   "settings.sessions.title": {
     "defaultMessage": "Relace"
@@ -4560,4 +4503,3 @@
     "defaultMessage": "Typ"
   }
 }
-

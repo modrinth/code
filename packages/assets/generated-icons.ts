@@ -66,7 +66,6 @@ import _BugIcon from './icons/bug.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CalendarArrowDownIcon from './icons/calendar-arrow-down.svg?component'
 import _CardIcon from './icons/card.svg?component'
-import _ChangeSkinIcon from './icons/change-skin.svg?component'
 import _ChartIcon from './icons/chart.svg?component'
 import _ChartAreaIcon from './icons/chart-area.svg?component'
 import _ChartColumnBigIcon from './icons/chart-column-big.svg?component'
@@ -81,7 +80,10 @@ import _ChevronUpIcon from './icons/chevron-up.svg?component'
 import _CircleAlertIcon from './icons/circle-alert.svg?component'
 import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleDashedIcon from './icons/circle-dashed.svg?component'
+import _CircleDollarSignIcon from './icons/circle-dollar-sign.svg?component'
+import _CircleSlashIcon from './icons/circle-slash.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
+import _CircuitBoardIcon from './icons/circuit-board.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
@@ -136,6 +138,7 @@ import _GapIcon from './icons/gap.svg?component'
 import _GaugeIcon from './icons/gauge.svg?component'
 import _GenericListIcon from './icons/generic-list.svg?component'
 import _GiftIcon from './icons/gift.svg?component'
+import _GitForkIcon from './icons/git-fork.svg?component'
 import _GitGraphIcon from './icons/git-graph.svg?component'
 import _GlassesIcon from './icons/glasses.svg?component'
 import _GlobeIcon from './icons/globe.svg?component'
@@ -175,6 +178,7 @@ import _ListBulletedIcon from './icons/list-bulleted.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
 import _ListFilterIcon from './icons/list-filter.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
+import _ListPlusIcon from './icons/list-plus.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LoaderCircleIcon from './icons/loader-circle.svg?component'
 import _LockIcon from './icons/lock.svg?component'
@@ -183,7 +187,9 @@ import _LogInIcon from './icons/log-in.svg?component'
 import _LogOutIcon from './icons/log-out.svg?component'
 import _MailIcon from './icons/mail.svg?component'
 import _ManageIcon from './icons/manage.svg?component'
+import _MapPinIcon from './icons/map-pin.svg?component'
 import _MaximizeIcon from './icons/maximize.svg?component'
+import _MegaphoneIcon from './icons/megaphone.svg?component'
 import _MemoryStickIcon from './icons/memory-stick.svg?component'
 import _MessageIcon from './icons/message.svg?component'
 import _MessagesSquareIcon from './icons/messages-square.svg?component'
@@ -219,6 +225,7 @@ import _PowerIcon from './icons/power.svg?component'
 import _PowerOffIcon from './icons/power-off.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
+import _RadioTowerIcon from './icons/radio-tower.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
 import _RefreshCwIcon from './icons/refresh-cw.svg?component'
@@ -244,6 +251,7 @@ import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
 import _ShieldAlertIcon from './icons/shield-alert.svg?component'
 import _ShieldCheckIcon from './icons/shield-check.svg?component'
+import _ShirtIcon from './icons/shirt.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
 import _SignatureIcon from './icons/signature.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
@@ -498,7 +506,6 @@ export const BugIcon = _BugIcon
 export const CalendarIcon = _CalendarIcon
 export const CalendarArrowDownIcon = _CalendarArrowDownIcon
 export const CardIcon = _CardIcon
-export const ChangeSkinIcon = _ChangeSkinIcon
 export const ChartIcon = _ChartIcon
 export const ChartAreaIcon = _ChartAreaIcon
 export const ChartColumnBigIcon = _ChartColumnBigIcon
@@ -513,7 +520,10 @@ export const ChevronUpIcon = _ChevronUpIcon
 export const CircleAlertIcon = _CircleAlertIcon
 export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleDashedIcon = _CircleDashedIcon
+export const CircleDollarSignIcon = _CircleDollarSignIcon
+export const CircleSlashIcon = _CircleSlashIcon
 export const CircleUserIcon = _CircleUserIcon
+export const CircuitBoardIcon = _CircuitBoardIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
@@ -568,6 +578,7 @@ export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
 export const GenericListIcon = _GenericListIcon
 export const GiftIcon = _GiftIcon
+export const GitForkIcon = _GitForkIcon
 export const GitGraphIcon = _GitGraphIcon
 export const GlassesIcon = _GlassesIcon
 export const GlobeIcon = _GlobeIcon
@@ -607,6 +618,7 @@ export const ListBulletedIcon = _ListBulletedIcon
 export const ListEndIcon = _ListEndIcon
 export const ListFilterIcon = _ListFilterIcon
 export const ListOrderedIcon = _ListOrderedIcon
+export const ListPlusIcon = _ListPlusIcon
 export const LoaderIcon = _LoaderIcon
 export const LoaderCircleIcon = _LoaderCircleIcon
 export const LockIcon = _LockIcon
@@ -615,7 +627,9 @@ export const LogInIcon = _LogInIcon
 export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon
 export const ManageIcon = _ManageIcon
+export const MapPinIcon = _MapPinIcon
 export const MaximizeIcon = _MaximizeIcon
+export const MegaphoneIcon = _MegaphoneIcon
 export const MemoryStickIcon = _MemoryStickIcon
 export const MessageIcon = _MessageIcon
 export const MessagesSquareIcon = _MessagesSquareIcon
@@ -651,6 +665,7 @@ export const PowerIcon = _PowerIcon
 export const PowerOffIcon = _PowerOffIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
+export const RadioTowerIcon = _RadioTowerIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const RedoIcon = _RedoIcon
 export const RefreshCwIcon = _RefreshCwIcon
@@ -676,6 +691,7 @@ export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
 export const ShieldAlertIcon = _ShieldAlertIcon
 export const ShieldCheckIcon = _ShieldCheckIcon
+export const ShirtIcon = _ShirtIcon
 export const SignalIcon = _SignalIcon
 export const SignatureIcon = _SignatureIcon
 export const SkullIcon = _SkullIcon

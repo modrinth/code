@@ -188,6 +188,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Приховати {name} на графіку"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Немає даних"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Підказку графіка закріплено"
   },
@@ -1247,6 +1250,9 @@
   "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
     "message": "Завантажувачі пакетів ресурсів не можна змінювати"
   },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Рекомендоване"
+  },
   "create-project-version.create-modal.stage.metadata.uploaded-files": {
     "message": "Завантажені файли"
   },
@@ -1471,9 +1477,6 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "Нещодавно оновлені"
-  },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Закрити"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Завантажити {formType}"
@@ -2125,6 +2128,9 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Замала сума"
+  },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "Цей спосіб виплат було вимкнено платіжним провайдером. Будь ласка, використайте інший спосіб виплат або зверніться до підтримки."
   },
   "dashboard.withdraw.error.payout-method-disabled.title": {
     "message": "Метод оплати недоступний"
@@ -2837,9 +2843,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2869,9 +2872,6 @@
   },
   "layout.nav.discover": {
     "message": "Дослідити"
-  },
-  "layout.nav.discover-content": {
-    "message": "Дослідити вміст"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Установити Modrinth App"
@@ -2918,14 +2918,26 @@
   "layout.publish.email-verification-required.title": {
     "message": "Необхідно підтвердити електронну пошту"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Автоматично встановлювати все, у що вони грають"
+  },
   "modal.shared-instance.open-in-app.benefit.join": {
     "message": "Можна грати в те саме, що й ваші друзі"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Підтримувати спільний вміст актуальним у міру його змін"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Завантажити Modrinth App"
   },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Під керуванням"
+  },
   "modal.shared-instance.open-in-app.opening-automatically": {
     "message": "Modrinth App відкриється автоматично…"
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Відкриття Modrinth App"
   },
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Навіщо використовувати Modrinth App"
@@ -2950,6 +2962,21 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} на сторінку"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Розмір пакета"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Це назавжди видалить усі групи атрибуції для цього проєкту та всі файли у них. Цю дію неможливо скасувати."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Не вдалося очистити всі групи: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Усі групи успішно очищено."
   },
   "modpack-scan-modal.failed": {
     "message": "Помилка"
@@ -2980,6 +3007,9 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Сканувати всі файли"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Не вдалося просканувати деякі файли: {error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Скануємо…"
@@ -3602,6 +3632,9 @@
   "project.gallery.title": {
     "message": "Галерея"
   },
+  "project.install-context.back-to-discover": {
+    "message": "Назад до огляду"
+  },
   "project.moderation.admonition.approved.body.private": {
     "message": "Ваш проєкт є приватним, тобто доступ до нього маєте лише ви та запрошені вами люди."
   },
@@ -3643,6 +3676,12 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Ви все ще можете змінити свій проєкт, це не вплине на вашу позицію в черзі."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Ми намагаємося перевіряти заявки протягом 24–48 годин, але деякі проєкти можуть зазнати затримок. Це не свідчить про проблему з вашою заявкою."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Ми намагаємося перевіряти заявки протягом тижня, але деякі проєкти можуть зазнати затримок. Це не свідчить про проблему з вашою заявкою."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Ми цінуємо ваше терпіння, поки наші модератори наполегливо працюють над безпекою Modrinth, і сподіваємося допомогти вам поділитися своїм умістом! 💚</emphasis>"
@@ -3761,6 +3800,21 @@
   "project.settings.permissions.completed.title": {
     "message": "Дозволи отримано!"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Видалити всі групи"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Це назавжди видалить {count, plural, one {# групу атрибуції} few {# групи атрибуції} many {# груп атрибуції} other {# груп атрибуції}} для цього проєкту та всі файли в них. Цю дію неможливо скасувати."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Видалити всі групи атрибуції?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Не вдалося видалити всі групи атрибуції"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Усі групи атрибуцій видалено."
+  },
   "project.settings.permissions.empty-state.description": {
     "message": "Жодна з ваших версій проєкту не містить зовнішнього вмісту, тому вам не потрібно турбуватися про отримання дозволів."
   },
@@ -3869,11 +3923,14 @@
   "project.settings.tags.featured-tags": {
     "message": "Основні теґи"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Ви можете обрати основними до 3 найбільш описових теґів. Інші теґи можуть стати основними, якщо не оберете всі 3."
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Оберіть найдоречніші теґи. Вони показуватимуться першими."
   },
   "project.settings.tags.features-description": {
     "message": "Оберіть увесь функціонал, який присутній у {type}."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} категорії} other {Категорії}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Ви обрали {count} теґів роздільної здатності ({tags}). Пакети ресурсів зазвичай повинні містити тільки один теґ роздільної здатності."
@@ -3884,8 +3941,8 @@
   "project.settings.tags.resolutions-description": {
     "message": "Оберіть роздільні здатності текстур у вашому {type}."
   },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Указання правильних теґів необхідне, щоб люди могли легше знайти ваш {type}. Переконайтеся, що ви обрали підхожі теґи."
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Виберіть хоча б одну категорію, щоб рекомендувати її."
   },
   "project.settings.tags.title": {
     "message": "Теґи"
@@ -3898,18 +3955,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Ви вибрали {count} теґів. Ми рекомендуємо зменшити їхню кількість до 12, щоб ваш сервер можна було легше знайти."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Спершу завантажте версію, щоб обирати теґи!"
-  },
-  "project.settings.title": {
-    "message": "Налаштування"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Панель керування проєктами"
-  },
-  "project.status.archived.message": {
-    "message": "«{title}» було архівовано. «{title}» не отримуватиме подальших оновлень допоки автор не вирішить розархівувати проєкт."
   },
   "project.versions.copy-id-option": {
     "message": "Копіювати ID"
@@ -4634,23 +4679,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Додати переадресацію URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Скасувати"
-  },
   "settings.applications.button.create": {
     "message": "Створити застосунок"
   },
   "settings.applications.button.delete": {
     "message": "Видалити"
   },
-  "settings.applications.button.edit": {
-    "message": "Редагувати"
-  },
   "settings.applications.button.new": {
     "message": "Новий застосунок"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Зберегти зміни"
   },
   "settings.applications.button.upload-icon": {
     "message": "Завантажити значок"
@@ -4724,17 +4760,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Про застосунок"
   },
-  "settings.authorizations.by": {
-    "message": "від"
+  "settings.authorizations.created-by": {
+    "message": "Створено {user}"
   },
   "settings.authorizations.description": {
     "message": "Коли ви авторизуєтеся у застосунку за допомогою Modrinth, ви надаєте йому доступ до вашого облікового запису. Ви завжди можете переглядати й керувати доступом до свого облікового запису тут."
   },
-  "settings.authorizations.empty-state": {
-    "message": "Наразі ми не можемо показати ваші авторизовані застосунки, але ми працюємо, щоб виправити це. Будь ласка, завітайте на цю сторінку пізніше!"
+  "settings.authorizations.empty-state.description": {
+    "message": "Авторизовані вами застосунки зʼявляться тут."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Немає авторизованих застосунків"
   },
   "settings.authorizations.head-title": {
     "message": "Авторизації"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Цей застосунок створено офіційним обліковим записом Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Відкликати"
@@ -4744,6 +4786,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Ви впевнені, що хочете відкликати цей застосунок?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Цей застосунок, попри свою назву, жодним чином не пов'язаний із Modrinth."
   },
   "settings.billing.charges.description": {
     "message": "Тут буде наведено перелік усіх попередніх оплат на вашому обліковому записі Modrinth:"
@@ -5090,27 +5135,6 @@
   "settings.pats.token.never-used": {
     "message": "Не використовувався"
   },
-  "settings.profile.bio.description": {
-    "message": "Короткий опис, щоб розповісти всім трохи про себе."
-  },
-  "settings.profile.bio.title": {
-    "message": "Про себе"
-  },
-  "settings.profile.description": {
-    "message": "Інформація з вашого профілю є загальнодоступною на Modrinth та через <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Налаштування профілю"
-  },
-  "settings.profile.profile-info": {
-    "message": "Інформація про профіль"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Зображення профілю"
-  },
-  "settings.profile.username.description": {
-    "message": "Унікальне ім’я без урахування регістру, для ідентифікації вашого профілю."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Завершити сеанс"
   },
@@ -5141,8 +5165,29 @@
   "settings.sidebar.label.display": {
     "message": "Перегляд"
   },
+  "shared-instance.invite.accept": {
+    "message": "Прийняти запрошення"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Користувач Modrinth"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# особа вже приєдналася} few {# особи вже приєдналися} many {# осіб вже приєдналися} other {# осіб вже приєдналися}}"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Завантаження запрошення…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} Запрошує вас зіграти"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "Це запрошення було створене іншим користувачем Modrinth, а не Modrinth. Приймайте запрошення лише від людей, яким ви довіряєте."
+  },
   "shared-instance.invite.trust.heading": {
     "message": "Ви знаєте цього користувача?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Можливо, термін його дії закінчився, досягнуто ліміту використань або його видалила особа, яка ним поділилася."
   },
   "shared-instance.invite.unavailable.title": {
     "message": "Це запрошення недоступне"

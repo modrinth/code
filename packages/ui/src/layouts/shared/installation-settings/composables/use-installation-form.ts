@@ -67,6 +67,7 @@ export function useInstallationForm(
 	})
 
 	const hasChanges = computed(() => {
+		if (ctx.requiresInstallation?.value) return true
 		if (selectedPlatform.value !== ctx.currentPlatform.value) return true
 		if (selectedGameVersion.value !== ctx.currentGameVersion.value) return true
 		if (
@@ -119,8 +120,12 @@ export function useInstallationForm(
 			isValid: isValid.value,
 			hasChanges: hasChanges.value,
 		})
-		if (ctx.isBusy.value) {
-			debug('save: ignored busy')
+		if (ctx.isBusy.value || !isValid.value || !hasChanges.value) {
+			debug('save: ignored', {
+				isBusy: ctx.isBusy.value,
+				isValid: isValid.value,
+				hasChanges: hasChanges.value,
+			})
 			return
 		}
 		isSaving.value = true
@@ -209,6 +214,11 @@ export function useInstallationForm(
 			selectedGameVersion: selectedGameVersion.value,
 			selectedLoaderVersion: selectedLoaderVersion.value,
 		})
+		if (!isValid.value) {
+			debug('performSave: ignored invalid form')
+			isSaving.value = false
+			return
+		}
 		try {
 			const loaderVersionId =
 				selectedPlatform.value !== 'vanilla'

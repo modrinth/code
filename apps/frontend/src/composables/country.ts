@@ -1,9 +1,10 @@
-import { useGeneratedState } from '@/composables/generated.ts'
-import { useRequestHeaders, useState } from '#imports'
+import type { ISO3166 } from '@modrinth/api-client'
+import { useUserCountry as useInjectedUserCountry } from '@modrinth/ui'
+
+import { countries, subdivisions } from '~/generated/state.json'
 
 export const useCountries = () => {
-	const generated = useGeneratedState()
-	return computed(() => generated.value.countries ?? [])
+	return computed(() => (countries ?? []) as ISO3166.Country[])
 }
 
 export const useFormattedCountries = () => {
@@ -28,44 +29,10 @@ export const useFormattedCountries = () => {
 }
 
 export const useSubdivisions = (countryCode: ComputedRef<string> | Ref<string> | string) => {
-	const generated = useGeneratedState()
 	const code = isRef(countryCode) ? countryCode : ref(countryCode)
+	const byCountry = (subdivisions ?? {}) as Record<string, ISO3166.Subdivision[]>
 
-	return computed(() => generated.value.subdivisions?.[unref(code)] ?? [])
+	return computed(() => byCountry[unref(code)] ?? [])
 }
 
-export const useUserCountry = () => {
-	const country = useState<string>('userCountry', () => 'US')
-	const fromServer = useState<boolean>('userCountryFromServer', () => false)
-
-	if (import.meta.server) {
-		const headers = useRequestHeaders(['cf-ipcountry', 'accept-language'])
-		const cf = headers['cf-ipcountry']
-		if (cf) {
-			country.value = cf.toUpperCase()
-			fromServer.value = true
-		} else {
-			const al = headers['accept-language'] || ''
-			const tag = al.split(',')[0]
-			const val = tag.split('-')[1]?.toLowerCase()
-			if (val) {
-				country.value = val
-				fromServer.value = true
-			}
-		}
-	}
-
-	if (import.meta.client) {
-		onMounted(() => {
-			if (fromServer.value) return
-			// @ts-expect-error - ignore TS not knowing about navigator.userLanguage
-			const lang = navigator.language || navigator.userLanguage || ''
-			const region = lang.split('-')[1]
-			if (region) {
-				country.value = region.toUpperCase()
-			}
-		})
-	}
-
-	return country
-}
+export const useUserCountry = useInjectedUserCountry

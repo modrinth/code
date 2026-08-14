@@ -153,19 +153,17 @@ For components that need user interaction to show:
 ```typescript
 export const Default: Story = {
 	render: () => ({
-		components: { Modal, ButtonStyled },
+		components: { Button, NewModal },
 		setup() {
-			const modalRef = ref<InstanceType<typeof Modal> | null>(null)
+			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			return { modalRef }
 		},
 		template: /* html */ `
             <div>
-                <ButtonStyled @click="modalRef?.show()">
-                    <button>Open Modal</button>
-                </ButtonStyled>
-                <Modal ref="modalRef" header="Example Modal">
+				<Button @click="modalRef?.show()">Open Modal</Button>
+                <NewModal ref="modalRef" header="Example Modal">
                     <p>Modal content</p>
-                </Modal>
+                </NewModal>
             </div>
         `,
 	}),
@@ -199,10 +197,10 @@ Components should use relative imports, not the package alias:
 
 ```typescript
 // ❌ BAD - Causes circular dependency in Storybook
-import { ButtonStyled } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 
 // ✅ GOOD - Use relative imports
-import ButtonStyled from '../base/ButtonStyled.vue'
+import Button from '../components/base/buttons/Button.vue'
 ```
 
 ### 2. Object/Array Prop Defaults Must Be Factory Functions

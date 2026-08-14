@@ -6,6 +6,7 @@ use crate::database::models::friend_item::DBFriend;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::UserId;
 use eyre::eyre;
@@ -34,30 +35,43 @@ pub async fn block_user(
         &session_queue,
         Scopes::USER_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let user_id = info.into_inner().0;
-    let Some(blocked) = DBUser::get(&user_id, &**pool, &redis).await? else {
-        return Err(ApiError::NotFound);
+    let Some(blocked) = DBUser::get(&user_id, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?
+    else {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
     if blocked.id == user.id.into() {
         return Err(ApiError::Request(eyre!("you cannot block yourself")));
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
-    DBFriend::remove(user.id.into(), blocked.id, &mut transaction).await?;
+    DBFriend::remove(user.id.into(), blocked.id, &mut transaction)
+        .await
+        .wrap_internal_err("deleting friend from database")?;
 
     DBBlockedUser {
         user_id: user.id.into(),
         blocked_id: blocked.id,
     }
     .insert(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("inserting database records for `block_user`")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }
@@ -79,15 +93,21 @@ pub async fn unblock_user(
         &session_queue,
         Scopes::USER_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let user_id = info.into_inner().0;
-    let Some(blocked) = DBUser::get(&user_id, &**pool, &redis).await? else {
-        return Err(ApiError::NotFound);
+    let Some(blocked) = DBUser::get(&user_id, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?
+    else {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-    DBBlockedUser::remove(user.id.into(), blocked.id, &**pool).await?;
+    DBBlockedUser::remove(user.id.into(), blocked.id, &**pool)
+        .await
+        .wrap_internal_err("deleting blocked user from database")?;
 
     Ok(())
 }
@@ -108,11 +128,13 @@ pub async fn get_blocked_users(
         &session_queue,
         Scopes::USER_READ,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let blocked = DBBlockedUser::get_blocked_for_user(user.id.into(), &**pool)
-        .await?
+        .await
+        .wrap_internal_err("fetching blocked user from database")?
         .into_iter()
         .map(UserId::from)
         .collect();

@@ -10,9 +10,7 @@
 		<div v-if="draftVersion.loaders.length" class="space-y-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Added loaders </span>
-				<ButtonStyled type="transparent" size="standard">
-					<button @click="onClearAll()">Clear all</button>
-				</ButtonStyled>
+				<Button type="quiet" @click="onClearAll()">Clear all</Button>
 			</div>
 			<div
 				class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
@@ -43,7 +41,7 @@
 
 <script lang="ts" setup>
 import { getLoaderIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, FormattedTag, TagItem } from '@modrinth/ui'
+import { Button, FormattedTag, TagItem } from '@modrinth/ui'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

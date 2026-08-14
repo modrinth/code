@@ -89,6 +89,9 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Opdatere delt indhold"
   },
+  "app.action-bar.installs": {
+    "message": "Installeringer"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Gør til primære instance"
   },
@@ -131,20 +134,14 @@
   "app.ads-consent.reject": {
     "message": "Afvis alle"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Aktiverer avanceret gengivelse som sløringseffekter, der kan forårsage ydelsesproblemer uden hardwareaccelereret gengivelse."
+  "app.ads-consent.title": {
+    "message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Avanceret rendering"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Vælg dit foretrukne farvetema til Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Farvetema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Skift hvilken side launcheren åbner i."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hjem"
@@ -155,41 +152,23 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Standard startside"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Slår nametagget over din spiller på skins siden fra."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gem nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Inkluderer de sidste verdener i afsnittet \"Hop tilbage\" på startsiden."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Hop tilbage ind i verdener"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimer launcheren når Minecraft starter."
-  },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimer launcher"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Vælg en mulighed"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Vis hvor meget tid du har brugt på at spille en instance."
+    "message": "Minimer app"
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis tid spillet"
   },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Aktivere muligheden for at slå sidepanelet til og fra."
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Spring ikke nødvendige advarseler over"
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Slå sidepanel til og fra"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Hvis du prøver at installere en Modrinth Pack fil (.mrpack) som ikke er hosted på Modrinth, så skal vi nok sikre os du forstår riskoen før du installere den."
+    "message": "Gem højre sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Advar mig før jeg installere en ukendt modpacks"
@@ -199,6 +178,9 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Hjem og indhold"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Tilføjet server til instance"
@@ -221,14 +203,17 @@
   "app.browse.back-to-instance": {
     "message": "Tilbage til instance"
   },
-  "app.browse.discover-content": {
-    "message": "Opdag indhold"
+  "app.browse.discover-project-type": {
+    "message": "Udforsk {projectType}"
   },
   "app.browse.discover-servers": {
     "message": "Opdag servere"
   },
   "app.browse.hide-added-servers": {
     "message": "Gem servere som allerede er tilføjet"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Skjul allerede installeret"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -269,11 +254,50 @@
   "app.install.phase.downloading_minecraft": {
     "message": "Downloader Minecraft"
   },
+  "app.install.phase.finalizing": {
+    "message": "Færdiggører"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "I kø til at intallere"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Forbereder Java"
+  },
   "app.install.phase.preparing_java.downloading": {
     "message": "Downloader Java {version}"
   },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Udpakker Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Henter Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Forbereder Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validerer Java {version}"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Tilføjet"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Skub opdatering"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Skubber..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Fjernet"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Skub opdatering"
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Gennemså ændringer"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Gennemgår..."
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Al' data for din instance vil blive permanent slettet, dette inkludere dine verdener, konfigurationer, og alt installeret indhold."
@@ -305,6 +329,9 @@
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
+  "app.instance.mods.locked-content": {
+    "message": "Indhold i låste instances kan ikke blive ændret."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" blev tilføjet"
   },
@@ -320,6 +347,18 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Uploadet"
   },
+  "app.instance.share.empty.description": {
+    "message": "Du kan ændre denne instance med dine venner!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Ingen venner inviteret"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Inviter venner"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Del {name}"
+  },
   "app.instance.share.locked.empty-description-suffix": {
     "message": "for at tilgå denne side."
   },
@@ -334,6 +373,12 @@
   },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Hvad vil der ske?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Fjern adgang"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Fjern adgang"
   },
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "{username}'s avatar"
@@ -416,9 +461,6 @@
   "app.modal.install-to-play.report-image-too-large": {
     "message": "Filen overskrider 1MiB størrelse begrænsning"
   },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Delt instance"
   },
@@ -466,9 +508,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Udseende"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standardindstillinger for instans"
   },
   "app.settings.tabs.java-installations": {
     "message": "Javainstallationer"
@@ -1091,9 +1130,6 @@
   "minecraft-required.sign-in": {
     "message": "Log ind på Microsoft"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Annuller"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Fortsæt i din browser"
   },
@@ -1133,16 +1169,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Synkroniser med instance"
   },
-  "search.filter.locked.server": {
-    "message": "Givet af serveren"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Kun klient-sided mods kan blive tilføjet til denne server instance"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Spille version er givet af serveren"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader er givet af serveren"
   }
 }

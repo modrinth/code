@@ -8,7 +8,7 @@ import {
 } from '@modrinth/assets'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import type { MessageDescriptor } from '#ui/composables/i18n'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -279,29 +279,29 @@ function getDescription(item: BackupAdmonitionEntry): string {
 			</span>
 		</div>
 		<template #top-right-actions>
-			<ButtonStyled v-if="canCancel(item)" type="outlined" color="blue">
-				<button
-					v-tooltip="canManageBackups === false ? permissionDeniedMessage : undefined"
-					class="!border"
-					type="button"
-					:disabled="cancelling || canManageBackups === false"
-					@click="$emit('cancel')"
-				>
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-if="canRetry(item)" color="red" type="outlined">
-				<button
-					v-tooltip="canManageBackups === false ? permissionDeniedMessage : undefined"
-					class="!border"
-					type="button"
-					:disabled="canManageBackups === false"
-					@click="$emit('retry')"
-				>
-					<RotateCounterClockwiseIcon class="size-5" />
-					{{ formatMessage(commonMessages.retryButton) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="canCancel(item)"
+				v-tooltip="canManageBackups === false ? permissionDeniedMessage : undefined"
+				type="outlined"
+				class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]"
+				native-type="button"
+				:disabled="cancelling || canManageBackups === false"
+				@click="$emit('cancel')"
+			>
+				{{ formatMessage(commonMessages.cancelButton) }}
+			</Button>
+			<Button
+				v-if="canRetry(item)"
+				v-tooltip="canManageBackups === false ? permissionDeniedMessage : undefined"
+				type="outlined"
+				class="!border !text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+				native-type="button"
+				:disabled="canManageBackups === false"
+				@click="$emit('retry')"
+			>
+				<RotateCounterClockwiseIcon class="size-5" />
+				{{ formatMessage(commonMessages.retryButton) }}
+			</Button>
 		</template>
 	</Admonition>
 </template>

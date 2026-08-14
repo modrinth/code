@@ -1,4 +1,5 @@
 use crate::database::PgPool;
+use crate::util::error::Context as _;
 use crate::{
     auth::get_user_from_headers,
     models::{pats::Scopes, v3::user_limits::UserLimits},
@@ -29,9 +30,12 @@ pub async fn get_project_limits(
         &session_queue,
         Scopes::empty(),
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let limits = UserLimits::get_for_projects(&user, &pool).await?;
+    let limits = UserLimits::get_for_projects(&user, &pool)
+        .await
+        .wrap_internal_err("fetching user limits from Redis")?;
     Ok(web::Json(limits))
 }
 
@@ -50,9 +54,12 @@ pub async fn get_organization_limits(
         &session_queue,
         Scopes::empty(),
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let limits = UserLimits::get_for_organizations(&user, &pool).await?;
+    let limits = UserLimits::get_for_organizations(&user, &pool)
+        .await
+        .wrap_internal_err("fetching user limits from Redis")?;
     Ok(web::Json(limits))
 }
 
@@ -71,8 +78,11 @@ pub async fn get_collection_limits(
         &session_queue,
         Scopes::empty(),
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let limits = UserLimits::get_for_collections(&user, &pool).await?;
+    let limits = UserLimits::get_for_collections(&user, &pool)
+        .await
+        .wrap_internal_err("fetching user limits from Redis")?;
     Ok(web::Json(limits))
 }

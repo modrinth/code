@@ -253,8 +253,8 @@ impl DirectoryInfo {
             if prev_dir != move_dir {
                 let loader_bar_id = init_loading(
                     LoadingBarType::DirectoryMove {
-                        old: prev_dir.clone(),
-                        new: move_dir.clone(),
+                        old: prev_dir.to_string_lossy().into_owned(),
+                        new: move_dir.to_string_lossy().into_owned(),
                     },
                     100.0,
                     "Moving launcher directory",

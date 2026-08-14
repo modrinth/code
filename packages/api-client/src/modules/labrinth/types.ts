@@ -463,6 +463,16 @@ export namespace Labrinth {
 	}
 
 	export namespace Analytics {
+		export namespace Internal {
+			export type AnalyticsEventUpsert = {
+				announcement_url: string | null
+				for_metric_kind: v3.AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				starts: string
+			}
+		}
+
 		export namespace v3 {
 			export type AnalyticsEventId = number
 			export type AnalyticsEventMetricKind = 'views' | 'revenue' | 'downloads' | 'playtime'
@@ -473,14 +483,6 @@ export namespace Labrinth {
 				title: string
 				ends: string
 				id: AnalyticsEventId
-				starts: string
-			}
-
-			export type AnalyticsEventUpsert = {
-				announcement_url: string | null
-				for_metric_kind: AnalyticsEventMetricKind[] | null
-				title: string
-				ends: string
 				starts: string
 			}
 
@@ -1151,9 +1153,10 @@ export namespace Labrinth {
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
 
-				minecraft_server?: MinecraftServer
-				minecraft_java_server?: MinecraftJavaServer
-				minecraft_bedrock_server?: MinecraftBedrockServer
+				minecraft_server?: MinecraftServer | null
+				minecraft_java_server?: MinecraftJavaServer | null
+				minecraft_bedrock_server?: MinecraftBedrockServer | null
+				minecraft_mod?: unknown | null
 
 				/**
 				 * @deprecated Not recommended to use.
@@ -1297,6 +1300,80 @@ export namespace Labrinth {
 			export type ProjectDependencies = {
 				projects: Project[]
 				versions: Labrinth.Versions.v3.Version[]
+			}
+
+			export type TelemetryConsent = 'opt_in' | 'opt_out' | 'always_active'
+
+			export type AiUsage = 'code' | 'assets' | 'text' | 'functionality'
+
+			export type DisclosureLockStatus = 'unlocked' | 'cannot_disable' | 'fully_locked'
+
+			export type DerivativeSource = {
+				label: string
+				link?: string | null
+				note?: string | null
+			}
+
+			export type ProjectDisclosure =
+				| {
+						type: 'ai_content'
+						uses: AiUsage[]
+						note?: string | null
+				  }
+				| {
+						type: 'advertisements'
+						note?: string | null
+				  }
+				| {
+						type: 'epilepsy_triggers'
+						note?: string | null
+				  }
+				| {
+						type: 'system_interactions'
+						interactions: string[]
+						note?: string | null
+				  }
+				| {
+						type: 'telemetry'
+						consent: TelemetryConsent
+						data_collected: string[]
+				  }
+				| {
+						type: 'derivative_work'
+						sources: DerivativeSource[]
+				  }
+				| {
+						type: 'paid_features'
+						features: string[]
+				  }
+				| {
+						type: 'archived'
+						note?: string | null
+				  }
+
+			export type ProjectDisclosureData = ProjectDisclosure & {
+				set_by_moderator: boolean
+				lock_status: DisclosureLockStatus
+				updated_at: string
+				updated_by?: string | null
+				deleted_at?: string | null
+			}
+
+			export type ProjectDisclosureType = ProjectDisclosure['type']
+
+			export type ProjectDisclosureOf<T extends ProjectDisclosureType> = Extract<
+				ProjectDisclosureData,
+				{ type: T }
+			>
+
+			export type GetProjectDisclosures = {
+				disclosures: ProjectDisclosureData[]
+			}
+
+			export type ModifyProjectDisclosures = {
+				set: ProjectDisclosure[]
+				remove: ProjectDisclosureType[]
+				lock_status?: DisclosureLockStatus | null
 			}
 		}
 	}
@@ -1688,6 +1765,18 @@ export namespace Labrinth {
 				accepted: boolean
 				created: string
 			}
+		}
+	}
+
+	export namespace BlockedUsers {
+		export namespace Internal {
+			export type BlockStatus = {
+				blocked: boolean
+			}
+		}
+
+		export namespace v3 {
+			export type BlockedUserId = string
 		}
 	}
 

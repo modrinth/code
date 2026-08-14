@@ -5,7 +5,7 @@
  */
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
-import { invoke } from '@tauri-apps/api/core'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot, SharedInstanceUpdateDiff } from './install'
 import type {
@@ -74,13 +74,21 @@ export async function get_content_items(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_content_items', { instanceId, cacheBehaviour })
+	const items = await invoke<ContentItem[]>('plugin:instance|instance_get_content_items', {
+		instanceId,
+		cacheBehaviour,
+	})
+	return adaptContentItems(items)
+}
+
+export async function refresh_content_updates(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_refresh_content_updates', { instanceId })
 }
 
 // Linked modpack info returned from backend
 export interface LinkedModpackInfo {
 	project: Labrinth.Projects.v2.Project
-	version: Labrinth.Versions.v2.Version
+	version: Labrinth.Versions.v2.Version | null
 	owner: ContentOwner | null
 	has_update: boolean
 	update_version_id: string | null
@@ -107,10 +115,11 @@ export async function get_linked_modpack_content(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_linked_modpack_content', {
+	const items = await invoke<ContentItem[]>('plugin:instance|instance_get_linked_modpack_content', {
 		instanceId,
 		cacheBehaviour,
 	})
+	return adaptContentItems(items)
 }
 
 // Convert a list of dependencies into ContentItems with rich metadata
@@ -118,9 +127,28 @@ export async function get_dependencies_as_content_items(
 	dependencies: Labrinth.Versions.v3.Dependency[],
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_dependencies_as_content_items', {
-		dependencies,
-		cacheBehaviour,
+	const items = await invoke<ContentItem[]>(
+		'plugin:instance|instance_get_dependencies_as_content_items',
+		{
+			dependencies,
+			cacheBehaviour,
+		},
+	)
+	return adaptContentItems(items)
+}
+
+function adaptContentItems(items: ContentItem[]): ContentItem[] {
+	return items.map((item) => {
+		const embeddedMetadata = item.embedded_metadata
+		if (!embeddedMetadata?.icon_path) return item
+
+		return {
+			...item,
+			embedded_metadata: {
+				...embeddedMetadata,
+				icon_url: convertFileSrc(embeddedMetadata.icon_path),
+			},
+		}
 	})
 }
 
@@ -260,6 +288,18 @@ export async function toggle_disable_project(
 	})
 }
 
+export async function set_project_locked(
+	instanceId: string,
+	projectPath: string,
+	locked: boolean,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_set_project_locked', {
+		instanceId,
+		projectPath,
+		locked,
+	})
+}
+
 // Remove a project
 export async function remove_project(instanceId: string, projectPath: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove_project', { instanceId, projectPath })
@@ -282,12 +322,13 @@ export async function update_repair_modrinth(instanceId: string): Promise<Instal
 }
 
 // Export an instance to .mrpack
-// included_overrides is an array of paths to override folders to include (ie: 'mods', 'resource_packs')
+// included_overrides and excluded_overrides are inherited path rules for files in the export.
 // Version id is optional (ie: 1.1.5)
 export async function export_instance_mrpack(
 	instanceId: string,
 	exportLocation: string,
 	includedOverrides: string[],
+	excludedOverrides: string[],
 	versionId?: string,
 	description?: string,
 	name?: string,
@@ -296,22 +337,33 @@ export async function export_instance_mrpack(
 		instanceId,
 		exportLocation,
 		includedOverrides,
+		excludedOverrides,
 		versionId,
 		description,
 		name,
 	})
 }
 
-// Given a folder path, populate an array of all the subfolders
-// Intended to be used for finding potential override folders
-// profile
-// -- mods
-// -- resourcepacks
-// -- file1
-// => [mods, resourcepacks]
-// allows selection for 'included_overrides' in export_instance_mrpack
-export async function get_pack_export_candidates(instanceId: string): Promise<string[]> {
-	return await invoke('plugin:instance|instance_get_pack_export_candidates', { instanceId })
+export type PackExportCandidate = {
+	path: string
+	type: 'directory' | 'file'
+	size?: number
+	modified?: number
+	count?: number
+	disabled: boolean
+	defaultSelected: boolean
+}
+
+// Given a folder path, populate an array of exportable direct children.
+// Allows selection for 'included_overrides' in export_instance_mrpack.
+export async function get_pack_export_candidates(
+	instanceId: string,
+	parent?: string,
+): Promise<PackExportCandidate[]> {
+	return await invoke('plugin:instance|instance_get_pack_export_candidates', {
+		instanceId,
+		parent: parent ?? null,
+	})
 }
 
 // Run Minecraft using an instance
@@ -365,6 +417,13 @@ export interface SharedInstanceInviteLink {
 	maxUses: number
 }
 
+export interface SharedInstanceInvite {
+	id: string
+	expiration: string
+	maxUses: number
+	uses: number
+}
+
 export async function can_current_user_use_shared_instances(): Promise<boolean> {
 	return await invoke('plugin:instance|instance_share_can_current_user_use')
 }
@@ -392,6 +451,19 @@ export async function create_shared_instance_invite_link(
 		instanceId,
 		...options,
 	})
+}
+
+export async function get_shared_instance_invites(
+	instanceId: string,
+): Promise<SharedInstanceInvite[]> {
+	return await invoke('plugin:instance|instance_share_get_invites', { instanceId })
+}
+
+export async function revoke_shared_instance_invite(
+	instanceId: string,
+	inviteId: string,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_share_revoke_invite', { instanceId, inviteId })
 }
 
 export async function remove_shared_instance_users(

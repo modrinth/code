@@ -1,22 +1,28 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "frontend",
-	"compatibility_date": "2025-12-10",
+	"compatibility_date": "2026-08-05",
 	"main": "./.output/server/index.mjs",
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./.output/public/"
 	},
-	"compatibility_flags": ["nodejs_compat_v2"],
 	"routes": ["modrinth.com/*"],
 	"preview_urls": true,
 	"workers_dev": true,
+	"upload_source_maps": true,
 	"limits": {
 		"cpu_ms": 5000
 	},
 	"observability": {
-		"enabled": true,
-		"head_sampling_rate": 0.0001
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 0.0001
+		},
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 0.0001
+		}
 	},
 	"keep_vars": false,
 	"secrets_store_secrets": [
@@ -49,8 +55,14 @@
 	"env": {
 		"staging": {
 			"observability": {
-				"enabled": true,
-				"head_sampling_rate": 0.1
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.1
+				},
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 0.1
+				}
 			},
 			"routes": ["staging.modrinth.com/*"],
 			"vars": {

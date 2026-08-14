@@ -1,0 +1,24 @@
+name: Deploy Command
+run-name: Deploy PR #${{ github.event.client_payload.github.payload.issue.number }}
+
+on:
+  repository_dispatch:
+    types: [deploy-command]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  deploy:
+    if: ${{ github.event.client_payload.pull_request.head.repo.full_name == github.repository }}
+    uses: SparkUniverse/workflows/.github/workflows/deploy-command.yaml@main
+    secrets:
+      ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
+      CMD_DISPATCH_GH_TOKEN: ${{ secrets.SLASH_CMD_GH_TOKEN }}
+    with:
+      application-set: labrinth
+      build-workflow: labrinth-build.yml
+      branch: ${{ github.event.client_payload.pull_request.head.ref }}
+      issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
+      head-sha: ${{ github.event.client_payload.pull_request.head.sha }}

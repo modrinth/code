@@ -17,6 +17,9 @@
   "analytics.breakdown.project": {
     "message": "פּרוֹיֶקט"
   },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} שעות"
+  },
   "analytics.chart.legend.monetization-details.description": {
     "message": "רק צפיות והורדות שבוצעו דרך Modrinth נספרות לצורך מונטיזציה, והורדות מחייבות את המשתמשים להיות מחוברים לחשבונם."
   },
@@ -1565,9 +1568,6 @@
   "layout.footer.social.discord": {
     "message": "דיסקורד"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "מסטודון"
   },
@@ -1579,9 +1579,6 @@
   },
   "layout.nav.discover": {
     "message": "גלה"
-  },
-  "layout.nav.discover-content": {
-    "message": "גלה תוכן"
   },
   "layout.nav.get-modrinth-app": {
     "message": "להוריד אפליקציאת Modrinth"
@@ -2024,15 +2021,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.title": {
-    "message": "הגדרות"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "ללוח הבקרה של הפרויקטים"
-  },
-  "project.status.archived.message": {
-    "message": "הפרויקט {title} הועבר לארכיון. {title} לא יקבל עדכונים נוספים, אלא אם המחבר יחליט להוציא את הפרויקט מהארכיון."
-  },
   "project.versions.title": {
     "message": "גרסאות"
   },
@@ -2285,9 +2273,6 @@
   "settings.account.data-export.description": {
     "message": "תבקש עותק של כל הדאטה האישי שהעלית ל-Modrinth. זה יכול לקחת כמה דקות."
   },
-  "settings.applications.button.edit": {
-    "message": "ערוך"
-  },
   "settings.applications.field.name": {
     "message": "שם"
   },
@@ -2308,11 +2293,5 @@
   },
   "settings.pats.modal.create.name.label": {
     "message": "שם"
-  },
-  "settings.profile.bio.title": {
-    "message": "תיאור"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "תמונת פרופיל"
   }
 }

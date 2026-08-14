@@ -1,3 +1,4 @@
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -6,6 +7,7 @@ use crate::database::models::categories::{
 };
 use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
+    LoaderMetadata,
 };
 use actix_web::{HttpResponse, get, web};
 use xredis::RedisPool;
@@ -48,7 +50,8 @@ pub async fn games_list(
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results = Game::list(&**pool, &redis)
-        .await?
+        .await
+        .wrap_internal_err("fetching game from Redis")?
         .into_iter()
         .map(|x| GameData {
             slug: x.slug,
@@ -83,7 +86,8 @@ pub async fn category_list(
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results = Category::list(&**pool, &redis)
-        .await?
+        .await
+        .wrap_internal_err("fetching category from Redis")?
         .into_iter()
         .map(|x| CategoryData {
             icon: x.icon,
@@ -103,7 +107,7 @@ pub struct LoaderData {
     pub supported_project_types: Vec<String>,
     pub supported_games: Vec<String>,
     pub supported_fields: Vec<String>, // Available loader fields for this loader
-    pub metadata: Value,
+    pub metadata: LoaderMetadata,
 }
 
 #[utoipa::path(tag = "tags", responses((status = OK)))]
@@ -119,14 +123,17 @@ pub async fn loader_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let loaders = Loader::list(&**pool, &redis).await?;
+    let loaders = Loader::list(&**pool, &redis)
+        .await
+        .wrap_internal_err("fetching loader from Redis")?;
 
     let loader_fields = LoaderField::get_fields_per_loader(
         &loaders.iter().map(|x| x.id).collect_vec(),
         &**pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching loader field from Redis")?;
 
     let mut results = loaders
         .into_iter()
@@ -179,25 +186,23 @@ pub async fn loader_fields_list(
 ) -> Result<HttpResponse, ApiError> {
     let query = query.into_inner();
     let loader_field = LoaderField::get_fields_all(&**pool, &redis)
-        .await?
+        .await
+        .wrap_internal_err("fetching loader field from Redis")?
         .into_iter()
         .find(|x| x.field == query.loader_field)
-        .ok_or_else(|| {
-            ApiError::InvalidInput(format!(
-                "'{}' was not a valid loader field.",
-                query.loader_field
-            ))
+        .wrap_request_err_with(|| {
+            format!("'{}' was not a valid loader field.", query.loader_field)
         })?;
 
     let (LoaderFieldType::Enum(loader_field_enum_id)
     | LoaderFieldType::ArrayEnum(loader_field_enum_id)) =
         loader_field.field_type
     else {
-        return Err(ApiError::InvalidInput(format!(
+        return Err(ApiError::Request(eyre::eyre!(format!(
             "'{}' is not an enumerable field, but an '{}' field.",
             query.loader_field,
             loader_field.field_type.to_str()
-        )));
+        ))));
     };
 
     let results: Vec<_> = if let Some(filters) = query.filters {
@@ -207,10 +212,12 @@ pub async fn loader_fields_list(
             &**pool,
             &redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("fetching loader field enum value from Redis")?
     } else {
         LoaderFieldEnumValue::list(loader_field_enum_id, &**pool, &redis)
-            .await?
+            .await
+            .wrap_internal_err("fetching loader field enum value from Redis")?
     };
 
     Ok(HttpResponse::Ok().json(results))
@@ -275,9 +282,9 @@ pub async fn license_text(
         }));
     }
 
-    Err(ApiError::InvalidInput(
-        "Invalid SPDX identifier specified".to_string(),
-    ))
+    Err(ApiError::Request(eyre::eyre!(
+        "Invalid SPDX identifier specified",
+    )))
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -301,7 +308,8 @@ pub async fn link_platform_list(
 ) -> Result<HttpResponse, ApiError> {
     let results: Vec<LinkPlatformQueryData> =
         LinkPlatform::list(&**pool, &redis)
-            .await?
+            .await
+            .wrap_internal_err("reading HTTP response body")?
             .into_iter()
             .map(|x| LinkPlatformQueryData {
                 name: x.name,
@@ -324,7 +332,9 @@ pub async fn report_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let results = ReportType::list(&**pool, &redis).await?;
+    let results = ReportType::list(&**pool, &redis)
+        .await
+        .wrap_internal_err("reading HTTP response body")?;
     Ok(HttpResponse::Ok().json(results))
 }
 
@@ -341,6 +351,8 @@ pub async fn project_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let results = ProjectType::list(&**pool, &redis).await?;
+    let results = ProjectType::list(&**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project type from Redis")?;
     Ok(HttpResponse::Ok().json(results))
 }

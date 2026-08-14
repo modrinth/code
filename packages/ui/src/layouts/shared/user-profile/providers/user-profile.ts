@@ -9,9 +9,17 @@ export interface UserProfileContext {
 	getCollections: (userId: string) => Promise<Labrinth.Collections.Collection[]>
 	patchUser: (
 		userId: string,
-		patch: Partial<Pick<Labrinth.Users.v3.User, 'badges' | 'role'>>,
+		patch: Partial<Pick<Labrinth.Users.v3.User, 'badges' | 'bio' | 'role' | 'username'>>,
 	) => Promise<void>
+	changeAvatar: (userId: string, file: Blob, extension: string) => Promise<void>
+	deleteAvatar: (userId: string) => Promise<void>
+	getBlockedUsers: () => Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]>
+	blockUser: (userId: string) => Promise<void>
+	unblockUser: (userId: string) => Promise<void>
 }
+
+export const blockedUsersQueryKey = (userId?: string | null) =>
+	['blocked-users', userId ?? null] as const
 
 export const [injectUserProfile, provideUserProfile] = createContext<UserProfileContext>(
 	'UserProfilePageLayout',

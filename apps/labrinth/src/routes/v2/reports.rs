@@ -3,6 +3,7 @@ use crate::models::reports::Report;
 use crate::models::v2::reports::LegacyReport;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
 use validator::Validate;
@@ -44,7 +45,8 @@ pub async fn report_create(
     let response =
         v3::reports::report_create(req, pool, body, redis, session_queue)
             .await
-            .or_else(v2_reroute::flatten_404_error)?;
+            .or_else(v2_reroute::flatten_404_error)
+            .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Report>(response).await {
@@ -60,15 +62,12 @@ pub async fn report_create(
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
     count: u16,
-    #[serde(default = "default_all")]
+    #[serde(default)]
     all: bool,
 }
 
 fn default_count() -> u16 {
     100
-}
-fn default_all() -> bool {
-    true
 }
 
 /// Get open reports for the current user.  
@@ -112,7 +111,8 @@ pub async fn reports(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Report>>(response).await {
@@ -167,7 +167,8 @@ pub async fn reports_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Report>>(response).await {
@@ -212,7 +213,8 @@ pub async fn report_get(
     let response =
         v3::reports::report_get(req, pool, redis, info, session_queue)
             .await
-            .or_else(v2_reroute::flatten_404_error)?;
+            .or_else(v2_reroute::flatten_404_error)
+            .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Report>(response).await {

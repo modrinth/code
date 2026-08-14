@@ -200,6 +200,7 @@ fn main() {
                         "instance_get_install_candidates",
                         "instance_content",
                         "instance_get_content_items",
+                        "instance_refresh_content_updates",
                         "instance_get_dependencies_as_content_items",
                         "instance_get_linked_modpack_info",
                         "instance_get_linked_modpack_content",
@@ -216,6 +217,7 @@ fn main() {
                         "instance_add_project_from_path",
                         "instance_is_file_on_modrinth",
                         "instance_toggle_disable_project",
+                        "instance_set_project_locked",
                         "instance_remove_project",
                         "instance_update_managed_modrinth_version",
                         "instance_repair_managed_modrinth",
@@ -227,6 +229,8 @@ fn main() {
                         "instance_share_get_users",
                         "instance_share_invite_users",
                         "instance_share_create_invite_link",
+                        "instance_share_get_invites",
+                        "instance_share_revoke_invite",
                         "instance_share_remove_users",
                         "instance_share_get_publish_preview",
                         "instance_share_publish",
@@ -283,6 +287,9 @@ fn main() {
                         "get_user_organizations",
                         "get_user_collections",
                         "patch_user",
+                        "block_user",
+                        "unblock_user",
+                        "get_blocked_users",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -312,7 +319,7 @@ fn main() {
                     .commands(&[
                         "init_ads_window",
                         "hide_ads_window",
-                        "show_ads_window",
+                        "update_ads_window_hold",
                         "show_ads_consent_ui",
                         "expand_ads_consent_webview",
                         "open_ads_consent_preferences",

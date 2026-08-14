@@ -584,18 +584,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Imena projekata"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetski"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Najnovije prvo"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Najstarije prvo"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortiraj so {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Ažuiraj sve"
   },
@@ -1252,9 +1240,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Datoteka sačuvana"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Zatvori"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Pronađi"
@@ -2032,24 +2017,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Izaberi ikonu"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ovaj modpack ne uključuje nikakav dodatni sadržaj."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nema pronađenog sadržaja"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Sadržaj modpacka"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Učitavanje sadržaja..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nijedan projekat ne odgovara tvojoj pretrazi."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Pretraga {count, number} {count, plural, one {projekta} few {projekta} other {projekata}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Upravo"
@@ -3593,15 +3560,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Napredno"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Isključi data pakete"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Isključi modove"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Isključi plugine"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Okruže"
   },
@@ -4370,9 +4328,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Server se instalira"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Sinhronizacija sadržaja u toku"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Pošalji i zahtev za prijateljstvo"
   },
@@ -4427,50 +4382,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Neuspešna instalacija"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Došlo je do interne greške prilikom instaliranja platforme. Molimo te, pokušaj ponovo."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Navedeni učitavač ili verzija Minecrafta se ne mogu instalirati. Moguće je da su nevažeći ili nepodržani."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Modpak nije mogao biti instaliran. Možda je oštećen ili nekompatibilan."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Ova verzija modpaka ne uključuje datoteku za preuzimanje. Moguće je da je pogrešno upakovana."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Došlo je do neočekivane greške tokom instalacije."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Ova verzija Minecrafta ili učitavača još uvek nije podržana od strane Modrinth Hosting-a."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Instaliranje addona..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Instaliranje modpacka..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Instaliranje platforme..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Pripremamo tvoj server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Dodavanje Jave..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurisanje servera..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Instaliranje modova..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organiziranje datoteka..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Podešavanje okruženja..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Već imaš server?"
@@ -5026,9 +4942,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Lični tokeni za pristup"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Javni profil"
   },
   "settings.sessions.title": {
     "defaultMessage": "Sesije"
@@ -5787,4 +5700,3 @@
     "defaultMessage": "Tip"
   }
 }
-
