@@ -1799,9 +1799,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2410,15 +2407,6 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Estado"
-  },
-  "project.settings.title": {
-    "message": "Mga Setting"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Bisitahin ang dashboard ng mga proyekto"
-  },
-  "project.status.archived.message": {
-    "message": "Inarkibo ang {title}. Ang {title} ay hindi na tatanggap ng mga update maliban kung iwawala nila ang pagkaarkibo ng proyekto."
   },
   "project.versions.title": {
     "message": "Mga bersiyon"

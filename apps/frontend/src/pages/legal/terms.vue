@@ -1,7 +1,7 @@
 <template>
 	<div class="markdown-body">
 		<h1>Terms of Use</h1>
-		<p><em>Last modified: September 16, 2023</em></p>
+		<p><em>Last modified: August 13, 2026</em></p>
 		<h2>Acceptance of the Terms of Use</h2>
 		<p>
 			These terms of use are entered into by and between You and Rinth, Inc.
@@ -222,6 +222,10 @@
 			<li>
 				Use any manual process to monitor or copy any of the material contained in the Service or
 				for any other unauthorized purpose without our prior written consent.
+			</li>
+			<li>
+				Use any data, content, or materials available on or through the Service to train, develop,
+				or improve any artificial intelligence or machine learning models.
 			</li>
 			<li>
 				Use any device, software or routine that interferes with the proper working of the Service.

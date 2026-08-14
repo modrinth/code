@@ -1044,6 +1044,7 @@ async fn project_create_inner(
                 .map(|v| v.version_id.into())
                 .collect::<Vec<_>>(),
             icon_url: project_builder.icon_url.clone(),
+            raw_icon_url: project_builder.raw_icon_url.clone(),
             link_urls: project_builder
                 .link_urls
                 .clone()

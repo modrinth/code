@@ -2846,14 +2846,17 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "unknown"
@@ -3449,6 +3452,12 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "Back to all projects"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "Back to project page"
+  },
   "project.actions.create-server": {
     "message": "Create a server"
   },
@@ -3460,6 +3469,9 @@
   },
   "project.actions.edit-project": {
     "message": "Edit project"
+  },
+  "project.actions.project-page": {
+    "message": "Project page"
   },
   "project.actions.rescan-modpack": {
     "message": "Rescan modpack"
@@ -3475,6 +3487,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Create a server"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "Using AI-generated images to represent your project is not allowed. Attempting to work around detection may lead to your Modrinth account being suspended."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "See section 6 of <rules>Modrinth's Content Rules</rules> for more information on our generative AI policy."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "AI-generated images not allowed"
   },
   "project.collections.create-new": {
     "message": "Create new collection"
@@ -3737,6 +3758,201 @@
   "project.notification.updated.title": {
     "message": "Project updated"
   },
+  "project.settings.back-to-all-projects": {
+    "message": "Back to all projects"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Back to project page"
+  },
+  "project.settings.danger-zone": {
+    "message": "Danger zone"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Delete project"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "If you proceed, all of this project's information and all of its versions will be immediately deleted from our database. None of it is recoverable later if you change your mind. Consider just setting your project to be Private for a less permanent option."
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Permanently delete project"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Are you sure you want to delete this project?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Permanently deletes this project from Modrinth. Deleted projects <emphasis>cannot be recovered</emphasis> by Modrinth staff or support."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Files uploaded to this project that are actively used in Modpacks hosted on Modrinth may continue to exist."
+  },
+  "project.settings.delete-project.title": {
+    "message": "Delete project"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "You must enable this if your project contains advertisements, sponsorships, or promotions of other works."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "If the promotion has no direct monetary value <emphasis>and</emphasis> it is for something that the average person would consider <italic>relevant</italic> and <italic>unobtrusive</italic> (such as a link to your Modrinth profile in the corner of the settings page for your own mod), we would not consider that an advertisement."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "e.g. Adds the Modrinth SMP server to your server list automatically."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Contains advertisements"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "Please refer to Section 6 of <rules>Modrinth's Content Rules</rules> for more information."
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "You must enable this if this project contains a substantial amount of AI-generated code, any\n\t\t\t\tassets that are substantially AI-generated, the project's functionality relies on the use of\n\t\t\t\tgenerative AI, or if any element of your project's page such as description or publishing\n\t\t\t\trelies on generative AI."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "e.g. The Chinese and Arabic translations are AI-generated."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Contains AI-generated content"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "What is generative AI being used for?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "Banner preview"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "Mark your project as archived to let users know that you are no longer working on it."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "Archived projects remain discoverable when their visibility is set to Public. If you wish to de-list your project, set its visibility to Unlisted."
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "e.g. I don't have time to maintain this project anymore, feel free to fork it!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Archive project"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "Content disclosures"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "You must enable this if your project is derivative of another project, such as being a fork or containing a substantial amount of someone else’s work."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Link to original work"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Name of original work"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Example project"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Explain how your project is based on the original work"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Contains derivative content"
+  },
+  "project.settings.disclosures.description": {
+    "message": "You must add any applicable content disclosures to your project in compliance with <rules>Modrinth's Content Rules</rules>."
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Last updated on {date} by {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Moderator"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be removed."
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "This disclosure has been locked by the moderators. Please <contact-support-link>contact support</contact-support-link> if you believe this is in error."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be edited or removed."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "You must enable this if your project contains features that can be obtained by spending real-world money."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "e.g. Cosmetics available as Patreon reward"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "List the types of paid features"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Contains paid features"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Enable this if your project contains anything that you think may be dangerous to certain people who are sensitive to flashing lights or patterns."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "e.g. It adds a flashlight item that has a strobe mode. It can be disabled in Accessibility settings in-game."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Photosensitivity warning"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "Advertising disclosure requires explanation."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "Derivative works disclosure must list at least one source work."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "Derivative work sources must have a name."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "You don't have permission to edit this project's disclosures."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "Paid features disclosure must list at least one paid feature."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "Photosensitivity warning disclosure must include a description."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "External system interactions disclosure must include a description."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "Telemetry disclosure must list at least one type of data collected."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "You must enable this if your project reads or edits things on the user's system outside of the game."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Describe the external system interactions"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "e.g. It adds a file to the desktop called wake_up.txt"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "External system interactions"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "What is the consent model of your telemetry?"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "You can either add a privacy policy, or a list of types of data that are collected. Remember to mention if it is anonymous or contains personally identifiable information (PII)."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "What data is collected?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "e.g. Anonymous launch analytics to track Minecraft version and mod loader usage."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "You must enable this if your project sends usage data back to yourself or a third party."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Contains telemetry"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "Upload versions before adding disclosures"
+  },
+  "project.settings.editing-project": {
+    "message": "Editing {projectType} project"
+  },
   "project.settings.general.name.description": {
     "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."
   },
@@ -3781,6 +3997,18 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.head-title": {
+    "message": "⚙️ {section} - {project}"
+  },
+  "project.settings.monetization.description": {
+    "message": "Projects on Modrinth are automatically enrolled in the <rewards-program-link>Rewards Program</rewards-program-link>. If you don't want to (or can't for legal reasons) earn revenue from this project, you can turn it off here."
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "This project is not eligible for monetization. If you think this is a mistake, please <contact-support-link>contact support</contact-support-link>."
+  },
+  "project.settings.monetization.title": {
+    "message": "Monetization"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Please provide proof that you have permission to redistribute all of the following files. Once completed, withheld versions will be automatically published."
@@ -3974,17 +4202,8 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover."
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Please upload a version first in order to select tags!"
-  },
-  "project.settings.title": {
-    "message": "Settings"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Visit projects dashboard"
-  },
-  "project.status.archived.message": {
-    "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Upload versions before adding tags"
   },
   "project.versions.copy-id-option": {
     "message": "Copy ID"
@@ -4094,6 +4313,12 @@
   "report.note.malicious.2": {
     "message": "Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted."
   },
+  "report.note.missing-disclosure.1": {
+    "message": "Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures."
+  },
+  "report.note.missing-disclosure.2": {
+    "message": "Check back later once the grace period has ended. Reports of this type are not being accepted at this time."
+  },
   "report.please-report": {
     "message": "Please report:"
   },
@@ -4111,6 +4336,9 @@
   },
   "report.report-item": {
     "message": "Report {title} to moderators"
+  },
+  "report.reported-for": {
+    "message": "Reported for {type}"
   },
   "report.submit": {
     "message": "Submit report"

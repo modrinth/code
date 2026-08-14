@@ -30,4 +30,4 @@ export type MessageSegment =
 	| { type: 'fn'; fn: ContentFn }
 	| { type: 'auto'; getVars?: GetVarsFn }
 	| { type: 'path'; path: string | (() => string); getVars?: GetVarsFn }
-	| { type: 'collect'; fallback?: MessageSegment }
+	| { type: 'collect'; fallback?: MessageSegment; prefix?: MessageSegment }

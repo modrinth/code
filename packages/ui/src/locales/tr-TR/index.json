@@ -596,18 +596,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Proje isimleri"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetik"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Önce en yeni"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Önce en eski"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sıralama şekli {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Tümünü güncelle"
   },
@@ -2050,27 +2038,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Simge seç"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Bu mod paketi başka hiç bir ekstra işerik içermez."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "İçerik bulunamadı"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Harici"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Mod paketi içeriği"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "İçerik yükleniyor..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Aramanızla eşleşen proje yok."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
@@ -3649,15 +3616,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Gelişmiş"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Veri paketlerini hariç tut"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Modları hariç tut"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Eklentileri hariç tut"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ortam"

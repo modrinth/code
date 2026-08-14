@@ -530,18 +530,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Tên dự án"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Thứ tự bảng chữ cái"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Mới nhất"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Cũ nhất"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sắp xếp theo {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Cập nhật tất cả"
   },
@@ -1708,24 +1696,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Chọn biểu tượng"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Gói modpack này không bao gồm các nội dung bổ sung nào."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Không có nội dung nào được tìm thấy"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Nội dung modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Đang tải nội dung..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Không có dự án nào phù hợp với kết quả tìm kiếm."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Tìm {count, number} {count, plural, other {dự án}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
@@ -5079,4 +5049,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-

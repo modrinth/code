@@ -30,6 +30,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_install_candidates,
             instance_content,
             instance_get_content_items,
+            instance_refresh_content_updates,
             instance_get_dependencies_as_content_items,
             instance_get_linked_modpack_info,
             instance_get_linked_modpack_content,
@@ -45,6 +46,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_add_project_from_path,
             instance_is_file_on_modrinth,
             instance_toggle_disable_project,
+            instance_set_project_locked,
             instance_remove_project,
             instance_update_managed_modrinth_version,
             instance_repair_managed_modrinth,
@@ -525,6 +527,11 @@ pub async fn instance_get_content_items(
 }
 
 #[tauri::command]
+pub async fn instance_refresh_content_updates(instance_id: &str) -> Result<()> {
+    Ok(theseus::instance::refresh_content_updates(instance_id).await?)
+}
+
+#[tauri::command]
 pub async fn instance_get_dependencies_as_content_items(
     dependencies: Vec<Dependency>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -694,6 +701,17 @@ pub async fn instance_toggle_disable_project(
         desired_enabled,
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_project_locked(
+    instance_id: &str,
+    project_path: &str,
+    locked: bool,
+) -> Result<()> {
+    theseus::instance::set_project_locked(instance_id, project_path, locked)
+        .await?;
+    Ok(())
 }
 
 #[tauri::command]

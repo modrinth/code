@@ -1,0 +1,4 @@
+interface:
+  display_name: "Convert Cross-Platform Page"
+  short_description: "Share pages across the web and desktop app"
+  default_prompt: "Use $cross-platform-pages to convert this page for the website and desktop app."

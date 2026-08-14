@@ -2336,9 +2336,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3061,15 +3058,6 @@
   },
   "project.settings.tags.title": {
     "message": "Tag"
-  },
-  "project.settings.title": {
-    "message": "Tetapan"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Kunjungi papan pemuka projek"
-  },
-  "project.status.archived.message": {
-    "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
   },
   "project.versions.share-option": {
     "message": "Kongsi"

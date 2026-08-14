@@ -2846,9 +2846,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3973,18 +3970,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Du hast {count} Tags ausgewählt. Wir empfehlen dir, die Anzahl auf 12 oder weniger zu reduzieren, damit dein Server übersichtlich bleibt und leichter gefunden werden kann."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Bitte lade zuerst eine Version hoch, um Tags auswählen zu können!"
-  },
-  "project.settings.title": {
-    "message": "Einstellungen"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Projekt-Dashboard besuchen"
-  },
-  "project.status.archived.message": {
-    "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheided sich, das Projekt zu Dearchivieren."
   },
   "project.versions.copy-id-option": {
     "message": "ID kopieren"

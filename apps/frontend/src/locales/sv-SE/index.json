@@ -2567,9 +2567,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3274,12 +3271,6 @@
   },
   "project.settings.tags.resolutions-description": {
     "message": "Välj upplösning(en/arna) på dina texturer i ditt {type}."
-  },
-  "project.settings.title": {
-    "message": "Inställningar"
-  },
-  "project.status.archived.message": {
-    "message": "{title} har arkiverats. {title} kommer inte få några ytterligare uppdateringar såvida inte författaren bestämmer sig för att avarkivera projektet."
   },
   "project.versions.copy-id-option": {
     "message": "Kopiera ID"

@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "Welt"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Installationseinstellungen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Zusätzliche Inhalte"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projektnamen"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alphabetisch"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Neuste zuerst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Älteste zuerst"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortieren nach {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Alle aktualisieren"
@@ -2080,33 +2065,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Icon auswählen"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Dieses Modpack enthält keine zusätzlichen inhalte."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Keine Inhalte gefunden"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Diese Datei ist nicht auf Modrinth veröffentlicht."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpack Inhalt"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Lade Inhalte..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Keine Projekte entsprechen deiner Suche."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "In Slicer öffnen"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
@@ -3832,15 +3790,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Erweitert"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Datenpakete ausschließen"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Mods ausschließen"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Plugins ausschließen"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Umgebung"
@@ -6231,4 +6180,3 @@
     "defaultMessage": "Typ"
   }
 }
-

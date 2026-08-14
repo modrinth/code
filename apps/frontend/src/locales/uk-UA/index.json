@@ -2843,9 +2843,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3958,18 +3955,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Ви вибрали {count} теґів. Ми рекомендуємо зменшити їхню кількість до 12, щоб ваш сервер можна було легше знайти."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Спершу завантажте версію, щоб обирати теґи!"
-  },
-  "project.settings.title": {
-    "message": "Налаштування"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Панель керування проєктами"
-  },
-  "project.status.archived.message": {
-    "message": "«{title}» було архівовано. «{title}» не отримуватиме подальших оновлень допоки автор не вирішить розархівувати проєкт."
   },
   "project.versions.copy-id-option": {
     "message": "Копіювати ID"

@@ -2846,9 +2846,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3973,18 +3970,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "你选择了 {count} 个标签。建议将数量减少到 12 个或更少，以确保你的服务器主题更明确，且更容易发现。"
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "请先上传一个版本再选择标签！"
-  },
-  "project.settings.title": {
-    "message": "设置"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "访问项目的控制面板"
-  },
-  "project.status.archived.message": {
-    "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
   },
   "project.versions.copy-id-option": {
     "message": "复制 ID"

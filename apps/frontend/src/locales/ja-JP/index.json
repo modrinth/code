@@ -2378,9 +2378,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "Github"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3064,15 +3061,6 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "ステータス"
-  },
-  "project.settings.title": {
-    "message": "設定"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "プロジェクトダッシュボードを見る"
-  },
-  "project.status.archived.message": {
-    "message": "{title} はアーカイブされました。作者がプロジェクトのアーカイブを解除しない限り、今後 {title} に更新はありません。"
   },
   "project.versions.title": {
     "message": "バージョン"

@@ -2846,9 +2846,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3973,18 +3970,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "你選擇了 {count} 個標籤。請考慮減少到 12 個或更少，以確保你的伺服器主題更明確，並更容易被搜尋到。"
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "請先上傳一個版本再選擇標籤！"
-  },
-  "project.settings.title": {
-    "message": "設定"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "前往專案資訊主頁"
-  },
-  "project.status.archived.message": {
-    "message": "{title} 已封存。{title} 將不會再收到任何後續更新，除非作者決定解除封存該專案。"
   },
   "project.versions.copy-id-option": {
     "message": "複製 ID"

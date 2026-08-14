@@ -12,7 +12,7 @@ import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
-import { process_listener } from '@/helpers/events'
+import { useAppEvent } from '@/composables/use-app-event'
 import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
@@ -78,7 +78,6 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 	const contextMenuRef = ref<ContextMenuHandle | null>(null)
 	let serverPingsActive = true
-	let unlistenProcesses: (() => void) | null = null
 
 	async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 		debugLog('checkServerRunningStates', { hitCount: hits.length })
@@ -280,7 +279,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		}
 	}
 
-	process_listener((event: { event: string; instance_id: string }) => {
+	useAppEvent('process', (event) => {
 		debugLog('process event', event)
 		if (event.event === 'finished') {
 			const projectId = Object.entries(runningServerProjects.value).find(
@@ -292,14 +291,9 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 			}
 		}
 	})
-		.then((unlisten) => {
-			unlistenProcesses = unlisten
-		})
-		.catch(options.handleError)
 
 	onUnmounted(() => {
 		serverPingsActive = false
-		unlistenProcesses?.()
 	})
 
 	return {

@@ -2843,9 +2843,6 @@
   "layout.footer.social.discord": {
     "message": "Discord "
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3970,18 +3967,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 12 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Upload eerst een versie om tags te kunnen selecteren!"
-  },
-  "project.settings.title": {
-    "message": "Instellingen"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Bezoek het project dashboard"
-  },
-  "project.status.archived.message": {
-    "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
   },
   "project.versions.copy-id-option": {
     "message": "ID kopiëren"

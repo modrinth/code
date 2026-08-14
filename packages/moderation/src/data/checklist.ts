@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { NodeState, StageNode } from '../types/node'
 import useCategoriesStage from './stages/categories'
 import useDescriptionStage from './stages/description'
+import useDisclosuresStage from './stages/disclosures'
 import useGalleryStage from './stages/gallery'
 import useLicenseStage from './stages/license'
 import useLinksStage from './stages/links'
@@ -29,6 +30,7 @@ export function useStages(
 		useSummaryStage(),
 		useDescriptionStage(),
 		useGalleryStage(),
+		useDisclosuresStage(),
 		useLinksStage(),
 		useLicenseStage(),
 		useCategoriesStage(),

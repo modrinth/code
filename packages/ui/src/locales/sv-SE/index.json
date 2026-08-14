@@ -560,9 +560,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "värld"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Installationsinställningar"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Ytterligare innehåll"
   },
@@ -613,18 +610,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projektnamn"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisk"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyaste först"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Äldsta först"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortera i {mode} ordning"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Uppdatera alla"
@@ -1801,30 +1786,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Välj ikon"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Modpaketet innehåller inget ytterligare innehåll."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Inget innehåll hittades"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Den här filen är inte publiserad på Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpaketets innehåll"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Laddar innehåll..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Inga projekt matchar din sökning."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Öppna i Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Sök genom {count, number} projekt"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -3454,12 +3415,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Avancerat"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Exkludera datapaket"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Exkludera moddar"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Miljö"
@@ -5463,4 +5418,3 @@
     "defaultMessage": "Typ"
   }
 }
-

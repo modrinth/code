@@ -2645,9 +2645,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3532,15 +3529,6 @@
   },
   "project.settings.tags.title": {
     "message": "Etiketler"
-  },
-  "project.settings.title": {
-    "message": "Ayarlar"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Projeler panelini ziyaret et"
-  },
-  "project.status.archived.message": {
-    "message": "{title} arşivlenmiş. {title}, yapımcı fikrini değiştirmediği sürece daha fazla güncelleme almayacak."
   },
   "project.versions.copy-id-option": {
     "message": "ID'yi Kopyala"

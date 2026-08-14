@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "세계"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "설치 설정"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "추가 콘텐츠"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "프로젝트 이름"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "알파벳순"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "최신순"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "오래된순"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "{mode}으로 정렬"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "모두 업데이트"
@@ -2080,33 +2065,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "아이콘 선택"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "이 모드팩에는 추가 콘텐츠가 포함되어 있지 않습니다."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "콘텐츠를 찾을 수 없습니다"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "외부"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "모드팩 콘텐츠"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "콘텐츠 불러오는 중..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Slicer에서 열기"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "{count, number}개의 프로젝트 검색"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
@@ -3817,15 +3775,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "고급"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "데이터 팩 제외"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "모드 제외"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "플러그인 제외"
   },
   "search.filter_type.environment": {
     "defaultMessage": "실행 환경"

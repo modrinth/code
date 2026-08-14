@@ -2846,9 +2846,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3955,18 +3952,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 12개 이하로 줄이는 것이 좋습니다."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "먼저 버전을 업로드해야 태그를 선택할 수 있습니다!"
-  },
-  "project.settings.title": {
-    "message": "설정"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "프로젝트 대시보드 방문"
-  },
-  "project.status.archived.message": {
-    "message": "{title} 은(는) 보관되었습니다. 작성자가 프로젝트 보관 해제를 결정하지 않는 한 더 이상 업데이트가 제공되지 않습니다."
   },
   "project.versions.copy-id-option": {
     "message": "ID 복사"

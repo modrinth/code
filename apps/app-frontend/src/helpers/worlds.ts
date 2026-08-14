@@ -3,6 +3,7 @@ import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 
+import type { InstancePayload } from '@/generated/app-events/InstancePayload'
 import { get_full_path } from '@/helpers/instance'
 import { openPath } from '@/helpers/utils'
 
@@ -532,18 +533,4 @@ export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVer
 	return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 }
 
-export type InstanceEvent = { instance_id: string } & (
-	| {
-			event: 'servers_updated'
-	  }
-	| {
-			event: 'world_updated'
-			world: string
-	  }
-	| {
-			event: 'server_joined'
-			host: string
-			port: number
-			timestamp: string
-	  }
-)
+export type InstanceEvent = InstancePayload

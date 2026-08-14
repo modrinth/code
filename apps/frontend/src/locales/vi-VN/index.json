@@ -2489,9 +2489,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3178,15 +3175,6 @@
   },
   "project.settings.permissions.learn-more": {
     "message": "Tìm hiểu thêm"
-  },
-  "project.settings.title": {
-    "message": "Cài đặt"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Truy cập bảng điều khiển dự án"
-  },
-  "project.status.archived.message": {
-    "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
   },
   "project.versions.title": {
     "message": "Phiên bản"

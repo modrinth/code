@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "mundo"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Ajustes de instalación"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenido adicional"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nombres de los proyectos"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabético"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Más recientes primero"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Más antiguo primero"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordenar por {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizar todo"
@@ -2080,33 +2065,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Seleccionar ícono"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Este modpack no incluye ningún contenido adicional."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "No se encontró contenido"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Externo"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Este archivo no está publicado en Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Contenido del modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Cargando contenido..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Ningún proyecto coincide con tu búsqueda."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Abrir en Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Buscar en {count, number} {count, plural, one {proyecto} other {proyectos}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actual"
@@ -3832,15 +3790,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Avanzado"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Excluir paquetes de datos"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Excluir mods"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Excluir complementos"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Entorno"
@@ -6231,4 +6180,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

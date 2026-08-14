@@ -377,17 +377,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "変更点を確認"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "アップデート内容を確認"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "審査中…"
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "{name}をプレイするにはアップデートが必要です。ゲームを起動するには最新バージョンにアップデートしてください。"
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "アップデートが利用可能です"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "インスタンス内のすべてのデータは、ワールド、設定、インストール済みのコンテンツを含め、完全に削除されます。"
@@ -703,15 +694,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "この起動構成はどの規則に違反していますか？"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "不適切なコンテンツ"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "悪意がある"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "スパム"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "共有された起動構成を通報する"
@@ -1922,17 +1904,8 @@
   "search.filter.locked.instance.sync": {
     "message": "インスタンスと同期"
   },
-  "search.filter.locked.server": {
-    "message": "サーバーによる条件"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "サーバーインスタンスにはクライアント側Modのみ追加可能"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "ゲームバージョンはサーバーによる条件です"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "ローダーはサーバーによる条件です"
   },
   "settings.sidebar.label.account": {
     "message": "アカウント"

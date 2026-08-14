@@ -2672,9 +2672,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3679,18 +3676,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "{count} címkét választottál ki. Fontold meg, hogy 12-re vagy annál kevesebbre csökkentsd a számukat, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "A címkék kiválasztásához előbb tölts fel egy verziót!"
-  },
-  "project.settings.title": {
-    "message": "Beállítások"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Projektek irányítópult megnyitása"
-  },
-  "project.status.archived.message": {
-    "message": "A(z) {title} archiválásra került. A(z) {title} nem kap további frissítéseket, kivéve, ha a fejlesztő úgy dönt, hogy visszavonja a projekt archiválását."
   },
   "project.versions.copy-id-option": {
     "message": "Azonosító másolása"

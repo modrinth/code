@@ -60,6 +60,7 @@ pub async fn update_project(
         &state,
     )
     .await?;
+    ensure_project_not_frozen(instance_id, project_path, &state).await?;
     let path = crate::state::instances::commands::update_project(
         instance_id,
         project_path,
@@ -197,6 +198,7 @@ pub async fn switch_project_version_with_dependencies(
         &state,
     )
     .await?;
+    ensure_project_not_frozen(instance_id, project_path, &state).await?;
     let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
@@ -289,6 +291,27 @@ pub async fn remove_project(
     Ok(())
 }
 
+#[tracing::instrument]
+pub async fn set_project_locked(
+    instance_id: &str,
+    project: &str,
+    locked: bool,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    ensure_shared_instance_can_modify_project(instance_id, project, &state)
+        .await?;
+    crate::state::instances::commands::set_project_locked(
+        instance_id,
+        project,
+        locked,
+        &state,
+    )
+    .await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+    Ok(())
+}
+
 async fn ensure_shared_instance_can_modify_project(
     instance_id: &str,
     project_path: &str,
@@ -320,6 +343,28 @@ async fn ensure_shared_instance_can_modify_project(
     if source_kind.is_some_and(ContentSourceKind::is_shared_instance_managed) {
         return Err(crate::ErrorKind::InputError(
             "Shared instance managed content cannot be changed directly."
+                .to_string(),
+        )
+        .into());
+    }
+
+    Ok(())
+}
+
+async fn ensure_project_not_frozen(
+    instance_id: &str,
+    project_path: &str,
+    state: &State,
+) -> crate::Result<()> {
+    if crate::state::instances::commands::is_project_locked(
+        instance_id,
+        project_path,
+        state,
+    )
+    .await?
+    {
+        return Err(crate::ErrorKind::InputError(
+            "Frozen content cannot change versions. Unfreeze it first."
                 .to_string(),
         )
         .into());

@@ -20,18 +20,12 @@
 		</div>
 
 		<div class="flex flex-col gap-6 px-6 pb-6">
-			<div class="flex justify-end gap-2">
-				<ButtonLink class="w-full" href="https://support.modrinth.com" @click="modal?.hide()">
+			<div class="grid grid-cols-2 gap-2">
+				<ButtonLink href="https://support.modrinth.com" @click="modal?.hide()">
 					<MessagesSquareIcon />
 					{{ formatMessage(messages.getSupport) }}
 				</ButtonLink>
-				<Button
-					type="colored"
-					color="brand"
-					class="w-full"
-					:disabled="loadingSignIn"
-					@click="signIn"
-				>
+				<Button type="colored" color="brand" :disabled="loadingSignIn" @click="signIn">
 					<SpinnerIcon v-if="loadingSignIn" class="animate-spin" />
 					<svg
 						v-else

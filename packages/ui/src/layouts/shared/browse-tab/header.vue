@@ -178,7 +178,7 @@ async function handleSelectedProjectsLeaveResult(
 				</PageHeaderMetadata>
 			</template>
 		</PageHeader>
-		<Admonition v-if="installContext.warning" type="warning" class="mb-1">
+		<Admonition v-if="installContext.warning" type="warning" class="mt-4 mb-1">
 			{{ installContext.warning }}
 		</Admonition>
 	</template>

@@ -1568,9 +1568,6 @@
   "layout.footer.social.discord": {
     "message": "דיסקורד"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "מסטודון"
   },
@@ -2023,15 +2020,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.title": {
-    "message": "הגדרות"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "ללוח הבקרה של הפרויקטים"
-  },
-  "project.status.archived.message": {
-    "message": "הפרויקט {title} הועבר לארכיון. {title} לא יקבל עדכונים נוספים, אלא אם המחבר יחליט להוציא את הפרויקט מהארכיון."
   },
   "project.versions.title": {
     "message": "גרסאות"

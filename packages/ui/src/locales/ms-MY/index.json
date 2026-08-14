@@ -488,18 +488,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nama projek"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Mengikut abjad"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Paling baharu dahulu"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Paling lama dahulu"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Isih mengikut {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Kemas kini semua"
   },
@@ -1678,24 +1666,6 @@
   },
   "instances.content-install.select-icon": {
     "defaultMessage": "Pilih ikon"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Pek mod ini tidak menyertakan sebarang kandungan tambahan."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Tiada kandungan dijumpai"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Kandungan pek mod"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Sedang memuat kandungan..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Tiada projek yang sepadan dengan carian anda."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Cari {count, number} {count, plural, other {projek}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Semasa"
@@ -5055,4 +5025,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

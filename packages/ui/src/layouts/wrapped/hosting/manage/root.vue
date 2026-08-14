@@ -1124,8 +1124,13 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 	)
 }
 
+let newModInvalidateTimer: ReturnType<typeof setTimeout> | null = null
 const handleNewMod = () => {
-	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	if (newModInvalidateTimer) clearTimeout(newModInvalidateTimer)
+	newModInvalidateTimer = setTimeout(() => {
+		newModInvalidateTimer = null
+		void queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	}, 500)
 }
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
@@ -1520,6 +1525,10 @@ function initializeServer() {
 
 const cleanup = () => {
 	isMounted.value = false
+	if (newModInvalidateTimer) {
+		clearTimeout(newModInvalidateTimer)
+		newModInvalidateTimer = null
+	}
 
 	saveWsStateToCache()
 
