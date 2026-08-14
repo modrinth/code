@@ -4571,18 +4571,6 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installazione fallita"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Si è verificato un errore durante l'installazione della piattaforma. Riprova più tardi."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Questa versione di Minecraft o del loader non è potuta essere installata. Potrebbe essere non valida o non supportata."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Questo pacchetto non è potuto essere installato. Potrebbe essere corrotto o incompatibile."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Questa versione del pacchetto non include un file scaricabile. Potrebbe essere stata malformata."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Si è verificato un errore durante l'installazione."
   },

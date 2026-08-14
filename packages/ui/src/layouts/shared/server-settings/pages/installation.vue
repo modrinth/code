@@ -302,10 +302,7 @@ const manifestQuery = useQuery({
 		() => ['loader-manifest', apiLoaderName.value, manifestFormatVersion.value] as const,
 	),
 	queryFn: () =>
-		client.launchermeta.manifest_v0.getManifest(
-			apiLoaderName.value!,
-			manifestFormatVersion.value,
-		),
+		client.launchermeta.manifest_v0.getManifest(apiLoaderName.value!, manifestFormatVersion.value),
 	enabled: computed(() => !!apiLoaderName.value),
 	staleTime: 5 * 60 * 1000,
 })
@@ -624,16 +621,12 @@ provideInstallationSettings({
 		if (loader === 'paper') {
 			const supported = paperSupportedVersionsQuery.data.value
 			if (!supported) return false
-			return serverVersions.some(
-				(v) => v.version_type !== 'release' && supported.has(v.version),
-			)
+			return serverVersions.some((v) => v.version_type !== 'release' && supported.has(v.version))
 		}
 		if (loader === 'purpur') {
 			const supported = purpurSupportedVersionsQuery.data.value
 			if (!supported) return false
-			return serverVersions.some(
-				(v) => v.version_type !== 'release' && supported.has(v.version),
-			)
+			return serverVersions.some((v) => v.version_type !== 'release' && supported.has(v.version))
 		}
 		const supportedVersions = getSupportedManifestGameVersions()
 		if (!supportedVersions) return false

@@ -29,10 +29,7 @@ type UseServerInstallationTrackerOptions = {
 	content?: ReadableRef<Archon.Content.v1.Addons | null | undefined>
 }
 
-type ServerInstallationPlatform = Extract<
-	ServerInstallationKey,
-	{ type: 'platform' }
->['platform']
+type ServerInstallationPlatform = Extract<ServerInstallationKey, { type: 'platform' }>['platform']
 
 function installationKeyId(key: ServerInstallationKey) {
 	switch (key.type) {

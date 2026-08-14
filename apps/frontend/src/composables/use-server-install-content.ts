@@ -428,14 +428,10 @@ export function useServerInstallContent({
 				serverId,
 				worldId,
 				install: async (plans) => {
-					await client.archon.content_v1.addAddons(
-						serverId,
-						worldId,
-						plans.map((plan) => ({
-							project_id: plan.projectId,
-							version_id: plan.versionId,
-						})),
-					)
+					const addons = await resolveQueuedAddonPlans(plans)
+					if (addons.length > 0) {
+						await client.archon.content_v1.addAddons(serverId, worldId, addons)
+					}
 				},
 				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
 			})

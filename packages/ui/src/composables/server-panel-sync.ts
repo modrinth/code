@@ -291,9 +291,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		}
 	}
 
-	function worldContentItemToAddon(
-		item: Archon.Sync.v1.WorldContentItem,
-	): Archon.Content.v1.Addon {
+	function worldContentItemToAddon(item: Archon.Sync.v1.WorldContentItem): Archon.Content.v1.Addon {
 		return {
 			id: item.version?.id ?? item.version_id ?? item.file_sha1 ?? item.filename,
 			filename: item.filename,
@@ -314,9 +312,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		}
 	}
 
-	function parentDirectoryToAddonKind(
-		parentDirectory: string,
-	): Archon.Content.v1.AddonKind {
+	function parentDirectoryToAddonKind(parentDirectory: string): Archon.Content.v1.AddonKind {
 		switch (parentDirectory) {
 			case 'plugins':
 				return 'plugin'
