@@ -463,26 +463,25 @@ fn pack_get_relative_path(
 fn get_mrpack_environment(
     environment: Option<VersionEnvironment>,
 ) -> HashMap<EnvType, SideType> {
-    let (client, server) = match environment
-        .unwrap_or(VersionEnvironment::Unknown)
-    {
-        VersionEnvironment::ClientAndServer
-        | VersionEnvironment::ClientOnlyServerOptional
-        | VersionEnvironment::ServerOnly
-        | VersionEnvironment::ServerOnlyClientOptional
-        | VersionEnvironment::ClientOrServer
-        | VersionEnvironment::ClientOrServerPrefersBoth
-        | VersionEnvironment::Unknown => {
-            (SideType::Required, SideType::Required)
-        }
-        VersionEnvironment::ClientOnly
-        | VersionEnvironment::SingleplayerOnly => {
-            (SideType::Required, SideType::Unsupported)
-        }
-        VersionEnvironment::DedicatedServerOnly => {
-            (SideType::Unsupported, SideType::Required)
-        }
-    };
+    let (client, server) =
+        match environment.unwrap_or(VersionEnvironment::Unknown) {
+            VersionEnvironment::ClientAndServer
+            | VersionEnvironment::ClientOnlyServerOptional
+            | VersionEnvironment::ServerOnly
+            | VersionEnvironment::ServerOnlyClientOptional
+            | VersionEnvironment::ClientOrServer
+            | VersionEnvironment::ClientOrServerPrefersBoth
+            | VersionEnvironment::Unknown => {
+                (SideType::Required, SideType::Required)
+            }
+            VersionEnvironment::ClientOnly
+            | VersionEnvironment::SingleplayerOnly => {
+                (SideType::Required, SideType::Unsupported)
+            }
+            VersionEnvironment::DedicatedServerOnly => {
+                (SideType::Unsupported, SideType::Required)
+            }
+        };
 
     HashMap::from([(EnvType::Client, client), (EnvType::Server, server)])
 }
