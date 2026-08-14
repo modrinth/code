@@ -230,11 +230,7 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Verifică link-urile externe"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Vizitează pagina de versiuni"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Vizitează setările link-urilor"
   }
 }
-

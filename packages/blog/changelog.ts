@@ -11,6 +11,127 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'app',
+		version: '0.17.7',
+		body: `## Added
+- Added a notification to indicate when modpack export is done.
+
+## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.
+
+## Fixed
+- Fixed modpack export appears to work but fails when imported as an instance.
+- Fixed modpack export progress bar.`,
+	},
+	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.`,
+	},
+	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'app',
+		version: '0.17.6',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.`,
+	},
+	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.
+- Updated parts of "General" settings for projects; moved the Monetization setting into the "Danger zone" with "Delete project"
+- Updated design of project settings header. Now has a dynamic back button to take you back to where you came from.
+
+## Fixed
+- Fixed changing slugs sometimes not redirecting properly.`,
+	},
+	{
+		date: `2026-08-10T18:17:39+00:00`,
+		product: 'web',
+		body: `## Added
+- Added official Modrinth subreddit and YouTube channel to footer, replacing GitHub which is already included below.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'app',
+		version: '0.17.5',
+		body: `## Changed
+- Common config file formats and RPO files are now hidden from the external modpack file warning modal.
+- Updated text in unknown file warning.
+- When viewing an instance's content in the app, content updates will now be checked immediately, rather than waiting for cache to be invalidated. It may take up to 10 minutes for updates to be shown in the content tab.
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed issue with animated GIFs sometimes not working in project page descriptions.
+- Fixed issue on Windows and Linux where the window close button was incorrectly coloured.
+- Fixed an issue when clicking content in the content tab of an instance it show a "Instance not found" notification
+- Fixed issue with the file information (name + file size) on the download button on project version pages not showing up.
+- Fixed broken buttons on the "Minecraft account required" modal on Windows.
+- Fixed the right sidebar closing when collapsing friend list sections when using the "Hide right sidebar" option.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations. Want to help translate the Modrinth website? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed issue with animated GIFs sometimes not working in project page descriptions.`,
+	},
+	{
+		date: `2026-08-10T17:34:55+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)`,
+	},
+	{
+		date: `2026-08-08T19:10:34+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed action bar becoming very wide on larger displays.
+- Version upload failing to detect mrpack loader.`,
+	},
+	{
+		date: `2026-08-07T20:41:51+00:00`,
+		product: 'app',
+		version: '0.17.4',
+		body: `## Changed
+- Added loading states for project members and server details, to make it feel smoother.
+- Improved popout menu animations.
+- Updated NeoForge icon to be closer to the actual logo and look more like a fox.
+- Updated design of buttons.
+
+## Fixed
+- Fixed "Licensed Unknown" showing up under details on server projects.
+- Fixed project types sometimes appearing in random orders on some pages.`,
+	},
+	{
+		date: `2026-08-07T20:41:51+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added loading states for project members and server details, to make it feel smoother.
+- Improved popout menu animations.
+- Updated project tag settings page to new design.
+- Updated NeoForge icon to be closer to the actual logo and look more like a fox.
+
+## Fixed
+- Fixed "Licensed Unknown" showing up under details on server projects.
+- Fixed tags settings page being broken.
+- Fixed project types sometimes appearing in random orders on some pages.
+- Fixed when the project download UI has two compatible versions and no additional content, it showed as radio buttons.`,
+	},
+	{
 		date: `2026-07-31T06:10:23+00:00`,
 		product: 'web',
 		body: `## Fixed

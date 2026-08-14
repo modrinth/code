@@ -17,10 +17,12 @@ import {
 	Accordion,
 	Avatar,
 	Badge,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
@@ -531,7 +533,7 @@ useSeoMeta({
 	<div>
 		<div class="landing-hero">
 			<div
-				class="relative mt-4 h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+				class="relative mt-4 h-fit w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 			>
 				{{ formatMessage(commonMessages.betaRelease) }}
 			</div>
@@ -545,21 +547,17 @@ useSeoMeta({
 			<h2 class="main-subheader">
 				{{ formatMessage(messages.description) }}
 			</h2>
-			<div class="button-group">
-				<ButtonStyled v-if="os" color="brand" size="large">
-					<button rel="noopener nofollow" @click="handleDownload">
-						<LinuxIcon v-if="os === 'Linux'" />
-						<WindowsIcon v-else-if="os === 'Windows'" />
-						<AppleIcon v-else-if="os === 'Mac'" />
-						{{ formatMessage(messages.downloadModrinthAppButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined" size="large">
-					<button @click="scrollToSection">
-						<ArrowDownIcon />
-						{{ formatMessage(messages.moreDownloadOptions) }}
-					</button>
-				</ButtonStyled>
+			<div class="mx-auto flex w-fit flex-wrap justify-center gap-2 [mask-image:none]">
+				<Button v-if="os" type="colored" color="brand" size="xl" @click="handleDownload">
+					<LinuxIcon v-if="os === 'Linux'" />
+					<WindowsIcon v-else-if="os === 'Windows'" />
+					<AppleIcon v-else-if="os === 'Mac'" />
+					{{ formatMessage(messages.downloadModrinthAppButton) }}
+				</Button>
+				<Button type="outlined" size="xl" @click="scrollToSection">
+					<ArrowDownIcon />
+					{{ formatMessage(messages.moreDownloadOptions) }}
+				</Button>
 			</div>
 			<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="" />
 			<div class="bottom-transition" />
@@ -602,11 +600,9 @@ useSeoMeta({
 							<div class="cell">{{ mod.version }}</div>
 							<div class="cell check">
 								<Checkbox :model-value="true" tabindex="-1" />
-								<ButtonStyled circular type="transparent">
-									<button tabindex="-1">
-										<TrashIcon />
-									</button>
-								</ButtonStyled>
+								<IconButton type="quiet" label="Delete" tabindex="-1">
+									<TrashIcon />
+								</IconButton>
 							</div>
 						</div>
 					</div>
@@ -750,10 +746,12 @@ useSeoMeta({
 					<div class="projects-showcase">
 						<div v-for="(row, index) in rows" :key="index" class="row">
 							<div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
-								<nuxt-link
+								<ButtonLink
 									v-for="project in row"
 									:key="project.id"
-									class="project button-animation gradient-border"
+									type="quiet"
+									interaction="none"
+									class="project gradient-border !h-auto !shrink !items-stretch !justify-start !whitespace-normal !p-4 !font-normal !leading-normal"
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
 								>
 									<Avatar :src="project.icon_url!" alt="" size="sm" />
@@ -765,7 +763,7 @@ useSeoMeta({
 											{{ project.description }}
 										</span>
 									</div>
-								</nuxt-link>
+								</ButtonLink>
 							</div>
 						</div>
 					</div>
@@ -1230,13 +1228,6 @@ useSeoMeta({
 		line-break: loose;
 		color: var(--landing-color-subheading);
 		max-width: 1096px;
-		mask-image: none;
-	}
-
-	.button-group {
-		width: fit-content;
-		margin: 0 auto;
-		justify-content: center;
 		mask-image: none;
 	}
 

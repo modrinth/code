@@ -2,6 +2,7 @@ use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::routes::ApiError;
 use crate::routes::internal::gotenberg::{GotenbergDocument, GotenbergError};
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use actix_web::http::header::HeaderName;
 use chrono::{DateTime, Datelike, Utc};
@@ -14,7 +15,7 @@ pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
 pub const MODRINTH_PAYMENT_ID: HeaderName =
     HeaderName::from_static("modrinth-payment-id");
-pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements:v3";
+pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements:v4";
 const REDIS_TIMEOUT_MARGIN_MS: u64 = 250;
 
 pub(crate) fn payment_statement_key(
@@ -166,7 +167,7 @@ impl GotenbergClient {
             .await
             .wrap_internal_err("failed to submit HTML to Gotenberg")?
             .error_for_status()
-            .wrap_internal_err("Gotenberg returned an error status")?;
+            .wrap_internal_err("received an error status from Gotenberg")?;
 
         Ok(())
     }
@@ -190,7 +191,9 @@ impl GotenbergClient {
         &self,
         statement: &PaymentStatement,
     ) -> Result<GotenbergDocument, ApiError> {
-        self.generate_payment_statement(statement).await?;
+        self.generate_payment_statement(statement)
+            .await
+            .wrap_api_err("executing `generate_payment_statement`")?;
 
         let timeout_ms = ENV.GOTENBERG_TIMEOUT;
         let redis_timeout_ms =
@@ -205,7 +208,7 @@ impl GotenbergClient {
                 .brpop(&response_key, Duration::from_millis(redis_timeout_ms)),
         )
         .await
-        .wrap_internal_err("Gotenberg document generation timed out")?
+        .wrap_internal_err("timed out generating Gotenberg document")?
         .wrap_internal_err("failed to get document over Redis")?
         .wrap_internal_err("no document was returned from Redis")?;
 
@@ -213,7 +216,7 @@ impl GotenbergClient {
             Result<GotenbergDocument, GotenbergError>,
         >(&document)
         .wrap_internal_err("failed to deserialize Redis document response")?
-        .wrap_internal_err("Gotenberg document generation failed")?;
+        .wrap_internal_err("failed to generate Gotenberg document")?;
 
         Ok(document)
     }

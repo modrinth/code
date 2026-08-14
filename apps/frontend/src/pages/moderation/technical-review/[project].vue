@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
+import { ButtonLink, injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import MaliciousSummaryModal, {
@@ -12,6 +12,7 @@ import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevC
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const route = useRoute()
+const keybinds = useModerationKeybinds()
 
 const projectId = String(useRouteId('project'))
 
@@ -269,17 +270,43 @@ function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 function refetch() {
 	queryClient.invalidateQueries({ queryKey: ['tech-review-project-report', projectId] })
 }
+
+function handleKeybinds(event: KeyboardEvent) {
+	keybinds.value.handle(event, {
+		scope: 'tech-review',
+		actions: {
+			goToTop: () => {
+				window.scrollTo({
+					top: 0,
+					behavior: 'smooth',
+				})
+			},
+			goToBottom: () => {
+				window.scrollTo({
+					top: document.body.scrollHeight,
+					behavior: 'smooth',
+				})
+			},
+		},
+	})
+}
+
+onMounted(() => {
+	window.addEventListener('keydown', handleKeybinds)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('keydown', handleKeybinds)
+})
 </script>
 
 <template>
 	<div class="flex flex-col gap-4">
 		<div>
-			<ButtonStyled
-				><nuxt-link :to="'/moderation/technical-review'">
-					<ArrowLeftIcon class="size-5" />
-					Back to queue
-				</nuxt-link></ButtonStyled
-			>
+			<ButtonLink :to="'/moderation/technical-review'">
+				<ArrowLeftIcon class="size-5" />
+				Back to queue
+			</ButtonLink>
 		</div>
 
 		<div v-if="isLoading" class="flex flex-col gap-4">

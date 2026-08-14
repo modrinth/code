@@ -1,7 +1,9 @@
 <template>
 	<div>
-		<MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
-			<CodeIcon class="inline-flex" />
+		<Admonition v-if="flags.developerMode" type="critical" class="mb-4" show-actions-underneath>
+			<template #icon="{ iconClass }">
+				<CodeIcon :class="iconClass" aria-hidden="true" />
+			</template>
 			<IntlFormatted :message-id="developerModeBanner.description">
 				<template #strong="{ children }">
 					<strong>
@@ -9,12 +11,12 @@
 					</strong>
 				</template>
 			</IntlFormatted>
-			<ButtonStyled color="red" type="highlight">
-				<button class="mt-3" @click="disableDeveloperMode()">
+			<template #actions>
+				<Button type="colored" color="red" @click="disableDeveloperMode()">
 					{{ formatMessage(developerModeBanner.deactivate) }}
-				</button>
-			</ButtonStyled>
-		</MessageBanner>
+				</Button>
+			</template>
+		</Admonition>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
 			<p>{{ formatMessage(colorTheme.description) }}</p>
@@ -41,13 +43,17 @@
 					</div>
 					<div class="project-list-layouts">
 						<button
-							class="preview-radio button-base"
+							type="button"
+							class="flex !w-full cursor-pointer flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-divider bg-button-bg p-0 text-left text-primary outline-2 outline-transparent transition-[filter,transform] hover:brightness-[0.85] focus-visible:ring-4 focus-visible:ring-brand-shadow active:scale-[0.97] active:brightness-[0.8] [&_.example-card]:m-0 [&_.example-card]:min-h-0 [&_.example-card]:border-2 [&_.example-card]:border-solid [&_.example-card]:border-transparent [&_.example-card]:p-4 [&_.example-card]:outline-2 [&_.example-card]:outline-transparent"
 							:class="{
-								selected: cosmetics.searchDisplayMode[projectType.id] === 'list',
+								'!text-contrast [&_.example-card]:!border-brand [&_.example-card]:!bg-brand-highlight [&_.radio]:text-brand':
+									cosmetics.searchDisplayMode[projectType.id] === 'list',
 							}"
 							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'list')"
 						>
-							<div class="preview">
+							<div
+								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
+							>
 								<div class="layout-list-mode">
 									<div class="example-card card"></div>
 									<div class="example-card card"></div>
@@ -55,25 +61,30 @@
 									<div class="example-card card"></div>
 								</div>
 							</div>
-							<div class="label">
+							<div
+								class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left"
+							>
 								<RadioButtonCheckedIcon
 									v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
-									class="radio shrink-0"
+									class="radio mr-2 shrink-0"
 								/>
-								<RadioButtonIcon v-else class="radio shrink-0" />
+								<RadioButtonIcon v-else class="radio mr-2 shrink-0" />
 								{{ formatMessage(layoutMode.rows) }}
 							</div>
 						</button>
 						<button
-							class="preview-radio button-base"
+							type="button"
+							class="flex !w-full cursor-pointer flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-divider bg-button-bg p-0 text-left text-primary outline-2 outline-transparent transition-[filter,transform] hover:brightness-[0.85] focus-visible:ring-4 focus-visible:ring-brand-shadow active:scale-[0.97] active:brightness-[0.8] [&_.example-card]:m-0 [&_.example-card]:min-h-0 [&_.example-card]:border-2 [&_.example-card]:border-solid [&_.example-card]:border-transparent [&_.example-card]:p-4 [&_.example-card]:outline-2 [&_.example-card]:outline-transparent"
 							:class="{
-								selected:
+								'!text-contrast [&_.example-card]:!border-brand [&_.example-card]:!bg-brand-highlight [&_.radio]:text-brand':
 									cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
 									cosmetics.searchDisplayMode[projectType.id] === 'grid',
 							}"
 							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'grid')"
 						>
-							<div class="preview">
+							<div
+								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
+							>
 								<div class="layout-gallery-mode">
 									<div class="example-card card"></div>
 									<div class="example-card card"></div>
@@ -81,15 +92,17 @@
 									<div class="example-card card"></div>
 								</div>
 							</div>
-							<div class="label">
+							<div
+								class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left"
+							>
 								<RadioButtonCheckedIcon
 									v-if="
 										cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
 										cosmetics.searchDisplayMode[projectType.id] === 'grid'
 									"
-									class="radio shrink-0"
+									class="radio mr-2 shrink-0"
 								/>
-								<RadioButtonIcon v-else class="radio shrink-0" />
+								<RadioButtonIcon v-else class="radio mr-2 shrink-0" />
 								{{ formatMessage(layoutMode.grid) }}
 							</div>
 						</button>
@@ -180,7 +193,8 @@
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Admonition,
+	Button,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
@@ -191,7 +205,6 @@ import {
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 
-import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'
 import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 
@@ -485,28 +498,5 @@ const listTypes = computed(() => {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
 	gap: var(--gap-lg);
-
-	.preview-radio .example-card {
-		border: 2px solid transparent;
-	}
-
-	.preview-radio.selected .example-card {
-		border-color: var(--color-brand);
-		background-color: var(--color-brand-highlight);
-	}
-
-	.preview {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-}
-
-.developer-message {
-	svg {
-		vertical-align: middle;
-		margin-bottom: 2px;
-		margin-right: 0.5rem;
-	}
 }
 </style>

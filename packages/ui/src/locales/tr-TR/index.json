@@ -467,8 +467,20 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Güncellendi"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural,one {# dosya}other {# dosya}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Oyun sürümü"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Yine de indir"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Yükleyici"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Bağlantılı mod paketi"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} kaldırıldı"
@@ -583,18 +595,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Proje isimleri"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetik"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Önce en yeni"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Önce en eski"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sıralama şekli {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Tümünü güncelle"
@@ -1160,6 +1160,15 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Bu çalışmayı mod paketinizde yeniden dağıtmak için özel izin alınmıştır."
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Grubu sil"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "{title} silinsin mi?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Grup silinemedi"
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Gruptan kaldır"
   },
@@ -1252,9 +1261,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Dosya kaydedildi"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Kapat"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Bul"
@@ -2033,24 +2039,6 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Simge seç"
   },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Bu mod paketi başka hiç bir ekstra işerik içermez."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "İçerik bulunamadı"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Mod paketi içeriği"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "İçerik yükleniyor..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Aramanızla eşleşen proje yok."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
   },
@@ -2791,6 +2779,42 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Bir Modrinth kullanıcısı."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Bu kullanıcıyı engellemek istediğinize emin misiniz?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Kullanıcıyı engellerken bir sorun oluştu. Lütfen tekrar deneyin."
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} engellendi."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Kullanıcı engellendi"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "{username}'i engelle"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Kullanıcı analizlerini göster"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Engelle"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Kullanıcı detaylarını göster"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Engellemeyi kaldır"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural,one{# proje} other{# proje}}"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Kullanıcı profili yüklenemedi."
   },
   "profile.label.badges": {
     "defaultMessage": "Rozetler"
@@ -3592,15 +3616,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Gelişmiş"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Veri paketlerini hariç tut"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Modları hariç tut"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Eklentileri hariç tut"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ortam"

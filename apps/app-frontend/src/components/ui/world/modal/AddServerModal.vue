@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PlayIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
@@ -96,24 +96,18 @@ defineExpose({ show, hide })
 		/>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button :disabled="!address" @click="addServer(false)">
-						<PlusIcon />
-						{{ formatMessage(messages.addServer) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!address" @click="addServer(true)">
-						<PlayIcon />
-						{{ formatMessage(messages.addAndPlay) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button :disabled="!address" @click="addServer(false)">
+					<PlusIcon />
+					{{ formatMessage(messages.addServer) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="!address" @click="addServer(true)">
+					<PlayIcon />
+					{{ formatMessage(messages.addAndPlay) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>

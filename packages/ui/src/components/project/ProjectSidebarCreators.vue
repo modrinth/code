@@ -2,45 +2,59 @@
 	<div class="flex flex-col gap-3">
 		<h2 class="text-lg font-semibold m-0">{{ formatMessage(messages.title) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold">
-			<template v-if="organization">
+			<template v-if="loading">
+				<div v-for="i in 2" :key="`creator-skeleton-${i}`" class="flex gap-2 items-center">
+					<div class="size-[32px] rounded-full bg-surface-4 animate-pulse"></div>
+					<div class="flex flex-col gap-1.5">
+						<div class="w-24 h-4 rounded-full bg-surface-4 animate-pulse"></div>
+						<div class="w-16 h-3 rounded-full bg-surface-4 animate-pulse"></div>
+					</div>
+				</div>
+			</template>
+			<template v-else-if="isEmpty">
+				<span class="text-red"> Error: Project has no members. This shouldn't happen. </span>
+			</template>
+			<template v-else>
+				<template v-if="organization">
+					<AutoLink
+						class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
+						:to="orgLink(organization.slug)"
+						:target="linkTarget ?? null"
+					>
+						<Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
+						<div class="flex flex-col flex-nowrap justify-center">
+							<span class="group-hover:underline font-medium">
+								{{ organization.name }}
+							</span>
+							<span class="text-sm font-normal text-secondary flex items-center gap-1"
+								><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
+							>
+						</div>
+					</AutoLink>
+					<hr v-if="sortedMembers.length > 0" class="w-full border-button-border my-0.5" />
+				</template>
 				<AutoLink
+					v-for="member in sortedMembers"
+					:key="`member-${member.id}`"
 					class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
-					:to="orgLink(organization.slug)"
-					:target="linkTarget ?? null"
+					:to="userLink(member.user.username)"
+					:target="resolveLinkTarget(userLinkTarget)"
 				>
-					<Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
-					<div class="flex flex-col flex-nowrap justify-center">
-						<span class="group-hover:underline font-medium">
-							{{ organization.name }}
+					<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
+					<div class="flex flex-col">
+						<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
+							<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
+							<CrownIcon
+								v-if="member.is_owner"
+								v-tooltip="formatMessage(messages.owner)"
+								class="text-brand-orange"
+							/>
+							<ExternalIcon v-if="resolveLinkTarget(userLinkTarget) === '_blank'" />
 						</span>
-						<span class="text-sm font-normal text-secondary flex items-center gap-1"
-							><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
-						>
+						<span class="text-sm font-normal text-secondary">{{ member.role }}</span>
 					</div>
 				</AutoLink>
-				<hr v-if="sortedMembers.length > 0" class="w-full border-button-border my-0.5" />
 			</template>
-			<AutoLink
-				v-for="member in sortedMembers"
-				:key="`member-${member.id}`"
-				class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
-				:to="userLink(member.user.username)"
-				:target="resolveLinkTarget(userLinkTarget)"
-			>
-				<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
-				<div class="flex flex-col">
-					<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
-						<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
-						<CrownIcon
-							v-if="member.is_owner"
-							v-tooltip="formatMessage(messages.owner)"
-							class="text-brand-orange"
-						/>
-						<ExternalIcon v-if="resolveLinkTarget(userLinkTarget) === '_blank'" />
-					</span>
-					<span class="text-sm font-normal text-secondary">{{ member.role }}</span>
-				</div>
-			</AutoLink>
 		</div>
 	</div>
 </template>
@@ -80,6 +94,7 @@ const props = defineProps<{
 	userLink: (username: string) => string
 	linkTarget?: string
 	userLinkTarget?: string | null
+	loading?: boolean
 }>()
 
 function resolveLinkTarget(target: string | null | undefined): string | null {
@@ -112,6 +127,8 @@ const sortedMembers = computed(() => {
 
 	return owner ? [owner, ...rest] : rest
 })
+
+const isEmpty = computed(() => !props.organization && sortedMembers.value.length === 0)
 
 const messages = defineMessages({
 	title: {

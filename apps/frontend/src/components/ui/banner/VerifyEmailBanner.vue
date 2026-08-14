@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { SettingsIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	defineMessages,
 	injectNotificationManager,
 	PagewideBanner,
@@ -97,15 +98,13 @@ async function handleResendEmailVerification() {
 			</span>
 		</template>
 		<template #actions_right>
-			<ButtonStyled color="orange">
-				<button v-if="hasEmail" @click="handleResendEmailVerification">
-					{{ formatMessage(verifyEmailBannerMessages.action) }}
-				</button>
-				<nuxt-link v-else to="/settings/account">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(addEmailBannerMessages.action) }}
-				</nuxt-link>
-			</ButtonStyled>
+			<Button v-if="hasEmail" type="colored" color="orange" @click="handleResendEmailVerification">
+				{{ formatMessage(verifyEmailBannerMessages.action) }}
+			</Button>
+			<ButtonLink v-else type="colored" color="orange" to="/settings/account">
+				<SettingsIcon aria-hidden="true" />
+				{{ formatMessage(addEmailBannerMessages.action) }}
+			</ButtonLink>
 		</template>
 	</PagewideBanner>
 </template>

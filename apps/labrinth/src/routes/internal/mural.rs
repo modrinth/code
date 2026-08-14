@@ -22,7 +22,7 @@ pub async fn get_bank_details(
     let mural = payouts_queue.muralpay.load();
     let mural = mural
         .as_ref()
-        .wrap_internal_err("Mural API not available")?;
+        .wrap_internal_err("required Mural API is not available")?;
     let fiat_and_rail_codes = FiatAndRailCode::iter().collect::<Vec<_>>();
     let details = mural
         .client

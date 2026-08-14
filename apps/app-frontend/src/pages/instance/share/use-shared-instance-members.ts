@@ -12,13 +12,14 @@ import {
 } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
+import { instanceKeys } from '../query-options'
 import {
 	normalizeInviteKey,
 	SHARED_INSTANCE_USER_LIMIT,
 	type ShareRow,
 } from './shared-instance-share-types'
 
-type MembersQueryKey = readonly ['sharedInstanceUsers', string]
+type MembersQueryKey = ReturnType<typeof instanceKeys.sharedMembers>
 
 type OptimisticChange = {
 	queryKey: MembersQueryKey
@@ -48,7 +49,7 @@ export function useSharedInstanceMembers(options: {
 	onError: (error: unknown) => void
 }) {
 	const queryClient = useQueryClient()
-	const queryKey = computed(() => ['sharedInstanceUsers', options.instance.value.id] as const)
+	const queryKey = computed(() => instanceKeys.sharedMembers(options.instance.value.id))
 	const invitingUserIds = new Set<string>()
 	const removingUserIds = new Set<string>()
 	const exclusiveMutationPending = ref(false)

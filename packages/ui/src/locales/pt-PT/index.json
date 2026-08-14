@@ -398,18 +398,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nomes dos projetos"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabético"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Mais recentes primeiro"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Mais antigos primeiro"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordenar por {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Atualizar tudo"
   },
@@ -496,9 +484,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Ficheiro salvo"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Fechar"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Encontrar"
@@ -751,21 +736,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Este modpack não inclui nenhum conteúdo adicional."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nenhum conteúdo encontrado"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Conteúdo do modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "A carregar conteúdo..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nenhum projeto corresponde à tua pesquisa."
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Atual"

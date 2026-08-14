@@ -14,63 +14,68 @@
 			:members="members"
 			:dependency-link-creator="createDependencyLink"
 		>
-			<template #headerActions>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="installing || (installed && installedVersion === version.id)"
-						@click="() => version && install(version.id)"
-					>
-						<DownloadIcon v-if="!installed" />
-						<SwapIcon v-else-if="installedVersion !== version.id" />
-						<CheckIcon v-else />
-						{{
-							installing
-								? formatMessage(messages.installing)
-								: installed && installedVersion === version.id
-									? formatMessage(commonMessages.installedLabel)
-									: installed
-										? formatMessage(commonMessages.switchToVersionButton)
-										: formatMessage(commonMessages.installButton)
-						}}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined" circular>
-					<OverflowMenu
-						v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
-						:options="[
-							{
-								id: 'open-in-browser',
-								link: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
-								external: true,
-							},
-							{
-								id: 'report',
-								color: 'red',
-								hoverFilled: true,
-								link: `https://modrinth.com/report?item=version&itemID=${version.id}`,
-								external: true,
-							},
-						]"
-						aria-label="More options"
-					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #open-in-browser>
-							<ExternalIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.openInBrowserButton) }}
-						</template>
-						<template #report>
-							<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+			<template #headerActions="{ primaryFile }">
+				<Button
+					v-tooltip="
+						primaryFile?.url
+							? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
+							: undefined
+					"
+					type="colored"
+					color="brand"
+					:disabled="installing || (installed && installedVersion === version.id)"
+					@click="() => version && install(version.id)"
+				>
+					<DownloadIcon v-if="!installed" />
+					<SwapIcon v-else-if="installedVersion !== version.id" />
+					<CheckIcon v-else />
+					{{
+						installing
+							? formatMessage(messages.installing)
+							: installed && installedVersion === version.id
+								? formatMessage(commonMessages.installedLabel)
+								: installed
+									? formatMessage(commonMessages.switchToVersionButton)
+									: formatMessage(commonMessages.installButton)
+					}}
+				</Button>
+				<TeleportOverflowMenu
+					type="outlined"
+					label="More options"
+					:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+					:options="[
+						{
+							id: 'open-in-browser',
+							label: formatMessage(commonMessages.openInBrowserButton),
+							type: 'link',
+							href: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
+							target: '_blank',
+						},
+						{
+							id: 'report',
+							label: formatMessage(commonMessages.reportButton),
+							type: 'link',
+							tone: 'red',
+							href: `https://modrinth.com/report?item=version&itemID=${version.id}`,
+							target: '_blank',
+						},
+					]"
+				>
+					<MoreVerticalIcon aria-hidden="true" />
+					<template #open-in-browser>
+						<ExternalIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.openInBrowserButton) }}
+					</template>
+					<template #report>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
+					</template>
+				</TeleportOverflowMenu>
 			</template>
 			<template #supplementaryResourceActions="{ file }">
-				<ButtonStyled>
-					<a :href="file.url" :download="file.filename" target="_blank">
-						<DownloadIcon aria-hidden="true" />
-						{{ formatMessage(messages.downloadInBrowser) }}
-					</a>
-				</ButtonStyled>
+				<ButtonLink :href="file.url" :download="file.filename" target="_blank">
+					<DownloadIcon aria-hidden="true" />
+					{{ formatMessage(messages.downloadInBrowser) }}
+				</ButtonLink>
 			</template>
 		</VersionPage>
 	</div>
@@ -87,12 +92,12 @@ import {
 	ReportIcon,
 	VersionIcon,
 } from '@modrinth/assets'
+import { Button, ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	type DependencyContext,
-	OverflowMenu,
+	useFormatBytes,
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'
@@ -104,6 +109,7 @@ import { get_project_many, get_version_many } from '@/helpers/cache.js'
 import { useBreadcrumb } from '@/providers/breadcrumbs'
 
 const { formatMessage } = useVIntl()
+const formatBytes = useFormatBytes()
 
 const messages = defineMessages({
 	allVersions: {

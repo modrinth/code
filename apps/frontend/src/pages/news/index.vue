@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ChevronRightIcon, GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { ButtonStyled, NewsArticleCard, useFormatDateTime } from '@modrinth/ui'
+import { ButtonLink, NewsArticleCard, useFormatDateTime } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
@@ -44,20 +44,27 @@ useSeoMeta({
 	<div class="page py-6">
 		<div class="flex flex-wrap items-center justify-between gap-4 px-6">
 			<div>
-				<h1 class="m-0 text-3xl font-extrabold">News</h1>
+				<h1 class="m-0 text-3xl font-semibold">News</h1>
 			</div>
 			<div class="flex gap-2">
 				<NewsletterButton />
-				<ButtonStyled circular>
-					<a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank">
-						<RssIcon />
-					</a>
-				</ButtonStyled>
-				<ButtonStyled circular>
-					<a v-tooltip="`Changelog`" href="/news/changelog" aria-label="Changelog">
-						<GitGraphIcon />
-					</a>
-				</ButtonStyled>
+				<ButtonLink
+					v-tooltip="`RSS feed`"
+					aria-label="RSS feed"
+					href="/news/feed/rss.xml"
+					target="_blank"
+					class="!w-9 !rounded-full !px-0"
+				>
+					<RssIcon />
+				</ButtonLink>
+				<ButtonLink
+					v-tooltip="`Changelog`"
+					href="/news/changelog"
+					aria-label="Changelog"
+					class="!w-9 !rounded-full !px-0"
+				>
+					<GitGraphIcon />
+				</ButtonLink>
 			</div>
 		</div>
 

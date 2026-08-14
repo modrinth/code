@@ -1,3 +1,26 @@
+:root {
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-expand-enter-from,
+.floating-expand-leave-to {
+	opacity: 0;
+	scale: 0.9 0.3;
+}
+
+.floating-expand-enter-to,
+.floating-expand-leave-from {
+	opacity: 1;
+}
+
+.floating-expand-enter-active,
+.floating-expand-leave-active {
+	transition:
+		opacity 0.125s var(--ease-out-expo),
+		scale 0.125s var(--ease-out-expo);
+	transform-origin: top;
+}
+
 @layer utilities {
 	.heading-xl {
 		@apply m-0 text-xl font-semibold leading-none text-contrast;

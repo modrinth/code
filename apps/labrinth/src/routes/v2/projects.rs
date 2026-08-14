@@ -1,7 +1,9 @@
+use crate::database::models as db_models;
 use crate::database::models::categories::LinkPlatform;
 use crate::database::models::{project_item, version_item};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
+use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, Version,
 };
@@ -13,6 +15,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
 use crate::search::{SearchBackend, SearchRequest, SearchState};
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -79,7 +83,8 @@ pub async fn project_search(
     // While the backend for this has changed, it doesnt affect much
     // in the API calls except that 'versions:x' is now 'game_versions:x'
     let facets: Option<Vec<Vec<String>>> = if let Some(facets) = info.facets {
-        let facets = serde_json::from_str::<Vec<Vec<String>>>(&facets)?;
+        let facets = serde_json::from_str::<Vec<Vec<String>>>(&facets)
+            .wrap_request_err("deserializing JSON data")?;
 
         Some(
             facets
@@ -119,7 +124,10 @@ pub async fn project_search(
         ..info
     };
 
-    let results = search_backend.search_for_project(&info, &redis).await?;
+    let results = search_backend
+        .search_for_project(&info, &redis)
+        .await
+        .wrap_api_err("searching projects")?;
 
     let results = LegacySearchResults::from(results);
 
@@ -194,12 +202,17 @@ pub async fn random_projects_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &pool, &redis)
+                    .await
+                    .wrap_internal_err(
+                        "executing `LegacyProject::from_many`",
+                    )?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -234,13 +247,18 @@ pub async fn projects_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &pool, &redis)
+                    .await
+                    .wrap_internal_err(
+                        "executing `LegacyProject::from_many`",
+                    )?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -284,18 +302,34 @@ pub async fn project_get(
     .await
     {
         Ok(resp) => resp.0,
-        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(ApiError::NotFound(_)) => {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
         Err(err) => return Err(err),
     };
 
     // Convert response to V2 format
     let version_item = match project.versions.first() {
         Some(vid) => {
-            version_item::DBVersion::get((*vid).into(), &**pool, &redis).await?
+            version_item::DBVersion::get((*vid).into(), &**pool, &redis)
+                .await
+                .wrap_internal_err("fetching version from database")?
         }
         None => None,
     };
-    let project = LegacyProject::from(project, version_item);
+    let has_archived_disclosure =
+        db_models::DBProjectDisclosure::projects_with_type(
+            ProjectDisclosureType::Archived,
+            &[project.id.into()],
+            &**pool,
+        )
+        .await
+        .wrap_internal_err("fetching archival disclosure status")?
+        .contains(&project.id.into());
+    let mut project = LegacyProject::from(project, version_item);
+    if has_archived_disclosure && project.status == ProjectStatus::Approved {
+        project.status = ProjectStatus::Archived;
+    }
     Ok(HttpResponse::Ok().json(project))
 }
 
@@ -371,7 +405,8 @@ pub async fn dependency_list(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     match v2_reroute::extract_ok_json::<
         crate::routes::v3::projects::DependencyInfo,
@@ -381,10 +416,13 @@ pub async fn dependency_list(
         Ok(dependency_info) => {
             let converted_projects = LegacyProject::from_many(
                 dependency_info.projects,
-                &**pool,
+                &pool,
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err(
+                "converting dependency projects to legacy responses",
+            )?;
             let converted_versions = dependency_info
                 .versions
                 .into_iter()
@@ -585,7 +623,9 @@ pub async fn project_edit(
     if let Some(donation_urls) = v2_new_project.donation_urls {
         // Fetch current donation links from project so we know what to delete
         let fetched_example_project =
-            project_item::DBProject::get(&info.0, &**pool, &redis).await?;
+            project_item::DBProject::get(&info.0, &**pool, &redis)
+                .await
+                .wrap_api_err("fetching project from database")?;
         let donation_links = fetched_example_project
             .map(|x| {
                 x.urls
@@ -645,9 +685,11 @@ pub async fn project_edit(
         redis.clone(),
         session_queue.clone(),
         search_state.clone(),
+        true,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // If client and server side were set, we will call
     // the version setting route for each version to set the side types for each of them.
@@ -659,11 +701,13 @@ pub async fn project_edit(
             &**pool,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_api_err("fetching project from database")?;
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions =
             version_item::DBVersion::get_many(&version_ids, &**pool, &redis)
-                .await?;
+                .await
+                .wrap_internal_err("fetching versions from database")?;
         for version in versions {
             let version = Version::from(version);
             let mut fields = version.fields;
@@ -690,7 +734,8 @@ pub async fn project_edit(
                 session_queue.clone(),
                 search_state.clone(),
             )
-            .await?;
+            .await
+            .wrap_api_err("editing project")?;
         }
     }
     Ok(response)
@@ -795,7 +840,9 @@ pub async fn projects_edit(
     // If we are *setting* donation links, we will set every possible donation link to None, as
     // setting will delete all of them then 're-add' the ones we want to keep
     if let Some(donation_url) = bulk_edit_project.donation_urls {
-        let link_platforms = LinkPlatform::list(&**pool, &redis).await?;
+        let link_platforms = LinkPlatform::list(&**pool, &redis)
+            .await
+            .wrap_internal_err("fetching link platform from Redis")?;
         for link in link_platforms {
             if link.donation {
                 link_urls.insert(link.name, None);

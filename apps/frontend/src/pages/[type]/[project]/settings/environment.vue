@@ -12,14 +12,14 @@
 				</div>
 				<div>Visit Project Settings to manage environments for each version.</div>
 			</div>
-			<ButtonStyled color="green">
-				<nuxt-link
-					:to="`/${projectV2.project_type}/${projectV2.id}/settings/versions`"
-					class="items flex"
-				>
-					<SettingsIcon /> Edit versions
-				</nuxt-link>
-			</ButtonStyled>
+			<ButtonLink
+				type="colored"
+				color="green"
+				:to="`/${projectV2.project_type}/${projectV2.id}/settings/versions`"
+				class="items flex"
+			>
+				<SettingsIcon /> Edit versions
+			</ButtonLink>
 		</div>
 	</div>
 </template>
@@ -27,7 +27,8 @@
 <script setup lang="ts">
 import { SettingsIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	ButtonLink,
+	commonProjectSettingsMessages,
 	EnvironmentMigration,
 	injectProjectPageContext,
 	LoadingIndicator,
@@ -35,6 +36,8 @@ import {
 import { isStaff } from '@modrinth/utils'
 
 const { currentMember, projectV2, projectV3 } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.environment)
 
 const showEnvironmentMigration = computed(() => {
 	return isStaff(currentMember.value?.user)

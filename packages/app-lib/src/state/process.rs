@@ -18,8 +18,6 @@ use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::sync::LazyLock;
 use std::time::Instant;
-#[cfg(feature = "tauri")]
-use tauri::Emitter;
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
@@ -107,6 +105,7 @@ impl ProcessManager {
         instance_name: &str,
         mut mc_command: Command,
         post_exit_command: Option<String>,
+        post_exit_env_vars: Vec<(String, String)>,
         logs_folder: PathBuf,
         xml_logging: bool,
         main_class_keep_alive: TempDir,
@@ -217,6 +216,7 @@ impl ProcessManager {
             instance_id.to_string(),
             instance_path.to_string(),
             post_exit_command,
+            post_exit_env_vars,
             metadata.uuid,
         ));
 
@@ -296,7 +296,11 @@ struct Process {
     rpc_server: RpcServer,
 }
 
-#[derive(Debug, Default, Serialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
 pub struct Log4jEvent {
     pub timestamp_millis: Option<i64>,
     pub logger_name: Option<String>,
@@ -604,15 +608,11 @@ impl Process {
 
         #[cfg(feature = "tauri")]
         {
-            if let Ok(event_state) = crate::EventState::get() {
-                let _ = event_state.app.emit(
-                    "log",
-                    LogPayload {
-                        instance_id: instance_id.to_string(),
-                        event: LogEvent::Log4j(event.clone()),
-                    },
-                );
-            }
+            let event_state = crate::EventState::get();
+            let _ = event_state.send(crate::event::AppEvent::Log(LogPayload {
+                instance_id: instance_id.to_string(),
+                event: LogEvent::Log4j(event.clone()),
+            }));
         }
         #[cfg(not(feature = "tauri"))]
         {
@@ -625,17 +625,13 @@ impl Process {
 
         #[cfg(feature = "tauri")]
         {
-            if let Ok(event_state) = crate::EventState::get() {
-                let _ = event_state.app.emit(
-                    "log",
-                    LogPayload {
-                        instance_id: instance_id.to_string(),
-                        event: LogEvent::Legacy {
-                            message: message.to_string(),
-                        },
-                    },
-                );
-            }
+            let event_state = crate::EventState::get();
+            let _ = event_state.send(crate::event::AppEvent::Log(LogPayload {
+                instance_id: instance_id.to_string(),
+                event: LogEvent::Legacy {
+                    message: message.to_string(),
+                },
+            }));
         }
         #[cfg(not(feature = "tauri"))]
         {
@@ -733,7 +729,7 @@ impl Process {
                     InstancePayloadType::ServerJoined {
                         host,
                         port,
-                        timestamp,
+                        timestamp: timestamp.to_rfc3339(),
                     },
                 )
                 .await;
@@ -750,6 +746,7 @@ impl Process {
         instance_id: String,
         instance_path: String,
         post_exit_command: Option<String>,
+        post_exit_env_vars: Vec<(String, String)>,
         uuid: Uuid,
     ) -> crate::Result<()> {
         async fn update_playtime(
@@ -885,7 +882,7 @@ impl Process {
 
                 if let Some(command) = cmd.next() {
                     let mut command = Command::new(command);
-                    command.args(cmd).current_dir(
+                    command.args(cmd).envs(post_exit_env_vars).current_dir(
                         state.directories.instances_dir().join(&instance_path),
                     );
                     command.spawn().map_err(IOError::from)?;

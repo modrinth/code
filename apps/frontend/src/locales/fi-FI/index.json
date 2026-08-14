@@ -863,9 +863,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -979,9 +976,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.title": {
-    "message": "Asetukset"
   },
   "project.versions.title": {
     "message": "Versiot"

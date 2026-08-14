@@ -55,6 +55,7 @@ pub struct CommonProject {
     pub loaders: Vec<String>,
     pub versions: Vec<VersionId>,
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub gallery: Vec<GalleryItem>,
     pub color: Option<u32>,
     pub thread_id: ThreadId,

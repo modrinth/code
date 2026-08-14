@@ -16,6 +16,11 @@ export interface ModerationActions {
 	tryEditMessage: () => void
 }
 
+export interface TechReviewActions {
+	goToTop: () => void
+	goToBottom: () => void
+}
+
 export interface ModerationState {
 	currentStage: number
 	totalStages: number
@@ -44,7 +49,15 @@ export type ModerationChecklistContext = {
 	actions: ModerationActions
 }
 
-export type ModerationContext = ModerationProjectContext | ModerationChecklistContext
+export type ModerationTechReviewContext = {
+	scope: 'tech-review'
+	actions: TechReviewActions
+}
+
+export type ModerationContext =
+	| ModerationProjectContext
+	| ModerationChecklistContext
+	| ModerationTechReviewContext
 
 export interface KeybindDefinition {
 	key: string
@@ -58,7 +71,7 @@ export interface KeybindDefinition {
 export type BaseKeybindListener<T> = {
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
-	scope: 'project' | 'checklist'
+	scope: 'project' | 'checklist' | 'tech-review'
 	enabled?: (ctx: T) => boolean
 	action: (ctx: T) => void
 }
@@ -69,7 +82,13 @@ export type KeybindProjectListener = BaseKeybindListener<ModerationProjectContex
 export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistContext> & {
 	scope: 'checklist'
 }
-export type KeybindListener = KeybindProjectListener | KeybindChecklistListener
+export type KeybindTechReviewListener = BaseKeybindListener<ModerationTechReviewContext> & {
+	scope: 'tech-review'
+}
+export type KeybindListener =
+	| KeybindProjectListener
+	| KeybindChecklistListener
+	| KeybindTechReviewListener
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())

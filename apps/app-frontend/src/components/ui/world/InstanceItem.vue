@@ -9,11 +9,11 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	injectNotificationManager,
-	OverflowMenu,
 	SmartClickable,
+	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
@@ -21,12 +21,12 @@ import {
 import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project } from '@/helpers/cache'
-import { process_listener } from '@/helpers/events'
 import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
@@ -108,7 +108,7 @@ const stop = async (event: MouseEvent) => {
 	loading.value = false
 }
 
-const unlistenProcesses = await process_listener(async () => {
+useAppEvent('process', async () => {
 	await checkProcess()
 })
 
@@ -120,10 +120,6 @@ const checkProcess = async () => {
 
 onMounted(() => {
 	checkProcess()
-})
-
-onUnmounted(() => {
-	unlistenProcesses()
 })
 </script>
 <template>
@@ -185,54 +181,53 @@ onUnmounted(() => {
 				</div>
 			</div>
 			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-				<ButtonStyled v-if="playing && !loading" color="red">
-					<button @click="stop">
-						<StopCircleIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.stopButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else>
-					<button
-						v-tooltip="
-							instance.quarantined
-								? 'This instance has been locked'
-								: playing
-									? 'Instance is already open'
-									: null
-						"
-						:disabled="instance.quarantined || playing || loading"
-						@click="play"
-					>
-						<SpinnerIcon v-if="loading" class="animate-spin" />
-						<PlayIcon v-else aria-hidden="true" />
-						{{ formatMessage(commonMessages.playButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						:options="[
-							{
-								id: 'open-instance',
-								shown: !!instance.id,
-								action: () => router.push(encodeURI(`/instance/${instance.id}`)),
-							},
-							{
-								id: 'open-folder',
-								action: () => showInstanceInFolder(instance.id),
-							},
-						]"
-					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #open-instance>
-							<EyeIcon aria-hidden="true" />
-							View instance
-						</template>
-						<template #open-folder>
-							<FolderOpenIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.openFolderButton) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+				<Button v-if="playing && !loading" type="colored" color="red" @click="stop">
+					<StopCircleIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.stopButton) }}
+				</Button>
+				<Button
+					v-else
+					v-tooltip="
+						instance.quarantined
+							? 'This instance has been locked'
+							: playing
+								? 'Instance is already open'
+								: null
+					"
+					:disabled="instance.quarantined || playing || loading"
+					@click="play"
+				>
+					<SpinnerIcon v-if="loading" class="animate-spin" />
+					<PlayIcon v-else aria-hidden="true" />
+					{{ formatMessage(commonMessages.playButton) }}
+				</Button>
+				<TeleportOverflowMenu
+					type="quiet"
+					label="More options"
+					:options="[
+						{
+							id: 'open-instance',
+							label: 'View instance',
+							shown: !!instance.id,
+							action: () => router.push(encodeURI(`/instance/${instance.id}`)),
+						},
+						{
+							id: 'open-folder',
+							label: formatMessage(commonMessages.openFolderButton),
+							action: () => showInstanceInFolder(instance.id),
+						},
+					]"
+				>
+					<MoreVerticalIcon aria-hidden="true" />
+					<template #open-instance>
+						<EyeIcon aria-hidden="true" />
+						View instance
+					</template>
+					<template #open-folder>
+						<FolderOpenIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.openFolderButton) }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 	</SmartClickable>

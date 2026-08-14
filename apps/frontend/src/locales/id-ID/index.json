@@ -1811,9 +1811,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2413,15 +2410,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.title": {
-    "message": "Pengaturan"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Kunjungi dasbor proyek"
-  },
-  "project.status.archived.message": {
-    "message": "{title} telah diarsip. {title} tidak akan menerima pembaruan di masa mendatang kecuali pembuat memutuskan untuk membuka arsip proyek ini."
   },
   "project.versions.title": {
     "message": "Versi"

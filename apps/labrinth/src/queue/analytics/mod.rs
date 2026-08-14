@@ -4,6 +4,7 @@ use crate::models::analytics::{
 };
 use crate::routes::ApiError;
 use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
+use crate::util::error::Context as _;
 use dashmap::{DashMap, DashSet};
 use std::collections::HashMap;
 use tracing::trace;
@@ -11,9 +12,9 @@ use xredis::RedisPool;
 
 pub mod cache;
 
-const DOWNLOADS_NAMESPACE: &str = "downloads:v3";
-const VIEWS_NAMESPACE: &str = "views:v3";
-const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays:v3";
+const DOWNLOADS_NAMESPACE: &str = "downloads:v4";
+const VIEWS_NAMESPACE: &str = "views:v4";
+const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays:v4";
 const MINECRAFT_SERVER_PLAYS_EXPIRY: u64 = 86_400; // 24 hours
 const MINECRAFT_SERVER_PLAYS_LIMIT: u32 = 5;
 
@@ -99,25 +100,39 @@ impl AnalyticsQueue {
         if !affiliate_code_clicks_queue.is_empty() {
             let mut insert_clicks = client
                 .insert::<AffiliateCodeClick>("affiliate_code_clicks")
-                .await?;
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
 
             for (_, click_vec) in affiliate_code_clicks_queue {
                 for click in click_vec {
-                    insert_clicks.write(&click).await?;
+                    insert_clicks.write(&click).await.wrap_internal_err(
+                        "writing analytics data to ClickHouse",
+                    )?;
                 }
             }
 
-            insert_clicks.end().await?;
+            insert_clicks
+                .end()
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
         }
 
         if !playtime_queue.is_empty() {
-            let mut playtimes = client.insert::<Playtime>("playtime").await?;
+            let mut playtimes = client
+                .insert::<Playtime>("playtime")
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
 
             for playtime in playtime_queue {
-                playtimes.write(&playtime).await?;
+                playtimes.write(&playtime).await.wrap_internal_err(
+                    "writing analytics data to ClickHouse",
+                )?;
             }
 
-            playtimes.end().await?;
+            playtimes
+                .end()
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
         }
 
         if !minecraft_server_plays_queue.is_empty() {
@@ -142,10 +157,15 @@ impl AnalyticsQueue {
                     )
                 })
                 .collect::<Vec<_>>();
-            let mut redis_connection = redis.connect().await?;
+            let mut redis_connection =
+                redis.connect().await.wrap_internal_err(
+                    "connecting to redis for server play counts",
+                )?;
 
-            let results =
-                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
+            let results = redis_connection
+                .get_many_typed::<u32>(&redis_keys)
+                .await
+                .wrap_internal_err("fetching server play counts from redis")?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count = if let Some(count) = count {
                     if count >= MINECRAFT_SERVER_PLAYS_LIMIT {
@@ -164,18 +184,25 @@ impl AnalyticsQueue {
                         new_count,
                         Some(MINECRAFT_SERVER_PLAYS_EXPIRY as i64),
                     )
-                    .await?;
+                    .await
+                    .wrap_internal_err("writing server play count to redis")?;
             }
 
             let mut plays = client
                 .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
-                .await?;
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
 
             for (_, play) in raw_plays {
-                plays.write(&play).await?;
+                plays.write(&play).await.wrap_internal_err(
+                    "writing analytics data to ClickHouse",
+                )?;
             }
 
-            plays.end().await?;
+            plays
+                .end()
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
         }
 
         if !views_queue.is_empty() {
@@ -198,10 +225,15 @@ impl AnalyticsQueue {
                     )
                 })
                 .collect::<Vec<_>>();
-            let mut redis_connection = redis.connect().await?;
+            let mut redis_connection = redis
+                .connect()
+                .await
+                .wrap_internal_err("connecting to redis for view counts")?;
 
-            let results =
-                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
+            let results = redis_connection
+                .get_many_typed::<u32>(&redis_keys)
+                .await
+                .wrap_internal_err("fetching view counts from redis")?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count =
                     if let Some((views, monetized)) = raw_views.get_mut(idx) {
@@ -226,10 +258,14 @@ impl AnalyticsQueue {
                 let key = &redis_keys[idx];
                 redis_connection
                     .set(key, new_count, Some(6 * 60 * 60))
-                    .await?;
+                    .await
+                    .wrap_internal_err("writing view count to redis")?;
             }
 
-            let mut views = client.insert::<PageView>("views").await?;
+            let mut views = client
+                .insert::<PageView>("views")
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
 
             for (all_views, monetized) in raw_views {
                 for (idx, mut view) in all_views.into_iter().enumerate() {
@@ -237,11 +273,16 @@ impl AnalyticsQueue {
                         view.monetized = false;
                     }
 
-                    views.write(&view).await?;
+                    views.write(&view).await.wrap_internal_err(
+                        "writing analytics data to ClickHouse",
+                    )?;
                 }
             }
 
-            views.end().await?;
+            views
+                .end()
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
         }
 
         if !downloads_queue.is_empty() {
@@ -267,10 +308,15 @@ impl AnalyticsQueue {
                     )
                 })
                 .collect::<Vec<_>>();
-            let mut redis_connection = redis.connect().await?;
+            let mut redis_connection = redis
+                .connect()
+                .await
+                .wrap_internal_err("connecting to redis for download counts")?;
 
-            let results =
-                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
+            let results = redis_connection
+                .get_many_typed::<u32>(&redis_keys)
+                .await
+                .wrap_internal_err("fetching download counts from redis")?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count = if let Some(count) = count {
                     if count > 5 {
@@ -286,11 +332,18 @@ impl AnalyticsQueue {
                 let key = &redis_keys[idx];
                 redis_connection
                     .set(key, new_count, Some(6 * 60 * 60))
-                    .await?;
+                    .await
+                    .wrap_internal_err("writing download count to redis")?;
             }
 
-            let mut transaction = pool.begin().await?;
-            let mut downloads = client.insert::<Download>("downloads").await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
+            let mut downloads = client
+                .insert::<Download>("downloads")
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
 
             let mut version_downloads: HashMap<i64, i32> = HashMap::new();
             let mut project_downloads: HashMap<i64, i32> = HashMap::new();
@@ -310,7 +363,9 @@ impl AnalyticsQueue {
 
                 trace!("writing download {download:?}");
 
-                downloads.write(&download).await?;
+                downloads.write(&download).await.wrap_internal_err(
+                    "writing analytics data to ClickHouse",
+                )?;
             }
 
             sqlx::query!(
@@ -324,7 +379,8 @@ impl AnalyticsQueue {
                 &version_downloads.values().copied().collect::<Vec<_>>(),
             )
             .execute(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("incrementing version download counts")?;
 
             sqlx::query!(
                 "
@@ -337,10 +393,17 @@ impl AnalyticsQueue {
                 &project_downloads.values().copied().collect::<Vec<_>>(),
             )
             .execute(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("incrementing project download counts")?;
 
-            transaction.commit().await?;
-            downloads.end().await?;
+            transaction
+                .commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
+            downloads
+                .end()
+                .await
+                .wrap_internal_err("writing analytics data to ClickHouse")?;
         }
 
         Ok(())

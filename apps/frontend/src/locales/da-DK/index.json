@@ -1952,9 +1952,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2482,18 +2479,6 @@
   },
   "project.settings.tags.title": {
     "message": "Tags"
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Upload venligst en version først for at kunne vælge tags!"
-  },
-  "project.settings.title": {
-    "message": "Indstillinger"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Gå til projekt kontrolpanel"
-  },
-  "project.status.archived.message": {
-    "message": "{title} er blevet arkiveret. {title} vil ikke modtage flere opdateringer medmindre forfatteren beslutter sig for at fjerne projektet fra arkivet."
   },
   "project.versions.copy-id-option": {
     "message": "Kopier ID"

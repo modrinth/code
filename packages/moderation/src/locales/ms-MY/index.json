@@ -227,9 +227,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Sekurang-kurangnya satu gambar galeri diperlukan untuk mempamerkan kandungan {type} anda."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pek sumber anda, melainkan ianya pek audio atau terjemahan. Jika pek ini adalah pek audio atau terjemahan, sila pilih tag yang sesuai"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Muat naik gambar galeri"
   },
@@ -244,9 +241,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Sahkan pautan luaran"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Kunjungi laman versi"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Kunjungi tetapan pautan"

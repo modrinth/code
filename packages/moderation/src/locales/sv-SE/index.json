@@ -51,7 +51,7 @@
     "defaultMessage": "Din beskrivning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en klar och informativ beskrivning."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "Expandera beskrivningen"
+    "defaultMessage": "Utöka beskrivningen"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Redigera beskrivning"
@@ -72,7 +72,7 @@
     "defaultMessage": "Den utvalda galleribilden är ofta hur ditt projekt gör sitt första intryck."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Välj ut en galleribild"
+    "defaultMessage": "Visa en galleribild"
   },
   "nags.gallery.title": {
     "defaultMessage": "Besök gallerisida"
@@ -87,19 +87,19 @@
     "defaultMessage": "Några av dina externa länkar ser ut att vara likadana. Varje länk ska bara anges en gång och med den passande länktypen."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Städa upp de identiska länkarna"
+    "defaultMessage": "Städa upp identiska länkar"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Din beskrivning ska ha tillräckligt med vanlig text eller bild-alternativtext, för att hålla det tillgängligt till de som använder skärmavläsare eller de med långsamma internetkopplingar."
   },
   "nags.image-heavy-description.title": {
-    "defaultMessage": "Se till att det är tillgängligt"
+    "defaultMessage": "Säkerställ tillgänglighet"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licens-URL är ogiltig."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Din licens-URL pekar till {domain}, vilket inte är lämpligt för licensinformation. Licens-URL:er ska bara länka direkt till din licensfil, inte sociala medier, gaming-plattformar, osv."
+    "defaultMessage": "Din licens-URL leder till {domain}, vilket inte är lämpligt för licensinformation. Licens-URL:er ska länka direkt till din licensfil, inte sociala medier, spelplattformar, osv."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Din licens-URL ser ut att vara söndrig. Vänligen ange en URL till din licenstext."
@@ -141,7 +141,7 @@
     "defaultMessage": "Visa moderationstråd"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Kolla igenom och ta upp problemen från moderationsteamet innan du skickar in det igen."
+    "defaultMessage": "Granska och ta upp alla bekymmer från moderationsteamet innan du skickar in det igen."
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Läs återkoppling"
@@ -177,7 +177,7 @@
     "defaultMessage": "Välj språk"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Välj licensen din {type} är utgiven under."
+    "defaultMessage": "Välj licensen ditt {type} är utgiven under."
   },
   "nags.select-license.title": {
     "defaultMessage": "Välj en licens"
@@ -210,7 +210,7 @@
     "defaultMessage": "Besök allmänna inställningar"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Din sammanfattning kan inte vara samma som ditt projekts namn. Det är viktigt att du skriver en sammanfattning som är informativ och lockande."
+    "defaultMessage": "Din sammanfattning kan inte vara samma som projektnamnet. Det är viktigt att skriva en informativ och lockande sammanfattning."
   },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "Gör sammanfattningen unik"
@@ -222,13 +222,13 @@
     "defaultMessage": "Rensa upp sammanfattningen"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Din sammanfattning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en informativ och lockande sammanfattning."
+    "defaultMessage": "Din sammanfattning är {length} tecken långt. Åtminstone {minChars} tecken rekommenderas för en informativ och lockande sammanfattning"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Expandera sammanfattningen"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Om du håller projektets namn rent blir det lättare att komma ihåg och hitta. Versions- och laddarinformation visas automatiskt tillsammans med ditt projekt."
+    "defaultMessage": "Om du håller projektetnamnet fint blir det minnesvärt och lättare att hitta. Versions- och laddarinformation visas automatiskt tillsammans med ditt projekt."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rensa upp namnet"
@@ -243,19 +243,22 @@
     "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Vänligen tänk på att minska till {maxTagCount} eller färre för att säkerställa att din server visas i relevanta sökresultat."
   },
   "nags.too-many-tags-server.title": {
-    "defaultMessage": "Välj korrekta taggar"
+    "defaultMessage": "Välj lämpliga taggar"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Försök minska till {maxTagCount} eller färre för att säkerställa att ditt projekt visas i relevanta sökresultat."
   },
   "nags.too-many-tags.title": {
-    "defaultMessage": "Välj korrekta taggar"
+    "defaultMessage": "Välj lämpliga taggar"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Åtminstone en galleribild måste visa innehållet av din {type}."
+    "defaultMessage": "Minst en galleribild krävs för att visa innehållet i ditt {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "resurspaket, förutom ljud eller lokaliseringspaket. Om detta beskriver ditt paket, vänligen välj den passande taggen"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Minst en galleribild krävs för att visa innehållet i ditt resurspaket, utom för ljud- eller lokaliseringspaket. Beskriver det här ditt paket, vänligen välj lämplig tagg."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Minst tre galleribilder krävs för att visa innehållet i din shader i flera olika situationer och förhållanden."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ladda upp en galleribild"
@@ -271,9 +274,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verifiera externa länkar"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Besök versionssida"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Besök länkinställningar"

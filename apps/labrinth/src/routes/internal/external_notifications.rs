@@ -1,3 +1,5 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use crate::auth::get_user_from_headers;
@@ -152,16 +154,23 @@ async fn create_impl(
         .map(|x| DBUserId(*x))
         .collect::<Vec<_>>();
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
-    if !DBUser::exists_many(&user_ids, &mut txn).await? {
-        return Err(ApiError::InvalidInput(
+    if !DBUser::exists_many(&user_ids, &mut txn)
+        .await
+        .wrap_internal_err("fetching users from database")?
+    {
+        return Err(ApiError::Request(eyre::eyre!(
             "One of the specified users do not exist.".to_owned(),
-        ));
+        )));
     }
 
     // Skip users who already have an identical notification
-    let body_value = serde_json::value::to_value(&body)?;
+    let body_value = serde_json::value::to_value(&body)
+        .wrap_request_err("serializing external notification body")?;
     let already_notified = sqlx::query!(
         "
         SELECT DISTINCT user_id
@@ -172,7 +181,8 @@ async fn create_impl(
         body_value,
     )
     .fetch_all(&mut txn)
-    .await?
+    .await
+    .wrap_internal_err("fetching already notified from database")?
     .into_iter()
     .map(|row| DBUserId(row.user_id))
     .collect::<std::collections::HashSet<_>>();
@@ -188,7 +198,8 @@ async fn create_impl(
     let notification_ids = if email_strategy == EmailStrategy::Async {
         notification_builder
             .insert_many(notification_user_ids, &mut txn, &redis)
-            .await?
+            .await
+            .wrap_internal_err("inserting notification IDs into database")?
     } else {
         notification_builder
             .insert_many_without_delivery(
@@ -196,22 +207,31 @@ async fn create_impl(
                 &mut txn,
                 &redis,
             )
-            .await?
+            .await
+            .wrap_internal_err("inserting database records for `create_impl`")?
     };
 
     let notifications =
-        get_site_exposed_notifications(&notification_ids, &mut txn).await?;
+        get_site_exposed_notifications(&notification_ids, &mut txn)
+            .await
+            .wrap_api_err("fetching site exposed notifications")?;
 
-    txn.commit().await?;
+    txn.commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     broadcast_notifications(&redis, notifications).await;
 
     if email_strategy == EmailStrategy::Sync {
-        let mut email_txn = pool.begin().await?;
+        let mut email_txn = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
 
         let mut failed = HashMap::new();
         let users = DBUser::get_many_ids(&user_ids, &mut email_txn, &redis)
-            .await?
+            .await
+            .wrap_internal_err("fetching users from database")?
             .into_iter()
             .map(|user| (user.id, user))
             .collect::<HashMap<_, _>>();
@@ -242,10 +262,7 @@ async fn create_impl(
                     }
                 }
                 Err(error) => {
-                    if matches!(
-                        error,
-                        ApiError::SqlxDatabase(_) | ApiError::Database(_)
-                    ) {
+                    if matches!(error, ApiError::Internal(_)) {
                         return Err(error);
                     };
                     failed.insert(user_id, error.into());
@@ -253,7 +270,10 @@ async fn create_impl(
             };
         }
 
-        email_txn.commit().await?;
+        email_txn
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
 
         let status = if failed
             .values()
@@ -310,14 +330,20 @@ pub async fn remove(
         .map(|x| DBUserId(x.0 as i64))
         .collect::<Vec<_>>();
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     DBNotification::remove_many_matching_body(
         &filters, &user_ids, &mut txn, &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("deleting notifications from database")?;
 
-    txn.commit().await?;
+    txn.commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -350,13 +376,14 @@ pub async fn send_custom_email(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     if user.role != Role::Admin {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to send custom emails!".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to send custom emails!",
+        )));
     }
 
     let SendEmail {
@@ -371,7 +398,10 @@ pub async fn send_custom_email(
         .map(|x| DBUserId(x.0 as i64))
         .collect::<Vec<_>>();
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     NotificationBuilder {
         body: NotificationBody::Custom {
@@ -381,9 +411,12 @@ pub async fn send_custom_email(
         },
     }
     .insert_many(users, &mut txn, &redis)
-    .await?;
+    .await
+    .wrap_internal_err("inserting database records for `send_custom_email`")?;
 
-    txn.commit().await?;
+    txn.commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(HttpResponse::Accepted().finish())
 }
@@ -404,13 +437,15 @@ async fn get_site_exposed_notifications(
         &raw_ids[..],
     )
     .fetch_all(&mut *txn)
-    .await?
+    .await
+    .wrap_internal_err("fetching exposed IDs from database")?
     .into_iter()
     .map(DBNotificationId)
     .collect::<Vec<_>>();
 
     Ok(DBNotification::get_many(&exposed_ids, txn)
-        .await?
+        .await
+        .wrap_internal_err("fetching notifications from database")?
         .into_iter()
         .map(Notification::from)
         .collect())

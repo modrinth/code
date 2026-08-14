@@ -3,7 +3,7 @@ import { PowerIcon, PowerOffIcon, XIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -95,6 +95,7 @@ interface Props {
 	ariaLabel?: string
 	getItemId?: (item: ContentItem) => string
 	toggleItems?: ContentItem[]
+	hideWhenModalOpen?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -111,6 +112,7 @@ const props = withDefaults(defineProps<Props>(), {
 	ariaLabel: undefined,
 	getItemId: undefined,
 	toggleItems: undefined,
+	hideWhenModalOpen: true,
 })
 
 const emit = defineEmits<{
@@ -181,7 +183,11 @@ const bulkProgressMessage = computed(() => {
 </script>
 
 <template>
-	<FloatingActionBar :shown="shown" :aria-label="ariaLabel" hide-when-modal-open>
+	<FloatingActionBar
+		:shown="shown"
+		:aria-label="ariaLabel"
+		:hide-when-modal-open="hideWhenModalOpen"
+	>
 		<div class="flex items-center gap-0.5">
 			<div
 				v-if="selectedItems.length > 0"
@@ -218,55 +224,54 @@ const bulkProgressMessage = computed(() => {
 				{{ selectedCountText }}
 			</span>
 			<div class="mx-0.5 h-6 w-px bg-surface-5" />
-			<ButtonStyled type="transparent">
-				<button
-					v-tooltip="formatMessage(commonMessages.clearButton)"
-					class="!text-primary"
-					:disabled="isBulkOperating"
-					:class="{ 'opacity-60 pointer-events-none': isBulkOperating }"
-					@click="emit('clear')"
-				>
-					<XIcon class="hidden cq-show-icon" />
-					<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
-				</button>
-			</ButtonStyled>
+			<Button
+				v-tooltip="formatMessage(commonMessages.clearButton)"
+				type="quiet"
+				class="!text-primary"
+				:disabled="isBulkOperating"
+				:class="{ 'opacity-60 pointer-events-none': isBulkOperating }"
+				@click="emit('clear')"
+			>
+				<XIcon class="hidden cq-show-icon" />
+				<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+			</Button>
 		</div>
 
 		<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
 			<slot name="actions" />
 
-			<ButtonStyled v-if="hasToggleActions" type="transparent">
-				<button
-					v-tooltip="
-						isBusy && busyTooltip
-							? busyTooltip
-							: allEnabled
-								? formatMessage(messages.allAlreadyEnabled)
-								: formatMessage(commonMessages.enableButton)
-					"
-					:disabled="isBusy || allEnabled"
-					@click="emit('enable')"
-				>
-					<PowerIcon />
-					<span class="bar-label">{{ formatMessage(commonMessages.enableButton) }}</span>
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-if="hasToggleActions" type="transparent">
-				<button
-					v-tooltip="
-						isBusy && busyTooltip
-							? busyTooltip
-							: allDisabled
-								? formatMessage(messages.allAlreadyDisabled)
-								: formatMessage(commonMessages.disableButton)
-					"
-					:disabled="isBusy || allDisabled"
-					@click="emit('disable')"
-				>
-					<PowerOffIcon />
-					<span class="bar-label">{{ formatMessage(commonMessages.disableButton) }}</span>
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="hasToggleActions"
+				v-tooltip="
+					isBusy && busyTooltip
+						? busyTooltip
+						: allEnabled
+							? formatMessage(messages.allAlreadyEnabled)
+							: formatMessage(commonMessages.enableButton)
+				"
+				type="quiet"
+				:disabled="isBusy || allEnabled"
+				@click="emit('enable')"
+			>
+				<PowerIcon />
+				<span class="bar-label">{{ formatMessage(commonMessages.enableButton) }}</span>
+			</Button>
+			<Button
+				v-if="hasToggleActions"
+				v-tooltip="
+					isBusy && busyTooltip
+						? busyTooltip
+						: allDisabled
+							? formatMessage(messages.allAlreadyDisabled)
+							: formatMessage(commonMessages.disableButton)
+				"
+				type="quiet"
+				:disabled="isBusy || allDisabled"
+				@click="emit('disable')"
+			>
+				<PowerOffIcon />
+				<span class="bar-label">{{ formatMessage(commonMessages.disableButton) }}</span>
+			</Button>
 
 			<slot name="actions-end" />
 		</div>
@@ -290,7 +295,7 @@ const bulkProgressMessage = computed(() => {
 				:aria-valuenow="bulkWaiting ? undefined : bulkProgress"
 				:aria-valuemin="0"
 				:aria-valuemax="bulkTotal"
-				style="box-shadow: 0px -2px 4px 0px rgba(27, 217, 106, 0.1)"
+				style="box-shadow: 0px -2px 4px 0px color-mix(in srgb, var(--color-brand) 10%, transparent)"
 			/>
 		</div>
 	</FloatingActionBar>

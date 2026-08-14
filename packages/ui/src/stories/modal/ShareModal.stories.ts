@@ -1,7 +1,7 @@
 import type { StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import ShareModal from '../../components/modal/ShareModal.vue'
 
 const meta = {
@@ -20,7 +20,7 @@ export const LinkShare: Story = {
 		link: true,
 	},
 	render: (args) => ({
-		components: { ShareModal, ButtonStyled },
+		components: { ShareModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ShareModal> | null>(null)
 			const openModal = () => {
@@ -30,9 +30,7 @@ export const LinkShare: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Open Link Share Modal</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">Open Link Share Modal</Button>
 				<ShareModal ref="modalRef" v-bind="args" />
 			</div>
 		`,
@@ -47,7 +45,7 @@ export const TextShare: Story = {
 		link: false,
 	},
 	render: (args) => ({
-		components: { ShareModal, ButtonStyled },
+		components: { ShareModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ShareModal> | null>(null)
 			const openModal = () => {
@@ -57,9 +55,7 @@ export const TextShare: Story = {
 		},
 		template: `
 			<div>
-				<ButtonStyled color="brand">
-					<button @click="openModal">Open Text Share Modal</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="openModal">Open Text Share Modal</Button>
 				<ShareModal ref="modalRef" v-bind="args" />
 			</div>
 		`,

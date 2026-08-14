@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Select accurate tags"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Make sure users are aware of any important details by filling in content disclosures that apply to your {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Check content disclosures"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Your description is {length, plural, one {# readable character} other {# readable characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create a clear and informative description."
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Visit description settings"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Visit disclosure settings"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Visit license settings"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Visit general settings"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Visit versions settings"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Your summary can not be the same as your project's Name. It's important to create an informative and enticing Summary."
@@ -254,8 +266,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "At least one gallery image is required to showcase the content of your {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "At least one gallery image is required to showcase the content of your resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "At least three gallery images are required to showcase the content of your shader in a variety of situations and conditions."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload a gallery image"
@@ -271,9 +286,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verify external links"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Visit versions page"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visit links settings"

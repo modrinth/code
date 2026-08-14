@@ -2,8 +2,9 @@
 import { MailIcon, SearchIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
@@ -220,26 +221,20 @@ const messages = defineMessages({
 					</div>
 					<div class="flex gap-2">
 						<template v-if="friend.id === userCredentials?.user_id">
-							<ButtonStyled color="brand">
-								<button @click="addFriend(friend)">
-									<UserPlusIcon />
-									Accept
-								</button>
-							</ButtonStyled>
-							<ButtonStyled>
-								<button @click="removeFriend(friend)">
-									<XIcon />
-									Ignore
-								</button>
-							</ButtonStyled>
+							<Button type="colored" color="brand" @click="addFriend(friend)">
+								<UserPlusIcon />
+								Accept
+							</Button>
+							<Button @click="removeFriend(friend)">
+								<XIcon />
+								Ignore
+							</Button>
 						</template>
 						<template v-else>
-							<ButtonStyled>
-								<button @click="removeFriend(friend)">
-									<XIcon />
-									Cancel
-								</button>
-							</ButtonStyled>
+							<Button @click="removeFriend(friend)">
+								<XIcon />
+								Cancel
+							</Button>
 						</template>
 					</div>
 				</div>
@@ -263,26 +258,28 @@ const messages = defineMessages({
 					wrapper-class="flex-1"
 					@keyup.enter="addFriendFromModal"
 				/>
-				<ButtonStyled color="brand">
-					<button :disabled="username.length === 0" @click="addFriendFromModal">
-						<SendIcon />
-						{{ formatMessage(messages.sendFriendRequest) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="username.length === 0"
+					@click="addFriendFromModal"
+				>
+					<SendIcon />
+					{{ formatMessage(messages.sendFriendRequest) }}
+				</Button>
 			</div>
 		</div>
 	</ModalWrapper>
 	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 -ml-1">
 		<template v-if="sortedFriends.length > 0">
-			<ButtonStyled circular type="transparent">
-				<button
-					v-tooltip="formatMessage(messages.addFriend)"
-					:aria-label="formatMessage(messages.addFriend)"
-					@click="addFriendModal.show"
-				>
-					<UserPlusIcon />
-				</button>
-			</ButtonStyled>
+			<IconButton
+				v-tooltip="formatMessage(messages.addFriend)"
+				type="quiet"
+				:label="formatMessage(messages.addFriend)"
+				@click="addFriendModal.show"
+			>
+				<UserPlusIcon />
+			</IconButton>
 			<StyledInput
 				v-model="search"
 				:icon="SearchIcon"
@@ -297,23 +294,23 @@ const messages = defineMessages({
 		<h3 v-else class="w-full text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
-		<ButtonStyled v-if="incomingRequests.length > 0" circular type="transparent">
-			<button
-				v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
-				class="relative"
-				:aria-label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
-				@click="friendInvitesModal.show"
+		<IconButton
+			v-if="incomingRequests.length > 0"
+			v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
+			type="quiet"
+			:label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
+			class="relative"
+			@click="friendInvitesModal.show"
+		>
+			<MailIcon />
+			<span
+				v-if="incomingRequests.length > 0"
+				aria-hidden="true"
+				class="absolute bg-brand text-brand-inverted text-[8px] top-0.5 px-1 right-0.5 min-w-3 h-3 rounded-full flex items-center justify-center font-bold"
 			>
-				<MailIcon />
-				<span
-					v-if="incomingRequests.length > 0"
-					aria-hidden="true"
-					class="absolute bg-brand text-brand-inverted text-[8px] top-0.5 px-1 right-0.5 min-w-3 h-3 rounded-full flex items-center justify-center font-bold"
-				>
-					{{ incomingRequests.length }}
-				</span>
-			</button>
-		</ButtonStyled>
+				{{ incomingRequests.length }}
+			</span>
+		</IconButton>
 	</div>
 	<div class="flex flex-col gap-3">
 		<h3 v-if="loading" class="text-base text-primary font-medium m-0">

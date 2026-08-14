@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use eyre::{Result, WrapErr};
 use prometheus::{IntGauge, Registry};
 
 const METRICS_UPDATE_INTERVAL: Duration = Duration::from_secs(5);
@@ -72,7 +73,7 @@ impl RedisPoolMetrics {
     fn register(
         registry: &Registry,
         kind: RedisPoolMetricsKind,
-    ) -> Result<Self, prometheus::Error> {
+    ) -> Result<Self> {
         let prefix = kind.metric_prefix();
         let description = kind.description();
         let max_size = IntGauge::new(
@@ -80,28 +81,40 @@ impl RedisPoolMetrics {
             format!(
                 "Maximum logical connection count for the {description}; clustered logical connections may own multiple physical sockets"
             ),
-        )?;
+        )
+        .wrap_err("creating Redis pool maximum size metric")?;
         let size = IntGauge::new(
             format!("{prefix}_size"),
             format!(
                 "Current logical connection count for the {description}; clustered logical connections may own multiple physical sockets"
             ),
-        )?;
+        )
+        .wrap_err("creating Redis pool size metric")?;
         let available = IntGauge::new(
             format!("{prefix}_available"),
             format!("Available logical connections in the {description}"),
-        )?;
+        )
+        .wrap_err("creating Redis pool availability metric")?;
         let waiting = IntGauge::new(
             format!("{prefix}_waiting"),
             format!(
                 "Number of futures waiting for a logical connection from the {description}"
             ),
-        )?;
+        )
+        .wrap_err("creating Redis pool waiters metric")?;
 
-        registry.register(Box::new(max_size.clone()))?;
-        registry.register(Box::new(size.clone()))?;
-        registry.register(Box::new(available.clone()))?;
-        registry.register(Box::new(waiting.clone()))?;
+        registry
+            .register(Box::new(max_size.clone()))
+            .wrap_err("registering Redis pool maximum size metric")?;
+        registry
+            .register(Box::new(size.clone()))
+            .wrap_err("registering Redis pool size metric")?;
+        registry
+            .register(Box::new(available.clone()))
+            .wrap_err("registering Redis pool availability metric")?;
+        registry
+            .register(Box::new(waiting.clone()))
+            .wrap_err("registering Redis pool waiters metric")?;
 
         Ok(Self {
             max_size,
@@ -122,7 +135,7 @@ impl RedisPoolMetrics {
 pub(super) fn register_command_pool_metrics<P>(
     registry: &Registry,
     provider: P,
-) -> Result<(), prometheus::Error>
+) -> Result<()>
 where
     P: LogicalPoolStatusProvider,
 {
@@ -132,7 +145,7 @@ where
 pub(super) fn register_blocking_pool_metrics<P>(
     registry: &Registry,
     provider: P,
-) -> Result<(), prometheus::Error>
+) -> Result<()>
 where
     P: LogicalPoolStatusProvider,
 {
@@ -143,11 +156,12 @@ fn register_pool_metrics<P>(
     registry: &Registry,
     kind: RedisPoolMetricsKind,
     provider: P,
-) -> Result<(), prometheus::Error>
+) -> Result<()>
 where
     P: LogicalPoolStatusProvider,
 {
-    let metrics = RedisPoolMetrics::register(registry, kind)?;
+    let metrics = RedisPoolMetrics::register(registry, kind)
+        .wrap_err("registering Redis pool metrics")?;
     metrics.set(provider.logical_pool_status());
 
     tokio::spawn(async move {

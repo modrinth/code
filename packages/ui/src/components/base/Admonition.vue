@@ -1,7 +1,8 @@
 <template>
 	<div
 		:class="[
-			'relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-2xl border border-solid p-4 text-contrast',
+			'relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] gap-x-2 rounded-2xl border border-solid p-4 text-contrast',
+			centerContent ? 'items-center' : 'items-start',
 			progress != null ? 'overflow-hidden pb-5' : '',
 			typeClasses[type],
 		]"
@@ -13,7 +14,7 @@
 			class="col-start-2 min-w-0"
 			:class="
 				inlineActions && !showActionsUnderneath && $slots.actions
-					? 'flex flex-wrap items-start gap-x-4 gap-y-3'
+					? ['flex flex-wrap gap-x-4 gap-y-3', centerContent ? 'items-center' : 'items-start']
 					: 'flex flex-1 flex-col gap-2'
 			"
 		>
@@ -39,7 +40,7 @@
 						{{ relativeTimeLabel }}
 					</span>
 				</div>
-				<div class="font-normal text-contrast/85 leading-tight">
+				<div v-if="!!$slots.default || body" class="font-normal text-contrast/85 leading-tight">
 					<slot>{{ body }}</slot>
 				</div>
 			</div>
@@ -58,17 +59,22 @@
 			class="col-start-3 row-start-1 flex shrink-0 items-center gap-2 self-start"
 		>
 			<slot name="top-right-actions" />
-			<ButtonStyled
+			<IconButton
 				v-if="dismissible"
-				circular
-				type="transparent"
-				:color="buttonColors[type]"
-				hover-color-fill="background"
+				type="quiet"
+				:color="
+					buttonColors[type] && buttonColors[type] !== 'standard'
+						? buttonColors[type] === 'medal-promo'
+							? 'medal_promotion'
+							: buttonColors[type]
+						: undefined
+				"
+				label="Dismiss"
+				native-type="button"
+				@click="$emit('dismiss')"
 			>
-				<button type="button" aria-label="Dismiss" @click="$emit('dismiss')">
-					<XIcon />
-				</button>
-			</ButtonStyled>
+				<XIcon />
+			</IconButton>
 		</div>
 		<div
 			v-if="progress != null"
@@ -96,9 +102,10 @@ import { ClockIcon, XIcon } from '@modrinth/assets'
 import { useNow } from '@vueuse/core'
 import { computed } from 'vue'
 
+import { IconButton } from '#ui/components/base/buttons'
+
 import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { getSeverityIcon } from '../../utils'
-import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -113,6 +120,7 @@ const props = withDefaults(
 		waiting?: boolean
 		/** Accepts a Date, an ISO string, or a millisecond Unix timestamp. */
 		timestamp?: Date | string | number
+		centerContent?: boolean
 	}>(),
 	{
 		type: 'info',
@@ -125,6 +133,7 @@ const props = withDefaults(
 		progressColor: undefined,
 		waiting: false,
 		timestamp: undefined,
+		centerContent: false,
 	},
 )
 

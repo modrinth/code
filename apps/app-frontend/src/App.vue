@@ -29,24 +29,25 @@ import {
 import {
 	Admonition,
 	Avatar,
-	ButtonStyled,
+	ButtonLink,
 	commonMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
+	IconButton,
 	IntlFormatted,
 	LoadingBar,
 	NewsArticleCard,
 	NotificationPanel,
-	OverflowMenu,
 	PopupNotificationPanel,
 	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	TeleportOverflowMenu,
 	TextLogo,
 	useDebugLogger,
 	useFormatBytes,
@@ -70,6 +71,7 @@ import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
@@ -88,19 +90,19 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { useAppEvent } from '@/composables/use-app-event'
 import { config } from '@/config'
 import {
-	ads_consent_listener,
 	hide_ads_window,
 	init_ads_window,
 	perform_ads_consent_action,
+	release_ads_window_hold,
 	should_show_ads_consent_popup,
-	show_ads_window,
+	take_ads_window_hold,
 } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
-import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
 import { can_current_user_use_shared_instances, get as getInstance, run } from '@/helpers/instance'
 import { get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
@@ -120,6 +122,7 @@ import {
 } from '@/helpers/utils.js'
 import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n from '@/i18n.config'
+import { instanceKeys } from '@/pages/instance/query-options'
 import {
 	appUpdateState,
 	downloadAvailableAppUpdate,
@@ -138,6 +141,7 @@ import {
 } from '@/providers/download-progress.ts'
 import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { setupProviders } from '@/providers/setup'
+import { setupAppEventsProvider } from '@/providers/setup/app-events'
 import { setupAuthProvider } from '@/providers/setup/auth'
 import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { useError } from '@/store/error.js'
@@ -153,6 +157,7 @@ import { appSettingsModalOpenProfileKey } from './providers/app-settings-modal'
 const themeStore = useTheming()
 const router = useRouter()
 const route = useRoute()
+const { channel: appEventChannel, events: appEvents } = setupAppEventsProvider()
 const breadcrumbManager = createBreadcrumbManager()
 provideBreadcrumbManager(breadcrumbManager)
 const canNavigateBack = ref(false)
@@ -164,6 +169,25 @@ function updateHistoryNavigationState() {
 	canNavigateForward.value = historyState?.forward != null
 }
 
+let fullscreenAdsWindowHold = false
+
+async function handleFullscreenChange() {
+	const fullscreen = document.fullscreenElement !== null
+	if (fullscreen === fullscreenAdsWindowHold) return
+
+	fullscreenAdsWindowHold = fullscreen
+	try {
+		if (fullscreen) {
+			await take_ads_window_hold()
+		} else {
+			await release_ads_window_hold()
+		}
+	} catch (error) {
+		fullscreenAdsWindowHold = !fullscreen
+		handleError(error)
+	}
+}
+
 updateHistoryNavigationState()
 
 const APP_LEFT_NAV_WIDTH = '4rem'
@@ -173,14 +197,26 @@ const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
 const credentials = ref()
 let credentialsRefreshId = 0
 const sidebarToggled = ref(true)
-const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
-	sidebarToggled.value = !themeStore.toggleSidebar
-})
+watch(
+	() => themeStore.toggleSidebar,
+	(toggleSidebar) => {
+		sidebarToggled.value = !toggleSidebar
+	},
+)
 const forceSidebar = computed(
-	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
+	() =>
+		route.path.startsWith('/browse') ||
+		route.path.startsWith('/project') ||
+		route.path.startsWith('/user'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
+const hostingUpdateRequired = computed(
+	() =>
+		hostingRouteActive.value &&
+		!!appUpdateState.availableUpdate.value &&
+		appUpdateState.updatesEnabled.value,
+)
 const prideFundraiserEnabled = computed(
 	() => themeStore.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
 )
@@ -191,7 +227,9 @@ const hostingIntercomIdentityKey = computed(() => {
 	return `${userId}:${serverId ?? 'hosting'}`
 })
 const hostingIntercom = useHostingIntercom({
-	enabled: computed(() => hostingRouteActive.value && !!credentials.value?.session),
+	enabled: computed(
+		() => hostingRouteActive.value && !hostingUpdateRequired.value && !!credentials.value?.session,
+	),
 	appId: 'ykeritl9',
 	fetchToken: fetchIntercomToken,
 	identityKey: hostingIntercomIdentityKey,
@@ -206,11 +244,22 @@ const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
 const { handleError, addNotification } = notificationManager
 
+useAppEvent(
+	'warning',
+	(event) =>
+		addNotification({
+			title: 'Warning',
+			text: event.message,
+			type: 'warning',
+		}),
+	appEvents,
+)
+
 const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
 let adsConsentPopupId = null
-let unlistenAdsConsent
+useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
@@ -242,7 +291,7 @@ const { data: authenticatedModrinthUser } = useQuery({
 	retry: false,
 })
 useQuery({
-	queryKey: computed(() => ['shared-instance-eligibility', credentials.value?.user?.id]),
+	queryKey: computed(() => instanceKeys.sharedEligibility(credentials.value?.user?.id)),
 	queryFn: can_current_user_use_shared_instances,
 	enabled: () => !!credentials.value?.session && !!credentials.value?.user?.id,
 	retry: false,
@@ -279,8 +328,8 @@ providePageContext({
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
-	onShow: () => hide_ads_window(),
-	onHide: () => show_ads_window(),
+	onShow: () => take_ads_window_hold(),
+	onHide: () => release_ads_window_hold(),
 })
 
 const {
@@ -295,7 +344,7 @@ const {
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
-} = setupProviders(notificationManager, popupNotificationManager)
+} = setupProviders(tauriApiClient, notificationManager, popupNotificationManager)
 
 const news = ref([])
 const displayedServerInviteNotifications = new Set()
@@ -347,7 +396,6 @@ const authUnreachable = computed(() => {
 onMounted(async () => {
 	await useCheckDisableMouseover()
 	try {
-		unlistenAdsConsent = await ads_consent_listener(handleAdsConsentRequired)
 		handleAdsConsentRequired(await should_show_ads_consent_popup())
 	} catch (error) {
 		handleError(error)
@@ -355,6 +403,7 @@ onMounted(async () => {
 
 	document.querySelector('body').addEventListener('click', handleClick)
 	document.querySelector('body').addEventListener('auxclick', handleAuxClick)
+	document.addEventListener('fullscreenchange', handleFullscreenChange)
 
 	checkUpdates()
 })
@@ -362,10 +411,13 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
-	unsubscribeSidebarToggle()
+	document.removeEventListener('fullscreenchange', handleFullscreenChange)
 	clearDelayedUpdatePopup()
 
-	await unlistenAdsConsent?.()
+	if (fullscreenAdsWindowHold) {
+		fullscreenAdsWindowHold = false
+		await release_ads_window_hold().catch(handleError)
+	}
 	await unlistenUpdateDownload?.()
 })
 
@@ -574,14 +626,6 @@ async function setupApp() {
 		document.getElementsByTagName('html')[0].classList.add('windows')
 	}
 
-	await warning_listener((e) =>
-		addNotification({
-			title: 'Warning',
-			text: e.message,
-			type: 'warning',
-		}),
-	)
-
 	fetch(`https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`)
 		.then((response) => response.json())
 		.then((res) => {
@@ -630,7 +674,7 @@ async function setupApp() {
 }
 
 const stateFailed = ref(false)
-initialize_state()
+initialize_state(appEventChannel)
 	.then(() => {
 		setupApp().catch((err) => {
 			stateFailed.value = true
@@ -760,7 +804,7 @@ const errorModal = ref()
 const minecraftAuthErrorModal = ref()
 const minecraftRequiredModal = ref()
 
-const contentInstall = createContentInstall({ router, handleError })
+const contentInstall = createContentInstall({ router, handleError, appEvents })
 provideContentInstall(contentInstall)
 const {
 	instances: contentInstallInstances,
@@ -793,7 +837,12 @@ const {
 	handleIncompatibilityWarningCancel: handleContentInstallIncompatibilityWarningCancel,
 } = contentInstall
 
-const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
+const serverInstall = createServerInstall({
+	router,
+	handleError,
+	popupNotificationManager,
+	appEvents,
+})
 provideServerInstall(serverInstall)
 const {
 	setInstallToPlayModal: setServerInstallToPlayModal,
@@ -969,8 +1018,8 @@ onMounted(() => {
 const accounts = ref(null)
 provide('accountsCard', accounts)
 
-command_listener(handleCommand)
-notification_listener(handleLiveNotification)
+useAppEvent('command', handleCommand, appEvents)
+useAppEvent('notification', handleLiveNotification, appEvents)
 
 async function markLiveNotificationRead(notification) {
 	try {
@@ -1396,6 +1445,7 @@ async function downloadUpdate(versionToDownload) {
 				handleError(e)
 			})
 		unlistenUpdateDownload = await subscribeToDownloadProgress(
+			appEvents,
 			appUpdateDownload,
 			versionToDownload.version,
 		)
@@ -1545,8 +1595,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.discoverContentLabel)"
 				to="/browse/modpack"
-				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
-				:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
+				:is-primary="() => route.path.startsWith('/browse') && !route.query.i && !route.query.sid"
+				:is-subpage="
+					(route) => route.path.startsWith('/project') && !route.query.i && !route.query.sid
+				"
 			>
 				<CompassIcon />
 			</NavButton>
@@ -1570,7 +1622,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(messages.modrinthHosting)"
 				to="/hosting/manage"
 				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
-				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
+				:is-subpage="
+					(r) =>
+						(r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/') ||
+						((r.path.startsWith('/browse') || r.path.startsWith('/project')) && r.query.sid)
+				"
 			>
 				<ServerStackIcon />
 			</NavButton>
@@ -1591,22 +1647,29 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<SettingsIcon />
 			</NavButton>
-			<OverflowMenu
+			<TeleportOverflowMenu
 				v-if="credentials?.user"
 				v-tooltip.right="formatMessage(messages.modrinthAccount)"
-				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
+				type="quiet"
+				size="xl"
+				label="More options"
 				:options="[
 					{
 						id: 'view-profile',
+						label: formatMessage(messages.signedInAs, {
+							username: credentials.user.username,
+						}),
 						action: () => router.push(`/user/${encodeURIComponent(credentials.user.username)}`),
 					},
 					{
 						id: 'sign-out',
+						label: formatMessage(commonMessages.signOutButton),
+						tone: 'red',
 						action: () => logOut(),
-						color: 'danger',
 					},
 				]"
 				placement="right-end"
+				:distance="4"
 			>
 				<Avatar :src="credentials?.user?.avatar_url" alt="" size="32px" circle />
 				<template #view-profile>
@@ -1629,7 +1692,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					<LogOutIcon />
 					{{ formatMessage(commonMessages.signOutButton) }}
 				</template>
-			</OverflowMenu>
+			</TeleportOverflowMenu>
 			<NavButton
 				v-else
 				v-tooltip.right="formatMessage(messages.signInToModrinthAccount)"
@@ -1642,49 +1705,44 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
 				<TextLogo class="h-7 w-auto shrink-0 text-contrast pointer-events-none" />
 				<div data-tauri-drag-region class="ml-2 flex shrink-0 items-center gap-2">
-					<ButtonStyled type="outlined" circular>
-						<button
-							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
-							:disabled="!canNavigateBack"
-							aria-label="Go back"
-							@click="router.back()"
-						>
-							<ChevronLeftIcon
-								class="!size-4 !text-primary"
-								:class="{ 'opacity-20': !canNavigateBack }"
-							/>
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined" circular>
-						<button
-							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
-							:disabled="!canNavigateForward"
-							aria-label="Go forward"
-							@click="router.forward()"
-						>
-							<ChevronRightIcon
-								class="!size-4 !text-primary"
-								:class="{ 'opacity-20': !canNavigateForward }"
-							/>
-						</button>
-					</ButtonStyled>
+					<IconButton
+						type="outlined"
+						label="Go back"
+						class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
+						:disabled="!canNavigateBack"
+						@click="router.back()"
+					>
+						<ChevronLeftIcon
+							class="!size-4 !text-primary"
+							:class="{ 'opacity-20': !canNavigateBack }"
+						/>
+					</IconButton>
+					<IconButton
+						type="outlined"
+						label="Go forward"
+						class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
+						:disabled="!canNavigateForward"
+						@click="router.forward()"
+					>
+						<ChevronRightIcon
+							class="!size-4 !text-primary"
+							:class="{ 'opacity-20': !canNavigateForward }"
+						/>
+					</IconButton>
 				</div>
 				<Breadcrumbs />
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
-				<ButtonStyled
+				<IconButton
 					v-if="!forceSidebar && themeStore.toggleSidebar"
-					:type="sidebarToggled ? 'standard' : 'transparent'"
-					circular
+					:type="sidebarToggled ? 'base' : 'quiet'"
+					label="Next image"
+					class="mr-3 transition-transform"
+					:class="{ 'rotate-180': !sidebarToggled }"
+					@click="sidebarToggled = !sidebarToggled"
 				>
-					<button
-						class="mr-3 transition-transform"
-						:class="{ 'rotate-180': !sidebarToggled }"
-						@click="sidebarToggled = !sidebarToggled"
-					>
-						<RightArrowIcon />
-					</button>
-				</ButtonStyled>
+					<RightArrowIcon />
+				</IconButton>
 				<div class="flex mr-3">
 					<Suspense>
 						<AppActionBar />
@@ -1746,7 +1804,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				{{ formatMessage(messages.authUnreachableBody) }}
 			</Admonition>
-			<RouterView v-slot="{ Component }">
+			<HostingUpdateRequired v-if="hostingUpdateRequired" />
+			<RouterView v-else v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
 						<component :is="Component"></component>
@@ -1793,12 +1852,17 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 								:key="`news-${index}`"
 								:article="item"
 							/>
-							<ButtonStyled color="brand" size="large">
-								<a href="https://modrinth.com/news" target="_blank" class="my-4">
-									<NewspaperIcon />
-									{{ formatMessage(messages.viewAllNews) }}
-								</a>
-							</ButtonStyled>
+							<ButtonLink
+								type="colored"
+								color="brand"
+								size="xl"
+								href="https://modrinth.com/news"
+								target="_blank"
+								class="my-4"
+							>
+								<NewspaperIcon />
+								{{ formatMessage(messages.viewAllNews) }}
+							</ButtonLink>
 						</div>
 					</div>
 				</div>
