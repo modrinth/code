@@ -39,7 +39,7 @@
 				@focusin="handleSearchFocus"
 				@focusout="handleSearchFocusout"
 				@click="handleSearchClick"
-				@clear="handleSearchInput"
+				@clear="handleSearchClear"
 			>
 				<template v-if="showChevron" #right>
 					<ChevronLeftIcon
@@ -840,6 +840,12 @@ function handleSearchInput() {
 	if (!isOpen.value) {
 		openDropdown()
 	}
+}
+
+function handleSearchClear() {
+	userHasTyped.value = true
+	emit('searchInput', searchQuery.value)
+	closeDropdown()
 }
 
 function handleSearchFocus(event: FocusEvent) {

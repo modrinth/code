@@ -10,21 +10,21 @@
 			show-search-icon
 			@update:model-value="addIncludedProject"
 		/>
-		<div v-if="dependencyProjectIds.length > 0" class="flex flex-col gap-1">
+		<div v-if="loadedDependentProjects.length > 0" class="flex flex-col gap-1">
 			<div
-				v-for="projectId in dependencyProjectIds"
+				v-for="{ projectId, project } in loadedDependentProjects"
 				:key="projectId"
 				class="group flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-primary"
 			>
 				<img
-					v-if="dependentProjectMap.get(projectId)?.icon_url"
-					:src="dependentProjectMap.get(projectId)?.icon_url ?? undefined"
-					:alt="dependentProjectMap.get(projectId)?.title ?? projectId"
+					v-if="project.icon_url"
+					:src="project.icon_url"
+					:alt="project.title"
 					class="size-6 shrink-0 rounded-md object-cover"
 				/>
 				<PackageIcon v-else class="size-8 shrink-0 text-secondary" />
 				<span class="min-w-0 flex-1 truncate font-medium text-contrast">
-					{{ dependentProjectMap.get(projectId)?.title ?? projectId }}
+					{{ project.title }}
 				</span>
 				<div class="flex items-center gap-1">
 					<button
@@ -33,7 +33,7 @@
 						class="flex shrink-0 cursor-pointer items-center justify-center rounded-xl border-0 bg-transparent px-2 py-1 text-secondary transition-all [@media(hover:hover)]:opacity-0 group-hover:opacity-100 hover:bg-button-bg hover:text-contrast active:scale-[0.96]"
 						:aria-label="
 							formatMessage(messages.removeIncludedProject, {
-								project: dependentProjectMap.get(projectId)?.title ?? projectId,
+								project: project.title,
 							})
 						"
 						@click="removeIncludedProject(projectId)"
@@ -68,7 +68,7 @@
 	</div>
 	<div v-else :class="innerPanelClass" class="flex flex-col gap-3">
 		<ProjectCombobox
-			v-show="!selectedProjectId"
+			v-show="!showSelectedProject"
 			ref="projectCombobox"
 			:model-value="selectedProjectId"
 			:project-types="selectableProjectTypes"
@@ -78,7 +78,7 @@
 			show-search-icon
 			@update:model-value="setSelectedProjectId"
 		/>
-		<template v-if="selectedProjectId && selectedProject">
+		<template v-if="showSelectedProject">
 			<div class="flex items-center justify-between gap-3 px-2 text-secondary">
 				<span>
 					{{
@@ -203,12 +203,18 @@ const { data: dependentProjects } = useQuery({
 	]),
 	queryFn: () => labrinth.projects_v2.getMultiple(dependencyProjectIds.value),
 	enabled: computed(() => isModpack.value && dependencyProjectIds.value.length > 0),
-	placeholderData: [],
+	placeholderData: (previousData) => previousData,
 	refetchOnWindowFocus: false,
 })
 
 const dependentProjectMap = computed(
 	() => new Map(dependentProjects.value?.map((project) => [project.id, project]) ?? []),
+)
+const loadedDependentProjects = computed(() =>
+	dependencyProjectIds.value.flatMap((projectId) => {
+		const project = dependentProjectMap.value.get(projectId)
+		return project ? [{ projectId, project }] : []
+	}),
 )
 const projectCombobox = ref<{ selectedProject: SearchHit | null } | null>(null)
 const selectedProject = computed(() => projectCombobox.value?.selectedProject ?? null)
@@ -220,6 +226,7 @@ const selectedProjectId = computed(() =>
 		? parseDependencyProjectFilterOption(selectedDependencyFilter.value.option).projectId
 		: undefined,
 )
+const showSelectedProject = computed(() => Boolean(selectedProjectId.value && selectedProject.value))
 
 const dependencyTypes = computed<DependencyType[]>(() =>
 	selectedDependencyFilter.value

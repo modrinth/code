@@ -91,7 +91,7 @@
 			type="button"
 			class="absolute right-0.5 z-[1] p-2 touch-manipulation bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer select-none"
 			aria-label="Clear input"
-			@click="clear"
+			@click.stop="clear"
 		>
 			<XIcon class="h-5 w-5" />
 		</button>
