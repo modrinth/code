@@ -20,6 +20,7 @@ import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
+import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -61,6 +62,7 @@ interface Props {
 	enabled?: boolean
 	locked?: boolean
 	installing?: boolean
+	installProgress?: number | null
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
@@ -87,6 +89,7 @@ const props = withDefaults(defineProps<Props>(), {
 	enabled: undefined,
 	locked: false,
 	installing: false,
+	installProgress: undefined,
 	hasUpdate: false,
 	isClientOnly: false,
 	clientWarning: null,
@@ -139,6 +142,11 @@ const clientWarningMessage = computed(() => {
 
 const { shift: shiftHeld } = useMagicKeys()
 const deleteHovered = ref(false)
+const installTooltip = computed(() => {
+	if (!props.installing) return undefined
+	if (props.installProgress == null) return formatMessage(commonMessages.installingLabel)
+	return `${formatMessage(commonMessages.installingLabel)} (${Math.round(props.installProgress)}%)`
+})
 </script>
 
 <template>
@@ -162,6 +170,7 @@ const deleteHovered = ref(false)
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
 				:aria-label="formatMessage(messages.selectProject, { project: project.title })"
+				:disabled="isDisabled"
 				class="shrink-0"
 				@update:model-value="(value, event) => emit('select', value, event)"
 			/>
@@ -170,10 +179,7 @@ const deleteHovered = ref(false)
 				class="flex min-w-0 items-center gap-3 transition-[filter,opacity] duration-200"
 				:class="enabled === false && !disabled ? 'grayscale opacity-50' : ''"
 			>
-				<div
-					v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined"
-					class="relative flex shrink-0 items-center"
-				>
+				<div v-tooltip="installTooltip" class="relative flex shrink-0 items-center">
 					<Avatar
 						:src="project.icon_url"
 						:alt="project.title"
@@ -185,7 +191,13 @@ const deleteHovered = ref(false)
 						v-if="installing"
 						class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20"
 					>
-						<SpinnerIcon class="size-5 animate-spin text-white" />
+						<ProgressSpinner
+							v-if="installProgress != null && installProgress > 0"
+							:progress="installProgress"
+							:max="100"
+							class="size-5 text-white"
+						/>
+						<SpinnerIcon v-else class="size-5 animate-spin text-white" />
 					</div>
 				</div>
 				<div class="flex min-w-0 flex-col gap-0.5">

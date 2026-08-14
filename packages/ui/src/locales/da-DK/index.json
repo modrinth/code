@@ -1961,9 +1961,6 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installering fejlede"
   },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurer server..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du allerede en server?"
   },
