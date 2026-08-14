@@ -111,11 +111,11 @@ pub async fn get(
 			status,
 			report: PayoutRunReport {
 				days: Vec::new(),
-				fees_deducted_usd: todo!(),
-				variance_adjustment_usd: todo!(),
-				net_estimated_revenue_usd: todo!(),
-				creator_net_estimated_revenue_usd: todo!(),
-				modrinth_net_estimated_revenue_usd: todo!(),
+				fees_deducted_usd: Decimal::ZERO, // TODO: calculate deducted fees
+				variance_adjustment_usd: Decimal::ZERO, // TODO: calculate variance adjustment
+				net_estimated_revenue_usd: Decimal::ZERO, // TODO: calculate net revenue
+				creator_net_estimated_revenue_usd: Decimal::ZERO, // TODO: calculate creator share
+				modrinth_net_estimated_revenue_usd: Decimal::ZERO, // TODO: calculate Modrinth share
 			},
             started_at: is_admin.then_some(run.started_at),
             started_by: is_admin
@@ -151,11 +151,11 @@ pub async fn get(
                     status,
 					report: PayoutRunReport {
 						days: Vec::new(),
-						fees_deducted_usd: todo!(),
-						variance_adjustment_usd: todo!(),
-						net_estimated_revenue_usd: todo!(),
-						creator_net_estimated_revenue_usd: todo!(),
-						modrinth_net_estimated_revenue_usd: todo!(),
+						fees_deducted_usd: Decimal::ZERO, // TODO: calculate deducted fees
+						variance_adjustment_usd: Decimal::ZERO, // TODO: calculate variance adjustment
+						net_estimated_revenue_usd: Decimal::ZERO, // TODO: calculate net revenue
+						creator_net_estimated_revenue_usd: Decimal::ZERO, // TODO: calculate creator share
+						modrinth_net_estimated_revenue_usd: Decimal::ZERO, // TODO: calculate Modrinth share
                     },
                     started_at: None,
                     started_by: None,
