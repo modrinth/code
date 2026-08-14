@@ -559,7 +559,11 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const triggerRect = effectiveTriggerEl.value.getBoundingClientRect()
+	const trigger = effectiveTriggerEl.value
+	const dropdown = dropdownRef.value
+	if (!isOpen.value || !trigger || !dropdown) return
+
+	const triggerRect = trigger.getBoundingClientRect()
 	const width = resolveDropdownWidth(triggerRect.width)
 	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
 
@@ -571,7 +575,10 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const dropdownRect = dropdownRef.value.getBoundingClientRect()
+	const positionedDropdown = dropdownRef.value
+	if (!isOpen.value || !positionedDropdown) return
+
+	const dropdownRect = positionedDropdown.getBoundingClientRect()
 	const viewport = getViewportRect()
 
 	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
