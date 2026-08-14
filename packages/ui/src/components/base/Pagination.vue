@@ -24,9 +24,33 @@
 			}"
 			class="page-number-container"
 		>
-			<div v-if="item === '-'" class="rotate-90 grid place-content-center">
-				<EllipsisVerticalIcon />
-			</div>
+			<form v-if="item === '-'" class="grid place-content-center" @submit.prevent="goToPage">
+				<StyledInput
+					v-if="showPageInput === index"
+					:ref="focusInput"
+					v-model="pageInput"
+					type="number"
+					:min="1"
+					:max="props.count"
+					placeholder="..."
+					clamp
+					class="w-14"
+					aria-label="Go to a specific page"
+					@focusout="showPageInput = undefined"
+					@keydown.escape="showPageInput = undefined"
+				/>
+
+				<div v-else class="rotate-90">
+					<button
+						type="button"
+						aria-label="Go to a specific page"
+						class="grid place-content-center"
+						@click="openPageInput(index)"
+					>
+						<EllipsisVerticalIcon aria-hidden="true" />
+					</button>
+				</div>
+			</form>
 			<template v-else>
 				<ButtonLink
 					v-if="linkFunction"
@@ -73,9 +97,10 @@
 </template>
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon, EllipsisVerticalIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { type ComponentPublicInstance,computed, ref } from 'vue'
 
 import { Button, ButtonLink, IconButton } from './buttons'
+import StyledInput from './StyledInput.vue'
 
 const emit = defineEmits<{
 	'switch-page': [page: number]
@@ -92,6 +117,8 @@ const props = withDefaults(
 		count: 1,
 	},
 )
+const showPageInput = ref<number | undefined>(undefined)
+const pageInput = ref<number | undefined>(undefined)
 
 const pages = computed(() => {
 	const pages: ('-' | number)[] = []
@@ -128,5 +155,26 @@ const pages = computed(() => {
 
 function switchPage(newPage: number) {
 	emit('switch-page', Math.min(Math.max(newPage, 1), props.count))
+}
+
+function focusInput(element: Element | ComponentPublicInstance | null) {
+	if (element && 'focus' in element) {
+		const styledInput = element as InstanceType<typeof StyledInput>
+		styledInput.focus()
+	}
+}
+
+function openPageInput(index: number) {
+	pageInput.value = undefined
+	showPageInput.value = index
+}
+
+function goToPage() {
+	if (pageInput.value !== undefined && pageInput.value >= 1 && pageInput.value <= props.count) {
+		switchPage(pageInput.value)
+	}
+
+	showPageInput.value = undefined
+	pageInput.value = undefined
 }
 </script>
