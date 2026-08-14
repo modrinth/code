@@ -467,17 +467,17 @@ fn get_mrpack_environment(
         .unwrap_or(VersionEnvironment::Unknown)
     {
         VersionEnvironment::ClientAndServer
-        | VersionEnvironment::SingleplayerOnly => {
+        | VersionEnvironment::ServerOnly => {
             (SideType::Required, SideType::Required)
         }
-        VersionEnvironment::ClientOnly => {
+        VersionEnvironment::ClientOnly
+        | VersionEnvironment::SingleplayerOnly => {
             (SideType::Required, SideType::Unsupported)
         }
         VersionEnvironment::ClientOnlyServerOptional => {
             (SideType::Required, SideType::Optional)
         }
-        VersionEnvironment::ServerOnly
-        | VersionEnvironment::DedicatedServerOnly => {
+        VersionEnvironment::DedicatedServerOnly => {
             (SideType::Unsupported, SideType::Required)
         }
         VersionEnvironment::ServerOnlyClientOptional => {
