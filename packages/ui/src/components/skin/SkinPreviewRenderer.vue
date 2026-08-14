@@ -279,14 +279,14 @@ const {
 	scene,
 	visibleBounds,
 } = useSkinPreviewScene({
-		selectedModelSrc,
-		textureSrc: toRef(props, 'textureSrc'),
-		earsTextureSrc: toRef(props, 'earsTextureSrc'),
-		capeSrc: toRef(props, 'capeSrc'),
-		earsEnabled: toRef(props, 'earsEnabled'),
-		initializeAnimations,
-		cleanupAnimationState,
-	})
+	selectedModelSrc,
+	textureSrc: toRef(props, 'textureSrc'),
+	earsTextureSrc: toRef(props, 'earsTextureSrc'),
+	capeSrc: toRef(props, 'capeSrc'),
+	earsEnabled: toRef(props, 'earsEnabled'),
+	initializeAnimations,
+	cleanupAnimationState,
+})
 
 function syncDamageFlashShaderMaterials() {
 	syncDamageFlashShader(scene.value, damageFlashIntensity.value)
