@@ -5,16 +5,11 @@ import { onMounted, onUnmounted, watch } from 'vue'
 
 import { injectModrinthClient } from '#ui/providers'
 
-import {
-	retainServerContextRuntime,
-	type ServerContextRuntimeLease,
-} from './server-context-runtime'
-
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 type SyncUnsubscriber = () => void
 
 type UseServerPanelSyncOptions = {
-	serverId: ReadableRef<string | null>
+	serverId: ReadableRef<string>
 	worldId: ReadableRef<string | null>
 }
 
@@ -25,7 +20,6 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	const queryClient = useQueryClient()
 
 	let activeServerId: string | null = null
-	let runtimeLease: ServerContextRuntimeLease | null = null
 	let unsubscribers: SyncUnsubscriber[] = []
 	let mounted = false
 	let actionLogInvalidateTimer: ReturnType<typeof setTimeout> | null = null
@@ -33,8 +27,6 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	const legacyServerDetailKey = (serverId: string) => ['servers', 'detail', serverId] as const
 	const serverV1DetailKey = (serverId: string) => ['servers', 'v1', 'detail', serverId] as const
 	const contentListKey = (serverId: string) => ['content', 'list', 'v1', serverId] as const
-	const modpackContentListKey = (serverId: string) =>
-		['content', 'list', 'v1', serverId, 'modpack'] as const
 	const actionLogBaseKey = (serverId: string) =>
 		['servers', 'action-log', 'v1', 'infinite', serverId] as const
 
@@ -51,9 +43,12 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		unsubscribers = [
 			client.archon.sync.onAny(targetServerId, (event) => handleSyncEvent(targetServerId, event)),
 		]
-		runtimeLease = retainServerContextRuntime(client, targetServerId, {
-			socket: false,
-			sync: true,
+
+		void client.archon.sync.safeConnectServer(targetServerId, { intent: 'all' }).catch((error) => {
+			console.warn(
+				`[server-panel-sync] Failed to connect sync stream for ${targetServerId}:`,
+				error,
+			)
 		})
 	}
 
@@ -66,9 +61,10 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		for (const unsubscribe of unsubscribers) unsubscribe()
 		unsubscribers = []
 
-		runtimeLease?.release()
-		runtimeLease = null
-		activeServerId = null
+		if (activeServerId) {
+			client.archon.sync.disconnect(activeServerId)
+			activeServerId = null
+		}
 	}
 
 	function handleSyncEvent(serverId: string, event: Archon.Sync.v1.SyncEvent) {
@@ -114,9 +110,6 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 				break
 			case 'world.content.base.update':
 				handleWorldContentBaseUpdate(serverId, event)
-				break
-			case 'world.content.update':
-				handleWorldContentUpdate(serverId, event)
 				break
 		}
 	}
@@ -223,106 +216,6 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		void queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) })
 	}
 
-	function handleWorldContentUpdate(
-		serverId: string,
-		event: Archon.Sync.v1.WorldContentUpdateEvent,
-	) {
-		if (event.world_id !== options.worldId.value) {
-			void invalidateContentAndServerDetails(serverId)
-			return
-		}
-
-		const content = worldContentUpdateToAddons(event)
-		queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), {
-			...content,
-			addons: content.addons?.filter((addon) => !addon.from_modpack) ?? null,
-		})
-		queryClient.setQueryData<Archon.Content.v1.Addons>(modpackContentListKey(serverId), {
-			...content,
-			addons: content.addons?.filter((addon) => addon.from_modpack) ?? null,
-		})
-		void queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) })
-	}
-
-	function worldContentUpdateToAddons(
-		event: Archon.Sync.v1.WorldContentUpdateEvent,
-	): Archon.Content.v1.Addons {
-		return {
-			modloader: event.platform_data?.platform ?? null,
-			modloader_version: event.platform_data?.platform_version ?? null,
-			game_version: event.platform_data?.game_version ?? null,
-			modpack: worldContentModpackToModpackFields(event.linked_modpack),
-			installing: event.installing,
-			error: event.error,
-			addons: event.content.map(worldContentItemToAddon),
-		}
-	}
-
-	function worldContentModpackToModpackFields(
-		modpack: Archon.Sync.v1.WorldContentModpack | null,
-	): Archon.Content.v1.ModpackFields | null {
-		if (!modpack || modpack.spec === 'CurseForge') return null
-
-		const spec: Archon.Content.v1.ModpackSpec =
-			'Modrinth' in modpack.spec
-				? {
-						platform: 'modrinth',
-						project_id: modpack.spec.Modrinth.project_id,
-						version_id: modpack.spec.Modrinth.version_id,
-					}
-				: {
-						platform: 'local_file',
-						filename: modpack.spec.LocalMrPackFile.path,
-						name: modpack.spec.LocalMrPackFile.name,
-						description: modpack.spec.LocalMrPackFile.description,
-					}
-
-		return {
-			spec,
-			has_update: modpack.has_update,
-			title: modpack.title,
-			description: modpack.description,
-			icon_url: modpack.icon_url,
-			owner: modpack.owner,
-			version_number: modpack.version_number,
-			date_published: modpack.date_published,
-			downloads: modpack.downloads,
-			followers: modpack.followers,
-		}
-	}
-
-	function worldContentItemToAddon(item: Archon.Sync.v1.WorldContentItem): Archon.Content.v1.Addon {
-		return {
-			id: item.version?.id ?? item.version_id ?? item.file_sha1 ?? item.filename,
-			filename: item.filename,
-			filesize: item.filesize ?? 0,
-			btime: item.btime,
-			disabled: item.filename.endsWith('.disabled'),
-			kind: parentDirectoryToAddonKind(item.parent_directory),
-			from_modpack: item.from_modpack,
-			status: item.status,
-			pack_client_retained: item.pack_client_retained,
-			pack_client_depends: item.pack_client_depends,
-			has_update: item.has_update,
-			name: item.name,
-			project_id: item.project_id,
-			version: item.version,
-			owner: item.owner,
-			icon_url: item.icon_url,
-		}
-	}
-
-	function parentDirectoryToAddonKind(parentDirectory: string): Archon.Content.v1.AddonKind {
-		switch (parentDirectory) {
-			case 'plugins':
-				return 'plugin'
-			case 'datapacks':
-				return 'datapack'
-			default:
-				return 'mod'
-		}
-	}
-
 	function handleBackupEvent(serverId: string) {
 		void queryClient.invalidateQueries({ queryKey: ['backups', 'queue', serverId] })
 		void invalidateServerDetails(serverId)
@@ -403,9 +296,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		return {
 			...current,
 			...incoming,
-			status: incoming.status ?? current.status,
 			filesize: incoming.filesize || current.filesize,
-			btime: incoming.btime ?? current.btime,
 			name: incoming.name ?? current.name,
 			owner: incoming.owner ?? current.owner,
 			icon_url: incoming.icon_url ?? current.icon_url,
@@ -427,7 +318,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 
 	onMounted(() => {
 		mounted = true
-		if (options.serverId.value) connect(options.serverId.value)
+		connect(options.serverId.value)
 	})
 
 	watch(

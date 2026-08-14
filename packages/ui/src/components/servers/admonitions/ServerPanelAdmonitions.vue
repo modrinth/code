@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import StackedAdmonitions, {
 	type StackedAdmonitionItem,
 } from '#ui/components/base/StackedAdmonitions.vue'
-import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
+import InstallingBanner, {
+	type ContentError,
+	type SyncProgress,
+} from '#ui/components/servers/InstallingBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -17,8 +20,13 @@ import BackupAdmonition, { type BackupAdmonitionEntry } from './BackupAdmonition
 import FileOperationAdmonition from './FileOperationAdmonition.vue'
 import UploadAdmonition from './UploadAdmonition.vue'
 
+const props = defineProps<{
+	syncProgress?: SyncProgress | null
+	contentError?: ContentError | null
+}>()
+
 const emit = defineEmits<{
-	'installation-retry': []
+	'content-retry': []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -50,18 +58,28 @@ const messages = defineMessages({
 const isOnContentTab = computed(() => route.path.includes('/content'))
 const isOnFilesTab = computed(() => route.path.includes('/files'))
 
+const bannerCoversInstalling = computed(
+	() =>
+		ctx.server.value?.status === 'installing' ||
+		ctx.isSyncingContent.value ||
+		ctx.busyReasons.value.some(
+			(r) =>
+				r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content',
+		),
+)
+
 function isBackupReason(id: string) {
 	return id === 'servers.busy.backup-creating' || id === 'servers.busy.backup-restoring'
 }
 
 function isInstallingReason(id: string) {
-	return id === 'servers.busy.installing'
+	return id === 'servers.busy.installing' || id === 'servers.busy.syncing-content'
 }
 
 const filteredBusyReasons = computed(() =>
 	ctx.busyReasons.value.filter((r) => {
 		if (isBackupReason(r.reason.id)) return false
-		if (isInstallingReason(r.reason.id)) return false
+		if (bannerCoversInstalling.value && isInstallingReason(r.reason.id)) return false
 		return true
 	}),
 )
@@ -77,6 +95,17 @@ const filesBusyHeader = computed(() =>
 const dismissedIds = reactive(new Set<string>())
 const cancellingIds = reactive(new Set<string>())
 const uploadCancelling = ref(false)
+const dismissedContentErrorKey = ref<string | null>(null)
+
+const contentErrorKey = computed(() =>
+	props.contentError ? `${props.contentError.step}:${props.contentError.description}` : null,
+)
+
+watch(contentErrorKey, (key) => {
+	if (!key) {
+		dismissedContentErrorKey.value = null
+	}
+})
 
 const backupAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 	const result: BackupAdmonitionEntry[] = []
@@ -142,7 +171,12 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 	)
 
 const showInstallingBanner = computed(() => {
-	return !!ctx.installation.value && ctx.installation.value.status !== 'complete'
+	if (!ctx.server.value) return false
+	const installing = bannerCoversInstalling.value || !!props.contentError
+	if (!installing) return false
+	if (contentErrorKey.value && dismissedContentErrorKey.value === contentErrorKey.value)
+		return false
+	return props.syncProgress?.phase !== 'Analyzing'
 })
 
 function fsOpType(op: FileOperation): StackedAdmonitionItem['type'] {
@@ -176,11 +210,10 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 	let sortIndex = 0
 
 	if (showInstallingBanner.value) {
-		const failed = ctx.installation.value?.status === 'failed'
 		out.push({
 			id: 'installing',
-			type: failed ? 'critical' : 'info',
-			dismissible: failed,
+			type: props.contentError ? 'critical' : 'info',
+			dismissible: !!props.contentError,
 			kind: 'installing',
 			priority: 0,
 			sortIndex: sortIndex++,
@@ -332,8 +365,8 @@ async function onDismissAll() {
 	const tasks: Promise<unknown>[] = []
 	for (const it of stackItems.value) {
 		if (!it.dismissible) continue
-		if (it.kind === 'installing') {
-			onInstallationDismiss()
+		if (it.kind === 'installing' && props.contentError) {
+			onContentErrorDismiss()
 		} else if (it.kind === 'fs-op' && it.op.id) {
 			const { op } = it
 			if (op.state === 'done' || op.state?.startsWith('fail')) {
@@ -352,9 +385,9 @@ function onFileOpDismiss(item: ServerAdmonitionItem) {
 	}
 }
 
-function onInstallationDismiss() {
-	if (ctx.installation.value) {
-		ctx.dismissInstallation(ctx.installation.value.id)
+function onContentErrorDismiss() {
+	if (contentErrorKey.value) {
+		dismissedContentErrorKey.value = contentErrorKey.value
 	}
 }
 </script>
@@ -369,10 +402,14 @@ function onInstallationDismiss() {
 		<template #item="{ item, dismissible }">
 			<InstallingBanner
 				v-if="item.kind === 'installing'"
+				:progress="syncProgress"
+				:fallback-phase="isOnContentTab && !syncProgress ? 'Addons' : null"
+				:content-error="contentError"
+				:dismissible="dismissible && !!contentError"
 				:retry-disabled="!canSetup"
 				:retry-disabled-tooltip="permissionDeniedMessage"
-				@dismiss="onInstallationDismiss"
-				@retry="emit('installation-retry')"
+				@dismiss="onContentErrorDismiss"
+				@retry="emit('content-retry')"
 			/>
 			<UploadAdmonition
 				v-else-if="item.kind === 'upload'"

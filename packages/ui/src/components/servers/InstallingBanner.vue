@@ -1,8 +1,7 @@
 <template>
 	<Admonition
-		v-if="installation"
-		:type="installation.status === 'failed' ? 'critical' : 'info'"
-		:dismissible="installation.status === 'failed'"
+		:type="contentError ? 'critical' : 'info'"
+		:dismissible="dismissible"
 		:progress="progressValue"
 		progress-color="blue"
 		:waiting="isWaiting"
@@ -11,8 +10,23 @@
 		<template #header>
 			{{ headerLabel }}
 		</template>
-		{{ installation.status === 'failed' ? errorLabel : descriptionLabel }}
-		<template v-if="installation.status === 'failed'" #top-right-actions>
+		<template v-if="contentError">
+			{{ errorLabel }}
+		</template>
+		<template v-else-if="effectivePhase">{{ phaseLabel }}</template>
+		<div v-else class="ticker-container">
+			<div class="ticker-content">
+				<div
+					v-for="(message, index) in tickerMessages"
+					:key="message"
+					class="ticker-item"
+					:class="{ active: index === currentIndex % tickerMessages.length }"
+				>
+					{{ message }}
+				</div>
+			</div>
+		</div>
+		<template v-if="contentError" #top-right-actions>
 			<Button
 				v-tooltip="retryDisabled ? retryDisabledTooltip : undefined"
 				type="outlined"
@@ -30,17 +44,29 @@
 
 <script setup lang="ts">
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectModrinthServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import Admonition from '../base/Admonition.vue'
 
-defineProps<{
+export interface SyncProgress {
+	phase: 'Analyzing' | 'InstallingPack' | 'InstallingLoader' | 'Addons'
+	percent: number
+}
+
+export interface ContentError {
+	step: string
+	description: string
+}
+
+const props = defineProps<{
+	progress?: SyncProgress | null
+	fallbackPhase?: SyncProgress['phase'] | null
+	contentError?: ContentError | null
+	dismissible?: boolean
 	retryDisabled?: boolean
 	retryDisabledTooltip?: string
 }>()
@@ -51,182 +77,191 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const { installation } = injectModrinthServerContext()
 
 const messages = defineMessages({
 	errorHeader: {
 		id: 'servers.installing-banner.error.header',
 		defaultMessage: 'Installation failed',
 	},
-	platformErrorHeader: {
-		id: 'servers.installing-banner.error.header.platform',
-		defaultMessage: 'Failed to install {loader} {loaderVersion} for Minecraft {gameVersion}',
+	preparingHeader: {
+		id: 'servers.installing-banner.preparing.header',
+		defaultMessage: "We're preparing your server",
 	},
-	platformWithoutVersionErrorHeader: {
-		id: 'servers.installing-banner.error.header.platform-without-version',
-		defaultMessage: 'Failed to install {loader} for Minecraft {gameVersion}',
+	invalidLoaderVersionError: {
+		id: 'servers.installing-banner.error.invalid-loader-version',
+		defaultMessage:
+			'The specified loader or Minecraft version could not be installed. It may be invalid or unsupported.',
 	},
-	minecraftErrorHeader: {
-		id: 'servers.installing-banner.error.header.minecraft',
-		defaultMessage: 'Failed to install Minecraft {version}',
+	unsupportedLoaderVersionError: {
+		id: 'servers.installing-banner.error.unsupported-loader-version',
+		defaultMessage: 'This version of Minecraft or loader is not yet supported by Modrinth Hosting.',
 	},
-	modpackErrorHeader: {
-		id: 'servers.installing-banner.error.header.modpack',
-		defaultMessage: 'Failed to install modpack',
+	internalPlatformError: {
+		id: 'servers.installing-banner.error.internal-platform',
+		defaultMessage: 'An internal error occurred while installing the platform. Please try again.',
 	},
-	localModpackErrorHeader: {
-		id: 'servers.installing-banner.error.header.local-modpack',
-		defaultMessage: 'Failed to install {filename}',
+	noPrimaryFileError: {
+		id: 'servers.installing-banner.error.no-primary-file',
+		defaultMessage:
+			'This modpack version does not include a downloadable file. It may have been packaged incorrectly.',
+	},
+	modpackInstallFailedError: {
+		id: 'servers.installing-banner.error.modpack-install-failed',
+		defaultMessage: 'The modpack could not be installed. It may be corrupted or incompatible.',
 	},
 	unknownError: {
 		id: 'servers.installing-banner.error.unknown',
 		defaultMessage: 'An unexpected error occurred during installation.',
 	},
-	preparingHeader: {
-		id: 'servers.installing-banner.preparing.header',
-		defaultMessage: 'Preparing your server',
-	},
 	installingPlatform: {
-		id: 'servers.installing-banner.installing-platform',
-		defaultMessage: 'Installing {loader} for Minecraft {version}',
-	},
-	installingMinecraft: {
-		id: 'servers.installing-banner.installing-minecraft',
-		defaultMessage: 'Installing Minecraft {version}',
+		id: 'servers.installing-banner.phase.installing-platform',
+		defaultMessage: 'Installing platform...',
 	},
 	installingModpack: {
-		id: 'servers.installing-banner.installing-modpack',
-		defaultMessage: 'Installing modpack',
+		id: 'servers.installing-banner.phase.installing-modpack',
+		defaultMessage: 'Installing modpack...',
 	},
-	installingLocalModpack: {
-		id: 'servers.installing-banner.installing-local-modpack',
-		defaultMessage: 'Installing {filename}',
+	installingAddons: {
+		id: 'servers.installing-banner.phase.installing-addons',
+		defaultMessage: 'Installing addons...',
 	},
-	preparingDescription: {
-		id: 'servers.installing-banner.description.preparing',
-		defaultMessage: 'Preparing your server...',
+	tickerOrganizingFiles: {
+		id: 'servers.installing-banner.ticker.organizing-files',
+		defaultMessage: 'Organizing files...',
 	},
-	applyingDescription: {
-		id: 'servers.installing-banner.description.applying',
-		defaultMessage: 'Applying your installation changes...',
+	tickerDownloadingMods: {
+		id: 'servers.installing-banner.ticker.downloading-mods',
+		defaultMessage: 'Downloading mods...',
 	},
-	durationDescription: {
-		id: 'servers.installing-banner.description.duration',
-		defaultMessage: 'This installation may take several minutes...',
+	tickerConfiguringServer: {
+		id: 'servers.installing-banner.ticker.configuring-server',
+		defaultMessage: 'Configuring server...',
 	},
-	controlsDescription: {
-		id: 'servers.installing-banner.description.controls',
-		defaultMessage: 'Server controls will unlock when installation finishes.',
+	tickerSettingUpEnvironment: {
+		id: 'servers.installing-banner.ticker.setting-up-environment',
+		defaultMessage: 'Setting up environment...',
 	},
-	stillWorkingDescription: {
-		id: 'servers.installing-banner.description.still-working',
-		defaultMessage: 'Still working—your installation is in progress...',
+	tickerAddingJava: {
+		id: 'servers.installing-banner.ticker.adding-java',
+		defaultMessage: 'Adding Java...',
 	},
 })
 
-const headerLabel = computed(() => {
-	const current = installation.value
-	if (!current) return ''
+const errorLabel = computed(() => {
+	const desc = props.contentError?.description?.toLowerCase()
+	const step = props.contentError?.step
 
-	switch (current.key.type) {
-		case 'platform': {
-			if (current.key.platform === 'vanilla') {
-				if (current.status === 'failed') {
-					return formatMessage(messages.minecraftErrorHeader, {
-						version: current.key.game_version,
-					})
-				}
-				return formatMessage(messages.installingMinecraft, {
-					version: current.key.game_version,
-				})
-			}
-			if (current.status === 'failed') {
-				if (!current.key.platform_version) {
-					return formatMessage(messages.platformWithoutVersionErrorHeader, {
-						loader: formatLoaderLabel(current.key.platform),
-						gameVersion: current.key.game_version,
-					})
-				}
-				return formatMessage(messages.platformErrorHeader, {
-					loader: formatLoaderLabel(current.key.platform),
-					loaderVersion: current.key.platform_version,
-					gameVersion: current.key.game_version,
-				})
-			}
-			return formatMessage(messages.installingPlatform, {
-				loader: formatLoaderLabel(current.key.platform),
-				version: current.key.game_version,
-			})
+	if (step === 'modloader') {
+		if (desc === 'the specified version may be incorrect') {
+			return formatMessage(messages.invalidLoaderVersionError)
 		}
-		case 'modrinth_modpack':
-			return formatMessage(
-				current.status === 'failed' ? messages.modpackErrorHeader : messages.installingModpack,
-			)
-		case 'local_modpack':
-			return formatMessage(
-				current.status === 'failed'
-					? messages.localModpackErrorHeader
-					: messages.installingLocalModpack,
-				{
-					filename: current.key.filename,
-				},
-			)
-		case 'unknown':
-			return formatMessage(
-				current.status === 'failed' ? messages.errorHeader : messages.preparingHeader,
-			)
+		if (desc === 'this version is not yet supported') {
+			return formatMessage(messages.unsupportedLoaderVersionError)
+		}
+		if (desc === 'internal error') {
+			return formatMessage(messages.internalPlatformError)
+		}
 	}
 
+	if (step === 'modpack') {
+		if (desc?.includes('no primary file')) {
+			return formatMessage(messages.noPrimaryFileError)
+		}
+		if (desc?.includes('failed to install')) {
+			return formatMessage(messages.modpackInstallFailedError)
+		}
+	}
+
+	return props.contentError?.description ?? formatMessage(messages.unknownError)
+})
+
+const effectivePhase = computed(() => props.progress?.phase ?? props.fallbackPhase ?? null)
+
+const headerLabel = computed(() => {
+	if (props.contentError) return formatMessage(messages.errorHeader)
+	if (effectivePhase.value === 'Addons') return formatMessage(commonMessages.installingContentLabel)
 	return formatMessage(messages.preparingHeader)
 })
 
-const descriptionIndex = ref(0)
-const installationId = computed(() => installation.value?.id ?? null)
-
-watch(installationId, () => {
-	descriptionIndex.value = 0
-})
-
-const descriptionLabel = computed(() => {
-	switch (descriptionIndex.value) {
-		case 0:
-			return formatMessage(messages.preparingDescription)
-		case 1:
-			return formatMessage(messages.applyingDescription)
-		case 2:
-			return formatMessage(messages.durationDescription)
+const phaseLabel = computed(() => {
+	switch (effectivePhase.value) {
+		case 'InstallingLoader':
+			return formatMessage(messages.installingPlatform)
+		case 'InstallingPack':
+			return formatMessage(messages.installingModpack)
+		case 'Addons':
+			return formatMessage(messages.installingAddons)
 		default:
-			return descriptionIndex.value % 2 === 1
-				? formatMessage(messages.controlsDescription)
-				: formatMessage(messages.stillWorkingDescription)
+			return formatMessage(commonMessages.installingLabel)
 	}
 })
 
-const errorLabel = computed(() => installation.value?.error ?? formatMessage(messages.unknownError))
-
 const progressValue = computed(() => {
-	const current = installation.value
-	if (!current || current.status === 'failed') return undefined
-	return current.progress == null ? 0 : current.progress / 100
+	if (props.contentError) return undefined
+	return props.progress ? props.progress.percent / 100 : 0
 })
 
 const isWaiting = computed(() => {
-	const current = installation.value
-	if (!current || current.status === 'failed') return false
-	return current.progress == null || current.progress <= 0
+	if (props.contentError) return false
+	return !props.progress || props.progress.percent <= 0
 })
+
+const tickerMessages = computed(() => [
+	formatMessage(messages.tickerOrganizingFiles),
+	formatMessage(messages.tickerDownloadingMods),
+	formatMessage(messages.tickerConfiguringServer),
+	formatMessage(messages.tickerSettingUpEnvironment),
+	formatMessage(messages.tickerAddingJava),
+])
+
+const currentIndex = ref(0)
 
 let intervalId: ReturnType<typeof setInterval> | null = null
 
 onMounted(() => {
 	intervalId = setInterval(() => {
-		if (installation.value?.status === 'pending' || installation.value?.status === 'installing') {
-			descriptionIndex.value += 1
-		}
-	}, 15_000)
+		currentIndex.value = (currentIndex.value + 1) % tickerMessages.value.length
+	}, 3000)
 })
 
 onUnmounted(() => {
-	if (intervalId) clearInterval(intervalId)
+	if (intervalId) {
+		clearInterval(intervalId)
+	}
 })
 </script>
+
+<style scoped>
+.ticker-container {
+	height: 20px;
+	width: 100%;
+	position: relative;
+}
+
+.ticker-content {
+	position: relative;
+	width: 100%;
+}
+
+.ticker-item {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
+	color: var(--color-secondary-text);
+	opacity: 0;
+	transform: scale(0.9);
+	filter: blur(4px);
+	transition: all 0.3s ease-in-out;
+}
+
+.ticker-item.active {
+	opacity: 1;
+	transform: scale(1);
+	filter: blur(0);
+}
+</style>
