@@ -901,10 +901,7 @@ function getCardActions(
 							: PlusIcon,
 				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
 				disabled:
-					showAsInstalled ||
-					isInstalling ||
-					isInstallingSelection ||
-					(isQueued && !isQueuedRoot),
+					showAsInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
 				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {

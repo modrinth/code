@@ -365,10 +365,7 @@ function getCardActions(
 							: DownloadIcon,
 				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
 				disabled:
-					!!isInstalled ||
-					isInstalling ||
-					isInstallingSelection ||
-					(isQueued && !isQueuedRoot),
+					!!isInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
 				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),

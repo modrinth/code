@@ -455,9 +455,7 @@ export function createServerInstallContent(opts: {
 		}))
 	}
 
-	async function resolveQueuedServerInstallPlan(
-		plan: BrowseInstallPlan<InstallableSearchResult>,
-	) {
+	async function resolveQueuedServerInstallPlan(plan: BrowseInstallPlan<InstallableSearchResult>) {
 		const resolvedContent = await resolveAddonPlan(plan, Array.from(serverContentProjectIds.value))
 		const storedPlan = queuedServerInstalls.value.get(plan.projectId)
 		if (!storedPlan || storedPlan.versionId !== plan.versionId) return
