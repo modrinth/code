@@ -38,20 +38,33 @@
 				{{ calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly) }}% with
 				annual billing!
 			</p>
-			<ButtonStyled v-if="auth.user && hasActiveMidas(auth.user)" color="purple" size="large">
-				<nuxt-link to="/settings/billing">
-					<SettingsIcon aria-hidden="true" />
-					Manage subscription
-				</nuxt-link>
-			</ButtonStyled>
-			<ButtonStyled v-else-if="auth.user" color="purple" size="large">
-				<button @click="purchaseModal.show()">Subscribe</button>
-			</ButtonStyled>
-			<ButtonStyled v-else color="purple" size="large">
-				<nuxt-link :to="`/auth/sign-in?redirect=${encodeURIComponent('/plus?showModal=true')}`">
-					Subscribe
-				</nuxt-link>
-			</ButtonStyled>
+			<ButtonLink
+				v-if="auth.user && hasActiveMidas(auth.user)"
+				type="colored"
+				color="purple"
+				size="xl"
+				to="/settings/billing"
+			>
+				<SettingsIcon aria-hidden="true" />
+				Manage subscription
+			</ButtonLink>
+			<Button
+				v-else-if="auth.user"
+				type="colored"
+				color="purple"
+				size="xl"
+				@click="purchaseModal.show()"
+				>Subscribe</Button
+			>
+			<ButtonLink
+				v-else
+				type="colored"
+				color="purple"
+				size="xl"
+				:to="`/auth/sign-in?redirect=${encodeURIComponent('/plus?showModal=true')}`"
+			>
+				Subscribe
+			</ButtonLink>
 		</div>
 	</div>
 	<div class="perks-hero">
@@ -83,7 +96,8 @@
 <script setup>
 import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	injectNotificationManager,
 	PurchaseModal,
 	useFormatPrice,

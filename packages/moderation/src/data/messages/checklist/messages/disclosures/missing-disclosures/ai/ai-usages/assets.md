@@ -1,0 +1,1 @@
+    - AI-generated or assisted art, assets, or other design elements.

@@ -11,6 +11,7 @@ use crate::database::models::{
 use crate::env::ENV;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 use ariadne::ids::base62_impl::to_base62;
@@ -135,7 +136,11 @@ pub async fn build_email(
 ) -> Result<Message, ApiError> {
     let get_html_body = async {
         let result: Result<Result<String, reqwest::Error>, ApiError> =
-            match template.get_cached_html_data(redis).await? {
+            match template
+                .get_cached_html_data(redis)
+                .await
+                .wrap_internal_err("fetching email template HTML from Redis")?
+            {
                 Some(html_body) => Ok(Ok(html_body)),
                 None => {
                     let result = client
@@ -149,7 +154,10 @@ pub async fn build_email(
                     if let Ok(ref body) = result {
                         template
                             .set_cached_html_data(body.clone(), redis)
-                            .await?;
+                            .await
+                            .wrap_internal_err(
+                                "updating database records for `build_email`",
+                            )?;
                     }
 
                     Ok(result)
@@ -167,8 +175,10 @@ pub async fn build_email(
     } = from;
 
     let db_user = DBUser::get_id(user_id, &mut *exec, redis)
-        .await?
-        .ok_or(DatabaseError::Database(sqlx::Error::RowNotFound))?;
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .ok_or(DatabaseError::Database(sqlx::Error::RowNotFound))
+        .wrap_internal_err("fetching user from database")?;
 
     let map = [
         (USER_NAME, db_user.username),
@@ -180,17 +190,24 @@ pub async fn build_email(
     let (html_body_result, either) = futures::try_join!(
         get_html_body,
         collect_template_variables(exec, redis, user_id, body, map)
-    )?;
+    )
+    .wrap_api_err("executing `collect_template_variables`")?;
 
     let mut message_builder = Message::builder().from(Mailbox::new(
         Some(from_name),
-        from_address.parse().map_err(MailError::from)?,
+        from_address
+            .parse()
+            .map_err(MailError::from)
+            .wrap_internal_err("reading HTTP response body")?,
     ));
 
     if let Some((name, address)) = reply_name.zip(reply_address) {
         message_builder = message_builder.reply_to(Mailbox::new(
             Some(name),
-            address.parse().map_err(MailError::from)?,
+            address
+                .parse()
+                .map_err(MailError::from)
+                .wrap_internal_err("reading HTTP response body")?,
         ));
     }
 
@@ -244,21 +261,26 @@ pub async fn build_email(
             html: Some(html),
         } => message_builder
             .multipart(MultiPart::alternative_plain_html(plaintext, html))
-            .map_err(MailError::from)?,
+            .map_err(MailError::from)
+            .wrap_internal_err(
+                "executing `MultiPart::alternative_plain_html`",
+            )?,
 
         Body {
             plaintext: Some(plaintext),
             html: None,
         } => message_builder
             .singlepart(SinglePart::plain(plaintext))
-            .map_err(MailError::from)?,
+            .map_err(MailError::from)
+            .wrap_internal_err("executing `SinglePart::plain`")?,
 
         Body {
             plaintext: None,
             html: Some(html),
         } => message_builder
             .singlepart(SinglePart::html(html))
-            .map_err(MailError::from)?,
+            .map_err(MailError::from)
+            .wrap_internal_err("executing `SinglePart::html`")?,
 
         Body {
             plaintext: None,
@@ -329,7 +351,10 @@ async fn resolve_report_title(
         return Ok(title);
     }
 
-    let Some(report) = DBReport::get(report_id, &mut *exec).await? else {
+    let Some(report) = DBReport::get(report_id, &mut *exec)
+        .await
+        .wrap_internal_err("fetching report from database")?
+    else {
         return Ok(title);
     };
     let Some(shared_instance_id) = report.shared_instance_id else {
@@ -398,8 +423,10 @@ async fn collect_template_variables(
                 exec,
                 redis,
             )
-            .await?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
+            .await
+            .wrap_api_err("fetching email project")?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
+            .wrap_internal_err("fetching project from database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -423,7 +450,7 @@ async fn collect_template_variables(
                 report_id.0 as i64
             )
             .fetch_one(&mut *exec)
-            .await?;
+            .await.wrap_internal_err("querying database for `collect_template_variables`")?;
 
             map.insert(REPORT_ID, to_base62(report_id.0));
             map.insert(
@@ -433,7 +460,8 @@ async fn collect_template_variables(
                     DBReportId(report_id.0 as i64),
                     result.title,
                 )
-                .await?,
+                .await
+                .wrap_api_err("executing `resolve_report_title`")?,
             );
             map.insert(REPORT_DATE, date_human_readable(result.created));
             Ok(EmailTemplate::Static(map))
@@ -453,7 +481,7 @@ async fn collect_template_variables(
                 report_id.0 as i64
             )
             .fetch_one(&mut *exec)
-            .await?;
+            .await.wrap_internal_err("querying database for `collect_template_variables`")?;
 
             map.insert(
                 REPORT_TITLE,
@@ -462,7 +490,8 @@ async fn collect_template_variables(
                     DBReportId(report_id.0 as i64),
                     result.title,
                 )
-                .await?,
+                .await
+                .wrap_api_err("executing `resolve_report_title`")?,
             );
             map.insert(NEWREPORT_ID, to_base62(report_id.0));
             Ok(EmailTemplate::Static(map))
@@ -476,7 +505,10 @@ async fn collect_template_variables(
                 project_id.0 as i64
             )
             .fetch_one(&mut *exec)
-            .await?;
+            .await
+            .wrap_internal_err(
+                "querying database for `collect_template_variables`",
+            )?;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
             map.insert(PROJECT_NAME, result.name);
@@ -494,8 +526,10 @@ async fn collect_template_variables(
                 exec,
                 redis,
             )
-            .await?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
+            .await
+            .wrap_api_err("fetching email project")?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
+            .wrap_internal_err("fetching project from database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -516,8 +550,10 @@ async fn collect_template_variables(
                 &mut *exec,
                 redis,
             )
-            .await?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
+            .await
+            .wrap_api_err("fetching email project")?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
+            .wrap_internal_err("fetching project from database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -530,10 +566,14 @@ async fn collect_template_variables(
                     &mut *exec,
                     redis,
                 )
-                .await?
+                .await
+                .wrap_internal_err("fetching user from database")?
                 .ok_or_else(|| {
                     DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
+                })
+                .wrap_internal_err(
+                    "querying database for `collect_template_variables`",
+                )?;
 
                 map.insert(NEWOWNER_TYPE, "user".to_string());
                 map.insert(NEWOWNER_TYPE_CAPITALIZED, "User".to_string());
@@ -546,10 +586,14 @@ async fn collect_template_variables(
                     &mut *exec,
                     redis,
                 )
-                .await?
+                .await
+                .wrap_internal_err("fetching organization from database")?
                 .ok_or_else(|| {
                     DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
+                })
+                .wrap_internal_err(
+                    "querying database for `collect_template_variables`",
+                )?;
 
                 map.insert(NEWOWNER_TYPE, "organization".to_string());
                 map.insert(
@@ -584,7 +628,10 @@ async fn collect_template_variables(
                 user_id.0 as i64
             )
             .fetch_one(&mut *exec)
-            .await?;
+            .await
+            .wrap_internal_err(
+                "querying database for `collect_template_variables`",
+            )?;
 
             map.insert(TEAMINVITE_INVITER_NAME, result.inviter_name);
             map.insert(TEAMINVITE_PROJECT_NAME, result.project_name);
@@ -616,7 +663,10 @@ async fn collect_template_variables(
                 user_id.0 as i64
             )
             .fetch_one(&mut *exec)
-            .await?;
+            .await
+            .wrap_internal_err(
+                "querying database for `collect_template_variables`",
+            )?;
 
             map.insert(ORGINVITE_INVITER_NAME, result.inviter_name);
             map.insert(ORGINVITE_ORG_NAME, result.organization_name);
@@ -644,7 +694,10 @@ async fn collect_template_variables(
                 user_id.0 as i64,
             )
             .fetch_one(&mut *exec)
-            .await?;
+            .await
+            .wrap_internal_err(
+                "querying database for `collect_template_variables`",
+            )?;
 
             map.insert(STATUSCHANGE_PROJECT_NAME, result.project_name);
             map.insert(STATUSCHANGE_OLD_STATUS, old_status.as_str().to_owned());
@@ -829,7 +882,9 @@ async fn collect_template_variables(
             key,
         } => Ok(EmailTemplate::Dynamic {
             variables: map,
-            body: dynamic_email_body(redis, title, body_md, key).await?,
+            body: dynamic_email_body(redis, title, body_md, key)
+                .await
+                .wrap_api_err("executing `dynamic_email_body`")?,
             title: title.to_string(),
         }),
 
@@ -844,8 +899,10 @@ async fn collect_template_variables(
                 &mut *exec,
                 redis,
             )
-            .await?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
+            .await
+            .wrap_internal_err("fetching user from database")?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
+            .wrap_internal_err("fetching user from database")?;
 
             map.insert(SERVERINVITE_INVITER_NAME, inviter.username);
             map.insert(SERVERINVITE_SERVER_NAME, server_name.clone());
@@ -883,9 +940,11 @@ async fn dynamic_email_body(
                 }))
                 .send()
                 .await
-                .and_then(|res| res.error_for_status())?
+                .and_then(|res| res.error_for_status())
+                .wrap_internal_err("deserializing HTTP response")?
                 .bytes()
-                .await?
+                .await
+                .wrap_internal_err("deserializing HTTP response")?
                 .as_ref(),
         )
         .wrap_internal_err("email body is not valid UTF-8")

@@ -7,13 +7,13 @@
 				:options="platformOptions"
 				fit-content
 				:dropdown-min-width="180"
-				trigger-class="!min-h-9 !px-3 !py-0"
+				trigger-type="base"
 				@update:model-value="updateSelectedPlatforms"
 			>
 				<template #input-content="{ isOpen, openDirection }">
 					<div class="flex items-center gap-2">
 						<FilterIcon class="h-5 w-5 text-secondary" />
-						<span class="font-semibold text-primary">Platforms</span>
+						<span class="font-semibold text-inherit">Platforms</span>
 						<ChevronLeftIcon
 							class="h-5 w-5 text-secondary transition-transform duration-150"
 							:class="
@@ -31,13 +31,13 @@
 				search-placeholder="Search..."
 				fit-content
 				:dropdown-min-width="240"
-				trigger-class="!min-h-9 !px-3 !py-0"
+				trigger-type="base"
 				@update:model-value="updateSelectedGameVersions"
 			>
 				<template #input-content="{ isOpen, openDirection }">
 					<div class="flex items-center gap-2">
 						<FilterIcon class="h-5 w-5 text-secondary" />
-						<span class="font-semibold text-primary">Game versions</span>
+						<span class="font-semibold text-inherit">Game versions</span>
 						<ChevronLeftIcon
 							class="h-5 w-5 text-secondary transition-transform duration-150"
 							:class="
@@ -63,13 +63,13 @@
 				:options="channelOptions"
 				fit-content
 				:dropdown-min-width="180"
-				trigger-class="!min-h-9 !px-3 !py-0"
+				trigger-type="base"
 				@update:model-value="updateSelectedChannels"
 			>
 				<template #input-content="{ isOpen, openDirection }">
 					<div class="flex items-center gap-2">
 						<FilterIcon class="h-5 w-5 text-secondary" />
-						<span class="font-semibold text-primary">Channels</span>
+						<span class="font-semibold text-inherit">Channels</span>
 						<ChevronLeftIcon
 							class="h-5 w-5 text-secondary transition-transform duration-150"
 							:class="
@@ -120,16 +120,17 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { ChevronLeftIcon, FilterIcon, XCircleIcon, XIcon } from '@modrinth/assets'
 import type { MultiSelectOption } from '@modrinth/ui'
 import { Checkbox, formatLoader, FormattedTag, MultiSelect, TagItem, useVIntl } from '@modrinth/ui'
-import type { GameVersionTag, Version } from '@modrinth/utils'
+import type { GameVersionTag } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 import type { LocationQueryValue } from 'vue-router'
 import { useRoute } from 'vue-router'
 
 const props = defineProps<{
-	versions: Version[]
+	versions: Labrinth.Versions.v3.Version[]
 	gameVersions: GameVersionTag[]
 	baseId?: string
 }>()
@@ -243,31 +244,35 @@ if (selectedGameVersions.value.some((version) => !isReleaseGameVersion(version))
 	showSnapshots.value = true
 }
 
-async function toggleFilters(type: FilterType, filters: Filter[]) {
-	for (const filter of filters) {
-		await toggleFilter(type, filter, true)
+function selectedFiltersOfType(type: FilterType) {
+	if (type === 'channel') {
+		return selectedChannels
+	} else if (type === 'gameVersion') {
+		return selectedGameVersions
+	} else {
+		return selectedPlatforms
 	}
+}
+
+function toggleFilters(type: FilterType, filters: Filter[]) {
+	const selected = selectedFiltersOfType(type)
+	const allSelected = filters.every((filter) => selected.value.includes(filter))
+
+	selected.value = allSelected
+		? selected.value.filter((x) => !filters.includes(x))
+		: [...selected.value, ...filters.filter((filter) => !selected.value.includes(filter))]
 
 	updateFilters()
 }
 
-async function toggleFilter(type: FilterType, filter: Filter, bulk = false) {
-	if (type === 'channel') {
-		selectedChannels.value = selectedChannels.value.includes(filter)
-			? selectedChannels.value.filter((x) => x !== filter)
-			: [...selectedChannels.value, filter]
-	} else if (type === 'gameVersion') {
-		selectedGameVersions.value = selectedGameVersions.value.includes(filter)
-			? selectedGameVersions.value.filter((x) => x !== filter)
-			: [...selectedGameVersions.value, filter]
-	} else if (type === 'platform') {
-		selectedPlatforms.value = selectedPlatforms.value.includes(filter)
-			? selectedPlatforms.value.filter((x) => x !== filter)
-			: [...selectedPlatforms.value, filter]
-	}
-	if (!bulk) {
-		updateFilters()
-	}
+function toggleFilter(type: FilterType, filter: Filter) {
+	const selected = selectedFiltersOfType(type)
+
+	selected.value = selected.value.includes(filter)
+		? selected.value.filter((x) => x !== filter)
+		: [...selected.value, filter]
+
+	updateFilters()
 }
 
 function updateSelectedGameVersions(versions: string[]) {
@@ -302,7 +307,7 @@ function updateShowSnapshots(value: boolean, _event?: MouseEvent) {
 	}
 }
 
-async function clearFilters() {
+function clearFilters() {
 	selectedChannels.value = []
 	selectedGameVersions.value = []
 	selectedPlatforms.value = []

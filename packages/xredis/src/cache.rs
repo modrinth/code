@@ -8,6 +8,7 @@ use std::str::FromStr;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
+use eyre::{Result, WrapErr, eyre};
 use futures::stream::{FuturesUnordered, StreamExt};
 use redis::aio::ConnectionLike;
 use serde::de::DeserializeOwned;
@@ -15,8 +16,6 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tokio::time::{Instant, timeout_at};
 use tracing::{Instrument, info_span};
-
-use crate::Error;
 
 use super::commands;
 use super::connection::RoutableConnection;
@@ -33,9 +32,7 @@ const FILL_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
 pub(super) trait ConnectionProvider {
     type Connection: ConnectionLike + RoutableConnection;
 
-    fn connect(
-        &self,
-    ) -> impl Future<Output = Result<Self::Connection, Error>> + Send;
+    fn connect(&self) -> impl Future<Output = Result<Self::Connection>> + Send;
 }
 
 #[derive(Clone, Copy)]
@@ -53,7 +50,7 @@ pub enum Codec {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncodingFormat {
-    Json,
+    Postcard,
 }
 
 #[derive(Debug, Error)]
@@ -92,7 +89,7 @@ impl FromStr for EncodingFormat {
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
-            "json" => Ok(Self::Json),
+            "postcard" => Ok(Self::Postcard),
             _ => Err(InvalidEncodingFormat),
         }
     }
@@ -112,12 +109,10 @@ pub struct CacheSettings {
 }
 
 impl CacheSettings {
-    pub fn encode_value<T: Serialize>(
-        &self,
-        value: &T,
-    ) -> Result<Vec<u8>, Error> {
+    pub fn encode_value<T: Serialize>(&self, value: &T) -> Result<Vec<u8>> {
         let mut value = match self.encoding_format {
-            EncodingFormat::Json => serde_json::to_vec(value)?,
+            EncodingFormat::Postcard => postcard::to_allocvec(value)
+                .wrap_err("serializing Redis cache value with postcard")?,
         };
 
         if self.compression_level > 0
@@ -149,15 +144,23 @@ impl CacheSettings {
         T: for<'a> Deserialize<'a>,
     {
         let (codec, value) = value.split_first()?;
-        let value = match Codec::try_from(*codec).ok()? {
+        let Ok(codec) = Codec::try_from(*codec) else {
+            return None;
+        };
+        let value = match codec {
             Codec::Raw => Cow::Borrowed(value),
-            Codec::Lz4 => Cow::Owned(
-                lz4_flex::block::decompress_size_prepended(value).ok()?,
-            ),
+            Codec::Lz4 => {
+                let Ok(value) =
+                    lz4_flex::block::decompress_size_prepended(value)
+                else {
+                    return None;
+                };
+                Cow::Owned(value)
+            }
         };
 
         match self.encoding_format {
-            EncodingFormat::Json => serde_json::from_slice(&value).ok(),
+            EncodingFormat::Postcard => postcard::from_bytes(&value).ok(),
         }
     }
 
@@ -202,12 +205,12 @@ impl CacheManager {
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<Vec<T>, E>
+    ) -> Result<Vec<T>>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -220,7 +223,8 @@ impl CacheManager {
     {
         Ok(self
             .get_cached_keys_raw(provider, namespace, keys, closure)
-            .await?
+            .await
+            .wrap_err("fetching Redis cache values")?
             .into_values()
             .collect())
     }
@@ -232,12 +236,12 @@ impl CacheManager {
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<HashMap<K, T>, E>
+    ) -> Result<HashMap<K, T>>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -297,11 +301,16 @@ impl CacheManager {
             keys,
             Some((expiry, expiry)),
             |ids| async move {
-                Ok(closure(ids)
-                    .await?
-                    .into_iter()
-                    .map(|(key, value)| (key, (None::<String>, value)))
-                    .collect())
+                let values = match closure(ids).await {
+                    Ok(values) => values,
+                    Err(error) => return Err(error),
+                };
+                Ok::<_, E>(
+                    values
+                        .into_iter()
+                        .map(|(key, value)| (key, (None::<String>, value)))
+                        .collect(),
+                )
             },
         )
         .await
@@ -316,12 +325,12 @@ impl CacheManager {
         case_sensitive: bool,
         keys: &[I],
         closure: F,
-    ) -> Result<Vec<T>, E>
+    ) -> Result<Vec<T>>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -343,7 +352,8 @@ impl CacheManager {
                 None,
                 closure,
             )
-            .await?
+            .await
+            .wrap_err("fetching Redis cache values by slug")?
             .into_values()
             .collect())
     }
@@ -358,12 +368,12 @@ impl CacheManager {
         keys: &[I],
         expiry_override: Option<(i64, i64)>,
         closure: F,
-    ) -> Result<HashMap<K, T>, E>
+    ) -> Result<HashMap<K, T>>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: From<Error>,
+        E: std::error::Error + Send + Sync + 'static,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -404,7 +414,9 @@ impl CacheManager {
                                 })
                                 .collect::<Vec<_>>();
                             let mut connection =
-                                provider.connect().await.map_err(E::from)?;
+                                provider.connect().await.wrap_err(
+                                    "connecting to Redis for slug lookup",
+                                )?;
                             let values = match routing {
                                 CacheReadRouting::ReplicaOptional => {
                                     commands::get_many_strings(
@@ -421,8 +433,8 @@ impl CacheManager {
                                     .await
                                 }
                             }
-                            .map_err(E::from)?;
-                            Ok::<_, E>(
+                            .wrap_err("fetching Redis cache slug values")?;
+                            eyre::Ok(
                                 values
                                     .into_iter()
                                     .flatten()
@@ -430,7 +442,8 @@ impl CacheManager {
                             )
                         }
                         .instrument(info_span!("get slug ids"))
-                        .await?
+                        .await
+                        .wrap_err("resolving Redis cache slugs")?
                     } else {
                         Vec::new()
                     };
@@ -447,8 +460,10 @@ impl CacheManager {
                         .map(|key| self.key_builder.entity(namespace, key))
                         .collect::<Vec<_>>();
 
-                    let mut connection =
-                        provider.connect().await.map_err(E::from)?;
+                    let mut connection = provider
+                        .connect()
+                        .await
+                        .wrap_err("connecting to Redis for cache lookup")?;
                     let mut cached_values = HashMap::new();
                     let values = match routing {
                         CacheReadRouting::ReplicaOptional => {
@@ -459,7 +474,7 @@ impl CacheManager {
                                 .await
                         }
                     }
-                    .map_err(E::from)?;
+                    .wrap_err("fetching Redis cache values")?;
                     for value in values {
                         if let Some(value) = value.and_then(|value| {
                             self.settings
@@ -469,7 +484,7 @@ impl CacheManager {
                         }
                     }
 
-                    Ok::<_, E>((cached_values, ids))
+                    eyre::Ok((cached_values, ids))
                 }
                 .instrument(info_span!("get_cached_values_closure"))
             };
@@ -482,7 +497,9 @@ impl CacheManager {
         let deadline = Instant::now() + WAIT_TIMEOUT;
 
         let (cached_values_raw, ids) =
-            get_cached_values(ids, CacheReadRouting::ReplicaOptional).await?;
+            get_cached_values(ids, CacheReadRouting::ReplicaOptional)
+                .await
+                .wrap_err("reading Redis cache")?;
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, value)| {
@@ -553,7 +570,10 @@ impl CacheManager {
 
                 let values = timeout_at(fill_deadline, closure(fetch_ids))
                     .await
-                    .map_err(|_| lock_timeout_error(0, waiters.len()))??;
+                    .map_err(|_| lock_timeout_error(0, waiters.len()))
+                    .wrap_err("waiting to fill Redis cache")?;
+                let values =
+                    values.wrap_err("fetching values to fill Redis cache")?;
 
                 let mut return_values = HashMap::new();
                 let mut encoded_values = Vec::with_capacity(values.len());
@@ -565,13 +585,17 @@ impl CacheManager {
                         val: value,
                         alias: slug.clone(),
                     };
-                    let encoded =
-                        self.settings.encode_value(&value).map_err(E::from)?;
+                    let encoded = self
+                        .settings
+                        .encode_value(&value)
+                        .wrap_err("encoding Redis cache value")?;
                     encoded_values.push((key, slug, value, encoded));
                 }
 
-                let mut connection =
-                    provider.connect().await.map_err(E::from)?;
+                let mut connection = provider
+                    .connect()
+                    .await
+                    .wrap_err("connecting to Redis to fill cache")?;
                 for (key, slug, _, encoded) in &encoded_values {
                     let redis_key =
                         self.key_builder.entity(namespace, key.to_string());
@@ -582,7 +606,7 @@ impl CacheManager {
                         default_expiry,
                     )
                     .await
-                    .map_err(E::from)?;
+                    .wrap_err("writing Redis cache value")?;
                     if let Some(slug) = slug
                         && let Some(slug_namespace) = slug_namespace
                     {
@@ -599,7 +623,7 @@ impl CacheManager {
                             default_expiry,
                         )
                         .await
-                        .map_err(E::from)?;
+                        .wrap_err("writing Redis cache slug")?;
                     }
                 }
 
@@ -608,7 +632,7 @@ impl CacheManager {
                     return_values.insert(key, value);
                 }
 
-                Result::<_, E>::Ok(return_values)
+                Result::<_>::Ok(return_values)
             }
             .await
         } else {
@@ -649,13 +673,14 @@ impl CacheManager {
                                 Err(error) => Err(error),
                             }
                         }
-                        Err(error) => Err(E::from(error)),
+                        Err(error) => Err(error),
                     }
                 }
             }
             Err(error) => Err(error),
         };
-        cached_values.extend(operation_result?);
+        cached_values
+            .extend(operation_result.wrap_err("populating Redis cache")?);
 
         Ok(cached_values
             .into_iter()
@@ -724,7 +749,7 @@ fn push_identity(identities: &mut Vec<String>, identity: String) {
 async fn wait_for_locks<I>(
     waiters: Vec<(I, LockWaiter)>,
     deadline: Instant,
-) -> Result<Vec<I>, Error> {
+) -> Result<Vec<I>> {
     let total = waiters.len();
     let mut released = Vec::with_capacity(total);
     let mut futures = FuturesUnordered::new();
@@ -740,26 +765,24 @@ async fn wait_for_locks<I>(
             Ok(()) => {
                 released.push(key);
             }
-            Err(error)
-                if is_lock_timeout(&error) || Instant::now() >= deadline =>
-            {
+            Err(_) if Instant::now() >= deadline => {
                 return Err(lock_timeout_error(released.len(), total));
             }
-            Err(error) => return Err(error),
+            Err(error) => {
+                return Err(error).wrap_err("waiting for Redis cache lock");
+            }
         }
     }
     Ok(released)
 }
 
-fn is_lock_timeout(error: &Error) -> bool {
-    matches!(error, Error::LocalCacheTimeout { .. })
-}
-
-fn lock_timeout_error(locks_released: usize, locks_waiting: usize) -> Error {
-    Error::LocalCacheTimeout {
-        released: locks_released,
-        total: locks_waiting,
-    }
+fn lock_timeout_error(
+    locks_released: usize,
+    locks_waiting: usize,
+) -> eyre::Report {
+    eyre!(
+        "timeout waiting on local Redis cache lock ({locks_released}/{locks_waiting} released)"
+    )
 }
 
 #[derive(Serialize, Deserialize)]
@@ -771,6 +794,15 @@ pub struct RedisValue<T, K, S> {
 }
 
 impl<T, K, S> RedisValue<T, K, S> {
+    pub fn new(key: K, alias: Option<S>, iat: i64, val: T) -> Self {
+        Self {
+            key,
+            alias,
+            iat,
+            val,
+        }
+    }
+
     pub fn value(&self) -> &T {
         &self.val
     }

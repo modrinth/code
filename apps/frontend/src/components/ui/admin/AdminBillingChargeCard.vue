@@ -87,29 +87,23 @@
 				</div>
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled v-if="isRefunded">
-					<div class="button-like disabled"><CheckIcon /> Charge refunded</div>
-				</ButtonStyled>
-				<ButtonStyled
+				<Button v-if="isRefunded" disabled><CheckIcon /> Charge refunded</Button>
+				<Button
 					v-else-if="charge.status === 'succeeded' && charge.type !== 'refund'"
-					color="red"
-					color-fill="text"
+					class="!text-red [&>svg]:!text-red"
+					@click="emit('refund', charge)"
 				>
-					<button @click="emit('refund', charge)">
-						<CurrencyIcon />
-						Refund options
-					</button>
-				</ButtonStyled>
-				<ButtonStyled
+					<CurrencyIcon />
+					Refund options
+				</Button>
+				<Button
 					v-else-if="charge.status === 'failed' || charge.status === 'open'"
-					color="red"
-					color-fill="text"
+					class="!text-red [&>svg]:!text-red"
+					@click="emit('modify', charge, subscription)"
 				>
-					<button @click="emit('modify', charge, subscription)">
-						<CurrencyIcon />
-						Modify charge
-					</button>
-				</ButtonStyled>
+					<CurrencyIcon />
+					Modify charge
+				</Button>
 			</div>
 		</div>
 	</div>
@@ -117,7 +111,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, CurrencyIcon } from '@modrinth/assets'
-import { ButtonStyled, useFormatDateTime, useFormatPrice, useRelativeTime } from '@modrinth/ui'
+import { Button, useFormatDateTime, useFormatPrice, useRelativeTime } from '@modrinth/ui'
 import dayjs from 'dayjs'
 
 import { products } from '~/generated/state.json'

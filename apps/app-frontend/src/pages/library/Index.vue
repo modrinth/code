@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { LibraryIcon, PlusIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, NavTabs } from '@modrinth/ui'
-import { inject, onUnmounted, ref, shallowRef } from 'vue'
+import { Button, injectNotificationManager, NavTabs } from '@modrinth/ui'
+import { inject, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
-import { instance_listener } from '@/helpers/events.js'
+import { useAppEvent } from '@/composables/use-app-event'
 import { list } from '@/helpers/instance'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
@@ -31,11 +31,8 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const unlistenInstance = await instance_listener(async () => {
+useAppEvent('instance', async () => {
 	instances.value = await list().catch(handleError)
-})
-onUnmounted(() => {
-	unlistenInstance()
 })
 </script>
 
@@ -53,12 +50,10 @@ onUnmounted(() => {
 					{ label: 'Saved', href: `/library/saved`, shown: false },
 				]"
 			/>
-			<ButtonStyled color="brand">
-				<button :disabled="offline" @click="showCreationModal?.()">
-					<PlusIcon />
-					New instance
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" :disabled="offline" @click="showCreationModal?.()">
+				<PlusIcon />
+				New instance
+			</Button>
 		</div>
 		<template v-if="instances && instances.length > 0">
 			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
@@ -68,12 +63,10 @@ onUnmounted(() => {
 				<NewInstanceImage />
 			</div>
 			<h3>No instances found</h3>
-			<ButtonStyled color="brand">
-				<button :disabled="offline" @click="showCreationModal?.()">
-					<PlusIcon />
-					Create new instance
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" :disabled="offline" @click="showCreationModal?.()">
+				<PlusIcon />
+				Create new instance
+			</Button>
 		</div>
 	</div>
 </template>

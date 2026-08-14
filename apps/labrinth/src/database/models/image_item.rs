@@ -6,7 +6,7 @@ use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const IMAGES_NAMESPACE: &str = "images:v3";
+const IMAGES_NAMESPACE: &str = "images:v4";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DBImage {

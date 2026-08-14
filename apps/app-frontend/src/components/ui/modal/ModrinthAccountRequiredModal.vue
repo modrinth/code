@@ -19,18 +19,20 @@
 
 			<div class="flex flex-col gap-6">
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-					<ButtonStyled>
-						<button class="w-full !shadow-none" type="button" @click="authenticate('sign-up')">
-							<UserPlusIcon aria-hidden="true" />
-							{{ formatMessage(messages.createAccountButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button class="w-full" type="button" @click="authenticate('sign-in')">
-							<LogInIcon aria-hidden="true" />
-							{{ formatMessage(messages.signInButton) }}
-						</button>
-					</ButtonStyled>
+					<Button class="w-full" native-type="button" @click="authenticate('sign-up')">
+						<UserPlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createAccountButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						class="w-full"
+						native-type="button"
+						@click="authenticate('sign-in')"
+					>
+						<LogInIcon aria-hidden="true" />
+						{{ formatMessage(messages.signInButton) }}
+					</Button>
 				</div>
 
 				<p class="m-0 text-center text-base font-medium leading-6 text-primary">
@@ -69,23 +71,19 @@
 
 			<div class="flex flex-col gap-6">
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-					<ButtonStyled type="outlined">
-						<button class="w-full" type="button" @click="modal?.hide()">
-							<XIcon aria-hidden="true" />
-							{{ formatMessage(messages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button
-							class="w-full !shadow-none"
-							type="button"
-							:disabled="reopeningBrowser"
-							@click="reopenBrowser"
-						>
-							<RefreshCwIcon aria-hidden="true" />
-							{{ formatMessage(messages.openBrowserAgainButton) }}
-						</button>
-					</ButtonStyled>
+					<Button type="outlined" class="w-full" native-type="button" @click="modal?.hide()">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						class="w-full"
+						native-type="button"
+						:disabled="reopeningBrowser"
+						@click="reopenBrowser"
+					>
+						<RefreshCwIcon aria-hidden="true" />
+						{{ formatMessage(messages.openBrowserAgainButton) }}
+					</Button>
 				</div>
 
 				<p class="m-0 text-center text-base font-medium leading-6 text-primary">
@@ -108,7 +106,14 @@
 
 <script setup lang="ts">
 import { LogInIcon, RefreshCwIcon, SpinnerIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'
 
@@ -246,10 +251,6 @@ const messages = defineMessages({
 	waitingForBrowser: {
 		id: 'modal.modrinth-account-required.waiting-for-browser',
 		defaultMessage: 'Waiting for browser confirmation...',
-	},
-	cancelButton: {
-		id: 'modal.modrinth-account-required.cancel-button',
-		defaultMessage: 'Cancel',
 	},
 	openBrowserAgainButton: {
 		id: 'modal.modrinth-account-required.open-browser-again-button',

@@ -7,8 +7,9 @@ import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
-import { instance_listener } from '@/helpers/events.js'
+import { useAppEvent } from '@/composables/use-app-event'
 import { list } from '@/helpers/instance'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
 const APPROX_USED_VERTICAL_SPACE = 513 // doesn't need to be exact lol just close enough so there's a little gap and no overflow
@@ -123,7 +124,7 @@ const getInstances = async () => {
 	const instances = await list().catch(handleError)
 
 	for (const instance of instances) {
-		queryClient.setQueryData(['instances', 'summary', instance.id], instance)
+		queryClient.setQueryData(instanceKeys.detail(instance.id), instance)
 	}
 
 	allInstances.value = instances.sort((a, b) => {
@@ -147,7 +148,7 @@ const getInstances = async () => {
 await getInstances()
 updateMaxAuto()
 
-const unlistenInstance = await instance_listener(async (event) => {
+useAppEvent('instance', async (event) => {
 	if (event.event !== 'synced') {
 		await getInstances()
 	}
@@ -161,7 +162,6 @@ onUnmounted(() => {
 	window.removeEventListener('resize', updateMaxAuto)
 	document.body.classList.remove('quick-instance-dragging')
 	clearOverdragFlash()
-	unlistenInstance()
 })
 
 const messages = defineMessages({

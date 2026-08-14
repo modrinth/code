@@ -17,64 +17,73 @@
 					}
 				"
 			/>
-			<ButtonStyled
+			<Button
+				type="quiet"
 				:color="
 					!hoveringTest && !testingJava
 						? testingJavaSuccess === true
 							? 'green'
 							: 'red'
-						: 'standard'
+						: undefined
 				"
-				color-fill="text"
+				:aria-label="formatMessage(messages.testJavaInstallation)"
+				class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
+				:disabled="testingJava || props.disabled"
+				:style="{
+					'--legacy-button-color':
+						(!hoveringTest && !testingJava
+							? testingJavaSuccess === true
+								? 'green'
+								: 'red'
+							: 'standard') &&
+						(!hoveringTest && !testingJava
+							? testingJavaSuccess === true
+								? 'green'
+								: 'red'
+							: 'standard') !== 'standard'
+							? `var(--color-${
+									!hoveringTest && !testingJava
+										? testingJavaSuccess === true
+											? 'green'
+											: 'red'
+										: 'standard'
+								})`
+							: undefined,
+				}"
+				@click="runTest(props.modelValue?.path)"
+				@mouseenter="!props.disabled && (hoveringTest = true)"
+				@mouseleave="hoveringTest = false"
 			>
-				<button
-					:aria-label="formatMessage(messages.testJavaInstallation)"
-					class="!shadow-none"
-					:disabled="testingJava || props.disabled"
-					@click="runTest(props.modelValue?.path)"
-					@mouseenter="!props.disabled && (hoveringTest = true)"
-					@mouseleave="hoveringTest = false"
-				>
-					<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-					<CheckCircleIcon
-						v-else-if="testingJavaSuccess === true && !hoveringTest"
-						class="h-4 w-4"
-					/>
-					<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
-					<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
-				</button>
-			</ButtonStyled>
+				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+				<CheckCircleIcon v-else-if="testingJavaSuccess === true && !hoveringTest" class="h-4 w-4" />
+				<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
+				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
+			</Button>
 		</div>
 		<span class="installation-buttons">
-			<ButtonStyled v-if="props.version">
-				<button
-					v-tooltip="
-						testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
-					"
-					class="!shadow-none"
-					:disabled="props.disabled || installingJava || testingJavaSuccess === true"
-					@click="reinstallJava"
-				>
-					<DownloadIcon />
-					{{
-						installingJava
-							? formatMessage(messages.installing)
-							: formatMessage(messages.installRecommended)
-					}}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
-					<SearchIcon />
-					{{ formatMessage(messages.detect) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
-					<FolderSearchIcon />
-					{{ formatMessage(messages.browse) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="props.version"
+				v-tooltip="
+					testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
+				"
+				:disabled="props.disabled || installingJava || testingJavaSuccess === true"
+				@click="reinstallJava"
+			>
+				<DownloadIcon />
+				{{
+					installingJava
+						? formatMessage(messages.installing)
+						: formatMessage(messages.installRecommended)
+				}}
+			</Button>
+			<Button :disabled="props.disabled" @click="autoDetect">
+				<SearchIcon />
+				{{ formatMessage(messages.detect) }}
+			</Button>
+			<Button :disabled="props.disabled" @click="handleJavaFileInput()">
+				<FolderSearchIcon />
+				{{ formatMessage(messages.browse) }}
+			</Button>
 		</span>
 	</div>
 </template>
@@ -90,7 +99,7 @@ import {
 	XCircleIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	defineMessages,
 	injectNotificationManager,
 	StyledInput,

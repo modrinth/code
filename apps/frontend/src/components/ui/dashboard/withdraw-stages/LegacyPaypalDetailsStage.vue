@@ -8,17 +8,18 @@
 			</label>
 
 			<div class="flex flex-col gap-2">
-				<ButtonStyled v-if="!isPayPalAuthenticated" color="standard">
-					<a :href="paypalAuthUrl" class="w-min" @click="handlePayPalAuth">
-						<PayPalColorIcon class="size-5" />
-						{{ formatMessage(messages.signInWithPaypal) }}
-					</a>
-				</ButtonStyled>
-				<ButtonStyled v-else>
-					<button class="w-min" @click="handleDisconnectPaypal">
-						<XIcon /> {{ formatMessage(messages.disconnectButton) }}
-					</button>
-				</ButtonStyled>
+				<ButtonLink
+					v-if="!isPayPalAuthenticated"
+					:href="paypalAuthUrl"
+					class="w-min"
+					@click="handlePayPalAuth"
+				>
+					<PayPalColorIcon class="size-5" />
+					{{ formatMessage(messages.signInWithPaypal) }}
+				</ButtonLink>
+				<Button v-else class="w-min" @click="handleDisconnectPaypal">
+					<XIcon /> {{ formatMessage(messages.disconnectButton) }}
+				</Button>
 			</div>
 		</div>
 
@@ -46,21 +47,21 @@
 					:placeholder="formatMessage(messages.venmoHandlePlaceholder)"
 					wrapper-class="w-full"
 				/>
-				<ButtonStyled color="brand">
-					<button
-						v-tooltip="!hasVenmoChanged ? 'Change the venmo username to save.' : undefined"
-						:disabled="venmoSaving || !hasVenmoChanged"
-						@click="saveVenmoHandle"
-					>
-						<CheckIcon v-if="venmoSaveSuccess" />
-						<SaveIcon v-else />
-						{{
-							venmoSaveSuccess
-								? formatMessage(commonMessages.savedLabel)
-								: formatMessage(commonMessages.saveButton)
-						}}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="!hasVenmoChanged ? 'Change the venmo username to save.' : undefined"
+					type="colored"
+					color="brand"
+					:disabled="venmoSaving || !hasVenmoChanged"
+					@click="saveVenmoHandle"
+				>
+					<CheckIcon v-if="venmoSaveSuccess" />
+					<SaveIcon v-else />
+					{{
+						venmoSaveSuccess
+							? formatMessage(commonMessages.savedLabel)
+							: formatMessage(commonMessages.saveButton)
+					}}
+				</Button>
 			</div>
 			<span v-if="venmoSaveError" class="text-sm font-bold text-red">
 				{{ venmoSaveError }}
@@ -104,7 +105,8 @@
 <script setup lang="ts">
 import { CheckIcon, PayPalColorIcon, SaveIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	Checkbox,
 	commonMessages,
 	defineMessages,

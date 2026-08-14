@@ -38,6 +38,9 @@
   "analytics.breakdown.country": {
     "message": "国 / 地域"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "次に依存"
+  },
   "analytics.breakdown.dependent-project-download": {
     "message": "依存プロジェクト"
   },
@@ -131,11 +134,32 @@
   "analytics.chart.empty.select-table-items": {
     "message": "以下の表から項目を選択して、データを可視化してください。"
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# 件のイベント} other {# 件のイベント}}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "お知らせを見る"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "収益に関する分析の詳細を表示"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "収益化に向けてModrinthを介して行われたビューとダウンロードのみが表示され、ダウンロードにはログインが必要です。"
+  },
   "analytics.chart.table-selection.top": {
     "message": "テーブル内の{itemType, select, project {{count, plural, other {プロジェクト}}} country {{count, plural, other {国}}} monetization {{count, plural, other {収益}}} downloadSource {{count, plural, other {ダウンロード元}}} downloadReason {{count, plural, other {ダウンロード理由}}} member {{count, plural, other {メンバー}}} projectVersion {{count, plural, other {プロジェクトバージョン}}} loader {{count, plural, other {ローダー}}} gameVersion {{count, plural, other {ゲームバージョン}}} other {{count, plural, other {項目}}}}上位 {count} 件を表示"
   },
   "analytics.chart.tooltip.dependent-on-project": {
     "message": "{project} に依存"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} は {dependencyProject} の {version} に依存しています"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "データなし"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "ピン留め"
   },
   "analytics.chart.tooltip.total": {
     "message": "合計"
@@ -198,7 +222,7 @@
     "message": "ソースを検索..."
   },
   "analytics.filter.search.members": {
-    "message": "メンバーを検索..."
+    "message": "メンバーを検索…"
   },
   "analytics.filter.search.project-versions": {
     "message": "プロジェクトバージョンを検索…"
@@ -266,8 +290,26 @@
   "analytics.project-event.project-approved": {
     "message": "承認済み"
   },
+  "analytics.project-event.project-private": {
+    "message": "プロジェクトを非公開に設定"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "プロジェクトの状態が変更"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "プロジェクトはリストにありません"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} がリリースされました"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "バージョンがアップロードされました"
+  },
   "analytics.project-status.approved": {
     "message": "承認済み"
+  },
+  "analytics.project-status.archived": {
+    "message": "アーカイブ済み"
   },
   "analytics.project-status.draft": {
     "message": "ドラフト"
@@ -277,6 +319,9 @@
   },
   "analytics.project-status.private": {
     "message": "非公開"
+  },
+  "analytics.project-status.rejected": {
+    "message": "却下"
   },
   "analytics.project-status.unlisted": {
     "message": "限定公開"
@@ -738,7 +783,7 @@
     "message": "アカウント設定"
   },
   "auth.verify-email.action.discover-mods": {
-    "message": "早速Modを探す"
+    "message": "Modを探す"
   },
   "auth.verify-email.already-verified.description": {
     "message": "メールアドレスはすでに承認されています！"
@@ -1105,9 +1150,6 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "更新順(新しい順)"
-  },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "閉じる"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} をダウンロード"
@@ -2022,7 +2064,7 @@
     "message": "プランを選択"
   },
   "landing.button.discover-mods": {
-    "message": "Modを探索する"
+    "message": "Modを探す"
   },
   "landing.button.go-to-dashboard": {
     "message": "ダッシュボードへ移動"
@@ -2043,7 +2085,7 @@
     "message": "検索結果やホームページ、Discordサーバー、そして今後追加される様々なルートを通じて、数千人ものユーザーにあなたのプロジェクトを見つけてもらいましょう！"
   },
   "landing.creator.feature.discovery.title": {
-    "message": "探索"
+    "message": "発見"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
     "message": "Minotaurを使ってビルドツールと連携すれば、新バージョンのリリースと同時に自動アップロードが可能です。"
@@ -2335,9 +2377,6 @@
   },
   "layout.footer.social.discord": {
     "message": "Discord"
-  },
-  "layout.footer.social.github": {
-    "message": "Github"
   },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
@@ -2933,6 +2972,27 @@
   "project.moderation.admonition.draft.header": {
     "message": "ドラフト"
   },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "あなたのプロジェクトはモデレーターによる審査待ちとなっております。"
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "あなたのプロジェクトはスキャンされ、その後、人間のモデレーターによって審査され、Modrinth の <rules-link>コンテンツルール</rules-link> および <terms-link>利用規約</terms-link> に準拠しているかどうかが確認されます。"
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "審査を待っている間もプロジェクトを編集することができます。編集をしても審査の順番が変わるわけではございません。"
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "提出されたプロジェクトは24～48時間以内に審査することを目指していますが、プロジェクトによっては遅れが発生してしまう場合があります。プロジェクトに問題があることを意味するというわけではありません。"
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "プロジェクトの審査は1週間以内に行うことを目標としていますが遅れが発生してしまう場合がございます。プロジェクトに問題があることを意味するというわけではありません。"
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>モデレーターがModrinthの安全を守るために尽くしております。ご協力お願いします。皆様のプロジェクト審査をサポートできることを楽しみにしております💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "プロジェクトは審査中です"
+  },
   "project.moderation.title": {
     "message": "管理"
   },
@@ -3001,15 +3061,6 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "ステータス"
-  },
-  "project.settings.title": {
-    "message": "設定"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "プロジェクトダッシュボードを見る"
-  },
-  "project.status.archived.message": {
-    "message": "{title} はアーカイブされました。作者がプロジェクトのアーカイブを解除しない限り、今後 {title} に更新はありません。"
   },
   "project.versions.title": {
     "message": "バージョン"

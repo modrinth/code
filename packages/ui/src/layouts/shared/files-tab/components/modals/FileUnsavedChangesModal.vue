@@ -5,24 +5,18 @@
 		</p>
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="handleCancel">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button @click="handleDiscard">
-						<TrashIcon />
-						{{ formatMessage(messages.discard) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="green">
-					<button @click="handleSave">
-						<SaveIcon />
-						{{ formatMessage(commonMessages.saveButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="handleCancel">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red" @click="handleDiscard">
+					<TrashIcon />
+					{{ formatMessage(messages.discard) }}
+				</Button>
+				<Button type="colored" color="green" @click="handleSave">
+					<SaveIcon />
+					{{ formatMessage(commonMessages.saveButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -32,7 +26,7 @@
 import { SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

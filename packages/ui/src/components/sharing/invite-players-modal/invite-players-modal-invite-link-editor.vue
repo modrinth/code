@@ -31,20 +31,18 @@
 								calendar-class="!border-none"
 							/>
 							<div class="flex justify-end gap-2 p-3 pt-1">
-								<ButtonStyled type="outlined">
-									<button type="button" @click="cancelCustomExpiry">
-										{{ formatMessage(messages.cancel) }}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="brand">
-									<button
-										type="button"
-										:disabled="!canApplyCustomExpiry"
-										@click="applyCustomExpiry"
-									>
-										{{ formatMessage(messages.apply) }}
-									</button>
-								</ButtonStyled>
+								<Button type="outlined" native-type="button" @click="cancelCustomExpiry">
+									{{ formatMessage(commonMessages.cancelButton) }}
+								</Button>
+								<Button
+									type="colored"
+									color="brand"
+									native-type="button"
+									:disabled="!canApplyCustomExpiry"
+									@click="applyCustomExpiry"
+								>
+									{{ formatMessage(messages.apply) }}
+								</Button>
 							</div>
 						</div>
 						<button
@@ -73,19 +71,15 @@
 		</div>
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<button :disabled="saving" @click="modal?.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!canSave" @click="save">
-						<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
-						<SaveIcon v-else aria-hidden="true" />
-						{{ formatMessage(messages.save) }}
-					</button>
-				</ButtonStyled>
+				<Button :disabled="saving" @click="modal?.hide()">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="!canSave" @click="save">
+					<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
+					<SaveIcon v-else aria-hidden="true" />
+					{{ formatMessage(messages.save) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -95,10 +89,12 @@
 import { SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'
-import ButtonStyled from '../../base/ButtonStyled.vue'
+import { commonMessages } from '../../../utils/common-messages'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import DatePicker from '../../base/DatePicker.vue'
 import StyledInput from '../../base/StyledInput.vue'
@@ -190,10 +186,6 @@ const messages = defineMessages({
 	customExpiryValue: {
 		id: 'sharing.invite-players-modal.custom-expiry-value',
 		defaultMessage: 'Custom: {date}',
-	},
-	cancel: {
-		id: 'sharing.invite-players-modal.cancel-button',
-		defaultMessage: 'Cancel',
 	},
 	apply: {
 		id: 'sharing.invite-players-modal.apply-button',

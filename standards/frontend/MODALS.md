@@ -1,38 +1,39 @@
-- [Regular Modals](#regular-modals)
-  - [Basic Usage](#basic-usage)
-  - [Props](#props)
-  - [Slots](#slots)
-    - [Default slot](#default-slot)
-    - [`title` slot](#title-slot)
-    - [`actions` slot](#actions-slot)
-  - [Scrollable Content](#scrollable-content)
-  - [Merged Header Mode](#merged-header-mode)
-  - [Modal Stacking](#modal-stacking)
-  - [Exposed Methods](#exposed-methods)
-- [Multistage Modals](#multistage-modals)
-  - [Architecture](#architecture)
-  - [Building a Multistage Modal](#building-a-multistage-modal)
-    - [1. Define the context](#1-define-the-context)
-    - [2. Define stage configs](#2-define-stage-configs)
-    - [3. Create stage components](#3-create-stage-components)
-    - [4. Create the wrapper component](#4-create-the-wrapper-component)
-  - [Modal API](#modal-api)
-  - [Non-Progress Stages (Edit Sub-Flows)](#non-progress-stages-edit-sub-flows)
-  - [Reference Implementation](#reference-implementation)
+- [Standard modals](#standard-modals)
+	- [Basic use](#basic-use)
+	- [Props](#props)
+	- [Slots](#slots)
+		- [Default slot](#default-slot)
+		- [`title` slot](#title-slot)
+		- [`actions` slot](#actions-slot)
+	- [Scrollable content](#scrollable-content)
+	- [Merged header](#merged-header)
+	- [Modal stack](#modal-stack)
+	- [Exposed methods](#exposed-methods)
+- [Multistage modals](#multistage-modals)
+	- [Architecture](#architecture)
+	- [Create a multistage modal](#create-a-multistage-modal)
+		- [1. Define the context](#1-define-the-context)
+		- [2. Define stage configurations](#2-define-stage-configurations)
+		- [3. Create stage components](#3-create-stage-components)
+		- [4. Create the wrapper component](#4-create-the-wrapper-component)
+	- [Modal API](#modal-api)
+	- [Non-progress stages](#non-progress-stages)
+	- [Reference implementation](#reference-implementation)
 
-# Regular Modals
+# Standard Modals
 
-Use the `NewModal` component (`packages/ui/src/components/modal/NewModal.vue`) for all standard modals.
+Use `NewModal` (`packages/ui/src/components/modal/NewModal.vue`) for all standard modals.
 
-- Set the modal’s width via the `width` or `maxWidth` props. For responsive sizing, use `min(base-size, calc(95vw - 10rem))`.
-- `ModalWrapper` is deprecated — modal behavior is automatically handled via the `injectModalBehavior` DI utility.
+- Set the modal width with the `width` or `maxWidth` prop.
+- For a responsive width, use `min(base-size, calc(95vw - 10rem))`.
+- Do not use `ModalWrapper`. The `injectModalBehavior` DI utility supplies modal behavior.
 
-## Basic Usage
+## Basic Use
 
 ```vue
 <script setup lang="ts">
-import { ref } from ‘vue’
-import { NewModal } from ‘@modrinth/ui’
+import { ref } from 'vue'
+import { NewModal } from '@modrinth/ui'
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 </script>
@@ -41,50 +42,54 @@ const modal = ref<InstanceType<typeof NewModal> | null>(null)
 	<button @click="modal?.show($event)">Open</button>
 
 	<NewModal ref="modal" header="My Modal">
-		<p>Modal content here.</p>
+		<p>Modal content.</p>
 	</NewModal>
 </template>
 ```
 
-Call `show(event?)` to open the modal. Passing the `MouseEvent` triggers an animation originating from the click position. Call `hide()` to close it programmatically.
+Call `show(event?)` to open the modal. A `MouseEvent` starts the animation at the click position.
+
+Call `hide()` to close the modal from code.
 
 ## Props
 
-| Prop                  | Type                                  | Default       | Description                                                                                      |
-| --------------------- | ------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------ |
-| `header`              | `string`                              | —             | Title text displayed in the header bar                                                           |
-| `hideHeader`          | `boolean`                             | `false`       | Hides the entire header (title + close button)                                                   |
-| `mergeHeader`         | `boolean`                             | `false`       | Removes the header bar; renders a floating close button over the content                         |
-| `closable`            | `boolean`                             | `true`        | Shows the close button and enables ESC / click-outside dismissal                                 |
-| `disableClose`        | `boolean`                             | `false`       | Disables all close actions (close button, ESC, click-outside). The close button appears disabled |
-| `closeOnEsc`          | `boolean`                             | `true`        | Allow closing with the Escape key                                                                |
-| `closeOnClickOutside` | `boolean`                             | `true`        | Allow closing by clicking the overlay                                                            |
-| `scrollable`          | `boolean`                             | `false`       | Enables scroll tracking with top/bottom fade indicators                                          |
-| `maxContentHeight`    | `string`                              | `’70vh’`      | Max height of the scrollable content area (only applies when `scrollable`)                       |
-| `noPadding`           | `boolean`                             | `false`       | Removes padding from the content area for edge-to-edge layouts                                   |
-| `maxWidth`            | `string`                              | `’60rem’`     | Maximum width of the modal                                                                       |
-| `width`               | `string`                              | `fit-content` | Width of the modal body                                                                          |
-| `noblur`              | `boolean`                             | —             | Disables backdrop blur. Defaults to the value from `injectModalBehavior`                         |
-| `fade`                | `’standard’ \| ‘warning’ \| ‘danger’` | `’standard’`  | Overlay color variant                                                                            |
-| `danger`              | `boolean`                             | `false`       | **Deprecated** — use `fade="danger"` instead                                                     |
-| `onShow`              | `() => void`                          | —             | Called when the modal opens                                                                      |
-| `onHide`              | `() => void`                          | —             | Called when the modal closes                                                                     |
+| Prop                  | Type                                      | Default       | Description                                                        |
+| --------------------- | ----------------------------------------- | ------------- | ------------------------------------------------------------------ |
+| `header`              | `string`                                  | None          | Sets the title in the header bar.                                  |
+| `hideHeader`          | `boolean`                                 | `false`       | Hides the title and close button.                                  |
+| `mergeHeader`         | `boolean`                                 | `false`       | Replaces the header bar with a floating close button.              |
+| `closable`            | `boolean`                                 | `true`        | Enables the close button, Escape key, and overlay click.           |
+| `disableClose`        | `boolean`                                 | `false`       | Disables all close actions and shows a disabled close button.      |
+| `closeOnEsc`          | `boolean`                                 | `true`        | Enables the Escape key as a close action.                          |
+| `closeOnClickOutside` | `boolean`                                 | `true`        | Enables an overlay click as a close action.                        |
+| `scrollable`          | `boolean`                                 | `false`       | Enables scroll tracking and edge-fade indicators.                  |
+| `maxContentHeight`    | `string`                                  | `'70vh'`      | Sets the maximum scrollable-content height.                        |
+| `noPadding`           | `boolean`                                 | `false`       | Removes content padding for edge-to-edge layouts.                  |
+| `maxWidth`            | `string`                                  | `'60rem'`     | Sets the maximum modal width.                                      |
+| `width`               | `string`                                  | `fit-content` | Sets the modal-body width.                                         |
+| `noblur`              | `boolean`                                 | None          | Disables the backdrop blur. The DI behavior supplies the default.  |
+| `fade`                | `'standard' \| 'warning' \| 'danger'`     | `'standard'`  | Sets the overlay color variant.                                    |
+| `danger`              | `boolean`                                 | `false`       | Deprecated. Use `fade="danger"`.                                 |
+| `onShow`              | `() => void`                              | None          | Runs when the modal opens.                                         |
+| `onHide`              | `() => void`                              | None          | Runs when the modal closes.                                        |
+
+`maxContentHeight` has an effect only when `scrollable` is true.
 
 ## Slots
 
-### Default slot
+### Default Slot
 
-The main content area. Rendered inside a padded, optionally scrollable container.
+The default slot contains the main content. `NewModal` puts it in a padded container that can scroll.
 
 ```vue
 <NewModal ref="modal" header="Confirm">
-	<p>Are you sure you want to proceed?</p>
+	<p>Are you sure that you want to continue?</p>
 </NewModal>
 ```
 
-### `title` slot
+### `title` Slot
 
-Replaces the default header text. Use this when you need custom markup in the header (e.g. an icon next to the title or a badge).
+The `title` slot replaces the default header text. Use it for custom header markup, such as an icon or badge.
 
 ```vue
 <NewModal ref="modal">
@@ -92,45 +97,47 @@ Replaces the default header text. Use this when you need custom markup in the he
 		<AlertIcon />
 		<span class="text-2xl font-semibold text-contrast">Custom Title</span>
 	</template>
-	<p>Content here.</p>
+	<p>Content.</p>
 </NewModal>
 ```
 
-### `actions` slot
+### `actions` Slot
 
-Renders a bottom action bar below the content area (with `p-4 pt-0` padding). Use this for confirm/cancel buttons.
+The `actions` slot makes an action bar below the content. The bar uses `p-4 pt-0` padding.
+
+Use this slot for confirmation and cancellation buttons:
 
 ```vue
 <NewModal ref="modal" header="Delete Item" fade="danger">
-	<p>This action cannot be undone.</p>
+	<p>You cannot reverse this action.</p>
 	<template #actions>
-		<ButtonStyled color="danger">
-			<button @click="handleDelete">Delete</button>
-		</ButtonStyled>
-		<ButtonStyled>
-			<button @click="modal?.hide()">Cancel</button>
-		</ButtonStyled>
+		<Button type="colored" color="red" @click="handleDelete">Delete</Button>
+		<Button @click="modal?.hide()">Cancel</Button>
 	</template>
 </NewModal>
 ```
 
 ## Scrollable Content
 
-Set `scrollable` to enable scroll tracking. The modal renders animated fade gradients at the top and bottom edges when content is scrolled, giving users a visual cue that more content exists.
+Set `scrollable` to enable scroll tracking. Fade gradients appear at the top and bottom when more content exists.
 
 ```vue
 <NewModal ref="modal" header="Long Content" scrollable max-content-height="60vh">
-	<!-- Long content that may overflow -->
+	<!-- Long content can overflow. -->
 </NewModal>
 ```
 
-The `checkScrollState` method is exposed via ref — call it after dynamically changing content to re-evaluate whether fade indicators should appear.
+Call the exposed `checkScrollState` method after a dynamic content change. The method recalculates the fade-indicator state.
 
-When `scrollable` is `false` (the default), content uses `overflow-y: auto` without fade indicators.
+When `scrollable` is false, the content uses `overflow-y: auto` without fade indicators. False is the default value.
 
-## Merged Header Mode
+## Merged Header
 
-When `mergeHeader` is set, the header bar is hidden and a floating close button is rendered in the top-right corner of the modal. Content receives extra top padding to avoid overlapping the button. This is useful for modals with hero images or full-bleed content at the top.
+When `mergeHeader` is true, the header bar is hidden. A floating close button appears in the top-right corner.
+
+The content gets more top padding. This padding prevents overlap with the button.
+
+Use this mode for a hero image or full-width content at the top:
 
 ```vue
 <NewModal ref="modal" merge-header no-padding>
@@ -141,35 +148,39 @@ When `mergeHeader` is set, the header bar is hidden and a floating close button 
 </NewModal>
 ```
 
-## Modal Stacking
+## Modal Stack
 
-`NewModal` integrates with a modal stack (`useModalStack`). Multiple modals can be open simultaneously — only the topmost modal responds to the Escape key. The document body scroll is locked when any modal is open and restored when the last modal closes.
+`NewModal` uses `useModalStack`. Multiple modals can be open at the same time.
+
+Only the top modal responds to the Escape key. The first open modal locks document-body scrolling.
+
+The last modal restores document-body scrolling when it closes.
 
 ## Exposed Methods
 
-| Method               | Description                                             |
-| -------------------- | ------------------------------------------------------- |
-| `show(event?)`       | Opens the modal. Pass `MouseEvent` for origin animation |
-| `hide()`             | Closes the modal                                        |
-| `checkScrollState()` | Re-evaluates scroll fade indicators (when `scrollable`) |
+| Method               | Description                                                   |
+| -------------------- | ------------------------------------------------------------- |
+| `show(event?)`       | Opens the modal. Pass a `MouseEvent` for the origin animation. |
+| `hide()`             | Closes the modal.                                             |
+| `checkScrollState()` | Recalculates fade indicators when `scrollable` is true.       |
 
 # Multistage Modals
 
-The `MultiStageModal` component (`packages/ui/src/components/base/MultiStageModal.vue`) provides a wizard-like modal with progress tracking, conditional stages, and per-stage button configuration.
+`MultiStageModal` (`packages/ui/src/components/base/MultiStageModal.vue`) supplies progress, conditional stages, and button configurations for each stage.
 
 ## Architecture
 
 A multistage modal has three parts:
 
-1. **Context** — A DI provider that holds all state, business logic, and stage configs
-2. **Stage configs** — Data objects describing each stage (title, component, buttons, skip conditions)
-3. **Stage components** — Vue components rendered inside the modal, consuming the context
+1. The context contains all state, application logic, and stage configurations.
+2. Stage configurations define the title, component, buttons, and skip conditions for each stage.
+3. Stage components inject the context and render inside the modal.
 
-## Building a Multistage Modal
+## Create a Multistage Modal
 
-### 1. Define the context
+### 1. Define the Context
 
-Create a DI provider with all the state your wizard needs. Include the modal ref and stage configs.
+Make a DI provider that contains the modal state. Include the modal reference and stage configurations.
 
 ```ts
 // providers/my-feature/my-modal.ts
@@ -179,15 +190,15 @@ import type { MultiStageModal, StageConfigInput } from '@modrinth/ui'
 import { createContext } from '@modrinth/ui'
 
 export interface MyModalContext {
-	// State
+	// State.
 	formData: Ref<MyFormData>
 	isSubmitting: Ref<boolean>
 
-	// Modal control
+	// Modal control.
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 	stageConfigs: StageConfigInput<MyModalContext>[]
 
-	// Business logic
+	// Application logic.
 	handleSubmit: () => Promise<void>
 }
 
@@ -214,9 +225,11 @@ export function createMyModalContext(
 }
 ```
 
-### 2. Define stage configs
+### 2. Define Stage Configurations
 
-Each stage is a `StageConfigInput<T>` where `T` is your context type. Most fields accept either a static value or a function receiving the context (`MaybeCtxFn<T, R>`).
+Each stage is a `StageConfigInput<T>`, where `T` is the context type.
+
+Most fields accept a static value or a function that receives the context. The function type is `MaybeCtxFn<T, R>`.
 
 ```ts
 // providers/my-feature/stages/details-stage.ts
@@ -231,7 +244,7 @@ export const detailsStageConfig: StageConfigInput<MyModalContext> = {
 	stageContent: markRaw(DetailsStage),
 	title: 'Details',
 
-	// Conditional behavior based on context
+	// Set behavior from the context.
 	skip: (ctx) => ctx.shouldSkipDetails.value,
 	cannotNavigateForward: (ctx) => !ctx.formData.value.name,
 	disableClose: (ctx) => ctx.isSubmitting.value,
@@ -251,36 +264,36 @@ export const detailsStageConfig: StageConfigInput<MyModalContext> = {
 }
 ```
 
-**Stage config fields:**
+Stage configuration fields:
 
-| Field                   | Type                                       | Purpose                                          |
-| ----------------------- | ------------------------------------------ | ------------------------------------------------ |
-| `id`                    | `string`                                   | Unique stage identifier (used with `setStage()`) |
-| `stageContent`          | `Component`                                | Vue component to render (wrap with `markRaw()`)  |
-| `title`                 | `MaybeCtxFn<T, string>`                    | Stage title in breadcrumbs                       |
-| `skip`                  | `MaybeCtxFn<T, boolean>`                   | Skip this stage conditionally                    |
-| `nonProgressStage`      | `MaybeCtxFn<T, boolean>`                   | Exclude from progress bar (for edit sub-flows)   |
-| `hideStageInBreadcrumb` | `MaybeCtxFn<T, boolean>`                   | Hide from breadcrumb nav                         |
-| `cannotNavigateForward` | `MaybeCtxFn<T, boolean>`                   | Block forward navigation (validation)            |
-| `disableClose`          | `MaybeCtxFn<T, boolean>`                   | Disable closing the modal                        |
-| `leftButtonConfig`      | `MaybeCtxFn<T, StageButtonConfig \| null>` | Left action button                               |
-| `rightButtonConfig`     | `MaybeCtxFn<T, StageButtonConfig \| null>` | Right action button                              |
-| `maxWidth`              | `MaybeCtxFn<T, string>`                    | Per-stage max width (default `560px`)            |
+| Field                   | Type                                       | Purpose                                           |
+| ----------------------- | ------------------------------------------ | ------------------------------------------------- |
+| `id`                    | `string`                                   | Supplies the unique stage identifier.             |
+| `stageContent`          | `Component`                                | Supplies the Vue component. Use `markRaw()`.      |
+| `title`                 | `MaybeCtxFn<T, string>`                    | Supplies the breadcrumb title.                    |
+| `skip`                  | `MaybeCtxFn<T, boolean>`                   | Skips the stage when the value is true.           |
+| `nonProgressStage`      | `MaybeCtxFn<T, boolean>`                   | Removes the stage from the progress bar.          |
+| `hideStageInBreadcrumb` | `MaybeCtxFn<T, boolean>`                   | Removes the stage from breadcrumb navigation.     |
+| `cannotNavigateForward` | `MaybeCtxFn<T, boolean>`                   | Prevents forward navigation.                      |
+| `disableClose`          | `MaybeCtxFn<T, boolean>`                   | Disables modal close actions.                     |
+| `leftButtonConfig`      | `MaybeCtxFn<T, StageButtonConfig \| null>` | Configures the left action button.                |
+| `rightButtonConfig`     | `MaybeCtxFn<T, StageButtonConfig \| null>` | Configures the right action button.               |
+| `maxWidth`              | `MaybeCtxFn<T, string>`                    | Sets the stage width. The default is `560px`.     |
 
-**Button config fields:**
+Button configuration fields:
 
-| Field          | Purpose                 |
-| -------------- | ----------------------- |
-| `label`        | Button text             |
-| `icon`         | Icon component          |
-| `iconPosition` | `'before'` or `'after'` |
-| `color`        | ButtonStyled color prop |
-| `disabled`     | Disable the button      |
-| `onClick`      | Click handler           |
+| Field          | Purpose                                 |
+| -------------- | --------------------------------------- |
+| `label`        | Supplies the button text.               |
+| `icon`         | Supplies the icon component.            |
+| `iconPosition` | Uses `'before'` or `'after'`.            |
+| `color`        | Supplies the `Button` color prop.       |
+| `disabled`     | Disables the button when true.          |
+| `onClick`      | Supplies the click handler.             |
 
-### 3. Create stage components
+### 3. Create Stage Components
 
-Stage components inject the context and render their UI:
+Inject the context into each stage component. Then, render the applicable UI:
 
 ```vue
 <!-- providers/my-feature/stages/DetailsStage.vue -->
@@ -298,9 +311,9 @@ const { formData } = injectMyModalContext()
 </template>
 ```
 
-### 4. Create the wrapper component
+### 4. Create the Wrapper Component
 
-The wrapper provides context and renders `MultiStageModal`:
+Provide the context from the wrapper. Then, render `MultiStageModal`:
 
 ```vue
 <!-- components/MyModalWrapper.vue -->
@@ -323,20 +336,20 @@ defineExpose({ show: () => modal.value?.show() })
 
 ## Modal API
 
-`MultiStageModal` exposes via ref:
+`MultiStageModal` exposes these methods and properties through its reference:
 
-| Method/Property       | Description                         |
-| --------------------- | ----------------------------------- |
-| `show()`              | Open the modal                      |
-| `hide()`              | Close the modal                     |
-| `setStage(indexOrId)` | Jump to stage by index or string id |
-| `nextStage()`         | Advance to next non-skipped stage   |
-| `prevStage()`         | Go back to previous stage           |
-| `currentStageIndex`   | Ref to current stage index          |
+| Method or property     | Description                                  |
+| ---------------------- | -------------------------------------------- |
+| `show()`               | Opens the modal.                             |
+| `hide()`               | Closes the modal.                            |
+| `setStage(indexOrId)`  | Goes to a stage by index or string ID.       |
+| `nextStage()`          | Goes to the next applicable stage.           |
+| `prevStage()`          | Goes to the previous stage.                  |
+| `currentStageIndex`    | Contains the current stage index as a `Ref`. |
 
-## Non-Progress Stages (Edit Sub-Flows)
+## Non-Progress Stages
 
-For stages that shouldn't appear in the progress bar (e.g. editing a specific field from a summary page):
+Use a non-progress stage for an edit flow that must not appear in the progress bar:
 
 ```ts
 export const editLoadersStageConfig: StageConfigInput<MyContext> = {
@@ -355,16 +368,18 @@ export const editLoadersStageConfig: StageConfigInput<MyContext> = {
 }
 ```
 
-Navigate to it with `modal.value?.setStage('edit-loaders')` — it won't affect the progress indicator.
+Call `modal.value?.setStage('edit-loaders')` to open the stage. This stage does not change the progress indicator.
 
 ## Reference Implementation
 
-The version creation/edit modal is the most complete example:
+The version create-and-edit modal is the most complete example:
 
-| File                                                          | Purpose                           |
-| ------------------------------------------------------------- | --------------------------------- |
-| `apps/frontend/src/providers/version/manage-version-modal.ts` | Context creation + business logic |
-| `apps/frontend/src/providers/version/stages/index.ts`         | Stage config barrel export        |
-| `apps/frontend/src/providers/version/stages/*-stage.ts`       | Individual stage configs          |
+| File                                                          | Purpose                                |
+| ------------------------------------------------------------- | -------------------------------------- |
+| `apps/frontend/src/providers/version/manage-version-modal.ts` | Contains context and application logic. |
+| `apps/frontend/src/providers/version/stages/index.ts`         | Exports all stage configurations.       |
+| `apps/frontend/src/providers/version/stages/*-stage.ts`       | Contains each stage configuration.      |
 
-The context includes computed properties for conditional UI, watchers for auto-fetching dependencies, loading states for granular button disabling, and both "create" and "edit" flows sharing the same stages with different button configs.
+The context has computed properties for conditional UI. It also has dependency watchers and granular button loading states.
+
+The create and edit flows use the same stages with different button configurations.

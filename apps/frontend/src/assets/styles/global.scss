@@ -40,6 +40,8 @@ html {
 
 	interpolate-size: allow-keywords;
 	scrollbar-gutter: stable;
+
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .light-mode {
@@ -473,18 +475,6 @@ kbd {
 
 input {
 	outline: 2px solid transparent !important;
-}
-
-.button-animation {
-	transition:
-		opacity 0.5s ease-in-out,
-		filter 0.2s ease-in-out,
-		transform 0.05s ease-in-out,
-		outline-width 0.2s ease-in-out;
-}
-
-.button-transparent {
-	box-shadow: none;
 }
 
 .qc-cmp2-close-tooltip {

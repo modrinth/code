@@ -16,18 +16,16 @@
 							placeholder="e.g. Secondary allocation"
 						/>
 						<div class="mb-1 mt-4 flex justify-end gap-2.5">
-							<ButtonStyled>
-								<button @click="editAllocationModal?.hide()">Cancel</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand">
-								<button
-									v-tooltip="advancedActionTooltip"
-									:disabled="!editAllocationName || creatingAllocation || !canUseAdvancedSettings"
-									type="submit"
-								>
-									<SaveIcon /> Update allocation
-								</button>
-							</ButtonStyled>
+							<Button @click="editAllocationModal?.hide()">Cancel</Button>
+							<Button
+								v-tooltip="advancedActionTooltip"
+								type="colored"
+								color="brand"
+								:disabled="!editAllocationName || creatingAllocation || !canUseAdvancedSettings"
+								native-type="submit"
+							>
+								<SaveIcon /> Update allocation
+							</Button>
 						</div>
 					</form>
 				</NewModal>
@@ -61,9 +59,14 @@
 								allocationsError?.message ?? 'Unknown error'
 							}}</span>
 						</p>
-						<ButtonStyled size="large" color="brand" @click="() => refetchAllocations()">
-							<button class="mt-6 !w-full">Retry</button>
-						</ButtonStyled>
+						<Button
+							type="colored"
+							color="brand"
+							size="xl"
+							class="mt-6 !w-full"
+							@click="() => refetchAllocations()"
+							>Retry</Button
+						>
 					</div>
 				</div>
 			</div>
@@ -83,16 +86,16 @@
 								placeholder="e.g. Secondary allocation"
 							/>
 
-							<ButtonStyled color="brand">
-								<button
-									v-tooltip="createAllocationTooltip"
-									:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
-									@click="addNewAllocation"
-								>
-									<PlusIcon />
-									<span>Create allocation</span>
-								</button>
-							</ButtonStyled>
+							<Button
+								v-tooltip="createAllocationTooltip"
+								type="colored"
+								color="brand"
+								:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
+								@click="addNewAllocation"
+							>
+								<PlusIcon />
+								<span>Create allocation</span>
+							</Button>
 						</div>
 
 						<Table :columns="allocationColumns" :data="allocationRows" row-key="port">
@@ -105,30 +108,33 @@
 							</template>
 							<template #cell-actions="{ row }">
 								<div class="flex items-center justify-end gap-2">
-									<ButtonStyled type="transparent" circular>
-										<button @click="copyText(`${serverIP}:${row.port}`)">
-											<CopyIcon />
-										</button>
-									</ButtonStyled>
+									<IconButton
+										type="quiet"
+										label="Copy"
+										@click="copyText(`${serverIP}:${row.port}`)"
+									>
+										<CopyIcon />
+									</IconButton>
 									<template v-if="!row.primary">
-										<ButtonStyled type="transparent" circular>
-											<button
-												v-tooltip="advancedActionTooltip"
-												:disabled="!canUseAdvancedSettings"
-												@click="showEditAllocationModal(row.port)"
-											>
-												<PencilIcon />
-											</button>
-										</ButtonStyled>
-										<ButtonStyled type="outlined" circular color="red">
-											<button
-												v-tooltip="advancedActionTooltip"
-												:disabled="!canUseAdvancedSettings"
-												@click="showConfirmDeleteModal(row.port)"
-											>
-												<TrashIcon />
-											</button>
-										</ButtonStyled>
+										<IconButton
+											v-tooltip="advancedActionTooltip"
+											type="quiet"
+											:label="advancedActionTooltip"
+											:disabled="!canUseAdvancedSettings"
+											@click="showEditAllocationModal(row.port)"
+										>
+											<PencilIcon />
+										</IconButton>
+										<IconButton
+											v-tooltip="advancedActionTooltip"
+											type="outlined"
+											:label="advancedActionTooltip"
+											:disabled="!canUseAdvancedSettings"
+											class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+											@click="showConfirmDeleteModal(row.port)"
+										>
+											<TrashIcon />
+										</IconButton>
 									</template>
 								</div>
 							</template>
@@ -153,16 +159,14 @@
 								:placeholder="exampleDomain"
 							/>
 
-							<ButtonStyled>
-								<button
-									class="!w-full sm:!w-auto"
-									:disabled="userDomain == ''"
-									@click="exportDnsRecords"
-								>
-									<UploadIcon />
-									<span>Export</span>
-								</button>
-							</ButtonStyled>
+							<Button
+								class="!w-full sm:!w-auto"
+								:disabled="userDomain == ''"
+								@click="exportDnsRecords"
+							>
+								<UploadIcon />
+								<span>Export</span>
+							</Button>
 						</div>
 
 						<Table :columns="dnsColumns" :data="dnsRecords">
@@ -223,8 +227,9 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
+import { ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,

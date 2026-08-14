@@ -45,7 +45,7 @@ where
 // This should not be used on the fallback no-route-found handler
 pub fn flatten_404_error(res: ApiError) -> Result<HttpResponse, ApiError> {
     match res {
-        ApiError::NotFound => Ok(HttpResponse::NotFound().body("")),
+        ApiError::NotFound(_) => Ok(HttpResponse::NotFound().body("")),
         _ => Err(res),
     }
 }

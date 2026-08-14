@@ -54,17 +54,17 @@
 							</div>
 						</template>
 					</Combobox>
-					<ButtonStyled color="brand">
-						<button
-							v-tooltip="searchInviteTooltip"
-							class="shrink-0"
-							:disabled="!canInviteSearchTarget"
-							@click="inviteSearchTarget"
-						>
-							<PlusIcon aria-hidden="true" />
-							{{ addButtonLabel }}
-						</button>
-					</ButtonStyled>
+					<Button
+						v-tooltip="searchInviteTooltip"
+						type="colored"
+						color="brand"
+						class="shrink-0"
+						:disabled="!canInviteSearchTarget"
+						@click="inviteSearchTarget"
+					>
+						<PlusIcon aria-hidden="true" />
+						{{ addButtonLabel }}
+					</Button>
 				</div>
 			</div>
 
@@ -102,18 +102,17 @@
 					<div class="text-base font-semibold text-contrast">
 						{{ inviteLinkHeading }}
 					</div>
-					<ButtonStyled>
-						<button
-							type="button"
-							class="!h-10 w-full !justify-between !px-4 text-left !shadow-none"
-							@click="copyInviteLink"
-						>
-							<span class="min-w-0 truncate text-base font-semibold text-primary">
-								{{ link }}
-							</span>
-							<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+					<Button
+						native-type="button"
+						size="lg"
+						class="w-full !justify-between text-left"
+						@click="copyInviteLink"
+					>
+						<span class="min-w-0 truncate text-base font-semibold text-primary">
+							{{ link }}
+						</span>
+						<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+					</Button>
 					<p v-if="link && linkExpiryDescription" class="m-0 text-base text-primary">
 						{{ linkExpiryDescription }}
 						<button
@@ -144,10 +143,12 @@
 import { ClipboardCopyIcon, PlusIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'
+import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox from '../../base/Combobox.vue'
 import NewModal from '../../modal/NewModal.vue'
 import InvitePlayersModalInviteLinkEditor from './invite-players-modal-invite-link-editor.vue'
@@ -226,10 +227,6 @@ const messages = defineMessages({
 		id: 'sharing.invite-players-modal.added',
 		defaultMessage: 'Added',
 	},
-	cancelButton: {
-		id: 'sharing.invite-players-modal.cancel',
-		defaultMessage: 'Cancel',
-	},
 	requestedButton: {
 		id: 'sharing.invite-players-modal.requested',
 		defaultMessage: 'Request sent',
@@ -297,7 +294,9 @@ const searchPlaceholderLabel = computed(
 const addButtonLabel = computed(() => props.addLabel ?? formatMessage(messages.addButton))
 const inviteButtonLabel = computed(() => props.inviteLabel ?? formatMessage(messages.inviteButton))
 const addedButtonLabel = computed(() => props.addedLabel ?? formatMessage(messages.addedButton))
-const cancelButtonLabel = computed(() => props.cancelLabel ?? formatMessage(messages.cancelButton))
+const cancelButtonLabel = computed(
+	() => props.cancelLabel ?? formatMessage(commonMessages.cancelButton),
+)
 const requestedButtonLabel = computed(
 	() => props.requestedLabel ?? formatMessage(messages.requestedButton),
 )

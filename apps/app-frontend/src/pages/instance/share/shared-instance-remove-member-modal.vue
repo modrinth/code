@@ -32,16 +32,12 @@
 				</ul>
 			</div>
 			<div class="flex justify-end gap-2 pt-1">
-				<ButtonStyled type="outlined"
-					><button class="!border !border-surface-5" @click="modal?.hide()">
-						<XIcon aria-hidden="true" />{{ formatMessage(commonMessages.cancelButton) }}
-					</button></ButtonStyled
-				>
-				<ButtonStyled color="orange"
-					><button :disabled="!row" @click="confirm">
-						<UserXIcon aria-hidden="true" />{{ formatMessage(messages.removeButton) }}
-					</button></ButtonStyled
-				>
+				<Button type="outlined" class="!border !border-surface-5" @click="modal?.hide()">
+					<XIcon aria-hidden="true" />{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="orange" :disabled="!row" @click="confirm">
+					<UserXIcon aria-hidden="true" />{{ formatMessage(messages.removeButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -52,7 +48,7 @@ import { UserXIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	NewModal,

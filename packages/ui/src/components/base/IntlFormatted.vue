@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import IntlMessageFormat, { type FormatXMLElementFn, type PrimitiveType } from 'intl-messageformat'
-import { computed, markRaw, useSlots, type VNode } from 'vue'
+import { computed, defineComponent, markRaw, type PropType, useSlots, type VNode } from 'vue'
 
 import type { MessageDescriptor } from '../../composables/i18n'
 import { injectI18nDebug } from '../../composables/i18n-debug'
 import { injectI18n } from '../../providers/i18n'
+
+const VNodeRenderer = defineComponent({
+	props: {
+		node: { type: Object as PropType<VNode>, required: true },
+	},
+	setup(props) {
+		return () => props.node
+	},
+})
 
 const props = defineProps<{
 	messageId: MessageDescriptor
@@ -49,11 +58,13 @@ const formattedParts = computed(() => {
 		slotHandlers[normalizedName] = (chunks) => {
 			const slot = slots[slotName]
 			if (slot) {
-				return markRaw(
-					slot({
-						children: chunks,
-					}),
-				) as VNode[]
+				const nodes = slot({
+					children: chunks,
+				})
+				if (Array.isArray(nodes) && nodes.length === 1) {
+					return markRaw(nodes[0]) as VNode
+				}
+				return markRaw(nodes) as VNode[]
 			}
 			return markRaw(chunks) as VNode[]
 		}
@@ -71,33 +82,35 @@ const formattedParts = computed(() => {
 			...slotHandlers,
 		})
 
-		// ensure result array items are marked as raw if they're VNodes
-		// prevents VNodes from entering the reactive system and SSR payload
-		if (Array.isArray(result)) {
-			return result.map((part) =>
-				typeof part === 'object' && part !== null ? markRaw(part) : part,
-			)
-		}
-		return [typeof result === 'object' && result !== null ? markRaw(result) : result]
+		return toFormattedParts(result)
 	} catch {
 		return [msg]
 	}
 })
+
+function toFormattedParts(value: unknown): unknown[] {
+	if (Array.isArray(value)) {
+		return value.flatMap(toFormattedParts)
+	}
+	if (typeof value === 'object' && value !== null) {
+		return [markRaw(value)]
+	}
+	return [value]
+}
+
+function isVNodePart(part: unknown): part is VNode {
+	return typeof part === 'object' && part !== null
+}
 </script>
 
 <template>
 	<span
-		v-if="debugEnabled && !debugKeyReveal"
-		:data-i18n-key="messageId.id"
 		style="display: contents"
+		:data-i18n-key="debugEnabled && !debugKeyReveal ? messageId.id : undefined"
 	>
 		<template v-for="(part, index) in formattedParts" :key="index">
-			<component :is="() => part" v-if="typeof part === 'object'" />
+			<VNodeRenderer v-if="isVNodePart(part)" :node="part" />
 			<template v-else>{{ part }}</template>
 		</template>
 	</span>
-	<template v-for="(part, index) in formattedParts" v-else :key="index">
-		<component :is="() => part" v-if="typeof part === 'object'" />
-		<template v-else>{{ part }}</template>
-	</template>
 </template>

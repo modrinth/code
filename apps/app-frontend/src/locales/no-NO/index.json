@@ -56,20 +56,11 @@
   "app.action-bar.view-logs": {
     "message": "Vis logger"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Skrur på avansert rendering, som for eksempel uskarphetseffekter, som kan forårsake ytelsesproblemer om man ikke har maskinvareaksellerert rendering."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Avansert rendering"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Velg ditt foretrukne fargetema for Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Fargetema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Endre sida som vises når launcheren åpnes."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hjem"
@@ -80,35 +71,14 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Åpningsside"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Skjuler navnelappen over din spiller på utseende siden."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gjøm navnelapp"
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimer launcheren"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Viser hvor lenge du har spilt et tilfelle."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis spilletid"
   },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Hopper automatisk over lav-rissiko fastslåelser som modpakkeinstalasjonsduplikat, vanlig innholdsletting, bolkoppdateringer, avkoble modpakker, og reparasjonsprompter. Farlige advarsler vil fortsatt vises."
-  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Hopp over mindre viktige advarsler"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Aktiverer evnen til å skru sidefeltet av/på."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Sidefeltsveksling"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Hvis du prøver å laste ned en Modrinth Pakke fil (.mrpack) som er ukjent for Modrinth så kommer vi til å forsikre oss om at du forstår risikoene før du installerer den."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Advar meg før jeg installerer ukjente modpakker"
@@ -232,9 +202,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Utseende"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Vanlige tilfelleinstillinger"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installasjoner"

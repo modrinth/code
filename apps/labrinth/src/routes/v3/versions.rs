@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -27,8 +28,8 @@ use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
 use crate::search::SearchState;
+use crate::util::error::Context;
 use crate::util::img;
-use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
@@ -79,8 +80,9 @@ pub async fn version_project_get_helper(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let result =
-        database::models::DBProject::get(&id.0, &***ro_pool, &redis).await?;
+    let result = database::models::DBProject::get(&id.0, &***ro_pool, &redis)
+        .await
+        .wrap_api_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -95,9 +97,10 @@ pub async fn version_project_get_helper(
 
     if let Some(project) = result {
         if !is_visible_project(&project.inner, &user_option, &pool, false)
-            .await?
+            .await
+            .wrap_api_err("checking project visibility")?
         {
-            return Err(ApiError::NotFound);
+            return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
         }
 
         let versions = database::models::DBVersion::get_many(
@@ -105,7 +108,8 @@ pub async fn version_project_get_helper(
             &***ro_pool,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching versions from database")?;
 
         let id_opt = parse_base62(&id.1).ok();
         let version = versions.into_iter().find(|x| {
@@ -115,7 +119,8 @@ pub async fn version_project_get_helper(
 
         if let Some(version) = version
             && is_visible_version(&version.inner, &user_option, &pool, &redis)
-                .await?
+                .await
+                .wrap_api_err("checking version visibility")?
         {
             let version_id = version.inner.id;
             let mut v = models::projects::Version::from(version);
@@ -148,7 +153,7 @@ pub async fn version_project_get_helper(
         }
     }
 
-    Err(ApiError::NotFound)
+    Err(ApiError::NotFound(eyre::eyre!("resource not found")))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -193,7 +198,8 @@ pub async fn versions_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let version_ids =
-        serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
+        serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)
+            .wrap_request_err("deserializing JSON data")?
             .into_iter()
             .map(|x| x.into())
             .collect::<Vec<database::models::DBVersionId>>();
@@ -202,7 +208,8 @@ pub async fn versions_get(
         &***ro_pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching versions from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -222,7 +229,8 @@ pub async fn versions_get(
         &ro_pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("filtering visible versions")?;
 
     if !ids.include_changelog {
         for version in &mut versions {
@@ -282,7 +290,8 @@ pub async fn version_get_helper(
 ) -> Result<web::Json<models::projects::Version>, ApiError> {
     let version_data =
         database::models::DBVersion::get(id.into(), &***ro_pool, &redis)
-            .await?;
+            .await
+            .wrap_internal_err("fetching version from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -296,7 +305,9 @@ pub async fn version_get_helper(
     .ok();
 
     if let Some(data) = version_data
-        && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
+        && is_visible_version(&data.inner, &user_option, &pool, &redis)
+            .await
+            .wrap_api_err("checking version visibility")?
     {
         let version_id = data.inner.id;
         let mut version = models::projects::Version::from(data);
@@ -329,7 +340,7 @@ pub async fn version_get_helper(
         return Ok(web::Json(version));
     }
 
-    Err(ApiError::NotFound)
+    Err(ApiError::NotFound(eyre::eyre!("resource not found")))
 }
 
 #[derive(Serialize, Deserialize, Validate, Default, Debug)]
@@ -431,7 +442,8 @@ pub async fn version_edit(
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let new_version: EditVersion =
-        serde_json::from_value(new_version.into_inner())?;
+        serde_json::from_value(new_version.into_inner())
+            .wrap_request_err("deserializing JSON data")?;
     version_edit_helper(
         req,
         info.into_inner(),
@@ -459,17 +471,20 @@ pub async fn version_edit_helper(
         &session_queue,
         Scopes::VERSION_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    new_version.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    new_version
+        .validate()
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("validating request")?;
 
     let version_id = info.0.into();
 
-    let result =
-        database::models::DBVersion::get(version_id, &**pool, &redis).await?;
+    let result = database::models::DBVersion::get(version_id, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching version from database")?;
 
     if let Some(version_item) = result {
         let team_member =
@@ -479,14 +494,16 @@ pub async fn version_edit_helper(
                 false,
                 &**pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("fetching team member from database")?;
 
         let organization =
             DBOrganization::get_associated_organization_project_id(
                 version_item.inner.project_id,
                 &**pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("fetching organization from database")?;
 
         let organization_team_member = if let Some(organization) = &organization
         {
@@ -495,7 +512,8 @@ pub async fn version_edit_helper(
                 user.id.into(),
                 &**pool,
             )
-            .await?
+            .await
+            .wrap_internal_err("fetching team member from database")?
         } else {
             None
         };
@@ -508,13 +526,15 @@ pub async fn version_edit_helper(
 
         if let Some(perms) = permissions {
             if !perms.contains(ProjectPermissions::UPLOAD_VERSION) {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have the permissions to edit this version!"
-                        .to_string(),
-                ));
+                return Err(ApiError::Auth(eyre::eyre!(
+                    "You do not have the permissions to edit this version!",
+                )));
             }
 
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
 
             if let Some(name) = &new_version.name {
                 sqlx::query!(
@@ -527,7 +547,10 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
             }
 
             if let Some(number) = &new_version.version_number {
@@ -541,7 +564,10 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
             }
 
             if let Some(version_type) = &new_version.version_type {
@@ -555,7 +581,8 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err("fetching version type from database")?;
             }
 
             if let Some(dependencies) = &new_version.dependencies {
@@ -566,7 +593,8 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err("fetching dependencies from database")?;
 
                 let builders = dependencies
                     .iter()
@@ -583,7 +611,10 @@ pub async fn version_edit_helper(
                     version_item.inner.id,
                     &mut transaction,
                 )
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "inserting database records for `version_edit_helper`",
+                )?;
             }
 
             if !new_version.fields.is_empty() {
@@ -595,7 +626,8 @@ pub async fn version_edit_helper(
 
                 let all_loaders =
                     loader_fields::Loader::list(&mut transaction, &redis)
-                        .await?;
+                        .await
+                        .wrap_internal_err("fetching loader from Redis")?;
                 let loader_ids = version_item
                     .loaders
                     .iter()
@@ -612,7 +644,8 @@ pub async fn version_edit_helper(
                     &mut transaction,
                     &redis,
                 )
-                .await?
+                .await
+                .wrap_internal_err("fetching loader field from Redis")?
                 .into_iter()
                 .filter(|lf| version_fields_names.contains(&lf.field))
                 .collect::<Vec<LoaderField>>();
@@ -631,7 +664,10 @@ pub async fn version_edit_helper(
                     &loader_field_ids
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
 
                 let mut loader_field_enum_values =
                     LoaderFieldEnumValue::list_many_loader_fields(
@@ -639,18 +675,19 @@ pub async fn version_edit_helper(
                         &mut transaction,
                         &redis,
                     )
-                    .await?;
+                    .await
+                    .wrap_internal_err(
+                        "fetching loader field enum value from Redis",
+                    )?;
 
                 let mut version_fields = Vec::new();
                 for (vf_name, vf_value) in new_version.fields {
                     let loader_field = loader_fields
                         .iter()
                         .find(|lf| lf.field == vf_name)
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                                "Loader field '{vf_name}' does not exist for any loaders supplied."
-                            ))
-                        })?;
+                        .wrap_request_err_with(|| format!(
+                                "loader field `{vf_name}` does not exist for any loaders supplied"
+                            ))?;
                     let enum_variants = loader_field_enum_values
                         .remove(&loader_field.id)
                         .unwrap_or_default();
@@ -660,11 +697,15 @@ pub async fn version_edit_helper(
                         vf_value.clone(),
                         enum_variants,
                     )
-                    .map_err(ApiError::InvalidInput)?;
+                    .map_err(eyre::Report::msg)
+                    .wrap_request_err("parsing version field")?;
                     version_fields.push(vf);
                 }
                 VersionField::insert_many(version_fields, &mut transaction)
-                    .await?;
+                    .await
+                    .wrap_internal_err(
+                        "inserting database records for `version_edit_helper`",
+                    )?;
             }
 
             if let Some(loaders) = &new_version.loaders {
@@ -675,7 +716,8 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err("fetching loaders from database")?;
 
                 let mut loader_versions = Vec::new();
                 for loader in loaders {
@@ -685,20 +727,24 @@ pub async fn version_edit_helper(
                             &mut transaction,
                             &redis,
                         )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "No database entry for loader provided."
-                                    .to_string(),
-                            )
-                        })?;
+                        .await
+                        .wrap_internal_err("fetching loader from Redis")?
+                        .wrap_request_err_with(
+                            || {
+                                "no database entry for loader provided."
+                                    .to_string()
+                            },
+                        )?;
                     loader_versions.push(DBLoaderVersion {
                         loader_id,
                         version_id,
                     });
                 }
                 DBLoaderVersion::insert_many(loader_versions, &mut transaction)
-                    .await?;
+                    .await
+                    .wrap_internal_err(
+                        "inserting loader versions into database",
+                    )?;
             }
 
             if let Some(featured) = &new_version.featured {
@@ -712,7 +758,8 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err("fetching featured status from database")?;
             }
 
             if let Some(body) = &new_version.changelog {
@@ -726,14 +773,17 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
             }
 
             if let Some(downloads) = &new_version.downloads {
                 if !user.role.is_mod() {
-                    return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set the downloads of this mod".to_string(),
-                    ));
+                    return Err(ApiError::Auth(eyre::eyre!(
+                        "You don't have permission to set the downloads of this mod",
+                    )));
                 }
 
                 sqlx::query!(
@@ -746,7 +796,10 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
 
                 let diff = *downloads - (version_item.inner.downloads as u32);
 
@@ -761,14 +814,17 @@ pub async fn version_edit_helper(
                         as database::models::ids::DBProjectId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
             }
 
             if let Some(status) = &new_version.status {
                 if !status.can_be_requested() {
-                    return Err(ApiError::InvalidInput(
-                        "The requested status cannot be set!".to_string(),
-                    ));
+                    return Err(ApiError::Request(eyre::eyre!(
+                        "The requested status cannot be set!",
+                    )));
                 }
 
                 sqlx::query!(
@@ -781,7 +837,10 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
             }
 
             if let Some(file_types) = &new_version.file_types {
@@ -796,12 +855,15 @@ pub async fn version_edit_helper(
                         file_type.algorithm
                     )
                     .fetch_optional(&**pool)
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput(format!(
-                            "Specified file with hash {} does not exist.",
+                    .await
+                    .wrap_internal_err(
+                        "querying database for `version_edit_helper`",
+                    )?
+                    .wrap_request_err_with(|| {
+                        format!(
+                            "specified file with hash `{}` does not exist",
                             file_type.algorithm.clone()
-                        ))
+                        )
                     })?;
 
                     sqlx::query!(
@@ -814,7 +876,10 @@ pub async fn version_edit_helper(
                         file_type.file_type.as_ref().map(|x| x.as_str()),
                     )
                     .execute(&mut transaction)
-                    .await?;
+                    .await
+                    .wrap_internal_err(
+                        "querying database for `version_edit_helper`",
+                    )?;
                 }
             }
 
@@ -829,7 +894,10 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `version_edit_helper`",
+                )?;
             }
 
             // delete any images no longer in the changelog
@@ -847,18 +915,24 @@ pub async fn version_edit_helper(
                 &mut transaction,
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_api_err("deleting unused images")?;
 
-            transaction.commit().await?;
+            transaction
+                .commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
             database::models::DBVersion::clear_cache(&version_item, &redis)
-                .await?;
+                .await
+                .wrap_internal_err("clearing cached data from Redis")?;
             database::models::DBProject::clear_cache(
                 version_item.inner.project_id,
                 None,
                 Some(true),
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_internal_err("clearing cached data from Redis")?;
             search_state
                 .queue
                 .push_version_changes(
@@ -868,12 +942,12 @@ pub async fn version_edit_helper(
                 .await;
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this version!".to_string(),
-            ))
+            Err(ApiError::Auth(eyre::eyre!(
+                "You do not have permission to edit this version!",
+            )))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -949,8 +1023,9 @@ pub async fn version_list_internal(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result =
-        database::models::DBProject::get(&string, &***ro_pool, &redis).await?;
+    let result = database::models::DBProject::get(&string, &***ro_pool, &redis)
+        .await
+        .wrap_api_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -965,9 +1040,10 @@ pub async fn version_list_internal(
 
     if let Some(project) = result {
         if !is_visible_project(&project.inner, &user_option, &pool, false)
-            .await?
+            .await
+            .wrap_api_err("checking project visibility")?
         {
-            return Err(ApiError::NotFound);
+            return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
         }
 
         let loader_field_filters = filters.loader_fields.as_ref().map(|x| {
@@ -982,7 +1058,8 @@ pub async fn version_list_internal(
             &***ro_pool,
             &redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("fetching versions from database")?
         .into_iter()
         .filter(|x| {
             let mut bool = true;
@@ -1048,7 +1125,7 @@ pub async fn version_list_internal(
                     &redis,
                 ),
             )
-            .await?;
+            .await.wrap_internal_err("fetching minecraft game version from Redis")?;
 
             let mut joined_filters = Vec::new();
             for game_version in &game_versions {
@@ -1093,7 +1170,8 @@ pub async fn version_list_internal(
             &ro_pool,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_api_err("filtering visible versions")?;
 
         if !filters.include_changelog {
             for version in &mut response {
@@ -1103,7 +1181,7 @@ pub async fn version_list_internal(
 
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -1154,16 +1232,16 @@ pub async fn version_delete(
         &session_queue,
         Scopes::VERSION_DELETE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
     let id = info.into_inner().0;
 
     let version = database::models::DBVersion::get(id.into(), &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified version does not exist!".to_string(),
-            )
+        .await
+        .wrap_internal_err("fetching version from database")?
+        .wrap_request_err_with(|| {
+            "the specified version does not exist!".to_string()
         })?;
 
     if !user.role.is_admin() {
@@ -1175,14 +1253,15 @@ pub async fn version_delete(
                 &**pool,
             )
             .await
-            .map_err(ApiError::Database)?;
+            .wrap_internal_err("fetching project team member")?;
 
         let organization =
             DBOrganization::get_associated_organization_project_id(
                 version.inner.project_id,
                 &**pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("fetching organization from database")?;
 
         let organization_team_member = if let Some(organization) = &organization
         {
@@ -1191,7 +1270,8 @@ pub async fn version_delete(
                 user.id.into(),
                 &**pool,
             )
-            .await?
+            .await
+            .wrap_internal_err("fetching team member from database")?
         } else {
             None
         };
@@ -1203,14 +1283,16 @@ pub async fn version_delete(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete versions in this team"
-                    .to_string(),
-            ));
+            return Err(ApiError::Auth(eyre::eyre!(
+                "You do not have permission to delete versions in this team",
+            )));
         }
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let context = ImageContext::Version {
         version_id: Some(version.inner.id.into()),
@@ -1219,9 +1301,12 @@ pub async fn version_delete(
         context,
         &mut transaction,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching images from database")?;
     for image in uploaded_images {
-        image_item::DBImage::remove(image.id, &mut transaction, &redis).await?;
+        image_item::DBImage::remove(image.id, &mut transaction, &redis)
+            .await
+            .wrap_internal_err("deleting image from database")?;
     }
 
     let result = database::models::DBVersion::remove_full(
@@ -1229,16 +1314,23 @@ pub async fn version_delete(
         &redis,
         &mut transaction,
     )
-    .await?;
+    .await
+    .wrap_internal_err("deleting version from database")?;
 
     delphi::tech_review_sync::sync_project_tech_review_state(
         &[version.inner.project_id],
         delphi::tech_review_sync::TechReviewExitReason::FileDeleted,
         &mut transaction,
     )
-    .await?;
+    .await
+    .wrap_api_err(
+        "executing `tech_review_sync::sync_project_tech_review_state`",
+    )?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     database::models::DBProject::clear_cache(
         version.inner.project_id,
@@ -1246,7 +1338,8 @@ pub async fn version_delete(
         Some(true),
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("clearing cached data from Redis")?;
     search_state
         .queue
         .push_version_changes(
@@ -1257,6 +1350,6 @@ pub async fn version_delete(
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }

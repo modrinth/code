@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Egy leírás ami leírja a projekt célját és funkcióját szükséges."
+    "defaultMessage": "Szükséges egy leírás ami leírja a projekt célját és funkcióját."
   },
   "nags.add-description.title": {
     "defaultMessage": "Adj hozzá egy leírást"
@@ -177,7 +177,7 @@
     "defaultMessage": "Nyelv kiválasztása"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Válaszd ki a licencet ami a te {type} -od alapján megfelelő."
+    "defaultMessage": "Válaszd ki a licencet ami a te {type}ed alapján megfelelő."
   },
   "nags.select-license.title": {
     "defaultMessage": "Válassz egy licenszet"
@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Legalább egy kép megadása szükséged a te {type}-od alapján."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "forráscsomag, kivéve a hang illetve a fordításos csomagok. Ha ez leírja a csomagod akkor válaszd ki a megfelelő címkét"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy képet"
   },
@@ -271,9 +268,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Ellenőrizd a külső linkeket"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Látogasd meg a Verziók fület"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"

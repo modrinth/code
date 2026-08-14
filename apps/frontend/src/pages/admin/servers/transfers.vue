@@ -13,12 +13,10 @@
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>
 			<h1 class="m-0 text-2xl">Server transfers</h1>
-			<ButtonStyled color="brand">
-				<button @click="openTransferModal">
-					<PlusIcon />
-					New transfer
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" @click="openTransferModal">
+				<PlusIcon />
+				New transfer
+			</Button>
 		</div>
 		<div>
 			<div v-if="loading" class="py-8 text-center text-secondary">Loading transfers...</div>
@@ -67,12 +65,16 @@
 								<span class="text-sm text-secondary">
 									{{ batch.log_count }} transfer{{ batch.log_count === 1 ? '' : 's' }}
 								</span>
-								<ButtonStyled v-if="canCancel(batch)" color="red" color-fill="text">
-									<button @click="showCancelModal(batch.id)">
-										<XCircleIcon />
-										Cancel
-									</button>
-								</ButtonStyled>
+								<Button
+									v-if="canCancel(batch)"
+									type="quiet"
+									color="red"
+									class="!text-red [&>svg]:!text-red"
+									@click="showCancelModal(batch.id)"
+								>
+									<XCircleIcon />
+									Cancel
+								</Button>
 							</div>
 						</div>
 						<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-secondary">
@@ -112,7 +114,7 @@ import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,

@@ -1,11 +1,5 @@
-import type { IdentifiedNodeBuilder, NodeState } from '@modrinth/moderation'
-import type { ComputedRef, InjectionKey, Ref } from 'vue'
-
-export interface ActiveAction {
-	node: IdentifiedNodeBuilder
-	state: Record<string, NodeState>
-	statePath: string[]
-}
+import type { ActiveAction, NodeState } from '@modrinth/moderation/src/types/node'
+import type { InjectionKey, Ref } from 'vue'
 
 export interface LiveNode {
 	isActive: boolean
@@ -17,7 +11,5 @@ export interface LiveNode {
 	activeActions: ActiveAction[]
 }
 
-export const NODE_META_KEY: InjectionKey<ComputedRef<Map<IdentifiedNodeBuilder, LiveNode>>> =
-	Symbol('nodeMeta')
 export const STATE_KEY: InjectionKey<Ref<Record<string, Record<string, NodeState>>>> =
 	Symbol('checklistState')

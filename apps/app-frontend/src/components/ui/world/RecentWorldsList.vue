@@ -5,12 +5,12 @@ import { GAME_MODES, injectNotificationManager } from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { instance_listener, process_listener } from '@/helpers/events'
 import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
 import { get_game_versions } from '@/helpers/tags'
@@ -215,11 +215,11 @@ async function stopInstance(path: string) {
 const currentInstance = ref<string>()
 const currentWorld = ref<string>()
 
-const unlistenProcesses = await process_listener(async () => {
+useAppEvent('process', async () => {
 	await checkProcesses()
 })
 
-const unlistenInstances = await instance_listener(async () => {
+useAppEvent('instance', async () => {
 	await populateJumpBackIn().catch(() => {
 		console.error('Failed to populate jump back in')
 	})
@@ -250,11 +250,6 @@ const checkProcesses = async () => {
 onMounted(() => {
 	checkProcesses()
 	linuxPopulateCount.value = 0
-})
-
-onUnmounted(() => {
-	unlistenProcesses()
-	unlistenInstances()
 })
 </script>
 

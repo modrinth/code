@@ -1076,9 +1076,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -1447,15 +1444,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.title": {
-    "message": "Setări"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Vizitează panoul de control al proiectelor"
-  },
-  "project.status.archived.message": {
-    "message": "Proiectul {title} a fost arhivat. Proiectul {title} nu va mai primi actualizări, cu excepția cazului în care autorul decide să-l dezarhiveze."
   },
   "project.versions.title": {
     "message": "Versiuni"

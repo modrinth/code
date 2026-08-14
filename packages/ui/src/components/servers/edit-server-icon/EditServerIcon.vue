@@ -2,19 +2,25 @@
 	<div class="flex flex-col gap-2.5">
 		<span class="text-lg font-semibold text-contrast">Icon</span>
 		<div class="group relative w-fit">
-			<OverflowMenu
-				v-tooltip="editIconTooltip"
-				class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
+			<TeleportOverflowMenu
+				:label="editIconTooltip"
+				:tooltip="editIconTooltip"
+				:icon-only="false"
+				type="quiet"
+				interaction="none"
+				class="m-0 !h-auto cursor-pointer appearance-none border-none bg-transparent !p-0 transition-transform group-active:scale-95"
 				:disabled="isIconActionDisabled"
 				:options="[
 					{
 						id: 'upload',
+						label: 'Upload icon',
 						action: () => triggerFileInput(),
 						disabled: !props.canEdit,
 						tooltip: !props.canEdit ? editIconTooltip : undefined,
 					},
 					{
 						id: 'sync',
+						label: 'Sync icon',
 						action: () => resetIcon(),
 						disabled: !props.canEdit,
 						tooltip: !props.canEdit ? editIconTooltip : undefined,
@@ -39,7 +45,7 @@
 				</div>
 				<template #upload> <UploadIcon /> Upload icon </template>
 				<template #sync> <TransferIcon /> Sync icon </template>
-			</OverflowMenu>
+			</TeleportOverflowMenu>
 		</div>
 	</div>
 </template>
@@ -49,7 +55,7 @@ import { EditIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@modrinth/asset
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import { OverflowMenu, ServerIcon } from '#ui/components'
+import { ServerIcon, TeleportOverflowMenu } from '#ui/components'
 import { useServerImage } from '#ui/composables'
 import { useVIntl } from '#ui/composables/i18n'
 import {

@@ -28,17 +28,15 @@
 				</label>
 				<div v-if="editingId" class="icon-submission">
 					<Avatar size="md" :src="icon" />
-					<ButtonStyled>
-						<FileInput
-							:max-size="262144"
-							class="button-like"
-							:prompt="formatMessage(messages.uploadIcon)"
-							accept="image/png,image/jpeg,image/gif,image/webp"
-							@change="onImageSelection"
-						>
-							<UploadIcon />
-						</FileInput>
-					</ButtonStyled>
+					<FileButton
+						:max-size="262144"
+						class="button-like"
+						:prompt="formatMessage(messages.uploadIcon)"
+						accept="image/png,image/jpeg,image/gif,image/webp"
+						@change="onImageSelection"
+					>
+						<UploadIcon />
+					</FileButton>
 				</div>
 				<label v-if="editingId" for="app-url" class="mb-2 mt-4 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
@@ -102,48 +100,51 @@
 								autocomplete="off"
 								:placeholder="formatMessage(messages.redirectUriPlaceholder)"
 							/>
-							<ButtonStyled v-if="index !== 0" circular>
-								<button @click="() => redirectUris.splice(index, 1)">
-									<TrashIcon />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="index === 0" color="brand">
-								<button @click="() => redirectUris.push('')">
-									<PlusIcon /> {{ formatMessage(messages.addMore) }}
-								</button>
-							</ButtonStyled>
+							<IconButton
+								v-if="index !== 0"
+								label="Delete"
+								@click="() => redirectUris.splice(index, 1)"
+							>
+								<TrashIcon />
+							</IconButton>
+							<Button
+								v-if="index === 0"
+								type="colored"
+								color="brand"
+								@click="() => redirectUris.push('')"
+							>
+								<PlusIcon /> {{ formatMessage(messages.addMore) }}
+							</Button>
 						</div>
 					</div>
 					<div v-if="redirectUris.length <= 0">
-						<ButtonStyled color="brand">
-							<button @click="() => redirectUris.push('')">
-								<PlusIcon /> {{ formatMessage(messages.addRedirectUri) }}
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" @click="() => redirectUris.push('')">
+							<PlusIcon /> {{ formatMessage(messages.addRedirectUri) }}
+						</Button>
 					</div>
 				</div>
 			</div>
 
 			<template #actions>
 				<div class="flex justify-end gap-2 p-2">
-					<ButtonStyled>
-						<button @click="$refs.appModal.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="editingId" color="brand">
-						<button :disabled="!canSubmit" @click="editApp">
-							<SaveIcon />
-							{{ formatMessage(commonMessages.saveChangesButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button :disabled="!canSubmit" @click="createApp">
-							<PlusIcon />
-							{{ formatMessage(messages.createApp) }}
-						</button>
-					</ButtonStyled>
+					<Button @click="$refs.appModal.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						v-if="editingId"
+						type="colored"
+						color="brand"
+						:disabled="!canSubmit"
+						@click="editApp"
+					>
+						<SaveIcon />
+						{{ formatMessage(commonMessages.saveChangesButton) }}
+					</Button>
+					<Button v-else type="colored" color="brand" :disabled="!canSubmit" @click="createApp">
+						<PlusIcon />
+						{{ formatMessage(messages.createApp) }}
+					</Button>
 				</div>
 			</template>
 		</NewModal>
@@ -152,22 +153,22 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.applications) }}</h2>
 			</div>
-			<ButtonStyled color="brand">
-				<button
-					@click="
-						() => {
-							name = null
-							icon = null
-							scopesVal = 0
-							redirectUris = ['']
-							editingId = null
-							$refs.appModal.show()
-						}
-					"
-				>
-					<PlusIcon /> {{ formatMessage(messages.newApplication) }}
-				</button>
-			</ButtonStyled>
+			<Button
+				type="colored"
+				color="brand"
+				@click="
+					() => {
+						name = null
+						icon = null
+						scopesVal = 0
+						redirectUris = ['']
+						editingId = null
+						$refs.appModal.show()
+					}
+				"
+			>
+				<PlusIcon /> {{ formatMessage(messages.newApplication) }}
+			</Button>
 		</div>
 		<p>
 			<IntlFormatted :message-id="messages.descriptionIntro">
@@ -215,35 +216,33 @@
 				</div>
 			</div>
 			<div class="input-group">
-				<ButtonStyled>
-					<button
-						@click="
-							() => {
-								setForm({
-									...app,
-									redirect_uris: app.redirect_uris.map((u) => u.uri) || [],
-								})
-								$refs.appModal.show()
-							}
-						"
-					>
-						<EditIcon />
-						{{ formatMessage(commonMessages.editButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button
-						@click="
-							() => {
-								editingId = app.id
-								$refs.modal_confirm.show()
-							}
-						"
-					>
-						<TrashIcon />
-						{{ formatMessage(messages.delete) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					@click="
+						() => {
+							setForm({
+								...app,
+								redirect_uris: app.redirect_uris.map((u) => u.uri) || [],
+							})
+							$refs.appModal.show()
+						}
+					"
+				>
+					<EditIcon />
+					{{ formatMessage(commonMessages.editButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="red"
+					@click="
+						() => {
+							editingId = app.id
+							$refs.modal_confirm.show()
+						}
+					"
+				>
+					<TrashIcon />
+					{{ formatMessage(messages.delete) }}
+				</Button>
 			</div>
 		</div>
 	</div>
@@ -252,14 +251,15 @@
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	Checkbox,
 	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
 	defineMessages,
-	FileInput,
+	FileButton,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,

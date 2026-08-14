@@ -3,7 +3,7 @@ use crate::models::v3::notifications::NotificationType;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types:v3";
+const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types:v4";
 
 #[derive(Serialize, Deserialize)]
 pub struct NotificationTypeItem {

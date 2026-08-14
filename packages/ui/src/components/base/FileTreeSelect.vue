@@ -258,6 +258,11 @@ type FileTreeSelectEntry = {
 	item?: NormalizedFileTreeSelectItem
 }
 
+type FileTreeSelectionRuleNode = {
+	selected?: boolean
+	children: Map<string, FileTreeSelectionRuleNode>
+}
+
 type FileTreeSelectSortField = 'name' | 'size' | 'modified'
 
 const formatBytes = useFormatBytes()
@@ -273,19 +278,22 @@ const props = withDefaults(
 	defineProps<{
 		items: FileTreeSelectItem[]
 		modelValue: string[]
+		excludedPaths: string[]
+		lazy?: boolean
 		showSize?: boolean
 		showModified?: boolean
 	}>(),
 	{
 		items: () => [],
 		modelValue: () => [],
+		lazy: false,
 		showSize: true,
 		showModified: true,
 	},
 )
 
 const emit = defineEmits<{
-	(e: 'update:modelValue', value: string[]): void
+	(e: 'update:modelValue' | 'update:excludedPaths', value: string[]): void
 	(e: 'navigate', path: string): void
 }>()
 
@@ -312,7 +320,23 @@ const normalizedItems = computed(() => {
 	return [...items.values()]
 })
 
-const selectedPaths = computed(() => new Set(props.modelValue.map((path) => normalizePath(path))))
+const includedPaths = computed(() => new Set(props.modelValue.map((path) => normalizePath(path))))
+const excludedPaths = computed(
+	() => new Set(props.excludedPaths.map((path) => normalizePath(path))),
+)
+
+const selectionRuleTree = computed(() => {
+	const root: FileTreeSelectionRuleNode = { children: new Map() }
+
+	for (const path of includedPaths.value) {
+		addSelectionRule(root, path, true)
+	}
+	for (const path of excludedPaths.value) {
+		addSelectionRule(root, path, false)
+	}
+
+	return root
+})
 
 const folderPaths = computed(() => {
 	const paths = new Set<string>()
@@ -361,24 +385,14 @@ const entries = computed<FileTreeSelectEntry[]>(() => {
 
 const visibleSelectableEntries = computed(() => entries.value.filter((entry) => !entry.disabled))
 
-const visibleSelectablePaths = computed(() => {
-	const paths = new Set<string>()
-	for (const entry of visibleSelectableEntries.value) {
-		for (const path of getEntrySelectablePaths(entry)) {
-			paths.add(path)
-		}
-	}
-	return [...paths]
-})
-
 const allVisibleSelected = computed(
 	() =>
-		visibleSelectablePaths.value.length > 0 &&
-		visibleSelectablePaths.value.every((path) => selectedPaths.value.has(path)),
+		visibleSelectableEntries.value.length > 0 &&
+		visibleSelectableEntries.value.every((entry) => entry.checked && !entry.indeterminate),
 )
 
 const someVisibleSelected = computed(() =>
-	visibleSelectablePaths.value.some((path) => selectedPaths.value.has(path)),
+	visibleSelectableEntries.value.some((entry) => entry.checked || entry.indeterminate),
 )
 
 const visibleRowCount = computed(
@@ -392,7 +406,7 @@ const fillerRowCount = computed(() =>
 watch(
 	normalizedItems,
 	() => {
-		if (currentPath.value && !folderPaths.value.has(currentPath.value)) {
+		if (!props.lazy && currentPath.value && !folderPaths.value.has(currentPath.value)) {
 			currentPath.value = ''
 		}
 	},
@@ -425,6 +439,57 @@ function normalizePath(path: string) {
 
 function getName(path: string) {
 	return path.split('/').pop() ?? path
+}
+
+function getParentPath(path: string) {
+	return path.split('/').slice(0, -1).join('/')
+}
+
+function addSelectionRule(root: FileTreeSelectionRuleNode, path: string, selected: boolean) {
+	if (!path) return
+
+	let node = root
+	for (const segment of path.split('/')) {
+		let child = node.children.get(segment)
+		if (!child) {
+			child = { children: new Map() }
+			node.children.set(segment, child)
+		}
+		node = child
+	}
+	node.selected = selected
+}
+
+function getSelectionRuleNode(path: string) {
+	let node = selectionRuleTree.value
+	if (!path) return node
+
+	for (const segment of path.split('/')) {
+		const child = node.children.get(segment)
+		if (!child) return undefined
+		node = child
+	}
+
+	return node
+}
+
+function isPathSelected(path: string) {
+	let node = selectionRuleTree.value
+	let selected = node.selected ?? false
+
+	for (const segment of path.split('/').filter(Boolean)) {
+		const child = node.children.get(segment)
+		if (!child) break
+		node = child
+		selected = node.selected ?? selected
+	}
+
+	return selected
+}
+
+function hasDescendantSelectionRule(path: string) {
+	const node = getSelectionRuleNode(path)
+	return node !== undefined && node.children.size > 0
 }
 
 function isInCurrentPath(segments: string[], currentSegments: string[]) {
@@ -505,22 +570,21 @@ function buildDirectoryEntry(
 	name: string,
 	item?: NormalizedFileTreeSelectItem,
 ): FileTreeSelectEntry {
-	const descendants = getFolderDescendants(path).filter((item) => !item.disabled)
-	const selectedCount = descendants.filter((item) =>
-		selectedPaths.value.has(item.normalizedPath),
-	).length
-	const selected = selectedPaths.value.has(path)
+	const descendants = item ? [] : getFolderDescendants(path)
+	const selectableDescendants = descendants.filter((item) => !item.disabled)
+	const selected = isPathSelected(path)
+	const indeterminate = hasDescendantSelectionRule(path)
 
 	return {
 		path,
 		name,
 		type: 'directory',
 		icon: getDirectoryIcon(name),
-		checked: selected || (descendants.length > 0 && selectedCount === descendants.length),
-		indeterminate: !selected && selectedCount > 0 && selectedCount < descendants.length,
-		disabled: item?.disabled ?? descendants.length === 0,
+		checked: selected && !indeterminate,
+		indeterminate,
+		disabled: item ? (item.disabled ?? false) : selectableDescendants.length === 0,
 		modified: item?.modified ?? getLatestModified(descendants),
-		count: item?.count ?? getFolderChildCount(path),
+		count: item?.count ?? (item ? undefined : getFolderChildCount(path)),
 		item,
 	}
 }
@@ -531,7 +595,7 @@ function buildFileEntry(item: NormalizedFileTreeSelectItem): FileTreeSelectEntry
 		name: item.name,
 		type: 'file',
 		icon: getFileIcon(item.name),
-		checked: selectedPaths.value.has(item.normalizedPath),
+		checked: isPathSelected(item.normalizedPath),
 		indeterminate: false,
 		disabled: item.disabled ?? false,
 		size: item.size,
@@ -564,48 +628,89 @@ function selectEntry(entry: FileTreeSelectEntry) {
 function toggleEntry(entry: FileTreeSelectEntry, selected: boolean) {
 	if (entry.disabled) return
 
-	const nextSelectedPaths = new Set(selectedPaths.value)
-	const paths = getEntrySelectablePaths(entry)
-
-	for (const path of paths) {
-		if (selected) {
-			nextSelectedPaths.add(path)
-		} else {
-			nextSelectedPaths.delete(path)
-		}
-	}
-
-	emit('update:modelValue', [...nextSelectedPaths])
+	updateSelection(entry.path, selected)
 }
 
-function getEntrySelectablePaths(entry: FileTreeSelectEntry) {
-	if (entry.type === 'directory') {
-		return entry.item?.type === 'directory'
-			? [entry.path]
-			: getFolderDescendants(entry.path)
-					.filter((item) => !item.disabled)
-					.map((item) => item.normalizedPath)
+function updateSelection(path: string, selected: boolean) {
+	const nextSelectedPaths = new Set(includedPaths.value)
+	const nextExcludedPaths = new Set(excludedPaths.value)
+	applySelection(nextSelectedPaths, nextExcludedPaths, path, selected)
+	emitSelection(nextSelectedPaths, nextExcludedPaths)
+}
+
+function applySelection(
+	nextSelectedPaths: Set<string>,
+	nextExcludedPaths: Set<string>,
+	path: string,
+	selected: boolean,
+) {
+	const normalizedPath = normalizePath(path)
+	if (!normalizedPath) return
+
+	removePathAndDescendants(nextSelectedPaths, normalizedPath)
+	removePathAndDescendants(nextExcludedPaths, normalizedPath)
+
+	const inheritedSelection = resolveSelectionFromSets(
+		getParentPath(normalizedPath),
+		nextSelectedPaths,
+		nextExcludedPaths,
+	)
+	if (inheritedSelection !== selected) {
+		const targetPaths = selected ? nextSelectedPaths : nextExcludedPaths
+		targetPaths.add(normalizedPath)
+	}
+}
+
+function removePathAndDescendants(paths: Set<string>, path: string) {
+	const prefix = `${path}/`
+	for (const candidate of paths) {
+		if (candidate === path || candidate.startsWith(prefix)) {
+			paths.delete(candidate)
+		}
+	}
+}
+
+function resolveSelectionFromSets(
+	path: string,
+	includedPaths: Set<string>,
+	excludedPaths: Set<string>,
+) {
+	let selected = false
+	let prefix = ''
+
+	for (const segment of path.split('/').filter(Boolean)) {
+		prefix = prefix ? `${prefix}/${segment}` : segment
+		if (includedPaths.has(prefix)) selected = true
+		if (excludedPaths.has(prefix)) selected = false
 	}
 
-	return [entry.path]
+	return selected
+}
+
+function emitSelection(includedPaths: Set<string>, excludedPaths: Set<string>) {
+	emit('update:modelValue', [...includedPaths])
+	emit('update:excludedPaths', [...excludedPaths])
 }
 
 function toggleAllVisible(selected: boolean) {
-	const nextSelectedPaths = new Set(selectedPaths.value)
-	for (const path of visibleSelectablePaths.value) {
-		if (selected) {
-			nextSelectedPaths.add(path)
-		} else {
-			nextSelectedPaths.delete(path)
+	const nextSelectedPaths = new Set(includedPaths.value)
+	const nextExcludedPaths = new Set(excludedPaths.value)
+
+	if (currentPath.value) {
+		applySelection(nextSelectedPaths, nextExcludedPaths, currentPath.value, selected)
+	} else {
+		for (const entry of visibleSelectableEntries.value) {
+			applySelection(nextSelectedPaths, nextExcludedPaths, entry.path, selected)
 		}
 	}
 
-	emit('update:modelValue', [...nextSelectedPaths])
+	emitSelection(nextSelectedPaths, nextExcludedPaths)
 }
 
 function formatSize(entry: FileTreeSelectEntry) {
 	if (entry.type === 'directory') {
-		return formatMessage(messages.itemCount, { count: entry.count ?? 0 })
+		if (entry.count === undefined) return ''
+		return formatMessage(messages.itemCount, { count: entry.count })
 	}
 
 	if (entry.size === undefined) return ''

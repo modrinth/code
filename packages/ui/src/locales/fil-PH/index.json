@@ -266,15 +266,6 @@
   "content.page-layout.share.project-links": {
     "defaultMessage": "Mga link ng proyekto"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alpabetiko"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Pinakabago ang mauuna"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Pinakaluma ang mauuna"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Nakapatay na ang lahat ng piniling konento"
   },
@@ -340,9 +331,6 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Oo"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Isara"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Hahanapin"
@@ -664,24 +652,6 @@
   },
   "instances.content-install.no-instances": {
     "defaultMessage": "Walang mahanap na magkatugmang instansiya"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Hindi naglalaman ng karagdagang kontento ang modpack na ito."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Walang mahanap na kontento"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Kontentong modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Inihahanda ang kontento..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Walang proyektong tumugma sa iyong paghanap."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Maghanap sa {count, number} {count, plural, one {proyekto} other {na proyekto}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Kasalukuyan"

@@ -4,6 +4,8 @@ use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::DependencyType;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
@@ -94,10 +96,13 @@ pub trait SearchBackend: Send + Sync {
         info: &SearchRequest,
         redis: &RedisPool,
     ) -> Result<SearchResults, ApiError> {
-        let mut results = self.search_for_project_raw(info).await?;
+        let mut results = self
+            .search_for_project_raw(info)
+            .await
+            .wrap_api_err("searching projects")?;
         hydrate_search_results(&mut results.hits, redis)
             .await
-            .map_err(ApiError::Internal)?;
+            .wrap_internal_err("hydrating search results from database")?;
         Ok(results)
     }
 
@@ -213,6 +218,11 @@ pub enum SearchField {
     MinecraftJavaServerPingData,
     DependencyProjectIds,
     CompatibleDependencyProjectIds,
+    DisclosureTypes,
+    RequiredDependencyProjectIds,
+    OptionalDependencyProjectIds,
+    EmbeddedDependencyProjectIds,
+    IncompatibleDependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -284,7 +294,17 @@ pub struct UploadSearchProject {
     #[serde(default)]
     pub compatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub required_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub optional_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub embedded_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub incompatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
+    #[serde(default)]
+    pub disclosure_types: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -382,7 +402,17 @@ pub struct ResultSearchProject {
     #[serde(default)]
     pub compatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub required_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub optional_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub embedded_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub incompatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
+    #[serde(default)]
+    pub disclosure_types: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -424,7 +454,16 @@ impl From<UploadSearchProject> for ResultSearchProject {
             dependency_project_ids: source.dependency_project_ids,
             compatible_dependency_project_ids: source
                 .compatible_dependency_project_ids,
+            required_dependency_project_ids: source
+                .required_dependency_project_ids,
+            optional_dependency_project_ids: source
+                .optional_dependency_project_ids,
+            embedded_dependency_project_ids: source
+                .embedded_dependency_project_ids,
+            incompatible_dependency_project_ids: source
+                .incompatible_dependency_project_ids,
             dependencies: source.dependencies,
+            disclosure_types: source.disclosure_types,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,
             components: source.components,

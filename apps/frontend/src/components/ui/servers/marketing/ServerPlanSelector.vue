@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type MessageDescriptor, useFormatPrice } from '@modrinth/ui'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessage,
 	defineMessages,
@@ -42,8 +42,7 @@ const plans: Record<
 	Plan,
 	{
 		buttonColor: 'blue' | 'green' | 'purple'
-		accentText: string
-		accentBg: string
+		buttonClasses: string
 		name: MessageDescriptor
 		description: MessageDescriptor
 		mostPopular: boolean
@@ -51,8 +50,7 @@ const plans: Record<
 > = {
 	small: {
 		buttonColor: 'blue',
-		accentText: 'text-blue',
-		accentBg: 'bg-bg-blue',
+		buttonClasses: '!bg-highlight-blue !text-blue',
 		name: commonMessages.planSmallLabel,
 		description: defineMessage({
 			id: 'servers.plan.small.description',
@@ -62,8 +60,7 @@ const plans: Record<
 	},
 	medium: {
 		buttonColor: 'green',
-		accentText: 'text-green',
-		accentBg: 'bg-bg-green',
+		buttonClasses: '',
 		name: commonMessages.planMediumLabel,
 		description: defineMessage({
 			id: 'servers.plan.medium.description',
@@ -73,8 +70,7 @@ const plans: Record<
 	},
 	large: {
 		buttonColor: 'purple',
-		accentText: 'text-purple',
-		accentBg: 'bg-bg-purple',
+		buttonClasses: '!bg-highlight-purple !text-purple',
 		name: commonMessages.planLargeLabel,
 		description: defineMessage({
 			id: 'servers.plan.large.description',
@@ -146,18 +142,28 @@ const billingMonths = computed(() => {
 				</span>
 				<p class="m-0 max-w-[18rem]">{{ formatMessage(plans[plan].description) }}</p>
 			</div>
-			<ButtonStyled
+			<Button
+				v-if="outOfStock"
+				disabled
+				size="xl"
+				:type="plans[plan].mostPopular ? 'colored' : 'quiet'"
 				:color="plans[plan].buttonColor"
-				:type="plans[plan].mostPopular ? 'standard' : 'highlight-colored-text'"
-				size="large"
+				:interaction="plans[plan].mostPopular ? undefined : 'none'"
+				:class="plans[plan].buttonClasses"
 			>
-				<span v-if="outOfStock" class="button-like disabled">{{
-					formatMessage(messages.outOfStock)
-				}}</span>
-				<button v-else @click="() => emit('select')">
-					{{ formatMessage(messages.selectPlanButton) }}
-				</button>
-			</ButtonStyled>
+				{{ formatMessage(messages.outOfStock) }}
+			</Button>
+			<Button
+				v-else
+				size="xl"
+				:type="plans[plan].mostPopular ? 'colored' : 'quiet'"
+				:color="plans[plan].buttonColor"
+				:interaction="plans[plan].mostPopular ? undefined : 'none'"
+				:class="plans[plan].buttonClasses"
+				@click="() => emit('select')"
+			>
+				{{ formatMessage(messages.selectPlanButton) }}
+			</Button>
 			<ServersSpecs
 				:ram="ram"
 				:storage="storage"

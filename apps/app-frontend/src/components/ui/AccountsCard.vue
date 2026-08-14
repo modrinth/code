@@ -4,13 +4,11 @@
 		class="flex flex-col gap-3 bg-button-bg border border-solid border-surface-5 rounded-xl p-3 mt-2"
 	>
 		<span>{{ formatMessage(messages.notSignedIn) }}</span>
-		<ButtonStyled color="brand">
-			<button color="primary" :disabled="loginDisabled" @click="login()">
-				<LogInIcon v-if="!loginDisabled" />
-				<SpinnerIcon v-else class="animate-spin" />
-				{{ formatMessage(messages.signInToMinecraft) }}
-			</button>
-		</ButtonStyled>
+		<Button type="colored" color="brand" :disabled="loginDisabled" @click="login()">
+			<LogInIcon v-if="!loginDisabled" />
+			<SpinnerIcon v-else class="animate-spin" />
+			{{ formatMessage(messages.signInToMinecraft) }}
+		</Button>
 	</div>
 	<Accordion
 		v-else
@@ -60,24 +58,28 @@
 							{{ account.profile.name }}
 						</p>
 					</button>
-					<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-						<button
-							v-tooltip="formatMessage(messages.removeAccount)"
-							class="mr-2"
-							@click="logout(account.profile.id)"
-						>
-							<TrashIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-tooltip="formatMessage(messages.removeAccount)"
+						type="quiet"
+						color="red"
+						:label="formatMessage(messages.removeAccount)"
+						class="mr-2 !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)] hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+						@click="logout(account.profile.id)"
+					>
+						<TrashIcon />
+					</IconButton>
 				</div>
 			</template>
 			<div class="flex flex-col gap-2 px-2 pt-2">
-				<ButtonStyled v-if="accounts.length > 0" class="w-full">
-					<button :disabled="loginDisabled" @click="login()">
-						<PlusIcon />
-						{{ formatMessage(messages.addAccount) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="accounts.length > 0"
+					class="w-full !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					:disabled="loginDisabled"
+					@click="login()"
+				>
+					<PlusIcon />
+					{{ formatMessage(messages.addAccount) }}
+				</Button>
 			</div>
 		</div>
 	</Accordion>
@@ -95,14 +97,16 @@ import {
 import {
 	Accordion,
 	Avatar,
-	ButtonStyled,
+	Button,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Ref } from 'vue'
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
 import {
 	get_default_user,
@@ -111,7 +115,6 @@ import {
 	set_default_user,
 	users,
 } from '@/helpers/auth'
-import { process_listener } from '@/helpers/events'
 import { getPlayerHeadUrl } from '@/helpers/rendering/batch-skin-renderer.ts'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
@@ -248,14 +251,10 @@ async function logout(id: string) {
 	trackEvent('AccountLogOut')
 }
 
-const unlisten = await process_listener(async (e) => {
+useAppEvent('process', async (e) => {
 	if (e.event === 'launched') {
 		await refreshValues()
 	}
-})
-
-onUnmounted(() => {
-	unlisten()
 })
 
 const messages = defineMessages({

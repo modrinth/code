@@ -37,7 +37,7 @@ import type { LocationQueryRaw } from 'vue-router'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import { projectQueryOptions } from '~/composables/queries/project'
+import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import type {
 	ServerInstallModalHandle,
@@ -67,14 +67,15 @@ let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
 const HOVER_DURATION_TO_PREFETCH_MS = 500
 
 const handleProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
-	const slug = result.slug || result.project_id
+	const projectId = result.project_id
 	prefetchTimeout = useTimeoutFn(
 		() => {
-			queryClient.prefetchQuery(projectQueryOptions.v2(slug, client))
-			queryClient.prefetchQuery(projectQueryOptions.v3(result.project_id, client))
-			queryClient.prefetchQuery(projectQueryOptions.members(result.project_id, client))
-			queryClient.prefetchQuery(projectQueryOptions.dependencies(result.project_id, client))
-			queryClient.prefetchQuery(projectQueryOptions.versionsV3(result.project_id, client))
+			warmProjectCheckCaches(queryClient, result)
+			queryClient.prefetchQuery(projectQueryOptions.v2(projectId, client))
+			queryClient.prefetchQuery(projectQueryOptions.v3(projectId, client))
+			queryClient.prefetchQuery(projectQueryOptions.members(projectId, client))
+			queryClient.prefetchQuery(projectQueryOptions.dependencies(projectId, client))
+			queryClient.prefetchQuery(projectQueryOptions.versionsV3(projectId, client))
 		},
 		HOVER_DURATION_TO_PREFETCH_MS,
 		{ immediate: false },
@@ -83,12 +84,13 @@ const handleProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject)
 }
 
 const handleServerProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
-	const slug = result.slug || result.project_id
+	const projectId = result.project_id
 
 	prefetchTimeout = useTimeoutFn(
 		async () => {
-			queryClient.prefetchQuery(projectQueryOptions.v2(slug, client))
-			queryClient.prefetchQuery(projectQueryOptions.v3(slug, client))
+			warmProjectCheckCaches(queryClient, result)
+			queryClient.prefetchQuery(projectQueryOptions.v2(projectId, client))
+			queryClient.prefetchQuery(projectQueryOptions.v3(projectId, client))
 
 			const content = result.minecraft_java_server?.content
 			if (content?.kind === 'modpack' && content.version_id) {
@@ -228,6 +230,19 @@ function parseSearchParams(requestParams: string): Labrinth.Search.SearchParams 
 	}
 }
 
+// Search returns expanded dependency data that no card renders and that isn't part of
+// ResultSearchProject. On modpacks it is ~90% of the response, and everything cached here
+// is serialized into the SSR payload, so drop it before it reaches the query cache.
+function stripUnrenderedFields(
+	hits: Labrinth.Search.v3.ResultSearchProject[],
+): Labrinth.Search.v3.ResultSearchProject[] {
+	return hits.map((hit) => {
+		const { dependencies, dependency_project_ids, compatible_dependency_project_ids, ...rendered } =
+			hit as Labrinth.Search.v3.ResultSearchProject & Record<string, unknown>
+		return rendered as Labrinth.Search.v3.ResultSearchProject
+	})
+}
+
 async function fetchSearch(requestParams: string) {
 	debug('search() called', {
 		requestParams: requestParams.substring(0, 100),
@@ -241,17 +256,19 @@ async function fetchSearch(requestParams: string) {
 
 	debug('search() response', { total_hits: raw.total_hits, hitCount: raw.hits?.length })
 
+	const hits = stripUnrenderedFields(raw.hits ?? [])
+
 	if (isServerType.value) {
 		return {
 			projectHits: [],
-			serverHits: raw.hits,
+			serverHits: hits,
 			total_hits: raw.total_hits,
 			per_page: raw.hits_per_page,
 		}
 	}
 
 	return {
-		projectHits: raw.hits,
+		projectHits: hits,
 		serverHits: [],
 		total_hits: raw.total_hits,
 		per_page: raw.hits_per_page,
@@ -401,6 +418,14 @@ const advancedFiltersCollapsed = computed({
 	},
 })
 
+const dismissedPhotosensitivityFilterWarning = computed({
+	get: () => flags.value.dismissedPhotosensitivityFilterWarning,
+	set: (value) => {
+		flags.value.dismissedPhotosensitivityFilterWarning = value
+		saveFeatureFlags()
+	},
+})
+
 const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 debug('projectTypeId:', projectTypeId.value)
@@ -421,6 +446,15 @@ const searchState = useBrowseSearch({
 	displayMode: resultsDisplayMode,
 })
 setBrowseSearchState(searchState)
+
+// Warm check caches for every visible hit so clicking a result skips /project/{slug}/check
+watch(
+	[() => searchState.projectHits.value, () => searchState.serverHits.value],
+	([projectHits, serverHits]) => {
+		warmProjectCheckCaches(queryClient, [...projectHits, ...serverHits])
+	},
+	{ immediate: true },
+)
 
 watch(
 	() =>
@@ -510,6 +544,7 @@ provideBrowseManager({
 	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
 	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
 	advancedFiltersCollapsed,
+	dismissedPhotosensitivityFilterWarning,
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,

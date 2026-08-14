@@ -1,27 +1,25 @@
 <script setup>
-import { XIcon } from '@modrinth/assets'
+import { FolderOpenIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	FileTreeSelect,
 	injectNotificationManager,
+	injectPopupNotificationManager,
 	NewModal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { save } from '@tauri-apps/plugin-dialog'
-import { readDir, stat } from '@tauri-apps/plugin-fs'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 import { PackageIcon } from '@/assets/icons'
-import {
-	export_instance_mrpack,
-	get_full_path,
-	get_pack_export_candidates,
-} from '@/helpers/instance'
+import { export_instance_mrpack, get_pack_export_candidates } from '@/helpers/instance'
+import { highlightInFolder } from '@/helpers/utils'
 
 const { handleError } = injectNotificationManager()
+const popupNotificationManager = injectPopupNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -44,6 +42,14 @@ const messages = defineMessages({
 		defaultMessage: 'Enter modpack description...',
 	},
 	exportButton: { id: 'app.export-modal.export-button', defaultMessage: 'Export' },
+	exportComplete: {
+		id: 'app.export-modal.export-complete',
+		defaultMessage: 'Export complete',
+	},
+	exportCompleteDescription: {
+		id: 'app.export-modal.export-complete-description',
+		defaultMessage: '{name} was exported successfully.',
+	},
 })
 
 const props = defineProps({
@@ -65,30 +71,24 @@ const exportModal = ref(null)
 const nameInput = ref(props.instance.name)
 const exportDescription = ref('')
 const versionInput = ref('1.0.0')
-const files = ref([])
-const selectedFilePaths = ref([])
+const files = shallowRef([])
+const includedFilePaths = ref([])
+const excludedFilePaths = ref([])
 const fileTreeKey = ref(0)
 const filesLoadId = ref(0)
-const instanceRoot = ref('')
-const loadedDirectories = ref(new Set())
+const directoryEntries = new Map()
+const currentDirectory = ref('')
 
 async function initFiles() {
 	const loadId = ++filesLoadId.value
-	const [filePaths, root] = await Promise.all([
-		get_pack_export_candidates(props.instance.id),
-		get_full_path(props.instance.id),
-	])
-	if (loadId !== filesLoadId.value) return
-
-	instanceRoot.value = root
-	const exportCandidates = await Promise.all(
-		filePaths.map((path) => buildExportCandidateItem(root, path)),
-	)
+	const exportCandidates = await get_pack_export_candidates(props.instance.id)
 	if (loadId !== filesLoadId.value) return
 
 	files.value = exportCandidates
-	selectedFilePaths.value = files.value
-		.filter((file) => !file.disabled && isDefaultSelectedExportCandidate(file.path))
+	directoryEntries.set('', exportCandidates)
+	currentDirectory.value = ''
+	includedFilePaths.value = files.value
+		.filter((file) => !file.disabled && file.defaultSelected)
 		.map((file) => file.path)
 }
 
@@ -104,15 +104,35 @@ const exportPack = async () => {
 	})
 
 	if (outputPath) {
-		export_instance_mrpack(
-			props.instance.id,
-			outputPath,
-			selectedFilePaths.value,
-			versionInput.value,
-			exportDescription.value,
-			nameInput.value,
-		).catch((err) => handleError(err))
 		exportModal.value.hide()
+
+		try {
+			await export_instance_mrpack(
+				props.instance.id,
+				outputPath,
+				includedFilePaths.value,
+				excludedFilePaths.value,
+				versionInput.value,
+				exportDescription.value,
+				nameInput.value,
+			)
+
+			const fileName = outputPath.split(/[\\/]/).pop() ?? outputPath
+			popupNotificationManager.addPopupNotification({
+				title: formatMessage(messages.exportComplete),
+				text: formatMessage(messages.exportCompleteDescription, { name: fileName }),
+				type: 'success',
+				buttons: [
+					{
+						label: formatMessage(commonMessages.openInFolderButton),
+						icon: FolderOpenIcon,
+						action: () => highlightInFolder(outputPath).catch(handleError),
+					},
+				],
+			})
+		} catch (error) {
+			handleError(error)
+		}
 	}
 }
 
@@ -121,114 +141,44 @@ function resetExportState() {
 	exportDescription.value = ''
 	versionInput.value = '1.0.0'
 	files.value = []
-	selectedFilePaths.value = []
+	includedFilePaths.value = []
+	excludedFilePaths.value = []
 	fileTreeKey.value += 1
-	instanceRoot.value = ''
-	loadedDirectories.value = new Set()
+	directoryEntries.clear()
+	currentDirectory.value = ''
 }
 
 async function loadExportDirectory(path) {
-	if (!path || !instanceRoot.value || loadedDirectories.value.has(path)) return
+	const normalizedPath = normalizeExportPath(path)
+	currentDirectory.value = normalizedPath
+
+	const cachedEntries = directoryEntries.get(normalizedPath)
+	if (cachedEntries) {
+		files.value = cachedEntries
+		return
+	}
 
 	const loadId = filesLoadId.value
-	loadedDirectories.value.add(path)
+	files.value = []
 
 	try {
-		const entries = await readDir(`${instanceRoot.value}/${path}`)
-		const childItems = await Promise.all(
-			entries.map((entry) => buildExportDirectoryChildItem(instanceRoot.value, path, entry)),
+		const childItems = await get_pack_export_candidates(
+			props.instance.id,
+			normalizedPath || undefined,
 		)
 		if (loadId !== filesLoadId.value) return
 
-		appendExportItems(childItems)
-	} catch {
-		loadedDirectories.value.delete(path)
-	}
-}
-
-async function buildExportCandidateItem(instanceRoot, path) {
-	try {
-		const entries = await readDir(`${instanceRoot}/${path}`)
-		const metadata = await getExportCandidateMetadata(instanceRoot, path)
-		return {
-			path,
-			type: 'directory',
-			disabled: isExportCandidateDisabled(path),
-			modified: metadata.modified,
-			count: entries.length,
+		directoryEntries.set(normalizedPath, childItems)
+		if (currentDirectory.value === normalizedPath) {
+			files.value = childItems
 		}
 	} catch {
-		return buildExportFileItem(instanceRoot, path)
-	}
-}
-
-async function buildExportDirectoryChildItem(instanceRoot, parentPath, entry) {
-	const path = `${parentPath}/${entry.name}`
-	if (entry.isDirectory) {
-		const metadata = await getExportCandidateMetadata(instanceRoot, path)
-		return {
-			path,
-			type: 'directory',
-			disabled: isExportCandidateDisabled(path),
-			modified: metadata.modified,
-		}
-	}
-
-	return buildExportFileItem(instanceRoot, path)
-}
-
-async function buildExportFileItem(instanceRoot, path) {
-	const metadata = await getExportCandidateMetadata(instanceRoot, path)
-	return {
-		path,
-		type: 'file',
-		disabled: isExportCandidateDisabled(path),
-		size: metadata.size,
-		modified: metadata.modified,
-	}
-}
-
-function appendExportItems(items) {
-	const nextFiles = new Map(files.value.map((file) => [normalizeExportPath(file.path), file]))
-	for (const item of items) {
-		nextFiles.set(normalizeExportPath(item.path), item)
-	}
-	files.value = [...nextFiles.values()]
-}
-
-async function getExportCandidateMetadata(instanceRoot, path) {
-	try {
-		const metadata = await stat(`${instanceRoot}/${path}`)
-		return {
-			size: metadata.size,
-			modified: metadata.mtime ? Math.floor(metadata.mtime.getTime() / 1000) : undefined,
-		}
-	} catch {
-		return {}
+		if (currentDirectory.value === normalizedPath) files.value = []
 	}
 }
 
 function normalizeExportPath(path) {
 	return path.replaceAll('\\', '/').split('/').filter(Boolean).join('/')
-}
-
-function isDefaultSelectedExportCandidate(path) {
-	return (
-		path.startsWith('mods') ||
-		path.startsWith('datapacks') ||
-		path.startsWith('resourcepacks') ||
-		path.startsWith('shaderpacks') ||
-		path.startsWith('config')
-	)
-}
-
-function isExportCandidateDisabled(path) {
-	return (
-		path === 'profile.json' ||
-		path.startsWith('modrinth_logs') ||
-		path.startsWith('.fabric') ||
-		path.startsWith('__MACOSX')
-	)
 }
 </script>
 
@@ -278,26 +228,24 @@ function isExportCandidateDisabled(path) {
 			</div>
 			<FileTreeSelect
 				:key="fileTreeKey"
-				v-model="selectedFilePaths"
+				v-model="includedFilePaths"
+				v-model:excluded-paths="excludedFilePaths"
 				class="min-w-0"
 				:items="files"
+				lazy
 				@navigate="loadExportDirectory"
 			/>
 		</div>
 		<template #actions>
 			<div class="flex items-center justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="exportModal.hide">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button @click="exportPack">
-						<PackageIcon />
-						{{ formatMessage(messages.exportButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="exportModal.hide">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" @click="exportPack">
+					<PackageIcon />
+					{{ formatMessage(messages.exportButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>

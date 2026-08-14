@@ -1,7 +1,17 @@
 import type { ISO3166, Labrinth } from '@modrinth/api-client'
 import type { DisplayProjectType } from '@modrinth/utils'
 
-import generatedState from '~/generated/state.json'
+import {
+	apiUrl,
+	categories,
+	donationPlatforms,
+	errors,
+	gameVersions,
+	lastGenerated,
+	loaders,
+	reportTypes,
+	taxComplianceThresholds,
+} from '~/generated/state.json'
 import type { DisplayMode } from '~/plugins/cosmetics'
 
 export interface ProjectType {
@@ -23,7 +33,25 @@ export interface LoaderData {
 export type Country = ISO3166.Country
 export type Subdivision = ISO3166.Subdivision
 
-export interface GeneratedState extends Labrinth.State.GeneratedState {
+/**
+ * Route-specific slices of the generated state are deliberately excluded here.
+ * Anything placed on `useGeneratedState` is serialized into the SSR payload of
+ * every page, so large fields must be imported directly by the pages that need
+ * them instead (see `useCountries`, `useSubdivisions`, `~/generated/state.json`).
+ */
+type GloballyUsedState = Omit<
+	Labrinth.State.GeneratedState,
+	| 'countries'
+	| 'subdivisions'
+	| 'muralBankDetails'
+	| 'tremendousIdMap'
+	| 'homePageProjects'
+	| 'homePageSearch'
+	| 'homePageNotifs'
+	| 'products'
+>
+
+export interface GeneratedState extends GloballyUsedState {
 	// Additional runtime-defined fields not from the API
 	projectTypes: ProjectType[]
 	loaderData: LoaderData
@@ -40,26 +68,22 @@ export interface GeneratedState extends Labrinth.State.GeneratedState {
 }
 
 /**
- * Composable for accessing the complete generated state.
- * This includes both fetched data and runtime-defined constants.
+ * Built once per module load rather than via `useState`, because every `useState` value is
+ * serialized into the SSR payload of every page. This is build-time constant data that the
+ * client already has via the static import above, so putting it in the payload would ship a
+ * second copy for no benefit.
+ *
+ * Consequence: on the server this object is shared by every request in the isolate, so it must
+ * stay immutable there. Runtime refreshes are client-only and go through `setGameVersions`.
  */
-export const useGeneratedState = () =>
-	useState<GeneratedState>('generatedState', () => ({
+const generatedState = shallowRef<GeneratedState>(
+	Object.freeze({
 		// Cast JSON data to typed API responses
-		categories: (generatedState.categories ?? []) as Labrinth.Tags.v2.Category[],
-		loaders: (generatedState.loaders ?? []) as Labrinth.Tags.v2.Loader[],
-		gameVersions: (generatedState.gameVersions ?? []) as Labrinth.Tags.v2.GameVersion[],
-		donationPlatforms: (generatedState.donationPlatforms ??
-			[]) as Labrinth.Tags.v2.DonationPlatform[],
-		reportTypes: (generatedState.reportTypes ?? []) as string[],
-		muralBankDetails: generatedState.muralBankDetails as
-			| Record<string, { bankNames: string[] }>
-			| undefined,
-		tremendousIdMap: generatedState.tremendousIdMap as
-			| Record<string, { name: string; image_url: string | null }>
-			| undefined,
-		countries: (generatedState.countries ?? []) as ISO3166.Country[],
-		subdivisions: (generatedState.subdivisions ?? {}) as Record<string, ISO3166.Subdivision[]>,
+		categories: (categories ?? []) as Labrinth.Tags.v2.Category[],
+		loaders: (loaders ?? []) as Labrinth.Tags.v2.Loader[],
+		gameVersions: (gameVersions ?? []) as Labrinth.Tags.v2.GameVersion[],
+		donationPlatforms: (donationPlatforms ?? []) as Labrinth.Tags.v2.DonationPlatform[],
+		reportTypes: (reportTypes ?? []) as string[],
 
 		projectTypes: [
 			{
@@ -121,20 +145,31 @@ export const useGeneratedState = () =>
 		rejectedStatuses: ['rejected', 'withheld'],
 		staffRoles: ['moderator', 'admin'],
 
-		homePageProjects: generatedState.homePageProjects as unknown as
-			| Labrinth.Projects.v2.Project[]
-			| undefined,
-		homePageSearch: generatedState.homePageSearch as Labrinth.Search.v2.SearchResults | undefined,
-		homePageNotifs: generatedState.homePageNotifs as Labrinth.Search.v2.SearchResults | undefined,
-		products: generatedState.products as Labrinth.Billing.Internal.Product[] | undefined,
-		taxComplianceThresholds: (generatedState.taxComplianceThresholds ?? {}) as Record<
-			string,
-			number
-		>,
+		taxComplianceThresholds: (taxComplianceThresholds ?? {}) as Record<string, number>,
 
-		lastGenerated: generatedState.lastGenerated,
-		apiUrl: generatedState.apiUrl,
-		errors: generatedState.errors,
+		lastGenerated,
+		apiUrl,
+		errors,
 
 		buildYear: new Date().getFullYear(),
-	}))
+	}) as GeneratedState,
+)
+
+/**
+ * Composable for accessing the globally used generated state.
+ * This includes both fetched data and runtime-defined constants.
+ */
+export const useGeneratedState = () => generatedState
+
+/**
+ * Replaces the build-time game versions with a freshly fetched list. Client-only: mutating this
+ * on the server would leak across every request sharing the isolate.
+ */
+export function setGameVersions(versions: Labrinth.Tags.v2.GameVersion[]) {
+	if (import.meta.server) return
+
+	generatedState.value = Object.freeze({
+		...generatedState.value,
+		gameVersions: versions,
+	}) as GeneratedState
+}

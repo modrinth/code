@@ -59,12 +59,6 @@ pub enum AuthenticationError {
     Url,
 }
 
-impl From<xredis::Error> for AuthenticationError {
-    fn from(error: xredis::Error) -> Self {
-        Self::Database(error.into())
-    }
-}
-
 impl actix_web::ResponseError for AuthenticationError {
     fn status_code(&self) -> StatusCode {
         match self {

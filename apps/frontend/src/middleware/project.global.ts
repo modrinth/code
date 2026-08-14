@@ -1,5 +1,5 @@
 import { useGeneratedState } from '~/composables/generated'
-import { projectQueryOptions } from '~/composables/queries/project'
+import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queries/project'
 import { useAppQueryClient } from '~/composables/query-client'
 import { createModrinthClient } from '~/helpers/api.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
@@ -20,11 +20,11 @@ const PROJECT_TYPES = [
 
 export default defineNuxtRouteMiddleware(async (to) => {
 	const routeProjectParam = to.params.project
-	const projectId = Array.isArray(routeProjectParam) ? routeProjectParam[0] : routeProjectParam
+	const routeParam = Array.isArray(routeProjectParam) ? routeProjectParam[0] : routeProjectParam
 	const routeType = Array.isArray(to.params.type) ? to.params.type[0] : to.params.type
 
 	// Only handle project routes
-	if (!projectId || !routeType || !PROJECT_TYPES.includes(routeType)) {
+	if (!routeParam || !routeType || !PROJECT_TYPES.includes(routeType)) {
 		return
 	}
 
@@ -35,7 +35,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	if (import.meta.client) startLoading()
 
 	try {
-		// Fetch v2 and v3 in parallel — cache both for the page's useQuery calls
+		// Resolve slug/ID to the canonical project ID, then fetch by ID only
+		const { id: projectId } = await queryClient.fetchQuery(
+			projectQueryOptions.check(routeParam, client),
+		)
+
+		warmProjectCheckCaches(queryClient, { id: projectId })
+
 		const [project, projectV3] = await Promise.all([
 			queryClient.fetchQuery(projectQueryOptions.v2(projectId, client)),
 			queryClient.fetchQuery(projectQueryOptions.v3(projectId, client)),
@@ -44,15 +50,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		// Let page handle 404
 		if (!project) return
 
-		// Cache by slug if we looked up by ID (or vice versa)
-		if (projectId !== project.slug) {
-			queryClient.setQueryData(['project', 'v2', project.slug], project)
-			queryClient.setQueryData(['project', 'v3', project.slug], projectV3)
-		}
-		if (projectId !== project.id) {
-			queryClient.setQueryData(['project', 'v2', project.id], project)
-			queryClient.setQueryData(['project', 'v3', project.id], projectV3)
-		}
+		warmProjectCheckCaches(queryClient, project)
 
 		const projectType = projectV3.minecraft_server != null ? 'server' : project.project_type
 		// Determine the correct URL type
