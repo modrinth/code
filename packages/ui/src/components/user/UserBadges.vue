@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	AlphaBadge,
 	BetaBadge,
+	ContributorBadge,
 	Downloads1mBadge,
 	Downloads10mBadge,
 	Downloads25mBadge,
@@ -20,7 +21,9 @@ import {
 	ModeratorBadge,
 	PlusBadge,
 	PrideBadge,
+	ProofreaderBadge,
 	StaffBadge,
+	TranslatorBadge,
 } from '@modrinth/assets'
 import {
 	defineMessage,
@@ -174,6 +177,84 @@ const BADGES = [
 			message: defineMessage({
 				id: 'user.profile.badge.beta.link',
 				defaultMessage: `Click to read about the launch of Modrinth Beta.`,
+			}),
+		},
+	},
+	{
+		icon: ContributorBadge,
+		name: defineMessage({
+			id: 'user.profile.badge.contributor.name',
+			defaultMessage: 'Contributor',
+		}),
+		about: [
+			defineMessage({
+				id: 'user.profile.badge.contributor.about.1',
+				defaultMessage: `This user has contributed code to Modrinth's open source projects.`,
+			}),
+		],
+		criteria: [
+			{
+				type: 'badge',
+				bitflag: BadgeBitflag.CONTRIBUTOR,
+			},
+		],
+		link: {
+			href: 'https://github.com/modrinth/code',
+			message: defineMessage({
+				id: 'user.profile.badge.contributor.link',
+				defaultMessage: `Click to view Modrinth's source code on GitHub.`,
+			}),
+		},
+	},
+	{
+		icon: TranslatorBadge,
+		name: defineMessage({
+			id: 'user.profile.badge.translator.name',
+			defaultMessage: 'Translator',
+		}),
+		about: [
+			defineMessage({
+				id: 'user.profile.badge.translator.about.1',
+				defaultMessage: `This user has helped translate Modrinth into other languages.`,
+			}),
+		],
+		criteria: [
+			{
+				type: 'badge',
+				bitflag: BadgeBitflag.TRANSLATOR,
+			},
+		],
+		link: {
+			href: 'https://crowdin.com/project/modrinth',
+			message: defineMessage({
+				id: 'user.profile.badge.translator.link',
+				defaultMessage: `Click to help translate Modrinth on Crowdin.`,
+			}),
+		},
+	},
+	{
+		icon: ProofreaderBadge,
+		name: defineMessage({
+			id: 'user.profile.badge.proofreader.name',
+			defaultMessage: 'Proofreader',
+		}),
+		about: [
+			defineMessage({
+				id: 'user.profile.badge.proofreader.about.1',
+				defaultMessage: `This user has helped proofread translations of Modrinth into other languages.`,
+			}),
+		],
+		criteria: [
+			{
+				type: 'badge',
+				bitflag: BadgeBitflag.PROOFREADER,
+			},
+		],
+		link: {
+			href: 'https://crowdin.com/project/modrinth',
+			message: defineMessage({
+				id: 'user.profile.badge.proofreader.link',
+				defaultMessage: `Click to help translate Modrinth on Crowdin.`,
 			}),
 		},
 	},
