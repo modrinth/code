@@ -232,6 +232,13 @@ pub async fn paypal_webhook(
             None,
         )
         .await
+        // Make deserialization errors yield a 5xx instead of a 400. For
+        // webhooks, the server must respect the client's request schema rather
+        // than requiring the client to conform to the server's schema.
+        .map_err(|error| match error {
+            ApiError::Request(report) => ApiError::Internal(report),
+            error => error,
+        })
         .wrap_api_err("verifying PayPal webhook signature")?;
 
     if &webhook_res.verification_status != "SUCCESS" {
@@ -242,7 +249,7 @@ pub async fn paypal_webhook(
 
     #[derive(Deserialize)]
     struct PayPalResource {
-        pub payout_item_id: String,
+        pub payout_item_id: Option<String>,
     }
 
     #[derive(Deserialize)]
@@ -252,7 +259,7 @@ pub async fn paypal_webhook(
     }
 
     let webhook = serde_json::from_str::<PayPalWebhook>(&body)
-        .wrap_request_err("deserializing JSON data")?;
+        .wrap_internal_err("deserializing PayPal webhook JSON data")?;
 
     match &*webhook.event_type {
         "PAYMENT.PAYOUTS-ITEM.BLOCKED"
@@ -260,6 +267,13 @@ pub async fn paypal_webhook(
         | "PAYMENT.PAYOUTS-ITEM.REFUNDED"
         | "PAYMENT.PAYOUTS-ITEM.RETURNED"
         | "PAYMENT.PAYOUTS-ITEM.CANCELED" => {
+            let payout_item_id = webhook
+                .resource
+                .payout_item_id
+                .as_deref()
+                .wrap_internal_err(
+                    "PayPal payout item webhook is missing `payout_item_id`",
+                )?;
             let mut transaction = pool
                 .begin()
                 .await
@@ -267,7 +281,7 @@ pub async fn paypal_webhook(
 
             let result = sqlx::query!(
                 "SELECT user_id, amount, fee FROM payouts WHERE platform_id = $1 AND status = $2",
-                webhook.resource.payout_item_id,
+                payout_item_id,
                 PayoutStatus::InTransit.as_str()
             )
             .fetch_optional(&mut transaction)
@@ -286,7 +300,7 @@ pub async fn paypal_webhook(
                         PayoutStatus::Failed
                     }
                     .as_str(),
-                    webhook.resource.payout_item_id
+                    payout_item_id
                 )
                 .execute(&mut transaction)
                 .await
@@ -309,6 +323,13 @@ pub async fn paypal_webhook(
             }
         }
         "PAYMENT.PAYOUTS-ITEM.SUCCEEDED" => {
+            let payout_item_id = webhook
+                .resource
+                .payout_item_id
+                .as_deref()
+                .wrap_internal_err(
+                    "PayPal payout item webhook is missing `payout_item_id`",
+                )?;
             let mut transaction = pool
                 .begin()
                 .await
@@ -320,7 +341,7 @@ pub async fn paypal_webhook(
                 WHERE platform_id = $2
                 ",
                 PayoutStatus::Success.as_str(),
-                webhook.resource.payout_item_id
+                payout_item_id
             )
             .execute(&mut transaction)
             .await
