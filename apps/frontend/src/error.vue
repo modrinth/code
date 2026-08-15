@@ -97,39 +97,16 @@ import {
 	LoadingBar,
 	normalizeChildren,
 	NotificationPanel,
-	provideModrinthClient,
-	provideNotificationManager,
-	providePageContext,
 	useVIntl,
 } from '@modrinth/ui'
 
 import Logo404 from '~/assets/images/404.svg'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { logout } from '~/composables/user.js'
-
-import { createModrinthClient } from './helpers/api.ts'
-import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
-import { setupLoadingStateProvider } from './providers/setup/loading-state.ts'
+import { setupProviders } from '~/providers/setup.ts'
 
 const auth = await useAuth()
-const config = useRuntimeConfig()
-
-provideNotificationManager(new FrontendNotificationManager())
-setupLoadingStateProvider()
-
-const client = createModrinthClient(auth.value, {
-	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
-	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
-	sharedInstancesBaseUrl: config.public.sharedInstancesBaseUrl,
-	rateLimitKey: config.rateLimitKey,
-})
-provideModrinthClient(client)
-providePageContext({
-	hierarchicalSidebarAvailable: ref(false),
-	showAds: ref(false),
-	adConsentAvailable: ref(false),
-	openExternalUrl: (url) => window.open(url, '_blank'),
-})
+setupProviders(auth)
 
 const { formatMessage } = useVIntl()
 

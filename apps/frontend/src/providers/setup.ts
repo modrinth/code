@@ -7,6 +7,7 @@ import { setupLoadingStateProvider } from './setup/loading-state'
 import { setupModrinthClientProvider } from './setup/modrinth-client'
 import { setupPageContextProvider } from './setup/page-context'
 import { setupTagsProvider } from './setup/tags'
+import { setupUserCountryProvider } from './setup/user-country'
 
 export function setupProviders(auth: Awaited<ReturnType<typeof useAuth>>) {
 	provideNotificationManager(new FrontendNotificationManager())
@@ -17,4 +18,5 @@ export function setupProviders(auth: Awaited<ReturnType<typeof useAuth>>) {
 	setupFilePickerProvider()
 	setupPageContextProvider()
 	setupLoadingStateProvider()
+	setupUserCountryProvider()
 }
