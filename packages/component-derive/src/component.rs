@@ -32,7 +32,7 @@ pub fn derive(input: &DeriveInput) -> Result<TokenStream> {
 
     let fields = &fields.fields;
     let struct_serial = struct_serial(&vis, &ident, fields)?;
-    let struct_edit = struct_edit(&vis, &ident, fields)?;
+    let struct_partial = struct_partial(&vis, &ident, fields)?;
 
     // `#[validate(nested)]` needs `Validate` in scope; `as _` avoids a name clash
     let validate_import = if fields.iter().any(|field| field.nested) {
@@ -45,7 +45,7 @@ pub fn derive(input: &DeriveInput) -> Result<TokenStream> {
         #validate_import
 
         #struct_serial
-        #struct_edit
+        #struct_partial
     })
 }
 
@@ -104,12 +104,12 @@ fn struct_serial(
     })
 }
 
-fn struct_edit(
+fn struct_partial(
     vis: &Visibility,
     ident: &Ident,
     fields: &[ComponentField],
 ) -> Result<TokenStream> {
-    let ident_edit = format_ident!("Edit{ident}");
+    let ident_partial = format_ident!("Partial{ident}");
 
     let (fields, apply_fields): (Vec<_>, Vec<_>) = fields
         .iter()
@@ -127,7 +127,7 @@ fn struct_edit(
             let attrs = &field.attrs;
 
             let (inner_ty, apply_value, validate_attr) = if field.nested {
-                let inner_ty = match nested_type(ty, "Edit") {
+                let inner_ty = match nested_type(ty, "Partial") {
                     Ok(inner_ty) => inner_ty,
                     Err(err) => return Some(Err(err)),
                 };
@@ -188,11 +188,11 @@ fn struct_edit(
             ::validator::Validate,
             ::utoipa::ToSchema,
         )]
-        #vis struct #ident_edit {
+        #vis struct #ident_partial {
             #(#fields),*
         }
 
-        impl #ident_edit {
+        impl #ident_partial {
             pub fn apply_to(
                 self,
                 component: &mut #ident,
