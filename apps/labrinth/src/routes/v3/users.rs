@@ -392,11 +392,13 @@ pub async fn get_user_preferences(
         &session_queue,
         Scopes::USER_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .wrap_not_found_err("resource not found")?;
 
     if requester.id != target.id.into() && !requester.role.is_mod() {
         return Err(ApiError::Auth(eyre!(
@@ -433,11 +435,13 @@ pub async fn edit_user_preferences(
         &session_queue,
         Scopes::USER_WRITE,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .wrap_not_found_err("resource not found")?;
 
     if requester.id != target.id.into() && !requester.role.is_mod() {
         return Err(ApiError::Auth(eyre!(
@@ -445,7 +449,10 @@ pub async fn edit_user_preferences(
         )));
     }
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let mut preferences = DBUserPreferences::get(target.id, &mut txn)
         .await
@@ -458,7 +465,9 @@ pub async fn edit_user_preferences(
         .await
         .wrap_internal_err("failed to update user preferences")?;
 
-    txn.commit().await?;
+    txn.commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(web::Json(preferences))
 }
