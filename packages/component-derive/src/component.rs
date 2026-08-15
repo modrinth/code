@@ -54,7 +54,7 @@ fn struct_serial(
     ident: &Ident,
     fields: &[ComponentField],
 ) -> Result<TokenStream> {
-    let ident_serial = format_ident!("{ident}Serial");
+    let ident_serial = format_ident!("Serial{ident}");
 
     let fields = fields
         .iter()
@@ -109,7 +109,7 @@ fn struct_edit(
     ident: &Ident,
     fields: &[ComponentField],
 ) -> Result<TokenStream> {
-    let ident_edit = format_ident!("{ident}Edit");
+    let ident_edit = format_ident!("Edit{ident}");
 
     let (fields, apply_fields): (Vec<_>, Vec<_>) = fields
         .iter()
@@ -203,12 +203,12 @@ fn struct_edit(
     })
 }
 
-fn nested_type(ty: &Type, suffix: &str) -> Result<TokenStream> {
+fn nested_type(ty: &Type, prefix: &str) -> Result<TokenStream> {
     if let Type::Path(path) = ty
         && let Some(segment) = path.path.segments.last()
     {
         // FIXME: Validate that nested type also derives component, prob by checking for component impl
-        let nested = format_ident!("{}{}", segment.ident, suffix);
+        let nested = format_ident!("{}{}", prefix, segment.ident);
         Ok(quote! { #nested })
     } else {
         Err(Error::new_spanned(
