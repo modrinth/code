@@ -160,7 +160,7 @@ fn struct_partial(
                     )]
                 }
             } else {
-                quote! { #[serde(default)] }
+                quote! { #[serde(default, skip_serializing_if = "::core::option::Option::is_none")] }
             };
 
             Some(Ok((
