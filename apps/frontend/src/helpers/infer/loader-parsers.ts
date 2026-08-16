@@ -6,6 +6,7 @@ import type { GameVersion, InferredVersionInfo, Project } from './infer'
 import {
 	getGameVersionsMatchingMavenRange,
 	getGameVersionsMatchingSemverRange,
+	semverRangeIntersects,
 } from './version-ranges'
 import { versionType } from './version-utils'
 
@@ -132,38 +133,73 @@ export function createLoaderParsers(
 				),
 			}
 		},
-		// Fabric (or Babric for mc version beta 1.7.3)
-		'fabric.mod.json': (file: string): InferredVersionInfo => {
+		// Fabric (or its derivatives: Babric, Legacy Fabric, Ornithe)
+		'fabric.mod.json': async (file: string, zip: JSZip): Promise<InferredVersionInfo> => {
 			const metadata = JSON.parse(file) as any
 
 			const mcDependency = metadata.depends?.minecraft
 			const mcDependencies = Array.isArray(mcDependency) ? mcDependency : [mcDependency]
 
 			let detectedGameVersions = metadata.depends
-				? getGameVersionsMatchingSemverRange(metadata.depends.minecraft, simplifiedGameVersions)
+				? getGameVersionsMatchingSemverRange(mcDependency, simplifiedGameVersions)
 				: []
 			const loaders: string[] = []
 
-			// Detect Beta 1.7.3 -> Babric
-			const hasBabricVersion = mcDependencies.some(
-				(version: string | undefined) => version?.includes('1.0.0-beta.7.3'), // this is fabric's normalized mc version format
-			)
+			// Both Legacy Fabric and Ornithe add details about their intermediary to the jar manifest
+			const manifestFile = zip.file('META-INF/MANIFEST.MF')
+			if (manifestFile !== null) {
+				const manifestText = await manifestFile.async('text')
+				if (manifestText.match(/^Legacy-Fabric-Intermediary-Version: (.*)$/)) {
+					loaders.push('legacy-fabric')
+				}
+				if (manifestText.match(/^Calamus-Generation: (.*)$/)) {
+					loaders.push('ornithe')
+				}
+			}
 
-			// Detect 1.3-1.13 -> legacy-fabric
-			const hasLegacyVersions = detectedGameVersions.some((version) => {
-				const match = version.match(/^1\.(\d+)/)
-				return match && parseInt(match[1]) >= 3 && parseInt(match[1]) <= 13
-			})
+			// fall back to version comparison if nothing found in jar manifest
+			if (loaders.length == 0) {
+				// Fabric and its derivates all support different version ranges
+				// - Fabric supports 18w43b and later
+				// - Legacy Fabric supports (almost) only release versions 1.3-1.13.2
+				// - Ornithe supports versions up to 1.14.4
+				// - Babric supports only b1.7.3
+				// These ranges overlap but given the jar manifest logic above the only likely overlap scenarios are
+				// - a b1.7.3 mod that could be Ornithe but is most likely Babric
+				// - a Fabric mod that is dependent on "*" (i.e. all versions)
+				// In other cases, resolve as follows:
+				// 1. if the dependency falls entirely in >=1.3 <=1.13.2, assume Legacy Fabric
+				// 2. if the dependency falls entirely in <=18w43a, assume Ornithe
 
-			if (hasBabricVersion) {
-				loaders.push('babric')
-				detectedGameVersions = gameVersions
-					.filter((version) => version.version === 'b1.7.3')
-					.map((version) => version.version)
-			} else if (hasLegacyVersions) {
-				loaders.push('legacy-fabric')
-			} else {
-				loaders.push('fabric')
+				// dependency version strings are normalized to be Semver 2.0.0 compliant through
+				// https://github.com/FabricMC/fabric-loader/blob/master/minecraft/src/main/java/net/fabricmc/loader/impl/game/minecraft/McVersionLookup.java
+
+				// assume Babric only if dependent on b1.7.3 exactly
+				const hasBabricVersion = mcDependencies.every(
+					(version: string | undefined) => version == '1.0.0-beta.7.3',
+				)
+
+				// Legacy Fabric supports (almost) only release versions which is easy to check
+				const hasLegacyFabricVersions = detectedGameVersions.every((version) => {
+					const match = version.match(/^1\.(\d+)/)
+					return match && parseInt(match[1]) >= 3 && parseInt(match[1]) <= 13
+				})
+
+				// Assume Ornithe only if the dependency range falls entirely into <18w43b
+				const hasOrnitheVersions = !semverRangeIntersects(mcDependencies, '>=1.14.0-alpha.18.43.b')
+
+				if (hasBabricVersion) {
+					loaders.push('babric')
+					detectedGameVersions = gameVersions
+						.filter((version) => version.version === 'b1.7.3')
+						.map((version) => version.version)
+				} else if (hasLegacyFabricVersions) {
+					loaders.push('legacy-fabric')
+				} else if (hasOrnitheVersions) {
+					loaders.push('ornithe')
+				} else {
+					loaders.push('fabric')
+				}
 			}
 
 			return {
@@ -174,23 +210,56 @@ export function createLoaderParsers(
 				game_versions: detectedGameVersions,
 			}
 		},
-		// Quilt
-		'quilt.mod.json': (file: string): InferredVersionInfo => {
+		// Quilt (or its derivatives: Ornithe)
+		'quilt.mod.json': async (file: string, zip: JSZip): Promise<InferredVersionInfo> => {
 			const metadata = JSON.parse(file) as any
+
+			const mcDependency = metadata.quilt_loader.depends?.find(
+				(x: any) => x.id === 'minecraft',
+			)?.versions
+			const mcDependencies = Array.isArray(mcDependency) ? mcDependency : [mcDependency]
+
+			const detectedGameVersions = metadata.quilt_loader.depends
+				? getGameVersionsMatchingSemverRange(mcDependency, simplifiedGameVersions)
+				: []
+			const loaders: string[] = []
+
+			// Ornithe add details about their intermediary to the jar manifest
+			const manifestFile = zip.file('META-INF/MANIFEST.MF')
+			if (manifestFile !== null) {
+				const manifestText = await manifestFile.async('text')
+				if (manifestText.match(/^Calamus-Generation: (.*)$/)) {
+					loaders.push('ornithe')
+				}
+			}
+
+			// fall back to version comparison if nothing found in jar manifest
+			if (loaders.length == 0) {
+				// Quilt and its derivates all support different version ranges
+				// - Quilt supports 1.14.4 and later
+				// - Ornithe supports versions up to 1.14.4
+				// These ranges overlap but given the jar manifest logic above
+				// we can simply prioritize Quilt for the small overlap range
+
+				// dependency version strings are normalized to be Semver 2.0.0 compliant through
+				// https://github.com/QuiltMC/quilt-loader/blob/develop/minecraft/src/main/java/org/quiltmc/loader/impl/game/minecraft/McVersionLookup.java
+
+				// Assume Ornithe only if the dependency range falls entirely into <1.14.4`
+				const hasOrnitheVersions = !semverRangeIntersects(mcDependencies, '>=1.14.4')
+
+				if (hasOrnitheVersions) {
+					loaders.push('ornithe')
+				} else {
+					loaders.push('quilt')
+				}
+			}
 
 			return {
 				name: `${project.title} ${metadata.quilt_loader.version}`,
 				version_number: metadata.quilt_loader.version,
-				loaders: ['quilt'],
+				loaders,
 				version_type: versionType(metadata.quilt_loader.version),
-				game_versions: metadata.quilt_loader.depends
-					? getGameVersionsMatchingSemverRange(
-							metadata.quilt_loader.depends.find((x: any) => x.id === 'minecraft')
-								? metadata.quilt_loader.depends.find((x: any) => x.id === 'minecraft').versions
-								: [],
-							simplifiedGameVersions,
-						)
-					: [],
+				game_versions: detectedGameVersions,
 			}
 		},
 		// Bukkit + Other Forks
