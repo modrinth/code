@@ -4322,11 +4322,20 @@
   "report.not-for.dmca.description": {
     "message": "See our <policy-link>Copyright Policy</policy-link>."
   },
+  "report.note.ai-images.1": {
+    "message": "We've just updated our rules to prohibit AI-generated images in icons, galleries, and descriptions. We're giving creators a grace period to remove AI images from their projects before we begin accepting reports for them."
+  },
+  "report.note.check-back-later": {
+    "message": "Check back later once the grace period has ended. Reports of this type are not being accepted at this time."
+  },
   "report.note.copyright.1": {
     "message": "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content."
   },
   "report.note.copyright.2": {
     "message": "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>."
+  },
+  "report.note.fully-ai-generated.1": {
+    "message": "We've just updated our rules to prohibit fully AI-generated projects. We're giving creators a grace period to update or take down fully AI-generated projects before we begin accepting reports for them."
   },
   "report.note.malicious.1": {
     "message": "Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples."
@@ -4336,9 +4345,6 @@
   },
   "report.note.missing-disclosure.1": {
     "message": "Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures."
-  },
-  "report.note.missing-disclosure.2": {
-    "message": "Check back later once the grace period has ended. Reports of this type are not being accepted at this time."
   },
   "report.please-report": {
     "message": "Please report:"
