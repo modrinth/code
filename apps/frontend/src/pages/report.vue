@@ -290,18 +290,17 @@ import { useDebounceFn } from '@vueuse/core'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 
+definePageMeta({
+	middleware: 'auth',
+})
+
 const { addNotification } = injectNotificationManager()
 
 const tags = useGeneratedState()
 const route = useNativeRoute()
-const router = useRouter()
 
 const auth = await useAuth()
 const { formatMessage } = useVIntl()
-
-if (!auth.value.user) {
-	router.push('/auth/sign-in?redirect=' + encodeURIComponent(route.fullPath))
-}
 
 const accessQuery = (id: string): string => {
 	return route.query?.[id]?.toString() || ''
