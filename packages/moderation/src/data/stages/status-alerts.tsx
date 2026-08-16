@@ -100,6 +100,18 @@ export default function (
 						return msg
 					}),
 
+				toggle('temporary-server', 'Temporary server')
+					.shown(
+						!!project.value.minecraft_java_server &&
+							!!project.value.minecraft_java_server.address &&
+							(project.value.minecraft_java_server.address.includes('aternos') ||
+								project.value.minecraft_java_server.address.includes('minekeep') ||
+								project.value.minecraft_java_server.address.includes('minehut')),
+					)
+					.suggestedStatus('flagged')
+					.priority(Priorities.alerts)
+					.message(),
+
 				toggle('server-use', 'Server use')
 					.shown(
 						computed(

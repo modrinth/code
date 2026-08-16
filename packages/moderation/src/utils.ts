@@ -266,6 +266,7 @@ export function flattenProjectVariables(
 	vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
 	vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
 	vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
+	vars[`PROJECT_ICON_FLINK`] = `[Icon](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_TITLE_FLINK`] = `[Name](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
