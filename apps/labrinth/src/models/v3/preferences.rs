@@ -1,58 +1,31 @@
-use partially::Partial;
+use component_derive::Component;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Default, Component)]
 pub struct UserPreferences {
+    #[component(nested)]
     pub appearance: AppearancePreferences,
+    #[component(nested)]
     pub localization: LocalizationPreferences,
+    #[component(nested)]
     pub layouts: LayoutPreferences,
+    #[component(nested)]
     pub sidebars: SidebarPreferences,
+    #[component(nested)]
     pub social: SocialPreferences,
 }
 
-#[derive(Debug, Deserialize, ToSchema, Default)]
-pub struct PartialUserPreferences {
-    pub appearance: Option<PartialAppearancePreferences>,
-    pub localization: Option<PartialLocalizationPreferences>,
-    pub layouts: Option<PartialLayoutPreferences>,
-    pub sidebars: Option<PartialSidebarPreferences>,
-    pub social: Option<PartialSocialPreferences>,
-}
-
-impl Partial for UserPreferences {
-    type Item = PartialUserPreferences;
-
-    fn apply_some(&mut self, partial: Self::Item) -> bool {
-        let mut applied = false;
-
-        if let Some(appearance) = partial.appearance {
-            applied |= self.appearance.apply_some(appearance);
-        }
-        if let Some(localization) = partial.localization {
-            applied |= self.localization.apply_some(localization);
-        }
-        if let Some(layouts) = partial.layouts {
-            applied |= self.layouts.apply_some(layouts);
-        }
-        if let Some(sidebars) = partial.sidebars {
-            applied |= self.sidebars.apply_some(sidebars);
-        }
-        if let Some(social) = partial.social {
-            applied |= self.social.apply_some(social);
-        }
-
-        applied
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema, Partial, Default)]
-#[partially(skip_attributes, derive(Debug, Deserialize, ToSchema))]
+#[derive(
+    Debug, Serialize, Deserialize, ToSchema, Default, PartialEq, Component,
+)]
 pub struct AppearancePreferences {
     pub theme: Theme,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
+#[derive(
+    Debug, Serialize, Deserialize, ToSchema, Default, Clone, PartialEq,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum Theme {
     Light,
@@ -62,8 +35,7 @@ pub enum Theme {
     Retro,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Partial)]
-#[partially(skip_attributes, derive(Debug, Deserialize, ToSchema))]
+#[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq, Component)]
 pub struct LocalizationPreferences {
     pub locale: String,
 }
@@ -76,8 +48,7 @@ impl Default for LocalizationPreferences {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Partial)]
-#[partially(skip_attributes, derive(Debug, Deserialize, ToSchema))]
+#[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq, Component)]
 pub struct LayoutPreferences {
     pub mods: LayoutOption,
     pub plugins: LayoutOption,
@@ -104,28 +75,32 @@ impl Default for LayoutPreferences {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum LayoutOption {
     Grid,
     Rows,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Partial, Default)]
-#[partially(skip_attributes, derive(Debug, Deserialize, ToSchema))]
+#[derive(
+    Debug, Serialize, Deserialize, ToSchema, Default, PartialEq, Component,
+)]
 pub struct SidebarPreferences {
     pub right_aligned_search: bool,
     pub left_aligned_content: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Partial, Default)]
-#[partially(skip_attributes, derive(Debug, Deserialize, ToSchema))]
+#[derive(
+    Debug, Serialize, Deserialize, ToSchema, Default, PartialEq, Component,
+)]
 pub struct SocialPreferences {
     pub friend_privacy: FriendPrivacy,
     pub shared_instances_privacy: SharedInstancesPrivacy,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
+#[derive(
+    Debug, Serialize, Deserialize, ToSchema, Default, Clone, PartialEq,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum FriendPrivacy {
     None,
@@ -134,7 +109,9 @@ pub enum FriendPrivacy {
     Everyone,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Default)]
+#[derive(
+    Debug, Serialize, Deserialize, ToSchema, Default, Clone, PartialEq,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum SharedInstancesPrivacy {
     None,

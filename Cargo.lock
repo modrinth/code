@@ -5490,6 +5490,7 @@ dependencies = [
  "clickhouse",
  "color-eyre",
  "color-thief",
+ "component-derive",
  "const_format",
  "dashmap",
  "derive_more 2.1.1",

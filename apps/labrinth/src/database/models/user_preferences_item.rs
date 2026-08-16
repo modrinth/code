@@ -1,7 +1,7 @@
-use sqlx::types::Json;
 use crate::database::Executor;
 use crate::database::models::DBUserId;
-use crate::models::v3::preferences::UserPreferences;
+use crate::models::v3::preferences::PartialUserPreferences;
+use sqlx::types::Json;
 
 pub struct DBUserPreferences;
 
@@ -9,13 +9,13 @@ impl DBUserPreferences {
     pub async fn get<'a, E>(
         user_id: DBUserId,
         exec: E,
-    ) -> Result<Option<UserPreferences>, sqlx::Error>
+    ) -> Result<Option<PartialUserPreferences>, sqlx::Error>
     where
         E: Executor<'a, Database = sqlx::Postgres>,
     {
         let row = sqlx::query!(
             r#"
-            SELECT preferences AS "preferences: Json<UserPreferences>"
+            SELECT preferences AS "preferences: Json<PartialUserPreferences>"
             FROM user_preferences
             WHERE user_id = $1
             "#,
@@ -29,7 +29,7 @@ impl DBUserPreferences {
 
     pub async fn upsert<'a, E>(
         user_id: DBUserId,
-        preferences: &UserPreferences,
+        preferences: &PartialUserPreferences,
         exec: E,
     ) -> Result<(), sqlx::Error>
     where
@@ -43,7 +43,7 @@ impl DBUserPreferences {
                 SET preferences = EXCLUDED.preferences
             "#,
             user_id.0,
-            Json(preferences) as Json<&UserPreferences>,
+            Json(preferences) as Json<&PartialUserPreferences>,
         )
         .execute(exec)
         .await?;

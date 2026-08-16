@@ -30,14 +30,11 @@ use crate::{
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use ariadne::ids::UserId;
 use eyre::eyre;
-use partially::Partial;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::database::models::user_preferences_item::DBUserPreferences;
-use crate::models::v3::preferences::{
-    PartialUserPreferences, UserPreferences,
-};
+use crate::models::v3::preferences::{PartialUserPreferences, UserPreferences};
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(user_auth_get_route)
@@ -406,9 +403,16 @@ pub async fn get_user_preferences(
         )));
     }
 
-    let preferences = DBUserPreferences::get(target.id, &**pool)
+    let preference_overrides = DBUserPreferences::get(target.id, &**pool)
         .await
-        .wrap_internal_err("failed to fetch user preferences")?
+        .wrap_internal_err("failed to fetch user preferences")?;
+
+    let preferences = preference_overrides
+        .map(|overrides| {
+            let mut preferences = UserPreferences::default();
+            overrides.apply_to(&mut preferences);
+            preferences
+        })
         .unwrap_or_default();
 
     Ok(web::Json(preferences))
@@ -454,20 +458,27 @@ pub async fn edit_user_preferences(
         .await
         .wrap_internal_err("starting database transaction")?;
 
-    let mut preferences = DBUserPreferences::get(target.id, &mut txn)
+    let stored = DBUserPreferences::get(target.id, &mut txn)
         .await
-        .wrap_internal_err("failed to fetch user preferences")?
-        .unwrap_or_default();
+        .wrap_internal_err("failed to fetch user preferences")?;
 
-    preferences.apply_some(body.into_inner());
+    let mut preferences = UserPreferences::default();
+    if let Some(stored) = stored {
+        stored.apply_to(&mut preferences);
+    }
+    body.into_inner().apply_to(&mut preferences);
 
-    DBUserPreferences::upsert(target.id, &preferences, &mut txn)
+    let overrides = preferences.into_diff_from(&UserPreferences::default());
+    DBUserPreferences::upsert(target.id, &overrides, &mut txn)
         .await
         .wrap_internal_err("failed to update user preferences")?;
 
     txn.commit()
         .await
         .wrap_internal_err("committing database transaction")?;
+
+    let mut preferences = UserPreferences::default();
+    overrides.apply_to(&mut preferences);
 
     Ok(web::Json(preferences))
 }
