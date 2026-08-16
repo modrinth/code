@@ -458,7 +458,7 @@ pub async fn edit_user_preferences(
         .await
         .wrap_internal_err("starting database transaction")?;
 
-    let stored = DBUserPreferences::get(target.id, &mut txn)
+    let stored = DBUserPreferences::get_for_update(target.id, &mut txn)
         .await
         .wrap_internal_err("failed to fetch user preferences")?;
 

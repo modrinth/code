@@ -27,6 +27,28 @@ impl DBUserPreferences {
         Ok(row.map(|row| row.preferences.0))
     }
 
+    pub async fn get_for_update<'a, E>(
+        user_id: DBUserId,
+        exec: E,
+    ) -> Result<Option<PartialUserPreferences>, sqlx::Error>
+    where
+        E: Executor<'a, Database = sqlx::Postgres>,
+    {
+        let row = sqlx::query!(
+            r#"
+            SELECT preferences AS "preferences: Json<PartialUserPreferences>"
+            FROM user_preferences
+            WHERE user_id = $1
+            FOR UPDATE
+            "#,
+            user_id.0,
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(row.map(|row| row.preferences.0))
+    }
+
     pub async fn upsert<'a, E>(
         user_id: DBUserId,
         preferences: &PartialUserPreferences,
