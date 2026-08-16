@@ -79,7 +79,6 @@ modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
 murmur2 = { workspace = true }
 neverbounce = { workspace = true }
-partially = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
 postcard = { workspace = true }
