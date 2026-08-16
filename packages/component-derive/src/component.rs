@@ -111,73 +111,83 @@ fn struct_partial(
 ) -> Result<TokenStream> {
     let ident_partial = format_ident!("Partial{ident}");
 
-    let (fields, apply_fields): (Vec<_>, Vec<_>) = fields
-        .iter()
-        .filter_map(|field| {
-            if field.synthetic {
-                return None;
-            }
-
-            let ident = &field
-                .ident
-                .as_ref()
-                .expect("macro only works on structs with named fields");
-            let vis = &field.vis;
-            let ty = &field.ty;
-            let attrs = &field.attrs;
-
-            let (inner_ty, apply_value, validate_attr) = if field.nested {
-                let inner_ty = match nested_type(ty, "Partial") {
-                    Ok(inner_ty) => inner_ty,
-                    Err(err) => return Some(Err(err)),
-                };
-                (
-                    inner_ty,
-                    quote! { t.apply_to(&mut component.#ident) },
-                    quote! { #[validate(nested)] },
-                )
-            } else {
-                (
-                    quote! { #ty },
-                    quote! { component.#ident = t },
-                    quote! {},
-                )
-            };
-
-            let serde_attr = if !field.nested
-                && let Type::Path(path) = ty
-                && path
-                    .path
-                    .segments
-                    .first()
-                    .is_some_and(|segment| segment.ident == "Option")
-            {
-                quote! {
-                    #[serde(
-                        default,
-                        skip_serializing_if = "::core::option::Option::is_none",
-                        with = "::serde_with::rust::double_option"
-                    )]
+    let (fields, (apply_fields, diff_fields)): (Vec<_>, (Vec<_>, Vec<_>)) =
+        fields
+            .iter()
+            .filter_map(|field| {
+                if field.synthetic {
+                    return None;
                 }
-            } else {
-                quote! { #[serde(default, skip_serializing_if = "::core::option::Option::is_none")] }
-            };
 
-            Some(Ok((
-                quote! {
-                    #(#attrs)*
-                    #validate_attr
-                    #serde_attr
-                    #vis #ident: ::core::option::Option<#inner_ty>
-                },
-                quote! {
-                    if let Some(t) = self.#ident {
-                        #apply_value;
+                let ident = &field
+                    .ident
+                    .as_ref()
+                    .expect("macro only works on structs with named fields");
+                let vis = &field.vis;
+                let ty = &field.ty;
+                let attrs = &field.attrs;
+
+                let (inner_ty, apply_value, diff_value, validate_attr) =
+                    if field.nested {
+                        let inner_ty = match nested_type(ty, "Partial") {
+                            Ok(inner_ty) => inner_ty,
+                            Err(err) => return Some(Err(err)),
+                        };
+                        (
+                            inner_ty,
+                            quote! { t.apply_to(&mut component.#ident) },
+                            quote! { self.#ident.into_diff_from(&base.#ident) },
+                            quote! { #[validate(nested)] },
+                        )
+                    } else {
+                        (
+                            quote! { #ty },
+                            quote! { component.#ident = t },
+                            quote! { self.#ident },
+                            quote! {},
+                        )
+                    };
+
+                let serde_attr = if !field.nested
+                    && let Type::Path(path) = ty
+                    && path
+                        .path
+                        .segments
+                        .first()
+                        .is_some_and(|segment| segment.ident == "Option")
+                {
+                    quote! {
+                        #[serde(
+                            default,
+                            skip_serializing_if = "::core::option::Option::is_none",
+                            with = "::serde_with::rust::double_option"
+                        )]
                     }
-                },
-            )))
-        })
-        .collect::<Result<(Vec<_>, Vec<_>)>>()?;
+                } else {
+                    quote! { #[serde(default, skip_serializing_if = "::core::option::Option::is_none")] }
+                };
+
+                Some(Ok((
+                    quote! {
+                        #(#attrs)*
+                        #validate_attr
+                        #serde_attr
+                        #vis #ident: ::core::option::Option<#inner_ty>
+                    },
+                    (
+                        quote! {
+                            if let Some(t) = self.#ident {
+                                #apply_value;
+                            }
+                        },
+                        quote! {
+                            #ident: (self.#ident != base.#ident)
+                                .then(|| #diff_value)
+                        },
+                    ),
+                )))
+            })
+            .collect::<Result<(Vec<_>, (Vec<_>, Vec<_>))>>()?;
 
     Ok(quote! {
         #[derive(
@@ -198,6 +208,14 @@ fn struct_partial(
                 component: &mut #ident,
             ) {
                 #(#apply_fields)*
+            }
+        }
+
+        impl #ident {
+            pub fn into_diff_from(self, base: &Self) -> #ident_partial {
+                #ident_partial {
+                    #(#diff_fields),*
+                }
             }
         }
     })
