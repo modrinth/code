@@ -59,13 +59,10 @@ pub async fn invite_privacy_status(
     let allowed = if blocked {
         false
     } else {
-        let mut preferences = UserPreferences::default();
-        if let Some(partial) = DBUserPreferences::get(target_id, &**pool)
+        let overrides = DBUserPreferences::get(target_id, &**pool)
             .await
-            .wrap_internal_err("fetching user preferences")?
-        {
-            partial.apply_to(&mut preferences);
-        }
+            .wrap_internal_err("fetching user preferences")?;
+        let preferences = UserPreferences::resolve(overrides);
 
         let privacy = match invite_type {
             InviteType::SharedInstances => {

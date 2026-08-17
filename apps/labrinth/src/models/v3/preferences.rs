@@ -16,6 +16,16 @@ pub struct UserPreferences {
     pub social: SocialPreferences,
 }
 
+impl UserPreferences {
+    pub fn resolve(overrides: Option<PartialUserPreferences>) -> Self {
+        let mut preferences = Self::default();
+        if let Some(overrides) = overrides {
+            overrides.apply_to(&mut preferences);
+        }
+        preferences
+    }
+}
+
 #[derive(
     Debug, Serialize, Deserialize, ToSchema, Default, PartialEq, Component,
 )]

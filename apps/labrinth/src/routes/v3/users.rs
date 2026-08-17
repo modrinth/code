@@ -409,15 +409,7 @@ pub async fn get_user_preferences(
         .await
         .wrap_internal_err("failed to fetch user preferences")?;
 
-    let preferences = preference_overrides
-        .map(|overrides| {
-            let mut preferences = UserPreferences::default();
-            overrides.apply_to(&mut preferences);
-            preferences
-        })
-        .unwrap_or_default();
-
-    Ok(web::Json(preferences))
+    Ok(web::Json(UserPreferences::resolve(preference_overrides)))
 }
 
 #[utoipa::path(
@@ -466,10 +458,7 @@ pub async fn edit_user_preferences(
         .await
         .wrap_internal_err("failed to fetch user preferences")?;
 
-    let mut preferences = UserPreferences::default();
-    if let Some(stored) = stored {
-        stored.apply_to(&mut preferences);
-    }
+    let mut preferences = UserPreferences::resolve(stored);
     body.into_inner().apply_to(&mut preferences);
 
     let overrides = preferences.into_diff_from(&UserPreferences::default());
@@ -481,8 +470,7 @@ pub async fn edit_user_preferences(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-    let mut preferences = UserPreferences::default();
-    overrides.apply_to(&mut preferences);
+    let preferences = UserPreferences::resolve(Some(overrides));
 
     Ok(web::Json(preferences))
 }
