@@ -1,50 +1,50 @@
 import { defineMessages } from '@modrinth/ui'
 
-import backpack from '@/assets/instance-icons/Backpack.png'
-import beacon from '@/assets/instance-icons/Beacon.png'
-import blueShark from '@/assets/instance-icons/Blue Shark.png'
-import bookshelf from '@/assets/instance-icons/Bookshelf.png'
-import brownBear from '@/assets/instance-icons/Brown Bear.png'
-import cake from '@/assets/instance-icons/Cake.png'
-import campfire from '@/assets/instance-icons/Campfire.png'
-import chest from '@/assets/instance-icons/Chest.png'
-import cogwheel from '@/assets/instance-icons/Cogwheel.png'
-import commandBlock from '@/assets/instance-icons/Command Block.png'
-import cookingPot from '@/assets/instance-icons/Cooking Pot.png'
-import couch from '@/assets/instance-icons/Couch.png'
-import craftingTable from '@/assets/instance-icons/Crafting Table.png'
-import creeper from '@/assets/instance-icons/Creeper.png'
-import enchantingTable from '@/assets/instance-icons/Enchanting Table.png'
-import enderChest from '@/assets/instance-icons/Ender Chest.png'
-import enderDragon from '@/assets/instance-icons/Ender Dragon.png'
-import engine from '@/assets/instance-icons/Engine.png'
-import furnace from '@/assets/instance-icons/Furnace.png'
-import gizmo from '@/assets/instance-icons/Gizmo.png'
-import globe from '@/assets/instance-icons/Globe.png'
-import grassBlock from '@/assets/instance-icons/Grass Block.png'
-import lantern from '@/assets/instance-icons/Lantern.png'
-import moobloom from '@/assets/instance-icons/Moobloom.png'
-import mrPack from '@/assets/instance-icons/Mr Pack.png'
-import orb from '@/assets/instance-icons/Orb.png'
-import oxygenDistributor from '@/assets/instance-icons/Oxygen Distributor.png'
-import pancakes from '@/assets/instance-icons/Pancakes.png'
-import pickaxe from '@/assets/instance-icons/Pickaxe.png'
-import pokeBall from '@/assets/instance-icons/Poke Ball.png'
-import redstoneBlock from '@/assets/instance-icons/Redstone Block.png'
-import sculkSensor from '@/assets/instance-icons/Sculk Sensor.png'
-import skeleton from '@/assets/instance-icons/Skeleton.png'
-import skillet from '@/assets/instance-icons/Skillet.png'
-import slimeBlock from '@/assets/instance-icons/Slime Block.png'
-import spaceHelmet from '@/assets/instance-icons/Space Helmet.png'
-import stickyPiston from '@/assets/instance-icons/Sticky Piston.png'
-import sword from '@/assets/instance-icons/Sword.png'
-import terminal from '@/assets/instance-icons/Terminal.png'
-import tinyPotato from '@/assets/instance-icons/Tiny Potato.png'
-import tire from '@/assets/instance-icons/Tire.png'
-import tnt from '@/assets/instance-icons/TNT.png'
-import wrench from '@/assets/instance-icons/Wrench.png'
-import wrench1 from '@/assets/instance-icons/Wrench1.png'
-import zombie from '@/assets/instance-icons/Zombie.png'
+import backpack from '@/assets/instance-icons/backpack.png'
+import beacon from '@/assets/instance-icons/beacon.png'
+import blueShark from '@/assets/instance-icons/blue-shark.png'
+import bookshelf from '@/assets/instance-icons/bookshelf.png'
+import brownBear from '@/assets/instance-icons/brown-bear.png'
+import cake from '@/assets/instance-icons/cake.png'
+import campfire from '@/assets/instance-icons/campfire.png'
+import chest from '@/assets/instance-icons/chest.png'
+import cogwheel from '@/assets/instance-icons/cogwheel.png'
+import commandBlock from '@/assets/instance-icons/command-block.png'
+import cookingPot from '@/assets/instance-icons/cooking-pot.png'
+import couch from '@/assets/instance-icons/couch.png'
+import craftingTable from '@/assets/instance-icons/crafting-table.png'
+import creeper from '@/assets/instance-icons/creeper.png'
+import enchantingTable from '@/assets/instance-icons/enchanting-table.png'
+import enderChest from '@/assets/instance-icons/ender-chest.png'
+import enderDragon from '@/assets/instance-icons/ender-dragon.png'
+import engine from '@/assets/instance-icons/engine.png'
+import furnace from '@/assets/instance-icons/furnace.png'
+import gizmo from '@/assets/instance-icons/gizmo.png'
+import globe from '@/assets/instance-icons/globe.png'
+import grassBlock from '@/assets/instance-icons/grass-block.png'
+import lantern from '@/assets/instance-icons/lantern.png'
+import moobloom from '@/assets/instance-icons/moobloom.png'
+import mrPack from '@/assets/instance-icons/mr-pack.png'
+import orb from '@/assets/instance-icons/orb.png'
+import oxygenDistributor from '@/assets/instance-icons/oxygen-distributor.png'
+import pancakes from '@/assets/instance-icons/pancakes.png'
+import pickaxe from '@/assets/instance-icons/pickaxe.png'
+import pokeBall from '@/assets/instance-icons/poke-ball.png'
+import redstoneBlock from '@/assets/instance-icons/redstone-block.png'
+import sculkSensor from '@/assets/instance-icons/sculk-sensor.png'
+import skeleton from '@/assets/instance-icons/skeleton.png'
+import skillet from '@/assets/instance-icons/skillet.png'
+import slimeBlock from '@/assets/instance-icons/slime-block.png'
+import spaceHelmet from '@/assets/instance-icons/space-helmet.png'
+import stickyPiston from '@/assets/instance-icons/sticky-piston.png'
+import sword from '@/assets/instance-icons/sword.png'
+import terminal from '@/assets/instance-icons/terminal.png'
+import tinyPotato from '@/assets/instance-icons/tiny-potato.png'
+import tire from '@/assets/instance-icons/tire.png'
+import tnt from '@/assets/instance-icons/tnt.png'
+import wrench from '@/assets/instance-icons/wrench.png'
+import wrenchRinth from '@/assets/instance-icons/wrench-rinth.png'
+import zombie from '@/assets/instance-icons/zombie.png'
 
 const names = defineMessages({
 	yellow: {
@@ -192,7 +192,10 @@ const names = defineMessages({
 	},
 	tire: { id: 'instance.icon-editor.symbol.tire', defaultMessage: 'Tire' },
 	wrench: { id: 'instance.icon-editor.symbol.wrench', defaultMessage: 'Wrench' },
-	wrench1: { id: 'instance.icon-editor.symbol.wrench1', defaultMessage: 'Wrench1' },
+	wrenchRinth: {
+		id: 'instance.icon-editor.symbol.wrench1',
+		defaultMessage: 'Wrench Rinth',
+	},
 	zombie: { id: 'instance.icon-editor.symbol.zombie', defaultMessage: 'Zombie' },
 })
 
@@ -399,7 +402,7 @@ export const symbolOptions = [
 	{ id: 'tire', name: names.tire, asset: tire, category: 'modded' },
 	{ id: 'tnt', name: names.tnt, asset: tnt, category: 'vanilla' },
 	{ id: 'wrench', name: names.wrench, asset: wrench, category: 'modded' },
-	{ id: 'wrench1', name: names.wrench1, asset: wrench1, category: 'modded' },
+	{ id: 'wrench1', name: names.wrenchRinth, asset: wrenchRinth, category: 'modded' },
 	{ id: 'zombie', name: names.zombie, asset: zombie, category: 'vanilla' },
 ] as const
 

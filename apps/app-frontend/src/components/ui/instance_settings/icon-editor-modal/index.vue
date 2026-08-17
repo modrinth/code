@@ -429,7 +429,7 @@ const messages = defineMessages({
 					<span>{{ formatMessage(messages.description) }}</span>
 				</div>
 				<div class="flex shrink-0 items-center gap-2">
-					<Button :disabled="saving" @click="hide" type="outlined">
+					<Button :disabled="saving" type="outlined" @click="hide">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
