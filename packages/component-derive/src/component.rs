@@ -49,8 +49,10 @@ pub fn derive(input: &DeriveInput) -> Result<TokenStream> {
         #struct_serial
         #struct_partial
 
-        #impl_apply_to
-        #impl_into_diff_from
+        const _: () = {
+            #impl_apply_to
+            #impl_into_diff_from
+        };
     })
 }
 
