@@ -112,10 +112,10 @@ pub async fn set_group_memberships(
         .collect::<HashSet<_>>();
 
     for group_id in unique_group_ids {
-        let exists = sqlx::query_scalar::<_, bool>(
-            "SELECT EXISTS(SELECT 1 FROM instance_groups WHERE id = ?)",
+        let exists = sqlx::query_scalar!(
+            r#"SELECT EXISTS(SELECT 1 FROM instance_groups WHERE id = ?) AS "exists!: bool""#,
+            group_id,
         )
-        .bind(group_id)
         .fetch_one(&mut *tx)
         .await?;
         if !exists {
@@ -127,10 +127,10 @@ pub async fn set_group_memberships(
     }
 
     for update in &updates {
-        let result = sqlx::query(
+        let result = sqlx::query!(
             "UPDATE instances SET modified = unixepoch() WHERE id = ?",
+            update.instance_id,
         )
-        .bind(&update.instance_id)
         .execute(&mut *tx)
         .await?;
         if result.rows_affected() == 0 {
@@ -175,26 +175,26 @@ pub async fn rename_group(
     let state = State::get().await?;
     let mut tx = state.pool.begin().await?;
 
-    let instance_ids = sqlx::query_scalar::<_, String>(
+    let instance_ids = sqlx::query_scalar!(
         "
 		SELECT instance_id
 		FROM instance_group_memberships
 		WHERE group_id = ?
 		",
+        id,
     )
-    .bind(&id)
     .fetch_all(&mut *tx)
     .await?;
 
-    let result = sqlx::query(
+    let result = sqlx::query!(
         "
 		UPDATE instance_groups
 		SET name = ?
 		WHERE id = ?
-		",
+        ",
+        new_name,
+        id,
     )
-    .bind(new_name)
-    .bind(&id)
     .execute(&mut *tx)
     .await?;
 
@@ -225,24 +225,24 @@ pub async fn delete_group(id: String) -> crate::Result<()> {
 
     let state = State::get().await?;
     let mut tx = state.pool.begin().await?;
-    let instance_ids = sqlx::query_scalar::<_, String>(
+    let instance_ids = sqlx::query_scalar!(
         "
 		SELECT instance_id
 		FROM instance_group_memberships
 		WHERE group_id = ?
 		",
+        id,
     )
-    .bind(&id)
     .fetch_all(&mut *tx)
     .await?;
 
-    let result = sqlx::query(
+    let result = sqlx::query!(
         "
-		DELETE FROM instance_groups
-		WHERE id = ?
-		",
+        DELETE FROM instance_groups
+        WHERE id = ?
+        ",
+        id,
     )
-    .bind(&id)
     .execute(&mut *tx)
     .await?;
 
