@@ -96,7 +96,8 @@ pub struct SidebarPreferences {
 )]
 pub struct SocialPreferences {
     pub friend_privacy: FriendPrivacy,
-    pub shared_instances_privacy: SharedInstancesPrivacy,
+    pub shared_instances_privacy: InvitePrivacy,
+    pub hosting_access_privacy: InvitePrivacy,
 }
 
 #[derive(
@@ -114,7 +115,7 @@ pub enum FriendPrivacy {
     Debug, Serialize, Deserialize, ToSchema, Default, Clone, PartialEq,
 )]
 #[serde(rename_all = "snake_case")]
-pub enum SharedInstancesPrivacy {
+pub enum InvitePrivacy {
     None,
     Friends,
     #[default]
