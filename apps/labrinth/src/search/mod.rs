@@ -247,7 +247,8 @@ impl FromStr for SearchBackendKind {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
     /// ID of the most recently published version.
-    pub version_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version_id: Option<String>,
     pub project_id: String,
     //
     pub project_types: Vec<String>,
@@ -285,7 +286,8 @@ pub struct UploadSearchProject {
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
     /// Unix timestamp of the most recently published version.
-    pub version_published_timestamp: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version_published_timestamp: Option<i64>,
     pub open_source: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<u32>,
@@ -369,7 +371,8 @@ pub struct SearchResults {
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
     /// ID of the most recently published version.
-    pub version_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub version_id: Option<String>,
     pub project_id: String,
     pub project_types: Vec<String>,
     #[serde(default)]

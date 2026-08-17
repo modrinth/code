@@ -1899,7 +1899,7 @@ export namespace Labrinth {
 
 		export namespace v3 {
 			export interface ResultSearchProject {
-				version_id: string
+				version_id?: string
 				project_id: string
 				project_types: string[]
 				all_project_types: string[]

@@ -152,7 +152,9 @@ impl LegacyResultSearchProject {
             server_side,
             environment: environments,
             versions,
-            latest_version: result_search_project.version_id,
+            latest_version: result_search_project
+                .version_id
+                .unwrap_or_default(),
             categories,
 
             project_id: result_search_project.project_id,
