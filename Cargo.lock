@@ -301,6 +301,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "aditude"
+version = "0.0.0"
+dependencies = [
+ "aditude",
+ "arc-swap",
+ "chrono",
+ "dotenvy",
+ "eyre",
+ "reqwest 0.12.24",
+ "rust_decimal",
+ "secrecy",
+ "serde",
+ "tokio",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

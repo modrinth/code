@@ -1,0 +1,25 @@
+[package]
+name = "aditude"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+arc-swap = { workspace = true, optional = true }
+reqwest = { workspace = true, features = ["json"] }
+rust_decimal = { workspace = true }
+secrecy = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+chrono = { workspace = true, features = ["serde"] }
+
+[dev-dependencies]
+aditude = { path = ".", features = ["mock"] }
+dotenvy = { workspace = true }
+eyre = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+
+[features]
+mock = ["dep:arc-swap"]
+
+[lints]
+workspace = true
