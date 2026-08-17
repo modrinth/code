@@ -881,8 +881,14 @@ pub async fn instance_edit_generated_icon(
 pub async fn instance_cache_generated_icon(
     recipe: theseus::data::InstanceIconRecipe,
     symbol_bytes: Vec<u8>,
+    add_to_recents: bool,
 ) -> Result<String> {
-    Ok(theseus::instance::cache_generated_icon(recipe, symbol_bytes).await?)
+    Ok(theseus::instance::cache_generated_icon(
+        recipe,
+        symbol_bytes,
+        add_to_recents,
+    )
+    .await?)
 }
 
 #[tauri::command]

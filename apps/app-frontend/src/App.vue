@@ -335,6 +335,10 @@ provideModalBehavior({
 	onHide: () => release_ads_window_hold(),
 })
 
+const creationIconEditorModal = ref(null)
+const creationGeneratedIcon = ref(null)
+const creationIconTarget = ref('creation-flow')
+
 const {
 	installationModal,
 	unknownPackWarningModal,
@@ -347,18 +351,22 @@ const {
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
-} = setupProviders(tauriApiClient, notificationManager, popupNotificationManager, appEvents)
+} = setupProviders(
+	tauriApiClient,
+	notificationManager,
+	popupNotificationManager,
+	appEvents,
+	(iconPath) =>
+		creationGeneratedIcon.value?.path === iconPath ? creationGeneratedIcon.value.recipe : null,
+)
 const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
 const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
-const creationIconEditorModal = ref(null)
-const creationIconRecipe = ref(null)
-const creationIconTarget = ref('creation-flow')
 
 async function randomizeCreationIcon() {
 	const generated = await creationIconEditorModal.value?.randomizeAndSave()
 	if (!generated) return null
 
-	creationIconRecipe.value = generated.recipe
+	creationGeneratedIcon.value = { path: generated.iconPath, recipe: generated.recipe }
 	return {
 		path: generated.iconPath,
 		previewUrl: convertFileSrc(generated.iconPath),
@@ -386,7 +394,7 @@ function customizeContentInstallIcon() {
 }
 
 function onCreationIconSaved(iconPath, recipe) {
-	creationIconRecipe.value = recipe
+	creationGeneratedIcon.value = { path: iconPath, recipe }
 	if (creationIconTarget.value === 'content-install') {
 		modInstallModal.value?.setIcon(iconPath, convertFileSrc(iconPath))
 		return
@@ -1666,7 +1674,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		/>
 		<IconEditorModal
 			ref="creationIconEditorModal"
-			:recipe="creationIconRecipe"
+			:recipe="creationGeneratedIcon?.recipe"
 			@saved="onCreationIconSaved"
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />

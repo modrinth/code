@@ -24,7 +24,8 @@ use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::instances::commands::resolve_icon_path;
 use crate::state::{
-    ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader, State,
+    ContentSourceKind, InstanceIconRecipe, InstanceInstallStage, InstanceLink,
+    ModLoader, State,
 };
 use crate::util::fetch::DownloadReason;
 use std::collections::HashSet;
@@ -37,6 +38,7 @@ pub async fn create_instance(
     loader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
+    icon_recipe: Option<InstanceIconRecipe>,
     link: InstanceLink,
 ) -> crate::Result<InstallJobSnapshot> {
     start(InstallRequest::CreateInstance {
@@ -45,6 +47,7 @@ pub async fn create_instance(
         loader,
         loader_version,
         icon_path,
+        icon_recipe,
         link,
     })
     .await
@@ -436,6 +439,7 @@ async fn prepare_initial_instance(
             loader,
             loader_version,
             icon_path,
+            icon_recipe,
             link,
         } => {
             let metadata = crate::api::instance::create(
@@ -444,6 +448,7 @@ async fn prepare_initial_instance(
                 loader,
                 loader_version,
                 icon_path,
+                icon_recipe,
                 link,
             )
             .await?;
@@ -490,6 +495,7 @@ async fn prepare_initial_instance(
                 preview.modloader,
                 preview.loader_version,
                 icon_path,
+                None,
                 link,
             )
             .await?;
@@ -535,6 +541,7 @@ async fn prepare_initial_instance(
                 loader,
                 loader_version,
                 icon_path,
+                None,
                 shared_link,
             )
             .await?;
@@ -556,6 +563,7 @@ async fn prepare_initial_instance(
                 "1.19.4".to_string(),
                 ModLoader::Vanilla,
                 Some("latest".to_string()),
+                None,
                 None,
                 InstanceLink::Unmanaged,
             )
@@ -582,6 +590,7 @@ async fn prepare_initial_instance(
                 metadata.applied_content_set.loader,
                 metadata.applied_content_set.loader_version,
                 metadata.instance.icon_path,
+                None,
                 metadata.link,
             )
             .await?;
@@ -806,6 +815,7 @@ async fn run_request(
             loader,
             loader_version: _,
             icon_path: _,
+            icon_recipe: _,
             link: _,
         } => {
             let Some(instance_id) = current_instance_id(job_state) else {

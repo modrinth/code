@@ -333,7 +333,7 @@ onMounted(() => {
 		<template #overlay>
 			<button
 				type="button"
-				class="selection-button group/selection absolute right-0.5 top-0 z-[2] flex size-[50px] cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
+				class="selection-button group/selection absolute right-2 top-1.5 z-[2] flex size-[50px] cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
 				:aria-label="selected ? 'Deselect instance' : 'Select instance'"
 				:aria-pressed="selected"
 				@click.stop="toggleSelection"

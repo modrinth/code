@@ -80,9 +80,21 @@ pub async fn edit_generated_icon(
 pub async fn cache_generated_icon(
     recipe: InstanceIconRecipe,
     symbol_bytes: Vec<u8>,
+    add_to_recents: bool,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    cache_generated_icon_with_state(recipe, symbol_bytes, &state).await
+    let icon_path =
+        cache_generated_icon_with_state(recipe.clone(), symbol_bytes, &state)
+            .await?;
+
+    if add_to_recents {
+        let mut tx = state.pool.begin().await?;
+        instance_rows::update_recent_instance_icon_recipe(&recipe, &mut tx)
+            .await?;
+        tx.commit().await?;
+    }
+
+    Ok(icon_path)
 }
 
 pub async fn get_recent_icon_recipes() -> crate::Result<Vec<InstanceIconRecipe>>
@@ -373,6 +385,12 @@ fn validate_icon_recipe(
     };
     validate_icon_recipe_id("symbol", &recipe.symbol)?;
     Ok(background)
+}
+
+pub(crate) fn validate_generated_icon_recipe(
+    recipe: &InstanceIconRecipe,
+) -> crate::Result<()> {
+    validate_icon_recipe(recipe).map(drop)
 }
 
 fn parse_background_color(value: &str) -> crate::Result<[u8; 3]> {

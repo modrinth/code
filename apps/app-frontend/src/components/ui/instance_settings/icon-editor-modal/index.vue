@@ -8,7 +8,7 @@ import {
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { toError } from '@/helpers/errors'
 import {
@@ -41,6 +41,11 @@ const { handleError } = injectNotificationManager()
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const recentRecipes = ref<InstanceIconRecipe[]>([])
 const saving = ref(false)
+const backgroundScroller = ref<HTMLElement | null>(null)
+const showLeftBackgroundShadow = ref(false)
+const showRightBackgroundShadow = ref(false)
+
+let backgroundScrollerResizeObserver: ResizeObserver | null = null
 
 const selectedBackground = ref<BackgroundId>(DEFAULT_BACKGROUND_ID)
 const selectedSymbol = ref<SymbolId>(DEFAULT_SYMBOL_ID)
@@ -60,6 +65,34 @@ const visibleRecentRecipes = computed(() =>
 		(recipe) => backgroundOption(recipe.background) && symbolOption(recipe.symbol),
 	),
 )
+
+function updateBackgroundScrollShadows() {
+	const el = backgroundScroller.value
+	if (!el) {
+		showLeftBackgroundShadow.value = false
+		showRightBackgroundShadow.value = false
+		return
+	}
+
+	showLeftBackgroundShadow.value = el.scrollLeft > 0
+	showRightBackgroundShadow.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 1
+}
+
+function onBackgroundWheel(event: WheelEvent) {
+	const el = backgroundScroller.value
+	if (!el || el.scrollWidth <= el.clientWidth) return
+
+	const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
+	el.scrollLeft += delta
+}
+
+onMounted(() => {
+	backgroundScrollerResizeObserver = new ResizeObserver(updateBackgroundScrollShadows)
+	if (backgroundScroller.value) backgroundScrollerResizeObserver.observe(backgroundScroller.value)
+	nextTick(updateBackgroundScrollShadows)
+})
+
+onBeforeUnmount(() => backgroundScrollerResizeObserver?.disconnect())
 
 function backgroundOption(background?: IconBackground) {
 	if (background?.type !== 'linear-top-down-gradient') return undefined
@@ -122,6 +155,7 @@ function show() {
 	selectedSymbol.value = symbolOption(props.recipe?.symbol ?? '')?.id ?? DEFAULT_SYMBOL_ID
 	modal.value?.show()
 	void loadRecents()
+	nextTick(updateBackgroundScrollShadows)
 }
 
 function hide() {
@@ -144,7 +178,7 @@ async function saveIcon() {
 		const symbolBytes = await loadSymbolBytes(selectedSymbolOption.value.asset)
 		const iconPath = props.instanceId
 			? await edit_generated_icon(props.instanceId, recipe, symbolBytes)
-			: await cache_generated_icon(recipe, symbolBytes)
+			: await cache_generated_icon(recipe, symbolBytes, true)
 		emit('saved', iconPath, recipe)
 		saving.value = false
 		await nextTick()
@@ -201,7 +235,7 @@ const messages = defineMessages({
 	},
 	surpriseMe: {
 		id: 'instance.icon-editor.surprise-me',
-		defaultMessage: 'Surprise me',
+		defaultMessage: 'Randomize',
 	},
 	recents: {
 		id: 'instance.icon-editor.recents',
@@ -261,11 +295,6 @@ const messages = defineMessages({
 							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 						</div>
 					</div>
-					<div class="flex items-center gap-2 text-sm font-medium text-primary">
-						<span>{{ formatMessage(selectedBackgroundOption.name) }}</span>
-						<span class="size-1.5 rounded-full bg-surface-5" />
-						<span>{{ formatMessage(selectedSymbolOption.name) }}</span>
-					</div>
 				</div>
 
 				<Button class="w-full !shadow-none" @click="surpriseMe">
@@ -299,24 +328,39 @@ const messages = defineMessages({
 					<h3 class="m-0 mb-3 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.background) }}
 					</h3>
-					<div class="grid grid-cols-6 gap-2.5">
-						<button
-							v-for="option in backgroundOptions"
-							:key="option.id"
-							class="relative aspect-square cursor-pointer rounded-[20px] border border-solid p-0"
-							:class="selectedBackground === option.id ? 'border-white/60' : 'border-white/15'"
-							:style="backgroundStyle(option.background)"
-							:aria-label="formatMessage(option.name)"
-							:aria-pressed="selectedBackground === option.id"
-							@click="selectedBackground = option.id"
+					<div class="relative">
+						<div
+							class="background-scroll-shadow-left pointer-events-none absolute bottom-0 -left-0.5 top-0 z-10 w-8 bg-surface-2 transition-opacity duration-200"
+							:class="showLeftBackgroundShadow ? 'opacity-100' : 'opacity-0'"
+						/>
+						<div
+							ref="backgroundScroller"
+							class="flex w-full gap-2.5 overflow-x-auto overflow-y-hidden pb-2 pr-6"
+							@wheel.prevent="onBackgroundWheel"
+							@scroll="updateBackgroundScrollShadows"
 						>
-							<span
-								v-if="selectedBackground === option.id"
-								class="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/80 text-black"
+							<button
+								v-for="option in backgroundOptions"
+								:key="option.id"
+								class="relative aspect-square w-[calc((100%_-_3.125rem)/6)] shrink-0 cursor-pointer rounded-[20px] border border-solid p-0"
+								:class="selectedBackground === option.id ? 'border-white/60' : 'border-white/15'"
+								:style="backgroundStyle(option.background)"
+								:aria-label="formatMessage(option.name)"
+								:aria-pressed="selectedBackground === option.id"
+								@click="selectedBackground = option.id"
 							>
-								<CheckIcon class="size-4" />
-							</span>
-						</button>
+								<span
+									v-if="selectedBackground === option.id"
+									class="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/80 text-black"
+								>
+									<CheckIcon class="size-4" />
+								</span>
+							</button>
+						</div>
+						<div
+							class="background-scroll-shadow-right pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-surface-2 transition-opacity duration-200"
+							:class="showRightBackgroundShadow ? 'opacity-100' : 'opacity-0'"
+						/>
 					</div>
 				</section>
 
@@ -328,6 +372,10 @@ const messages = defineMessages({
 						<button
 							v-for="option in symbolOptions"
 							:key="option.id"
+							v-tooltip="{
+								content: formatMessage(option.name),
+								delay: { show: 500, hide: 0 },
+							}"
 							class="relative aspect-square cursor-pointer overflow-hidden rounded-[20px] border border-solid bg-transparent p-0"
 							:class="selectedSymbol === option.id ? 'border-white/60' : 'border-white/15'"
 							:aria-label="formatMessage(option.name)"
@@ -368,3 +416,15 @@ const messages = defineMessages({
 		</template>
 	</NewModal>
 </template>
+
+<style scoped>
+.background-scroll-shadow-left {
+	-webkit-mask-image: linear-gradient(to right, black, transparent);
+	mask-image: linear-gradient(to right, black, transparent);
+}
+
+.background-scroll-shadow-right {
+	-webkit-mask-image: linear-gradient(to left, black, transparent);
+	mask-image: linear-gradient(to left, black, transparent);
+}
+</style>

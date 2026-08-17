@@ -639,8 +639,6 @@ pub(crate) async fn update_instance_icon_recipe(
     if let Some(recipe) = recipe {
         let background = serde_json::to_string(&recipe.background)?;
         let symbol = &recipe.symbol;
-        let used_at = Utc::now().timestamp_millis();
-
         sqlx::query(
             "
 			INSERT INTO instance_icon_recipes (instance_id, background, symbol)
@@ -656,33 +654,7 @@ pub(crate) async fn update_instance_icon_recipe(
         .execute(&mut **tx)
         .await?;
 
-        sqlx::query(
-            "
-			INSERT INTO recent_instance_icon_recipes (background, symbol, used_at)
-			VALUES (?, ?, ?)
-			ON CONFLICT (background, symbol) DO UPDATE SET
-				used_at = excluded.used_at
-			",
-        )
-        .bind(&background)
-        .bind(symbol)
-        .bind(used_at)
-        .execute(&mut **tx)
-        .await?;
-
-        sqlx::query(
-            "
-			DELETE FROM recent_instance_icon_recipes
-			WHERE rowid NOT IN (
-				SELECT rowid
-				FROM recent_instance_icon_recipes
-				ORDER BY used_at DESC, background, symbol
-				LIMIT 6
-			)
-			",
-        )
-        .execute(&mut **tx)
-        .await?;
+        update_recent_instance_icon_recipe(recipe, tx).await?;
     } else {
         sqlx::query(
             "
@@ -694,6 +666,44 @@ pub(crate) async fn update_instance_icon_recipe(
         .execute(&mut **tx)
         .await?;
     }
+
+    Ok(())
+}
+
+pub(crate) async fn update_recent_instance_icon_recipe(
+    recipe: &InstanceIconRecipe,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    let background = serde_json::to_string(&recipe.background)?;
+    let used_at = Utc::now().timestamp_millis();
+
+    sqlx::query(
+        "
+			INSERT INTO recent_instance_icon_recipes (background, symbol, used_at)
+			VALUES (?, ?, ?)
+			ON CONFLICT (background, symbol) DO UPDATE SET
+				used_at = excluded.used_at
+			",
+    )
+    .bind(&background)
+    .bind(&recipe.symbol)
+    .bind(used_at)
+    .execute(&mut **tx)
+    .await?;
+
+    sqlx::query(
+        "
+			DELETE FROM recent_instance_icon_recipes
+			WHERE rowid NOT IN (
+				SELECT rowid
+				FROM recent_instance_icon_recipes
+				ORDER BY used_at DESC, background, symbol
+				LIMIT 6
+			)
+			",
+    )
+    .execute(&mut **tx)
+    .await?;
 
     Ok(())
 }

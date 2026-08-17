@@ -411,10 +411,12 @@ export async function edit_generated_icon(
 export async function cache_generated_icon(
 	recipe: InstanceIconRecipe,
 	symbolBytes: number[],
+	addToRecents = false,
 ): Promise<string> {
 	return await invoke('plugin:instance|instance_cache_generated_icon', {
 		recipe,
 		symbolBytes,
+		addToRecents,
 	})
 }
 

@@ -2,8 +2,8 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
-    CreateInstance, EditInstance, InstanceLink, InstanceMetadata, ModLoader,
-    State,
+    CreateInstance, EditInstance, InstanceIconRecipe, InstanceLink,
+    InstanceMetadata, ModLoader, State,
 };
 
 #[tracing::instrument]
@@ -14,9 +14,13 @@ pub(crate) async fn create(
     modloader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
+    icon_recipe: Option<InstanceIconRecipe>,
     link: InstanceLink,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
+    if let Some(icon_recipe) = &icon_recipe {
+        super::icon::validate_generated_icon_recipe(icon_recipe)?;
+    }
     let instance = crate::state::create_instance(
         CreateInstance {
             name,
@@ -25,6 +29,7 @@ pub(crate) async fn create(
             loader: modloader,
             loader_version,
             icon_path,
+            icon_recipe,
             link,
         },
         &state,

@@ -5,8 +5,8 @@ use crate::state::instances::{
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
-    State,
+    InstanceIconRecipe, InstanceInstallStage, LauncherFeatureVersion,
+    ModLoader, ReleaseChannel, State,
 };
 use crate::util::fetch;
 use crate::util::io;
@@ -23,6 +23,7 @@ pub struct CreateInstance {
     pub loader: ModLoader,
     pub loader_version: Option<String>,
     pub icon_path: Option<String>,
+    pub icon_recipe: Option<InstanceIconRecipe>,
     pub link: InstanceLink,
 }
 
@@ -97,6 +98,14 @@ pub(crate) async fn create_instance(
 
         let mut tx = state.pool.begin().await?;
         instance_rows::insert_instance(&instance, &mut tx).await?;
+        if let Some(icon_recipe) = &input.icon_recipe {
+            instance_rows::update_instance_icon_recipe(
+                &instance_id,
+                Some(icon_recipe),
+                &mut tx,
+            )
+            .await?;
+        }
         content_rows::insert_content_set(&content_set, &mut tx).await?;
         instance_rows::upsert_instance_link(&instance_id, &input.link, &mut tx)
             .await?;
