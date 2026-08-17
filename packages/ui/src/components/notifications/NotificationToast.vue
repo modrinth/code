@@ -197,8 +197,8 @@ import { computed, ref } from 'vue'
 
 import { Button, type ButtonColor, IconButton } from '#ui/components/base/buttons'
 
-import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useFormatBytes, useFormatNumber } from '../../composables'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'
 import { truncatedTooltip } from '../../utils/truncate'
 import Avatar from '../base/Avatar.vue'

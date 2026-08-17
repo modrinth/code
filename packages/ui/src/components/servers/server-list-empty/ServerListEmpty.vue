@@ -84,7 +84,6 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import frog from '#ui/assets/welcome/frog.png'
 import iconTexture from '#ui/assets/welcome/icon-texture.png'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import { Button } from '#ui/components/base/buttons'

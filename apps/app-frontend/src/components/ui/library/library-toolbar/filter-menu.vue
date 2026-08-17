@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
+	defineMessages,
 	DropdownFilterBar,
 	type DropdownFilterBarCategory,
-	defineMessages,
 	formatLoader,
 	useVIntl,
 } from '@modrinth/ui'
