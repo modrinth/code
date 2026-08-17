@@ -267,7 +267,7 @@
     "message": "Modpacks"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content."
+    "message": "Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated."
   },
   "app.browse.server.installing": {
     "message": "Installing"
@@ -280,6 +280,12 @@
   },
   "app.export-modal.export-button": {
     "message": "Export"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Export complete"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} was exported successfully."
   },
   "app.export-modal.header": {
     "message": "Export modpack"
@@ -301,6 +307,18 @@
   },
   "app.home.jump-back-in.new-instance": {
     "message": "New instance"
+  },
+  "app.hosting.update-required.description": {
+    "message": "You need to update to use Modrinth Hosting through the Modrinth App"
+  },
+  "app.hosting.update-required.download": {
+    "message": "Download to update"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Excited Modrinth Bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Modrinth App update required"
   },
   "app.icon-editor.apply-icons-modal.apply-error": {
     "message": "Failed to apply random icons to instances."
@@ -422,17 +440,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Review changes"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Review update"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Reviewing..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "An update is required to play {name}. Please update to latest version to launch the game."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "An update is available"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
@@ -458,6 +467,12 @@
   "app.instance.confirm-delete.instances-label": {
     "message": "{count, plural, one {Instance} other {Instances ({count})}}"
   },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Modpack content"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Shared content"
+  },
   "app.instance.modpack-already-installed.body": {
     "message": "This modpack is already installed in the <bold>{instanceName}</bold> instance. Are you sure you want to duplicate it?"
   },
@@ -482,6 +497,9 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "Freeze version"
+  },
   "app.instance.mods.locked-content": {
     "message": "Content in locked instances cannot be changed."
   },
@@ -499,6 +517,9 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Unfreeze version"
   },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"
@@ -818,6 +839,9 @@
   "app.modal.install-to-play.invite-warning-with-creator": {
     "message": "This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust."
   },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "Modpack content"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
@@ -835,15 +859,6 @@
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Which rule does this instance violate?"
-  },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Inappropriate"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Malicious"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Report shared instance"
@@ -1592,11 +1607,26 @@
   "instance.icon-editor.background.blue": {
     "message": "Blue"
   },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Dark gray"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Gray"
+  },
   "instance.icon-editor.background.green": {
     "message": "Green"
   },
+  "instance.icon-editor.background.indigo": {
+    "message": "Indigo"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Light gray"
+  },
   "instance.icon-editor.background.orange": {
     "message": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Pink"
   },
   "instance.icon-editor.background.purple": {
     "message": "Purple"
@@ -1604,8 +1634,11 @@
   "instance.icon-editor.background.red": {
     "message": "Red"
   },
-  "instance.icon-editor.background.surface": {
-    "message": "Surface"
+  "instance.icon-editor.background.rose": {
+    "message": "Rose"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Yellow"
   },
   "instance.icon-editor.description": {
     "message": "Mix and match elements to create a custom icon."
@@ -1622,6 +1655,9 @@
   "instance.icon-editor.symbol": {
     "message": "Symbol"
   },
+  "instance.icon-editor.symbol.dirt-block": {
+    "message": "Dirt block"
+  },
   "instance.icon-editor.symbol.dusk-block": {
     "message": "Dusk block"
   },
@@ -1636,6 +1672,9 @@
   },
   "instance.icon-editor.title": {
     "message": "Icon editor"
+  },
+  "instance.last-played": {
+    "message": "Last played"
   },
   "instance.locked.delete-button": {
     "message": "Delete instance"
@@ -2108,17 +2147,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Sync with instance"
   },
-  "search.filter.locked.server": {
-    "message": "Provided by the server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Only client-side mods can be added to the server instance"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Game version is provided by the server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader is provided by the server"
   },
   "settings.sidebar.label.account": {
     "message": "Account"

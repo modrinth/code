@@ -2753,15 +2753,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.title": {
-    "message": "Definições"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Visitar o painel de projetos"
-  },
-  "project.status.archived.message": {
-    "message": "{title} foi arquivado. {title} não receberá mais atualizações, a menos que o autor decida desarquivar o projeto."
-  },
   "project.versions.title": {
     "message": "Versões"
   },

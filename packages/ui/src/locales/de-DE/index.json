@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "Welt"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Installationseinstellungen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Zusätzliche Inhalte"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projektnamen"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alphabetisch"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Neuste zuerst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Älteste zuerst"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortieren nach {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Alle aktualisieren"
@@ -2051,6 +2036,7 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Instanz suchen"
   },
+<<<<<<< HEAD
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Dieses Modpack enthält keine zusätzlichen Inhalte."
   },
@@ -2077,6 +2063,10 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
+=======
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Icon auswählen"
+>>>>>>> main
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
@@ -3803,15 +3793,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Erweitert"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Datenpakete ausschließen"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Mods ausschließen"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Plugins ausschließen"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Umgebung"
   },
@@ -4580,9 +4561,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Server wird installiert"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Inhalt wird synchronisiert"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Auch eine Freundschaftsanfrage senden"
   },
@@ -4637,50 +4615,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation fehlgeschlagen"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Während der Installation der Plattform ist ein interner Fehler aufgetreten. Bitte versuche es erneut."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Die angegebene Loader- oder Minecraft-Version konnte nicht installiert werden. Sie ist möglicherweise ungültig oder wird nicht unterstützt."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Das Modpack konnte nicht installiert werden. Es ist eventuell beschädigt oder nicht kompatibel."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Diese Modpack-Version enthält keine herunterladbare Datei. Es wurde eventuell falsch gepackt."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Während der Installation ist ein unerwarteter Fehler aufgetreten."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Diese Version von Minecraft oder des Loaders wird aktuell noch nicht von Modrinth Hosting unterstützt."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Addons werden installiert..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Modpack wird installiert..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Plattform wird installiert..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Wir bereiten deinen Server vor"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java wird hinzugefügt..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Server wird konfiguriert..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Mods werden heruntergeladen..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Dateien werden organisiert..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Umgebung wird eingerichtet..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Du hast bereits einen Server?"

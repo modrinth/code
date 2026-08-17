@@ -3,7 +3,7 @@ import type { RouteLocationRaw } from 'vue-router'
 
 import type { AnchoredTeleportPlacement } from '../../../utils/use-anchored-teleport'
 
-export type ButtonType = 'base' | 'colored' | 'outlined' | 'quiet'
+export type ButtonType = 'base' | 'colored' | 'colored-text' | 'outlined' | 'quiet'
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -33,6 +33,10 @@ export type ButtonVisualProps = {
 	  }
 	| {
 			type: 'colored'
+			color?: ButtonColor
+	  }
+	| {
+			type: 'colored-text'
 			color?: ButtonColor
 	  }
 	| {

@@ -24,11 +24,11 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import type { Dayjs } from 'dayjs'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { process_listener } from '@/helpers/events'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
@@ -115,7 +115,7 @@ const stop = async (event: MouseEvent) => {
 	loading.value = false
 }
 
-const unlistenProcesses = await process_listener(async () => {
+useAppEvent('process', async () => {
 	await checkProcess()
 })
 
@@ -127,10 +127,6 @@ const checkProcess = async () => {
 
 onMounted(() => {
 	checkProcess()
-})
-
-onUnmounted(() => {
-	unlistenProcesses()
 })
 </script>
 <template>
@@ -203,9 +199,9 @@ onUnmounted(() => {
 								: null
 					"
 					:disabled="instance.quarantined || playing || loading"
-					@click="play"
 					type="colored"
 					color="green"
+					@click="play"
 				>
 					<SpinnerIcon v-if="loading" class="animate-spin" />
 					<PlayIcon v-else aria-hidden="true" />

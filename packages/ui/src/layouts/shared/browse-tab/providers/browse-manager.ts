@@ -45,6 +45,8 @@ export interface BrowseManagerContext {
 	setPage: (page: number) => Promise<void>
 	clearSearch: () => void
 	onFilterChange: () => void
+	linkOverridesAdvancedPrefs: Ref<boolean>
+	applySavedAdvancedPrefs: () => void
 
 	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => string | RouteLocationRaw
 	getServerProjectLink: (
@@ -74,6 +76,7 @@ export interface BrowseManagerContext {
 	serverOnlyLabel?: ComputedRef<string>
 	hiddenFilterTypes?: ComputedRef<string[]>
 	advancedFiltersCollapsed?: Ref<boolean>
+	dismissedPhotosensitivityFilterWarning?: Ref<boolean>
 	onInstalled?: (projectId: string) => void
 
 	displayMode?: Ref<'list' | 'grid' | 'gallery'> | ComputedRef<'list' | 'grid' | 'gallery'>

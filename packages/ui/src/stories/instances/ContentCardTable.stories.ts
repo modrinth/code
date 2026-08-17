@@ -119,6 +119,7 @@ const etfItem: ContentCardTableItem = {
 
 const importedModItem: ContentCardTableItem = {
 	id: 'imported123',
+	external: true,
 	project: {
 		id: 'imported123',
 		slug: 'import-mod',

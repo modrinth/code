@@ -3,9 +3,9 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Emitter, Manager, PhysicalPosition, PhysicalSize, Runtime};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
 use tauri_plugin_opener::OpenerExt;
-use theseus::settings;
+use theseus::{AppEvent, EventState, settings};
 use tokio::sync::RwLock;
 
 pub struct AdsState {
@@ -20,7 +20,6 @@ pub struct AdsState {
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
-const ADS_CONSENT_REQUIRED_EVENT: &str = "ads-consent-required";
 const APP_TITLE_BAR_HEIGHT: f32 = 48.0;
 #[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
@@ -37,6 +36,12 @@ const ADS_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_VERSION"),
     " (Modrinth App)",
 );
+
+fn emit_ads_consent_required(required: bool) {
+    EventState::get()
+        .send(AppEvent::AdsConsentRequired(required))
+        .ok();
+}
 
 #[cfg(windows)]
 fn ads_user_agent_override_params() -> String {
@@ -187,10 +192,19 @@ async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
 
     state.occluded = occluded;
     let visible = should_show_ads_webview(&state);
+    let consent_overlay_shown = state.consent_overlay_shown;
     drop(state);
 
     if let Some(webview) = app.webviews().get("ads-window") {
-        set_webview_visible(webview, visible);
+        let is_minimized = app
+            .get_window("main")
+            .and_then(|window| window.is_minimized().ok())
+            .unwrap_or(false);
+
+        set_webview_visible(
+            webview,
+            visible && !is_minimized && (!occluded || consent_overlay_shown),
+        );
     }
 }
 
@@ -657,7 +671,7 @@ pub async fn init_ads_window<R: Runtime>(
         && state.consent_required
         && state.consent_notification_enabled
     {
-        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, true).ok();
+        emit_ads_consent_required(true);
     }
 
     Ok(())
@@ -695,7 +709,7 @@ pub async fn update_ads_window_hold<R: Runtime>(
         && state.consent_required
         && state.consent_notification_enabled
     {
-        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, true).ok();
+        emit_ads_consent_required(true);
     }
 
     Ok(())
@@ -721,7 +735,7 @@ pub async fn hide_ads_window<R: Runtime>(
     }
 
     if reset {
-        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, false).ok();
+        emit_ads_consent_required(false);
     }
 
     Ok(())
@@ -752,8 +766,7 @@ pub async fn show_ads_consent_ui<R: Runtime>(
         )?;
     }
 
-    app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, show_notification)
-        .ok();
+    emit_ads_consent_required(show_notification);
 
     Ok(())
 }
@@ -832,7 +845,7 @@ pub async fn finish_ads_consent_flow<R: Runtime>(
         }
     }
 
-    app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, false).ok();
+    emit_ads_consent_required(false);
 
     Ok(())
 }

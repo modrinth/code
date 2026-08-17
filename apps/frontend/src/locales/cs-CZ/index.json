@@ -2375,12 +2375,6 @@
   "project.settings.permissions.sort.status": {
     "message": "Stav"
   },
-  "project.settings.title": {
-    "message": "Nastavení"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Přejít na přehled projektů"
-  },
   "project.versions.title": {
     "message": "Verze"
   },

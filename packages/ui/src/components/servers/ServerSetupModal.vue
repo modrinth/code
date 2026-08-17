@@ -131,6 +131,11 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 			await handleMrpackUpload(ctx.modpackFile.value, ctx.buildProperties())
 		} else if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {
 			debug('onFlowComplete: modpack selection path, calling installContent')
+			serverContext.beginInstallation({
+				type: 'modrinth_modpack',
+				project_id: ctx.modpackSelection.value.projectId,
+				version_id: ctx.modpackSelection.value.versionId,
+			})
 			await client.archon.content_v1.installContent(
 				serverContext.serverId,
 				serverContext.worldId.value!,
@@ -159,6 +164,15 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 				apiLoader: toApiLoader(loader ?? 'vanilla'),
 			})
 
+			serverContext.beginInstallation({
+				type: 'platform',
+				platform: (loader ?? 'vanilla') as Extract<
+					Archon.Websocket.v0.InstallProgressKey,
+					{ type: 'platform' }
+				>['platform'],
+				platform_version: loaderVersion,
+				game_version: ctx.selectedGameVersion.value ?? '',
+			})
 			await client.archon.content_v1.installContent(
 				serverContext.serverId,
 				serverContext.worldId.value!,
@@ -183,6 +197,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 		creationFlowRef.value?.hide()
 	} catch (error) {
 		debug('onFlowComplete: ERROR', error)
+		serverContext.cancelOptimisticInstallation()
 		if ((error as ModrinthApiError).statusCode === 429) {
 			addNotification({
 				title: formatMessage(messages.rateLimitTitle),
@@ -210,6 +225,10 @@ async function handleMrpackUpload(file: File, properties: Archon.Content.v1.Prop
 		{ softOverride: false },
 	)
 	await uploadProgressModal.value!.track(handle)
+	serverContext.beginInstallation({
+		type: 'local_modpack',
+		filename: file.name,
+	})
 	emitReinstall()
 }
 

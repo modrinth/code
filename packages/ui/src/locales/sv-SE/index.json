@@ -560,9 +560,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "värld"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Installationsinställningar"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Ytterligare innehåll"
   },
@@ -613,18 +610,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projektnamn"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisk"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyaste först"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Äldsta först"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortera i {mode} ordning"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Uppdatera alla"
@@ -1772,6 +1757,7 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Sök för instans"
   },
+<<<<<<< HEAD
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Modpaketet innehåller inget ytterligare innehåll."
   },
@@ -1795,6 +1781,10 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Sök genom {count, number} projekt"
+=======
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Välj ikon"
+>>>>>>> main
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -3425,12 +3415,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Avancerat"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Exkludera datapaket"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Exkludera moddar"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Miljö"
   },
@@ -4160,41 +4144,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installering misslyckades"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Ett internt fel inträffade när plattformen installerades. Vänligen försök igen."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Den angivna loader eller Minecraft-versionen kunde inte installeras. Den kan vara ogiltig eller stöds inte."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Modpaketet kunde inte installeras. Det kanske är korrumperad eller inkompatibel."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Ett oväntat fel inträffade under installeringen."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Denna version av Minecraft eller loader stöds ännu inte av Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installerar tillägg..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Vi förbereder din server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Lägger till Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurerar server..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Laddar ner moddar..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organiserar filer..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Ställer in miljö..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du redan en server?"

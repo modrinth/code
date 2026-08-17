@@ -11,6 +11,117 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-15T02:19:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed error page not working`,
+	},
+	{
+		date: `2026-08-14T18:44:06+00:00`,
+		product: 'app',
+		version: '0.17.10',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T18:44:06+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'app',
+		version: '0.17.9',
+		body: `## Fixed
+- Reverted server panel change that wasn't meant to go out yet.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Reverted server panel change that wasn't meant to go out yet.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project pages failing to load when user is not logged in.`,
+	},
+	{
+		date: `2026-08-14T17:04:48+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T17:04:48+00:00`,
+		product: 'app',
+		version: '0.17.8',
+		body: `## Fixed
+- Fixed some issues rendering Ears skins
+- Fixed mrpack exports setting the wrong environment inclusion values.
+- Fixed issue where if your instance was linked to a modpack version that has been deleted from Modrinth the Managed content card on the content tab would not show up`,
+	},
+	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'app',
+		version: '0.17.7',
+		body: `## Added
+- Added a notification to indicate when modpack export is done.
+
+## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.
+
+## Fixed
+- Fixed modpack export appears to work but fails when imported as an instance.
+- Fixed modpack export progress bar.`,
+	},
+	{
+		date: `2026-08-13T17:59:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved how disclosures are displayed and added support for basic Markdown functionality.`,
+	},
+	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'app',
+		version: '0.17.6',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.`,
+	},
+	{
+		date: `2026-08-13T16:01:54+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new content disclosures for projects.
+
+## Changed
+- "Advanced" search filter group is now called "Advanced exclusions" and now contains content disclosure filters
+- Project archiving has been changed from a visibility status to a content disclosure, making it compatible with Unlisted and Private projects.
+- Updated parts of "General" settings for projects; moved the Monetization setting into the "Danger zone" with "Delete project"
+- Updated design of project settings header. Now has a dynamic back button to take you back to where you came from.
+
+## Fixed
+- Fixed changing slugs sometimes not redirecting properly.`,
+	},
+	{
 		date: `2026-08-10T18:17:39+00:00`,
 		product: 'web',
 		body: `## Added

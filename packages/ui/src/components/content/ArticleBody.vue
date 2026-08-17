@@ -2,6 +2,7 @@
 import { type Component, computed } from 'vue'
 
 import PrideCollectionWidget from './PrideCollectionWidget.vue'
+import Rule6Widget from './Rule6Widget.vue'
 import SparkLiveWidget from './SparkLiveWidget.vue'
 import SparkLiveWidgetEmbed from './SparkLiveWidgetEmbed.vue'
 
@@ -9,6 +10,7 @@ const ARTICLE_WIDGETS: Record<string, Component> = {
 	'spark-live-widget': SparkLiveWidget,
 	'spark-live-widget-embed': SparkLiveWidgetEmbed,
 	'pride-collection-widget': PrideCollectionWidget,
+	'rule-6': Rule6Widget,
 }
 
 type ArticleBodyPart = { type: 'html'; content: string } | { type: 'widget'; id: string }

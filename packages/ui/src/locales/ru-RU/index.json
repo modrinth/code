@@ -536,9 +536,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "мир"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Настройки установки"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Дополнительный контент"
   },
@@ -586,18 +583,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Названия проектов"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "По алфавиту"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Сначала новые"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Сначала старые"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Сортировка: {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Обновить всё"
@@ -1967,6 +1952,7 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Поиск сборки"
   },
+<<<<<<< HEAD
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "В сборке нет дополнительного контента."
   },
@@ -1993,6 +1979,10 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
+=======
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Выбрать иконку"
+>>>>>>> main
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"
@@ -3716,15 +3706,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Расширенные"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Исключать наборы данных"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Исключать моды"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Исключать плагины"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Среда"
   },
@@ -4493,9 +4474,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Сервер устанавливается"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Синхронизация контента в процессе"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Также отправить запрос в друзья"
   },
@@ -4550,50 +4528,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Установка не удалась"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Во время установки платформы произошла внутренняя ошибка. Попробуйте ещё раз."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Не удалось установить указанную версию загрузчика или Minecraft. Возможно, она недействительна или не поддерживается."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Не удалось установить сборку модов. Возможно, она повреждена или несовместима."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Эта версия сборки не содержит загрузочного файла. Возможно, она была собрана неправильно."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Во время установки произошла непредвиденная ошибка."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Эта версия Minecraft или загрузчика пока не поддерживается Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Установка дополнений..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Установка сборки..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Установка платформы..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Подготовка сервера"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Добавление Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Настройка сервера..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Скачивание модов..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Упорядочивание файлов..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Настройка среды..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже есть сервер?"

@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "安装设置"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "附加内容"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "项目名称"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "按字母顺序"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "按从新到旧顺序"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "按从旧到新顺序"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "按{mode}排序"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新所有"
@@ -2051,6 +2036,7 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜索实例"
   },
+<<<<<<< HEAD
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "这个整合包不包含任何额外内容。"
   },
@@ -2077,6 +2063,10 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
+=======
+  "instances.content-install.select-icon": {
+    "defaultMessage": "选择图标"
+>>>>>>> main
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
@@ -3803,15 +3793,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "高级"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "排除数据包"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "排除模组"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "排除插件"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "运行环境"
   },
@@ -4580,9 +4561,6 @@
   "servers.busy.installing": {
     "defaultMessage": "正在安装服务器"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "正在同步內容"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "同时发送好友邀请"
   },
@@ -4637,50 +4615,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "安装失败"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "安装平台时发生内部错误，请重试。"
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "指定的加载器或 Minecraft 版本无法安装。它可能无效或不受支持。"
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "整合包无法安装。它可能已损坏或不兼容。"
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "这个整合包版本不包含可下载的文件，可能是打包方式有问题。"
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "安装过程中发生意外错误。"
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Modrinth Hosting 目前尚不支持此版本的 Minecraft 或加载器。"
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "正在安装组件……"
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "正在安装整合包……"
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "正在安装平台……"
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "我们正在准备你的服务器"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "正在添加 Java……"
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "正在配置服务器……"
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "正在下载模组……"
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "正在整理文件……"
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "正在设置运行环境……"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已经有服务器了吗？"

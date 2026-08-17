@@ -3,7 +3,10 @@ use std::convert::TryFrom;
 use std::collections::HashMap;
 
 use super::super::ids::OrganizationId;
-use crate::database::models::{DatabaseError, version_item};
+use crate::database::models::{
+    DBProjectDisclosure, DBProjectId, DatabaseError, version_item,
+};
+use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
@@ -238,28 +241,42 @@ impl LegacyProject {
     }
 
     // Because from needs a version_item, this is a helper function to get many from one db query.
-    pub async fn from_many<'a, E>(
+    pub async fn from_many(
         data: Vec<Project>,
-        exec: E,
+        pool: &crate::database::PgPool,
         redis: &RedisPool,
-    ) -> Result<Vec<Self>, DatabaseError>
-    where
-        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
-    {
+    ) -> Result<Vec<Self>, DatabaseError> {
         let version_ids: Vec<_> = data
             .iter()
             .filter_map(|p| p.versions.first().map(|i| (*i).into()))
             .collect();
+        let project_ids: Vec<DBProjectId> =
+            data.iter().map(|p| p.id.into()).collect();
+
         let example_versions =
-            version_item::DBVersion::get_many(&version_ids, exec, redis)
+            version_item::DBVersion::get_many(&version_ids, pool, redis)
                 .await?;
+        let archived_disclosure_ids = DBProjectDisclosure::projects_with_type(
+            ProjectDisclosureType::Archived,
+            &project_ids,
+            pool,
+        )
+        .await?;
+
         let mut legacy_projects = Vec::new();
         for project in data {
             let version_item = example_versions
                 .iter()
                 .find(|v| v.inner.project_id == project.id.into())
                 .cloned();
-            let project = LegacyProject::from(project, version_item);
+            let has_archived_disclosure =
+                archived_disclosure_ids.contains(&project.id.into());
+            let mut project = LegacyProject::from(project, version_item);
+            if has_archived_disclosure
+                && project.status == ProjectStatus::Approved
+            {
+                project.status = ProjectStatus::Archived;
+            }
             legacy_projects.push(project);
         }
         Ok(legacy_projects)

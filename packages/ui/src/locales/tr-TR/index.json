@@ -596,18 +596,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Proje isimleri"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetik"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Önce en yeni"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Önce en eski"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sıralama şekli {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Tümünü güncelle"
   },
@@ -2021,6 +2009,7 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Kurulum ara"
   },
+<<<<<<< HEAD
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Bu mod paketi başka hiç bir ekstra işerik içermez."
   },
@@ -2041,6 +2030,10 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
+=======
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Simge seç"
+>>>>>>> main
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
@@ -3620,15 +3613,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Gelişmiş"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Veri paketlerini hariç tut"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Modları hariç tut"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Eklentileri hariç tut"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Ortam"
   },
@@ -4391,9 +4375,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Sunucu kuruluyor"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "İçerik eşlemesi sürüyor"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Ayrıca bir arkadaş isteği gönderin"
   },
@@ -4448,50 +4429,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Kurulum başarısız oldu"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Platform yüklenirken dahili bir hata oluştu. Lütfen tekrar deneyin."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Belirtilen yükleyici veya Minecraft sürümü kurulamazdı. Belki de geçersiz veya desteklenmeyen bir sürüm olabilir."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Mod paketi yüklenemedi. Bozuk veya uyumsuz olabilir."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Bu mod paketi sürümü indirilebilir bir dosya içermez. Yanlış paketlenmiş olabilir."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Kurulum sırasında beklenmeyen bir hata oluştu."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Minecraft veya yükleyicinin bu sürümü henüz Modrinth Hosting tarafından desteklenmemektedir."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Eklentiler yükleniyor..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Mod paketi indiriliyor..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Platform yükleniyor..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Sunucunuzu hazırlıyoruz"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java ekleniyor..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Sunucu yapılandırılıyor..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Modlar indiriliyor..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Dosyalar düzenleniyor..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Ortam hazırlanıyor..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Zaten sunucunuz var mı?"

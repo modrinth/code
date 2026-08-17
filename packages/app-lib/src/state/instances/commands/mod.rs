@@ -22,6 +22,8 @@ pub(crate) use self::list_content::{
     list_linked_modpack_content,
 };
 
+mod embedded_content_metadata;
+
 mod remove_instance;
 pub(crate) use self::remove_instance::*;
 

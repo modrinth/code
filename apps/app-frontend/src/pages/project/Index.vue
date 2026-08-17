@@ -283,7 +283,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
@@ -293,6 +293,7 @@ import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
+import { useAppEvent } from '@/composables/use-app-event'
 import {
 	get_organization,
 	get_project,
@@ -301,7 +302,6 @@ import {
 	get_version,
 	get_version_many,
 } from '@/helpers/cache.js'
-import { process_listener } from '@/helpers/events'
 import {
 	get as getInstance,
 	get_projects as getInstanceProjects,
@@ -814,8 +814,7 @@ function fetchDeferredServerData(project) {
 
 await fetchProjectData()
 
-let unlistenProcesses
-process_listener((e) => {
+useAppEvent('process', (e) => {
 	if (
 		e.event === 'finished' &&
 		serverInstancePath.value &&
@@ -823,12 +822,6 @@ process_listener((e) => {
 	) {
 		serverPlaying.value = false
 	}
-}).then((unlisten) => {
-	unlistenProcesses = unlisten
-})
-
-onUnmounted(() => {
-	unlistenProcesses?.()
 })
 
 watch(

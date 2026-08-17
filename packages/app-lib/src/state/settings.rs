@@ -68,6 +68,7 @@ pub enum FeatureFlag {
     FriendsOnlineCollapsed,
     FriendsOfflineCollapsed,
     FriendsPendingCollapsed,
+    DismissedPhotosensitivityFilterWarning,
 }
 
 impl Settings {

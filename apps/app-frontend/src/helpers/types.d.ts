@@ -139,6 +139,7 @@ export type ContentSourceKind =
 
 type ContentFile = {
 	enabled: boolean
+	locked: boolean
 	source_kind?: ContentSourceKind | null
 	metadata?: {
 		project_id: string

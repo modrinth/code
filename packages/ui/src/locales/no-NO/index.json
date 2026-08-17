@@ -413,18 +413,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Prosjektnavn"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisk"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyeste først"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Eldste først"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter etter {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"
   },
@@ -857,6 +845,7 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søk etter instans"
   },
+<<<<<<< HEAD
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Ingen innhold funnet"
   },
@@ -868,6 +857,10 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Søk etter {count, number} {count, plural, one {prosjekt} other {prosjekter}}"
+=======
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Velg ikon"
+>>>>>>> main
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nåværende"

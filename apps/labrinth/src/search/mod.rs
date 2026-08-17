@@ -218,6 +218,7 @@ pub enum SearchField {
     MinecraftJavaServerPingData,
     DependencyProjectIds,
     CompatibleDependencyProjectIds,
+    DisclosureTypes,
     RequiredDependencyProjectIds,
     OptionalDependencyProjectIds,
     EmbeddedDependencyProjectIds,
@@ -302,6 +303,8 @@ pub struct UploadSearchProject {
     pub incompatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
+    #[serde(default)]
+    pub disclosure_types: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -408,6 +411,8 @@ pub struct ResultSearchProject {
     pub incompatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
+    #[serde(default)]
+    pub disclosure_types: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -458,6 +463,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             incompatible_dependency_project_ids: source
                 .incompatible_dependency_project_ids,
             dependencies: source.dependencies,
+            disclosure_types: source.disclosure_types,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,
             components: source.components,

@@ -3884,18 +3884,6 @@
   "project.settings.tags.title": {
     "message": "Tagi"
   },
-  "project.settings.tags.upload-version-first": {
-    "message": "Prześlij wersję, by móc wybierać tagi!"
-  },
-  "project.settings.title": {
-    "message": "Ustawienia"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Odwiedź pulpit projektów"
-  },
-  "project.status.archived.message": {
-    "message": "{title} zostało zarchiwizowane. {title} nie będzie otrzymywać żadnych dalszych aktualizacji, chyba że autor zdecyduje się przywrócić projekt."
-  },
   "project.versions.copy-id-option": {
     "message": "Kopiuj ID"
   },

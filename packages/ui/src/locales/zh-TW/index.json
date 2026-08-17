@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "安裝設定"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "專案名稱"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "字母順序"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "最新在前"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "最舊在前"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "排序依據：{mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新全部"
@@ -2051,6 +2036,7 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜尋實例"
   },
+<<<<<<< HEAD
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "這個模組包不包含任何額外內容。"
   },
@@ -2077,6 +2063,10 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
+=======
+  "instances.content-install.select-icon": {
+    "defaultMessage": "選擇圖示"
+>>>>>>> main
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
@@ -3803,15 +3793,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "進階篩選"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "排除資料包"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "排除模組"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "排除插件"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "環境"
   },
@@ -4580,9 +4561,6 @@
   "servers.busy.installing": {
     "defaultMessage": "正在安裝伺服器"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "正在同步內容"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "同時傳送好友邀請"
   },
@@ -4637,50 +4615,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "無法安裝"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "安裝平臺時發生內部錯誤，請再試一次。"
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "無法安裝指定的載入器或 Minecraft 版本。該載入器或版本可能無效或不受支援。"
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "無法安裝模組包。該模組包可能已損毀或不相容。"
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "這個模組包版本不包含可下載檔案。可能是打包時出了問題。"
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "安裝時發生非預期的錯誤。"
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Modrinth Hosting 尚不支援這個 Minecraft 版本或載入器。"
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "正在安裝額外內容..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "正在安裝模組包..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "正在安裝平臺..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "我們正在為你準備伺服器"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "正在新增 Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "正在設定伺服器..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "正在下載模組..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "正在整理檔案..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "正在設定環境..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已經有伺服器了嗎？"

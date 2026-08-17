@@ -38,6 +38,7 @@
 		"wrangler": "^4.115.0"
 	},
 	"dependencies": {
+		"@contentauth/c2pa-web": "^0.13.1",
 		"@formatjs/intl-localematcher": "^0.5.4",
 		"@ltd/j-toml": "^1.38.0",
 		"@modrinth/api-client": "workspace:*",

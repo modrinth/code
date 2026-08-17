@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<AiImageWarningModal ref="aiImageWarningModal" />
 		<Modal
 			v-if="currentMember"
 			ref="modal_edit_item"
@@ -18,12 +19,7 @@
 							:accept="acceptFileTypes"
 							:max-size="5242880"
 							aria-label="Replace image"
-							@change="
-								(x) => {
-									editFile = x[0]
-									showPreviewImage()
-								}
-							"
+							@change="replaceEditFile"
 						>
 							<TransferIcon aria-hidden="true" />
 						</FileButton>
@@ -294,6 +290,7 @@ import {
 import {
 	Button,
 	ButtonLink,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	DropArea,
 	FileButton,
@@ -304,6 +301,8 @@ import {
 	useFormatDateTime,
 } from '@modrinth/ui'
 
+import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
 const formatDate = useFormatDateTime({
@@ -320,16 +319,9 @@ const {
 	deleteGalleryItem: deleteGalleryItemMutation,
 } = injectProjectPageContext()
 
-const title = `${project.value.title} - Gallery`
-const description = `View ${project.value.gallery?.length ?? 0} images of ${project.value.title} on Modrinth.`
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.gallery)
 
-useSeoMeta({
-	title,
-	description,
-	ogTitle: title,
-	ogDescription: description,
-})
-
+const aiImageWarningModal = ref(null)
 const modal_edit_item = ref(null)
 const modal_confirm = ref(null)
 
@@ -387,12 +379,33 @@ const resetEdit = () => {
 	previewImage.value = null
 }
 
-const handleFiles = (files) => {
+const handleFiles = async (files) => {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
 	resetEdit()
-	editFile.value = files[0]
+	editFile.value = file
 
 	showPreviewImage()
 	modal_edit_item.value.show()
+}
+
+const replaceEditFile = async (files) => {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
+	editFile.value = file
+	showPreviewImage()
 }
 
 const showPreviewImage = () => {

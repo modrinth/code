@@ -715,6 +715,14 @@ impl SearchField {
                 optional: true,
                 token_separators: &["-"],
             },
+            SearchField::DisclosureTypes => TypesenseFieldSpec {
+                path: "disclosure_types",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: &["_"],
+            },
             SearchField::RequiredDependencyProjectIds => TypesenseFieldSpec {
                 path: "required_dependency_project_ids",
                 ty: "string[]",

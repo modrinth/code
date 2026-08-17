@@ -872,16 +872,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar com a instância"
   },
-  "search.filter.locked.server": {
-    "message": "Fornecido pelo servidor"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Apenas mods no cliente podem ser adicionados à instância de servidor"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Versão do jogo é fornecida pelo servidor"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Carregador é fornecido pelo servidor"
   }
 }

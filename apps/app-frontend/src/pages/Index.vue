@@ -2,14 +2,14 @@
 import { HomeIcon, PlusIcon } from '@modrinth/assets'
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import dayjs from 'dayjs'
-import { computed, inject, onActivated, onUnmounted, ref } from 'vue'
+import { computed, inject, onActivated, ref } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import LibrarySection from '@/components/ui/library/index.vue'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
+import { useAppEvent } from '@/composables/use-app-event'
 import { toError } from '@/helpers/errors'
-import { instance_groups_listener, instance_listener } from '@/helpers/events'
 import { list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
@@ -70,15 +70,8 @@ if (hasCreatedInstance.value) {
 	await fetchInstances()
 }
 
-const [unlistenInstance, unlistenInstanceGroups] = await Promise.all([
-	instance_listener(fetchInstances),
-	instance_groups_listener(fetchInstances),
-])
-
-onUnmounted(() => {
-	unlistenInstance()
-	unlistenInstanceGroups()
-})
+useAppEvent('instance', fetchInstances)
+useAppEvent('instance_groups_changed', fetchInstances)
 
 function openPageContextMenu(event: MouseEvent) {
 	if (

@@ -25,60 +25,39 @@
 		</template>
 
 		<template #metadata>
-			<div v-if="isServerInstance" class="flex flex-wrap items-center gap-2">
-				<InstanceHeaderServerMetadata
-					:loading-server-ping="loadingServerPing"
-					:players-online="playersOnline"
-					:status-online="statusOnline"
-					:recent-plays="recentPlays"
-					:ping="ping"
-					:minecraft-server="minecraftServer"
-					:linked-project-v3="linkedProjectV3"
-					:instance-id="instance.id"
-				/>
-				<PageHeaderMetadataItem v-if="sharedInstanceManager" :action="sharedInstanceManagerAction">
-					{{ sharedInstanceManagerLabel }}
-					<Avatar
-						:src="sharedInstanceManager.avatarUrl"
-						:alt="sharedInstanceManager.name"
-						:tint-by="sharedInstanceManager.tintBy"
-						size="24px"
-						:circle="sharedInstanceManager.type === 'user'"
-						no-shadow
-					/>
-					<span class="min-w-0 truncate">{{ sharedInstanceManager.name }}</span>
-				</PageHeaderMetadataItem>
-			</div>
+			<InstanceHeaderServerMetadata
+				v-if="isServerInstance"
+				:loading-server-ping="loadingServerPing"
+				:players-online="playersOnline"
+				:status-online="statusOnline"
+				:ping="ping"
+				:minecraft-server="minecraftServer"
+				:show-instance-play-time="showInstancePlayTime"
+				:playtime-label="playtimeLabel"
+			/>
 			<PageHeaderMetadata v-else>
-				<PageHeaderMetadataItem :icon="Gamepad2Icon" tooltip="Minecraft version">
-					Minecraft {{ instance.game_version }}
-				</PageHeaderMetadataItem>
 				<PageHeaderMetadataItem
-					v-if="sharedInstanceManager?.type !== 'user'"
 					:icon="TagIcon"
 					:icon-props="{ tag: loaderDisplayName, enforceType: 'loader' }"
-					tooltip="Mod loader"
+					tooltip="Mod loader and Minecraft version"
 				>
 					{{ loaderLabel }}
 				</PageHeaderMetadataItem>
 				<PageHeaderMetadataItem
-					v-if="showInstancePlayTime"
+					v-if="showInstancePlayTime && playtimeLabel"
 					:icon="TimerIcon"
 					tooltip="Total playtime"
 				>
 					{{ playtimeLabel }}
 				</PageHeaderMetadataItem>
-				<PageHeaderMetadataItem v-if="sharedInstanceManager" :action="sharedInstanceManagerAction">
-					{{ sharedInstanceManagerLabel }}
-					<Avatar
-						:src="sharedInstanceManager.avatarUrl"
-						:alt="sharedInstanceManager.name"
-						:tint-by="sharedInstanceManager.tintBy"
-						size="24px"
-						:circle="sharedInstanceManager.type === 'user'"
-						no-shadow
-					/>
-					<span class="min-w-0 truncate">{{ sharedInstanceManager.name }}</span>
+				<PageHeaderMetadataTimeItem
+					v-if="instance.last_played"
+					:icon="ClockIcon"
+					:date="instance.last_played"
+					:label="formatMessage(messages.lastPlayed)"
+				/>
+				<PageHeaderMetadataItem v-else :icon="ClockIcon" tooltip="Last played">
+					{{ formatMessage(messages.neverPlayed) }}
 				</PageHeaderMetadataItem>
 			</PageHeaderMetadata>
 		</template>
@@ -185,6 +164,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	ClockIcon,
 	DownloadIcon,
 	ExternalIcon,
 	FolderOpenIcon,
@@ -195,7 +175,6 @@ import {
 	ReportIcon,
 	SettingsIcon,
 	StopCircleIcon,
-	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TimerIcon,
 	UnknownIcon,
 } from '@modrinth/assets'
@@ -211,12 +190,12 @@ import {
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
+	PageHeaderMetadataTimeItem,
 	type ServerLoader,
 	TagIcon,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 
 import type { GameInstance } from '@/helpers/types'
 
@@ -247,6 +226,10 @@ const messages = defineMessages({
 		id: 'instance.playtime.never-played',
 		defaultMessage: 'Never played',
 	},
+	lastPlayed: {
+		id: 'instance.last-played',
+		defaultMessage: 'Last played',
+	},
 	openFolder: {
 		id: 'instance.action.open-folder',
 		defaultMessage: 'Open folder',
@@ -276,7 +259,6 @@ const messages = defineMessages({
 		defaultMessage: "This instance's content is being shared to other users.",
 	},
 })
-const router = useRouter()
 
 const props = withDefaults(
 	defineProps<{
@@ -291,16 +273,8 @@ const props = withDefaults(
 		loadingServerPing?: boolean
 		playersOnline?: number
 		statusOnline?: boolean
-		recentPlays?: number
 		ping?: number
 		minecraftServer?: Labrinth.Projects.v3.Project['minecraft_server']
-		linkedProjectV3?: Labrinth.Projects.v3.Project
-		sharedInstanceManager?: {
-			type: 'user' | 'server'
-			name: string
-			avatarUrl?: string
-			tintBy: string
-		} | null
 	}>(),
 	{
 		iconSrc: null,
@@ -313,11 +287,8 @@ const props = withDefaults(
 		loadingServerPing: false,
 		playersOnline: undefined,
 		statusOnline: false,
-		recentPlays: undefined,
 		ping: undefined,
 		minecraftServer: undefined,
-		linkedProjectV3: undefined,
-		sharedInstanceManager: null,
 	},
 )
 
@@ -346,7 +317,7 @@ const { formatMessage } = useVIntl()
 const isInstalling = computed(() => installingStages.includes(props.instance.install_stage))
 const loaderDisplayName = computed(() => formatLoaderLabel(props.instance.loader) as ServerLoader)
 const loaderLabel = computed(() =>
-	[loaderDisplayName.value, props.instance.loader_version].filter(Boolean).join(' '),
+	[loaderDisplayName.value, props.instance.game_version].filter(Boolean).join(' '),
 )
 const sharedInstanceTooltip = computed(() =>
 	formatMessage(
@@ -355,29 +326,23 @@ const sharedInstanceTooltip = computed(() =>
 			: messages.sharedInstanceTooltip,
 	),
 )
-const sharedInstanceManagerLabel = computed(() =>
-	props.sharedInstanceManager?.type === 'server' ? 'Linked to' : 'Managed by',
-)
-const sharedInstanceManagerAction = computed(() => {
-	const manager = props.sharedInstanceManager
-	if (manager?.type !== 'user') return undefined
-	return () => router.push(`/user/${encodeURIComponent(manager.name)}`)
-})
 const playtimeLabel = computed(() => {
-	if (props.timePlayed <= 0) return formatMessage(messages.neverPlayed)
+	const seconds = Math.floor(props.timePlayed)
+	if (seconds <= 0) {
+		return undefined
+	}
 
-	const hours = Math.floor(props.timePlayed / 3600)
+	const hours = Math.floor(seconds / 3600)
 	if (hours >= 1) {
 		return `${hours} hour${hours > 1 ? 's' : ''}`
 	}
 
-	const minutes = Math.floor(props.timePlayed / 60)
+	const minutes = Math.floor(seconds / 60)
 	if (minutes >= 1) {
 		return `${minutes} minute${minutes > 1 ? 's' : ''}`
 	}
 
-	const seconds = Math.floor(props.timePlayed)
-	return `${seconds} second${seconds > 1 ? 's' : ''}`
+	return `${seconds} second${seconds === 1 ? '' : 's'}`
 })
 const serverPlayOptions = computed<OverflowMenuOption[]>(() => [
 	{

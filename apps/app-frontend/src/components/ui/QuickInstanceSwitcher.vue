@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
-import { instance_listener } from '@/helpers/events.js'
+import { useAppEvent } from '@/composables/use-app-event'
 import { getInstanceIconUrl, list } from '@/helpers/instance'
 import { instanceKeys } from '@/pages/instance/query-options'
 
@@ -147,7 +147,7 @@ const getInstances = async () => {
 await getInstances()
 updateMaxAuto()
 
-const unlistenInstance = await instance_listener(async (event) => {
+useAppEvent('instance', async (event) => {
 	if (event.event !== 'synced') {
 		await getInstances()
 	}
@@ -161,7 +161,6 @@ onUnmounted(() => {
 	window.removeEventListener('resize', updateMaxAuto)
 	document.body.classList.remove('quick-instance-dragging')
 	clearOverdragFlash()
-	unlistenInstance()
 })
 
 const messages = defineMessages({
