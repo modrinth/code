@@ -46,6 +46,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(web::scope("/campaign").configure(campaign::config))
             .service(web::scope("/search-management").configure(search::config))
             .service(web::scope("/globals").configure(globals::config))
+            .service(web::scope("/payout-runs").configure(payout_runs::config))
             .service(web::scope("/server-ping").configure(server_ping::config))
             .service(web::scope("/attribution").configure(attribution::config))
             .configure(billing::config)

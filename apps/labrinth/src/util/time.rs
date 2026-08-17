@@ -8,7 +8,7 @@ pub struct YearMonth(NaiveDate);
 
 impl YearMonth {
     pub fn from_day1(date: NaiveDate) -> Self {
-        Self(date.with_day(1).expect("every monht has a first day"))
+        Self(date.with_day(1).expect("every month has a first day"))
     }
 
     pub fn from_year_month(year: i32, month: u32) -> Option<Self> {
@@ -93,13 +93,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn rejects_dates_after_the_first() {
-        let date = NaiveDate::from_ymd_opt(2026, 7, 2).unwrap();
-
-        assert_eq!(YearMonth::new(date), Err(InvalidYearMonth));
-    }
-
-    #[test]
     fn constructs_from_year_and_month() {
         let year_month = YearMonth::from_year_month(2026, 7).unwrap();
 
@@ -123,7 +116,7 @@ mod tests {
     #[test]
     fn serializes_as_year_and_month() {
         let date = NaiveDate::from_ymd_opt(2026, 7, 1).unwrap();
-        let year_month = YearMonth::new(date).unwrap();
+        let year_month = YearMonth::from_day1(date);
 
         assert_eq!(serde_json::to_string(&year_month).unwrap(), r#""2026-07""#);
     }

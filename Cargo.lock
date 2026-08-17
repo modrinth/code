@@ -5479,6 +5479,7 @@ dependencies = [
  "actix-web",
  "actix-web-prom",
  "actix-ws",
+ "aditude",
  "arc-swap",
  "argon2",
  "ariadne",

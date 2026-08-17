@@ -14,7 +14,7 @@ use crate::{
     util::{error::Context, time::YearMonth},
 };
 
-const REDIS_KEY: &str = "aditude_month_estimate_v1";
+const REDIS_KEY: &str = "aditude_month_estimate:v1";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PeriodEstimate {
@@ -35,23 +35,24 @@ pub async fn estimate(
     redis: &RedisPool,
     periods: &[YearMonth],
 ) -> Result<Vec<PeriodEstimate>> {
-    redis
+    let mut periods = redis
         .get_cached_keys(REDIS_KEY, periods, |periods| async move {
-            fetch_estimates(aditude, redis, &periods)
+            fetch_estimates(aditude, &periods)
                 .await
                 .map_err(ApiError::Internal)
         })
-        .await
+        .await?;
+    periods.sort_unstable_by_key(|p| p.period);
+    Ok(periods)
 }
 
 async fn fetch_estimates(
     aditude: &aditude::Client,
-    redis: &RedisPool,
     periods: &[YearMonth],
 ) -> Result<DashMap<YearMonth, PeriodEstimate>> {
-    let mut periods = periods.iter();
-    let first_period = periods.next().wrap_err("no first period")?;
-    let last_period = periods.last().unwrap_or(first_period);
+    let mut periods_iter = periods.iter();
+    let first_period = periods_iter.next().wrap_err("no first period")?;
+    let last_period = periods_iter.last().unwrap_or(first_period);
 
     let range_start = first_period
         .date()
@@ -110,6 +111,15 @@ async fn fetch_estimates(
     // so for safety sort the days here
     for period in map.values_mut() {
         period.days.sort_unstable_by_key(|day| day.date);
+    }
+
+    // for any `periods` for which we don't have data yet,
+    // give them an empty estimate dataset
+    for &period in periods {
+        map.entry(period).or_insert(PeriodEstimate {
+            period,
+            days: Vec::new(),
+        });
     }
 
     Ok(map.into_iter().collect::<DashMap<_, _>>())
