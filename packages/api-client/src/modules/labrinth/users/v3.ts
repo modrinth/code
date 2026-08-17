@@ -38,6 +38,45 @@ export class LabrinthUsersV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Get a user's account preferences. The authenticated user may access their
+	 * own preferences, while moderators may access another user's preferences.
+	 *
+	 * GET /v3/user/{id}/preferences
+	 */
+	public async getPreferences(
+		idOrUsername: string,
+	): Promise<Labrinth.Users.v3.UserPreferences> {
+		return this.client.request<Labrinth.Users.v3.UserPreferences>(
+			`/user/${encodeURIComponent(idOrUsername)}/preferences`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Update a user's account preferences and return the fully resolved result.
+	 *
+	 * PATCH /v3/user/{id}/preferences
+	 */
+	public async patchPreferences(
+		idOrUsername: string,
+		preferences: Labrinth.Users.v3.PartialUserPreferences,
+	): Promise<Labrinth.Users.v3.UserPreferences> {
+		return this.client.request<Labrinth.Users.v3.UserPreferences>(
+			`/user/${encodeURIComponent(idOrUsername)}/preferences`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'PATCH',
+				body: preferences,
+			},
+		)
+	}
+
+	/**
 	 * Search users by username prefix.
 	 *
 	 * @param query - Username search query

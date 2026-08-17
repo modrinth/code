@@ -3,6 +3,7 @@ import {
 	Admonition,
 	commonSettingsMessages,
 	injectI18n,
+	injectUserPreferences,
 	IntlFormatted,
 	LanguageSelector,
 	languageSelectorMessages,
@@ -12,6 +13,7 @@ import {
 
 const { formatMessage } = useVIntl()
 const { locale, setLocale } = injectI18n()
+const { updatePreferences } = injectUserPreferences()
 
 const platform = computed(() => formatMessage(languageSelectorMessages.platformSite))
 
@@ -23,6 +25,7 @@ async function onLocaleChange(newLocale: string) {
 	$isChanging.value = true
 	try {
 		await setLocale(newLocale)
+		await updatePreferences({ localization: { locale: newLocale } }).catch(() => undefined)
 	} finally {
 		$isChanging.value = false
 	}

@@ -49,7 +49,7 @@
 								'!text-contrast [&_.example-card]:!border-brand [&_.example-card]:!bg-brand-highlight [&_.radio]:text-brand':
 									cosmetics.searchDisplayMode[projectType.id] === 'list',
 							}"
-							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'list')"
+							@click="updateLayout(projectType.id, 'rows')"
 						>
 							<div
 								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
@@ -80,7 +80,7 @@
 									cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
 									cosmetics.searchDisplayMode[projectType.id] === 'grid',
 							}"
-							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'grid')"
+							@click="updateLayout(projectType.id, 'grid')"
 						>
 							<div
 								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
@@ -166,8 +166,9 @@
 					</label>
 					<Toggle
 						id="search-layout-toggle"
-						v-model="cosmetics.rightSearchLayout"
+						:model-value="cosmetics.rightSearchLayout"
 						class="shrink-0"
+						@update:model-value="updateRightSearchLayout"
 					/>
 				</div>
 				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
@@ -181,8 +182,9 @@
 					</label>
 					<Toggle
 						id="project-layout-toggle"
-						v-model="cosmetics.leftContentLayout"
+						:model-value="cosmetics.leftContentLayout"
 						class="shrink-0"
+						@update:model-value="updateLeftContentLayout"
 					/>
 				</div>
 			</div>
@@ -191,12 +193,14 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
 	defineMessages,
 	injectNotificationManager,
+	injectUserPreferences,
 	IntlFormatted,
 	normalizeChildren,
 	ThemeSelector,
@@ -267,7 +271,7 @@ const colorTheme = defineMessages({
 	},
 	description: {
 		id: 'settings.display.theme.description',
-		defaultMessage: 'Select your preferred color theme for Modrinth on this device.',
+		defaultMessage: 'Select your preferred color theme across Modrinth.',
 	},
 })
 
@@ -278,8 +282,7 @@ const projectListLayouts = defineMessages({
 	},
 	description: {
 		id: 'settings.display.project-list-layouts.description',
-		defaultMessage:
-			'Select your preferred layout for each page that displays project lists on this device.',
+		defaultMessage: 'Select your preferred layout for each page that displays project lists.',
 	},
 	mod: {
 		id: 'settings.display.project-list-layouts.mod',
@@ -376,6 +379,7 @@ const toggleFeatures = defineMessages({
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
 const tags = useGeneratedState()
+const { updatePreferences } = injectUserPreferences()
 
 const theme = useTheme()
 
@@ -412,6 +416,52 @@ function updateColorTheme(value: Theme | 'system') {
 	}
 
 	theme.preferred = value
+	void updatePreferences({
+		appearance:
+			value === 'system'
+				? { auto: true }
+				: {
+						auto: false,
+						theme: value,
+					},
+	}).catch(() => undefined)
+}
+
+const layoutPreferenceKeys = {
+	mod: 'mods',
+	plugin: 'plugins',
+	datapack: 'datapacks',
+	shader: 'shaders',
+	resourcepack: 'resourcepacks',
+	modpack: 'modpacks',
+	server: 'servers',
+	user: 'users',
+} as const satisfies Partial<Record<DisplayLocation, keyof Labrinth.Users.v3.LayoutPreferences>>
+
+function updateLayout(projectType: DisplayLocation, layout: Labrinth.Users.v3.LayoutOption) {
+	cosmetics.value.searchDisplayMode[projectType] = layout === 'rows' ? 'list' : 'grid'
+	const preferenceKey = layoutPreferenceKeys[projectType as keyof typeof layoutPreferenceKeys]
+	if (!preferenceKey) return
+
+	void updatePreferences({
+		layouts: {
+			[preferenceKey]: layout,
+		} as Partial<Labrinth.Users.v3.LayoutPreferences>,
+	}).catch(() => undefined)
+}
+
+function updateRightSearchLayout(value: boolean) {
+	cosmetics.value.rightSearchLayout = value
+	void updatePreferences({
+		sidebars: { right_aligned_search: value },
+	}).catch(() => undefined)
+}
+
+function updateLeftContentLayout(value: boolean) {
+	cosmetics.value.leftContentLayout = value
+	void updatePreferences({
+		sidebars: { left_aligned_content: value },
+	}).catch(() => undefined)
 }
 
 function disableDeveloperMode() {

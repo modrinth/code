@@ -1,4 +1,4 @@
-import { provideNotificationManager } from '@modrinth/ui'
+import { provideNotificationManager, setupUserPreferencesProvider } from '@modrinth/ui'
 
 import { FrontendNotificationManager } from './frontend-notifications'
 import { setupAuthProvider } from './setup/auth'
@@ -14,9 +14,12 @@ export function setupProviders(auth: Awaited<ReturnType<typeof useAuth>>) {
 
 	setupAuthProvider(auth)
 	setupModrinthClientProvider(auth)
+	const userPreferences = setupUserPreferencesProvider()
 	setupTagsProvider()
 	setupFilePickerProvider()
 	setupPageContextProvider()
 	setupLoadingStateProvider()
 	setupUserCountryProvider()
+
+	return userPreferences
 }

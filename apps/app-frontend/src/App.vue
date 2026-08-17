@@ -46,6 +46,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	setupUserPreferencesProvider,
 	TeleportOverflowMenu,
 	TextLogo,
 	useDebugLogger,
@@ -966,6 +967,40 @@ setupAuthProvider(credentials, async (_redirectPath, flow, options) => {
 		await requestSignIn(flow)
 	}
 })
+
+const userPreferences = setupUserPreferencesProvider()
+let userPreferencesSync = Promise.resolve()
+
+watch(
+	userPreferences.preferences,
+	(preferences) => {
+		if (!preferences) return
+
+		userPreferencesSync = userPreferencesSync
+			.then(async () => {
+				const settings = await getSettings()
+				const selectedTheme = preferences.appearance.auto
+					? 'system'
+					: preferences.appearance.theme
+				const locale = preferences.localization.locale
+
+				if (themeStore.selectedTheme !== selectedTheme) {
+					themeStore.setThemeState(selectedTheme)
+				}
+				if (i18n.global.locale.value !== locale) {
+					i18n.global.locale.value = locale
+				}
+
+				if (settings.theme === selectedTheme && settings.locale === locale) return
+
+				settings.theme = selectedTheme
+				settings.locale = locale
+				await setSettings(settings)
+			})
+			.catch(handleError)
+	},
+	{ immediate: true },
+)
 
 async function validateSession(sessionToken) {
 	try {

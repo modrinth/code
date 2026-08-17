@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { defineMessages, ThemeSelector, Toggle, useVIntl } from '@modrinth/ui'
+import {
+	defineMessages,
+	injectUserPreferences,
+	ThemeSelector,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
@@ -9,6 +15,7 @@ import type { ColorTheme } from '@/store/theme.ts'
 
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
+const { preferences, updatePreferences } = injectUserPreferences()
 
 const messages = defineMessages({
 	colorThemeTitle: {
@@ -17,7 +24,7 @@ const messages = defineMessages({
 	},
 	colorThemeDescription: {
 		id: 'app.appearance-settings.color-theme.description',
-		defaultMessage: 'Choose the color theme used by Modrinth App.',
+		defaultMessage: 'Choose the color theme used across Modrinth.',
 	},
 	advancedRenderingTitle: {
 		id: 'app.appearance-settings.advanced-rendering.title',
@@ -41,10 +48,36 @@ const messages = defineMessages({
 
 const os = ref(await getOS())
 const settings = ref(await get())
+const selectedTheme = ref(settings.value.theme)
 const themeOptions = computed(() =>
 	themeStore
 		.getThemeOptions()
-		.filter((theme) => theme !== 'retro' || themeStore.devMode || settings.value.theme === 'retro'),
+		.filter((theme) => theme !== 'retro' || themeStore.devMode || selectedTheme.value === 'retro'),
+)
+
+function updateColorTheme(theme: ColorTheme) {
+	themeStore.setThemeState(theme)
+	selectedTheme.value = theme
+	settings.value.theme = theme
+	void updatePreferences({
+		appearance:
+			theme === 'system'
+				? { auto: true }
+				: {
+						auto: false,
+						theme,
+					},
+	}).catch(() => undefined)
+}
+
+watch(
+	preferences,
+	(value) => {
+		if (!value) return
+
+		selectedTheme.value = value.appearance.auto ? 'system' : value.appearance.theme
+	},
+	{ immediate: true },
 )
 
 watch(
@@ -63,13 +96,8 @@ watch(
 	<p class="m-0 mt-1">{{ formatMessage(messages.colorThemeDescription) }}</p>
 
 	<ThemeSelector
-		:update-color-theme="
-			(theme: ColorTheme) => {
-				themeStore.setThemeState(theme)
-				settings.theme = theme
-			}
-		"
-		:current-theme="settings.theme"
+		:update-color-theme="updateColorTheme"
+		:current-theme="selectedTheme"
 		:theme-options="themeOptions"
 		system-theme-color="system"
 	/>

@@ -3,6 +3,7 @@ import {
 	Admonition,
 	AutoLink,
 	commonSettingsMessages,
+	injectUserPreferences,
 	IntlFormatted,
 	LanguageSelector,
 	languageSelectorMessages,
@@ -15,10 +16,22 @@ import { get, set } from '@/helpers/settings.ts'
 import i18n from '@/i18n.config'
 
 const { formatMessage } = useVIntl()
+const { preferences, updatePreferences } = injectUserPreferences()
 
 const platform = computed(() => formatMessage(languageSelectorMessages.platformApp))
 
 const settings = ref(await get())
+const selectedLocale = ref(settings.value.locale)
+
+watch(
+	preferences,
+	(value) => {
+		if (!value) return
+
+		selectedLocale.value = value.localization.locale
+	},
+	{ immediate: true },
+)
 
 watch(
 	settings,
@@ -31,12 +44,14 @@ watch(
 const $isChanging = ref(false)
 
 async function onLocaleChange(newLocale: string) {
-	if (settings.value.locale === newLocale) return
+	if (selectedLocale.value === newLocale) return
 
 	$isChanging.value = true
 	try {
 		i18n.global.locale.value = newLocale
+		selectedLocale.value = newLocale
 		settings.value.locale = newLocale
+		await updatePreferences({ localization: { locale: newLocale } }).catch(() => undefined)
 	} finally {
 		$isChanging.value = false
 	}
@@ -66,7 +81,7 @@ async function onLocaleChange(newLocale: string) {
 	</p>
 
 	<LanguageSelector
-		:current-locale="settings.locale"
+		:current-locale="selectedLocale"
 		:locales="LOCALES"
 		:on-locale-change="onLocaleChange"
 		:is-changing="$isChanging"

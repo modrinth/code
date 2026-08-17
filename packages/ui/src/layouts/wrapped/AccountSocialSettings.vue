@@ -29,13 +29,14 @@
 					{{ formatMessage(messages.friendRequestsTitle) }}
 				</h2>
 				<Chips
-					v-model="friendRequestSource"
-					:items="friendRequestSourceOptions"
+					:model-value="friendPrivacy"
+					:items="friendPrivacyOptions"
 					:format-label="formatInteractionSource"
-					:disabled-items="friendRequestSourceOptions"
-					:disabled-tooltip="formatMessage(messages.comingSoon)"
+					:disabled-items="preferenceControlsDisabled ? friendPrivacyOptions : undefined"
+					:disabled-tooltip="preferenceControlsTooltip"
 					:capitalize="false"
 					:aria-label="formatMessage(messages.friendRequestsTitle)"
+					@update:model-value="updateFriendPrivacy"
 				/>
 				<p class="m-0 text-secondary">
 					{{ formatMessage(messages.friendRequestsDescription) }}
@@ -47,16 +48,36 @@
 					{{ formatMessage(messages.sharedInstanceInvitesTitle) }}
 				</h2>
 				<Chips
-					v-model="sharedInstanceInviteSource"
-					:items="sharedInstanceInviteSourceOptions"
+					:model-value="sharedInstancesPrivacy"
+					:items="invitePrivacyOptions"
 					:format-label="formatInteractionSource"
-					:disabled-items="sharedInstanceInviteSourceOptions"
-					:disabled-tooltip="formatMessage(messages.comingSoon)"
+					:disabled-items="preferenceControlsDisabled ? invitePrivacyOptions : undefined"
+					:disabled-tooltip="preferenceControlsTooltip"
 					:capitalize="false"
 					:aria-label="formatMessage(messages.sharedInstanceInvitesTitle)"
+					@update:model-value="updateSharedInstancesPrivacy"
 				/>
 				<p class="m-0 text-secondary">
 					{{ formatMessage(messages.sharedInstanceInvitesDescription) }}
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.hostingAccessTitle) }}
+				</h2>
+				<Chips
+					:model-value="hostingAccessPrivacy"
+					:items="invitePrivacyOptions"
+					:format-label="formatInteractionSource"
+					:disabled-items="preferenceControlsDisabled ? invitePrivacyOptions : undefined"
+					:disabled-tooltip="preferenceControlsTooltip"
+					:capitalize="false"
+					:aria-label="formatMessage(messages.hostingAccessTitle)"
+					@update:model-value="updateHostingAccessPrivacy"
+				/>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.hostingAccessDescription) }}
 				</p>
 			</div>
 		</section>
@@ -187,7 +208,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { LogInIcon, SpinnerIcon, ThinkingRinthbot } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -195,15 +216,15 @@ import Chips from '#ui/components/base/Chips.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import Table, { type TableColumn } from '#ui/components/base/Table.vue'
 import { defineMessages, useScrollIndicator, useVIntl } from '#ui/composables'
-import { injectAuth, injectNotificationManager } from '#ui/providers'
+import { injectAuth, injectNotificationManager, injectUserPreferences } from '#ui/providers'
 import { commonMessages } from '#ui/utils'
 
 import { blockedUsersQueryKey } from '../shared/user-profile/providers'
 
 type BlockedUserTableColumn = 'user' | 'actions'
 type BlockedUser = Labrinth.Users.v2.User & Record<BlockedUserTableColumn, unknown>
-type FriendRequestSource = 'everyone' | 'mutuals' | 'no-one'
-type SharedInstanceInviteSource = 'everyone' | 'friends' | 'no-one'
+type FriendPrivacy = Labrinth.Users.v3.FriendPrivacy
+type InvitePrivacy = Labrinth.Users.v3.InvitePrivacy
 
 const props = defineProps<{
 	getBlockedUsers: () => Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]>
@@ -213,30 +234,89 @@ const props = defineProps<{
 
 const auth = injectAuth()
 const notificationManager = injectNotificationManager()
+const {
+	preferences,
+	isLoading: preferencesLoading,
+	isUpdating: preferencesUpdating,
+	updatePreferences,
+} = injectUserPreferences()
 const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
 const blockedUsersTable = ref<HTMLElement | null>(null)
 const unblockingUserId = ref<string | null>(null)
-const friendRequestSource = ref<FriendRequestSource>('everyone')
-const sharedInstanceInviteSource = ref<SharedInstanceInviteSource>('everyone')
-const friendRequestSourceOptions: FriendRequestSource[] = ['everyone', 'mutuals', 'no-one']
-const sharedInstanceInviteSourceOptions: SharedInstanceInviteSource[] = [
-	'everyone',
-	'friends',
-	'no-one',
-]
+const friendPrivacy = ref<FriendPrivacy>('everyone')
+const sharedInstancesPrivacy = ref<InvitePrivacy>('everyone')
+const hostingAccessPrivacy = ref<InvitePrivacy>('everyone')
+const friendPrivacyOptions: FriendPrivacy[] = ['everyone', 'mutual', 'none']
+const invitePrivacyOptions: InvitePrivacy[] = ['everyone', 'friends', 'none']
+const preferenceControlsDisabled = computed(
+	() => preferencesLoading.value || preferencesUpdating.value || !preferences.value,
+)
+const preferenceControlsTooltip = computed(() => {
+	if (preferencesLoading.value) return formatMessage(messages.loadingPreferences)
+	if (preferencesUpdating.value) return formatMessage(messages.savingPreferences)
+	return formatMessage(messages.preferencesUnavailable)
+})
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(blockedUsersTable)
 
-function formatInteractionSource(source: FriendRequestSource | SharedInstanceInviteSource): string {
+function formatInteractionSource(source: FriendPrivacy | InvitePrivacy): string {
 	switch (source) {
 		case 'everyone':
 			return formatMessage(messages.everyone)
-		case 'mutuals':
+		case 'mutual':
 			return formatMessage(messages.friendsOfFriends)
 		case 'friends':
 			return formatMessage(messages.friends)
-		case 'no-one':
+		case 'none':
 			return formatMessage(messages.noOne)
+	}
+}
+
+watch(
+	preferences,
+	(value) => {
+		if (!value) return
+
+		friendPrivacy.value = value.social.friend_privacy
+		sharedInstancesPrivacy.value = value.social.shared_instances_privacy
+		hostingAccessPrivacy.value = value.social.hosting_access_privacy
+	},
+	{ immediate: true },
+)
+
+async function updateFriendPrivacy(value: FriendPrivacy | null): Promise<void> {
+	if (!value || value === friendPrivacy.value) return
+
+	const previous = friendPrivacy.value
+	friendPrivacy.value = value
+	try {
+		await updatePreferences({ social: { friend_privacy: value } })
+	} catch {
+		friendPrivacy.value = previous
+	}
+}
+
+async function updateSharedInstancesPrivacy(value: InvitePrivacy | null): Promise<void> {
+	if (!value || value === sharedInstancesPrivacy.value) return
+
+	const previous = sharedInstancesPrivacy.value
+	sharedInstancesPrivacy.value = value
+	try {
+		await updatePreferences({ social: { shared_instances_privacy: value } })
+	} catch {
+		sharedInstancesPrivacy.value = previous
+	}
+}
+
+async function updateHostingAccessPrivacy(value: InvitePrivacy | null): Promise<void> {
+	if (!value || value === hostingAccessPrivacy.value) return
+
+	const previous = hostingAccessPrivacy.value
+	hostingAccessPrivacy.value = value
+	try {
+		await updatePreferences({ social: { hosting_access_privacy: value } })
+	} catch {
+		hostingAccessPrivacy.value = previous
 	}
 }
 
@@ -346,8 +426,15 @@ const messages = defineMessages({
 	},
 	sharedInstanceInvitesDescription: {
 		id: 'settings.social.shared-instance-invites.description',
-		defaultMessage:
-			'Control who can send you invites to shared instances and Modrinth Hosting panels.',
+		defaultMessage: 'Control who can send you invites to shared instances.',
+	},
+	hostingAccessTitle: {
+		id: 'settings.social.hosting-access.title',
+		defaultMessage: 'Hosting access invitations',
+	},
+	hostingAccessDescription: {
+		id: 'settings.social.hosting-access.description',
+		defaultMessage: 'Control who can invite you to manage a Modrinth Hosting server.',
 	},
 	everyone: {
 		id: 'settings.social.interaction-source.everyone',
@@ -365,9 +452,17 @@ const messages = defineMessages({
 		id: 'settings.social.interaction-source.no-one',
 		defaultMessage: 'No one',
 	},
-	comingSoon: {
-		id: 'settings.social.interaction-source.coming-soon',
-		defaultMessage: 'Coming soon!',
+	savingPreferences: {
+		id: 'settings.social.interaction-source.saving',
+		defaultMessage: 'Saving your preferences…',
+	},
+	loadingPreferences: {
+		id: 'settings.social.interaction-source.loading',
+		defaultMessage: 'Loading your preferences…',
+	},
+	preferencesUnavailable: {
+		id: 'settings.social.interaction-source.unavailable',
+		defaultMessage: 'Your preferences are currently unavailable.',
 	},
 	blockedUsersTitle: {
 		id: 'settings.social.blocked-users.title',

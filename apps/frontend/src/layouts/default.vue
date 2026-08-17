@@ -877,6 +877,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectPageContext,
+	injectUserPreferences,
 	providePageContext,
 	TeleportOverflowMenu,
 	useHostingIntercom,
@@ -911,6 +912,7 @@ const country = useUserCountry()
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const { updatePreferences } = injectUserPreferences()
 
 const auth = await useAuth()
 const user = await useUser()
@@ -1479,7 +1481,17 @@ function toggleBrowseMenu() {
 	}
 }
 
-const { cycle: changeTheme } = useTheme()
+const theme = useTheme()
+
+function changeTheme() {
+	const selectedTheme = theme.cycle()
+	void updatePreferences({
+		appearance: {
+			auto: false,
+			theme: selectedTheme,
+		},
+	}).catch(() => undefined)
+}
 </script>
 
 <style lang="scss">

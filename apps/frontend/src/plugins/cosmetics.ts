@@ -9,6 +9,7 @@ export type DisplayLocation =
 	| 'modpack'
 	| 'shader'
 	| 'datapack'
+	| 'server'
 	| 'user'
 	| 'collection'
 

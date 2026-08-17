@@ -1710,6 +1710,57 @@ export namespace Labrinth {
 			export type Role = Common.Role
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
+			export type Theme = 'light' | 'dark' | 'oled' | 'retro'
+			export type LayoutOption = 'grid' | 'rows'
+			export type FriendPrivacy = 'none' | 'mutual' | 'everyone'
+			export type InvitePrivacy = 'none' | 'friends' | 'everyone'
+
+			export type AppearancePreferences = {
+				auto: boolean
+				theme: Theme
+			}
+
+			export type LocalizationPreferences = {
+				locale: string
+			}
+
+			export type LayoutPreferences = {
+				mods: LayoutOption
+				plugins: LayoutOption
+				datapacks: LayoutOption
+				shaders: LayoutOption
+				resourcepacks: LayoutOption
+				modpacks: LayoutOption
+				servers: LayoutOption
+				users: LayoutOption
+			}
+
+			export type SidebarPreferences = {
+				right_aligned_search: boolean
+				left_aligned_content: boolean
+			}
+
+			export type SocialPreferences = {
+				friend_privacy: FriendPrivacy
+				shared_instances_privacy: InvitePrivacy
+				hosting_access_privacy: InvitePrivacy
+			}
+
+			export type UserPreferences = {
+				appearance: AppearancePreferences
+				localization: LocalizationPreferences
+				layouts: LayoutPreferences
+				sidebars: SidebarPreferences
+				social: SocialPreferences
+			}
+
+			export type PartialUserPreferences = {
+				appearance?: Partial<AppearancePreferences>
+				localization?: Partial<LocalizationPreferences>
+				layouts?: Partial<LayoutPreferences>
+				sidebars?: Partial<SidebarPreferences>
+				social?: Partial<SocialPreferences>
+			}
 
 			export type Pride26CampaignDonation = {
 				last_donated_at: string
