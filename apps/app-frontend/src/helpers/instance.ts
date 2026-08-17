@@ -408,6 +408,20 @@ export async function edit_generated_icon(
 	})
 }
 
+export async function edit_generated_icon_if_empty(
+	instanceId: string,
+	config: InstanceIconConfig,
+	symbolBytes: number[],
+): Promise<boolean> {
+	const result = await invoke<string | null>('plugin:instance|instance_edit_generated_icon', {
+		instanceId,
+		config,
+		symbolBytes,
+		onlyIfEmpty: true,
+	})
+	return result !== null
+}
+
 export async function cache_generated_icon(
 	config: InstanceIconConfig,
 	symbolBytes: number[],

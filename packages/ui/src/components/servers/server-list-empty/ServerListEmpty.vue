@@ -51,7 +51,7 @@
 					<AutoLink
 						to="https://modrinth.com/hosting"
 						target="_blank"
-						class="flex items-center gap-1 hover:brightness-125"
+						class="flex items-center gap-1 hover:brightness-125 font-semibold"
 					>
 						{{ formatMessage(messages.learnMoreLink) }}
 						<RightArrowIcon class="size-5 shrink-0" aria-hidden="true" />

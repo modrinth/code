@@ -61,7 +61,7 @@ function handleModalClose() {
 <template>
 	<section
 		v-show="!modalOpen"
-		class="new-icon-editor-notification ml-auto w-[360px] max-w-full overflow-hidden rounded-[20px] border border-solid border-surface-5 bg-surface-3 px-3.5 pb-4 pt-3.5"
+		class="relative ml-auto w-full max-w-full overflow-hidden rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4 shadow-xl"
 		:aria-label="formatMessage(messages.title)"
 	>
 		<div class="icon-grid" aria-hidden="true">
@@ -71,43 +71,32 @@ function handleModalClose() {
 		</div>
 		<div class="icon-fade" />
 
-		<div class="relative z-[1] flex w-full flex-col items-start gap-2.5">
-			<div class="flex w-full items-start gap-1">
-				<div class="min-w-0 flex-1 grow leading-5 flex flex-col gap-1">
-					<div class="font-semibold text-contrast">
+		<div class="relative z-[1] flex w-full flex-col items-start gap-3">
+			<div class="flex w-full flex-col gap-2">
+				<div class="flex w-full items-center justify-between gap-2.5">
+					<div class="min-w-0 flex-1 font-semibold text-contrast">
 						{{ formatMessage(messages.title) }}
 					</div>
-					<div class="whitespace-nowrap text-primary">
-						{{ formatMessage(messages.description) }}
-					</div>
+					<IconButton
+						class="-m-1.5 -mx-2"
+						type="quiet"
+						size="sm"
+						:label="formatMessage(messages.close)"
+						@click="emit('dismiss')"
+					>
+						<XIcon />
+					</IconButton>
 				</div>
-				<IconButton
-					class="-m-1"
-					type="quiet"
-					size="sm"
-					:label="formatMessage(messages.close)"
-					@click="emit('dismiss')"
-				>
-					<XIcon />
-				</IconButton>
+				<div class="text-primary">
+					{{ formatMessage(messages.description) }}
+				</div>
 			</div>
 
-			<div class="flex items-center gap-2">
-				<Button
-					type="colored"
-					color="brand"
-					size="sm"
-					class="!rounded-xl !px-3 !font-medium !leading-4"
-					@click="viewUpdate"
-				>
+			<div class="flex items-center gap-1.5">
+				<Button type="colored" color="brand" @click="viewUpdate">
 					{{ formatMessage(messages.viewUpdate) }}
 				</Button>
-				<Button
-					type="outlined"
-					size="sm"
-					class="!rounded-xl !px-3 !font-medium !leading-4"
-					@click="emit('dismiss')"
-				>
+				<Button @click="emit('dismiss')">
 					{{ formatMessage(messages.dismiss) }}
 				</Button>
 			</div>
@@ -117,15 +106,6 @@ function handleModalClose() {
 </template>
 
 <style scoped>
-.new-icon-editor-notification {
-	position: relative;
-	box-shadow:
-		0 2px 4px rgba(0, 0, 0, 0.04),
-		0 5px 8px rgba(0, 0, 0, 0.04),
-		0 10px 18px rgba(0, 0, 0, 0.03),
-		0 24px 48px rgba(0, 0, 0, 0.03);
-}
-
 .icon-grid {
 	position: absolute;
 	top: -4px;

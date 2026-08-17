@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BanIcon, SpinnerIcon, TagCategoryWandSparklesIcon, XIcon } from '@modrinth/assets'
 import {
+	Avatar,
 	Button,
 	defineMessages,
 	IconButton,
@@ -207,14 +208,14 @@ defineExpose({ show, hide })
 					<XIcon />
 				</IconButton>
 
-				<div class="grid size-56 grid-cols-3 grid-rows-3 gap-4" aria-hidden="true">
-					<div
+				<div class="grid size-60 grid-cols-3 grid-rows-3 gap-4" aria-hidden="true">
+					<Avatar
 						v-for="(icon, index) in icons"
 						:key="index"
-						class="min-h-0 min-w-0 overflow-hidden rounded-2xl border border-solid border-white/15 shadow-[0_1px_1px_rgba(0,0,0,0.12)]"
-					>
-						<img :src="icon" alt="" class="size-full object-cover" />
-					</div>
+						:src="icon"
+						size="100%"
+						class="min-h-0 min-w-0 !rounded-2xl"
+					/>
 				</div>
 			</section>
 		</div>

@@ -868,13 +868,25 @@ pub async fn instance_edit_generated_icon(
     instance_id: &str,
     config: theseus::data::InstanceIconConfig,
     symbol_bytes: Vec<u8>,
-) -> Result<String> {
-    Ok(theseus::instance::edit_generated_icon(
-        instance_id,
-        config,
-        symbol_bytes,
-    )
-    .await?)
+    only_if_empty: Option<bool>,
+) -> Result<Option<String>> {
+    if only_if_empty.unwrap_or(false) {
+        return Ok(theseus::instance::edit_generated_icon_if_empty(
+            instance_id,
+            config,
+            symbol_bytes,
+        )
+        .await?);
+    }
+
+    Ok(Some(
+        theseus::instance::edit_generated_icon(
+            instance_id,
+            config,
+            symbol_bytes,
+        )
+        .await?,
+    ))
 }
 
 #[tauri::command]

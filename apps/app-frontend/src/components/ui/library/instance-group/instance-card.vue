@@ -271,7 +271,7 @@ onMounted(() => {
 				<div class="absolute inset-0 bg-surface-1 opacity-30" />
 				<SpinnerIcon
 					v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
-					class="relative size-9 animate-spin text-contrast"
+					class="relative size-[30%] animate-spin text-contrast"
 					tabindex="-1"
 				/>
 			</div>

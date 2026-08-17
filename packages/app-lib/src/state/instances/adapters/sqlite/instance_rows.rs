@@ -670,6 +670,38 @@ pub(crate) async fn update_instance_icon_config(
     Ok(())
 }
 
+pub(crate) async fn update_instance_icon_if_empty(
+    instance_id: &str,
+    icon_path: &str,
+    config: &InstanceIconConfig,
+    pool: &SqlitePool,
+) -> crate::Result<bool> {
+    let modified = Utc::now().timestamp();
+    let mut tx = pool.begin().await?;
+    let result = sqlx::query(
+        "
+		UPDATE instances
+		SET icon_path = ?, modified = ?
+		WHERE id = ? AND (icon_path IS NULL OR icon_path = '')
+		",
+    )
+    .bind(icon_path)
+    .bind(modified)
+    .bind(instance_id)
+    .execute(&mut *tx)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        tx.rollback().await?;
+        return Ok(false);
+    }
+
+    update_instance_icon_config(instance_id, Some(config), &mut tx).await?;
+    tx.commit().await?;
+
+    Ok(true)
+}
+
 pub(crate) async fn update_recent_instance_icon_config(
     config: &InstanceIconConfig,
     tx: &mut Transaction<'_, Sqlite>,

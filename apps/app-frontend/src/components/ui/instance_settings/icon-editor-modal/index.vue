@@ -14,6 +14,7 @@ import { toError } from '@/helpers/errors'
 import {
 	cache_generated_icon,
 	edit_generated_icon,
+	edit_generated_icon_if_empty,
 	get_recent_icon_configs,
 } from '@/helpers/instance'
 import type { IconBackground, InstanceIconConfig } from '@/helpers/types'
@@ -212,7 +213,7 @@ async function applyGeneratedIcon(instanceId: string, config: InstanceIconConfig
 		const symbol = symbolOption(config.symbol)
 		if (!backgroundOption(config.background) || !symbol) return false
 
-		await edit_generated_icon(instanceId, config, await loadSymbolBytes(symbol.asset))
+		await edit_generated_icon_if_empty(instanceId, config, await loadSymbolBytes(symbol.asset))
 		return true
 	} catch (error) {
 		handleError(toError(error))
@@ -428,7 +429,7 @@ const messages = defineMessages({
 					<span>{{ formatMessage(messages.description) }}</span>
 				</div>
 				<div class="flex shrink-0 items-center gap-2">
-					<Button :disabled="saving" @click="hide">
+					<Button :disabled="saving" @click="hide" type="outlined">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>

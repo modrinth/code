@@ -378,16 +378,6 @@ function customizeCreationIcon() {
 	creationIconEditorModal.value?.show()
 }
 
-onMounted(async () => {
-	if (!shouldShowNewIconEditorNotification()) return
-
-	addPopupNotification({
-		contentType: 'custom',
-		component: NewIconEditorNotification,
-		autoCloseMs: null,
-	})
-})
-
 function customizeContentInstallIcon() {
 	creationIconTarget.value = 'content-install'
 	creationIconEditorModal.value?.show()
@@ -621,6 +611,14 @@ function handleAdsConsentRequired(required) {
 
 async function setupApp() {
 	await onboardingChecklist.initialize()
+
+	if (shouldShowNewIconEditorNotification(showChecklist.value)) {
+		addPopupNotification({
+			contentType: 'custom',
+			component: NewIconEditorNotification,
+			autoCloseMs: null,
+		})
+	}
 
 	const {
 		native_decorations,

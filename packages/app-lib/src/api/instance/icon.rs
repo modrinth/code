@@ -77,6 +77,52 @@ pub async fn edit_generated_icon(
     Ok(icon_path)
 }
 
+pub async fn edit_generated_icon_if_empty(
+    instance_id: &str,
+    config: InstanceIconConfig,
+    symbol_bytes: Vec<u8>,
+) -> crate::Result<Option<String>> {
+    let state = State::get().await?;
+    let icon_path =
+        cache_generated_icon_with_state(config.clone(), symbol_bytes, &state)
+            .await?;
+    let instance =
+        instance_rows::get_instance_display_info(instance_id, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError("Unknown instance".to_string())
+            })?;
+
+    let applied = instance_rows::update_instance_icon_if_empty(
+        instance_id,
+        &icon_path,
+        &config,
+        &state.pool,
+    )
+    .await?;
+    if !applied {
+        return Ok(None);
+    }
+
+    if let Err(error) = super::shared::sync_shared_instance_icon(
+        instance_id,
+        Some(&icon_path),
+        &state,
+    )
+    .await
+    {
+        tracing::warn!(
+            instance_id,
+            error = %error,
+            "Failed to sync shared instance icon"
+        );
+    }
+
+    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
+
+    Ok(Some(icon_path))
+}
+
 pub async fn cache_generated_icon(
     config: InstanceIconConfig,
     symbol_bytes: Vec<u8>,

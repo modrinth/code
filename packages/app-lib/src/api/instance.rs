@@ -30,8 +30,8 @@ pub use self::groups::{
     set_group_memberships, set_group_order,
 };
 pub use self::icon::{
-    cache_generated_icon, edit_generated_icon, edit_icon,
-    get_recent_icon_configs,
+    cache_generated_icon, edit_generated_icon, edit_generated_icon_if_empty,
+    edit_icon, get_recent_icon_configs,
 };
 pub(crate) use self::icon::{
     cache_icon, cache_icon_from_path, migrate_legacy_icons,
