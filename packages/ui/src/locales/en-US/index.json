@@ -587,11 +587,11 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "world"
   },
-  "content.managed-card.managed-by": {
-    "defaultMessage": "Managed by"
-  },
   "content.managed-card.modpack-content": {
     "defaultMessage": "Modpack content"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Provided by"
   },
   "content.managed-card.server-suffix": {
     "defaultMessage": "server"
@@ -602,14 +602,14 @@
   "content.managed-card.shared-content": {
     "defaultMessage": "Shared content"
   },
-  "content.managed-card.summary.empty": {
-    "defaultMessage": "No managed content"
-  },
   "content.managed-card.summary.installing": {
     "defaultMessage": "Installing content..."
   },
   "content.managed-card.summary.loading": {
     "defaultMessage": "Loading managed content summary"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "No provided content"
   },
   "content.managed-card.switch-version": {
     "defaultMessage": "Switch version"
@@ -655,12 +655,6 @@
   },
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update available"
-  },
-  "content.metadata-filter.update.up-to-date": {
-    "defaultMessage": "Up to date"
-  },
-  "content.metadata-filter.updates": {
-    "defaultMessage": "Updates"
   },
   "content.metadata-filter.warning.client-depends": {
     "defaultMessage": "Client depends on file"

@@ -118,9 +118,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 			await options.playServerProject(projectId)
 			checkServerRunningStates(lastServerHits.value)
 		} finally {
-			preparingServerProjects.value = preparingServerProjects.value.filter(
-				(id) => id !== projectId,
-			)
+			preparingServerProjects.value = preparingServerProjects.value.filter((id) => id !== projectId)
 		}
 	}
 
