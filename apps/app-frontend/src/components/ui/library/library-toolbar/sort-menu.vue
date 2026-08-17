@@ -73,6 +73,7 @@ const groupOptions: ComboboxOption<LibraryGroupBy>[] = libraryGroupOptions.map((
 		v-model="displayState.group"
 		class="w-max"
 		:options="groupOptions"
+		dropdown-min-width="160px"
 		:show-icon-in-selected="false"
 	>
 		<template #prefix>
