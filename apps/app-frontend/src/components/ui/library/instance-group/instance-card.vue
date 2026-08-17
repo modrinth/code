@@ -3,13 +3,13 @@ import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { IconButton, injectNotificationManager } from '@modrinth/ui'
 import { useEventListener, useMagicKeys } from '@vueuse/core'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { process_listener } from '@/helpers/events'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
 import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
@@ -18,11 +18,6 @@ import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 
 type ProcessEvent = 'installing' | 'launched' | 'finished'
-
-type ProcessEventPayload = {
-	instance_id: string
-	event: ProcessEvent
-}
 
 const LOADING_INDICATOR_DELAY_MS = 100
 
@@ -227,9 +222,7 @@ defineExpose({
 	instance: props.instance,
 })
 
-let unlisten: (() => void) | undefined
-let isUnmounted = false
-void process_listener((event: ProcessEventPayload) => {
+useAppEvent('process', (event) => {
 	if (event.instance_id === props.instance.id) {
 		currentEvent.value = event.event
 		if (event.event === 'finished') {
@@ -237,21 +230,9 @@ void process_listener((event: ProcessEventPayload) => {
 		}
 	}
 })
-	.then((listener) => {
-		if (isUnmounted) {
-			listener()
-		} else {
-			unlisten = listener
-		}
-	})
-	.catch(handleError)
 
 onMounted(() => {
 	void checkProcess()
-})
-onUnmounted(() => {
-	isUnmounted = true
-	unlisten?.()
 })
 </script>
 

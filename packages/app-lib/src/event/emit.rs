@@ -12,7 +12,7 @@ use crate::state::OnboardingChecklist;
 use futures::prelude::*;
 use serde_json::Value;
 #[cfg(feature = "tauri")]
-use tauri::{Emitter, Manager};
+use tauri::Manager;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
@@ -257,10 +257,7 @@ pub async fn emit_onboarding_checklist(
     #[cfg(feature = "tauri")]
     {
         let event_state = crate::EventState::get();
-        event_state
-            .app
-            .emit("onboarding_checklist", checklist)
-            .map_err(EventError::from)?;
+        event_state.send(AppEvent::OnboardingChecklist(checklist))?;
     }
     Ok(())
 }

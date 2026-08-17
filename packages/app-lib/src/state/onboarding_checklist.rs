@@ -1,7 +1,11 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Executor, Sqlite};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
 pub struct OnboardingChecklist {
     pub has_created_instance: bool,
     pub has_logged_into_minecraft: bool,

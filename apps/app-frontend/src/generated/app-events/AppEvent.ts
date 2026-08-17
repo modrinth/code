@@ -7,7 +7,8 @@ import type { InstanceGroupsChangedPayload } from "./InstanceGroupsChangedPayloa
 import type { InstancePayload } from "./InstancePayload";
 import type { LoadingPayload } from "./LoadingPayload";
 import type { LogPayload } from "./LogPayload";
+import type { OnboardingChecklist } from "./OnboardingChecklist";
 import type { ProcessPayload } from "./ProcessPayload";
 import type { WarningPayload } from "./WarningPayload";
 
-export type AppEvent = { "type": "loading", "payload": LoadingPayload } | { "type": "process", "payload": ProcessPayload } | { "type": "instance", "payload": InstancePayload } | { "type": "instance_groups_changed", "payload": InstanceGroupsChangedPayload } | { "type": "instance_bulk_update_progress", "payload": InstanceBulkUpdateProgressPayload } | { "type": "install_job", "payload": InstallJobSnapshot } | { "type": "command", "payload": CommandPayload } | { "type": "warning", "payload": WarningPayload } | { "type": "friend", "payload": FriendPayload } | { "type": "notification", "payload": unknown } | { "type": "log", "payload": LogPayload } | { "type": "ads_consent_required", "payload": boolean };
+export type AppEvent = { "type": "loading", "payload": LoadingPayload } | { "type": "process", "payload": ProcessPayload } | { "type": "instance", "payload": InstancePayload } | { "type": "instance_groups_changed", "payload": InstanceGroupsChangedPayload } | { "type": "onboarding_checklist", "payload": OnboardingChecklist } | { "type": "instance_bulk_update_progress", "payload": InstanceBulkUpdateProgressPayload } | { "type": "install_job", "payload": InstallJobSnapshot } | { "type": "command", "payload": CommandPayload } | { "type": "warning", "payload": WarningPayload } | { "type": "friend", "payload": FriendPayload } | { "type": "notification", "payload": unknown } | { "type": "log", "payload": LogPayload } | { "type": "ads_consent_required", "payload": boolean };

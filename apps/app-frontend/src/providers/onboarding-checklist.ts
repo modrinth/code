@@ -1,7 +1,7 @@
 import { createContext } from '@modrinth/ui'
-import { listen, type UnlistenFn } from '@tauri-apps/api/event'
-import { computed, type ComputedRef, onUnmounted, ref } from 'vue'
+import { computed, type ComputedRef, ref } from 'vue'
 
+import { useAppEvent } from '@/composables/use-app-event'
 import { getOnboardingChecklist, type OnboardingChecklist } from '@/helpers/onboarding-checklist'
 
 export interface OnboardingChecklistContext {
@@ -21,7 +21,6 @@ export const [injectOnboardingChecklist, provideOnboardingChecklist] =
 
 export function setupOnboardingChecklistProvider(): OnboardingChecklistProvider {
 	const checklist = ref<OnboardingChecklist>()
-	let unlisten: UnlistenFn | undefined
 
 	const context: OnboardingChecklistContext = {
 		hasCreatedInstance: computed(() => checklist.value?.has_created_instance ?? false),
@@ -47,14 +46,9 @@ export function setupOnboardingChecklistProvider(): OnboardingChecklistProvider 
 		}
 	}
 
-	const initialize = async () => {
-		unlisten = await listen<OnboardingChecklist>('onboarding_checklist', (event) => {
-			applyChecklist(event.payload)
-		})
-		applyChecklist(await getOnboardingChecklist())
-	}
+	useAppEvent('onboarding_checklist', applyChecklist)
 
-	onUnmounted(() => unlisten?.())
+	const initialize = async () => applyChecklist(await getOnboardingChecklist())
 
 	return { ...context, initialize }
 }
