@@ -1,3 +1,4 @@
+use crate::auth::two_factor::{use_backup_code, verify_2fa_code};
 use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
@@ -2303,79 +2304,6 @@ pub struct Login2FA {
     pub flow: String,
 }
 
-async fn validate_2fa_code(
-    input: String,
-    secret: String,
-    allow_backup: bool,
-    user_id: crate::database::models::DBUserId,
-    redis: &RedisPool,
-    pool: &PgPool,
-    transaction: &mut PgTransaction<'_>,
-) -> Result<bool, AuthenticationError> {
-    let totp = totp_rs::TOTP::new(
-        totp_rs::Algorithm::SHA1,
-        6,
-        1,
-        30,
-        totp_rs::Secret::Encoded(secret)
-            .to_bytes()
-            .map_err(|_| AuthenticationError::InvalidCredentials)?,
-    )
-    .map_err(|_| AuthenticationError::InvalidCredentials)?;
-
-    const TOTP_NAMESPACE: &str = "used_totp:v4";
-    let mut conn = redis.connect().await?;
-    let logical_key = format!("{}-{}", input, user_id.0);
-    let key = redis
-        .key()
-        .with_slot(TOTP_NAMESPACE, &logical_key, &logical_key);
-
-    // Check if TOTP has already been used
-    if conn.get(&key).await?.is_some() {
-        return Err(AuthenticationError::InvalidCredentials);
-    }
-
-    if totp
-        .check_current(input.as_str())
-        .map_err(|_| AuthenticationError::InvalidCredentials)?
-    {
-        conn.set(&key, "", Some(60)).await?;
-
-        Ok(true)
-    } else if allow_backup {
-        let backup_codes =
-            crate::database::models::DBUser::get_backup_codes(user_id, pool)
-                .await?;
-
-        if !backup_codes.contains(&input) {
-            Ok(false)
-        } else {
-            let code = parse_base62(&input).unwrap_or_default();
-
-            sqlx::query!(
-                "
-                    DELETE FROM user_backup_codes
-                    WHERE user_id = $1 AND code = $2
-                    ",
-                user_id as crate::database::models::ids::DBUserId,
-                code as i64,
-            )
-            .execute(&mut *transaction)
-            .await?;
-
-            crate::database::models::DBUser::clear_caches(
-                &[(user_id, None)],
-                redis,
-            )
-            .await?;
-
-            Ok(true)
-        }
-    } else {
-        Err(AuthenticationError::InvalidCredentials)
-    }
-}
-
 /// Complete login with 2FA.
 #[utoipa::path(
 	context_path = "/auth",
@@ -2412,20 +2340,21 @@ pub async fn login_2fa(
             .begin()
             .await
             .wrap_internal_err("starting database transaction")?;
-        if !validate_2fa_code(
-            login.code.clone(),
-            user.totp_secret
-                .ok_or_else(|| AuthenticationError::InvalidCredentials)
-                .wrap_auth_err("authenticating API request")?,
-            true,
-            user.id,
-            &redis,
-            &pool,
-            &mut transaction,
-        )
-        .await
-        .wrap_auth_err("authenticating API request")?
-        {
+        let secret = user
+            .totp_secret
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)
+            .wrap_auth_err("authenticating API request")?;
+        let valid_totp = verify_2fa_code(&login.code, &secret, user.id, &redis)
+            .await
+            .wrap_auth_err("authenticating API request")?;
+        let valid_backup = if valid_totp {
+            false
+        } else {
+            use_backup_code(&login.code, user.id, &mut transaction)
+                .await
+                .wrap_auth_err("authenticating API request")?
+        };
+        if !valid_totp && !valid_backup {
             return Err(ApiError::Auth(eyre::eyre!(
                 AuthenticationError::InvalidCredentials,
             )));
@@ -2554,17 +2483,9 @@ pub async fn finish_2fa_flow(
             .await
             .wrap_internal_err("starting database transaction")?;
 
-        if !validate_2fa_code(
-            login.code.clone(),
-            secret.clone(),
-            false,
-            user.id.into(),
-            &redis,
-            &pool,
-            &mut transaction,
-        )
-        .await
-        .wrap_auth_err("authenticating API request")?
+        if !verify_2fa_code(&login.code, &secret, user.id.into(), &redis)
+            .await
+            .wrap_auth_err("authenticating API request")?
         {
             return Err(ApiError::Auth(eyre::eyre!(
                 AuthenticationError::InvalidCredentials,
@@ -2703,20 +2624,20 @@ pub async fn remove_2fa(
         .await
         .wrap_internal_err("starting database transaction")?;
 
-    if !validate_2fa_code(
-        login.code.clone(),
-        user.totp_secret.wrap_request_err_with(|| {
-            "user does not have 2FA enabled on the account!".to_string()
-        })?,
-        true,
-        user.id,
-        &redis,
-        &pool,
-        &mut transaction,
-    )
-    .await
-    .wrap_auth_err("authenticating API request")?
-    {
+    let secret = user.totp_secret.wrap_request_err_with(|| {
+        "user does not have 2FA enabled on the account!".to_string()
+    })?;
+    let valid_totp = verify_2fa_code(&login.code, &secret, user.id, &redis)
+        .await
+        .wrap_auth_err("authenticating API request")?;
+    let valid_backup = if valid_totp {
+        false
+    } else {
+        use_backup_code(&login.code, user.id, &mut transaction)
+            .await
+            .wrap_auth_err("authenticating API request")?
+    };
+    if !valid_totp && !valid_backup {
         return Err(ApiError::Auth(eyre::eyre!(
             AuthenticationError::InvalidCredentials,
         )));

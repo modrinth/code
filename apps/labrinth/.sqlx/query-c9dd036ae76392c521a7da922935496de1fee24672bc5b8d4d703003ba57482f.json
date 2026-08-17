@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tDELETE FROM user_backup_codes\n\t\tWHERE user_id = $1 AND code = $2\n\t\tRETURNING code\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "code",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c9dd036ae76392c521a7da922935496de1fee24672bc5b8d4d703003ba57482f"
+}

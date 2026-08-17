@@ -1,6 +1,7 @@
 pub mod checks;
 pub mod oauth;
 pub mod templates;
+pub mod two_factor;
 pub mod validate;
 pub use checks::{
     filter_enlisted_projects_ids, filter_enlisted_version_ids,
