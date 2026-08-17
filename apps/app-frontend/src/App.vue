@@ -1935,11 +1935,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </template>
 
 <style lang="scss" scoped>
-.app-grid-layout,
+.app-grid-layout {
+	--top-bar-height: 3rem;
+	--left-bar-width: 4rem;
+	--right-bar-width: 0px;
+}
+
 .app-contents {
 	--top-bar-height: 3rem;
 	--left-bar-width: 4rem;
-	--right-bar-width: 300px;
+	--right-bar-width: 0px;
 }
 
 .app-grid-layout {
@@ -1971,6 +1976,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 }
 
 .app-contents {
+	--top-bar-height: 3rem;
+	--left-bar-width: 4rem;
+	--right-bar-width: 0px;
+
 	position: absolute;
 	z-index: 1;
 	left: var(--left-bar-width);
@@ -1986,6 +1995,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	// transition: grid-template-columns 0.4s ease-in-out;
 
 	&.sidebar-enabled {
+		--right-bar-width: 300px;
 		grid-template-columns: 1fr 300px;
 	}
 }
