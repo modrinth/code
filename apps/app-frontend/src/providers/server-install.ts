@@ -39,7 +39,7 @@ export interface ServerInstallContext {
 				project: Labrinth.Projects.v3.Project,
 				modpackVersionId: string | null,
 				callback?: () => void,
-			) => void
+			) => Promise<void>
 		>,
 	) => void
 	setUpdateToPlayModal: (
@@ -84,7 +84,7 @@ export function createServerInstall(opts: {
 			project: Labrinth.Projects.v3.Project,
 			modpackVersionId: string | null,
 			callback?: () => void,
-		) => void
+		) => Promise<void>
 	> | null = null
 	let updateToPlayModalRef: ModalRef<
 		(instance: GameInstance, activeVersionId: string | null, callback?: () => void) => void
@@ -314,7 +314,7 @@ export function createServerInstall(opts: {
 			return
 		}
 		if (isModpack && !instance) {
-			installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
+			await installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
 				const newInstance = await findInstalledInstance(project.id)
 				if (!newInstance) return
 				showModpackInstallSuccess(newInstance, serverAddress)
