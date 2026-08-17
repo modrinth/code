@@ -194,7 +194,7 @@ const names = defineMessages({
 	wrench: { id: 'instance.icon-editor.symbol.wrench', defaultMessage: 'Wrench' },
 	wrenchRinth: {
 		id: 'instance.icon-editor.symbol.wrench1',
-		defaultMessage: 'Wrench Rinth',
+		defaultMessage: 'Modrinth Wrench',
 	},
 	zombie: { id: 'instance.icon-editor.symbol.zombie', defaultMessage: 'Zombie' },
 })
@@ -339,71 +339,105 @@ export const backgroundOptions = [
 ] as const
 
 export const symbolOptions = [
-	{ id: 'backpack', name: names.backpack, asset: backpack, category: 'modded' },
-	{ id: 'beacon', name: names.beacon, asset: beacon, category: 'vanilla' },
-	{ id: 'blue_shark', name: names.blueShark, asset: blueShark, category: 'modded' },
-	{ id: 'bookshelf', name: names.bookshelf, asset: bookshelf, category: 'vanilla' },
-	{ id: 'brown_bear', name: names.brownBear, asset: brownBear, category: 'modded' },
-	{ id: 'cake', name: names.cake, asset: cake, category: 'vanilla' },
-	{ id: 'campfire', name: names.campfire, asset: campfire, category: 'vanilla' },
-	{ id: 'chest', name: names.chest, asset: chest, category: 'vanilla' },
-	{ id: 'cogwheel', name: names.cogwheel, asset: cogwheel, category: 'modded' },
-	{ id: 'command_block', name: names.commandBlock, asset: commandBlock, category: 'vanilla' },
-	{ id: 'cooking_pot', name: names.cookingPot, asset: cookingPot, category: 'modded' },
-	{ id: 'couch', name: names.couch, asset: couch, category: 'modded' },
-	{ id: 'crafting_table', name: names.craftingTable, asset: craftingTable, category: 'vanilla' },
-	{ id: 'creeper', name: names.creeper, asset: creeper, category: 'vanilla' },
-	{
-		id: 'enchanting_table',
-		name: names.enchantingTable,
-		asset: enchantingTable,
-		category: 'vanilla',
-	},
-	{ id: 'ender_chest', name: names.enderChest, asset: enderChest, category: 'vanilla' },
-	{ id: 'ender_dragon', name: names.enderDragon, asset: enderDragon, category: 'vanilla' },
-	{ id: 'engine', name: names.engine, asset: engine, category: 'modded' },
-	{ id: 'furnace', name: names.furnace, asset: furnace, category: 'vanilla' },
-	{ id: 'gizmo', name: names.gizmo, asset: gizmo, category: 'modded' },
-	{ id: 'globe', name: names.globe, asset: globe, category: 'modded' },
-	{ id: 'grass_block', name: names.grassBlock, asset: grassBlock, category: 'vanilla' },
-	{ id: 'lantern', name: names.lantern, asset: lantern, category: 'vanilla' },
-	{ id: 'moobloom', name: names.moobloom, asset: moobloom, category: 'modded' },
-	{ id: 'mr_pack', name: names.mrPack, asset: mrPack, category: 'modded' },
+	// Cobblemon: Poké Ball
+	{ id: 'poke_ball', name: names.pokeBall, asset: pokeBall, category: 'modded' },
+
+	// Origins: Orb of Origins
 	{ id: 'orb', name: names.orb, asset: orb, category: 'modded' },
+
+	// Farmer's Delight: Cooking Pot, Skillet
+	{ id: 'cooking_pot', name: names.cookingPot, asset: cookingPot, category: 'modded' },
+	{ id: 'skillet', name: names.skillet, asset: skillet, category: 'modded' },
+
+	// Supplementaries: Globe, Pancakes
+	{ id: 'globe', name: names.globe, asset: globe, category: 'modded' },
+	{ id: 'pancakes', name: names.pancakes, asset: pancakes, category: 'modded' },
+
+	// Sophisticated Backpacks: Backpack
+	{ id: 'backpack', name: names.backpack, asset: backpack, category: 'modded' },
+
+	// Chipped: Chair
+	{ id: 'couch', name: names.couch, asset: couch, category: 'modded' },
+
+	// Botania: Tiny Potato
+	{ id: 'tiny_potato', name: names.tinyPotato, asset: tinyPotato, category: 'modded' },
+
+	// Blåhaj: Blue Shark
+	{ id: 'blue_shark', name: names.blueShark, asset: blueShark, category: 'modded' },
+
+	// Other modded symbols: Brown Bear, Moobloom
+	{ id: 'brown_bear', name: names.brownBear, asset: brownBear, category: 'modded' },
+	{ id: 'moobloom', name: names.moobloom, asset: moobloom, category: 'modded' },
+
+	// Create: Wrench, Cogwheel
+	{ id: 'wrench', name: names.wrench, asset: wrench, category: 'modded' },
+	{ id: 'cogwheel', name: names.cogwheel, asset: cogwheel, category: 'modded' },
+
+	// Create Aeronautics: Engine, Tire
+	{ id: 'engine', name: names.engine, asset: engine, category: 'modded' },
+	{ id: 'tire', name: names.tire, asset: tire, category: 'modded' },
+
+	// Ad Astra: Oxygen Distributor, Space Helmet
 	{
 		id: 'oxygen_distributor',
 		name: names.oxygenDistributor,
 		asset: oxygenDistributor,
 		category: 'modded',
 	},
-	{ id: 'pancakes', name: names.pancakes, asset: pancakes, category: 'modded' },
-	{ id: 'pickaxe', name: names.pickaxe, asset: pickaxe, category: 'vanilla' },
-	{ id: 'poke_ball', name: names.pokeBall, asset: pokeBall, category: 'modded' },
+	{ id: 'space_helmet', name: names.spaceHelmet, asset: spaceHelmet, category: 'modded' },
+
+	// Miscellaneous: Gizmo, Terminal
+	{ id: 'gizmo', name: names.gizmo, asset: gizmo, category: 'modded' },
+	{ id: 'terminal', name: names.terminal, asset: terminal, category: 'modded' },
+
+	// Miscellaneous: Modrinth Wrench, Mr Pack
+	{ id: 'wrench1', name: names.wrenchRinth, asset: wrenchRinth, category: 'modded' },
+	{ id: 'mr_pack', name: names.mrPack, asset: mrPack, category: 'modded' },
+
+	/////////////////////////
+	// vanilla ones
+	/////////////////////////
+
+	{ id: 'grass_block', name: names.grassBlock, asset: grassBlock, category: 'vanilla' },
+
+	{ id: 'crafting_table', name: names.craftingTable, asset: craftingTable, category: 'vanilla' },
+	{ id: 'furnace', name: names.furnace, asset: furnace, category: 'vanilla' },
+
+	{ id: 'bookshelf', name: names.bookshelf, asset: bookshelf, category: 'vanilla' },
 	{
 		id: 'redstone_block',
 		name: names.redstoneBlock,
 		asset: redstoneBlock,
 		category: 'vanilla',
 	},
-	{ id: 'sculk_sensor', name: names.sculkSensor, asset: sculkSensor, category: 'vanilla' },
-	{ id: 'skeleton', name: names.skeleton, asset: skeleton, category: 'vanilla' },
-	{ id: 'skillet', name: names.skillet, asset: skillet, category: 'modded' },
-	{ id: 'slime_block', name: names.slimeBlock, asset: slimeBlock, category: 'vanilla' },
-	{ id: 'space_helmet', name: names.spaceHelmet, asset: spaceHelmet, category: 'modded' },
 	{
 		id: 'sticky_piston',
 		name: names.stickyPiston,
 		asset: stickyPiston,
 		category: 'vanilla',
 	},
+	{ id: 'cake', name: names.cake, asset: cake, category: 'vanilla' },
+	{ id: 'campfire', name: names.campfire, asset: campfire, category: 'vanilla' },
+	{ id: 'chest', name: names.chest, asset: chest, category: 'vanilla' },
+	{ id: 'pickaxe', name: names.pickaxe, asset: pickaxe, category: 'vanilla' },
 	{ id: 'sword', name: names.sword, asset: sword, category: 'vanilla' },
-	{ id: 'terminal', name: names.terminal, asset: terminal, category: 'modded' },
-	{ id: 'tiny_potato', name: names.tinyPotato, asset: tinyPotato, category: 'modded' },
-	{ id: 'tire', name: names.tire, asset: tire, category: 'modded' },
-	{ id: 'tnt', name: names.tnt, asset: tnt, category: 'vanilla' },
-	{ id: 'wrench', name: names.wrench, asset: wrench, category: 'modded' },
-	{ id: 'wrench1', name: names.wrenchRinth, asset: wrenchRinth, category: 'modded' },
 	{ id: 'zombie', name: names.zombie, asset: zombie, category: 'vanilla' },
+	{ id: 'creeper', name: names.creeper, asset: creeper, category: 'vanilla' },
+	{ id: 'skeleton', name: names.skeleton, asset: skeleton, category: 'vanilla' },
+	{ id: 'slime_block', name: names.slimeBlock, asset: slimeBlock, category: 'vanilla' },
+	{ id: 'ender_dragon', name: names.enderDragon, asset: enderDragon, category: 'vanilla' },
+	{ id: 'ender_chest', name: names.enderChest, asset: enderChest, category: 'vanilla' },
+	{ id: 'sculk_sensor', name: names.sculkSensor, asset: sculkSensor, category: 'vanilla' },
+	{ id: 'beacon', name: names.beacon, asset: beacon, category: 'vanilla' },
+	{
+		id: 'enchanting_table',
+		name: names.enchantingTable,
+		asset: enchantingTable,
+		category: 'vanilla',
+	},
+	{ id: 'lantern', name: names.lantern, asset: lantern, category: 'vanilla' },
+	{ id: 'tnt', name: names.tnt, asset: tnt, category: 'vanilla' },
+	{ id: 'command_block', name: names.commandBlock, asset: commandBlock, category: 'vanilla' },
 ] as const
 
 export type BackgroundId = (typeof backgroundOptions)[number]['id']

@@ -64,8 +64,7 @@ const selectedBackgroundOption = computed(
 const selectedSymbolOption = computed(
 	() => symbolOptions.find((option) => option.id === selectedSymbol.value)!,
 )
-const vanillaSymbolOptions = symbolOptions.filter((option) => option.category === 'vanilla')
-const moddedSymbolOptions = symbolOptions.filter((option) => option.category === 'modded')
+const vanillaSymbolStartIndex = symbolOptions.findIndex((option) => option.category === 'vanilla')
 const selectedConfig = computed<InstanceIconConfig>(() => ({
 	background: { ...selectedBackgroundOption.value.background },
 	symbol: selectedSymbol.value,
@@ -444,51 +443,31 @@ const messages = defineMessages({
 						{{ formatMessage(messages.symbol) }}
 					</h3>
 					<div class="grid grid-cols-6 gap-2.5">
-						<button
-							v-for="option in moddedSymbolOptions"
-							:key="option.id"
-							v-tooltip="{
-								content: formatMessage(option.name),
-								delay: { show: 500, hide: 0 },
-							}"
-							class="icon-option icon-outline relative aspect-square cursor-pointer overflow-hidden rounded-[20px] border-0 bg-transparent p-0"
-							:class="{ 'icon-outline-selected': selectedSymbol === option.id }"
-							:aria-label="formatMessage(option.name)"
-							:aria-pressed="selectedSymbol === option.id"
-							@click="selectedSymbol = option.id"
-						>
-							<img :src="option.asset" alt="" class="size-full object-cover" />
-							<span
-								v-if="selectedSymbol === option.id"
-								class="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/80 text-black"
+						<template v-for="(option, index) in symbolOptions" :key="option.id">
+							<hr
+								v-if="index === vanillaSymbolStartIndex"
+								class="col-span-6 my-2.5 mx-1 w-full border-0 border-t border-solid border-surface-5"
+							/>
+							<button
+								v-tooltip="{
+									content: formatMessage(option.name),
+									delay: { show: 500, hide: 0 },
+								}"
+								class="icon-option icon-outline relative aspect-square cursor-pointer overflow-hidden rounded-[20px] border-0 bg-transparent p-0"
+								:class="{ 'icon-outline-selected': selectedSymbol === option.id }"
+								:aria-label="formatMessage(option.name)"
+								:aria-pressed="selectedSymbol === option.id"
+								@click="selectedSymbol = option.id"
 							>
-								<CheckIcon class="size-4" />
-							</span>
-						</button>
-						<hr
-							class="col-span-6 my-2.5 mx-1 w-full border-0 border-t border-solid border-surface-5"
-						/>
-						<button
-							v-for="option in vanillaSymbolOptions"
-							:key="option.id"
-							v-tooltip="{
-								content: formatMessage(option.name),
-								delay: { show: 500, hide: 0 },
-							}"
-							class="icon-option icon-outline relative aspect-square cursor-pointer overflow-hidden rounded-[20px] border-0 bg-transparent p-0"
-							:class="{ 'icon-outline-selected': selectedSymbol === option.id }"
-							:aria-label="formatMessage(option.name)"
-							:aria-pressed="selectedSymbol === option.id"
-							@click="selectedSymbol = option.id"
-						>
-							<img :src="option.asset" alt="" class="size-full object-cover" />
-							<span
-								v-if="selectedSymbol === option.id"
-								class="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/80 text-black"
-							>
-								<CheckIcon class="size-4" />
-							</span>
-						</button>
+								<img :src="option.asset" alt="" class="size-full object-cover" />
+								<span
+									v-if="selectedSymbol === option.id"
+									class="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/80 text-black"
+								>
+									<CheckIcon class="size-4" />
+								</span>
+							</button>
+						</template>
 					</div>
 				</section>
 			</div>
