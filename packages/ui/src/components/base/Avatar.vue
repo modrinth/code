@@ -59,6 +59,7 @@ let detectionTimeout: number | undefined
 let detectingSource: string | undefined
 
 const DETECTION_TIMEOUT_MS = 2000
+const CORNER_SAMPLE_SIZE = 8
 
 defineExpose({
 	failed,
@@ -197,23 +198,42 @@ function canReadImagePixels(source: string): boolean {
 }
 
 function detectTransparentCorners(image: HTMLImageElement): boolean | null {
-	if (image.naturalWidth < 2 || image.naturalHeight < 2) return false
+	if (image.naturalWidth < CORNER_SAMPLE_SIZE || image.naturalHeight < CORNER_SAMPLE_SIZE) {
+		return false
+	}
 
 	const canvas = document.createElement('canvas')
-	canvas.width = 4
-	canvas.height = 4
+	canvas.width = CORNER_SAMPLE_SIZE * 2
+	canvas.height = CORNER_SAMPLE_SIZE * 2
 	const context = canvas.getContext('2d', { willReadFrequently: true })
 	if (!context) return false
 
-	const right = image.naturalWidth - 2
-	const bottom = image.naturalHeight - 2
+	const right = image.naturalWidth - CORNER_SAMPLE_SIZE
+	const bottom = image.naturalHeight - CORNER_SAMPLE_SIZE
+	const drawCorner = (
+		sourceX: number,
+		sourceY: number,
+		destinationX: number,
+		destinationY: number,
+	) =>
+		context.drawImage(
+			image,
+			sourceX,
+			sourceY,
+			CORNER_SAMPLE_SIZE,
+			CORNER_SAMPLE_SIZE,
+			destinationX,
+			destinationY,
+			CORNER_SAMPLE_SIZE,
+			CORNER_SAMPLE_SIZE,
+		)
 
 	try {
-		context.drawImage(image, 0, 0, 2, 2, 0, 0, 2, 2)
-		context.drawImage(image, right, 0, 2, 2, 2, 0, 2, 2)
-		context.drawImage(image, 0, bottom, 2, 2, 0, 2, 2, 2)
-		context.drawImage(image, right, bottom, 2, 2, 2, 2, 2, 2)
-		const pixels = context.getImageData(0, 0, 4, 4).data
+		drawCorner(0, 0, 0, 0)
+		drawCorner(right, 0, CORNER_SAMPLE_SIZE, 0)
+		drawCorner(0, bottom, 0, CORNER_SAMPLE_SIZE)
+		drawCorner(right, bottom, CORNER_SAMPLE_SIZE, CORNER_SAMPLE_SIZE)
+		const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data
 		for (let alpha = 3; alpha < pixels.length; alpha += 4) {
 			if (pixels[alpha] !== 0) return false
 		}

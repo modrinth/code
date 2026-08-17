@@ -197,8 +197,6 @@ function requestGroupDeletion() {
 }
 
 function openGroupContextMenu(event: MouseEvent) {
-	if (displayState.value.group !== 'Group') return
-
 	groupContextMenuOpen.value = true
 	groupOptions.value?.showMenu(
 		event,
