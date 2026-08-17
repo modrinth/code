@@ -175,6 +175,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                             }
                         }
                     }
+
                 }
                 Err(error) => tracing::warn!("Unable to watch file: {error}"),
             }
@@ -185,6 +186,25 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
         watcher: RwLock::new(file_watcher),
         instance_ids,
     })
+}
+
+async fn emit_instance_event_for_path(
+    instance_path: &str,
+    event: InstancePayloadType,
+) {
+    let Ok(state) = State::get().await else {
+        tracing::warn!("Unable to get state for watcher event for {instance_path}");
+        return;
+    };
+
+    let Ok(Some(instance)) =
+        instance_rows::get_instance_by_path(instance_path, &state.pool).await
+    else {
+        tracing::debug!("Skipping watcher event for unknown instance path: {instance_path}");
+        return;
+    };
+
+    let _ = emit_instance(&instance.id, event).await;
 }
 
 pub(crate) async fn watch_instances_init(
