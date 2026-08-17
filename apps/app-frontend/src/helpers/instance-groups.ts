@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 
 export const FAVORITES_GROUP_ID = 'group:favorites'
+export const MAX_INSTANCE_GROUP_NAME_LENGTH = 256
 
 export type InstanceGroupDefinition = {
 	id: string

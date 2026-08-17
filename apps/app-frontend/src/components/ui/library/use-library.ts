@@ -23,6 +23,7 @@ import {
 	FAVORITES_GROUP_ID,
 	type InstanceGroupDefinition,
 	list_groups as listInstanceGroups,
+	MAX_INSTANCE_GROUP_NAME_LENGTH,
 	rename_group as renameInstanceGroup,
 	set_group_memberships as setInstanceGroupMemberships,
 	set_group_order as setInstanceGroupOrder,
@@ -192,7 +193,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const existingGroupNames = computed(
 		() => new Set(['none', ...Array.from(groupNames.value, (group) => group.toLowerCase())]),
 	)
-	const normalizedNewGroupName = computed(() => newGroupName.value.trim().substring(0, 128))
+	const normalizedNewGroupName = computed(() =>
+		newGroupName.value.trim().substring(0, MAX_INSTANCE_GROUP_NAME_LENGTH),
+	)
 	const newGroupInstances = computed(() => {
 		const query = newGroupSearch.value.trim().toLowerCase()
 

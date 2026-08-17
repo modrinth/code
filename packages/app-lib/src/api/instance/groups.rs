@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use uuid::Uuid;
 
-const MAX_GROUP_NAME_LENGTH: usize = 128;
+const MAX_GROUP_NAME_LENGTH: usize = 256;
 pub const FAVORITES_GROUP_ID: &str = "group:favorites";
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

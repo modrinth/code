@@ -23,7 +23,7 @@
 				ref="groupNameInput"
 				v-model="newGroupName"
 				:placeholder="formatMessage(messages.groupNamePlaceholder)"
-				:maxlength="128"
+				:maxlength="MAX_INSTANCE_GROUP_NAME_LENGTH"
 				@click="groupNameInput?.select()"
 			/>
 		</div>
@@ -116,6 +116,7 @@ import { computed, ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
 import { getInstanceIconUrl } from '@/helpers/instance'
+import { MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
 
 const { formatMessage } = useVIntl()
 

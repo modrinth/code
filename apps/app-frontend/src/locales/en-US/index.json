@@ -780,7 +780,7 @@
     "message": "\"None\" is reserved and cannot be used as a group name."
   },
   "app.library.group.name-too-long": {
-    "message": "Group names cannot be longer than 32 characters."
+    "message": "Group names cannot be longer than {maxLength} characters."
   },
   "app.library.group.rename-failed": {
     "message": "Unable to rename group"

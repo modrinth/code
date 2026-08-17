@@ -29,7 +29,7 @@ import type {
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
-import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
+import { FAVORITES_GROUP_ID, MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
 
 const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500
 
@@ -135,7 +135,7 @@ const messages = defineMessages({
 	},
 	groupNameTooLong: {
 		id: 'app.library.group.name-too-long',
-		defaultMessage: 'Group names cannot be longer than 32 characters.',
+		defaultMessage: 'Group names cannot be longer than {maxLength} characters.',
 	},
 	groupNameReserved: {
 		id: 'app.library.group.name-reserved',
@@ -276,8 +276,10 @@ function validateGroupName(value: string) {
 
 	if (normalizedGroupName.length === 0) {
 		reason = formatMessage(messages.groupNameEmpty)
-	} else if (normalizedGroupName.length > 32) {
-		reason = formatMessage(messages.groupNameTooLong)
+	} else if (normalizedGroupName.length > MAX_INSTANCE_GROUP_NAME_LENGTH) {
+		reason = formatMessage(messages.groupNameTooLong, {
+			maxLength: MAX_INSTANCE_GROUP_NAME_LENGTH,
+		})
 	} else if (normalizedGroupName.toLowerCase() === 'none') {
 		reason = formatMessage(messages.groupNameReserved)
 	}
@@ -417,7 +419,7 @@ onMounted(startInstanceGridResizeObserver)
 					:edit-label="formatMessage(commonMessages.renameButton)"
 					max-width="24rem"
 					icon-text-class="select-none"
-					:max-length="32"
+					:max-length="MAX_INSTANCE_GROUP_NAME_LENGTH"
 					:on-change="updateGroupName"
 					:validate="validateGroupName"
 				/>
