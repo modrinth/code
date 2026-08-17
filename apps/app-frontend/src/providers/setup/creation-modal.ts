@@ -17,6 +17,7 @@ import {
 	install_create_instance,
 	install_create_modpack_instance,
 	install_get_modpack_preview,
+	installJobInstanceId,
 } from '@/helpers/install'
 import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
@@ -56,20 +57,36 @@ export function setupCreationModal(
 		installationModal.value?.ctx.setImportMode()
 	})
 
+	async function navigateToCreatedInstance(
+		job: Awaited<ReturnType<typeof install_create_instance>>,
+	) {
+		const instanceId = installJobInstanceId(job)
+		if (instanceId) {
+			await router.push(`/instance/${encodeURIComponent(instanceId)}`)
+		}
+	}
+
 	async function proceedWithModpackCreation(
 		projectId: string,
 		versionId: string,
 		name: string,
 		iconUrl?: string,
 	) {
-		await install_create_modpack_instance({
+		const job = await install_create_modpack_instance({
 			type: 'fromVersionId',
 			project_id: projectId,
 			version_id: versionId,
 			title: name,
 			icon_url: iconUrl,
-		}).catch(handleError)
+		})
+		await navigateToCreatedInstance(job)
 		trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
+	}
+
+	async function proceedWithModpackFileCreation(location: CreatePackLocation) {
+		const job = await install_create_modpack_instance(location)
+		await navigateToCreatedInstance(job)
+		trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
 	}
 
 	async function handleCreate(config: CreationFlowContextValue) {
@@ -91,16 +108,25 @@ export function setupCreationModal(
 			installationModal.value?.hide()
 
 			if (config.isImportMode.value) {
+				let importCount = 0
+				let importedInstanceId: string | null = null
 				for (const [launcherName, instanceSet] of Object.entries(
 					config.importSelectedInstances.value,
 				)) {
 					const launcher = config.importLaunchers.value.find((l) => l.name === launcherName)
 					if (!launcher || instanceSet.size === 0) continue
 					for (const name of instanceSet) {
-						await import_instance(launcher.name, launcher.path, name).catch(handleError)
+						importCount += 1
+						const job = await import_instance(launcher.name, launcher.path, name).catch(handleError)
+						if (job) {
+							importedInstanceId = installJobInstanceId(job)
+						}
 					}
 				}
 				trackEvent('InstanceCreate', { source: 'CreationModalImport' })
+				if (importCount === 1 && importedInstanceId) {
+					await router.push(`/instance/${encodeURIComponent(importedInstanceId)}`)
+				}
 				return
 			}
 
@@ -124,17 +150,16 @@ export function setupCreationModal(
 						: config.modpackFilePath.value
 					if (unknownPackWarningModal.value) {
 						unknownPackWarningModal.value?.show(
-							() => install_create_modpack_instance(location).then(() => undefined),
+							() => proceedWithModpackFileCreation(location).catch(handleError),
 							fileName,
 							preview.externalFilesInModpack,
 						)
 					} else {
-						await install_create_modpack_instance(location)
+						await proceedWithModpackFileCreation(location)
 					}
 				} else {
-					await install_create_modpack_instance(location)
+					await proceedWithModpackFileCreation(location)
 				}
-				trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
 				return
 			}
 
@@ -148,14 +173,15 @@ export function setupCreationModal(
 			const iconPath = config.instanceIconPath.value ?? null
 			const name = config.instanceName.value.trim() || config.autoInstanceName.value
 
-			await install_create_instance({
+			const job = await install_create_instance({
 				name,
 				gameVersion: config.selectedGameVersion.value!,
 				loader: loader as InstanceLoader,
 				loaderVersion,
 				iconPath,
 				iconConfig: iconPath ? getGeneratedIconConfig?.(iconPath) : null,
-			}).catch(handleError)
+			})
+			await navigateToCreatedInstance(job)
 
 			trackEvent('InstanceCreate', {
 				source: 'CreationModal',
@@ -176,7 +202,11 @@ export function setupCreationModal(
 		if (!pendingModpackCreation.value) return
 		const { projectId, versionId, name, iconUrl } = pendingModpackCreation.value
 		pendingModpackCreation.value = null
-		await proceedWithModpackCreation(projectId, versionId, name, iconUrl)
+		try {
+			await proceedWithModpackCreation(projectId, versionId, name, iconUrl)
+		} catch (error) {
+			handleError(error as Error)
+		}
 	}
 
 	function handleModpackDuplicateGoToInstance(instanceId: string) {

@@ -788,7 +788,7 @@ const appliedFilterPreviews = computed(() =>
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
-const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem]'
+const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem] !rounded-xl'
 const effectivePreviewTriggerClass = computed(
 	() => (props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS) + ' h-9',
 )
