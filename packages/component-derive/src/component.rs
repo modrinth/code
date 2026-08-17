@@ -223,7 +223,10 @@ fn impl_apply_to(ident: &Ident, fields: &[ComponentField]) -> TokenStream {
     }
 }
 
-fn impl_into_diff_from(ident: &Ident, fields: &[ComponentField]) -> TokenStream {
+fn impl_into_diff_from(
+    ident: &Ident,
+    fields: &[ComponentField],
+) -> TokenStream {
     let ident_partial = format_ident!("Partial{ident}");
 
     let diff_fields = fields

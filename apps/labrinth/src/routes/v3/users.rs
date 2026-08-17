@@ -397,7 +397,8 @@ pub async fn get_user_preferences(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("resource not found")?;
 
-    let can_access = requester.id == target.id.into() || requester.role.is_mod();
+    let can_access =
+        requester.id == target.id.into() || requester.role.is_mod();
     if !can_access {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to access this user's preferences"
@@ -448,7 +449,8 @@ pub async fn edit_user_preferences(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("resource not found")?;
 
-    let can_access = requester.id == target.id.into() || requester.role.is_mod();
+    let can_access =
+        requester.id == target.id.into() || requester.role.is_mod();
     if !can_access {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to access this user's preferences"
