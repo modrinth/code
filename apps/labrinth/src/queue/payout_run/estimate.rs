@@ -2,10 +2,11 @@
 
 use std::collections::HashMap;
 
-use chrono::{Datelike, Months};
+use chrono::{Datelike, Months, NaiveDate};
 use dashmap::DashMap;
 use eyre::{Result, eyre};
 use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
 use crate::{
@@ -15,19 +16,20 @@ use crate::{
 
 const REDIS_KEY: &str = "aditude_month_estimate_v1";
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PeriodEstimate {
     pub period: YearMonth,
     pub days: Vec<DayEstimate>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DayEstimate {
-    pub day: u32,
+    pub date: NaiveDate,
     pub raw_estimated_revenue_usd: Decimal,
     pub impressions: u128,
 }
 
+/// Get per-month and per-day estimated ad provider info.
 pub async fn estimate(
     aditude: &aditude::Client,
     redis: &RedisPool,
@@ -93,7 +95,7 @@ async fn fetch_estimates(
 
             let day = date.day();
             days.push(DayEstimate {
-                day,
+                date,
                 raw_estimated_revenue_usd: row
                     .revenue
                     .wrap_err_with(|| eyre!("no revenue data for day {day}"))?,
@@ -107,7 +109,7 @@ async fn fetch_estimates(
     // we have no clue if the Aditude row return order is stable,
     // so for safety sort the days here
     for period in map.values_mut() {
-        period.days.sort_unstable_by_key(|day| day.day);
+        period.days.sort_unstable_by_key(|day| day.date);
     }
 
     Ok(map.into_iter().collect::<DashMap<_, _>>())
