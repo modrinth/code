@@ -357,7 +357,7 @@ const {
 	popupNotificationManager,
 	appEvents,
 	(iconPath) =>
-		creationGeneratedIcon.value?.path === iconPath ? creationGeneratedIcon.value.recipe : null,
+		creationGeneratedIcon.value?.path === iconPath ? creationGeneratedIcon.value.config : null,
 )
 const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
 const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
@@ -366,7 +366,7 @@ async function randomizeCreationIcon() {
 	const generated = await creationIconEditorModal.value?.randomizeAndSave()
 	if (!generated) return null
 
-	creationGeneratedIcon.value = { path: generated.iconPath, recipe: generated.recipe }
+	creationGeneratedIcon.value = { path: generated.iconPath, config: generated.config }
 	return {
 		path: generated.iconPath,
 		previewUrl: convertFileSrc(generated.iconPath),
@@ -393,8 +393,8 @@ function customizeContentInstallIcon() {
 	creationIconEditorModal.value?.show()
 }
 
-function onCreationIconSaved(iconPath, recipe) {
-	creationGeneratedIcon.value = { path: iconPath, recipe }
+function onCreationIconSaved(iconPath, config) {
+	creationGeneratedIcon.value = { path: iconPath, config }
 	if (creationIconTarget.value === 'content-install') {
 		modInstallModal.value?.setIcon(iconPath, convertFileSrc(iconPath))
 		return
@@ -1674,7 +1674,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		/>
 		<IconEditorModal
 			ref="creationIconEditorModal"
-			:recipe="creationGeneratedIcon?.recipe"
+			:config="creationGeneratedIcon?.config"
 			@saved="onCreationIconSaved"
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />

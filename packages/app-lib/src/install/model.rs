@@ -1,7 +1,7 @@
 use crate::api::pack::import::ImportLauncherType;
 use crate::api::pack::install_from::{CreatePackInstance, CreatePackLocation};
 use crate::state::{
-    InstanceIconRecipe, InstanceInstallStage, InstanceLink, InstanceMetadata,
+    InstanceIconConfig, InstanceInstallStage, InstanceLink, InstanceMetadata,
     ModLoader,
 };
 use chrono::{DateTime, Utc};
@@ -163,7 +163,7 @@ pub enum InstallRequest {
         loader_version: Option<String>,
         icon_path: Option<String>,
         #[serde(default)]
-        icon_recipe: Option<InstanceIconRecipe>,
+        icon_config: Option<InstanceIconConfig>,
         link: InstanceLink,
     },
     CreateModpackInstance {

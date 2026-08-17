@@ -20,12 +20,12 @@ import {
 } from '@/helpers/install'
 import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
-import type { InstanceIconRecipe, InstanceLoader } from '@/helpers/types'
+import type { InstanceIconConfig, InstanceLoader } from '@/helpers/types'
 import { useTheming } from '@/store/state'
 
 export function setupCreationModal(
 	notificationManager: AbstractWebNotificationManager,
-	getGeneratedIconRecipe?: (iconPath: string) => InstanceIconRecipe | null,
+	getGeneratedIconConfig?: (iconPath: string) => InstanceIconConfig | null,
 ) {
 	const { handleError } = notificationManager
 	const router = useRouter()
@@ -154,7 +154,7 @@ export function setupCreationModal(
 				loader: loader as InstanceLoader,
 				loaderVersion,
 				iconPath,
-				iconRecipe: iconPath ? getGeneratedIconRecipe?.(iconPath) : null,
+				iconConfig: iconPath ? getGeneratedIconConfig?.(iconPath) : null,
 			}).catch(handleError)
 
 			trackEvent('InstanceCreate', {

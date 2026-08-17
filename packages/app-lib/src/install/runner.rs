@@ -24,7 +24,7 @@ use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::instances::commands::resolve_icon_path;
 use crate::state::{
-    ContentSourceKind, InstanceIconRecipe, InstanceInstallStage, InstanceLink,
+    ContentSourceKind, InstanceIconConfig, InstanceInstallStage, InstanceLink,
     ModLoader, State,
 };
 use crate::util::fetch::DownloadReason;
@@ -38,7 +38,7 @@ pub async fn create_instance(
     loader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
-    icon_recipe: Option<InstanceIconRecipe>,
+    icon_config: Option<InstanceIconConfig>,
     link: InstanceLink,
 ) -> crate::Result<InstallJobSnapshot> {
     start(InstallRequest::CreateInstance {
@@ -47,7 +47,7 @@ pub async fn create_instance(
         loader,
         loader_version,
         icon_path,
-        icon_recipe,
+        icon_config,
         link,
     })
     .await
@@ -439,7 +439,7 @@ async fn prepare_initial_instance(
             loader,
             loader_version,
             icon_path,
-            icon_recipe,
+            icon_config,
             link,
         } => {
             let metadata = crate::api::instance::create(
@@ -448,7 +448,7 @@ async fn prepare_initial_instance(
                 loader,
                 loader_version,
                 icon_path,
-                icon_recipe,
+                icon_config,
                 link,
             )
             .await?;
@@ -815,7 +815,7 @@ async fn run_request(
             loader,
             loader_version: _,
             icon_path: _,
-            icon_recipe: _,
+            icon_config: _,
             link: _,
         } => {
             let Some(instance_id) = current_instance_id(job_state) else {

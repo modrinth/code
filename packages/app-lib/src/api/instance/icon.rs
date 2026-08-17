@@ -2,7 +2,7 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
-    EditInstance, InstanceIconBackground, InstanceIconRecipe, State,
+    EditInstance, InstanceIconBackground, InstanceIconConfig, State,
 };
 use crate::util::fetch::{sha1_async, write};
 use crate::util::io;
@@ -18,7 +18,7 @@ const INSTANCE_ICON_MAX_DIMENSION: u32 = 512;
 const INSTANCE_ICON_MAX_SOURCE_DIMENSION: u32 = 8_192;
 const INSTANCE_ICON_MAX_DECODE_BYTES: u64 = 64 * 1024 * 1024;
 const GENERATED_ICON_SIZE: u32 = 256;
-const MAX_ICON_RECIPE_ID_LENGTH: usize = 64;
+const MAX_ICON_CONFIG_ID_LENGTH: usize = 64;
 const MAX_SYMBOL_BYTES: usize = 4 * 1024 * 1024;
 const MAX_SYMBOL_DIMENSION: u32 = 4096;
 
@@ -58,18 +58,18 @@ pub async fn edit_icon(
 
 pub async fn edit_generated_icon(
     instance_id: &str,
-    recipe: InstanceIconRecipe,
+    config: InstanceIconConfig,
     symbol_bytes: Vec<u8>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
     let icon_path =
-        cache_generated_icon_with_state(recipe.clone(), symbol_bytes, &state)
+        cache_generated_icon_with_state(config.clone(), symbol_bytes, &state)
             .await?;
 
     apply_instance_icon(
         instance_id,
         Some(icon_path.clone()),
-        Some(recipe),
+        Some(config),
         &state,
     )
     .await?;
@@ -78,18 +78,18 @@ pub async fn edit_generated_icon(
 }
 
 pub async fn cache_generated_icon(
-    recipe: InstanceIconRecipe,
+    config: InstanceIconConfig,
     symbol_bytes: Vec<u8>,
     add_to_recents: bool,
 ) -> crate::Result<String> {
     let state = State::get().await?;
     let icon_path =
-        cache_generated_icon_with_state(recipe.clone(), symbol_bytes, &state)
+        cache_generated_icon_with_state(config.clone(), symbol_bytes, &state)
             .await?;
 
     if add_to_recents {
         let mut tx = state.pool.begin().await?;
-        instance_rows::update_recent_instance_icon_recipe(&recipe, &mut tx)
+        instance_rows::update_recent_instance_icon_config(&config, &mut tx)
             .await?;
         tx.commit().await?;
     }
@@ -97,18 +97,18 @@ pub async fn cache_generated_icon(
     Ok(icon_path)
 }
 
-pub async fn get_recent_icon_recipes() -> crate::Result<Vec<InstanceIconRecipe>>
+pub async fn get_recent_icon_configs() -> crate::Result<Vec<InstanceIconConfig>>
 {
     let state = State::get().await?;
-    instance_rows::get_recent_instance_icon_recipes(&state.pool).await
+    instance_rows::get_recent_instance_icon_configs(&state.pool).await
 }
 
 async fn cache_generated_icon_with_state(
-    recipe: InstanceIconRecipe,
+    config: InstanceIconConfig,
     symbol_bytes: Vec<u8>,
     state: &State,
 ) -> crate::Result<String> {
-    let background = validate_icon_recipe(&recipe)?;
+    let background = validate_icon_config(&config)?;
     let icon_bytes = tokio::task::spawn_blocking(move || {
         render_generated_icon(background, &symbol_bytes)
     })
@@ -223,7 +223,7 @@ pub(crate) async fn migrate_legacy_icons() -> crate::Result<()> {
 async fn apply_instance_icon(
     instance_id: &str,
     icon_path: Option<String>,
-    icon_recipe: Option<InstanceIconRecipe>,
+    icon_config: Option<InstanceIconConfig>,
     state: &State,
 ) -> crate::Result<()> {
     let instance =
@@ -236,7 +236,7 @@ async fn apply_instance_icon(
         instance_id,
         EditInstance {
             icon_path: Some(icon_path.clone()),
-            icon_recipe: Some(icon_recipe),
+            icon_config: Some(icon_config),
             ..EditInstance::default()
         },
         &state.pool,
@@ -368,10 +368,10 @@ fn validate_normalized_icon(normalized: Vec<u8>) -> crate::Result<Bytes> {
     Ok(Bytes::from(normalized))
 }
 
-fn validate_icon_recipe(
-    recipe: &InstanceIconRecipe,
+fn validate_icon_config(
+    config: &InstanceIconConfig,
 ) -> crate::Result<ValidatedIconBackground> {
-    let background = match &recipe.background {
+    let background = match &config.background {
         InstanceIconBackground::Color { value } => {
             ValidatedIconBackground::Color(parse_background_color(value)?)
         }
@@ -383,14 +383,14 @@ fn validate_icon_recipe(
             bottom_color: parse_background_color(bottom_color)?,
         },
     };
-    validate_icon_recipe_id("symbol", &recipe.symbol)?;
+    validate_icon_config_id("symbol", &config.symbol)?;
     Ok(background)
 }
 
-pub(crate) fn validate_generated_icon_recipe(
-    recipe: &InstanceIconRecipe,
+pub(crate) fn validate_generated_icon_config(
+    config: &InstanceIconConfig,
 ) -> crate::Result<()> {
-    validate_icon_recipe(recipe).map(drop)
+    validate_icon_config(config).map(drop)
 }
 
 fn parse_background_color(value: &str) -> crate::Result<[u8; 3]> {
@@ -414,9 +414,9 @@ fn parse_background_color(value: &str) -> crate::Result<[u8; 3]> {
     ])
 }
 
-fn validate_icon_recipe_id(kind: &str, value: &str) -> crate::Result<()> {
+fn validate_icon_config_id(kind: &str, value: &str) -> crate::Result<()> {
     if value.is_empty()
-        || value.len() > MAX_ICON_RECIPE_ID_LENGTH
+        || value.len() > MAX_ICON_CONFIG_ID_LENGTH
         || !value.bytes().all(|byte| {
             byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'_'
         })
@@ -547,8 +547,8 @@ fn svg_not_supported_error() -> crate::Error {
 #[cfg(test)]
 mod tests {
     use super::{
-        GENERATED_ICON_SIZE, InstanceIconBackground, InstanceIconRecipe,
-        ValidatedIconBackground, render_generated_icon, validate_icon_recipe,
+        GENERATED_ICON_SIZE, InstanceIconBackground, InstanceIconConfig,
+        ValidatedIconBackground, render_generated_icon, validate_icon_config,
     };
     use image::{DynamicImage, ImageFormat, Rgba, RgbaImage};
     use std::io::Cursor;
@@ -614,9 +614,9 @@ mod tests {
     }
 
     #[test]
-    fn generated_icon_recipe_validates_color_and_symbol_id() {
+    fn generated_icon_config_validates_color_and_symbol_id() {
         assert_eq!(
-            validate_icon_recipe(&InstanceIconRecipe {
+            validate_icon_config(&InstanceIconConfig {
                 background: InstanceIconBackground::Color {
                     value: "#c78aff".to_string(),
                 },
@@ -626,7 +626,7 @@ mod tests {
             ValidatedIconBackground::Color([199, 138, 255])
         );
         assert!(
-            validate_icon_recipe(&InstanceIconRecipe {
+            validate_icon_config(&InstanceIconConfig {
                 background: InstanceIconBackground::Color {
                     value: "purple".to_string(),
                 },
@@ -635,7 +635,7 @@ mod tests {
             .is_err()
         );
         assert!(
-            validate_icon_recipe(&InstanceIconRecipe {
+            validate_icon_config(&InstanceIconConfig {
                 background: InstanceIconBackground::Color {
                     value: "#c78aff".to_string(),
                 },

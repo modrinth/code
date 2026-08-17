@@ -27,7 +27,7 @@ import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInsta
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, getInstanceIconUrl, remove } from '@/helpers/instance'
-import type { GameInstance, InstanceIconRecipe } from '@/helpers/types'
+import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
 
 import { injectInstanceSettings } from './instance-settings-context'
 
@@ -45,7 +45,7 @@ const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
-const iconRecipe = ref<InstanceIconRecipe | null>(instance.value.icon_recipe ?? null)
+const iconConfig = ref<InstanceIconConfig | null>(instance.value.icon_config ?? null)
 const savingReleaseChannel = ref(false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
@@ -55,10 +55,10 @@ const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 const installing = computed(() => instance.value.install_stage !== 'installed')
 
 watch(
-	() => [instance.value.id, instance.value.icon_path, instance.value.icon_recipe] as const,
+	() => [instance.value.id, instance.value.icon_path, instance.value.icon_config] as const,
 	() => {
 		icon.value = instance.value.icon_path
-		iconRecipe.value = instance.value.icon_recipe ?? null
+		iconConfig.value = instance.value.icon_config ?? null
 	},
 )
 
@@ -120,7 +120,7 @@ async function resetIcon() {
 	try {
 		await edit_icon(instance.value.id, null)
 		icon.value = undefined
-		iconRecipe.value = null
+		iconConfig.value = null
 	} catch (error) {
 		handleError(error)
 		return
@@ -144,7 +144,7 @@ async function setIcon() {
 	try {
 		await edit_icon(instance.value.id, value)
 		icon.value = value
-		iconRecipe.value = null
+		iconConfig.value = null
 	} catch (error) {
 		handleError(error)
 		return
@@ -155,12 +155,12 @@ async function setIcon() {
 
 function openIconEditor() {
 	iconEditorModal.value?.show()
-	trackEvent(iconRecipe.value ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
+	trackEvent(iconConfig.value ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
 }
 
-function onGeneratedIconSaved(iconPath: string, recipe: InstanceIconRecipe) {
+function onGeneratedIconSaved(iconPath: string, config: InstanceIconConfig) {
 	icon.value = iconPath
-	iconRecipe.value = recipe
+	iconConfig.value = config
 	trackEvent('InstanceSaveCreatedIcon')
 }
 
@@ -297,7 +297,7 @@ const messages = defineMessages({
 	<IconEditorModal
 		ref="iconEditorModal"
 		:instance-id="instance.id"
-		:recipe="iconRecipe"
+		:config="iconConfig"
 		@saved="onGeneratedIconSaved"
 	/>
 	<div class="block">
@@ -350,7 +350,7 @@ const messages = defineMessages({
 						</template>
 						<template #create>
 							<PaletteIcon />
-							{{ formatMessage(iconRecipe ? messages.editCreatedIcon : messages.createIcon) }}
+							{{ formatMessage(iconConfig ? messages.editCreatedIcon : messages.createIcon) }}
 						</template>
 						<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
 					</TeleportOverflowMenu>

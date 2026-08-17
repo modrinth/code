@@ -62,7 +62,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_edit_icon,
             instance_edit_generated_icon,
             instance_cache_generated_icon,
-            instance_get_recent_icon_recipes,
+            instance_get_recent_icon_configs,
             instance_share_can_current_user_use,
             instance_share_get_users,
             instance_share_invite_users,
@@ -88,7 +88,7 @@ pub struct Instance {
     pub launcher_feature_version: String,
     pub name: String,
     pub icon_path: Option<String>,
-    pub icon_recipe: Option<theseus::data::InstanceIconRecipe>,
+    pub icon_config: Option<theseus::data::InstanceIconConfig>,
     pub game_version: String,
     pub protocol_version: Option<u32>,
     pub loader: ModLoader,
@@ -252,7 +252,7 @@ impl From<InstanceMetadata> for Instance {
                 .to_string(),
             name: metadata.instance.name,
             icon_path: metadata.instance.icon_path,
-            icon_recipe: metadata.icon_recipe,
+            icon_config: metadata.icon_config,
             game_version: metadata.applied_content_set.game_version,
             protocol_version: metadata.applied_content_set.protocol_version,
             loader: metadata.applied_content_set.loader,
@@ -424,7 +424,7 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
         launcher_feature_version: None,
         name: edit_instance.name,
         icon_path: None,
-        icon_recipe: None,
+        icon_config: None,
         update_channel: edit_instance.update_channel,
         group_ids: edit_instance.group_ids,
         link: edit_instance
@@ -866,12 +866,12 @@ pub async fn instance_edit_icon(
 #[tauri::command]
 pub async fn instance_edit_generated_icon(
     instance_id: &str,
-    recipe: theseus::data::InstanceIconRecipe,
+    config: theseus::data::InstanceIconConfig,
     symbol_bytes: Vec<u8>,
 ) -> Result<String> {
     Ok(theseus::instance::edit_generated_icon(
         instance_id,
-        recipe,
+        config,
         symbol_bytes,
     )
     .await?)
@@ -879,12 +879,12 @@ pub async fn instance_edit_generated_icon(
 
 #[tauri::command]
 pub async fn instance_cache_generated_icon(
-    recipe: theseus::data::InstanceIconRecipe,
+    config: theseus::data::InstanceIconConfig,
     symbol_bytes: Vec<u8>,
     add_to_recents: bool,
 ) -> Result<String> {
     Ok(theseus::instance::cache_generated_icon(
-        recipe,
+        config,
         symbol_bytes,
         add_to_recents,
     )
@@ -892,9 +892,9 @@ pub async fn instance_cache_generated_icon(
 }
 
 #[tauri::command]
-pub async fn instance_get_recent_icon_recipes()
--> Result<Vec<theseus::data::InstanceIconRecipe>> {
-    Ok(theseus::instance::get_recent_icon_recipes().await?)
+pub async fn instance_get_recent_icon_configs()
+-> Result<Vec<theseus::data::InstanceIconConfig>> {
+    Ok(theseus::instance::get_recent_icon_configs().await?)
 }
 
 #[tauri::command]

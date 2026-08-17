@@ -1,5 +1,5 @@
 use crate::state::instances::{
-    ContentSourceKind, Instance, InstanceIconRecipe, InstanceLaunchOverrides,
+    ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
     InstanceLink,
     adapters::sqlite::{content_rows, instance_rows},
 };
@@ -27,7 +27,7 @@ pub struct EditInstance {
         skip_serializing_if = "Option::is_none",
         with = "serde_with::rust::double_option"
     )]
-    pub icon_recipe: Option<Option<InstanceIconRecipe>>,
+    pub icon_config: Option<Option<InstanceIconConfig>>,
     pub update_channel: Option<ReleaseChannel>,
     pub group_ids: Option<Vec<String>>,
     pub link: Option<InstanceLink>,
@@ -195,15 +195,15 @@ pub(crate) async fn edit_instance(
             .await?;
     }
 
-    if let Some(icon_recipe) = &patch.icon_recipe {
-        instance_rows::update_instance_icon_recipe(
+    if let Some(icon_config) = &patch.icon_config {
+        instance_rows::update_instance_icon_config(
             &instance.id,
-            icon_recipe.as_ref(),
+            icon_config.as_ref(),
             &mut tx,
         )
         .await?;
     } else if patch.icon_path.is_some() {
-        instance_rows::update_instance_icon_recipe(&instance.id, None, &mut tx)
+        instance_rows::update_instance_icon_config(&instance.id, None, &mut tx)
             .await?;
     }
 

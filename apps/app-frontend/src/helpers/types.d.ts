@@ -8,7 +8,7 @@ export type GameInstance = {
 
 	name: string
 	icon_path?: string
-	icon_recipe?: InstanceIconRecipe | null
+	icon_config?: InstanceIconConfig | null
 
 	game_version: string
 	protocol_version?: number
@@ -50,7 +50,7 @@ export type IconBackground =
 			bottom_color: string
 	  }
 
-export type InstanceIconRecipe = {
+export type InstanceIconConfig = {
 	background: IconBackground
 	symbol: string
 }

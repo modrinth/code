@@ -14,9 +14,9 @@ import { toError } from '@/helpers/errors'
 import {
 	cache_generated_icon,
 	edit_generated_icon,
-	get_recent_icon_recipes,
+	get_recent_icon_configs,
 } from '@/helpers/instance'
-import type { IconBackground, InstanceIconRecipe } from '@/helpers/types'
+import type { IconBackground, InstanceIconConfig } from '@/helpers/types'
 
 import {
 	type BackgroundId,
@@ -29,17 +29,17 @@ import {
 
 const props = defineProps<{
 	instanceId?: string
-	recipe?: InstanceIconRecipe | null
+	config?: InstanceIconConfig | null
 }>()
 
 const emit = defineEmits<{
-	saved: [iconPath: string, recipe: InstanceIconRecipe]
+	saved: [iconPath: string, config: InstanceIconConfig]
 }>()
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
-const recentRecipes = ref<InstanceIconRecipe[]>([])
+const recentConfigs = ref<InstanceIconConfig[]>([])
 const saving = ref(false)
 const backgroundScroller = ref<HTMLElement | null>(null)
 const showLeftBackgroundShadow = ref(false)
@@ -58,13 +58,13 @@ const selectedSymbolOption = computed(
 )
 const vanillaSymbolOptions = symbolOptions.filter((option) => option.category === 'vanilla')
 const moddedSymbolOptions = symbolOptions.filter((option) => option.category === 'modded')
-const selectedRecipe = computed<InstanceIconRecipe>(() => ({
+const selectedConfig = computed<InstanceIconConfig>(() => ({
 	background: { ...selectedBackgroundOption.value.background },
 	symbol: selectedSymbol.value,
 }))
-const visibleRecentRecipes = computed(() =>
-	recentRecipes.value.filter(
-		(recipe) => backgroundOption(recipe.background) && symbolOption(recipe.symbol),
+const visibleRecentConfigs = computed(() =>
+	recentConfigs.value.filter(
+		(config) => backgroundOption(config.background) && symbolOption(config.symbol),
 	),
 )
 
@@ -121,9 +121,9 @@ function symbolOption(symbol: string) {
 	return symbolOptions.find((option) => option.id === symbol)
 }
 
-function selectRecent(recipe: InstanceIconRecipe) {
-	const background = backgroundOption(recipe.background)
-	const symbol = symbolOption(recipe.symbol)
+function selectRecent(config: InstanceIconConfig) {
+	const background = backgroundOption(config.background)
+	const symbol = symbolOption(config.symbol)
 	if (!background || !symbol) return
 
 	selectedBackground.value = background.id
@@ -146,15 +146,15 @@ function surpriseMe() {
 
 async function loadRecents() {
 	try {
-		recentRecipes.value = await get_recent_icon_recipes()
+		recentConfigs.value = await get_recent_icon_configs()
 	} catch (error) {
 		handleError(toError(error))
 	}
 }
 
 function show() {
-	selectedBackground.value = backgroundOption(props.recipe?.background)?.id ?? DEFAULT_BACKGROUND_ID
-	selectedSymbol.value = symbolOption(props.recipe?.symbol ?? '')?.id ?? DEFAULT_SYMBOL_ID
+	selectedBackground.value = backgroundOption(props.config?.background)?.id ?? DEFAULT_BACKGROUND_ID
+	selectedSymbol.value = symbolOption(props.config?.symbol ?? '')?.id ?? DEFAULT_SYMBOL_ID
 	modal.value?.show()
 	void loadRecents()
 	nextTick(updateBackgroundScrollShadows)
@@ -176,12 +176,12 @@ async function saveIcon() {
 
 	saving.value = true
 	try {
-		const recipe = selectedRecipe.value
+		const config = selectedConfig.value
 		const symbolBytes = await loadSymbolBytes(selectedSymbolOption.value.asset)
 		const iconPath = props.instanceId
-			? await edit_generated_icon(props.instanceId, recipe, symbolBytes)
-			: await cache_generated_icon(recipe, symbolBytes, true)
-		emit('saved', iconPath, recipe)
+			? await edit_generated_icon(props.instanceId, config, symbolBytes)
+			: await cache_generated_icon(config, symbolBytes, true)
+		emit('saved', iconPath, config)
 		saving.value = false
 		await nextTick()
 		hide()
@@ -195,24 +195,24 @@ async function saveIcon() {
 async function randomizeAndSave() {
 	try {
 		surpriseMe()
-		const recipe = selectedRecipe.value
+		const config = selectedConfig.value
 		const iconPath = await cache_generated_icon(
-			recipe,
+			config,
 			await loadSymbolBytes(selectedSymbolOption.value.asset),
 		)
-		return { iconPath, recipe }
+		return { iconPath, config }
 	} catch (error) {
 		handleError(toError(error))
 		return null
 	}
 }
 
-async function applyGeneratedIcon(instanceId: string, recipe: InstanceIconRecipe) {
+async function applyGeneratedIcon(instanceId: string, config: InstanceIconConfig) {
 	try {
-		const symbol = symbolOption(recipe.symbol)
-		if (!backgroundOption(recipe.background) || !symbol) return false
+		const symbol = symbolOption(config.symbol)
+		if (!backgroundOption(config.background) || !symbol) return false
 
-		await edit_generated_icon(instanceId, recipe, await loadSymbolBytes(symbol.asset))
+		await edit_generated_icon(instanceId, config, await loadSymbolBytes(symbol.asset))
 		return true
 	} catch (error) {
 		handleError(toError(error))
@@ -304,19 +304,19 @@ const messages = defineMessages({
 					{{ formatMessage(messages.surpriseMe) }}
 				</Button>
 
-				<div v-if="visibleRecentRecipes.length" class="flex flex-col gap-2.5">
+				<div v-if="visibleRecentConfigs.length" class="flex flex-col gap-2.5">
 					<span class="font-semibold text-contrast">{{ formatMessage(messages.recents) }}</span>
 					<div class="grid grid-cols-4 gap-3">
 						<button
-							v-for="(recentRecipe, index) in visibleRecentRecipes"
-							:key="`${backgroundKey(recentRecipe.background)}-${recentRecipe.symbol}`"
+							v-for="(recentConfig, index) in visibleRecentConfigs"
+							:key="`${backgroundKey(recentConfig.background)}-${recentConfig.symbol}`"
 							class="icon-outline relative size-10 cursor-pointer overflow-hidden rounded-xl border-0 p-0 transition-transform hover:scale-105"
-							:style="backgroundStyle(recentRecipe.background)"
+							:style="backgroundStyle(recentConfig.background)"
 							:aria-label="`${formatMessage(messages.recents)} ${index + 1}`"
-							@click="selectRecent(recentRecipe)"
+							@click="selectRecent(recentConfig)"
 						>
 							<img
-								:src="symbolOption(recentRecipe.symbol)?.asset"
+								:src="symbolOption(recentConfig.symbol)?.asset"
 								alt=""
 								class="size-full object-cover"
 							/>

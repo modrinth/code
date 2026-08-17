@@ -18,7 +18,7 @@ pub enum InstanceIconBackground {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
-pub struct InstanceIconRecipe {
+pub struct InstanceIconConfig {
     pub background: InstanceIconBackground,
     pub symbol: String,
 }

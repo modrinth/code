@@ -109,7 +109,7 @@ async function applyIcons() {
 				if (!generated) return false
 
 				return (
-					(await iconEditorModal.value?.applyGeneratedIcon(instanceId, generated.recipe)) ?? false
+					(await iconEditorModal.value?.applyGeneratedIcon(instanceId, generated.config)) ?? false
 				)
 			}),
 		)

@@ -24,7 +24,7 @@ pub mod data {
         AppliedContentSetPatch, CacheBehaviour, CacheValueType, ContentFile,
         ContentItem, ContentItemOwner, ContentItemProject, ContentItemVersion,
         CreateInstance, Credentials, Dependency, DirectoryInfo, EditInstance,
-        Hooks, InstanceIconBackground, InstanceIconRecipe,
+        Hooks, InstanceIconBackground, InstanceIconConfig,
         InstanceInstallCandidate, InstanceInstallTarget,
         InstanceLaunchOverridesPatch, InstanceLink, InstanceMetadata,
         JavaVersion, LinkedModpackInfo, MemorySettings, ModLoader,
