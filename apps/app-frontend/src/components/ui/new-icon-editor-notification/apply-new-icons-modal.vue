@@ -73,6 +73,10 @@ const messages = defineMessages({
 		id: 'app.icon-editor.apply-icons-modal.apply-error',
 		defaultMessage: 'Failed to apply random icons to instances.',
 	},
+	applySuccess: {
+		id: 'app.icon-editor.apply-icons-modal.apply-success',
+		defaultMessage: 'Randomized icon for {num, plural, one {# instance} other {# instances}}.',
+	},
 })
 
 async function show() {
@@ -102,6 +106,7 @@ async function applyIcons() {
 	if (applying.value || loading.value) return
 
 	applying.value = true
+	const instanceCount = iconlessInstanceIds.value.length
 	let applied = false
 	try {
 		const results = await Promise.all(
@@ -122,6 +127,10 @@ async function applyIcons() {
 	if (applied) {
 		await nextTick()
 		hide()
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.applySuccess, { num: instanceCount }),
+		})
 	} else {
 		addNotification({
 			type: 'error',

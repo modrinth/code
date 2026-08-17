@@ -141,15 +141,24 @@ onBeforeUnmount(() => {
 
 	.item {
 		align-items: center;
-		color: var(--color-base);
+		color: var(--color-text-primary);
+		font-weight: 500;
 		cursor: pointer;
 		display: flex;
 		gap: var(--gap-sm);
 		padding: var(--gap-sm);
 		border-radius: var(--radius-sm);
 
+		:deep(svg) {
+			color: var(--color-base);
+		}
+
 		&:hover,
 		&:active {
+			:deep(svg) {
+				color: inherit;
+			}
+
 			&.base {
 				background-color: var(--color-button-bg);
 				color: var(--color-contrast);
