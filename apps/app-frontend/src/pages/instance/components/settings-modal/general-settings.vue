@@ -165,7 +165,7 @@ function onGeneratedIconSaved(iconPath: string, config: InstanceIconConfig) {
 }
 
 const editInstanceObject = computed(() => ({
-	name: title.value.trim().substring(0, 32) ?? 'Instance',
+	name: title.value.trim().substring(0, 80) ?? 'Instance',
 }))
 
 watch(
