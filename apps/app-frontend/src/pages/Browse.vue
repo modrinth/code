@@ -123,6 +123,7 @@ const {
 	effectiveServerWorldId,
 	serverContextServerData,
 	serverContentProjectIds,
+	queuedServerInstallRootProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
 	selectedServerInstallProjects,
@@ -143,6 +144,7 @@ const {
 	enforceSetupModpackRoute,
 	getQueuedServerInstallPlans,
 	setQueuedServerInstallPlans,
+	resolveQueuedServerInstallPlan,
 	openServerModpackInstallFlow,
 	onServerFlowBack,
 	handleServerModpackFlowCreate,
@@ -870,6 +872,7 @@ function getCardActions(
 		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
 	) {
 		const isQueued = queuedServerInstallProjectIds.value.has(projectResult.project_id)
+		const isQueuedRoot = queuedServerInstallRootProjectIds.value.has(projectResult.project_id)
 		const isInstallingSelection = isInstallingQueuedServerInstalls.value
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
@@ -897,14 +900,16 @@ function getCardActions(
 							? CheckIcon
 							: PlusIcon,
 				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
-				disabled: showAsInstalled || isInstalling || isInstallingSelection,
+				disabled:
+					showAsInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
 				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					if (isQueued) {
+					if (isQueuedRoot) {
 						removeQueuedServerInstall(projectResult.project_id)
 						return
 					}
+					if (isQueued) return
 
 					const contentType = currentProjectType as BrowseInstallContentType
 					const isModpack = contentType === 'modpack'
@@ -913,7 +918,7 @@ function getCardActions(
 						setProjectInstalling(projectResult.project_id, true)
 					}
 					try {
-						await requestInstall({
+						const plan = await requestInstall({
 							project: projectResult,
 							contentType,
 							mode: isModpack ? 'immediate' : 'queue',
@@ -937,7 +942,9 @@ function getCardActions(
 									iconUrl: plan.project.icon_url ?? undefined,
 								}),
 						})
+						if (!isModpack) await resolveQueuedServerInstallPlan(plan)
 					} catch (err) {
+						if (!isModpack) removeQueuedServerInstall(projectResult.project_id)
 						handleError(err as Error)
 					} finally {
 						if (shouldShowInstalling) {

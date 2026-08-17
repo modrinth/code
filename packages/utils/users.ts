@@ -5,7 +5,7 @@ export const getUserLink = (user) => {
 }
 
 export const isStaff = (user) => {
-	return user && STAFF_ROLES.includes(user.role)
+	return !!user && STAFF_ROLES.includes(user.role)
 }
 
 export const isAdmin = (user) => {

@@ -52,7 +52,7 @@ export function createRadialSpotlightShader() {
   `,
 		transparent: true,
 		depthWrite: false,
-		depthTest: false,
+		depthTest: true,
 	}
 }
 

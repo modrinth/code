@@ -1049,6 +1049,14 @@ export const reportTypeMessages = defineMessages({
 		id: 'report.type.missing-disclosure',
 		defaultMessage: 'Missing or incorrect disclosure',
 	},
+	'ai-images': {
+		id: 'report.type.ai-images',
+		defaultMessage: 'AI-generated images in icon, gallery, or description',
+	},
+	'fully-ai-generated': {
+		id: 'report.type.fully-ai-generated',
+		defaultMessage: 'Fully AI-generated project',
+	},
 })
 
 export function formatReportType(formatMessage: FormatMessage, type: string | undefined): string {

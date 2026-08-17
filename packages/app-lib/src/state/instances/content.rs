@@ -77,7 +77,7 @@ pub enum OwnerType {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LinkedModpackInfo {
     pub project: Project,
-    pub version: Version,
+    pub version: Option<Version>,
     pub owner: Option<ContentItemOwner>,
     pub has_update: bool,
     pub update_version_id: Option<String>,

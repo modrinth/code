@@ -1,21 +1,21 @@
-import type { AbstractModrinthClient, Archon, Labrinth } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
-	addPendingServerContentInstalls,
 	type BrowseInstallPlan,
 	type BrowseSelectedProject,
 	createContext,
 	type CreationFlowContextValue,
 	flushStoredServerAddonInstallQueue,
+	getServerAddonInstallPlanProjectIds,
 	getStoredServerAddonInstallQueue,
+	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
 	type ModpackSearchResult,
-	type PendingServerContentInstall,
-	type PendingServerContentInstallType,
-	readPendingServerContentInstalls,
 	readStoredServerInstallQueue,
-	removePendingServerContentInstall,
-	writePendingServerContentInstallBaseline,
+	resolveServerAddonInstallPlans,
+	useServerContextRuntime,
+	useServerPanelSync,
+	waitForServerContextRuntimeReady,
 	writeStoredServerInstallQueue,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -28,7 +28,6 @@ type InstallableSearchResult = Labrinth.Search.v3.ResultSearchProject & {
 	installing?: boolean
 	installed?: boolean
 }
-type PendingServerContentInstallInput = Omit<PendingServerContentInstall, 'createdAt'>
 
 export interface ServerModpackSelectionRequest {
 	projectId: string
@@ -54,6 +53,7 @@ export interface ServerInstallContentContext {
 	effectiveServerWorldId: ComputedRef<string | null>
 	serverContextServerData: Ref<Archon.Servers.v0.Server | null>
 	serverContentProjectIds: Ref<Set<string>>
+	queuedServerInstallRootProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallCount: ComputedRef<number>
 	selectedServerInstallProjects: ComputedRef<BrowseSelectedProject[]>
@@ -76,6 +76,9 @@ export interface ServerInstallContentContext {
 	setQueuedServerInstallPlans: (
 		plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
 	) => void
+	resolveQueuedServerInstallPlan: (
+		plan: BrowseInstallPlan<InstallableSearchResult>,
+	) => Promise<void>
 	openServerModpackInstallFlow: (request: ServerModpackSelectionRequest) => Promise<void>
 	onServerFlowBack: () => void
 	handleServerModpackFlowCreate: (config: CreationFlowContextValue) => Promise<void>
@@ -88,114 +91,6 @@ export const [injectServerInstallContent, provideServerInstallContent] =
 function readQueryString(value: unknown): string | null {
 	if (Array.isArray(value)) return value[0] ?? null
 	return typeof value === 'string' && value.length > 0 ? value : null
-}
-
-function getQueuedInstallOwnerFallback(project: InstallableSearchResult) {
-	if (project.organization) {
-		const ownerId = project.organization_id ?? project.organization
-		return {
-			id: ownerId,
-			name: project.organization,
-			type: 'organization' as const,
-			link: `https://modrinth.com/organization/${ownerId}`,
-		}
-	}
-
-	if (!project.author) return null
-
-	const ownerId = project.author_id ?? project.author
-	return {
-		id: ownerId,
-		name: project.author,
-		type: 'user' as const,
-		link: `/user/${encodeURIComponent(ownerId)}`,
-	}
-}
-
-async function getQueuedInstallOwner(
-	client: AbstractModrinthClient,
-	project: InstallableSearchResult,
-) {
-	const fallback = getQueuedInstallOwnerFallback(project)
-
-	try {
-		if (project.organization) {
-			const organization = await client.labrinth.projects_v3.getOrganization(project.project_id)
-			if (organization) {
-				return {
-					id: organization.id,
-					name: organization.name,
-					type: 'organization' as const,
-					avatar_url: organization.icon_url ?? undefined,
-					link: `https://modrinth.com/organization/${organization.slug}`,
-				}
-			}
-		}
-
-		const members = await client.labrinth.projects_v3.getMembers(project.project_id)
-		const owner =
-			members.find((member) => member.user.id === project.author_id)?.user ??
-			members.find((member) => member.is_owner || member.role === 'Owner')?.user ??
-			members[0]?.user
-
-		if (owner) {
-			return {
-				id: owner.id,
-				name: owner.username,
-				type: 'user' as const,
-				avatar_url: owner.avatar_url,
-				link: `/user/${encodeURIComponent(owner.username)}`,
-			}
-		}
-	} catch {
-		return fallback
-	}
-
-	return fallback
-}
-
-function getQueuedAddonInstallPlans(
-	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
-) {
-	return Array.from(plans.values()).filter((plan) => plan.contentType !== 'modpack')
-}
-
-function getQueuedInstallPlaceholder(
-	plan: BrowseInstallPlan<InstallableSearchResult>,
-	owner: PendingServerContentInstallInput['owner'],
-): PendingServerContentInstallInput {
-	const project = plan.project as InstallableSearchResult & { slug?: string | null }
-	return {
-		projectId: plan.projectId,
-		versionId: plan.versionId,
-		contentType: plan.contentType as PendingServerContentInstallType,
-		title: project.name ?? 'Project',
-		versionName: plan.versionName ?? null,
-		versionNumber: plan.versionNumber ?? null,
-		fileName: plan.fileName ?? null,
-		owner,
-		slug: project.slug ?? plan.projectId,
-		iconUrl: project.icon_url ?? null,
-	}
-}
-
-function getQueuedInstallPlaceholderFallbacks(
-	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
-) {
-	return getQueuedAddonInstallPlans(plans).map((plan) =>
-		getQueuedInstallPlaceholder(plan, getQueuedInstallOwnerFallback(plan.project)),
-	)
-}
-
-async function getQueuedInstallPlaceholders(
-	client: AbstractModrinthClient,
-	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
-) {
-	return Promise.all(
-		getQueuedAddonInstallPlans(plans).map(async (plan) =>
-			getQueuedInstallPlaceholder(plan, await getQueuedInstallOwner(client, plan.project)),
-		),
-	)
 }
 
 export function createServerInstallContent(opts: {
@@ -220,6 +115,7 @@ export function createServerInstallContent(opts: {
 	const isFromWorlds = computed(() => browseFrom.value === 'worlds')
 	const isServerContext = computed(() => !!serverIdQuery.value)
 	const isSetupServerContext = computed(() => !!serverIdQuery.value && !!serverFlowFrom.value)
+	useServerContextRuntime(serverIdQuery)
 
 	const serverContextWorldId = ref<string | null>(worldIdQuery.value)
 
@@ -246,11 +142,15 @@ export function createServerInstallContent(opts: {
 		initialServerId ? getCachedServer(initialServerId) : null,
 	)
 	const serverContentProjectIds = ref<Set<string>>(new Set())
-	const serverContentInstallKeys = ref<Set<string>>(new Set())
 	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(
 		new Map(),
 	)
-	const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
+	const queuedServerInstallRootProjectIds = computed(
+		() => new Set(queuedServerInstalls.value.keys()),
+	)
+	const queuedServerInstallProjectIds = computed(() =>
+		getServerAddonInstallPlanProjectIds(queuedServerInstalls.value.values()),
+	)
 	const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
 	const selectedServerInstallProjects = computed<BrowseSelectedProject[]>(() =>
 		Array.from(queuedServerInstalls.value.values()).map((plan) => ({
@@ -262,6 +162,10 @@ export function createServerInstallContent(opts: {
 	const isInstallingQueuedServerInstalls = ref(false)
 	const queuedInstallProgress = ref({ completed: 0, total: 0 })
 	const effectiveServerWorldId = computed(() => worldIdQuery.value ?? serverContextWorldId.value)
+	useServerPanelSync({
+		serverId: serverIdQuery,
+		worldId: effectiveServerWorldId,
+	})
 	const serverBackUrl = computed(() => {
 		const sid = serverIdQuery.value
 		if (!sid) return '/hosting/manage'
@@ -307,11 +211,7 @@ export function createServerInstallContent(opts: {
 					.map((addon) => addon.project_id)
 					.filter((projectId): projectId is string => !!projectId),
 			)
-			const keys = new Set(
-				(content.addons ?? []).map((addon) => addon.project_id ?? addon.filename),
-			)
 			serverContentProjectIds.value = ids
-			serverContentInstallKeys.value = keys
 		} catch (err) {
 			handleError(err as Error)
 		}
@@ -353,14 +253,12 @@ export function createServerInstallContent(opts: {
 				serverContextWorldId.value = null
 				serverContextServerData.value = null
 				serverContentProjectIds.value = new Set()
-				serverContentInstallKeys.value = new Set()
 				setQueuedServerInstallPlans(new Map())
 				return
 			}
 
 			if (sid !== prevSid) {
 				serverContentProjectIds.value = new Set()
-				serverContentInstallKeys.value = new Set()
 				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
 				serverContextServerData.value = getCachedServer(sid)
 				try {
@@ -462,6 +360,59 @@ export function createServerInstallContent(opts: {
 		writeStoredServerInstallQueue(serverId, worldId, plans)
 	}
 
+	function toResolvePreferences(
+		preferences?: BrowseInstallPlan<InstallableSearchResult>['preferences'],
+	): Labrinth.Content.v3.ResolutionPreferences {
+		return {
+			game_versions: preferences?.gameVersions,
+			loaders: preferences?.loaders,
+		}
+	}
+
+	async function resolveAddonPlan(
+		plan: BrowseInstallPlan<InstallableSearchResult>,
+		existingProjectIds: string[],
+	) {
+		const target = getTargetInstallPreferences(
+			{
+				gameVersion: serverContextServerData.value?.mc_version,
+				loader: serverContextServerData.value?.loader,
+			},
+			plan.contentType,
+		)
+		const resolved = await client.labrinth.content_v3.resolve({
+			project_id: plan.projectId,
+			version_id: plan.versionId,
+			content_type: plan.contentType as Labrinth.Content.v3.ContentType,
+			selected: toResolvePreferences(plan.preferences),
+			target: toResolvePreferences(target),
+			existing_project_ids: existingProjectIds,
+		})
+
+		return [resolved.primary, ...resolved.dependencies].map((item) => ({
+			projectId: item.project_id,
+			versionId: item.version_id,
+		}))
+	}
+
+	async function resolveQueuedServerInstallPlan(plan: BrowseInstallPlan<InstallableSearchResult>) {
+		const resolvedContent = await resolveAddonPlan(plan, Array.from(serverContentProjectIds.value))
+		const storedPlan = queuedServerInstalls.value.get(plan.projectId)
+		if (!storedPlan || storedPlan.versionId !== plan.versionId) return
+
+		const nextPlans = new Map(queuedServerInstalls.value)
+		nextPlans.set(plan.projectId, { ...storedPlan, resolvedContent })
+		setQueuedServerInstallPlans(nextPlans)
+	}
+
+	async function resolveQueuedAddonPlans(plans: BrowseInstallPlan<InstallableSearchResult>[]) {
+		return await resolveServerAddonInstallPlans({
+			plans,
+			existingProjectIds: serverContentProjectIds.value,
+			resolvePlan: resolveAddonPlan,
+		})
+	}
+
 	async function flushQueuedServerInstalls(
 		serverId: string | null = serverIdQuery.value,
 		worldId: string | null = effectiveServerWorldId.value,
@@ -476,6 +427,13 @@ export function createServerInstallContent(opts: {
 		const queuedPlans = getStoredServerAddonInstallQueue<InstallableSearchResult>(serverId, worldId)
 		if (queuedPlans.size === 0) return true
 
+		try {
+			await waitForServerContextRuntimeReady(client, serverId)
+		} catch (error) {
+			handleError(error as Error)
+			return false
+		}
+
 		isInstallingQueuedServerInstalls.value = true
 		queuedInstallProgress.value = {
 			completed: 0,
@@ -486,22 +444,16 @@ export function createServerInstallContent(opts: {
 			const result = await flushStoredServerAddonInstallQueue({
 				serverId,
 				worldId,
-				install: (plans) =>
-					client.archon.content_v1.addAddons(
-						serverId,
-						worldId,
-						plans.map((plan) => ({
-							project_id: plan.projectId,
-							version_id: plan.versionId,
-						})),
-					),
+				install: async (plans) => {
+					const addons = await resolveQueuedAddonPlans(plans)
+					if (addons.length > 0) {
+						await client.archon.content_v1.addAddons(serverId, worldId, addons)
+					}
+				},
 				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
 			})
 
 			if (!result.ok) {
-				for (const plan of result.attemptedPlans) {
-					removePendingServerContentInstall(serverId, worldId, plan.projectId)
-				}
 				handleError(result.error as Error)
 				return false
 			}
@@ -512,10 +464,6 @@ export function createServerInstallContent(opts: {
 			}
 			serverContentProjectIds.value = new Set([
 				...serverContentProjectIds.value,
-				...result.flushedPlans.map((plan) => plan.projectId),
-			])
-			serverContentInstallKeys.value = new Set([
-				...serverContentInstallKeys.value,
 				...result.flushedPlans.map((plan) => plan.projectId),
 			])
 			if (result.flushedPlans.length > 0) {
@@ -542,23 +490,10 @@ export function createServerInstallContent(opts: {
 
 		if (sid && wid) {
 			writeStoredServerInstallQueue(sid, wid, plans)
-			writePendingServerContentInstallBaseline(sid, wid, serverContentInstallKeys.value)
-			addPendingServerContentInstalls(sid, wid, getQueuedInstallPlaceholderFallbacks(plans))
-			void getQueuedInstallPlaceholders(client, plans)
-				.then((items) => {
-					const pendingProjectIds = new Set(
-						readPendingServerContentInstalls(sid, wid).map((item) => item.projectId),
-					)
-					addPendingServerContentInstalls(
-						sid,
-						wid,
-						items.filter((item) => pendingProjectIds.has(item.projectId)),
-					)
-				})
-				.catch((err) => handleError(err as Error))
 		}
+		const installed = await flushQueuedServerInstalls(sid, wid)
+		if (!installed) return false
 		await router.push(backUrl)
-		void flushQueuedServerInstalls(sid, wid)
 
 		return true
 	}
@@ -627,6 +562,7 @@ export function createServerInstallContent(opts: {
 		effectiveServerWorldId,
 		serverContextServerData,
 		serverContentProjectIds,
+		queuedServerInstallRootProjectIds,
 		queuedServerInstallProjectIds,
 		queuedServerInstallCount,
 		selectedServerInstallProjects,
@@ -647,6 +583,7 @@ export function createServerInstallContent(opts: {
 		enforceSetupModpackRoute,
 		getQueuedServerInstallPlans,
 		setQueuedServerInstallPlans,
+		resolveQueuedServerInstallPlan,
 		openServerModpackInstallFlow,
 		onServerFlowBack,
 		handleServerModpackFlowCreate,

@@ -25,7 +25,7 @@ Here’s the current list of content disclosures available at this time:
   - Projects must enable this if they:
     - contain a substantial amount of AI-generated code
     - _any_ assets that are substantially AI-generated
-    - the project’s design relies on the use of generative AI
+    - the project’s functionality relies on the use of generative AI
     - or, if any element of your project’s page such as description or publishing relies on generative AI
   - There are also options available to disclose if you use it for code, assets, text, or functionality within the project.
 - **Contains advertising**

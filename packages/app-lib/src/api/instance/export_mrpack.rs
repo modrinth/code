@@ -463,32 +463,25 @@ fn pack_get_relative_path(
 fn get_mrpack_environment(
     environment: Option<VersionEnvironment>,
 ) -> HashMap<EnvType, SideType> {
-    let (client, server) = match environment
-        .unwrap_or(VersionEnvironment::Unknown)
-    {
-        VersionEnvironment::ClientAndServer
-        | VersionEnvironment::SingleplayerOnly => {
-            (SideType::Required, SideType::Required)
-        }
-        VersionEnvironment::ClientOnly => {
-            (SideType::Required, SideType::Unsupported)
-        }
-        VersionEnvironment::ClientOnlyServerOptional => {
-            (SideType::Required, SideType::Optional)
-        }
-        VersionEnvironment::ServerOnly
-        | VersionEnvironment::DedicatedServerOnly => {
-            (SideType::Unsupported, SideType::Required)
-        }
-        VersionEnvironment::ServerOnlyClientOptional => {
-            (SideType::Optional, SideType::Required)
-        }
-        VersionEnvironment::ClientOrServer
-        | VersionEnvironment::ClientOrServerPrefersBoth => {
-            (SideType::Optional, SideType::Optional)
-        }
-        VersionEnvironment::Unknown => (SideType::Optional, SideType::Optional),
-    };
+    let (client, server) =
+        match environment.unwrap_or(VersionEnvironment::Unknown) {
+            VersionEnvironment::ClientAndServer
+            | VersionEnvironment::ClientOnlyServerOptional
+            | VersionEnvironment::ServerOnly
+            | VersionEnvironment::ServerOnlyClientOptional
+            | VersionEnvironment::ClientOrServer
+            | VersionEnvironment::ClientOrServerPrefersBoth
+            | VersionEnvironment::Unknown => {
+                (SideType::Required, SideType::Required)
+            }
+            VersionEnvironment::ClientOnly
+            | VersionEnvironment::SingleplayerOnly => {
+                (SideType::Required, SideType::Unsupported)
+            }
+            VersionEnvironment::DedicatedServerOnly => {
+                (SideType::Unsupported, SideType::Required)
+            }
+        };
 
     HashMap::from([(EnvType::Client, client), (EnvType::Server, server)])
 }

@@ -1,7 +1,7 @@
 <template>
 	<div class="markdown-body">
 		<h1>Content Rules</h1>
-		<p><em>Last modified: August 12, 2026</em></p>
+		<p><em>Last modified: August 13, 2026</em></p>
 
 		<p>
 			These Content Rules are to be considered part of our

@@ -88,7 +88,7 @@ export async function refresh_content_updates(instanceId: string): Promise<void>
 // Linked modpack info returned from backend
 export interface LinkedModpackInfo {
 	project: Labrinth.Projects.v2.Project
-	version: Labrinth.Versions.v2.Version
+	version: Labrinth.Versions.v2.Version | null
 	owner: ContentOwner | null
 	has_update: boolean
 	update_version_id: string | null

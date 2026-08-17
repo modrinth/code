@@ -129,15 +129,14 @@ function deserialize_LOADING_BAR_TYPE(d) {
         };
     case 5:
         return {
-            tag: "minecraft_download",
+            tag: "pack_import",
             value: {
-                instance_id: d.deserialize_string(),
-                instance_name: d.deserialize_string()
+                pack_name: d.deserialize_string()
             }
         };
     case 6:
         return {
-            tag: "instance_update",
+            tag: "minecraft_download",
             value: {
                 instance_id: d.deserialize_string(),
                 instance_name: d.deserialize_string()
@@ -145,7 +144,7 @@ function deserialize_LOADING_BAR_TYPE(d) {
         };
     case 7:
         return {
-            tag: "zip_extract",
+            tag: "instance_update",
             value: {
                 instance_id: d.deserialize_string(),
                 instance_name: d.deserialize_string()
@@ -153,12 +152,28 @@ function deserialize_LOADING_BAR_TYPE(d) {
         };
     case 8:
         return {
+            tag: "zip_extract",
+            value: {
+                instance_id: d.deserialize_string(),
+                instance_name: d.deserialize_string()
+            }
+        };
+    case 9:
+        return {
+            tag: "pack_export",
+            value: {
+                instance_id: d.deserialize_string(),
+                instance_name: d.deserialize_string()
+            }
+        };
+    case 10:
+        return {
             tag: "config_change",
             value: {
                 new_path: d.deserialize_string()
             }
         };
-    case 9:
+    case 11:
         return {
             tag: "copy_instance",
             value: {
@@ -166,7 +181,7 @@ function deserialize_LOADING_BAR_TYPE(d) {
                 instance_name: d.deserialize_string()
             }
         };
-    case 10:
+    case 12:
         return {
             tag: "launcher_update",
             value: {

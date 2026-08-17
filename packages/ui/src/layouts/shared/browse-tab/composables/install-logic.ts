@@ -31,6 +31,11 @@ export interface BrowseInstallTarget {
 	loader?: string | null
 }
 
+export interface BrowseResolvedInstallContent {
+	projectId: string
+	versionId: string
+}
+
 /**
  * Minimal project shape needed by shared install resolution.
  */
@@ -53,12 +58,10 @@ export interface BrowseInstallPlan<TProject extends BrowseInstallProject = Brows
 	project: TProject
 	projectId: string
 	versionId: string
-	versionName?: string
-	versionNumber?: string
-	fileName?: string
 	contentType: BrowseInstallContentType
 	preferences: BrowseInstallPreferences
 	source: BrowseInstallPlanSource
+	resolvedContent?: BrowseResolvedInstallContent[]
 }
 
 /**
@@ -335,6 +338,15 @@ export interface FlushStoredServerAddonInstallQueueOptions<TProject extends Brow
 	onQueueChange?: (plans: Map<string, BrowseInstallPlan<TProject>>) => void
 }
 
+export interface ResolveServerAddonInstallPlansOptions<TProject extends BrowseInstallProject> {
+	plans: readonly BrowseInstallPlan<TProject>[]
+	existingProjectIds: Iterable<string>
+	resolvePlan: (
+		plan: BrowseInstallPlan<TProject>,
+		existingProjectIds: string[],
+	) => Promise<BrowseResolvedInstallContent[]>
+}
+
 /**
  * Result of a queue flush. Failed plans are also written back to the queue.
  */
@@ -567,15 +579,10 @@ export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 		const version = getLatestMatchingInstallVersion(versions, candidate.preferences)
 
 		if (version) {
-			const fileName =
-				version.files.find((file) => file.primary)?.filename ?? version.files[0]?.filename
 			return {
 				project: options.project,
 				projectId,
 				versionId: version.id,
-				versionName: version.name,
-				versionNumber: version.version_number,
-				fileName,
 				contentType: options.contentType,
 				preferences: candidate.preferences,
 				source: candidate.source,
@@ -644,6 +651,62 @@ export function getStoredServerAddonInstallQueue<
 	}
 
 	return addonPlans
+}
+
+export function getServerAddonInstallPlanProjectIds<TProject extends BrowseInstallProject>(
+	plans: Iterable<BrowseInstallPlan<TProject>>,
+) {
+	const projectIds = new Set<string>()
+	for (const plan of plans) {
+		projectIds.add(plan.projectId)
+		for (const item of plan.resolvedContent ?? []) {
+			projectIds.add(item.projectId)
+		}
+	}
+	return projectIds
+}
+
+export async function resolveServerAddonInstallPlans<TProject extends BrowseInstallProject>({
+	plans,
+	existingProjectIds,
+	resolvePlan,
+}: ResolveServerAddonInstallPlansOptions<TProject>) {
+	const installedProjectIds = new Set(existingProjectIds)
+	const resolutionExistingProjectIds = Array.from(installedProjectIds)
+	const resolvedPlans = await Promise.all(
+		plans.map(
+			async (plan) =>
+				plan.resolvedContent ?? (await resolvePlan(plan, resolutionExistingProjectIds)),
+		),
+	)
+	const explicitProjectIds = new Set(plans.map((plan) => plan.projectId))
+	const addons = new Map<string, { project_id: string; version_id: string }>()
+
+	for (const plan of plans) {
+		if (installedProjectIds.has(plan.projectId)) continue
+		addons.set(plan.projectId, {
+			project_id: plan.projectId,
+			version_id: plan.versionId,
+		})
+	}
+
+	for (const content of resolvedPlans) {
+		for (const item of content) {
+			if (
+				installedProjectIds.has(item.projectId) ||
+				explicitProjectIds.has(item.projectId) ||
+				addons.has(item.projectId)
+			) {
+				continue
+			}
+			addons.set(item.projectId, {
+				project_id: item.projectId,
+				version_id: item.versionId,
+			})
+		}
+	}
+
+	return Array.from(addons.values())
 }
 
 export async function flushStoredServerAddonInstallQueue<TProject extends BrowseInstallProject>({
@@ -869,7 +932,22 @@ function isStoredBrowseInstallPlan(
 		typeof record.versionId === 'string' &&
 		isStoredBrowseInstallContentType(record.contentType) &&
 		isStoredBrowseInstallPreferences(record.preferences) &&
-		(record.source === 'filtered' || record.source === 'target')
+		(record.source === 'filtered' || record.source === 'target') &&
+		isOptionalStoredResolvedContent(record.resolvedContent)
+	)
+}
+
+function isOptionalStoredResolvedContent(value: unknown) {
+	return (
+		value === undefined ||
+		(Array.isArray(value) &&
+			value.every(
+				(item) =>
+					!!item &&
+					typeof item === 'object' &&
+					typeof (item as Record<string, unknown>).projectId === 'string' &&
+					typeof (item as Record<string, unknown>).versionId === 'string',
+			))
 	)
 }
 
