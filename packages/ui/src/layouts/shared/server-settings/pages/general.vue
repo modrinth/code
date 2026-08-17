@@ -10,7 +10,7 @@
 								<span class="text-lg font-semibold text-contrast">Server name</span>
 							</label>
 							<div class="flex flex-col gap-2.5">
-								<StyledInput
+								<Input
 									id="server-name-field"
 									v-model="serverName"
 									v-tooltip="advancedActionTooltip"
@@ -150,7 +150,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
-import { CopyCode, StyledInput, Toggle } from '#ui/components'
+import { CopyCode, Input, Toggle } from '#ui/components'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'

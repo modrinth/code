@@ -18,7 +18,7 @@
 		<div class="flex flex-col gap-5" @submit.prevent="saveEvent">
 			<div class="flex flex-col gap-2">
 				<span class="label__title font-semibold">Title</span>
-				<StyledInput
+				<Input
 					id="analytics-event-title"
 					ref="titleInput"
 					v-model="form.title"
@@ -49,7 +49,7 @@
 					</ButtonLink>
 				</div>
 				<div class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						id="analytics-event-link"
 						v-model="form.announcementUrl"
 						type="url"
@@ -131,7 +131,7 @@
 				<h1 class="m-0 text-2xl font-extrabold text-contrast">Analytics Events</h1>
 
 				<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-					<StyledInput
+					<Input
 						v-model="searchQuery"
 						:icon="SearchIcon"
 						type="search"
@@ -247,11 +247,11 @@ import {
 	DatePicker,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	MultiSelect,
 	type MultiSelectOption,
 	NewModal,
 	type SortDirection,
-	StyledInput,
 	Table,
 	type TableColumn,
 } from '@modrinth/ui'
@@ -321,7 +321,7 @@ const allMetricKinds = metricKindOptions.map((option) => option.value)
 
 const deleteEventModal = ref<InstanceType<typeof ConfirmModal> | null>(null)
 const eventModal = ref<InstanceType<typeof NewModal> | null>(null)
-const titleInput = ref<InstanceType<typeof StyledInput> | null>(null)
+const titleInput = ref<InstanceType<typeof Input> | null>(null)
 const searchQuery = ref('')
 const sortColumn = ref<EventColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('desc')

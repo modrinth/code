@@ -7,7 +7,7 @@ import {
 	Chips,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
@@ -346,7 +346,7 @@ const messages = defineMessages({
 			{{ formatMessage(messages.name) }}
 		</label>
 		<div class="flex">
-			<StyledInput
+			<Input
 				id="instance-name"
 				v-model="title"
 				autocomplete="off"
@@ -387,7 +387,7 @@ const messages = defineMessages({
 					@click="toggleGroup(group)"
 				/>
 				<div class="flex gap-2 items-center">
-					<StyledInput
+					<Input
 						v-model="newCategoryInput"
 						:placeholder="formatMessage(messages.libraryGroupsEnterName)"
 						class="w-full max-w-[300px]"

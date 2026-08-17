@@ -1,6 +1,6 @@
 <script setup>
 import { CheckIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
-import { Admonition, Avatar, Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import { Admonition, Avatar, Button, injectNotificationManager, Input } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
@@ -80,7 +80,7 @@ async function addServer(instance) {
 	<ModalWrapper ref="modal" header="Add server to instance">
 		<div class="flex flex-col gap-4 min-w-[350px]">
 			<Admonition type="warning" body="This server may not be compatible with all instances." />
-			<StyledInput
+			<Input
 				v-model="searchFilter"
 				:icon="SearchIcon"
 				type="search"

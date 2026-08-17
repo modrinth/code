@@ -2,26 +2,22 @@ import { KeyIcon, LinkIcon, MailIcon, SearchIcon, UserIcon } from '@modrinth/ass
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import StyledInput from '../../components/base/StyledInput.vue'
+import Input from '../../components/base/inputs/Input.vue'
 
 const meta = {
-	title: 'Base/StyledInput',
-	component: StyledInput,
+	title: 'Inputs/Input',
+	component: Input,
 	argTypes: {
 		size: {
 			control: 'select',
-			options: ['standard', 'small'],
+			options: ['small', 'standard', 'medium', 'large'],
 		},
 		type: {
 			control: 'select',
-			options: ['text', 'email', 'password', 'number', 'url', 'search', 'date', 'datetime-local'],
-		},
-		resize: {
-			control: 'select',
-			options: ['none', 'vertical', 'both'],
+			options: ['text', 'email', 'password', 'number', 'url', 'search'],
 		},
 	},
-} satisfies Meta<typeof StyledInput>
+} satisfies Meta<typeof Input>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -41,13 +37,13 @@ export const WithIcon: Story = {
 
 export const Clearable: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('Some text to clear')
 			return { value, SearchIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="SearchIcon"
 				placeholder="Search..."
@@ -59,13 +55,13 @@ export const Clearable: Story = {
 
 export const WithIconAndClearable: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('Search query')
 			return { value, SearchIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="SearchIcon"
 				placeholder="Search..."
@@ -102,18 +98,6 @@ export const Search: Story = {
 	},
 }
 
-export const Date: Story = {
-	args: {
-		type: 'date',
-	},
-}
-
-export const DatetimeLocal: Story = {
-	args: {
-		type: 'datetime-local',
-	},
-}
-
 export const Small: Story = {
 	args: {
 		icon: SearchIcon,
@@ -132,13 +116,13 @@ export const Disabled: Story = {
 
 export const Readonly: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('This is readonly')
 			return { value, UserIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="UserIcon"
 				placeholder="Readonly input"
@@ -150,13 +134,13 @@ export const Readonly: Story = {
 
 export const Error: Story = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const value = ref('invalid-url')
 			return { value, LinkIcon }
 		},
 		template: `
-			<StyledInput
+			<Input
 				v-model="value"
 				:icon="LinkIcon"
 				type="url"
@@ -169,7 +153,7 @@ export const Error: Story = {
 
 export const AllSizes: StoryObj = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			return { SearchIcon }
 		},
@@ -177,7 +161,7 @@ export const AllSizes: StoryObj = {
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Standard (36px)</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Standard size..."
 						size="standard"
@@ -185,133 +169,26 @@ export const AllSizes: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Small (32px)</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Small size..."
 						size="small"
 					/>
 				</div>
-			</div>
-		`,
-	}),
-}
-
-export const Multiline: Story = {
-	args: {
-		multiline: true,
-		placeholder: 'Enter a description...',
-	},
-}
-
-export const MultilineWithRows: Story = {
-	render: () => ({
-		components: { StyledInput },
-		setup() {
-			const value = ref('This textarea has 5 rows configured for longer content entry.')
-			return { value }
-		},
-		template: `
-			<StyledInput
-				v-model="value"
-				multiline
-				:rows="5"
-				placeholder="Enter details..."
-			/>
-		`,
-	}),
-}
-
-export const MultilineResizable: Story = {
-	args: {
-		multiline: true,
-		resize: 'vertical',
-		placeholder: 'Drag the bottom-right corner to resize...',
-	},
-}
-
-export const MultilineError: Story = {
-	render: () => ({
-		components: { StyledInput },
-		setup() {
-			const value = ref('Invalid content')
-			return { value }
-		},
-		template: `
-			<StyledInput
-				v-model="value"
-				multiline
-				placeholder="Enter text..."
-				error
-			/>
-		`,
-	}),
-}
-
-export const MultilineDisabled: Story = {
-	args: {
-		multiline: true,
-		placeholder: 'Disabled textarea',
-		disabled: true,
-	},
-}
-
-export const MultilineAllStates: StoryObj = {
-	render: () => ({
-		components: { StyledInput },
-		setup() {
-			const normalValue = ref('')
-			const filledValue = ref('Some content that has been entered into the textarea.')
-			const errorValue = ref('Invalid content')
-			const readonlyValue = ref('This content is readonly')
-			return { normalValue, filledValue, errorValue, readonlyValue }
-		},
-		template: /*html*/ `
-			<div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
 				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Default</p>
-					<StyledInput
-						v-model="normalValue"
-						multiline
-						placeholder="Enter text..."
+					<p style="margin-bottom: 0.5rem; font-weight: 600;">Medium (40px)</p>
+					<Input
+						:icon="SearchIcon"
+						placeholder="Medium size..."
+						size="medium"
 					/>
 				</div>
 				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">With Value</p>
-					<StyledInput
-						v-model="filledValue"
-						multiline
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Error State</p>
-					<StyledInput
-						v-model="errorValue"
-						multiline
-						error
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Disabled</p>
-					<StyledInput
-						multiline
-						placeholder="Disabled..."
-						disabled
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Readonly</p>
-					<StyledInput
-						v-model="readonlyValue"
-						multiline
-						readonly
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Resizable (vertical)</p>
-					<StyledInput
-						multiline
-						resize="vertical"
-						placeholder="Drag to resize..."
+					<p style="margin-bottom: 0.5rem; font-weight: 600;">Large (48px)</p>
+					<Input
+						:icon="SearchIcon"
+						placeholder="Large size..."
+						size="large"
 					/>
 				</div>
 			</div>
@@ -321,7 +198,7 @@ export const MultilineAllStates: StoryObj = {
 
 export const AllStates: StoryObj = {
 	render: () => ({
-		components: { StyledInput },
+		components: { Input },
 		setup() {
 			const normalValue = ref('')
 			const filledValue = ref('With content')
@@ -333,7 +210,7 @@ export const AllStates: StoryObj = {
 			<div style="display: flex; flex-direction: column; gap: 1rem; max-width: 300px;">
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Default</p>
-					<StyledInput
+					<Input
 						v-model="normalValue"
 						:icon="SearchIcon"
 						placeholder="Enter text..."
@@ -341,7 +218,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">With Value + Clearable</p>
-					<StyledInput
+					<Input
 						v-model="filledValue"
 						:icon="SearchIcon"
 						placeholder="Enter text..."
@@ -350,7 +227,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Error State</p>
-					<StyledInput
+					<Input
 						v-model="errorValue"
 						:icon="LinkIcon"
 						placeholder="Enter URL..."
@@ -359,7 +236,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Disabled</p>
-					<StyledInput
+					<Input
 						:icon="SearchIcon"
 						placeholder="Disabled..."
 						disabled
@@ -367,7 +244,7 @@ export const AllStates: StoryObj = {
 				</div>
 				<div>
 					<p style="margin-bottom: 0.5rem; font-weight: 600;">Readonly</p>
-					<StyledInput
+					<Input
 						v-model="readonlyValue"
 						:icon="SearchIcon"
 						placeholder="Readonly..."

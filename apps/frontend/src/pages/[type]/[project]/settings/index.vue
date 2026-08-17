@@ -22,12 +22,7 @@
 					<label for="project-name">
 						<span class="label__title">Name</span>
 					</label>
-					<StyledInput
-						id="project-name"
-						v-model="name"
-						:maxlength="2048"
-						:disabled="!hasPermission"
-					/>
+					<Input id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
 				</div>
 
 				<div>
@@ -38,7 +33,7 @@
 						<div class="text-input-wrapper__before">
 							<span class="hidden sm:inline">https://modrinth.com</span>/{{ projectTypeForUrl }}/
 						</div>
-						<StyledInput
+						<Input
 							id="project-slug"
 							v-model="slug"
 							:maxlength="64"
@@ -52,10 +47,9 @@
 					<label for="project-summary">
 						<span class="label__title">Summary</span>
 					</label>
-					<StyledInput
+					<Textarea
 						id="project-summary"
 						v-model="summary"
-						multiline
 						:maxlength="256"
 						:disabled="!hasPermission"
 						resize="vertical"
@@ -311,12 +305,13 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
 	SettingsInlineWarning,
 	SettingsOptionCard,
 	SettingsToggleCard,
-	StyledInput,
+	Textarea,
 	UnsavedChangesPopup,
 	useFormatBytes,
 	usePageLeaveSafety,

@@ -98,7 +98,7 @@
 					{{ formatMessage(messages.serversTitle) }}
 				</h1>
 				<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
-					<StyledInput
+					<Input
 						id="search"
 						v-model="searchInput"
 						:icon="SearchIcon"
@@ -237,12 +237,12 @@ import {
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
 	ServersGuestPlanModal,
-	StyledInput,
 	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'

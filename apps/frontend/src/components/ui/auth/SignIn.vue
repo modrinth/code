@@ -18,7 +18,7 @@
 							{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						id="two-factor-code"
 						v-model="twoFactorCodeModel"
 						:maxlength="11"
@@ -80,7 +80,7 @@
 
 				<section class="mx-auto flex w-full flex-col gap-2.5">
 					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
-					<StyledInput
+					<Input
 						id="email"
 						v-model="emailModel"
 						:icon="MailIcon"
@@ -92,7 +92,7 @@
 					/>
 
 					<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-					<StyledInput
+					<Input
 						id="password"
 						v-model="passwordModel"
 						:icon="KeyIcon"
@@ -158,14 +158,7 @@ import {
 	SteamColorIcon,
 	UserKeyIcon,
 } from '@modrinth/assets'
-import {
-	Button,
-	ButtonLink,
-	commonMessages,
-	defineMessages,
-	StyledInput,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, ButtonLink, commonMessages, defineMessages, Input, useVIntl } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import type { LocationQuery } from 'vue-router'

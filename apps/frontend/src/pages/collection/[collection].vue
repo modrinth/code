@@ -84,7 +84,7 @@
 						<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
 							{{ formatMessage(commonMessages.titleLabel) }}
 						</label>
-						<StyledInput
+						<Input
 							id="collection-title"
 							v-model="current.name"
 							:maxlength="255"
@@ -98,10 +98,9 @@
 					>
 						{{ formatMessage(commonMessages.descriptionLabel) }}
 					</label>
-					<StyledInput
+					<Textarea
 						id="collection-description"
 						v-model="current.description"
-						multiline
 						:maxlength="255"
 						wrapper-class="h-24"
 					/>
@@ -416,6 +415,7 @@ import {
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NavTabs,
 	NewModal,
@@ -426,8 +426,8 @@ import {
 	RadioButtons,
 	SidebarCard,
 	sortProjectTypes,
-	StyledInput,
 	TeleportOverflowMenu,
+	Textarea,
 	useCompactNumber,
 	useFormatDateTime,
 	useRelativeTime,

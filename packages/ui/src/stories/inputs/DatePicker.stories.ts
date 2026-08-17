@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, nextTick, onMounted, ref } from 'vue'
 
-import DatePicker from '../../components/base/DatePicker.vue'
+import DatePicker from '../../components/base/inputs/DatePicker.vue'
 
 const meta = {
-	title: 'Base/DatePicker',
+	title: 'Inputs/DatePicker',
 	component: DatePicker,
 } satisfies Meta<typeof DatePicker>
 

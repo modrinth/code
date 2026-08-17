@@ -4,7 +4,7 @@
 			<label class="label" for="insert-link-label">
 				<span class="label__title">{{ formatMessage(messages.linkModalLabelFieldTitle) }}</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-link-label"
 				v-model="linkText"
 				:icon="AlignLeftIcon"
@@ -18,7 +18,7 @@
 					{{ formatMessage(messages.urlLabel) }}<span class="required">*</span>
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-link-url"
 				v-model="linkUrl"
 				:icon="LinkIcon"
@@ -76,7 +76,7 @@
 					{{ formatMessage(messages.imageModalDescriptionFieldDescription) }}
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-image-alt"
 				v-model="linkText"
 				:icon="AlignLeftIcon"
@@ -113,7 +113,7 @@
 					<UploadIcon />
 				</FileInput>
 			</div>
-			<StyledInput
+			<Input
 				v-if="!props.onImageUpload || imageUploadOption === 'link'"
 				id="insert-link-url"
 				v-model="linkUrl"
@@ -171,7 +171,7 @@
 					{{ formatMessage(messages.videoModalUrlFieldDescription) }}
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-video-url"
 				v-model="linkUrl"
 				:icon="YouTubeIcon"
@@ -333,8 +333,8 @@ import { commonMessages } from '../../utils/common-messages.ts'
 import NewModal from '../modal/NewModal.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
+import Input from './inputs/Input.vue'
 import IntlFormatted from './IntlFormatted.vue'
-import StyledInput from './StyledInput.vue'
 import Toggle from './Toggle.vue'
 
 const { formatMessage } = useVIntl()
