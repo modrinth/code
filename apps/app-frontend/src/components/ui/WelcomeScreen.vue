@@ -84,17 +84,13 @@ onUnmounted(() => {
 <template>
 	<div class="flex flex-col min-h-full px-6 pb-6 pt-16">
 		<div class="relative flex grow items-center justify-center">
-			<div class="relative flex flex-col items-center gap-6">
+			<div class="relative isolate flex flex-col items-center gap-6">
 				<div
-					class="dot-pattern pointer-events-none absolute left-1/2 -top-52 h-[29.875rem] w-[min(25.9375rem,80vw)] -translate-x-1/2 rounded-2xl [@media(max-height:700px)]:h-[23rem]"
+					class="dot-pattern pointer-events-none absolute left-1/2 -top-52 -z-10 h-[29.875rem] w-[min(25.9375rem,80vw)] -translate-x-1/2 rounded-2xl [@media(max-height:700px)]:h-[23rem]"
 					aria-hidden="true"
 				/>
-				<div class="relative h-[6.25rem] w-[6.25rem]">
-					<img
-						:src="modrinthSocialIcon"
-						alt=""
-						class="welcome-artwork pointer-events-none absolute left-1/2 top-1/2 h-[33.75rem] w-[33.75rem] max-w-none -translate-x-1/2 -translate-y-1/2"
-					/>
+				<div class="size-[6.25rem]">
+					<img :src="modrinthSocialIcon" alt="" class="pointer-events-none size-full" />
 				</div>
 				<div class="flex flex-col items-center gap-2">
 					<h1 class="m-0 flex items-center gap-2 text-2xl font-semibold leading-8 text-contrast">
@@ -144,11 +140,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.welcome-artwork {
-	-webkit-mask-image: radial-gradient(circle, black 45%, transparent 72%);
-	mask-image: radial-gradient(circle, black 45%, transparent 72%);
-}
-
 .dot-pattern {
 	background-image: radial-gradient(
 		circle,
