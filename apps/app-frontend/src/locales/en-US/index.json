@@ -1379,6 +1379,24 @@
   "app.user.project.install-to-instance": {
     "message": "Install to instance"
   },
+  "app.welcome-screen.create-instance": {
+    "message": "Create an instance"
+  },
+  "app.welcome-screen.description": {
+    "message": "Ready to start playing?"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "Import from launcher"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "Escaping another launcher?"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "Press <shortcut>N</shortcut> to quick create an instance"
+  },
+  "app.welcome-screen.title": {
+    "message": "Welcome to Modrinth"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },

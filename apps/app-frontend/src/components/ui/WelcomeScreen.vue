@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ImportIcon, PlusIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
+import { Button, defineMessages, IntlFormatted, useVIntl } from '@modrinth/ui'
 import frog from '@modrinth/ui/src/assets/welcome/frog.png'
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
@@ -8,6 +8,35 @@ import modrinthSocialIcon from '../../assets/welcome/modrinth-social-icon.png'
 
 const showCreationModal = inject<() => void>('showCreationModal')
 const showImportModal = inject<() => void>('showImportModal')
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	welcomeTitle: {
+		id: 'app.welcome-screen.title',
+		defaultMessage: 'Welcome to Modrinth',
+	},
+	welcomeDescription: {
+		id: 'app.welcome-screen.description',
+		defaultMessage: 'Ready to start playing?',
+	},
+	createInstance: {
+		id: 'app.welcome-screen.create-instance',
+		defaultMessage: 'Create an instance',
+	},
+	quickCreateHint: {
+		id: 'app.welcome-screen.quick-create-hint',
+		defaultMessage: 'Press <shortcut>N</shortcut> to quick create an instance',
+	},
+	importPrompt: {
+		id: 'app.welcome-screen.import-prompt',
+		defaultMessage: 'Escaping another launcher?',
+	},
+	importFromLauncher: {
+		id: 'app.welcome-screen.import-from-launcher',
+		defaultMessage: 'Import from launcher',
+	},
+})
 
 const offline = ref(!navigator.onLine)
 
@@ -69,10 +98,12 @@ onUnmounted(() => {
 				</div>
 				<div class="flex flex-col items-center gap-2">
 					<h1 class="m-0 flex items-center gap-2 text-2xl font-semibold leading-8 text-contrast">
-						Welcome to Modrinth
+						{{ formatMessage(messages.welcomeTitle) }}
 						<img :src="frog" alt="" class="h-8 w-8 [image-rendering:pixelated]" />
 					</h1>
-					<p class="m-0 text-center text-base leading-6 text-primary">Ready to start playing?</p>
+					<p class="m-0 text-center text-base leading-6 text-primary">
+						{{ formatMessage(messages.welcomeDescription) }}
+					</p>
 				</div>
 				<div class="flex w-72 flex-col items-center gap-4">
 					<Button
@@ -84,15 +115,18 @@ onUnmounted(() => {
 						@click="showCreationModal?.()"
 					>
 						<PlusIcon />
-						Create an instance
+						{{ formatMessage(messages.createInstance) }}
 					</Button>
 					<span class="flex items-center gap-1 text-sm leading-5 text-secondary">
-						Press
-						<kbd
-							class="inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-solid border-surface-5 bg-button-bg px-1 text-xs font-normal leading-4 text-primary"
-							>N</kbd
-						>
-						to quick create an instance
+						<IntlFormatted :message-id="messages.quickCreateHint">
+							<template #shortcut="{ children }">
+								<kbd
+									class="inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-solid border-surface-5 bg-button-bg px-1 text-xs font-normal leading-4 text-primary"
+								>
+									<component :is="() => children" />
+								</kbd>
+							</template>
+						</IntlFormatted>
 					</span>
 				</div>
 			</div>
@@ -100,10 +134,10 @@ onUnmounted(() => {
 		<div
 			class="flex flex-col h-max items-center justify-end gap-4 text-sm leading-5 text-secondary"
 		>
-			<span class="whitespace-nowrap">Escaping another launcher?</span>
+			<span class="whitespace-nowrap">{{ formatMessage(messages.importPrompt) }}</span>
 			<Button size="lg" class="!font-medium" :disabled="offline" @click="showImportModal?.()">
 				<ImportIcon />
-				Import from launcher
+				{{ formatMessage(messages.importFromLauncher) }}
 			</Button>
 		</div>
 	</div>
