@@ -35,9 +35,36 @@ const props = defineProps<{
 
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	library: { id: 'app.library.title', defaultMessage: 'Library' },
 	noSearchResults: {
 		id: 'app.library.search.no-results.title',
 		defaultMessage: 'No instances match your search.',
+	},
+	play: { id: 'app.library.instance.action.play', defaultMessage: 'Play' },
+	stop: { id: 'app.library.instance.action.stop', defaultMessage: 'Stop' },
+	addToFavorites: {
+		id: 'app.library.instance.action.add-to-favorites',
+		defaultMessage: 'Add to favorites',
+	},
+	removeFromFavorites: {
+		id: 'app.library.instance.action.remove-from-favorites',
+		defaultMessage: 'Remove from favorites',
+	},
+	addContent: { id: 'app.library.instance.action.add-content', defaultMessage: 'Add content' },
+	viewInstance: {
+		id: 'app.library.instance.action.view-instance',
+		defaultMessage: 'View instance',
+	},
+	duplicateInstance: {
+		id: 'app.library.instance.action.duplicate',
+		defaultMessage: 'Duplicate instance',
+	},
+	delete: { id: 'app.library.instance.action.delete', defaultMessage: 'Delete' },
+	openFolder: { id: 'app.library.instance.action.open-folder', defaultMessage: 'Open folder' },
+	copyPath: { id: 'app.library.instance.action.copy-path', defaultMessage: 'Copy path' },
+	removeFromGroup: {
+		id: 'app.library.instance.action.remove-from-group',
+		defaultMessage: 'Remove from group',
 	},
 })
 
@@ -250,7 +277,9 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 <template>
 	<InstanceGroupDnd :instances="instances">
 		<section data-library-page-background class="flex flex-col gap-3 pb-16 min-h-[500px]">
-			<h2 class="m-0 text-2xl font-semibold text-contrast">Library</h2>
+			<h2 class="m-0 text-2xl font-semibold text-contrast">
+				{{ formatMessage(messages.library) }}
+			</h2>
 			<LibraryToolbar />
 			<div
 				v-if="libraryGroupsLoaded && isSearching && visibleInstanceGroups.length === 0"
@@ -379,20 +408,26 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 		@delete="deleteInstance"
 	/>
 	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">
-		<template #play> <PlayIcon /> Play </template>
-		<template #stop> <StopCircleIcon /> Stop </template>
-		<template #add_to_favorites> <StarIcon /> Add to favorites </template>
-		<template #remove_from_favorites>
-			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" /> Remove
-			from favorites
+		<template #play> <PlayIcon /> {{ formatMessage(messages.play) }} </template>
+		<template #stop> <StopCircleIcon /> {{ formatMessage(messages.stop) }} </template>
+		<template #add_to_favorites>
+			<StarIcon /> {{ formatMessage(messages.addToFavorites) }}
 		</template>
-		<template #add_content> <PlusIcon /> Add content </template>
-		<template #edit> <EyeIcon /> View instance </template>
-		<template #duplicate> <ClipboardCopyIcon /> Duplicate instance</template>
-		<template #delete> <TrashIcon /> Delete </template>
-		<template #open> <FolderOpenIcon /> Open folder </template>
-		<template #copy> <ClipboardCopyIcon /> Copy path </template>
-		<template #remove_from_group> <MinusIcon /> Remove from group </template>
+		<template #remove_from_favorites>
+			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" />
+			{{ formatMessage(messages.removeFromFavorites) }}
+		</template>
+		<template #add_content> <PlusIcon /> {{ formatMessage(messages.addContent) }} </template>
+		<template #edit> <EyeIcon /> {{ formatMessage(messages.viewInstance) }} </template>
+		<template #duplicate>
+			<ClipboardCopyIcon /> {{ formatMessage(messages.duplicateInstance) }}
+		</template>
+		<template #delete> <TrashIcon /> {{ formatMessage(messages.delete) }} </template>
+		<template #open> <FolderOpenIcon /> {{ formatMessage(messages.openFolder) }} </template>
+		<template #copy> <ClipboardCopyIcon /> {{ formatMessage(messages.copyPath) }} </template>
+		<template #remove_from_group>
+			<MinusIcon /> {{ formatMessage(messages.removeFromGroup) }}
+		</template>
 	</ContextMenu>
 </template>
 

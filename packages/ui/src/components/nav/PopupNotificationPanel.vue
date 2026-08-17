@@ -111,7 +111,7 @@
 							<IconButton
 								v-if="item.dismissible !== false"
 								type="quiet"
-								label="Close"
+								:label="formatMessage(messages.close)"
 								size="sm"
 								class="-m-1.5 -mx-2"
 								@click="handleStandardNotificationDismiss(item)"
@@ -186,6 +186,7 @@ import { computed, ref } from 'vue'
 
 import { Button, type ButtonColor, IconButton } from '#ui/components/base/buttons'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useModalStack } from '../../composables/modal-stack'
 import {
 	injectPopupNotificationManager,
@@ -196,6 +197,11 @@ import {
 } from '../../providers'
 import ProgressBar from '../base/ProgressBar.vue'
 import NotificationToast from '../notifications/NotificationToast.vue'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	close: { id: 'notifications.close', defaultMessage: 'Close' },
+})
 
 const popupNotificationManager = injectPopupNotificationManager()
 const notifications = computed<PopupNotification[]>(() =>

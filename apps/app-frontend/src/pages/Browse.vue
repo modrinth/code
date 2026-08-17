@@ -585,6 +585,17 @@ const messages = defineMessages({
 		id: 'app.browse.project-type.modpacks',
 		defaultMessage: 'Modpacks',
 	},
+	modsProjectType: { id: 'app.browse.project-type.mods', defaultMessage: 'Mods' },
+	resourcePacksProjectType: {
+		id: 'app.browse.project-type.resource-packs',
+		defaultMessage: 'Resource Packs',
+	},
+	dataPacksProjectType: {
+		id: 'app.browse.project-type.data-packs',
+		defaultMessage: 'Data Packs',
+	},
+	shadersProjectType: { id: 'app.browse.project-type.shaders', defaultMessage: 'Shaders' },
+	serversProjectType: { id: 'app.browse.project-type.servers', defaultMessage: 'Servers' },
 	providedByInstance: {
 		id: 'search.filter.locked.instance',
 		defaultMessage: 'Provided by the instance',
@@ -687,16 +698,31 @@ const selectableProjectTypes = computed(() => {
 	}
 
 	if (isFromWorlds.value) {
-		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
+		return [{ label: formatMessage(messages.serversProjectType), href: `/browse/server${suffix}` }]
 	}
 
 	return [
-		{ label: 'Modpacks', href: `/browse/modpack${suffix}`, shown: modpacks },
-		{ label: 'Mods', href: `/browse/mod${suffix}`, shown: mods },
-		{ label: 'Resource Packs', href: `/browse/resourcepack${suffix}` },
-		{ label: 'Data Packs', href: `/browse/datapack${suffix}`, shown: dataPacks },
-		{ label: 'Shaders', href: `/browse/shader${suffix}` },
-		{ label: 'Servers', href: `/browse/server${suffix}`, shown: !instance.value },
+		{
+			label: formatMessage(messages.modpacksProjectType),
+			href: `/browse/modpack${suffix}`,
+			shown: modpacks,
+		},
+		{ label: formatMessage(messages.modsProjectType), href: `/browse/mod${suffix}`, shown: mods },
+		{
+			label: formatMessage(messages.resourcePacksProjectType),
+			href: `/browse/resourcepack${suffix}`,
+		},
+		{
+			label: formatMessage(messages.dataPacksProjectType),
+			href: `/browse/datapack${suffix}`,
+			shown: dataPacks,
+		},
+		{ label: formatMessage(messages.shadersProjectType), href: `/browse/shader${suffix}` },
+		{
+			label: formatMessage(messages.serversProjectType),
+			href: `/browse/server${suffix}`,
+			shown: !instance.value,
+		},
 	]
 })
 

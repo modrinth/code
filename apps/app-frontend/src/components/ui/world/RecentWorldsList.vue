@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { LoaderCircleIcon } from '@modrinth/assets'
 import type { GameVersion } from '@modrinth/ui'
-import { GAME_MODES, injectNotificationManager } from '@modrinth/ui'
+import { defineMessages, GAME_MODES, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
@@ -33,6 +33,10 @@ import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/theme.ts'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	jumpIn: { id: 'app.home.jump-back-in.title', defaultMessage: 'Jump in' },
+})
 
 const props = defineProps<{
 	recentInstances: GameInstance[]
@@ -279,7 +283,7 @@ onMounted(() => {
 		<span
 			class="flex mt-1 mb-3 leading-none items-center gap-1 text-2xl font-semibold text-contrast"
 		>
-			Jump in
+			{{ formatMessage(messages.jumpIn) }}
 		</span>
 		<div class="text-center py-4">
 			<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
@@ -289,7 +293,7 @@ onMounted(() => {
 		<span
 			class="flex mt-1 mb-3 leading-none items-center gap-1 text-2xl font-semibold text-contrast"
 		>
-			Jump in
+			{{ formatMessage(messages.jumpIn) }}
 		</span>
 		<div class="grid-when-huge flex flex-col w-full gap-3">
 			<template

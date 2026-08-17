@@ -64,6 +64,22 @@ const messages = defineMessages({
 		id: 'app.home.jump-back-in.never-played',
 		defaultMessage: 'Never played',
 	},
+	lockedTooltip: {
+		id: 'app.home.jump-back-in.instance-locked',
+		defaultMessage: 'This instance has been locked',
+	},
+	alreadyOpenTooltip: {
+		id: 'app.home.jump-back-in.instance-open',
+		defaultMessage: 'Instance is already open',
+	},
+	moreOptions: {
+		id: 'app.home.jump-back-in.more-options',
+		defaultMessage: 'More options',
+	},
+	viewInstance: {
+		id: 'app.home.jump-back-in.view-instance',
+		defaultMessage: 'View instance',
+	},
 })
 
 const instanceIcon = computed(() => props.instance.icon_path)
@@ -193,9 +209,9 @@ onMounted(() => {
 					v-else
 					v-tooltip="
 						instance.quarantined
-							? 'This instance has been locked'
+							? formatMessage(messages.lockedTooltip)
 							: playing
-								? 'Instance is already open'
+								? formatMessage(messages.alreadyOpenTooltip)
 								: null
 					"
 					:disabled="instance.quarantined || playing || loading"
@@ -209,11 +225,11 @@ onMounted(() => {
 				</Button>
 				<TeleportOverflowMenu
 					type="quiet"
-					label="More options"
+					:label="formatMessage(messages.moreOptions)"
 					:options="[
 						{
 							id: 'open-instance',
-							label: 'View instance',
+							label: formatMessage(messages.viewInstance),
 							shown: !!instance.id,
 							action: () => router.push(encodeURI(`/instance/${instance.id}`)),
 						},
@@ -227,7 +243,7 @@ onMounted(() => {
 					<MoreVerticalIcon aria-hidden="true" />
 					<template #open-instance>
 						<EyeIcon aria-hidden="true" />
-						View instance
+						{{ formatMessage(messages.viewInstance) }}
 					</template>
 					<template #open-folder>
 						<FolderOpenIcon aria-hidden="true" />

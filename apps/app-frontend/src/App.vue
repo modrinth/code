@@ -251,7 +251,7 @@ useAppEvent(
 	'warning',
 	(event) =>
 		addNotification({
-			title: 'Warning',
+			title: formatMessage(messages.warning),
 			text: event.message,
 			type: 'warning',
 		}),
@@ -476,6 +476,15 @@ const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 
 const messages = defineMessages({
+	warning: { id: 'app.notification.warning', defaultMessage: 'Warning' },
+	moreOptions: { id: 'app.navigation.more-options', defaultMessage: 'More options' },
+	goBack: { id: 'app.navigation.go-back', defaultMessage: 'Go back' },
+	goForward: { id: 'app.navigation.go-forward', defaultMessage: 'Go forward' },
+	nextImage: { id: 'app.navigation.next-image', defaultMessage: 'Next image' },
+	updateDownloadMissingVersion: {
+		id: 'app.update.download-error.missing-version',
+		defaultMessage: 'Failed to download update: no version available',
+	},
 	updateInstalledToastTitle: {
 		id: 'app.update.complete-toast.title',
 		defaultMessage: 'Version {version} was successfully installed!',
@@ -1497,7 +1506,7 @@ async function downloadAvailableUpdate() {
 
 async function downloadUpdate(versionToDownload) {
 	if (!versionToDownload) {
-		handleError(`Failed to download update: no version available`)
+		handleError(formatMessage(messages.updateDownloadMissingVersion))
 		return
 	}
 
@@ -1737,7 +1746,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(messages.modrinthAccount)"
 				type="quiet"
 				size="xl"
-				label="More options"
+				:label="formatMessage(messages.moreOptions)"
 				:options="[
 					{
 						id: 'view-profile',
@@ -1792,7 +1801,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<div data-tauri-drag-region class="ml-2 flex shrink-0 items-center gap-2">
 					<IconButton
 						type="outlined"
-						label="Go back"
+						:label="formatMessage(messages.goBack)"
 						class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 						:disabled="!canNavigateBack"
 						@click="router.back()"
@@ -1804,7 +1813,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</IconButton>
 					<IconButton
 						type="outlined"
-						label="Go forward"
+						:label="formatMessage(messages.goForward)"
 						class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 						:disabled="!canNavigateForward"
 						@click="router.forward()"
@@ -1821,7 +1830,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<IconButton
 					v-if="!forceSidebar && themeStore.toggleSidebar"
 					:type="sidebarToggled ? 'base' : 'quiet'"
-					label="Next image"
+					:label="formatMessage(messages.nextImage)"
 					class="mr-3 transition-transform"
 					:class="{ 'rotate-180': !sidebarToggled }"
 					@click="sidebarToggled = !sidebarToggled"

@@ -28,6 +28,10 @@ const pageOptions = ref<InstanceType<typeof ContextMenu>>()
 const themeStore = useTheming()
 
 const messages = defineMessages({
+	home: {
+		id: 'app.navigation.home',
+		defaultMessage: 'Home',
+	},
 	newInstance: {
 		id: 'app.library.context-menu.create-instance',
 		defaultMessage: 'New instance',
@@ -37,7 +41,7 @@ const messages = defineMessages({
 const homeBreadcrumb = useRootBreadcrumb({
 	slot: 'root',
 	id: 'home',
-	label: 'Home',
+	label: formatMessage(messages.home),
 	to: '/',
 	visual: { type: 'icon', component: HomeIcon },
 })

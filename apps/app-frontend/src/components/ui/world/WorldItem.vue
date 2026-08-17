@@ -149,18 +149,31 @@ async function createShortcut() {
 
 		addNotification({
 			type: 'success',
-			title: 'Shortcut created',
+			title: formatMessage(messages.shortcutCreated),
 		})
 	} catch (error) {
 		addNotification({
 			type: 'error',
-			title: 'Failed to create shortcut',
+			title: formatMessage(messages.shortcutCreationFailed),
 			text: error instanceof Error ? error.message : '',
 		})
 	}
 }
 
 const messages = defineMessages({
+	shortcutCreated: {
+		id: 'instance.worlds.shortcut-created',
+		defaultMessage: 'Shortcut created',
+	},
+	shortcutCreationFailed: {
+		id: 'instance.worlds.shortcut-creation-failed',
+		defaultMessage: 'Failed to create shortcut',
+	},
+	moreOptions: { id: 'instance.worlds.more-options', defaultMessage: 'More options' },
+	instanceLocked: {
+		id: 'instance.worlds.instance-locked',
+		defaultMessage: 'This instance has been locked',
+	},
 	hardcore: {
 		id: 'instance.worlds.hardcore',
 		defaultMessage: 'Hardcore mode',
@@ -394,7 +407,7 @@ const messages = defineMessages({
 					v-else
 					v-tooltip="
 						quarantined
-							? 'This instance has been locked'
+							? formatMessage(messages.instanceLocked)
 							: world.type === 'server'
 								? !supportsServerQuickPlay
 									? formatMessage(messages.noServerQuickPlay)
@@ -428,7 +441,7 @@ const messages = defineMessages({
 				</Button>
 				<TeleportOverflowMenu
 					type="quiet"
-					label="More options"
+					:label="formatMessage(messages.moreOptions)"
 					:options="[
 						{
 							id: 'play-instance',

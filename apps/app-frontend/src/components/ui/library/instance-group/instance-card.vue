@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
-import { IconButton, injectNotificationManager } from '@modrinth/ui'
+import { defineMessages, IconButton, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useEventListener, useMagicKeys } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -29,6 +29,28 @@ const instanceCardSensors = [
 ]
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	selectInstance: {
+		id: 'app.library.instance.select-with-name',
+		defaultMessage: 'Select {name}',
+	},
+	deselectInstance: {
+		id: 'app.library.instance.deselect-with-name',
+		defaultMessage: 'Deselect {name}',
+	},
+	openInstance: {
+		id: 'app.library.instance.open-with-name',
+		defaultMessage: 'Open {name}',
+	},
+	loading: { id: 'app.library.instance.loading', defaultMessage: 'Instance is loading...' },
+	installing: { id: 'app.library.instance.installing', defaultMessage: 'Installing...' },
+	stop: { id: 'app.library.instance.stop', defaultMessage: 'Stop' },
+	repair: { id: 'app.library.instance.repair', defaultMessage: 'Repair' },
+	play: { id: 'app.library.instance.play', defaultMessage: 'Play' },
+	select: { id: 'app.library.instance.select', defaultMessage: 'Select instance' },
+	deselect: { id: 'app.library.instance.deselect', defaultMessage: 'Deselect instance' },
+})
 const {
 	displayState,
 	selectedLibraryInstances,
@@ -254,8 +276,10 @@ onMounted(() => {
 		tabindex="0"
 		:aria-label="
 			isLibraryInstanceSelectionActive
-				? `${selected ? 'Deselect' : 'Select'} ${instance.name}`
-				: `Open ${instance.name}`
+				? formatMessage(selected ? messages.deselectInstance : messages.selectInstance, {
+						name: instance.name,
+					})
+				: formatMessage(messages.openInstance, { name: instance.name })
 		"
 		:aria-pressed="isLibraryInstanceSelectionActive ? selected : undefined"
 		@click="activateCard"
@@ -270,7 +294,7 @@ onMounted(() => {
 			>
 				<div class="absolute inset-0 bg-surface-1 opacity-30" />
 				<SpinnerIcon
-					v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
+					v-tooltip="formatMessage(modLoading ? messages.loading : messages.installing)"
 					class="relative size-[30%] animate-spin text-contrast"
 					tabindex="-1"
 				/>
@@ -281,8 +305,8 @@ onMounted(() => {
 				<div class="absolute inset-0 flex items-center justify-center">
 					<IconButton
 						v-if="playing"
-						v-tooltip="'Stop'"
-						label="Stop"
+						v-tooltip="formatMessage(messages.stop)"
+						:label="formatMessage(messages.stop)"
 						type="colored"
 						color="red"
 						size="lg"
@@ -299,8 +323,8 @@ onMounted(() => {
 							!installed &&
 							!instance.quarantined
 						"
-						v-tooltip="'Repair'"
-						label="Repair"
+						v-tooltip="formatMessage(messages.repair)"
+						:label="formatMessage(messages.repair)"
 						type="colored"
 						color="brand"
 						size="lg"
@@ -316,8 +340,8 @@ onMounted(() => {
 							!isLibraryInstanceSelectionActive &&
 							!instance.quarantined
 						"
-						v-tooltip="'Play'"
-						label="Play"
+						v-tooltip="formatMessage(messages.play)"
+						:label="formatMessage(messages.play)"
 						type="colored"
 						color="brand"
 						size="lg"
@@ -334,12 +358,12 @@ onMounted(() => {
 			<button
 				type="button"
 				class="selection-button group/selection absolute right-2 top-1.5 z-[2] flex size-[50px] cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
-				:aria-label="selected ? 'Deselect instance' : 'Select instance'"
+				:aria-label="formatMessage(selected ? messages.deselect : messages.select)"
 				:aria-pressed="selected"
 				@click.stop="toggleSelection"
 			>
 				<span
-					v-tooltip="selected ? 'Deselect instance' : 'Select instance'"
+					v-tooltip="formatMessage(selected ? messages.deselect : messages.select)"
 					class="relative flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
 					:class="{
 						'border-0 !opacity-100': selected,

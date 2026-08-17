@@ -83,12 +83,14 @@
 			</RouterView>
 		</div>
 		<ContextMenu ref="options" @option-clicked="handleOptionsClick">
-			<template #play> <PlayIcon /> Play </template>
-			<template #stop> <StopCircleIcon /> Stop </template>
-			<template #add_content> <PlusIcon /> Add content </template>
-			<template #edit> <EditIcon /> Edit </template>
-			<template #copy_path> <ClipboardCopyIcon /> Copy path </template>
-			<template #open_folder> <FolderOpenIcon /> Open folder </template>
+			<template #play> <PlayIcon /> {{ formatMessage(messages.play) }} </template>
+			<template #stop> <StopCircleIcon /> {{ formatMessage(messages.stop) }} </template>
+			<template #add_content> <PlusIcon /> {{ formatMessage(messages.addContent) }} </template>
+			<template #edit> <EditIcon /> {{ formatMessage(messages.edit) }} </template>
+			<template #copy_path> <ClipboardCopyIcon /> {{ formatMessage(messages.copyPath) }} </template>
+			<template #open_folder>
+				<FolderOpenIcon /> {{ formatMessage(messages.openFolder) }}
+			</template>
 		</ContextMenu>
 	</div>
 </template>
@@ -107,6 +109,7 @@ import {
 } from '@modrinth/assets'
 import {
 	commonMessages,
+	defineMessages,
 	injectNotificationManager,
 	NavTabs,
 	useLoadingBarToken,
@@ -179,6 +182,28 @@ const { playServerProject } = injectServerInstall()
 const queryClient = useQueryClient()
 const route = useRoute()
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	play: { id: 'app.instance.action.play', defaultMessage: 'Play' },
+	stop: { id: 'app.instance.action.stop', defaultMessage: 'Stop' },
+	addContent: { id: 'app.instance.action.add-content', defaultMessage: 'Add content' },
+	edit: { id: 'app.instance.action.edit', defaultMessage: 'Edit' },
+	copyPath: { id: 'app.instance.action.copy-path', defaultMessage: 'Copy path' },
+	openFolder: { id: 'app.instance.action.open-folder', defaultMessage: 'Open folder' },
+	contentTab: { id: 'app.instance.tab.content', defaultMessage: 'Content' },
+	filesTab: { id: 'app.instance.tab.files', defaultMessage: 'Files' },
+	worldsTab: { id: 'app.instance.tab.worlds', defaultMessage: 'Worlds' },
+	logsTab: { id: 'app.instance.tab.logs', defaultMessage: 'Logs' },
+	shareTab: { id: 'app.instance.tab.share', defaultMessage: 'Share' },
+	shortcutCreated: {
+		id: 'app.instance.shortcut.created',
+		defaultMessage: 'Shortcut created',
+	},
+	shortcutCreationError: {
+		id: 'app.instance.shortcut.creation-error',
+		defaultMessage: 'Error creating shortcut',
+	},
+})
 
 const router = useRouter()
 const displayedInstanceRoute = shallowRef(router.currentRoute.value)
@@ -454,22 +479,22 @@ const showShareTab = computed(() => {
 const tabs = computed(() => {
 	const instanceTabs = [
 		{
-			label: 'Content',
+			label: formatMessage(messages.contentTab),
 			href: `${basePath.value}`,
 			icon: BoxesIcon,
 		},
 		{
-			label: 'Files',
+			label: formatMessage(messages.filesTab),
 			href: `${basePath.value}/files`,
 			icon: FolderOpenIcon,
 		},
 		{
-			label: 'Worlds',
+			label: formatMessage(messages.worldsTab),
 			href: `${basePath.value}/worlds`,
 			icon: GlobeIcon,
 		},
 		{
-			label: 'Logs',
+			label: formatMessage(messages.logsTab),
 			href: `${basePath.value}/logs`,
 			icon: TerminalSquareIcon,
 		},
@@ -477,7 +502,7 @@ const tabs = computed(() => {
 
 	if (showShareTab.value) {
 		instanceTabs.push({
-			label: 'Share',
+			label: formatMessage(messages.shareTab),
 			href: `${basePath.value}/share`,
 			icon: UserPlusIcon,
 		})
@@ -686,12 +711,12 @@ const createShortcut = async () => {
 
 		addNotification({
 			type: 'success',
-			title: 'Shortcut created',
+			title: formatMessage(messages.shortcutCreated),
 		})
 	} catch (error: unknown) {
 		addNotification({
 			type: 'error',
-			title: `Error creating shortcut`,
+			title: formatMessage(messages.shortcutCreationError),
 			text: `${error}`,
 		})
 	}

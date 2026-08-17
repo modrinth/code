@@ -336,6 +336,10 @@ const messages = defineMessages({
 		id: 'servers.manage.handle-error.title',
 		defaultMessage: 'An error occurred',
 	},
+	unknownError: {
+		id: 'servers.manage.error.unknown',
+		defaultMessage: 'Unknown error',
+	},
 	purchaseUnavailableTitle: {
 		id: 'servers.manage.purchase-unavailable.title',
 		defaultMessage: 'Purchase unavailable',
@@ -681,7 +685,9 @@ function handleError(err: unknown) {
 }
 
 function formatFetchError(error: unknown) {
-	return error instanceof Error && error.message ? error.message : 'Unknown error'
+	return error instanceof Error && error.message
+		? error.message
+		: formatMessage(messages.unknownError)
 }
 
 function handleSignIn() {

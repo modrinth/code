@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
-import { Avatar, ButtonLink, FormattedTag } from '@modrinth/ui'
+import { Avatar, ButtonLink, defineMessages, FormattedTag, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { getInstanceIconUrl } from '@/helpers/instance'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	backToInstance: {
+		id: 'app.instance.navigation.back-to-instance',
+		defaultMessage: 'Back to instance',
+	},
+})
 
 type Instance = {
 	game_version: string
@@ -45,7 +53,9 @@ const instanceLink = computed(() => {
 				</span>
 			</span>
 		</router-link>
-		<ButtonLink :to="instanceLink"> <LeftArrowIcon /> Back to instance </ButtonLink>
+		<ButtonLink :to="instanceLink">
+			<LeftArrowIcon /> {{ formatMessage(messages.backToInstance) }}
+		</ButtonLink>
 	</div>
 </template>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PlusIcon, SearchIcon, SquarePlusIcon } from '@modrinth/assets'
-import { Button, StyledInput } from '@modrinth/ui'
+import { Button, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
 import { computed, inject } from 'vue'
 
 import FilterMenu from '@/components/ui/library/library-toolbar/filter-menu.vue'
@@ -10,6 +10,12 @@ import { useLibrary } from '@/components/ui/library/use-library'
 
 const { search, selectedLibraryInstances, openNewGroupModal } = useLibrary()
 const showCreationModal = inject<() => void>('showCreationModal')
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	search: { id: 'app.library.search.placeholder', defaultMessage: 'Search' },
+	newGroup: { id: 'app.library.group.new', defaultMessage: 'New group' },
+	newInstance: { id: 'app.library.instance.new', defaultMessage: 'New instance' },
+})
 const selectedInstanceIds = computed(
 	() =>
 		new Set([...selectedLibraryInstances.value.values()].map((selection) => selection.instanceId)),
@@ -27,17 +33,17 @@ function openNewGroup() {
 				v-model="search"
 				:icon="SearchIcon"
 				type="text"
-				placeholder="Search"
+				:placeholder="formatMessage(messages.search)"
 				clearable
 				wrapper-class="min-w-[16rem] flex-1"
 			/>
 			<Button @click="openNewGroup">
 				<SquarePlusIcon />
-				New group
+				{{ formatMessage(messages.newGroup) }}
 			</Button>
 			<Button type="colored" color="brand" @click="showCreationModal?.()">
 				<PlusIcon />
-				New instance
+				{{ formatMessage(messages.newInstance) }}
 			</Button>
 		</div>
 		<div class="flex flex-wrap items-center gap-2">

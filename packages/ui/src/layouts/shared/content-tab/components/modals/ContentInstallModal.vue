@@ -74,9 +74,13 @@
 					class="flex-1"
 				/>
 				<IconButton
-					v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
+					v-tooltip="
+						formatMessage(hideUninstallable ? messages.showUnavailable : messages.hideUnavailable)
+					"
 					type="outlined"
-					:label="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
+					:label="
+						formatMessage(hideUninstallable ? messages.showUnavailable : messages.hideUnavailable)
+					"
 					@click="hideUninstallable = !hideUninstallable"
 				>
 					<EyeOffIcon v-if="hideUninstallable" />
@@ -316,6 +320,14 @@ const messages = defineMessages({
 	searchPlaceholder: {
 		id: 'instances.content-install.search-placeholder',
 		defaultMessage: 'Search instance',
+	},
+	showUnavailable: {
+		id: 'instances.content-install.show-unavailable',
+		defaultMessage: 'Show unavailable',
+	},
+	hideUnavailable: {
+		id: 'instances.content-install.hide-unavailable',
+		defaultMessage: 'Hide unavailable',
 	},
 	installedBadge: {
 		id: 'instances.content-install.installed-badge',

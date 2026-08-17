@@ -115,6 +115,8 @@ const messages = defineMessages({
 		id: 'app.library.group.favorites',
 		defaultMessage: 'Favorites',
 	},
+	collapseGroup: { id: 'app.library.group.collapse', defaultMessage: 'Collapse group' },
+	expandGroup: { id: 'app.library.group.expand', defaultMessage: 'Expand group' },
 	deleteGroup: {
 		id: 'app.library.group.delete',
 		defaultMessage: 'Delete group',
@@ -396,7 +398,9 @@ onMounted(startInstanceGridResizeObserver)
 					:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
 					type="button"
 					:aria-expanded="groupAccordion?.isOpen"
-					:aria-label="groupAccordion?.isOpen ? 'Collapse group' : 'Expand group'"
+					:aria-label="
+						formatMessage(groupAccordion?.isOpen ? messages.collapseGroup : messages.expandGroup)
+					"
 					@click.stop="toggleGroup"
 				>
 					<DropdownIcon

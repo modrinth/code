@@ -2,6 +2,14 @@
 import { CheckIcon } from '@modrinth/assets'
 import { ref, watch } from 'vue'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	selectNamedSkin: { id: 'skins.select-named', defaultMessage: 'Select {name}' },
+	selectSkin: { id: 'skins.select', defaultMessage: 'Select skin' },
+})
+
 const emit = defineEmits<{
 	(e: 'select'): void
 	(e: 'edit', event: MouseEvent): void
@@ -64,7 +72,11 @@ watch(
 
 		<button
 			class="absolute inset-0 z-10 cursor-pointer border-none bg-transparent p-0 focus-visible:outline-none"
-			:aria-label="tooltip ? `Select ${tooltip}` : 'Select skin'"
+			:aria-label="
+				tooltip
+					? formatMessage(messages.selectNamedSkin, { name: tooltip })
+					: formatMessage(messages.selectSkin)
+			"
 			:aria-pressed="selected"
 			:disabled="disabled"
 			@click="emit('select')"

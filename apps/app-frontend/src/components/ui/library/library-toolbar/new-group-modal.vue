@@ -9,16 +9,20 @@
 		:on-hide="closeNewGroupModal"
 	>
 		<template #title>
-			<span class="text-2xl font-semibold text-contrast">Create group</span>
+			<span class="text-2xl font-semibold text-contrast">
+				{{ formatMessage(messages.createGroup) }}
+			</span>
 		</template>
 
 		<div class="flex flex-col gap-2.5 p-6">
-			<label for="new-group-name" class="font-semibold text-contrast">Group name</label>
+			<label for="new-group-name" class="font-semibold text-contrast">
+				{{ formatMessage(messages.groupName) }}
+			</label>
 			<StyledInput
 				id="new-group-name"
 				ref="groupNameInput"
 				v-model="newGroupName"
-				placeholder="Enter group name"
+				:placeholder="formatMessage(messages.groupNamePlaceholder)"
 				:maxlength="128"
 				@click="groupNameInput?.select()"
 			/>
@@ -31,7 +35,7 @@
 				<StyledInput
 					v-model="newGroupSearch"
 					:icon="SearchIcon"
-					placeholder="Search instance"
+					:placeholder="formatMessage(messages.searchInstance)"
 					class="w-full"
 				/>
 			</div>
@@ -40,7 +44,7 @@
 				v-if="newGroupInstances.length === 0"
 				class="flex items-center justify-center py-12 text-secondary"
 			>
-				No instances found
+				{{ formatMessage(messages.noInstancesFound) }}
 			</div>
 			<div v-else class="flex flex-col gap-1">
 				<div
@@ -60,7 +64,9 @@
 						<div class="flex min-w-0 items-center gap-2">
 							<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
 							<TagItem v-if="instance.group_ids[0]" class="shrink-0">
-								{{ groupNamesById.get(instance.group_ids[0]) ?? 'Unknown group' }}
+								{{
+									groupNamesById.get(instance.group_ids[0]) ?? formatMessage(messages.unknownGroup)
+								}}
 							</TagItem>
 						</div>
 					</div>
@@ -69,7 +75,11 @@
 						@click="toggleNewGroupInstance(instance.id)"
 					>
 						<CheckIcon v-if="selectedNewGroupInstanceIds.has(instance.id)" />
-						{{ selectedNewGroupInstanceIds.has(instance.id) ? 'Added' : 'Add' }}
+						{{
+							formatMessage(
+								selectedNewGroupInstanceIds.has(instance.id) ? messages.added : messages.add,
+							)
+						}}
 					</Button>
 				</div>
 			</div>
@@ -79,12 +89,12 @@
 			<div class="flex items-center justify-end gap-2">
 				<Button type="outlined" @click="modal?.hide()">
 					<XIcon />
-					Cancel
+					{{ formatMessage(messages.cancel) }}
 				</Button>
 				<Button type="colored" color="brand" :disabled="!canCreateGroup" @click="handleCreateGroup">
 					<SpinnerIcon v-if="creatingGroup" class="animate-spin" />
 					<PlusIcon v-else />
-					Create group
+					{{ formatMessage(messages.createGroup) }}
 				</Button>
 			</div>
 		</template>
@@ -93,11 +103,42 @@
 
 <script setup lang="ts">
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { Avatar, Button, NewModal, StyledInput, TagItem } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	defineMessages,
+	NewModal,
+	StyledInput,
+	TagItem,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
 import { getInstanceIconUrl } from '@/helpers/instance'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	createGroup: { id: 'app.library.group.create', defaultMessage: 'Create group' },
+	groupName: { id: 'app.library.group.name', defaultMessage: 'Group name' },
+	groupNamePlaceholder: {
+		id: 'app.library.group.name-placeholder',
+		defaultMessage: 'Enter group name',
+	},
+	searchInstance: {
+		id: 'app.library.group.search-instance',
+		defaultMessage: 'Search instance',
+	},
+	noInstancesFound: {
+		id: 'app.library.group.no-instances-found',
+		defaultMessage: 'No instances found',
+	},
+	unknownGroup: { id: 'app.library.group.unknown', defaultMessage: 'Unknown group' },
+	add: { id: 'app.library.group.instance.add', defaultMessage: 'Add' },
+	added: { id: 'app.library.group.instance.added', defaultMessage: 'Added' },
+	cancel: { id: 'app.library.group.create.cancel', defaultMessage: 'Cancel' },
+})
 
 const {
 	isNewGroupModalOpen,
