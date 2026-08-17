@@ -1746,14 +1746,16 @@ const following = computed(() => {
 })
 
 const title = computed(() =>
-	project.value ? `${project.value.title} - Minecraft ${projectTypeDisplay.value}` : '',
+	project.value
+		? `${project.value.title} - Minecraft ${projectTypeDisplay.value}`
+		: 'Project not found',
 )
 const description = computed(() =>
 	project.value
 		? `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
 				project.value.title
 			} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`
-		: '',
+		: `There's no project here, check that you have the right URL! It may still be under review or is no longer publicly available on Modrinth.`,
 )
 
 const canCreateServerFrom = computed(() => {
@@ -1987,7 +1989,7 @@ if (!route.name.startsWith('type-project-settings')) {
 		description: () => description.value,
 		ogTitle: () => title.value,
 		ogDescription: () => project.value?.description ?? '',
-		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/not-found.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
