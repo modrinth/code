@@ -1983,7 +1983,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 	display: grid;
 	grid-template-columns: 1fr 0px;
-	// transition: grid-template-columns 0.4s ease-in-out;
+	will-change: grid-template-columns;
 
 	&.sidebar-enabled {
 		grid-template-columns: 1fr 300px;

@@ -112,16 +112,30 @@ function onAnimationIteration() {
 }
 
 let resizeObserver: ResizeObserver | null = null
+let resizeObserverTimeout: number | null = null
+
+function debouncedCheckOverflow() {
+	if (resizeObserverTimeout !== null) {
+		clearTimeout(resizeObserverTimeout)
+	}
+	resizeObserverTimeout = window.setTimeout(() => {
+		checkOverflow()
+		resizeObserverTimeout = null
+	}, 100)
+}
 
 onMounted(() => {
 	checkOverflow()
-	resizeObserver = new ResizeObserver(checkOverflow)
+	resizeObserver = new ResizeObserver(debouncedCheckOverflow)
 	if (outerRef.value) resizeObserver.observe(outerRef.value)
 	if (innerRef.value) resizeObserver.observe(innerRef.value)
 })
 
 onBeforeUnmount(() => {
 	resizeObserver?.disconnect()
+	if (resizeObserverTimeout !== null) {
+		clearTimeout(resizeObserverTimeout)
+	}
 })
 
 watch(breadcrumbs, () => {
