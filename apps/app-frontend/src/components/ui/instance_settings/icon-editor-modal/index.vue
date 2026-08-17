@@ -45,8 +45,15 @@ const saving = ref(false)
 const backgroundScroller = ref<HTMLElement | null>(null)
 const showLeftBackgroundShadow = ref(false)
 const showRightBackgroundShadow = ref(false)
+const draggingBackgrounds = ref(false)
 
 let backgroundScrollerResizeObserver: ResizeObserver | null = null
+let backgroundDragPointerId: number | null = null
+let backgroundDragCaptureTarget: Element | null = null
+let backgroundDragStartX = 0
+let backgroundDragStartScrollLeft = 0
+let suppressBackgroundClick = false
+let suppressBackgroundClickTimeout: ReturnType<typeof setTimeout> | null = null
 
 const selectedBackground = ref<BackgroundId>(DEFAULT_BACKGROUND_ID)
 const selectedSymbol = ref<SymbolId>(DEFAULT_SYMBOL_ID)
@@ -89,13 +96,72 @@ function onBackgroundWheel(event: WheelEvent) {
 	el.scrollLeft += delta
 }
 
+function onBackgroundPointerDown(event: PointerEvent) {
+	const el = backgroundScroller.value
+	if (!el || event.pointerType === 'touch' || event.button !== 0) return
+
+	backgroundDragPointerId = event.pointerId
+	backgroundDragStartX = event.clientX
+	backgroundDragStartScrollLeft = el.scrollLeft
+	suppressBackgroundClick = false
+	backgroundDragCaptureTarget =
+		event.target instanceof Element ? (event.target.closest('button') ?? el) : el
+	backgroundDragCaptureTarget.setPointerCapture(event.pointerId)
+}
+
+function onBackgroundPointerMove(event: PointerEvent) {
+	const el = backgroundScroller.value
+	if (!el || event.pointerId !== backgroundDragPointerId) return
+
+	const distance = event.clientX - backgroundDragStartX
+	if (!draggingBackgrounds.value && Math.abs(distance) < 4) return
+
+	draggingBackgrounds.value = true
+	suppressBackgroundClick = true
+	event.preventDefault()
+	el.scrollLeft = backgroundDragStartScrollLeft - distance
+}
+
+function finishBackgroundDrag(event: PointerEvent) {
+	const el = backgroundScroller.value
+	if (!el || event.pointerId !== backgroundDragPointerId) return
+
+	if (backgroundDragCaptureTarget?.hasPointerCapture(event.pointerId)) {
+		backgroundDragCaptureTarget.releasePointerCapture(event.pointerId)
+	}
+	backgroundDragPointerId = null
+	backgroundDragCaptureTarget = null
+	draggingBackgrounds.value = false
+
+	if (suppressBackgroundClick) {
+		if (suppressBackgroundClickTimeout) clearTimeout(suppressBackgroundClickTimeout)
+		suppressBackgroundClickTimeout = setTimeout(() => {
+			suppressBackgroundClick = false
+			suppressBackgroundClickTimeout = null
+		}, 0)
+	}
+}
+
+function onBackgroundClick(event: MouseEvent) {
+	if (!suppressBackgroundClick) return
+
+	event.preventDefault()
+	event.stopPropagation()
+	suppressBackgroundClick = false
+	if (suppressBackgroundClickTimeout) clearTimeout(suppressBackgroundClickTimeout)
+	suppressBackgroundClickTimeout = null
+}
+
 onMounted(() => {
 	backgroundScrollerResizeObserver = new ResizeObserver(updateBackgroundScrollShadows)
 	if (backgroundScroller.value) backgroundScrollerResizeObserver.observe(backgroundScroller.value)
 	nextTick(updateBackgroundScrollShadows)
 })
 
-onBeforeUnmount(() => backgroundScrollerResizeObserver?.disconnect())
+onBeforeUnmount(() => {
+	backgroundScrollerResizeObserver?.disconnect()
+	if (suppressBackgroundClickTimeout) clearTimeout(suppressBackgroundClickTimeout)
+})
 
 function backgroundOption(background?: IconBackground) {
 	if (background?.type !== 'linear-top-down-gradient') return undefined
@@ -338,7 +404,13 @@ const messages = defineMessages({
 						/>
 						<div
 							ref="backgroundScroller"
-							class="flex w-full gap-2.5 overflow-x-auto overflow-y-hidden pb-2 pr-6"
+							class="flex w-full select-none gap-2.5 overflow-x-auto overflow-y-hidden pb-2 pr-6"
+							:class="{ 'cursor-grabbing': draggingBackgrounds }"
+							@pointerdown="onBackgroundPointerDown"
+							@pointermove="onBackgroundPointerMove"
+							@pointerup="finishBackgroundDrag"
+							@pointercancel="finishBackgroundDrag"
+							@click.capture="onBackgroundClick"
 							@wheel.prevent="onBackgroundWheel"
 							@scroll="updateBackgroundScrollShadows"
 						>
@@ -456,6 +528,11 @@ const messages = defineMessages({
 
 .icon-option {
 	transition: outline-color 150ms ease;
+}
+
+.cursor-grabbing,
+.cursor-grabbing * {
+	cursor: grabbing !important;
 }
 
 .icon-outline-selected {
