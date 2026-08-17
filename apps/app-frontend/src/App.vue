@@ -960,7 +960,7 @@ watch(incompatibilityWarningModal, (modal) => {
 	}
 })
 
-setupAuthProvider(credentials, async (_redirectPath, flow, options) => {
+const authProvider = setupAuthProvider(credentials, async (_redirectPath, flow, options) => {
 	if (options?.showModal === false) {
 		await signIn(flow)
 	} else {
@@ -968,7 +968,11 @@ setupAuthProvider(credentials, async (_redirectPath, flow, options) => {
 	}
 })
 
-const userPreferences = setupUserPreferencesProvider()
+const userPreferences = setupUserPreferencesProvider({
+	auth: authProvider,
+	client: tauriApiClient,
+	notificationManager,
+})
 let userPreferencesSync = Promise.resolve()
 
 watch(

@@ -10,11 +10,16 @@ import { setupTagsProvider } from './setup/tags'
 import { setupUserCountryProvider } from './setup/user-country'
 
 export function setupProviders(auth: Awaited<ReturnType<typeof useAuth>>) {
-	provideNotificationManager(new FrontendNotificationManager())
+	const notificationManager = new FrontendNotificationManager()
+	provideNotificationManager(notificationManager)
 
-	setupAuthProvider(auth)
-	setupModrinthClientProvider(auth)
-	const userPreferences = setupUserPreferencesProvider()
+	const authProvider = setupAuthProvider(auth)
+	const client = setupModrinthClientProvider(auth)
+	const userPreferences = setupUserPreferencesProvider({
+		auth: authProvider,
+		client,
+		notificationManager,
+	})
 	setupTagsProvider()
 	setupFilePickerProvider()
 	setupPageContextProvider()

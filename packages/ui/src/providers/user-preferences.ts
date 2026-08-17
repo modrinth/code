@@ -1,12 +1,11 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../composables/i18n'
-import { injectAuth } from './auth'
-import { injectModrinthClient } from './api-client'
+import type { AuthProvider } from './auth'
 import { createContext } from './create-context'
-import { injectNotificationManager } from './web-notifications'
+import type { AbstractWebNotificationManager } from './web-notifications'
 
 export const userPreferencesQueryKey = (userId: string | null | undefined) =>
 	['user', userId ?? null, 'preferences', 'v3'] as const
@@ -37,10 +36,15 @@ const messages = defineMessages({
 	},
 })
 
-export function setupUserPreferencesProvider(): UserPreferencesContext {
-	const auth = injectAuth()
-	const client = injectModrinthClient()
-	const notificationManager = injectNotificationManager()
+export function setupUserPreferencesProvider({
+	auth,
+	client,
+	notificationManager,
+}: {
+	auth: AuthProvider
+	client: AbstractModrinthClient
+	notificationManager: AbstractWebNotificationManager
+}): UserPreferencesContext {
 	const queryClient = useQueryClient()
 	const { formatMessage } = useVIntl()
 	const userId = computed(() => auth.user.value?.id ?? null)
