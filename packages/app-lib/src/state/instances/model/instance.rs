@@ -7,7 +7,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum InstanceIconBackground {
-    Color { value: String },
+    Color {
+        value: String,
+    },
+    #[serde(rename = "linear-top-down-gradient")]
+    LinearTopDownGradient {
+        top_color: String,
+        bottom_color: String,
+    },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]

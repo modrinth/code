@@ -1,10 +1,50 @@
 import { defineMessages } from '@modrinth/ui'
 
-import dirtBlock from '@/assets/instance-icons/dirt.png'
-import duskBlock from '@/assets/instance-icons/dusk-block.png'
-import duskBlockGold from '@/assets/instance-icons/dusk-block-gold-test.png'
-import duskBlockRose from '@/assets/instance-icons/dusk-block-rose-test.png'
-import duskBlockTeal from '@/assets/instance-icons/dusk-block-teal-test.png'
+import backpack from '@/assets/instance-icons/Backpack.png'
+import beacon from '@/assets/instance-icons/Beacon.png'
+import blueShark from '@/assets/instance-icons/Blue Shark.png'
+import bookshelf from '@/assets/instance-icons/Bookshelf.png'
+import brownBear from '@/assets/instance-icons/Brown Bear.png'
+import cake from '@/assets/instance-icons/Cake.png'
+import campfire from '@/assets/instance-icons/Campfire.png'
+import chest from '@/assets/instance-icons/Chest.png'
+import cogwheel from '@/assets/instance-icons/Cogwheel.png'
+import commandBlock from '@/assets/instance-icons/Command Block.png'
+import cookingPot from '@/assets/instance-icons/Cooking Pot.png'
+import couch from '@/assets/instance-icons/Couch.png'
+import craftingTable from '@/assets/instance-icons/Crafting Table.png'
+import creeper from '@/assets/instance-icons/Creeper.png'
+import enchantingTable from '@/assets/instance-icons/Enchanting Table.png'
+import enderChest from '@/assets/instance-icons/Ender Chest.png'
+import enderDragon from '@/assets/instance-icons/Ender Dragon.png'
+import engine from '@/assets/instance-icons/Engine.png'
+import furnace from '@/assets/instance-icons/Furnace.png'
+import gizmo from '@/assets/instance-icons/Gizmo.png'
+import globe from '@/assets/instance-icons/Globe.png'
+import grassBlock from '@/assets/instance-icons/Grass Block.png'
+import lantern from '@/assets/instance-icons/Lantern.png'
+import moobloom from '@/assets/instance-icons/Moobloom.png'
+import mrPack from '@/assets/instance-icons/Mr Pack.png'
+import orb from '@/assets/instance-icons/Orb.png'
+import oxygenDistributor from '@/assets/instance-icons/Oxygen Distributor.png'
+import pancakes from '@/assets/instance-icons/Pancakes.png'
+import pickaxe from '@/assets/instance-icons/Pickaxe.png'
+import pokeBall from '@/assets/instance-icons/Poke Ball.png'
+import redstoneBlock from '@/assets/instance-icons/Redstone Block.png'
+import sculkSensor from '@/assets/instance-icons/Sculk Sensor.png'
+import skeleton from '@/assets/instance-icons/Skeleton.png'
+import skillet from '@/assets/instance-icons/Skillet.png'
+import slimeBlock from '@/assets/instance-icons/Slime Block.png'
+import spaceHelmet from '@/assets/instance-icons/Space Helmet.png'
+import stickyPiston from '@/assets/instance-icons/Sticky Piston.png'
+import sword from '@/assets/instance-icons/Sword.png'
+import terminal from '@/assets/instance-icons/Terminal.png'
+import tinyPotato from '@/assets/instance-icons/Tiny Potato.png'
+import tire from '@/assets/instance-icons/Tire.png'
+import tnt from '@/assets/instance-icons/TNT.png'
+import wrench from '@/assets/instance-icons/Wrench.png'
+import wrench1 from '@/assets/instance-icons/Wrench1.png'
+import zombie from '@/assets/instance-icons/Zombie.png'
 
 const names = defineMessages({
 	yellow: {
@@ -14,6 +54,14 @@ const names = defineMessages({
 	green: {
 		id: 'instance.icon-editor.background.green',
 		defaultMessage: 'Green',
+	},
+	lime: {
+		id: 'instance.icon-editor.background.lime',
+		defaultMessage: 'Lime',
+	},
+	darkGreen: {
+		id: 'instance.icon-editor.background.dark-green',
+		defaultMessage: 'Dark green',
 	},
 	purple: {
 		id: 'instance.icon-editor.background.purple',
@@ -43,6 +91,10 @@ const names = defineMessages({
 		id: 'instance.icon-editor.background.indigo',
 		defaultMessage: 'Indigo',
 	},
+	lavender: {
+		id: 'instance.icon-editor.background.lavender',
+		defaultMessage: 'Lavender',
+	},
 	lightGray: {
 		id: 'instance.icon-editor.background.light-gray',
 		defaultMessage: 'Light gray',
@@ -55,53 +107,287 @@ const names = defineMessages({
 		id: 'instance.icon-editor.background.dark-gray',
 		defaultMessage: 'Dark gray',
 	},
-	dirtBlock: {
-		id: 'instance.icon-editor.symbol.dirt-block',
-		defaultMessage: 'Dirt block',
+	backpack: { id: 'instance.icon-editor.symbol.backpack', defaultMessage: 'Backpack' },
+	beacon: { id: 'instance.icon-editor.symbol.beacon', defaultMessage: 'Beacon' },
+	blueShark: { id: 'instance.icon-editor.symbol.blue-shark', defaultMessage: 'Blue Shark' },
+	bookshelf: { id: 'instance.icon-editor.symbol.bookshelf', defaultMessage: 'Bookshelf' },
+	brownBear: { id: 'instance.icon-editor.symbol.brown-bear', defaultMessage: 'Brown Bear' },
+	cake: { id: 'instance.icon-editor.symbol.cake', defaultMessage: 'Cake' },
+	campfire: { id: 'instance.icon-editor.symbol.campfire', defaultMessage: 'Campfire' },
+	chest: { id: 'instance.icon-editor.symbol.chest', defaultMessage: 'Chest' },
+	cogwheel: { id: 'instance.icon-editor.symbol.cogwheel', defaultMessage: 'Cogwheel' },
+	commandBlock: {
+		id: 'instance.icon-editor.symbol.command-block',
+		defaultMessage: 'Command Block',
 	},
-	duskBlock: {
-		id: 'instance.icon-editor.symbol.dusk-block',
-		defaultMessage: 'Dusk block',
+	cookingPot: {
+		id: 'instance.icon-editor.symbol.cooking-pot',
+		defaultMessage: 'Cooking Pot',
 	},
-	duskBlockRose: {
-		id: 'instance.icon-editor.symbol.dusk-block-rose',
-		defaultMessage: 'Test block',
+	couch: { id: 'instance.icon-editor.symbol.couch', defaultMessage: 'Couch' },
+	craftingTable: {
+		id: 'instance.icon-editor.symbol.crafting-table',
+		defaultMessage: 'Crafting Table',
 	},
-	duskBlockGold: {
-		id: 'instance.icon-editor.symbol.dusk-block-gold',
-		defaultMessage: 'Test block',
+	creeper: { id: 'instance.icon-editor.symbol.creeper', defaultMessage: 'Creeper' },
+	enchantingTable: {
+		id: 'instance.icon-editor.symbol.enchanting-table',
+		defaultMessage: 'Enchanting Table',
 	},
-	duskBlockTeal: {
-		id: 'instance.icon-editor.symbol.dusk-block-teal',
-		defaultMessage: 'Test block',
+	enderChest: {
+		id: 'instance.icon-editor.symbol.ender-chest',
+		defaultMessage: 'Ender Chest',
 	},
+	enderDragon: {
+		id: 'instance.icon-editor.symbol.ender-dragon',
+		defaultMessage: 'Ender Dragon',
+	},
+	engine: { id: 'instance.icon-editor.symbol.engine', defaultMessage: 'Engine' },
+	furnace: { id: 'instance.icon-editor.symbol.furnace', defaultMessage: 'Furnace' },
+	gizmo: { id: 'instance.icon-editor.symbol.gizmo', defaultMessage: 'Gizmo' },
+	globe: { id: 'instance.icon-editor.symbol.globe', defaultMessage: 'Globe' },
+	grassBlock: {
+		id: 'instance.icon-editor.symbol.grass-block',
+		defaultMessage: 'Grass Block',
+	},
+	lantern: { id: 'instance.icon-editor.symbol.lantern', defaultMessage: 'Lantern' },
+	moobloom: { id: 'instance.icon-editor.symbol.moobloom', defaultMessage: 'Moobloom' },
+	mrPack: { id: 'instance.icon-editor.symbol.mr-pack', defaultMessage: 'Mr Pack' },
+	orb: { id: 'instance.icon-editor.symbol.orb', defaultMessage: 'Orb' },
+	oxygenDistributor: {
+		id: 'instance.icon-editor.symbol.oxygen-distributor',
+		defaultMessage: 'Oxygen Distributor',
+	},
+	pancakes: { id: 'instance.icon-editor.symbol.pancakes', defaultMessage: 'Pancakes' },
+	pickaxe: { id: 'instance.icon-editor.symbol.pickaxe', defaultMessage: 'Pickaxe' },
+	pokeBall: { id: 'instance.icon-editor.symbol.poke-ball', defaultMessage: 'Poke Ball' },
+	redstoneBlock: {
+		id: 'instance.icon-editor.symbol.redstone-block',
+		defaultMessage: 'Redstone Block',
+	},
+	sculkSensor: {
+		id: 'instance.icon-editor.symbol.sculk-sensor',
+		defaultMessage: 'Sculk Sensor',
+	},
+	skeleton: { id: 'instance.icon-editor.symbol.skeleton', defaultMessage: 'Skeleton' },
+	skillet: { id: 'instance.icon-editor.symbol.skillet', defaultMessage: 'Skillet' },
+	slimeBlock: {
+		id: 'instance.icon-editor.symbol.slime-block',
+		defaultMessage: 'Slime Block',
+	},
+	spaceHelmet: {
+		id: 'instance.icon-editor.symbol.space-helmet',
+		defaultMessage: 'Space Helmet',
+	},
+	stickyPiston: {
+		id: 'instance.icon-editor.symbol.sticky-piston',
+		defaultMessage: 'Sticky Piston',
+	},
+	sword: { id: 'instance.icon-editor.symbol.sword', defaultMessage: 'Sword' },
+	tnt: { id: 'instance.icon-editor.symbol.tnt', defaultMessage: 'TNT' },
+	terminal: { id: 'instance.icon-editor.symbol.terminal', defaultMessage: 'Terminal' },
+	tinyPotato: {
+		id: 'instance.icon-editor.symbol.tiny-potato',
+		defaultMessage: 'Tiny Potato',
+	},
+	tire: { id: 'instance.icon-editor.symbol.tire', defaultMessage: 'Tire' },
+	wrench: { id: 'instance.icon-editor.symbol.wrench', defaultMessage: 'Wrench' },
+	wrench1: { id: 'instance.icon-editor.symbol.wrench1', defaultMessage: 'Wrench1' },
+	zombie: { id: 'instance.icon-editor.symbol.zombie', defaultMessage: 'Zombie' },
 })
 
 export const backgroundOptions = [
-	{ background: { type: 'color', value: '#fdd844' }, name: names.yellow },
-	{ background: { type: 'color', value: '#ffa347' }, name: names.orange },
-	{ background: { type: 'color', value: '#ff496e' }, name: names.rose },
-	{ background: { type: 'color', value: '#f64447' }, name: names.red },
-	{ background: { type: 'color', value: '#f468e6' }, name: names.pink },
-	{ background: { type: 'color', value: '#c78aff' }, name: names.purple },
-	{ background: { type: 'color', value: '#4f9cff' }, name: names.blue },
-	{ background: { type: 'color', value: '#5a4eff' }, name: names.indigo },
-	{ background: { type: 'color', value: '#1bd96a' }, name: names.green },
-	{ background: { type: 'color', value: '#d9d9d9' }, name: names.lightGray },
-	{ background: { type: 'color', value: '#4c4f58' }, name: names.gray },
-	{ background: { type: 'color', value: '#252731' }, name: names.darkGray },
+	{
+		id: 'orange',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#FF8D29',
+			bottom_color: '#FFB452',
+		},
+		name: names.orange,
+	},
+	{
+		id: 'yellow',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#FFC629',
+			bottom_color: '#FFEE53',
+		},
+		name: names.yellow,
+	},
+	{
+		id: 'lime',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#6FDA1D',
+			bottom_color: '#CBFF50',
+		},
+		name: names.lime,
+	},
+	{
+		id: 'green',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#0B9F21',
+			bottom_color: '#4FD24B',
+		},
+		name: names.green,
+	},
+	{
+		id: 'dark_green',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#084C13',
+			bottom_color: '#327735',
+		},
+		name: names.darkGreen,
+	},
+	{
+		id: 'indigo',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#3F00D3',
+			bottom_color: '#2659FE',
+		},
+		name: names.indigo,
+	},
+	{
+		id: 'purple',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#4739FF',
+			bottom_color: '#6670FF',
+		},
+		name: names.purple,
+	},
+	{
+		id: 'blue',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#227EFF',
+			bottom_color: '#5EC1FF',
+		},
+		name: names.blue,
+	},
+	{
+		id: 'lavender',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#C056FD',
+			bottom_color: '#B889FF',
+		},
+		name: names.lavender,
+	},
+	{
+		id: 'pink',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#F640C0',
+			bottom_color: '#FF7BF1',
+		},
+		name: names.pink,
+	},
+	{
+		id: 'rose',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#D62E63',
+			bottom_color: '#F95C62',
+		},
+		name: names.rose,
+	},
+	{
+		id: 'red',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#F6111C',
+			bottom_color: '#F94548',
+		},
+		name: names.red,
+	},
+	{
+		id: 'light_gray',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#AEAEAE',
+			bottom_color: '#D9D9D9',
+		},
+		name: names.lightGray,
+	},
+	{
+		id: 'gray',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#373C4C',
+			bottom_color: '#4C4F58',
+		},
+		name: names.gray,
+	},
+	{
+		id: 'dark_gray',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#1B1D29',
+			bottom_color: '#252731',
+		},
+		name: names.darkGray,
+	},
 ] as const
 
 export const symbolOptions = [
-	{ id: 'dirt_block', name: names.dirtBlock, asset: dirtBlock },
-	{ id: 'dusk_block', name: names.duskBlock, asset: duskBlock },
-	{ id: 'dusk_block_rose_test', name: names.duskBlockRose, asset: duskBlockRose },
-	{ id: 'dusk_block_gold_test', name: names.duskBlockGold, asset: duskBlockGold },
-	{ id: 'dusk_block_teal_test', name: names.duskBlockTeal, asset: duskBlockTeal },
+	{ id: 'backpack', name: names.backpack, asset: backpack },
+	{ id: 'beacon', name: names.beacon, asset: beacon },
+	{ id: 'blue_shark', name: names.blueShark, asset: blueShark },
+	{ id: 'bookshelf', name: names.bookshelf, asset: bookshelf },
+	{ id: 'brown_bear', name: names.brownBear, asset: brownBear },
+	{ id: 'cake', name: names.cake, asset: cake },
+	{ id: 'campfire', name: names.campfire, asset: campfire },
+	{ id: 'chest', name: names.chest, asset: chest },
+	{ id: 'cogwheel', name: names.cogwheel, asset: cogwheel },
+	{ id: 'command_block', name: names.commandBlock, asset: commandBlock },
+	{ id: 'cooking_pot', name: names.cookingPot, asset: cookingPot },
+	{ id: 'couch', name: names.couch, asset: couch },
+	{ id: 'crafting_table', name: names.craftingTable, asset: craftingTable },
+	{ id: 'creeper', name: names.creeper, asset: creeper },
+	{ id: 'enchanting_table', name: names.enchantingTable, asset: enchantingTable },
+	{ id: 'ender_chest', name: names.enderChest, asset: enderChest },
+	{ id: 'ender_dragon', name: names.enderDragon, asset: enderDragon },
+	{ id: 'engine', name: names.engine, asset: engine },
+	{ id: 'furnace', name: names.furnace, asset: furnace },
+	{ id: 'gizmo', name: names.gizmo, asset: gizmo },
+	{ id: 'globe', name: names.globe, asset: globe },
+	{ id: 'grass_block', name: names.grassBlock, asset: grassBlock },
+	{ id: 'lantern', name: names.lantern, asset: lantern },
+	{ id: 'moobloom', name: names.moobloom, asset: moobloom },
+	{ id: 'mr_pack', name: names.mrPack, asset: mrPack },
+	{ id: 'orb', name: names.orb, asset: orb },
+	{
+		id: 'oxygen_distributor',
+		name: names.oxygenDistributor,
+		asset: oxygenDistributor,
+	},
+	{ id: 'pancakes', name: names.pancakes, asset: pancakes },
+	{ id: 'pickaxe', name: names.pickaxe, asset: pickaxe },
+	{ id: 'poke_ball', name: names.pokeBall, asset: pokeBall },
+	{ id: 'redstone_block', name: names.redstoneBlock, asset: redstoneBlock },
+	{ id: 'sculk_sensor', name: names.sculkSensor, asset: sculkSensor },
+	{ id: 'skeleton', name: names.skeleton, asset: skeleton },
+	{ id: 'skillet', name: names.skillet, asset: skillet },
+	{ id: 'slime_block', name: names.slimeBlock, asset: slimeBlock },
+	{ id: 'space_helmet', name: names.spaceHelmet, asset: spaceHelmet },
+	{ id: 'sticky_piston', name: names.stickyPiston, asset: stickyPiston },
+	{ id: 'sword', name: names.sword, asset: sword },
+	{ id: 'terminal', name: names.terminal, asset: terminal },
+	{ id: 'tiny_potato', name: names.tinyPotato, asset: tinyPotato },
+	{ id: 'tire', name: names.tire, asset: tire },
+	{ id: 'tnt', name: names.tnt, asset: tnt },
+	{ id: 'wrench', name: names.wrench, asset: wrench },
+	{ id: 'wrench1', name: names.wrench1, asset: wrench1 },
+	{ id: 'zombie', name: names.zombie, asset: zombie },
 ] as const
 
-export type BackgroundColor = (typeof backgroundOptions)[number]['background']['value']
+export type BackgroundId = (typeof backgroundOptions)[number]['id']
 export type SymbolId = (typeof symbolOptions)[number]['id']
 
-export const DEFAULT_BACKGROUND_COLOR = '#c78aff' satisfies BackgroundColor
-export const DEFAULT_SYMBOL_ID = 'dusk_block' satisfies SymbolId
+export const DEFAULT_BACKGROUND_ID = 'purple' satisfies BackgroundId
+export const DEFAULT_SYMBOL_ID = 'grass_block' satisfies SymbolId

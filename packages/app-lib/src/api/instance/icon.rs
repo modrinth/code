@@ -28,6 +28,15 @@ enum LegacyIconAction {
     Remove,
 }
 
+#[derive(Debug, Eq, PartialEq)]
+enum ValidatedIconBackground {
+    Color([u8; 3]),
+    LinearTopDownGradient {
+        top_color: [u8; 3],
+        bottom_color: [u8; 3],
+    },
+}
+
 pub async fn edit_icon(
     instance_id: &str,
     icon_path: Option<&Path>,
@@ -87,9 +96,9 @@ async fn cache_generated_icon_with_state(
     symbol_bytes: Vec<u8>,
     state: &State,
 ) -> crate::Result<String> {
-    let background_color = validate_icon_recipe(&recipe)?;
+    let background = validate_icon_recipe(&recipe)?;
     let icon_bytes = tokio::task::spawn_blocking(move || {
-        render_generated_icon(background_color, &symbol_bytes)
+        render_generated_icon(background, &symbol_bytes)
     })
     .await??;
     let file = write_cached_icon(Bytes::from(icon_bytes), state).await?;
@@ -347,14 +356,23 @@ fn validate_normalized_icon(normalized: Vec<u8>) -> crate::Result<Bytes> {
     Ok(Bytes::from(normalized))
 }
 
-fn validate_icon_recipe(recipe: &InstanceIconRecipe) -> crate::Result<[u8; 3]> {
-    let background_color = match &recipe.background {
+fn validate_icon_recipe(
+    recipe: &InstanceIconRecipe,
+) -> crate::Result<ValidatedIconBackground> {
+    let background = match &recipe.background {
         InstanceIconBackground::Color { value } => {
-            parse_background_color(value)?
+            ValidatedIconBackground::Color(parse_background_color(value)?)
         }
+        InstanceIconBackground::LinearTopDownGradient {
+            top_color,
+            bottom_color,
+        } => ValidatedIconBackground::LinearTopDownGradient {
+            top_color: parse_background_color(top_color)?,
+            bottom_color: parse_background_color(bottom_color)?,
+        },
     };
     validate_icon_recipe_id("symbol", &recipe.symbol)?;
-    Ok(background_color)
+    Ok(background)
 }
 
 fn parse_background_color(value: &str) -> crate::Result<[u8; 3]> {
@@ -395,7 +413,7 @@ fn validate_icon_recipe_id(kind: &str, value: &str) -> crate::Result<()> {
 }
 
 fn render_generated_icon(
-    background_color: [u8; 3],
+    background: ValidatedIconBackground,
     symbol_bytes: &[u8],
 ) -> crate::Result<Vec<u8>> {
     if symbol_bytes.is_empty() || symbol_bytes.len() > MAX_SYMBOL_BYTES {
@@ -429,16 +447,35 @@ fn render_generated_icon(
                 FilterType::Lanczos3,
             )
             .to_rgba8();
-    let mut icon = RgbaImage::from_pixel(
-        GENERATED_ICON_SIZE,
-        GENERATED_ICON_SIZE,
-        Rgba([
-            background_color[0],
-            background_color[1],
-            background_color[2],
-            255,
-        ]),
-    );
+    let mut icon = match background {
+        ValidatedIconBackground::Color(color) => RgbaImage::from_pixel(
+            GENERATED_ICON_SIZE,
+            GENERATED_ICON_SIZE,
+            Rgba([color[0], color[1], color[2], 255]),
+        ),
+        ValidatedIconBackground::LinearTopDownGradient {
+            top_color,
+            bottom_color,
+        } => RgbaImage::from_fn(
+            GENERATED_ICON_SIZE,
+            GENERATED_ICON_SIZE,
+            |_, y| {
+                let interpolate = |top: u8, bottom: u8| {
+                    let distance = i32::from(bottom) - i32::from(top);
+                    (i32::from(top)
+                        + distance * y as i32
+                            / (GENERATED_ICON_SIZE - 1) as i32)
+                        as u8
+                };
+                Rgba([
+                    interpolate(top_color[0], bottom_color[0]),
+                    interpolate(top_color[1], bottom_color[1]),
+                    interpolate(top_color[2], bottom_color[2]),
+                    255,
+                ])
+            },
+        ),
+    };
     image::imageops::overlay(&mut icon, &symbol, 0, 0);
     for pixel in icon.pixels_mut() {
         pixel[3] = 255;
@@ -493,7 +530,7 @@ fn svg_not_supported_error() -> crate::Error {
 mod tests {
     use super::{
         GENERATED_ICON_SIZE, InstanceIconBackground, InstanceIconRecipe,
-        render_generated_icon, validate_icon_recipe,
+        ValidatedIconBackground, render_generated_icon, validate_icon_recipe,
     };
     use image::{DynamicImage, ImageFormat, Rgba, RgbaImage};
     use std::io::Cursor;
@@ -509,7 +546,7 @@ mod tests {
     #[test]
     fn generated_icon_renders_background_and_symbol() {
         let bytes = render_generated_icon(
-            [10, 20, 30],
+            ValidatedIconBackground::Color([10, 20, 30]),
             &png(Rgba([200, 100, 50, 128])),
         )
         .unwrap();
@@ -527,7 +564,35 @@ mod tests {
 
     #[test]
     fn generated_icon_rejects_invalid_symbol_data() {
-        assert!(render_generated_icon([0, 0, 0], b"not a png").is_err());
+        assert!(
+            render_generated_icon(
+                ValidatedIconBackground::Color([0, 0, 0]),
+                b"not a png",
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn generated_icon_renders_linear_top_down_gradient() {
+        let bytes = render_generated_icon(
+            ValidatedIconBackground::LinearTopDownGradient {
+                top_color: [10, 20, 30],
+                bottom_color: [110, 120, 130],
+            },
+            &png(Rgba([0, 0, 0, 0])),
+        )
+        .unwrap();
+        let icon =
+            image::load_from_memory_with_format(&bytes, ImageFormat::Png)
+                .unwrap()
+                .to_rgba8();
+
+        assert_eq!(icon.get_pixel(0, 0), &Rgba([10, 20, 30, 255]));
+        assert_eq!(
+            icon.get_pixel(0, GENERATED_ICON_SIZE - 1),
+            &Rgba([110, 120, 130, 255])
+        );
     }
 
     #[test]
@@ -540,7 +605,7 @@ mod tests {
                 symbol: "dusk_block".to_string(),
             })
             .unwrap(),
-            [199, 138, 255]
+            ValidatedIconBackground::Color([199, 138, 255])
         );
         assert!(
             validate_icon_recipe(&InstanceIconRecipe {

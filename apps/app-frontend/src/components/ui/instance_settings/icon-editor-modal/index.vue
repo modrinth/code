@@ -19,9 +19,9 @@ import {
 import type { IconBackground, InstanceIconRecipe } from '@/helpers/types'
 
 import {
-	type BackgroundColor,
+	type BackgroundId,
 	backgroundOptions,
-	DEFAULT_BACKGROUND_COLOR,
+	DEFAULT_BACKGROUND_ID,
 	DEFAULT_SYMBOL_ID,
 	type SymbolId,
 	symbolOptions,
@@ -42,18 +42,17 @@ const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const recentRecipes = ref<InstanceIconRecipe[]>([])
 const saving = ref(false)
 
-const selectedBackground = ref<BackgroundColor>(DEFAULT_BACKGROUND_COLOR)
+const selectedBackground = ref<BackgroundId>(DEFAULT_BACKGROUND_ID)
 const selectedSymbol = ref<SymbolId>(DEFAULT_SYMBOL_ID)
 
 const selectedBackgroundOption = computed(
-	() => backgroundOptions.find((option) => option.background.value === selectedBackground.value)!,
+	() => backgroundOptions.find((option) => option.id === selectedBackground.value)!,
 )
 const selectedSymbolOption = computed(
 	() => symbolOptions.find((option) => option.id === selectedSymbol.value)!,
 )
-const selectedBackgroundColor = computed(() => selectedBackgroundOption.value.background.value)
 const selectedRecipe = computed<InstanceIconRecipe>(() => ({
-	background: { type: 'color', value: selectedBackground.value },
+	background: { ...selectedBackgroundOption.value.background },
 	symbol: selectedSymbol.value,
 }))
 const visibleRecentRecipes = computed(() =>
@@ -63,8 +62,24 @@ const visibleRecentRecipes = computed(() =>
 )
 
 function backgroundOption(background?: IconBackground) {
-	if (background?.type !== 'color') return undefined
-	return backgroundOptions.find((option) => option.background.value === background.value)
+	if (background?.type !== 'linear-top-down-gradient') return undefined
+	return backgroundOptions.find(
+		(option) =>
+			option.background.top_color === background.top_color &&
+			option.background.bottom_color === background.bottom_color,
+	)
+}
+
+function backgroundStyle(background: IconBackground) {
+	if (background.type === 'color') return { backgroundColor: background.value }
+	return {
+		backgroundImage: `linear-gradient(to bottom, ${background.top_color}, ${background.bottom_color})`,
+	}
+}
+
+function backgroundKey(background: IconBackground) {
+	if (background.type === 'color') return `${background.type}-${background.value}`
+	return `${background.type}-${background.top_color}-${background.bottom_color}`
 }
 
 function symbolOption(symbol: string) {
@@ -76,19 +91,17 @@ function selectRecent(recipe: InstanceIconRecipe) {
 	const symbol = symbolOption(recipe.symbol)
 	if (!background || !symbol) return
 
-	selectedBackground.value = background.background.value
+	selectedBackground.value = background.id
 	selectedSymbol.value = symbol.id
 }
 
 function surpriseMe() {
 	const currentBackgroundIndex = backgroundOptions.findIndex(
-		(option) => option.background.value === selectedBackground.value,
+		(option) => option.id === selectedBackground.value,
 	)
 	const backgroundOffset = Math.floor(Math.random() * (backgroundOptions.length - 1)) + 1
 	selectedBackground.value =
-		backgroundOptions[
-			(currentBackgroundIndex + backgroundOffset) % backgroundOptions.length
-		].background.value
+		backgroundOptions[(currentBackgroundIndex + backgroundOffset) % backgroundOptions.length].id
 
 	const currentSymbolIndex = symbolOptions.findIndex((option) => option.id === selectedSymbol.value)
 	const symbolOffset = Math.floor(Math.random() * (symbolOptions.length - 1)) + 1
@@ -105,8 +118,7 @@ async function loadRecents() {
 }
 
 function show() {
-	selectedBackground.value =
-		backgroundOption(props.recipe?.background)?.background.value ?? DEFAULT_BACKGROUND_COLOR
+	selectedBackground.value = backgroundOption(props.recipe?.background)?.id ?? DEFAULT_BACKGROUND_ID
 	selectedSymbol.value = symbolOption(props.recipe?.symbol ?? '')?.id ?? DEFAULT_SYMBOL_ID
 	modal.value?.show()
 	void loadRecents()
@@ -225,26 +237,26 @@ const messages = defineMessages({
 				>
 					<div
 						class="relative size-[132px] overflow-hidden rounded-[20px] border border-solid border-white/15"
-						:style="{ backgroundColor: selectedBackgroundColor }"
+						:style="backgroundStyle(selectedBackgroundOption.background)"
 					>
 						<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 					</div>
 					<div class="flex items-center gap-2.5">
 						<div
 							class="relative size-12 overflow-hidden rounded-2xl border border-solid border-white/15"
-							:style="{ backgroundColor: selectedBackgroundColor }"
+							:style="backgroundStyle(selectedBackgroundOption.background)"
 						>
 							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 						</div>
 						<div
 							class="relative size-8 overflow-hidden rounded-[10px] border border-solid border-white/15"
-							:style="{ backgroundColor: selectedBackgroundColor }"
+							:style="backgroundStyle(selectedBackgroundOption.background)"
 						>
 							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 						</div>
 						<div
 							class="relative size-4 overflow-hidden rounded-[5px] border border-solid border-white/15"
-							:style="{ backgroundColor: selectedBackgroundColor }"
+							:style="backgroundStyle(selectedBackgroundOption.background)"
 						>
 							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 						</div>
@@ -266,11 +278,9 @@ const messages = defineMessages({
 					<div class="grid grid-cols-4 gap-3">
 						<button
 							v-for="(recentRecipe, index) in visibleRecentRecipes"
-							:key="`${recentRecipe.background.type}-${recentRecipe.background.value}-${recentRecipe.symbol}`"
+							:key="`${backgroundKey(recentRecipe.background)}-${recentRecipe.symbol}`"
 							class="relative size-10 cursor-pointer overflow-hidden rounded-xl border border-solid border-white/15 p-0 transition-transform hover:scale-105"
-							:style="{
-								backgroundColor: backgroundOption(recentRecipe.background)?.background.value,
-							}"
+							:style="backgroundStyle(recentRecipe.background)"
 							:aria-label="`${formatMessage(messages.recents)} ${index + 1}`"
 							@click="selectRecent(recentRecipe)"
 						>
@@ -292,20 +302,16 @@ const messages = defineMessages({
 					<div class="grid grid-cols-6 gap-2.5">
 						<button
 							v-for="option in backgroundOptions"
-							:key="option.background.value"
+							:key="option.id"
 							class="relative aspect-square cursor-pointer rounded-[20px] border border-solid p-0"
-							:class="
-								selectedBackground === option.background.value
-									? 'border-white/60'
-									: 'border-white/15'
-							"
-							:style="{ backgroundColor: option.background.value }"
+							:class="selectedBackground === option.id ? 'border-white/60' : 'border-white/15'"
+							:style="backgroundStyle(option.background)"
 							:aria-label="formatMessage(option.name)"
-							:aria-pressed="selectedBackground === option.background.value"
-							@click="selectedBackground = option.background.value"
+							:aria-pressed="selectedBackground === option.id"
+							@click="selectedBackground = option.id"
 						>
 							<span
-								v-if="selectedBackground === option.background.value"
+								v-if="selectedBackground === option.id"
 								class="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/80 text-black"
 							>
 								<CheckIcon class="size-4" />

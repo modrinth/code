@@ -1610,6 +1610,9 @@
   "instance.icon-editor.background.dark-gray": {
     "message": "Dark gray"
   },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Dark green"
+  },
   "instance.icon-editor.background.gray": {
     "message": "Gray"
   },
@@ -1619,8 +1622,14 @@
   "instance.icon-editor.background.indigo": {
     "message": "Indigo"
   },
+  "instance.icon-editor.background.lavender": {
+    "message": "Lavender"
+  },
   "instance.icon-editor.background.light-gray": {
     "message": "Light gray"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Lime"
   },
   "instance.icon-editor.background.orange": {
     "message": "Orange"
@@ -1655,20 +1664,140 @@
   "instance.icon-editor.symbol": {
     "message": "Symbol"
   },
-  "instance.icon-editor.symbol.dirt-block": {
-    "message": "Dirt block"
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Backpack"
   },
-  "instance.icon-editor.symbol.dusk-block": {
-    "message": "Dusk block"
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Beacon"
   },
-  "instance.icon-editor.symbol.dusk-block-gold": {
-    "message": "Test block"
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Blue Shark"
   },
-  "instance.icon-editor.symbol.dusk-block-rose": {
-    "message": "Test block"
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Bookshelf"
   },
-  "instance.icon-editor.symbol.dusk-block-teal": {
-    "message": "Test block"
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Brown Bear"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Cake"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Campfire"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Chest"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Cogwheel"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Command Block"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Cooking Pot"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Couch"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Crafting Table"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Enchanting Table"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Ender Chest"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Ender Dragon"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "Engine"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Furnace"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Globe"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Grass Block"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Lantern"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "Oxygen Distributor"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Pancakes"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Pickaxe"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "Redstone Block"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "Sculk Sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Skeleton"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Skillet"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Slime Block"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "Space Helmet"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Sticky Piston"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Sword"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Tiny Potato"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Tire"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.wrench": {
+    "message": "Wrench"
+  },
+  "instance.icon-editor.symbol.wrench1": {
+    "message": "Wrench1"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Zombie"
   },
   "instance.icon-editor.title": {
     "message": "Icon editor"
