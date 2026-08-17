@@ -20,6 +20,7 @@ pub struct UserPreferences {
     Debug, Serialize, Deserialize, ToSchema, Default, PartialEq, Component,
 )]
 pub struct AppearancePreferences {
+    pub auto: bool,
     pub theme: Theme,
 }
 
