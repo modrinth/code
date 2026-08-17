@@ -2036,38 +2036,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Instanz suchen"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Dieses Modpack enthält keine zusätzlichen inhalte."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Keine Inhalte gefunden"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Diese Datei ist nicht auf Modrinth veröffentlicht."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpack Inhalt"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Lade Inhalte..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Keine Projekte entsprechen deiner Suche."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "In Slicer öffnen"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Icon auswählen"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
   },

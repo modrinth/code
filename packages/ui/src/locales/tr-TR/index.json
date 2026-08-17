@@ -2009,32 +2009,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Kurulum ara"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Bu mod paketi başka hiç bir ekstra işerik içermez."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "İçerik bulunamadı"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Harici"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Mod paketi içeriği"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "İçerik yükleniyor..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Aramanızla eşleşen proje yok."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Simge seç"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
   },

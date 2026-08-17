@@ -2036,38 +2036,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜索实例"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "这个整合包不包含任何额外内容。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "未找到内容"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "外部来源"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "此文件未发布于 Modrinth 平台。"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "整合包内容"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "加载内容……"
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "没有符合搜索条件的项目。"
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "在 Slicer 中打开"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "选择图标"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
   },

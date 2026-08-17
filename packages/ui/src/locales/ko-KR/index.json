@@ -2036,38 +2036,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "인스턴스 검색"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "이 모드팩에는 추가 콘텐츠가 포함되어 있지 않습니다."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "콘텐츠를 찾을 수 없습니다"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "외부"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "모드팩 콘텐츠"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "콘텐츠 불러오는 중..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Slicer에서 열기"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "{count, number}개의 프로젝트 검색"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "아이콘 선택"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
   },

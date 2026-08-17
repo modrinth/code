@@ -1004,29 +1004,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Căutare instanță"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Acest modpack nu include niciun conținut suplimentar."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nu a fost găsit niciun conținut"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Conținutul Modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Se încarcă materialul..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Niciun proiect nu corespunde căutării dvs."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Căutare {count, number}{count, plural,one {proiect}other {proiecte}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selectează iconița"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Curent"
   },

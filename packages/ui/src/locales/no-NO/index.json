@@ -845,23 +845,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søk etter instans"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Ingen innhold funnet"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Laster inn innhold..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Ingen prosjekter samsvarte med søket ditt."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Søk etter {count, number} {count, plural, one {prosjekt} other {prosjekter}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Velg ikon"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nåværende"
   },

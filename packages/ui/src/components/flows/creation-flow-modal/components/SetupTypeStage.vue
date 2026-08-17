@@ -115,7 +115,6 @@ import {
 	BoxImportIcon,
 	CompassIcon,
 	DownloadIcon,
-	ImportIcon,
 	RightArrowIcon,
 	UploadIcon,
 } from '@modrinth/assets'

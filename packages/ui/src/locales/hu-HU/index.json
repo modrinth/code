@@ -1703,38 +1703,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Profilok keresése"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ez a modcsomag nem tartalmaz további tartalmakat."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nincsen tartalom"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Külső"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Ez a fájl nem szerepel a Modrinthon."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modcsomag tartalma"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Tartalmak betöltése..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nincsen olyan projekt ami keresnél."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Megnyitás a Slicer-ben"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Keresés {count, number} projekt között"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Ikon feltöltése"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"
   },

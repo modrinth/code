@@ -1757,35 +1757,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Sök för instans"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Modpaketet innehåller inget ytterligare innehåll."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Inget innehåll hittades"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Den här filen är inte publiserad på Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpaketets innehåll"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Laddar innehåll..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Inga projekt matchar din sökning."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Öppna i Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Sök genom {count, number} projekt"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Välj ikon"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
   },

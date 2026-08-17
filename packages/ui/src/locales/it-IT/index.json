@@ -1994,38 +1994,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Cerca istanza"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Questo pacchetto di mod non include alcun contenuto aggiuntivo."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nessun contenuto trovato"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Esterno"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Questo file non è su Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Contenuto del pacchetto"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Caricamento contenuto..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nessun progetto corrisponde alla tua ricerca."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Apri con Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Cerca tra {count, number} {count, plural, one {progetto} other {progetti}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Scegli un'icona"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Attuale"
   },

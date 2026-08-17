@@ -785,14 +785,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søg efter instanser"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Ekstern"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Vælg ikon"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuværrende"
   },

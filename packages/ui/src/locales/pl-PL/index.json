@@ -2027,35 +2027,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Szukaj instancji"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ta paczka modów nie zawiera żadnych innych treści."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nie znaleziono treści"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Zewnętrzne"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Ten plik nie jest opublikowany na Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Zawartość paczki modów"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Ładowanie treści..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nie znaleziono żadnego projektu pasującego do Twojego wyszukiwania."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Szukaj wśród {count, number} {count, plural, one {projektu} other {projektów}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Wybierz ikonę"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktualny"
   },

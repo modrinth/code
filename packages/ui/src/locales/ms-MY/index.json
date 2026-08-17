@@ -1640,29 +1640,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Cari pemasangan"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Pek mod ini tidak menyertakan sebarang kandungan tambahan."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Tiada kandungan dijumpai"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Kandungan pek mod"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Sedang memuat kandungan..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Tiada projek yang sepadan dengan carian anda."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Cari {count, number} {count, plural, other {projek}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Pilih ikon"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Semasa"
   },

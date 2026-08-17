@@ -2036,38 +2036,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜尋實例"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "這個模組包不包含任何額外內容。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "找不到內容"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "外部"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "這個檔案未在 Modrinth 上發布。"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "模組包內容"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "正在載入內容..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "沒有專案符合你的搜尋字詞。"
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "在 Slicer 中開啟"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "選擇圖示"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
   },

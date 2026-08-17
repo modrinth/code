@@ -1790,23 +1790,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Hledat instance"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nebyl nalezen obsah"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Obsah modpacku"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Načítání obsahu..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Žádné projekty neodpovídají tvému vyhledávání."
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Vybrat ikonu"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Mometálně"
   },

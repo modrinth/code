@@ -1667,29 +1667,6 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Tìm phiên chơi"
   },
-<<<<<<< HEAD
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Gói modpack này không bao gồm các nội dung bổ sung nào."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Không có nội dung nào được tìm thấy"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Nội dung modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Đang tải nội dung..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Không có dự án nào phù hợp với kết quả tìm kiếm."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Tìm {count, number} {count, plural, other {dự án}}"
-=======
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Chọn biểu tượng"
->>>>>>> main
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
   },
