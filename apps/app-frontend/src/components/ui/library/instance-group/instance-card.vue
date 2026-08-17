@@ -247,9 +247,7 @@ defineExpose({
 useAppEvent('process', (event) => {
 	if (event.instance_id === props.instance.id) {
 		currentEvent.value = event.event
-		if (event.event === 'finished') {
-			playing.value = false
-		}
+		playing.value = event.event === 'launched'
 	}
 })
 
