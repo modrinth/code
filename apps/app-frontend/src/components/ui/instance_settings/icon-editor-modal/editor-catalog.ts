@@ -198,6 +198,15 @@ const names = defineMessages({
 
 export const backgroundOptions = [
 	{
+		id: 'rose',
+		background: {
+			type: 'linear-top-down-gradient',
+			top_color: '#D62E63',
+			bottom_color: '#F95C62',
+		},
+		name: names.rose,
+	},
+	{
 		id: 'orange',
 		background: {
 			type: 'linear-top-down-gradient',
@@ -233,24 +242,24 @@ export const backgroundOptions = [
 		},
 		name: names.green,
 	},
-	{
-		id: 'dark_green',
-		background: {
-			type: 'linear-top-down-gradient',
-			top_color: '#084C13',
-			bottom_color: '#327735',
-		},
-		name: names.darkGreen,
-	},
-	{
-		id: 'indigo',
-		background: {
-			type: 'linear-top-down-gradient',
-			top_color: '#3F00D3',
-			bottom_color: '#2659FE',
-		},
-		name: names.indigo,
-	},
+	// {
+	// 	id: 'dark_green',
+	// 	background: {
+	// 		type: 'linear-top-down-gradient',
+	// 		top_color: '#084C13',
+	// 		bottom_color: '#327735',
+	// 	},
+	// 	name: names.darkGreen,
+	// },
+	// {
+	// 	id: 'indigo',
+	// 	background: {
+	// 		type: 'linear-top-down-gradient',
+	// 		top_color: '#3F00D3',
+	// 		bottom_color: '#2659FE',
+	// 	},
+	// 	name: names.indigo,
+	// },
 	{
 		id: 'purple',
 		background: {
@@ -287,24 +296,16 @@ export const backgroundOptions = [
 		},
 		name: names.pink,
 	},
-	{
-		id: 'rose',
-		background: {
-			type: 'linear-top-down-gradient',
-			top_color: '#D62E63',
-			bottom_color: '#F95C62',
-		},
-		name: names.rose,
-	},
-	{
-		id: 'red',
-		background: {
-			type: 'linear-top-down-gradient',
-			top_color: '#F6111C',
-			bottom_color: '#F94548',
-		},
-		name: names.red,
-	},
+
+	// {
+	// 	id: 'red',
+	// 	background: {
+	// 		type: 'linear-top-down-gradient',
+	// 		top_color: '#F6111C',
+	// 		bottom_color: '#F94548',
+	// 	},
+	// 	name: names.red,
+	// },
 	{
 		id: 'light_gray',
 		background: {

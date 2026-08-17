@@ -56,6 +56,8 @@ const selectedBackgroundOption = computed(
 const selectedSymbolOption = computed(
 	() => symbolOptions.find((option) => option.id === selectedSymbol.value)!,
 )
+const vanillaSymbolOptions = symbolOptions.filter((option) => option.category === 'vanilla')
+const moddedSymbolOptions = symbolOptions.filter((option) => option.category === 'modded')
 const selectedRecipe = computed<InstanceIconRecipe>(() => ({
 	background: { ...selectedBackgroundOption.value.background },
 	symbol: selectedSymbol.value,
@@ -270,26 +272,26 @@ const messages = defineMessages({
 					class="flex w-full flex-col items-center gap-3 rounded-[20px] border border-solid border-surface-4 bg-surface-2 p-4"
 				>
 					<div
-						class="relative size-[132px] overflow-hidden rounded-[20px] border border-solid border-white/15"
+						class="icon-outline relative size-[132px] overflow-hidden rounded-[20px]"
 						:style="backgroundStyle(selectedBackgroundOption.background)"
 					>
 						<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 					</div>
 					<div class="flex items-center gap-2.5">
 						<div
-							class="relative size-12 overflow-hidden rounded-2xl border border-solid border-white/15"
+							class="icon-outline relative size-12 overflow-hidden rounded-2xl"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
 						>
 							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 						</div>
 						<div
-							class="relative size-8 overflow-hidden rounded-[10px] border border-solid border-white/15"
+							class="icon-outline relative size-8 overflow-hidden rounded-[10px]"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
 						>
 							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
 						</div>
 						<div
-							class="relative size-4 overflow-hidden rounded-[5px] border border-solid border-white/15"
+							class="icon-outline relative size-4 overflow-hidden rounded-[5px]"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
 						>
 							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
@@ -308,7 +310,7 @@ const messages = defineMessages({
 						<button
 							v-for="(recentRecipe, index) in visibleRecentRecipes"
 							:key="`${backgroundKey(recentRecipe.background)}-${recentRecipe.symbol}`"
-							class="relative size-10 cursor-pointer overflow-hidden rounded-xl border border-solid border-white/15 p-0 transition-transform hover:scale-105"
+							class="icon-outline relative size-10 cursor-pointer overflow-hidden rounded-xl border-0 p-0 transition-transform hover:scale-105"
 							:style="backgroundStyle(recentRecipe.background)"
 							:aria-label="`${formatMessage(messages.recents)} ${index + 1}`"
 							@click="selectRecent(recentRecipe)"
@@ -342,8 +344,8 @@ const messages = defineMessages({
 							<button
 								v-for="option in backgroundOptions"
 								:key="option.id"
-								class="relative aspect-square w-[calc((100%_-_3.125rem)/6)] shrink-0 cursor-pointer rounded-[20px] border border-solid p-0"
-								:class="selectedBackground === option.id ? 'border-white/60' : 'border-white/15'"
+								class="icon-option icon-outline relative aspect-square w-[calc((100%_-_3.125rem)/6)] shrink-0 cursor-pointer rounded-[20px] border-0 p-0"
+								:class="{ 'icon-outline-selected': selectedBackground === option.id }"
 								:style="backgroundStyle(option.background)"
 								:aria-label="formatMessage(option.name)"
 								:aria-pressed="selectedBackground === option.id"
@@ -370,14 +372,38 @@ const messages = defineMessages({
 					</h3>
 					<div class="grid grid-cols-6 gap-2.5">
 						<button
-							v-for="option in symbolOptions"
+							v-for="option in moddedSymbolOptions"
 							:key="option.id"
 							v-tooltip="{
 								content: formatMessage(option.name),
 								delay: { show: 500, hide: 0 },
 							}"
-							class="relative aspect-square cursor-pointer overflow-hidden rounded-[20px] border border-solid bg-transparent p-0"
-							:class="selectedSymbol === option.id ? 'border-white/60' : 'border-white/15'"
+							class="icon-option icon-outline relative aspect-square cursor-pointer overflow-hidden rounded-[20px] border-0 bg-transparent p-0"
+							:class="{ 'icon-outline-selected': selectedSymbol === option.id }"
+							:aria-label="formatMessage(option.name)"
+							:aria-pressed="selectedSymbol === option.id"
+							@click="selectedSymbol = option.id"
+						>
+							<img :src="option.asset" alt="" class="size-full object-cover" />
+							<span
+								v-if="selectedSymbol === option.id"
+								class="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/80 text-black"
+							>
+								<CheckIcon class="size-4" />
+							</span>
+						</button>
+						<hr
+							class="col-span-6 my-2.5 mx-1 w-full border-0 border-t border-solid border-surface-5"
+						/>
+						<button
+							v-for="option in vanillaSymbolOptions"
+							:key="option.id"
+							v-tooltip="{
+								content: formatMessage(option.name),
+								delay: { show: 500, hide: 0 },
+							}"
+							class="icon-option icon-outline relative aspect-square cursor-pointer overflow-hidden rounded-[20px] border-0 bg-transparent p-0"
+							:class="{ 'icon-outline-selected': selectedSymbol === option.id }"
 							:aria-label="formatMessage(option.name)"
 							:aria-pressed="selectedSymbol === option.id"
 							@click="selectedSymbol = option.id"
@@ -418,6 +444,23 @@ const messages = defineMessages({
 </template>
 
 <style scoped>
+.icon-outline {
+	outline: 1px solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
+	outline-offset: -1px;
+}
+
+.icon-option:not(.icon-outline-selected):hover {
+	outline-color: color-mix(in srgb, var(--color-text-primary) 30%, transparent);
+}
+
+.icon-option {
+	transition: outline-color 150ms ease;
+}
+
+.icon-outline-selected {
+	outline-color: color-mix(in srgb, var(--color-text-primary) 60%, transparent);
+}
+
 .background-scroll-shadow-left {
 	-webkit-mask-image: linear-gradient(to right, black, transparent);
 	mask-image: linear-gradient(to right, black, transparent);

@@ -342,7 +342,7 @@ const messages = defineMessages({
 						<div
 							class="absolute top-0 h-full w-full flex items-center justify-center opacity-0 transition-all group-hover:opacity-100"
 						>
-							<EditIcon aria-hidden="true" class="h-10 w-10 text-primary" />
+							<EditIcon aria-hidden="true" class="h-10 w-10 text-white opacity-70" />
 						</div>
 						<template #select>
 							<UploadIcon />
