@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ImportIcon, PlusIcon } from '@modrinth/assets'
 import { Button, defineMessages, IntlFormatted, useVIntl } from '@modrinth/ui'
-import frog from '@modrinth/ui/src/assets/welcome/frog.png'
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
 import modrinthSocialIcon from '../../assets/welcome/modrinth-social-icon.png'
@@ -95,7 +94,6 @@ onUnmounted(() => {
 				<div class="flex flex-col items-center gap-2">
 					<h1 class="m-0 flex items-center gap-2 text-2xl font-semibold leading-8 text-contrast">
 						{{ formatMessage(messages.welcomeTitle) }}
-						<img :src="frog" alt="" class="h-8 w-8 [image-rendering:pixelated]" />
 					</h1>
 					<p class="m-0 text-center text-base leading-6 text-primary">
 						{{ formatMessage(messages.welcomeDescription) }}

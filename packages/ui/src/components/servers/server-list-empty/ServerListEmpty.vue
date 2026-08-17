@@ -7,7 +7,6 @@
 						<h1 class="m-0 text-3xl font-semibold leading-9 text-contrast">
 							{{ formatMessage(messages.modrinthHostingLabel) }}
 						</h1>
-						<img :src="frog" alt="" class="size-8 shrink-0 [image-rendering:pixelated]" />
 					</div>
 					<p class="m-0 text-base text-primary">
 						{{ formatMessage(messages.noServersDescription) }}
