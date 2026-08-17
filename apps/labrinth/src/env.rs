@@ -335,6 +335,7 @@ vars! {
     STRIPE_API_KEY: String = "none";
     STRIPE_WEBHOOK_SECRET: String = "none";
 
+    ADITUDE_BASE_URL: String = "https://cloud.aditude.io/api";
     ADITUDE_API_KEY: String = "none";
 
     PYRO_API_KEY: String = "none";

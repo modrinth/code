@@ -36,7 +36,7 @@ pub async fn estimate(
     periods: &[YearMonth],
 ) -> Result<Vec<PeriodEstimate>> {
     redis
-        .get_cached_keys(REDIS_KEY, periods, |periods| async {
+        .get_cached_keys(REDIS_KEY, periods, |periods| async move {
             fetch_estimates(aditude, redis, &periods)
                 .await
                 .map_err(ApiError::Internal)

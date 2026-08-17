@@ -26,7 +26,7 @@
 //!
 //! How revenue is distributed:
 //! - While a month is still open/in review:
-//!   - `raw_estimated_revenue_usd`: how much our ad provider estimates we'll
+//!   - `estimated.raw_revenue_usd`: how much our ad provider estimates we'll
 //!     earn for a specific period
 //!     - We also get a value for this per day
 //!   - `fees_usd`: how much we pay in fees to Clean.io
@@ -36,23 +36,23 @@
 //!     - e.g. if variance is 10%, and we estimate that we'll earn $100k, then
 //!       our ad provider will probably give us closer to $90k - the variance
 //!       lets us express this difference
-//!   - `net_estimated_revenue_usd`: raw estimated - fees - variance
-//!   - `platform_net_estimated_revenue_usd`: net estimated revenue x Modrinth's cut
-//!   - `creator_net_estimated_revenue_usd`: net estimated revenue x (1 - Modrinth's cut)
+//!   - `net_revenue_usd`: raw estimated - fees - variance
+//!   - `platform_net_revenue_usd`: net estimated revenue x Modrinth's cut
+//!   - `creator_net_revenue_usd`: net estimated revenue x (1 - Modrinth's cut)
 //! - After a payout run has been executed:
 //!   - We save the per-day raw estimated revenue and impressions in the
 //!     database
-//!   - `raw_actual_revenue_usd`: how much we got from Aditude, input by an admin
+//!   - `actual.raw_revenue_usd`: how much we got from Aditude, input by an admin
 //!     - We compute this per-day by:
 //!       ```text
-//!       let factor = raw_actual_revenue_usd / raw_estimated_revenue_usd
-//!       raw_actual_revenue_usd_for_today = raw_estimated_revenue_usd_for_today * factor
+//!       let factor = actual.raw_revenue_usd / raw_estimated_revenue_usd
+//!       raw_revenue_usd_for_today = raw_estimated_revenue_usd_for_today * factor
 //!       ```
 //!   - (fees stay the same, since they're based on impressions, not revenue)
 //!   - (variance is ignored, since that's purely an estimation value)
 //!   - `adjustments_usd`: sum of all manual adjustments input by the admin
-//!   - `net_actual_revenue_usd`: raw actual revenue - fees + adjustments
-//!   - `(platform|creator)_net_estimated_revenue_usd`: same logic as estimated,
+//!   - `actual.net_revenue_usd`: raw actual revenue - fees + adjustments
+//!   - `actual.(platform|creator)_net_revenue_usd`: same logic as estimated,
 //!     but using the net actual revenue
 //!
 //! ## Variance
@@ -76,12 +76,22 @@ const PLATFORM_REVENUE_SPLIT: Decimal = dec!(0.25);
 /// This may refer to either estimated or actual revenue.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DayDistribution {
+    /// Amount of revenue input into the algorithm.
     pub raw_revenue_usd: Decimal,
+    /// Operational fees to subtract.
     pub fees_usd: Decimal,
+    /// Estimation variance to subtract.
+    ///
+    /// For non-estimates (actual revenue values), this is zero.
     pub variance_usd: Decimal,
+    /// Manually-input adjustments on top of raw revenue.
     pub sum_adjustments_usd: Decimal,
+    /// Total net revenue that we earned;
+    /// `raw_revenue - fees - variance + sum_adjustments`.
     pub net_revenue_usd: Decimal,
+    /// How much of the net revenue goes to the platform.
     pub platform_net_revenue_usd: Decimal,
+    /// How much of the net revenue goes to creators.
     pub creator_net_revenue_usd: Decimal,
 }
 

@@ -70,6 +70,7 @@ pub struct LabrinthConfig {
     pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
     pub anrok_client: anrok::Client,
+    pub aditude_client: web::Data<aditude::Client>,
     pub email_queue: web::Data<EmailQueue>,
     pub archon_client: web::Data<ArchonClient>,
     pub gotenberg_client: GotenbergClient,
@@ -99,6 +100,10 @@ pub fn app_setup(
     let scheduler = scheduler::Scheduler::new();
 
     let http_client = web::Data::new(HttpClient::new());
+    let aditude_client = web::Data::new(aditude::Client::new(
+        ENV.ADITUDE_BASE_URL.clone(),
+        ENV.ADITUDE_API_KEY.clone(),
+    ));
     let tiltify_client =
         web::Data::new(TiltifyClient::new(http_client.get_ref().clone()));
     let search_state = web::Data::new(search::SearchState {
@@ -302,6 +307,7 @@ pub fn app_setup(
         rate_limiter: limiter,
         stripe_client,
         anrok_client,
+        aditude_client,
         gotenberg_client,
         http_client,
         tiltify_client,
@@ -359,6 +365,7 @@ pub fn app_data_config(
     .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
+    .app_data(labrinth_config.aditude_client.clone())
     .app_data(labrinth_config.rate_limiter.clone())
     .app_data(labrinth_config.kafka_client.clone())
     .app_data(labrinth_config.search_state.clone())

@@ -15,6 +15,7 @@ pub mod medal;
 pub mod moderation;
 pub mod mural;
 pub mod pats;
+pub mod payout_runs;
 pub mod search;
 pub mod server_ping;
 pub mod session;
