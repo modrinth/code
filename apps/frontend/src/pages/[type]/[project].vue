@@ -1745,16 +1745,24 @@ const following = computed(() => {
 	return !!user.value.follows.find((x) => x.id === project.value.id)
 })
 
+const PROJECT_NOT_FOUND_DESCRIPTION =
+	"There's no project here, check that you have the right link! It may still be under review or no longer publicly available on Modrinth."
+
 const title = computed(() =>
-	project.value ? `${project.value.title} - Minecraft ${projectTypeDisplay.value}` : '',
-)
-const description = computed(() =>
 	project.value
-		? `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
-				project.value.title
-			} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`
-		: '',
+		? `${project.value.title} - Minecraft ${projectTypeDisplay.value}`
+		: 'Project not found',
 )
+const description = computed(() => {
+	if (!project.value) {
+		return PROJECT_NOT_FOUND_DESCRIPTION
+	}
+
+	const creator = organization.value?.name || members.value.find((x) => x.is_owner)?.user?.username
+	const byLine = creator ? ` by ${creator}` : ''
+
+	return `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${project.value.title}${byLine} on Modrinth`
+})
 
 const canCreateServerFrom = computed(() => {
 	if (!project.value) return false
@@ -1986,8 +1994,11 @@ if (!route.name.startsWith('type-project-settings')) {
 		title: () => title.value,
 		description: () => description.value,
 		ogTitle: () => title.value,
-		ogDescription: () => project.value?.description ?? '',
-		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+		ogDescription: () => project.value?.description ?? PROJECT_NOT_FOUND_DESCRIPTION,
+		ogImage: () =>
+			project.value
+				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
+				: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
