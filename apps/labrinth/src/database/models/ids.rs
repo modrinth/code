@@ -4,9 +4,10 @@ use crate::models::ids::{
     AffiliateCodeId, AnalyticsEventId, AttributionGroupId, CampaignDonationId,
     ChargeId, CollectionId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
-    OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId, ProductId,
-    ProductPriceId, ProjectId, ReportId, SessionId, TeamId, TeamMemberId,
-    ThreadId, ThreadMessageId, UserSubscriptionId, VersionId,
+    OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId,
+    PayoutRunId, ProductId, ProductPriceId, ProjectId, ReportId, SessionId,
+    TeamId, TeamMemberId, ThreadId, ThreadMessageId, UserSubscriptionId,
+    VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -216,6 +217,10 @@ db_id_interface!(
 db_id_interface!(
     PayoutId,
     generator: generate_payout_id @ "payouts",
+);
+db_id_interface!(
+    PayoutRunId,
+    generator: generate_payout_run_id @ "payout_runs",
 );
 db_id_interface!(
     ProductId,

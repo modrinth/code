@@ -58,8 +58,8 @@
 //! ## Variance
 //!
 //! We store a table `payouts_variance` with columns:
-//! - a timestamp from when this variance value applies (first entry at Unix
-//!   epoch)
+//! - a date from when this variance value applies (first entry on the Unix
+//!   epoch date)
 //! - the decimal fraction of variance to apply
 
 use chrono::NaiveDate;

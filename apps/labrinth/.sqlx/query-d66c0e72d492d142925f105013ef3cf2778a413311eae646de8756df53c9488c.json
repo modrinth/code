@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tINSERT INTO payouts_variance (applied_on, variance)\n\t\t\tVALUES ($1, $2)\n\t\t\tON CONFLICT (applied_on) DO UPDATE\n\t\t\tSET variance = EXCLUDED.variance\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Date",
+        "Numeric"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d66c0e72d492d142925f105013ef3cf2778a413311eae646de8756df53c9488c"
+}

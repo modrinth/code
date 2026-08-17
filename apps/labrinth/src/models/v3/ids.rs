@@ -14,6 +14,7 @@ base62_id!(OAuthRedirectUriId);
 base62_id!(OrganizationId);
 base62_id!(PatId);
 base62_id!(PayoutId);
+base62_id!(PayoutRunId);
 base62_id!(ProductId);
 base62_id!(ProductPriceId);
 base62_id!(ProjectId);

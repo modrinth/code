@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tINSERT INTO payout_runs (\n\t\t\t\tid,\n\t\t\t\tperiod,\n\t\t\t\tstatus,\n\t\t\t\tstarted_at,\n\t\t\t\tstarted_by,\n\t\t\t\texecute_at,\n\t\t\t\tprocessing_started_at,\n\t\t\t\tfinished_at,\n\t\t\t\tcancelled_at,\n\t\t\t\tcancelled_by,\n\t\t\t\terror\n\t\t\t)\n\t\t\tVALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)\n\t\t\tON CONFLICT (id) DO UPDATE SET\n\t\t\t\tperiod = EXCLUDED.period,\n\t\t\t\tstatus = EXCLUDED.status,\n\t\t\t\tstarted_at = EXCLUDED.started_at,\n\t\t\t\tstarted_by = EXCLUDED.started_by,\n\t\t\t\texecute_at = EXCLUDED.execute_at,\n\t\t\t\tprocessing_started_at = EXCLUDED.processing_started_at,\n\t\t\t\tfinished_at = EXCLUDED.finished_at,\n\t\t\t\tcancelled_at = EXCLUDED.cancelled_at,\n\t\t\t\tcancelled_by = EXCLUDED.cancelled_by,\n\t\t\t\terror = EXCLUDED.error\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Date",
+        "Text",
+        "Timestamptz",
+        "Int8",
+        "Timestamptz",
+        "Timestamptz",
+        "Timestamptz",
+        "Timestamptz",
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3de025bb99952ac0ba5d1bbf270a42b68c675c0f38cb760c42acd1786a20c241"
+}
