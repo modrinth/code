@@ -63,7 +63,12 @@
 					<UploadIcon />
 					{{ formatMessage(messages.uploadIcon) }}
 				</Button>
-				<Button type="outlined" :disabled="randomizing" @click="randomizeIcon">
+				<Button
+					type="outlined"
+					:disabled="randomizing"
+					class="disabled:!cursor-defcaault"
+					@click="randomizeIcon"
+				>
 					<SpinnerIcon v-if="randomizing" class="animate-spin" />
 					<RefreshCwIcon v-else />
 					{{ formatMessage(messages.randomizeIcon) }}

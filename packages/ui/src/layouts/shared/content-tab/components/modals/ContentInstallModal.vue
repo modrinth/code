@@ -165,6 +165,7 @@
 						v-if="props.randomizeIcon"
 						type="outlined"
 						:disabled="randomizing"
+						class="disabled:!cursor-default"
 						@click="randomizeInstanceIcon"
 					>
 						<SpinnerIcon v-if="randomizing" class="animate-spin" />
