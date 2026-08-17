@@ -402,6 +402,7 @@ export const symbolOptions = [
 
 	{ id: 'crafting_table', name: names.craftingTable, asset: craftingTable, category: 'vanilla' },
 	{ id: 'furnace', name: names.furnace, asset: furnace, category: 'vanilla' },
+	{ id: 'chest', name: names.chest, asset: chest, category: 'vanilla' },
 
 	{ id: 'bookshelf', name: names.bookshelf, asset: bookshelf, category: 'vanilla' },
 	{
@@ -416,15 +417,14 @@ export const symbolOptions = [
 		asset: stickyPiston,
 		category: 'vanilla',
 	},
+	{ id: 'slime_block', name: names.slimeBlock, asset: slimeBlock, category: 'vanilla' },
 	{ id: 'cake', name: names.cake, asset: cake, category: 'vanilla' },
 	{ id: 'campfire', name: names.campfire, asset: campfire, category: 'vanilla' },
-	{ id: 'chest', name: names.chest, asset: chest, category: 'vanilla' },
 	{ id: 'pickaxe', name: names.pickaxe, asset: pickaxe, category: 'vanilla' },
 	{ id: 'sword', name: names.sword, asset: sword, category: 'vanilla' },
 	{ id: 'zombie', name: names.zombie, asset: zombie, category: 'vanilla' },
 	{ id: 'creeper', name: names.creeper, asset: creeper, category: 'vanilla' },
 	{ id: 'skeleton', name: names.skeleton, asset: skeleton, category: 'vanilla' },
-	{ id: 'slime_block', name: names.slimeBlock, asset: slimeBlock, category: 'vanilla' },
 	{ id: 'ender_dragon', name: names.enderDragon, asset: enderDragon, category: 'vanilla' },
 	{ id: 'ender_chest', name: names.enderChest, asset: enderChest, category: 'vanilla' },
 	{ id: 'sculk_sensor', name: names.sculkSensor, asset: sculkSensor, category: 'vanilla' },
