@@ -910,6 +910,7 @@ impl Elasticsearch {
                 let mut document = hit["_source"].clone();
                 let object = document.as_object_mut()?;
                 object.remove("document_type");
+                object.remove("_search_tokens");
                 if filter
                     .as_ref()
                     .is_some_and(|filter| filter.has_version_filter)

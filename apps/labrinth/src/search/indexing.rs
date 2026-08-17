@@ -129,11 +129,22 @@ pub async fn build_project_documents(
     project_ids: &[ProjectId],
 ) -> eyre::Result<Vec<UploadSearchProject>> {
     let version_ids = HashSet::new();
-    Ok(
-        build_search_document_batch(pool, redis, project_ids, &version_ids)
-            .await?
-            .projects,
+    Ok(build_search_document_batch(
+        pool,
+        redis,
+        project_ids,
+        Some(&version_ids),
     )
+    .await?
+    .projects)
+}
+
+pub async fn build_project_and_all_version_documents(
+    pool: &PgPool,
+    redis: &RedisPool,
+    project_ids: &[ProjectId],
+) -> eyre::Result<SearchDocumentBatch> {
+    build_search_document_batch(pool, redis, project_ids, None).await
 }
 
 pub async fn build_version_change_documents(
@@ -147,14 +158,15 @@ pub async fn build_version_change_documents(
         .copied()
         .map(DBVersionId::from)
         .collect::<HashSet<_>>();
-    build_search_document_batch(pool, redis, project_ids, &version_ids).await
+    build_search_document_batch(pool, redis, project_ids, Some(&version_ids))
+        .await
 }
 
 async fn build_search_document_batch(
     pool: &PgPool,
     redis: &RedisPool,
     project_ids: &[ProjectId],
-    version_ids: &HashSet<DBVersionId>,
+    version_ids: Option<&HashSet<DBVersionId>>,
 ) -> eyre::Result<SearchDocumentBatch> {
     let searchable_statuses = searchable_statuses();
     let project_ids = project_ids
@@ -194,7 +206,7 @@ async fn build_search_document_batch(
     .await
     .wrap_err("failed to fetch project")?;
 
-    build_search_documents(pool, redis, db_projects, Some(version_ids)).await
+    build_search_documents(pool, redis, db_projects, version_ids).await
 }
 
 async fn build_search_documents(
@@ -612,231 +624,219 @@ async fn build_search_documents(
             .map(|dependency| dependency.project_id.clone())
             .collect::<Vec<_>>();
 
-        if let Some(versions) = versions.remove(&project.id) {
-            let Some(latest_version) = versions.iter().max_by(|a, b| {
-                a.date_published
-                    .cmp(&b.date_published)
-                    .then_with(|| a.id.0.cmp(&b.id.0))
-            }) else {
-                continue;
-            };
+        let versions = versions.remove(&project.id).unwrap_or_default();
+        let latest_version = versions.iter().max_by(|a, b| {
+            a.date_published
+                .cmp(&b.date_published)
+                .then_with(|| a.id.0.cmp(&b.id.0))
+        });
 
-            let project_version_fields = versions
-                .iter()
-                .flat_map(|x| x.version_fields.clone())
-                .collect::<Vec<_>>();
-            let aggregated_version_fields = VersionField::from_query_json(
-                project_version_fields,
+        let project_version_fields = versions
+            .iter()
+            .flat_map(|x| x.version_fields.clone())
+            .collect::<Vec<_>>();
+        let aggregated_version_fields = VersionField::from_query_json(
+            project_version_fields,
+            &loader_field_definitions,
+            &loader_field_enum_values,
+            true,
+        );
+        let unvectorized_loader_fields = aggregated_version_fields
+            .iter()
+            .map(|field| {
+                (field.field_name.clone(), field.value.serialize_internal())
+            })
+            .collect();
+        let mut loader_fields =
+            from_duplicate_version_fields(aggregated_version_fields);
+        let project_loader_fields = loader_fields.clone();
+
+        let mut project_loaders = versions
+            .iter()
+            .flat_map(|x| x.loaders.clone())
+            .collect::<Vec<_>>();
+        project_loaders.sort();
+        project_loaders.dedup();
+
+        let mut project_types = versions
+            .iter()
+            .flat_map(|x| x.project_types.clone())
+            .collect::<Vec<_>>();
+        project_types.sort();
+        project_types.dedup();
+        exp::compat::correct_project_types(
+            &project.components,
+            &mut project_types,
+        );
+
+        let project_id = ProjectId::from(project.id).to_string();
+        version_uploads.extend(versions.iter().filter_map(|version| {
+            if version_ids
+                .is_some_and(|version_ids| !version_ids.contains(&version.id))
+            {
+                return None;
+            }
+
+            let version_fields = VersionField::from_query_json(
+                version.version_fields.clone(),
                 &loader_field_definitions,
                 &loader_field_enum_values,
-                true,
+                false,
             );
-            let unvectorized_loader_fields = aggregated_version_fields
+            let unvectorized_loader_fields = version_fields
                 .iter()
                 .map(|field| {
                     (field.field_name.clone(), field.value.serialize_internal())
                 })
                 .collect();
-            let mut loader_fields =
-                from_duplicate_version_fields(aggregated_version_fields);
-            let project_loader_fields = loader_fields.clone();
-
-            let mut project_loaders = versions
-                .iter()
-                .flat_map(|x| x.loaders.clone())
-                .collect::<Vec<_>>();
-            project_loaders.sort();
-            project_loaders.dedup();
-
-            let mut project_types = versions
-                .iter()
-                .flat_map(|x| x.project_types.clone())
-                .collect::<Vec<_>>();
-            project_types.sort();
-            project_types.dedup();
+            let mut fields = from_duplicate_version_fields(version_fields);
+            let mut version_project_types = version.project_types.clone();
             exp::compat::correct_project_types(
                 &project.components,
-                &mut project_types,
+                &mut version_project_types,
             );
 
-            let project_id = ProjectId::from(project.id).to_string();
-            version_uploads.extend(versions.iter().filter_map(|version| {
-                if version_ids.is_some_and(|version_ids| {
-                    !version_ids.contains(&version.id)
-                }) {
-                    return None;
-                }
-
-                let version_fields = VersionField::from_query_json(
-                    version.version_fields.clone(),
-                    &loader_field_definitions,
-                    &loader_field_enum_values,
-                    false,
-                );
-                let unvectorized_loader_fields = version_fields
-                    .iter()
-                    .map(|field| {
-                        (
-                            field.field_name.clone(),
-                            field.value.serialize_internal(),
-                        )
-                    })
-                    .collect();
-                let mut fields = from_duplicate_version_fields(version_fields);
-                let mut version_project_types = version.project_types.clone();
-                exp::compat::correct_project_types(
-                    &project.components,
-                    &mut version_project_types,
-                );
-
-                // SPECIAL BEHAVIOUR
-                // Todo: revisit.
-                // For consistency with v2 searching, we consider the loader field 'mrpack_loaders' to be a category.
-                // These were previously considered the loader, and in v2, the loader is a category for searching.
-                // So to avoid breakage or awkward conversions, we just consider those loader_fields to be categories.
-                // The loaders are kept in the project document's aggregated loader fields as well, so that no information is lost on retrieval.
-                let mut version_categories = project_categories.clone();
-                version_categories.extend(version.loaders.iter().cloned());
-                let mrpack_loaders = fields
-                    .get("mrpack_loaders")
-                    .into_iter()
-                    .flatten()
-                    .filter_map(|value| value.as_str().map(String::from))
-                    .collect::<Vec<_>>();
-                version_categories.extend(mrpack_loaders);
-                if fields.contains_key("mrpack_loaders") {
-                    version_categories.retain(|category| category != "mrpack");
-                }
-                version_categories.sort();
-                version_categories.dedup();
-
-                let (_, v2_og_project_type) =
-                    LegacyProject::get_project_type(&version_project_types);
-                let (client_side, server_side) =
-                    v2_reroute::convert_v3_side_types_to_v2_side_types(
-                        &unvectorized_loader_fields,
-                        Some(&v2_og_project_type),
-                    );
-                if let Ok(client_side) = serde_json::to_value(client_side) {
-                    fields.insert("client_side".to_string(), vec![client_side]);
-                }
-                if let Ok(server_side) = serde_json::to_value(server_side) {
-                    fields.insert("server_side".to_string(), vec![server_side]);
-                }
-                fields.retain(|field, _| {
-                    matches!(
-                        field.as_str(),
-                        "environment"
-                            | "game_versions"
-                            | "client_side"
-                            | "server_side"
-                    )
-                });
-
-                Some(UploadSearchVersion {
-                    version_id: VersionId::from(version.id).to_string(),
-                    project_id: project_id.clone(),
-                    categories: version_categories,
-                    project_types: version_project_types,
-                    version_published_timestamp: version
-                        .date_published
-                        .timestamp(),
-                    loader_fields: fields,
-                })
-            }));
-
-            let mut categories = project_categories.clone();
-            categories.extend(project_loaders.iter().cloned());
-
-            let mrpack_loaders = loader_fields
+            // SPECIAL BEHAVIOUR
+            // Todo: revisit.
+            // For consistency with v2 searching, we consider the loader field 'mrpack_loaders' to be a category.
+            // These were previously considered the loader, and in v2, the loader is a category for searching.
+            // So to avoid breakage or awkward conversions, we just consider those loader_fields to be categories.
+            // The loaders are kept in the project document's aggregated loader fields as well, so that no information is lost on retrieval.
+            let mut version_categories = project_categories.clone();
+            version_categories.extend(version.loaders.iter().cloned());
+            let mrpack_loaders = fields
                 .get("mrpack_loaders")
                 .into_iter()
                 .flatten()
                 .filter_map(|value| value.as_str().map(String::from))
                 .collect::<Vec<_>>();
-            categories.extend(mrpack_loaders);
-            if loader_fields.contains_key("mrpack_loaders") {
-                categories.retain(|category| category != "mrpack");
+            version_categories.extend(mrpack_loaders);
+            if fields.contains_key("mrpack_loaders") {
+                version_categories.retain(|category| category != "mrpack");
             }
-            categories.sort();
-            categories.dedup();
+            version_categories.sort();
+            version_categories.dedup();
 
             let (_, v2_og_project_type) =
-                LegacyProject::get_project_type(&project_types);
+                LegacyProject::get_project_type(&version_project_types);
             let (client_side, server_side) =
                 v2_reroute::convert_v3_side_types_to_v2_side_types(
                     &unvectorized_loader_fields,
                     Some(&v2_og_project_type),
                 );
-
             if let Ok(client_side) = serde_json::to_value(client_side) {
-                loader_fields
-                    .insert("client_side".to_string(), vec![client_side]);
+                fields.insert("client_side".to_string(), vec![client_side]);
             }
             if let Ok(server_side) = serde_json::to_value(server_side) {
-                loader_fields
-                    .insert("server_side".to_string(), vec![server_side]);
+                fields.insert("server_side".to_string(), vec![server_side]);
             }
-
-            let components = project
-                .components
-                .clone()
-                .into_query(ProjectId::from(project.id), &project_query_context)
-                .wrap_err("failed to populate query components")?;
-            let indexed_name = normalize_for_search(&project.name);
-
-            project_uploads.push(UploadSearchProject {
-                version_id: crate::models::ids::VersionId::from(
-                    latest_version.id,
+            fields.retain(|field, _| {
+                matches!(
+                    field.as_str(),
+                    "environment"
+                        | "game_versions"
+                        | "client_side"
+                        | "server_side"
                 )
-                .to_string(),
-                project_id,
-                name: project.name,
-                indexed_name,
-                summary: project.summary,
-                categories,
-                project_categories,
-                display_categories,
-                follows: project.follows,
-                downloads: project.downloads,
-                log_downloads: (project.downloads.max(1) as f64).ln(),
-                icon_url: project.icon_url,
-                author: username.clone(),
-                author_id: ariadne::ids::UserId::from(user_id).to_string(),
-                organization: org_name,
-                organization_id: org_id.map(|id| {
-                    crate::models::ids::OrganizationId::from(id).to_string()
-                }),
-                indexed_author: normalize_for_search(&username),
-                date_created: project.approved,
-                created_timestamp: project.approved.timestamp(),
-                date_modified: project.updated,
-                modified_timestamp: project.updated.timestamp(),
-                version_published_timestamp: latest_version
-                    .date_published
-                    .timestamp(),
-                license,
-                slug: project.slug,
-                project_types: project_types.clone(),
-                all_project_types: project_types,
-                gallery,
-                featured_gallery,
-                open_source,
-                color: project.color.map(|x| x as u32),
-                dependency_project_ids,
-                compatible_dependency_project_ids,
-                required_dependency_project_ids,
-                optional_dependency_project_ids,
-                embedded_dependency_project_ids,
-                incompatible_dependency_project_ids,
-                dependencies,
-                disclosure_types,
-                project_loader_fields,
-                loader_fields,
-                loaders: project_loaders,
-                components,
             });
+
+            Some(UploadSearchVersion {
+                version_id: VersionId::from(version.id).to_string(),
+                project_id: project_id.clone(),
+                categories: version_categories,
+                project_types: version_project_types,
+                version_published_timestamp: version.date_published.timestamp(),
+                loader_fields: fields,
+            })
+        }));
+
+        let mut categories = project_categories.clone();
+        categories.extend(project_loaders.iter().cloned());
+
+        let mrpack_loaders = loader_fields
+            .get("mrpack_loaders")
+            .into_iter()
+            .flatten()
+            .filter_map(|value| value.as_str().map(String::from))
+            .collect::<Vec<_>>();
+        categories.extend(mrpack_loaders);
+        if loader_fields.contains_key("mrpack_loaders") {
+            categories.retain(|category| category != "mrpack");
         }
+        categories.sort();
+        categories.dedup();
+
+        let (_, v2_og_project_type) =
+            LegacyProject::get_project_type(&project_types);
+        let (client_side, server_side) =
+            v2_reroute::convert_v3_side_types_to_v2_side_types(
+                &unvectorized_loader_fields,
+                Some(&v2_og_project_type),
+            );
+
+        if let Ok(client_side) = serde_json::to_value(client_side) {
+            loader_fields.insert("client_side".to_string(), vec![client_side]);
+        }
+        if let Ok(server_side) = serde_json::to_value(server_side) {
+            loader_fields.insert("server_side".to_string(), vec![server_side]);
+        }
+
+        let components = project
+            .components
+            .clone()
+            .into_query(ProjectId::from(project.id), &project_query_context)
+            .wrap_err("failed to populate query components")?;
+        let indexed_name = normalize_for_search(&project.name);
+
+        project_uploads.push(UploadSearchProject {
+            version_id: latest_version.map(|version| {
+                crate::models::ids::VersionId::from(version.id).to_string()
+            }),
+            project_id,
+            name: project.name,
+            indexed_name,
+            summary: project.summary,
+            categories,
+            project_categories,
+            display_categories,
+            follows: project.follows,
+            downloads: project.downloads,
+            log_downloads: (project.downloads.max(1) as f64).ln(),
+            icon_url: project.icon_url,
+            author: username.clone(),
+            author_id: ariadne::ids::UserId::from(user_id).to_string(),
+            organization: org_name,
+            organization_id: org_id.map(|id| {
+                crate::models::ids::OrganizationId::from(id).to_string()
+            }),
+            indexed_author: normalize_for_search(&username),
+            date_created: project.approved,
+            created_timestamp: project.approved.timestamp(),
+            date_modified: project.updated,
+            modified_timestamp: project.updated.timestamp(),
+            version_published_timestamp: latest_version
+                .map(|version| version.date_published.timestamp()),
+            license,
+            slug: project.slug,
+            project_types: project_types.clone(),
+            all_project_types: project_types,
+            gallery,
+            featured_gallery,
+            open_source,
+            color: project.color.map(|x| x as u32),
+            dependency_project_ids,
+            compatible_dependency_project_ids,
+            required_dependency_project_ids,
+            optional_dependency_project_ids,
+            embedded_dependency_project_ids,
+            incompatible_dependency_project_ids,
+            dependencies,
+            disclosure_types,
+            project_loader_fields,
+            loader_fields,
+            loaders: project_loaders,
+            components,
+        });
     }
 
     Ok(SearchDocumentBatch {
