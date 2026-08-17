@@ -2224,6 +2224,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "component-derive"
+version = "0.0.0"
+dependencies = [
+ "darling 0.23.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
+]
+
+[[package]]
 name = "compression-codecs"
 version = "0.4.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5480,6 +5490,7 @@ dependencies = [
  "clickhouse",
  "color-eyre",
  "color-thief",
+ "component-derive",
  "const_format",
  "dashmap",
  "derive_more 2.1.1",
@@ -5555,16 +5566,6 @@ dependencies = [
  "yaserde",
  "zip 6.0.0",
  "zxcvbn",
-]
-
-[[package]]
-name = "labrinth-derive"
-version = "0.0.0"
-dependencies = [
- "darling 0.23.0",
- "proc-macro2",
- "quote",
- "syn 2.0.106",
 ]
 
 [[package]]

@@ -7,8 +7,8 @@ members = [
   "apps/labrinth",
   "packages/app-lib",
   "packages/ariadne",
+  "packages/component-derive",
   "packages/daedalus",
-  "packages/labrinth-derive",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
@@ -68,6 +68,7 @@ clap = "4.5.48"
 clickhouse = "0.14.0"
 color-eyre = "0.6.5"
 color-thief = "0.2.2"
+component-derive = { path = "packages/component-derive" }
 const_format = "0.2.34"
 core-foundation = "0.10.1"
 core-graphics = "0.24.0"

@@ -1,5 +1,5 @@
 [package]
-name = "labrinth-derive"
+name = "component-derive"
 edition.workspace = true
 rust-version.workspace = true
 repository.workspace = true
