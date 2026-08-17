@@ -156,7 +156,7 @@
     "message": "Advanced rendering"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Choose the color theme used by Modrinth App."
+    "message": "Choose the color theme used across Modrinth."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"

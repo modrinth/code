@@ -5129,9 +5129,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Запросы в друзья"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Скоро будет!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Все"
   },

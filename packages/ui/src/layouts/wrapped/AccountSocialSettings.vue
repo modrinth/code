@@ -422,7 +422,7 @@ const messages = defineMessages({
 	},
 	sharedInstanceInvitesTitle: {
 		id: 'settings.social.shared-instance-invites.title',
-		defaultMessage: 'Invitations',
+		defaultMessage: 'Shared instance invites',
 	},
 	sharedInstanceInvitesDescription: {
 		id: 'settings.social.shared-instance-invites.description',
@@ -430,7 +430,7 @@ const messages = defineMessages({
 	},
 	hostingAccessTitle: {
 		id: 'settings.social.hosting-access.title',
-		defaultMessage: 'Hosting access invitations',
+		defaultMessage: 'Hosting access invites',
 	},
 	hostingAccessDescription: {
 		id: 'settings.social.hosting-access.description',

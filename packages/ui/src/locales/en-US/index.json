@@ -5606,6 +5606,12 @@
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"
   },
+  "settings.preferences.update-failed.description": {
+    "defaultMessage": "Your settings could not be saved to your Modrinth account. Please try again."
+  },
+  "settings.preferences.update-failed.title": {
+    "defaultMessage": "Failed to sync settings"
+  },
   "settings.profile.bio.description": {
     "defaultMessage": "A short description to tell everyone a little bit about you."
   },
@@ -5690,8 +5696,11 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Friend requests"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Coming soon!"
+  "settings.social.hosting-access.description": {
+    "defaultMessage": "Control who can invite you to manage a Modrinth Hosting server."
+  },
+  "settings.social.hosting-access.title": {
+    "defaultMessage": "Hosting access invites"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Everyone"
@@ -5702,14 +5711,23 @@
   "settings.social.interaction-source.friends-of-friends": {
     "defaultMessage": "Friends of friends"
   },
+  "settings.social.interaction-source.loading": {
+    "defaultMessage": "Loading your preferences…"
+  },
   "settings.social.interaction-source.no-one": {
     "defaultMessage": "No one"
   },
+  "settings.social.interaction-source.saving": {
+    "defaultMessage": "Saving your preferences…"
+  },
+  "settings.social.interaction-source.unavailable": {
+    "defaultMessage": "Your preferences are currently unavailable."
+  },
   "settings.social.shared-instance-invites.description": {
-    "defaultMessage": "Control who can send you invites to shared instances and Modrinth Hosting panels."
+    "defaultMessage": "Control who can send you invites to shared instances."
   },
   "settings.social.shared-instance-invites.title": {
-    "defaultMessage": "Invitations"
+    "defaultMessage": "Shared instance invites"
   },
   "settings.social.sign-in-required.description": {
     "defaultMessage": "You can control who can interact with you, and manage blocked users with a Modrinth Account"

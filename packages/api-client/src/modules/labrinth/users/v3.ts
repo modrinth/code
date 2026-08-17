@@ -43,9 +43,7 @@ export class LabrinthUsersV3Module extends AbstractModule {
 	 *
 	 * GET /v3/user/{id}/preferences
 	 */
-	public async getPreferences(
-		idOrUsername: string,
-	): Promise<Labrinth.Users.v3.UserPreferences> {
+	public async getPreferences(idOrUsername: string): Promise<Labrinth.Users.v3.UserPreferences> {
 		return this.client.request<Labrinth.Users.v3.UserPreferences>(
 			`/user/${encodeURIComponent(idOrUsername)}/preferences`,
 			{

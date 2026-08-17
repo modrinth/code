@@ -5207,9 +5207,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Vriendschapsverzoeken"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Binnenkort beschikbaar!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Iedereen"
   },

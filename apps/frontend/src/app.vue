@@ -14,8 +14,8 @@
 import { I18nDebugPanel, injectI18n, LoadingBar, NotificationPanel } from '@modrinth/ui'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
-import { setupProviders } from '~/providers/setup.ts'
 import { isDarkTheme } from '~/plugins/theme/index.ts'
+import { setupProviders } from '~/providers/setup.ts'
 
 import { useAuth } from './composables/auth'
 
@@ -41,8 +41,7 @@ watch(
 			void setLocale(preferences.localization.locale)
 		}
 
-		cosmetics.value.searchDisplayMode.mod =
-			preferences.layouts.mods === 'rows' ? 'list' : 'grid'
+		cosmetics.value.searchDisplayMode.mod = preferences.layouts.mods === 'rows' ? 'list' : 'grid'
 		cosmetics.value.searchDisplayMode.plugin =
 			preferences.layouts.plugins === 'rows' ? 'list' : 'grid'
 		cosmetics.value.searchDisplayMode.datapack =
@@ -55,8 +54,7 @@ watch(
 			preferences.layouts.modpacks === 'rows' ? 'list' : 'grid'
 		cosmetics.value.searchDisplayMode.server =
 			preferences.layouts.servers === 'rows' ? 'list' : 'grid'
-		cosmetics.value.searchDisplayMode.user =
-			preferences.layouts.users === 'rows' ? 'list' : 'grid'
+		cosmetics.value.searchDisplayMode.user = preferences.layouts.users === 'rows' ? 'list' : 'grid'
 		cosmetics.value.rightSearchLayout = preferences.sidebars.right_aligned_search
 		cosmetics.value.leftContentLayout = preferences.sidebars.left_aligned_content
 	},

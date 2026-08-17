@@ -983,9 +983,7 @@ watch(
 		userPreferencesSync = userPreferencesSync
 			.then(async () => {
 				const settings = await getSettings()
-				const selectedTheme = preferences.appearance.auto
-					? 'system'
-					: preferences.appearance.theme
+				const selectedTheme = preferences.appearance.auto ? 'system' : preferences.appearance.theme
 				const locale = preferences.localization.locale
 
 				if (themeStore.selectedTheme !== selectedTheme) {

@@ -5298,7 +5298,7 @@
     "message": "Data Packs page"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "Select your preferred layout for each page that displays project lists on this device."
+    "message": "Select your preferred layout for each page that displays project lists."
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Mods page"
@@ -5367,7 +5367,7 @@
     "message": "Right-aligned filters sidebar on search pages"
   },
   "settings.display.theme.description": {
-    "message": "Select your preferred color theme for Modrinth on this device."
+    "message": "Select your preferred color theme across Modrinth."
   },
   "settings.display.theme.title": {
     "message": "Color theme"

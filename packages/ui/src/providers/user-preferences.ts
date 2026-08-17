@@ -31,8 +31,7 @@ const messages = defineMessages({
 	},
 	updateFailedDescription: {
 		id: 'settings.preferences.update-failed.description',
-		defaultMessage:
-			'Your settings could not be saved to your Modrinth account. Please try again.',
+		defaultMessage: 'Your settings could not be saved to your Modrinth account. Please try again.',
 	},
 })
 

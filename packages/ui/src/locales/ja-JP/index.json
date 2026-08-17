@@ -4889,9 +4889,6 @@
   "settings.social.blocked-users.unblock": {
     "defaultMessage": "ブロックを解除"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "近日公開！"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "全員"
   },

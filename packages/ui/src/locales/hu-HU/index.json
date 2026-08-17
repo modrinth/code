@@ -4394,9 +4394,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Barátkérelmek"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Hamarosan érkezik!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Bárki"
   },
