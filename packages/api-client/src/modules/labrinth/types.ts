@@ -1884,6 +1884,7 @@ export namespace Labrinth {
 				license: string
 				client_side: string
 				server_side: string
+				disclosure_types: string[]
 				gallery: string[]
 				featured_gallery: string | null
 				color: number | null
@@ -1929,6 +1930,7 @@ export namespace Labrinth {
 				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
 				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
 				minecraft_mod?: unknown | null
+				disclosure_types: string[]
 			}
 
 			export interface SearchResults {

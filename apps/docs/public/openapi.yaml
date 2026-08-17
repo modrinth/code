@@ -429,6 +429,25 @@ components:
         - unknown
       example: client_and_server
       description: 'The environment a project or version supports. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
+    DisclosureTypeEnum:
+      type: string
+      enum:
+        - ai_content
+        - ai_content_code
+        - ai_content_assets
+        - ai_content_text
+        - ai_content_functionality
+        - advertisements
+        - epilepsy_triggers
+        - system_interactions
+        - telemetry
+        - telemetry_opt_in
+        - telemetry_opt_out
+        - telemetry_always_active
+        - derivative_work
+        - paid_features
+        - archived
+      example: ai_content_code
     EnvironmentInputEnum:
       type: string
       enum:
@@ -727,6 +746,12 @@ components:
             $ref: '#/components/schemas/EnvironmentEnum'
           description: 'All the environments that versions of this project support. Not in any particular order, we recommend using the environment information on a version instead. For an explanation of each environment, see the blog post here: https://modrinth.com/news/article/new-environments/#new-system'
           example: [client_and_server]
+        disclosure_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisclosureTypeEnum'
+          description: Disclosures listed on the project.
+          example: [ai_content, ai_content_code, advertisements]
         gallery:
           type: array
           description: A list of images that have been uploaded to the project's gallery
@@ -796,6 +821,7 @@ components:
         - latest_version
         - license
         - environment
+        - disclosure_types
         - gallery
         - client_side
         - server_side
@@ -2160,7 +2186,33 @@ paths:
             - `categories` (loaders are lumped in with categories in search)
             - `versions`
             - `open_source`
-            - `environment`
+            - `environment` (one of the following values)
+              - `client_and_server`
+              - `client_only`
+              - `client_only_server_optional`
+              - `singleplayer_only`
+              - `server_only`
+              - `server_only_client_optional`
+              - `dedicated_server_only`
+              - `client_or_server`
+              - `client_or_server_prefers_both`
+              - `unknown`
+            - `disclosure_types` (list of any of the following values)
+              - `ai_content`
+              - `ai_content_code`
+              - `ai_content_assets`
+              - `ai_content_text`
+              - `ai_content_functionality`
+              - `advertisements`
+              - `epilepsy_triggers`
+              - `system_interactions`
+              - `telemetry`
+              - `telemetry_opt_in`
+              - `telemetry_opt_out`
+              - `telemetry_always_active`
+              - `derivative_work`
+              - `paid_features`
+              - `archived`
             - `client_side` (deprecated - use `environment` instead)
             - `server_side` (deprecated - use `environment` instead)
 
