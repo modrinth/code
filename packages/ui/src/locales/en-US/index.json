@@ -3995,8 +3995,14 @@
   "report.item-type.version": {
     "defaultMessage": "version"
   },
+  "report.type.ai-images": {
+    "defaultMessage": "AI-generated images in icon, gallery, or description"
+  },
   "report.type.copyright": {
     "defaultMessage": "Reuploaded work"
+  },
+  "report.type.fully-ai-generated": {
+    "defaultMessage": "Fully AI-generated project"
   },
   "report.type.inappropriate": {
     "defaultMessage": "Inappropriate"
