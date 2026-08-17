@@ -246,10 +246,10 @@ export function createServerInstall(opts: {
 				project_id: contentProjectId,
 				version_id: contentVersionId,
 				title: project.title,
+				icon_url: project.icon_url,
 			},
 			{
 				name: project.title,
-				iconPath: project.icon_url ?? null,
 				link: {
 					type: 'server_project_modpack',
 					server_project_id: serverProjectId,
