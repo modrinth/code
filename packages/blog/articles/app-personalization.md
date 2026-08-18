@@ -78,7 +78,7 @@ We’ve released an initial set of backgrounds and symbols, with more to come ov
 - Botania
 - Blåhaj
 
-![The updated instance creation menu, with a search bar to browse for content and four options to create a custom instance, go to the full discover page, upload a .mrpack, or import from another launcher.](./instance-creation.webp)
+![The new icon editor, where you can select a background color and a symbol of iconic modded and vanilla blocks and items to combine together into a new icon for your instance.](./icon-editor.webp)
 
 ## Onboarding
 
