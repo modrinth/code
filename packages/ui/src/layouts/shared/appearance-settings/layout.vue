@@ -65,7 +65,7 @@ const sidebarPreferenceValues = sidebarPreferences?.value
 					>
 						<Toggle
 							id="sync-theme-across-devices"
-							:model-value="syncAcrossDevices"
+							:model-value="syncDisabled ? false : syncAcrossDevices"
 							:disabled="syncDisabled"
 							:aria-labelledby="labelledBy"
 							@update:model-value="theme.syncAcrossDevices.update"

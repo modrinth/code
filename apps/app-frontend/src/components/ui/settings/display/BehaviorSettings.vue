@@ -164,7 +164,7 @@ watch(
 			>
 				<Toggle
 					id="sync-behavior-across-devices"
-					:model-value="appSettings.syncBehaviorAcrossDevices"
+					:model-value="Boolean(auth.user.value) && appSettings.syncBehaviorAcrossDevices"
 					:disabled="!auth.user.value"
 					aria-labelledby="sync-behavior-across-devices-label"
 					@update:model-value="setSyncBehaviorAcrossDevices"

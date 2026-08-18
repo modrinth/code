@@ -19,8 +19,8 @@ export const appearanceSettingsMessages = defineMessages({
 			"Use this theme everywhere you're signed in. Turn this off to keep a separate theme on this device.",
 	},
 	syncAcrossDevicesSignedOutTooltip: {
-		id: 'settings.display.theme.sync-across-devices.signed-out-tooltip',
-		defaultMessage: 'Sign into a Modrinth account to sync settings.',
+		id: 'settings.display.theme.sync-across-devices.sign-in-tooltip',
+		defaultMessage: 'Sign into Modrinth to sync theme',
 	},
 	projectListLayoutsTitle: {
 		id: 'settings.display.project-list-layouts.title',
