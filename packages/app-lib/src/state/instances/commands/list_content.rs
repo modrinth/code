@@ -929,10 +929,7 @@ async fn content_files_to_content_items(
                     &meta.versions_v3,
                 ),
                 owner,
-                has_update: file.update_version_id.is_some()
-                    && !file.source_kind.is_some_and(
-                        ContentSourceKind::is_shared_instance_managed,
-                    ),
+                has_update: file.update_version_id.is_some(),
                 update_version_id: file.update_version_id.clone(),
                 date_added: modification_times[index].clone(),
                 source_kind: file.source_kind,
