@@ -14,70 +14,72 @@
 			</span>
 		</Card>
 	</div>
-	<div v-if="expandedGalleryItem" class="expanded-image-modal" @click="hideImage">
-		<div class="content">
-			<img
-				class="image"
-				:class="{ 'zoomed-in': zoomedIn }"
-				:src="
-					expandedGalleryItem.raw_url
-						? expandedGalleryItem.raw_url
-						: 'https://cdn.modrinth.com/placeholder-banner.svg'
-				"
-				:alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
-				@click.stop="() => {}"
-			/>
+	<Teleport to="#teleports">
+		<div v-if="expandedGalleryItem" class="expanded-image-modal" @click="hideImage">
+			<div class="content">
+				<img
+					class="image"
+					:class="{ 'zoomed-in': zoomedIn }"
+					:src="
+						expandedGalleryItem.raw_url
+							? expandedGalleryItem.raw_url
+							: 'https://cdn.modrinth.com/placeholder-banner.svg'
+					"
+					:alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
+					@click.stop="() => {}"
+				/>
 
-			<div class="floating" @click.stop="() => {}">
-				<div class="text">
-					<h2 v-if="expandedGalleryItem.title">
-						{{ expandedGalleryItem.title }}
-					</h2>
-					<p v-if="expandedGalleryItem.description">
-						{{ expandedGalleryItem.description }}
-					</p>
-				</div>
-				<div class="controls">
-					<div class="buttons">
-						<IconButton label="Close" class="close" @click="hideImage">
-							<XIcon aria-hidden="true" />
-						</IconButton>
-						<ButtonLink
-							class="open btn icon-only !w-9 !px-0 !rounded-full"
-							target="_blank"
-							:href="
-								expandedGalleryItem.raw_url
-									? expandedGalleryItem.raw_url
-									: 'https://cdn.modrinth.com/placeholder-banner.svg'
-							"
-						>
-							<ExternalIcon aria-hidden="true" />
-						</ButtonLink>
-						<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
-							<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-							<ContractIcon v-else aria-hidden="true" />
-						</IconButton>
-						<IconButton
-							v-if="filteredGallery.length > 1"
-							label="Previous image"
-							class="previous"
-							@click="previousImage()"
-						>
-							<LeftArrowIcon aria-hidden="true" />
-						</IconButton>
-						<IconButton
-							v-if="filteredGallery.length > 1"
-							label="Next image"
-							class="next"
-							@click="nextImage()"
-						>
-							<RightArrowIcon aria-hidden="true" />
-						</IconButton>
+				<div class="floating" @click.stop="() => {}">
+					<div class="text">
+						<h2 v-if="expandedGalleryItem.title">
+							{{ expandedGalleryItem.title }}
+						</h2>
+						<p v-if="expandedGalleryItem.description">
+							{{ expandedGalleryItem.description }}
+						</p>
+					</div>
+					<div class="controls">
+						<div class="buttons">
+							<IconButton label="Close" class="close" @click="hideImage">
+								<XIcon aria-hidden="true" />
+							</IconButton>
+							<ButtonLink
+								class="open btn icon-only !w-9 !px-0 !rounded-full"
+								target="_blank"
+								:href="
+									expandedGalleryItem.raw_url
+										? expandedGalleryItem.raw_url
+										: 'https://cdn.modrinth.com/placeholder-banner.svg'
+								"
+							>
+								<ExternalIcon aria-hidden="true" />
+							</ButtonLink>
+							<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
+								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+								<ContractIcon v-else aria-hidden="true" />
+							</IconButton>
+							<IconButton
+								v-if="filteredGallery.length > 1"
+								label="Previous image"
+								class="previous"
+								@click="previousImage()"
+							>
+								<LeftArrowIcon aria-hidden="true" />
+							</IconButton>
+							<IconButton
+								v-if="filteredGallery.length > 1"
+								label="Next image"
+								class="next"
+								@click="nextImage()"
+							>
+								<RightArrowIcon aria-hidden="true" />
+							</IconButton>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</Teleport>
 </template>
 
 <script setup>
