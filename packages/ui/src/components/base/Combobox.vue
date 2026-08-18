@@ -478,7 +478,7 @@ function setInitialFocus() {
 
 function determineOpenDirection(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: { width: number; height: number },
 	viewport: ViewportRect,
 ): 'up' | 'down' {
 	if (props.forceDirection) {
@@ -499,7 +499,7 @@ function determineOpenDirection(
 
 function calculateVerticalPosition(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: { width: number; height: number },
 	direction: 'up' | 'down',
 	viewport: ViewportRect,
 ): number {
@@ -513,7 +513,7 @@ function calculateVerticalPosition(
 
 function calculateHorizontalPosition(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: { width: number; height: number },
 	viewport: ViewportRect,
 ): number {
 	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
@@ -556,7 +556,7 @@ async function updateDropdownPosition() {
 	await nextTick()
 
 	const triggerRect = effectiveTriggerEl.value.getBoundingClientRect()
-	const width = resolveDropdownWidth(triggerRect.width)
+	const width = resolveDropdownWidth(effectiveTriggerEl.value.offsetWidth)
 	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
 
 	dropdownStyle.value = {
@@ -567,7 +567,10 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const dropdownRect = dropdownRef.value.getBoundingClientRect()
+	const dropdownRect = {
+		width: dropdownRef.value.offsetWidth,
+		height: dropdownRef.value.offsetHeight,
+	}
 	const viewport = getViewportRect()
 
 	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
