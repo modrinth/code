@@ -107,14 +107,29 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Biblioteca"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Página de inicio predeterminada"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Desactiva la etiqueta arriba de tu personaje en la página de skins."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar etiqueta de nombre"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Volver a jugar en tus mundos"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimiza el lanzador cuando se inicia un proceso de Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimizar lanzador"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Usa el marco de ventana del sistema (requiere reiniciar la aplicación)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Decoraciones nativas"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Muestra cuánto tiempo has estado jugando en una instancia."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostrar tiempo de juego"
@@ -437,15 +452,6 @@
   "app.skins.sign-in.button": {
     "message": "Iniciar Sesión"
   },
-  "app.skins.sign-in.description": {
-    "message": "Por favor, inicia sesión con tu cuenta de Minecraft para usar las funciones del administrador de Skins de la app de Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Modrinth Bot emocionado"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Por favor, inicia sesión"
-  },
   "app.skins.title": {
     "message": "Selector de Skin"
   },
@@ -493,9 +499,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Desconectado"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} en línea"
   },
   "friends.action.add-friend": {
     "message": "Agrega a un amigo"
@@ -652,18 +655,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Seleccionar icono"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupos de librerías"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Crear un nuevo grupo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Los grupos de librerías te permiten organizar tus instancias en diferentes secciones en tu librería."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Inserta nombre de grupo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nombre"

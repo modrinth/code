@@ -154,7 +154,7 @@ async fn restore_instance_metadata(
     .await?;
     instance_rows::replace_instance_groups(
         &metadata.instance.id,
-        &metadata.groups,
+        &metadata.group_ids,
         &mut tx,
     )
     .await?;

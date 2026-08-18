@@ -1,5 +1,6 @@
 use crate::state::instances::{
-    ContentSourceKind, Instance, InstanceLaunchOverrides, InstanceLink,
+    ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
+    InstanceLink,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
@@ -21,8 +22,14 @@ pub struct EditInstance {
         with = "serde_with::rust::double_option"
     )]
     pub icon_path: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub icon_config: Option<Option<InstanceIconConfig>>,
     pub update_channel: Option<ReleaseChannel>,
-    pub groups: Option<Vec<String>>,
+    pub group_ids: Option<Vec<String>>,
     pub link: Option<InstanceLink>,
     pub launch_overrides: Option<InstanceLaunchOverridesPatch>,
     pub content_set_patch: Option<AppliedContentSetPatch>,
@@ -174,13 +181,29 @@ pub(crate) async fn edit_instance(
             .await?;
     }
 
-    if let Some(groups) = &patch.groups {
-        instance_rows::replace_instance_groups(&instance.id, groups, &mut tx)
-            .await?;
+    if let Some(group_ids) = &patch.group_ids {
+        instance_rows::replace_instance_groups(
+            &instance.id,
+            group_ids,
+            &mut tx,
+        )
+        .await?;
     }
 
     if let Some(overrides) = launch_overrides.as_mut() {
         instance_rows::upsert_instance_launch_overrides(overrides, &mut tx)
+            .await?;
+    }
+
+    if let Some(icon_config) = &patch.icon_config {
+        instance_rows::update_instance_icon_config(
+            &instance.id,
+            icon_config.as_ref(),
+            &mut tx,
+        )
+        .await?;
+    } else if patch.icon_path.is_some() {
+        instance_rows::update_instance_icon_config(&instance.id, None, &mut tx)
             .await?;
     }
 

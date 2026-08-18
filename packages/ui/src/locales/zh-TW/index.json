@@ -707,9 +707,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "搜尋遊戲版本..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "移除圖示"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "選擇圖示"
   },
@@ -872,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "清除全部"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "瀏覽模組包"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "匯入模組包"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "已經選好想要安裝的模組包了嗎？"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "找不到結果"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "搜尋模組包"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "實例是指具有特定載入器、版本及模組的 Minecraft 設定。"
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "從頭開始，先選擇載入器與遊戲版本。"
   },
@@ -922,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "選擇世界類型"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "選擇模組包"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "建立實例"
@@ -2057,14 +2033,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "找不到相容的實例"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "移除圖示"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜尋實例"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "選擇圖示"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
@@ -4622,9 +4592,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已經有伺服器了嗎？"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "深入了解 Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4633,9 +4600,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "安裝模組、邀請好友並一起暢玩，這一切都能在 Modrinth App 中輕鬆完成。"
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "目前還沒有伺服器"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "挑選你喜愛的模組，剩下的就交給我們處理。"
@@ -4651,12 +4615,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "登入"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "設定伺服器就像建立單人遊戲世界一樣簡單。"
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "簡單設定"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "已複製"

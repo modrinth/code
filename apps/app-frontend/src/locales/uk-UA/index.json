@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Колірна тема"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Оберіть сторінку, яка показуватиметься при відкритті Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Головна"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Бібліотека"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Усталена цільова сторінка"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Приховати ваш нікнейм над попереднім переглядом гравця на сторінці вибору skin."
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "Головна"
   },
-  "app.nav.library": {
-    "message": "Бібліотека"
-  },
   "app.nav.modrinth-account": {
     "message": "Обліковий запис Modrinth"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "Увійдіть"
   },
-  "app.skins.sign-in.description": {
-    "message": "Будь ласка, увійдіть у свій обліковий запис Minecraft, щоб використовувати особливості керування скінами в Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Схвильований бот Modrinth"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Увійдіть"
-  },
   "app.skins.title": {
     "message": "Вибір скіну"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Не в мережі"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} у мережі"
   },
   "content.shared-instance.change-version-body": {
     "message": "Зміна версії впливає лише на вашу локальну копію. Майбутні оновлення спільної збірки можуть відновити або знову змінити її."
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Вибрати значок"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Групи бібліотеки"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Створити нову групу"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Групи бібліотеки дозволяють вам упорядковувати профілі в різні секції у вашій бібліотеці."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Уведіть назву групи"
   },
   "instance.settings.tabs.general.name": {
     "message": "Назва"

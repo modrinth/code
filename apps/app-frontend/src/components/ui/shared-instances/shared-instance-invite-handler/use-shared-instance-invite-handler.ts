@@ -225,22 +225,21 @@ export function useSharedInstanceInviteHandler(
 
 		displayedNotificationKeys.add(notificationKey)
 		const popupNotification = popupNotificationManager.addPopupNotification({
+			contentType: 'toast',
 			title: invite.sharedInstanceName,
+			type: 'instance-invite',
+			actorName: invite.invitedByUsername,
+			actorAvatarUrl: invite.invitedByAvatarUrl ?? undefined,
+			entityName: invite.sharedInstanceName,
+			entityIconUrl: invite.instanceIconUrl ?? undefined,
 			autoCloseMs: null,
-			toast: {
-				type: 'instance-invite',
-				actorName: invite.invitedByUsername,
-				actorAvatarUrl: invite.invitedByAvatarUrl ?? undefined,
-				entityName: invite.sharedInstanceName,
-				entityIconUrl: invite.instanceIconUrl ?? undefined,
-				onAccept: () => acceptNotification(notification, invite),
-				onDecline: () =>
-					markNotificationRead(notification).catch((error) => handleError(toError(error))),
-				onOpenActor: () => {
-					if (invite.invitedByUsername) {
-						void router.push(`/user/${encodeURIComponent(invite.invitedByUsername)}`)
-					}
-				},
+			onAccept: () => acceptNotification(notification, invite),
+			onDecline: () =>
+				markNotificationRead(notification).catch((error) => handleError(toError(error))),
+			onOpenActor: () => {
+				if (invite.invitedByUsername) {
+					void router.push(`/user/${encodeURIComponent(invite.invitedByUsername)}`)
+				}
 			},
 		})
 		popupNotificationIds.add(popupNotification.id)

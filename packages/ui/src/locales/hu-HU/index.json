@@ -620,9 +620,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Játékverzió keresése..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Ikon eltávolítása"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Ikon feltöltése"
   },
@@ -797,9 +794,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Modcsomag keresése"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "A játékprofil egy külön Minecraft-környezet egy adott modbetöltővel, verzióval és modokkal."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Kezdés alapoktól: válassz betöltőt és játékverziót."
   },
@@ -832,9 +826,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Világ típusa"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modcsomag kiválasztása"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Játékprofil létrehozása"
@@ -1709,14 +1700,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nem található kompatibilis profil"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Ikon eltávolítása"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Profilok keresése"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Ikon feltöltése"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"
@@ -3910,9 +3895,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Telepíts modokat, hívd meg a barátaidat, és játsszatok együtt, mindezt a Modrinth Appban."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Még nincsenek szerverek"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Válaszd ki a kedvenc modjaidat, a többit bízd ránk!"

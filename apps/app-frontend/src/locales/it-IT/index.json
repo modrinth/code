@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Scegli la pagina che Modrinth App mostrerà all'avvio."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Libreria"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Pagina di avvio"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Nasconde il tuo nome dalle anteprime della pagina delle Skin."
@@ -758,9 +752,6 @@
   "app.nav.home": {
     "message": "Home"
   },
-  "app.nav.library": {
-    "message": "Libreria"
-  },
   "app.nav.modrinth-account": {
     "message": "Account Modrinth"
   },
@@ -1145,15 +1136,6 @@
   "app.skins.sign-in.button": {
     "message": "Accedi"
   },
-  "app.skins.sign-in.description": {
-    "message": "Accedi col tuo account Minecraft per poter gestire le skin qui."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Modrinth Bot emozionato"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Effettua l'accesso"
-  },
   "app.skins.title": {
     "message": "Seleziona una skin"
   },
@@ -1225,9 +1207,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Modificare la versione cambia solo la copia locale. Gli aggiornamenti condivisi futuri potrebbero rimodificarla."
@@ -1534,18 +1513,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Scegli un'icona"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Gruppi della libreria"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Crea nuovo gruppo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "I gruppi della libreria ti permettono di organizzare le tue istanze in più sezioni nella tua libreria."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Inserisci il nome del gruppo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nome"

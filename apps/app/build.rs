@@ -141,6 +141,14 @@ fn main() {
                     ),
             )
             .plugin(
+                "onboarding-checklist",
+                InlinedPlugin::new()
+                    .commands(&["get_onboarding_checklist"])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "install",
                 InlinedPlugin::new()
                     .commands(&[
@@ -208,6 +216,12 @@ fn main() {
                         "instance_get_full_path",
                         "instance_get_mod_full_path",
                         "instance_list",
+                        "instance_list_groups",
+                        "instance_create_group",
+                        "instance_rename_group",
+                        "instance_delete_group",
+                        "instance_set_group_order",
+                        "instance_set_group_memberships",
                         "instance_check_installed",
                         "instance_update_all",
                         "instance_update_project",
@@ -225,6 +239,9 @@ fn main() {
                         "instance_kill",
                         "instance_edit",
                         "instance_edit_icon",
+                        "instance_edit_generated_icon",
+                        "instance_cache_generated_icon",
+                        "instance_get_recent_icon_configs",
                         "instance_share_can_current_user_use",
                         "instance_share_get_users",
                         "instance_share_invite_users",

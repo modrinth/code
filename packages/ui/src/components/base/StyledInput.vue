@@ -90,7 +90,7 @@
 			v-if="!multiline && clearable && model && !disabled && !readonly && variant === 'filled'"
 			type="button"
 			class="absolute right-0.5 z-[1] p-2 touch-manipulation bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer select-none"
-			aria-label="Clear input"
+			:aria-label="formatMessage(messages.clearInput)"
 			@click="clear"
 		>
 			<XIcon class="h-5 w-5" />
@@ -101,7 +101,7 @@
 			v-if="!multiline && variant === 'outlined'"
 			type="button"
 			class="flex touch-manipulation items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
-			:aria-label="clearable && model ? 'Clear input' : 'Search'"
+			:aria-label="formatMessage(clearable && model ? messages.clearInput : messages.search)"
 			:tabindex="clearable && model ? undefined : -1"
 			@click="clearable && model ? clear() : undefined"
 		>
@@ -118,6 +118,14 @@
 <script setup lang="ts">
 import { SearchIcon, XIcon } from '@modrinth/assets'
 import { type Component, computed, ref } from 'vue'
+
+import { defineMessages, useVIntl } from '../../composables/i18n'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	clearInput: { id: 'input.clear', defaultMessage: 'Clear input' },
+	search: { id: 'input.search', defaultMessage: 'Search' },
+})
 
 const RING = {
 	error: 'ring-4 ring-red focus:ring-4 focus:ring-red',
@@ -184,6 +192,10 @@ const resizeClass = computed(
 
 defineExpose({
 	focus: () => inputRef.value?.focus(),
+	select: () => {
+		inputRef.value?.focus()
+		inputRef.value?.select()
+	},
 	setValue: (v: string) => {
 		if (inputRef.value) inputRef.value.value = v
 	},

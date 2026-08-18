@@ -8,13 +8,14 @@ export type GameInstance = {
 
 	name: string
 	icon_path?: string
+	icon_config?: InstanceIconConfig | null
 
 	game_version: string
 	protocol_version?: number
 	loader: InstanceLoader
 	loader_version?: string
 
-	groups: string[]
+	group_ids: string[]
 
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null
@@ -36,6 +37,22 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+}
+
+export type IconBackground =
+	| {
+			type: 'color'
+			value: string
+	  }
+	| {
+			type: 'linear-top-down-gradient'
+			top_color: string
+			bottom_color: string
+	  }
+
+export type InstanceIconConfig = {
+	background: IconBackground
+	symbol: string
 }
 
 type InstallStage =
@@ -201,8 +218,6 @@ type AppSettings = {
 	discord_rpc: boolean
 	developer_mode: boolean
 	personalized_ads: boolean
-
-	onboarded: boolean
 
 	extra_launch_args: string[]
 	custom_env_vars: [string, string][]

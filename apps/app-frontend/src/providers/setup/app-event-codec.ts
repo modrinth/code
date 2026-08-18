@@ -220,6 +220,10 @@ export function decodeAppEvent(payload: ArrayBuffer): AppEvent {
 				return { type: event.tag, payload: normalizeProcessPayload(event.value) }
 			case 'instance':
 				return { type: event.tag, payload: normalizeInstancePayload(event.value) }
+			case 'instance_groups_changed':
+				return { type: event.tag, payload: wireObject(event.value) }
+			case 'onboarding_checklist':
+				return { type: event.tag, payload: wireObject(event.value) }
 			case 'instance_bulk_update_progress':
 				return { type: event.tag, payload: normalizeBulkUpdatePayload(event.value) }
 			case 'install_job':
