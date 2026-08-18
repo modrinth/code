@@ -20,7 +20,7 @@
 					<ButtonLink
 						v-else-if="item.link ?? item.to"
 						type="quiet"
-						interaction="surface"
+						:interaction="isActive(item as NavStackLinkItem) ? 'none' : 'surface'"
 						:to="(item.link ?? item.to) as string"
 						class="nav-item !h-auto !w-full !justify-start !rounded-xl !px-4 !py-2.5 text-left leading-tight"
 						:class="{ 'is-active': isActive(item as NavStackLinkItem) }"
