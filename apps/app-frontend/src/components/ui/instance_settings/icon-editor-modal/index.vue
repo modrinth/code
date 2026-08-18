@@ -24,6 +24,7 @@ import {
 	backgroundOptions,
 	DEFAULT_BACKGROUND_ID,
 	DEFAULT_SYMBOL_ID,
+	RANDOM_CONFIG_BLACKLIST,
 	type SymbolId,
 	symbolOptions,
 } from './editor-catalog'
@@ -197,17 +198,23 @@ function selectRecent(config: InstanceIconConfig) {
 }
 
 function surpriseMe() {
-	const currentBackgroundIndex = backgroundOptions.findIndex(
-		(option) => option.id === selectedBackground.value,
+	const configurations = backgroundOptions.flatMap((background) =>
+		symbolOptions
+			.filter(
+				(symbol) =>
+					background.id !== selectedBackground.value &&
+					symbol.id !== selectedSymbol.value &&
+					!RANDOM_CONFIG_BLACKLIST.some(
+						(config) => config.background === background.id && config.symbol === symbol.id,
+					),
+			)
+			.map((symbol) => ({ background: background.id, symbol: symbol.id })),
 	)
-	const backgroundOffset = Math.floor(Math.random() * (backgroundOptions.length - 1)) + 1
-	selectedBackground.value =
-		backgroundOptions[(currentBackgroundIndex + backgroundOffset) % backgroundOptions.length].id
+	const configuration = configurations[Math.floor(Math.random() * configurations.length)]
 
-	const currentSymbolIndex = symbolOptions.findIndex((option) => option.id === selectedSymbol.value)
-	const symbolOffset = Math.floor(Math.random() * (symbolOptions.length - 1)) + 1
-	selectedSymbol.value =
-		symbolOptions[(currentSymbolIndex + symbolOffset) % symbolOptions.length].id
+	if (!configuration) return
+	selectedBackground.value = configuration.background
+	selectedSymbol.value = configuration.symbol
 }
 
 async function loadRecents() {

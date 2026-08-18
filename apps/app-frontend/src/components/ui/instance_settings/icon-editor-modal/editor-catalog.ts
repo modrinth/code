@@ -191,9 +191,9 @@ const names = defineMessages({
 		defaultMessage: 'Tiny Potato',
 	},
 	tire: { id: 'instance.icon-editor.symbol.tire', defaultMessage: 'Tire' },
-	wrench: { id: 'instance.icon-editor.symbol.wrench', defaultMessage: 'Wrench' },
+	wrench: { id: 'instance.icon-editor.symbol.create-wrench', defaultMessage: 'Wrench' },
 	wrenchRinth: {
-		id: 'instance.icon-editor.symbol.wrench1',
+		id: 'instance.icon-editor.symbol.wrenth-rinth',
 		defaultMessage: 'Modrinth Wrench',
 	},
 	zombie: { id: 'instance.icon-editor.symbol.zombie', defaultMessage: 'Zombie' },
@@ -370,7 +370,7 @@ export const symbolOptions = [
 	{ id: 'moobloom', name: names.moobloom, asset: moobloom, category: 'modded' },
 
 	// Create: Wrench, Cogwheel
-	{ id: 'wrench', name: names.wrench, asset: wrench, category: 'modded' },
+	{ id: 'create_wrench', name: names.wrench, asset: wrench, category: 'modded' },
 	{ id: 'cogwheel', name: names.cogwheel, asset: cogwheel, category: 'modded' },
 
 	// Create Aeronautics: Engine, Tire
@@ -391,7 +391,7 @@ export const symbolOptions = [
 	{ id: 'terminal', name: names.terminal, asset: terminal, category: 'modded' },
 
 	// Miscellaneous: Modrinth Wrench, Mr Pack
-	{ id: 'wrench1', name: names.wrenchRinth, asset: wrenchRinth, category: 'modded' },
+	{ id: 'wrenth_rinth', name: names.wrenchRinth, asset: wrenchRinth, category: 'modded' },
 	{ id: 'mr_pack', name: names.mrPack, asset: mrPack, category: 'modded' },
 
 	/////////////////////////
@@ -442,6 +442,25 @@ export const symbolOptions = [
 
 export type BackgroundId = (typeof backgroundOptions)[number]['id']
 export type SymbolId = (typeof symbolOptions)[number]['id']
+
+export const RANDOM_CONFIG_BLACKLIST = [
+	{ background: 'purple', symbol: 'globe' },
+	{ background: 'blue', symbol: 'globe' },
+	{ background: 'gray', symbol: 'cogwheel' },
+	{ background: 'dark_gray', symbol: 'cogwheel' },
+	{ background: 'rose', symbol: 'poke_ball' },
+	{ background: 'lime', symbol: 'slime_block' },
+	{ background: 'green', symbol: 'slime_block' },
+	{ background: 'rose', symbol: 'redstone_block' },
+	{ background: 'rose', symbol: 'couch' },
+	{ background: 'orange', symbol: 'space_helmet' },
+	{ background: 'rose', symbol: 'tnt' },
+	{ background: 'yellow', symbol: 'moobloom' },
+	{ background: 'green', symbol: 'wrenth_rinth' },
+	{ background: 'lime', symbol: 'mr_pack' },
+	{ background: 'light_gray', symbol: 'skillet' },
+	{ background: 'light_gray', symbol: 'cooking_pot' },
+] satisfies readonly { background: BackgroundId; symbol: SymbolId }[]
 
 export const DEFAULT_BACKGROUND_ID = 'purple' satisfies BackgroundId
 export const DEFAULT_SYMBOL_ID = 'grass_block' satisfies SymbolId
