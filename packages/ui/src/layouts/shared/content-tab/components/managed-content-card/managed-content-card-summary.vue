@@ -23,8 +23,8 @@ const messages = defineMessages({
 		defaultMessage: 'Loading managed content summary',
 	},
 	empty: {
-		id: 'content.managed-card.summary.empty',
-		defaultMessage: 'No managed content',
+		id: 'content.managed-card.summary.no-provided-content',
+		defaultMessage: 'No provided content',
 	},
 	installing: {
 		id: 'content.managed-card.summary.installing',

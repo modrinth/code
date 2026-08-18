@@ -33,7 +33,7 @@
 				:ping="ping"
 				:minecraft-server="minecraftServer"
 				:show-instance-play-time="showInstancePlayTime"
-				:playtime-label="playtimeLabel"
+				:playtime-label="playtimeLabel ?? formatMessage(messages.neverPlayed)"
 			/>
 			<PageHeaderMetadata v-else>
 				<PageHeaderMetadataItem
