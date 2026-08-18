@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { defineMessages, Toggle, useVIntl } from '@modrinth/ui'
+import { defineMessages, injectAuth, injectUserPreferences, Toggle, useVIntl } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
+import { type FeatureFlag, useAppSettings } from '@/composables/use-app-settings.ts'
 import { get, set } from '@/helpers/settings.ts'
-import { useTheming } from '@/store/state'
-import type { FeatureFlag } from '@/store/theme.ts'
 
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
+const auth = injectAuth()
+const { updatePreferences } = injectUserPreferences()
 
 const worldsInHomeFlag: FeatureFlag = 'worlds_in_home'
 const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
@@ -15,6 +16,19 @@ const skipUnknownPackWarningFlag: FeatureFlag = 'skip_unknown_pack_warning'
 const showPlayTimeFlag: FeatureFlag = 'show_instance_play_time'
 
 const messages = defineMessages({
+	syncAcrossDevicesTitle: {
+		id: 'app.behavior-settings.sync-across-devices.title',
+		defaultMessage: 'Sync behavior across devices',
+	},
+	syncAcrossDevicesDescription: {
+		id: 'app.behavior-settings.sync-across-devices.description',
+		defaultMessage:
+			"Use these behavior settings everywhere you're signed in. Turn this off to keep separate settings on this device.",
+	},
+	syncAcrossDevicesSignedOutTooltip: {
+		id: 'app.behavior-settings.sync-across-devices.signed-out-tooltip',
+		defaultMessage: 'Sign into a Modrinth account to sync settings.',
+	},
 	startupAndNavigationTitle: {
 		id: 'app.behavior-settings.startup-and-navigation.title',
 		defaultMessage: 'Startup and navigation',
@@ -98,16 +112,68 @@ const messages = defineMessages({
 
 const settings = ref(await get())
 
+function syncBehaviorPreferences() {
+	return updatePreferences({
+		behavior: {
+			minimize_app: settings.value.hide_on_process_start,
+			hide_right_sidebar: settings.value.toggle_sidebar,
+			show_jump_in: appSettings.getFeatureFlag(worldsInHomeFlag),
+			show_play_time: appSettings.getFeatureFlag(showPlayTimeFlag),
+			hide_nametag: settings.value.hide_nametag_skins_page,
+			warn_on_unknown_modpacks: !appSettings.getFeatureFlag(skipUnknownPackWarningFlag),
+			skip_non_essential_warnings: appSettings.getFeatureFlag(skipNonEssentialWarningsFlag),
+		},
+	}).catch(() => {
+		setSyncBehaviorAcrossDevices(false)
+		return undefined
+	})
+}
+
+function setSyncBehaviorAcrossDevices(value: boolean) {
+	appSettings.setBehaviorSyncAcrossDevices(value)
+	settings.value.sync_behavior_across_devices = value
+}
+
 watch(
 	settings,
 	async () => {
 		await set(settings.value)
+		if (!appSettings.syncBehaviorAcrossDevices) return
+
+		await syncBehaviorPreferences()
 	},
 	{ deep: true },
 )
 </script>
 <template>
-	<section>
+	<section class="border-0 border-b border-solid border-divider pb-6">
+		<div class="flex items-center justify-between gap-4">
+			<div>
+				<h2 id="sync-behavior-across-devices-label" class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.syncAcrossDevicesTitle) }}
+				</h2>
+				<p class="m-0 mt-1 text-secondary">
+					{{ formatMessage(messages.syncAcrossDevicesDescription) }}
+				</p>
+			</div>
+			<span
+				v-tooltip="
+					!auth.user.value ? formatMessage(messages.syncAcrossDevicesSignedOutTooltip) : undefined
+				"
+				class="inline-flex shrink-0"
+			>
+				<Toggle
+					id="sync-behavior-across-devices"
+					:model-value="appSettings.syncBehaviorAcrossDevices"
+					:disabled="!auth.user.value"
+					aria-labelledby="sync-behavior-across-devices-label"
+					@update:model-value="setSyncBehaviorAcrossDevices"
+				/>
+			</span>
+		</div>
+	</section>
+
+	<section class="mt-6">
 		<h2 class="m-0 text-xl font-semibold text-contrast">
 			{{ formatMessage(messages.startupAndNavigationTitle) }}
 		</h2>
@@ -137,7 +203,7 @@ watch(
 					@update:model-value="
 						(e) => {
 							settings.toggle_sidebar = !!e
-							themeStore.toggleSidebar = settings.toggle_sidebar
+							appSettings.toggleSidebar = settings.toggle_sidebar
 						}
 					"
 				/>
@@ -161,11 +227,11 @@ watch(
 				</div>
 				<Toggle
 					id="jump-back-into-worlds"
-					:model-value="themeStore.getFeatureFlag(worldsInHomeFlag)"
+					:model-value="appSettings.getFeatureFlag(worldsInHomeFlag)"
 					@update:model-value="
 						() => {
-							const newValue = !themeStore.getFeatureFlag(worldsInHomeFlag)
-							themeStore.featureFlags[worldsInHomeFlag] = newValue
+							const newValue = !appSettings.getFeatureFlag(worldsInHomeFlag)
+							appSettings.featureFlags[worldsInHomeFlag] = newValue
 							settings.feature_flags[worldsInHomeFlag] = newValue
 						}
 					"
@@ -181,11 +247,11 @@ watch(
 				</div>
 				<Toggle
 					id="show-play-time"
-					:model-value="themeStore.getFeatureFlag(showPlayTimeFlag)"
+					:model-value="appSettings.getFeatureFlag(showPlayTimeFlag)"
 					@update:model-value="
 						() => {
-							const newValue = !themeStore.getFeatureFlag(showPlayTimeFlag)
-							themeStore.featureFlags[showPlayTimeFlag] = newValue
+							const newValue = !appSettings.getFeatureFlag(showPlayTimeFlag)
+							appSettings.featureFlags[showPlayTimeFlag] = newValue
 							settings.feature_flags[showPlayTimeFlag] = newValue
 						}
 					"
@@ -201,11 +267,11 @@ watch(
 				</div>
 				<Toggle
 					id="hide-nametag-skins-page"
-					:model-value="themeStore.hideNametagSkinsPage"
+					:model-value="appSettings.hideNametagSkinsPage"
 					@update:model-value="
 						(e) => {
-							themeStore.hideNametagSkinsPage = !!e
-							settings.hide_nametag_skins_page = themeStore.hideNametagSkinsPage
+							appSettings.hideNametagSkinsPage = !!e
+							settings.hide_nametag_skins_page = appSettings.hideNametagSkinsPage
 						}
 					"
 				/>
@@ -229,12 +295,12 @@ watch(
 				</div>
 				<Toggle
 					id="warn-before-installing-unknown-modpacks"
-					:model-value="!themeStore.getFeatureFlag(skipUnknownPackWarningFlag)"
+					:model-value="!appSettings.getFeatureFlag(skipUnknownPackWarningFlag)"
 					@update:model-value="
 						(e) => {
 							const warnBeforeUnknownPackInstall = !!e
 							const skipUnknownPackWarning = !warnBeforeUnknownPackInstall
-							themeStore.featureFlags[skipUnknownPackWarningFlag] = skipUnknownPackWarning
+							appSettings.featureFlags[skipUnknownPackWarningFlag] = skipUnknownPackWarning
 							settings.feature_flags[skipUnknownPackWarningFlag] = skipUnknownPackWarning
 						}
 					"
@@ -252,11 +318,11 @@ watch(
 				</div>
 				<Toggle
 					id="skip-non-essential-warnings"
-					:model-value="themeStore.getFeatureFlag(skipNonEssentialWarningsFlag)"
+					:model-value="appSettings.getFeatureFlag(skipNonEssentialWarningsFlag)"
 					@update:model-value="
 						() => {
-							const newValue = !themeStore.getFeatureFlag(skipNonEssentialWarningsFlag)
-							themeStore.featureFlags[skipNonEssentialWarningsFlag] = newValue
+							const newValue = !appSettings.getFeatureFlag(skipNonEssentialWarningsFlag)
+							appSettings.featureFlags[skipNonEssentialWarningsFlag] = newValue
 							settings.feature_flags[skipNonEssentialWarningsFlag] = newValue
 						}
 					"

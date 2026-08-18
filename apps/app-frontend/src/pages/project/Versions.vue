@@ -5,7 +5,7 @@
 			:game-versions="gameVersions"
 			:versions="versions"
 			:project="project"
-			:show-environment-column="themeStore.featureFlags.show_version_environment_column"
+			:show-environment-column="appSettings.featureFlags.show_version_environment_column"
 			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
@@ -63,11 +63,11 @@ import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
-import { useTheming } from '@/store/theme.ts'
 
 const { formatMessage } = useVIntl()
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 
 const messages = defineMessages({
 	alreadyInstalled: {

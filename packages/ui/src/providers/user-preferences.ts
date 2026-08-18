@@ -1,4 +1,4 @@
-import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef } from 'vue'
 
@@ -37,11 +37,16 @@ const messages = defineMessages({
 
 export function setupUserPreferencesProvider({
 	auth,
-	client,
+	getPreferences,
+	patchPreferences,
 	notificationManager,
 }: {
 	auth: AuthProvider
-	client: AbstractModrinthClient
+	getPreferences: (userId: string) => Promise<Labrinth.Users.v3.UserPreferences>
+	patchPreferences: (
+		userId: string,
+		preferences: Labrinth.Users.v3.PartialUserPreferences,
+	) => Promise<Labrinth.Users.v3.UserPreferences>
 	notificationManager: AbstractWebNotificationManager
 }): UserPreferencesContext {
 	const queryClient = useQueryClient()
@@ -55,7 +60,7 @@ export function setupUserPreferencesProvider({
 				throw new Error('A signed-in user is required to fetch preferences')
 			}
 
-			return client.labrinth.users_v3.getPreferences(userId.value)
+			return getPreferences(userId.value)
 		},
 		enabled: computed(() => Boolean(userId.value)),
 		staleTime: 30_000,
@@ -70,9 +75,7 @@ export function setupUserPreferencesProvider({
 			userId: string
 			preferences: Labrinth.Users.v3.PartialUserPreferences
 		}) => {
-			const request = updateQueue.then(() =>
-				client.labrinth.users_v3.patchPreferences(userId, preferences),
-			)
+			const request = updateQueue.then(() => patchPreferences(userId, preferences))
 			updateQueue = request.then(
 				() => undefined,
 				() => undefined,
@@ -87,7 +90,7 @@ export function setupUserPreferencesProvider({
 				queryKey: userPreferencesQueryKey(variables.userId),
 			})
 			notificationManager.addNotification({
-				type: 'error',
+				type: 'warning',
 				title: formatMessage(messages.updateFailedTitle),
 				text: formatMessage(messages.updateFailedDescription),
 			})

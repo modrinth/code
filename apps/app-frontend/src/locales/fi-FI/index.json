@@ -71,12 +71,6 @@
   "app.action-bar.view-logs": {
     "message": "Katso lokeja"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Edistynyt renderointi"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Väriteema"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Koti"
   },
@@ -97,12 +91,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Piilota käynnistysohjelma"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Käytä järjestelmän ikkuna kehystä (Vaatii sovelluksen uudelleen käynnistämisen)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Natiivit koristukset"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Näyttää, kuinka paljon aikaa olet käyttänyt instanssin pelaamiseen."

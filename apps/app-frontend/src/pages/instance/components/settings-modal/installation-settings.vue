@@ -16,6 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
@@ -34,7 +35,6 @@ import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { injectAppEvents } from '@/providers/app-events'
 import { provideInstanceBackup } from '@/providers/instance-backup'
-import { useTheming } from '@/store/state'
 
 import type { Manifest } from '../../../../helpers/types'
 import { instanceKeys } from '../../query-options.ts'
@@ -47,12 +47,12 @@ const filePicker = injectFilePicker()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('AppInstallationSettings')
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
 const managedContentPolicy = useManagedContentPolicy(instance)
 const skipNonEssentialWarnings = computed(() =>
-	themeStore.getFeatureFlag('skip_non_essential_warnings'),
+	appSettings.getFeatureFlag('skip_non_essential_warnings'),
 )
 
 debug('metadata load: start', {

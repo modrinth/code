@@ -17,7 +17,9 @@ export function setupProviders(auth: Awaited<ReturnType<typeof useAuth>>) {
 	const client = setupModrinthClientProvider(auth)
 	const userPreferences = setupUserPreferencesProvider({
 		auth: authProvider,
-		client,
+		getPreferences: (userId) => client.labrinth.users_v3.getPreferences(userId),
+		patchPreferences: (userId, preferences) =>
+			client.labrinth.users_v3.patchPreferences(userId, preferences),
 		notificationManager,
 	})
 	setupTagsProvider()

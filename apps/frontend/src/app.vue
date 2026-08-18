@@ -30,12 +30,14 @@ watch(
 	(preferences) => {
 		if (!preferences) return
 
-		if (isDarkTheme(preferences.appearance.theme)) {
-			theme.preferences.dark = preferences.appearance.theme
-		} else {
-			theme.preferences.light = preferences.appearance.theme
+		if (theme.syncAcrossDevices) {
+			if (isDarkTheme(preferences.appearance.theme)) {
+				theme.preferences.dark = preferences.appearance.theme
+			} else {
+				theme.preferences.light = preferences.appearance.theme
+			}
+			theme.preferred = preferences.appearance.auto ? 'system' : preferences.appearance.theme
 		}
-		theme.preferred = preferences.appearance.auto ? 'system' : preferences.appearance.theme
 
 		if (locale.value !== preferences.localization.locale) {
 			void setLocale(preferences.localization.locale)

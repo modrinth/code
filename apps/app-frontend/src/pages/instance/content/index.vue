@@ -127,6 +127,7 @@ import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { useAppEvent } from '@/composables/use-app-event'
+import { type FeatureFlag, useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import {
@@ -149,8 +150,6 @@ import type { CacheBehaviour } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { type AppEventPayload, injectAppEvents } from '@/providers/app-events'
 import { injectContentInstall } from '@/providers/content-install'
-import { useTheming } from '@/store/state'
-import type { FeatureFlag } from '@/store/theme'
 
 import { injectInstancePage } from '../instance-context'
 import { instanceContentQueryOptions, instanceKeys } from '../query-options'
@@ -234,10 +233,10 @@ const { installingItems, installRevisionByInstance, installFailureRevisionByInst
 const router = useRouter()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const skipUnknownFileWarningFeatureFlag = 'skip_unknown_pack_warning' as FeatureFlag
 const skipNonEssentialWarnings = computed(() =>
-	themeStore.getFeatureFlag('skip_non_essential_warnings'),
+	appSettings.getFeatureFlag('skip_non_essential_warnings'),
 )
 
 const instancePage = injectInstancePage()
@@ -759,7 +758,7 @@ async function handleUploadFiles() {
 }
 
 function confirmUnknownFileInstallation(fileName: string) {
-	if (themeStore.getFeatureFlag(skipUnknownFileWarningFeatureFlag)) {
+	if (appSettings.getFeatureFlag(skipUnknownFileWarningFeatureFlag)) {
 		return Promise.resolve(true)
 	}
 
@@ -779,7 +778,7 @@ function resolveUnknownFileWarning(confirmed: boolean) {
 
 async function handleUnknownFileContinue(dontShowAgain: boolean) {
 	if (dontShowAgain) {
-		themeStore.featureFlags[skipUnknownFileWarningFeatureFlag] = true
+		appSettings.featureFlags[skipUnknownFileWarningFeatureFlag] = true
 		try {
 			const settings = await getSettings()
 			settings.feature_flags[skipUnknownFileWarningFeatureFlag] = true

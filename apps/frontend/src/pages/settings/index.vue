@@ -18,201 +18,37 @@
 			</template>
 		</Admonition>
 		<section class="universal-card">
-			<h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
-			<p>{{ formatMessage(colorTheme.description) }}</p>
-			<ThemeSelector
-				:update-color-theme="updateColorTheme"
-				:current-theme="theme.preferred"
-				:theme-options="themeOptions"
-				:system-theme-color="systemTheme"
-			/>
-		</section>
-		<section class="universal-card">
-			<h2 class="text-2xl">{{ formatMessage(projectListLayouts.title) }}</h2>
-			<p class="mb-4">{{ formatMessage(projectListLayouts.description) }}</p>
-			<div class="project-lists">
-				<div v-for="projectType in listTypes" :key="projectType.id + '-project-list-layouts'">
-					<div class="label">
-						<div class="label__title">
-							{{
-								projectListLayouts[projectType.id]
-									? formatMessage(projectListLayouts[projectType.id])
-									: projectType.id
-							}}
-						</div>
-					</div>
-					<div class="project-list-layouts">
-						<button
-							type="button"
-							class="flex !w-full cursor-pointer flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-divider bg-button-bg p-0 text-left text-primary outline-2 outline-transparent transition-[filter,transform] hover:brightness-[0.85] focus-visible:ring-4 focus-visible:ring-brand-shadow active:scale-[0.97] active:brightness-[0.8] [&_.example-card]:m-0 [&_.example-card]:min-h-0 [&_.example-card]:border-2 [&_.example-card]:border-solid [&_.example-card]:border-transparent [&_.example-card]:p-4 [&_.example-card]:outline-2 [&_.example-card]:outline-transparent"
-							:class="{
-								'!text-contrast [&_.example-card]:!border-brand [&_.example-card]:!bg-brand-highlight [&_.radio]:text-brand':
-									cosmetics.searchDisplayMode[projectType.id] === 'list',
-							}"
-							@click="updateLayout(projectType.id, 'rows')"
-						>
-							<div
-								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
-							>
-								<div class="layout-list-mode">
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-								</div>
-							</div>
-							<div
-								class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left"
-							>
-								<RadioButtonCheckedIcon
-									v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
-									class="radio mr-2 shrink-0"
-								/>
-								<RadioButtonIcon v-else class="radio mr-2 shrink-0" />
-								{{ formatMessage(layoutMode.rows) }}
-							</div>
-						</button>
-						<button
-							type="button"
-							class="flex !w-full cursor-pointer flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-divider bg-button-bg p-0 text-left text-primary outline-2 outline-transparent transition-[filter,transform] hover:brightness-[0.85] focus-visible:ring-4 focus-visible:ring-brand-shadow active:scale-[0.97] active:brightness-[0.8] [&_.example-card]:m-0 [&_.example-card]:min-h-0 [&_.example-card]:border-2 [&_.example-card]:border-solid [&_.example-card]:border-transparent [&_.example-card]:p-4 [&_.example-card]:outline-2 [&_.example-card]:outline-transparent"
-							:class="{
-								'!text-contrast [&_.example-card]:!border-brand [&_.example-card]:!bg-brand-highlight [&_.radio]:text-brand':
-									cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
-									cosmetics.searchDisplayMode[projectType.id] === 'grid',
-							}"
-							@click="updateLayout(projectType.id, 'grid')"
-						>
-							<div
-								class="preview flex w-full items-center justify-center bg-bg p-6 outline-2 outline-transparent"
-							>
-								<div class="layout-gallery-mode">
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-								</div>
-							</div>
-							<div
-								class="label flex grow items-center px-[var(--gap-lg)] py-[var(--gap-md)] text-left"
-							>
-								<RadioButtonCheckedIcon
-									v-if="
-										cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
-										cosmetics.searchDisplayMode[projectType.id] === 'grid'
-									"
-									class="radio mr-2 shrink-0"
-								/>
-								<RadioButtonIcon v-else class="radio mr-2 shrink-0" />
-								{{ formatMessage(layoutMode.grid) }}
-							</div>
-						</button>
-					</div>
-				</div>
-			</div>
-		</section>
-		<section class="universal-card">
-			<h2 class="text-2xl">{{ formatMessage(toggleFeatures.title) }}</h2>
-			<p class="mb-4">{{ formatMessage(toggleFeatures.description) }}</p>
-			<div class="flex flex-col gap-4">
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="advanced-rendering" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.advancedRenderingTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.advancedRenderingDescription) }}
-						</span>
-					</label>
-					<Toggle id="advanced-rendering" v-model="cosmetics.advancedRendering" class="shrink-0" />
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="external-links-new-tab" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.externalLinksNewTabTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.externalLinksNewTabDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="external-links-new-tab"
-						v-model="cosmetics.externalLinksNewTab"
-						class="shrink-0"
-					/>
-				</div>
-				<div v-if="false" class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="modrinth-app-promos" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.hideModrinthAppPromosDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="modrinth-app-promos"
-						v-model="cosmetics.hideModrinthAppPromos"
-						class="shrink-0"
-					/>
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="search-layout-toggle" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="search-layout-toggle"
-						:model-value="cosmetics.rightSearchLayout"
-						class="shrink-0"
-						@update:model-value="updateRightSearchLayout"
-					/>
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="project-layout-toggle" class="">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.leftAlignedContentSidebarTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.leftAlignedContentSidebarDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="project-layout-toggle"
-						:model-value="cosmetics.leftContentLayout"
-						class="shrink-0"
-						@update:model-value="updateLeftContentLayout"
-					/>
-				</div>
-			</div>
+			<AppearanceSettingsLayout />
 		</section>
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
+import { CodeIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	AppearanceSettingsLayout,
 	Button,
 	defineMessages,
+	injectAuth,
 	injectNotificationManager,
 	injectUserPreferences,
 	IntlFormatted,
+	isProjectDisplayLocation,
 	normalizeChildren,
-	ThemeSelector,
-	Toggle,
+	type ProjectDisplayLocation,
+	type ProjectLayout,
+	type ProjectLayoutSetting,
+	provideAppearanceSettings,
+	type SidebarPreferences,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
 
-import type { DisplayLocation } from '~/plugins/cosmetics'
 import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 
 const { addNotification } = injectNotificationManager()
+const auth = injectAuth()
+const { updatePreferences } = injectUserPreferences()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -238,21 +74,6 @@ useHead({
 	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
-const layoutMode = defineMessages({
-	rows: {
-		id: 'settings.display.project-list-layouts.mode.rows',
-		defaultMessage: 'Rows',
-	},
-	grid: {
-		id: 'settings.display.project-list-layouts.mode.grid',
-		defaultMessage: 'Grid',
-	},
-	gallery: {
-		id: 'settings.display.project-list-layouts.mode.gallery',
-		defaultMessage: 'Gallery',
-	},
-})
-
 const notifications = defineMessages({
 	developerModeDeactivatedTitle: {
 		id: 'settings.display.notification.developer-mode-deactivated.title',
@@ -264,123 +85,9 @@ const notifications = defineMessages({
 	},
 })
 
-const colorTheme = defineMessages({
-	title: {
-		id: 'settings.display.theme.title',
-		defaultMessage: 'Color theme',
-	},
-	description: {
-		id: 'settings.display.theme.description',
-		defaultMessage: 'Select your preferred color theme across Modrinth.',
-	},
-})
-
-const projectListLayouts = defineMessages({
-	title: {
-		id: 'settings.display.project-list-layouts.title',
-		defaultMessage: 'Project list layouts',
-	},
-	description: {
-		id: 'settings.display.project-list-layouts.description',
-		defaultMessage: 'Select your preferred layout for each page that displays project lists.',
-	},
-	mod: {
-		id: 'settings.display.project-list-layouts.mod',
-		defaultMessage: 'Mods page',
-	},
-	plugin: {
-		id: 'settings.display.project-list-layouts.plugin',
-		defaultMessage: 'Plugins page',
-	},
-	datapack: {
-		id: 'settings.display.project-list-layouts.datapack',
-		defaultMessage: 'Data Packs page',
-	},
-	shader: {
-		id: 'settings.display.project-list-layouts.shader',
-		defaultMessage: 'Shaders page',
-	},
-	resourcepack: {
-		id: 'settings.display.project-list-layouts.resourcepack',
-		defaultMessage: 'Resource Packs page',
-	},
-	modpack: {
-		id: 'settings.display.project-list-layouts.modpack',
-		defaultMessage: 'Modpacks page',
-	},
-	server: {
-		id: 'settings.display.project-list-layouts.server',
-		defaultMessage: 'Servers page',
-	},
-	user: {
-		id: 'settings.display.project-list-layouts.user',
-		defaultMessage: 'User profile pages',
-	},
-	collection: {
-		id: 'settings.display.project-list.layouts.collection',
-		defaultMessage: 'Collection',
-	},
-})
-
-const toggleFeatures = defineMessages({
-	title: {
-		id: 'settings.display.flags.title',
-		defaultMessage: 'Toggle features',
-	},
-	description: {
-		id: 'settings.display.flags.description',
-		defaultMessage: 'Enable or disable certain features on this device.',
-	},
-	advancedRenderingTitle: {
-		id: 'settings.display.sidebar.advanced-rendering.title',
-		defaultMessage: 'Advanced rendering',
-	},
-	advancedRenderingDescription: {
-		id: 'settings.display.sidebar.advanced-rendering.description',
-		defaultMessage:
-			'Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering.',
-	},
-	externalLinksNewTabTitle: {
-		id: 'settings.display.sidebar.external-links-new-tab.title',
-		defaultMessage: 'Open external links in new tab',
-	},
-	externalLinksNewTabDescription: {
-		id: 'settings.display.sidebar.external-links-new-tab.description',
-		defaultMessage:
-			'Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab.',
-	},
-	hideModrinthAppPromosTitle: {
-		id: 'settings.display.sidebar.hide-app-promos.title',
-		defaultMessage: 'Hide Modrinth App promotions',
-	},
-	hideModrinthAppPromosDescription: {
-		id: 'settings.display.sidebar.hide-app-promos.description',
-		defaultMessage:
-			'Hides the "Get Modrinth App" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer.',
-	},
-	rightAlignedFiltersSidebarTitle: {
-		id: 'settings.display.sidebar.right-aligned-filters-sidebar.title',
-		defaultMessage: 'Right-aligned filters sidebar on search pages',
-	},
-	rightAlignedFiltersSidebarDescription: {
-		id: 'settings.display.sidebar.right-aligned-filters-sidebar.description',
-		defaultMessage: 'Aligns the filters sidebar to the right of the search results.',
-	},
-	leftAlignedContentSidebarTitle: {
-		id: 'settings.display.sidebar.left-aligned-content-sidebar.title',
-		defaultMessage: 'Left-aligned sidebar on content pages',
-	},
-	leftAlignedContentSidebarDescription: {
-		id: 'settings.display.sidebar.right-aligned-content-sidebar.description',
-		defaultMessage: "Aligns the sidebar to the left of the page's content.",
-	},
-})
-
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
 const tags = useGeneratedState()
-const { updatePreferences } = injectUserPreferences()
-
 const theme = useTheme()
 
 // On the server the value of native theme can be 'unknown'. To hydrate
@@ -406,7 +113,31 @@ const themeOptions = computed(() => {
 	return options
 })
 
-function updateColorTheme(value: Theme | 'system') {
+const projectLayouts = computed<ProjectLayoutSetting[]>(() => {
+	const layouts = tags.value.projectTypes
+		.map(({ id }) => id)
+		.filter(isProjectDisplayLocation)
+		.map(
+			(type): ProjectLayoutSetting => ({
+				type,
+				layout: cosmetics.value.searchDisplayMode[type] === 'list' ? 'rows' : 'grid',
+			}),
+		)
+
+	layouts.push({
+		type: 'user',
+		layout: cosmetics.value.searchDisplayMode.user === 'list' ? 'rows' : 'grid',
+	})
+
+	return layouts
+})
+
+const sidebarPreferences = computed<SidebarPreferences>(() => ({
+	right_aligned_search: cosmetics.value.rightSearchLayout,
+	left_aligned_content: cosmetics.value.leftContentLayout,
+}))
+
+function setTheme(value: Theme | 'system'): void {
 	if (value !== 'system') {
 		if (isDarkTheme(value)) {
 			theme.preferences.dark = value
@@ -416,55 +147,64 @@ function updateColorTheme(value: Theme | 'system') {
 	}
 
 	theme.preferred = value
-	void updatePreferences({
-		appearance:
-			value === 'system'
-				? { auto: true }
-				: {
-						auto: false,
-						theme: value,
-					},
-	}).catch(() => undefined)
 }
 
-const layoutPreferenceKeys = {
-	mod: 'mods',
-	plugin: 'plugins',
-	datapack: 'datapacks',
-	shader: 'shaders',
-	resourcepack: 'resourcepacks',
-	modpack: 'modpacks',
-	server: 'servers',
-	user: 'users',
-} as const satisfies Partial<Record<DisplayLocation, keyof Labrinth.Users.v3.LayoutPreferences>>
-
-function updateLayout(projectType: DisplayLocation, layout: Labrinth.Users.v3.LayoutOption) {
-	cosmetics.value.searchDisplayMode[projectType] = layout === 'rows' ? 'list' : 'grid'
-	const preferenceKey = layoutPreferenceKeys[projectType as keyof typeof layoutPreferenceKeys]
-	if (!preferenceKey) return
-
-	void updatePreferences({
-		layouts: {
-			[preferenceKey]: layout,
-		} as Partial<Labrinth.Users.v3.LayoutPreferences>,
-	}).catch(() => undefined)
+function setSyncAcrossDevices(value: boolean): void {
+	theme.syncAcrossDevices = value
 }
 
-function updateRightSearchLayout(value: boolean) {
-	cosmetics.value.rightSearchLayout = value
-	void updatePreferences({
-		sidebars: { right_aligned_search: value },
-	}).catch(() => undefined)
+function setAdvancedRendering(value: boolean): void {
+	cosmetics.value.advancedRendering = value
 }
 
-function updateLeftContentLayout(value: boolean) {
-	cosmetics.value.leftContentLayout = value
-	void updatePreferences({
-		sidebars: { left_aligned_content: value },
-	}).catch(() => undefined)
+function setProjectLayout(type: ProjectDisplayLocation, layout: ProjectLayout): void {
+	cosmetics.value.searchDisplayMode[type] = layout === 'rows' ? 'list' : 'grid'
 }
 
-function disableDeveloperMode() {
+function setExternalLinksNewTab(value: boolean): void {
+	cosmetics.value.externalLinksNewTab = value
+}
+
+function setSidebarPreference(key: keyof SidebarPreferences, value: boolean): void {
+	if (key === 'right_aligned_search') {
+		cosmetics.value.rightSearchLayout = value
+	} else {
+		cosmetics.value.leftContentLayout = value
+	}
+}
+
+provideAppearanceSettings({
+	theme: {
+		current: computed(() => theme.preferred),
+		options: themeOptions,
+		system: systemTheme,
+		set: setTheme,
+		syncAcrossDevices: {
+			value: computed(() => theme.syncAcrossDevices),
+			set: setSyncAcrossDevices,
+		},
+		syncDisabled: computed(() => !auth.user.value),
+	},
+	advancedRendering: {
+		value: computed(() => cosmetics.value.advancedRendering),
+		set: setAdvancedRendering,
+	},
+	projectLayouts: {
+		value: projectLayouts,
+		set: setProjectLayout,
+	},
+	externalLinksNewTab: {
+		value: computed(() => cosmetics.value.externalLinksNewTab),
+		set: setExternalLinksNewTab,
+	},
+	sidebarPreferences: {
+		value: sidebarPreferences,
+		set: setSidebarPreference,
+	},
+	updatePreferences,
+})
+
+function disableDeveloperMode(): void {
 	flags.value.developerMode = !flags.value.developerMode
 	saveFeatureFlags()
 	addNotification({
@@ -473,80 +213,4 @@ function disableDeveloperMode() {
 		type: 'success',
 	})
 }
-
-const listTypes = computed(() => {
-	const types = tags.value.projectTypes.map((type) => {
-		return {
-			id: type.id as DisplayLocation,
-			name: formatProjectType(type.id) + 's',
-			display: 'the ' + formatProjectType(type.id).toLowerCase() + 's search page',
-		}
-	})
-
-	types.push({
-		id: 'user' as DisplayLocation,
-		name: 'User profiles',
-		display: 'user pages',
-	})
-
-	return types
-})
 </script>
-<style scoped lang="scss">
-.project-lists {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-md);
-
-	> :first-child .label__title {
-		margin-top: 0;
-	}
-
-	.preview {
-		--_layout-width: 7rem;
-		--_layout-height: 4.5rem;
-		--_layout-gap: 0.25rem;
-
-		.example-card {
-			border-radius: 0.5rem;
-			width: var(--_layout-width);
-			height: calc((var(--_layout-height) - 3 * var(--_layout-gap)) / 4);
-			padding: 0;
-		}
-
-		.layout-list-mode {
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: var(--_layout-gap);
-		}
-
-		.layout-grid-mode {
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr;
-			gap: var(--_layout-gap);
-
-			.example-card {
-				width: calc((var(--_layout-width) - 2 * var(--_layout-gap)) / 3);
-				height: calc((var(--_layout-height) - var(--_layout-gap)) / 2);
-			}
-		}
-
-		.layout-gallery-mode {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: var(--_layout-gap);
-
-			.example-card {
-				width: calc((var(--_layout-width) - var(--_layout-gap)) / 2);
-				height: calc((var(--_layout-height) - var(--_layout-gap)) / 2);
-			}
-		}
-	}
-}
-
-.project-list-layouts {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
-	gap: var(--gap-lg);
-}
-</style>

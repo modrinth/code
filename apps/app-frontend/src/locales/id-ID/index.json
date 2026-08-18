@@ -44,12 +44,6 @@
   "app.action-bar.view-logs": {
     "message": "Lihat catatan"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Renderasi tingkat lanjut"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema warna"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Beranda"
   },
@@ -70,12 +64,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Kecilkan peluncur"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gunakan bingkai jendela sistem (wajib menjalankan ulang aplikasi)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Hiasan asli"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Menampilkan seberapa lama Anda memainkan sebuah instans."

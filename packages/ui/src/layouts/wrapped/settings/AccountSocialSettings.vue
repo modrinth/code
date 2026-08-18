@@ -219,7 +219,7 @@ import { defineMessages, useScrollIndicator, useVIntl } from '#ui/composables'
 import { injectAuth, injectNotificationManager, injectUserPreferences } from '#ui/providers'
 import { commonMessages } from '#ui/utils'
 
-import { blockedUsersQueryKey } from '../shared/user-profile/providers'
+import { blockedUsersQueryKey } from '../../shared/user-profile/providers'
 
 type BlockedUserTableColumn = 'user' | 'actions'
 type BlockedUser = Labrinth.Users.v2.User & Record<BlockedUserTableColumn, unknown>

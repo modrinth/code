@@ -46,7 +46,6 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
-	setupUserPreferencesProvider,
 	TeleportOverflowMenu,
 	TextLogo,
 	useDebugLogger,
@@ -95,6 +94,9 @@ import SurveyPopup from '@/components/ui/SurveyPopup.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useError } from '@/composables/use-error.js'
+import { useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
 import {
 	hide_ads_window,
@@ -148,8 +150,7 @@ import { setupProviders } from '@/providers/setup'
 import { setupAppEventsProvider } from '@/providers/setup/app-events'
 import { setupAuthProvider } from '@/providers/setup/auth'
 import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
-import { useError } from '@/store/error.js'
-import { useTheming } from '@/store/state'
+import { setupAppUserPreferencesProvider } from '@/providers/setup/user-preferences.ts'
 import { appMessages } from '@/utils/app-messages'
 
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
@@ -158,7 +159,8 @@ import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 import { appSettingsModalOpenProfileKey } from './providers/app-settings-modal'
 
-const themeStore = useTheming()
+const appSettings = useAppSettings()
+const appTheme = useTheme()
 const router = useRouter()
 const route = useRoute()
 const { channel: appEventChannel, events: appEvents } = setupAppEventsProvider()
@@ -202,7 +204,7 @@ const credentials = ref()
 let credentialsRefreshId = 0
 const sidebarToggled = ref(true)
 watch(
-	() => themeStore.toggleSidebar,
+	() => appSettings.toggleSidebar,
 	(toggleSidebar) => {
 		sidebarToggled.value = !toggleSidebar
 	},
@@ -222,7 +224,7 @@ const hostingUpdateRequired = computed(
 		appUpdateState.updatesEnabled.value,
 )
 const prideFundraiserEnabled = computed(
-	() => themeStore.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
+	() => appSettings.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
 )
 const hostingIntercomIdentityKey = computed(() => {
 	const rawServerId = route.params.id
@@ -325,13 +327,13 @@ providePageContext({
 	intercomBubble: hostingIntercom.intercomBubble,
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
-			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
+			appSettings.getFeatureFlag('server_ram_as_bytes_always_on'),
 		),
 	},
 	openExternalUrl: (url) => void openUrl(url),
 })
 provideModalBehavior({
-	noblur: computed(() => !themeStore.advancedRendering),
+	noblur: computed(() => !appTheme.advancedRendering),
 	onShow: () => take_ads_window_hold(),
 	onHide: () => release_ads_window_hold(),
 })
@@ -635,10 +637,11 @@ async function setupApp() {
 		theme,
 		locale,
 		telemetry,
-		collapsed_navigation,
 		hide_nametag_skins_page,
 		advanced_rendering,
 		toggle_sidebar,
+		sync_theme_across_devices,
+		sync_behavior_across_devices,
 		developer_mode,
 		feature_flags,
 		pending_update_toast_for_version,
@@ -656,13 +659,14 @@ async function setupApp() {
 	nativeDecorations.value = native_decorations
 	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
-	themeStore.setThemeState(theme)
-	themeStore.collapsedNavigation = collapsed_navigation
-	themeStore.advancedRendering = advanced_rendering
-	themeStore.hideNametagSkinsPage = hide_nametag_skins_page
-	themeStore.toggleSidebar = toggle_sidebar
-	themeStore.devMode = developer_mode
-	themeStore.featureFlags = feature_flags
+	appTheme.preferred = theme
+	appTheme.advancedRendering = advanced_rendering
+	appTheme.syncAcrossDevices = sync_theme_across_devices
+	appSettings.syncBehaviorAcrossDevices = sync_behavior_across_devices
+	appSettings.hideNametagSkinsPage = hide_nametag_skins_page
+	appSettings.toggleSidebar = toggle_sidebar
+	appSettings.devMode = developer_mode
+	Object.assign(appSettings.featureFlags, feature_flags)
 	stateInitialized.value = true
 
 	isMaximized.value = await getCurrentWindow().isMaximized()
@@ -968,36 +972,73 @@ const authProvider = setupAuthProvider(credentials, async (_redirectPath, flow, 
 	}
 })
 
-const userPreferences = setupUserPreferencesProvider({
-	auth: authProvider,
-	client: tauriApiClient,
-	notificationManager,
-})
+const userPreferences = setupAppUserPreferencesProvider(authProvider, notificationManager)
 let userPreferencesSync = Promise.resolve()
 
 watch(
-	userPreferences.preferences,
-	(preferences) => {
-		if (!preferences) return
+	[userPreferences.preferences, stateInitialized],
+	([preferences, initialized]) => {
+		if (!preferences || !initialized) return
 
 		userPreferencesSync = userPreferencesSync
 			.then(async () => {
 				const settings = await getSettings()
 				const selectedTheme = preferences.appearance.auto ? 'system' : preferences.appearance.theme
 				const locale = preferences.localization.locale
+				const behavior = preferences.behavior
+				let settingsChanged = false
 
-				if (themeStore.selectedTheme !== selectedTheme) {
-					themeStore.setThemeState(selectedTheme)
+				if (appTheme.syncAcrossDevices && appTheme.preferred !== selectedTheme) {
+					appTheme.preferred = selectedTheme
 				}
 				if (i18n.global.locale.value !== locale) {
 					i18n.global.locale.value = locale
 				}
 
-				if (settings.theme === selectedTheme && settings.locale === locale) return
+				if (appTheme.syncAcrossDevices && settings.theme !== selectedTheme) {
+					settings.theme = selectedTheme
+					settingsChanged = true
+				}
+				if (settings.locale !== locale) {
+					settings.locale = locale
+					settingsChanged = true
+				}
 
-				settings.theme = selectedTheme
-				settings.locale = locale
-				await setSettings(settings)
+				if (behavior && appSettings.syncBehaviorAcrossDevices) {
+					const behaviorFeatureFlags = {
+						worlds_in_home: behavior.show_jump_in,
+						show_instance_play_time: behavior.show_play_time,
+						skip_unknown_pack_warning: !behavior.warn_on_unknown_modpacks,
+						skip_non_essential_warnings: behavior.skip_non_essential_warnings,
+					}
+
+					appSettings.toggleSidebar = behavior.hide_right_sidebar
+					appSettings.hideNametagSkinsPage = behavior.hide_nametag
+					Object.assign(appSettings.featureFlags, behaviorFeatureFlags)
+
+					if (settings.hide_on_process_start !== behavior.minimize_app) {
+						settings.hide_on_process_start = behavior.minimize_app
+						settingsChanged = true
+					}
+					if (settings.toggle_sidebar !== behavior.hide_right_sidebar) {
+						settings.toggle_sidebar = behavior.hide_right_sidebar
+						settingsChanged = true
+					}
+					if (settings.hide_nametag_skins_page !== behavior.hide_nametag) {
+						settings.hide_nametag_skins_page = behavior.hide_nametag
+						settingsChanged = true
+					}
+					for (const [flag, value] of Object.entries(behaviorFeatureFlags)) {
+						if (settings.feature_flags[flag] !== value) {
+							settings.feature_flags[flag] = value
+							settingsChanged = true
+						}
+					}
+				}
+
+				if (settingsChanged) {
+					await setSettings(settings)
+				}
 			})
 			.catch(handleError)
 	},
@@ -1679,7 +1720,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<div
 		v-if="stateInitialized"
 		class="app-grid-layout relative"
-		:class="{ 'disable-advanced-rendering': !themeStore.advancedRendering }"
+		:class="{ 'disable-advanced-rendering': !appTheme.advancedRendering }"
 	>
 		<Transition name="fade">
 			<div
@@ -1865,7 +1906,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
 				<IconButton
-					v-if="!forceSidebar && themeStore.toggleSidebar"
+					v-if="!forceSidebar && appSettings.toggleSidebar"
 					:type="sidebarToggled ? 'base' : 'quiet'"
 					:label="formatMessage(messages.nextImage)"
 					class="mr-3 transition-transform"
@@ -1888,7 +1929,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		class="app-contents"
 		:class="{
 			'sidebar-enabled': sidebarVisible,
-			'disable-advanced-rendering': !themeStore.advancedRendering,
+			'disable-advanced-rendering': !appTheme.advancedRendering,
 		}"
 	>
 		<div class="app-viewport flex-grow router-view">
@@ -1904,7 +1945,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<LoadingBar position="absolute" />
 			</div>
 			<div
-				v-if="themeStore.featureFlags.page_path"
+				v-if="appSettings.featureFlags.page_path"
 				class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50"
 			>
 				{{ route.fullPath }}

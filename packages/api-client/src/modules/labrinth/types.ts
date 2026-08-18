@@ -1720,6 +1720,16 @@ export namespace Labrinth {
 				theme: Theme
 			}
 
+			export type BehaviorPreferences = {
+				minimize_app: boolean
+				hide_right_sidebar: boolean
+				show_jump_in: boolean
+				show_play_time: boolean
+				hide_nametag: boolean
+				warn_on_unknown_modpacks: boolean
+				skip_non_essential_warnings: boolean
+			}
+
 			export type LocalizationPreferences = {
 				locale: string
 			}
@@ -1748,6 +1758,7 @@ export namespace Labrinth {
 
 			export type UserPreferences = {
 				appearance: AppearancePreferences
+				behavior: BehaviorPreferences
 				localization: LocalizationPreferences
 				layouts: LayoutPreferences
 				sidebars: SidebarPreferences
@@ -1756,6 +1767,7 @@ export namespace Labrinth {
 
 			export type PartialUserPreferences = {
 				appearance?: Partial<AppearancePreferences>
+				behavior?: Partial<BehaviorPreferences>
 				localization?: Partial<LocalizationPreferences>
 				layouts?: Partial<LayoutPreferences>
 				sidebars?: Partial<SidebarPreferences>

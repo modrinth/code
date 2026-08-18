@@ -4922,95 +4922,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Tryb dewelopera</strong> jest aktywny. To umożliwia wyświetlać wewnętrzne identyfikatory różnych rzeczy w Modrinth, które mogą być pomocne, jeśli jesteś deweloperem korzystającym z API Modrinth'a. Kliknij logo Modrinth na dole strony 5 razy, aby przełączać tryb dewelopera."
   },
-  "settings.display.flags.description": {
-    "message": "Włącz lub wyłącz określone funkcje na tym urządzeniu."
-  },
-  "settings.display.flags.title": {
-    "message": "Funkcje"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Tryb dewelopera został wyłączony"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Wyłączono tryb dewelopera"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Strona paczek danych"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Wybierz preferowany układ każdej strony, na której wyświetlane są listy projektów na tym urządzeniu."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Strona modów"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galeria"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Siatka"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rzędy"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Strona paczek modów"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Strona pluginów"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Strona paczek zasobów"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Strony serwerów"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Strona shaderów"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Układy listy projektów"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Strony profilowe użytkowników"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Kolekcja"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Włącza zaawansowane renderowanie, takie jak efekty rozmycia, które może powodować problemy z wydajnością bez sprzętowej akceleracji renderowania."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Zaawansowane renderowanie"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Spraw, aby linki prowadzące poza Modrinth otwierały się w nowej karcie. Niezależnie od tego ustawienia linki w tej samej domenie i w opisach Markdown będą otwierane w tej samej karcie, a linki w reklamach i edytowanych stronach będą otwierane w nowej karcie."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Otwieraj linki zewnętrzne w nowej karcie"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Ukrywa przyciski \"Pobierz Modrinth App\" z głównych stron nawigacji. Strona aplikacji Modrinth nadal może być znaleziona na stronie lądowania lub w stopce."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ukryj reklamy Modrinth App"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Pasek boczny wyrównany do lewej strony na stronach z treścią"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Wyrównuje pasek boczny po lewej stronie treści strony."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Przesuwa filtry na prawo od wyników wyszukiwania."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Filtry po prawej na stronach wyszukiwania"
-  },
-  "settings.display.theme.description": {
-    "message": "Wybierz preferowany motyw dla Modrinth na tym urządzeniu."
-  },
-  "settings.display.theme.title": {
-    "message": "Motyw"
   },
   "settings.head-title": {
     "message": "Ustawienia wyświetlania"

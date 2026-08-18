@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Deine Privatsphäre und wie Werbung Modrinth unterstützt"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Visuelle Effekte wie Hintergrundunschärfe aktivieren. Ohne Hardwarebeschleunigung kann dies die Leistung beeinträchtigen."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Erweitertes Rendering"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Wähle das Farbschema der Modrinth App aus."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Farbschema"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "App minimieren"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Nutzt die Titelleiste und Fenstersteuerung deines Betriebssystems. Erfordert einen App-Neustart."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "System-Fensterrahmen"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Zeigt, wie lange du jede einzelne Instanz gespielt hast."

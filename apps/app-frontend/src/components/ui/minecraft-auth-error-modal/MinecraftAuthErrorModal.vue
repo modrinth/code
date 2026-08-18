@@ -10,8 +10,8 @@ import {
 import { Admonition, Button, ButtonLink, Collapsible, IconButton, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { handleSevereError } from '@/composables/use-error.js'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
-import { handleSevereError } from '@/store/error.js'
 
 import { findMinecraftAuthError, type MinecraftAuthError } from './minecraft-auth-errors'
 

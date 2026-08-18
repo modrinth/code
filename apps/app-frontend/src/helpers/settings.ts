@@ -5,8 +5,9 @@
  */
 import { invoke } from '@tauri-apps/api/core'
 
+import type { FeatureFlag } from '@/composables/use-app-settings.ts'
+import type { ColorTheme } from '@/composables/use-theme.ts'
 import type { Hooks, MemorySettings, WindowSize } from '@/helpers/types'
-import type { ColorTheme, FeatureFlag } from '@/store/theme.ts'
 
 // Settings object
 /*
@@ -43,6 +44,8 @@ export type AppSettings = {
 	advanced_rendering: boolean
 	native_decorations: boolean
 	toggle_sidebar: boolean
+	sync_theme_across_devices: boolean
+	sync_behavior_across_devices: boolean
 
 	telemetry: boolean
 	discord_rpc: boolean

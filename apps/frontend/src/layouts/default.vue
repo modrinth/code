@@ -1485,6 +1485,8 @@ const theme = useTheme()
 
 function changeTheme() {
 	const selectedTheme = theme.cycle()
+	if (!theme.syncAcrossDevices) return
+
 	void updatePreferences({
 		appearance: {
 			auto: false,

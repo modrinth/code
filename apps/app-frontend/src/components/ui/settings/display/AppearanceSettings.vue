@@ -1,84 +1,71 @@
 <script setup lang="ts">
 import {
-	defineMessages,
+	AppearanceSettingsLayout,
+	injectAuth,
 	injectUserPreferences,
-	ThemeSelector,
-	Toggle,
-	useVIntl,
+	provideAppearanceSettings,
 } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
+import { type ColorTheme, useTheme } from '@/composables/use-theme.ts'
 import { get, set } from '@/helpers/settings.ts'
 import { getOS } from '@/helpers/utils'
-import { useTheming } from '@/store/state'
-import type { ColorTheme } from '@/store/theme.ts'
 
-const themeStore = useTheming()
-const { formatMessage } = useVIntl()
-const { preferences, updatePreferences } = injectUserPreferences()
-
-const messages = defineMessages({
-	colorThemeTitle: {
-		id: 'app.appearance-settings.color-theme.title',
-		defaultMessage: 'Color theme',
-	},
-	colorThemeDescription: {
-		id: 'app.appearance-settings.color-theme.description',
-		defaultMessage: 'Choose the color theme used across Modrinth.',
-	},
-	advancedRenderingTitle: {
-		id: 'app.appearance-settings.advanced-rendering.title',
-		defaultMessage: 'Advanced rendering',
-	},
-	advancedRenderingDescription: {
-		id: 'app.appearance-settings.advanced-rendering.description',
-		defaultMessage:
-			'Enable visual effects such as background blur. This may reduce performance without hardware acceleration.',
-	},
-	nativeDecorationsTitle: {
-		id: 'app.appearance-settings.native-decorations.title',
-		defaultMessage: 'System window frame',
-	},
-	nativeDecorationsDescription: {
-		id: 'app.appearance-settings.native-decorations.description',
-		defaultMessage:
-			"Use your operating system's title bar and window controls. Requires an app restart.",
-	},
-})
-
-const os = ref(await getOS())
+const theme = useTheme()
+const auth = injectAuth()
+const { updatePreferences } = injectUserPreferences()
+const os = await getOS()
 const settings = ref(await get())
-const selectedTheme = ref(settings.value.theme)
 const themeOptions = computed(() =>
-	themeStore
-		.getThemeOptions()
-		.filter((theme) => theme !== 'retro' || themeStore.devMode || selectedTheme.value === 'retro'),
+	theme.options.filter(
+		(option) => option !== 'retro' || settings.value.developer_mode || theme.preferred === 'retro',
+	),
 )
 
-function updateColorTheme(theme: ColorTheme) {
-	themeStore.setThemeState(theme)
-	selectedTheme.value = theme
-	settings.value.theme = theme
-	void updatePreferences({
-		appearance:
-			theme === 'system'
-				? { auto: true }
-				: {
-						auto: false,
-						theme,
-					},
-	}).catch(() => undefined)
+function setTheme(value: ColorTheme): void {
+	theme.preferred = value
+	settings.value.theme = value
 }
 
-watch(
-	preferences,
-	(value) => {
-		if (!value) return
+function setSyncAcrossDevices(enabled: boolean): void {
+	theme.syncAcrossDevices = enabled
+	settings.value.sync_theme_across_devices = enabled
+}
 
-		selectedTheme.value = value.appearance.auto ? 'system' : value.appearance.theme
+function setAdvancedRendering(enabled: boolean): void {
+	theme.advancedRendering = enabled
+	settings.value.advanced_rendering = enabled
+}
+
+function setNativeDecorations(enabled: boolean): void {
+	settings.value.native_decorations = enabled
+}
+
+provideAppearanceSettings({
+	theme: {
+		current: computed(() => theme.preferred),
+		options: themeOptions,
+		system: computed(() => theme.native),
+		set: setTheme,
+		syncAcrossDevices: {
+			value: computed(() => theme.syncAcrossDevices),
+			set: setSyncAcrossDevices,
+		},
+		syncDisabled: computed(() => !auth.user.value),
 	},
-	{ immediate: true },
-)
+	advancedRendering: {
+		value: computed(() => settings.value.advanced_rendering),
+		set: setAdvancedRendering,
+	},
+	nativeDecorations:
+		os !== 'MacOS'
+			? {
+					value: computed(() => settings.value.native_decorations),
+					set: setNativeDecorations,
+				}
+			: undefined,
+	updatePreferences,
+})
 
 watch(
 	settings,
@@ -88,49 +75,7 @@ watch(
 	{ deep: true },
 )
 </script>
+
 <template>
-	<h2 class="m-0 text-lg font-semibold text-contrast">
-		{{ formatMessage(messages.colorThemeTitle) }}
-	</h2>
-
-	<p class="m-0 mt-1">{{ formatMessage(messages.colorThemeDescription) }}</p>
-
-	<ThemeSelector
-		:update-color-theme="updateColorTheme"
-		:current-theme="selectedTheme"
-		:theme-options="themeOptions"
-		system-theme-color="system"
-	/>
-
-	<div class="mt-6 flex items-center justify-between">
-		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.advancedRenderingTitle) }}
-			</h2>
-			<p class="m-0 mt-1">
-				{{ formatMessage(messages.advancedRenderingDescription) }}
-			</p>
-		</div>
-
-		<Toggle
-			id="advanced-rendering"
-			:model-value="themeStore.advancedRendering"
-			@update:model-value="
-				(e) => {
-					themeStore.advancedRendering = !!e
-					settings.advanced_rendering = themeStore.advancedRendering
-				}
-			"
-		/>
-	</div>
-
-	<div v-if="os !== 'MacOS'" class="mt-6 flex items-center justify-between gap-4">
-		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.nativeDecorationsTitle) }}
-			</h2>
-			<p class="m-0 mt-1">{{ formatMessage(messages.nativeDecorationsDescription) }}</p>
-		</div>
-		<Toggle id="native-decorations" v-model="settings.native_decorations" />
-	</div>
+	<AppearanceSettingsLayout />
 </template>

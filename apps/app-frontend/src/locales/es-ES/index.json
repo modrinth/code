@@ -95,12 +95,6 @@
   "app.action-bar.view-logs": {
     "message": "Ver registros"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Renderizado avanzado"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema de color"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Inicio"
   },
@@ -121,12 +115,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimizar lanzador"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Usa el marco de ventana del sistema (requiere reiniciar la aplicación)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Decoraciones nativas"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Muestra cuánto tiempo has estado jugando en una instancia."
