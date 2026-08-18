@@ -2051,6 +2051,9 @@
   "instance.icon-editor.symbol.crafting-table": {
     "message": "Crafting Table"
   },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Wrench"
+  },
   "instance.icon-editor.symbol.creeper": {
     "message": "Creeper"
   },
@@ -2137,9 +2140,6 @@
   },
   "instance.icon-editor.symbol.tnt": {
     "message": "TNT"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Wrench"
   },
   "instance.icon-editor.symbol.wrenth-rinth": {
     "message": "Modrinth Wrench"
