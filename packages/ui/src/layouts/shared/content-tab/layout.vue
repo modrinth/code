@@ -1024,11 +1024,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
 								>
 									<div
-										class="h-6 w-px shrink-0 bg-surface-5"
-										:class="{
-											hidden: metadataFiltersWrapped,
-											'mr-0.5': !metadataFiltersWrapped,
-										}"
+										class="mr-0.5 h-6 w-px shrink-0 bg-surface-5"
+										:class="{ invisible: metadataFiltersWrapped }"
 									/>
 									<DropdownFilterBar
 										v-model="selectedMetadataFilters"

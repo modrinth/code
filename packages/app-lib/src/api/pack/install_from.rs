@@ -309,7 +309,6 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     reporter: InstallProgressReporter,
 ) -> crate::Result<CreatePack> {
     let state = State::get().await?;
-    let has_icon_url = icon_url.is_some();
 
     let version = CachedEntry::get_version(
         &version_id,
@@ -443,48 +442,28 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         .update(InstallPhaseId::ResolvingPack, None, details.clone())
         .await?;
 
-    let project = CachedEntry::get_project(
-        &version.project_id,
-        None,
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Invalid project ID specified!".to_string(),
-        )
-    })?;
-
-    // Only fetch the pack icon when icon_url is provided (new profile).
-    // When installing to an existing profile (e.g. server projects),
-    // icon_url is None and we preserve the profile's existing icon.
-    let icon = if has_icon_url {
-        if let Some(icon_url) = project.icon_url {
-            let state = State::get().await?;
-            reporter
-                .set_context(
-                    InstallErrorContext::new("download modpack icon")
-                        .urls(vec![icon_url.clone()])
-                        .project_id(project_id.clone())
-                        .version_id(version_id.clone())
-                        .build(),
-                )
-                .await?;
-            let icon_bytes = fetch(
-                &icon_url,
-                None,
-                None,
-                None,
-                &state.fetch_semaphore,
-                &state.pool,
+    // When no icon URL is supplied, preserve the instance's existing icon.
+    let icon = if let Some(icon_url) = icon_url {
+        reporter
+            .set_context(
+                InstallErrorContext::new("download modpack icon")
+                    .urls(vec![icon_url.clone()])
+                    .project_id(project_id.clone())
+                    .version_id(version_id.clone())
+                    .build(),
             )
             .await?;
+        let icon_bytes = fetch(
+            &icon_url,
+            None,
+            None,
+            None,
+            &state.fetch_semaphore,
+            &state.pool,
+        )
+        .await?;
 
-            Some(crate::api::instance::cache_icon(icon_bytes, &state).await?)
-        } else {
-            None
-        }
+        Some(crate::api::instance::cache_icon(icon_bytes, &state).await?)
     } else {
         None
     };
@@ -587,7 +566,7 @@ pub async fn set_instance_information(
     } else {
         None
     };
-    let link = match (&description.project_id, &description.version_id) {
+    let pack_link = match (&description.project_id, &description.version_id) {
         (Some(project_id), Some(version_id)) => {
             Some(InstanceLink::ModrinthModpack {
                 project_id: project_id.clone(),
@@ -605,12 +584,34 @@ pub async fn set_instance_information(
         }
         _ => None,
     };
+    let existing_link = crate::api::instance::get(&instance_id)
+        .await?
+        .map(|metadata| metadata.link);
+    let link = match existing_link {
+        Some(
+            link @ (InstanceLink::ServerProject { .. }
+            | InstanceLink::ServerProjectModpack { .. }
+            | InstanceLink::ModrinthHosting { .. }
+            | InstanceLink::SharedInstance { .. }),
+        ) => Some(link),
+        _ => pack_link,
+    };
     let source_kind = match &link {
         Some(InstanceLink::ModrinthModpack { .. }) => {
             Some(ContentSourceKind::ModrinthModpack)
         }
+        Some(
+            InstanceLink::ServerProject { .. }
+            | InstanceLink::ServerProjectModpack { .. },
+        ) => Some(ContentSourceKind::ServerProject),
+        Some(InstanceLink::ModrinthHosting { .. }) => {
+            Some(ContentSourceKind::ModrinthHosting)
+        }
         Some(InstanceLink::ImportedModpack { .. }) => {
             Some(ContentSourceKind::ImportedModpack)
+        }
+        Some(InstanceLink::SharedInstance { .. }) => {
+            Some(ContentSourceKind::SharedInstance)
         }
         _ => None,
     };
