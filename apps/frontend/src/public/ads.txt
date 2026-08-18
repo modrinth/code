@@ -27,7 +27,8 @@ conversantmedia.com, 100141, RESELLER
 # Adagio - Equativ
 smartadserver.com, 3554, RESELLER
 loopme.com, 5679, RESELLER, 6c8d5f95897a5a3b
-sharethrough.com, OAW69Fon, RESELLER, d53b998a7bd4ecd2
+smartadserver.com,3262,RESELLER,060d053dcf45cbf3
+sharethrough.com,3262,RESELLER,d53b998a7bd4ecd2
 # Adagio - Sovrn
 lijit.com, 367236, RESELLER, fafdf38b16bf6b2b
 openx.com, 538959099, RESELLER, 6a698e2ec38604c6
