@@ -1,4 +1,4 @@
-import { satisfies } from 'semver'
+import { intersects, satisfies } from 'semver'
 
 /**
  * Returns game versions that match a semver range or array of ranges.
@@ -17,6 +17,21 @@ export function getGameVersionsMatchingSemverRange(
 		const semverVersion = version.split('.').length === 2 ? `${version}.0` : version // add patch version if missing (e.g. 1.16 -> 1.16.0)
 		return normalizedRanges.some((v) => satisfies(semverVersion, v))
 	})
+}
+
+/**
+ * Returns whether a semver range intersects another semver range.
+ */
+export function semverRangeIntersects(
+	range: string | string[] | undefined,
+	other: string,
+): boolean {
+	if (!range) {
+		return true
+	}
+
+	const ranges = Array.isArray(range) ? range : [range]
+	return ranges.some((r) => intersects(r, other))
 }
 
 /**
