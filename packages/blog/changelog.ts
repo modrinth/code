@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-18T03:40:19+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved loader detection logic for Fabric derivatives when uploading versions.`,
+	},
+	{
 		date: `2026-08-18T01:11:08+00:00`,
 		product: 'app',
 		version: '0.18.0',
