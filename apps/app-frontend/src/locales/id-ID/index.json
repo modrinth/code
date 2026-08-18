@@ -56,14 +56,29 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Pustaka"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Halaman arahan bawaan"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan label nama"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Masuk kembali ke dunia"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Kecilkan pluncur ketika proses Minecraft berjalan."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Kecilkan peluncur"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Gunakan bingkai jendela sistem (wajib menjalankan ulang aplikasi)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Hiasan asli"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Menampilkan seberapa lama Anda memainkan sebuah instans."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Tampilkan waktu bermain"
@@ -380,15 +395,6 @@
   "app.skins.sign-in.button": {
     "message": "Masuk"
   },
-  "app.skins.sign-in.description": {
-    "message": "Mohon masuk ke akun Minecraft Anda untuk menggunakan fitur pengelolaan rupa dari Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Bot Modrinth penuh antusias"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Silakan masuk"
-  },
   "app.skins.title": {
     "message": "Pemilih rupa"
   },
@@ -436,9 +442,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Luring"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} orang daring"
   },
   "friends.action.add-friend": {
     "message": "Tambah teman"
@@ -595,18 +598,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Pilih ikon"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Pengelompokan koleksi"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Buat kelompok baru"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Pengelompokan koleksi membolehkan Anda mengorganisasi instans ke dalam bagian-bagian berbeda dalam koleksi Anda."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Masukkan nama kelompok"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nama"

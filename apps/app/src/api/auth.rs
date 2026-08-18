@@ -52,6 +52,9 @@ pub async fn login<R: Runtime>(
     )
     .title("Sign into Modrinth")
     .always_on_top(true)
+    .min_inner_size(500.0, 500.0)
+    .inner_size(1000.0, 700.0)
+    .focused(true)
     .center()
     .build()?;
 

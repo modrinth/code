@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "色彩主题"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "选择 Modrinth App 启动时显示的页面。"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首页"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "库"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "默认起始页"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "在皮肤选择器页面的玩家预览上隐藏用户名。"
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "首页"
   },
-  "app.nav.library": {
-    "message": "库"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth账户"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "登录"
   },
-  "app.skins.sign-in.description": {
-    "message": "请登录您的 Minecraft 账号，以便使用 Modrinth 应用的皮肤管理功能。"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "兴奋的 Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "请登录"
-  },
   "app.skins.title": {
     "message": "皮肤选择器"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "离线"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} 人在线"
   },
   "content.shared-instance.change-version-body": {
     "message": "更改版本只会修改你的本地副本。未来的共享实例更新可能会再次将其恢复或更改。"
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "选择图标"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "库分组"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "新建分组"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "库分组功能可以让你将实例整理到库中的不同部分。"
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "输入分组名称"
   },
   "instance.settings.tabs.general.name": {
     "message": "名称"

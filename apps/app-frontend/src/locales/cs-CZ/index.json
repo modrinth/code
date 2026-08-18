@@ -86,14 +86,29 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Knihovna"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Výchozí stránka po spuštění"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Zakáže zobrazení jmenovky nad vaší postavou na stránce skinů."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Skrýt jmenovku"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Rychlý návrat do světů"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimalizovat launcher při spuštění Minecraftu."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimalizovat launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Použít systémový rámeček okna (vyžaduje restart aplikace)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Systémové dekorace"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Zobrazuje, kolik času jsi strávil hraním instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Zobrazit odehraný čas"
@@ -521,15 +536,6 @@
   "app.skins.sign-in.button": {
     "message": "Přihlásit se"
   },
-  "app.skins.sign-in.description": {
-    "message": "Přihlas se prosím ke svému Minecraft účtu, abys mohl/a využívat funkce pro správu skinů v aplikaci Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Nadšený Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Přihlaš se prosím"
-  },
   "app.skins.title": {
     "message": "Výběr skinu"
   },
@@ -577,9 +583,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Přidat přítele"
@@ -736,18 +739,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Vybrat ikonu"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Skupiny knihovny"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Vytvořit novou skupinu"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Skupiny knihovny ti umožňují uspořádat instance do různých sekcí v knihovně."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Zadej název skupiny"
   },
   "instance.settings.tabs.general.name": {
     "message": "Jméno"

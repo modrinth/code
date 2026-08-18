@@ -563,9 +563,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Cari versi permainan..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Alih keluar ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Pilih ikon"
   },
@@ -722,21 +719,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Kosongkan semua"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Layari pek mod"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Import pek mod"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Sudah tahu pek mod yang ingin anda pasang?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Tiada hasil dijumpai"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Cari pek mod"
-  },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Persediaan tersuai"
   },
@@ -757,9 +739,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Pilih jenis dunia"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Pilih pek mod"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Cipta pemasangan"
@@ -1658,14 +1637,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Tiada pemasangan yang serasi dijumpai"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Alih keluar ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Cari pemasangan"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Pilih ikon"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Semasa"
@@ -3884,9 +3857,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Sudah mempunyai pelayan?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Ketahui lebih lanjut tentang Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3895,9 +3865,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Pasang mod, jemput rakan dan main bersama-sama, semuanya dari Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Belum ada pelayan"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Pilih mod kegemaran anda dan kami uruskan selebihnya."
@@ -3913,12 +3880,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Daftar masuk"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Sediakan pelayan anda seperti dunia ekapemain."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Persediaan yang mudah"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Disalin"

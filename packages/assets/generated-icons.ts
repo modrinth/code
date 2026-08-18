@@ -168,6 +168,7 @@ import _KeyboardIcon from './icons/keyboard.svg?component'
 import _LandmarkIcon from './icons/landmark.svg?component'
 import _LanguagesIcon from './icons/languages.svg?component'
 import _LayersIcon from './icons/layers.svg?component'
+import _LayoutGridIcon from './icons/layout-grid.svg?component'
 import _LayoutTemplateIcon from './icons/layout-template.svg?component'
 import _LeftArrowIcon from './icons/left-arrow.svg?component'
 import _LibraryIcon from './icons/library.svg?component'
@@ -212,6 +213,7 @@ import _PackageIcon from './icons/package.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackagePlusIcon from './icons/package-plus.svg?component'
+import _PageRoundIcon from './icons/page-round.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
 import _PauseIcon from './icons/pause.svg?component'
@@ -261,6 +263,7 @@ import _SortDescIcon from './icons/sort-desc.svg?component'
 import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
 import _SplitIcon from './icons/split.svg?component'
+import _SquarePlusIcon from './icons/square-plus.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _StoreIcon from './icons/store.svg?component'
@@ -608,6 +611,7 @@ export const KeyboardIcon = _KeyboardIcon
 export const LandmarkIcon = _LandmarkIcon
 export const LanguagesIcon = _LanguagesIcon
 export const LayersIcon = _LayersIcon
+export const LayoutGridIcon = _LayoutGridIcon
 export const LayoutTemplateIcon = _LayoutTemplateIcon
 export const LeftArrowIcon = _LeftArrowIcon
 export const LibraryIcon = _LibraryIcon
@@ -652,6 +656,7 @@ export const PackageIcon = _PackageIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
 export const PackagePlusIcon = _PackagePlusIcon
+export const PageRoundIcon = _PageRoundIcon
 export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PauseIcon = _PauseIcon
@@ -701,6 +706,7 @@ export const SortDescIcon = _SortDescIcon
 export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
 export const SplitIcon = _SplitIcon
+export const SquarePlusIcon = _SquarePlusIcon
 export const StarIcon = _StarIcon
 export const StopCircleIcon = _StopCircleIcon
 export const StoreIcon = _StoreIcon

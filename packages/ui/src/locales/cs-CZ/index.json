@@ -608,9 +608,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Hledat verzi hry..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Odebrat ikonu"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Vybrat ikonu"
   },
@@ -767,24 +764,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Zrušit vše"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Procházet modpacky"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importovat modpack"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Už víš modpack, který chceš nainstalovat?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Nenalezeny žádné výsledky"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Hledat modpack"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Instance je nastavení Minecraftu s konkrétním loaderem, verzí a módy."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Začněte od začátku výběrem loaderu a verze hry."
   },
@@ -817,9 +796,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Vyber typ světa"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Výběr modpacku"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Vytvoření instance"
@@ -1811,14 +1787,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nebyly nalezeny žádné kompatibilní instance"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Odebrat ikonu"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Hledat instance"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Vybrat ikonu"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Mometálně"
@@ -3665,9 +3635,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Už máte server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Zjistěte víc o Modrinth hostingu"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3676,9 +3643,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Instalujte mody, zvěte přátele a hrajte společně, to vše z Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Zatím žádné servery"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Vyberte si své oblíbené mody a o zbytek se postaráme."
@@ -3694,9 +3658,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Přihlásit se"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Nastavte si server stejně jako svět pro jednoho hráče."
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Zkopírováno"

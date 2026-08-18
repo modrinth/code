@@ -4,6 +4,7 @@ mod content;
 mod content_set_diff;
 mod export_mrpack;
 mod get;
+mod groups;
 mod icon;
 mod install;
 mod lifecycle;
@@ -23,7 +24,15 @@ pub use self::export_mrpack::{
     get_pack_export_candidates, get_pack_export_candidates_for_parent,
 };
 pub use self::get::{get, get_many, list};
-pub use self::icon::edit_icon;
+pub use self::groups::{
+    FAVORITES_GROUP_ID, InstanceGroup, InstanceGroupMembershipUpdate,
+    create_group, delete_group, list_groups, rename_group,
+    set_group_memberships, set_group_order,
+};
+pub use self::icon::{
+    cache_generated_icon, edit_generated_icon, edit_generated_icon_if_empty,
+    edit_icon, get_recent_icon_configs,
+};
 pub(crate) use self::icon::{
     cache_icon, cache_icon_from_path, migrate_legacy_icons,
 };

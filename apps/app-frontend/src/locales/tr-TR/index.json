@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Renk teması"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Modrinth App açıldığında gözüken sayfayı seçin."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Ana Sayfa"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Kütüphane"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Varsayılan karşılama sayfası"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Dış görünüm seçici sayfasında oyuncu önizlemesinin üzerindeki kullanıcı adınızı gizleyin."
@@ -701,9 +695,6 @@
   "app.nav.home": {
     "message": "Ana Sayfa"
   },
-  "app.nav.library": {
-    "message": "Kütüphane"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth hesabı"
   },
@@ -944,15 +935,6 @@
   "app.skins.sign-in.button": {
     "message": "Giriş Yap"
   },
-  "app.skins.sign-in.description": {
-    "message": "Modrinth appdeki skin yönetim özelliklerini kullanmak için lütfen Minecraft hesabınıza giriş yapın."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Heyecanlı Modrinth Botu"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Lütfen giriş yapın"
-  },
   "app.skins.title": {
     "message": "Dış görünüm seçici"
   },
@@ -1009,9 +991,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Çevrimdışı"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} çevrimiçi"
   },
   "friends.action.add-friend": {
     "message": "Bir arkadaş ekle"
@@ -1204,18 +1183,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Simge seç"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Kütüphane grupları"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Yeni grup oluştur"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Kütüphane grupları profillerinizi kütüphane içinde farklı bölümler altında organize etmenizi sağlar."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Grup adı girin"
   },
   "instance.settings.tabs.general.name": {
     "message": "Ad"

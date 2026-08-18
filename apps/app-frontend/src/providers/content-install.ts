@@ -6,7 +6,6 @@ import {
 	getLatestMatchingInstallVersion,
 	useVIntl,
 } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { nextTick, type Ref, ref } from 'vue'
@@ -30,6 +29,7 @@ import {
 	get,
 	get_install_candidates,
 	get_projects,
+	getInstanceIconUrl,
 	install_project_with_dependencies,
 	list,
 	remove_project,
@@ -145,6 +145,7 @@ export interface ContentInstallContext {
 		loader: string
 		gameVersion: string
 	}) => Promise<void>
+	prepareNewInstance: (projectId: string) => Promise<void>
 	handleNavigate: (instance: ContentInstallInstance) => void
 	handleCancel: () => void
 	setContentInstallModal: (ref: ModalRef) => void
@@ -424,7 +425,12 @@ export function createContentInstall(opts: {
 		project: Labrinth.Projects.v2.Project,
 		versions: Labrinth.Versions.v2.Version[],
 		onInstall: ContentInstallCallback,
-		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
+		hints?: {
+			preferredLoader?: string
+			preferredGameVersion?: string
+			showProjectInfo?: boolean
+			showModal?: boolean
+		},
 	) {
 		currentProject = project
 		currentVersions = versions
@@ -434,6 +440,7 @@ export function createContentInstall(opts: {
 		loading.value = true
 		defaultTab.value = 'existing'
 
+		let projectInfoPromise: Promise<unknown> = Promise.resolve()
 		if (hints?.showProjectInfo) {
 			projectInfo.value = {
 				title: project.title,
@@ -441,7 +448,7 @@ export function createContentInstall(opts: {
 				link: `/project/${project.slug ?? project.id}`,
 			}
 			if (project.organization) {
-				get_organization(project.organization)
+				projectInfoPromise = get_organization(project.organization)
 					.then((org: { id: string; slug: string; name: string; icon_url?: string }) => {
 						if (projectInfo.value) {
 							const orgSlug = org.slug ?? org.id
@@ -458,7 +465,7 @@ export function createContentInstall(opts: {
 					})
 					.catch(() => {})
 			} else if (project.team) {
-				get_team(project.team)
+				projectInfoPromise = get_team(project.team)
 					.then(
 						(
 							members: {
@@ -509,10 +516,12 @@ export function createContentInstall(opts: {
 				: null
 
 		await nextTick()
-		modalRef?.show()
-		trackEvent('ProjectInstallStart', { source: 'ProjectInstallModal' })
+		if (hints?.showModal !== false) {
+			modalRef?.show()
+			trackEvent('ProjectInstallStart', { source: 'ProjectInstallModal' })
+		}
 
-		get_game_versions()
+		const gameVersionMetadataPromise = get_game_versions()
 			.then((allGameVersions) => {
 				const releases = new Set<string>()
 				const ordered: string[] = []
@@ -541,7 +550,7 @@ export function createContentInstall(opts: {
 				return {
 					id: instance.id,
 					name: instance.name,
-					iconUrl: instance.icon_path ? convertFileSrc(instance.icon_path) : null,
+					iconUrl: getInstanceIconUrl(instance.icon_path),
 					installed: instance.installed,
 					compatible: instance.compatible,
 					installing: false,
@@ -559,6 +568,24 @@ export function createContentInstall(opts: {
 		} finally {
 			loading.value = false
 		}
+		await gameVersionMetadataPromise
+		await projectInfoPromise
+	}
+
+	async function prepareNewInstance(projectId: string) {
+		const project: Labrinth.Projects.v2.Project = await get_project(projectId, 'must_revalidate')
+		if (!project || project.project_type === 'modpack') {
+			throw new Error(`Project cannot be prepared as a new instance: '${projectId}'`)
+		}
+
+		const versions = (
+			(await get_version_many(project.versions)) as Labrinth.Versions.v2.Version[]
+		).sort((a, b) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf())
+
+		await showModInstallModal(project, versions, () => {}, {
+			showProjectInfo: true,
+			showModal: false,
+		})
 	}
 
 	function getInstallTargets(versions: Labrinth.Versions.v2.Version[]) {
@@ -940,6 +967,7 @@ export function createContentInstall(opts: {
 		projectInfo,
 		handleInstallToInstance,
 		handleCreateAndInstall,
+		prepareNewInstance,
 		handleNavigate,
 		handleCancel,
 		setContentInstallModal(ref: ModalRef) {

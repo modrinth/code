@@ -2,12 +2,12 @@
 import {
 	CheckIcon,
 	EditIcon,
-	ExcitedRinthbot,
 	EyeIcon,
-	LogInIcon,
+	InfoIcon,
 	RotateCounterClockwiseIcon,
 	ShirtIcon,
 	SpinnerIcon,
+	WindowsIcon,
 } from '@modrinth/assets'
 import {
 	Button,
@@ -173,6 +173,10 @@ const messages = defineMessages({
 		id: 'app.skins.apply-button',
 		defaultMessage: 'Apply',
 	},
+	demoApplyTooltip: {
+		id: 'app.skins.demo.apply-tooltip',
+		defaultMessage: 'Sign in to apply skins.',
+	},
 	editSkinButton: {
 		id: 'app.skins.preview.edit-button',
 		defaultMessage: 'Edit skin',
@@ -189,22 +193,17 @@ const messages = defineMessages({
 		id: 'app.skins.toggle-ears-features-on',
 		defaultMessage: 'Toggle on',
 	},
-	excitedRinthbotAlt: {
-		id: 'app.skins.sign-in.rinthbot-alt',
-		defaultMessage: 'Excited Modrinth Bot',
+	demoTitle: {
+		id: 'app.skins.demo.title',
+		defaultMessage: 'Editing with a demo account',
 	},
-	signInTitle: {
-		id: 'app.skins.sign-in.title',
-		defaultMessage: 'Please sign in',
-	},
-	signInDescription: {
-		id: 'app.skins.sign-in.description',
-		defaultMessage:
-			'Please sign into your Minecraft account to use the skin management features of the Modrinth app.',
+	demoDescription: {
+		id: 'app.skins.demo.description',
+		defaultMessage: 'Sign in to your Minecraft account to save and apply skins!',
 	},
 	signInButton: {
 		id: 'app.skins.sign-in.button',
-		defaultMessage: 'Sign In',
+		defaultMessage: 'Sign in to Microsoft',
 	},
 })
 
@@ -342,7 +341,9 @@ const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
 const skinNametag = computed(() => (themeStore.hideNametagSkinsPage ? undefined : username.value))
 const isSkinManagementReadOnly = computed(
-	() => offline.value || (authServerQuery.isError.value && !authServerQuery.isLoading.value),
+	() =>
+		!!currentUser.value &&
+		(offline.value || (authServerQuery.isError.value && !authServerQuery.isLoading.value)),
 )
 const hasPendingSkinChange = computed(
 	() => !skinsMatch(selectedSkin.value, originalSelectedSkin.value),
@@ -746,6 +747,7 @@ function schedulePendingSkinRefresh() {
 async function applySelectedSkin() {
 	const skinToApply = selectedSkin.value
 	if (
+		!currentUser.value ||
 		!skinToApply ||
 		!hasPendingSkinChange.value ||
 		isApplyingSkin.value ||
@@ -1058,6 +1060,7 @@ await loadSkins()
 	<EditSkinModal
 		ref="editSkinModal"
 		:capes="capes"
+		:demo="!currentUser"
 		@saved="onSkinSaved"
 		@deleted="() => loadSkins()"
 	/>
@@ -1076,7 +1079,7 @@ await loadSkins()
 		@proceed="deleteSkin"
 	/>
 
-	<div v-if="currentUser" class="skin-layout box-border min-h-full p-4">
+	<div class="skin-layout box-border grow p-4" :class="{ 'pb-40': !currentUser }">
 		<div class="sticky top-6 self-start p-2 pt-0">
 			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
 				{{ formatMessage(appMessages.skinSelectorLabel) }}
@@ -1132,13 +1135,17 @@ await loadSkins()
 								</Button>
 								<Button
 									v-tooltip="
-										selectedSkinHasEarsFeatures ? formatMessage(messages.applyButton) : undefined
+										!currentUser
+											? formatMessage(messages.demoApplyTooltip)
+											: selectedSkinHasEarsFeatures
+												? formatMessage(messages.applyButton)
+												: undefined
 									"
 									type="colored"
 									color="brand"
 									size="lg"
 									class="skin-preview-action-button"
-									:disabled="isApplyingSkin || isSkinManagementReadOnly"
+									:disabled="!currentUser || isApplyingSkin || isSkinManagementReadOnly"
 									:aria-label="formatMessage(messages.applyButton)"
 									@click="applySelectedSkin"
 								>
@@ -1258,45 +1265,32 @@ await loadSkins()
 		</div>
 	</div>
 
-	<div v-else class="box-border flex min-h-full items-center justify-center pt-[25%]">
+	<div v-if="!currentUser" class="sticky w-full bottom-0 z-20 p-4 pt-0">
 		<div
-			class="relative mx-auto flex w-full max-w-xl flex-col gap-5 rounded-lg bg-bg-raised p-7 shadow-lg"
+			class="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 rounded-[20px] border border-solid border-surface-5 bg-surface-3 p-4"
 		>
-			<img
-				:src="ExcitedRinthbot"
-				:alt="formatMessage(messages.excitedRinthbotAlt)"
-				class="absolute -top-28 right-8 md:right-20 h-28 w-auto"
-			/>
-			<div
-				class="absolute top-0 left-0 w-full h-[1px] opacity-40 bg-gradient-to-r from-transparent via-green-500 to-transparent"
-				style="
-					background: linear-gradient(
-						to right,
-						transparent 2rem,
-						var(--color-green) calc(100% - 13rem),
-						var(--color-green) calc(100% - 5rem),
-						transparent calc(100% - 2rem)
-					);
-				"
-			></div>
-
-			<div class="flex flex-col gap-5">
-				<h1 class="text-3xl font-extrabold m-0">{{ formatMessage(messages.signInTitle) }}</h1>
-				<p class="text-lg m-0">
-					{{ formatMessage(messages.signInDescription) }}
-				</p>
-				<Button
-					v-show="accountsCard"
-					type="colored"
-					color="brand"
-					:disabled="accountsCard.loginDisabled"
-					@click="login"
-				>
-					<LogInIcon v-if="!accountsCard.loginDisabled" />
-					<SpinnerIcon v-else class="animate-spin" />
-					{{ formatMessage(messages.signInButton) }}
-				</Button>
+			<div class="flex min-w-0 grow items-start gap-3">
+				<InfoIcon class="size-6 shrink-0 text-blue" />
+				<div class="flex min-w-0 flex-col gap-1">
+					<p class="m-0 text-lg font-semibold leading-6 text-contrast">
+						{{ formatMessage(messages.demoTitle) }}
+					</p>
+					<p class="m-0 text-base leading-6 text-primary">
+						{{ formatMessage(messages.demoDescription) }}
+					</p>
+				</div>
 			</div>
+			<Button
+				v-show="accountsCard"
+				type="colored"
+				color="brand"
+				:disabled="accountsCard.loginDisabled"
+				@click="login"
+			>
+				<SpinnerIcon v-if="accountsCard.loginDisabled" class="animate-spin" />
+				<WindowsIcon v-else />
+				{{ formatMessage(messages.signInButton) }}
+			</Button>
 		</div>
 	</div>
 </template>

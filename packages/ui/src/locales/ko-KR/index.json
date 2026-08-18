@@ -707,9 +707,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "게임 버전 검색..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "아이콘 제거"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "아이콘 선택"
   },
@@ -872,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "모두 해제"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "모드팩 둘러보기"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "모드팩 가져오기"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "설치하고 싶은 모드팩을 이미 알고 계신가요?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "결과 없음"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "모드팩 검색"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "인스턴스란 특정 로더, 버전 및 모드가 적용된 Minecraft 환경을 의미합니다."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "로더와 게임 버전을 선택하여 처음부터 시작합니다."
   },
@@ -922,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "세계 방식 선택"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "모드팩 선택"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "인스턴스 생성"
@@ -2057,14 +2033,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "호환가능한 인스턴스 없음"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "아이콘 제거"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "인스턴스 검색"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "아이콘 선택"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
@@ -4607,9 +4577,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "서버가 이미 있으신가요?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Modrinth 호스팅에 관하여 알아보기"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth 호스팅"
   },
@@ -4618,9 +4585,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Modrinth 앱에서 모드를 설치하고, 친구를 초대해 함께 플레이하세요."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "서버 없음"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "즐겨찾는 모드들을 선택하시고 나머지는 저희에게 맡겨주세요."
@@ -4636,12 +4600,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "로그인"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "싱글 플레이어 월드처럼 서버를 설정하세요."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "간단한 설정"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "복사됨"

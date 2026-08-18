@@ -662,9 +662,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Знайти версію гри…"
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Видалити значок"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Вибрати значок"
   },
@@ -842,9 +839,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Пошук збірок"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Профіль — це налаштування Minecraft із певним завантажувачем, версією та модами."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Почніть з нуля, вибравши завантажувач і версію гри."
   },
@@ -877,9 +871,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Виберіть тип світу"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Виберіть збірку"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Створити збірку"
@@ -2012,14 +2003,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Не знайдено сумісних профілів"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Прибрати значок"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Пошук профілів"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Вибрати значок"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Поточна"
@@ -4588,9 +4573,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Установлюйте моди, запрошуйте друзів і грайте разом із Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Серверів ще немає"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Виберіть свої улюблені моди, а ми подбаємо про решту."

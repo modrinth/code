@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Kleurenthema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Kies de pagina die wordt weergegeven wanneer de Modrinth-app wordt geopend."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotheek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standaard openingspagina"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Verberg je gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "Start"
   },
-  "app.nav.library": {
-    "message": "Bibliotheek"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth-account"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "Inloggen"
   },
-  "app.skins.sign-in.description": {
-    "message": "Log in op je Minecraft-account om de functies voor het beheren van skins in de Modrinth-app te kunnen gebruiken."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Excited Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Graag inloggen"
-  },
   "app.skins.title": {
     "message": "Skinkiezer"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Als je de versie wijzigt, wordt alleen je lokale kopie aangepast. Bij toekomstige updates van de gedeelde instantie kan deze weer worden teruggezet of opnieuw worden gewijzigd."
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecteer pictogram"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Bibliotheekgroepen"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Nieuwe groep creëren"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Bibliotheekgroepen stellen je in staat om je instanties in verschillende secties in je bibliotheek te organiseren."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Voer groepsnaam in"
   },
   "instance.settings.tabs.general.name": {
     "message": "Naam"

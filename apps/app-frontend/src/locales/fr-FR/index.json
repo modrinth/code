@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Couleur du thème"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Choisir la page affichée quand Modrinth App s'ouvre."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Accueil"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliothèque"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Page d'ouverture"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Cache votre nom d'utilisateur au-dessus de la prévisualisation du joueur sur la page de sélection de Skins."
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "Accueil"
   },
-  "app.nav.library": {
-    "message": "Bibliothèque"
-  },
   "app.nav.modrinth-account": {
     "message": "Compte Modrinth"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "Se connecter"
   },
-  "app.skins.sign-in.description": {
-    "message": "Veuillez vous connecter à votre compte Minecraft pour utiliser les fonctionnalités de gestion de skins de Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Bot Modrinth enthousiaste"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Veuillez vous connecter"
-  },
   "app.skins.title": {
     "message": "Sélecteur de skin"
   },
@@ -1534,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Sélectionner l'icône"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Groupes de la bibliothèque"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Créer un nouveau groupe"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Les groupes vous permettent d'organiser vos instances dans différentes sections de votre bibliothèque."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Saisir le nom du groupe"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nom"

@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "色彩主題"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "選擇 Modrinth App 開啟時顯示的頁面。"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首頁"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "遊戲庫"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "預設起始頁面"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "在外觀選擇工具頁面中隱藏玩家預覽上方的使用者名稱。"
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "首頁"
   },
-  "app.nav.library": {
-    "message": "遊戲庫"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth 帳號"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "登入"
   },
-  "app.skins.sign-in.description": {
-    "message": "請登入你的 Minecraft 帳號以使用 Modrinth App 的外觀管理功能。"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "興奮的 Modrinth 機器人"
-  },
-  "app.skins.sign-in.title": {
-    "message": "請登入"
-  },
   "app.skins.title": {
     "message": "外觀選擇工具"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "離線"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} 人在線上"
   },
   "content.shared-instance.change-version-body": {
     "message": "變更版本只會影響本機副本。未來共用實例更新時可能會再次復原或變更這個專案。"
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "選擇圖示"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "遊戲庫群組"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "建立新的群組"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "遊戲庫群組讓你可以將實例整理到遊戲庫中的不同分類。"
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "輸入群組名稱"
   },
   "instance.settings.tabs.general.name": {
     "message": "名稱"

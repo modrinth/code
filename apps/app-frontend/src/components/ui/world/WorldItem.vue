@@ -9,7 +9,6 @@ import {
 	MoreVerticalIcon,
 	NoSignalIcon,
 	PlayIcon,
-	SignalIcon,
 	SkullIcon,
 	SpinnerIcon,
 	StopCircleIcon,
@@ -21,26 +20,25 @@ import {
 import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
+	BulletDivider,
 	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	ServerOnlinePlayers,
 	SmartClickable,
 	TagItem,
 	TeleportOverflowMenu,
 	useFormatDateTime,
-	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { getPingLevel } from '@modrinth/utils'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { getInstanceIconUrl } from '@/helpers/instance'
 import { copyToClipboard, createInstanceShortcut } from '@/helpers/utils'
 import type {
 	ProtocolVersion,
@@ -55,7 +53,6 @@ import { LockIcon } from '../../../../../../packages/assets/generated-icons'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
-const formatNumber = useFormatNumber()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
@@ -124,9 +121,6 @@ const props = withDefaults(
 )
 
 const playingOtherWorld = computed(() => props.playingInstance && !props.playingWorld)
-const hasPlayersTooltip = computed(
-	() => !!props.serverStatus?.players?.sample && props.serverStatus.players?.sample?.length > 0,
-)
 const serverIncompatible = computed(
 	() =>
 		!!props.serverStatus &&
@@ -155,18 +149,31 @@ async function createShortcut() {
 
 		addNotification({
 			type: 'success',
-			title: 'Shortcut created',
+			title: formatMessage(messages.shortcutCreated),
 		})
 	} catch (error) {
 		addNotification({
 			type: 'error',
-			title: 'Failed to create shortcut',
+			title: formatMessage(messages.shortcutCreationFailed),
 			text: error instanceof Error ? error.message : '',
 		})
 	}
 }
 
 const messages = defineMessages({
+	shortcutCreated: {
+		id: 'instance.worlds.shortcut-created',
+		defaultMessage: 'Shortcut created',
+	},
+	shortcutCreationFailed: {
+		id: 'instance.worlds.shortcut-creation-failed',
+		defaultMessage: 'Failed to create shortcut',
+	},
+	moreOptions: { id: 'instance.worlds.more-options', defaultMessage: 'More options' },
+	instanceLocked: {
+		id: 'instance.worlds.instance-locked',
+		defaultMessage: 'This instance has been locked',
+	},
 	hardcore: {
 		id: 'instance.worlds.hardcore',
 		defaultMessage: 'Hardcore mode',
@@ -231,10 +238,6 @@ const messages = defineMessages({
 		id: 'app.world.world-item.incompatible-version',
 		defaultMessage: 'Incompatible version {version}',
 	},
-	playersOnline: {
-		id: 'app.world.world-item.players-online',
-		defaultMessage: '{count} online',
-	},
 	offline: {
 		id: 'app.world.world-item.offline',
 		defaultMessage: 'Offline',
@@ -246,7 +249,7 @@ const messages = defineMessages({
 })
 </script>
 <template>
-	<SmartClickable>
+	<SmartClickable class="[--active-scale:0.985]">
 		<template v-if="instanceId" #clickable>
 			<router-link
 				class="no-click-animation"
@@ -254,7 +257,7 @@ const messages = defineMessages({
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised card-shadow smart-clickable:highlight-on-hover rounded-xl"
+			class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
 			:class="{
 				'world-item-highlighted': highlighted,
 			}"
@@ -266,10 +269,12 @@ const messages = defineMessages({
 						: world.icon
 				"
 				size="48px"
+				no-shadow
+				class="!rounded-[14px]"
 			/>
-			<div class="flex flex-col justify-between h-full">
-				<div class="flex items-center gap-2">
-					<div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
+			<div class="flex flex-col justify-center gap-0.5 h-full">
+				<div class="flex items-center gap-1.5">
+					<div class="text-base text-contrast font-semibold truncate">
 						{{ world.name }}
 					</div>
 					<TagItem
@@ -310,34 +315,13 @@ const messages = defineMessages({
 									}}
 								</span>
 							</template>
-							<template v-else>
-								<SignalIcon
-									v-tooltip="serverStatus ? `${serverStatus.ping}ms` : null"
-									aria-hidden="true"
-									:style="`--_signal-${getPingLevel(serverStatus.ping || 0)}: var(--color-green)`"
-									stroke-width="3px"
-									class="shrink-0"
-									:class="{
-										'smart-clickable:allow-pointer-events': serverStatus,
-									}"
+							<div v-else class="flex items-center gap-2">
+								<ServerOnlinePlayers
+									:online="serverStatus.players?.online ?? 0"
+									status-online
+									hide-label
 								/>
-								<Tooltip :disabled="!hasPlayersTooltip">
-									<span :class="{ 'cursor-help': hasPlayersTooltip }">
-										{{
-											formatMessage(messages.playersOnline, {
-												count: formatNumber(serverStatus.players?.online ?? 0),
-											})
-										}}
-									</span>
-									<template #popper>
-										<div class="flex flex-col gap-1">
-											<span v-for="player in serverStatus.players?.sample" :key="player.name">
-												{{ player.name }}
-											</span>
-										</div>
-									</template>
-								</Tooltip>
-							</template>
+							</div>
 						</template>
 						<template v-else>
 							<NoSignalIcon aria-hidden="true" stroke-width="3px" class="shrink-0" />
@@ -345,7 +329,24 @@ const messages = defineMessages({
 						</template>
 					</div>
 				</div>
-				<div class="flex items-center gap-2 text-sm text-secondary">
+				<div class="flex items-center gap-1.5 text-sm text-secondary">
+					<template v-if="instanceId">
+						<router-link
+							data-no-card-click
+							class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
+							:to="`/instance/${instanceId}`"
+						>
+							<Avatar
+								:src="getInstanceIconUrl(instanceIcon)"
+								size="16px"
+								:tint-by="instanceId"
+								class="shrink-0"
+								no-shadow
+							/>
+							<span class="truncate">{{ instanceName }}</span>
+						</router-link>
+						<BulletDivider class="shrink-0" />
+					</template>
 					<div
 						v-tooltip="world.last_played ? formatDateTime(world.last_played) : null"
 						class="w-fit shrink-0"
@@ -354,29 +355,10 @@ const messages = defineMessages({
 						}"
 					>
 						<template v-if="world.last_played">
-							{{
-								formatMessage(commonMessages.playedLabel, {
-									ago: formatRelativeTime(dayjs(world.last_played).toISOString()),
-								})
-							}}
+							{{ formatRelativeTime(dayjs(world.last_played).toISOString()) }}
 						</template>
 						<template v-else> {{ formatMessage(messages.notPlayedYet) }} </template>
 					</div>
-					<template v-if="instanceId">
-						•
-						<router-link
-							class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
-							:to="`/instance/${instanceId}`"
-						>
-							<Avatar
-								:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
-								size="16px"
-								:tint-by="instanceId"
-								class="shrink-0"
-							/>
-							<span class="truncate">{{ instanceName }}</span>
-						</router-link>
-					</template>
 				</div>
 			</div>
 			<div
@@ -425,7 +407,7 @@ const messages = defineMessages({
 					v-else
 					v-tooltip="
 						quarantined
-							? 'This instance has been locked'
+							? formatMessage(messages.instanceLocked)
 							: world.type === 'server'
 								? !supportsServerQuickPlay
 									? formatMessage(messages.noServerQuickPlay)
@@ -449,6 +431,8 @@ const messages = defineMessages({
 						(world.type == 'server' && !supportsServerQuickPlay) ||
 						(world.type == 'singleplayer' && !supportsWorldQuickPlay)
 					"
+					type="colored"
+					color="brand"
 					@click="emit('play')"
 				>
 					<SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
@@ -457,7 +441,7 @@ const messages = defineMessages({
 				</Button>
 				<TeleportOverflowMenu
 					type="quiet"
-					label="More options"
+					:label="formatMessage(messages.moreOptions)"
 					:options="[
 						{
 							id: 'play-instance',
@@ -595,6 +579,10 @@ const messages = defineMessages({
 	</SmartClickable>
 </template>
 <style scoped lang="scss">
+.clickable-card:has([data-no-card-click]:hover) {
+	--hover-brightness: 1;
+}
+
 .world-item-highlighted {
 	position: relative;
 	animation: fade-highlight 4s ease-out;

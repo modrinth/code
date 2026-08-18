@@ -308,14 +308,8 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "อินสแตนซ์อันใหม่"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "ลบไอคอน"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "ค้นหาอินสแตนซ์"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "เลือกไอคอน"
   },
   "label.available": {
     "defaultMessage": "ว่างอยู่ {amount}"
