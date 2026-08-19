@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE screenshot_groups SET name = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "607eac5be3e2a29bb81cce3d0ff14690b61e08f5cb3316c4349c78dc0e4d81f7"
+}

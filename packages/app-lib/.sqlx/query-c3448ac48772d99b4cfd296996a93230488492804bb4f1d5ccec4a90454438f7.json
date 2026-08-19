@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tINSERT INTO screenshot_groups (id, name, display_order)\n\t\t\tVALUES (?, ?, ?)\n\t\t\tON CONFLICT(id) DO UPDATE SET name = excluded.name\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "c3448ac48772d99b4cfd296996a93230488492804bb4f1d5ccec4a90454438f7"
+}

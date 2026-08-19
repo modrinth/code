@@ -1,0 +1,1209 @@
+<script setup lang="ts">
+import {
+	DragDropProvider,
+	type DragEndEvent,
+	type DragMoveEvent,
+	type DragOverEvent,
+	DragOverlay,
+	type DragStartEvent,
+} from '@dnd-kit/vue'
+import {
+	ClipboardCopyIcon,
+	EditIcon,
+	ExternalIcon,
+	FileArchiveIcon,
+	TrashIcon,
+} from '@modrinth/assets'
+import {
+	Button,
+	commonMessages,
+	type ComboboxOption,
+	ConfirmModal,
+	defineMessages,
+	EmptyState,
+	FloatingActionBar,
+	IconButton,
+	injectNotificationManager,
+	ReadyTransition,
+	useFormatDateTime,
+	useReadyState,
+	useVIntl,
+} from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { save } from '@tauri-apps/plugin-dialog'
+import { readFile } from '@tauri-apps/plugin-fs'
+import { useStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+
+import { useAppEvent } from '@/composables/use-app-event'
+import {
+	create_screenshot_group,
+	delete_screenshot_group,
+	delete_screenshots,
+	export_screenshots,
+	import_screenshot_groups,
+	type InstanceScreenshot,
+	list_all_screenshots,
+	move_screenshots,
+	open_screenshot,
+	rename_screenshot_group,
+	type ScreenshotGroup,
+	type ScreenshotGroupImport,
+	type ScreenshotKey,
+	set_screenshot_group_memberships,
+} from '@/helpers/instance'
+import { MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
+import {
+	instanceListQueryOptions,
+	instanceScreenshotsQueryOptions,
+	screenshotGroupsQueryOptions,
+	screenshotKeys,
+	syncedScreenshotsQueryOptions,
+} from '@/pages/instance/query-options'
+
+import ScreenshotDragGather from './drag-gather.vue'
+import ScreenshotDragPreview from './drag-preview.vue'
+import ScreenshotGroupSection from './group.vue'
+import ScreenshotPreviewModal from './preview-modal.vue'
+import ScreenshotToolbar from './toolbar.vue'
+import {
+	type ActiveScreenshotDrag,
+	useScreenshotDragGather,
+} from './use-screenshot-drag-gather'
+
+type ScreenshotSort = 'newest' | 'oldest' | 'name'
+type ScreenshotGroupBy = 'custom' | 'instance' | 'date' | 'none'
+type ScreenshotFilters = Record<'loader' | 'gameVersion' | 'modpack', string[]>
+
+type LegacyCustomScreenshotGrouping = {
+	groups: ScreenshotGroup[]
+	assignments: Record<string, string>
+}
+
+type ScreenshotGroupData = {
+	id: string
+	title: string
+	screenshots: InstanceScreenshot[]
+	dropInstanceId?: string
+	customGroupId?: string | null
+}
+
+type ScreenshotDragData = {
+	selectionKey: string
+	instanceId: string
+}
+
+type ScreenshotDropData = {
+	groupId: string
+	instanceId?: string
+	customGroupId?: string | null
+}
+
+const props = withDefaults(
+	defineProps<{
+		instanceId?: string
+		showHeading?: boolean
+	}>(),
+	{
+		instanceId: undefined,
+		showHeading: false,
+	},
+)
+
+const isGlobal = computed(() => !props.instanceId)
+const storageSuffix = props.instanceId ? 'instance' : 'global'
+const search = ref('')
+const sort = useStorage<ScreenshotSort>(`screenshots-sort-${storageSuffix}`, 'newest')
+const groupBy = useStorage<ScreenshotGroupBy>(
+	`screenshots-group-${storageSuffix}`,
+	props.instanceId ? 'date' : 'instance',
+)
+const filters = useStorage<ScreenshotFilters>(`screenshots-filters-${storageSuffix}`, {
+	loader: [],
+	gameVersion: [],
+	modpack: [],
+})
+const sortModel = computed<string>({
+	get: () => sort.value,
+	set: (value) => {
+		sort.value = value as ScreenshotSort
+	},
+})
+const groupByModel = computed<string>({
+	get: () => groupBy.value,
+	set: (value) => {
+		groupBy.value = value as ScreenshotGroupBy
+	},
+})
+const collapsedGroups = useStorage<Record<string, boolean>>(
+	`screenshots-collapsed-groups-${storageSuffix}`,
+	{},
+)
+const legacyCustomGrouping = useStorage<LegacyCustomScreenshotGrouping>('screenshots-custom-groups', {
+	groups: [],
+	assignments: {},
+})
+const selectedKeys = ref(new Set<string>())
+const screenshotToDelete = ref<InstanceScreenshot | null>(null)
+const deleteFromPreview = ref(false)
+const activeDrag = ref<ActiveScreenshotDrag | null>(null)
+const activeDropGroupId = ref<string | null>(null)
+const previewModal = ref<InstanceType<typeof ScreenshotPreviewModal>>()
+const deleteModal = ref<InstanceType<typeof ConfirmModal>>()
+const bulkDeleteModal = ref<InstanceType<typeof ConfirmModal>>()
+const deleteGroupModal = ref<InstanceType<typeof ConfirmModal>>()
+const customGroupToDelete = ref<ScreenshotGroup>()
+const groupIdPendingNameEdit = ref<string>()
+const migratingLegacyGroups = ref(false)
+const queryClient = useQueryClient()
+const { formatMessage } = useVIntl()
+const { addNotification, handleError } = injectNotificationManager()
+const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
+const formatMonth = useFormatDateTime({ month: 'long', year: 'numeric' })
+
+const messages = defineMessages({
+	heading: { id: 'app.screenshots.heading', defaultMessage: 'Screenshots' },
+	emptyHeading: { id: 'app.screenshots.empty-heading', defaultMessage: 'No screenshots yet' },
+	emptyDescription: {
+		id: 'app.screenshots.empty-description',
+		defaultMessage: 'Screenshots you take in-game will appear here.',
+	},
+	noResultsHeading: {
+		id: 'app.screenshots.no-results-heading',
+		defaultMessage: 'No matching screenshots',
+	},
+	noResultsDescription: {
+		id: 'app.screenshots.no-results-description',
+		defaultMessage: 'Try a different search or filter.',
+	},
+	errorHeading: {
+		id: 'app.screenshots.error-heading',
+		defaultMessage: 'Failed to load screenshots',
+	},
+	newest: { id: 'app.screenshots.sort.newest', defaultMessage: 'Newest' },
+	oldest: { id: 'app.screenshots.sort.oldest', defaultMessage: 'Oldest' },
+	name: { id: 'app.screenshots.sort.name', defaultMessage: 'Name' },
+	custom: { id: 'app.screenshots.group.custom', defaultMessage: 'Custom grouping' },
+	instance: { id: 'app.screenshots.group.instance', defaultMessage: 'Instance' },
+	date: { id: 'app.screenshots.group.date', defaultMessage: 'Date' },
+	none: { id: 'app.screenshots.group.none', defaultMessage: 'No grouping' },
+	today: { id: 'app.screenshots.group.today', defaultMessage: 'Today' },
+	yesterday: { id: 'app.screenshots.group.yesterday', defaultMessage: 'Yesterday' },
+	thisWeek: { id: 'app.screenshots.group.this-week', defaultMessage: 'This week' },
+	thisMonth: { id: 'app.screenshots.group.this-month', defaultMessage: 'This month' },
+	allScreenshots: {
+		id: 'app.screenshots.group.all-screenshots',
+		defaultMessage: 'All screenshots',
+	},
+	ungrouped: { id: 'app.screenshots.group.ungrouped', defaultMessage: 'Ungrouped' },
+	editGroup: { id: 'app.screenshots.group.edit', defaultMessage: 'Edit group name' },
+	deleteGroup: { id: 'app.screenshots.group.delete', defaultMessage: 'Delete group' },
+	deleteGroupDescription: {
+		id: 'app.screenshots.group.delete-description',
+		defaultMessage: 'Screenshots in this group will become ungrouped.',
+	},
+	instanceAndDate: {
+		id: 'app.screenshots.preview.instance-and-date',
+		defaultMessage: '{instance} · {date}',
+	},
+	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
+	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
+	deleteTitle: { id: 'app.screenshots.delete-title', defaultMessage: 'Delete screenshot' },
+	deleteDescription: {
+		id: 'app.screenshots.delete-description',
+		defaultMessage: 'Permanently delete {name}? This action cannot be undone.',
+	},
+	deleteSuccess: { id: 'app.screenshots.delete-success', defaultMessage: 'Screenshot deleted' },
+	selectionAriaLabel: {
+		id: 'app.screenshots.selection.aria-label',
+		defaultMessage: 'Selected screenshots',
+	},
+	selectedCount: {
+		id: 'app.screenshots.selection.selected-count',
+		defaultMessage: '{count} selected',
+	},
+	exportZip: { id: 'app.screenshots.selection.export-zip', defaultMessage: 'Export ZIP' },
+	zipArchive: { id: 'app.screenshots.selection.zip-archive', defaultMessage: 'ZIP archive' },
+	globalExportFilename: {
+		id: 'app.screenshots.selection.global-export-filename',
+		defaultMessage: 'Modrinth screenshots.zip',
+	},
+	instanceExportFilename: {
+		id: 'app.screenshots.selection.instance-export-filename',
+		defaultMessage: '{instance} screenshots.zip',
+	},
+	bulkDeleteTitle: {
+		id: 'app.screenshots.selection.delete-title',
+		defaultMessage: 'Delete selected screenshots',
+	},
+	bulkDeleteDescription: {
+		id: 'app.screenshots.selection.delete-description',
+		defaultMessage:
+			'Delete {count, plural, one {# screenshot} other {# screenshots}}? This action cannot be undone.',
+	},
+	bulkDeleteSuccess: {
+		id: 'app.screenshots.selection.delete-success',
+		defaultMessage: '{count, plural, one {# screenshot deleted} other {# screenshots deleted}}',
+	},
+})
+
+const screenshotsQuery = useQuery(
+	computed(() =>
+		props.instanceId
+			? instanceScreenshotsQueryOptions(props.instanceId)
+			: syncedScreenshotsQueryOptions(),
+	),
+)
+const instancesQuery = useQuery(instanceListQueryOptions())
+const screenshotGroupsQuery = useQuery(screenshotGroupsQueryOptions())
+const screenshotsQueryPending = useReadyState(screenshotsQuery)
+const screenshotGroupsQueryPending = useReadyState(screenshotGroupsQuery)
+const screenshotsReadyPending = computed(
+	() =>
+		screenshotsQueryPending.value ||
+		(groupBy.value === 'custom' &&
+			(screenshotGroupsQueryPending.value || migratingLegacyGroups.value)),
+)
+const screenshots = computed(() => screenshotsQuery.data.value ?? [])
+const customGroups = computed(() => screenshotGroupsQuery.data.value ?? [])
+const instances = computed(() => instancesQuery.data.value ?? [])
+const instancesById = computed(() =>
+	new Map(instances.value.map((instance) => [instance.id, instance])),
+)
+const screenshotInstanceIds = computed(
+	() => new Set(screenshots.value.map((screenshot) => screenshot.instance_id)),
+)
+const filterInstances = computed(() =>
+	instances.value.filter((instance) => screenshotInstanceIds.value.has(instance.id)),
+)
+const modpackFilterOptions = computed<ComboboxOption<string>[]>(() => {
+	const modpacksByProjectId = new Map<string, string>()
+	for (const instance of filterInstances.value) {
+		if (instance.shared_instance || instance.link?.type !== 'modrinth_modpack') continue
+		if (!modpacksByProjectId.has(instance.link.project_id)) {
+			modpacksByProjectId.set(instance.link.project_id, instance.name)
+		}
+	}
+
+	return [...modpacksByProjectId]
+		.map(([value, label]) => ({ value, label }))
+		.sort((a, b) => a.label.localeCompare(b.label))
+})
+const screenshotsError = computed(() => {
+	const error =
+		screenshotsQuery.error.value ||
+		(groupBy.value === 'custom' ? screenshotGroupsQuery.error.value : null)
+	return error instanceof Error ? error : error ? new Error(String(error)) : null
+})
+const selectionActive = computed(() => selectedKeys.value.size > 0)
+const selectedScreenshots = computed(() =>
+	screenshots.value.filter((screenshot) => selectedKeys.value.has(getSelectionKey(screenshot))),
+)
+const activeDraggedKeys = computed(
+	() => new Set(activeDrag.value?.selectionKeys ?? []),
+)
+const activeDraggedScreenshots = computed(() => {
+	const drag = activeDrag.value
+	if (!drag) return []
+
+	const screenshotsByKey = new Map(
+		screenshots.value.map((screenshot) => [getSelectionKey(screenshot), screenshot]),
+	)
+	return drag.selectionKeys.flatMap((selectionKey) => {
+		const screenshot = screenshotsByKey.get(selectionKey)
+		return screenshot ? [screenshot] : []
+	})
+})
+const activeDraggedScreenshot = computed(() =>
+	activeDrag.value
+		? screenshots.value.find(
+				(screenshot) => getSelectionKey(screenshot) === activeDrag.value?.primarySelectionKey,
+			)
+		: undefined,
+)
+const {
+	items: gatherItems,
+	target: gatherTarget,
+	isGathering,
+	start: startGather,
+	updateTarget: updateGatherTarget,
+	clear: clearGather,
+	finish: finishGather,
+} = useScreenshotDragGather(screenshots)
+const hasActiveFilters = computed(() =>
+	Object.values(filters.value).some((selectedValues) => selectedValues.length > 0),
+)
+const isNarrowingResults = computed(() => search.value.trim().length > 0 || hasActiveFilters.value)
+
+const sortOptions = computed<ComboboxOption<string>[]>(() => [
+	{ value: 'newest', label: formatMessage(messages.newest) },
+	{ value: 'oldest', label: formatMessage(messages.oldest) },
+	{ value: 'name', label: formatMessage(messages.name) },
+])
+const groupOptions = computed<ComboboxOption<string>[]>(() => [
+	{ value: 'custom', label: formatMessage(messages.custom) },
+	...(isGlobal.value
+		? [{ value: 'instance', label: formatMessage(messages.instance) }]
+		: []),
+	{ value: 'date', label: formatMessage(messages.date) },
+	{ value: 'none', label: formatMessage(messages.none) },
+])
+
+const filteredScreenshots = computed(() => {
+	const query = search.value.trim().toLocaleLowerCase()
+	const filtered = screenshots.value.filter((screenshot) => {
+		const instance = instancesById.value.get(screenshot.instance_id)
+		const matchesSearch =
+			!query ||
+			screenshot.file_name.toLocaleLowerCase().includes(query) ||
+			screenshot.instance_name.toLocaleLowerCase().includes(query)
+		const matchesLoader =
+			filters.value.loader.length === 0 ||
+			(instance ? filters.value.loader.includes(instance.loader) : false)
+		const matchesGameVersion =
+			filters.value.gameVersion.length === 0 ||
+			(instance ? filters.value.gameVersion.includes(instance.game_version) : false)
+		const linkedModpackProjectId =
+			!instance?.shared_instance && instance?.link?.type === 'modrinth_modpack'
+				? instance.link.project_id
+				: undefined
+		const matchesModpack =
+			filters.value.modpack.length === 0 ||
+			(linkedModpackProjectId
+				? filters.value.modpack.includes(linkedModpackProjectId)
+				: false)
+
+		return matchesSearch && matchesLoader && matchesGameVersion && matchesModpack
+	})
+
+	return filtered.sort((a, b) => {
+		if (sort.value === 'name') return a.file_name.localeCompare(b.file_name)
+		const difference = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+		return sort.value === 'oldest' ? difference : -difference
+	})
+})
+
+const groupedScreenshots = computed((): ScreenshotGroupData[] => {
+	if (groupBy.value === 'none') {
+		return [
+			{
+				id: 'all',
+				title: formatMessage(messages.allScreenshots),
+				screenshots: filteredScreenshots.value,
+			},
+		]
+	}
+
+	if (groupBy.value === 'instance') {
+		const screenshotGroups = new Map<string, InstanceScreenshot[]>()
+		for (const screenshot of filteredScreenshots.value) {
+			const group = screenshotGroups.get(screenshot.instance_id) ?? []
+			group.push(screenshot)
+			screenshotGroups.set(screenshot.instance_id, group)
+		}
+
+		const syncedInstances = (instancesQuery.data.value ?? [])
+			.filter((instance) => instance.synced_options.screenshots)
+			.sort((a, b) => a.name.localeCompare(b.name))
+		const groups = syncedInstances.map((instance) => ({
+			id: `instance:${instance.id}`,
+			title: instance.name,
+			screenshots: screenshotGroups.get(instance.id) ?? [],
+			dropInstanceId: instance.id,
+		}))
+
+		for (const [instanceId, instanceScreenshots] of screenshotGroups) {
+			if (groups.some((group) => group.dropInstanceId === instanceId)) continue
+			groups.push({
+				id: `instance:${instanceId}`,
+				title: instanceScreenshots[0]?.instance_name ?? instanceId,
+				screenshots: instanceScreenshots,
+				dropInstanceId: instanceId,
+			})
+		}
+
+		return isNarrowingResults.value
+			? groups.filter((group) => group.screenshots.length > 0)
+			: groups
+	}
+
+	if (groupBy.value === 'custom') {
+		const screenshotGroups = new Map<string, InstanceScreenshot[]>()
+		const ungroupedScreenshots: InstanceScreenshot[] = []
+		const validGroupIds = new Set(customGroups.value.map((group) => group.id))
+		for (const screenshot of filteredScreenshots.value) {
+			const customGroupId = screenshot.group_id
+			if (!customGroupId || !validGroupIds.has(customGroupId)) {
+				ungroupedScreenshots.push(screenshot)
+				continue
+			}
+			const group = screenshotGroups.get(customGroupId) ?? []
+			group.push(screenshot)
+			screenshotGroups.set(customGroupId, group)
+		}
+
+		const groups: ScreenshotGroupData[] = customGroups.value.map((group) => ({
+			id: `custom:${group.id}`,
+			title: group.name,
+			screenshots: screenshotGroups.get(group.id) ?? [],
+			customGroupId: group.id,
+		}))
+		groups.push({
+			id: 'custom:ungrouped',
+			title: formatMessage(messages.ungrouped),
+			screenshots: ungroupedScreenshots,
+			customGroupId: null,
+		})
+		return isNarrowingResults.value
+			? groups.filter(
+					(group) =>
+						group.screenshots.length > 0 || group.customGroupId === groupIdPendingNameEdit.value,
+				)
+			: groups
+	}
+
+	const groups = new Map<string, ScreenshotGroupData>()
+	for (const screenshot of filteredScreenshots.value) {
+		const dateGroup = getDateGroup(screenshot.created_at)
+		const group = groups.get(dateGroup.id) ?? { ...dateGroup, screenshots: [] }
+		group.screenshots.push(screenshot)
+		groups.set(dateGroup.id, group)
+	}
+	return [...groups.values()].sort((a, b) => {
+		const aTime = Math.max(
+			...a.screenshots.map((screenshot) => new Date(screenshot.created_at).getTime()),
+		)
+		const bTime = Math.max(
+			...b.screenshots.map((screenshot) => new Date(screenshot.created_at).getTime()),
+		)
+		return sort.value === 'oldest' ? aTime - bTime : bTime - aTime
+	})
+})
+
+const previewItems = computed(() =>
+	filteredScreenshots.value.map((screenshot) => ({
+		id: getSelectionKey(screenshot),
+		src: screenshot.url,
+		alt: screenshot.file_name,
+		title: screenshot.file_name,
+		description: isGlobal.value
+			? formatMessage(messages.instanceAndDate, {
+					instance: screenshot.instance_name,
+					date: formatDateTime(screenshot.created_at),
+				})
+			: formatDateTime(screenshot.created_at),
+	})),
+)
+
+const deleteMutation = useMutation({
+	mutationFn: (keys: ScreenshotKey[]) => delete_screenshots(keys),
+	onSuccess: async (_, keys) => {
+		await invalidateScreenshots(keys.map((key) => key.instance_id))
+	},
+})
+const exportMutation = useMutation({
+	mutationFn: ({ keys, path }: { keys: ScreenshotKey[]; path: string }) =>
+		export_screenshots(keys, path),
+})
+const moveMutation = useMutation({
+	mutationFn: ({ keys, targetInstanceId }: { keys: ScreenshotKey[]; targetInstanceId: string }) =>
+		move_screenshots(keys, targetInstanceId),
+	onSuccess: async (_, variables) => {
+		await invalidateScreenshots([
+			...variables.keys.map((key) => key.instance_id),
+			variables.targetInstanceId,
+		])
+		selectedKeys.value = new Set()
+	},
+})
+const bulkBusy = computed(
+	() =>
+		deleteMutation.isPending.value ||
+		exportMutation.isPending.value ||
+		moveMutation.isPending.value,
+)
+
+watch(screenshots, (currentScreenshots) => {
+	const currentKeys = new Set(currentScreenshots.map(getSelectionKey))
+	selectedKeys.value = new Set([...selectedKeys.value].filter((key) => currentKeys.has(key)))
+})
+
+watch(
+	[() => screenshotsQuery.isSuccess.value, () => instancesQuery.isSuccess.value, modpackFilterOptions],
+	([screenshotsLoaded, instancesLoaded, options]) => {
+		if (!screenshotsLoaded || !instancesLoaded) return
+
+		const validProjectIds = new Set(options.map((option) => option.value))
+		const modpack = filters.value.modpack.filter((projectId) => validProjectIds.has(projectId))
+		if (modpack.length !== filters.value.modpack.length) {
+			filters.value = { ...filters.value, modpack }
+		}
+	},
+	{ immediate: true },
+)
+
+watch(groupBy, (currentGroupBy) => {
+	if (currentGroupBy !== 'custom') {
+		groupIdPendingNameEdit.value = undefined
+	}
+})
+
+watch(
+	() => screenshotGroupsQuery.isSuccess.value,
+	(groupsLoaded) => {
+		if (groupsLoaded) void migrateLegacyScreenshotGroups()
+	},
+	{ immediate: true },
+)
+
+useAppEvent('instance', (event) => {
+	if (event.event !== 'screenshots_updated') return
+	void invalidateScreenshots([event.instance_id])
+})
+
+function getSelectionKey(screenshot: InstanceScreenshot) {
+	return JSON.stringify([screenshot.instance_id, screenshot.file_name])
+}
+
+function getScreenshotKey(screenshot: InstanceScreenshot): ScreenshotKey {
+	return {
+		instance_id: screenshot.instance_id,
+		file_name: screenshot.file_name,
+	}
+}
+
+async function migrateLegacyScreenshotGroups() {
+	const legacy = legacyCustomGrouping.value
+	if (migratingLegacyGroups.value || legacy.groups.length === 0) return
+
+	migratingLegacyGroups.value = true
+	try {
+		const allScreenshots = await list_all_screenshots()
+		const screenshotIdsByLegacyKey = new Map(
+			allScreenshots.map((screenshot) => [getSelectionKey(screenshot), screenshot.id]),
+		)
+		const screenshotIdsByGroupId = new Map<string, string[]>()
+		for (const [legacyKey, groupId] of Object.entries(legacy.assignments)) {
+			const screenshotId = screenshotIdsByLegacyKey.get(legacyKey)
+			if (!screenshotId) continue
+			const screenshotIds = screenshotIdsByGroupId.get(groupId) ?? []
+			screenshotIds.push(screenshotId)
+			screenshotIdsByGroupId.set(groupId, screenshotIds)
+		}
+		const groups: ScreenshotGroupImport[] = legacy.groups.map((group) => ({
+			...group,
+			screenshot_ids: screenshotIdsByGroupId.get(group.id) ?? [],
+		}))
+		await import_screenshot_groups(groups)
+		legacyCustomGrouping.value = { groups: [], assignments: {} }
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: screenshotKeys.groups() }),
+			invalidateScreenshots(allScreenshots.map((screenshot) => screenshot.instance_id)),
+		])
+	} catch (error) {
+		handleError(error)
+	} finally {
+		migratingLegacyGroups.value = false
+	}
+}
+
+function getDefaultCustomGroupName() {
+	const existingNames = new Set(
+		customGroups.value.map((group) => group.name.trim().toLocaleLowerCase()),
+	)
+	let groupNumber = customGroups.value.length + 1
+	while (existingNames.has(`group ${groupNumber}`.toLocaleLowerCase())) {
+		groupNumber += 1
+	}
+	return `Group ${groupNumber}`
+}
+
+async function createCustomGroup() {
+	try {
+		const screenshotsToGroup = [...selectedScreenshots.value]
+		const group = await create_screenshot_group(
+			getDefaultCustomGroupName(),
+			screenshotsToGroup.map((screenshot) => screenshot.id),
+		)
+		queryClient.setQueryData<ScreenshotGroup[]>(screenshotKeys.groups(), (groups = []) => [
+			group,
+			...groups.filter((existingGroup) => existingGroup.id !== group.id),
+		])
+		await invalidateScreenshots([
+			...new Set(screenshotsToGroup.map((screenshot) => screenshot.instance_id)),
+		])
+		groupBy.value = 'custom'
+		selectedKeys.value = new Set()
+		groupIdPendingNameEdit.value = group.id
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+function validateCustomGroupName(value: string) {
+	const normalizedGroupName = value.trim()
+	return (
+		normalizedGroupName.length > 0 &&
+		normalizedGroupName.length <= MAX_INSTANCE_GROUP_NAME_LENGTH &&
+		normalizedGroupName.toLocaleLowerCase() !== 'none'
+	)
+}
+
+async function renameCustomGroup(groupId: string | null | undefined, name: string) {
+	if (!groupId) return false
+	try {
+		const group = await rename_screenshot_group(groupId, name)
+		queryClient.setQueryData<ScreenshotGroup[]>(screenshotKeys.groups(), (groups = []) =>
+			groups.map((existingGroup) => (existingGroup.id === group.id ? group : existingGroup)),
+		)
+		return true
+	} catch {
+		return false
+	}
+}
+
+function requestCustomGroupDeletion(groupId: string) {
+	customGroupToDelete.value = customGroups.value.find((group) => group.id === groupId)
+	if (customGroupToDelete.value) deleteGroupModal.value?.show()
+}
+
+async function deleteCustomGroup() {
+	const group = customGroupToDelete.value
+	if (!group) return
+	try {
+		await delete_screenshot_group(group.id)
+		queryClient.setQueryData<ScreenshotGroup[]>(screenshotKeys.groups(), (groups = []) =>
+			groups.filter((candidate) => candidate.id !== group.id),
+		)
+		await invalidateScreenshots(screenshots.value.map((screenshot) => screenshot.instance_id))
+		if (groupIdPendingNameEdit.value === group.id) {
+			groupIdPendingNameEdit.value = undefined
+		}
+		customGroupToDelete.value = undefined
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+async function assignCustomGroup(
+	screenshotsToMove: InstanceScreenshot[],
+	customGroupId: string | null,
+) {
+	const movedScreenshots = screenshotsToMove.filter(
+		(screenshot) => (screenshot.group_id ?? null) !== customGroupId,
+	)
+	if (movedScreenshots.length === 0) return
+	try {
+		await set_screenshot_group_memberships(
+			movedScreenshots.map((screenshot) => ({
+				screenshot_id: screenshot.id,
+				group_id: customGroupId,
+			})),
+		)
+		await invalidateScreenshots(
+			movedScreenshots.map((screenshot) => screenshot.instance_id),
+		)
+		selectedKeys.value = new Set()
+	} catch {
+		return
+	}
+}
+
+function getDateGroup(createdAt: string): Omit<ScreenshotGroupData, 'screenshots'> {
+	const created = dayjs(createdAt)
+	const now = dayjs()
+	if (created.isSame(now, 'day')) {
+		return { id: 'date:today', title: formatMessage(messages.today) }
+	}
+	if (created.isSame(now.subtract(1, 'day'), 'day')) {
+		return { id: 'date:yesterday', title: formatMessage(messages.yesterday) }
+	}
+	if (created.isSame(now, 'week')) {
+		return {
+			id: `date:week:${created.startOf('week').format('YYYY-MM-DD')}`,
+			title: formatMessage(messages.thisWeek),
+		}
+	}
+	if (created.isSame(now, 'month')) {
+		return { id: `date:month:${created.format('YYYY-MM')}`, title: formatMessage(messages.thisMonth) }
+	}
+	return {
+		id: `date:month:${created.format('YYYY-MM')}`,
+		title: formatMonth(created.toDate()),
+	}
+}
+
+async function invalidateScreenshots(instanceIds: string[]) {
+	const uniqueInstanceIds = [...new Set(instanceIds)]
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: screenshotKeys.global() }),
+		...uniqueInstanceIds.map((instanceId) =>
+			queryClient.invalidateQueries({ queryKey: screenshotKeys.instance(instanceId) }),
+		),
+	])
+}
+
+function toggleScreenshotSelection(screenshot: InstanceScreenshot) {
+	if (bulkBusy.value) return
+	const key = getSelectionKey(screenshot)
+	const next = new Set(selectedKeys.value)
+	if (next.has(key)) {
+		next.delete(key)
+	} else {
+		next.add(key)
+	}
+	selectedKeys.value = next
+}
+
+function activateScreenshot(screenshot: InstanceScreenshot, event: MouseEvent | KeyboardEvent) {
+	if (selectionActive.value || event.shiftKey) {
+		toggleScreenshotSelection(screenshot)
+		return
+	}
+	const index = filteredScreenshots.value.findIndex(
+		(candidate) => getSelectionKey(candidate) === getSelectionKey(screenshot),
+	)
+	if (index >= 0) previewModal.value?.show(index)
+}
+
+function clearSelection() {
+	if (!bulkBusy.value) selectedKeys.value = new Set()
+}
+
+function requestDelete(screenshot: InstanceScreenshot, fromPreview = false) {
+	deleteFromPreview.value = fromPreview
+	screenshotToDelete.value = screenshot
+	deleteModal.value?.show()
+}
+
+function screenshotBySelectionKey(selectionKey: string) {
+	return screenshots.value.find(
+		(screenshot) => getSelectionKey(screenshot) === selectionKey,
+	)
+}
+
+function copyScreenshotBySelectionKey(selectionKey: string) {
+	const screenshot = screenshotBySelectionKey(selectionKey)
+	if (screenshot) void copyScreenshot(screenshot)
+}
+
+function openScreenshotBySelectionKey(selectionKey: string) {
+	const screenshot = screenshotBySelectionKey(selectionKey)
+	if (screenshot) void openScreenshot(screenshot)
+}
+
+function requestPreviewDelete(selectionKey: string) {
+	const screenshot = screenshotBySelectionKey(selectionKey)
+	if (screenshot) requestDelete(screenshot, true)
+}
+
+async function confirmDelete() {
+	const screenshot = screenshotToDelete.value
+	if (!screenshot) return
+	try {
+		await deleteMutation.mutateAsync([getScreenshotKey(screenshot)])
+		if (deleteFromPreview.value) previewModal.value?.hide()
+		addNotification({ type: 'success', title: formatMessage(messages.deleteSuccess) })
+	} catch (error) {
+		handleError(error)
+	} finally {
+		screenshotToDelete.value = null
+		deleteFromPreview.value = false
+	}
+}
+
+async function deleteSelected() {
+	const selected = selectedScreenshots.value
+	if (bulkBusy.value || selected.length === 0) return
+	try {
+		await deleteMutation.mutateAsync(selected.map(getScreenshotKey))
+		selectedKeys.value = new Set()
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.bulkDeleteSuccess, { count: selected.length }),
+		})
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+async function exportSelected() {
+	const selected = selectedScreenshots.value
+	if (bulkBusy.value || selected.length === 0) return
+	const instanceName =
+		selected[0]?.instance_name.replace(/[\\/:*?"<>|]/g, '-') ?? formatMessage(messages.heading)
+	const outputPath = await save({
+		defaultPath: isGlobal.value
+			? formatMessage(messages.globalExportFilename)
+			: formatMessage(messages.instanceExportFilename, { instance: instanceName }),
+		filters: [{ name: formatMessage(messages.zipArchive), extensions: ['zip'] }],
+	})
+	if (!outputPath) return
+	try {
+		await exportMutation.mutateAsync({
+			keys: selected.map(getScreenshotKey),
+			path: outputPath,
+		})
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+async function copyScreenshot(screenshot: InstanceScreenshot) {
+	try {
+		const png = readFile(screenshot.path).then((bytes) => new Blob([bytes], { type: 'image/png' }))
+		await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })])
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+async function openScreenshot(screenshot: InstanceScreenshot) {
+	try {
+		await open_screenshot(getScreenshotKey(screenshot))
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+function handleDragStart(event: DragStartEvent) {
+	const source = event.operation.source?.data as ScreenshotDragData | undefined
+	if (!source) return
+
+	const selectedDragKeys = selectedKeys.value.has(source.selectionKey)
+		? selectedScreenshots.value.map(getSelectionKey)
+		: []
+	const selectionKeys = [
+		source.selectionKey,
+		...selectedDragKeys.filter((selectionKey) => selectionKey !== source.selectionKey),
+	]
+	activeDrag.value = {
+		primarySelectionKey: source.selectionKey,
+		selectionKeys,
+	}
+	startGather(activeDrag.value, event.operation.position.current)
+}
+
+function handleDragMove(event: DragMoveEvent) {
+	if (gatherItems.value.length === 0) return
+	updateGatherTarget(event.to ?? event.operation.position.current)
+}
+
+function handleDragOver(event: DragOverEvent) {
+	const target = event.operation.target?.data as ScreenshotDropData | undefined
+	activeDropGroupId.value = target?.groupId ?? null
+}
+
+function canDropScreenshotsOnTarget(target: ScreenshotDropData) {
+	if (!activeDrag.value || activeDraggedScreenshots.value.length === 0) return false
+
+	if ('customGroupId' in target) {
+		const targetGroupId = target.customGroupId ?? null
+		return activeDraggedScreenshots.value.some(
+			(screenshot) => (screenshot.group_id ?? null) !== targetGroupId,
+		)
+	}
+
+	return Boolean(
+		target.instanceId &&
+			activeDraggedScreenshots.value.some(
+				(screenshot) => screenshot.instance_id !== target.instanceId,
+			),
+	)
+}
+
+function canDropScreenshotsOnGroup(group: ScreenshotGroupData) {
+	if (groupBy.value === 'custom') {
+		return canDropScreenshotsOnTarget({
+			groupId: group.id,
+			customGroupId: group.customGroupId ?? null,
+		})
+	}
+	if (groupBy.value === 'instance' && group.dropInstanceId) {
+		return canDropScreenshotsOnTarget({
+			groupId: group.id,
+			instanceId: group.dropInstanceId,
+		})
+	}
+	return false
+}
+
+async function handleDragEnd(event: DragEndEvent) {
+	const drag = activeDrag.value
+	const target = event.operation.target?.data as ScreenshotDropData | undefined
+	clearGroupHoverOpenTimeout()
+	if (!event.canceled && drag && target && canDropScreenshotsOnTarget(target)) {
+		if ('customGroupId' in target) {
+			await assignCustomGroup(activeDraggedScreenshots.value, target.customGroupId ?? null)
+			await nextTick()
+		} else if (target.instanceId) {
+			const keys = activeDraggedScreenshots.value.map(getScreenshotKey)
+			const movableKeys = keys.filter((key) => key.instance_id !== target.instanceId)
+			if (movableKeys.length > 0) {
+				moveMutation.mutate({ keys: movableKeys, targetInstanceId: target.instanceId })
+			}
+		}
+	}
+
+	clearGather()
+	activeDrag.value = null
+	activeDropGroupId.value = null
+}
+
+function setGroupCollapsed(groupId: string, collapsed: boolean) {
+	collapsedGroups.value = { ...collapsedGroups.value, [groupId]: collapsed }
+}
+
+const GROUP_HOVER_OPEN_DELAY = 750
+let groupHoverOpenTimeout: ReturnType<typeof setTimeout> | undefined
+
+function clearGroupHoverOpenTimeout() {
+	if (groupHoverOpenTimeout !== undefined) {
+		clearTimeout(groupHoverOpenTimeout)
+	}
+	groupHoverOpenTimeout = undefined
+}
+
+watch(activeDropGroupId, (groupId) => {
+	clearGroupHoverOpenTimeout()
+	if (!groupId || !collapsedGroups.value[groupId]) return
+
+	const group = groupedScreenshots.value.find((candidate) => candidate.id === groupId)
+	if (!group || !canDropScreenshotsOnGroup(group)) return
+
+	groupHoverOpenTimeout = setTimeout(() => {
+		groupHoverOpenTimeout = undefined
+		if (activeDropGroupId.value === groupId) {
+			setGroupCollapsed(groupId, false)
+		}
+	}, GROUP_HOVER_OPEN_DELAY)
+})
+
+onBeforeUnmount(clearGroupHoverOpenTimeout)
+</script>
+
+<template>
+	<ConfirmModal
+		ref="deleteModal"
+		:title="formatMessage(messages.deleteTitle)"
+		:description="
+			formatMessage(messages.deleteDescription, {
+				name: screenshotToDelete?.file_name ?? '',
+			})
+		"
+		:proceed-label="formatMessage(commonMessages.deleteLabel)"
+		:markdown="false"
+		@proceed="confirmDelete"
+	/>
+	<ConfirmModal
+		ref="bulkDeleteModal"
+		:title="formatMessage(messages.bulkDeleteTitle)"
+		:description="formatMessage(messages.bulkDeleteDescription, { count: selectedKeys.size })"
+		:proceed-label="formatMessage(commonMessages.deleteLabel)"
+		:markdown="false"
+		@proceed="deleteSelected"
+	/>
+	<ConfirmModal
+		ref="deleteGroupModal"
+		:title="formatMessage(messages.deleteGroup)"
+		:description="formatMessage(messages.deleteGroupDescription)"
+		:proceed-label="formatMessage(commonMessages.deleteLabel)"
+		:markdown="false"
+		@proceed="deleteCustomGroup"
+	/>
+	<ScreenshotPreviewModal ref="previewModal" :items="previewItems">
+		<template #actions="{ item }">
+			<IconButton
+				v-tooltip="formatMessage(messages.copy)"
+				:label="formatMessage(messages.copy)"
+				@click="copyScreenshotBySelectionKey(item.id)"
+			>
+				<ClipboardCopyIcon />
+			</IconButton>
+			<IconButton
+				v-tooltip="formatMessage(messages.showInFolder)"
+				:label="formatMessage(messages.showInFolder)"
+				@click="openScreenshotBySelectionKey(item.id)"
+			>
+				<ExternalIcon />
+			</IconButton>
+			<IconButton
+				v-tooltip="formatMessage(commonMessages.deleteLabel)"
+				:label="formatMessage(commonMessages.deleteLabel)"
+				@click="requestPreviewDelete(item.id)"
+			>
+				<TrashIcon />
+			</IconButton>
+		</template>
+	</ScreenshotPreviewModal>
+
+	<div class="flex w-full flex-col gap-5">
+		<h1 v-if="showHeading" class="m-0 text-2xl font-bold text-contrast">
+			{{ formatMessage(messages.heading) }}
+		</h1>
+
+		<ScreenshotToolbar
+			v-model:search="search"
+			v-model:sort="sortModel"
+			v-model:group="groupByModel"
+			v-model:filters="filters"
+			:sort-options="sortOptions"
+			:group-options="groupOptions"
+			:instances="filterInstances"
+			:modpack-options="modpackFilterOptions"
+			@new-group="createCustomGroup"
+		/>
+
+		<ReadyTransition :pending="screenshotsReadyPending">
+			<EmptyState
+				v-if="screenshotsError"
+				type="error"
+				:heading="formatMessage(messages.errorHeading)"
+				:description="screenshotsError.message"
+			>
+				<template #actions>
+					<Button type="outlined" @click="screenshotsQuery.refetch()">
+						{{ formatMessage(commonMessages.retryButton) }}
+					</Button>
+				</template>
+			</EmptyState>
+
+			<EmptyState
+				v-else-if="screenshots.length === 0 && !groupIdPendingNameEdit"
+				type="no-images"
+				:heading="formatMessage(messages.emptyHeading)"
+				:description="formatMessage(messages.emptyDescription)"
+			/>
+			<EmptyState
+				v-else-if="filteredScreenshots.length === 0 && !groupIdPendingNameEdit"
+				type="no-images"
+				:heading="formatMessage(messages.noResultsHeading)"
+				:description="formatMessage(messages.noResultsDescription)"
+			/>
+
+			<DragDropProvider
+				v-else
+				@drag-start="handleDragStart"
+				@drag-move="handleDragMove"
+				@drag-over="handleDragOver"
+				@drag-end="handleDragEnd"
+			>
+				<div class="flex flex-col">
+					<ScreenshotGroupSection
+						v-for="group in groupedScreenshots"
+						:key="group.id"
+						:id="group.id"
+						:title="group.title"
+						:screenshots="group.screenshots"
+						:selected-keys="selectedKeys"
+						:selection-active="selectionActive"
+						:active-dragged-keys="activeDraggedKeys"
+						:show-drop-outline="
+							activeDropGroupId === group.id && canDropScreenshotsOnGroup(group)
+						"
+						:can-drag="groupBy === 'custom' || (isGlobal && groupBy === 'instance')"
+						:drop-instance-id="groupBy === 'instance' ? group.dropInstanceId : undefined"
+						:drop-custom-group="groupBy === 'custom'"
+						:drop-custom-group-id="group.customGroupId ?? undefined"
+						:show-instance-name="isGlobal && groupBy !== 'instance'"
+						:force-open="search.length > 0"
+						:hide-header="groupBy === 'none'"
+						:editable-title="Boolean(group.customGroupId)"
+						:start-editing-title="groupIdPendingNameEdit === group.customGroupId"
+						:max-title-length="MAX_INSTANCE_GROUP_NAME_LENGTH"
+						:validate-title="validateCustomGroupName"
+						:on-title-change="(name: string) => renameCustomGroup(group.customGroupId, name)"
+						:collapsed="Boolean(collapsedGroups[group.id])"
+						@update:collapsed="(value) => setGroupCollapsed(group.id, value)"
+						@activate="activateScreenshot"
+						@toggle-selection="toggleScreenshotSelection"
+						@copy="copyScreenshot"
+						@open="openScreenshot"
+						@delete="requestDelete"
+					>
+						<template v-if="group.customGroupId" #actions="{ startEditing }">
+							<div
+								class="flex shrink-0 items-center opacity-0 transition-opacity duration-250 group-hover/header:opacity-100 focus-within:opacity-100"
+							>
+								<IconButton
+									v-tooltip="formatMessage(messages.editGroup)"
+									:label="formatMessage(messages.editGroup)"
+									type="quiet"
+									size="sm"
+									@click.stop="startEditing"
+								>
+									<EditIcon />
+								</IconButton>
+								<IconButton
+									v-tooltip="formatMessage(messages.deleteGroup)"
+									:label="formatMessage(messages.deleteGroup)"
+									type="quiet"
+									size="sm"
+									@click.stop="requestCustomGroupDeletion(group.customGroupId)"
+								>
+									<TrashIcon />
+								</IconButton>
+							</div>
+						</template>
+					</ScreenshotGroupSection>
+				</div>
+				<Teleport to="body">
+					<div class="pointer-events-none fixed inset-0 z-[9999]">
+						<DragOverlay :drop-animation="null">
+							<div
+								v-if="activeDraggedScreenshot"
+								class="w-full transition-all duration-150 ease-out"
+								:class="isGathering ? 'scale-[0.975]' : 'scale-100'"
+							>
+								<ScreenshotDragPreview
+									:screenshot="activeDraggedScreenshot"
+									:count="activeDraggedScreenshots.length"
+								/>
+							</div>
+						</DragOverlay>
+					</div>
+				</Teleport>
+			</DragDropProvider>
+			<ScreenshotDragGather
+				v-if="gatherItems.length > 0"
+				:items="gatherItems"
+				:target="gatherTarget"
+				@complete="finishGather"
+			/>
+		</ReadyTransition>
+	</div>
+
+	<FloatingActionBar
+		:shown="selectionActive"
+		:aria-label="formatMessage(messages.selectionAriaLabel)"
+		hide-when-modal-open
+	>
+		<div class="flex items-center gap-0.5">
+			<span class="px-4 py-2.5 text-base font-semibold tabular-nums text-contrast">
+				{{ formatMessage(messages.selectedCount, { count: selectedKeys.size }) }}
+			</span>
+			<div class="mx-1 h-6 w-px bg-surface-5" />
+			<Button type="quiet" :disabled="bulkBusy" @click="clearSelection">
+				{{ formatMessage(commonMessages.clearButton) }}
+			</Button>
+		</div>
+		<div class="ml-auto flex items-center gap-0.5">
+			<Button type="quiet" :disabled="bulkBusy" @click="exportSelected">
+				<FileArchiveIcon />
+				<span>{{ formatMessage(messages.exportZip) }}</span>
+			</Button>
+			<div class="mx-1 h-6 w-px bg-surface-5" />
+			<Button
+				type="quiet"
+				color="red"
+				interaction="filled"
+				:disabled="bulkBusy"
+				@click="bulkDeleteModal?.show()"
+			>
+				<TrashIcon />
+				<span>{{ formatMessage(commonMessages.deleteLabel) }}</span>
+			</Button>
+		</div>
+	</FloatingActionBar>
+</template>
