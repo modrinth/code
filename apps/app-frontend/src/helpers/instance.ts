@@ -195,9 +195,7 @@ export type ScreenshotGroupImport = ScreenshotGroup & {
 	screenshot_ids: string[]
 }
 
-export async function list_instance_screenshots(
-	instanceId: string,
-): Promise<InstanceScreenshot[]> {
+export async function list_instance_screenshots(instanceId: string): Promise<InstanceScreenshot[]> {
 	return await invoke('plugin:instance|instance_list_screenshots', { instanceId })
 }
 
@@ -248,10 +246,7 @@ export async function delete_screenshots(keys: ScreenshotKey[]): Promise<void> {
 	return await invoke('plugin:instance|instance_delete_screenshots', { keys })
 }
 
-export async function export_screenshots(
-	keys: ScreenshotKey[],
-	exportPath: string,
-): Promise<void> {
+export async function export_screenshots(keys: ScreenshotKey[], exportPath: string): Promise<void> {
 	return await invoke('plugin:instance|instance_export_screenshots', { keys, exportPath })
 }
 

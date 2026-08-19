@@ -82,10 +82,7 @@ watch(
 			v-if="!hideHeader"
 			class="group/header flex h-10 w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 		>
-			<div
-				class="group/open-target flex min-w-0 cursor-pointer items-center gap-2"
-				@click="toggle"
-			>
+			<div class="group/open-target flex min-w-0 cursor-pointer items-center gap-2" @click="toggle">
 				<button
 					type="button"
 					class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0"

@@ -689,8 +689,8 @@ pub async fn instance_list_synced_screenshots<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn instance_list_screenshot_groups(
-) -> Result<Vec<theseus::instance::ScreenshotGroup>> {
+pub async fn instance_list_screenshot_groups()
+-> Result<Vec<theseus::instance::ScreenshotGroup>> {
     Ok(theseus::instance::list_screenshot_groups().await?)
 }
 
@@ -722,10 +722,7 @@ pub async fn instance_delete_screenshot_group(id: String) -> Result<()> {
 pub async fn instance_set_screenshot_group_memberships(
     updates: Vec<theseus::instance::ScreenshotGroupMembershipUpdate>,
 ) -> Result<()> {
-    Ok(
-        theseus::instance::set_screenshot_group_memberships(updates)
-            .await?,
-    )
+    Ok(theseus::instance::set_screenshot_group_memberships(updates).await?)
 }
 
 #[tauri::command]

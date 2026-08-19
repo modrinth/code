@@ -23,7 +23,9 @@ pub struct InstanceIconConfig {
     pub symbol: String,
 }
 
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize,
+)]
 pub struct InstanceSyncedOptions {
     pub screenshots: bool,
 }
