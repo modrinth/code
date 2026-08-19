@@ -40,11 +40,7 @@ const resolvedRel = computed(() => {
 
 // https://github.com/vuejs/vue-router/issues/2005 moment
 const linkAttrs = computed(() =>
-	usesRouter.value
-		? { to: props.to }
-		: !props.disabled
-			? { href: props.href }
-			: {},
+	usesRouter.value ? { to: props.to } : !props.disabled ? { href: props.href } : {},
 )
 
 function handleClick(event: MouseEvent) {
