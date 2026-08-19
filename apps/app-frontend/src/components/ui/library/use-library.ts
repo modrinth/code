@@ -158,12 +158,14 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		group: LibraryGroupBy
 		sortBy: LibrarySort
 		collapsedGroups: string[]
+		ungroupedGroupPosition: number
 	}>(
 		'Instances-grid-display-state',
 		{
 			group: 'Group',
 			sortBy: 'Last played',
 			collapsedGroups: [],
+			ungroupedGroupPosition: Number.MAX_SAFE_INTEGER,
 		},
 		localStorage,
 		{ mergeDefaults: true },
@@ -209,10 +211,15 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				return a.name.localeCompare(b.name)
 			})
 	})
-	const groupInstancesModalGroup = computed(
-		() =>
-			libraryGroups.value.find((group) => group.id === groupInstancesModalGroupId.value) ?? null,
-	)
+	const groupInstancesModalGroup = computed(() => {
+		if (groupInstancesModalGroupId.value === 'group:none') {
+			return { id: 'group:none', name: 'None' }
+		}
+
+		return (
+			libraryGroups.value.find((group) => group.id === groupInstancesModalGroupId.value) ?? null
+		)
+	})
 	const groupInstances = computed(() => {
 		const query = groupInstancesSearch.value.trim().toLowerCase()
 
@@ -227,8 +234,23 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const customLibraryGroups = computed(() =>
 		libraryGroups.value.filter((group) => group.id !== FAVORITES_GROUP_ID),
 	)
-	const customGroupOrder = computed(
-		() => new Map(customLibraryGroups.value.map((group, index) => [group.id, index])),
+	const orderedLibraryGroupIds = computed(() => {
+		const groupIds = customLibraryGroups.value.map((group) => group.id)
+		const storedUngroupedGroupPosition = displayState.value.ungroupedGroupPosition
+		const ungroupedGroupPosition = Math.min(
+			Math.max(
+				Number.isFinite(storedUngroupedGroupPosition)
+					? Math.trunc(storedUngroupedGroupPosition)
+					: Number.MAX_SAFE_INTEGER,
+				0,
+			),
+			groupIds.length,
+		)
+		groupIds.splice(ungroupedGroupPosition, 0, 'group:none')
+		return groupIds
+	})
+	const libraryGroupOrder = computed(
+		() => new Map(orderedLibraryGroupIds.value.map((groupId, index) => [groupId, index])),
 	)
 
 	const refreshGroups = async () => {
@@ -436,11 +458,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				if (a.id === b.id) return 0
 				if (a.id === FAVORITES_GROUP_ID) return -1
 				if (b.id === FAVORITES_GROUP_ID) return 1
-				if (a.id === 'group:none') return 1
-				if (b.id === 'group:none') return -1
 
-				const aOrder = customGroupOrder.value.get(a.id) ?? Number.MAX_SAFE_INTEGER
-				const bOrder = customGroupOrder.value.get(b.id) ?? Number.MAX_SAFE_INTEGER
+				const aOrder = libraryGroupOrder.value.get(a.id) ?? Number.MAX_SAFE_INTEGER
+				const bOrder = libraryGroupOrder.value.get(b.id) ?? Number.MAX_SAFE_INTEGER
 				return aOrder - bOrder || a.key.localeCompare(b.key) || a.id.localeCompare(b.id)
 			})
 		}
@@ -701,13 +721,17 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const openGroupInstancesModal = (groupId: string) => {
 		const group = libraryGroups.value.find((candidate) => candidate.id === groupId)
-		if (!group) return
+		if (!group && groupId !== 'group:none') return
 
 		groupInstancesModalGroupId.value = groupId
 		groupInstancesSearch.value = ''
 		selectedGroupInstanceIds.value = new Set(
 			instances.value
-				.filter((instance) => instance.group_ids.includes(groupId))
+				.filter((instance) =>
+					groupId === 'group:none'
+						? instance.group_ids.length === 0
+						: instance.group_ids.includes(groupId),
+				)
 				.map((instance) => instance.id),
 		)
 		isGroupInstancesModalOpen.value = true
@@ -722,6 +746,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		const selectedIds = new Set(selectedGroupInstanceIds.value)
 
 		if (selectedIds.has(instanceId)) {
+			if (groupInstancesModalGroupId.value === 'group:none') return
 			selectedIds.delete(instanceId)
 		} else {
 			selectedIds.add(instanceId)
@@ -734,15 +759,20 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		const groupId = groupInstancesModalGroupId.value
 		if (!groupId || savingGroupInstances.value) return false
 
-		const changedInstances = instances.value.filter(
-			(instance) =>
-				instance.group_ids.includes(groupId) !== selectedGroupInstanceIds.value.has(instance.id),
-		)
+		const isUngrouped = groupId === 'group:none'
+		const changedInstances = instances.value.filter((instance) => {
+			const isSelected = selectedGroupInstanceIds.value.has(instance.id)
+			return isUngrouped
+				? isSelected && instance.group_ids.length > 0
+				: instance.group_ids.includes(groupId) !== isSelected
+		})
 		const operations = changedInstances.map((instance) => {
 			const shouldIncludeGroup = selectedGroupInstanceIds.value.has(instance.id)
-			const nextGroupIds = shouldIncludeGroup
-				? [...instance.group_ids, groupId]
-				: instance.group_ids.filter((instanceGroupId) => instanceGroupId !== groupId)
+			const nextGroupIds = isUngrouped
+				? []
+				: shouldIncludeGroup
+					? [...instance.group_ids, groupId]
+					: instance.group_ids.filter((instanceGroupId) => instanceGroupId !== groupId)
 
 			return {
 				instance,
@@ -964,14 +994,16 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const canMoveGroupUp = (groupId: string) =>
 		!reorderingGroups.value &&
-		customLibraryGroups.value.findIndex((group) => group.id === groupId) > 0
+		orderedLibraryGroupIds.value.findIndex((orderedGroupId) => orderedGroupId === groupId) > 0
 
 	const canMoveGroupDown = (groupId: string) => {
-		const groupIndex = customLibraryGroups.value.findIndex((group) => group.id === groupId)
+		const groupIndex = orderedLibraryGroupIds.value.findIndex(
+			(orderedGroupId) => orderedGroupId === groupId,
+		)
 		return (
 			!reorderingGroups.value &&
 			groupIndex >= 0 &&
-			groupIndex < customLibraryGroups.value.length - 1
+			groupIndex < orderedLibraryGroupIds.value.length - 1
 		)
 	}
 
@@ -979,35 +1011,48 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		if (reorderingGroups.value) return false
 
 		const previousGroups = libraryGroups.value
+		const previousUngroupedGroupPosition = displayState.value.ungroupedGroupPosition
 		const customGroupsById = new Map(customLibraryGroups.value.map((group) => [group.id, group]))
+		const reorderableGroupIds = new Set([...customGroupsById.keys(), 'group:none'])
 		const orderedGroupIdSet = new Set(orderedGroupIds)
 
 		if (
 			orderedGroupIdSet.size !== orderedGroupIds.length ||
-			orderedGroupIds.some((groupId) => !customGroupsById.has(groupId))
+			orderedGroupIds.some((groupId) => !reorderableGroupIds.has(groupId))
 		) {
 			return false
 		}
 
-		const orderedGroups = orderedGroupIds.map((groupId) => customGroupsById.get(groupId)!)
 		let orderedGroupIndex = 0
-		const reorderedCustomGroups = customLibraryGroups.value.map((group) =>
-			orderedGroupIdSet.has(group.id) ? orderedGroups[orderedGroupIndex++] : group,
+		const reorderedGroupIds = orderedLibraryGroupIds.value.map((groupId) =>
+			orderedGroupIdSet.has(groupId) ? orderedGroupIds[orderedGroupIndex++] : groupId,
 		)
 
-		if (reorderedCustomGroups.every((group, index) => group === customLibraryGroups.value[index])) {
+		if (
+			reorderedGroupIds.every((groupId, index) => groupId === orderedLibraryGroupIds.value[index])
+		) {
 			return false
 		}
 
+		const reorderedCustomGroups = reorderedGroupIds
+			.filter((groupId) => groupId !== 'group:none')
+			.map((groupId) => customGroupsById.get(groupId)!)
+		const customGroupOrderChanged = reorderedCustomGroups.some(
+			(group, index) => group !== customLibraryGroups.value[index],
+		)
 		const favoriteGroups = previousGroups.filter((group) => group.id === FAVORITES_GROUP_ID)
 		libraryGroups.value = [...favoriteGroups, ...reorderedCustomGroups]
+		displayState.value.ungroupedGroupPosition = reorderedGroupIds.indexOf('group:none')
 		reorderingGroups.value = true
 
 		try {
-			await setInstanceGroupOrder(reorderedCustomGroups.map((group) => group.id))
+			if (customGroupOrderChanged) {
+				await setInstanceGroupOrder(reorderedCustomGroups.map((group) => group.id))
+			}
 			return true
 		} catch (error) {
 			libraryGroups.value = previousGroups
+			displayState.value.ungroupedGroupPosition = previousUngroupedGroupPosition
 			handleError(toError(error))
 			await refreshGroups()
 			return false
@@ -1017,7 +1062,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	}
 
 	const moveGroup = async (groupId: string, direction: -1 | 1) => {
-		const orderedGroupIds = customLibraryGroups.value.map((group) => group.id)
+		const orderedGroupIds = [...orderedLibraryGroupIds.value]
 		const groupIndex = orderedGroupIds.indexOf(groupId)
 		const targetIndex = groupIndex + direction
 

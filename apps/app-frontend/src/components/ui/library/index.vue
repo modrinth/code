@@ -100,40 +100,35 @@ const visibleInstanceGroups = computed(() =>
 	),
 )
 
-const visibleCustomGroups = computed(() =>
+const visibleReorderableGroups = computed(() =>
 	displayState.value.group === 'Group'
-		? visibleInstanceGroups.value.filter(
-				(group) => group.id !== FAVORITES_GROUP_ID && group.id !== 'group:none',
-			)
+		? visibleInstanceGroups.value.filter((group) => group.id !== FAVORITES_GROUP_ID)
 		: [],
 )
 const visibleFavoritesGroup = computed(() =>
 	visibleInstanceGroups.value.find((group) => group.id === FAVORITES_GROUP_ID),
 )
-const visibleUngroupedGroup = computed(() =>
-	visibleInstanceGroups.value.find((group) => group.id === 'group:none'),
-)
-const draggableCustomGroups = ref<InstanceGroupType[]>([])
+const draggableGroups = ref<InstanceGroupType[]>([])
 const libraryGroupsContainer = ref<HTMLElement>()
 const isDraggingGroup = ref(false)
 const GROUP_REORDERING_CLASS = 'instance-group-reordering'
 const canDragReorderGroups = computed(
-	() => !reorderingGroups.value && draggableCustomGroups.value.length > 1,
+	() => !reorderingGroups.value && draggableGroups.value.length > 1,
 )
 
 watch(
-	visibleCustomGroups,
+	visibleReorderableGroups,
 	(groups) => {
 		if (!isDraggingGroup.value) {
-			const previousGroupTops = getCustomGroupTops()
-			draggableCustomGroups.value = [...groups]
-			void nextTick(() => animateCustomGroupReorder(previousGroupTops))
+			const previousGroupTops = getReorderableGroupTops()
+			draggableGroups.value = [...groups]
+			void nextTick(() => animateGroupReorder(previousGroupTops))
 		}
 	},
 	{ immediate: true },
 )
 
-function getCustomGroupTops() {
+function getReorderableGroupTops() {
 	const groupTops = new Map<string, number>()
 	const groupElements = libraryGroupsContainer.value?.querySelectorAll<HTMLElement>(
 		'[data-instance-group-reorder-id]',
@@ -149,7 +144,7 @@ function getCustomGroupTops() {
 	return groupTops
 }
 
-function animateCustomGroupReorder(previousGroupTops: Map<string, number>) {
+function animateGroupReorder(previousGroupTops: Map<string, number>) {
 	if (
 		previousGroupTops.size === 0 ||
 		window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -185,10 +180,10 @@ function onGroupDragEnd() {
 	isDraggingGroup.value = false
 	document.documentElement.classList.remove(GROUP_REORDERING_CLASS)
 
-	const currentGroupIds = visibleCustomGroups.value.map((group) => group.id)
-	const orderedGroupIds = draggableCustomGroups.value.map((group) => group.id)
+	const currentGroupIds = visibleReorderableGroups.value.map((group) => group.id)
+	const orderedGroupIds = draggableGroups.value.map((group) => group.id)
 	if (orderedGroupIds.every((groupId, index) => groupId === currentGroupIds[index])) {
-		draggableCustomGroups.value = [...visibleCustomGroups.value]
+		draggableGroups.value = [...visibleReorderableGroups.value]
 		return
 	}
 
@@ -313,7 +308,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 					</div>
 
 					<Draggable
-						:list="draggableCustomGroups"
+						:list="draggableGroups"
 						class="flex flex-col"
 						item-key="id"
 						:disabled="!canDragReorderGroups"
@@ -341,6 +336,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 							>
 								<InstanceGroup
 									:can-drag-reorder="canDragReorderGroups"
+									:hide-header="visibleInstanceGroups.length === 1"
 									:instance-group="instanceGroup"
 									:selection-anchor-instance-id="
 										anchorInstance?.groupId === instanceGroup.id ? anchorInstance?.instanceId : null
@@ -353,20 +349,6 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 							</div>
 						</template>
 					</Draggable>
-
-					<div v-if="visibleUngroupedGroup" class="min-w-0">
-						<InstanceGroup
-							:hide-header="visibleInstanceGroups.length === 1"
-							:instance-group="visibleUngroupedGroup"
-							:selection-anchor-instance-id="
-								anchorInstance?.groupId === 'group:none' ? anchorInstance.instanceId : null
-							"
-							@toggle-selection="
-								(instanceId: string, shiftKey: boolean) =>
-									handleToggleInstance('group:none', instanceId, shiftKey)
-							"
-						/>
-					</div>
 				</div>
 
 				<TransitionGroup

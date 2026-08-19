@@ -84,6 +84,9 @@ const isFavorites = computed(() => props.instanceGroup.id === FAVORITES_GROUP_ID
 const isCustomGroup = computed(
 	() => displayState.value.group === 'Group' && !isUngrouped.value && !isFavorites.value,
 )
+const isReorderableGroup = computed(
+	() => displayState.value.group === 'Group' && !isFavorites.value,
+)
 const groupContextMenuOpen = ref(false)
 const isGroupToggleBlocked = computed(
 	() => isSearching.value || groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
@@ -383,7 +386,7 @@ onMounted(startInstanceGridResizeObserver)
 			v-if="!hideHeader"
 			class="group/header h-10 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 			:class="{
-				'instance-group-reorder-handle': isCustomGroup && canDragReorder,
+				'instance-group-reorder-handle': isReorderableGroup && canDragReorder,
 			}"
 		>
 			<div
@@ -442,7 +445,7 @@ onMounted(startInstanceGridResizeObserver)
 			</div>
 			<div class="min-w-0 flex-1" />
 			<GroupActionButtons
-				v-if="isCustomGroup"
+				v-if="isCustomGroup || isUngrouped"
 				:can-move-down="canMoveGroupDown(instanceGroup.id)"
 				:can-move-up="canMoveGroupUp(instanceGroup.id)"
 				:deleting="deletingGroup"
@@ -451,6 +454,8 @@ onMounted(startInstanceGridResizeObserver)
 				:on-edit-group-name="() => groupNameInput?.startEditing()"
 				:on-move-down="() => moveGroup(instanceGroup.id, 1)"
 				:on-move-up="() => moveGroup(instanceGroup.id, -1)"
+				:show-delete="!isUngrouped"
+				:show-edit="!isUngrouped"
 			/>
 		</div>
 		<Accordion
