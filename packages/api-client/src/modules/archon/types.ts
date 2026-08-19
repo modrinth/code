@@ -573,6 +573,12 @@ export namespace Archon {
 	}
 
 	export namespace Servers {
+		export namespace Internal {
+			export type Lookup = {
+				id: string
+			}
+		}
+
 		export namespace v0 {
 			export type ServerGetResponse = {
 				servers: Server[]
