@@ -1286,9 +1286,6 @@
   "app.settings.tabs.behavior": {
     "message": "Zachowanie"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Domyślne opcje gry"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
   },

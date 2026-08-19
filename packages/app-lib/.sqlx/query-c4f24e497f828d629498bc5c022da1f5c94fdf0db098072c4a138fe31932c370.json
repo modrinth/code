@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT option, enabled AS \"enabled!: bool\"\n\t\tFROM global_synced_options_overrides\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "option",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "enabled!: bool",
+        "ordinal": 1,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "c4f24e497f828d629498bc5c022da1f5c94fdf0db098072c4a138fe31932c370"
+}

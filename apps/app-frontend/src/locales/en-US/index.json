@@ -1637,14 +1637,59 @@
   "app.settings.sidebar.label.instances": {
     "message": "Instances"
   },
+  "app.settings.synced-options.choose-base.description": {
+    "message": "The current data from this instance will become the initial synced version."
+  },
+  "app.settings.synced-options.choose-base.enable": {
+    "message": "Enable syncing"
+  },
+  "app.settings.synced-options.choose-base.instance": {
+    "message": "Base instance"
+  },
+  "app.settings.synced-options.choose-base.title": {
+    "message": "Choose a base instance"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "Command history"
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "Edit command history"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "Saved creative hotbars"
+  },
+  "app.settings.synced-options.description": {
+    "message": "Sync options and config across instances so you don’t have to set them up every time."
+  },
+  "app.settings.synced-options.folder": {
+    "message": "Synced folder"
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "Multiplayer servers"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "Server address"
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "Edit synced servers"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "No user-added servers are currently synced."
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "Server name"
+  },
+  "app.settings.synced-options.screenshots": {
+    "message": "Screenshots"
+  },
+  "app.settings.synced-options.screenshots.description": {
+    "message": "View screenshots from all your instances in one place."
+  },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
   },
   "app.settings.tabs.behavior": {
     "message": "Behavior"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Default game options"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
@@ -1657,6 +1702,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "Synced options"
   },
   "app.sidebar.playing-as": {
     "message": "Playing as"
@@ -2582,14 +2630,32 @@
   "instance.settings.tabs.synced-options": {
     "message": "Synced options"
   },
-  "instance.settings.tabs.synced-options.description": {
-    "message": "Override synced options for this instance."
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "Command history"
   },
+  "instance.settings.tabs.synced-options.command-history.description": {
+    "message": "Share the latest commands entered in Minecraft."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "Saved creative hotbars"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.description": {
+    "message": "Share saved creative-mode toolbar slots across compatible versions."
+  },
+	"instance.settings.tabs.synced-options.description": {
+		"message": "Override synced options for this instance."
+	},
+	"instance.settings.tabs.synced-options.multiplayer-servers": {
+		"message": "Multiplayer servers"
+	},
+	"instance.settings.tabs.synced-options.multiplayer-servers.description": {
+		"message": "Keep user-added multiplayer servers consistent across instances."
+	},
   "instance.settings.tabs.synced-options.screenshots": {
     "message": "Screenshots"
   },
   "instance.settings.tabs.synced-options.screenshots.description": {
-    "message": "Show screenshots from this instance in the global Screenshots page. Turn this off to use an instance-only Screenshots tab."
+    "message": "Show screenshots from this instance in the global Screenshots page."
   },
   "instance.settings.tabs.window": {
     "message": "Window"
@@ -2689,6 +2755,21 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "Create shortcut"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "Do you want to keep this server in other synced instances, or remove it from them?"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "Keep in other instances"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "Remove from other instances"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "Desync server"
+  },
+  "instance.worlds.desync_server": {
+    "message": "Desync"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Don't show on Home"

@@ -1484,9 +1484,6 @@
   "app.settings.tabs.behavior": {
     "message": "行為"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "預設遊戲選項"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 安裝"
   },

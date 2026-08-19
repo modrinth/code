@@ -1484,9 +1484,6 @@
   "app.settings.tabs.behavior": {
     "message": "行为"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "默认游戏选项"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 管理"
   },

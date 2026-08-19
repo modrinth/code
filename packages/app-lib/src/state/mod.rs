@@ -169,6 +169,14 @@ impl State {
             )
             .await;
 
+            if let Err(error) =
+                crate::api::instance::reconcile_all_synced_options().await
+            {
+                tracing::error!(
+                    "Failed to reconcile instance synced options during startup: {error}"
+                );
+            }
+
             if let Err(e) = crate::api::instance::migrate_legacy_icons().await {
                 tracing::error!("Error migrating legacy instance icons: {e}");
             }

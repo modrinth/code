@@ -1400,9 +1400,6 @@
   "app.settings.tabs.behavior": {
     "message": "동작"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "기본 게임 옵션"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 설치"
   },

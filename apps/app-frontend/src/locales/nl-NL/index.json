@@ -974,9 +974,6 @@
   "app.settings.tabs.behavior": {
     "message": "Gedrag"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standaard spelopties"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
   },

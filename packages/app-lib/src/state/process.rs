@@ -823,6 +823,20 @@ impl Process {
         // Now fully complete- update playtime one last time
         update_playtime(&mut last_updated_playtime, &instance_id, true).await;
 
+        let reconcile_instance_id = instance_id.clone();
+        tokio::spawn(async move {
+            if let Err(error) =
+                crate::api::instance::reconcile_instance_synced_options(
+                    &reconcile_instance_id,
+                )
+                .await
+            {
+                tracing::warn!(
+                    "Failed to reconcile synced options after Minecraft exited for {reconcile_instance_id}: {error}"
+                );
+            }
+        });
+
         // Publish play time update
         // Allow failure, it will be stored locally and sent next time
         // Sent in another thread as first call may take a couple seconds and hold up process ending
