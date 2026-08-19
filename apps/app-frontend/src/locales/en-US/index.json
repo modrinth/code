@@ -332,6 +332,9 @@
   "app.home.jump-back-in.new-instance": {
     "message": "New instance"
   },
+  "app.home.jump-back-in.resize": {
+    "message": "Drag to resize"
+  },
   "app.home.jump-back-in.title": {
     "message": "Jump in"
   },

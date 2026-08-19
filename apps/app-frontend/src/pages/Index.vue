@@ -4,7 +4,7 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import dayjs from 'dayjs'
 import { computed, inject, onActivated, ref } from 'vue'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import LibrarySection from '@/components/ui/library/index.vue'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'

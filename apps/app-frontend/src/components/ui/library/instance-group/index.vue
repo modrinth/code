@@ -21,7 +21,7 @@ import {
 } from '@modrinth/ui'
 import { computed, inject, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
 import type {
