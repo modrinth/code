@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import {
 	ClipboardCopyIcon,
+	EditIcon,
 	EyeIcon,
 	FolderOpenIcon,
 	MinusIcon,
+	PaletteIcon,
 	PlayIcon,
 	PlusIcon,
 	StarIcon,
 	StopCircleIcon,
 	TrashIcon,
+	UploadIcon,
 } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
 import ContextMenu from '@/components/ui/context-menu/index.vue'
+import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
@@ -55,6 +59,30 @@ const messages = defineMessages({
 		id: 'app.library.instance.action.view-instance',
 		defaultMessage: 'View instance',
 	},
+	editIcon: {
+		id: 'instance.settings.tabs.general.edit-icon',
+		defaultMessage: 'Edit icon',
+	},
+	selectIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.select',
+		defaultMessage: 'Select icon',
+	},
+	replaceIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.replace',
+		defaultMessage: 'Replace icon',
+	},
+	createIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.create',
+		defaultMessage: 'Create an icon',
+	},
+	editCreatedIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.edit-created',
+		defaultMessage: 'Edit icon',
+	},
+	removeIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.remove',
+		defaultMessage: 'Remove icon',
+	},
 	duplicateInstance: {
 		id: 'app.library.instance.action.duplicate',
 		defaultMessage: 'Duplicate instance',
@@ -78,10 +106,13 @@ const {
 	reorderGroups,
 	instanceOptions,
 	confirmDeleteModal,
+	iconEditorModal,
+	currentIconEditorInstance,
 	currentDeleteInstances,
 	clearLibraryInstanceSelection,
 	deleteInstance,
 	handleInstanceOption,
+	handleInstanceIconSaved,
 	selectedLibraryInstances,
 	setSelectedLibraryInstances,
 	toggleLibraryInstanceSelection,
@@ -254,6 +285,10 @@ function setConfirmDeleteModal(component: unknown) {
 	confirmDeleteModal.value = component as InstanceType<typeof ConfirmDeleteInstanceModal> | null
 }
 
+function setIconEditorModal(component: unknown) {
+	iconEditorModal.value = component as InstanceType<typeof IconEditorModal> | null
+}
+
 watch(selectedLibraryInstances, (selectedInstances) => {
 	if (selectedInstances.size === 0) {
 		anchorInstance.value = null
@@ -389,6 +424,12 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 		:instances="currentDeleteInstances"
 		@delete="deleteInstance"
 	/>
+	<IconEditorModal
+		:ref="setIconEditorModal"
+		:instance-id="currentIconEditorInstance?.id"
+		:config="currentIconEditorInstance?.icon_config"
+		@saved="handleInstanceIconSaved"
+	/>
 	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">
 		<template #play> <PlayIcon /> {{ formatMessage(messages.play) }} </template>
 		<template #stop> <StopCircleIcon /> {{ formatMessage(messages.stop) }} </template>
@@ -401,6 +442,14 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 		</template>
 		<template #add_content> <PlusIcon /> {{ formatMessage(messages.addContent) }} </template>
 		<template #edit> <EyeIcon /> {{ formatMessage(messages.viewInstance) }} </template>
+		<template #edit_icon> <EditIcon /> {{ formatMessage(messages.editIcon) }} </template>
+		<template #select_icon> <UploadIcon /> {{ formatMessage(messages.selectIcon) }} </template>
+		<template #replace_icon> <UploadIcon /> {{ formatMessage(messages.replaceIcon) }} </template>
+		<template #create_icon> <PaletteIcon /> {{ formatMessage(messages.createIcon) }} </template>
+		<template #edit_created_icon>
+			<PaletteIcon /> {{ formatMessage(messages.editCreatedIcon) }}
+		</template>
+		<template #remove_icon> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
 		<template #duplicate>
 			<ClipboardCopyIcon /> {{ formatMessage(messages.duplicateInstance) }}
 		</template>

@@ -1,11 +1,13 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import {
 	computed,
 	inject,
 	type InjectionKey,
+	nextTick,
 	provide,
 	type Ref,
 	ref,
@@ -13,10 +15,11 @@ import {
 	watchEffect,
 } from 'vue'
 
+import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3_many } from '@/helpers/cache.js'
 import { toError } from '@/helpers/errors'
 import { install_duplicate_instance } from '@/helpers/install'
-import { edit, remove } from '@/helpers/instance'
+import { edit, edit_icon, remove } from '@/helpers/instance'
 import {
 	create_group as createInstanceGroup,
 	delete_group as deleteInstanceGroup,
@@ -28,7 +31,7 @@ import {
 	set_group_memberships as setInstanceGroupMemberships,
 	set_group_order as setInstanceGroupOrder,
 } from '@/helpers/instance-groups'
-import type { GameInstance } from '@/helpers/types'
+import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
 
 export const librarySortOptions = [
 	'Name',
@@ -100,6 +103,10 @@ type ConfirmDeleteModal = {
 	show: () => void
 }
 
+type IconEditorModal = {
+	show: () => void
+}
+
 type ContextMenuSelection = {
 	option: string
 	item: InstanceCard
@@ -153,6 +160,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	)
 	const currentContextGroupId = ref<string | null>(null)
 	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
+	const iconEditorModal = ref<IconEditorModal | null>(null)
+	const currentIconEditorInstanceId = ref<string | null>(null)
+	const currentIconEditorInstance = computed(
+		() =>
+			instances.value.find((instance) => instance.id === currentIconEditorInstanceId.value) ?? null,
+	)
 
 	const displayState = useStorage<{
 		group: LibraryGroupBy
@@ -1088,6 +1101,47 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		await install_duplicate_instance(instanceId).catch((error) => handleError(toError(error)))
 	}
 
+	const selectInstanceIcon = async (item: InstanceCard) => {
+		const iconPath = await openDialog({
+			multiple: false,
+			filters: [
+				{
+					name: 'Image',
+					extensions: ['png', 'jpeg', 'svg', 'webp', 'gif', 'jpg'],
+				},
+			],
+		})
+
+		if (!iconPath) return
+
+		try {
+			await edit_icon(item.instance.id, iconPath)
+			trackEvent('InstanceSetIcon')
+		} catch (error) {
+			handleError(toError(error))
+		}
+	}
+
+	const removeInstanceIcon = async (item: InstanceCard) => {
+		try {
+			await edit_icon(item.instance.id, null)
+			trackEvent('InstanceRemoveIcon')
+		} catch (error) {
+			handleError(toError(error))
+		}
+	}
+
+	const openInstanceIconEditor = async (item: InstanceCard) => {
+		currentIconEditorInstanceId.value = item.instance.id
+		await nextTick()
+		iconEditorModal.value?.show()
+		trackEvent(item.instance.icon_config ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
+	}
+
+	const handleInstanceIconSaved = (_iconPath: string, _config: InstanceIconConfig) => {
+		trackEvent('InstanceSaveCreatedIcon')
+	}
+
 	const handleInstanceContextMenu = (
 		event: MouseEvent,
 		item: InstanceCard,
@@ -1114,6 +1168,14 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			{ name: 'duplicate' },
 			{ name: 'open' },
 			{ name: 'copy' },
+			{
+				name: 'edit_icon',
+				children: [
+					{ name: item.instance.icon_path ? 'replace_icon' : 'select_icon' },
+					{ name: item.instance.icon_config ? 'edit_created_icon' : 'create_icon' },
+					...(item.instance.icon_path ? [{ name: 'remove_icon' }] : []),
+				],
+			},
 			...(currentContextGroupId.value
 				? [{ name: 'remove_from_group' }, { type: 'divider' }]
 				: [{ type: 'divider' }]),
@@ -1157,6 +1219,17 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				break
 			case 'edit':
 				await item.seeInstance()
+				break
+			case 'select_icon':
+			case 'replace_icon':
+				await selectInstanceIcon(item)
+				break
+			case 'create_icon':
+			case 'edit_created_icon':
+				await openInstanceIconEditor(item)
+				break
+			case 'remove_icon':
+				await removeInstanceIcon(item)
 				break
 			case 'duplicate':
 				if (item.instance.install_stage === 'installed') {
@@ -1220,6 +1293,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		canCreateGroup,
 		instanceOptions,
 		confirmDeleteModal,
+		iconEditorModal,
+		currentIconEditorInstance,
 		currentDeleteInstances,
 		isSectionCollapsed,
 		setSectionCollapsed,
@@ -1251,6 +1326,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		deleteInstance,
 		handleInstanceContextMenu,
 		handleInstanceOption,
+		handleInstanceIconSaved,
 	}
 }
 
