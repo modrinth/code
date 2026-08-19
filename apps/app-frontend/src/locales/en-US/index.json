@@ -161,6 +161,12 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Display library instances in a compact row layout."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Compact mode"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
@@ -1744,6 +1750,9 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Changing the version only changes your local copy. Future shared instance updates may restore or change it again."
