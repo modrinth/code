@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
-use actix_web::{get, web};
+use actix_web::{HttpRequest, get, web};
 use chrono::{Months, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
 use crate::{
+    auth::get_user_from_headers,
     database::{
         PgPool,
         models::{
@@ -14,9 +15,13 @@ use crate::{
             payout_variance_item::DBPayoutVariance,
         },
     },
-    queue::payout_run::{
-        DayDistribution, PayoutVariance, PayoutVariances,
-        compute_actual_distribution_flow, distribution_for_day, estimate,
+    models::pats::Scopes,
+    queue::{
+        payout_run::{
+            DayDistribution, PayoutVariance, PayoutVariances,
+            compute_actual_distribution_flow, distribution_for_day, estimate,
+        },
+        session::AuthQueue,
     },
     routes::ApiError,
     util::{
@@ -69,19 +74,32 @@ pub struct PayoutRunDay {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PayoutRunAdjustment {
     /// Total value of the adjustment.
+    #[serde(with = "rust_decimal::serde::float")]
     pub amount_usd: Decimal,
     /// Why this adjustment was applied.
     ///
     /// Only visible to admins.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 }
 
 #[get("")]
 pub async fn get_runs(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     aditude: web::Data<aditude::Client>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<PayoutRuns>, ApiError> {
+    let show_adjustment_descriptions = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .is_ok_and(|(_, user)| user.role.is_admin());
     let now = Utc::now();
     let latest_payout_value = sqlx::query_scalar!(
         r#"
@@ -93,7 +111,7 @@ pub async fn get_runs(
     .await
     .wrap_internal_err("fetching latest payout value")?
     .unwrap_or(now)
-    .max(now);
+    .min(now);
 
     let current_period = YearMonth::from_day1(now.date_naive());
     let mut period = YearMonth::from_day1(latest_payout_value.date_naive());
@@ -146,10 +164,16 @@ pub async fn get_runs(
         .into_iter()
         .map(|estimate| -> Result<_, ApiError> {
             if let Some(period) = stored_periods.get(&estimate.period.date()) {
-                let adjustments = serde_json::from_value::<
-                    Vec<PayoutRunAdjustment>,
-                >(period.adjustments.clone())
-                .wrap_internal_err("deserializing payout adjustments")?;
+                let mut adjustments =
+                    serde_json::from_value::<Vec<PayoutRunAdjustment>>(
+                        period.adjustments.clone(),
+                    )
+                    .wrap_internal_err("deserializing payout adjustments")?;
+                if !show_adjustment_descriptions {
+                    for adjustment in &mut adjustments {
+                        adjustment.description = None;
+                    }
+                }
                 let total_estimated_revenue_usd = period
                     .days
                     .iter()

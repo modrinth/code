@@ -80,19 +80,25 @@ const PLATFORM_REVENUE_SPLIT: Decimal = dec!(0.25);
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DayDistribution {
     /// Amount of revenue input into the algorithm.
+    #[serde(with = "rust_decimal::serde::float")]
     pub raw_revenue_usd: Decimal,
     /// Operational fees to subtract.
+    #[serde(with = "rust_decimal::serde::float")]
     pub fees_usd: Decimal,
     /// Estimation variance to subtract.
     ///
     /// For non-estimates (actual revenue values), this is zero.
+    #[serde(with = "rust_decimal::serde::float")]
     pub variance_usd: Decimal,
     /// Total net revenue that we earned;
     /// `raw_revenue - fees - variance`.
+    #[serde(with = "rust_decimal::serde::float")]
     pub net_revenue_usd: Decimal,
     /// How much of the net revenue goes to the platform.
+    #[serde(with = "rust_decimal::serde::float")]
     pub platform_net_revenue_usd: Decimal,
     /// How much of the net revenue goes to creators.
+    #[serde(with = "rust_decimal::serde::float")]
     pub creator_net_revenue_usd: Decimal,
 }
 
