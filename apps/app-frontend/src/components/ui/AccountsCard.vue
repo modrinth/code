@@ -20,6 +20,7 @@
 			<div class="flex gap-2 w-full min-w-0">
 				<Avatar
 					size="36px"
+					disable-conditional-icon-padding
 					:src="
 						selectedAccount
 							? avatarUrl
@@ -46,7 +47,11 @@
 							class="w-5 h-5 text-brand shrink-0"
 						/>
 						<RadioButtonIcon v-else class="w-5 h-5 text-secondary shrink-0" />
-						<Avatar :src="getAccountAvatarUrl(account)" size="24px" />
+						<Avatar
+							:src="getAccountAvatarUrl(account)"
+							size="24px"
+							disable-conditional-icon-padding
+						/>
 						<p
 							class="m-0 truncate min-w-0"
 							:class="
