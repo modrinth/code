@@ -8,9 +8,7 @@ pub fn configure_webkit() {
         Path::new("/sys/module/nvidia").exists(),
         env::var_os(NVIDIA_EXPLICIT_SYNC_ENV).is_some(),
     ) {
-        unsafe {
-            env::set_var(NVIDIA_EXPLICIT_SYNC_ENV, "1");
-        }
+        env::set_var(NVIDIA_EXPLICIT_SYNC_ENV, "1");
     }
 }
 
