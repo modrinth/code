@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { RadioButtonCheckedIcon, RadioButtonIcon, SearchIcon } from '@modrinth/assets'
+import { SearchIcon } from '@modrinth/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
 import {
 	buildLocaleMessages,
 	defineMessages,
@@ -18,6 +19,7 @@ import type { LanguageCoverageStats } from './language-settings-coverage'
 const { formatMessage } = useVIntl()
 
 const props = defineProps<{
+	product: 'app' | 'website'
 	currentLocale: string
 	locales: LocaleDefinition[]
 	onLocaleChange: (locale: string) => void | Promise<void>
@@ -51,10 +53,13 @@ const messages = defineMessages({
 		id: 'settings.language.coverage.label',
 		defaultMessage: '{percentage}% supported',
 	},
-	coverageTooltip: {
-		id: 'settings.language.coverage.tooltip',
-		defaultMessage:
-			'Estimated coverage: {percentage}%. {interfaceCoverage}% of the interface supports localization, and {translationCoverage}% of available messages have been translated ({translatedMessages}/{totalMessages}).',
+	appCoverageTooltip: {
+		id: 'settings.language.coverage.app-tooltip',
+		defaultMessage: 'About {percentage}% of the Modrinth App is available in this language.',
+	},
+	websiteCoverageTooltip: {
+		id: 'settings.language.coverage.website-tooltip',
+		defaultMessage: 'About {percentage}% of the website is available in this language.',
 	},
 })
 
@@ -66,9 +71,48 @@ type LocaleInfo = {
 	category: Category
 	tag: string
 	displayName: string
-	translatedName: string
+	browserDisplayName: string
+	flagUrl?: string
 	searchTerms?: string[]
 	coverage?: LanguageCoverageStats
+}
+
+const localeFlagRegions: Record<string, string> = {
+	'es-419': 'mx',
+	'sr-CS': 'rs',
+}
+
+const $browserLocales = ref([props.currentLocale])
+
+onMounted(() => {
+	$browserLocales.value = navigator.languages.length ? [...navigator.languages] : [navigator.language]
+})
+
+const $browserDisplayNames = computed(() => {
+	try {
+		return new Intl.DisplayNames($browserLocales.value, { type: 'language' })
+	} catch {
+		return undefined
+	}
+})
+
+function getBrowserDisplayName(tag: string, fallback: string): string {
+	try {
+		return $browserDisplayNames.value?.of(tag) ?? fallback
+	} catch {
+		try {
+			return $browserDisplayNames.value?.of(tag.split('-')[0]) ?? fallback
+		} catch {
+			return fallback
+		}
+	}
+}
+
+function getFlagUrl(tag: string): string | undefined {
+	const region = localeFlagRegions[tag] ?? tag.split('-').at(-1)
+	if (!region || !/^[a-z]{2}$/i.test(region)) return undefined
+
+	return `https://flagcdn.com/${region.toLowerCase()}.svg`
 }
 
 const $locales = computed(() => {
@@ -79,19 +123,23 @@ const $locales = computed(() => {
 		const meta = localeMetas[tag] ?? null
 		const displayName = meta?.displayName ?? loc.name
 		const translatedName = formatMessage(loc.translatedName)
+		const browserDisplayName = getBrowserDisplayName(tag, translatedName)
 		const searchTerms = meta?.searchTerms === '-' ? undefined : meta?.searchTerms?.split('\n')
 
 		result.push({
 			tag,
 			category: 'default',
 			displayName,
-			translatedName,
+			browserDisplayName,
+			flagUrl: getFlagUrl(tag),
 			searchTerms,
 			coverage: props.coverageByLocale?.[tag],
 		})
 	}
 
-	return result
+	return result.sort(
+		(a, b) => (b.coverage?.percentage ?? -1) - (a.coverage?.percentage ?? -1),
+	)
 })
 
 const $query = ref('')
@@ -101,7 +149,7 @@ const isQueryEmpty = () => $query.value.trim().length === 0
 const fuse = computed(
 	() =>
 		new Fuse<LocaleInfo>($locales.value, {
-			keys: ['tag', 'displayName', 'nativeName', 'searchTerms'],
+			keys: ['tag', 'displayName', 'browserDisplayName', 'searchTerms'],
 			threshold: 0.4,
 			distance: 100,
 		}),
@@ -155,24 +203,10 @@ function onSearchKeydown(e: KeyboardEvent) {
 	if (e.key !== 'Enter' || isModifierKeyDown(e)) return
 
 	const focusableTarget = $languagesList.value?.querySelector(
-		'input, [tabindex]:not([tabindex="-1"])',
+		'button:not(:disabled), [tabindex]:not([tabindex="-1"])',
 	) as HTMLElement | undefined
 
 	focusableTarget?.focus()
-}
-
-function onItemKeydown(e: KeyboardEvent, loc: LocaleInfo) {
-	switch (e.key) {
-		case 'Enter':
-		case ' ':
-			break
-		default:
-			return
-	}
-
-	if (isModifierKeyDown(e) || isChangingLocale()) return
-
-	changeLocale(loc.tag)
 }
 
 function onItemClick(e: MouseEvent, loc: LocaleInfo) {
@@ -181,20 +215,24 @@ function onItemClick(e: MouseEvent, loc: LocaleInfo) {
 	changeLocale(loc.tag)
 }
 
+function showBrowserDisplayName(loc: LocaleInfo): boolean {
+	return loc.browserDisplayName.localeCompare(loc.displayName, undefined, { sensitivity: 'base' }) !== 0
+}
+
 function getItemLabel(loc: LocaleInfo) {
 	const coverageLabel = loc.coverage
 		? `. ${formatMessage(messages.coverageLabel, { percentage: loc.coverage.percentage })}`
 		: ''
-	return `${loc.translatedName}. ${loc.displayName}${coverageLabel}`
+	const browserDisplayName = showBrowserDisplayName(loc) ? `. ${loc.browserDisplayName}` : ''
+	return `${loc.displayName}${browserDisplayName}${coverageLabel}`
 }
 
 function getCoverageTooltip(coverage: LanguageCoverageStats): string {
-	return formatMessage(messages.coverageTooltip, {
+	const message =
+		props.product === 'app' ? messages.appCoverageTooltip : messages.websiteCoverageTooltip
+
+	return formatMessage(message, {
 		percentage: coverage.percentage,
-		interfaceCoverage: coverage.interfaceCoverage,
-		translationCoverage: coverage.translationCoverage,
-		translatedMessages: coverage.translatedMessages,
-		totalMessages: coverage.totalMessages,
 	})
 }
 
@@ -247,46 +285,47 @@ function getCategoryName(category: Category): string {
 				</div>
 
 				<template v-for="loc in categoryLocales" :key="loc.tag">
-					<div
-						role="button"
+					<Button
+						:type="$activeLocale === loc.tag ? 'colored' : 'base'"
+						:color="$activeLocale === loc.tag ? 'green' : undefined"
 						:aria-pressed="$activeLocale === loc.tag"
-						:class="[
-							'flex items-center gap-2 border-2 rounded-lg bg-surface-4 p-4 py-2 cursor-pointer relative overflow-hidden border-transparent transition-colors duration-100',
-							'focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand hover:border-surface-5 border-solid',
-							isChangingLocale() && $changingTo !== loc.tag
-								? 'opacity-80 pointer-events-none cursor-default'
-								: '',
-						]"
-						:aria-disabled="isChangingLocale() && $changingTo !== loc.tag"
-						:tabindex="0"
+						:disabled="isChangingLocale() && $changingTo !== loc.tag"
 						:aria-label="getItemLabel(loc)"
+						class="w-full !justify-start !gap-2 !text-left sm:!h-10"
+						:class="
+							$activeLocale === loc.tag
+								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)]'
+								: ''
+						"
 						@click="(e) => onItemClick(e, loc)"
-						@keydown="(e) => onItemKeydown(e, loc)"
 					>
-						<RadioButtonCheckedIcon v-if="$activeLocale === loc.tag" class="size-6" />
-						<RadioButtonIcon v-else class="size-6" />
+						<img
+							v-if="loc.flagUrl"
+							:src="loc.flagUrl"
+							alt=""
+							aria-hidden="true"
+							class="h-4 w-6 shrink-0 rounded-sm object-cover"
+							loading="lazy"
+						/>
 
-						<div class="flex flex-1 flex-wrap justify-between gap-x-6">
-							<div class="font-medium">
-								{{ loc.displayName }}
-							</div>
+						<span class="flex min-w-0 flex-1 items-baseline gap-2 overflow-hidden">
+							<span class="truncate text-sm sm:text-base">{{ loc.displayName }}</span>
+							<span
+								v-if="showBrowserDisplayName(loc)"
+								class="truncate text-xs font-normal text-secondary sm:text-sm"
+							>
+								{{ loc.browserDisplayName }}
+							</span>
+						</span>
 
-							<div class="flex items-center gap-2">
-								<span>{{ loc.translatedName }}</span>
-								<span
-									v-if="loc.coverage"
-									v-tooltip="getCoverageTooltip(loc.coverage)"
-									class="whitespace-nowrap rounded-full bg-surface-3 px-2 py-0.5 text-sm text-secondary"
-								>
-									{{
-										formatMessage(messages.coverageLabel, {
-											percentage: loc.coverage.percentage,
-										})
-									}}
-								</span>
-							</div>
-						</div>
-					</div>
+						<span
+							v-if="loc.coverage"
+							v-tooltip="getCoverageTooltip(loc.coverage)"
+							class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm"
+						>
+							{{ loc.coverage.percentage }}%
+						</span>
+					</Button>
 				</template>
 			</template>
 		</div>

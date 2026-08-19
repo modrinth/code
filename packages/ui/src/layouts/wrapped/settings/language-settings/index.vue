@@ -22,6 +22,7 @@
 		</p>
 
 		<LanguageSettingsSelector
+			:product="product"
 			:current-locale="current.locale"
 			:locales="LOCALES"
 			:on-locale-change="onLocaleChange"
