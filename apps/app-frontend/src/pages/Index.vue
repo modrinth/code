@@ -102,7 +102,7 @@ function handlePageOption({ option }: { option: string }) {
 	<div
 		v-else-if="isReady"
 		data-library-page-background
-		class="flex flex-col gap-6 p-6"
+		class="flex flex-col gap-3 p-6"
 		@contextmenu="openPageContextMenu"
 	>
 		<RecentWorldsList
