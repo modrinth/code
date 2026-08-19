@@ -57,28 +57,25 @@ pub async fn list_screenshots(
     instance_id: &str,
 ) -> crate::Result<Vec<InstanceScreenshot>> {
     let state = State::get().await?;
-    let source = instance_rows::get_instance_screenshot_source(
-        instance_id,
-        &state.pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    let source =
+        instance_rows::get_instance_screenshot_source(instance_id, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError("Unknown instance".to_string())
+            })?;
 
     list_source_screenshots(&state, source).await
 }
 
-pub async fn list_synced_screenshots(
-) -> crate::Result<Vec<InstanceScreenshot>> {
+pub async fn list_synced_screenshots() -> crate::Result<Vec<InstanceScreenshot>>
+{
     let state = State::get().await?;
     let sources =
         instance_rows::list_synced_screenshot_sources(&state.pool).await?;
     list_source_screenshot_sets(&state, sources).await
 }
 
-pub async fn list_all_screenshots(
-) -> crate::Result<Vec<InstanceScreenshot>> {
+pub async fn list_all_screenshots() -> crate::Result<Vec<InstanceScreenshot>> {
     let state = State::get().await?;
     let sources = instance_rows::list_screenshot_sources(&state.pool).await?;
     list_source_screenshot_sets(&state, sources).await
@@ -88,23 +85,22 @@ async fn list_source_screenshot_sets(
     state: &State,
     sources: Vec<InstanceScreenshotSource>,
 ) -> crate::Result<Vec<InstanceScreenshot>> {
-    let mut screenshots = stream::iter(sources.into_iter().map(|source| {
-        async move { list_source_screenshots(state, source).await }
-    }))
-    .buffer_unordered(SCREENSHOT_SCAN_CONCURRENCY)
-    .try_collect::<Vec<Vec<InstanceScreenshot>>>()
-    .await?
-    .into_iter()
-    .flatten()
-    .collect::<Vec<_>>();
+    let mut screenshots =
+        stream::iter(sources.into_iter().map(|source| async move {
+            list_source_screenshots(state, source).await
+        }))
+        .buffer_unordered(SCREENSHOT_SCAN_CONCURRENCY)
+        .try_collect::<Vec<Vec<InstanceScreenshot>>>()
+        .await?
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
 
     sort_screenshots(&mut screenshots);
     Ok(screenshots)
 }
 
-pub async fn delete_screenshots(
-    keys: &[ScreenshotKey],
-) -> crate::Result<()> {
+pub async fn delete_screenshots(keys: &[ScreenshotKey]) -> crate::Result<()> {
     ensure_unique_keys(keys)?;
     let state = State::get().await?;
     let mut instance_ids = keys
@@ -159,9 +155,7 @@ pub async fn export_screenshots(
                 )
                 .await?
                 .ok_or_else(|| {
-                    crate::ErrorKind::InputError(
-                        "Unknown instance".to_string(),
-                    )
+                    crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
                 sources.insert(key.instance_id.clone(), source);
                 sources.get(&key.instance_id).unwrap()
@@ -190,11 +184,8 @@ pub async fn export_screenshots(
     for (archive_name, path) in screenshots {
         let mut stream = writer
             .write_entry_stream(
-                ZipEntryBuilder::new(
-                    archive_name.into(),
-                    Compression::Stored,
-                )
-                .build(),
+                ZipEntryBuilder::new(archive_name.into(), Compression::Stored)
+                    .build(),
             )
             .await?
             .compat_write();
@@ -251,8 +242,8 @@ pub async fn move_screenshots(
         }
 
         let source_path = get_screenshot_path(key).await?;
-        let target_path = available_target_path(&target_dir, &key.file_name)
-            .await?;
+        let target_path =
+            available_target_path(&target_dir, &key.file_name).await?;
         io::rename_or_move(&source_path, &target_path)
             .await
             .map_err(|error| {
@@ -344,11 +335,9 @@ pub(crate) async fn reconcile_screenshots(
     instance_id: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let Some(source) = instance_rows::get_instance_screenshot_source(
-        instance_id,
-        &state.pool,
-    )
-    .await?
+    let Some(source) =
+        instance_rows::get_instance_screenshot_source(instance_id, &state.pool)
+            .await?
     else {
         return Ok(());
     };
@@ -438,8 +427,8 @@ async fn reconcile_source_screenshots(
     source: &InstanceScreenshotSource,
     scanned: Vec<ScannedScreenshot>,
 ) -> crate::Result<Vec<InstanceScreenshot>> {
-    let existing = screenshot_rows::list_screenshots(&source.id, &state.pool)
-        .await?;
+    let existing =
+        screenshot_rows::list_screenshots(&source.id, &state.pool).await?;
     let mut existing_by_name = existing
         .into_iter()
         .map(|row| (row.file_name.clone(), row))
@@ -448,8 +437,7 @@ async fn reconcile_source_screenshots(
     let mut unmatched_scanned = Vec::new();
 
     for scanned in scanned {
-        let Some(mut row) = existing_by_name.remove(&scanned.file_name)
-        else {
+        let Some(mut row) = existing_by_name.remove(&scanned.file_name) else {
             unmatched_scanned.push(scanned);
             continue;
         };
@@ -471,7 +459,8 @@ async fn reconcile_source_screenshots(
         });
     }
 
-    let mut unmatched_by_hash = HashMap::<(String, i64), Vec<ScreenshotRow>>::new();
+    let mut unmatched_by_hash =
+        HashMap::<(String, i64), Vec<ScreenshotRow>>::new();
     for row in existing_by_name.into_values() {
         unmatched_by_hash
             .entry((row.content_hash.clone(), row.file_size))
@@ -566,13 +555,12 @@ async fn source_screenshots_dir(
     state: &State,
     source: &InstanceScreenshotSource,
 ) -> crate::Result<PathBuf> {
-    let instance_dir =
-        state.directories.instances_dir().join(&source.path);
-    let canonical_instance_dir = tokio::fs::canonicalize(&instance_dir)
-        .await
-        .map_err(|error| IOError::with_path(error, &instance_dir))?;
-    let screenshots_dir =
-        canonical_instance_dir.join(SCREENSHOTS_DIRECTORY);
+    let instance_dir = state.directories.instances_dir().join(&source.path);
+    let canonical_instance_dir =
+        tokio::fs::canonicalize(&instance_dir)
+            .await
+            .map_err(|error| IOError::with_path(error, &instance_dir))?;
+    let screenshots_dir = canonical_instance_dir.join(SCREENSHOTS_DIRECTORY);
 
     ensure_directory_is_not_symlink(&screenshots_dir).await?;
     Ok(screenshots_dir)
@@ -617,7 +605,8 @@ async fn available_target_path(
     let extension = path.extension().and_then(|value| value.to_str()).unwrap();
 
     for suffix in 1_u32.. {
-        let candidate = target_dir.join(format!("{stem} ({suffix}).{extension}"));
+        let candidate =
+            target_dir.join(format!("{stem} ({suffix}).{extension}"));
         if !tokio::fs::try_exists(&candidate)
             .await
             .map_err(|error| IOError::with_path(error, &candidate))?
@@ -644,8 +633,9 @@ fn ensure_unique_keys(keys: &[ScreenshotKey]) -> crate::Result<()> {
 fn validate_file_name(file_name: &str) -> crate::Result<()> {
     let path = Path::new(file_name);
     let mut components = path.components();
-    let is_single_file = matches!(components.next(), Some(Component::Normal(_)))
-        && components.next().is_none();
+    let is_single_file =
+        matches!(components.next(), Some(Component::Normal(_)))
+            && components.next().is_none();
 
     if !is_single_file || !has_png_extension(path) {
         return Err(crate::ErrorKind::InputError(
