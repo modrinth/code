@@ -13,6 +13,7 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	CompassIcon,
+	ImagesIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -533,6 +534,10 @@ const messages = defineMessages({
 	modrinthHosting: {
 		id: 'app.nav.modrinth-hosting',
 		defaultMessage: 'Modrinth Hosting',
+	},
+	screenshots: {
+		id: 'app.nav.screenshots',
+		defaultMessage: 'Screenshots',
 	},
 	createNewInstance: {
 		id: 'app.nav.create-new-instance',
@@ -1789,6 +1794,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
 				<ShirtIcon />
+			</NavButton>
+			<NavButton
+				v-tooltip.right="formatMessage(messages.screenshots)"
+				to="/screenshots"
+			>
+				<ImagesIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(messages.modrinthHosting)"

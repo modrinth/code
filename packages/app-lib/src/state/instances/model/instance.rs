@@ -23,6 +23,25 @@ pub struct InstanceIconConfig {
     pub symbol: String,
 }
 
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+pub struct InstanceSyncedOptions {
+    pub screenshots: bool,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum InstanceSyncedOption {
+    Screenshots,
+}
+
+impl InstanceSyncedOption {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Screenshots => "screenshots",
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
     pub id: String,
