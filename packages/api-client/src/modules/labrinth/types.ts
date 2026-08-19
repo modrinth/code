@@ -2398,14 +2398,8 @@ export namespace Labrinth {
 
 			export type RuleInput = {
 				schema_version: number
-				trace: {
-					key: string
-					issue_type: string
-					severity: DelphiSeverity
-					jar: string | null
-					file_path: string
-					data: Record<string, unknown>
-				}
+				trace: RuleTrace
+				sibling_traces: RuleTrace[]
 				scan: {
 					delphi_version: number
 				}
@@ -2424,6 +2418,15 @@ export namespace Labrinth {
 				file: {
 					id: string | null
 				}
+			}
+
+			export type RuleTrace = {
+				key: string
+				issue_type: string
+				severity: DelphiSeverity
+				jar: string | null
+				file_path: string
+				data: Record<string, unknown>
 			}
 
 			export type TestDelphiRuleResponse = {

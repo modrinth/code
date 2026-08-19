@@ -460,6 +460,7 @@ const TEST_INPUTS: Labrinth.TechReview.Internal.RuleInput[] = [
 				symbol_count: 42,
 			},
 		},
+		sibling_traces: [],
 		scan: {
 			delphi_version: 17,
 		},
@@ -494,6 +495,7 @@ const TEST_INPUTS: Labrinth.TechReview.Internal.RuleInput[] = [
 				host: 'telemetry.example.com',
 			},
 		},
+		sibling_traces: [],
 		scan: {
 			delphi_version: 18,
 		},
