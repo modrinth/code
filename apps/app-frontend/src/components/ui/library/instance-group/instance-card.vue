@@ -367,8 +367,10 @@ onMounted(() => {
 			>
 				<span
 					v-tooltip="formatMessage(selected ? messages.deselect : messages.select)"
-					class="relative flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
+					class="relative flex items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
 					:class="{
+						'size-[20px]': compact,
+						'size-[24px]': !compact,
 						'border-0 !opacity-100': selected,
 						'border-2 border-solid border-primary bg-transparent': !selected,
 						'[outline:3px_solid_var(--color-purple)] outline-offset-1':
