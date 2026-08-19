@@ -1,25 +1,28 @@
 <script setup lang="ts">
 import { RadioButtonCheckedIcon, RadioButtonIcon, SearchIcon } from '@modrinth/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
-import { computed, ref, watchSyncEffect } from 'vue'
+import { computed, ref } from 'vue'
 
+import StyledInput from '#ui/components/base/StyledInput.vue'
 import {
 	buildLocaleMessages,
 	defineMessages,
 	type LocaleDefinition,
 	useVIntl,
-} from '../../composables/i18n'
-import { metaLocaleModules } from '../../locales.ts'
-import { isModifierKeyDown } from '../../utils/events'
-import StyledInput from '../base/StyledInput.vue'
+} from '#ui/composables/i18n'
+import { metaLocaleModules } from '#ui/locales.ts'
+import { isModifierKeyDown } from '#ui/utils/events'
+
+import type { LanguageCoverageStats } from './language-settings-coverage'
 
 const { formatMessage } = useVIntl()
 
 const props = defineProps<{
 	currentLocale: string
 	locales: LocaleDefinition[]
-	onLocaleChange: (locale: string) => Promise<void>
+	onLocaleChange: (locale: string) => void | Promise<void>
 	isChanging?: boolean
+	coverageByLocale?: Record<string, LanguageCoverageStats>
 }>()
 
 const messages = defineMessages({
@@ -44,6 +47,15 @@ const messages = defineMessages({
 		id: 'settings.language.categories.search-result',
 		defaultMessage: 'Search results',
 	},
+	coverageLabel: {
+		id: 'settings.language.coverage.label',
+		defaultMessage: '{percentage}% supported',
+	},
+	coverageTooltip: {
+		id: 'settings.language.coverage.tooltip',
+		defaultMessage:
+			'Estimated coverage: {percentage}%. {interfaceCoverage}% of the interface supports localization, and {translationCoverage}% of available messages have been translated ({translatedMessages}/{totalMessages}).',
+	},
 })
 
 const localeMetas = buildLocaleMessages(metaLocaleModules)
@@ -56,6 +68,7 @@ type LocaleInfo = {
 	displayName: string
 	translatedName: string
 	searchTerms?: string[]
+	coverage?: LanguageCoverageStats
 }
 
 const $locales = computed(() => {
@@ -74,6 +87,7 @@ const $locales = computed(() => {
 			displayName,
 			translatedName,
 			searchTerms,
+			coverage: props.coverageByLocale?.[tag],
 		})
 	}
 
@@ -84,13 +98,14 @@ const $query = ref('')
 
 const isQueryEmpty = () => $query.value.trim().length === 0
 
-const fuse = new Fuse<LocaleInfo>([], {
-	keys: ['tag', 'displayName', 'nativeName', 'searchTerms'],
-	threshold: 0.4,
-	distance: 100,
-})
-
-watchSyncEffect(() => fuse.setCollection($locales.value))
+const fuse = computed(
+	() =>
+		new Fuse<LocaleInfo>($locales.value, {
+			keys: ['tag', 'displayName', 'nativeName', 'searchTerms'],
+			threshold: 0.4,
+			distance: 100,
+		}),
+)
 
 const $categories = computed(() => {
 	const categories = new Map<Category, LocaleInfo[]>()
@@ -100,7 +115,7 @@ const $categories = computed(() => {
 
 const $searchResults = computed(() => {
 	return new Map<Category, LocaleInfo[]>([
-		['searchResult', isQueryEmpty() ? [] : fuse.search($query.value).map(({ item }) => item)],
+		['searchResult', isQueryEmpty() ? [] : fuse.value.search($query.value).map(({ item }) => item)],
 	])
 })
 
@@ -117,16 +132,21 @@ const $activeLocale = computed(() => {
 	return props.currentLocale
 })
 
-async function changeLocale(value: string) {
+function changeLocale(value: string) {
 	if ($activeLocale.value === value) return
 
-	$changingTo.value = value
+	const result = props.onLocaleChange(value)
+	if (!result) return
 
-	try {
-		await props.onLocaleChange(value)
-	} finally {
-		$changingTo.value = undefined
-	}
+	$changingTo.value = value
+	void result.then(
+		() => {
+			$changingTo.value = undefined
+		},
+		() => {
+			$changingTo.value = undefined
+		},
+	)
 }
 
 const $languagesList = ref<HTMLDivElement | undefined>()
@@ -162,7 +182,20 @@ function onItemClick(e: MouseEvent, loc: LocaleInfo) {
 }
 
 function getItemLabel(loc: LocaleInfo) {
-	return `${loc.translatedName}. ${loc.displayName}`
+	const coverageLabel = loc.coverage
+		? `. ${formatMessage(messages.coverageLabel, { percentage: loc.coverage.percentage })}`
+		: ''
+	return `${loc.translatedName}. ${loc.displayName}${coverageLabel}`
+}
+
+function getCoverageTooltip(coverage: LanguageCoverageStats): string {
+	return formatMessage(messages.coverageTooltip, {
+		percentage: coverage.percentage,
+		interfaceCoverage: coverage.interfaceCoverage,
+		translationCoverage: coverage.translationCoverage,
+		translatedMessages: coverage.translatedMessages,
+		totalMessages: coverage.totalMessages,
+	})
 }
 
 function getCategoryName(category: Category): string {
@@ -238,8 +271,19 @@ function getCategoryName(category: Category): string {
 								{{ loc.displayName }}
 							</div>
 
-							<div>
-								{{ loc.translatedName }}
+							<div class="flex items-center gap-2">
+								<span>{{ loc.translatedName }}</span>
+								<span
+									v-if="loc.coverage"
+									v-tooltip="getCoverageTooltip(loc.coverage)"
+									class="whitespace-nowrap rounded-full bg-surface-3 px-2 py-0.5 text-sm text-secondary"
+								>
+									{{
+										formatMessage(messages.coverageLabel, {
+											percentage: loc.coverage.percentage,
+										})
+									}}
+								</span>
 							</div>
 						</div>
 					</div>

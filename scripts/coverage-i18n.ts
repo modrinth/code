@@ -13,6 +13,9 @@ import { parse as parseVue } from '@vue/compiler-sfc'
 import chalk from 'chalk'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { contractFromMessage, translationCompatibleWithSource } from './i18n-icu-contract.ts'
 
 interface FileResult {
 	path: string
@@ -37,6 +40,38 @@ interface CoverageReport {
 		}
 	>
 	filesNeedingWork: FileResult[]
+}
+
+type MessageEntry = string | { message?: string; defaultMessage?: string }
+type MessageFile = Record<string, MessageEntry>
+type LanguageProduct = 'app' | 'website'
+
+interface LanguageCoverageStats {
+	percentage: number
+	interfaceCoverage: number
+	translationCoverage: number
+	translatedMessages: number
+	totalMessages: number
+	unlocalizedStrings: number
+}
+
+type LanguageCoverageByProduct = Record<
+	LanguageProduct,
+	Record<string, LanguageCoverageStats>
+>
+
+const PRODUCT_SCOPES: Record<
+	LanguageProduct,
+	{ sourceDirectories: string[]; catalogScopes: string[] }
+> = {
+	app: {
+		sourceDirectories: ['apps/app-frontend/src', 'packages/ui/src'],
+		catalogScopes: ['apps/app-frontend', 'packages/ui'],
+	},
+	website: {
+		sourceDirectories: ['apps/frontend/src', 'packages/moderation/src', 'packages/ui/src'],
+		catalogScopes: ['packages/ui', 'packages/moderation', 'apps/frontend'],
+	},
 }
 
 const theme = {
@@ -456,6 +491,159 @@ function generateReport(results: FileResult[], rootDir: string): CoverageReport 
 	return report
 }
 
+function messageText(entry: MessageEntry | undefined): string | undefined {
+	if (typeof entry === 'string') return entry
+	return entry?.message ?? entry?.defaultMessage
+}
+
+function readMessageFile(filePath: string): MessageFile {
+	if (!fs.existsSync(filePath)) return {}
+	return JSON.parse(fs.readFileSync(filePath, 'utf8')) as MessageFile
+}
+
+function mergeProductCatalog(
+	rootDir: string,
+	catalogScopes: string[],
+	locale: string,
+): MessageFile {
+	const merged: MessageFile = {}
+	for (const scope of catalogScopes) {
+		Object.assign(
+			merged,
+			readMessageFile(path.join(rootDir, scope, 'src/locales', locale, 'index.json')),
+		)
+	}
+	return merged
+}
+
+function getLocaleCodes(rootDir: string): string[] {
+	const localesDirectory = path.join(rootDir, 'packages/ui/src/locales')
+	return fs
+		.readdirSync(localesDirectory, { withFileTypes: true })
+		.filter(
+			(entry) =>
+				entry.isDirectory() &&
+				fs.existsSync(path.join(localesDirectory, entry.name, 'index.json')),
+		)
+		.map((entry) => entry.name)
+		.sort((left, right) => left.localeCompare(right))
+}
+
+function isValidTranslation(
+	key: string,
+	sourceEntry: MessageEntry,
+	translationEntry: MessageEntry | undefined,
+): boolean {
+	const source = messageText(sourceEntry)
+	const translation = messageText(translationEntry)
+	if (!source || !translation) return false
+
+	try {
+		return translationCompatibleWithSource(
+			contractFromMessage(source, `source:${key}`),
+			contractFromMessage(translation, `translation:${key}`),
+		)
+	} catch {
+		return false
+	}
+}
+
+function generateLanguageCoverage(
+	results: FileResult[],
+	rootDir: string,
+): LanguageCoverageByProduct {
+	const localeCodes = getLocaleCodes(rootDir)
+	const coverage: LanguageCoverageByProduct = { app: {}, website: {} }
+
+	for (const [product, definition] of Object.entries(PRODUCT_SCOPES) as [
+		LanguageProduct,
+		(typeof PRODUCT_SCOPES)[LanguageProduct],
+	][]) {
+		const sourceRoots = definition.sourceDirectories.map((directory) =>
+			`${path.join(rootDir, directory)}${path.sep}`,
+		)
+		const productResults = results.filter((result) =>
+			sourceRoots.some((sourceRoot) => result.path.startsWith(sourceRoot)),
+		)
+		const localizedUsages = productResults.reduce(
+			(total, result) => total + result.i18nUsages,
+			0,
+		)
+		const unlocalizedStrings = productResults.reduce(
+			(total, result) => total + result.plainStrings.length,
+			0,
+		)
+		const detectedStrings = localizedUsages + unlocalizedStrings
+		const interfaceCoverage =
+			detectedStrings > 0 ? Math.round((localizedUsages / detectedStrings) * 100) : 100
+		const sourceCatalog = mergeProductCatalog(rootDir, definition.catalogScopes, 'en-US')
+		const sourceEntries = Object.entries(sourceCatalog).filter(([, entry]) => messageText(entry))
+
+		for (const locale of localeCodes) {
+			const translationCatalog = mergeProductCatalog(rootDir, definition.catalogScopes, locale)
+			const translatedMessages =
+				locale === 'en-US'
+					? sourceEntries.length
+					: sourceEntries.filter(([key, source]) =>
+							isValidTranslation(key, source, translationCatalog[key]),
+						).length
+			const translationCoverage =
+				sourceEntries.length > 0
+					? Math.round((translatedMessages / sourceEntries.length) * 100)
+					: 100
+			const percentage =
+				locale === 'en-US'
+					? 100
+					: Math.round((interfaceCoverage * translationCoverage) / 100)
+
+			coverage[product][locale] = {
+				percentage,
+				interfaceCoverage,
+				translationCoverage,
+				translatedMessages,
+				totalMessages: sourceEntries.length,
+				unlocalizedStrings,
+			}
+		}
+	}
+
+	return coverage
+}
+
+function renderLanguageCoverageModule(coverage: LanguageCoverageByProduct): string {
+	const products = (
+		Object.entries(coverage) as [LanguageProduct, Record<string, LanguageCoverageStats>][]
+	).map(([product, locales]) => {
+			const localeEntries = Object.entries(locales)
+				.map(
+					([locale, stats]) =>
+						`\t\t'${locale}': {\n` +
+						`\t\t\tpercentage: ${stats.percentage},\n` +
+						`\t\t\tinterfaceCoverage: ${stats.interfaceCoverage},\n` +
+						`\t\t\ttranslationCoverage: ${stats.translationCoverage},\n` +
+						`\t\t\ttranslatedMessages: ${stats.translatedMessages},\n` +
+						`\t\t\ttotalMessages: ${stats.totalMessages},\n` +
+						`\t\t\tunlocalizedStrings: ${stats.unlocalizedStrings},\n` +
+						`\t\t},`,
+				)
+				.join('\n')
+			return `\t${product}: {\n${localeEntries}\n\t},`
+		})
+		.join('\n')
+
+	return `import type { LanguageCoverageByProduct } from './language-settings-coverage'\n\nexport const languageCoverage = {\n${products}\n} satisfies LanguageCoverageByProduct\n`
+}
+
+function writeLanguageCoverageModule(
+	rootDir: string,
+	outputPath: string,
+	coverage: LanguageCoverageByProduct,
+): void {
+	const resolvedOutput = path.resolve(rootDir, outputPath)
+	fs.mkdirSync(path.dirname(resolvedOutput), { recursive: true })
+	fs.writeFileSync(resolvedOutput, renderLanguageCoverageModule(coverage))
+}
+
 function progressBar(percent: number, width: number = 20): string {
 	const filled = Math.round((percent / 100) * width)
 	const empty = width - filled
@@ -564,13 +752,24 @@ function main() {
 	const args = process.argv.slice(2)
 	const verbose = args.includes('--verbose') || args.includes('-v')
 	const jsonOutput = args.includes('--json')
+	const quiet = args.includes('--quiet')
+	const writeIndex = args.indexOf('--write')
+	const writeOutput = writeIndex >= 0 ? args[writeIndex + 1] : undefined
+	if (writeIndex >= 0 && (!writeOutput || writeOutput.startsWith('--'))) {
+		throw new Error('--write requires an output path')
+	}
 
-	const rootDir = path.resolve(__dirname, '..')
+	const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 	// Directories to scan for Vue files
-	const scanDirs = ['apps/frontend/src', 'apps/app-frontend/src', 'packages/ui/src']
+	const scanDirs = [
+		'apps/frontend/src',
+		'apps/app-frontend/src',
+		'packages/ui/src',
+		'packages/moderation/src',
+	]
 
-	if (!jsonOutput) {
+	if (!jsonOutput && !quiet) {
 		console.log()
 		process.stdout.write(theme.muted('  Scanning Vue files... '))
 	}
@@ -584,7 +783,7 @@ function main() {
 		}
 	}
 
-	if (!jsonOutput) {
+	if (!jsonOutput && !quiet) {
 		console.log(`${icons.check} ${theme.highlight(allFiles.length)} files`)
 	}
 
@@ -598,10 +797,14 @@ function main() {
 	}
 
 	const report = generateReport(results, rootDir)
+	const languageCoverage = generateLanguageCoverage(results, rootDir)
+	if (writeOutput) {
+		writeLanguageCoverageModule(rootDir, writeOutput, languageCoverage)
+	}
 
 	if (jsonOutput) {
-		console.log(JSON.stringify(report, null, 2))
-	} else {
+		console.log(JSON.stringify({ ...report, languageCoverage }, null, 2))
+	} else if (!quiet) {
 		printReport(report, rootDir, verbose)
 	}
 }

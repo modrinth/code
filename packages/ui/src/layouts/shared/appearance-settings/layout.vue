@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Toggle from '#ui/components/base/Toggle.vue'
-import ThemeSelector from '#ui/components/settings/ThemeSelector.vue'
 import { useVIntl } from '#ui/composables'
 
 import AppearanceSettingRow from './components/AppearanceSettingRow.vue'
+import AppearanceSettingsThemeSelector from './components/appearance-settings-theme-selector.vue'
 import ProjectLayoutSelector from './components/ProjectLayoutSelector.vue'
 import { appearanceSettingsMessages as messages } from './messages'
 import { injectAppearanceSettings } from './providers'
@@ -40,7 +40,7 @@ const sidebarPreferenceValues = sidebarPreferences?.value
 				</p>
 			</div>
 
-			<ThemeSelector
+			<AppearanceSettingsThemeSelector
 				class="mt-4"
 				:aria-label="formatMessage(messages.colorThemeTitle)"
 				:model-value="currentTheme"

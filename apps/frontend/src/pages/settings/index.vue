@@ -20,10 +20,18 @@
 		<section class="universal-card">
 			<AppearanceSettingsLayout />
 		</section>
+		<UnsavedChangesPopup
+			:original="saved"
+			:modified="changes"
+			:saving="saving"
+			@reset="reset"
+			@save="saveAppearanceSettings"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CodeIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -41,6 +49,8 @@ import {
 	type ProjectLayoutSetting,
 	provideAppearanceSettings,
 	type SidebarPreferences,
+	UnsavedChangesPopup,
+	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -105,14 +115,6 @@ const systemTheme = useMountedValue((mounted): Theme => {
 	return systemTheme_ === 'light' ? theme.preferences.light : theme.preferences.dark
 })
 
-const themeOptions = computed(() => {
-	const options: ('system' | Theme)[] = ['system', 'light', 'dark', 'oled']
-	if (flags.value.developerMode || theme.preferred === 'retro') {
-		options.push('retro')
-	}
-	return options
-})
-
 const projectLayouts = computed<ProjectLayoutSetting[]>(() => {
 	const layouts = tags.value.projectTypes
 		.map(({ id }) => id)
@@ -137,68 +139,179 @@ const sidebarPreferences = computed<SidebarPreferences>(() => ({
 	left_aligned_content: cosmetics.value.leftContentLayout,
 }))
 
-function setTheme(value: Theme | 'system'): void {
-	if (value !== 'system') {
-		if (isDarkTheme(value)) {
-			theme.preferences.dark = value
-		} else {
-			theme.preferences.light = value
-		}
-	}
+type AppearanceSettingsState = {
+	theme: Theme | 'system'
+	syncAcrossDevices: boolean
+	advancedRendering: boolean
+	projectLayouts: ProjectLayoutSetting[]
+	externalLinksNewTab: boolean
+	sidebarPreferences: SidebarPreferences
+}
 
-	theme.preferred = value
+const layoutPreferenceKeys: Record<
+	ProjectDisplayLocation,
+	keyof Labrinth.Users.v3.LayoutPreferences
+> = {
+	mod: 'mods',
+	plugin: 'plugins',
+	datapack: 'datapacks',
+	shader: 'shaders',
+	resourcepack: 'resourcepacks',
+	modpack: 'modpacks',
+	server: 'servers',
+	user: 'users',
+}
+
+function getAppearanceSettingsState(): AppearanceSettingsState {
+	return {
+		theme: theme.preferred,
+		syncAcrossDevices: theme.syncAcrossDevices,
+		advancedRendering: cosmetics.value.advancedRendering,
+		projectLayouts: projectLayouts.value,
+		externalLinksNewTab: cosmetics.value.externalLinksNewTab,
+		sidebarPreferences: sidebarPreferences.value,
+	}
+}
+
+const { saved, current, changes, saving, reset, save } = useSavable(
+	getAppearanceSettingsState,
+	async (appearanceChanges) => {
+		const value = current.value
+		const preferencesPatch: Labrinth.Users.v3.PartialUserPreferences = {}
+
+		if (
+			value.syncAcrossDevices &&
+			auth.user.value &&
+			(appearanceChanges.theme !== undefined ||
+				appearanceChanges.syncAcrossDevices !== undefined)
+		) {
+			preferencesPatch.appearance =
+				value.theme === 'system'
+					? { auto: true }
+					: { auto: false, theme: value.theme }
+		}
+
+		if (appearanceChanges.projectLayouts !== undefined) {
+			const layouts: Partial<Labrinth.Users.v3.LayoutPreferences> = {}
+			for (const setting of value.projectLayouts) {
+				layouts[layoutPreferenceKeys[setting.type]] = setting.layout
+			}
+			preferencesPatch.layouts = layouts
+		}
+
+		if (appearanceChanges.sidebarPreferences !== undefined) {
+			preferencesPatch.sidebars = value.sidebarPreferences
+		}
+
+		if (Object.keys(preferencesPatch).length > 0) {
+			await updatePreferences(preferencesPatch)
+		}
+
+		if (value.theme !== 'system') {
+			if (isDarkTheme(value.theme)) {
+				theme.preferences.dark = value.theme
+			} else {
+				theme.preferences.light = value.theme
+			}
+		}
+
+		theme.preferred = value.theme
+		theme.syncAcrossDevices = value.syncAcrossDevices
+		cosmetics.value.advancedRendering = value.advancedRendering
+		cosmetics.value.externalLinksNewTab = value.externalLinksNewTab
+		cosmetics.value.rightSearchLayout = value.sidebarPreferences.right_aligned_search
+		cosmetics.value.leftContentLayout = value.sidebarPreferences.left_aligned_content
+		for (const setting of value.projectLayouts) {
+			cosmetics.value.searchDisplayMode[setting.type] =
+				setting.layout === 'rows' ? 'list' : 'grid'
+		}
+	},
+)
+
+const themeOptions = computed(() => {
+	const options: ('system' | Theme)[] = ['system', 'light', 'dark', 'oled']
+	if (flags.value.developerMode || current.value.theme === 'retro') {
+		options.push('retro')
+	}
+	return options
+})
+
+function setTheme(value: Theme | 'system'): void {
+	current.value.theme = value
 }
 
 function setSyncAcrossDevices(value: boolean): void {
-	theme.syncAcrossDevices = value
+	current.value.syncAcrossDevices = value
 }
 
 function setAdvancedRendering(value: boolean): void {
-	cosmetics.value.advancedRendering = value
+	current.value.advancedRendering = value
 }
 
 function setProjectLayout(type: ProjectDisplayLocation, layout: ProjectLayout): void {
-	cosmetics.value.searchDisplayMode[type] = layout === 'rows' ? 'list' : 'grid'
+	current.value.projectLayouts = current.value.projectLayouts.map((setting) =>
+		setting.type === type ? { ...setting, layout } : setting,
+	)
 }
 
 function setExternalLinksNewTab(value: boolean): void {
-	cosmetics.value.externalLinksNewTab = value
+	current.value.externalLinksNewTab = value
 }
 
 function setSidebarPreference(key: keyof SidebarPreferences, value: boolean): void {
-	if (key === 'right_aligned_search') {
-		cosmetics.value.rightSearchLayout = value
-	} else {
-		cosmetics.value.leftContentLayout = value
+	current.value.sidebarPreferences = {
+		...current.value.sidebarPreferences,
+		[key]: value,
+	}
+}
+
+watch(
+	[() => current.value.theme, () => saved.value.theme],
+	([selectedTheme, savedTheme]) => {
+		theme.preview = selectedTheme === savedTheme ? null : selectedTheme
+	},
+	{ immediate: true },
+)
+
+onBeforeUnmount(() => {
+	theme.preview = null
+})
+
+async function saveAppearanceSettings(): Promise<void> {
+	try {
+		await save()
+	} catch {
+		return
 	}
 }
 
 provideAppearanceSettings({
+	deferPersistence: true,
 	theme: {
-		current: computed(() => theme.preferred),
+		current: computed(() => current.value.theme),
 		options: themeOptions,
 		system: systemTheme,
 		set: setTheme,
 		syncAcrossDevices: {
-			value: computed(() => theme.syncAcrossDevices),
+			value: computed(() => current.value.syncAcrossDevices),
 			set: setSyncAcrossDevices,
 		},
 		syncDisabled: computed(() => !auth.user.value),
 	},
 	advancedRendering: {
-		value: computed(() => cosmetics.value.advancedRendering),
+		value: computed(() => current.value.advancedRendering),
 		set: setAdvancedRendering,
 	},
 	projectLayouts: {
-		value: projectLayouts,
+		value: computed(() => current.value.projectLayouts),
 		set: setProjectLayout,
 	},
 	externalLinksNewTab: {
-		value: computed(() => cosmetics.value.externalLinksNewTab),
+		value: computed(() => current.value.externalLinksNewTab),
 		set: setExternalLinksNewTab,
 	},
 	sidebarPreferences: {
-		value: sidebarPreferences,
+		value: computed(() => current.value.sidebarPreferences),
 		set: setSidebarPreference,
 	},
 	updatePreferences,

@@ -6,13 +6,15 @@ export type ColorTheme = (typeof THEME_OPTIONS)[number]
 type Theme = Exclude<ColorTheme, 'system'>
 
 const preferred = ref<ColorTheme>('dark')
+const preview = ref<ColorTheme | null>(null)
 const advancedRendering = ref(true)
 const syncAcrossDevices = ref(false)
 const nativeThemeQuery = window.matchMedia('(prefers-color-scheme: dark)')
 const native = ref<Theme>(nativeThemeQuery.matches ? 'dark' : 'light')
-const active = computed<Theme>(() =>
-	preferred.value === 'system' ? native.value : preferred.value,
-)
+const active = computed<Theme>(() => {
+	const selectedTheme = preview.value ?? preferred.value
+	return selectedTheme === 'system' ? native.value : selectedTheme
+})
 
 nativeThemeQuery.addEventListener('change', (event) => {
 	native.value = event.matches ? 'dark' : 'light'
@@ -32,6 +34,7 @@ watch(
 
 const theme = reactive({
 	preferred,
+	preview,
 	active,
 	native,
 	syncAcrossDevices,

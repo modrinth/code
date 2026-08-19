@@ -172,10 +172,19 @@ const modifiedUnsavedChangesState = computed(
 	() => unsavedChangesController.value?.getModified() ?? emptyUnsavedChangesState,
 )
 const savingUnsavedChanges = computed(() => unsavedChangesController.value?.isSaving() ?? false)
-const hasUnsavedChanges = computed(() => unsavedChangesController.value?.hasChanges() ?? false)
+const hasUnsavedChanges = computed(
+	() =>
+		(unsavedChangesController.value?.hasChanges() ?? false) ||
+		(unsavedChangesController.value?.isSaving() ?? false),
+)
 
 function canLeaveCurrentTab(): boolean {
-	if (!unsavedChangesController.value?.hasChanges()) return true
+	if (
+		!unsavedChangesController.value?.hasChanges() &&
+		!unsavedChangesController.value?.isSaving()
+	) {
+		return true
+	}
 	unsavedChangesPopup.value?.nudge()
 	return false
 }

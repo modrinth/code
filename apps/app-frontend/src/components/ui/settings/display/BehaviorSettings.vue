@@ -1,14 +1,27 @@
 <script setup lang="ts">
-import { defineMessages, injectAuth, injectUserPreferences, Toggle, useVIntl } from '@modrinth/ui'
-import { ref, watch } from 'vue'
+import {
+	defineMessages,
+	injectAuth,
+	injectUserPreferences,
+	Toggle,
+	useSavable,
+	useVIntl,
+} from '@modrinth/ui'
+import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { type FeatureFlag, useAppSettings } from '@/composables/use-app-settings.ts'
-import { get, set } from '@/helpers/settings.ts'
+import {
+	DEFAULT_FEATURE_FLAGS,
+	type FeatureFlag,
+	useAppSettings,
+} from '@/composables/use-app-settings.ts'
+import { type AppSettings, get, set } from '@/helpers/settings.ts'
+import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
 const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 const auth = injectAuth()
 const { updatePreferences } = injectUserPreferences()
+const settingsModal = inject(appSettingsModalContextKey, null)
 
 const worldsInHomeFlag: FeatureFlag = 'worlds_in_home'
 const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
@@ -110,40 +123,107 @@ const messages = defineMessages({
 	},
 })
 
-const settings = ref(await get())
-
-function syncBehaviorPreferences() {
-	return updatePreferences({
-		behavior: {
-			minimize_app: settings.value.hide_on_process_start,
-			hide_right_sidebar: settings.value.toggle_sidebar,
-			show_jump_in: appSettings.getFeatureFlag(worldsInHomeFlag),
-			show_play_time: appSettings.getFeatureFlag(showPlayTimeFlag),
-			hide_nametag: settings.value.hide_nametag_skins_page,
-			warn_on_unknown_modpacks: !appSettings.getFeatureFlag(skipUnknownPackWarningFlag),
-			skip_non_essential_warnings: appSettings.getFeatureFlag(skipNonEssentialWarningsFlag),
-		},
-	}).catch(() => {
-		setSyncBehaviorAcrossDevices(false)
-		return undefined
-	})
+type BehaviorSettingsState = {
+	syncBehaviorAcrossDevices: boolean
+	minimizeApp: boolean
+	hideRightSidebar: boolean
+	showJumpIn: boolean
+	showPlayTime: boolean
+	hideNametag: boolean
+	warnOnUnknownModpacks: boolean
+	skipNonEssentialWarnings: boolean
 }
 
-function setSyncBehaviorAcrossDevices(value: boolean) {
-	appSettings.setBehaviorSyncAcrossDevices(value)
-	settings.value.sync_behavior_across_devices = value
+const persistedSettings = ref(await get())
+
+function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState {
+	return {
+		syncBehaviorAcrossDevices: settings.sync_behavior_across_devices,
+		minimizeApp: settings.hide_on_process_start,
+		hideRightSidebar: settings.toggle_sidebar,
+		showJumpIn:
+			settings.feature_flags[worldsInHomeFlag] ?? DEFAULT_FEATURE_FLAGS[worldsInHomeFlag],
+		showPlayTime:
+			settings.feature_flags[showPlayTimeFlag] ?? DEFAULT_FEATURE_FLAGS[showPlayTimeFlag],
+		hideNametag: settings.hide_nametag_skins_page,
+		warnOnUnknownModpacks: !(
+			settings.feature_flags[skipUnknownPackWarningFlag] ??
+			DEFAULT_FEATURE_FLAGS[skipUnknownPackWarningFlag]
+		),
+		skipNonEssentialWarnings:
+			settings.feature_flags[skipNonEssentialWarningsFlag] ??
+			DEFAULT_FEATURE_FLAGS[skipNonEssentialWarningsFlag],
+	}
 }
 
-watch(
-	settings,
+const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
+	() => getBehaviorSettingsState(persistedSettings.value),
 	async () => {
-		await set(settings.value)
-		if (!appSettings.syncBehaviorAcrossDevices) return
+		const value = current.value
 
-		await syncBehaviorPreferences()
+		if (value.syncBehaviorAcrossDevices && auth.user.value) {
+			await updatePreferences({
+				behavior: {
+					minimize_app: value.minimizeApp,
+					hide_right_sidebar: value.hideRightSidebar,
+					show_jump_in: value.showJumpIn,
+					show_play_time: value.showPlayTime,
+					hide_nametag: value.hideNametag,
+					warn_on_unknown_modpacks: value.warnOnUnknownModpacks,
+					skip_non_essential_warnings: value.skipNonEssentialWarnings,
+				},
+			})
+		}
+
+		const nextSettings: AppSettings = {
+			...persistedSettings.value,
+			sync_behavior_across_devices: value.syncBehaviorAcrossDevices,
+			hide_on_process_start: value.minimizeApp,
+			toggle_sidebar: value.hideRightSidebar,
+			hide_nametag_skins_page: value.hideNametag,
+			feature_flags: {
+				...persistedSettings.value.feature_flags,
+				[worldsInHomeFlag]: value.showJumpIn,
+				[showPlayTimeFlag]: value.showPlayTime,
+				[skipUnknownPackWarningFlag]: !value.warnOnUnknownModpacks,
+				[skipNonEssentialWarningsFlag]: value.skipNonEssentialWarnings,
+			},
+		}
+
+		await set(nextSettings)
+		persistedSettings.value = nextSettings
+		appSettings.setBehaviorSyncAcrossDevices(value.syncBehaviorAcrossDevices)
+		appSettings.toggleSidebar = value.hideRightSidebar
+		appSettings.hideNametagSkinsPage = value.hideNametag
+		appSettings.featureFlags[worldsInHomeFlag] = value.showJumpIn
+		appSettings.featureFlags[showPlayTimeFlag] = value.showPlayTime
+		appSettings.featureFlags[skipUnknownPackWarningFlag] = !value.warnOnUnknownModpacks
+		appSettings.featureFlags[skipNonEssentialWarningsFlag] = value.skipNonEssentialWarnings
 	},
-	{ deep: true },
 )
+
+async function saveBehaviorSettings(): Promise<void> {
+	try {
+		await save()
+	} catch {
+		return
+	}
+}
+
+onMounted(() => {
+	settingsModal?.registerUnsavedChangesController({
+		hasChanges: () => hasChanges.value,
+		getOriginal: () => saved.value,
+		getModified: () => changes.value,
+		isSaving: () => saving.value,
+		reset,
+		save: saveBehaviorSettings,
+	})
+})
+
+onBeforeUnmount(() => {
+	settingsModal?.registerUnsavedChangesController(null)
+})
 </script>
 <template>
 	<section class="border-0 border-b border-solid border-divider pb-6">
@@ -164,10 +244,10 @@ watch(
 			>
 				<Toggle
 					id="sync-behavior-across-devices"
-					:model-value="Boolean(auth.user.value) && appSettings.syncBehaviorAcrossDevices"
+					:model-value="Boolean(auth.user.value) && current.syncBehaviorAcrossDevices"
 					:disabled="!auth.user.value"
 					aria-labelledby="sync-behavior-across-devices-label"
-					@update:model-value="setSyncBehaviorAcrossDevices"
+					@update:model-value="current.syncBehaviorAcrossDevices = $event"
 				/>
 			</span>
 		</div>
@@ -187,7 +267,7 @@ watch(
 						{{ formatMessage(messages.minimizeLauncherDescription) }}
 					</p>
 				</div>
-				<Toggle id="minimize-launcher" v-model="settings.hide_on_process_start" />
+				<Toggle id="minimize-launcher" v-model="current.minimizeApp" />
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
@@ -197,16 +277,7 @@ watch(
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.toggleSidebarDescription) }}</p>
 				</div>
-				<Toggle
-					id="toggle-sidebar"
-					:model-value="settings.toggle_sidebar"
-					@update:model-value="
-						(e) => {
-							settings.toggle_sidebar = !!e
-							appSettings.toggleSidebar = settings.toggle_sidebar
-						}
-					"
-				/>
+				<Toggle id="toggle-sidebar" v-model="current.hideRightSidebar" />
 			</div>
 		</div>
 	</section>
@@ -225,17 +296,7 @@ watch(
 						{{ formatMessage(messages.jumpBackIntoWorldsDescription) }}
 					</p>
 				</div>
-				<Toggle
-					id="jump-back-into-worlds"
-					:model-value="appSettings.getFeatureFlag(worldsInHomeFlag)"
-					@update:model-value="
-						() => {
-							const newValue = !appSettings.getFeatureFlag(worldsInHomeFlag)
-							appSettings.featureFlags[worldsInHomeFlag] = newValue
-							settings.feature_flags[worldsInHomeFlag] = newValue
-						}
-					"
-				/>
+				<Toggle id="jump-back-into-worlds" v-model="current.showJumpIn" />
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
@@ -245,17 +306,7 @@ watch(
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.showPlayTimeDescription) }}</p>
 				</div>
-				<Toggle
-					id="show-play-time"
-					:model-value="appSettings.getFeatureFlag(showPlayTimeFlag)"
-					@update:model-value="
-						() => {
-							const newValue = !appSettings.getFeatureFlag(showPlayTimeFlag)
-							appSettings.featureFlags[showPlayTimeFlag] = newValue
-							settings.feature_flags[showPlayTimeFlag] = newValue
-						}
-					"
-				/>
+				<Toggle id="show-play-time" v-model="current.showPlayTime" />
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
@@ -265,16 +316,7 @@ watch(
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.hideNametagDescription) }}</p>
 				</div>
-				<Toggle
-					id="hide-nametag-skins-page"
-					:model-value="appSettings.hideNametagSkinsPage"
-					@update:model-value="
-						(e) => {
-							appSettings.hideNametagSkinsPage = !!e
-							settings.hide_nametag_skins_page = appSettings.hideNametagSkinsPage
-						}
-					"
-				/>
+				<Toggle id="hide-nametag-skins-page" v-model="current.hideNametag" />
 			</div>
 		</div>
 	</section>
@@ -295,15 +337,7 @@ watch(
 				</div>
 				<Toggle
 					id="warn-before-installing-unknown-modpacks"
-					:model-value="!appSettings.getFeatureFlag(skipUnknownPackWarningFlag)"
-					@update:model-value="
-						(e) => {
-							const warnBeforeUnknownPackInstall = !!e
-							const skipUnknownPackWarning = !warnBeforeUnknownPackInstall
-							appSettings.featureFlags[skipUnknownPackWarningFlag] = skipUnknownPackWarning
-							settings.feature_flags[skipUnknownPackWarningFlag] = skipUnknownPackWarning
-						}
-					"
+					v-model="current.warnOnUnknownModpacks"
 				/>
 			</div>
 
@@ -318,14 +352,7 @@ watch(
 				</div>
 				<Toggle
 					id="skip-non-essential-warnings"
-					:model-value="appSettings.getFeatureFlag(skipNonEssentialWarningsFlag)"
-					@update:model-value="
-						() => {
-							const newValue = !appSettings.getFeatureFlag(skipNonEssentialWarningsFlag)
-							appSettings.featureFlags[skipNonEssentialWarningsFlag] = newValue
-							settings.feature_flags[skipNonEssentialWarningsFlag] = newValue
-						}
-					"
+					v-model="current.skipNonEssentialWarnings"
 				/>
 			</div>
 		</div>

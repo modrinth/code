@@ -36,7 +36,7 @@
 					:disabled-tooltip="preferenceControlsTooltip"
 					:capitalize="false"
 					:aria-label="formatMessage(messages.friendRequestsTitle)"
-					@update:model-value="updateFriendPrivacy"
+					@update:model-value="setFriendPrivacy"
 				/>
 				<p class="m-0 text-secondary">
 					{{ formatMessage(messages.friendRequestsDescription) }}
@@ -55,7 +55,7 @@
 					:disabled-tooltip="preferenceControlsTooltip"
 					:capitalize="false"
 					:aria-label="formatMessage(messages.sharedInstanceInvitesTitle)"
-					@update:model-value="updateSharedInstancesPrivacy"
+					@update:model-value="setSharedInstancesPrivacy"
 				/>
 				<p class="m-0 text-secondary">
 					{{ formatMessage(messages.sharedInstanceInvitesDescription) }}
@@ -74,7 +74,7 @@
 					:disabled-tooltip="preferenceControlsTooltip"
 					:capitalize="false"
 					:aria-label="formatMessage(messages.hostingAccessTitle)"
-					@update:model-value="updateHostingAccessPrivacy"
+					@update:model-value="setHostingAccessPrivacy"
 				/>
 				<p class="m-0 text-secondary">
 					{{ formatMessage(messages.hostingAccessDescription) }}
@@ -225,6 +225,11 @@ type BlockedUserTableColumn = 'user' | 'actions'
 type BlockedUser = Labrinth.Users.v2.User & Record<BlockedUserTableColumn, unknown>
 type FriendPrivacy = Labrinth.Users.v3.FriendPrivacy
 type InvitePrivacy = Labrinth.Users.v3.InvitePrivacy
+type SocialSettingsState = {
+	friendPrivacy: FriendPrivacy
+	sharedInstancesPrivacy: InvitePrivacy
+	hostingAccessPrivacy: InvitePrivacy
+}
 
 const props = defineProps<{
 	getBlockedUsers: () => Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]>
@@ -244,20 +249,41 @@ const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
 const blockedUsersTable = ref<HTMLElement | null>(null)
 const unblockingUserId = ref<string | null>(null)
+const saving = ref(false)
+const preferencesInitialized = ref(false)
 const friendPrivacy = ref<FriendPrivacy>('everyone')
 const sharedInstancesPrivacy = ref<InvitePrivacy>('everyone')
 const hostingAccessPrivacy = ref<InvitePrivacy>('everyone')
 const friendPrivacyOptions: FriendPrivacy[] = ['everyone', 'mutual', 'none']
 const invitePrivacyOptions: InvitePrivacy[] = ['everyone', 'friends', 'none']
 const preferenceControlsDisabled = computed(
-	() => preferencesLoading.value || preferencesUpdating.value || !preferences.value,
+	() =>
+		preferencesLoading.value || preferencesUpdating.value || saving.value || !preferences.value,
 )
 const preferenceControlsTooltip = computed(() => {
 	if (preferencesLoading.value) return formatMessage(messages.loadingPreferences)
-	if (preferencesUpdating.value) return formatMessage(messages.savingPreferences)
+	if (saving.value || preferencesUpdating.value) return formatMessage(messages.savingPreferences)
 	return formatMessage(messages.preferencesUnavailable)
 })
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(blockedUsersTable)
+
+const originalState = computed<SocialSettingsState>(() => ({
+	friendPrivacy: preferences.value?.social.friend_privacy ?? 'everyone',
+	sharedInstancesPrivacy: preferences.value?.social.shared_instances_privacy ?? 'everyone',
+	hostingAccessPrivacy: preferences.value?.social.hosting_access_privacy ?? 'everyone',
+}))
+const modifiedState = computed<Partial<SocialSettingsState>>(() => ({
+	...(friendPrivacy.value !== originalState.value.friendPrivacy
+		? { friendPrivacy: friendPrivacy.value }
+		: {}),
+	...(sharedInstancesPrivacy.value !== originalState.value.sharedInstancesPrivacy
+		? { sharedInstancesPrivacy: sharedInstancesPrivacy.value }
+		: {}),
+	...(hostingAccessPrivacy.value !== originalState.value.hostingAccessPrivacy
+		? { hostingAccessPrivacy: hostingAccessPrivacy.value }
+		: {}),
+}))
+const hasChanges = computed(() => Object.keys(modifiedState.value).length > 0)
 
 function formatInteractionSource(source: FriendPrivacy | InvitePrivacy): string {
 	switch (source) {
@@ -276,49 +302,57 @@ watch(
 	preferences,
 	(value) => {
 		if (!value) return
+		if (preferencesInitialized.value && hasChanges.value && !saving.value) return
 
 		friendPrivacy.value = value.social.friend_privacy
 		sharedInstancesPrivacy.value = value.social.shared_instances_privacy
 		hostingAccessPrivacy.value = value.social.hosting_access_privacy
+		preferencesInitialized.value = true
 	},
-	{ immediate: true },
+	{ immediate: true, flush: 'sync' },
 )
 
-async function updateFriendPrivacy(value: FriendPrivacy | null): Promise<void> {
-	if (!value || value === friendPrivacy.value) return
-
-	const previous = friendPrivacy.value
+function setFriendPrivacy(value: FriendPrivacy | null): void {
+	if (!value) return
 	friendPrivacy.value = value
-	try {
-		await updatePreferences({ social: { friend_privacy: value } })
-	} catch {
-		friendPrivacy.value = previous
-	}
 }
 
-async function updateSharedInstancesPrivacy(value: InvitePrivacy | null): Promise<void> {
-	if (!value || value === sharedInstancesPrivacy.value) return
-
-	const previous = sharedInstancesPrivacy.value
+function setSharedInstancesPrivacy(value: InvitePrivacy | null): void {
+	if (!value) return
 	sharedInstancesPrivacy.value = value
-	try {
-		await updatePreferences({ social: { shared_instances_privacy: value } })
-	} catch {
-		sharedInstancesPrivacy.value = previous
-	}
 }
 
-async function updateHostingAccessPrivacy(value: InvitePrivacy | null): Promise<void> {
-	if (!value || value === hostingAccessPrivacy.value) return
-
-	const previous = hostingAccessPrivacy.value
+function setHostingAccessPrivacy(value: InvitePrivacy | null): void {
+	if (!value) return
 	hostingAccessPrivacy.value = value
+}
+
+function reset(): void {
+	friendPrivacy.value = originalState.value.friendPrivacy
+	sharedInstancesPrivacy.value = originalState.value.sharedInstancesPrivacy
+	hostingAccessPrivacy.value = originalState.value.hostingAccessPrivacy
+}
+
+async function save(): Promise<void> {
+	if (!hasChanges.value || saving.value) return
+
+	saving.value = true
 	try {
-		await updatePreferences({ social: { hosting_access_privacy: value } })
+		await updatePreferences({
+			social: {
+				friend_privacy: friendPrivacy.value,
+				shared_instances_privacy: sharedInstancesPrivacy.value,
+				hosting_access_privacy: hostingAccessPrivacy.value,
+			},
+		})
 	} catch {
-		hostingAccessPrivacy.value = previous
+		return
+	} finally {
+		saving.value = false
 	}
 }
+
+defineExpose({ hasChanges, originalState, modifiedState, saving, reset, save })
 
 const columns = computed<TableColumn<BlockedUserTableColumn>[]>(() => [
 	{
