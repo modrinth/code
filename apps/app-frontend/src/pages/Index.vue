@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HomeIcon, PlusIcon } from '@modrinth/assets'
+import { PlayIcon, PlusIcon } from '@modrinth/assets'
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, inject, onActivated, ref } from 'vue'
@@ -43,7 +43,7 @@ const homeBreadcrumb = useRootBreadcrumb({
 	id: 'home',
 	label: formatMessage(messages.home),
 	to: '/',
-	visual: { type: 'icon', component: HomeIcon },
+	visual: { type: 'icon', component: PlayIcon },
 })
 onActivated(homeBreadcrumb.reset)
 
