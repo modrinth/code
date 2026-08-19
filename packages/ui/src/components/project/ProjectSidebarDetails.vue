@@ -14,7 +14,7 @@
 		</NewModal>
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div
-			class="flex flex-col gap-3 [&>div>svg]:shrink-0 [&>div>svg]:mt-[1px] [&>div]:flex [&>div]:gap-2 [&>div]:items-start"
+			class="flex flex-col gap-3 [&>div>svg]:shrink-0 [&>div>svg]:mt-[1px] [&>div]:flex [&>div]:gap-2 [&>div]:items-start [&>div>div]:min-w-0"
 		>
 			<div v-if="photosensitivityDisclosure" class="text-orange">
 				<EyeIcon aria-hidden="true" />
@@ -23,7 +23,7 @@
 						{{ capitalizeString(formatMessage(messages.photosensitivityTitle)) }}
 					</span>
 					<span v-if="photosensitivityDisclosure.note" class="text-sm text-secondary">
-						{{ photosensitivityDisclosure.note }}
+						<BasicMarkdownText :text="photosensitivityDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -34,7 +34,7 @@
 						{{ capitalizeString(aiGeneratedLabel) }}
 					</span>
 					<span v-if="aiDisclosure.note" class="text-sm text-secondary">
-						{{ aiDisclosure.note }}
+						<BasicMarkdownText :text="aiDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -45,7 +45,7 @@
 						{{ capitalizeString(formatMessage(messages.advertisingTitle)) }}
 					</span>
 					<span v-if="advertisingDisclosure.note" class="text-sm text-secondary">
-						{{ advertisingDisclosure.note }}
+						<BasicMarkdownText :text="advertisingDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -60,7 +60,7 @@
 						:key="`${feature}-${index}`"
 						class="text-sm text-secondary"
 					>
-						{{ feature }}
+						<BasicMarkdownText :text="feature" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -81,7 +81,7 @@
 						:key="`${entry}-${index}`"
 						class="text-sm text-secondary"
 					>
-						{{ entry }}
+						<BasicMarkdownText :text="entry" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -92,7 +92,7 @@
 						{{ capitalizeString(formatMessage(messages.systemInteractionsTitle)) }}
 					</span>
 					<span v-if="systemInteractionsDisclosure.note" class="text-sm text-secondary">
-						{{ systemInteractionsDisclosure.note }}
+						<BasicMarkdownText :text="systemInteractionsDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -130,7 +130,7 @@
 						{{ capitalizeString(formatMessage(messages.derivativeWork)) }}
 					</span>
 					<div
-						v-for="(source, index) in derivativeWorkDisclosure.sources"
+						v-for="(source, index) in visibleDerivativeSources"
 						:key="`${source.label}-${index}`"
 						class="flex flex-col gap-1"
 					>
@@ -139,14 +139,36 @@
 							:href="source.link"
 							:target="linkTarget"
 							rel="noopener nofollow ugc"
-							class="text-blue text-sm flex items-center gap-1 hover:underline"
+							class="text-blue text-sm min-w-0 break-words hover:underline"
 						>
 							{{ source.label }}
 							<ExternalIcon />
 						</a>
-						<span v-else class="text-sm">{{ source.label }}</span>
-						<span v-if="source.note" class="text-sm text-secondary">{{ source.note }}</span>
+						<span v-else class="text-sm">
+							<BasicMarkdownText :text="source.label" :target="linkTarget" />
+						</span>
+						<span v-if="source.note" class="text-sm text-secondary">
+							<BasicMarkdownText :text="source.note" :target="linkTarget" />
+						</span>
 					</div>
+					<button
+						v-if="hasMoreDerivativeSources"
+						type="button"
+						class="flex w-fit items-center gap-1 border-none bg-transparent p-0 text-sm font-semibold text-secondary cursor-pointer active:scale-95 transition-transform"
+						@click="showAllDerivativeSources = !showAllDerivativeSources"
+					>
+						<DropdownIcon
+							class="h-4 w-4 transition-transform"
+							:class="{ 'rotate-180': showAllDerivativeSources }"
+						/>
+						{{
+							showAllDerivativeSources
+								? formatMessage(messages.showLessDerivativeSources)
+								: formatMessage(messages.showMoreDerivativeSources, {
+										count: hiddenDerivativeSourcesCount,
+									})
+						}}
+					</button>
 				</div>
 			</div>
 			<div v-if="showFollowers">
@@ -207,6 +229,7 @@ import {
 	CalendarIcon,
 	CircleDollarSignIcon,
 	CircuitBoardIcon,
+	DropdownIcon,
 	ExternalIcon,
 	EyeIcon,
 	GitForkIcon,
@@ -226,7 +249,7 @@ import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
 import { getActiveDisclosures } from '../../utils/disclosures'
-import { Avatar, IntlFormatted } from '../base'
+import { Avatar, BasicMarkdownText, IntlFormatted } from '../base'
 import { NewModal } from '../modal'
 
 const LICENSE_STALE_TIME = 1000 * 60 * 10
@@ -285,6 +308,14 @@ const messages = defineMessages({
 		id: 'project.disclosure.derivative-work.title',
 		defaultMessage: 'This is a derivative work of:',
 	},
+	showMoreDerivativeSources: {
+		id: 'project.disclosure.derivative-work.show-more',
+		defaultMessage: 'Show {count} more',
+	},
+	showLessDerivativeSources: {
+		id: 'project.disclosure.derivative-work.show-fewer',
+		defaultMessage: 'Show fewer',
+	},
 	telemetryTitle: {
 		id: 'project.disclosure.telemetry.title',
 		defaultMessage:
@@ -321,6 +352,28 @@ const telemetryDisclosure = computed(() => findDisclosure('telemetry'))
 const derivativeWorkDisclosure = computed(() => findDisclosure('derivative_work'))
 const photosensitivityDisclosure = computed(() => findDisclosure('epilepsy_triggers'))
 const systemInteractionsDisclosure = computed(() => findDisclosure('system_interactions'))
+
+const DERIVATIVE_SOURCES_PREVIEW_LIMIT = 3
+const showAllDerivativeSources = ref(false)
+
+const visibleDerivativeSources = computed(() => {
+	const sources = derivativeWorkDisclosure.value?.sources ?? []
+	if (showAllDerivativeSources.value || sources.length <= DERIVATIVE_SOURCES_PREVIEW_LIMIT) {
+		return sources
+	}
+	return sources.slice(0, DERIVATIVE_SOURCES_PREVIEW_LIMIT)
+})
+
+const hasMoreDerivativeSources = computed(
+	() => (derivativeWorkDisclosure.value?.sources.length ?? 0) > DERIVATIVE_SOURCES_PREVIEW_LIMIT,
+)
+
+const hiddenDerivativeSourcesCount = computed(() =>
+	Math.max(
+		0,
+		(derivativeWorkDisclosure.value?.sources.length ?? 0) - DERIVATIVE_SOURCES_PREVIEW_LIMIT,
+	),
+)
 
 const aiUseLabels = {
 	code: defineMessage({

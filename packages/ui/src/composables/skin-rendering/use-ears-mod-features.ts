@@ -1939,6 +1939,10 @@ export function removeEarsMod(model: THREE.Object3D | null) {
 	registry.removeFromParent()
 }
 
+export function isEarsModFeature(object: THREE.Object3D) {
+	return object.name.startsWith(EARS_FEATURE_PREFIX)
+}
+
 export function applyEarsMod(model: THREE.Object3D, sourceTexture: THREE.Texture, enabled = true) {
 	removeEarsMod(model)
 

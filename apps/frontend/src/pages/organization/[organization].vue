@@ -483,7 +483,7 @@ watch(
 				description,
 				ogTitle: title,
 				ogDescription: org.description,
-				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+				ogImage: org.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png',
 				ogUrl: canonicalUrl,
 			})
 			useHead({

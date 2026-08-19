@@ -167,7 +167,7 @@ export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): voi
 						const propertiesNeedUpdate = setShaderMaterialProperties(mat, {
 							alphaTest: 0.1,
 							flatShading: true,
-							side: THREE.FrontSide,
+							side: isSkinLayer ? THREE.DoubleSide : THREE.FrontSide,
 							toneMapped: false,
 							transparent: isSkinLayer,
 						})

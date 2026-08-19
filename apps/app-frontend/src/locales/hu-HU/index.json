@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Téma"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Válaszd ki, hogy a Modrinth App megnyitásakor melyik oldal jelenjen meg."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Kezdőlap"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Könyvtár"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Alapértelmezett nyitóoldal"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Elrejti a játékosod előnézete felett megjelenő névcímkét a Kinézetváltó oldalon."
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "Kezdőlap"
   },
-  "app.nav.library": {
-    "message": "Könyvtár"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth fiók"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "Bejelentkezés"
   },
-  "app.skins.sign-in.description": {
-    "message": "Kérlek jelentkezz be a Minecraft-fiókodba, hogy használni tudd a Modrinth App kinézetkezelési funkcióit."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Izgatott Modrinth bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Kérlek jelentkezz be"
-  },
   "app.skins.title": {
     "message": "Kinézetváltó"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "A verzió módosítása csak a helyi példányt érinti. A megosztott példány jövőbeli frissítései felülírhatják vagy ismét megváltoztathatják azt."
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Ikon kiválasztása"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Könyvtárgyűjtemények"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Új csoport létrehozása"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "A könyvtárgyűjtemények segítenek külön kategóriákba rendszerezni a példányokat."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Add meg a gyűjtemény nevét"
   },
   "instance.settings.tabs.general.name": {
     "message": "Név"

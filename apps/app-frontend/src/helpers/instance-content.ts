@@ -15,7 +15,7 @@ export type InstanceContentData = {
 
 export type InstanceContentModpackData = {
 	project: ManagedContentProject
-	version: ManagedContentVersion
+	version: ManagedContentVersion | null
 	updateVersionId: string | null
 }
 
@@ -53,10 +53,12 @@ function normalizeLinkedModpackInfo(
 			slug: modpackInfo.project.slug ?? modpackInfo.project.id,
 			icon_url: modpackInfo.project.icon_url ?? undefined,
 		},
-		version: {
-			...modpackInfo.version,
-			date_published: modpackInfo.version.date_published.toString(),
-		},
+		version: modpackInfo.version
+			? {
+					...modpackInfo.version,
+					date_published: modpackInfo.version.date_published.toString(),
+				}
+			: null,
 		updateVersionId: modpackInfo.update_version_id,
 	}
 }

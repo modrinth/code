@@ -15,6 +15,7 @@ pub mod medal;
 pub mod moderation;
 pub mod mural;
 pub mod pats;
+pub mod privacy;
 pub mod search;
 pub mod server_ping;
 pub mod session;
@@ -32,6 +33,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .wrap(default_cors())
             .configure(admin::config)
             .configure(blocked_users::config)
+            .configure(privacy::config)
             .configure(session::config)
             .configure(flows::config)
             .configure(pats::config)
@@ -68,6 +70,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 	paths(
 		admin::count_download,
 		blocked_users::block_status,
+		privacy::invite_privacy_status,
 		admin::force_reindex,
 		admin::force_reindex_project,
 		session::list,

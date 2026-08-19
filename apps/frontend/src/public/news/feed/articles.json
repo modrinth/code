@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "More ways to personalize your library",
+			"summary": "The new Play page, overhauled instance groups, custom icons, and a smoother onboarding experience.",
+			"thumbnail": "https://modrinth.com/news/article/app-personalization/thumbnail.webp",
+			"date": "2026-08-18T00:30:00.000Z",
+			"link": "https://modrinth.com/news/article/app-personalization"
+		},
+		{
 			"title": "New AI rules and project disclosures",
 			"summary": "An update to Modrinth’s Content Rules and our new mandatory content disclosures.",
 			"thumbnail": "https://modrinth.com/news/article/ai-policy-and-disclosures/thumbnail.webp",

@@ -2,6 +2,8 @@
 import { EyeIcon, WrenchIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
+import AutoLink from '#ui/components/base/AutoLink.vue'
+import Avatar from '#ui/components/base/Avatar.vue'
 import { Button, IconButton } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
@@ -67,9 +69,20 @@ const title = computed(() =>
 		<div
 			class="flex min-h-[94px] flex-col items-stretch justify-between gap-4 bg-surface-3 px-[18px] py-4 @[700px]:flex-row @[700px]:items-center"
 		>
-			<div class="flex min-w-0 flex-1 flex-col gap-1.5 pl-0.5">
-				<h2 class="m-0 text-2xl font-semibold leading-8 text-contrast">{{ title }}</h2>
-				<ManagedContentCardSummary :summary="data.summary" :installing="data.installing" />
+			<div class="flex min-w-0 flex-1 items-center gap-4 pl-0.5">
+				<AutoLink v-if="data.kind === 'modpack'" :to="data.manager.link" class="shrink-0">
+					<Avatar
+						:src="data.manager.iconUrl"
+						:alt="data.manager.name"
+						size="4rem"
+						:tint-by="data.manager.name"
+						no-shadow
+					/>
+				</AutoLink>
+				<div class="flex min-w-0 flex-1 flex-col gap-1.5">
+					<h2 class="m-0 text-2xl font-semibold leading-8 text-contrast">{{ title }}</h2>
+					<ManagedContentCardSummary :summary="data.summary" :installing="data.installing" />
+				</div>
 			</div>
 
 			<div

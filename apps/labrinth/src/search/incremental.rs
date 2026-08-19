@@ -17,7 +17,7 @@ use crate::{
 };
 
 pub const SEARCH_PROJECT_INDEX_QUEUE_TOPIC: &str =
-    "public.labrinth.search-project-index-queue.v1";
+    "public.labrinth.search-project-index-queue.v2";
 const QUEUE_FLUSH_INTERVAL: Duration = Duration::from_secs(10);
 
 #[derive(Clone)]
@@ -38,6 +38,16 @@ impl IncrementalSearchQueue {
 
     pub async fn push_project_change(&self, project_id: ProjectId) {
         self.operations.lock().await.push_project_change(project_id);
+    }
+
+    pub async fn push_project_with_all_versions_change(
+        &self,
+        project_id: ProjectId,
+    ) {
+        self.operations
+            .lock()
+            .await
+            .push_project_with_all_versions_change(project_id);
     }
 
     pub async fn push_version_changes(
@@ -116,6 +126,7 @@ impl IncrementalSearchQueue {
 #[derive(Default)]
 struct PendingSearchIndexOperations {
     changed_project_ids: HashSet<ProjectId>,
+    changed_project_ids_with_all_versions: HashSet<ProjectId>,
     changed_project_versions: HashMap<ProjectId, HashSet<VersionId>>,
     removed_project_ids: HashSet<ProjectId>,
 }
@@ -123,14 +134,31 @@ struct PendingSearchIndexOperations {
 impl PendingSearchIndexOperations {
     fn is_empty(&self) -> bool {
         self.changed_project_ids.is_empty()
+            && self.changed_project_ids_with_all_versions.is_empty()
             && self.changed_project_versions.is_empty()
             && self.removed_project_ids.is_empty()
     }
 
     fn push_project_change(&mut self, project_id: ProjectId) {
-        if !self.removed_project_ids.contains(&project_id) {
+        if !self.removed_project_ids.contains(&project_id)
+            && !self
+                .changed_project_ids_with_all_versions
+                .contains(&project_id)
+            && !self.changed_project_versions.contains_key(&project_id)
+        {
             self.changed_project_ids.insert(project_id);
         }
+    }
+
+    fn push_project_with_all_versions_change(&mut self, project_id: ProjectId) {
+        if self.removed_project_ids.contains(&project_id) {
+            return;
+        }
+
+        self.changed_project_ids.remove(&project_id);
+        self.changed_project_versions.remove(&project_id);
+        self.changed_project_ids_with_all_versions
+            .insert(project_id);
     }
 
     fn push_version_change(
@@ -138,10 +166,15 @@ impl PendingSearchIndexOperations {
         project_id: ProjectId,
         version_ids: impl IntoIterator<Item = VersionId>,
     ) {
-        if self.removed_project_ids.contains(&project_id) {
+        if self.removed_project_ids.contains(&project_id)
+            || self
+                .changed_project_ids_with_all_versions
+                .contains(&project_id)
+        {
             return;
         }
 
+        self.changed_project_ids.remove(&project_id);
         let version_ids = version_ids.into_iter().collect::<HashSet<_>>();
         if !version_ids.is_empty() {
             self.changed_project_versions
@@ -153,6 +186,8 @@ impl PendingSearchIndexOperations {
 
     fn push_project_removal(&mut self, project_id: ProjectId) {
         self.changed_project_ids.remove(&project_id);
+        self.changed_project_ids_with_all_versions
+            .remove(&project_id);
         self.changed_project_versions.remove(&project_id);
         self.removed_project_ids.insert(project_id);
     }
@@ -162,6 +197,9 @@ impl PendingSearchIndexOperations {
             SearchProjectIndexQueueEventData::Change { project_id } => {
                 self.push_project_change(project_id)
             }
+            SearchProjectIndexQueueEventData::ChangeWithAllVersions {
+                project_id,
+            } => self.push_project_with_all_versions_change(project_id),
             SearchProjectIndexQueueEventData::VersionChange {
                 project_id,
                 version_ids,
@@ -175,6 +213,7 @@ impl PendingSearchIndexOperations {
     fn into_events(self) -> Vec<SearchProjectIndexQueueEventData> {
         let mut events = Vec::with_capacity(
             self.changed_project_ids.len()
+                + self.changed_project_ids_with_all_versions.len()
                 + self.changed_project_versions.len()
                 + self.removed_project_ids.len(),
         );
@@ -185,6 +224,15 @@ impl PendingSearchIndexOperations {
         events.extend(self.changed_project_ids.into_iter().map(|project_id| {
             SearchProjectIndexQueueEventData::Change { project_id }
         }));
+        events.extend(
+            self.changed_project_ids_with_all_versions.into_iter().map(
+                |project_id| {
+                    SearchProjectIndexQueueEventData::ChangeWithAllVersions {
+                        project_id,
+                    }
+                },
+            ),
+        );
         events.extend(self.changed_project_versions.into_iter().map(
             |(project_id, version_ids)| {
                 SearchProjectIndexQueueEventData::VersionChange {
@@ -202,6 +250,8 @@ impl PendingSearchIndexOperations {
 pub enum SearchProjectIndexQueueEventData {
     #[serde(rename = "project_change")]
     Change { project_id: ProjectId },
+    #[serde(rename = "project_change_with_all_versions")]
+    ChangeWithAllVersions { project_id: ProjectId },
     #[serde(rename = "project_version_change")]
     VersionChange {
         project_id: ProjectId,

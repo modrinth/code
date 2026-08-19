@@ -83,14 +83,29 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Kirjasto"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Oletus laskeutumissivu"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Kytkee pois päältä nimikyltin pelaajasi päällä skinit sivulla."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Piilota nimikyltti"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Hyppää takaisin sisään maailmoihin"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Pienennä laukaisin kun Minecraft prosessi käynnistyy."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Piilota käynnistysohjelma"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Käytä järjestelmän ikkuna kehystä (Vaatii sovelluksen uudelleen käynnistämisen)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Natiivit koristukset"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Näyttää, kuinka paljon aikaa olet käyttänyt instanssin pelaamiseen."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Näyttää peliaika"
@@ -506,15 +521,6 @@
   "app.skins.sign-in.button": {
     "message": "Kirjaudu sisään"
   },
-  "app.skins.sign-in.description": {
-    "message": "Kirjaudu Minecraft-tilillesi käyttääksesi Modrinth-sovelluksen ulkoasujen hallintaominaisuuksia."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Innostunut Modrinth Botti"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Kirjaudu sisään"
-  },
   "app.skins.title": {
     "message": "Skinivalinta"
   },
@@ -568,9 +574,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline-tilassa"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} paikalla"
   },
   "friends.action.add-friend": {
     "message": "Lisää ystävä"
@@ -730,18 +733,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Valitse kuvake"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Kirjaston ryhmät"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Luo uusi ryhmä"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Kirjaston ryhmät sallivat sinun järjestää instanssisi eri osioihin kirjastossasi."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Syötä ryhmän nimi"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nimi"

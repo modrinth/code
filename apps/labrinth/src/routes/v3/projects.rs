@@ -1207,6 +1207,14 @@ pub async fn project_edit_internal(
 
     let mut reindex_versions = new_project.categories.is_some()
         || new_project.additional_categories.is_some();
+    let became_searchable = !project_item.inner.status.is_searchable()
+        && new_project
+            .status
+            .is_some_and(|status| status.is_searchable());
+    let became_unsearchable = project_item.inner.status.is_searchable()
+        && new_project
+            .status
+            .is_some_and(|status| !status.is_searchable());
 
     reindex_versions |= update(
         &mut transaction,
@@ -1284,7 +1292,7 @@ pub async fn project_edit_internal(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-    if reindex_versions {
+    if became_unsearchable {
         db_models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
@@ -1295,10 +1303,20 @@ pub async fn project_edit_internal(
         .wrap_internal_err("clearing cached data from Redis")?;
         search_state
             .queue
-            .push_version_changes(
-                project_item.inner.id.into(),
-                project_item.versions.iter().copied().map(VersionId::from),
-            )
+            .push_project_removal(project_item.inner.id.into())
+            .await;
+    } else if reindex_versions || became_searchable {
+        db_models::DBProject::clear_cache(
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+            &redis,
+        )
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
+        search_state
+            .queue
+            .push_project_with_all_versions_change(project_item.inner.id.into())
             .await;
     } else {
         clear_project_cache_and_queue_search(
@@ -1310,17 +1328,6 @@ pub async fn project_edit_internal(
         )
         .await
         .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
-    }
-
-    // Remove no longer searchable projects from search index
-    if let (true, Some(false)) = (
-        project_item.inner.status.is_searchable(),
-        new_project.status.map(|status| status.is_searchable()),
-    ) {
-        search_state
-            .queue
-            .push_project_removal(project_item.inner.id.into())
-            .await;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1890,7 +1897,6 @@ pub async fn projects_edit(
         changed_projects.push((
             project.inner.id,
             project.inner.slug,
-            project.versions,
             reindex_versions,
         ));
     }
@@ -1900,17 +1906,14 @@ pub async fn projects_edit(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-    for (project_id, slug, versions, reindex_versions) in changed_projects {
+    for (project_id, slug, reindex_versions) in changed_projects {
         if reindex_versions {
             db_models::DBProject::clear_cache(project_id, slug, None, &redis)
                 .await
                 .wrap_internal_err("clearing cached data from Redis")?;
             search_state
                 .queue
-                .push_version_changes(
-                    project_id.into(),
-                    versions.into_iter().map(VersionId::from),
-                )
+                .push_project_with_all_versions_change(project_id.into())
                 .await;
         } else {
             clear_project_cache_and_queue_search(

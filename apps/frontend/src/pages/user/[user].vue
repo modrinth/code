@@ -85,10 +85,12 @@ if (projectsResult.status === 'fulfilled') {
 	warmProjectCheckCaches(queryClient, projectsResult.value)
 }
 const title = computed(() =>
-	prefetchedUser ? `${prefetchedUser.username} - Modrinth` : 'Modrinth',
+	prefetchedUser ? `${prefetchedUser.username} - Modrinth` : 'User not found',
 )
 const description = computed(() => {
-	if (!prefetchedUser) return ''
+	if (!prefetchedUser) {
+		return `There's no user here, check that you have the right link!`
+	}
 	return prefetchedUser.bio
 		? `${prefetchedUser.bio} - Download ${prefetchedUser.username}'s projects on Modrinth`
 		: `Download ${prefetchedUser.username}'s projects on Modrinth`
@@ -99,7 +101,10 @@ useSeoMeta({
 	description: () => description.value,
 	ogTitle: () => title.value,
 	ogDescription: () => description.value,
-	ogImage: () => prefetchedUser?.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
+	ogImage: () =>
+		prefetchedUser
+			? (prefetchedUser?.avatar_url ?? 'https://cdn-raw.modrinth.com/placeholder-circle.png')
+			: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
 })
 
 const projectCreateModal = ref<InstanceType<typeof ProjectCreateModal> | null>(null)

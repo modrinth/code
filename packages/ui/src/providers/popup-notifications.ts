@@ -1,4 +1,7 @@
-import { type Component, type Ref, ref } from 'vue'
+import { type Component, markRaw, type Ref, ref } from 'vue'
+import type { ComponentProps } from 'vue-component-type-helpers'
+
+import type { ButtonColor } from '#ui/components/base/buttons/types.ts'
 
 import { createContext } from '.'
 
@@ -6,7 +9,7 @@ export interface PopupNotificationButton {
 	label: string
 	action: () => void | Promise<void>
 	icon?: Component
-	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
+	color?: ButtonColor | 'standard'
 	keepOpen?: boolean
 }
 
@@ -35,7 +38,39 @@ export type PopupNotificationToastType =
 	| 'instance-download'
 	| 'instance-ready'
 
-export interface PopupNotificationToast {
+interface PopupNotificationBase {
+	id: string | number
+	autoCloseMs?: number | null
+	timer?: NodeJS.Timeout
+}
+
+export interface PopupNotificationCustom<
+	TComponent extends Component = Component,
+> extends PopupNotificationBase {
+	contentType: 'custom'
+	component: TComponent
+	componentProps?: ComponentProps<TComponent>
+}
+
+export interface PopupNotificationStandard extends PopupNotificationBase {
+	contentType: 'standard'
+	title: string
+	type: 'error' | 'warning' | 'success' | 'info' | 'download'
+	titleLogo?: Component
+	text?: string
+	iconUrl?: string | null
+	hideIcon?: boolean
+	progress?: number
+	waiting?: boolean
+	progressItems?: PopupNotificationProgressItem[]
+	buttons?: PopupNotificationButton[]
+	dismissible?: boolean
+	onDismiss?: () => void | Promise<void>
+}
+
+export interface PopupNotificationToast extends PopupNotificationBase {
+	contentType: 'toast'
+	title: string
 	type: PopupNotificationToastType
 	actorName?: string | null
 	actorAvatarUrl?: string | null
@@ -56,25 +91,40 @@ export interface PopupNotificationToast {
 	onOpenInstance?: () => void | Promise<void>
 }
 
-export interface PopupNotification {
-	id: string | number
-	title: string
-	titleLogo?: Component
-	bodyComponent?: Component
-	bodyProps?: Record<string, unknown>
-	text?: string
-	iconUrl?: string | null
-	hideIcon?: boolean
-	type?: 'error' | 'warning' | 'success' | 'info' | 'download'
-	progress?: number
-	waiting?: boolean
-	progressItems?: PopupNotificationProgressItem[]
-	buttons?: PopupNotificationButton[]
-	toast?: PopupNotificationToast
-	dismissible?: boolean
-	onDismiss?: () => void | Promise<void>
-	autoCloseMs?: number | null
-	timer?: NodeJS.Timeout
+export type PopupNotification =
+	| PopupNotificationCustom
+	| PopupNotificationStandard
+	| PopupNotificationToast
+
+type PopupNotificationDownload =
+	| (PopupNotificationStandard & { type: 'download' })
+	| (PopupNotificationToast & { type: 'instance-download' })
+
+type PopupNotificationInput = PopupNotification extends infer Notification
+	? Notification extends PopupNotification
+		? Omit<Notification, 'id' | 'timer'>
+		: never
+	: never
+
+type PopupNotificationCustomInput<TComponent extends Component> = Omit<
+	PopupNotificationCustom<TComponent>,
+	'id' | 'timer'
+>
+
+type PopupNotificationNonCustomInput =
+	| Omit<PopupNotificationStandard, 'id' | 'timer'>
+	| Omit<PopupNotificationToast, 'id' | 'timer'>
+
+type StoredPopupNotification<Input extends PopupNotificationInput> = Input &
+	Pick<PopupNotificationBase, 'id' | 'timer'>
+
+interface AddPopupNotification {
+	<TComponent extends Component>(
+		notification: PopupNotificationCustomInput<TComponent>,
+	): StoredPopupNotification<PopupNotificationCustomInput<TComponent>>
+	<Input extends PopupNotificationNonCustomInput>(
+		notification: Input,
+	): StoredPopupNotification<Input>
 }
 
 export interface PopupNotificationDownloadState {
@@ -108,7 +158,7 @@ export abstract class AbstractPopupNotificationManager {
 		)
 
 	getVisibleDownloadProgressItems = (
-		notification: PopupNotification,
+		notification: PopupNotificationStandard,
 	): PopupNotificationProgressItem[] =>
 		(notification.progressItems ?? []).filter(
 			(progressItem) =>
@@ -121,17 +171,18 @@ export abstract class AbstractPopupNotificationManager {
 	protected abstract removeNotificationFromStorage(id: string | number): void
 	protected abstract clearAllNotificationsFromStorage(): void
 
-	addPopupNotification = (
-		notification: Omit<PopupNotification, 'id' | 'timer'>,
-	): PopupNotification => {
-		const newNotification: PopupNotification = {
+	addPopupNotification = ((notification: PopupNotificationInput) => {
+		const newNotification = {
 			...notification,
+			...(notification.contentType === 'custom'
+				? { component: markRaw(notification.component) }
+				: {}),
 			id: Date.now() + Math.random(),
-		}
+		} as StoredPopupNotification<PopupNotificationInput>
 		this.setNotificationTimer(newNotification)
 		this.addNotificationToStorage(newNotification)
 		return newNotification
-	}
+	}) as AddPopupNotification
 
 	removeNotification = (id: string | number): void => {
 		const notifications = this.getNotifications()
@@ -151,18 +202,18 @@ export abstract class AbstractPopupNotificationManager {
 		this.hiddenDownloadItemKeys.value.clear()
 	}
 
-	hideDownloadItem = (notificationId: string | number, progressItemId: string): void => {
+	hideDownloadItem = (notificationId: string | number, progressItemId?: string): void => {
 		const notification = this.getDownloadNotifications().find(
 			(candidate) => candidate.id === notificationId,
 		)
-		if (!notification?.progressItems?.some((item) => item.id === progressItemId)) return
+		if (!notification) return
 
-		this.hiddenDownloadItemKeys.value.add(this.getDownloadItemKey(notificationId, progressItemId))
-		if (
-			this.getDownloadItemKeys(notification).every((key) =>
-				this.hiddenDownloadItemKeys.value.has(key),
-			)
-		) {
+		const itemKey = this.getDownloadItemKey(notificationId, progressItemId)
+		const itemKeys = this.getDownloadItemKeys(notification)
+		if (!itemKeys.includes(itemKey)) return
+
+		this.hiddenDownloadItemKeys.value.add(itemKey)
+		if (itemKeys.every((key) => this.hiddenDownloadItemKeys.value.has(key))) {
 			this.clearNotificationTimer(notification)
 		}
 	}
@@ -212,11 +263,16 @@ export abstract class AbstractPopupNotificationManager {
 		}
 	}
 
-	private isDownloadNotification(notification: PopupNotification): boolean {
-		return notification.type === 'download' || notification.toast?.type === 'instance-download'
+	private isDownloadNotification(
+		notification: PopupNotification,
+	): notification is PopupNotificationDownload {
+		return (
+			(notification.contentType === 'standard' && notification.type === 'download') ||
+			(notification.contentType === 'toast' && notification.type === 'instance-download')
+		)
 	}
 
-	private getDownloadNotifications(): PopupNotification[] {
+	private getDownloadNotifications(): PopupNotificationDownload[] {
 		return this.getNotifications().filter((notification) =>
 			this.isDownloadNotification(notification),
 		)
@@ -224,7 +280,7 @@ export abstract class AbstractPopupNotificationManager {
 
 	private getDownloadItemKeys(notification: PopupNotification): string[] {
 		if (!this.isDownloadNotification(notification)) return []
-		if (notification.progressItems?.length) {
+		if (notification.contentType === 'standard' && notification.progressItems?.length) {
 			return notification.progressItems.map((progressItem) =>
 				this.getDownloadItemKey(notification.id, progressItem.id),
 			)

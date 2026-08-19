@@ -686,9 +686,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Oyun sürümü ara..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Simgeyi kaldır"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Simge seç"
   },
@@ -851,24 +848,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Tümünü temizle"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Modpacklere göz atın"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Mod paketini dışa aktar"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Yüklemek istediğiniz mod paketini zaten biliyor musunuz?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Sonuç bulunamadı"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Mod paketi ara"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Her bir 'kurulum', kendine has yükleyicisi (modloader), sürümü ve modları olan bir Minecraft kurulumudur."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Bir yükleyici ve sürüm seçerek başlayın."
   },
@@ -901,9 +880,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Dünya Türünü Seçin"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modpack seçin"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Kurulum oluştur"
@@ -2030,14 +2006,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Uyumlu kurulum yok"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Simgeyi kaldır"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Kurulum ara"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Simge seç"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
@@ -4379,9 +4349,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Sunucu kuruluyor"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "İçerik eşlemesi sürüyor"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Ayrıca bir arkadaş isteği gönderin"
   },
@@ -4436,56 +4403,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Kurulum başarısız oldu"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Platform yüklenirken dahili bir hata oluştu. Lütfen tekrar deneyin."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Belirtilen yükleyici veya Minecraft sürümü kurulamazdı. Belki de geçersiz veya desteklenmeyen bir sürüm olabilir."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Mod paketi yüklenemedi. Bozuk veya uyumsuz olabilir."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Bu mod paketi sürümü indirilebilir bir dosya içermez. Yanlış paketlenmiş olabilir."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Kurulum sırasında beklenmeyen bir hata oluştu."
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Minecraft veya yükleyicinin bu sürümü henüz Modrinth Hosting tarafından desteklenmemektedir."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Eklentiler yükleniyor..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Mod paketi indiriliyor..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Platform yükleniyor..."
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Sunucunuzu hazırlıyoruz"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java ekleniyor..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Sunucu yapılandırılıyor..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Modlar indiriliyor..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Dosyalar düzenleniyor..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Ortam hazırlanıyor..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Zaten sunucunuz var mı?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Modrinth Hosting hakkında daha fazla bilgi edinin"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4495,9 +4420,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Mod kur, arkadaş davet et, birlikte oyna ve hepsini Modrinth App'ten yap."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Daha sunucu yok"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Beğendiğiniz modları seçin ve biz geri kalan işi hallederiz."
@@ -4513,12 +4435,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Giriş yap"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Sunucunuzu tıpkı tek oyunculu bir dünya gibi kurun."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Basit kurulum"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Kopyalandı"

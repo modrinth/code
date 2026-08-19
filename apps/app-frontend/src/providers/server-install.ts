@@ -39,7 +39,7 @@ export interface ServerInstallContext {
 				project: Labrinth.Projects.v3.Project,
 				modpackVersionId: string | null,
 				callback?: () => void,
-			) => void
+			) => Promise<void>
 		>,
 	) => void
 	setUpdateToPlayModal: (
@@ -84,7 +84,7 @@ export function createServerInstall(opts: {
 			project: Labrinth.Projects.v3.Project,
 			modpackVersionId: string | null,
 			callback?: () => void,
-		) => void
+		) => Promise<void>
 	> | null = null
 	let updateToPlayModalRef: ModalRef<
 		(instance: GameInstance, activeVersionId: string | null, callback?: () => void) => void
@@ -152,6 +152,7 @@ export function createServerInstall(opts: {
 
 	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
 			title: 'Install complete',
 			text: `${project.name} is installed and ready to play.`,
 			type: 'success',
@@ -187,6 +188,7 @@ export function createServerInstall(opts: {
 
 	function showUpdateSuccess(instance: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
 			title: 'Update complete',
 			text: `${instance.name} has been updated and is ready to play.`,
 			type: 'success',
@@ -246,10 +248,10 @@ export function createServerInstall(opts: {
 				project_id: contentProjectId,
 				version_id: contentVersionId,
 				title: project.title,
+				icon_url: project.icon_url,
 			},
 			{
 				name: project.title,
-				iconPath: project.icon_url ?? null,
 				link: {
 					type: 'server_project_modpack',
 					server_project_id: serverProjectId,
@@ -314,7 +316,7 @@ export function createServerInstall(opts: {
 			return
 		}
 		if (isModpack && !instance) {
-			installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
+			await installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
 				const newInstance = await findInstalledInstance(project.id)
 				if (!newInstance) return
 				showModpackInstallSuccess(newInstance, serverAddress)

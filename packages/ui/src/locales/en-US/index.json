@@ -587,11 +587,11 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "world"
   },
-  "content.managed-card.managed-by": {
-    "defaultMessage": "Managed by"
-  },
   "content.managed-card.modpack-content": {
     "defaultMessage": "Modpack content"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Provided by"
   },
   "content.managed-card.server-suffix": {
     "defaultMessage": "server"
@@ -602,14 +602,14 @@
   "content.managed-card.shared-content": {
     "defaultMessage": "Shared content"
   },
-  "content.managed-card.summary.empty": {
-    "defaultMessage": "No managed content"
-  },
   "content.managed-card.summary.installing": {
     "defaultMessage": "Installing content..."
   },
   "content.managed-card.summary.loading": {
     "defaultMessage": "Loading managed content summary"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "No provided content"
   },
   "content.managed-card.switch-version": {
     "defaultMessage": "Switch version"
@@ -655,12 +655,6 @@
   },
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update available"
-  },
-  "content.metadata-filter.update.up-to-date": {
-    "defaultMessage": "Up to date"
-  },
-  "content.metadata-filter.updates": {
-    "defaultMessage": "Updates"
   },
   "content.metadata-filter.warning.client-depends": {
     "defaultMessage": "Client depends on file"
@@ -839,11 +833,14 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Search game version..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Remove icon"
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Customize"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Randomize"
   },
   "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Select icon"
+    "defaultMessage": "Upload"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Latest"
@@ -1019,8 +1016,20 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Search for modpack"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "An instance is a Minecraft setup with a specific loader, version, and mods."
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Already know what you want to play?"
+  },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Create instance"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Install modpack"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "No results found"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Search mods, modpacks, and more..."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Start from scratch by picking a loader and game version."
@@ -1035,10 +1044,16 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Browse modpacks on Modrinth or import one from a file."
+    "defaultMessage": "Choose a project and we’ll use its latest version."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Install modpack"
+    "defaultMessage": "Start from a mod or modpack"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "Install a modpack from an .mrpack file on your device."
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "Upload a modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Classic Minecraft with no mods or plugins."
@@ -1054,9 +1069,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Select world type"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Choose modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Create instance"
@@ -1739,6 +1751,30 @@
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Uploading .zip contents from URL"
   },
+  "filter-bar.add": {
+    "defaultMessage": "Add"
+  },
+  "filter-bar.clear": {
+    "defaultMessage": "Clear"
+  },
+  "filter-bar.clear-named-filter": {
+    "defaultMessage": "Clear {name} filter"
+  },
+  "filter-bar.filtered-by": {
+    "defaultMessage": "Filtered by"
+  },
+  "filter-bar.no-options": {
+    "defaultMessage": "No options available."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "No options found."
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "Search..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "Select all"
+  },
   "form.label.address-line": {
     "defaultMessage": "Address line"
   },
@@ -1976,6 +2012,12 @@
   "icon-select.select": {
     "defaultMessage": "Select icon"
   },
+  "input.clear": {
+    "defaultMessage": "Clear input"
+  },
+  "input.search": {
+    "defaultMessage": "Search"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "Search version..."
   },
@@ -2168,6 +2210,9 @@
   "instances.content-install.header": {
     "defaultMessage": "Install project"
   },
+  "instances.content-install.hide-unavailable": {
+    "defaultMessage": "Hide unavailable"
+  },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "This instance uses a different loader or game version than this project supports."
   },
@@ -2195,14 +2240,11 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "No compatible instances found"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Remove icon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Search instance"
   },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Select icon"
+  "instances.content-install.show-unavailable": {
+    "defaultMessage": "Show unavailable"
   },
   "instances.managed-content-modal.empty-description": {
     "defaultMessage": "This source does not include any managed content."
@@ -2834,6 +2876,39 @@
   "notification.error.title": {
     "defaultMessage": "An error occurred"
   },
+  "notifications.actor.unknown": {
+    "defaultMessage": "Someone"
+  },
+  "notifications.close": {
+    "defaultMessage": "Close"
+  },
+  "notifications.dismiss": {
+    "defaultMessage": "Dismiss notification"
+  },
+  "notifications.friend-request.body": {
+    "defaultMessage": "<actor>{actor}</actor> sent you a friend request."
+  },
+  "notifications.instance-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> invited you to <entity>{entity}</entity> instance."
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "Launch game"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "Instance"
+  },
+  "notifications.instance-ready.status": {
+    "defaultMessage": "Installed and ready to play."
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "Accept"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "Decline"
+  },
+  "notifications.server-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> invited you to manage the server <entity>{entity}</entity>."
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Accepted"
   },
@@ -3385,6 +3460,12 @@
   },
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "text"
+  },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "Show fewer"
+  },
+  "project.disclosure.derivative-work.show-more": {
+    "defaultMessage": "Show {count} more"
   },
   "project.disclosure.derivative-work.title": {
     "defaultMessage": "This is a derivative work of:"
@@ -3989,8 +4070,14 @@
   "report.item-type.version": {
     "defaultMessage": "version"
   },
+  "report.type.ai-images": {
+    "defaultMessage": "AI-generated images in icon, gallery, or description"
+  },
   "report.type.copyright": {
     "defaultMessage": "Reuploaded work"
+  },
+  "report.type.fully-ai-generated": {
+    "defaultMessage": "Fully AI-generated project"
   },
   "report.type.inappropriate": {
     "defaultMessage": "Inappropriate"
@@ -4859,9 +4946,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Server is installing"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Content sync in progress"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Also send a friend request"
   },
@@ -4913,59 +4997,62 @@
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Searching..."
   },
+  "servers.installing-banner.description.applying": {
+    "defaultMessage": "Applying your installation changes..."
+  },
+  "servers.installing-banner.description.controls": {
+    "defaultMessage": "Server controls will unlock when installation finishes."
+  },
+  "servers.installing-banner.description.duration": {
+    "defaultMessage": "This installation may take several minutes..."
+  },
+  "servers.installing-banner.description.preparing": {
+    "defaultMessage": "Preparing your server..."
+  },
+  "servers.installing-banner.description.still-working": {
+    "defaultMessage": "Still working—your installation is in progress..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation failed"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "An internal error occurred while installing the platform. Please try again."
+  "servers.installing-banner.error.header.local-modpack": {
+    "defaultMessage": "Failed to install {filename}"
   },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "The specified loader or Minecraft version could not be installed. It may be invalid or unsupported."
+  "servers.installing-banner.error.header.minecraft": {
+    "defaultMessage": "Failed to install Minecraft {version}"
   },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "The modpack could not be installed. It may be corrupted or incompatible."
+  "servers.installing-banner.error.header.modpack": {
+    "defaultMessage": "Failed to install modpack"
   },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "This modpack version does not include a downloadable file. It may have been packaged incorrectly."
+  "servers.installing-banner.error.header.platform": {
+    "defaultMessage": "Failed to install {loader} {loaderVersion} for Minecraft {gameVersion}"
+  },
+  "servers.installing-banner.error.header.platform-without-version": {
+    "defaultMessage": "Failed to install {loader} for Minecraft {gameVersion}"
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "An unexpected error occurred during installation."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "This version of Minecraft or loader is not yet supported by Modrinth Hosting."
+  "servers.installing-banner.installing-local-modpack": {
+    "defaultMessage": "Installing {filename}"
   },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installing addons..."
+  "servers.installing-banner.installing-minecraft": {
+    "defaultMessage": "Installing Minecraft {version}"
   },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Installing modpack..."
+  "servers.installing-banner.installing-modpack": {
+    "defaultMessage": "Installing modpack"
   },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Installing platform..."
+  "servers.installing-banner.installing-platform": {
+    "defaultMessage": "Installing {loader} for Minecraft {version}"
   },
   "servers.installing-banner.preparing.header": {
-    "defaultMessage": "We're preparing your server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Adding Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Configuring server..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Downloading mods..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizing files..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Setting up environment..."
+    "defaultMessage": "Preparing your server"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Learn more about Modrinth Hosting"
+    "defaultMessage": "Learn more"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4976,9 +5063,6 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Install mods, invite friends, and play together all from the Modrinth App."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "No servers yet"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Pick your favorite mods and we handle the rest."
   },
@@ -4986,13 +5070,13 @@
     "defaultMessage": "One-click mod installs"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Invite friends and get them set up right in the Modrinth App."
+    "defaultMessage": "Invite friends to play your server with one-click play from the Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Play with friends"
   },
   "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "Sign in to Modrinth"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Set up your server just like a single player world."
@@ -5104,6 +5188,9 @@
   },
   "servers.manage.error.title": {
     "defaultMessage": "Servers could not be loaded"
+  },
+  "servers.manage.error.unknown": {
+    "defaultMessage": "Unknown error"
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
@@ -5648,6 +5735,9 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username}'s avatar"
   },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Cancel"
+  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Custom..."
   },
@@ -5683,6 +5773,9 @@
   },
   "sharing.invite-players-modal.friends-heading": {
     "defaultMessage": "Your friends - {count}"
+  },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "Invite players"
   },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "Invite"
@@ -5728,6 +5821,24 @@
   },
   "sharing.invite-players-modal.update-invite-link-failed-title": {
     "defaultMessage": "Failed to update invite link"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "Accept"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "Decline"
+  },
+  "sharing.invite-players-toast.invited-you-to": {
+    "defaultMessage": "invited you to"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "server."
+  },
+  "skins.select": {
+    "defaultMessage": "Select skin"
+  },
+  "skins.select-named": {
+    "defaultMessage": "Select {name}"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

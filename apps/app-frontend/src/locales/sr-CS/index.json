@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema boje"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Izaberi stranicu prikazanu kada se Modrinth App pokrene."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Početna stranica"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Podrazumevana odredišna stranica"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Sakrij svoje korisničko ime iznad pregleda igrača na stranici Skin birača."
@@ -656,15 +650,6 @@
   "app.skins.sign-in.button": {
     "message": "Prijavi se"
   },
-  "app.skins.sign-in.description": {
-    "message": "Prijavi se na svoj Minecraft račun da bi koristio funkcije upravljanja skinovima u Modrinth aplikaciji."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Uzbuđeni Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Molimo prijavi se"
-  },
   "app.skins.title": {
     "message": "Selektor skina"
   },
@@ -712,9 +697,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Oflajn"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} onlajn"
   },
   "friends.action.add-friend": {
     "message": "Dodaj prijatelja/prijateljicu"
@@ -871,18 +853,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Izaberi ikonu"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupe biblioteke"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Kreiraj novu grupu"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupe biblioteka ti omogućavaju da organizuješ svoje instance u različite odeljke u svojoj biblioteci."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ukucaj ime grupe"
   },
   "instance.settings.tabs.general.name": {
     "message": "Ime"

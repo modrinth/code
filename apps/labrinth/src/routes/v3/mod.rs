@@ -217,6 +217,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		users::user_delete_route,
 		users::user_follows_route,
 		users::user_notifications_route,
+		users::get_user_preferences,
+		users::edit_user_preferences,
 		version_creation::version_create_route,
 		version_creation::upload_file_to_version_route,
 		version_file::get_version_from_hash_route,

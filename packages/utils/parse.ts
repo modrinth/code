@@ -229,3 +229,54 @@ export const md = (options = {}) => {
 }
 
 export const renderString = (string: string) => configuredXss.process(md().render(string))
+
+const basicMarkdownXss = new FilterXSS({
+	whiteList: {
+		a: ['href', 'target', 'rel'],
+		strong: [],
+		em: [],
+		code: [],
+		br: [],
+	},
+	stripIgnoreTag: true,
+	stripIgnoreTagBody: ['script', 'style'],
+})
+
+export const renderBasicInlineMarkdown = (
+	string: string,
+	options: {
+		target?: string
+	} = {},
+) => {
+	const instance = new MarkdownIt({
+		html: false,
+		linkify: true,
+		breaks: true,
+	})
+
+	instance.disable(['image', 'strikethrough'])
+
+	instance.linkify.set({
+		fuzzyLink: false,
+		fuzzyIP: false,
+	})
+
+	const defaultLinkOpenRenderer =
+		instance.renderer.rules.link_open ||
+		function (tokens, idx, options, _env, self) {
+			return self.renderToken(tokens, idx, options)
+		}
+
+	instance.renderer.rules.link_open = function (tokens, idx, renderOptions, env, self) {
+		const token = tokens[idx]
+		token.attrSet('rel', 'noopener nofollow ugc')
+
+		if (options.target) {
+			token.attrSet('target', options.target)
+		}
+
+		return defaultLinkOpenRenderer(tokens, idx, renderOptions, env, self)
+	}
+
+	return basicMarkdownXss.process(instance.renderInline(string))
+}

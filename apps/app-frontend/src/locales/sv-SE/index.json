@@ -149,17 +149,14 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Färgtema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Välj sidan som visas när Modrinth App öppnas."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hem"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standardlandingssida"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Inaktiverar namnskylten ovanför din spelare på utseende-sidan."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
@@ -172,6 +169,12 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimera app"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Använd systemets fönsterram (omstart av app krävs)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Inbyggda fönsterdekorationer"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Visa hur länge du spelat varje instans."
@@ -734,9 +737,6 @@
   "app.nav.home": {
     "message": "Hem"
   },
-  "app.nav.library": {
-    "message": "Bibliotek"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth-konto"
   },
@@ -1034,15 +1034,6 @@
   "app.skins.sign-in.button": {
     "message": "Logga in"
   },
-  "app.skins.sign-in.description": {
-    "message": "Vänligen logga in på ditt Minecraft-konto för att använda utseendehanteringfunktioner i Modrinth appen."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Exalterad Modrinth bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Vänligen logga in"
-  },
   "app.skins.title": {
     "message": "Utseende väljare"
   },
@@ -1108,9 +1099,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Att ändra versionen ändrar endast din lokala kopia. Framtida uppdateringar till den delade instansen kan återställa eller ändra den igen."
@@ -1396,18 +1384,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Välj ikon"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Biblioteksgrupper"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Skapa ny grupp"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Biblioteksgrupper tillåter dig att organisera dina instanser till olika sektioner i ditt bibliotek."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ange grupp namn"
   },
   "instance.settings.tabs.general.name": {
     "message": "Namn"
