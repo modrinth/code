@@ -1,9 +1,5 @@
 <template>
-	<SharedLanguageSettings
-		ref="languageSettings"
-		product="app"
-		:persist-locale="persistLocale"
-	/>
+	<SharedLanguageSettings ref="languageSettings" product="app" :persist-locale="persistLocale" />
 </template>
 
 <script setup lang="ts">

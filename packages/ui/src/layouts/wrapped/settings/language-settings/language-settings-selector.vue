@@ -3,8 +3,8 @@ import { SearchIcon } from '@modrinth/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
 import { computed, onMounted, ref } from 'vue'
 
-import StyledInput from '#ui/components/base/StyledInput.vue'
 import Button from '#ui/components/base/buttons/Button.vue'
+import StyledInput from '#ui/components/base/StyledInput.vue'
 import {
 	buildLocaleMessages,
 	defineMessages,
@@ -85,7 +85,9 @@ const localeFlagRegions: Record<string, string> = {
 const $browserLocales = ref([props.currentLocale])
 
 onMounted(() => {
-	$browserLocales.value = navigator.languages.length ? [...navigator.languages] : [navigator.language]
+	$browserLocales.value = navigator.languages.length
+		? [...navigator.languages]
+		: [navigator.language]
 })
 
 const $browserDisplayNames = computed(() => {
@@ -137,9 +139,7 @@ const $locales = computed(() => {
 		})
 	}
 
-	return result.sort(
-		(a, b) => (b.coverage?.percentage ?? -1) - (a.coverage?.percentage ?? -1),
-	)
+	return result.sort((a, b) => (b.coverage?.percentage ?? -1) - (a.coverage?.percentage ?? -1))
 })
 
 const $query = ref('')
@@ -216,7 +216,9 @@ function onItemClick(e: MouseEvent, loc: LocaleInfo) {
 }
 
 function showBrowserDisplayName(loc: LocaleInfo): boolean {
-	return loc.browserDisplayName.localeCompare(loc.displayName, undefined, { sensitivity: 'base' }) !== 0
+	return (
+		loc.browserDisplayName.localeCompare(loc.displayName, undefined, { sensitivity: 'base' }) !== 0
+	)
 }
 
 function getItemLabel(loc: LocaleInfo) {

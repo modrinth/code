@@ -141,8 +141,7 @@ function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState 
 		syncBehaviorAcrossDevices: settings.sync_behavior_across_devices,
 		minimizeApp: settings.hide_on_process_start,
 		hideRightSidebar: settings.toggle_sidebar,
-		showJumpIn:
-			settings.feature_flags[worldsInHomeFlag] ?? DEFAULT_FEATURE_FLAGS[worldsInHomeFlag],
+		showJumpIn: settings.feature_flags[worldsInHomeFlag] ?? DEFAULT_FEATURE_FLAGS[worldsInHomeFlag],
 		showPlayTime:
 			settings.feature_flags[showPlayTimeFlag] ?? DEFAULT_FEATURE_FLAGS[showPlayTimeFlag],
 		hideNametag: settings.hide_nametag_skins_page,
@@ -350,10 +349,7 @@ onBeforeUnmount(() => {
 						{{ formatMessage(messages.skipNonEssentialWarningsDescription) }}
 					</p>
 				</div>
-				<Toggle
-					id="skip-non-essential-warnings"
-					v-model="current.skipNonEssentialWarnings"
-				/>
+				<Toggle id="skip-non-essential-warnings" v-model="current.skipNonEssentialWarnings" />
 			</div>
 		</div>
 	</section>

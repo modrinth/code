@@ -38,11 +38,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Admonition, AutoLink, IntlFormatted } from '#ui/components/base'
 import { LOCALES, useVIntl } from '#ui/composables'
 import { injectI18n, injectUserPreferences } from '#ui/providers'
-import {
-	commonSettingsMessages,
-	languageSelectorMessages,
-	useSavable,
-} from '#ui/utils'
+import { commonSettingsMessages, languageSelectorMessages, useSavable } from '#ui/utils'
 
 import { languageCoverage } from './language-settings-coverage.generated'
 import LanguageSettingsSelector from './language-settings-selector.vue'
@@ -76,9 +72,7 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 )
 
 function queueLocaleChange(newLocale: string, persist = false): Promise<void> {
-	const request = localeChangeQueue.then(() =>
-		Promise.resolve(setLocale(newLocale, { persist })),
-	)
+	const request = localeChangeQueue.then(() => Promise.resolve(setLocale(newLocale, { persist })))
 	localeChangeQueue = request.catch(() => undefined)
 	return request
 }

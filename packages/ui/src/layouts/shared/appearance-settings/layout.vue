@@ -2,8 +2,8 @@
 import Toggle from '#ui/components/base/Toggle.vue'
 import { useVIntl } from '#ui/composables'
 
-import AppearanceSettingRow from './components/AppearanceSettingRow.vue'
 import AppearanceSettingsThemeSelector from './components/appearance-settings-theme-selector.vue'
+import AppearanceSettingRow from './components/AppearanceSettingRow.vue'
 import ProjectLayoutSelector from './components/ProjectLayoutSelector.vue'
 import { appearanceSettingsMessages as messages } from './messages'
 import { injectAppearanceSettings } from './providers'

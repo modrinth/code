@@ -257,8 +257,7 @@ const hostingAccessPrivacy = ref<InvitePrivacy>('everyone')
 const friendPrivacyOptions: FriendPrivacy[] = ['everyone', 'mutual', 'none']
 const invitePrivacyOptions: InvitePrivacy[] = ['everyone', 'friends', 'none']
 const preferenceControlsDisabled = computed(
-	() =>
-		preferencesLoading.value || preferencesUpdating.value || saving.value || !preferences.value,
+	() => preferencesLoading.value || preferencesUpdating.value || saving.value || !preferences.value,
 )
 const preferenceControlsTooltip = computed(() => {
 	if (preferencesLoading.value) return formatMessage(messages.loadingPreferences)

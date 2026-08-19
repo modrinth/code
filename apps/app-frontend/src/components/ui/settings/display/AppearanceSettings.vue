@@ -43,14 +43,10 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 		if (
 			value.syncAcrossDevices &&
 			auth.user.value &&
-			(appearanceChanges.theme !== undefined ||
-				appearanceChanges.syncAcrossDevices !== undefined)
+			(appearanceChanges.theme !== undefined || appearanceChanges.syncAcrossDevices !== undefined)
 		) {
 			await updatePreferences({
-				appearance:
-					value.theme === 'system'
-						? { auto: true }
-						: { auto: false, theme: value.theme },
+				appearance: value.theme === 'system' ? { auto: true } : { auto: false, theme: value.theme },
 			})
 		}
 
@@ -72,7 +68,8 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 
 const themeOptions = computed(() =>
 	theme.options.filter(
-		(option) => option !== 'retro' || settings.value.developer_mode || current.value.theme === 'retro',
+		(option) =>
+			option !== 'retro' || settings.value.developer_mode || current.value.theme === 'retro',
 	),
 )
 

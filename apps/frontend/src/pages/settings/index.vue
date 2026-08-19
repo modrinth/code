@@ -182,13 +182,10 @@ const { saved, current, changes, saving, reset, save } = useSavable(
 		if (
 			value.syncAcrossDevices &&
 			auth.user.value &&
-			(appearanceChanges.theme !== undefined ||
-				appearanceChanges.syncAcrossDevices !== undefined)
+			(appearanceChanges.theme !== undefined || appearanceChanges.syncAcrossDevices !== undefined)
 		) {
 			preferencesPatch.appearance =
-				value.theme === 'system'
-					? { auto: true }
-					: { auto: false, theme: value.theme }
+				value.theme === 'system' ? { auto: true } : { auto: false, theme: value.theme }
 		}
 
 		if (appearanceChanges.projectLayouts !== undefined) {
@@ -222,8 +219,7 @@ const { saved, current, changes, saving, reset, save } = useSavable(
 		cosmetics.value.rightSearchLayout = value.sidebarPreferences.right_aligned_search
 		cosmetics.value.leftContentLayout = value.sidebarPreferences.left_aligned_content
 		for (const setting of value.projectLayouts) {
-			cosmetics.value.searchDisplayMode[setting.type] =
-				setting.layout === 'rows' ? 'list' : 'grid'
+			cosmetics.value.searchDisplayMode[setting.type] = setting.layout === 'rows' ? 'list' : 'grid'
 		}
 	},
 )
