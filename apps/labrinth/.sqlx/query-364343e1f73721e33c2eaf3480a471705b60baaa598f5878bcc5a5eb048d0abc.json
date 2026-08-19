@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM payout_period_days\n        WHERE period = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Date"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "364343e1f73721e33c2eaf3480a471705b60baaa598f5878bcc5a5eb048d0abc"
+}

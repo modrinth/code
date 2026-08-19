@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT\n\t\t\t\tpayout_periods.period,\n\t\t\t\tpayout_periods.raw_actual_aditude_revenue_usd,\n\t\t\t\tpayout_periods.adjustments,\n\t\t\t\tEXISTS (\n\t\t\t\t\tSELECT 1\n\t\t\t\t\tFROM payout_runs\n\t\t\t\t\tWHERE payout_runs.period = payout_periods.period\n\t\t\t\t\t\tAND payout_runs.status = 'scheduled'\n\t\t\t\t) AS \"has_scheduled_run!\",\n\t\t\t\tEXISTS (\n\t\t\t\t\tSELECT 1\n\t\t\t\t\tFROM payout_runs\n\t\t\t\t\tWHERE payout_runs.period = payout_periods.period\n\t\t\t\t\t\tAND payout_runs.status = 'running'\n\t\t\t\t) AS \"has_running_run!\",\n\t\t\t\tEXISTS (\n\t\t\t\t\tSELECT 1\n\t\t\t\t\tFROM payout_runs\n\t\t\t\t\tWHERE payout_runs.period = payout_periods.period\n\t\t\t\t\t\tAND payout_runs.status = 'succeeded'\n\t\t\t\t) AS \"has_succeeded_run!\"\n\t\t\tFROM payout_periods\n\t\t\tWHERE payout_periods.period = ANY($1)\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "period",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 1,
+        "name": "raw_actual_aditude_revenue_usd",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 2,
+        "name": "adjustments",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "has_scheduled_run!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "has_running_run!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "has_succeeded_run!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "DateArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "066e14c739f3467fbeef939879074a4816912b069894c4b06972300f19ebd191"
+}

@@ -2,10 +2,10 @@ use std::collections::HashMap;
 
 use actix_web::{HttpRequest, get, web};
 use chrono::{Months, NaiveDate, Utc};
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
+use super::Adjustment;
 use crate::{
     auth::get_user_from_headers,
     database::{
@@ -30,10 +30,6 @@ use crate::{
     },
 };
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_runs);
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PayoutRuns {
     pub periods: Vec<PayoutRunPeriod>,
@@ -44,7 +40,7 @@ pub struct PayoutRunPeriod {
     pub period: YearMonth,
     pub status: PayoutPeriodStatus,
     pub days: Vec<PayoutRunDay>,
-    pub adjustments: Vec<PayoutRunAdjustment>,
+    pub adjustments: Vec<Adjustment>,
 }
 
 /// Has revenue been distributed for a specific payout period month yet?
@@ -57,6 +53,8 @@ pub enum PayoutPeriodStatus {
     /// Revenue should have been received for the platform by now; waiting for
     /// an admin to manually execute the payout run.
     InReview,
+    /// A payout run is waiting for its cancellation window to expire.
+    Scheduled,
     /// Payout run is currently executing.
     Running,
     /// Payout run has been paid out to creators.
@@ -68,19 +66,6 @@ pub struct PayoutRunDay {
     pub date: NaiveDate,
     pub estimated: DayDistribution,
     pub actual: Option<DayDistribution>,
-}
-
-/// Manual admin-input adjustment to a [`PayoutRunPeriod`].
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PayoutRunAdjustment {
-    /// Total value of the adjustment.
-    #[serde(with = "rust_decimal::serde::float")]
-    pub amount_usd: Decimal,
-    /// Why this adjustment was applied.
-    ///
-    /// Only visible to admins.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
 }
 
 #[get("")]
@@ -165,7 +150,7 @@ pub async fn get_runs(
         .map(|estimate| -> Result<_, ApiError> {
             if let Some(period) = stored_periods.get(&estimate.period.date()) {
                 let mut adjustments =
-                    serde_json::from_value::<Vec<PayoutRunAdjustment>>(
+                    serde_json::from_value::<Vec<Adjustment>>(
                         period.adjustments.clone(),
                     )
                     .wrap_internal_err("deserializing payout adjustments")?;
@@ -178,7 +163,7 @@ pub async fn get_runs(
                     .days
                     .iter()
                     .map(|day| day.raw_estimated_aditude_revenue_usd)
-                    .sum::<Decimal>();
+                    .sum();
                 let actual_flow = compute_actual_distribution_flow(
                     total_estimated_revenue_usd,
                     period.raw_actual_aditude_revenue_usd,
@@ -210,8 +195,10 @@ pub async fn get_runs(
                     .collect::<Result<Vec<_>, _>>()?;
                 let status = if period.has_succeeded_run {
                     PayoutPeriodStatus::Paid
-                } else if period.has_active_run {
+                } else if period.has_running_run {
                     PayoutPeriodStatus::Running
+                } else if period.has_scheduled_run {
+                    PayoutPeriodStatus::Scheduled
                 } else {
                     PayoutPeriodStatus::InReview
                 };

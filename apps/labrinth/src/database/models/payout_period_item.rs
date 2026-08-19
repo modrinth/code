@@ -11,7 +11,8 @@ pub struct DBPayoutPeriod {
     pub raw_actual_aditude_revenue_usd: Decimal,
     pub adjustments: serde_json::Value,
     pub days: Vec<DBPayoutPeriodDay>,
-    pub has_active_run: bool,
+    pub has_scheduled_run: bool,
+    pub has_running_run: bool,
     pub has_succeeded_run: bool,
 }
 
@@ -41,8 +42,14 @@ impl DBPayoutPeriod {
 					SELECT 1
 					FROM payout_runs
 					WHERE payout_runs.period = payout_periods.period
-						AND payout_runs.status IN ('scheduled', 'running')
-				) AS "has_active_run!",
+						AND payout_runs.status = 'scheduled'
+				) AS "has_scheduled_run!",
+				EXISTS (
+					SELECT 1
+					FROM payout_runs
+					WHERE payout_runs.period = payout_periods.period
+						AND payout_runs.status = 'running'
+				) AS "has_running_run!",
 				EXISTS (
 					SELECT 1
 					FROM payout_runs
@@ -68,7 +75,8 @@ impl DBPayoutPeriod {
                             .raw_actual_aditude_revenue_usd,
                         adjustments: row.adjustments,
                         days: Vec::new(),
-                        has_active_run: row.has_active_run,
+                        has_scheduled_run: row.has_scheduled_run,
+                        has_running_run: row.has_running_run,
                         has_succeeded_run: row.has_succeeded_run,
                     },
                 )
