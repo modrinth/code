@@ -70,10 +70,9 @@ jobs:
         run: pnpm install
 
       - name: Build Storybook
-        working-directory: ./packages/ui
         env:
           NODE_OPTIONS: --max-old-space-size=6144
-        run: pnpm run build-storybook
+        run: pnpm build-storybook
 
       - name: Configure short SHA
         id: meta
