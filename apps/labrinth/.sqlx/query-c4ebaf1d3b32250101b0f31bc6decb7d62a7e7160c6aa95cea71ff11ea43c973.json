@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            EXISTS (\n                SELECT 1\n                FROM payout_runs\n                WHERE status IN ('scheduled', 'running')\n            ) AS \"has_active_run!\",\n            EXISTS (\n                SELECT 1\n                FROM payout_runs\n                WHERE period = $1\n                    AND status = 'succeeded'\n            ) AS \"has_succeeded_run!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "has_active_run!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "has_succeeded_run!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Date"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "c4ebaf1d3b32250101b0f31bc6decb7d62a7e7160c6aa95cea71ff11ea43c973"
+}

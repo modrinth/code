@@ -28,7 +28,13 @@ use crate::{
 #[derive(Debug, Deserialize)]
 pub struct StartPayoutRun {
     pub period: YearMonth,
-    pub two_factor_code: String,
+    pub two_factor_code: Option<String>,
+    /// Skip TOTP verification when testing this route locally.
+    ///
+    /// This field does not exist in release builds.
+    #[cfg(debug_assertions)]
+    #[serde(default)]
+    pub ignore_totp: bool,
     #[serde(with = "rust_decimal::serde::float")]
     pub raw_actual_revenue_usd: Decimal,
     pub adjustments: Vec<Adjustment>,
@@ -66,26 +72,37 @@ pub async fn start_run(
     }
     let user_id = DBUserId::from(user.id);
 
-    let secret = sqlx::query_scalar!(
-        r#"
+    #[cfg(debug_assertions)]
+    let ignore_totp = body.ignore_totp;
+    #[cfg(not(debug_assertions))]
+    let ignore_totp = false;
+
+    if !ignore_totp {
+        let two_factor_code = body
+            .two_factor_code
+            .as_deref()
+            .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
+        let secret = sqlx::query_scalar!(
+            r#"
         SELECT totp_secret
         FROM users
         WHERE id = $1
         "#,
-        user_id.0,
-    )
-    .fetch_one(&**pool)
-    .await
-    .wrap_internal_err("fetching user two-factor secret")?
-    .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
-    let valid_totp =
-        verify_2fa_code(&body.two_factor_code, &secret, user_id, &redis)
-            .await
-            .wrap_auth_err("verifying two-factor code")?;
-    if !valid_totp {
-        return Err(ApiError::Auth(eyre::eyre!(
-            AuthenticationError::InvalidCredentials,
-        )));
+            user_id.0,
+        )
+        .fetch_one(&**pool)
+        .await
+        .wrap_internal_err("fetching user two-factor secret")?
+        .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
+        let valid_totp =
+            verify_2fa_code(two_factor_code, &secret, user_id, &redis)
+                .await
+                .wrap_auth_err("verifying two-factor code")?;
+        if !valid_totp {
+            return Err(ApiError::Auth(eyre::eyre!(
+                AuthenticationError::InvalidCredentials,
+            )));
+        }
     }
 
     if body.raw_actual_revenue_usd.is_sign_negative() {
@@ -144,8 +161,7 @@ pub async fn start_run(
             EXISTS (
                 SELECT 1
                 FROM payout_runs
-                WHERE period = $1
-                    AND status IN ('scheduled', 'running')
+                WHERE status IN ('scheduled', 'running')
             ) AS "has_active_run!",
             EXISTS (
                 SELECT 1

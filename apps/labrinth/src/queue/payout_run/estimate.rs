@@ -2,9 +2,9 @@
 
 use std::collections::HashMap;
 
-use chrono::{Datelike, Months, NaiveDate};
+use chrono::{Months, NaiveDate};
 use dashmap::DashMap;
-use eyre::{Result, eyre};
+use eyre::Result;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -85,6 +85,13 @@ async fn fetch_estimates(
     let mut map = HashMap::<YearMonth, PeriodEstimate>::new();
     for response in metrics.responses {
         for row in response.rows {
+            let Some(raw_estimated_revenue_usd) = row.revenue else {
+                continue;
+            };
+            let Some(impressions) = row.impressions else {
+                continue;
+            };
+
             let date = row.time.date_naive();
             let period = YearMonth::from_day1(date);
 
@@ -94,15 +101,10 @@ async fn fetch_estimates(
             });
             let days = &mut period_estimate.days;
 
-            let day = date.day();
             days.push(DayEstimate {
                 date,
-                raw_estimated_revenue_usd: row
-                    .revenue
-                    .wrap_err_with(|| eyre!("no revenue data for day {day}"))?,
-                impressions: row.impressions.wrap_err_with(|| {
-                    eyre!("no impressions data for day {day}")
-                })?,
+                raw_estimated_revenue_usd,
+                impressions,
             });
         }
     }
