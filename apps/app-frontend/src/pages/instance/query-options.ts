@@ -40,8 +40,7 @@ export const instanceKeys = {
 export const screenshotKeys = {
 	all: ['screenshots'] as const,
 	global: () => [...screenshotKeys.all, 'global'] as const,
-	instance: (instanceId: string) =>
-		[...screenshotKeys.all, 'instance', instanceId] as const,
+	instance: (instanceId: string) => [...screenshotKeys.all, 'instance', instanceId] as const,
 	groups: () => [...screenshotKeys.all, 'groups'] as const,
 }
 

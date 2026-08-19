@@ -54,7 +54,10 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 </script>
 
 <template>
-	<div ref="dropTarget" class="group/instance-container relative select-none pb-3 transition-colors">
+	<div
+		ref="dropTarget"
+		class="group/instance-container relative select-none pb-3 transition-colors"
+	>
 		<Transition
 			enter-active-class="transition-opacity duration-150 ease-out"
 			enter-from-class="!opacity-0"

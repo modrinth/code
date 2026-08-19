@@ -407,6 +407,18 @@
   "app.icon-editor.notification.view-update": {
     "message": "View update"
   },
+  "app.image-preview.close": {
+    "message": "Close"
+  },
+  "app.image-preview.next": {
+    "message": "Next image"
+  },
+  "app.image-preview.previous": {
+    "message": "Previous image"
+  },
+  "app.image-preview.toggle-zoom": {
+    "message": "Toggle zoom"
+  },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
   },
@@ -763,6 +775,9 @@
   },
   "app.instance.tab.logs": {
     "message": "Logs"
+  },
+  "app.instance.tab.screenshots": {
+    "message": "Screenshots"
   },
   "app.instance.tab.share": {
     "message": "Share"
@@ -1262,11 +1277,14 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
-  "app.nav.remove-account": {
-    "message": "Remove account"
-  },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Sign into Modrinth"
+	"app.nav.remove-account": {
+		"message": "Remove account"
+	},
+	"app.nav.screenshots": {
+		"message": "Screenshots"
+	},
+	"app.nav.sign-in-to-modrinth-account": {
+		"message": "Sign into Modrinth"
   },
   "app.nav.switch-account": {
     "message": "Switch account"
@@ -1360,6 +1378,162 @@
   },
   "app.restarting": {
     "message": "Restarting..."
+  },
+  "app.screenshots.card.instance-and-time": {
+    "message": "{instance} · {time}"
+  },
+  "app.screenshots.copy": {
+    "message": "Copy image"
+  },
+  "app.screenshots.delete-description": {
+    "message": "Permanently delete {name}? This action cannot be undone."
+  },
+  "app.screenshots.delete-success": {
+    "message": "Screenshot deleted"
+  },
+  "app.screenshots.delete-title": {
+    "message": "Delete screenshot"
+  },
+  "app.screenshots.deselect": {
+    "message": "Deselect {name}"
+  },
+  "app.screenshots.empty-description": {
+    "message": "Screenshots you take in-game will appear here."
+  },
+  "app.screenshots.empty-heading": {
+    "message": "No screenshots yet"
+  },
+  "app.screenshots.error-heading": {
+    "message": "Failed to load screenshots"
+  },
+  "app.screenshots.filter.add": {
+    "message": "Add filter"
+  },
+  "app.screenshots.filter.clear": {
+    "message": "Clear filters"
+  },
+  "app.screenshots.filter.game-version": {
+    "message": "Game version"
+  },
+  "app.screenshots.filter.label": {
+    "message": "Filter by"
+  },
+  "app.screenshots.filter.loader": {
+    "message": "Loader"
+  },
+  "app.screenshots.filter.modpack": {
+    "message": "Modpack"
+  },
+  "app.screenshots.group-by": {
+    "message": "Group by"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "All screenshots"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "Collapse group"
+  },
+  "app.screenshots.group.custom": {
+    "message": "Custom grouping"
+  },
+  "app.screenshots.group.date": {
+    "message": "Date"
+  },
+  "app.screenshots.group.delete": {
+    "message": "Delete group"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "Screenshots in this group will become ungrouped."
+  },
+  "app.screenshots.group.edit": {
+    "message": "Edit group name"
+  },
+  "app.screenshots.group.expand": {
+    "message": "Expand group"
+  },
+  "app.screenshots.group.instance": {
+    "message": "Instance"
+  },
+  "app.screenshots.group.new": {
+    "message": "New group"
+  },
+  "app.screenshots.group.none": {
+    "message": "No grouping"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "This month"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "This week"
+  },
+  "app.screenshots.group.today": {
+    "message": "Today"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "Ungrouped"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "Yesterday"
+  },
+  "app.screenshots.heading": {
+    "message": "Screenshots"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "Try a different search or filter."
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "No matching screenshots"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "Search"
+  },
+  "app.screenshots.select": {
+    "message": "Select {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "Selected screenshots"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "Delete {count, plural, one {# screenshot} other {# screenshots}}? This action cannot be undone."
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, one {# screenshot deleted} other {# screenshots deleted}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "Delete selected screenshots"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "Export ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Modrinth screenshots.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "{instance} screenshots.zip"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "{count} selected"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "ZIP archive"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "Show in folder"
+  },
+  "app.screenshots.sort-by": {
+    "message": "Sort by"
+  },
+  "app.screenshots.sort.name": {
+    "message": "Name"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "Newest"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "Oldest"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2470,6 +2644,18 @@
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
+  },
+  "instance.settings.tabs.synced-options": {
+    "message": "Synced options"
+  },
+  "instance.settings.tabs.synced-options.description": {
+    "message": "Choose which content from this instance appears across the app."
+  },
+  "instance.settings.tabs.synced-options.screenshots": {
+    "message": "Screenshots"
+  },
+  "instance.settings.tabs.synced-options.screenshots.description": {
+    "message": "Show screenshots from this instance in the global Screenshots page. Turn this off to use an instance-only Screenshots tab."
   },
   "instance.settings.tabs.window": {
     "message": "Window"

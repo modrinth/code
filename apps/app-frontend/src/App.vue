@@ -2030,10 +2030,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
 				<ShirtIcon />
 			</NavButton>
-			<NavButton
-				v-tooltip.right="formatMessage(messages.screenshots)"
-				to="/screenshots"
-			>
+			<NavButton v-tooltip.right="formatMessage(messages.screenshots)" to="/screenshots">
 				<ImagesIcon />
 			</NavButton>
 			<NavButton

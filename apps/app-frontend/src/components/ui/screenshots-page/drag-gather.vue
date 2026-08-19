@@ -2,10 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import ScreenshotDragPreview from './drag-preview.vue'
-import {
-	gatherDuration,
-	type ScreenshotDragGatherItem,
-} from './use-screenshot-drag-gather'
+import { gatherDuration, type ScreenshotDragGatherItem } from './use-screenshot-drag-gather'
 
 const props = defineProps<{
 	items: ScreenshotDragGatherItem[]

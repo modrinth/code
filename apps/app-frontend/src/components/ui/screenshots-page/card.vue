@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
+import { CheckIcon, ClipboardCopyIcon, ExternalIcon, TrashIcon } from '@modrinth/assets'
 import {
-	CheckIcon,
-	ClipboardCopyIcon,
-	ExternalIcon,
-	TrashIcon,
-} from '@modrinth/assets'
-import { commonMessages, defineMessages, IconButton, useFormatDateTime, useVIntl } from '@modrinth/ui'
+	commonMessages,
+	defineMessages,
+	IconButton,
+	useFormatDateTime,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import type { InstanceScreenshot } from '@/helpers/instance'
@@ -23,8 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(e: 'activate', event: MouseEvent | KeyboardEvent): void
-	(e: 'toggle-selection'): void
-	(e: 'copy' | 'open' | 'delete'): void
+	(e: 'copy' | 'open' | 'delete' | 'toggle-selection'): void
 }>()
 
 const card = ref<HTMLElement>()
@@ -109,9 +109,7 @@ function activate(event: MouseEvent | KeyboardEvent) {
 			<span
 				class="relative flex size-6 items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-hover/selection:brightness-125"
 				:class="
-					selected
-						? 'border-0 !opacity-100'
-						: 'border-2 border-solid border-primary bg-transparent'
+					selected ? 'border-0 !opacity-100' : 'border-2 border-solid border-primary bg-transparent'
 				"
 			>
 				<span v-if="selected" class="absolute inset-0 rounded-full bg-contrast" />

@@ -16,8 +16,8 @@ import {
 } from '@modrinth/assets'
 import {
 	Button,
-	commonMessages,
 	type ComboboxOption,
+	commonMessages,
 	ConfirmModal,
 	defineMessages,
 	EmptyState,
@@ -67,10 +67,7 @@ import ScreenshotDragPreview from './drag-preview.vue'
 import ScreenshotGroupSection from './group.vue'
 import ScreenshotPreviewModal from './preview-modal.vue'
 import ScreenshotToolbar from './toolbar.vue'
-import {
-	type ActiveScreenshotDrag,
-	useScreenshotDragGather,
-} from './use-screenshot-drag-gather'
+import { type ActiveScreenshotDrag, useScreenshotDragGather } from './use-screenshot-drag-gather'
 
 type ScreenshotSort = 'newest' | 'oldest' | 'name'
 type ScreenshotGroupBy = 'custom' | 'instance' | 'date' | 'none'
@@ -140,10 +137,13 @@ const collapsedGroups = useStorage<Record<string, boolean>>(
 	`screenshots-collapsed-groups-${storageSuffix}`,
 	{},
 )
-const legacyCustomGrouping = useStorage<LegacyCustomScreenshotGrouping>('screenshots-custom-groups', {
-	groups: [],
-	assignments: {},
-})
+const legacyCustomGrouping = useStorage<LegacyCustomScreenshotGrouping>(
+	'screenshots-custom-groups',
+	{
+		groups: [],
+		assignments: {},
+	},
+)
 const selectedKeys = ref(new Set<string>())
 const screenshotToDelete = ref<InstanceScreenshot | null>(null)
 const deleteFromPreview = ref(false)
@@ -268,8 +268,8 @@ const screenshotsReadyPending = computed(
 const screenshots = computed(() => screenshotsQuery.data.value ?? [])
 const customGroups = computed(() => screenshotGroupsQuery.data.value ?? [])
 const instances = computed(() => instancesQuery.data.value ?? [])
-const instancesById = computed(() =>
-	new Map(instances.value.map((instance) => [instance.id, instance])),
+const instancesById = computed(
+	() => new Map(instances.value.map((instance) => [instance.id, instance])),
 )
 const screenshotInstanceIds = computed(
 	() => new Set(screenshots.value.map((screenshot) => screenshot.instance_id)),
@@ -300,9 +300,7 @@ const selectionActive = computed(() => selectedKeys.value.size > 0)
 const selectedScreenshots = computed(() =>
 	screenshots.value.filter((screenshot) => selectedKeys.value.has(getSelectionKey(screenshot))),
 )
-const activeDraggedKeys = computed(
-	() => new Set(activeDrag.value?.selectionKeys ?? []),
-)
+const activeDraggedKeys = computed(() => new Set(activeDrag.value?.selectionKeys ?? []))
 const activeDraggedScreenshots = computed(() => {
 	const drag = activeDrag.value
 	if (!drag) return []
@@ -343,9 +341,7 @@ const sortOptions = computed<ComboboxOption<string>[]>(() => [
 ])
 const groupOptions = computed<ComboboxOption<string>[]>(() => [
 	{ value: 'custom', label: formatMessage(messages.custom) },
-	...(isGlobal.value
-		? [{ value: 'instance', label: formatMessage(messages.instance) }]
-		: []),
+	...(isGlobal.value ? [{ value: 'instance', label: formatMessage(messages.instance) }] : []),
 	{ value: 'date', label: formatMessage(messages.date) },
 	{ value: 'none', label: formatMessage(messages.none) },
 ])
@@ -370,9 +366,7 @@ const filteredScreenshots = computed(() => {
 				: undefined
 		const matchesModpack =
 			filters.value.modpack.length === 0 ||
-			(linkedModpackProjectId
-				? filters.value.modpack.includes(linkedModpackProjectId)
-				: false)
+			(linkedModpackProjectId ? filters.value.modpack.includes(linkedModpackProjectId) : false)
 
 		return matchesSearch && matchesLoader && matchesGameVersion && matchesModpack
 	})
@@ -530,7 +524,11 @@ watch(screenshots, (currentScreenshots) => {
 })
 
 watch(
-	[() => screenshotsQuery.isSuccess.value, () => instancesQuery.isSuccess.value, modpackFilterOptions],
+	[
+		() => screenshotsQuery.isSuccess.value,
+		() => instancesQuery.isSuccess.value,
+		modpackFilterOptions,
+	],
 	([screenshotsLoaded, instancesLoaded, options]) => {
 		if (!screenshotsLoaded || !instancesLoaded) return
 
@@ -701,9 +699,7 @@ async function assignCustomGroup(
 				group_id: customGroupId,
 			})),
 		)
-		await invalidateScreenshots(
-			movedScreenshots.map((screenshot) => screenshot.instance_id),
-		)
+		await invalidateScreenshots(movedScreenshots.map((screenshot) => screenshot.instance_id))
 		selectedKeys.value = new Set()
 	} catch {
 		return
@@ -726,7 +722,10 @@ function getDateGroup(createdAt: string): Omit<ScreenshotGroupData, 'screenshots
 		}
 	}
 	if (created.isSame(now, 'month')) {
-		return { id: `date:month:${created.format('YYYY-MM')}`, title: formatMessage(messages.thisMonth) }
+		return {
+			id: `date:month:${created.format('YYYY-MM')}`,
+			title: formatMessage(messages.thisMonth),
+		}
 	}
 	return {
 		id: `date:month:${created.format('YYYY-MM')}`,
@@ -778,9 +777,7 @@ function requestDelete(screenshot: InstanceScreenshot, fromPreview = false) {
 }
 
 function screenshotBySelectionKey(selectionKey: string) {
-	return screenshots.value.find(
-		(screenshot) => getSelectionKey(screenshot) === selectionKey,
-	)
+	return screenshots.value.find((screenshot) => getSelectionKey(screenshot) === selectionKey)
 }
 
 function copyScreenshotBySelectionKey(selectionKey: string) {
@@ -907,9 +904,9 @@ function canDropScreenshotsOnTarget(target: ScreenshotDropData) {
 
 	return Boolean(
 		target.instanceId &&
-			activeDraggedScreenshots.value.some(
-				(screenshot) => screenshot.instance_id !== target.instanceId,
-			),
+		activeDraggedScreenshots.value.some(
+			(screenshot) => screenshot.instance_id !== target.instanceId,
+		),
 	)
 }
 
@@ -1092,16 +1089,14 @@ onBeforeUnmount(clearGroupHoverOpenTimeout)
 				<div class="flex flex-col">
 					<ScreenshotGroupSection
 						v-for="group in groupedScreenshots"
-						:key="group.id"
 						:id="group.id"
+						:key="group.id"
 						:title="group.title"
 						:screenshots="group.screenshots"
 						:selected-keys="selectedKeys"
 						:selection-active="selectionActive"
 						:active-dragged-keys="activeDraggedKeys"
-						:show-drop-outline="
-							activeDropGroupId === group.id && canDropScreenshotsOnGroup(group)
-						"
+						:show-drop-outline="activeDropGroupId === group.id && canDropScreenshotsOnGroup(group)"
 						:can-drag="groupBy === 'custom' || (isGlobal && groupBy === 'instance')"
 						:drop-instance-id="groupBy === 'instance' ? group.dropInstanceId : undefined"
 						:drop-custom-group="groupBy === 'custom'"

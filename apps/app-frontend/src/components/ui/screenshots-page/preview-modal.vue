@@ -28,10 +28,7 @@
 								<XIcon aria-hidden="true" />
 							</IconButton>
 							<slot name="actions" :item="activeItem" :index="activeIndex" :hide="hide" />
-							<IconButton
-								:label="formatMessage(messages.toggleZoom)"
-								@click="zoomedIn = !zoomedIn"
-							>
+							<IconButton :label="formatMessage(messages.toggleZoom)" @click="zoomedIn = !zoomedIn">
 								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
 								<ContractIcon v-else aria-hidden="true" />
 							</IconButton>
@@ -58,13 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	ContractIcon,
-	ExpandIcon,
-	LeftArrowIcon,
-	RightArrowIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { ContractIcon, ExpandIcon, LeftArrowIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
 import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 

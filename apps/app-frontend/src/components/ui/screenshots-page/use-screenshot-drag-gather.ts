@@ -85,8 +85,7 @@ export function useScreenshotDragGather(screenshots: Ref<InstanceScreenshot[]>) 
 			const screenshot = screenshotsByKey.get(selectionKey)
 			const card = screenshotCards.find(
 				(candidate) =>
-					candidate.dataset.selectionKey === selectionKey &&
-					candidate.getClientRects().length > 0,
+					candidate.dataset.selectionKey === selectionKey && candidate.getClientRects().length > 0,
 			)
 			if (!screenshot || !card) return []
 

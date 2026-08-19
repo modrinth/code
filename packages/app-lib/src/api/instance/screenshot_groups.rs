@@ -51,8 +51,7 @@ fn validate_group_name(name: &str) -> crate::Result<&str> {
     Ok(name)
 }
 
-pub async fn list_screenshot_groups(
-) -> crate::Result<Vec<ScreenshotGroup>> {
+pub async fn list_screenshot_groups() -> crate::Result<Vec<ScreenshotGroup>> {
     let state = State::get().await?;
     Ok(screenshot_rows::list_groups(&state.pool)
         .await?
@@ -140,12 +139,10 @@ pub async fn delete_screenshot_group(id: String) -> crate::Result<()> {
     )
     .fetch_all(&state.pool)
     .await?;
-    let result = sqlx::query!(
-        "DELETE FROM screenshot_groups WHERE id = ?",
-        id,
-    )
-    .execute(&state.pool)
-    .await?;
+    let result =
+        sqlx::query!("DELETE FROM screenshot_groups WHERE id = ?", id,)
+            .execute(&state.pool)
+            .await?;
     if result.rows_affected() == 0 {
         return Err(crate::ErrorKind::InputError(format!(
             "Unknown screenshot group {id}"
@@ -176,11 +173,8 @@ pub async fn set_screenshot_group_memberships(
 
     let mut instance_ids = HashSet::new();
     for update in updates {
-        let instance_id = screenshot_instance_id(
-            &update.screenshot_id,
-            &mut tx,
-        )
-        .await?;
+        let instance_id =
+            screenshot_instance_id(&update.screenshot_id, &mut tx).await?;
         instance_ids.insert(instance_id);
         sqlx::query!(
             "DELETE FROM screenshot_group_memberships WHERE screenshot_id = ?",
@@ -296,9 +290,7 @@ async fn set_group_members(
 ) -> crate::Result<HashSet<String>> {
     let mut instance_ids = HashSet::new();
     for screenshot_id in screenshot_ids {
-        instance_ids.insert(
-            screenshot_instance_id(&screenshot_id, tx).await?,
-        );
+        instance_ids.insert(screenshot_instance_id(&screenshot_id, tx).await?);
         sqlx::query!(
             "
 			INSERT INTO screenshot_group_memberships (screenshot_id, group_id)
