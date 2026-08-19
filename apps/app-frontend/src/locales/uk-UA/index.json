@@ -980,9 +980,6 @@
   "app.settings.tabs.behavior": {
     "message": "Поведінка"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Стандартні параметри гри"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Інсталяції Java"
   },

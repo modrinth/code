@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_server_baselines\n\t\t\t(instance_id, version_id, reconstructed)\n\t\tVALUES (?, ?, ?)\n\t\tON CONFLICT(instance_id) DO UPDATE SET\n\t\t\tversion_id = excluded.version_id,\n\t\t\treconstructed = excluded.reconstructed\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "8f09e98c6b8e0f1d5444aabbf2a80f9bde067f3ac15aa40d15c19d217639b605"
+}

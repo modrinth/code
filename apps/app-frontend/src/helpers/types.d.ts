@@ -17,6 +17,9 @@ export type GameInstance = {
 
 	group_ids: string[]
 	synced_options: {
+		command_history: boolean
+		multiplayer_servers: boolean
+		creative_hotbars: boolean
 		screenshots: boolean
 	}
 

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT expected_sha1\n\t\tFROM synced_option_materializations\n\t\tWHERE instance_id = ? AND option = ? AND family = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "expected_sha1",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "d0620336091b153f01448417ca655a6a7c6dbad8f7975973e2614441301bec23"
+}

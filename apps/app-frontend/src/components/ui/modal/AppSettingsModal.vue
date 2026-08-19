@@ -33,7 +33,7 @@ import AppearanceSettings from '@/components/ui/settings/display/AppearanceSetti
 import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
 import LanguageSettings from '@/components/ui/settings/display/LanguageSettings.vue'
-import DefaultInstanceSettings from '@/components/ui/settings/instances/DefaultInstanceSettings.vue'
+import InstancesSyncedSettings from '@/components/ui/settings/instances/InstancesSyncedSettings.vue'
 import JavaSettings from '@/components/ui/settings/instances/JavaSettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/instances/ResourceManagementSettings.vue'
 import { get, set } from '@/helpers/settings.ts'
@@ -130,12 +130,12 @@ const tabs = [
 	},
 	{
 		name: defineMessage({
-			id: 'app.settings.tabs.default-instance-options',
-			defaultMessage: 'Default game options',
+			id: 'app.settings.tabs.synced-options',
+			defaultMessage: 'Synced options',
 		}),
 		category: tabCategories.instances,
 		icon: GameIcon,
-		content: DefaultInstanceSettings,
+		content: InstancesSyncedSettings,
 	},
 	{
 		name: defineMessage({

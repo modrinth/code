@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-	Checkbox,
 	defineMessages,
 	injectNotificationManager,
 	StyledInput,
@@ -54,6 +53,10 @@ watch(
 )
 
 const messages = defineMessages({
+	window: {
+		id: 'instance.settings.tabs.window',
+		defaultMessage: 'Window',
+	},
 	customWindowSettings: {
 		id: 'instance.settings.tabs.window.custom-window-settings',
 		defaultMessage: 'Custom window settings',
@@ -95,67 +98,65 @@ const messages = defineMessages({
 
 <template>
 	<div class="flex flex-col gap-6">
-		<Checkbox
-			v-model="overrideWindowSettings"
-			:label="formatMessage(messages.customWindowSettings)"
-		/>
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
+		<div class="flex items-center justify-between gap-4">
+			<div class="flex min-w-0 flex-col gap-1">
 				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.fullscreen) }}
+					{{ formatMessage(messages.window) }}
 				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.fullscreenDescription) }}
-				</p>
+				<p class="m-0">{{ formatMessage(messages.customWindowSettings) }}</p>
 			</div>
-			<Toggle
-				id="fullscreen"
-				:model-value="overrideWindowSettings ? fullscreenSetting : globalSettings.force_fullscreen"
-				:disabled="!overrideWindowSettings"
-				@update:model-value="
-					(e) => {
-						fullscreenSetting = e
-					}
-				"
-			/>
+			<Toggle id="override-window-settings" v-model="overrideWindowSettings" />
 		</div>
-
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.width) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.widthDescription) }}
-				</p>
+		<div v-if="overrideWindowSettings" class="flex flex-col gap-6">
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.fullscreen) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.fullscreenDescription) }}
+					</p>
+				</div>
+				<Toggle id="fullscreen" v-model="fullscreenSetting" />
 			</div>
-			<StyledInput
-				id="width"
-				v-model="resolution[0]"
-				autocomplete="off"
-				:disabled="!overrideWindowSettings || fullscreenSetting"
-				type="number"
-				:placeholder="formatMessage(messages.enterWidth)"
-			/>
-		</div>
 
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.height) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.heightDescription) }}
-				</p>
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.width) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.widthDescription) }}
+					</p>
+				</div>
+				<StyledInput
+					id="width"
+					v-model="resolution[0]"
+					autocomplete="off"
+					:disabled="fullscreenSetting"
+					type="number"
+					:placeholder="formatMessage(messages.enterWidth)"
+				/>
 			</div>
-			<StyledInput
-				id="height"
-				v-model="resolution[1]"
-				autocomplete="off"
-				:disabled="!overrideWindowSettings || fullscreenSetting"
-				type="number"
-				:placeholder="formatMessage(messages.enterHeight)"
-			/>
+
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.height) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.heightDescription) }}
+					</p>
+				</div>
+				<StyledInput
+					id="height"
+					v-model="resolution[1]"
+					autocomplete="off"
+					:disabled="fullscreenSetting"
+					type="number"
+					:placeholder="formatMessage(messages.enterHeight)"
+				/>
+			</div>
 		</div>
 	</div>
 </template>

@@ -980,9 +980,6 @@
   "app.settings.tabs.behavior": {
     "message": "Comportement"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Options de jeu par défaut"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Installations de Java"
   },

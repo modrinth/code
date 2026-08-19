@@ -29,11 +29,17 @@ export type SingleplayerWorld = BaseWorld & {
 export type ServerWorld = BaseWorld & {
 	type: 'server'
 	index: number
+	server_id?: string
+	source?: ServerSource
 	address: string
 	pack_status: ServerPackStatus
 	project_id?: string
 	content_kind?: string
 }
+
+export type ServerSource = 'user_synced' | 'modpack' | 'linked_server_project' | 'local_desynced'
+
+export type DesyncServerMode = 'keep_in_other_instances' | 'remove_from_other_instances'
 
 export type World = SingleplayerWorld | ServerWorld
 
@@ -43,6 +49,14 @@ export type WorldWithInstance = {
 
 export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
 export type ServerPackStatus = 'enabled' | 'disabled' | 'prompt'
+
+export async function desync_server(
+	instanceId: string,
+	serverId: string,
+	mode: DesyncServerMode,
+): Promise<void> {
+	return await invoke('plugin:worlds|desync_server', { instanceId, serverId, mode })
+}
 
 export type ServerStatus = {
 	// https://minecraft.wiki/w/Text_component_format

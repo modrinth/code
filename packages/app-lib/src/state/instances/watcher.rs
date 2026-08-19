@@ -169,6 +169,18 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 },
                                             )
                                         });
+                                    let synced_option_file = first_file_name
+                                        .as_ref()
+                                        .and_then(|name| name.to_str())
+                                        .filter(|name| {
+                                            matches!(
+                                                *name,
+                                                "command_history.txt"
+                                                    | "hotbar.nbt"
+                                                    | "servers.dat"
+                                            )
+                                        })
+                                        .map(ToOwned::to_owned);
                                     tokio::spawn(async move {
                                         if sync_content
                                             && let Ok(state) =
@@ -179,11 +191,23 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                     &state,
                                                 )
                                                 .await
-                                        {
+										{
                                             tracing::error!(
                                                 "Failed to sync instance content after filesystem change: {error}"
                                             );
-                                        }
+										}
+                                        if let Some(file_name) = synced_option_file
+											&& let Err(error) =
+												crate::api::instance::reconcile_synced_option_file(
+													&emit_instance_id,
+													&file_name,
+												)
+												.await
+										{
+											tracing::error!(
+												"Failed to reconcile {file_name} after filesystem change: {error}"
+											);
+										}
                                         if reconcile_screenshots
                                             && let Err(error) =
                                                 crate::api::instance::reconcile_screenshots(

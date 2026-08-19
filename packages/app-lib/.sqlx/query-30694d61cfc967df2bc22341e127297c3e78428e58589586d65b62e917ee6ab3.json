@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_synced_options (instance_id, option, enabled)\n\t\tSELECT ?, option, enabled\n\t\tFROM global_synced_options_overrides\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "30694d61cfc967df2bc22341e127297c3e78428e58589586d65b62e917ee6ab3"
+}

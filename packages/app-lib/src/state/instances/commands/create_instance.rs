@@ -130,6 +130,8 @@ pub(crate) async fn create_instance(
             &state.directories,
         )
         .await;
+        crate::api::instance::reconcile_instance_synced_options(&instance.id)
+            .await?;
 
         Ok(instance)
     }

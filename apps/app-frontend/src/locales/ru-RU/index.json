@@ -971,9 +971,6 @@
   "app.settings.tabs.behavior": {
     "message": "Поведение"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Предустановки игры"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Расположение Java"
   },
