@@ -155,6 +155,12 @@
   "app.appearance-settings.compact-mode.title": {
     "message": "Compact mode"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Display library instances in a compact row layout."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Compact mode"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
