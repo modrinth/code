@@ -27,6 +27,7 @@ pub mod organization_item;
 pub mod passkey_item;
 pub mod pat_item;
 pub mod payout_item;
+pub mod payout_period_item;
 pub mod payout_run_item;
 pub mod payout_variance_item;
 pub mod payouts_values_notifications;

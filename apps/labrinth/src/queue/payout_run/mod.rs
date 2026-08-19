@@ -50,10 +50,11 @@
 //!       ```
 //!   - (fees stay the same, since they're based on impressions, not revenue)
 //!   - (variance is ignored, since that's purely an estimation value)
-//!   - `adjustments_usd`: sum of all manual adjustments input by the admin
-//!   - `actual.net_revenue_usd`: raw actual revenue - fees + adjustments
+//!   - `actual.net_revenue_usd`: raw actual revenue - fees
 //!   - `actual.(platform|creator)_net_revenue_usd`: same logic as estimated,
 //!     but using the net actual revenue
+//! - Manual adjustments are stored separately on the payout period and applied
+//!   on top of its actual distribution.
 //!
 //! ## Variance
 //!
@@ -86,10 +87,8 @@ pub struct DayDistribution {
     ///
     /// For non-estimates (actual revenue values), this is zero.
     pub variance_usd: Decimal,
-    /// Manually-input adjustments on top of raw revenue.
-    pub sum_adjustments_usd: Decimal,
     /// Total net revenue that we earned;
-    /// `raw_revenue - fees - variance + sum_adjustments`.
+    /// `raw_revenue - fees - variance`.
     pub net_revenue_usd: Decimal,
     /// How much of the net revenue goes to the platform.
     pub platform_net_revenue_usd: Decimal,
@@ -125,7 +124,6 @@ pub fn distribution_for_day(
     date: NaiveDate,
     raw_revenue_usd: Decimal,
     impressions: u128,
-    sum_adjustments_usd: Decimal,
     variances: &PayoutVariances,
 ) -> DayDistribution {
     let fees_usd = {
@@ -135,23 +133,76 @@ pub fn distribution_for_day(
     let variance_frac = variances
         .fracs
         .iter()
-        .find(|v| v.starts_at >= date)
+        .rev()
+        .find(|v| v.starts_at <= date)
         .map(|v| v.frac)
         .unwrap_or(variances.default_frac);
     let variance_usd = raw_revenue_usd * variance_frac;
 
-    let net_estimated_revenue_usd =
-        raw_revenue_usd - fees_usd - variance_usd + sum_adjustments_usd;
+    let net_estimated_revenue_usd = raw_revenue_usd - fees_usd - variance_usd;
 
     DayDistribution {
         raw_revenue_usd,
         fees_usd,
         variance_usd,
-        sum_adjustments_usd,
         net_revenue_usd: net_estimated_revenue_usd,
         platform_net_revenue_usd: net_estimated_revenue_usd
             * PLATFORM_REVENUE_SPLIT,
         creator_net_revenue_usd: net_estimated_revenue_usd
             * (dec!(1) - PLATFORM_REVENUE_SPLIT),
+    }
+}
+
+/// Precomputed allocation used to distribute actual period revenue by day.
+#[derive(Debug, Clone, Copy)]
+pub struct ActualDistributionFlow {
+    share: Decimal,
+}
+
+/// Start a flow for computing the actual revenue distribution of a payout
+/// period.
+///
+/// Our ad provider gives us per-day estimates for how much money we earned,
+/// but only provides money in a lump sum per month. Therefore, it is up to us
+/// to figure out how much each day contributed to the lump-sum amount.
+///
+/// We do this using the following formula:
+/// ```text
+/// let share = raw_actual_revenue / raw_estimated_revenue
+/// actual_day_revenue[day] = share * estimated_day_revenue[day]
+/// ```
+///
+/// If the period's estimated revenue is zero, the share is `1`.
+///
+/// We use a type-state-ish pattern here to ensure that the same flow is used
+/// for each day in a period.
+pub fn compute_actual_distribution_flow(
+    raw_estimated_revenue_usd: Decimal,
+    raw_actual_revenue_usd: Decimal,
+) -> ActualDistributionFlow {
+    let share = if raw_estimated_revenue_usd.is_zero() {
+        Decimal::ONE
+    } else {
+        raw_actual_revenue_usd / raw_estimated_revenue_usd
+    };
+
+    ActualDistributionFlow { share }
+}
+
+impl ActualDistributionFlow {
+    /// Compute the actual distribution for a stored day in this period.
+    pub fn distribution_for_day(
+        &self,
+        date: NaiveDate,
+        raw_estimated_revenue_usd: Decimal,
+        impressions: u128,
+    ) -> DayDistribution {
+        distribution_for_day(
+            date,
+            raw_estimated_revenue_usd * self.share,
+            impressions,
+            // actual rev distribution always has no variance
+            &PayoutVariances::ZERO,
+        )
     }
 }

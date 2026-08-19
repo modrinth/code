@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT\n\t\t\t\tperiod,\n\t\t\t\tdate,\n\t\t\t\traw_estimated_aditude_revenue_usd,\n\t\t\t\taditude_impressions\n\t\t\tFROM payout_period_days\n\t\t\tWHERE period = ANY($1)\n\t\t\tORDER BY period, date\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "period",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 1,
+        "name": "date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 2,
+        "name": "raw_estimated_aditude_revenue_usd",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "aditude_impressions",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "DateArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "53e45fef7122a91a4509b232ede70c36b476340e3c9bca62517b074ff8038e89"
+}
