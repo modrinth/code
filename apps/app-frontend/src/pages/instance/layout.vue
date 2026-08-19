@@ -92,6 +92,7 @@ import {
 	EditIcon,
 	FolderOpenIcon,
 	GlobeIcon,
+	ImagesIcon,
 	PlayIcon,
 	PlusIcon,
 	StopCircleIcon,
@@ -187,6 +188,7 @@ const messages = defineMessages({
 	},
 	contentTab: { id: 'app.instance.tab.content', defaultMessage: 'Content' },
 	filesTab: { id: 'app.instance.tab.files', defaultMessage: 'Files' },
+	screenshotsTab: { id: 'app.instance.tab.screenshots', defaultMessage: 'Screenshots' },
 	worldsTab: { id: 'app.instance.tab.worlds', defaultMessage: 'Worlds' },
 	logsTab: { id: 'app.instance.tab.logs', defaultMessage: 'Logs' },
 	shareTab: { id: 'app.instance.tab.share', defaultMessage: 'Share' },
@@ -494,6 +496,14 @@ const tabs = computed(() => {
 			icon: TerminalSquareIcon,
 		},
 	]
+
+	if (!instance.value?.synced_options.screenshots) {
+		instanceTabs.splice(2, 0, {
+			label: formatMessage(messages.screenshotsTab),
+			href: `${basePath.value}/screenshots`,
+			icon: ImagesIcon,
+		})
+	}
 
 	if (showShareTab.value) {
 		instanceTabs.push({

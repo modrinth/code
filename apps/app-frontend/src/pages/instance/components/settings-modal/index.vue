@@ -6,6 +6,7 @@ import {
 	CoffeeIcon,
 	InfoIcon,
 	MonitorIcon,
+	RefreshCwIcon,
 	UsersIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
@@ -33,6 +34,7 @@ import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
 import JavaSettings from './java-settings.vue'
 import SharingSettings from './sharing-settings.vue'
+import SyncedOptionsSettings from './synced-options-settings.vue'
 import WindowSettings from './window-settings.vue'
 
 const { formatMessage } = useVIntl()
@@ -97,6 +99,14 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: WrenchIcon,
 		content: InstallationSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.synced-options',
+			defaultMessage: 'Synced options',
+		}),
+		icon: RefreshCwIcon,
+		content: SyncedOptionsSettings,
 	},
 	{
 		name: defineMessage({

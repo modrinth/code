@@ -11,6 +11,8 @@ mod lifecycle;
 mod paths;
 mod projects;
 mod run;
+mod screenshots;
+mod screenshot_groups;
 mod shared;
 
 pub use self::content::{
@@ -38,7 +40,7 @@ pub(crate) use self::icon::{
 };
 pub use self::install::get_optimal_jre_key;
 pub(crate) use self::lifecycle::create;
-pub use self::lifecycle::{edit, remove};
+pub use self::lifecycle::{edit, remove, set_synced_option};
 pub use self::paths::{get_full_path, get_mod_full_path};
 pub use self::projects::{
     InstallProjectWithDependenciesRequest, add_project_from_path,
@@ -50,6 +52,19 @@ pub use self::projects::{
 };
 pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,
+};
+pub use self::screenshots::{
+    InstanceScreenshot, ScreenshotKey, delete_screenshots,
+    export_screenshots, get_screenshot_path, list_screenshots,
+    list_all_screenshots, list_synced_screenshots, move_screenshots,
+};
+pub(crate) use self::screenshots::reconcile_screenshots;
+pub use self::screenshot_groups::{
+    ScreenshotGroup, ScreenshotGroupImport,
+    ScreenshotGroupMembershipUpdate, create_screenshot_group,
+    delete_screenshot_group, import_screenshot_groups,
+    list_screenshot_groups, rename_screenshot_group,
+    set_screenshot_group_memberships,
 };
 pub(crate) use self::shared::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
