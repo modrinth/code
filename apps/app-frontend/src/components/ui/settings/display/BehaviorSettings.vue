@@ -10,6 +10,7 @@ const themeStore = useTheming()
 const { formatMessage } = useVIntl()
 
 const worldsInHomeFlag: FeatureFlag = 'worlds_in_home'
+const compactInstanceCardsFlag: FeatureFlag = 'compact_instance_cards'
 const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
 const skipUnknownPackWarningFlag: FeatureFlag = 'skip_unknown_pack_warning'
 const showPlayTimeFlag: FeatureFlag = 'show_instance_play_time'
@@ -59,6 +60,14 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.jump-back-into-worlds.description',
 		defaultMessage:
 			'Show recently played worlds or instances in the "Jump in" section on the Home page.',
+	},
+	compactModeTitle: {
+		id: 'app.appearance-settings.compact-mode.title',
+		defaultMessage: 'Compact mode',
+	},
+	compactModeDescription: {
+		id: 'app.appearance-settings.compact-mode.description',
+		defaultMessage: 'Display library instances in a compact row layout.',
 	},
 	showPlayTimeTitle: {
 		id: 'app.appearance-settings.show-play-time.title',
@@ -167,6 +176,26 @@ watch(
 							const newValue = !themeStore.getFeatureFlag(worldsInHomeFlag)
 							themeStore.featureFlags[worldsInHomeFlag] = newValue
 							settings.feature_flags[worldsInHomeFlag] = newValue
+						}
+					"
+				/>
+			</div>
+
+			<div class="flex items-center justify-between gap-4">
+				<div>
+					<h3 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.compactModeTitle) }}
+					</h3>
+					<p class="m-0 mt-1">{{ formatMessage(messages.compactModeDescription) }}</p>
+				</div>
+				<Toggle
+					id="compact-mode"
+					:model-value="themeStore.getFeatureFlag(compactInstanceCardsFlag)"
+					@update:model-value="
+						() => {
+							const newValue = !themeStore.getFeatureFlag(compactInstanceCardsFlag)
+							themeStore.featureFlags[compactInstanceCardsFlag] = newValue
+							settings.feature_flags[compactInstanceCardsFlag] = newValue
 						}
 					"
 				/>
