@@ -122,23 +122,6 @@ export default defineNuxtConfig({
 		},
 	},
 	hooks: {
-		async 'nitro:config'(nitroConfig) {
-			const emailTemplates = Object.keys(
-				await import('./src/templates/emails/index.ts').then((m) => m.default),
-			)
-			const docTemplates = Object.keys(
-				await import('./src/templates/docs/index.ts').then((m) => m.default),
-			)
-
-			nitroConfig.prerender = nitroConfig.prerender || {}
-			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
-			for (const template of emailTemplates) {
-				nitroConfig.prerender.routes.push(`/_internal/templates/email/${template}`)
-			}
-			for (const template of docTemplates) {
-				nitroConfig.prerender.routes.push(`/_internal/templates/doc/${template}`)
-			}
-		},
 		async 'build:before'() {
 			// 30 minutes
 			const TTL = 30 * 60 * 1000
@@ -326,14 +309,12 @@ export default defineNuxtConfig({
 			redirect: '/_internal/templates/email/**',
 		},
 		'/_internal/templates/email/**': {
-			prerender: true,
 			headers: {
 				'Content-Type': 'text/html',
 				'Cache-Control': 'public, max-age=3600',
 			},
 		},
 		'/_internal/templates/doc/**': {
-			prerender: true,
 			headers: {
 				'Content-Type': 'text/html',
 				'Cache-Control': 'public, max-age=3600',
