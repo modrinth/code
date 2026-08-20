@@ -4640,9 +4640,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Vänförfrågningar"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Kommer snart!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Alla"
   },

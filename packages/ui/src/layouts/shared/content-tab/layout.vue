@@ -19,6 +19,7 @@ import {
 	TrashIcon,
 	UserIcon,
 } from '@modrinth/assets'
+import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -179,7 +180,9 @@ function getItemId(item: ContentItem) {
 }
 
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
-const sortMode = ref<SortMode>('alphabetical-asc')
+const sortMode = ctx.filterPersistKey
+	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, 'alphabetical-asc')
+	: ref<SortMode>('alphabetical-asc')
 
 const sortLabels: Record<SortMode, () => string> = {
 	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),

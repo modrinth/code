@@ -30,4 +30,5 @@ export function setupAuthProvider(auth: Awaited<ReturnType<typeof useAuth>>) {
 	})
 
 	provideAuth(authProvider)
+	return authProvider
 }

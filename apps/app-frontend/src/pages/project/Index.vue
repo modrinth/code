@@ -55,7 +55,7 @@
 			<InstanceIndicator v-if="instance && !projectInstallContext" :instance="instance" />
 			<template v-if="data">
 				<Teleport
-					v-if="themeStore.featureFlags.project_background"
+					v-if="appSettings.featureFlags.project_background"
 					to="#background-teleport-target"
 				>
 					<ProjectBackgroundGradient :project="data" />
@@ -294,6 +294,7 @@ import {
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import {
 	get_organization,
 	get_project,
@@ -317,7 +318,6 @@ import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
-import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
 
@@ -348,7 +348,7 @@ const projectBreadcrumbTo = computed(() => {
 	return currentRoute.fullPath
 })
 const queryClient = useQueryClient()
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({

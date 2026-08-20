@@ -4103,95 +4103,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Chế độ nhà phát triển</strong> đang được bật. Chế độ này cho phép bạn xem các ID nội bộ của nhiều thành phần trên Modrinth, hữu ích nếu bạn là nhà phát triển sử dụng API của Modrinth. Nhấp vào logo Modrinth ở cuối trang 5 lần để bật hoặc tắt chế độ nhà phát triển."
   },
-  "settings.display.flags.description": {
-    "message": "Bật hoặc tắt một số tính năng trên thiết bị này."
-  },
-  "settings.display.flags.title": {
-    "message": "Bật / Tắt tính năng"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Chế độ nhà phát triển đã bị tắt"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Chế độ nhà phát triển đã tắt"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Trang Gói dữ liệu"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Chọn bố cục hiển thị bạn ưa thích cho từng trang có danh sách dự án trên thiết bị này."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Trang mod"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Thư viện"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Lưới"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Hàng"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Trang modpack"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Trang plugin"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Trang gói tài nguyên"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Trang máy chủ"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Trang shader"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Bố cục danh sách dự án"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Trang hồ sơ người dùng"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Bộ sưu tập"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Bật chế độ kết xuất nâng cao như hiệu ứng làm mờ, có thể gây vấn đề hiệu năng nếu không có tăng tốc phần cứng."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Kết xuất nâng cao"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Mở các liên kết dẫn ra ngoài Modrinth trong tab mới. Bất kể cài đặt này, các liên kết cùng tên miền và trong mô tả Markdown sẽ mở trong cùng tab, còn các liên kết trong quảng cáo và trang chỉnh sửa sẽ mở trong tab mới."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Mở liên kết bên ngoài trong tab mới"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Ẩn các nút “Tải ứng dụng Modrinth” khỏi thanh điều hướng chính. Trang ứng dụng Modrinth vẫn có thể được tìm thấy ở trang chủ hoặc phần chân trang."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ẩn quảng bá ứng dụng Modrinth"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Thanh bên căn trái trên các trang nội dung"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Căn thanh bên sang bên trái nội dung trang."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Căn thanh bên bộ lọc sang bên phải kết quả tìm kiếm."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Thanh bên bộ lọc căn phải trên các trang tìm kiếm"
-  },
-  "settings.display.theme.description": {
-    "message": "Chọn chủ đề màu bạn ưa thích cho Modrinth trên thiết bị này."
-  },
-  "settings.display.theme.title": {
-    "message": "Chủ đề màu"
   },
   "settings.head-title": {
     "message": "Cài đặt hiển thị"

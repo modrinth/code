@@ -149,18 +149,6 @@
   "app.ads-consent.title": {
     "message": "Your privacy and how ads support Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Enable visual effects such as background blur. This may reduce performance without hardware acceleration."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Advanced rendering"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Choose the color theme used by Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Color theme"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
@@ -184,12 +172,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimize app"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Use your operating system's title bar and window controls. Requires an app restart."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "System window frame"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Show how long you've played each instance."
@@ -229,6 +211,15 @@
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Startup and navigation"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Use these behavior settings everywhere you're signed in. Turn this off to keep separate settings on this device."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Sign into a Modrinth account to sync settings."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Sync behavior across devices"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Adding server to instance"
@@ -1082,6 +1073,9 @@
   "app.library.sort.date-modified": {
     "message": "Date modified"
   },
+  "app.library.sort.game-version": {
+    "message": "Game version"
+  },
   "app.library.sort.hours-played": {
     "message": "Hours played"
   },
@@ -1090,6 +1084,9 @@
   },
   "app.library.sort.last-played": {
     "message": "Last played"
+  },
+  "app.library.sort.loader": {
+    "message": "Loader"
   },
   "app.library.sort.name": {
     "message": "Name"

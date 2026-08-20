@@ -1,25 +1,22 @@
 <script setup lang="ts" generic="T extends string">
 import { MoonIcon, RadioButtonCheckedIcon, RadioButtonIcon, SunIcon } from '@modrinth/assets'
 
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+
 const { formatMessage } = useVIntl()
 
-const { updateColorTheme, currentTheme, themeOptions, systemThemeColor } = defineProps<{
-	updateColorTheme: (theme: T) => void
-	currentTheme: T
+const { ariaLabel, modelValue, themeOptions, systemThemeColor } = defineProps<{
+	ariaLabel: string
+	modelValue: T
 	themeOptions: readonly T[]
 	systemThemeColor: T
 }>()
 
-const colorTheme = defineMessages({
-	title: {
-		id: 'settings.display.theme.title',
-		defaultMessage: 'Color theme',
-	},
-	description: {
-		id: 'settings.display.theme.description',
-		defaultMessage: 'Select your preferred color theme for Modrinth on this device.',
-	},
+const emit = defineEmits<{
+	'update:modelValue': [theme: T]
+}>()
+
+const themeLabels = defineMessages({
 	system: {
 		id: 'settings.display.theme.system',
 		defaultMessage: 'Sync with system',
@@ -40,6 +37,9 @@ const colorTheme = defineMessages({
 		id: 'settings.display.theme.retro',
 		defaultMessage: 'Retro',
 	},
+})
+
+const themeTooltips = defineMessages({
 	preferredLight: {
 		id: 'settings.display.theme.preferred-light-theme',
 		defaultMessage: 'Preferred light theme',
@@ -50,8 +50,9 @@ const colorTheme = defineMessages({
 	},
 })
 
-function asString(theme: T): string {
-	return theme
+function formatTheme(theme: T): string {
+	const message = themeLabels[theme as keyof typeof themeLabels]
+	return message ? formatMessage(message) : theme
 }
 
 function getPreviewClass(option: T): string {
@@ -61,34 +62,42 @@ function getPreviewClass(option: T): string {
 </script>
 
 <template>
-	<div class="theme-options mt-4">
+	<div class="theme-options" role="group" :aria-label="ariaLabel">
 		<button
 			v-for="option in themeOptions"
 			:key="option"
+			type="button"
 			class="preview-radio button-base"
-			:class="{ selected: currentTheme === option }"
-			@click="() => updateColorTheme(option)"
+			:class="{ selected: modelValue === option }"
+			:aria-pressed="modelValue === option"
+			@click="emit('update:modelValue', option)"
 		>
-			<div class="preview" :class="getPreviewClass(option)">
-				<div class="example-card card card">
+			<div class="preview" :class="getPreviewClass(option)" aria-hidden="true">
+				<div class="example-card rounded-lg border border-solid border-surface-4 bg-surface-3">
 					<div class="example-icon"></div>
 					<div class="example-text-1"></div>
 					<div class="example-text-2"></div>
 				</div>
 			</div>
 			<div class="label">
-				<RadioButtonCheckedIcon v-if="currentTheme === option" class="radio shrink-0" />
-				<RadioButtonIcon v-else class="radio shrink-0" />
-				{{ colorTheme[asString(option)] ? formatMessage(colorTheme[asString(option)]) : option }}
+				<RadioButtonCheckedIcon
+					v-if="modelValue === option"
+					class="radio shrink-0"
+					aria-hidden="true"
+				/>
+				<RadioButtonIcon v-else class="radio shrink-0" aria-hidden="true" />
+				{{ formatTheme(option) }}
 				<SunIcon
 					v-if="'light' === option"
-					v-tooltip="formatMessage(colorTheme.preferredLight)"
+					v-tooltip="formatMessage(themeTooltips.preferredLight)"
 					class="theme-icon shrink-0"
+					aria-hidden="true"
 				/>
 				<MoonIcon
 					v-else-if="'dark' === option"
-					v-tooltip="formatMessage(colorTheme.preferredDark)"
+					v-tooltip="formatMessage(themeTooltips.preferredDark)"
 					class="theme-icon shrink-0"
+					aria-hidden="true"
 				/>
 			</div>
 		</button>

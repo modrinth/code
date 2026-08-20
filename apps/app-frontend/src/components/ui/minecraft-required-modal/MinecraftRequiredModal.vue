@@ -63,9 +63,9 @@ import { inject, type Ref, ref } from 'vue'
 
 import steveImage from '@/assets/steve-look-up-left.webp'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { login as loginFlow, set_default_user } from '@/helpers/auth.js'
-import { handleSevereError } from '@/store/error.js'
 
 const { formatMessage } = useVIntl()
 const accountsCard = inject('accountsCard') as Ref<InstanceType<typeof AccountsCard> | null>

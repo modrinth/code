@@ -134,12 +134,6 @@
   "app.ads-consent.title": {
     "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Dựng hình nâng cao"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Màu chủ đề"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Trang chủ"
   },
@@ -160,12 +154,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Thu nhỏ launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Sử dụng khung cửa sổ hệ thống (yêu cầu khởi động lại ứng dụng)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Giao diện cửa sổ hệ thống"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Hiển thị thời gian bạn đã dành để chơi bằng một cấu hình."

@@ -4991,95 +4991,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>개발자 모드</strong>가 활성화되어 있습니다. 이를 통해 Modrinth API를 사용하는 개발자인 경우 도움이 될 수 있는 Modrinth 전체의 여러 내부 ID를 확인할 수 있습니다. 페이지 하단의 Modrinth 로고를 5번 클릭하여 개발자 모드를 전환합니다."
   },
-  "settings.display.flags.description": {
-    "message": "이 장치에서 특정 기능을 사용하거나 사용하지 않도록 설정합니다."
-  },
-  "settings.display.flags.title": {
-    "message": "기능 전환"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "개발자 모드가 비활성화 되었습니다"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "개발자 모드 비활성화됨"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "데이터 팩 페이지"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "이 장치에서 프로젝트 목록을 표시하는 각 페이지에 대해 원하는 레이아웃을 선택합니다."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "모드 페이지"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "갤러리"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "그리드"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "행"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "모드팩 페이지"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "플러그인 페이지"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "리소스 팩 페이지"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "서버 페이지"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "셰이더 페이지"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "프로젝트 목록 레이아웃"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "사용자 프로필 페이지"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "컬렉션"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "하드웨어 가속 렌더링이 없으면 성능 문제를 일으킬 수 있는 고급 렌더링을 활성화합니다."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "고급 렌더링"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Modrinth 외부로 나가는 링크를 새 탭에서 엽니다. 이 설정에 상관없이 동일한 도메인과 마크다운 설명의 링크가 같은 탭에서 열리고 광고 및 편집 페이지의 링크가 새 탭에서 열립니다."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "새 탭에서 외부 링크 열기"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "기본 네비게이선에서 \"Modrinth App 받기\" 버튼을 숨깁니다. Modrinth App 페이지는 여전히 시작 페이지 또는 하단에서 찾을 수 있습니다."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth 앱 프로모션 숨기기"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "콘텐츠 페이지에서 사이드바를 왼쪽으로 정렬"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "사이드바를 페이지 콘텐츠의 왼쪽에 정렬합니다."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "필터 사이드바를 검색 결과 페이지의 오른쪽에 정렬합니다."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "검색 페이지에서 필터 사이드바를 오른쪽으로 정렬"
-  },
-  "settings.display.theme.description": {
-    "message": "이 디바이스에서 선호하는 Modrinth 의 색상 테마를 선택합니다."
-  },
-  "settings.display.theme.title": {
-    "message": "색상 테마"
   },
   "settings.head-title": {
     "message": "디스플레이 설정"

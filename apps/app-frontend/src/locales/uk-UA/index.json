@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Ваша приватність та як реклама підтримує Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Умикає візуальні ефекти, як-от розмиття фону. Це може знизити продуктивність без апаратного прискорення."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Розширене промальовування"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Оберіть тему для Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Колірна тема"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Головна"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Згортати застосунок"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Використовувати заголовок вікна та елементи керування вашої операційної системи. Потребує перезапуску застосунку."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Системна рамка вікна"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показувати награний час для кожної збірки."

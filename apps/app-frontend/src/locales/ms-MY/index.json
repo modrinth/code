@@ -53,12 +53,6 @@
   "app.action-bar.view-logs": {
     "message": "Lihat log"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Pemaparan lanjutan"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema warna"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Laman utama"
   },
@@ -79,12 +73,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimumkan pelancar"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gunakan bingkai tetingkap sistem (aplikasi perlu dimulakan semula)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Hiasan asli"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
     "message": "Melangkau pengesahan berisiko rendah secara automatik seperti pemasangan pek mod pendua, pemadaman kandungan biasa, kemas kini pukal, menyahpautkan pek mod dan gesaan pembaikan. Amaran berbahaya masih akan ditunjukkan."

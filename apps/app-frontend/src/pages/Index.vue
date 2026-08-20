@@ -9,12 +9,12 @@ import LibrarySection from '@/components/ui/library/index.vue'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { toError } from '@/helpers/errors'
 import { list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
-import { useTheming } from '@/store/theme.ts'
 
 defineOptions({
 	name: 'LibraryPage',
@@ -25,7 +25,7 @@ const { formatMessage } = useVIntl()
 const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
 const showCreationModal = inject<() => void>('showCreationModal')
 const pageOptions = ref<InstanceType<typeof ContextMenu>>()
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 
 const messages = defineMessages({
 	home: {
@@ -106,7 +106,7 @@ function handlePageOption({ option }: { option: string }) {
 		@contextmenu="openPageContextMenu"
 	>
 		<RecentWorldsList
-			v-if="recentInstances?.length > 0 && themeStore.getFeatureFlag('worlds_in_home')"
+			v-if="recentInstances?.length > 0 && appSettings.getFeatureFlag('worlds_in_home')"
 			:recent-instances="recentInstances"
 		/>
 		<LibrarySection :instances="instances" />

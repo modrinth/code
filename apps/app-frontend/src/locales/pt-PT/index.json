@@ -140,12 +140,6 @@
   "app.ads-consent.title": {
     "message": "A sua privacidade e como os anúncios são financiados pela Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Renderização avançada"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Cor de tema"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Casa"
   },
@@ -166,12 +160,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimizar launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Utilizar a moldura da janela do sistema (é necessário reiniciar a aplicação)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Decorações nativas"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Apresenta quanto tempo passou a jogar uma instância."
