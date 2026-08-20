@@ -529,12 +529,12 @@ pub async fn create_mrpack_json(
     )
     .await?
     .into_iter()
-    .filter_map(|(path, file)| match file.metadata {
-        Some(metadata) => Some((path, metadata.version_id)),
-        _ => None,
+    .filter_map(|(path, file)| {
+        file.metadata
+            .map(|metadata| (path, file.hash, metadata.version_id))
     })
     .collect::<Vec<_>>();
-    let version_ids = projects.iter().map(|x| &*x.1).collect::<Vec<_>>();
+    let version_ids = projects.iter().map(|x| &*x.2).collect::<Vec<_>>();
     let versions = CachedEntry::get_version_v3_many(
         &version_ids,
         Some(CacheBehaviour::MustRevalidate),
@@ -544,43 +544,38 @@ pub async fn create_mrpack_json(
     .await?;
     let files = projects
         .into_iter()
-        .filter_map(|(path, version_id)| {
-            if let Some(version) = versions.iter().find(|x| x.id == version_id)
-            {
-                let env = get_mrpack_environment(version.environment);
-                let Some(primary_file) = version.files.first() else {
-                    return Some(Err(crate::ErrorKind::OtherError(format!(
-                        "No primary file found for mod at: {path}"
-                    ))
-                    .as_error()));
-                };
-                let file_size = primary_file.size;
-                let downloads = vec![primary_file.url.clone()];
-                let hashes = primary_file
-                    .hashes
-                    .clone()
-                    .into_iter()
-                    .map(|(h1, h2)| (PackFileHash::from(h1), h2))
-                    .collect();
+        .filter_map(|(path, hash, version_id)| {
+            let version = versions.iter().find(|x| x.id == version_id)?;
+            let env = get_mrpack_environment(version.environment);
+            let file = version.files.iter().find(|file| {
+                file.hashes
+                    .get("sha1")
+                    .is_some_and(|file_hash| file_hash == &hash)
+            })?;
+            let file_size = file.size;
+            let downloads = vec![file.url.clone()];
+            let hashes = file
+                .hashes
+                .clone()
+                .into_iter()
+                .map(|(h1, h2)| (PackFileHash::from(h1), h2))
+                .collect();
 
-                Some(Ok(PackFile {
-                    path: match path.try_into() {
-                        Ok(path) => path,
-                        Err(_) => {
-                            return Some(Err(crate::ErrorKind::OtherError(
-                                "Invalid file path in project".into(),
-                            )
-                            .as_error()));
-                        }
-                    },
-                    hashes,
-                    env: Some(env),
-                    downloads,
-                    file_size,
-                }))
-            } else {
-                None
-            }
+            Some(Ok(PackFile {
+                path: match path.try_into() {
+                    Ok(path) => path,
+                    Err(_) => {
+                        return Some(Err(crate::ErrorKind::OtherError(
+                            "Invalid file path in project".into(),
+                        )
+                        .as_error()));
+                    }
+                },
+                hashes,
+                env: Some(env),
+                downloads,
+                file_size,
+            }))
         })
         .collect::<crate::Result<Vec<PackFile>>>()?;
 
