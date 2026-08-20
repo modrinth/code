@@ -14,7 +14,9 @@ import {
 import type { Ref } from 'vue'
 
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
+import { useVisitorUserAgent } from '~/composables/visitor-user-agent.ts'
 import { withStagingArchonBaseUrl } from '~/helpers/archon.ts'
+import { getFrontendUserAgent, VISITOR_USER_AGENT_HEADER } from '~/helpers/user-agent.ts'
 
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 	try {
@@ -33,10 +35,12 @@ export function createModrinthClient(
 		apiBaseUrl: string
 		archonBaseUrl: string
 		sharedInstancesBaseUrl: string
+		commitHash: string
 		rateLimitKey?: string
 	},
 ): NuxtModrinthClient {
 	const flags = useFeatureFlags()
+	const visitorUserAgent = useVisitorUserAgent()
 	const optionalFeatures = [
 		import.meta.dev ? (new VerboseLoggingFeature() as AbstractFeature) : undefined,
 	].filter(Boolean) as AbstractFeature[]
@@ -46,6 +50,8 @@ export function createModrinthClient(
 		archonBaseUrl: () =>
 			withStagingArchonBaseUrl(config.archonBaseUrl, flags.value.archonApiStaging),
 		sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
+		userAgent: () => (import.meta.server ? getFrontendUserAgent(config.commitHash) : undefined),
+		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
 		archonSentryCapture: () => flags.value.archonSentryCapture,
 		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features: [

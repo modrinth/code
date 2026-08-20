@@ -3,7 +3,9 @@
  * This composable is kept for legacy code that hasn't been migrated yet.
  */
 
+import { useVisitorUserAgent } from '~/composables/visitor-user-agent.ts'
 import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
+import { getFrontendUserAgent, VISITOR_USER_AGENT_HEADER } from '~/helpers/user-agent.ts'
 
 let cachedRateLimitKey = undefined
 let rateLimitKeyPromise = undefined
@@ -40,6 +42,12 @@ export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
 
 	if (import.meta.server) {
 		options.headers['x-ratelimit-key'] = await getRateLimitKey(config)
+		options.headers['User-Agent'] = getFrontendUserAgent(config.public.hash)
+
+		const visitorUserAgent = useVisitorUserAgent()
+		if (visitorUserAgent) {
+			options.headers[VISITOR_USER_AGENT_HEADER] = visitorUserAgent
+		}
 	}
 
 	if (!skipAuth) {

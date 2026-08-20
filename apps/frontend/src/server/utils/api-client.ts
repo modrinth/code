@@ -5,7 +5,9 @@ import {
 	type NuxtClientConfig,
 	NuxtModrinthClient,
 } from '@modrinth/api-client'
-import type { H3Event } from 'h3'
+import { getRequestHeader, type H3Event } from 'h3'
+
+import { getFrontendUserAgent, VISITOR_USER_AGENT_HEADER } from '~/helpers/user-agent'
 
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 	try {
@@ -28,6 +30,10 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 	const sharedInstancesBaseUrl =
 		config.sharedInstancesBaseUrl || config.public.sharedInstancesBaseUrl
 
+	const visitorUserAgent = options?.event
+		? getRequestHeader(options.event, 'user-agent')
+		: undefined
+
 	const features = []
 
 	if (options?.authToken) {
@@ -42,6 +48,8 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: apiBaseUrl,
 		sharedInstancesBaseUrl,
+		userAgent: getFrontendUserAgent(config.public.hash),
+		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
 		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features,
 	}
