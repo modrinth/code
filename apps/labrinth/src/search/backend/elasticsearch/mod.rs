@@ -688,6 +688,11 @@ impl Elasticsearch {
                     "compatible_dependency_project_ids": {
                         "type": "keyword"
                     },
+                    "disclosure_types": {"type": "keyword"},
+                    "required_dependency_project_ids": {"type": "keyword"},
+                    "optional_dependency_project_ids": {"type": "keyword"},
+                    "embedded_dependency_project_ids": {"type": "keyword"},
+                    "incompatible_dependency_project_ids": {"type": "keyword"},
                     "project_loader_fields": {
                         "type": "object",
                         "enabled": false
@@ -905,6 +910,7 @@ impl Elasticsearch {
                 let mut document = hit["_source"].clone();
                 let object = document.as_object_mut()?;
                 object.remove("document_type");
+                object.remove("_search_tokens");
                 if filter
                     .as_ref()
                     .is_some_and(|filter| filter.has_version_filter)

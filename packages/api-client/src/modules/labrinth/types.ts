@@ -1301,6 +1301,80 @@ export namespace Labrinth {
 				projects: Project[]
 				versions: Labrinth.Versions.v3.Version[]
 			}
+
+			export type TelemetryConsent = 'opt_in' | 'opt_out' | 'always_active'
+
+			export type AiUsage = 'code' | 'assets' | 'text' | 'functionality'
+
+			export type DisclosureLockStatus = 'unlocked' | 'cannot_disable' | 'fully_locked'
+
+			export type DerivativeSource = {
+				label: string
+				link?: string | null
+				note?: string | null
+			}
+
+			export type ProjectDisclosure =
+				| {
+						type: 'ai_content'
+						uses: AiUsage[]
+						note?: string | null
+				  }
+				| {
+						type: 'advertisements'
+						note?: string | null
+				  }
+				| {
+						type: 'epilepsy_triggers'
+						note?: string | null
+				  }
+				| {
+						type: 'system_interactions'
+						interactions: string[]
+						note?: string | null
+				  }
+				| {
+						type: 'telemetry'
+						consent: TelemetryConsent
+						data_collected: string[]
+				  }
+				| {
+						type: 'derivative_work'
+						sources: DerivativeSource[]
+				  }
+				| {
+						type: 'paid_features'
+						features: string[]
+				  }
+				| {
+						type: 'archived'
+						note?: string | null
+				  }
+
+			export type ProjectDisclosureData = ProjectDisclosure & {
+				set_by_moderator: boolean
+				lock_status: DisclosureLockStatus
+				updated_at: string
+				updated_by?: string | null
+				deleted_at?: string | null
+			}
+
+			export type ProjectDisclosureType = ProjectDisclosure['type']
+
+			export type ProjectDisclosureOf<T extends ProjectDisclosureType> = Extract<
+				ProjectDisclosureData,
+				{ type: T }
+			>
+
+			export type GetProjectDisclosures = {
+				disclosures: ProjectDisclosureData[]
+			}
+
+			export type ModifyProjectDisclosures = {
+				set: ProjectDisclosure[]
+				remove: ProjectDisclosureType[]
+				lock_status?: DisclosureLockStatus | null
+			}
 		}
 	}
 
@@ -1636,6 +1710,69 @@ export namespace Labrinth {
 			export type Role = Common.Role
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
+			export type Theme = 'light' | 'dark' | 'oled' | 'retro'
+			export type LayoutOption = 'grid' | 'rows'
+			export type FriendPrivacy = 'none' | 'mutual' | 'everyone'
+			export type InvitePrivacy = 'none' | 'friends' | 'everyone'
+
+			export type AppearancePreferences = {
+				auto: boolean
+				theme: Theme
+			}
+
+			export type BehaviorPreferences = {
+				minimize_app: boolean
+				hide_right_sidebar: boolean
+				show_jump_in: boolean
+				show_play_time: boolean
+				hide_nametag: boolean
+				warn_on_unknown_modpacks: boolean
+				skip_non_essential_warnings: boolean
+			}
+
+			export type LocalizationPreferences = {
+				locale: string
+			}
+
+			export type LayoutPreferences = {
+				mods: LayoutOption
+				plugins: LayoutOption
+				datapacks: LayoutOption
+				shaders: LayoutOption
+				resourcepacks: LayoutOption
+				modpacks: LayoutOption
+				servers: LayoutOption
+				users: LayoutOption
+			}
+
+			export type SidebarPreferences = {
+				right_aligned_search: boolean
+				left_aligned_content: boolean
+			}
+
+			export type SocialPreferences = {
+				friend_privacy: FriendPrivacy
+				shared_instances_privacy: InvitePrivacy
+				hosting_access_privacy: InvitePrivacy
+			}
+
+			export type UserPreferences = {
+				appearance: AppearancePreferences
+				behavior: BehaviorPreferences
+				localization: LocalizationPreferences
+				layouts: LayoutPreferences
+				sidebars: SidebarPreferences
+				social: SocialPreferences
+			}
+
+			export type PartialUserPreferences = {
+				appearance?: Partial<AppearancePreferences>
+				behavior?: Partial<BehaviorPreferences>
+				localization?: Partial<LocalizationPreferences>
+				layouts?: Partial<LayoutPreferences>
+				sidebars?: Partial<SidebarPreferences>
+				social?: Partial<SocialPreferences>
+			}
 
 			export type Pride26CampaignDonation = {
 				last_donated_at: string
@@ -1810,6 +1947,7 @@ export namespace Labrinth {
 				license: string
 				client_side: string
 				server_side: string
+				disclosure_types: string[]
 				gallery: string[]
 				featured_gallery: string | null
 				color: number | null
@@ -1825,7 +1963,7 @@ export namespace Labrinth {
 
 		export namespace v3 {
 			export interface ResultSearchProject {
-				version_id: string
+				version_id?: string
 				project_id: string
 				project_types: string[]
 				all_project_types: string[]
@@ -1855,6 +1993,7 @@ export namespace Labrinth {
 				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
 				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
 				minecraft_mod?: unknown | null
+				disclosure_types: string[]
 			}
 
 			export interface SearchResults {

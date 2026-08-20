@@ -15,6 +15,9 @@ use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::disclosures::{
+    DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureType,
+};
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
@@ -22,8 +25,9 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{
     MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
 };
-use crate::models::teams::ProjectPermissions;
+use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
+use crate::models::users::DELETED_USER;
 use crate::models::{self, exp};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -41,6 +45,7 @@ use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use rand::seq::SliceRandom;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
@@ -268,7 +273,7 @@ pub async fn projects_get(
     Ok(HttpResponse::Ok().json(projects))
 }
 
-/// Get a project.  
+/// Get a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = Project))
@@ -403,7 +408,7 @@ pub struct EditProject {
 }
 
 #[allow(clippy::too_many_arguments)]
-/// Update a project.  
+/// Update a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -426,6 +431,7 @@ pub async fn project_edit(
         redis,
         session_queue,
         search_state,
+        false,
     )
     .await
 }
@@ -438,6 +444,7 @@ pub async fn project_edit_internal(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    sync_archival_disclosure: bool,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -538,105 +545,142 @@ pub async fn project_edit_internal(
             )));
         }
 
-        if !(user.role.is_mod()
-            || !project_item.inner.status.is_approved()
-                && status == &ProjectStatus::Processing
-            || project_item.inner.status.is_approved()
-                && status.can_be_requested())
-        {
-            return Err(ApiError::Auth(eyre::eyre!(
-                "You don't have permission to set this status!",
-            )));
-        }
+        let archival_disclosure =
+            db_models::DBProjectDisclosure::get_many_for_project(
+                project_item.inner.id,
+                false,
+                &mut transaction,
+            )
+            .await
+            .wrap_internal_err("failed to fetch project disclosures")?
+            .into_iter()
+            .find(|disclosure| {
+                matches!(
+                    disclosure.disclosure,
+                    ProjectDisclosure::Archived { .. }
+                )
+            });
+        let has_archived_disclosure = archival_disclosure.is_some();
 
-        // If a moderator (non-admin) is completing a review while another moderator holds an
-        // active checklist lock, block them from changing the project status.
-        if user.role.is_mod()
-            && !user.role.is_admin()
-            && project_item.inner.status == ProjectStatus::Processing
-            && status != &ProjectStatus::Processing
-            && let Some(lock) =
-                DBModerationLock::get_with_user(project_item.inner.id, &pool)
-                    .await
-                    .wrap_internal_err(
-                        "fetching moderation lock from database",
-                    )?
-            && lock.moderator_id != db_ids::DBUserId::from(user.id)
-            && !lock.expired
-        {
-            return Err(ApiError::Auth(eyre::eyre!(format!(
-                "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
-                lock.moderator_username
-            ))));
-        }
+        if status == &ProjectStatus::Archived {
+            if !has_archived_disclosure {
+                db_models::DBProjectDisclosure {
+                    project_id: project_item.inner.id,
+                    disclosure: ProjectDisclosure::Archived { note: None },
+                    updated_at: Utc::now(),
+                    updated_by: user.id.into(),
+                    set_by_moderator: user.role.is_mod(),
+                    deleted_at: None,
+                    lock_status: DisclosureLockStatus::Unlocked,
+                }
+                .upsert(&mut transaction)
+                .await
+                .wrap_internal_err("failed to upsert archival disclosure")?;
+            }
+        } else {
+            if !(user.role.is_mod()
+                || !project_item.inner.status.is_approved()
+                    && status == &ProjectStatus::Processing
+                || project_item.inner.status.is_approved()
+                    && status.can_be_requested())
+            {
+                return Err(ApiError::Auth(eyre::eyre!(
+                    "You don't have permission to set this status!",
+                )));
+            }
 
-        if status == &ProjectStatus::Processing {
-            if project_item.versions.is_empty() {
-                return Err(ApiError::Request(eyre::eyre!(String::from(
-                    "Project submitted for review with no initial versions",
+            // If a moderator (non-admin) is completing a review while another moderator holds an
+            // active checklist lock, block them from changing the project status.
+            if user.role.is_mod()
+                && !user.role.is_admin()
+                && project_item.inner.status == ProjectStatus::Processing
+                && status != &ProjectStatus::Processing
+                && let Some(lock) = DBModerationLock::get_with_user(
+                    project_item.inner.id,
+                    &pool,
+                )
+                .await
+                .wrap_internal_err("fetching moderation lock from database")?
+                && lock.moderator_id != db_ids::DBUserId::from(user.id)
+                && !lock.expired
+            {
+                return Err(ApiError::Auth(eyre::eyre!(format!(
+                    "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
+                    lock.moderator_username
                 ))));
             }
 
-            sqlx::query!(
-                "
-                UPDATE mods
-                SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
-                WHERE (id = $1)
-                ",
-                id as db_ids::DBProjectId,
-            )
-            .execute(&mut transaction)
-            .await.wrap_internal_err("querying database for `project_edit_internal`")?;
-        }
+            if status == &ProjectStatus::Processing {
+                if project_item.versions.is_empty() {
+                    return Err(ApiError::Request(eyre::eyre!(String::from(
+                        "Project submitted for review with no initial versions",
+                    ))));
+                }
 
-        if status.is_approved() && !project_item.inner.status.is_approved() {
-            sqlx::query!(
-                "
-                UPDATE mods
-                SET approved = NOW()
-                WHERE id = $1 AND approved IS NULL
-                ",
-                id as db_ids::DBProjectId,
-            )
-            .execute(&mut transaction)
-            .await
-            .wrap_internal_err(
-                "querying database for `project_edit_internal`",
-            )?;
-        }
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
+                    WHERE (id = $1)
+                    ",
+                    id as db_ids::DBProjectId,
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err(
+                    "querying database for `project_edit_internal`",
+                )?;
+            }
 
-        if status.is_searchable()
-            && !project_item.inner.webhook_sent
-            && !ENV.PUBLIC_DISCORD_WEBHOOK.is_empty()
-            && project_item.inner.components.minecraft_server.is_none()
-        {
-            crate::util::webhook::send_discord_webhook(
-                project_item.inner.id.into(),
-                &pool,
-                &redis,
-                &ENV.PUBLIC_DISCORD_WEBHOOK,
-                None,
-            )
-            .await
-            .ok();
+            if status.is_approved() && !project_item.inner.status.is_approved()
+            {
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET approved = NOW()
+                    WHERE id = $1 AND approved IS NULL
+                    ",
+                    id as db_ids::DBProjectId,
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err(
+                    "querying database for `project_edit_internal`",
+                )?;
+            }
 
-            sqlx::query!(
-                "
+            if status.is_searchable()
+                && !project_item.inner.webhook_sent
+                && !ENV.PUBLIC_DISCORD_WEBHOOK.is_empty()
+                && project_item.inner.components.minecraft_server.is_none()
+            {
+                crate::util::webhook::send_discord_webhook(
+                    project_item.inner.id.into(),
+                    &pool,
+                    &redis,
+                    &ENV.PUBLIC_DISCORD_WEBHOOK,
+                    None,
+                )
+                .await
+                .ok();
+
+                sqlx::query!(
+                    "
                     UPDATE mods
                     SET webhook_sent = TRUE
                     WHERE id = $1
                     ",
-                id as db_ids::DBProjectId,
-            )
-            .execute(&mut transaction)
-            .await
-            .wrap_internal_err(
-                "querying database for `project_edit_internal`",
-            )?;
-        }
+                    id as db_ids::DBProjectId,
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err(
+                    "querying database for `project_edit_internal`",
+                )?;
+            }
 
-        if user.role.is_mod() && !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
-            crate::util::webhook::send_slack_project_webhook(
+            if user.role.is_mod() && !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
+                crate::util::webhook::send_slack_project_webhook(
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
@@ -655,83 +699,103 @@ pub async fn project_edit_internal(
                 )
                 .await
                 .ok();
-        }
-
-        if team_member.is_none_or(|x| !x.accepted) {
-            let notified_members = sqlx::query!(
-                "
-                SELECT tm.user_id id
-                FROM team_members tm
-                WHERE tm.team_id = $1 AND tm.accepted
-                ",
-                project_item.inner.team_id as db_ids::DBTeamId
-            )
-            .fetch(&mut transaction)
-            .map_ok(|c| db_models::DBUserId(c.id))
-            .try_collect::<Vec<_>>()
-            .await
-            .wrap_internal_err("fetching notified members from database")?;
-
-            NotificationBuilder {
-                body: NotificationBody::StatusChange {
-                    project_id: project_item.inner.id.into(),
-                    old_status: project_item.inner.status,
-                    new_status: *status,
-                },
             }
-            .insert_many(notified_members.clone(), &mut transaction, &redis)
-            .await
-            .wrap_internal_err(
-                "inserting database records for `project_edit_internal`",
-            )?;
 
-            NotificationBuilder {
-                body: if status.is_approved() {
-                    NotificationBody::ProjectStatusApproved {
-                        project_id: project_item.inner.id.into(),
-                    }
-                } else {
-                    NotificationBody::ProjectStatusNeutral {
+            if team_member.is_none_or(|x| !x.accepted) {
+                let notified_members = sqlx::query!(
+                    "
+                    SELECT tm.user_id id
+                    FROM team_members tm
+                    WHERE tm.team_id = $1 AND tm.accepted
+                    ",
+                    project_item.inner.team_id as db_ids::DBTeamId
+                )
+                .fetch(&mut transaction)
+                .map_ok(|c| db_models::DBUserId(c.id))
+                .try_collect::<Vec<_>>()
+                .await
+                .wrap_internal_err("fetching notified members from database")?;
+
+                NotificationBuilder {
+                    body: NotificationBody::StatusChange {
                         project_id: project_item.inner.id.into(),
                         old_status: project_item.inner.status,
                         new_status: *status,
-                    }
-                },
+                    },
+                }
+                .insert_many(notified_members.clone(), &mut transaction, &redis)
+                .await
+                .wrap_internal_err(
+                    "inserting database records for `project_edit_internal`",
+                )?;
+
+                NotificationBuilder {
+                    body: if status.is_approved() {
+                        NotificationBody::ProjectStatusApproved {
+                            project_id: project_item.inner.id.into(),
+                        }
+                    } else {
+                        NotificationBody::ProjectStatusNeutral {
+                            project_id: project_item.inner.id.into(),
+                            old_status: project_item.inner.status,
+                            new_status: *status,
+                        }
+                    },
+                }
+                .insert_many(notified_members, &mut transaction, &redis)
+                .await
+                .wrap_internal_err(
+                    "inserting database records for `project_edit_internal`",
+                )?;
             }
-            .insert_many(notified_members, &mut transaction, &redis)
+
+            ThreadMessageBuilder {
+                author_id: Some(user.id.into()),
+                body: MessageBody::StatusChange {
+                    new_status: *status,
+                    old_status: project_item.inner.status,
+                },
+                thread_id: project_item.thread_id,
+                hide_identity: user.role.is_mod(),
+            }
+            .insert(&mut transaction)
             .await
             .wrap_internal_err(
                 "inserting database records for `project_edit_internal`",
             )?;
-        }
 
-        ThreadMessageBuilder {
-            author_id: Some(user.id.into()),
-            body: MessageBody::StatusChange {
-                new_status: *status,
-                old_status: project_item.inner.status,
-            },
-            thread_id: project_item.thread_id,
-            hide_identity: user.role.is_mod(),
-        }
-        .insert(&mut transaction)
-        .await
-        .wrap_internal_err(
-            "inserting database records for `project_edit_internal`",
-        )?;
+            sqlx::query!(
+                "
+                UPDATE mods
+                SET status = $1
+                WHERE (id = $2)
+                ",
+                status.as_str(),
+                id as db_ids::DBProjectId,
+            )
+            .execute(&mut transaction)
+            .await
+            .wrap_internal_err(
+                "querying database for `project_edit_internal`",
+            )?;
 
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET status = $1
-            WHERE (id = $2)
-            ",
-            status.as_str(),
-            id as db_ids::DBProjectId,
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_internal_err("querying database for `project_edit_internal`")?;
+            if sync_archival_disclosure
+                && archival_disclosure.is_some_and(|disclosure| {
+                    user.role.is_mod()
+                        || disclosure.lock_status.allows_removal()
+                })
+            {
+                db_models::DBProjectDisclosure::remove(
+                    project_item.inner.id,
+                    ProjectDisclosureType::Archived,
+                    user.id.into(),
+                    user.role.is_mod(),
+                    &mut transaction,
+                )
+                .await
+                .wrap_internal_err("failed to remove archival disclosure")?;
+            }
+        }
     }
 
     if let Some(requested_status) = &new_project.requested_status {
@@ -1195,6 +1259,14 @@ pub async fn project_edit_internal(
 
     let mut reindex_versions = new_project.categories.is_some()
         || new_project.additional_categories.is_some();
+    let became_searchable = !project_item.inner.status.is_searchable()
+        && new_project
+            .status
+            .is_some_and(|status| status.is_searchable());
+    let became_unsearchable = project_item.inner.status.is_searchable()
+        && new_project
+            .status
+            .is_some_and(|status| !status.is_searchable());
 
     reindex_versions |= update(
         &mut transaction,
@@ -1272,7 +1344,7 @@ pub async fn project_edit_internal(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-    if reindex_versions {
+    if became_unsearchable {
         db_models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
@@ -1283,10 +1355,20 @@ pub async fn project_edit_internal(
         .wrap_internal_err("clearing cached data from Redis")?;
         search_state
             .queue
-            .push_version_changes(
-                project_item.inner.id.into(),
-                project_item.versions.iter().copied().map(VersionId::from),
-            )
+            .push_project_removal(project_item.inner.id.into())
+            .await;
+    } else if reindex_versions || became_searchable {
+        db_models::DBProject::clear_cache(
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+            &redis,
+        )
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
+        search_state
+            .queue
+            .push_project_with_all_versions_change(project_item.inner.id.into())
             .await;
     } else {
         clear_project_cache_and_queue_search(
@@ -1298,17 +1380,6 @@ pub async fn project_edit_internal(
         )
         .await
         .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
-    }
-
-    // Remove no longer searchable projects from search index
-    if let (true, Some(false)) = (
-        project_item.inner.status.is_searchable(),
-        new_project.status.map(|status| status.is_searchable()),
-    ) {
-        search_state
-            .queue
-            .push_project_removal(project_item.inner.id.into())
-            .await;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1365,7 +1436,7 @@ pub async fn edit_project_categories(
 //     pub total_hits: usize,
 // }
 
-/// Search projects.  
+/// Search projects.
 #[utoipa::path(
 	tag = "search",
     get,
@@ -1412,7 +1483,7 @@ pub async fn project_search(
 }
 
 // for more complicated search queries
-/// Search projects.  
+/// Search projects.
 #[utoipa::path(
 	tag = "search",
 	request_body = serde_json::Value,
@@ -1432,7 +1503,7 @@ pub async fn project_search_post(
 }
 
 //checks the validity of a project id or slug
-/// Check project availability.  
+/// Check project availability.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = ProjectCheckResponse))
@@ -1472,7 +1543,7 @@ pub struct DependencyInfo {
     pub versions: Vec<models::projects::Version>,
 }
 
-/// List project dependencies.  
+/// List project dependencies.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = DependencyInfo))
@@ -1878,7 +1949,6 @@ pub async fn projects_edit(
         changed_projects.push((
             project.inner.id,
             project.inner.slug,
-            project.versions,
             reindex_versions,
         ));
     }
@@ -1888,17 +1958,14 @@ pub async fn projects_edit(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-    for (project_id, slug, versions, reindex_versions) in changed_projects {
+    for (project_id, slug, reindex_versions) in changed_projects {
         if reindex_versions {
             db_models::DBProject::clear_cache(project_id, slug, None, &redis)
                 .await
                 .wrap_internal_err("clearing cached data from Redis")?;
             search_state
                 .queue
-                .push_version_changes(
-                    project_id.into(),
-                    versions.into_iter().map(VersionId::from),
-                )
+                .push_project_with_all_versions_change(project_id.into())
                 .await;
         } else {
             clear_project_cache_and_queue_search(
@@ -1996,7 +2063,7 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-/// Update a project icon.  
+/// Update a project icon.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2160,7 +2227,7 @@ pub async fn project_icon_edit_internal(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-/// Delete a project icon.  
+/// Delete a project icon.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -2301,7 +2368,7 @@ pub struct GalleryCreateQuery {
 }
 
 #[allow(clippy::too_many_arguments)]
-/// Add a gallery item.  
+/// Add a gallery item.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2524,7 +2591,7 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
-/// Update a gallery item.  
+/// Update a gallery item.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2746,7 +2813,7 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
-/// Delete a gallery item.  
+/// Delete a gallery item.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -2901,7 +2968,7 @@ pub async fn delete_gallery_item_internal(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-/// Delete a project.  
+/// Delete a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -2986,6 +3053,169 @@ pub async fn project_delete_internal(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
+
+    // rejected & withheld projects are transferred to ghost so moderation data is preserved
+    if matches!(
+        project.inner.status,
+        ProjectStatus::Rejected | ProjectStatus::Withheld
+    ) {
+        let deleted_user: db_ids::DBUserId = DELETED_USER.into();
+
+        let deleted_slug = if let Some(slug) = &project.inner.slug {
+            let candidate = format!(
+                "{slug}--deleted-{}",
+                ProjectId::from(project.inner.id)
+            );
+            if candidate.len() <= 255 {
+                let taken = sqlx::query!(
+                    r#"
+                    SELECT EXISTS(
+                        SELECT 1 FROM mods
+                        WHERE
+                            (slug = LOWER($1) OR text_id_lower = LOWER($1))
+                            AND id != $2
+                    ) AS "exists!"
+                    "#,
+                    candidate,
+                    project.inner.id as db_ids::DBProjectId,
+                )
+                .fetch_one(&mut transaction)
+                .await
+                .wrap_internal_err("checking deleted slug availability")?
+                .exists;
+
+                if !taken {
+                    Some(candidate.to_lowercase())
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET organization_id = NULL, slug = COALESCE($1, slug)
+            WHERE id = $2
+            ",
+            deleted_slug,
+            project.inner.id as db_ids::DBProjectId,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err(
+            "failed to detach project from organization and update slug",
+        )?;
+
+        let affected_user_ids = sqlx::query!(
+            "
+            DELETE FROM team_members
+            WHERE team_id = $1
+            RETURNING user_id
+            ",
+            project.inner.team_id as db_ids::DBTeamId,
+        )
+        .fetch(&mut transaction)
+        .map_ok(|x| db_ids::DBUserId(x.user_id))
+        .try_collect::<Vec<_>>()
+        .await
+        .wrap_internal_err("failed to remove project team members")?;
+
+        let new_member_id = db_ids::generate_team_member_id(&mut transaction)
+            .await
+            .wrap_internal_err("failed to generate team member ID")?;
+        DBTeamMember {
+            id: new_member_id,
+            team_id: project.inner.team_id,
+            user_id: deleted_user,
+            role: DEFAULT_ROLE.to_owned(),
+            is_owner: true,
+            permissions: ProjectPermissions::all(),
+            organization_permissions: None,
+            accepted: true,
+            payouts_split: Decimal::ZERO,
+            ordering: 0,
+        }
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err("failed to transfer project ownership to ghost")?;
+
+        ThreadMessageBuilder {
+            author_id: Some(deleted_user),
+            body: MessageBody::Text {
+                body: format!(
+                    "Project transferred to Ghost when user account `{}` (`{}`) deleted this project",
+                    user.username,
+                    user.id
+                ),
+                private: true,
+                replying_to: None,
+                associated_images: Vec::new(),
+            },
+            thread_id: project.thread_id,
+            hide_identity: false,
+        }
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err(
+            "failed to insert project transfer thread message",
+        )?;
+
+        sqlx::query!(
+            "
+            DELETE FROM collections_mods
+            WHERE mod_id = $1
+            ",
+            project.inner.id as db_ids::DBProjectId,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err("failed to delete project from collections_mods")?;
+
+        sqlx::query!(
+            "
+            DELETE FROM mod_follows
+            WHERE mod_id = $1
+            ",
+            project.inner.id as db_ids::DBProjectId,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err("failed to delete project followers")?;
+
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("failed to commit transaction")?;
+
+        let mut cache_user_ids = affected_user_ids;
+        cache_user_ids.push(deleted_user);
+        db_models::DBUser::clear_project_cache(&cache_user_ids, &redis)
+            .await
+            .wrap_internal_err("failed to clear user project cache")?;
+        DBTeamMember::clear_cache(project.inner.team_id, &redis)
+            .await
+            .wrap_internal_err("clearing cached data from Redis")?;
+        db_models::DBProject::clear_cache(
+            project.inner.id,
+            project.inner.slug.clone(),
+            None,
+            &redis,
+        )
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
+        search_state
+            .queue
+            .push_project_removal(project.inner.id.into())
+            .await;
+
+        return Ok(());
+    }
+
     delphi::tech_review_sync::sync_deleted_project_tech_review_exit(
         project.inner.id,
         &mut transaction,
@@ -3053,7 +3283,7 @@ pub async fn project_delete_internal(
     }
 }
 
-/// Follow a project.  
+/// Follow a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -3160,7 +3390,7 @@ pub async fn project_follow_internal(
     }
 }
 
-/// Unfollow a project.  
+/// Unfollow a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = NO_CONTENT))
@@ -3264,7 +3494,7 @@ pub async fn project_unfollow_internal(
     }
 }
 
-/// Get a project's organization.  
+/// Get a project's organization.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects", responses((status = OK, body = models::organizations::Organization))

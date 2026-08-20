@@ -212,9 +212,6 @@
   "app.world.world-item.offline": {
     "message": "לא מקוון"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} מחוברים"
-  },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
   },
@@ -371,18 +368,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "בחירת סמל"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "קבוצות ספרייה"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "יצירת קבוצה חדשה"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לחלקים שונים בספרייה שלך."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "שם קבוצה"
-  },
   "instance.settings.tabs.general.name": {
     "message": "שם"
   },
@@ -533,16 +518,7 @@
   "search.filter.locked.instance.sync": {
     "message": "סנכרן עם התקנה"
   },
-  "search.filter.locked.server": {
-    "message": "מסופק על ידי השרת"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "ניתן להוסיף רק מודים בצד הלקוח לשרת"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "גרסת המשחק מסופקת על ידי השרת"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "הטוען מסופק על ידי השרת"
   }
 }

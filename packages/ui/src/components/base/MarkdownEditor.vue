@@ -243,8 +243,8 @@
 					</template>
 				</div>
 				<div class="flex items-center gap-2">
-					<Toggle id="preview" v-model="previewMode" small />
-					<label class="label" for="preview">
+					<Toggle :id="previewId" v-model="previewMode" small />
+					<label class="label" :for="previewId">
 						{{ formatMessage(messages.editorPreviewToggleLabel) }}
 					</label>
 				</div>
@@ -324,7 +324,7 @@ import {
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
-import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
+import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, useId, watch } from 'vue'
 
 import { Button, IconButton } from '#ui/components/base/buttons'
 
@@ -566,6 +566,8 @@ const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
 let isDisabledCompartment: Compartment | null = null
 let editorThemeCompartment: Compartment | null = null
+
+const previewId = useId()
 
 const emit = defineEmits(['update:modelValue'])
 const resolvedPlaceholder = computed(

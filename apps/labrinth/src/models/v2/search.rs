@@ -41,6 +41,8 @@ pub struct LegacyResultSearchProject {
     pub license: String,
     pub client_side: String,
     pub server_side: String,
+    pub environment: Vec<String>,
+    pub disclosure_types: Vec<String>,
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
@@ -118,6 +120,14 @@ impl LegacyResultSearchProject {
 
         let environment =
             get_one_string_loader_field("environment").unwrap_or("unknown");
+        let environments = result_search_project
+            .loader_fields
+            .get("environment")
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(|environment| environment.as_str().map(String::from))
+            .collect();
 
         let (client_side, server_side) =
             v2_reroute::convert_v3_environment_to_v2_side_types(
@@ -141,8 +151,12 @@ impl LegacyResultSearchProject {
             all_project_types: result_search_project.all_project_types,
             client_side,
             server_side,
+            environment: environments,
+            disclosure_types: result_search_project.disclosure_types,
             versions,
-            latest_version: result_search_project.version_id,
+            latest_version: result_search_project
+                .version_id
+                .unwrap_or_default(),
             categories,
 
             project_id: result_search_project.project_id,

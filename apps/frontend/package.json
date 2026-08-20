@@ -38,6 +38,7 @@
 		"wrangler": "^4.115.0"
 	},
 	"dependencies": {
+		"@contentauth/c2pa-web": "^0.13.1",
 		"@formatjs/intl-localematcher": "^0.5.4",
 		"@ltd/j-toml": "^1.38.0",
 		"@modrinth/api-client": "workspace:*",
@@ -53,6 +54,7 @@
 		"@vue-email/components": "^0.0.21",
 		"@vue-email/render": "^0.0.9",
 		"@vueuse/core": "^11.1.0",
+		"@zip.js/zip.js": "^2.8.34",
 		"ace-builds": "^1.36.2",
 		"ansi-to-html": "^0.7.2",
 		"chart.js": "^4.5.1",

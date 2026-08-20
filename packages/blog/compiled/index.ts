@@ -1,7 +1,9 @@
 // AUTO-GENERATED FILE - DO NOT EDIT
 import { article as a_new_chapter_for_modrinth_servers } from "./a_new_chapter_for_modrinth_servers";
 import { article as accelerating_development } from "./accelerating_development";
+import { article as ai_policy_and_disclosures } from "./ai_policy_and_disclosures";
 import { article as analytics_overhaul } from "./analytics_overhaul";
+import { article as app_personalization } from "./app_personalization";
 import { article as becoming_sustainable } from "./becoming_sustainable";
 import { article as capital_return } from "./capital_return";
 import { article as carbon_ads } from "./carbon_ads";
@@ -47,7 +49,9 @@ import { article as windows_borderless_malware_disclosure } from "./windows_bord
 export const articles = [
   a_new_chapter_for_modrinth_servers,
   accelerating_development,
+  ai_policy_and_disclosures,
   analytics_overhaul,
+  app_personalization,
   becoming_sustainable,
   capital_return,
   carbon_ads,

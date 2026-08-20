@@ -218,6 +218,11 @@ pub enum SearchField {
     MinecraftJavaServerPingData,
     DependencyProjectIds,
     CompatibleDependencyProjectIds,
+    DisclosureTypes,
+    RequiredDependencyProjectIds,
+    OptionalDependencyProjectIds,
+    EmbeddedDependencyProjectIds,
+    IncompatibleDependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -242,7 +247,8 @@ impl FromStr for SearchBackendKind {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
     /// ID of the most recently published version.
-    pub version_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version_id: Option<String>,
     pub project_id: String,
     //
     pub project_types: Vec<String>,
@@ -280,7 +286,8 @@ pub struct UploadSearchProject {
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
     /// Unix timestamp of the most recently published version.
-    pub version_published_timestamp: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version_published_timestamp: Option<i64>,
     pub open_source: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<u32>,
@@ -289,7 +296,17 @@ pub struct UploadSearchProject {
     #[serde(default)]
     pub compatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub required_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub optional_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub embedded_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub incompatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
+    #[serde(default)]
+    pub disclosure_types: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -354,7 +371,8 @@ pub struct SearchResults {
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
     /// ID of the most recently published version.
-    pub version_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub version_id: Option<String>,
     pub project_id: String,
     pub project_types: Vec<String>,
     #[serde(default)]
@@ -387,7 +405,17 @@ pub struct ResultSearchProject {
     #[serde(default)]
     pub compatible_dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub required_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub optional_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub embedded_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub incompatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
+    #[serde(default)]
+    pub disclosure_types: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -429,7 +457,16 @@ impl From<UploadSearchProject> for ResultSearchProject {
             dependency_project_ids: source.dependency_project_ids,
             compatible_dependency_project_ids: source
                 .compatible_dependency_project_ids,
+            required_dependency_project_ids: source
+                .required_dependency_project_ids,
+            optional_dependency_project_ids: source
+                .optional_dependency_project_ids,
+            embedded_dependency_project_ids: source
+                .embedded_dependency_project_ids,
+            incompatible_dependency_project_ids: source
+                .incompatible_dependency_project_ids,
             dependencies: source.dependencies,
+            disclosure_types: source.disclosure_types,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,
             components: source.components,

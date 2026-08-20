@@ -10,6 +10,7 @@ on:
       - 'packages/ui/**/*'
       - 'packages/utils/**/*'
       - 'packages/assets/**/*'
+      - 'packages/moderation/**/*'
       - '**/wrangler.jsonc'
       - '**/pnpm-*.yaml'
       - '.github/workflows/frontend-deploy.yml'
@@ -124,8 +125,7 @@ jobs:
         run: pnpm install
 
       - name: Build frontend
-        working-directory: ./apps/frontend
-        run: pnpm build
+        run: pnpm web:build
         env:
           CF_PAGES_BRANCH: ${{ inputs.head_ref || github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ inputs.head_sha || github.sha }}

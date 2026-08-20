@@ -17,7 +17,7 @@ import {
 	ConfirmLeaveModal,
 	type ContentItem,
 	injectModrinthClient,
-	ModpackContentModal,
+	ManagedContentModal,
 	Table,
 	type TableColumn,
 	useFormatDateTime,
@@ -76,7 +76,7 @@ const emit = defineEmits<{
 	contentError: [error: unknown]
 }>()
 
-const contentModal = ref<InstanceType<typeof ModpackContentModal> | null>(null)
+const contentModal = ref<InstanceType<typeof ManagedContentModal> | null>(null)
 const banModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 const client = injectModrinthClient()
 const contentByVersion = new Map<string, ContentItem[]>()
@@ -406,11 +406,11 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 			</footer>
 		</div>
 
-		<ModpackContentModal
+		<ManagedContentModal
 			ref="contentModal"
 			header="Shared instance content"
-			:modpack-name="contentInstance.name"
-			:modpack-icon-url="contentInstance.icon_url ?? undefined"
+			:source-name="contentInstance.name"
+			:source-icon-url="contentInstance.icon_url ?? undefined"
 		/>
 		<ConfirmLeaveModal
 			ref="banModal"

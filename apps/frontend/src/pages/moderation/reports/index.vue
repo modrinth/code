@@ -217,6 +217,7 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
+	formatReportType,
 	injectModrinthClient,
 	MultiSelect,
 	type MultiSelectItem,
@@ -361,7 +362,13 @@ const reportIssueFilterTypes = computed<ComboboxOption<string>[]>(() => {
 	const issueTypes = new Set(allReports.value.map((report) => report.report_type))
 
 	const sortedTypes = Array.from(issueTypes).sort()
-	return [...base, ...sortedTypes.map((type) => ({ value: type, label: type }))]
+	return [
+		...base,
+		...sortedTypes.map((type) => ({
+			value: type,
+			label: formatReportType(formatMessage, type),
+		})),
+	]
 })
 
 type ReportedType<T> = T & { report_item_count: number }

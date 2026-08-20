@@ -1,21 +1,11 @@
 import { type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { SignJWT } from 'jose'
 
+import { readEnv } from '~/helpers/env'
 import { useServerModrinthClient } from '~/server/utils/api-client'
 
 type IntercomTokenResponse = {
 	token: string
-}
-
-async function getIntercomKeyFromSecretsStore(): Promise<string | undefined> {
-	try {
-		const mod = 'cloudflare:workers'
-		const { env } = await import(/* @vite-ignore */ mod)
-		return await env.INTERCOM_IDENTITY_SECRET?.get()
-	} catch {
-		// Not running in Cloudflare Workers environment
-		return undefined
-	}
 }
 
 async function signIntercomUserJwt(
@@ -72,7 +62,7 @@ export default defineEventHandler(async (event): Promise<IntercomTokenResponse> 
 	setHeader(event, 'cache-control', 'private, no-store, max-age=0')
 
 	const intercomSecret =
-		(await getIntercomKeyFromSecretsStore()) ?? useRuntimeConfig(event).intercomIdentitySecret
+		(await readEnv('INTERCOM_IDENTITY_SECRET')) ?? useRuntimeConfig(event).intercomIdentitySecret
 
 	if (!intercomSecret) {
 		throw createError({

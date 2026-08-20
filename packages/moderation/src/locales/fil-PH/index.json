@@ -242,10 +242,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Patunayan ang mga link palabas"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Bisitahin ang pahina ng mga bersiyon"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bisitahin ang mga setting sa mga link"
   }
 }
+

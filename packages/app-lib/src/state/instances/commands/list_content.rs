@@ -12,7 +12,8 @@ use crate::state::{
     CacheBehaviour, CachedEntry, CachedFile, ContentFile, ContentItem,
     ContentItemOwner, ContentItemProject, ContentItemVersion, Dependency,
     LinkedModpackInfo, ModLoader, Organization, OwnerType, Project,
-    ProjectType, ReleaseChannel, TeamMember, Version,
+    ProjectType, ReleaseChannel, TeamMember, Version, VersionEnvironment,
+    VersionV3,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
@@ -247,6 +248,7 @@ pub(crate) async fn list_content(
 
     content_files_to_content_items(
         &resolved.instance,
+        resolved.content_set.loader,
         &files,
         cache_behaviour,
         state,
@@ -287,6 +289,7 @@ pub(crate) async fn list_linked_modpack_content(
 
         return content_files_to_content_items(
             &resolved.instance,
+            resolved.content_set.loader,
             &files,
             cache_behaviour,
             state,
@@ -297,7 +300,7 @@ pub(crate) async fn list_linked_modpack_content(
     let Some((_, version_id)) = linked_modpack_ids(&link) else {
         return Ok(Vec::new());
     };
-    let ids = match get_modpack_identifiers(
+    let modpack_ids = match get_modpack_identifiers(
         &version_id,
         &resolved.content_set,
         &state.pool,
@@ -305,23 +308,30 @@ pub(crate) async fn list_linked_modpack_content(
     )
     .await
     {
-        Ok(ids) => ids,
+        Ok(ids) => Some(ids),
         Err(err) => {
             tracing::warn!("Failed to fetch modpack identifiers: {}", err);
-            return Ok(Vec::new());
+            None
         }
     };
-    let files = content_projects_for_scope(
-        &resolved,
-        cache_behaviour,
-        state,
-        ContentFilter::OnlyModpack(&ids),
-    )
-    .await?;
+    let filter = if let Some(ids) = modpack_ids.as_ref() {
+        ContentFilter::OnlyModpack(ids)
+    } else if let Some(source_kind) = linked_modpack_source_kind(&link) {
+        ContentFilter::OnlySourceKind {
+            source_kind,
+            include_untracked: true,
+        }
+    } else {
+        return Ok(Vec::new());
+    };
+    let files =
+        content_projects_for_scope(&resolved, cache_behaviour, state, filter)
+            .await?;
     let files = files.into_iter().collect::<Vec<_>>();
 
     content_files_to_content_items(
         &resolved.instance,
+        resolved.content_set.loader,
         &files,
         cache_behaviour,
         state,
@@ -367,30 +377,30 @@ pub(crate) async fn get_linked_modpack_info(
             &state.api_semaphore,
         ),
     )?;
-    let version = version.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Linked modpack version {version_id} not found"
-        ))
-    })?;
-    let (project, all_versions) = if version.project_id != project_id {
-        let (modpack_project, modpack_versions) = tokio::try_join!(
-            CachedEntry::get_project(
-                &version.project_id,
-                cache_behaviour,
-                &state.pool,
-                &state.api_semaphore,
-            ),
-            CachedEntry::get_project_versions(
-                &version.project_id,
-                cache_behaviour,
-                &state.pool,
-                &state.api_semaphore,
-            ),
-        )?;
-        (modpack_project.or(project), modpack_versions)
-    } else {
-        (project, all_versions)
-    };
+    let version_project_id = version
+        .as_ref()
+        .filter(|version| version.project_id != project_id)
+        .map(|version| version.project_id.clone());
+    let (project, all_versions) =
+        if let Some(version_project_id) = version_project_id {
+            let (modpack_project, modpack_versions) = tokio::try_join!(
+                CachedEntry::get_project(
+                    &version_project_id,
+                    cache_behaviour,
+                    &state.pool,
+                    &state.api_semaphore,
+                ),
+                CachedEntry::get_project_versions(
+                    &version_project_id,
+                    cache_behaviour,
+                    &state.pool,
+                    &state.api_semaphore,
+                ),
+            )?;
+            (modpack_project.or(project), modpack_versions)
+        } else {
+            (project, all_versions)
+        };
     let project = project.ok_or_else(|| {
         crate::ErrorKind::InputError(format!(
             "Linked modpack project {project_id} not found"
@@ -429,12 +439,17 @@ pub(crate) async fn get_linked_modpack_info(
                 })
         })
     };
-    let (has_update, update_version_id, update_version) = check_modpack_update(
-        &version_id,
-        &version,
-        all_versions,
-        resolved.instance.update_channel,
-    );
+    let (has_update, update_version_id, update_version) = version
+        .as_ref()
+        .map(|version| {
+            check_modpack_update(
+                &version_id,
+                version,
+                all_versions,
+                resolved.instance.update_channel,
+            )
+        })
+        .unwrap_or((false, None, None));
 
     Ok(Some(LinkedModpackInfo {
         project,
@@ -507,13 +522,9 @@ pub(crate) async fn dependencies_to_content_items(
                     .map(|file| file.size as u64)
                     .unwrap_or(0),
                 enabled: true,
+                locked: false,
                 project_type,
-                project: Some(ContentItemProject {
-                    id: project.id.clone(),
-                    slug: project.slug.clone(),
-                    title: project.title.clone(),
-                    icon_url: project.icon_url.clone(),
-                }),
+                project: Some(content_item_project(project)),
                 version: version.map(|version| ContentItemVersion {
                     id: version.id.clone(),
                     version_number: version.version_number.clone(),
@@ -524,11 +535,16 @@ pub(crate) async fn dependencies_to_content_items(
                         .unwrap_or_default(),
                     date_published: Some(version.date_published.to_rfc3339()),
                 }),
+                environment: resolve_environment(
+                    dependency.version_id.as_deref(),
+                    &meta.versions_v3,
+                ),
                 owner,
                 has_update: false,
                 update_version_id: None,
                 date_added: None,
                 source_kind: None,
+                embedded_metadata: None,
             })
         })
         .collect::<Vec<_>>();
@@ -604,6 +620,11 @@ async fn content_projects_for_scope(
             entry.file_id.as_deref().map(|file_id| (file_id, entry))
         })
         .collect::<HashMap<_, _>>();
+    let locked_file_ids = sqlite::content_rows::get_locked_instance_file_ids(
+        &resolved.instance.id,
+        &state.pool,
+    )
+    .await?;
     let hashes = files
         .iter()
         .map(|file| file.sha1.as_str())
@@ -736,6 +757,7 @@ async fn content_projects_for_scope(
                 enabled: entry.map_or(file.enabled, |entry| {
                     entry.enabled && file.enabled
                 }),
+                locked: locked_file_ids.contains(&file.id),
                 size: file.size,
                 metadata: file_metadata_from_entry_or_cache(entry, metadata),
                 project_type,
@@ -812,6 +834,7 @@ fn file_update_cache_key(
 
 async fn content_files_to_content_items(
     instance: &Instance,
+    loader: ModLoader,
     files: &[(String, ContentFile)],
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
@@ -840,6 +863,11 @@ async fn content_files_to_content_items(
         &state.api_semaphore,
     )
     .await?;
+    let embedded_metadata =
+        super::embedded_content_metadata::resolve_embedded_content_metadata(
+            instance, loader, files, state,
+        )
+        .await?;
     let instance_path = state.directories.instances_dir().join(&instance.path);
     let paths = files
         .iter()
@@ -885,27 +913,27 @@ async fn content_files_to_content_items(
                 id: file.hash.clone(),
                 size: file.size,
                 enabled: file.enabled,
+                locked: file.locked,
                 project_type: file.project_type,
-                project: project.map(|project| ContentItemProject {
-                    id: project.id.clone(),
-                    slug: project.slug.clone(),
-                    title: project.title.clone(),
-                    icon_url: project.icon_url.clone(),
-                }),
+                project: project.map(content_item_project),
                 version: version.map(|version| ContentItemVersion {
                     id: version.id.clone(),
                     version_number: version.version_number.clone(),
                     file_name: file.file_name.clone(),
                     date_published: Some(version.date_published.to_rfc3339()),
                 }),
+                environment: resolve_environment(
+                    file.metadata
+                        .as_ref()
+                        .map(|metadata| metadata.version_id.as_str()),
+                    &meta.versions_v3,
+                ),
                 owner,
-                has_update: file.update_version_id.is_some()
-                    && !file.source_kind.is_some_and(
-                        ContentSourceKind::is_shared_instance_managed,
-                    ),
+                has_update: file.update_version_id.is_some(),
                 update_version_id: file.update_version_id.clone(),
                 date_added: modification_times[index].clone(),
                 source_kind: file.source_kind,
+                embedded_metadata: embedded_metadata.get(&file.hash).cloned(),
             }
         })
         .collect::<Vec<_>>();
@@ -917,6 +945,7 @@ async fn content_files_to_content_items(
 struct ResolvedMetadata {
     projects: Vec<Project>,
     versions: Vec<Version>,
+    versions_v3: Vec<VersionV3>,
     teams: Vec<Vec<TeamMember>>,
     organizations: Vec<Organization>,
 }
@@ -932,7 +961,7 @@ async fn resolve_metadata(
         project_ids.iter().map(String::as_str).collect::<Vec<_>>();
     let version_id_refs =
         version_ids.iter().map(String::as_str).collect::<Vec<_>>();
-    let (projects, versions) =
+    let (projects, versions, versions_v3) =
         if !project_ids.is_empty() || !version_ids.is_empty() {
             tokio::try_join!(
                 async {
@@ -960,10 +989,23 @@ async fn resolve_metadata(
                         )
                         .await
                     }
+                },
+                async {
+                    if version_ids.is_empty() {
+                        Ok(Vec::new())
+                    } else {
+                        CachedEntry::get_version_v3_many(
+                            &version_id_refs,
+                            cache_behaviour,
+                            pool,
+                            fetch_semaphore,
+                        )
+                        .await
+                    }
                 }
             )?
         } else {
-            (Vec::new(), Vec::new())
+            (Vec::new(), Vec::new(), Vec::new())
         };
     let team_ids = projects
         .iter()
@@ -1012,9 +1054,21 @@ async fn resolve_metadata(
     Ok(ResolvedMetadata {
         projects,
         versions,
+        versions_v3,
         teams,
         organizations,
     })
+}
+
+fn resolve_environment(
+    version_id: Option<&str>,
+    versions: &[VersionV3],
+) -> Option<VersionEnvironment> {
+    let version_id = version_id?;
+    versions
+        .iter()
+        .find(|version| version.id == version_id)
+        .and_then(|version| version.environment)
 }
 
 fn resolve_owner(
@@ -1046,6 +1100,18 @@ fn resolve_owner(
                 avatar_url: member.user.avatar_url.clone(),
                 owner_type: OwnerType::User,
             })
+    }
+}
+
+fn content_item_project(project: &Project) -> ContentItemProject {
+    ContentItemProject {
+        id: project.id.clone(),
+        slug: project.slug.clone(),
+        title: project.title.clone(),
+        icon_url: project.icon_url.clone(),
+        license: project.license.clone(),
+        categories: project.categories.clone(),
+        additional_categories: project.additional_categories.clone(),
     }
 }
 

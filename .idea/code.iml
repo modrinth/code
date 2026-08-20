@@ -17,6 +17,18 @@
       <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-maxmind/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-util/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages/muralpay/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/async-minecraft-ping/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/async-minecraft-ping/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/async-minecraft-ping/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/labrinth-derive/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-content-management/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-content-management/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/neverbounce/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/serde-binhum/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/sqlx-tracing/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/sqlx-tracing/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/xredis/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/component-derive/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

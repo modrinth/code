@@ -63,7 +63,6 @@ where
         settings.telemetry = !legacy_settings.opt_out_analytics;
         settings.discord_rpc = !legacy_settings.disable_discord_rpc;
         settings.developer_mode = legacy_settings.developer_mode;
-        settings.onboarded = legacy_settings.fully_onboarded;
         settings.extra_launch_args = legacy_settings.custom_java_args;
         settings.custom_env_vars = legacy_settings.custom_env_args;
         settings.memory.maximum = legacy_settings.memory.maximum;
@@ -588,14 +587,45 @@ where
     .await?;
 
     for group in input.groups {
-        sqlx::query!(
+        let group_id = match sqlx::query_scalar::<_, String>(
             "
-            INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
+            SELECT id
+            FROM instance_groups
+            WHERE name = ?
+            ",
+        )
+        .bind(&group)
+        .fetch_optional(exec)
+        .await?
+        {
+            Some(group_id) => group_id,
+            None => {
+                let group_id = Uuid::new_v4().to_string();
+                sqlx::query(
+                    "
+                    INSERT INTO instance_groups (id, name)
+                    VALUES (?, ?)
+                    ",
+                )
+                .bind(&group_id)
+                .bind(&group)
+                .execute(exec)
+                .await?;
+                group_id
+            }
+        };
+
+        sqlx::query(
+            "
+            INSERT OR IGNORE INTO instance_group_memberships (
+                instance_id,
+                group_id
+            )
             VALUES (?, ?)
             ",
-            instance_id_str,
-            group,
         )
+        .bind(instance_id_str)
+        .bind(group_id)
         .execute(exec)
         .await?;
     }
@@ -659,8 +689,6 @@ struct LegacySettings {
     pub opt_out_analytics: bool,
     #[serde(default)]
     pub advanced_rendering: bool,
-    #[serde(default)]
-    pub fully_onboarded: bool,
     #[serde(default = "default_settings_dir")]
     pub loaded_config_dir: Option<PathBuf>,
 }

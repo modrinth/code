@@ -4,6 +4,7 @@ import { createContext } from '@modrinth/ui'
 import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import {
@@ -17,7 +18,7 @@ import { edit, get, list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import { start_join_server } from '@/helpers/worlds.ts'
-import { handleSevereError } from '@/store/error.js'
+import type { AppEvents } from '@/providers/app-events'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface ModalRef<TShow extends (...args: any[]) => void = () => void> {
@@ -38,7 +39,7 @@ export interface ServerInstallContext {
 				project: Labrinth.Projects.v3.Project,
 				modpackVersionId: string | null,
 				callback?: () => void,
-			) => void
+			) => Promise<void>
 		>,
 	) => void
 	setUpdateToPlayModal: (
@@ -74,6 +75,7 @@ export function createServerInstall(opts: {
 	router: Router
 	handleError: (err: unknown) => void
 	popupNotificationManager: AbstractPopupNotificationManager
+	appEvents: AppEvents
 }): ServerInstallContext {
 	const installingServerProjects = ref<string[]>([])
 
@@ -82,7 +84,7 @@ export function createServerInstall(opts: {
 			project: Labrinth.Projects.v3.Project,
 			modpackVersionId: string | null,
 			callback?: () => void,
-		) => void
+		) => Promise<void>
 	> | null = null
 	let updateToPlayModalRef: ModalRef<
 		(instance: GameInstance, activeVersionId: string | null, callback?: () => void) => void
@@ -134,7 +136,7 @@ export function createServerInstall(opts: {
 		const instanceId = installJobInstanceId(job)
 		if (!instanceId) return null
 
-		await wait_for_install_job(job.job_id)
+		await wait_for_install_job(opts.appEvents, job.job_id)
 		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 
 		return instanceId
@@ -145,11 +147,12 @@ export function createServerInstall(opts: {
 
 		await edit(instance.id, { game_version: targetGameVersion })
 		const job = await install_existing_instance(instance.id, false)
-		await wait_for_install_job(job.job_id)
+		await wait_for_install_job(opts.appEvents, job.job_id)
 	}
 
 	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
 			title: 'Install complete',
 			text: `${project.name} is installed and ready to play.`,
 			type: 'success',
@@ -185,6 +188,7 @@ export function createServerInstall(opts: {
 
 	function showUpdateSuccess(instance: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
 			title: 'Update complete',
 			text: `${instance.name} has been updated and is ready to play.`,
 			type: 'success',
@@ -244,10 +248,10 @@ export function createServerInstall(opts: {
 				project_id: contentProjectId,
 				version_id: contentVersionId,
 				title: project.title,
+				icon_url: project.icon_url,
 			},
 			{
 				name: project.title,
-				iconPath: project.icon_url ?? null,
 				link: {
 					type: 'server_project_modpack',
 					server_project_id: serverProjectId,
@@ -261,7 +265,7 @@ export function createServerInstall(opts: {
 		const instanceId = installJobInstanceId(createJob)
 		if (!instanceId) return
 
-		await wait_for_install_job(createJob.job_id)
+		await wait_for_install_job(opts.appEvents, createJob.job_id)
 		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 	}
 
@@ -312,7 +316,7 @@ export function createServerInstall(opts: {
 			return
 		}
 		if (isModpack && !instance) {
-			installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
+			await installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
 				const newInstance = await findInstalledInstance(project.id)
 				if (!newInstance) return
 				showModpackInstallSuccess(newInstance, serverAddress)

@@ -4,6 +4,25 @@ use crate::state::{
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum InstanceIconBackground {
+    Color {
+        value: String,
+    },
+    #[serde(rename = "linear-top-down-gradient")]
+    LinearTopDownGradient {
+        top_color: String,
+        bottom_color: String,
+    },
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub struct InstanceIconConfig {
+    pub background: InstanceIconBackground,
+    pub symbol: String,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
     pub id: String,

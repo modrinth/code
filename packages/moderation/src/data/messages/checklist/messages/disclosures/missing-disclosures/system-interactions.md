@@ -1,0 +1,1 @@
+- Features that interact with the user's machine outside of the context of the game.

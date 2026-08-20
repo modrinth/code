@@ -1206,7 +1206,7 @@
     "message": "Details"
   },
   "create-project-version.create-modal.stage.metadata.detected-loaders": {
-    "message": "Erkannte Plattformen"
+    "message": "Erkannte Loader"
   },
   "create-project-version.create-modal.stage.metadata.detected-versions": {
     "message": "Erkannte Versionen"
@@ -1221,7 +1221,7 @@
     "message": "Dateien"
   },
   "create-project-version.create-modal.stage.metadata.loaders": {
-    "message": "Plattformen"
+    "message": "Loader"
   },
   "create-project-version.create-modal.stage.metadata.metadata-tab": {
     "message": "Metadaten"
@@ -1233,13 +1233,13 @@
     "message": "Modpack-Versionen können nicht bearbeitet werden"
   },
   "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
-    "message": "Es wurden keine Abhängigkeiten hinzugefügt."
+    "message": "Keine Abhängigkeiten hinzugefügt."
   },
   "create-project-version.create-modal.stage.metadata.no-environment-set": {
-    "message": "Es wurde keine Umgebung festgelegt."
+    "message": "Keine Umgebung wurde festgelegt."
   },
   "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
-    "message": "Es wurden keine Plattformen ausgewählt."
+    "message": "Keine Loader ausgewählt."
   },
   "create-project-version.create-modal.stage.metadata.no-mod-loader": {
     "message": "Kein Modloader"
@@ -2846,9 +2846,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3929,8 +3926,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Hervorgehobene Tags"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Du musst mindestens ein hervorgehobenes Tag haben."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Wähle deine relevantesten Tags aus. Diese werden vor den übrigen Tags angezeigt."
+  },
   "project.settings.tags.features-description": {
     "message": "Wähle alle Funktionen aus, die dein {type} nutzt."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} Kategorien} other {Kategorien}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} Funktionen} other {Funktionen}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} Auswirkungen auf die Leistung} other {Auswirkungen auf die Leistung}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} Auflösungen} other {Auflösungen}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Du hast {count} Auflösungs-Tags ({tags}) ausgewählt. Ressourcenpakete sollten in der Regel nur einen Auflösungs-Tag haben."
@@ -3955,18 +3970,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Du hast {count} Tags ausgewählt. Wir empfehlen dir, die Anzahl auf 12 oder weniger zu reduzieren, damit dein Server übersichtlich bleibt und leichter gefunden werden kann."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Bitte lade zuerst eine Version hoch, um Tags auswählen zu können!"
-  },
-  "project.settings.title": {
-    "message": "Einstellungen"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Projekt-Dashboard besuchen"
-  },
-  "project.status.archived.message": {
-    "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheided sich, das Projekt zu Dearchivieren."
   },
   "project.versions.copy-id-option": {
     "message": "ID kopieren"
@@ -5009,95 +5012,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Entwicklermodus</strong> ist aktiviert. Dies erlaubt es dir, die internen IDs von verschiedensten Dingen in Modrinth anzusehen, welche eventuell von nutzen sein können, wenn du ein Entwickler bist, welcher die Modrinth API verwendet. Klicke 5 mal auf das Modrinth Logo am unteren Ender der Seite um den Entwicklermodus umzuschalten."
   },
-  "settings.display.flags.description": {
-    "message": "Aktiviere oder deaktiviere bestimmte Funktionen auf diesem Gerät."
-  },
-  "settings.display.flags.title": {
-    "message": "Funktionen umschalten"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Entwicklermodus wurde deaktiviert"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Entwicklermodus deaktiviert"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Datenpakete-Seite"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Wähle dein bevorzugtes Layout für jede Seite, welches Projektlisten auf diesem Gerät anzeigt."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods-Seite"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galerie"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Raster"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Zeilen"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpakete-Seite"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins-Seite"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Ressourcenpakete-Seite"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Server-Seite"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shader-Seite"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Projeklisten-Layouts"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Benutzerprofilseiten"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Kollektionen"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Aktiviert erweiterte Renderfunktionen wie Unschärfeeffekte, welche ohne hardwarebeschleunigtes Rendering zu Leistungsproblemen führen kann."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Erweiterte Renderfunktionen"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Lasse Links, welche ausserhalb von Modrinth führen, in einem neuen Tab öffnen. Unabhängig von dieser Einstellung werden Links auf die gleiche Domain und in Markdown beschreibungen im selben Tab geöffnet, und Links in Werbung Bearbeitungsseiten öffnen in einem neuen Tab."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Öffne externe Links in neuem Tab"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Versteckt die \"Modrinth App herunterladen\" Schaltfläche von der Hauptnavigation. Die Modrinth App Seite kann immer noch auf der Startseite oder in der Fusszeile gefunden werden."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Verstecke Modrinth App Werbung"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Linksbündige Seitenleiste auf Inhaltsseiten"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Richtet die Seitenleiste links vom Seiteninhalt aus."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Richtet die Filter-Seitenleiste rechts neben den Suchergebnissen aus."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Rechtsbündige Filter-Suchleiste auf Suchseiten"
-  },
-  "settings.display.theme.description": {
-    "message": "Wähle dein bevorzugtes Farbschema für Modrinth auf diesem Gerät aus."
-  },
-  "settings.display.theme.title": {
-    "message": "Farbschema"
   },
   "settings.head-title": {
     "message": "Anzeigeeinstellungen"

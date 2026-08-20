@@ -318,6 +318,7 @@ vars! {
     NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
 
     EMAIL_DOMAIN_BLACKLIST: StringCsv = StringCsv(vec![]);
+    EMAIL_DOMAIN_WHITELIST: StringCsv = StringCsv(vec![]);
 
     CLICKHOUSE_REPLICATED: bool = false;
     CLICKHOUSE_URL: String = "http://localhost:8123";

@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, PlayIcon, PlusIcon, StopCircleIcon } from '@modrinth/assets'
+import { CheckIcon, PlayIcon, PlusIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import type { CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -12,7 +12,7 @@ import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
-import { process_listener } from '@/helpers/events'
+import { useAppEvent } from '@/composables/use-app-event'
 import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
@@ -75,10 +75,10 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	const debugLog = useDebugLogger('BrowseServer')
 	const serverPings = shallowRef<Record<string, number | undefined>>({})
 	const runningServerProjects = ref<Record<string, string>>({})
+	const preparingServerProjects = ref<string[]>([])
 	const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 	const contextMenuRef = ref<ContextMenuHandle | null>(null)
 	let serverPingsActive = true
-	let unlistenProcesses: (() => void) | null = null
 
 	async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 		debugLog('checkServerRunningStates', { hitCount: hits.length })
@@ -110,9 +110,16 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	}
 
 	async function handlePlayServerProject(projectId: string) {
+		if (preparingServerProjects.value.includes(projectId)) return
+
 		debugLog('handlePlayServerProject', projectId)
-		await options.playServerProject(projectId)
-		checkServerRunningStates(lastServerHits.value)
+		preparingServerProjects.value.push(projectId)
+		try {
+			await options.playServerProject(projectId)
+			checkServerRunningStates(lastServerHits.value)
+		} finally {
+			preparingServerProjects.value = preparingServerProjects.value.filter((id) => id !== projectId)
+		}
 	}
 
 	async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
@@ -248,13 +255,16 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 			})
 		} else {
 			const isInstalling = options.installingServerProjects.value.includes(serverResult.project_id)
+			const isPreparing = preparingServerProjects.value.includes(serverResult.project_id)
+			const isBusy = isInstalling || isPreparing
 			actions.push({
 				key: 'play',
 				label: formatMessage(
 					isInstalling ? commonMessages.installingLabel : commonMessages.playButton,
 				),
-				icon: PlayIcon,
-				disabled: isInstalling,
+				icon: isBusy ? SpinnerIcon : PlayIcon,
+				iconClass: isBusy ? 'animate-spin' : undefined,
+				disabled: isBusy,
 				color: 'brand',
 				type: 'outlined',
 				onClick: () => handlePlayServerProject(serverResult.project_id),
@@ -280,7 +290,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		}
 	}
 
-	process_listener((event: { event: string; instance_id: string }) => {
+	useAppEvent('process', (event) => {
 		debugLog('process event', event)
 		if (event.event === 'finished') {
 			const projectId = Object.entries(runningServerProjects.value).find(
@@ -292,14 +302,9 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 			}
 		}
 	})
-		.then((unlisten) => {
-			unlistenProcesses = unlisten
-		})
-		.catch(options.handleError)
 
 	onUnmounted(() => {
 		serverPingsActive = false
-		unlistenProcesses?.()
 	})
 
 	return {

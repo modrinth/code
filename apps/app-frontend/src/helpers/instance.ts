@@ -5,7 +5,7 @@
  */
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
-import { invoke } from '@tauri-apps/api/core'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot, SharedInstanceUpdateDiff } from './install'
 import type {
@@ -13,9 +13,16 @@ import type {
 	ContentFile,
 	ContentFileProjectType,
 	GameInstance,
+	InstanceIconConfig,
 	InstanceLoader,
 	SharedInstanceAttachment,
 } from './types'
+
+export function getInstanceIconUrl(iconPath: string | null | undefined): string | null {
+	if (!iconPath) return null
+	if (iconPath.startsWith('http://') || iconPath.startsWith('https://')) return iconPath
+	return convertFileSrc(iconPath)
+}
 
 export async function remove(instanceId: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove', { instanceId })
@@ -74,13 +81,21 @@ export async function get_content_items(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_content_items', { instanceId, cacheBehaviour })
+	const items = await invoke<ContentItem[]>('plugin:instance|instance_get_content_items', {
+		instanceId,
+		cacheBehaviour,
+	})
+	return adaptContentItems(items)
+}
+
+export async function refresh_content_updates(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_refresh_content_updates', { instanceId })
 }
 
 // Linked modpack info returned from backend
 export interface LinkedModpackInfo {
 	project: Labrinth.Projects.v2.Project
-	version: Labrinth.Versions.v2.Version
+	version: Labrinth.Versions.v2.Version | null
 	owner: ContentOwner | null
 	has_update: boolean
 	update_version_id: string | null
@@ -107,10 +122,11 @@ export async function get_linked_modpack_content(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_linked_modpack_content', {
+	const items = await invoke<ContentItem[]>('plugin:instance|instance_get_linked_modpack_content', {
 		instanceId,
 		cacheBehaviour,
 	})
+	return adaptContentItems(items)
 }
 
 // Convert a list of dependencies into ContentItems with rich metadata
@@ -118,9 +134,28 @@ export async function get_dependencies_as_content_items(
 	dependencies: Labrinth.Versions.v3.Dependency[],
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:instance|instance_get_dependencies_as_content_items', {
-		dependencies,
-		cacheBehaviour,
+	const items = await invoke<ContentItem[]>(
+		'plugin:instance|instance_get_dependencies_as_content_items',
+		{
+			dependencies,
+			cacheBehaviour,
+		},
+	)
+	return adaptContentItems(items)
+}
+
+function adaptContentItems(items: ContentItem[]): ContentItem[] {
+	return items.map((item) => {
+		const embeddedMetadata = item.embedded_metadata
+		if (!embeddedMetadata?.icon_path) return item
+
+		return {
+			...item,
+			embedded_metadata: {
+				...embeddedMetadata,
+				icon_url: convertFileSrc(embeddedMetadata.icon_path),
+			},
+		}
 	})
 }
 
@@ -260,6 +295,18 @@ export async function toggle_disable_project(
 	})
 }
 
+export async function set_project_locked(
+	instanceId: string,
+	projectPath: string,
+	locked: boolean,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_set_project_locked', {
+		instanceId,
+		projectPath,
+		locked,
+	})
+}
+
 // Remove a project
 export async function remove_project(instanceId: string, projectPath: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove_project', { instanceId, projectPath })
@@ -347,6 +394,48 @@ export async function edit(instanceId: string, editInstance: Partial<GameInstanc
 // Edits an instance's icon
 export async function edit_icon(instanceId: string, iconPath: string | null): Promise<void> {
 	return await invoke('plugin:instance|instance_edit_icon', { instanceId, iconPath })
+}
+
+export async function edit_generated_icon(
+	instanceId: string,
+	config: InstanceIconConfig,
+	symbolBytes: number[],
+): Promise<string> {
+	return await invoke('plugin:instance|instance_edit_generated_icon', {
+		instanceId,
+		config,
+		symbolBytes,
+	})
+}
+
+export async function edit_generated_icon_if_empty(
+	instanceId: string,
+	config: InstanceIconConfig,
+	symbolBytes: number[],
+): Promise<boolean> {
+	const result = await invoke<string | null>('plugin:instance|instance_edit_generated_icon', {
+		instanceId,
+		config,
+		symbolBytes,
+		onlyIfEmpty: true,
+	})
+	return result !== null
+}
+
+export async function cache_generated_icon(
+	config: InstanceIconConfig,
+	symbolBytes: number[],
+	addToRecents = false,
+): Promise<string> {
+	return await invoke('plugin:instance|instance_cache_generated_icon', {
+		config,
+		symbolBytes,
+		addToRecents,
+	})
+}
+
+export async function get_recent_icon_configs(): Promise<InstanceIconConfig[]> {
+	return await invoke('plugin:instance|instance_get_recent_icon_configs')
 }
 
 export type SharedInstanceUsers = {

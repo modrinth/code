@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useNativeTheme } from './native-theme.ts'
 import { usePreferredThemes } from './preferred-theme.ts'
 import { useThemeSettings } from './theme-settings.ts'
-import { isDarkTheme } from './themes.ts'
+import { isDarkTheme, type Theme } from './themes.ts'
 
 export * from './themes.ts'
 
@@ -33,8 +33,13 @@ export default defineNuxtPlugin({
 		}
 
 		const $settings = useThemeSettings(() => getPreferredNativeTheme())
+		const $preview = ref<Theme | 'system' | null>(null)
+		const $active = computed(() => {
+			if ($preview.value === null) return $settings.active
+			return $preview.value === 'system' ? getPreferredNativeTheme() : $preview.value
+		})
 
-		useHead({ htmlAttrs: { class: () => [`${$settings.active}-mode`] } })
+		useHead({ htmlAttrs: { class: () => [`${$active.value}-mode`] } })
 
 		function syncTheme() {
 			$settings.active =
@@ -74,6 +79,8 @@ export default defineNuxtPlugin({
 			provide: {
 				theme: reactive({
 					...toRefs($settings),
+					active: $active,
+					preview: $preview,
 					/**
 					 * Preferred themes for each mode.
 					 */

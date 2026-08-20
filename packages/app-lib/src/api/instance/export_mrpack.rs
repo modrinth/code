@@ -8,18 +8,18 @@ use crate::pack::install_from::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, InstanceMetadata, ModLoader, SideType, State,
+    VersionEnvironment,
 };
 use crate::util::io::{self, IOError};
-use async_zip::tokio::write::ZipFileWriter;
-use async_zip::{Compression, ZipEntryBuilder};
 use futures::{StreamExt, stream};
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
+use std::io::{Read, Seek, Write};
 use std::path::PathBuf;
 use std::time::UNIX_EPOCH;
-use tokio::fs::File;
-use tokio_util::compat::FuturesAsyncWriteCompatExt;
+use zip::write::SimpleFileOptions;
+use zip::{CompressionMethod, ZipWriter};
 
 const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
     "mods",
@@ -29,6 +29,8 @@ const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
     "config",
 ];
 const EXPORT_CANDIDATE_METADATA_CONCURRENCY: usize = 32;
+const EXPORT_COPY_BUFFER_SIZE: usize = 256 * 1024;
+const STANDARD_ZIP_FILE_SIZE_ERROR: &str = "Your modpack cannot be exported as it contains a file over the size limit of 4 GB";
 
 const NEVER_EXPORTABLE_PATH_PREFIXES: &[&str] = &[
     "profile.json",
@@ -181,10 +183,6 @@ pub async fn export_mrpack(
     );
 
     let instance_base_path = get_full_path(instance_id).await?;
-    let mut file = File::create(&export_path)
-        .await
-        .map_err(|e| IOError::with_path(e, &export_path))?;
-    let mut writer = ZipFileWriter::with_tokio(&mut file);
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
         create_mrpack_json(&metadata, version_id, description).await?;
@@ -196,16 +194,8 @@ pub async fn export_mrpack(
         .iter()
         .map(|file| file.path.as_str().to_string())
         .collect::<HashSet<_>>();
-    let loading_bar = init_loading(
-        LoadingBarType::ZipExtract {
-            instance_id: metadata.instance.id.clone(),
-            instance_name: metadata.instance.name.clone(),
-        },
-        1.0,
-        "Exporting instance to .mrpack",
-    )
-    .await?;
 
+    let mut override_files = Vec::new();
     let mut directories = vec![instance_base_path.clone()];
     while let Some(directory) = directories.pop() {
         let mut read_dir = io::read_dir(&directory).await?;
@@ -238,34 +228,91 @@ pub async fn export_mrpack(
                 continue;
             }
 
-            let mut stream = writer
-                .write_entry_stream(
-                    ZipEntryBuilder::new(
-                        format!("overrides/{relative_path}").into(),
-                        Compression::Deflate,
-                    )
-                    .build(),
-                )
-                .await?
-                .compat_write();
-            let mut source = File::open(&path)
+            let size = entry
+                .metadata()
                 .await
-                .map_err(|e| IOError::with_path(e, &path))?;
-            tokio::io::copy(&mut source, &mut stream)
-                .await
-                .map_err(IOError::from)?;
-            stream.into_inner().close().await?;
+                .map_err(|e| IOError::with_path(e, &path))?
+                .len();
+            ensure_standard_zip_file_size(size)?;
+            override_files.push((path, relative_path, size));
         }
     }
 
+    let total_bytes = override_files
+        .iter()
+        .fold(1_u64, |total, (_, _, size)| total.saturating_add(*size));
+    let loading_bar = init_loading(
+        LoadingBarType::PackExport {
+            instance_id: metadata.instance.id.clone(),
+            instance_name: metadata.instance.name.clone(),
+        },
+        total_bytes as f64,
+        "Exporting instance to .mrpack",
+    )
+    .await?;
     let data = serde_json::to_vec_pretty(&packfile)?;
-    let builder = ZipEntryBuilder::new(
-        "modrinth.index.json".to_string().into(),
-        Compression::Deflate,
-    );
-    writer.write_entry_whole(builder, &data).await?;
-    writer.close().await?;
-    emit_loading(&loading_bar, 1.0, None)?;
+    tokio::task::spawn_blocking(move || {
+        let file = std::fs::File::create(&export_path)
+            .map_err(|error| IOError::with_path(error, &export_path))?;
+        write_mrpack_archive(file, override_files, &data, |bytes_written| {
+            emit_loading(&loading_bar, bytes_written as f64, None)
+        })
+    })
+    .await??;
+
+    Ok(())
+}
+
+fn ensure_standard_zip_file_size(size: u64) -> crate::Result<()> {
+    if size > zip::ZIP64_BYTES_THR {
+        return Err(crate::ErrorKind::OtherError(
+            STANDARD_ZIP_FILE_SIZE_ERROR.to_string(),
+        )
+        .into());
+    }
+
+    Ok(())
+}
+
+fn write_mrpack_archive<W, F>(
+    writer: W,
+    override_files: Vec<(PathBuf, SafeRelativeUtf8UnixPathBuf, u64)>,
+    packfile_data: &[u8],
+    mut emit_progress: F,
+) -> crate::Result<()>
+where
+    W: Write + Seek,
+    F: FnMut(u64) -> crate::Result<()>,
+{
+    let options = SimpleFileOptions::default()
+        .compression_method(CompressionMethod::Deflated);
+    let mut writer = ZipWriter::new(writer);
+    let mut buffer = vec![0_u8; EXPORT_COPY_BUFFER_SIZE];
+
+    for (path, relative_path, _) in override_files {
+        writer
+            .start_file(format!("overrides/{relative_path}"), options)
+            .map_err(std::io::Error::from)?;
+        let mut source = std::fs::File::open(&path)
+            .map_err(|error| IOError::with_path(error, &path))?;
+        loop {
+            let bytes_read = source
+                .read(&mut buffer)
+                .map_err(|error| IOError::with_path(error, &path))?;
+            if bytes_read == 0 {
+                break;
+            }
+            writer.write_all(&buffer[..bytes_read])?;
+            emit_progress(bytes_read as u64)?;
+        }
+    }
+
+    writer
+        .start_file("modrinth.index.json", options)
+        .map_err(std::io::Error::from)?;
+    writer.write_all(packfile_data)?;
+    writer.finish().map_err(std::io::Error::from)?;
+    emit_progress(1)?;
 
     Ok(())
 }
@@ -413,6 +460,32 @@ fn pack_get_relative_path(
     )?)
 }
 
+fn get_mrpack_environment(
+    environment: Option<VersionEnvironment>,
+) -> HashMap<EnvType, SideType> {
+    let (client, server) =
+        match environment.unwrap_or(VersionEnvironment::Unknown) {
+            VersionEnvironment::ClientAndServer
+            | VersionEnvironment::ClientOnlyServerOptional
+            | VersionEnvironment::ServerOnly
+            | VersionEnvironment::ServerOnlyClientOptional
+            | VersionEnvironment::ClientOrServer
+            | VersionEnvironment::ClientOrServerPrefersBoth
+            | VersionEnvironment::Unknown => {
+                (SideType::Required, SideType::Required)
+            }
+            VersionEnvironment::ClientOnly
+            | VersionEnvironment::SingleplayerOnly => {
+                (SideType::Required, SideType::Unsupported)
+            }
+            VersionEnvironment::DedicatedServerOnly => {
+                (SideType::Unsupported, SideType::Required)
+            }
+        };
+
+    HashMap::from([(EnvType::Client, client), (EnvType::Server, server)])
+}
+
 #[tracing::instrument(skip_all)]
 pub async fn create_mrpack_json(
     metadata: &InstanceMetadata,
@@ -461,9 +534,10 @@ pub async fn create_mrpack_json(
         _ => None,
     })
     .collect::<Vec<_>>();
-    let versions = CachedEntry::get_version_many(
-        &projects.iter().map(|x| &*x.1).collect::<Vec<_>>(),
-        None,
+    let version_ids = projects.iter().map(|x| &*x.1).collect::<Vec<_>>();
+    let versions = CachedEntry::get_version_v3_many(
+        &version_ids,
+        Some(CacheBehaviour::MustRevalidate),
         &state.pool,
         &state.api_semaphore,
     )
@@ -473,9 +547,7 @@ pub async fn create_mrpack_json(
         .filter_map(|(path, version_id)| {
             if let Some(version) = versions.iter().find(|x| x.id == version_id)
             {
-                let mut env = HashMap::new();
-                env.insert(EnvType::Client, SideType::Required);
-                env.insert(EnvType::Server, SideType::Required);
+                let env = get_mrpack_environment(version.environment);
                 let Some(primary_file) = version.files.first() else {
                     return Some(Err(crate::ErrorKind::OtherError(format!(
                         "No primary file found for mod at: {path}"

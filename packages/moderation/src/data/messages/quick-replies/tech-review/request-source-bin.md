@@ -8,7 +8,8 @@ If these files are your own work:
 - Ensure that binary files are built through transparent automation so we can verify from the provided source code is always identical to the files uploaded to Modrinth.
 
 We understand that you may not want to publish the source code for this project, so you are welcome to share it privately to the [Modrinth Content Moderation Team](https://github.com/ModrinthModeration) on GitHub.
+Remember to ensure your repository is up-to-date with the content being published on Modrinth.
 
 If these files are third-party work:
 
-- Please provide a publicly available link to the origin of the files or source-code from a known safe source.
+- Please provide a publicly available link to the origin of the files or source-code from a known safe source, including the exact version used if applicable.

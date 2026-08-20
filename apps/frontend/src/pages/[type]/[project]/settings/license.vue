@@ -158,6 +158,7 @@ import {
 	Checkbox,
 	Combobox,
 	type ComboboxOption,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	injectProjectPageContext,
 	StyledInput,
@@ -169,6 +170,8 @@ import { builtinLicenses, formatProjectType, TeamMemberPermission } from '@modri
 import { computed } from 'vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.license)
 
 const licenseOptions: ComboboxOption<string>[] = builtinLicenses.map((license) => ({
 	value: license.short,

@@ -40,6 +40,7 @@ clap = { workspace = true, features = ["derive"] }
 clickhouse = { workspace = true, features = ["time", "uuid"] }
 color-eyre = { workspace = true }
 color-thief = { workspace = true }
+component-derive = { workspace = true }
 const_format = { workspace = true }
 dashmap = { workspace = true }
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }

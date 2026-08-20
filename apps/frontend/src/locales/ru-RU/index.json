@@ -2840,9 +2840,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -3920,8 +3917,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Ключевые теги"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Необходим хотя бы один ключевой тег."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Выберите наиболее подходящие теги. Они видны первыми."
+  },
   "project.settings.tags.features-description": {
     "message": "Выберите все особенности, которые использует ваш {type}"
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types}: категории} other {Категории}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types}: особенности} other {Особенности}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types}: требования} other {Требования}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types}: разрешения} other {Разрешения}}"
   },
   "project.settings.tags.performance-impact-description": {
     "message": "Выберите реалистичное влияние на производительность вашего {type}. Выберите несколько, если {type} можно конфигурировать разными уровнями влияния на производительность."
@@ -3934,18 +3949,6 @@
   },
   "project.settings.tags.title": {
     "message": "Теги"
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Загрузите версию перед тем, как выбрать теги!"
-  },
-  "project.settings.title": {
-    "message": "Настройки"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Управление проектами"
-  },
-  "project.status.archived.message": {
-    "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },
   "project.versions.copy-id-option": {
     "message": "Копировать ID"
@@ -4964,95 +4967,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Режим разработчика</strong> включён. Отображаются внутренние идентификаторы различных элементов сайта, что удобно при работе с API. Чтобы отключить, снова нажмите на логотип Modrinth внизу страницы 5 раз."
   },
-  "settings.display.flags.description": {
-    "message": "Настройте отдельные функции на этом устройстве."
-  },
-  "settings.display.flags.title": {
-    "message": "Настройка функций"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Режим разработчика больше не активен"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Режим разработчика отключён"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Страница наборов данных"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Выберите вид для каждой страницы с проектами на этом устройстве."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Страница модов"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Галерея"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Сетка"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Список"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Страница сборок"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Страница плагинов"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Страница наборов ресурсов"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Страница серверов"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Страница шейдеров"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Вид проектов"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Страницы пользователей"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Коллекция"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Включает продвинутые эффекты вроде размытия, но может снизить производительность на устройствах без аппаратного ускорения."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Расширенные эффекты"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Ссылки за пределы Modrinth будут открываться в новой вкладке. Исключения: ссылки внутри домена и в Markdown — всегда в той же вкладке; реклама и страницы редактирования — всегда в новой."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Внешние ссылки в новой вкладке"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Убирает кнопку «Скачать Modrinth App» с поисковых страниц. Ссылку на раздел с Modrinth App всё ещё можно найти на главной странице или в нижней части интерфейса."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Скрывать кнопку скачивания Modrinth App"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Панель сведений слева"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Помещает панель сведений слева от содержимого страницы."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Помещает панель фильтров справа от результатов поиска."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Панель фильтров справа"
-  },
-  "settings.display.theme.description": {
-    "message": "Выберите тему для Modrinth на этом устройстве."
-  },
-  "settings.display.theme.title": {
-    "message": "Тема"
   },
   "settings.head-title": {
     "message": "Настройки отображения"

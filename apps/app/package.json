@@ -3,7 +3,7 @@
 	"scripts": {
 		"tauri": "tauri",
 		"build": "tauri build",
-		"dev": "tauri dev",
+		"dev": "tauri dev --features export-app-events",
 		"test": "cargo nextest run --all-targets --no-fail-fast",
 		"lint": "cargo fmt --check && cargo clippy --all-targets && cargo clippy --all-targets --features updater",
 		"lint:ancillary": "prettier --check .",

@@ -117,7 +117,7 @@
     "defaultMessage": "Du har valt {count, number} projekt att installera. Installera dem nu eller gå tillbaka utan att installera dem."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
-    "defaultMessage": "Valda projekt är inte installerade än"
+    "defaultMessage": "De valda projekten är inte installerade än"
   },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "Kasta"
@@ -500,6 +500,9 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} borttagna"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "En fil granskas bara om den publiceras på Modrinth, oavsett dess filformat (däribland .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Något innehåll på din server kunde inte analyseras och kommer kanske påverkas av denna ändring."
   },
@@ -608,18 +611,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projektnamn"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisk"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyaste först"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Äldsta först"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortera i {mode} ordning"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Uppdatera alla"
   },
@@ -710,9 +701,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Sök spelversion..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Ta bort ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Välj ikon"
   },
@@ -792,7 +780,7 @@
     "defaultMessage": "Ange världnamn"
   },
   "creation-flow.modal.final-config.world-seed.description": {
-    "defaultMessage": "Lämna tom för slumpmässig utsäde."
+    "defaultMessage": "Lämna tom för slumpmässig frö."
   },
   "creation-flow.modal.final-config.world-seed.placeholder": {
     "defaultMessage": "Ange världsfrö"
@@ -833,24 +821,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Töm allt"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Bläddra bland modpaket"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importera modpaket"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Vet du redan modpaketet du vill installera?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Inga resultat hittades"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Sök efter modpaket"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "En instans är ett Minecraft-upplägg med en specifik laddare, version och moddar."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Anpassat upplägg"
   },
@@ -860,20 +830,26 @@
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importera instans"
   },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Bläddra bland modpaket på Modrinth eller importera ett från en fil."
+  },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Installera modpaket"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klassiska Minecraft, utan moddar eller plugin."
   },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "Vanilla Minecraft"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "Välj installationstyp"
+  },
   "creation-flow.modal.setup-type.title.instance": {
     "defaultMessage": "Välj instanstyp"
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Välj världstyp"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Välj modpaket"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Skapa instans"
@@ -1778,38 +1754,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Inga kompatibla instanser hittades"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Radera ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Sök för instans"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Välj ikon"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Modpaketet innehåller inget ytterligare innehåll."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Inget innehåll hittades"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Den här filen är inte publiserad på Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modpaketets innehåll"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Laddar innehåll..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Inga projekt matchar din sökning."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Öppna i Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Sök genom {count, number} projekt"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -3359,6 +3305,9 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
   "project.visibility.archived": {
     "defaultMessage": "Arkiverad"
   },
@@ -3436,12 +3385,6 @@
   },
   "search.filter_type.advanced": {
     "defaultMessage": "Avancerat"
-  },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Exkludera datapaket"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Exkludera moddar"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Miljö"
@@ -3574,6 +3517,9 @@
   },
   "servers.access-page.activity-log-filter.action.java-version-modified": {
     "defaultMessage": "Ändrade Java-version"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "Ändrade loaderversion"
   },
   "servers.access-page.activity-log-filter.action.modpack-changed": {
     "defaultMessage": "Ändrade modpaket"
@@ -3875,6 +3821,18 @@
   "servers.audit-log.event.java-version-modified": {
     "defaultMessage": "Ändrade Java-version till <java-version></java-version>"
   },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Ändrade loader till <loader></loader> <version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Ändrade loader till <loader></loader>"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "Ändrare loaderversion till <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "Rensade laoaderversion"
+  },
   "servers.audit-log.event.modpack-changed": {
     "defaultMessage": "Ändrade modpaket"
   },
@@ -4157,35 +4115,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installering misslyckades"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Ett internt fel inträffade när plattformen installerades. Vänligen försök igen."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Modpaketet kunde inte installeras. Det kanske är korrumperad eller inkompatibel."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Ett oväntat fel inträffade under installeringen."
   },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installerar tillägg..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Vi förbereder din server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Lägger till Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurerar server..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Laddar ner moddar..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organiserar filer..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Ställer in miljö..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du redan en server?"
@@ -4195,9 +4129,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installera moddar, bjud in vänner och spela tillsammans, allt från Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Inga servrar än"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Välj dina favorit moddar så hanterar vi resten."
@@ -4535,6 +4466,9 @@
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Ställ in server"
   },
+  "servers.setup.onboarding.step.choose.description": {
+    "defaultMessage": "Välj ditt favorit modpaket från Modrinth, eller välj en loader och lägg till de moddar du vill."
+  },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Välj vad du vill spela"
   },
@@ -4705,9 +4639,6 @@
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "Vänförfrågningar"
-  },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Kommer snart!"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Alla"
@@ -5407,6 +5338,9 @@
   },
   "version.section.included-content": {
     "defaultMessage": "Inkluderat innehåll"
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Ingen modloader"
   },
   "version.supplementary-resources.file": {
     "defaultMessage": "Fil"

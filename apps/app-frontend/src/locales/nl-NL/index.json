@@ -143,29 +143,11 @@
   "app.ads-consent.title": {
     "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Schakel visuele effecten zoals achtergrondvervaging in. Zonder hardwareversnelling kan dit ten koste gaan van de prestaties."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Geavanceerde weergave"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Kies het kleurenthema dat door de Modrinth-app wordt gebruikt."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Kleurenthema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Kies de pagina die wordt weergegeven wanneer de Modrinth-app wordt geopend."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotheek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standaard openingspagina"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Verberg je gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
@@ -184,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "App minimaliseren"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systeemvensterframe"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Laat zien hoe lang je elke instantie hebt gespeeld."
@@ -377,17 +353,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Wijzigingen bekijken"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Update bekijken"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Controleren..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Er is een update nodig om {name} te kunnen spelen. Werk het spel bij naar de nieuwste versie om het te kunnen starten."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Update is beschikbaar"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Alle gegevens van je instantie worden definitief verwijderd, inclusief je werelden, configuraties en alle geïnstalleerde inhoud."
@@ -590,6 +557,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Noch servers noch werelden toegevoegd"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Verversen..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Server verwijderen"
   },
@@ -701,15 +671,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Welke regel wordt in deze instantie overtreden?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Ongepast"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Kwaadaardig"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Gedeelde instantie melden"
   },
@@ -775,9 +736,6 @@
   },
   "app.nav.home": {
     "message": "Start"
-  },
-  "app.nav.library": {
-    "message": "Bibliotheek"
   },
   "app.nav.modrinth-account": {
     "message": "Modrinth-account"
@@ -932,8 +890,77 @@
   "app.settings.privacy.discord-rich-presence.description": {
     "message": "Laat Modrinth als jouw activiteit op Discord. Dit verandert niet activiteiten toegevoegd door mods."
   },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth verzamelt geanonimiseerde analyse- en gebruiksgegevens om de gebruikerservaring te verbeteren en uw ervaring te personaliseren. Door deze optie uit te schakelen, meldt u zich af en worden uw gegevens niet langer verzameld."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetrie"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Geef de knop 'Details kopiëren' weer terwijl een installatie in de wachtrij staat of wordt uitgevoerd. Deze actie is altijd beschikbaar voor mislukte of onderbroken installaties."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Altijd 'Details kopiëren' laten zien"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "De cache van de app wissen?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Wis de gegevens in de cache en download ze opnieuw via Modrinth. De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Cache leegmaken"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "App-cache"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Hier worden back-ups van belangrijke app-gegevens opgeslagen voor het geval je ze later nodig hebt."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Open de map met back-ups"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Back-ups van de app-database"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Zoek naar een app-folder"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Hier slaat de Modrinth-app instanties en andere bestanden op. Wijzigingen worden pas van kracht nadat de app opnieuw is opgestart."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Kies een nieuwe app-folder"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "App-folder"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Het aantal bestanden dat de app tegelijkertijd kan downloaden. Verlaag dit aantal als downloads via je verbinding niet betrouwbaar zijn. Hiervoor moet de app opnieuw worden opgestart."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Maximaal aantal gelijktijdige downloads"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Het aantal bestanden dat de app tegelijkertijd naar de schijf kan schrijven. Verlaag deze waarde als je vaak I/O-fouten tegenkomt. Hiervoor moet de app opnieuw worden opgestart."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instanties"
+  },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
+  },
+  "app.settings.tabs.behavior": {
+    "message": "Gedrag"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Standaard spelopties"
@@ -1094,15 +1121,6 @@
   "app.skins.sign-in.button": {
     "message": "Inloggen"
   },
-  "app.skins.sign-in.description": {
-    "message": "Log in op je Minecraft-account om de functies voor het beheren van skins in de Modrinth-app te kunnen gebruiken."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Excited Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Graag inloggen"
-  },
   "app.skins.title": {
     "message": "Skinkiezer"
   },
@@ -1157,6 +1175,9 @@
   "app.update.complete-toast.title": {
     "message": "Versie {version} is succesvol geïnstalleerd!"
   },
+  "app.user.project.install-to-instance": {
+    "message": "Op instantie installeren"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "voorbeeld.modrinth.gg"
   },
@@ -1171,9 +1192,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Als je de versie wijzigt, wordt alleen je lokale kopie aangepast. Bij toekomstige updates van de gedeelde instantie kan deze weer worden teruggezet of opnieuw worden gewijzigd."
@@ -1427,6 +1445,21 @@
   "instance.settings.sharing.active-invites.title": {
     "message": "Actieve uitnodigingen"
   },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Keren gebruikt"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "De uitnodigingslink <monospace>{code}</monospace> zal gelijk niet meer werken. Mensen die zich al hebben aangemeld, behouden hun toegang."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "Deze actie kan niet ongedaan worden gemaakt"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Uitnodiging intrekken"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Uitnodiging intrekken"
+  },
   "instance.settings.tabs.general": {
     "message": "Algemeen"
   },
@@ -1465,18 +1498,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecteer pictogram"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Bibliotheekgroepen"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Nieuwe groep creëren"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Bibliotheekgroepen stellen je in staat om je instanties in verschillende secties in je bibliotheek te organiseren."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Voer groepsnaam in"
   },
   "instance.settings.tabs.general.name": {
     "message": "Naam"
@@ -1534,6 +1555,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Game opstart haakjes"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Hooks worden uitgevoerd in de werkfolder van de instantie, met de volgende variabelen:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: Het absolute pad naar de map van de instantie"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: De naam van de map van de instantie"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: De JVM-argumenten die aan het spel worden doorgegeven"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: Het absolute pad naar het Java-uitvoeringsbestand"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Een alias voor $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: De naam van de instantie"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -1627,6 +1669,12 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Er is iets misgegaan"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "Kan geen verbinding maken met de API voor gedeelde instanties"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Netwerkfout"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "De inhoud van deze instantie wordt gedeeld met andere gebruikers."
@@ -1805,16 +1853,13 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchroniseer installatie"
   },
-  "search.filter.locked.server": {
-    "message": "Aangeleverd door de server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Alleen client-side mods kunnen toegevoegd worden aan de server instantie"
   },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Spel versie is gegeven door de server"
+  "settings.sidebar.label.account": {
+    "message": "Account"
   },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader is gegeven door de server"
+  "settings.sidebar.label.display": {
+    "message": "Weergave"
   }
 }

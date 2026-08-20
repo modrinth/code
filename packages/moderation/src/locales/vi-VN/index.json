@@ -269,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Xác minh các liên kết bên ngoài"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Truy cập trang phiên bản"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
+

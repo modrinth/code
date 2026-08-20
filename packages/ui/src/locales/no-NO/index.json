@@ -413,18 +413,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Prosjektnavn"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisk"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyeste først"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Eldste først"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter etter {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"
   },
@@ -449,9 +437,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Søk etter spillversjon..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Fjern ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Velg ikon"
   },
@@ -472,12 +457,6 @@
   },
   "creation-flow.modal.import-instance.search.placeholder": {
     "defaultMessage": "Søk etter instansnavn"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ingen resultater funnet"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Søk etter modpakke"
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# fil} other {# filer}} valgt"
@@ -863,26 +842,8 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "Ny instans"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Fjern ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søk etter instans"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Velg ikon"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Ingen innhold funnet"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Laster inn innhold..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Ingen prosjekter samsvarte med søket ditt."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Søk etter {count, number} {count, plural, one {prosjekt} other {prosjekter}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nåværende"
@@ -2778,4 +2739,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

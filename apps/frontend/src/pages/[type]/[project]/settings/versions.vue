@@ -381,6 +381,8 @@ const {
 	cdnDownloadReason,
 } = injectProjectPageContext()
 
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.versions)
+
 // Load versions on mount (client-side)
 onMounted(() => {
 	loadVersions()

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add API Module"
+  short_description: "Add typed API client modules from OpenAPI"
+  default_prompt: "Use $api-module to add an API client module from this OpenAPI schema."

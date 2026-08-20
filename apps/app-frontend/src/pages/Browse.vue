@@ -33,18 +33,19 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
+import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
-import { instance_listener } from '@/helpers/events.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
+	getInstanceIconUrl,
 	list as listInstances,
 } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
@@ -63,7 +64,6 @@ import {
 	createServerInstallContent,
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
-import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -109,7 +109,7 @@ const breadcrumbLabel = computed(() => {
 		),
 	})
 })
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
@@ -123,6 +123,7 @@ const {
 	effectiveServerWorldId,
 	serverContextServerData,
 	serverContentProjectIds,
+	queuedServerInstallRootProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
 	selectedServerInstallProjects,
@@ -143,6 +144,7 @@ const {
 	enforceSetupModpackRoute,
 	getQueuedServerInstallPlans,
 	setQueuedServerInstallPlans,
+	resolveQueuedServerInstallPlan,
 	openServerModpackInstallFlow,
 	onServerFlowBack,
 	handleServerModpackFlowCreate,
@@ -180,7 +182,7 @@ const instanceBreadcrumbDefinition = {
 	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
 	visual: () => ({
 		type: 'image' as const,
-		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		src: getInstanceIconUrl(instance.value?.icon_path),
 		alt: instance.value?.name,
 		tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
 	}),
@@ -382,7 +384,7 @@ async function initInstanceContext() {
 }
 
 function setBrowseHideInstalledFlag(flag: 'hide_installed_modpacks', value: boolean) {
-	themeStore.featureFlags[flag] = value
+	appSettings.featureFlags[flag] = value
 	getSettings()
 		.then((settings) => {
 			settings.feature_flags[flag] = value
@@ -392,16 +394,17 @@ function setBrowseHideInstalledFlag(flag: 'hide_installed_modpacks', value: bool
 }
 
 const hideInstalledModpacks = computed({
-	get: () => themeStore.getFeatureFlag('hide_installed_modpacks'),
+	get: () => appSettings.getFeatureFlag('hide_installed_modpacks'),
 	set: (value: boolean) => setBrowseHideInstalledFlag('hide_installed_modpacks', value),
 })
 
 const instanceFilters = computed(() => {
 	const filters = []
 
-	if (instance.value) {
+	if (instance.value && projectType.value !== 'resourcepack') {
+		const isVanillaShader = projectType.value === 'shader' && instance.value.loader === 'vanilla'
 		const gameVersion = instance.value.game_version
-		if (gameVersion) {
+		if (gameVersion && !isVanillaShader) {
 			filters.push({ type: 'game_version', option: gameVersion })
 		}
 
@@ -410,6 +413,9 @@ const instanceFilters = computed(() => {
 
 		if (platform && projectType.value === 'mod' && supportedModLoaders.includes(platform)) {
 			filters.push({ type: 'mod_loader', option: platform })
+		}
+		if (isVanillaShader) {
+			filters.push({ type: 'shader_loader', option: 'vanilla' })
 		}
 
 		if (isServerInstance.value) {
@@ -524,13 +530,20 @@ const {
 })
 
 const offline = ref(!navigator.onLine)
-window.addEventListener('offline', () => {
+const handleOffline = () => {
 	debugLog('went offline')
 	offline.value = true
-})
-window.addEventListener('online', () => {
+}
+const handleOnline = () => {
 	debugLog('went online')
 	offline.value = false
+}
+window.addEventListener('offline', handleOffline)
+window.addEventListener('online', handleOnline)
+
+onBeforeUnmount(() => {
+	window.removeEventListener('offline', handleOffline)
+	window.removeEventListener('online', handleOnline)
 })
 
 const messages = defineMessages({
@@ -549,10 +562,6 @@ const messages = defineMessages({
 	gameVersionProvidedByInstance: {
 		id: 'search.filter.locked.instance-game-version.title',
 		defaultMessage: 'Game version is provided by the instance',
-	},
-	gameVersionProvidedByServer: {
-		id: 'search.filter.locked.server-game-version.title',
-		defaultMessage: 'Game version is provided by the server',
 	},
 	hideAddedServers: {
 		id: 'app.browse.hide-added-servers',
@@ -573,7 +582,7 @@ const messages = defineMessages({
 	serverInstanceContentWarning: {
 		id: 'app.browse.server-instance-content-warning',
 		defaultMessage:
-			'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.',
+			'Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated.',
 	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
@@ -583,17 +592,20 @@ const messages = defineMessages({
 		id: 'app.browse.project-type.modpacks',
 		defaultMessage: 'Modpacks',
 	},
-	modLoaderProvidedByServer: {
-		id: 'search.filter.locked.server-loader.title',
-		defaultMessage: 'Loader is provided by the server',
+	modsProjectType: { id: 'app.browse.project-type.mods', defaultMessage: 'Mods' },
+	resourcePacksProjectType: {
+		id: 'app.browse.project-type.resource-packs',
+		defaultMessage: 'Resource Packs',
 	},
+	dataPacksProjectType: {
+		id: 'app.browse.project-type.data-packs',
+		defaultMessage: 'Data Packs',
+	},
+	shadersProjectType: { id: 'app.browse.project-type.shaders', defaultMessage: 'Shaders' },
+	serversProjectType: { id: 'app.browse.project-type.servers', defaultMessage: 'Servers' },
 	providedByInstance: {
 		id: 'search.filter.locked.instance',
 		defaultMessage: 'Provided by the instance',
-	},
-	providedByServer: {
-		id: 'search.filter.locked.server',
-		defaultMessage: 'Provided by the server',
 	},
 	syncFilterButton: {
 		id: 'search.filter.locked.instance.sync',
@@ -693,16 +705,31 @@ const selectableProjectTypes = computed(() => {
 	}
 
 	if (isFromWorlds.value) {
-		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
+		return [{ label: formatMessage(messages.serversProjectType), href: `/browse/server${suffix}` }]
 	}
 
 	return [
-		{ label: 'Modpacks', href: `/browse/modpack${suffix}`, shown: modpacks },
-		{ label: 'Mods', href: `/browse/mod${suffix}`, shown: mods },
-		{ label: 'Resource Packs', href: `/browse/resourcepack${suffix}` },
-		{ label: 'Data Packs', href: `/browse/datapack${suffix}`, shown: dataPacks },
-		{ label: 'Shaders', href: `/browse/shader${suffix}` },
-		{ label: 'Servers', href: `/browse/server${suffix}`, shown: !instance.value },
+		{
+			label: formatMessage(messages.modpacksProjectType),
+			href: `/browse/modpack${suffix}`,
+			shown: modpacks,
+		},
+		{ label: formatMessage(messages.modsProjectType), href: `/browse/mod${suffix}`, shown: mods },
+		{
+			label: formatMessage(messages.resourcePacksProjectType),
+			href: `/browse/resourcepack${suffix}`,
+		},
+		{
+			label: formatMessage(messages.dataPacksProjectType),
+			href: `/browse/datapack${suffix}`,
+			shown: dataPacks,
+		},
+		{ label: formatMessage(messages.shadersProjectType), href: `/browse/shader${suffix}` },
+		{
+			label: formatMessage(messages.serversProjectType),
+			href: `/browse/server${suffix}`,
+			shown: !instance.value,
+		},
 	]
 })
 
@@ -722,7 +749,7 @@ const installContext = computed(() => {
 			queuedCount: queuedServerInstallCount.value,
 			selectedProjects: selectedServerInstallProjects.value,
 			isInstallingSelected: isInstallingQueuedServerInstalls.value,
-			skipNonEssentialWarnings: themeStore.getFeatureFlag('skip_non_essential_warnings'),
+			skipNonEssentialWarnings: appSettings.getFeatureFlag('skip_non_essential_warnings'),
 			installProgress: queuedInstallProgress.value,
 			clearQueued: clearQueuedServerInstalls,
 			clearSelected: clearQueuedServerInstalls,
@@ -736,14 +763,14 @@ const installContext = computed(() => {
 			name: instance.value.name,
 			loader: instance.value.loader,
 			gameVersion: instance.value.game_version,
-			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+			iconSrc: getInstanceIconUrl(instance.value.icon_path),
 			backUrl: `/instance/${encodeURIComponent(instance.value.id)}${isFromWorlds.value ? '/worlds' : ''}`,
 			backLabel: formatMessage(messages.backToInstance),
 			heading: formatMessage(
 				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
 			),
 			warning:
-				isServerInstance.value && !isFromWorlds.value
+				isServerInstance.value && instance.value.loader !== 'vanilla' && !isFromWorlds.value
 					? formatMessage(messages.serverInstanceContentWarning)
 					: undefined,
 		}
@@ -878,6 +905,7 @@ function getCardActions(
 		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
 	) {
 		const isQueued = queuedServerInstallProjectIds.value.has(projectResult.project_id)
+		const isQueuedRoot = queuedServerInstallRootProjectIds.value.has(projectResult.project_id)
 		const isInstallingSelection = isInstallingQueuedServerInstalls.value
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
@@ -905,14 +933,16 @@ function getCardActions(
 							? CheckIcon
 							: PlusIcon,
 				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
-				disabled: showAsInstalled || isInstalling || isInstallingSelection,
+				disabled:
+					showAsInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
 				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					if (isQueued) {
+					if (isQueuedRoot) {
 						removeQueuedServerInstall(projectResult.project_id)
 						return
 					}
+					if (isQueued) return
 
 					const contentType = currentProjectType as BrowseInstallContentType
 					const isModpack = contentType === 'modpack'
@@ -921,7 +951,7 @@ function getCardActions(
 						setProjectInstalling(projectResult.project_id, true)
 					}
 					try {
-						await requestInstall({
+						const plan = await requestInstall({
 							project: projectResult,
 							contentType,
 							mode: isModpack ? 'immediate' : 'queue',
@@ -945,7 +975,9 @@ function getCardActions(
 									iconUrl: plan.project.icon_url ?? undefined,
 								}),
 						})
+						if (!isModpack) await resolveQueuedServerInstallPlan(plan)
 					} catch (err) {
+						if (!isModpack) removeQueuedServerInstall(projectResult.project_id)
 						handleError(err as Error)
 					} finally {
 						if (shouldShowInstalling) {
@@ -1106,24 +1138,12 @@ async function search(requestParams: string) {
 	}
 }
 
-const isServerFilterContext = computed(() => isServerContext.value || isServerInstance.value)
-
 const lockedFilterMessages = computed(() => ({
-	gameVersion: formatMessage(
-		isServerFilterContext.value
-			? messages.gameVersionProvidedByServer
-			: messages.gameVersionProvidedByInstance,
-	),
-	modLoader: formatMessage(
-		isServerFilterContext.value
-			? messages.modLoaderProvidedByServer
-			: messages.modLoaderProvidedByInstance,
-	),
+	gameVersion: formatMessage(messages.gameVersionProvidedByInstance),
+	modLoader: formatMessage(messages.modLoaderProvidedByInstance),
 	environment: formatMessage(messages.environmentProvidedByServer),
 	syncButton: formatMessage(messages.syncFilterButton),
-	providedBy: formatMessage(
-		isServerFilterContext.value ? messages.providedByServer : messages.providedByInstance,
-	),
+	providedBy: formatMessage(messages.providedByInstance),
 }))
 
 const searchState = useBrowseSearch({
@@ -1178,44 +1198,23 @@ if (instance.value?.game_version) {
 
 void searchState.refreshSearch()
 
-type UnlistenFn = () => void
-
-let isUnmounted = false
-let unlistenInstances: UnlistenFn | null = null
-
-onMounted(() => {
-	instance_listener(async (event: { event: string; instance_id: string }) => {
-		if (event.event === 'added' || event.event === 'created' || event.event === 'removed') {
-			if (!route.query.i) {
-				await refreshInstalledProjectIds()
-				if (projectType.value === 'modpack') {
-					if (event.event === 'removed') {
-						syncHiddenInstanceProjectIds()
-					}
-					await searchState.refreshSearch()
-				}
-			}
-		}
-
-		if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+useAppEvent('instance', async (event) => {
+	if (event.event === 'created' || event.event === 'removed') {
+		if (!route.query.i) {
 			await refreshInstalledProjectIds()
-			await searchState.refreshSearch()
-		}
-	})
-		.then((unlisten) => {
-			if (isUnmounted) {
-				unlisten()
-				return
+			if (projectType.value === 'modpack') {
+				if (event.event === 'removed') {
+					syncHiddenInstanceProjectIds()
+				}
+				await searchState.refreshSearch()
 			}
+		}
+	}
 
-			unlistenInstances = unlisten
-		})
-		.catch(handleError)
-})
-
-onUnmounted(() => {
-	isUnmounted = true
-	unlistenInstances?.()
+	if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
+		await refreshInstalledProjectIds()
+		await searchState.refreshSearch()
+	}
 })
 
 function getProjectBrowseQuery() {
@@ -1230,12 +1229,25 @@ function getProjectBrowseQuery() {
 }
 
 const advancedFiltersCollapsed = computed({
-	get: () => themeStore.getFeatureFlag('advanced_filters_collapsed'),
+	get: () => appSettings.getFeatureFlag('advanced_filters_collapsed'),
 	set: (value) => {
-		themeStore.featureFlags['advanced_filters_collapsed'] = value
+		appSettings.featureFlags['advanced_filters_collapsed'] = value
 		getSettings()
 			.then((settings) => {
 				settings.feature_flags['advanced_filters_collapsed'] = value
+				return setSettings(settings)
+			})
+			.catch(handleError)
+	},
+})
+
+const dismissedPhotosensitivityFilterWarning = computed({
+	get: () => appSettings.getFeatureFlag('dismissed_photosensitivity_filter_warning'),
+	set: (value) => {
+		appSettings.featureFlags['dismissed_photosensitivity_filter_warning'] = value
+		getSettings()
+			.then((settings) => {
+				settings.feature_flags['dismissed_photosensitivity_filter_warning'] = value
 				return setSettings(settings)
 			})
 			.catch(handleError)
@@ -1247,6 +1259,7 @@ provideBrowseManager({
 	projectType,
 	...searchState,
 	advancedFiltersCollapsed,
+	dismissedPhotosensitivityFilterWarning,
 	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: getProjectBrowseQuery(),

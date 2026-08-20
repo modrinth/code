@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { SearchIcon } from '@modrinth/assets'
+import { RotateCounterClockwiseIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref, toValue } from 'vue'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import { Button, IconButton } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
@@ -66,6 +67,14 @@ const messages = defineMessages({
 		id: 'browse.no-results',
 		defaultMessage: 'No results found for your query!',
 	},
+	linkOverridingPreferences: {
+		id: 'browse.advanced-filters.link-overriding-preferences',
+		defaultMessage: "This link's filters differ from your saved advanced exclusions",
+	},
+	applySavedPreferences: {
+		id: 'browse.advanced-filters.apply-saved-preferences',
+		defaultMessage: 'Apply saved preferences',
+	},
 })
 
 function cardActionType(action: CardAction) {
@@ -121,7 +130,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
 		<div
 			ref="stickyInstallHeaderRef"
-			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-3 py-4 border-surface-5"
+			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-6 py-4 border-surface-5"
 			:class="[isInstallHeaderStuck ? 'border-t' : '']"
 		>
 			<BrowseInstallHeader />
@@ -150,6 +159,21 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
 		@clear="ctx.clearSearch()"
 	/>
+
+	<Admonition
+		v-if="ctx.linkOverridesAdvancedPrefs.value"
+		type="info"
+		:header="formatMessage(messages.linkOverridingPreferences)"
+		inline-actions
+		center-content
+	>
+		<template #actions>
+			<Button type="colored" color="blue" @click="ctx.applySavedAdvancedPrefs()">
+				<RotateCounterClockwiseIcon />
+				{{ formatMessage(messages.applySavedPreferences) }}
+			</Button>
+		</template>
+	</Admonition>
 
 	<div class="flex flex-wrap items-center gap-2">
 		<Combobox

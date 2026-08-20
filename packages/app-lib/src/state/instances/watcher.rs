@@ -138,7 +138,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 };
                                 if let Some(event) = event {
                                     let emit_instance_id = instance_id.clone();
-                                    let mark_shared_stale = first_file_name
+                                    let sync_content = first_file_name
                                         .as_ref()
                                         .is_some_and(|name| {
                                             ProjectType::iterator().any(
@@ -150,18 +150,18 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                             )
                                         });
                                     tokio::spawn(async move {
-                                        if mark_shared_stale
+                                        if sync_content
                                             && let Ok(state) =
                                                 State::get().await
                                             && let Err(error) =
-                                                crate::state::mark_shared_instance_stale(
+                                                crate::state::sync_content_files(
                                                     &emit_instance_id,
-                                                    &state.pool,
+                                                    &state,
                                                 )
                                                 .await
                                         {
                                             tracing::error!(
-                                                "Failed to mark shared instance stale after filesystem sync: {error}"
+                                                "Failed to sync instance content after filesystem change: {error}"
                                             );
                                         }
                                         let _ = emit_instance(

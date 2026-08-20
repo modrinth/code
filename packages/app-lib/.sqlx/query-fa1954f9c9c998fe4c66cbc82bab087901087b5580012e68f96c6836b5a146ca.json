@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE onboarding_checklist\n                SET has_logged_into_modrinth = TRUE\n                WHERE id = 0 AND has_logged_into_modrinth = FALSE\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "fa1954f9c9c998fe4c66cbc82bab087901087b5580012e68f96c6836b5a146ca"
+}

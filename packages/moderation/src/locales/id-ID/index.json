@@ -269,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "Periksa tautan eksternal"
   },
-  "nags.versions.title": {
-    "defaultMessage": "Kunjungi laman versi"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Kunjungi pengaturan tautan"
   }
 }
+

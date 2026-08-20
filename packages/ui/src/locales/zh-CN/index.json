@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "安装设置"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "附加内容"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "项目名称"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "按字母顺序"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "按从新到旧顺序"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "按从旧到新顺序"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "按{mode}排序"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新所有"
@@ -721,9 +706,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "搜索游戏版本……"
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "移除图标"
   },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "选择图标"
@@ -887,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "清除所有"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "浏览整合包"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "导入整合包"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "已经知道你想安装哪个整合包？"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "未找到结果"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "搜索整合包"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "实例是带有特定加载器、游戏版本和模组的一套 Minecraft 配置。"
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "从头开始，选择一个加载器和游戏版本。"
   },
@@ -937,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "选择世界类型"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "选择整合包"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "创建实例"
@@ -2072,41 +2033,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "未找到相关的实例"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "移除图标"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "搜索实例"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "选择图标"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "这个整合包不包含任何额外内容。"
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "未找到内容"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "外部来源"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "此文件未发布于 Modrinth 平台。"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "整合包内容"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "加载内容……"
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "没有符合搜索条件的项目。"
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "在 Slicer 中打开"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
@@ -3833,15 +3761,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "高级"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "排除数据包"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "排除模组"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "排除插件"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "运行环境"
   },
@@ -4610,9 +4529,6 @@
   "servers.busy.installing": {
     "defaultMessage": "正在安装服务器"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "正在同步內容"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "同时发送好友邀请"
   },
@@ -4667,56 +4583,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "安装失败"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "安装平台时发生内部错误，请重试。"
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "指定的加载器或 Minecraft 版本无法安装。它可能无效或不受支持。"
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "整合包无法安装。它可能已损坏或不兼容。"
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "这个整合包版本不包含可下载的文件，可能是打包方式有问题。"
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "安装过程中发生意外错误。"
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Modrinth Hosting 目前尚不支持此版本的 Minecraft 或加载器。"
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "正在安装组件……"
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "正在安装整合包……"
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "正在安装平台……"
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "我们正在准备你的服务器"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "正在添加 Java……"
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "正在配置服务器……"
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "正在下载模组……"
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "正在整理文件……"
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "正在设置运行环境……"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已经有服务器了吗？"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "深入了解 Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4726,9 +4600,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "安装模组、邀请好友并一起畅玩，这一切都能在 Modrinth App 中轻松完成。"
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "目前还没有服务器"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "选出你最喜欢的模组，其余的交给我们来处理。"
@@ -4744,12 +4615,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "登录"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "像设置单人游戏世界一样配置你的服务器。"
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "设置简单"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "已复制"
@@ -5350,9 +5215,6 @@
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "好友邀请"
-  },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "即将到来！"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "所有人"

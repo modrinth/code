@@ -143,29 +143,11 @@
   "app.ads-consent.title": {
     "message": "La tua privacy e come le pubblicità supportano Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Abilita effetti come lo sfondo sfocato. Questo potrebbe ridurre le prestazioni senza accelerazione hardware."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Rendering avanzato"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Scegli il tema usato da Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Scegli la pagina che Modrinth App mostrerà all'avvio."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Libreria"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Pagina di avvio"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Nasconde il tuo nome dalle anteprime della pagina delle Skin."
@@ -184,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimizza app"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Usa la barra e i controlli delle finestre di sistema. Richiede un riavvio."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Usa cornice di sistema"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Mostra quanto tempo hai giocato a un'istanza."
@@ -377,23 +353,14 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Revisiona modifiche"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Revisiona aggiornamento"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Revisione..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "{name} richiede degli aggiornamenti. Installa l'ultima versione per poter giocare."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Aggiornamento disponibile"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Tutti i dati della tua istanza verranno eliminati permanentemente, inclusi i tuoi mondi, configurazioni e tutti i contenuti installati."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Questa azione non può essere annullata"
+    "message": "Questa azione è irreversibile"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "Elimina istanza"
@@ -564,7 +531,7 @@
     "message": "Eliminare il mondo"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
-    "message": "Questo mondo verrà eliminato permanentemente dall'istanza. Questa azione non può essere annullata."
+    "message": "Il mondo sarà eliminato dall'istanza per sempre. Questa azione è irreversibile."
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
     "message": "Eliminare {name}"
@@ -701,15 +668,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Quale regola è violata da quest'istanza?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Inappropriato"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Dannoso"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Segnala istanza condivisa"
   },
@@ -775,9 +733,6 @@
   },
   "app.nav.home": {
     "message": "Home"
-  },
-  "app.nav.library": {
-    "message": "Libreria"
   },
   "app.nav.modrinth-account": {
     "message": "Account Modrinth"
@@ -1035,7 +990,7 @@
     "message": "Elimina"
   },
   "app.skins.delete-modal.description": {
-    "message": "Questa skin sarà rimossa per sempre. Quest'azione non può essere annullata."
+    "message": "La skin selezionata sarà eliminata per sempre. Questa azione è irreversibile."
   },
   "app.skins.delete-modal.title": {
     "message": "Vuoi davvero eliminare questa skin?"
@@ -1163,15 +1118,6 @@
   "app.skins.sign-in.button": {
     "message": "Accedi"
   },
-  "app.skins.sign-in.description": {
-    "message": "Accedi col tuo account Minecraft per poter gestire le skin qui."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Modrinth Bot emozionato"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Effettua l'accesso"
-  },
   "app.skins.title": {
     "message": "Seleziona una skin"
   },
@@ -1226,6 +1172,9 @@
   "app.update.complete-toast.title": {
     "message": "La versione {version} è stata installata con successo!"
   },
+  "app.user.project.install-to-instance": {
+    "message": "Installa nell'istanza"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -1240,9 +1189,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Modificare la versione cambia solo la copia locale. Gli aggiornamenti condivisi futuri potrebbero rimodificarla."
@@ -1503,7 +1449,7 @@
     "message": "L'invito <monospace>{code}</monospace> smetterà di funzionare immediatamente. Le persone già entrate manterranno l'accesso."
   },
   "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Questa azione non può essere annullata"
+    "message": "Questa azione è irreversibile"
   },
   "instance.settings.sharing.revoke-invite.confirm": {
     "message": "Revoca invito"
@@ -1549,18 +1495,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Scegli un'icona"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Gruppi della libreria"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Crea nuovo gruppo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "I gruppi della libreria ti permettono di organizzare le tue istanze in più sezioni nella tua libreria."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Inserisci il nome del gruppo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nome"
@@ -1618,6 +1552,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Hook all'avvio del gioco"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Gli hook si eseguono nella cartella principale dell'istanza, con le seguenti variabili:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: Il percorso assoluto della cartella dell'istanza"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: Il nome della cartella dell'istanza"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: Gli argomenti JVM forniti al gioco"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: Il percorso assoluto dei binari di Java"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Alias di $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: Il nome dell'istanza"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -1895,17 +1850,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizza con l'istanza"
   },
-  "search.filter.locked.server": {
-    "message": "Determinato dal server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Solo mod lato client possono essere aggiunte all'istanza del server"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "La versione del gioco è determinata dal server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Il loader è determinato dal server"
   },
   "settings.sidebar.label.account": {
     "message": "Account"
