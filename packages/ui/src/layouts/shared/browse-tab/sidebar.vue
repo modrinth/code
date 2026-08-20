@@ -92,6 +92,9 @@ const buttonClass = computed(() => {
 
 const contentClass = computed(() => (isApp.value ? 'mt-2 mb-3' : 'mb-4 mx-3'))
 const innerPanelClass = computed(() => (isApp.value ? 'ml-2 mr-3' : 'p-1'))
+const selectedProjectClass = computed(() =>
+	isApp.value ? 'bg-surface-1 border border-solid border-surface-3' : 'bg-surface-2',
+)
 
 function hasProvidedFilter(filterId: string): boolean {
 	return (ctx.providedFilters?.value ?? []).some((filter) => filter.type === filterId)
@@ -222,6 +225,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:button-class="buttonClass"
 				:content-class="contentClass"
 				:inner-panel-class="innerPanelClass"
+				:selected-project-class="selectedProjectClass"
 				:open-by-default="getFilterOpenByDefault(filterType.id)"
 				@on-open="() => filterType.id === 'advanced' && setAdvancedFiltersCollapsed(false)"
 				@on-close="() => filterType.id === 'advanced' && setAdvancedFiltersCollapsed(true)"
@@ -255,6 +259,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:button-class="buttonClass"
 				:content-class="contentClass"
 				:inner-panel-class="innerPanelClass"
+				:selected-project-class="selectedProjectClass"
 				:open-by-default="getFilterOpenByDefault(filter.id)"
 				@on-open="() => filter.id === 'advanced' && setAdvancedFiltersCollapsed(false)"
 				@on-close="() => filter.id === 'advanced' && setAdvancedFiltersCollapsed(true)"

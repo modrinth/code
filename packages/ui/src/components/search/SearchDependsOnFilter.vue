@@ -8,6 +8,7 @@
 			:show-chevron="false"
 			:sync-with-selection="false"
 			clearable
+			search-input-variant="button"
 			show-search-icon
 			@update:model-value="addIncludedProject"
 		/>
@@ -76,12 +77,16 @@
 			:search-placeholder="formatMessage(messages.searchProjectPlaceholder)"
 			:show-chevron="false"
 			clearable
+			search-input-variant="button"
 			select-search-text-on-focus
 			show-search-icon
 			@update:model-value="setSelectedProjectId"
 		/>
 		<template v-if="showSelectedProject">
-			<div class="flex items-center gap-2 rounded-2xl bg-surface-2 p-2.5">
+			<div
+				class="flex items-center gap-2 rounded-2xl p-2.5"
+				:class="selectedProjectClass ?? 'bg-surface-2'"
+			>
 				<img
 					v-if="selectedProject?.icon_url"
 					:src="selectedProject.icon_url"
@@ -164,6 +169,7 @@ const selectedFilters = defineModel<FilterValue[]>('selectedFilters', { required
 const props = defineProps<{
 	projectType: string
 	innerPanelClass?: string
+	selectedProjectClass?: string
 	resultCount?: number
 	refreshing?: boolean
 }>()

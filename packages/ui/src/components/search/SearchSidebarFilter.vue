@@ -74,6 +74,7 @@
 				v-model:selected-filters="selectedFilters"
 				:project-type="projectType"
 				:inner-panel-class="innerPanelClass"
+				:selected-project-class="selectedProjectClass"
 				:result-count="resultCount"
 				:loading="loading"
 				:refreshing="refreshing"
@@ -88,7 +89,6 @@
 					:placeholder="formatMessage(messages.searchPlaceholder)"
 					autocomplete="off"
 					clearable
-					size="small"
 					input-class="!bg-button-bg"
 					wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
 				/>
@@ -251,6 +251,7 @@ const props = defineProps<{
 	buttonClass?: string
 	contentClass?: string
 	innerPanelClass?: string
+	selectedProjectClass?: string
 	openByDefault?: boolean
 	providedFilters: FilterValue[]
 	resultCount?: number

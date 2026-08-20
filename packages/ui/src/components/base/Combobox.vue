@@ -1,10 +1,14 @@
 <template>
 	<div ref="containerRef" class="relative inline-block w-full">
 		<!-- Searchable mode: input trigger -->
-		<div v-if="searchable" class="relative w-full rounded-xl bg-surface-4">
+		<div
+			v-if="searchable"
+			class="relative w-full rounded-xl"
+			:class="{ 'bg-surface-4': searchInputVariant === 'surface' }"
+		>
 			<!--
 				Selection mirror: horizontal padding must match StyledInput (filled + left icon uses `pl-10`,
-				else `pl-3`) and `searchableInputClass` when the chevron is shown (`!pr-9`), or the overlay
+				else `pl-3`) and `resolvedSearchInputClass` when the chevron is shown (`!pr-9`), or the overlay
 				text will not line up with the transparent input text / caret.
 			-->
 			<div
@@ -32,7 +36,7 @@
 				:inputmode="searchInputmode"
 				:input-attrs="searchInputAttrs"
 				wrapper-class="w-full !bg-transparent"
-				:input-class="searchableInputClass"
+				:input-class="resolvedSearchInputClass"
 				class="relative z-[1]"
 				@input="handleSearchInput"
 				@keydown="handleSearchKeydown"
@@ -236,6 +240,8 @@ export interface ComboboxOption<T> {
 	searchTerms?: string[]
 }
 
+export type ComboboxSearchInputVariant = 'surface' | 'button'
+
 type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
 type ViewportRect = {
 	width: number
@@ -314,6 +320,7 @@ const props = withDefaults(
 		searchAutocapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters'
 		searchSpellcheck?: boolean
 		searchInputAttrs?: Record<string, string | number | boolean | undefined>
+		searchInputVariant?: ComboboxSearchInputVariant
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -331,6 +338,7 @@ const props = withDefaults(
 		selectSearchTextOnFocus: false,
 		showSearchIcon: false,
 		searchType: 'text',
+		searchInputVariant: 'surface',
 		triggerType: 'base',
 		triggerSize: 'md',
 		triggerInteraction: 'surface',
@@ -401,8 +409,8 @@ const searchSelectionOverlayVisible = computed(() => {
 	return true
 })
 
-const searchableInputClass = computed(() => {
-	const parts = ['!bg-transparent']
+const resolvedSearchInputClass = computed(() => {
+	const parts = [props.searchInputVariant === 'button' ? '!bg-button-bg' : '!bg-transparent']
 	if (props.showChevron) parts.push('!pr-9')
 	if (searchSelectionOverlayVisible.value) {
 		parts.push('!text-transparent [caret-color:var(--color-text-primary)] selection:bg-transparent')

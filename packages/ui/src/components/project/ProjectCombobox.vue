@@ -9,6 +9,7 @@
 		:disable-search-filter="true"
 		:disabled="disabled"
 		:clearable="clearable"
+		:search-input-variant="searchInputVariant"
 		:sync-with-selection="syncWithSelection"
 		:select-search-text-on-focus="selectSearchTextOnFocus"
 		show-icon-in-selected
@@ -23,7 +24,7 @@ import Fuse from 'fuse.js'
 import { defineAsyncComponent, h, markRaw, ref, watch } from 'vue'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
-import type { ComboboxOption } from '../base/Combobox.vue'
+import type { ComboboxOption, ComboboxSearchInputVariant } from '../base/Combobox.vue'
 import Combobox from '../base/Combobox.vue'
 
 export type ProjectType =
@@ -60,6 +61,8 @@ const props = withDefaults(
 		disabled?: boolean
 		/** Whether to show a button for clearing the search input */
 		clearable?: boolean
+		/** Visual treatment for the search input */
+		searchInputVariant?: ComboboxSearchInputVariant
 		/** Keep the selected project's label in the search input */
 		syncWithSelection?: boolean
 		/** Select all search text when the input receives focus */
@@ -79,6 +82,7 @@ const props = withDefaults(
 		loadingMessage: 'Loading...',
 		noResultsMessage: 'No results found',
 		disabled: false,
+		searchInputVariant: 'surface',
 		syncWithSelection: true,
 		limit: 20,
 	},
