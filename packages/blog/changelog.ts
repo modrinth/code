@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-20T22:10:10+00:00`,
+		product: 'app',
+		version: '0.18.2',
+		body: `## Security
+- Fixed .mrpack exports replacing the original file with the primary file of a version previously detected on hash lookup.`,
+	},
+	{
 		date: `2026-08-20T21:46:49+00:00`,
 		product: 'app',
 		version: '0.18.1',
