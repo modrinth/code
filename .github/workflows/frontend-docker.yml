@@ -72,7 +72,7 @@ jobs:
 
       - name: Build frontend
         working-directory: ./apps/frontend
-        run: pnpm web;build
+        run: pnpm web:build
         env:
           NITRO_PRESET: node-server
           BUILD_ENV: ${{ steps.meta.outputs.env }}
