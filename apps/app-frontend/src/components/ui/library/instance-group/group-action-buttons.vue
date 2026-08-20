@@ -2,16 +2,25 @@
 import { ArrowDownIcon, ArrowUpIcon, EditIcon, SquarePlusIcon, TrashIcon } from '@modrinth/assets'
 import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 
-defineProps<{
-	deleting?: boolean
-	canMoveDown: boolean
-	canMoveUp: boolean
-	onAddToGroup: () => void
-	onDeleteGroup: () => void
-	onEditGroupName: () => void
-	onMoveDown: () => void
-	onMoveUp: () => void
-}>()
+withDefaults(
+	defineProps<{
+		deleting?: boolean
+		canMoveDown: boolean
+		canMoveUp: boolean
+		onAddToGroup: () => void
+		onDeleteGroup: () => void
+		onEditGroupName: () => void
+		onMoveDown: () => void
+		onMoveUp: () => void
+		showDelete?: boolean
+		showEdit?: boolean
+	}>(),
+	{
+		deleting: false,
+		showDelete: true,
+		showEdit: true,
+	},
+)
 
 const { formatMessage } = useVIntl()
 
@@ -64,6 +73,7 @@ const messages = defineMessages({
 			<ArrowDownIcon />
 		</IconButton>
 		<IconButton
+			v-if="showEdit"
 			v-tooltip="formatMessage(messages.editGroupName)"
 			:label="formatMessage(messages.editGroupName)"
 			type="quiet"
@@ -82,6 +92,7 @@ const messages = defineMessages({
 			<SquarePlusIcon />
 		</IconButton>
 		<IconButton
+			v-if="showDelete"
 			v-tooltip="formatMessage(messages.deleteGroup)"
 			:label="formatMessage(messages.deleteGroup)"
 			type="quiet"

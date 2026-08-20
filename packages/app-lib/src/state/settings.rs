@@ -62,6 +62,7 @@ pub enum FeatureFlag {
     ServerProjectQa,
     I18nDebug,
     ShowInstancePlayTime,
+    CompactInstanceCards,
     SkipNonEssentialWarnings,
     AdvancedFiltersCollapsed,
     AlwaysShowCopyDetails,

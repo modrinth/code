@@ -98,7 +98,7 @@
 						<Avatar size="xs" :src="organization.icon_url" :raised="raised" no-shadow />
 					</nuxt-link>
 					<nuxt-link v-else-if="user" :to="getUserLink(user)" tabindex="-1">
-						<Avatar size="xs" :src="user.avatar_url" :raised="raised" no-shadow />
+						<Avatar size="xs" :src="user.avatar_url" :raised="raised" no-shadow circle />
 					</nuxt-link>
 					<Avatar v-else size="xs" :raised="raised" no-shadow />
 				</template>

@@ -1,4 +1,4 @@
-import { defineMessages } from '@modrinth/ui'
+import { defineMessages, type MessageDescriptor } from '@modrinth/ui'
 
 import backpack from '@/assets/instance-icons/backpack.png'
 import beacon from '@/assets/instance-icons/beacon.png'
@@ -18,6 +18,8 @@ import enchantingTable from '@/assets/instance-icons/enchanting-table.png'
 import enderChest from '@/assets/instance-icons/ender-chest.png'
 import enderDragon from '@/assets/instance-icons/ender-dragon.png'
 import engine from '@/assets/instance-icons/engine.png'
+import fabric from '@/assets/instance-icons/fabric.png'
+import forge from '@/assets/instance-icons/forge.png'
 import furnace from '@/assets/instance-icons/furnace.png'
 import gizmo from '@/assets/instance-icons/gizmo.png'
 import globe from '@/assets/instance-icons/globe.png'
@@ -25,11 +27,13 @@ import grassBlock from '@/assets/instance-icons/grass-block.png'
 import lantern from '@/assets/instance-icons/lantern.png'
 import moobloom from '@/assets/instance-icons/moobloom.png'
 import mrPack from '@/assets/instance-icons/mr-pack.png'
+import neoForge from '@/assets/instance-icons/neoforge.png'
 import orb from '@/assets/instance-icons/orb.png'
 import oxygenDistributor from '@/assets/instance-icons/oxygen-distributor.png'
 import pancakes from '@/assets/instance-icons/pancakes.png'
 import pickaxe from '@/assets/instance-icons/pickaxe.png'
 import pokeBall from '@/assets/instance-icons/poke-ball.png'
+import quilt from '@/assets/instance-icons/quilt.png'
 import redstoneBlock from '@/assets/instance-icons/redstone-block.png'
 import sculkSensor from '@/assets/instance-icons/sculk-sensor.png'
 import skeleton from '@/assets/instance-icons/skeleton.png'
@@ -197,7 +201,19 @@ const names = defineMessages({
 		defaultMessage: 'Modrinth Wrench',
 	},
 	zombie: { id: 'instance.icon-editor.symbol.zombie', defaultMessage: 'Zombie' },
+	fabric: { id: 'instance.icon-editor.symbol.fabric', defaultMessage: 'Fabric' },
+	forge: { id: 'instance.icon-editor.symbol.forge', defaultMessage: 'Forge' },
+	neoForge: { id: 'instance.icon-editor.symbol.neoforge', defaultMessage: 'NeoForge' },
+	quilt: { id: 'instance.icon-editor.symbol.quilt', defaultMessage: 'Quilt' },
 })
+
+export interface SymbolOption {
+	id: string
+	name: MessageDescriptor
+	asset: string
+	category: 'loader' | 'modded' | 'vanilla'
+	excludeFromRandomization?: boolean
+}
 
 export const backgroundOptions = [
 	{
@@ -339,6 +355,39 @@ export const backgroundOptions = [
 ] as const
 
 export const symbolOptions = [
+	/////////////////////////
+	// loaders
+	/////////////////////////
+
+	{
+		id: 'fabric',
+		name: names.fabric,
+		asset: fabric,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
+	{
+		id: 'forge',
+		name: names.forge,
+		asset: forge,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
+	{
+		id: 'neoforge',
+		name: names.neoForge,
+		asset: neoForge,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
+	{
+		id: 'quilt',
+		name: names.quilt,
+		asset: quilt,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
+
 	// Cobblemon: Poké Ball
 	{ id: 'poke_ball', name: names.pokeBall, asset: pokeBall, category: 'modded' },
 
@@ -438,7 +487,7 @@ export const symbolOptions = [
 	{ id: 'lantern', name: names.lantern, asset: lantern, category: 'vanilla' },
 	{ id: 'tnt', name: names.tnt, asset: tnt, category: 'vanilla' },
 	{ id: 'command_block', name: names.commandBlock, asset: commandBlock, category: 'vanilla' },
-] as const
+] as const satisfies readonly SymbolOption[]
 
 export type BackgroundId = (typeof backgroundOptions)[number]['id']
 export type SymbolId = (typeof symbolOptions)[number]['id']
