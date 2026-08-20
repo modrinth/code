@@ -1968,7 +1968,7 @@ const projectHeaderMoreActions = computed(() => {
 			},
 			shown: !isPluginOnly && project.value?.actualProjectType !== 'modpack',
 		},
-		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value },
+		{ type: 'divider' },
 		{
 			id: 'moderation-checklist',
 			label: formatMessage(messages.reviewProject),
