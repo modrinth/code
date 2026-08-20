@@ -347,6 +347,15 @@ export const backgroundOptions = [
 ] as const
 
 export const symbolOptions = [
+	/////////////////////////
+	// loaders
+	/////////////////////////
+
+	{ id: 'fabric', name: names.fabric, asset: fabric, category: 'loader' },
+	{ id: 'forge', name: names.forge, asset: forge, category: 'loader' },
+	{ id: 'neoforge', name: names.neoForge, asset: neoForge, category: 'loader' },
+	{ id: 'quilt', name: names.quilt, asset: quilt, category: 'loader' },
+
 	// Cobblemon: Poké Ball
 	{ id: 'poke_ball', name: names.pokeBall, asset: pokeBall, category: 'modded' },
 
@@ -446,15 +455,6 @@ export const symbolOptions = [
 	{ id: 'lantern', name: names.lantern, asset: lantern, category: 'vanilla' },
 	{ id: 'tnt', name: names.tnt, asset: tnt, category: 'vanilla' },
 	{ id: 'command_block', name: names.commandBlock, asset: commandBlock, category: 'vanilla' },
-
-	/////////////////////////
-	// loaders
-	/////////////////////////
-
-	{ id: 'fabric', name: names.fabric, asset: fabric, category: 'loader' },
-	{ id: 'forge', name: names.forge, asset: forge, category: 'loader' },
-	{ id: 'neoforge', name: names.neoForge, asset: neoForge, category: 'loader' },
-	{ id: 'quilt', name: names.quilt, asset: quilt, category: 'loader' },
 ] as const
 
 export type BackgroundId = (typeof backgroundOptions)[number]['id']

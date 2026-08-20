@@ -67,7 +67,6 @@ const selectedSymbolOption = computed(
 	() => symbolOptions.find((option) => option.id === selectedSymbol.value)!,
 )
 const vanillaSymbolStartIndex = symbolOptions.findIndex((option) => option.category === 'vanilla')
-const loaderSymbolStartIndex = symbolOptions.findIndex((option) => option.category === 'loader')
 const selectedConfig = computed<InstanceIconConfig>(() => ({
 	background: { ...selectedBackgroundOption.value.background },
 	symbol: selectedSymbol.value,
@@ -454,7 +453,7 @@ const messages = defineMessages({
 					<div class="grid grid-cols-6 gap-2.5">
 						<template v-for="(option, index) in symbolOptions" :key="option.id">
 							<hr
-								v-if="index === vanillaSymbolStartIndex || index === loaderSymbolStartIndex"
+								v-if="index === vanillaSymbolStartIndex"
 								class="col-span-6 my-2.5 mx-1 w-full border-0 border-t border-solid border-surface-5"
 							/>
 							<button
