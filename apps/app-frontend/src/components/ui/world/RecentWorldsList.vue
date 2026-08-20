@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { LoaderCircleIcon } from '@modrinth/assets'
-import type { GameVersion } from '@modrinth/ui'
-import { defineMessages, GAME_MODES, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import {
+	Accordion,
+	defineMessages,
+	GAME_MODES,
+	type GameVersion,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
@@ -36,6 +42,7 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	jumpIn: { id: 'app.home.jump-back-in.title', defaultMessage: 'Jump in' },
+	resize: { id: 'app.home.jump-back-in.resize', defaultMessage: 'Drag to resize' },
 })
 
 const props = defineProps<{
@@ -54,6 +61,100 @@ const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []
 const MAX_JUMP_BACK_IN = 5
 const MAX_NEW_INSTANCES = 3
 const MAX_LINUX_POPULATES = 3
+const ITEM_DRAG_DISTANCE = 92
+const STORAGE_KEY = 'modrinth-jump-back-in-count'
+
+const storedVisibleCount = Number.parseInt(localStorage.getItem(STORAGE_KEY) ?? '', 10)
+const visibleItemLimit = ref(
+	Number.isFinite(storedVisibleCount)
+		? Math.max(1, Math.min(storedVisibleCount, MAX_JUMP_BACK_IN))
+		: MAX_JUMP_BACK_IN,
+)
+const maxVisibleItems = computed(() => Math.min(jumpBackInItems.value.length, MAX_JUMP_BACK_IN))
+const visibleItemCount = computed(() => Math.min(visibleItemLimit.value, maxVisibleItems.value))
+const visibleJumpBackInItems = computed(() =>
+	jumpBackInItems.value.slice(0, visibleItemCount.value),
+)
+const canResize = computed(() => maxVisibleItems.value > 1)
+const resizing = ref(false)
+const showOverdrag = ref(false)
+
+function setVisibleItemLimit(count: number) {
+	const clamped = Math.max(1, Math.min(count, maxVisibleItems.value))
+	if (clamped >= maxVisibleItems.value) {
+		visibleItemLimit.value = MAX_JUMP_BACK_IN
+		localStorage.removeItem(STORAGE_KEY)
+	} else {
+		visibleItemLimit.value = clamped
+		localStorage.setItem(STORAGE_KEY, String(clamped))
+	}
+}
+
+function adjustVisibleItemLimit(delta: number) {
+	const target = visibleItemCount.value + delta
+	if (target < 1 || target > maxVisibleItems.value) {
+		flashOverdrag()
+	}
+	setVisibleItemLimit(target)
+}
+
+let dragStartY = 0
+let dragStartCount = 0
+let wasOverdragging = false
+let overdragTimeout: ReturnType<typeof setTimeout> | undefined
+
+function clearOverdragFlash() {
+	showOverdrag.value = false
+	if (overdragTimeout) {
+		clearTimeout(overdragTimeout)
+		overdragTimeout = undefined
+	}
+}
+
+function flashOverdrag() {
+	showOverdrag.value = true
+	if (overdragTimeout) clearTimeout(overdragTimeout)
+	overdragTimeout = setTimeout(() => {
+		showOverdrag.value = false
+		overdragTimeout = undefined
+	}, 500)
+}
+
+function onResizePointerDown(event: PointerEvent) {
+	if (!canResize.value) return
+	event.preventDefault()
+	resizing.value = true
+	wasOverdragging = false
+	clearOverdragFlash()
+	dragStartY = event.clientY
+	dragStartCount = visibleItemCount.value
+	document.body.classList.add('recent-worlds-resizing')
+	const handle = event.currentTarget as HTMLElement
+	handle.setPointerCapture(event.pointerId)
+}
+
+function onResizePointerMove(event: PointerEvent) {
+	if (!resizing.value) return
+	const target = dragStartCount + Math.round((event.clientY - dragStartY) / ITEM_DRAG_DISTANCE)
+	const isOverdragging = target < 1 || target > maxVisibleItems.value
+	if (isOverdragging && !wasOverdragging) {
+		flashOverdrag()
+	}
+	wasOverdragging = isOverdragging
+	setVisibleItemLimit(target)
+}
+
+function endResize(event?: PointerEvent) {
+	if (!resizing.value) return
+	resizing.value = false
+	wasOverdragging = false
+	clearOverdragFlash()
+	document.body.classList.remove('recent-worlds-resizing')
+	const target = event?.currentTarget as HTMLElement | undefined
+	if (event && target?.hasPointerCapture(event.pointerId)) {
+		target.releasePointerCapture(event.pointerId)
+	}
+}
 
 // Track populate calls on Linux to prevent server ping spam
 const isLinux = platform() === 'linux'
@@ -276,100 +377,180 @@ onMounted(() => {
 	checkProcesses()
 	linuxPopulateCount.value = 0
 })
+
+onUnmounted(() => {
+	document.body.classList.remove('recent-worlds-resizing')
+	clearOverdragFlash()
+})
 </script>
 
 <template>
-	<div v-if="loading" class="flex flex-col gap-2">
-		<span
-			class="flex mt-1 mb-3 leading-none items-center gap-1 text-2xl font-semibold text-contrast"
-		>
-			{{ formatMessage(messages.jumpIn) }}
-		</span>
-		<div class="text-center py-4">
+	<Accordion
+		v-if="loading || jumpBackInItems.length > 0"
+		open-by-default
+		button-class="group mt-1 mb-3 flex w-fit cursor-pointer items-center border-0 bg-transparent p-0 text-left"
+	>
+		<template #title>
+			<span class="flex items-center gap-1 text-2xl font-semibold leading-none text-contrast mr-1">
+				{{ formatMessage(messages.jumpIn) }}
+			</span>
+		</template>
+		<div v-if="loading" class="text-center py-4">
 			<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
 		</div>
-	</div>
-	<div v-else-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-		<span
-			class="flex mt-1 mb-3 leading-none items-center gap-1 text-2xl font-semibold text-contrast"
-		>
-			{{ formatMessage(messages.jumpIn) }}
-		</span>
-		<div class="grid-when-huge flex flex-col w-full gap-3">
-			<template
-				v-for="item in jumpBackInItems"
-				:key="`${item.instance.id}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
-			>
-				<WorldItem
-					v-if="item.type === 'world'"
-					:world="item.world"
-					:playing-instance="runningInstances.includes(item.instance.id)"
-					:playing-world="
-						currentInstance === item.instance.id && currentWorld === getWorldIdentifier(item.world)
-					"
-					:refreshing="
-						item.world.type === 'server'
-							? serverData[item.world.address].refreshing && !serverData[item.world.address].status
-							: undefined
-					"
-					:supports-server-quick-play="
-						item.world.type === 'server' &&
-						hasServerQuickPlaySupport(gameVersions, item.instance.game_version || '')
-					"
-					:supports-world-quick-play="
-						item.world.type === 'singleplayer' &&
-						hasWorldQuickPlaySupport(gameVersions, item.instance.game_version || '')
-					"
-					:quarantined="item.instance.quarantined"
-					:server-status="
-						item.world.type === 'server' ? serverData[item.world.address].status : undefined
-					"
-					:rendered-motd="
-						item.world.type === 'server' ? serverData[item.world.address].renderedMotd : undefined
-					"
-					:current-protocol="protocolVersions[item.instance.id]"
-					:game-mode="
-						item.world.type === 'singleplayer' ? GAME_MODES[item.world.game_mode] : undefined
-					"
-					:instance-id="item.instance.id"
-					:instance-name="item.instance.name"
-					:instance-icon="item.instance.icon_path"
-					@refresh="
-						() =>
+		<div v-else class="grid-when-huge relative flex w-full flex-col gap-3">
+			<TransitionGroup name="jump-back-in-item">
+				<div
+					v-for="item in visibleJumpBackInItems"
+					:key="`${item.instance.id}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
+					class="jump-back-in-item min-w-0"
+				>
+					<WorldItem
+						v-if="item.type === 'world'"
+						:world="item.world"
+						:playing-instance="runningInstances.includes(item.instance.id)"
+						:playing-world="
+							currentInstance === item.instance.id &&
+							currentWorld === getWorldIdentifier(item.world)
+						"
+						:refreshing="
 							item.world.type === 'server'
-								? refreshServer(item.world.address, item.instance.id)
-								: {}
-					"
-					@update="() => populateJumpBackIn()"
-					@play="
-						() => {
-							currentInstance = item.instance.id
-							currentWorld = getWorldIdentifier(item.world)
-							joinWorld(item.world, item.instance)
-						}
-					"
-					@play-instance="
-						() => {
-							currentInstance = item.instance.id
-							playInstance(item.instance)
-						}
-					"
-					@stop="() => stopInstance(item.instance.id)"
-				/>
-				<InstanceItem
-					v-else
-					:instance="item.instance"
-					:last_played="item.sort_time"
-					:newly-added="item.newly_added"
-					@play="() => markInstancePlayed(item)"
-				/>
-			</template>
+								? serverData[item.world.address].refreshing &&
+									!serverData[item.world.address].status
+								: undefined
+						"
+						:supports-server-quick-play="
+							item.world.type === 'server' &&
+							hasServerQuickPlaySupport(gameVersions, item.instance.game_version || '')
+						"
+						:supports-world-quick-play="
+							item.world.type === 'singleplayer' &&
+							hasWorldQuickPlaySupport(gameVersions, item.instance.game_version || '')
+						"
+						:quarantined="item.instance.quarantined"
+						:server-status="
+							item.world.type === 'server' ? serverData[item.world.address].status : undefined
+						"
+						:rendered-motd="
+							item.world.type === 'server' ? serverData[item.world.address].renderedMotd : undefined
+						"
+						:current-protocol="protocolVersions[item.instance.id]"
+						:game-mode="
+							item.world.type === 'singleplayer' ? GAME_MODES[item.world.game_mode] : undefined
+						"
+						:instance-id="item.instance.id"
+						:instance-name="item.instance.name"
+						:instance-icon="item.instance.icon_path"
+						@refresh="
+							() =>
+								item.world.type === 'server'
+									? refreshServer(item.world.address, item.instance.id)
+									: {}
+						"
+						@update="() => populateJumpBackIn()"
+						@play="
+							() => {
+								currentInstance = item.instance.id
+								currentWorld = getWorldIdentifier(item.world)
+								joinWorld(item.world, item.instance)
+							}
+						"
+						@play-instance="
+							() => {
+								currentInstance = item.instance.id
+								playInstance(item.instance)
+							}
+						"
+						@stop="() => stopInstance(item.instance.id)"
+					/>
+					<InstanceItem
+						v-else
+						:instance="item.instance"
+						:last_played="item.sort_time"
+						:newly-added="item.newly_added"
+						@play="() => markInstancePlayed(item)"
+					/>
+				</div>
+			</TransitionGroup>
+			<div
+				v-if="canResize"
+				v-tooltip="resizing ? null : formatMessage(messages.resize)"
+				role="separator"
+				tabindex="0"
+				aria-orientation="horizontal"
+				:aria-label="formatMessage(messages.resize)"
+				:aria-valuemin="1"
+				:aria-valuemax="maxVisibleItems"
+				:aria-valuenow="visibleItemCount"
+				class="group/resize relative inset-x-0 bottom-0 flex h-6 -mt-3 w-1/3 mx-auto cursor-ns-resize touch-none select-none items-center justify-center opacity-0 transition-opacity duration-200 hover:opacity-100 focus-visible:opacity-100"
+				:class="{ 'opacity-100': resizing }"
+				@pointerdown="onResizePointerDown"
+				@pointermove="onResizePointerMove"
+				@pointerup="endResize"
+				@pointercancel="endResize"
+				@keydown.up.prevent="adjustVisibleItemLimit(-1)"
+				@keydown.down.prevent="adjustVisibleItemLimit(1)"
+				@keydown.home.prevent="setVisibleItemLimit(1)"
+				@keydown.end.prevent="setVisibleItemLimit(maxVisibleItems)"
+			>
+				<div class="flex flex-col gap-0.5">
+					<span
+						class="h-px w-6 transition-colors"
+						:class="showOverdrag ? 'bg-red' : 'bg-surface-3 group-hover/resize:bg-secondary'"
+					/>
+					<span
+						class="h-px w-6 transition-colors"
+						:class="showOverdrag ? 'bg-red' : 'bg-surface-3 group-hover/resize:bg-secondary'"
+					/>
+				</div>
+			</div>
 		</div>
-	</div>
+	</Accordion>
 </template>
 <style scoped lang="scss">
 .grid-when-huge {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(670px, 1fr));
+}
+
+.jump-back-in-item {
+	height: 5rem;
+	overflow: hidden;
+}
+
+.jump-back-in-item-enter-active,
+.jump-back-in-item-leave-active {
+	transition:
+		opacity 0.25s ease,
+		transform 0.25s ease,
+		height 0.25s ease;
+}
+
+.jump-back-in-item-enter-from,
+.jump-back-in-item-leave-to {
+	opacity: 0;
+	transform: scale(0.98);
+	height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.jump-back-in-item-enter-active,
+	.jump-back-in-item-leave-active {
+		transition: none;
+	}
+
+	.jump-back-in-item-enter-from,
+	.jump-back-in-item-leave-to {
+		opacity: 1;
+		transform: none;
+		height: 5rem;
+	}
+}
+</style>
+
+<style lang="scss">
+body.recent-worlds-resizing,
+body.recent-worlds-resizing * {
+	cursor: ns-resize !important;
 }
 </style>

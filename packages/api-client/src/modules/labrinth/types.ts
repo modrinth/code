@@ -1724,6 +1724,7 @@ export namespace Labrinth {
 				minimize_app: boolean
 				hide_right_sidebar: boolean
 				show_jump_in: boolean
+				compact_instance_cards: boolean
 				show_play_time: boolean
 				hide_nametag: boolean
 				warn_on_unknown_modpacks: boolean

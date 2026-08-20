@@ -287,7 +287,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import {
 	fetchCachedServerStatus,
