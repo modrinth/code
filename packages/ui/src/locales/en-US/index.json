@@ -2252,6 +2252,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Show unavailable"
   },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Download File"
+  },
   "instances.managed-content-modal.empty-description": {
     "defaultMessage": "This source does not include any managed content."
   },
