@@ -293,26 +293,23 @@
 					</div>
 				</SidebarCard>
 			</template>
-			<div
+			<NavTabs
 				v-if="projects && projectTypes.length > 1"
-				class="-mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2"
-			>
-				<NavTabs
-					:links="[
-						{
-							label: formatMessage(commonMessages.allProjectType),
-							href: `/collection/${collection.id}`,
-						},
-						...projectTypes.map((x) => {
-							return {
-								label: formatMessage(getProjectTypeCategoryMessage(x)),
-								href: `/collection/${collection.id}/${x}s`,
-							}
-						}),
-					]"
-					replace
-				/>
-			</div>
+				:links="[
+					{
+						label: formatMessage(commonMessages.allProjectType),
+						href: `/collection/${collection.id}`,
+					},
+					...projectTypes.map((x) => {
+						return {
+							label: formatMessage(getProjectTypeCategoryMessage(x)),
+							href: `/collection/${collection.id}/${x}s`,
+						}
+					}),
+				]"
+				replace
+				page-nav
+			/>
 
 			<ProjectList
 				v-if="projects && projects?.length > 0"

@@ -122,9 +122,7 @@
 						</Button>
 					</div>
 				</div>
-				<div v-if="navLinks.length > 2" class="-mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2">
-					<NavTabs :links="navLinks" replace />
-				</div>
+				<NavTabs v-if="navLinks.length > 2" :links="navLinks" replace page-nav />
 				<ProjectList
 					v-if="projects && projects.length > 0"
 					:projects="displayedProjects"

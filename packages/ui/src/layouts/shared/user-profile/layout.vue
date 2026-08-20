@@ -221,121 +221,117 @@
 				</UserPageHeader>
 			</template>
 
-			<div class="flex flex-col gap-4">
-				<div v-if="navLinks.length > 2" class="-mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2">
-					<NavTabs :links="navLinks" replace />
-				</div>
+			<NavTabs v-if="navLinks.length > 2" :links="navLinks" replace page-nav />
 
-				<div class="flex flex-col gap-3">
-					<ProjectList
-						v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
-						:projects="filteredProjects"
-						:layout="displayMode"
-						:link-mode="projectLinkMode"
-						show-status
+			<div class="flex flex-col gap-3">
+				<ProjectList
+					v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
+					:projects="filteredProjects"
+					:layout="displayMode"
+					:link-mode="projectLinkMode"
+					show-status
+				>
+					<template v-if="$slots['project-actions']" #actions="{ project }">
+						<slot name="project-actions" :project="project" />
+					</template>
+				</ProjectList>
+
+				<EmptyState
+					v-if="showProjectsEmptyState"
+					type="empty"
+					:heading="formatMessage(messages.profileNoProjectsLabel)"
+					:description="
+						isSelf ? formatMessage(messages.profileNoProjectsAuthDescription) : undefined
+					"
+				>
+					<template v-if="isSelf" #actions>
+						<Button type="colored" color="brand" native-type="button" @click="createProject">
+							{{ formatMessage(messages.createProjectButton) }}
+						</Button>
+					</template>
+				</EmptyState>
+
+				<ProjectCardList
+					v-if="selectedProjectType === null || selectedProjectType === 'collection'"
+					layout="grid"
+				>
+					<SmartClickable
+						v-for="collection in sortedCollections"
+						:key="collection.id"
+						class="h-full w-full"
 					>
-						<template v-if="$slots['project-actions']" #actions="{ project }">
-							<slot name="project-actions" :project="project" />
+						<template #clickable>
+							<AutoLink
+								:to="collectionLink(collection.id)"
+								class="no-click-animation custom-focus-indicator rounded-xl no-outline"
+							/>
 						</template>
-					</ProjectList>
-
-					<EmptyState
-						v-if="showProjectsEmptyState"
-						type="empty"
-						:heading="formatMessage(messages.profileNoProjectsLabel)"
-						:description="
-							isSelf ? formatMessage(messages.profileNoProjectsAuthDescription) : undefined
-						"
-					>
-						<template v-if="isSelf" #actions>
-							<Button type="colored" color="brand" native-type="button" @click="createProject">
-								{{ formatMessage(messages.createProjectButton) }}
-							</Button>
-						</template>
-					</EmptyState>
-
-					<ProjectCardList
-						v-if="selectedProjectType === null || selectedProjectType === 'collection'"
-						layout="grid"
-					>
-						<SmartClickable
-							v-for="collection in sortedCollections"
-							:key="collection.id"
-							class="h-full w-full"
+						<div
+							class="smart-clickable:outline-on-focus smart-clickable:highlight-on-hover flex h-full w-full flex-col gap-4 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all"
 						>
-							<template #clickable>
-								<AutoLink
-									:to="collectionLink(collection.id)"
-									class="no-click-animation custom-focus-indicator rounded-xl no-outline"
-								/>
-							</template>
-							<div
-								class="smart-clickable:outline-on-focus smart-clickable:highlight-on-hover flex h-full w-full flex-col gap-4 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all"
-							>
-								<div class="grid grid-cols-[auto_1fr] gap-4">
-									<Avatar :src="collection.icon_url" size="64px" no-shadow />
-									<div class="flex min-w-0 flex-col gap-2">
-										<h2
-											class="smart-clickable:underline-on-hover m-0 truncate text-lg font-semibold text-contrast"
-										>
-											{{ collection.name }}
-										</h2>
-										<div class="flex items-center gap-1">
-											<LibraryIcon aria-hidden="true" />
-											{{ formatMessage(messages.collectionLabel) }}
-										</div>
-									</div>
-								</div>
-								<div class="grow text-primary">
-									{{ collection.description }}
-								</div>
-								<div class="mt-auto flex flex-wrap items-center gap-4">
+							<div class="grid grid-cols-[auto_1fr] gap-4">
+								<Avatar :src="collection.icon_url" size="64px" no-shadow />
+								<div class="flex min-w-0 flex-col gap-2">
+									<h2
+										class="smart-clickable:underline-on-hover m-0 truncate text-lg font-semibold text-contrast"
+									>
+										{{ collection.name }}
+									</h2>
 									<div class="flex items-center gap-1">
-										<BoxIcon />
-										{{
-											formatMessage(messages.collectionProjectsCount, {
-												count: collection.projects.length,
-											})
-										}}
-									</div>
-									<div class="flex items-center gap-1">
-										<template v-if="collection.status === 'listed'">
-											<GlobeIcon />
-											{{ formatMessage(commonMessages.publicLabel) }}
-										</template>
-										<template v-else-if="collection.status === 'unlisted'">
-											<LinkIcon />
-											{{ formatMessage(commonMessages.unlistedLabel) }}
-										</template>
-										<template v-else-if="collection.status === 'private'">
-											<LockIcon />
-											{{ formatMessage(commonMessages.privateLabel) }}
-										</template>
-										<template v-else-if="collection.status === 'rejected'">
-											<XIcon />
-											{{ formatMessage(commonMessages.rejectedLabel) }}
-										</template>
+										<LibraryIcon aria-hidden="true" />
+										{{ formatMessage(messages.collectionLabel) }}
 									</div>
 								</div>
 							</div>
-						</SmartClickable>
-					</ProjectCardList>
+							<div class="grow text-primary">
+								{{ collection.description }}
+							</div>
+							<div class="mt-auto flex flex-wrap items-center gap-4">
+								<div class="flex items-center gap-1">
+									<BoxIcon />
+									{{
+										formatMessage(messages.collectionProjectsCount, {
+											count: collection.projects.length,
+										})
+									}}
+								</div>
+								<div class="flex items-center gap-1">
+									<template v-if="collection.status === 'listed'">
+										<GlobeIcon />
+										{{ formatMessage(commonMessages.publicLabel) }}
+									</template>
+									<template v-else-if="collection.status === 'unlisted'">
+										<LinkIcon />
+										{{ formatMessage(commonMessages.unlistedLabel) }}
+									</template>
+									<template v-else-if="collection.status === 'private'">
+										<LockIcon />
+										{{ formatMessage(commonMessages.privateLabel) }}
+									</template>
+									<template v-else-if="collection.status === 'rejected'">
+										<XIcon />
+										{{ formatMessage(commonMessages.rejectedLabel) }}
+									</template>
+								</div>
+							</div>
+						</div>
+					</SmartClickable>
+				</ProjectCardList>
 
-					<EmptyState
-						v-if="showCollectionsEmptyState"
-						type="empty"
-						:heading="formatMessage(messages.profileNoCollectionsLabel)"
-						:description="
-							isSelf ? formatMessage(messages.profileNoCollectionsAuthDescription) : undefined
-						"
-					>
-						<template v-if="isSelf" #actions>
-							<Button type="colored" color="brand" native-type="button" @click="createCollection">
-								{{ formatMessage(messages.createCollectionButton) }}
-							</Button>
-						</template>
-					</EmptyState>
-				</div>
+				<EmptyState
+					v-if="showCollectionsEmptyState"
+					type="empty"
+					:heading="formatMessage(messages.profileNoCollectionsLabel)"
+					:description="
+						isSelf ? formatMessage(messages.profileNoCollectionsAuthDescription) : undefined
+					"
+				>
+					<template v-if="isSelf" #actions>
+						<Button type="colored" color="brand" native-type="button" @click="createCollection">
+							{{ formatMessage(messages.createCollectionButton) }}
+						</Button>
+					</template>
+				</EmptyState>
 			</div>
 
 			<template #sidebar>

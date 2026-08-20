@@ -228,13 +228,15 @@
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
 
 			<template v-else>
-				<div
-					data-pyro-navigation
-					class="server-stagger-item -mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2"
-					:class="containedLayout ? 'shrink-0' : ''"
-					:style="{ '--si': 1 }"
-				>
-					<NavTabs :links="navLinks" replace />
+				<div class="server-stagger-item -mb-3">
+					<NavTabs
+						:links="navLinks"
+						replace
+						page-nav
+						data-pyro-navigation
+						:class="containedLayout ? 'shrink-0' : ''"
+						:style="{ '--si': 1 }"
+					/>
 				</div>
 
 				<div

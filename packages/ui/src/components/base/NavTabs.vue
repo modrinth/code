@@ -1,71 +1,77 @@
 <template>
-	<nav
+	<div
 		v-if="filteredLinks.length > 1"
-		ref="scrollContainer"
-		class="relative flex w-fit rounded-full bg-bg-raised p-1 text-xs sm:text-sm font-bold"
-		:class="{
-			'card-shadow border border-solid border-surface-4': mode === 'navigation',
-			'tab-color-delayed': colorChangeDelayed,
-		}"
+		:class="pageNav ? '-mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2' : 'contents'"
+		v-bind="pageNav ? $attrs : {}"
 	>
-		<template v-if="mode === 'navigation'">
-			<RouterLink
-				v-for="(link, index) in filteredLinks"
-				v-show="link.shown ?? true"
-				:key="link.href"
-				ref="tabLinkElements"
-				:replace="replace"
-				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
-				:class="getSSRFallbackClasses(index)"
-				@mouseenter="link.onHover?.()"
-				@focus="link.onHover?.()"
-			>
-				<component
-					:is="link.icon"
-					v-if="link.icon"
-					class="tab-color hidden sm:block size-5"
-					:class="getIconClasses(index)"
-				/>
-				<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
-					{{ link.label }}
-				</span>
-			</RouterLink>
-		</template>
+		<nav
+			ref="scrollContainer"
+			class="relative flex w-fit rounded-full bg-bg-raised p-1 text-xs sm:text-sm font-bold"
+			:class="{
+				'card-shadow border border-solid border-surface-4': mode === 'navigation',
+				'tab-color-delayed': colorChangeDelayed,
+			}"
+			v-bind="pageNav ? {} : $attrs"
+		>
+			<template v-if="mode === 'navigation'">
+				<RouterLink
+					v-for="(link, index) in filteredLinks"
+					v-show="link.shown ?? true"
+					:key="link.href"
+					ref="tabLinkElements"
+					:replace="replace"
+					:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
+					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+					:class="getSSRFallbackClasses(index)"
+					@mouseenter="link.onHover?.()"
+					@focus="link.onHover?.()"
+				>
+					<component
+						:is="link.icon"
+						v-if="link.icon"
+						class="tab-color hidden sm:block size-5"
+						:class="getIconClasses(index)"
+					/>
+					<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
+						{{ link.label }}
+					</span>
+				</RouterLink>
+			</template>
 
-		<template v-else>
+			<template v-else>
+				<div
+					v-for="(link, index) in filteredLinks"
+					v-show="link.shown ?? true"
+					:key="link.href"
+					ref="tabLinkElements"
+					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
+					:class="getSSRFallbackClasses(index)"
+					@click="emit('tabClick', index, link)"
+				>
+					<component
+						:is="link.icon"
+						v-if="link.icon"
+						class="tab-color size-5"
+						:class="getIconClasses(index)"
+					/>
+					<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
+						{{ link.label }}
+					</span>
+				</div>
+			</template>
+
 			<div
-				v-for="(link, index) in filteredLinks"
-				v-show="link.shown ?? true"
-				:key="link.href"
-				ref="tabLinkElements"
-				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
-				:class="getSSRFallbackClasses(index)"
-				@click="emit('tabClick', index, link)"
-			>
-				<component
-					:is="link.icon"
-					v-if="link.icon"
-					class="tab-color size-5"
-					:class="getIconClasses(index)"
-				/>
-				<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
-					{{ link.label }}
-				</span>
-			</div>
-		</template>
-
-		<div
-			v-if="sliderReady && currentActiveIndex !== -1"
-			class="pointer-events-none absolute rounded-full"
-			:class="[
-				subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
-				{ 'navtabs-transition': transitionsEnabled },
-			]"
-			:style="sliderStyle"
-			aria-hidden="true"
-		/>
-	</nav>
+				v-if="sliderReady && currentActiveIndex !== -1"
+				class="pointer-events-none absolute rounded-full"
+				:class="[
+					subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
+					{ 'navtabs-transition': transitionsEnabled },
+				]"
+				:style="sliderStyle"
+				aria-hidden="true"
+			/>
+		</nav>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -74,6 +80,8 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
 const route = useRoute()
+
+defineOptions({ inheritAttrs: false })
 
 interface Tab {
 	label: string
@@ -91,11 +99,13 @@ const props = withDefaults(
 		query?: string
 		mode?: 'navigation' | 'local'
 		activeIndex?: number
+		pageNav?: boolean
 	}>(),
 	{
 		mode: 'navigation',
 		query: undefined,
 		activeIndex: undefined,
+		pageNav: false,
 	},
 )
 
@@ -247,7 +257,7 @@ function animateSliderTo(newPosition: {
 	right: number
 	bottom: number
 }) {
-	const STAGGER_DELAY = '200ms'
+	const STAGGER_DELAY = '175ms'
 
 	sliderDelays.value = {
 		left: newPosition.left < sliderLeft.value ? '0ms' : STAGGER_DELAY,
@@ -356,17 +366,17 @@ watch(
 <style scoped>
 .navtabs-transition {
 	transition:
-		left 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(leftDelay),
-		right 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(rightDelay),
-		top 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(topDelay),
-		bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay);
+		left 80ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(leftDelay),
+		right 80ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(rightDelay),
+		top 80ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(topDelay),
+		bottom 80ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay);
 }
 
 .tab-color {
-	transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+	transition: color 100ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-color-delayed .tab-color {
-	transition-delay: 150ms;
+	transition-delay: 100ms;
 }
 </style>
