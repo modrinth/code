@@ -3,6 +3,7 @@ import {
 	ArrowLeftRightIcon,
 	BoxIcon,
 	ExternalIcon,
+	FileIcon,
 	GlassesIcon,
 	PaintbrushIcon,
 	SearchIcon,
@@ -103,6 +104,10 @@ const messages = defineMessages({
 	openInSlicer: {
 		id: 'instances.managed-content-modal.open-in-slicer',
 		defaultMessage: 'Open in Slicer',
+	},
+	downloadFile: {
+		id: 'instances.managed-content-modal.download-file',
+		defaultMessage: 'Download File',
 	},
 })
 
@@ -310,6 +315,15 @@ const externalSlicerUrls = computed(() => {
 	for (const item of items.value) {
 		if (item.external && item.external_url) {
 			urls[item.id] = `https://slicer.run/?url=${encodeURIComponent(item.external_url)}`
+		}
+	}
+	return urls
+})
+const externalUrls = computed(() => {
+	const urls: Record<string, string> = {}
+	for (const item of items.value) {
+		if (item.external && item.external_url) {
+			urls[item.id] = item.external_url
 		}
 	}
 	return urls
@@ -597,6 +611,18 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									class="!w-9 !px-0 !rounded-full"
 								>
 									<ExternalIcon class="size-4" />
+								</ButtonLink>
+								<ButtonLink
+									v-if="externalUrls[item.id]"
+									v-tooltip="formatMessage(messages.downloadFile)"
+									type="quiet"
+									:aria-label="formatMessage(messages.downloadFile)"
+									:href="externalUrls[item.id]"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="!w-9 !px-0 !rounded-full"
+								>
+									<FileIcon class="size-4" />
 								</ButtonLink>
 							</template>
 						</ContentCardTable>
