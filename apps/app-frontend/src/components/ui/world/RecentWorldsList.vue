@@ -482,8 +482,7 @@ onUnmounted(() => {
 				:aria-valuemin="1"
 				:aria-valuemax="maxVisibleItems"
 				:aria-valuenow="visibleItemCount"
-				class="group/resize relative inset-x-0 bottom-0 flex h-6 -mt-3 w-1/3 mx-auto cursor-ns-resize touch-none select-none items-center justify-center opacity-0 transition-opacity duration-200 hover:opacity-100 focus-visible:opacity-100"
-				:class="{ 'opacity-100': resizing }"
+				class="group/resize relative inset-x-0 bottom-0 flex h-6 -mt-3 w-1/3 mx-auto cursor-ns-resize touch-none select-none items-center justify-center"
 				@pointerdown="onResizePointerDown"
 				@pointermove="onResizePointerMove"
 				@pointerup="endResize"
@@ -496,11 +495,11 @@ onUnmounted(() => {
 				<div class="flex flex-col gap-0.5">
 					<span
 						class="h-px w-6 transition-colors"
-						:class="showOverdrag ? 'bg-red' : 'bg-surface-3 group-hover/resize:bg-secondary'"
+						:class="showOverdrag ? 'bg-red' : 'bg-secondary'"
 					/>
 					<span
 						class="h-px w-6 transition-colors"
-						:class="showOverdrag ? 'bg-red' : 'bg-surface-3 group-hover/resize:bg-secondary'"
+						:class="showOverdrag ? 'bg-red' : 'bg-secondary'"
 					/>
 				</div>
 			</div>
