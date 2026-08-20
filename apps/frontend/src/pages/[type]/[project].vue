@@ -532,7 +532,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="mb-3 overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-1" /></div>
+					<NavTabs :links="navLinks" replace page-nav />
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
