@@ -38,6 +38,11 @@ const resolvedRel = computed(() => {
 	return props.target === '_blank' ? 'noopener noreferrer' : undefined
 })
 
+// https://github.com/vuejs/vue-router/issues/2005 moment
+const linkAttrs = computed(() =>
+	usesRouter.value ? { to: props.to } : !props.disabled ? { href: props.href } : {},
+)
+
 function handleClick(event: MouseEvent) {
 	if (!props.disabled) return
 	event.preventDefault()
@@ -52,8 +57,7 @@ function handleClick(event: MouseEvent) {
 		:color="props.color"
 		:size="props.size"
 		:interaction="props.interaction"
-		:to="usesRouter ? props.to : undefined"
-		:href="!usesRouter && !props.disabled ? props.href : undefined"
+		v-bind="linkAttrs"
 		:target="props.target"
 		:rel="resolvedRel"
 		:download="!props.disabled ? props.download : undefined"
