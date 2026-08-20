@@ -2676,10 +2676,10 @@ dependencies = [
  "futures",
  "indexmap 2.11.4",
  "itertools 0.14.0",
+ "quick-xml 0.38.3",
  "reqwest 0.12.24",
  "rust-s3",
  "serde",
- "serde-xml-rs",
  "serde_json",
  "sha1_smol",
  "thiserror 2.0.17",
@@ -9431,18 +9431,6 @@ dependencies = [
  "serde",
  "serde_core",
  "typeid",
-]
-
-[[package]]
-name = "serde-xml-rs"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53630160a98edebde0123eb4dfd0fce6adff091b2305db3154a9e920206eb510"
-dependencies = [
- "log",
- "serde",
- "thiserror 1.0.69",
- "xml-rs",
 ]
 
 [[package]]

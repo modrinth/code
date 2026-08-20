@@ -304,7 +304,7 @@ pub async fn fetch_xml<T: DeserializeOwned>(
     url: &str,
     semaphore: &Arc<Semaphore>,
 ) -> Result<T, Error> {
-    Ok(serde_xml_rs::from_reader(
+    Ok(quick_xml::de::from_reader(
         &*download_file(url, None, semaphore).await?,
     )?)
 }
