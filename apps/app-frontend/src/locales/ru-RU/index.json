@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Конфиденциальность и реклама на Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Использовать эффекты вроде размытия фона. Без аппаратного ускорения возможна потеря производительности."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Расширенные эффекты"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Выберите тему для Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Тема"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Главная"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Сворачивание приложения"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Использовать системное оформление заголовка и кнопок окна. Требуется перезапуск."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Системная рамка окна"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показывать проведённое время в сборке."

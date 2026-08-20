@@ -5180,9 +5180,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Zaproszenia do znajomych"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Już wkrótce!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Wszyscy"
   },

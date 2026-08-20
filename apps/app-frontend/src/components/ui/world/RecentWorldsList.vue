@@ -16,6 +16,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -35,8 +37,6 @@ import {
 	start_join_singleplayer_world,
 	type WorldWithInstance,
 } from '@/helpers/worlds.ts'
-import { handleSevereError } from '@/store/error'
-import { useTheming } from '@/store/theme.ts'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -49,7 +49,7 @@ const props = defineProps<{
 	recentInstances: GameInstance[]
 }>()
 
-const theme = useTheming()
+const appSettings = useAppSettings()
 
 const jumpBackInItems = ref<JumpBackInItem[]>([])
 const loading = ref(true)
@@ -177,7 +177,7 @@ type WorldJumpBackInItem = BaseJumpBackInItem & {
 
 type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
-const showWorlds = computed(() => theme.getFeatureFlag('worlds_in_home'))
+const showWorlds = computed(() => appSettings.getFeatureFlag('worlds_in_home'))
 
 watch([() => props.recentInstances, () => showWorlds.value], async () => {
 	await populateJumpBackIn().catch(() => {

@@ -42,6 +42,7 @@ pub struct LegacyResultSearchProject {
     pub client_side: String,
     pub server_side: String,
     pub environment: Vec<String>,
+    pub disclosure_types: Vec<String>,
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
@@ -151,6 +152,7 @@ impl LegacyResultSearchProject {
             client_side,
             server_side,
             environment: environments,
+            disclosure_types: result_search_project.disclosure_types,
             versions,
             latest_version: result_search_project
                 .version_id

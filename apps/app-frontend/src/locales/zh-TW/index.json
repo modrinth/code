@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "關於你的隱私，以及廣告如何幫助 Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "啟用視覺效果（如背景模糊），若無硬體加速可能會降低效能。"
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "進階繪製"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "選擇 Modrinth App 使用的色彩主題。"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "色彩主題"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首頁"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "最小化應用程式"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "使用作業系統的標題列和視窗控制項。需要重新啟動應用程式。"
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "系統視窗外框"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "顯示你在各個實例的遊玩時數。"

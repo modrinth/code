@@ -41,6 +41,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/context-menu/index.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
@@ -63,7 +64,6 @@ import {
 	createServerInstallContent,
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
-import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -109,7 +109,7 @@ const breadcrumbLabel = computed(() => {
 		),
 	})
 })
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
@@ -384,7 +384,7 @@ async function initInstanceContext() {
 }
 
 function setBrowseHideInstalledFlag(flag: 'hide_installed_modpacks', value: boolean) {
-	themeStore.featureFlags[flag] = value
+	appSettings.featureFlags[flag] = value
 	getSettings()
 		.then((settings) => {
 			settings.feature_flags[flag] = value
@@ -394,7 +394,7 @@ function setBrowseHideInstalledFlag(flag: 'hide_installed_modpacks', value: bool
 }
 
 const hideInstalledModpacks = computed({
-	get: () => themeStore.getFeatureFlag('hide_installed_modpacks'),
+	get: () => appSettings.getFeatureFlag('hide_installed_modpacks'),
 	set: (value: boolean) => setBrowseHideInstalledFlag('hide_installed_modpacks', value),
 })
 
@@ -742,7 +742,7 @@ const installContext = computed(() => {
 			queuedCount: queuedServerInstallCount.value,
 			selectedProjects: selectedServerInstallProjects.value,
 			isInstallingSelected: isInstallingQueuedServerInstalls.value,
-			skipNonEssentialWarnings: themeStore.getFeatureFlag('skip_non_essential_warnings'),
+			skipNonEssentialWarnings: appSettings.getFeatureFlag('skip_non_essential_warnings'),
 			installProgress: queuedInstallProgress.value,
 			clearQueued: clearQueuedServerInstalls,
 			clearSelected: clearQueuedServerInstalls,
@@ -1222,9 +1222,9 @@ function getProjectBrowseQuery() {
 }
 
 const advancedFiltersCollapsed = computed({
-	get: () => themeStore.getFeatureFlag('advanced_filters_collapsed'),
+	get: () => appSettings.getFeatureFlag('advanced_filters_collapsed'),
 	set: (value) => {
-		themeStore.featureFlags['advanced_filters_collapsed'] = value
+		appSettings.featureFlags['advanced_filters_collapsed'] = value
 		getSettings()
 			.then((settings) => {
 				settings.feature_flags['advanced_filters_collapsed'] = value
@@ -1235,9 +1235,9 @@ const advancedFiltersCollapsed = computed({
 })
 
 const dismissedPhotosensitivityFilterWarning = computed({
-	get: () => themeStore.getFeatureFlag('dismissed_photosensitivity_filter_warning'),
+	get: () => appSettings.getFeatureFlag('dismissed_photosensitivity_filter_warning'),
 	set: (value) => {
-		themeStore.featureFlags['dismissed_photosensitivity_filter_warning'] = value
+		appSettings.featureFlags['dismissed_photosensitivity_filter_warning'] = value
 		getSettings()
 			.then((settings) => {
 				settings.feature_flags['dismissed_photosensitivity_filter_warning'] = value

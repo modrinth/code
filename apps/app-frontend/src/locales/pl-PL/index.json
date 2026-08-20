@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Twoja prywatność i jak reklamy wspierają Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Włącz efekty wizualne, takie jak rozmycie tła. Może to negatywnie wpłynąć na wydajność, jeżeli akceleracja sprzętowa jest wyłączona."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Zaawansowane renderowanie"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Wybierz motyw użyty przez Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Motyw"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Strona główna"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimalizuj aplikację"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Używaj pasek tytułu i kontrolki okna systemu operacyjnego. Wymaga ponownego uruchomienia aplikacji."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systemowa ramka okna"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Pokazuje czas gry spędzony w danej instancji."

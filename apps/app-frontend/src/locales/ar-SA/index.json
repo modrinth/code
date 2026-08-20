@@ -134,12 +134,6 @@
   "app.ads-consent.reject": {
     "message": "رفض الكل"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "العرض المتقدم"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "لون السمة"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "صفحة الرئيسية"
   },
@@ -160,12 +154,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "تصغير نافذة المشغل"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "استخدام إطار نافذة النظام (يتطلب إعادة تشغيل التطبيق)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "الزخارف التقليدية"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "يعرض مقدار الوقت الذي قضيته في لعب إحدى المهام."

@@ -1,6 +1,6 @@
 import { cloneDeep, isEqual } from 'es-toolkit'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 export function useSavable<T extends Record<string, unknown>>(
 	data: () => T,
@@ -30,6 +30,16 @@ export function useSavable<T extends Record<string, unknown>>(
 	})
 
 	const hasChanges = computed(() => Object.keys(changes.value).length > 0)
+
+	watch(
+		savedValues,
+		(value, previousValue) => {
+			if (isEqual(currentValues.value, previousValue)) {
+				currentValues.value = cloneDeep(value)
+			}
+		},
+		{ deep: true },
+	)
 
 	const reset = () => {
 		currentValues.value = cloneDeep(data())

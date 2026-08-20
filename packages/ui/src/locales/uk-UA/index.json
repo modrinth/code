@@ -5195,9 +5195,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Запити в друзі"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Незабаром!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Усі"
   },

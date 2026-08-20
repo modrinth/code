@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Schakel visuele effecten zoals achtergrondvervaging in. Zonder hardwareversnelling kan dit ten koste gaan van de prestaties."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Geavanceerde weergave"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Kies het kleurenthema dat door de Modrinth-app wordt gebruikt."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Kleurenthema"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "App minimaliseren"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systeemvensterframe"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Laat zien hoe lang je elke instantie hebt gespeeld."
