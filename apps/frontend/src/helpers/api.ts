@@ -16,18 +16,8 @@ import type { Ref } from 'vue'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 import { useVisitorUserAgent } from '~/composables/visitor-user-agent.ts'
 import { withStagingArchonBaseUrl } from '~/helpers/archon.ts'
+import { readEnv } from '~/helpers/env.ts'
 import { getFrontendUserAgent, VISITOR_USER_AGENT_HEADER } from '~/helpers/user-agent.ts'
-
-async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
-	try {
-		const mod = 'cloudflare:workers'
-		const { env } = await import(/* @vite-ignore */ mod)
-		return await env.RATE_LIMIT_IGNORE_KEY?.get()
-	} catch {
-		// Not running in Cloudflare Workers environment
-		return undefined
-	}
-}
 
 export function createModrinthClient(
 	auth: Ref<{ token: string | undefined }>,
@@ -53,7 +43,7 @@ export function createModrinthClient(
 		userAgent: () => (import.meta.server ? getFrontendUserAgent(config.commitHash) : undefined),
 		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
 		archonSentryCapture: () => flags.value.archonSentryCapture,
-		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
+		rateLimitKey: config.rateLimitKey || (() => readEnv('RATE_LIMIT_IGNORE_KEY')),
 		features: [
 			// for modrinth hosting
 			// is skipped for normal reqs

@@ -7,17 +7,8 @@ import {
 } from '@modrinth/api-client'
 import { getRequestHeader, type H3Event } from 'h3'
 
+import { readEnv } from '~/helpers/env'
 import { getFrontendUserAgent, VISITOR_USER_AGENT_HEADER } from '~/helpers/user-agent'
-
-async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
-	try {
-		const mod = 'cloudflare:workers'
-		const { env } = await import(/* @vite-ignore */ mod)
-		return await env.RATE_LIMIT_IGNORE_KEY?.get()
-	} catch {
-		return undefined
-	}
-}
 
 export interface ServerModrinthClientOptions {
 	event?: H3Event
@@ -50,7 +41,7 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 		sharedInstancesBaseUrl,
 		userAgent: getFrontendUserAgent(config.public.hash),
 		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
-		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
+		rateLimitKey: config.rateLimitKey || (() => readEnv('RATE_LIMIT_IGNORE_KEY')),
 		features,
 	}
 
