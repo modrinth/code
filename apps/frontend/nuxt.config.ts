@@ -273,7 +273,7 @@ export default defineNuxtConfig({
 			external: ['cloudflare:workers'],
 		},
 		preset: 'cloudflare_module',
-		noExternals: true,
+		noExternals: getNoExternals(),
 		cloudflare: {
 			nodeCompat: true,
 		},
@@ -350,6 +350,15 @@ function getSharedInstancesApiUrl() {
 
 function isProduction() {
 	return process.env.NODE_ENV === 'production'
+}
+
+function getNoExternals() {
+	if (process.env.NITRO_NO_EXTERNALS !== undefined) {
+		return process.env.NITRO_NO_EXTERNALS === 'true'
+	}
+
+	// bundling every dependency breaks the dev server, so only do it for real builds
+	return isProduction()
 }
 
 function getFeatureFlagOverrides() {
