@@ -86,7 +86,7 @@ pub async fn notifications_get(
     Ok(HttpResponse::Ok().json(notifications))
 }
 
-#[utoipa::path(tag = "notifications", responses((status = OK)))]
+#[utoipa::path(tag = "notifications", params(("id" = NotificationId, Path, description = "Notification id",)), responses((status = OK)))]
 #[get("/notification/{id}")]
 pub async fn notification_get_route(
     req: HttpRequest,
@@ -137,7 +137,7 @@ pub async fn notification_get(
     }
 }
 
-#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[utoipa::path(tag = "notifications", params(("id" = NotificationId, Path, description = "Notification id",)), responses((status = NO_CONTENT)))]
 #[patch("/notification/{id}")]
 pub async fn notification_read_route(
     req: HttpRequest,
@@ -208,7 +208,7 @@ pub async fn notification_read(
     }
 }
 
-#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[utoipa::path(tag = "notifications", params(("id" = NotificationId, Path, description = "Notification id",)), responses((status = NO_CONTENT)))]
 #[delete("/notification/{id}")]
 pub async fn notification_delete_route(
     req: HttpRequest,
