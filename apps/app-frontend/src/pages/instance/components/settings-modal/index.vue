@@ -2,10 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
-	CodeIcon,
-	CoffeeIcon,
 	InfoIcon,
-	MonitorIcon,
 	RefreshCwIcon,
 	UsersIcon,
 	WrenchIcon,
@@ -29,13 +26,10 @@ import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 
 import GeneralSettings from './general-settings.vue'
-import HooksSettings from './hooks-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
-import JavaSettings from './java-settings.vue'
 import SharingSettings from './sharing-settings.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
-import WindowSettings from './window-settings.vue'
 
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
@@ -116,30 +110,6 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		icon: UsersIcon,
 		content: SharingSettings,
 		shown: props.instance.shared_instance?.role === 'owner' && !props.instance.quarantined,
-	},
-	{
-		name: defineMessage({
-			id: 'instance.settings.tabs.window',
-			defaultMessage: 'Window',
-		}),
-		icon: MonitorIcon,
-		content: WindowSettings,
-	},
-	{
-		name: defineMessage({
-			id: 'instance.settings.tabs.java',
-			defaultMessage: 'Java and memory',
-		}),
-		icon: CoffeeIcon,
-		content: JavaSettings,
-	},
-	{
-		name: defineMessage({
-			id: 'instance.settings.tabs.hooks',
-			defaultMessage: 'Launch hooks',
-		}),
-		icon: CodeIcon,
-		content: HooksSettings,
 	},
 ])
 

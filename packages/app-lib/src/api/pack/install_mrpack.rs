@@ -630,6 +630,8 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         );
     }
 
+    crate::api::instance::prepare_instance_update(&instance_id).await?;
+
     set_instance_information(
         instance_id.clone(),
         &description,
@@ -972,6 +974,11 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         .iter()
         .map(|(_, file)| file.uncompressed_size())
         .sum::<u64>();
+    let has_servers_override = override_file_entries.iter().any(|(_, file)| {
+        let filename = file.filename().as_str().unwrap_or_default();
+        filename == "overrides/servers.dat"
+            || filename == "client-overrides/servers.dat"
+    });
     let progress = (override_total_bytes > 0).then_some(InstallProgress {
         current: 0,
         total: override_total_bytes,
@@ -1122,6 +1129,20 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             }
         }
     }
+
+    if has_servers_override {
+        crate::api::instance::synced_servers::capture_modpack_servers(
+            &instance_id,
+        )
+        .await?;
+    } else {
+        crate::api::instance::synced_servers::clear_modpack_servers(
+            &instance_id,
+        )
+        .await?;
+    }
+    crate::api::instance::reconcile_instance_synced_options(&instance_id)
+        .await?;
 
     // If the icon doesn't exist, we expect icon.png to be a potential icon.
     // If it doesn't exist, and an override to icon.png exists, cache and use that

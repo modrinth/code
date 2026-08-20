@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tINSERT INTO instance_server_snapshots\n\t\t\t\t(instance_id, server_id, source, nbt, position)\n\t\t\tVALUES (?, ?, ?, ?, ?)\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "1cdee99e388ed61a0d57a61ded6ac1bafff2c46863e844a1f4ea5501eedb9ad4"
+}

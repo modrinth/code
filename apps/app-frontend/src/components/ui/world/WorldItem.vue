@@ -66,7 +66,7 @@ const router = useRouter()
 const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
-	(e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
+	(e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete' | 'desync'): void
 	(e: 'open-folder', world: SingleplayerWorld): void
 }>()
 
@@ -216,6 +216,10 @@ const messages = defineMessages({
 	copyAddress: {
 		id: 'instance.worlds.copy_address',
 		defaultMessage: 'Copy address',
+	},
+	desync: {
+		id: 'instance.worlds.desync_server',
+		defaultMessage: 'Desync',
 	},
 	viewInstance: {
 		id: 'instance.worlds.view_instance',
@@ -501,6 +505,16 @@ const messages = defineMessages({
 							action: () => copyToClipboard((world as ServerWorld).address),
 						},
 						{
+							id: 'desync',
+							label: formatMessage(messages.desync),
+							action: () => emit('desync'),
+							shown:
+								!instanceId &&
+								world.type === 'server' &&
+								(world as ServerWorld).source === 'user_synced' &&
+								!!(world as ServerWorld).server_id,
+						},
+						{
 							id: 'edit',
 							label: formatMessage(commonMessages.editButton),
 							action: () => emit('edit'),
@@ -576,6 +590,10 @@ const messages = defineMessages({
 					<template #edit>
 						<EditIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.editButton) }}
+					</template>
+					<template #desync>
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(messages.desync) }}
 					</template>
 					<template #open-folder>
 						<FolderOpenIcon aria-hidden="true" />

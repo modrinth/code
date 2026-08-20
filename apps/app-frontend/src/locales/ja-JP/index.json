@@ -962,9 +962,6 @@
   "app.settings.tabs.behavior": {
     "message": "動作"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "デフォルトのゲーム設定"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Javaのインストール設定"
   },

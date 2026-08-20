@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT version_id\n\t\tFROM instance_server_baselines\n\t\tWHERE instance_id = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "version_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "0bb6b572586c47253e224af9bee1b92e6abffdcad59050db59a0fcbace5b5f26"
+}

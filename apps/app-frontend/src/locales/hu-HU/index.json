@@ -962,9 +962,6 @@
   "app.settings.tabs.behavior": {
     "message": "Működés"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "A játék alapbeállításai"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Telepített Java példányok"
   },

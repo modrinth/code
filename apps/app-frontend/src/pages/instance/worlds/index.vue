@@ -18,6 +18,7 @@
 		:world="worldToRemove"
 		@confirm="proceedRemoveWorld"
 	/>
+	<DesyncServerModal ref="desyncServerModal" @confirm="confirmDesyncServer" />
 	<ReadyTransition :pending="worldsReadyPending">
 		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
 			<div class="flex flex-wrap items-center gap-2">
@@ -108,6 +109,7 @@
 									: editServerModal?.show(world)
 					"
 					@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
+					@desync="() => world.type === 'server' && desyncServerModal?.show(world as ServerWorld)"
 					@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.id, world.path)"
 				/>
 			</div>
@@ -153,6 +155,7 @@ import { useRoute } from 'vue-router'
 
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWorldModal.vue'
+import DesyncServerModal from '@/components/ui/world/modal/DesyncServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
@@ -164,6 +167,8 @@ import { get_game_versions } from '@/helpers/tags'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import {
 	delete_world,
+	desync_server,
+	type DesyncServerMode,
 	get_instance_protocol_version,
 	getServerDomainKey,
 	getWorldIdentifier,
@@ -244,6 +249,7 @@ const addServerModal = ref<InstanceType<typeof AddServerModal>>()
 const editServerModal = ref<InstanceType<typeof EditServerModal>>()
 const editWorldModal = ref<InstanceType<typeof EditWorldModal>>()
 const removeWorldModal = ref<InstanceType<typeof ConfirmRemoveWorldModal>>()
+const desyncServerModal = ref<InstanceType<typeof DesyncServerModal>>()
 
 const worldToRemove = ref<World | null>(null)
 
@@ -505,6 +511,12 @@ async function removeServer(server: ServerWorld) {
 			w.index = serverIdx++
 		}
 	}
+}
+
+async function confirmDesyncServer(server: ServerWorld, mode: DesyncServerMode) {
+	if (!server.server_id) return
+	await desync_server(instance.value.id, server.server_id, mode).catch(handleError)
+	await refreshAllWorlds()
 }
 
 async function editWorld(path: string, name: string, removeIcon: boolean) {

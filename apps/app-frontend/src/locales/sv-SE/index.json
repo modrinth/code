@@ -860,9 +860,6 @@
   "app.settings.tabs.behavior": {
     "message": "Beteende"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standard spelinställningar"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java-installationer"
   },
