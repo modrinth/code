@@ -661,6 +661,8 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
             (r"^DawnLauncher/", P::Named("Dawn")),
             (r"^Complementary-Installer", P::Named("Complementary Installer")),
             (r"^noriskclient-launcher-v3/", P::Named("NoRisk Client")),
+            (r"^Resourcify/", P::Named("Resourcify")),
+            (r"^OneClient", P::Named("OneClient")),
             (
                 r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
                 P::Website,
