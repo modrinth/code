@@ -71,7 +71,6 @@ jobs:
         run: pnpm install
 
       - name: Build frontend
-        working-directory: ./apps/frontend
         run: pnpm web:build
         env:
           NITRO_PRESET: node-server
