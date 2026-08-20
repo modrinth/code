@@ -6530,6 +6530,15 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Leave page?"
   },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "Go to page"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "Next page"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "Previous page"
+  },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count, plural, one {# alert} other {# alerts}}"
   },
