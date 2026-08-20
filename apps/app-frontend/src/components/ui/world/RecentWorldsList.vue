@@ -388,10 +388,10 @@ onUnmounted(() => {
 	<Accordion
 		v-if="loading || jumpBackInItems.length > 0"
 		open-by-default
-		button-class="group mt-1 mb-3 flex w-full cursor-pointer items-center border-0 bg-transparent p-0 text-left"
+		button-class="group mt-1 mb-3 flex w-fit cursor-pointer items-center border-0 bg-transparent p-0 text-left"
 	>
 		<template #title>
-			<span class="flex items-center gap-1 text-2xl font-semibold leading-none text-contrast">
+			<span class="flex items-center gap-1 text-2xl font-semibold leading-none text-contrast mr-1">
 				{{ formatMessage(messages.jumpIn) }}
 			</span>
 		</template>
