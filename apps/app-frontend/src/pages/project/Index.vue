@@ -702,11 +702,16 @@ function reportProject() {
 }
 
 async function fetchProjectData() {
-	projectBreadcrumbLabel.value = getProjectBreadcrumbLabel(route.params.id)
+	const requestedId = String(route.params.id ?? '')
+	projectBreadcrumbLabel.value = getProjectBreadcrumbLabel(requestedId)
 	const [project, projectV3Result] = await Promise.all([
-		get_project(route.params.id, 'must_revalidate').catch(handleError),
-		get_project_v3(route.params.id, 'must_revalidate').catch(handleError),
+		get_project(requestedId, 'must_revalidate').catch(handleError),
+		get_project_v3(requestedId, 'must_revalidate').catch(handleError),
 	])
+	if (String(route.params.id ?? '') !== requestedId) {
+		return
+	}
+
 	projectV3.value = projectV3Result
 
 	if (!project) {
@@ -724,6 +729,9 @@ async function fetchProjectData() {
 			route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
 			route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
 		])
+	if (String(route.params.id ?? '') !== requestedId) {
+		return
+	}
 
 	for (const member of members.value ?? []) {
 		for (const identifier of [member.user.id, member.user.username]) {
@@ -735,18 +743,21 @@ async function fetchProjectData() {
 
 	versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
-	if (instanceProjects.value) {
-		const installedFile = Object.values(instanceProjects.value).find(
-			(x) => x.metadata && x.metadata.project_id === data.value.id,
-		)
-		if (installedFile) {
-			installed.value = true
-			installedVersion.value = installedFile.metadata.version_id
-		}
-	}
+	const installedFile = instanceProjects.value
+		? Object.values(instanceProjects.value).find(
+				(x) => x.metadata && x.metadata.project_id === data.value.id,
+			)
+		: undefined
+	installed.value = !!installedFile
+	installedVersion.value = installedFile?.metadata.version_id ?? null
 
 	if (project.organization) {
 		organization.value = await get_organization(project.organization).catch(handleError)
+	} else {
+		organization.value = null
+	}
+	if (String(route.params.id ?? '') !== requestedId) {
+		return
 	}
 
 	isServerProject.value = projectV3.value?.minecraft_server != null
