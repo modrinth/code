@@ -9,6 +9,8 @@
 		:disable-search-filter="true"
 		:disabled="disabled"
 		:clearable="clearable"
+		:sync-with-selection="syncWithSelection"
+		:select-search-text-on-focus="selectSearchTextOnFocus"
 		show-icon-in-selected
 		@search-input="(query) => handleSearch(query)"
 	/>
@@ -58,6 +60,10 @@ const props = withDefaults(
 		disabled?: boolean
 		/** Whether to show a button for clearing the search input */
 		clearable?: boolean
+		/** Keep the selected project's label in the search input */
+		syncWithSelection?: boolean
+		/** Select all search text when the input receives focus */
+		selectSearchTextOnFocus?: boolean
 		/** Maximum number of results to show */
 		limit?: number
 		/** Project IDs to exclude from results */
@@ -73,6 +79,7 @@ const props = withDefaults(
 		loadingMessage: 'Loading...',
 		noResultsMessage: 'No results found',
 		disabled: false,
+		syncWithSelection: true,
 		limit: 20,
 	},
 )

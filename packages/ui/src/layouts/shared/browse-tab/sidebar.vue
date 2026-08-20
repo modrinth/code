@@ -105,7 +105,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		return true
 	}
 	if (filterId === 'compatible_dependency_project_ids') {
-		return ctx.projectType.value === 'modpack'
+		return true
 	}
 	if (ctx.isServerType.value) {
 		return ![

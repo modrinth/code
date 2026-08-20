@@ -445,6 +445,21 @@ export function useSearch(
 		const filterTypes: FilterType[] = [
 			...Object.values(categoryFilters),
 			{
+				id: 'compatible_dependency_project_ids',
+				formatted_name: formatMessage(
+					projectTypes.value.includes('modpack') ? includedContentFilterName : dependsOnFilterName,
+				),
+				supported_project_types: ALL_PROJECT_TYPES,
+				query_param: 'dep',
+				supports: ['include'],
+				display: 'depends-on-project',
+				searchable: false,
+				options: [],
+				allows_custom_options: 'and',
+				custom_option_field: 'compatible_dependency_project_ids',
+				ordering: projectTypes.value.includes('modpack') ? undefined : -999,
+			},
+			{
 				id: 'environment',
 				formatted_name: formatMessage(
 					defineMessage({
@@ -659,21 +674,6 @@ export function useSearch(
 							value: `categories:${loader.name}`,
 						}
 					}),
-			},
-			{
-				id: 'compatible_dependency_project_ids',
-				formatted_name: formatMessage(
-					projectTypes.value.includes('modpack') ? includedContentFilterName : dependsOnFilterName,
-				),
-				supported_project_types: ALL_PROJECT_TYPES,
-				query_param: 'dep',
-				supports: ['include'],
-				display: 'depends-on-project',
-				searchable: false,
-				options: [],
-				allows_custom_options: 'and',
-				custom_option_field: 'compatible_dependency_project_ids',
-				ordering: projectTypes.value.includes('modpack') ? undefined : -999,
 			},
 			{
 				id: 'license',

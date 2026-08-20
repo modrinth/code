@@ -6,6 +6,7 @@
 			:exclude-project-ids="dependencyProjectIds"
 			:search-placeholder="formatMessage(messages.searchContentPlaceholder)"
 			:show-chevron="false"
+			:sync-with-selection="false"
 			clearable
 			show-search-icon
 			@update:model-value="addIncludedProject"
@@ -14,7 +15,7 @@
 			<div
 				v-for="{ projectId, project } in loadedDependentProjects"
 				:key="projectId"
-				class="group flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-primary"
+				class="group flex min-w-0 items-center gap-2 rounded-xl px-1 pr-0 py-1 text-primary"
 			>
 				<img
 					v-if="project.icon_url"
@@ -26,20 +27,7 @@
 				<span class="min-w-0 flex-1 truncate font-medium text-contrast">
 					{{ project.title }}
 				</span>
-				<div class="flex items-center gap-1">
-					<button
-						v-tooltip="formatMessage(messages.removeIncludedProjectTooltip)"
-						type="button"
-						class="flex shrink-0 cursor-pointer items-center justify-center rounded-xl border-0 bg-transparent px-2 py-1 text-secondary transition-all [@media(hover:hover)]:opacity-0 group-hover:opacity-100 hover:bg-button-bg hover:text-contrast active:scale-[0.96]"
-						:aria-label="
-							formatMessage(messages.removeIncludedProject, {
-								project: project.title,
-							})
-						"
-						@click="removeIncludedProject(projectId)"
-					>
-						<XIcon class="size-4" aria-hidden="true" />
-					</button>
+				<div class="flex items-center gap-0.5">
 					<button
 						v-tooltip="
 							excludedProjectIds.has(projectId)
@@ -62,6 +50,19 @@
 					>
 						<BanIcon class="size-4" aria-hidden="true" />
 					</button>
+					<button
+						v-tooltip="formatMessage(messages.removeIncludedProjectTooltip)"
+						type="button"
+						class="flex shrink-0 cursor-pointer items-center justify-center rounded-xl border-0 bg-transparent px-2 py-1 text-secondary transition-all [@media(hover:hover)]:opacity-0 group-hover:opacity-100 hover:bg-button-bg hover:text-contrast active:scale-[0.96]"
+						:aria-label="
+							formatMessage(messages.removeIncludedProject, {
+								project: project.title,
+							})
+						"
+						@click="removeIncludedProject(projectId)"
+					>
+						<XIcon class="size-4" aria-hidden="true" />
+					</button>
 				</div>
 			</div>
 		</div>
@@ -75,26 +76,12 @@
 			:search-placeholder="formatMessage(messages.searchProjectPlaceholder)"
 			:show-chevron="false"
 			clearable
+			select-search-text-on-focus
 			show-search-icon
 			@update:model-value="setSelectedProjectId"
 		/>
 		<template v-if="showSelectedProject">
-			<div class="flex items-center justify-between gap-3 px-2 text-secondary">
-				<span>
-					{{
-						refreshing
-							? 'Loading...'
-							: formatMessage(messages.dependentCount, { count: resultCount ?? 0 })
-					}}
-				</span>
-				<button
-					class="border-none bg-transparent p-0 text-secondary cursor-pointer hover:text-contrast"
-					@click="setSelectedProjectId(undefined)"
-				>
-					{{ formatMessage(messages.clearFilter) }}
-				</button>
-			</div>
-			<div class="flex items-center gap-2 rounded-2xl bg-surface-1 p-2.5">
+			<div class="flex items-center gap-2 rounded-2xl bg-surface-2 p-2.5">
 				<img
 					v-if="selectedProject?.icon_url"
 					:src="selectedProject.icon_url"
@@ -132,6 +119,16 @@
 						</MultiSelect>
 					</div>
 				</div>
+				<IconButton
+					v-tooltip="formatMessage(messages.clearDependencyFilter)"
+					type="quiet"
+					size="sm"
+					class="ml-auto"
+					:label="formatMessage(messages.clearDependencyFilter)"
+					@click="setSelectedProjectId(undefined)"
+				>
+					<XIcon aria-hidden="true" />
+				</IconButton>
 			</div>
 		</template>
 	</div>
@@ -151,6 +148,7 @@ import {
 	parseDependencyProjectFilterOption,
 } from '../../utils/search'
 import MultiSelect, { type MultiSelectOption } from '../base/MultiSelect.vue'
+import { IconButton } from '../base/buttons'
 import ProjectCombobox, {
 	type ProjectType as ProjectComboboxProjectType,
 	type SearchHit,
@@ -337,13 +335,9 @@ function commitDependencyTypes() {
 }
 
 const messages = defineMessages({
-	clearFilter: {
-		id: 'search.filter.clear',
-		defaultMessage: 'Clear',
-	},
-	dependentCount: {
-		id: 'search.filter.dependent_count',
-		defaultMessage: '{count, plural, one {# dependent} other {# dependents}}',
+	clearDependencyFilter: {
+		id: 'search.filter.dependent_project.clear',
+		defaultMessage: 'Clear dependency filter',
 	},
 	searchContentPlaceholder: {
 		id: 'search.filter.included_content.search_placeholder',
