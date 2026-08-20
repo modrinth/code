@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24.15.0-slim
+FROM node:24-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.title=frontend
