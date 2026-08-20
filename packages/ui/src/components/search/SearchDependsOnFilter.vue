@@ -35,7 +35,7 @@
 								: formatMessage(messages.exclude)
 						"
 						type="button"
-						class="flex shrink-0 cursor-pointer items-center justify-center rounded-xl border-0 px-2 py-1 transition-all"
+						class="flex shrink-0 cursor-pointer items-center justify-center rounded-xl border-0 px-2 py-2 transition-all [@media(hover:hover)]:py-1"
 						:class="
 							excludedProjectIds.has(projectId)
 								? 'text-red opacity-100 bg-highlight-red'
@@ -53,7 +53,7 @@
 					<button
 						v-tooltip="formatMessage(messages.removeIncludedProjectTooltip)"
 						type="button"
-						class="flex shrink-0 cursor-pointer items-center justify-center rounded-xl border-0 bg-transparent px-2 py-1 text-secondary transition-all [@media(hover:hover)]:opacity-0 group-hover:opacity-100 hover:bg-button-bg hover:text-contrast active:scale-[0.96]"
+						class="flex shrink-0 cursor-pointer items-center justify-center rounded-xl border-0 bg-transparent px-2 py-2 text-secondary transition-all [@media(hover:hover)]:py-1 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 hover:bg-button-bg hover:text-contrast active:scale-[0.96]"
 						:aria-label="
 							formatMessage(messages.removeIncludedProject, {
 								project: project.title,
