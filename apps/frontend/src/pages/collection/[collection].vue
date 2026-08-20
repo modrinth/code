@@ -307,64 +307,32 @@
 						}
 					}),
 				]"
-				class="mb-4"
+				replace
+				page-nav
 			/>
 
-			<ProjectCardList
+			<ProjectList
 				v-if="projects && projects?.length > 0"
+				:projects="displayedProjects"
 				:layout="cosmetics.searchDisplayMode.collection"
 			>
-				<ProjectCard
-					v-for="project in (route.params.projectType !== undefined
-						? projects.filter(
-								(x) =>
-									x.project_type ===
-									route.params.projectType.substr(0, route.params.projectType.length - 1),
-							)
-						: projects
-					)
-						.slice()
-						.sort((a, b) => b.downloads - a.downloads)"
-					:key="project.id"
-					:link="`/${project.project_type}/${project.slug ?? project.id}`"
-					:title="project.title"
-					:icon-url="project.icon_url"
-					:banner="project.gallery.find((element) => element.featured)?.url"
-					:summary="project.description"
-					:date-updated="project.updated"
-					:downloads="project.downloads ?? 0"
-					:followers="project.followers ?? 0"
-					:tags="project.categories"
-					:environment="{
-						clientSide: project.client_side,
-						serverSide: project.server_side,
-					}"
-					:color="project.color"
-					:layout="
-						cosmetics.searchDisplayMode.collection === 'grid' ||
-						cosmetics.searchDisplayMode.collection === 'gallery'
-							? 'grid'
-							: 'list'
-					"
-				>
-					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<Button
-							v-if="canEdit"
-							class="remove-btn"
-							:disabled="removing"
-							@click="() => removeProject(project)"
-						>
-							<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-							<XIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.removeProjectButton) }}
-						</Button>
-						<Button v-if="collection.id === 'following'" @click="unfollowProject(project)">
-							<HeartMinusIcon aria-hidden="true" />
-							{{ formatMessage(messages.unfollowProjectButton) }}
-						</Button>
-					</template>
-				</ProjectCard>
-			</ProjectCardList>
+				<template v-if="canEdit || collection.id === 'following'" #actions="{ project }">
+					<Button
+						v-if="canEdit"
+						class="remove-btn"
+						:disabled="removing"
+						@click="() => removeProject(project)"
+					>
+						<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+						<XIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.removeProjectButton) }}
+					</Button>
+					<Button v-if="collection.id === 'following'" @click="unfollowProject(project)">
+						<HeartMinusIcon aria-hidden="true" />
+						{{ formatMessage(messages.unfollowProjectButton) }}
+					</Button>
+				</template>
+			</ProjectList>
 			<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
 				<template #actions>
 					<ButtonLink
@@ -405,6 +373,7 @@ import {
 	Avatar,
 	Button,
 	ButtonLink,
+	catalogProjectTypes,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
@@ -413,6 +382,7 @@ import {
 	defineMessages,
 	EmptyState,
 	FileInput,
+	filterProjectsByType,
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -421,11 +391,10 @@ import {
 	NewModal,
 	normalizeChildren,
 	NormalPage,
-	ProjectCard,
-	ProjectCardList,
+	parseProjectTypeRouteParam,
+	ProjectList,
 	RadioButtons,
 	SidebarCard,
-	sortProjectTypes,
 	StyledInput,
 	TeleportOverflowMenu,
 	useCompactNumber,
@@ -463,21 +432,13 @@ async function fetchProjectsByIds(projectIds) {
 		segments.push(projectIds.slice(i, i + segmentSize))
 	}
 	const results = await Promise.all(
-		segments.map((ids) => api.labrinth.projects_v2.getMultiple(ids)),
+		segments.map((ids) => api.labrinth.projects_v3.getMultiple(ids)),
 	)
-	const projects = results.flat()
-	for (const project of projects) {
-		project.categories = project.categories.concat(project.loaders)
-	}
-	return projects
+	return results.flat()
 }
 
 async function fetchFollowedProjects(userId) {
-	const projects = await api.labrinth.users_v2.getFollowedProjects(userId)
-	for (const project of projects) {
-		project.categories = project.categories.concat(project.loaders)
-	}
-	return projects
+	return api.labrinth.users_v3.getFollowedProjects(userId)
 }
 
 const messages = defineMessages({
@@ -765,13 +726,13 @@ const canEdit = computed(
 		collection.value.id !== 'following',
 )
 
-const projectTypes = computed(() => {
-	const projectSet = new Set(
-		projects.value?.map((project) => project?.project_type).filter((x) => x !== undefined) || [],
-	)
-	projectSet.delete('project')
-	return sortProjectTypes(projectSet)
-})
+const projectTypes = computed(() => catalogProjectTypes(projects.value ?? []))
+
+const displayedProjects = computed(() =>
+	filterProjectsByType(projects.value ?? [], parseProjectTypeRouteParam(route.params.projectType))
+		.slice()
+		.sort((a, b) => b.downloads - a.downloads),
+)
 
 function getProjectTypeSentenceMessage(type) {
 	return commonProjectTypeSentenceMessages[type] ?? commonProjectTypeSentenceMessages.project

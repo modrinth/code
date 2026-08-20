@@ -94,6 +94,54 @@ export class LabrinthUsersV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Get a user's projects.
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 * @returns Promise resolving to an array of the user's projects
+	 *
+	 * GET /v3/user/{id}/projects
+	 *
+	 * @example
+	 * ```typescript
+	 * const projects = await client.labrinth.users_v3.getProjects('my_user')
+	 * ```
+	 */
+	public async getProjects(idOrUsername: string): Promise<Labrinth.Projects.v3.Project[]> {
+		return this.client.request<Labrinth.Projects.v3.Project[]>(
+			`/user/${encodeURIComponent(idOrUsername)}/projects`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Get projects a user follows.
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 * @returns Promise resolving to an array of followed projects
+	 *
+	 * GET /v3/user/{id}/follows
+	 *
+	 * @example
+	 * ```typescript
+	 * const projects = await client.labrinth.users_v3.getFollowedProjects('my_user')
+	 * ```
+	 */
+	public async getFollowedProjects(idOrUsername: string): Promise<Labrinth.Projects.v3.Project[]> {
+		return this.client.request<Labrinth.Projects.v3.Project[]>(
+			`/user/${encodeURIComponent(idOrUsername)}/follows`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Get all projects the authenticated user can access directly or through
 	 * their organizations.
 	 *
