@@ -71,6 +71,8 @@ export default function () {
 							),
 					)
 					.collect(undefined, 'missing-disclosures/list-intro'),
+
+				toggle('misused', 'Misused').suggestedStatus('flagged').message(),
 			),
 		)
 }

@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { CheckIcon } from '@modrinth/assets'
 import { ref, watch } from 'vue'
+
+import { defineMessages, useVIntl } from '../../composables/i18n'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	selectNamedSkin: { id: 'skins.select-named', defaultMessage: 'Select {name}' },
+	selectSkin: { id: 'skins.select', defaultMessage: 'Select skin' },
+})
 
 const emit = defineEmits<{
 	(e: 'select'): void
@@ -63,7 +72,11 @@ watch(
 
 		<button
 			class="absolute inset-0 z-10 cursor-pointer border-none bg-transparent p-0 focus-visible:outline-none"
-			:aria-label="tooltip ? `Select ${tooltip}` : 'Select skin'"
+			:aria-label="
+				tooltip
+					? formatMessage(messages.selectNamedSkin, { name: tooltip })
+					: formatMessage(messages.selectSkin)
+			"
 			:aria-pressed="selected"
 			:disabled="disabled"
 			@click="emit('select')"
@@ -73,6 +86,14 @@ watch(
 			v-if="active && !selected && !$slots['top-buttons']"
 			class="pointer-events-none absolute right-3 top-3 z-20 size-3 rounded-full border-2 border-solid border-surface-3 bg-green"
 		></span>
+
+		<span
+			v-if="selected"
+			class="pointer-events-none absolute right-3 top-3 z-20 flex size-6 items-center justify-center rounded-full"
+		>
+			<span class="absolute inset-0 rounded-full bg-contrast"></span>
+			<CheckIcon class="relative size-4 invert [stroke-width:3]" />
+		</span>
 
 		<div v-if="!imagesLoaded.forward" class="skeleton-loader h-full w-full">
 			<div class="skeleton absolute inset-0 aspect-[5/7]"></div>
@@ -109,22 +130,23 @@ watch(
 }
 
 .skeleton {
-	background: linear-gradient(
-		90deg,
-		var(--color-bg) 25%,
-		var(--color-raised-bg) 50%,
-		var(--color-bg) 75%
-	);
-	background-size: 200% 100%;
-	animation: wave 1500ms infinite linear;
+	background: linear-gradient(145deg, var(--surface-2), var(--surface-3));
+	animation: skeleton-pulse 2700ms ease-in-out infinite;
 }
 
-@keyframes wave {
-	0% {
-		background-position: -200% 0;
-	}
+@keyframes skeleton-pulse {
+	0%,
 	100% {
-		background-position: 200% 0;
+		filter: brightness(0.95);
+	}
+	50% {
+		filter: brightness(1.15);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skeleton {
+		animation: none;
 	}
 }
 
@@ -168,13 +190,10 @@ watch(
 .skin-button.skin-button--selected:hover,
 .skin-button.skin-button--selected:focus-within,
 .skin-button.skin-button--selected.skin-button--with-actions:hover,
-.skin-button.skin-button--selected.skin-button--with-actions:focus-within,
-.skin-button.skin-button--active:hover,
-.skin-button.skin-button--active:focus-within,
-.skin-button.skin-button--active.skin-button--with-actions:hover,
-.skin-button.skin-button--active.skin-button--with-actions:focus-within {
-	border-color: var(--color-brand);
-	background: var(--color-brand-highlight);
+.skin-button.skin-button--selected.skin-button--with-actions:focus-within {
+	border-color: color-mix(in srgb, var(--color-text-primary) 40%, transparent);
+	background: var(--surface-3);
+	filter: brightness(1.1);
 }
 
 .skin-button--disabled {

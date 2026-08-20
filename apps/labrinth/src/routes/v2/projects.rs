@@ -376,7 +376,7 @@ struct DependencyInfo {
     get,
     operation_id = "getDependencies",
     params(
-        ("id" = String, Path, description = "The ID or slug of the project")
+        ("project_id" = String, Path, description = "The ID or slug of the project")
     ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = DependencyInfo),

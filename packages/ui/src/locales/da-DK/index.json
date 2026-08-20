@@ -431,9 +431,6 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "Opsæt server"
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Fjern ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Vælg ikon"
   },
@@ -499,12 +496,6 @@
   },
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Ryd alle"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ingen resultater fundet"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Søg efter modpack"
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Installer modpack"
@@ -791,14 +782,8 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "Ny instans"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Fjern ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søg efter instanser"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Vælg ikon"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuværrende"
@@ -1964,9 +1949,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du allerede en server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Lær mere om Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -1975,9 +1957,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installer mods, inviter venner og spil alle sammen fra Modrinth Appen."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Ingen servere endnu"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Vælg dine favorit mods og vi håndtere resten."
@@ -1990,9 +1969,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Log ind"
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Simpel opsætning"
   },
   "servers.notice.heading.info": {
     "defaultMessage": "Information"

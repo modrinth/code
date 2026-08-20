@@ -3,6 +3,7 @@ import type { Theme } from './themes.ts'
 interface ThemeSettings {
 	preference: Theme | 'system'
 	value: Theme
+	syncAcrossDevices?: boolean
 }
 
 export function useThemeSettings(getDefaultTheme?: () => Theme) {
@@ -22,6 +23,7 @@ export function useThemeSettings(getDefaultTheme?: () => Theme) {
 		$settings.value = {
 			preference: 'system',
 			value: getDefaultTheme(),
+			syncAcrossDevices: true,
 		}
 	}
 
@@ -34,6 +36,11 @@ export function useThemeSettings(getDefaultTheme?: () => Theme) {
 		active: computed({
 			get: () => $settings.value.value ?? getDefaultTheme(),
 			set: (value) => ($settings.value.value = value),
+		}),
+
+		syncAcrossDevices: computed({
+			get: () => $settings.value.syncAcrossDevices ?? true,
+			set: (value) => ($settings.value.syncAcrossDevices = value),
 		}),
 	})
 }

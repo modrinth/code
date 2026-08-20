@@ -608,9 +608,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Tìm phiên bản Game..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Xóa biểu tượng"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Chọn biểu tượng"
   },
@@ -773,24 +770,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Xóa hết"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Duyệt modpack"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Thêm modpack"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Biết modpack bạn định cài là gì rồi?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Không tìm thấy"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Tìm modpack"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Cấu hình là một bản cài Minecraft với mod, phiên bản và loader của riêng nó."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Cài từ đầu bằng cách lựa chọn mod loader và phiên bản game."
   },
@@ -823,9 +802,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Chọn loại thế giới"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Chọn modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Tạo cấu hình"
@@ -1688,14 +1664,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Không tìm thấy phiên chơi tương thích"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Xoá biểu tượng"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Tìm phiên chơi"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Chọn biểu tượng"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
@@ -3893,9 +3863,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Đã có máy chủ rồi?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Tìm hiểu thêm về Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3904,9 +3871,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Cài mod, mời bạn bè, và chơi cùng nhau mà chỉ cần Ứng dụng Modrinth."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Không máy chủ khả dụng"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Chọn bản mod mà bạn yêu thích và chúng tôi sẽ làm tất cả phần còn lại."
@@ -3922,12 +3886,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Đăng nhập"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Thiết lập máy chủ giống như thế giới chơi đơn."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Thiết lập đơn giản"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Đã sao chép"

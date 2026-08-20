@@ -2224,6 +2224,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "component-derive"
+version = "0.0.0"
+dependencies = [
+ "darling 0.23.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
+]
+
+[[package]]
 name = "compression-codecs"
 version = "0.4.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2666,10 +2676,10 @@ dependencies = [
  "futures",
  "indexmap 2.11.4",
  "itertools 0.14.0",
+ "quick-xml 0.38.3",
  "reqwest 0.12.24",
  "rust-s3",
  "serde",
- "serde-xml-rs",
  "serde_json",
  "sha1_smol",
  "thiserror 2.0.17",
@@ -5480,6 +5490,7 @@ dependencies = [
  "clickhouse",
  "color-eyre",
  "color-thief",
+ "component-derive",
  "const_format",
  "dashmap",
  "derive_more 2.1.1",
@@ -5555,16 +5566,6 @@ dependencies = [
  "yaserde",
  "zip 6.0.0",
  "zxcvbn",
-]
-
-[[package]]
-name = "labrinth-derive"
-version = "0.0.0"
-dependencies = [
- "darling 0.23.0",
- "proc-macro2",
- "quote",
- "syn 2.0.106",
 ]
 
 [[package]]
@@ -9430,18 +9431,6 @@ dependencies = [
  "serde",
  "serde_core",
  "typeid",
-]
-
-[[package]]
-name = "serde-xml-rs"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53630160a98edebde0123eb4dfd0fce6adff091b2305db3154a9e920206eb510"
-dependencies = [
- "log",
- "serde",
- "thiserror 1.0.69",
- "xml-rs",
 ]
 
 [[package]]

@@ -5012,95 +5012,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "開發人員模式<strong>已啟用</strong>。這個模式可以讓你查看 Modrinth 各項內容的內部 ID，如果你是使用 Modrinth API 的開發人員，這項功能可能會對你有所幫助。按 5 次頁面底部的 Modrinth 標誌即可切換開發人員模式。"
   },
-  "settings.display.flags.description": {
-    "message": "針對這部裝置，設定要啟用或停用的特定功能。"
-  },
-  "settings.display.flags.title": {
-    "message": "功能開關"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "開發者模式已被停用"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "開發人員模式已停用"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "資料包頁面"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "依你偏好，設定這部裝置的專案清單版面配置。"
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "模組頁面"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "圖庫"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "網格"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "列"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "模組包頁面"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "插件頁面"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "資源包頁面"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "伺服器頁面"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "光影包頁面"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "專案清單版面配置"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "使用者個人檔案頁面"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "收藏"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "啟用進階繪製（如模糊效果）；若無硬體加速可能會導致效能問題。"
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "進階繪製"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "在新分頁中開啟 Modrinth 的外部連結。這項設定僅適用於外部連結，內部連結和 Markdown 說明中的連結仍會在同一個分頁中開啟，而廣告和編輯頁面的連結會在新分頁中開啟。"
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "在新分頁中開啟外部連結"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "在主導覽列中隱藏「下載 Modrinth App」按鈕。你仍可在登入頁面或頁尾找到 Modrinth 應用程式頁面。"
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "隱藏 Modrinth App 廣告"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "內容頁面左側邊欄"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "使側邊欄靠頁面內容左側對齊。"
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "使篩選側邊欄靠搜尋結果右側對齊。"
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "搜尋頁面右側篩選側邊欄"
-  },
-  "settings.display.theme.description": {
-    "message": "請為這部裝置選擇你偏好的色彩主題。"
-  },
-  "settings.display.theme.title": {
-    "message": "色彩主題"
   },
   "settings.head-title": {
     "message": "顯示設定"

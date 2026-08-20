@@ -8,9 +8,34 @@ const meta = {
 	parameters: {
 		layout: 'centered',
 	},
+	args: {
+		onClickNewServer: () => undefined,
+		onClickSignIn: () => undefined,
+	},
 } satisfies Meta<typeof ServerListEmpty>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const SignedOut: Story = {
+	args: {
+		loggedIn: false,
+	},
+}
+
+export const LoggedIn: Story = {
+	args: {
+		loggedIn: true,
+	},
+}
+
+export const Narrow: Story = {
+	args: {
+		loggedIn: false,
+	},
+	parameters: {
+		viewport: {
+			defaultViewport: 'mobile2',
+		},
+	},
+}

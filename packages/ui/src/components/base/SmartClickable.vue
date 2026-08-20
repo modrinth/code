@@ -83,7 +83,7 @@ defineOptions({
 
 	// When clickable is being clicked, give contents an effect
 	:first-child:active + .smart-clickable__contents:not(.smart-clickable__contents--disabled) {
-		scale: 0.98;
+		scale: var(--active-scale, 0.98);
 	}
 }
 </style>

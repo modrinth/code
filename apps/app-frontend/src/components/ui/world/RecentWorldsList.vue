@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { LoaderCircleIcon } from '@modrinth/assets'
 import type { GameVersion } from '@modrinth/ui'
-import { GAME_MODES, injectNotificationManager } from '@modrinth/ui'
+import { defineMessages, GAME_MODES, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
@@ -10,6 +10,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -29,26 +31,28 @@ import {
 	start_join_singleplayer_world,
 	type WorldWithInstance,
 } from '@/helpers/worlds.ts'
-import { handleSevereError } from '@/store/error'
-import { useTheming } from '@/store/theme.ts'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	jumpIn: { id: 'app.home.jump-back-in.title', defaultMessage: 'Jump in' },
+})
 
 const props = defineProps<{
 	recentInstances: GameInstance[]
 }>()
 
-const theme = useTheming()
+const appSettings = useAppSettings()
 
 const jumpBackInItems = ref<JumpBackInItem[]>([])
 const loading = ref(true)
 const serverData = ref<Record<string, ServerData>>({})
 const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
+const locallyPlayedInstances = ref<Record<string, Dayjs>>({})
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
 
-const MIN_JUMP_BACK_IN = 3
-const MAX_JUMP_BACK_IN = 6
-const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
+const MAX_JUMP_BACK_IN = 5
+const MAX_NEW_INSTANCES = 3
 const MAX_LINUX_POPULATES = 3
 
 // Track populate calls on Linux to prevent server ping spam
@@ -56,8 +60,9 @@ const isLinux = platform() === 'linux'
 const linuxPopulateCount = ref(0)
 
 type BaseJumpBackInItem = {
-	last_played: Dayjs
+	sort_time: Dayjs
 	instance: GameInstance
+	newly_added?: boolean
 }
 
 type InstanceJumpBackInItem = BaseJumpBackInItem & {
@@ -71,7 +76,7 @@ type WorldJumpBackInItem = BaseJumpBackInItem & {
 
 type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
-const showWorlds = computed(() => theme.getFeatureFlag('worlds_in_home'))
+const showWorlds = computed(() => appSettings.getFeatureFlag('worlds_in_home'))
 
 watch([() => props.recentInstances, () => showWorlds.value], async () => {
 	await populateJumpBackIn().catch(() => {
@@ -108,7 +113,7 @@ async function populateJumpBackIn() {
 
 			worldItems.push({
 				type: 'world',
-				last_played: dayjs(world.last_played ?? 0),
+				sort_time: dayjs(world.last_played ?? 0),
 				world: world,
 				instance: instance,
 			})
@@ -153,22 +158,42 @@ async function populateJumpBackIn() {
 	const instanceItems: InstanceJumpBackInItem[] = []
 	for (const instance of props.recentInstances) {
 		const worldItem = worldItems.find((item) => item.instance.id === instance.id)
-		if ((worldItem && worldItem.last_played.isAfter(TWO_WEEKS_AGO)) || !instance.last_played) {
-			continue
-		}
+		const lastPlayed = instance.last_played
+			? dayjs(instance.last_played)
+			: locallyPlayedInstances.value[instance.id]
+		const newlyAdded = !lastPlayed
+		if (worldItem && (!lastPlayed || !lastPlayed.isAfter(worldItem.sort_time))) continue
+		if (worldItem) worldItems.splice(worldItems.indexOf(worldItem), 1)
 
 		instanceItems.push({
 			type: 'instance',
-			last_played: dayjs(instance.last_played ?? 0),
+			sort_time: lastPlayed ?? dayjs(instance.created),
 			instance: instance,
+			newly_added: newlyAdded,
 		})
 	}
 
 	const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
-	items.sort((a, b) => dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0)))
+	items.sort((a, b) => b.sort_time.diff(a.sort_time))
+	let newInstanceCount = 0
 	jumpBackInItems.value = items
-		.filter((item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO))
+		.filter((item) => {
+			if (item.type !== 'instance' || !item.newly_added) return true
+			if (newInstanceCount >= MAX_NEW_INSTANCES) return false
+			newInstanceCount++
+			return true
+		})
 		.slice(0, MAX_JUMP_BACK_IN)
+}
+
+function markInstancePlayed(item: InstanceJumpBackInItem) {
+	const lastPlayed = dayjs()
+	locallyPlayedInstances.value = {
+		...locallyPlayedInstances.value,
+		[item.instance.id]: lastPlayed,
+	}
+	item.sort_time = lastPlayed
+	item.newly_added = false
 }
 
 function refreshServer(address: string, instanceId: string) {
@@ -255,18 +280,22 @@ onMounted(() => {
 
 <template>
 	<div v-if="loading" class="flex flex-col gap-2">
-		<span class="flex mt-1 mb-3 leading-none items-center gap-1 text-primary text-lg font-bold">
-			Jump back in
+		<span
+			class="flex mt-1 mb-3 leading-none items-center gap-1 text-2xl font-semibold text-contrast"
+		>
+			{{ formatMessage(messages.jumpIn) }}
 		</span>
 		<div class="text-center py-4">
 			<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
 		</div>
 	</div>
 	<div v-else-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-		<span class="flex mt-1 mb-3 leading-none items-center gap-1 text-primary text-lg font-bold">
-			Jump back in
+		<span
+			class="flex mt-1 mb-3 leading-none items-center gap-1 text-2xl font-semibold text-contrast"
+		>
+			{{ formatMessage(messages.jumpIn) }}
 		</span>
-		<div class="grid-when-huge flex flex-col w-full gap-2">
+		<div class="grid-when-huge flex flex-col w-full gap-3">
 			<template
 				v-for="item in jumpBackInItems"
 				:key="`${item.instance.id}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
@@ -327,7 +356,13 @@ onMounted(() => {
 					"
 					@stop="() => stopInstance(item.instance.id)"
 				/>
-				<InstanceItem v-else :instance="item.instance" :last_played="item.last_played" />
+				<InstanceItem
+					v-else
+					:instance="item.instance"
+					:last_played="item.sort_time"
+					:newly-added="item.newly_added"
+					@play="() => markInstancePlayed(item)"
+				/>
 			</template>
 		</div>
 	</div>

@@ -8,6 +8,10 @@ on:
 concurrency:
   group: i18n-management
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   pull_translations:
     name: 'Pull translations from Crowdin'
@@ -38,23 +42,17 @@ jobs:
             flight_failure "CROWDIN_PERSONAL_TOKEN secret is not defined (required to push)"
           fi
 
-          if [ "$CROWDIN_GH_TOKEN_DEFINED" != true ]; then
-            flight_failure "CROWDIN_GH_TOKEN secret is not defined (required to make pull requests)"
-          fi
-
           if [ "$PREFLIGHT_CHECK_RESULT" = false ]; then
             exit 1
           fi
         env:
           CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
           CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
-          CROWDIN_GH_TOKEN_DEFINED: ${{ secrets.CROWDIN_GH_TOKEN != '' }}
 
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref }}
-          token: ${{ secrets.CROWDIN_GH_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -66,12 +64,6 @@ jobs:
 
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Configure Git author
-        id: git-author
-        uses: MarcoIeni/git-config@59144859caf016f8b817a2ac9b051578729173c4 # v0.1.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.CROWDIN_GH_TOKEN }}
 
       # # Because --all flag of Crowdin CLI is currently broken we need to create a fake source file
       # # so that the CLI won't omit translations for it. See https://github.com/crowdin/crowdin-cli/issues/724
@@ -116,7 +108,4 @@ jobs:
           body-path: .github/templates/crowdin-pr.md
           commit-message: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
           branch: crowdin-pull/${{ steps.branch-name.outputs.branch_name }}
-          author: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
-          committer: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
           labels: sync
-          token: ${{ secrets.CROWDIN_GH_TOKEN }}

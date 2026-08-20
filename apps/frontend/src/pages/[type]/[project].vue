@@ -564,10 +564,12 @@ import {
 	HeartIcon,
 	LeftArrowIcon,
 	MoreVerticalIcon,
+	PackageSearchIcon,
 	PlayIcon,
 	ReportIcon,
 	ScaleIcon,
 	ScanEyeIcon,
+	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
 	XIcon,
@@ -582,6 +584,8 @@ import {
 	ButtonLink,
 	commonMessages,
 	defineMessages,
+	formatDependencyProjectFilterOption,
+	formatProjectTypeSentence,
 	getActiveDisclosures,
 	IconButton,
 	injectModrinthClient,
@@ -845,6 +849,18 @@ const messages = defineMessages({
 	reviewProject: {
 		id: 'project.actions.review-project',
 		defaultMessage: 'Review project',
+	},
+	viewDependents: {
+		id: 'project.actions.view-dependents',
+		defaultMessage: 'View dependents',
+	},
+	viewProjectTypeDependents: {
+		id: 'project.actions.view-project-type-dependents',
+		defaultMessage: 'View {projectType} dependents',
+	},
+	viewModpacks: {
+		id: 'project.actions.view-modpacks',
+		defaultMessage: 'View modpacks',
 	},
 	rescanModpack: {
 		id: 'project.actions.rescan-modpack',
@@ -1745,16 +1761,24 @@ const following = computed(() => {
 	return !!user.value.follows.find((x) => x.id === project.value.id)
 })
 
+const PROJECT_NOT_FOUND_DESCRIPTION =
+	"There's no project here, check that you have the right link! It may still be under review or no longer publicly available on Modrinth."
+
 const title = computed(() =>
-	project.value ? `${project.value.title} - Minecraft ${projectTypeDisplay.value}` : '',
-)
-const description = computed(() =>
 	project.value
-		? `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
-				project.value.title
-			} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`
-		: '',
+		? `${project.value.title} - Minecraft ${projectTypeDisplay.value}`
+		: 'Project not found',
 )
+const description = computed(() => {
+	if (!project.value) {
+		return PROJECT_NOT_FOUND_DESCRIPTION
+	}
+
+	const creator = organization.value?.name || members.value.find((x) => x.is_owner)?.user?.username
+	const byLine = creator ? ` by ${creator}` : ''
+
+	return `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${project.value.title}${byLine} on Modrinth`
+})
 
 const canCreateServerFrom = computed(() => {
 	if (!project.value) return false
@@ -1896,6 +1920,30 @@ async function checkModpackArchives() {
 
 const projectHeaderMoreActions = computed(() => {
 	const isStaff = !!(auth.value.user && tags.value.staffRoles.includes(auth.value.user.role))
+	const projectId = project.value?.id
+	const dependentSearchTypes = getDependentSearchTypes()
+	const dependentSearchActions = dependentSearchTypes
+		.filter((projectType) => projectType !== 'modpack')
+		.map((projectType) => ({
+			id: `view-${projectType}-dependents`,
+			label: formatMessage(
+				dependentSearchTypes.length === 1
+					? messages.viewDependents
+					: messages.viewProjectTypeDependents,
+				{
+					projectType: formatProjectTypeSentence(formatMessage, projectType),
+				},
+			),
+			icon: SearchIcon,
+			type: 'link',
+			to: {
+				path: `/discover/${projectType}s`,
+				query: {
+					dep: formatDependencyProjectFilterOption(projectId, ['required']),
+				},
+			},
+		}))
+	const isPluginOnly = dependentSearchTypes.length === 1 && dependentSearchTypes[0] === 'plugin'
 
 	return [
 		{
@@ -1906,7 +1954,21 @@ const projectHeaderMoreActions = computed(() => {
 			to: `${projectPath.value}/settings/analytics`,
 			shown: !!auth.value.user && !!currentMember.value,
 		},
-		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value },
+		...dependentSearchActions,
+		{
+			id: 'view-modpacks',
+			label: formatMessage(messages.viewModpacks),
+			icon: PackageSearchIcon,
+			type: 'link',
+			to: {
+				path: '/discover/modpacks',
+				query: {
+					dep: formatDependencyProjectFilterOption(projectId, ['required']),
+				},
+			},
+			shown: !isPluginOnly && project.value?.actualProjectType !== 'modpack',
+		},
+		{ type: 'divider' },
 		{
 			id: 'moderation-checklist',
 			label: formatMessage(messages.reviewProject),
@@ -1969,6 +2031,29 @@ const projectHeaderMoreActions = computed(() => {
 	]
 })
 
+function getDependentSearchTypes() {
+	if (!project.value) return []
+
+	if (project.value.actualProjectType !== 'mod') {
+		return [isServerProject.value ? 'server' : project.value.actualProjectType]
+	}
+
+	const loaders = project.value.loaders ?? []
+	const projectTypes = []
+
+	if (loaders.some((loader) => tags.value.loaderData.modLoaders.includes(loader))) {
+		projectTypes.push('mod')
+	}
+	if (loaders.some((loader) => tags.value.loaderData.allPluginLoaders.includes(loader))) {
+		projectTypes.push('plugin')
+	}
+	if (loaders.some((loader) => tags.value.loaderData.dataPackLoaders.includes(loader))) {
+		projectTypes.push('datapack')
+	}
+
+	return projectTypes.length > 0 ? projectTypes : ['mod']
+}
+
 const createCanonicalUrl = () =>
 	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
 
@@ -1986,8 +2071,11 @@ if (!route.name.startsWith('type-project-settings')) {
 		title: () => title.value,
 		description: () => description.value,
 		ogTitle: () => title.value,
-		ogDescription: () => project.value?.description ?? '',
-		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+		ogDescription: () => project.value?.description ?? PROJECT_NOT_FOUND_DESCRIPTION,
+		ogImage: () =>
+			project.value
+				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
+				: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})

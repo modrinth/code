@@ -44,9 +44,9 @@ const formatDateTime = useFormatDateTime({
 })
 
 const messages = defineMessages({
-	managedBy: {
-		id: 'content.managed-card.managed-by',
-		defaultMessage: 'Managed by',
+	providedBy: {
+		id: 'content.managed-card.provided-by',
+		defaultMessage: 'Provided by',
 	},
 	server: {
 		id: 'content.managed-card.server-suffix',
@@ -110,7 +110,7 @@ const showAction = computed(
 				<LockIcon aria-hidden="true" class="size-5 shrink-0" />
 				<div class="flex min-w-0 flex-wrap items-center gap-[5px] @[700px]:flex-nowrap">
 					<span class="whitespace-nowrap">
-						{{ formatMessage(messages.managedBy) }}
+						{{ formatMessage(messages.providedBy) }}
 					</span>
 					<AutoLink
 						:to="data.manager.link"

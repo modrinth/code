@@ -2,10 +2,10 @@
 	<span
 		v-if="showLabel"
 		class="flex h-10 items-center text-nowrap text-base font-medium text-primary"
-		:aria-label="useFilterIcon ? label : undefined"
+		:aria-label="useFilterIcon ? effectiveLabel : undefined"
 	>
 		<FilterIcon v-if="useFilterIcon" class="size-5 text-primary" aria-hidden="true" />
-		<template v-else>{{ label }}</template>
+		<template v-else>{{ effectiveLabel }}</template>
 	</span>
 
 	<template v-for="preview in appliedFilterPreviews" :key="preview.key">
@@ -15,7 +15,7 @@
 			native-type="button"
 			size="lg"
 			:class="effectivePreviewTriggerClass"
-			:aria-label="`Clear ${preview.label} filter`"
+			:aria-label="formatMessage(messages.clearNamedFilter, { name: preview.label })"
 			@click="clearFilterCategory(preview.key)"
 		>
 			<span class="font-semibold">{{ preview.label }}</span>
@@ -84,7 +84,7 @@
 						<button
 							type="button"
 							class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-							:aria-label="`Clear ${preview.label} filter`"
+							:aria-label="formatMessage(messages.clearNamedFilter, { name: preview.label })"
 							@click.stop="clearFilterCategory(preview.key)"
 						>
 							<XIcon class="size-4 text-primary" />
@@ -142,11 +142,11 @@
 			@keydown="handleAddMenuTriggerKeydown"
 		>
 			<PlusIcon />
-			{{ addLabel }}
+			{{ effectiveAddLabel }}
 		</Button>
 
 		<Button v-if="shouldShowClear" type="quiet" native-type="button" @click="clearAllFilters">{{
-			clearLabel
+			effectiveClearLabel
 		}}</Button>
 	</div>
 
@@ -226,7 +226,9 @@
 						v-model="categorySearchQuery"
 						:icon="SearchIcon"
 						type="text"
-						:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
+						:placeholder="
+							activeCategory.searchPlaceholder ?? formatMessage(messages.searchPlaceholder)
+						"
 						wrapper-class="grow bg-surface-4 mx-1"
 						input-class="ps-9 mx-1.5"
 					/>
@@ -327,7 +329,11 @@
 										class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:text-contrast"
 										@click="toggleSectionHeaderOptions(item)"
 									>
-										{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
+										{{
+											formatMessage(
+												areSectionHeaderOptionsSelected(item) ? messages.clear : messages.selectAll,
+											)
+										}}
 									</button>
 								</div>
 								<button
@@ -423,6 +429,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/components/base/buttons'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 import StyledInput from './StyledInput.vue'
@@ -539,6 +546,21 @@ const TAILWIND_WIDTH_CLASS_SIZE: Record<string, string> = {
 	[DEFAULT_SUBMENU_CLASS]: DEFAULT_SUBMENU_WIDTH,
 }
 
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	filteredBy: { id: 'filter-bar.filtered-by', defaultMessage: 'Filtered by' },
+	add: { id: 'filter-bar.add', defaultMessage: 'Add' },
+	clear: { id: 'filter-bar.clear', defaultMessage: 'Clear' },
+	selectAll: { id: 'filter-bar.select-all', defaultMessage: 'Select all' },
+	noOptions: { id: 'filter-bar.no-options', defaultMessage: 'No options available.' },
+	noSearchResults: { id: 'filter-bar.no-search-results', defaultMessage: 'No options found.' },
+	searchPlaceholder: { id: 'filter-bar.search-placeholder', defaultMessage: 'Search...' },
+	clearNamedFilter: {
+		id: 'filter-bar.clear-named-filter',
+		defaultMessage: 'Clear {name} filter',
+	},
+})
+
 const props = withDefaults(
 	defineProps<{
 		modelValue: DropdownFilterBarValue
@@ -559,19 +581,24 @@ const props = withDefaults(
 		checkboxPosition?: 'left' | 'right'
 	}>(),
 	{
-		label: 'Filtered by',
-		addLabel: 'Add',
-		clearLabel: 'Clear',
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
 		addButtonSize: 'md',
 		applyImmediately: false,
 		showPreviewFilterIcon: false,
-		emptyOptionsLabel: 'No options available.',
-		emptySearchLabel: 'No options found.',
 		checkboxPosition: 'left',
 	},
+)
+
+const effectiveLabel = computed(() => props.label ?? formatMessage(messages.filteredBy))
+const effectiveAddLabel = computed(() => props.addLabel ?? formatMessage(messages.add))
+const effectiveClearLabel = computed(() => props.clearLabel ?? formatMessage(messages.clear))
+const effectiveEmptyOptionsLabel = computed(
+	() => props.emptyOptionsLabel ?? formatMessage(messages.noOptions),
+)
+const effectiveEmptySearchLabel = computed(
+	() => props.emptySearchLabel ?? formatMessage(messages.noSearchResults),
 )
 
 const emit = defineEmits<{
@@ -737,12 +764,12 @@ const activeCategoryOptionsListStyle = computed<CSSProperties | undefined>(() =>
 const activeCategoryEmptyStateLabel = computed(() => {
 	const category = activeCategory.value
 	if (!category) {
-		return props.emptyOptionsLabel
+		return effectiveEmptyOptionsLabel.value
 	}
 
 	return category.searchable && categorySearchQuery.value.trim().length > 0
-		? (category.emptySearchLabel ?? props.emptySearchLabel)
-		: (category.emptyOptionsLabel ?? props.emptyOptionsLabel)
+		? (category.emptySearchLabel ?? effectiveEmptySearchLabel.value)
+		: (category.emptyOptionsLabel ?? effectiveEmptyOptionsLabel.value)
 })
 
 const submenuStyle = computed<CSSProperties>(() => {
@@ -788,9 +815,9 @@ const appliedFilterPreviews = computed(() =>
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
-const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem]'
+const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem] !rounded-xl'
 const effectivePreviewTriggerClass = computed(
-	() => props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS,
+	() => (props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS) + ' h-9',
 )
 
 function cloneSelectedFilters(filters: DropdownFilterBarValue): DropdownFilterBarValue {

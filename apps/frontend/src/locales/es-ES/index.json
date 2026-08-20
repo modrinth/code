@@ -4265,95 +4265,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "El <strong>modo desarrollador</strong> está activo. Esto te permitirá ver los ID internos de varios elementos de Modrinth, lo que puede resultarte útil si eres desarrollador y utilizas la API de Modrinth. Haz clic 5 veces en el logotipo de Modrinth situado en la parte inferior de la página para activar o desactivar el modo desarrollador."
   },
-  "settings.display.flags.description": {
-    "message": "Activar o desactivar determinadas funciones de este dispositivo."
-  },
-  "settings.display.flags.title": {
-    "message": "Alternar funciones"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "El modo de desarrollador se ha desactivado"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Modo de desarrollador desactivado"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Página de Paquetes de Datos"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Selecciona tu diseño preferido para cada página que muestre listas de proyectos en este dispositivo."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Página de Mods"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galería"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Cuadrícula"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Filas"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Página de Modpacks"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Página de Plugins"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Página de Paquetes de Recursos"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Página de servidores"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Página de Sombreadores"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Diseños de la lista de proyectos"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Páginas de perfil de usuario"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Colección"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Habilita el renderizado avanzado, como los efectos de desenfoque, que pueden causar problemas de rendimiento sin renderizado acelerado por hardware."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Renderizado avanzado"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Haz que los enlaces que salen de Modrinth se abran en una nueva pestaña. Independientemente de esta configuración, los enlaces del mismo dominio y de las descripciones Markdown se abrirán en la misma pestaña, y los enlaces de los anuncios y las páginas de edición se abrirán en una nueva pestaña."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Abrir enlaces externos en una nueva pestaña"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Oculta los botones «Obtener la aplicación Modrinth» de la navegación principal. La página de la aplicación Modrinth sigue estando disponible en la página de inicio o en el pie de página."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ocultar promociones de la aplicación de Modrinth"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Barra lateral alineada a la izquierda en páginas de contenido"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Alinea la barra lateral a la izquierda del contenido de la página."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Alinea la barra lateral de filtros a la derecha de los resultados de la búsqueda."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Barra lateral de filtros alineada a la derecha en las páginas de búsqueda"
-  },
-  "settings.display.theme.description": {
-    "message": "Seleccione su tema de color preferido para Modrinth en este dispositivo."
-  },
-  "settings.display.theme.title": {
-    "message": "Tema de color"
   },
   "settings.head-title": {
     "message": "Configuración de pantalla"

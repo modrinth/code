@@ -13,9 +13,16 @@ import type {
 	ContentFile,
 	ContentFileProjectType,
 	GameInstance,
+	InstanceIconConfig,
 	InstanceLoader,
 	SharedInstanceAttachment,
 } from './types'
+
+export function getInstanceIconUrl(iconPath: string | null | undefined): string | null {
+	if (!iconPath) return null
+	if (iconPath.startsWith('http://') || iconPath.startsWith('https://')) return iconPath
+	return convertFileSrc(iconPath)
+}
 
 export async function remove(instanceId: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove', { instanceId })
@@ -387,6 +394,48 @@ export async function edit(instanceId: string, editInstance: Partial<GameInstanc
 // Edits an instance's icon
 export async function edit_icon(instanceId: string, iconPath: string | null): Promise<void> {
 	return await invoke('plugin:instance|instance_edit_icon', { instanceId, iconPath })
+}
+
+export async function edit_generated_icon(
+	instanceId: string,
+	config: InstanceIconConfig,
+	symbolBytes: number[],
+): Promise<string> {
+	return await invoke('plugin:instance|instance_edit_generated_icon', {
+		instanceId,
+		config,
+		symbolBytes,
+	})
+}
+
+export async function edit_generated_icon_if_empty(
+	instanceId: string,
+	config: InstanceIconConfig,
+	symbolBytes: number[],
+): Promise<boolean> {
+	const result = await invoke<string | null>('plugin:instance|instance_edit_generated_icon', {
+		instanceId,
+		config,
+		symbolBytes,
+		onlyIfEmpty: true,
+	})
+	return result !== null
+}
+
+export async function cache_generated_icon(
+	config: InstanceIconConfig,
+	symbolBytes: number[],
+	addToRecents = false,
+): Promise<string> {
+	return await invoke('plugin:instance|instance_cache_generated_icon', {
+		config,
+		symbolBytes,
+		addToRecents,
+	})
+}
+
+export async function get_recent_icon_configs(): Promise<InstanceIconConfig[]> {
+	return await invoke('plugin:instance|instance_get_recent_icon_configs')
 }
 
 export type SharedInstanceUsers = {
