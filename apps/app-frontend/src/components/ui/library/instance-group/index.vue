@@ -29,8 +29,8 @@ import type {
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { FAVORITES_GROUP_ID, MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
-import { useTheming } from '@/store/state'
 
 const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500
 
@@ -49,8 +49,8 @@ const props = withDefaults(
 )
 
 const { formatMessage } = useVIntl()
-const themeStore = useTheming()
-const compactMode = computed(() => themeStore.getFeatureFlag('compact_instance_cards'))
+const appSettings = useAppSettings()
+const compactMode = computed(() => appSettings.getFeatureFlag('compact_instance_cards'))
 const { addNotification } = injectNotificationManager()
 const {
 	isSectionCollapsed,

@@ -137,6 +137,7 @@ type BehaviorSettingsState = {
 	minimizeApp: boolean
 	hideRightSidebar: boolean
 	showJumpIn: boolean
+	compactInstanceCards: boolean
 	showPlayTime: boolean
 	hideNametag: boolean
 	warnOnUnknownModpacks: boolean
@@ -151,6 +152,9 @@ function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState 
 		minimizeApp: settings.hide_on_process_start,
 		hideRightSidebar: settings.toggle_sidebar,
 		showJumpIn: settings.feature_flags[worldsInHomeFlag] ?? DEFAULT_FEATURE_FLAGS[worldsInHomeFlag],
+		compactInstanceCards:
+			settings.feature_flags[compactInstanceCardsFlag] ??
+			DEFAULT_FEATURE_FLAGS[compactInstanceCardsFlag],
 		showPlayTime:
 			settings.feature_flags[showPlayTimeFlag] ?? DEFAULT_FEATURE_FLAGS[showPlayTimeFlag],
 		hideNametag: settings.hide_nametag_skins_page,
@@ -175,6 +179,7 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 					minimize_app: value.minimizeApp,
 					hide_right_sidebar: value.hideRightSidebar,
 					show_jump_in: value.showJumpIn,
+					compact_instance_cards: value.compactInstanceCards,
 					show_play_time: value.showPlayTime,
 					hide_nametag: value.hideNametag,
 					warn_on_unknown_modpacks: value.warnOnUnknownModpacks,
@@ -192,6 +197,7 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 			feature_flags: {
 				...persistedSettings.value.feature_flags,
 				[worldsInHomeFlag]: value.showJumpIn,
+				[compactInstanceCardsFlag]: value.compactInstanceCards,
 				[showPlayTimeFlag]: value.showPlayTime,
 				[skipUnknownPackWarningFlag]: !value.warnOnUnknownModpacks,
 				[skipNonEssentialWarningsFlag]: value.skipNonEssentialWarnings,
@@ -204,6 +210,7 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 		appSettings.toggleSidebar = value.hideRightSidebar
 		appSettings.hideNametagSkinsPage = value.hideNametag
 		appSettings.featureFlags[worldsInHomeFlag] = value.showJumpIn
+		appSettings.featureFlags[compactInstanceCardsFlag] = value.compactInstanceCards
 		appSettings.featureFlags[showPlayTimeFlag] = value.showPlayTime
 		appSettings.featureFlags[skipUnknownPackWarningFlag] = !value.warnOnUnknownModpacks
 		appSettings.featureFlags[skipNonEssentialWarningsFlag] = value.skipNonEssentialWarnings
@@ -314,17 +321,7 @@ onBeforeUnmount(() => {
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.compactModeDescription) }}</p>
 				</div>
-				<Toggle
-					id="compact-mode"
-					:model-value="themeStore.getFeatureFlag(compactInstanceCardsFlag)"
-					@update:model-value="
-						() => {
-							const newValue = !themeStore.getFeatureFlag(compactInstanceCardsFlag)
-							themeStore.featureFlags[compactInstanceCardsFlag] = newValue
-							settings.feature_flags[compactInstanceCardsFlag] = newValue
-						}
-					"
-				/>
+				<Toggle id="compact-mode" v-model="current.compactInstanceCards" />
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
