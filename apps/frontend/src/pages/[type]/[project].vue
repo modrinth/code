@@ -564,7 +564,7 @@ import {
 	HeartIcon,
 	LeftArrowIcon,
 	MoreVerticalIcon,
-	PackageIcon,
+	PackageSearchIcon,
 	PlayIcon,
 	ReportIcon,
 	ScaleIcon,
@@ -1958,7 +1958,7 @@ const projectHeaderMoreActions = computed(() => {
 		{
 			id: 'view-modpacks',
 			label: formatMessage(messages.viewModpacks),
-			icon: PackageIcon,
+			icon: PackageSearchIcon,
 			type: 'link',
 			to: {
 				path: '/discover/modpacks',
