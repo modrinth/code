@@ -24,6 +24,7 @@
 				:name="searchName"
 				:placeholder="searchPlaceholder || placeholder"
 				:disabled="disabled"
+				:clearable="clearable"
 				:autocomplete="searchAutocomplete"
 				:autocorrect="searchAutocorrect"
 				:autocapitalize="searchAutocapitalize"
@@ -38,6 +39,7 @@
 				@focusin="handleSearchFocus"
 				@focusout="handleSearchFocusout"
 				@click="handleSearchClick"
+				@clear="handleSearchClear"
 			>
 				<template v-if="showChevron" #right>
 					<ChevronLeftIcon
@@ -274,6 +276,7 @@ const props = withDefaults(
 		placeholder?: string
 		disabled?: boolean
 		searchable?: boolean
+		clearable?: boolean
 		searchPlaceholder?: string
 		listbox?: boolean
 		showChevron?: boolean
@@ -316,6 +319,7 @@ const props = withDefaults(
 		placeholder: 'Select an option',
 		disabled: false,
 		searchable: false,
+		clearable: false,
 		searchPlaceholder: 'Search...',
 		listbox: true,
 		showChevron: true,
@@ -836,6 +840,12 @@ function handleSearchInput() {
 	if (!isOpen.value) {
 		openDropdown()
 	}
+}
+
+function handleSearchClear() {
+	userHasTyped.value = true
+	emit('searchInput', searchQuery.value)
+	closeDropdown()
 }
 
 function handleSearchFocus(event: FocusEvent) {
