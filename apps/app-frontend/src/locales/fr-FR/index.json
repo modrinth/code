@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Votre vie privée et comment les publicités soutiennent Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Activer les effets visuels tel que le flou d'arrière-plan. Ceci peut réduire les performances sans accélération matérielle."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Rendu avancé"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Choisir la couleur de thème utilisée par Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Couleur du thème"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Accueil"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimiser l'application"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Utilise la barre de titre et les contrôles de fenêtre de votre système d'exploitation. Nécessite le redémarrage de l'application."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Cadre de fenêtre système"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Montre combien de temps vous avez joué à chaque instance."

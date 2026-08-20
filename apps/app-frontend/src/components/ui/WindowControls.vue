@@ -39,17 +39,17 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
 import { getOS } from '@/helpers/utils.js'
-import { useTheming } from '@/store/state'
 
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 
 const nativeDecorations = ref(true)
 const isMaximized = ref(false)
 const os = ref('')
 
-const alwaysShowAppControls = computed(() => themeStore.getFeatureFlag('always_show_app_controls'))
+const alwaysShowAppControls = computed(() => appSettings.getFeatureFlag('always_show_app_controls'))
 
 const showControls = computed(
 	() =>

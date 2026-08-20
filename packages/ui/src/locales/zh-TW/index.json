@@ -5216,9 +5216,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "好友邀請"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "即將推出！"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "所有人"
   },

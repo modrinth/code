@@ -137,12 +137,6 @@
   "app.ads-consent.title": {
     "message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Avanceret rendering"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Farvetema"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hjem"
   },

@@ -3959,95 +3959,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>開発者モード</strong> が有効です。これにより、Modrinth全体の様々な内部IDを表示することができ、Modrinth APIを使用する開発に役立ちます。ページの下部にあるModrinthロゴを5回クリックすると、開発者モードが切り替わります。"
   },
-  "settings.display.flags.description": {
-    "message": "このデバイスで特定の機能を有効または無効にします。"
-  },
-  "settings.display.flags.title": {
-    "message": "機能の切り替え"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "開発者モードが無効になりました"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "開発者モード無効"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "データパックページ"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "このデバイスでプロジェクト一覧を表示する各ページのレイアウトをお選びください。"
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Modページ"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "ギャラリー"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "グリッド表示"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "行表示"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modパックページ"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "プラグインページ"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "リソースパックページ"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "サーバーページ"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "シェーダーページ"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "プロジェクト一覧のレイアウト"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "ユーザープロフィールページ"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "コレクション"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィックアクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "高度なレンダリング"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Modrinth外のリンクを新しいタブで開くように設定します。この設定にかかわらず、同一ドメイン上のリンクとMarkdownの概要欄のリンクは同じタブで開かれ、広告ページと編集ページ上のリンクは新しいタブで開かれます。"
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "外部リンクを新しいタブで開く"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "「Modrinth Appを入手」ボタンをプライマリナビゲーションから非表示にします。Modrinth Appのページは、ランディングページまたはフッターに表示されます。"
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth Appのプロモーションを非表示"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "コンテンツの左寄せサイドバー"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "コンテンツのサイドバーをページの左側に揃えます。"
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "検索フィルターのサイドバーを検索結果の右側に揃えます。"
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "検索フィルターの右寄せサイドバー"
-  },
-  "settings.display.theme.description": {
-    "message": "このデバイスでのお好みのテーマを選択してください。"
-  },
-  "settings.display.theme.title": {
-    "message": "テーマ"
   },
   "settings.head-title": {
     "message": "表示設定"

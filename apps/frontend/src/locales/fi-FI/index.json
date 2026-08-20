@@ -1025,21 +1025,6 @@
   "settings.billing.payment_method.primary": {
     "message": "Ensisijainen"
   },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods -sivu"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins -sivu"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaders -sivu"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Kokoelma"
-  },
-  "settings.display.theme.title": {
-    "message": "Väri teema"
-  },
   "settings.pats.modal.create.expires.label": {
     "message": "Vanhenee"
   },

@@ -140,15 +140,6 @@
   "app.ads-consent.title": {
     "message": "Din integritet och hur reklam stödjer Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Avancerad rendering"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Välj färgtemat som används av Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Färgtema"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hem"
   },
@@ -169,12 +160,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimera app"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Använd systemets fönsterram (omstart av app krävs)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Inbyggda fönsterdekorationer"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Visa hur länge du spelat varje instans."

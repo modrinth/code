@@ -14,10 +14,13 @@ if (!scriptName) {
 
 const scriptPath = join(__dirname, `${scriptName}.ts`)
 
-const child = spawn('pnpx', ['tsx', scriptPath, ...args], {
-	stdio: 'inherit',
-	shell: true,
-})
+const child = spawn(
+	process.execPath,
+	['--disable-warning=MODULE_TYPELESS_PACKAGE_JSON', scriptPath, ...args],
+	{
+		stdio: 'inherit',
+	},
+)
 
 child.on('exit', (code) => {
 	process.exit(code ?? 0)

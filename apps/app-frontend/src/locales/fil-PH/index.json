@@ -47,12 +47,6 @@
   "app.action-bar.view-logs": {
     "message": "Tignan ang logs"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Masalimuot na pagrerender"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema ng kulay"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Tahanan"
   },
@@ -73,12 +67,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Liitin ang launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gamitin ang system window frame (kailangan i-restart ang app)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Native decorations"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Magpapakita ang katagal ng iyong paglalaro sa isang instansiya."

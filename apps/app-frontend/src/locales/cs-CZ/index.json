@@ -74,12 +74,6 @@
   "app.ads-consent.title": {
     "message": "Vaše soukromí a způsob, jakým reklamy podporují Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Pokročilé vykreslování"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Barevný motiv"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Domů"
   },
@@ -100,12 +94,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimalizovat launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Použít systémový rámeček okna (vyžaduje restart aplikace)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systémové dekorace"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Zobrazuje, kolik času jsi strávil hraním instance."

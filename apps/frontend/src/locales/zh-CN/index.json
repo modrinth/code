@@ -5012,95 +5012,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>开发者模式</strong>已激活。该模式可让你查看 Modrinth 各种对象的内部 ID，对于使用 Modrinth API 的开发者会有所帮助。点击页面底部的 Modrinth 徽标 5 次可开关开发者模式。"
   },
-  "settings.display.flags.description": {
-    "message": "为当前设备开启或关闭特定功能。"
-  },
-  "settings.display.flags.title": {
-    "message": "功能开关"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "开发者模式已被禁用"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "开发者模式已关闭"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "数据包页面"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "为当前设备选择你喜欢的含项目列表页面的布局。"
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "模组页面"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "图库"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "网格"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "列表"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "整合包页面"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "插件页面"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "资源包页面"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "服务器页面"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "光影包页面"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "项目列表布局"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "用户个人资料页面"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "收藏"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "启用模糊效果等高级渲染。可能会在没有硬件加速渲染的情况下造成性能问题。"
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "高级渲染"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "在新标签页中打开跳出 Modrinth 的站外链接。但同一域名下的链接、Markdown 描述中的链接始终在当前标签页打开，广告和编辑页面上的链接则始终在新标签页打开。"
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "在新标签页打开外部链接"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "隐藏主导航栏中的“获取 Modrinth App”按钮。Modrinth App 页面仍然可以通过登录页面或页脚访问。"
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "隐藏 Modrinth App 推荐"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "内容页面侧边栏左对齐"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "将侧边栏显示在页面内容的左侧。"
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "将侧边栏显示在搜索结果的右侧。"
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "搜索页面筛选侧边栏右对齐"
-  },
-  "settings.display.theme.description": {
-    "message": "为当前设备选择你偏好的色彩主题。"
-  },
-  "settings.display.theme.title": {
-    "message": "色彩主题"
   },
   "settings.head-title": {
     "message": "显示设置"

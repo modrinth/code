@@ -56,12 +56,6 @@
   "app.action-bar.view-logs": {
     "message": "Vis logger"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Avansert rendering"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Fargetema"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hjem"
   },

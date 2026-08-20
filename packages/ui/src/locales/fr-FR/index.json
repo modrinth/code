@@ -5207,9 +5207,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Demandes d'ami"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "À venir !"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Tout le monde"
   },

@@ -46,4 +46,5 @@ export function setupAuthProvider(
 	})
 
 	provideAuth(authProvider)
+	return authProvider
 }

@@ -4670,95 +4670,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "A <strong>fejlesztői mód</strong> aktív. Ez lehetővé teszi, hogy megtekintsd a Modrinth különböző elemeinek belső azonosítóit, ami hasznos lehet, ha a Modrinth API-t használó fejlesztő vagy. Kattints 5-ször a lap alján található Modrinth logóra a fejlesztői mód bekapcsolásához."
   },
-  "settings.display.flags.description": {
-    "message": "Bizonyos funkciók engedélyezése vagy letiltása ezen az eszközön."
-  },
-  "settings.display.flags.title": {
-    "message": "Funkciók be-/kikapcsolása"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "A fejlesztői mód le lett tiltva"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Fejlesztői mód letiltva"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Adatcsomagok oldal"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Válaszd ki a kívánt elrendezést minden olyan oldalhoz, amelyen a projektlisták megjelennek ezen az eszközön."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Modok oldal"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Képek"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Rács"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Lista"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modcsomagok oldal"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Bővítmények oldal"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Forráscsomagok oldal"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Szerverek oldal"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaderek oldal"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Projektlista elrendezések"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Profil oldalak"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Gyűjtemény"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Lehetővé teszi a összetett megjelenítést, például az elmosódási effektusokat, amelyek teljesítményproblémákat okozhatnak hardveres gyorsítás nélkül."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Összetett renderelés"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "A Modrinthon kívüli linkeket új lapon nyílnak meg. Ettől a beállítástól függetlenül az azonos domainen található linkek és a Markdown leírásokban szereplő linkek ugyanazon a lapon nyílnak meg, míg a hirdetésekben és a szerkesztési oldalakon található linkek új lapon nyílnak meg."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Külső linkek megnyitása új lapon"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Elrejti a „Szerezd meg a Modrinth Appot” gombokat az elsődleges navigációból. A Modrinth App oldal továbbra is megtalálható a nyitóoldalon vagy a láblécben."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth App promóciók elrejtése"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Balra igazított oldalsáv oldalakon"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "A tartalom bal oldalára igazítja az oldalsávot."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "A keresési eredmények jobb oldalára igazítja a szűrőket."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Jobbra igazított szűrők oldalakon"
-  },
-  "settings.display.theme.description": {
-    "message": "Válaszd ki a Modrinth számára a kívánt színsémát ezen az eszközön."
-  },
-  "settings.display.theme.title": {
-    "message": "Téma"
   },
   "settings.head-title": {
     "message": "Megjelenési beállítások"

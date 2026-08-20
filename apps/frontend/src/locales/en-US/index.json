@@ -5282,95 +5282,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Developer mode</strong> is active. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode."
   },
-  "settings.display.flags.description": {
-    "message": "Enable or disable certain features on this device."
-  },
-  "settings.display.flags.title": {
-    "message": "Toggle features"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Developer mode has been disabled"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Developer mode deactivated"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Data Packs page"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Select your preferred layout for each page that displays project lists on this device."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods page"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Gallery"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Grid"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rows"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks page"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins page"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resource Packs page"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Servers page"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaders page"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Project list layouts"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "User profile pages"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Collection"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Advanced rendering"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Open external links in new tab"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Hides the \"Get Modrinth App\" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Hide Modrinth App promotions"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Left-aligned sidebar on content pages"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Aligns the sidebar to the left of the page's content."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Aligns the filters sidebar to the right of the search results."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Right-aligned filters sidebar on search pages"
-  },
-  "settings.display.theme.description": {
-    "message": "Select your preferred color theme for Modrinth on this device."
-  },
-  "settings.display.theme.title": {
-    "message": "Color theme"
   },
   "settings.head-title": {
     "message": "Display settings"

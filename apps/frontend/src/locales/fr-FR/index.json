@@ -5012,95 +5012,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Le mode développeur</strong> est activé. Cela vous permettra de voir les ID internes de diverses choses dans Modrinth qui peuvent être utiles si vous êtes un développeur utilisant l'API de Modrinth. Cliquez 5 fois sur le logo Modrinth en bas de la page pour désactiver le mode développeur."
   },
-  "settings.display.flags.description": {
-    "message": "Activer ou désactiver certaines fonctionnalités sur cet appareil."
-  },
-  "settings.display.flags.title": {
-    "message": "Activer/désactiver les fonctionnalités"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Le mode développeur a été désactivé"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Mode développeur désactivé"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Page des data packs"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Sélectionnez votre mise en page préférée pour chaque page qui affiche les listes de projets sur cet appareil."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Page des mods"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galerie"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Grille"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Lignes"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Page des modpacks"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Page des plugins"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Page des packs de ressources"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Page des serveurs"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Page des shaders"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Mises en pages de la liste de projet"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Pages de profil utilisateur"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Collection"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Permet un rendu avancé tel que les effets de flou qui pourrait causer des problèmes de performance si le rendu n'est pas accéléré par le matériel."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Rendu avancé"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Les liens qui vont en dehors de Modrinth s'ouvrent dans un nouvel onglet. Peu importe ce paramètre, les liens sur le même domaine et dans les descriptions Markdown s'ouvriront dans le même onglet, et les liens sur les publicités et les pages d'édition s'ouvriront dans un nouvel onglet."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Ouvre les liens externes dans un nouvel onglet"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Cache les boutons « Obtenir Modrinth App » de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Cache les publicités de Modrinth App"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Barre latérale alignée à gauche sur les pages de contenus"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Aligne la barre latérale à gauche du contenu de la page."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Aligne les filtres de la barre latérale à droite des résultats de recherche."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Filtres de la barre latérale alignés à droite sur les pages de recherche"
-  },
-  "settings.display.theme.description": {
-    "message": "Sélectionnez votre thème de couleur préféré pour Modrinth sur cet appareil."
-  },
-  "settings.display.theme.title": {
-    "message": "Thème de couleur"
   },
   "settings.head-title": {
     "message": "Paramètres d’affichage"

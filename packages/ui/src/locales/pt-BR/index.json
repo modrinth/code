@@ -5216,9 +5216,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Solicitações de amizade"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Em breve!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Todos"
   },

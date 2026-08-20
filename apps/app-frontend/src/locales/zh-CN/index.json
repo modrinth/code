@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "您的隐私以及广告如何支持 Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "启用模糊效果等高级渲染。可能会在没有硬件加速渲染的情况下造成性能问题。"
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "高级渲染"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "为 Modrinth App 选择偏好的色彩主题。"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "色彩主题"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首页"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "最小化 App"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "使用操作系统的标题栏和窗口控件。需要重启应用。"
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "系统窗口框架"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "显示你在每个实例中游玩的时间。"

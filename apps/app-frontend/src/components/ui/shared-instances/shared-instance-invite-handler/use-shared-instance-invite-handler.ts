@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { type Ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_user } from '@/helpers/cache'
 import { toError } from '@/helpers/errors'
 import {
@@ -18,7 +19,6 @@ import {
 } from '@/helpers/install'
 import { list } from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
-import { useTheming } from '@/store/state'
 
 import { parseSharedInstanceInviteNotification } from './shared-instance-invite-parser'
 import type { AppNotification, SharedInstanceInvite } from './shared-instance-invite-types'
@@ -58,7 +58,7 @@ export function useSharedInstanceInviteHandler(
 	const popupNotificationManager = injectPopupNotificationManager()
 	const queryClient = useQueryClient()
 	const router = useRouter()
-	const themeStore = useTheming()
+	const appSettings = useAppSettings()
 	const displayedNotifications = new Set<string | number>()
 	const displayedNotificationKeys = new Set<string>()
 	const popupNotificationIds = new Set<string | number>()
@@ -121,7 +121,7 @@ export function useSharedInstanceInviteHandler(
 			(instance) => instance.shared_instance?.id === sharedInstanceId,
 		)
 
-		if (!existingInstance || themeStore.getFeatureFlag('skip_non_essential_warnings')) {
+		if (!existingInstance || appSettings.getFeatureFlag('skip_non_essential_warnings')) {
 			showInstall(preview, install, creator)
 			return
 		}

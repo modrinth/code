@@ -3965,95 +3965,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Mod pembangun</strong> kini aktif. Ini akan membolehkan anda melihat ID dalaman pelbagai perkara di seluruh Modrinth yang mungkin berguna jika anda seorang pembangun yang menggunakan API Modrinth. Klik pada logo Modrinth di bahagian bawah laman sebanyak 5 kali untuk menogol mod pembangun."
   },
-  "settings.display.flags.description": {
-    "message": "Dayakan atau nyahdayakan ciri tertentu pada peranti ini."
-  },
-  "settings.display.flags.title": {
-    "message": "Togol ciri-ciri"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Mod pembangun telah dinyahdayakan"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Mod pembangun dinyahaktifkan"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Laman Pek Data"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Pilih susun atur pilihan anda untuk setiap laman yang memaparkan senarai projek pada peranti ini."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Laman Mod"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galeri"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Grid"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Barisan"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Laman Pek Mod"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Laman Pemalam"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Laman Pek Sumber"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Laman Pelayan"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Laman Pembayang"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Susun atur senarai projek"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Laman profil pengguna"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Koleksi"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Mendayakan pemaparan lanjutan seperti kesan kabur yang boleh menyebabkan masalah prestasi tanpa pemaparan dipercepatkan perkakasan."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Pemaparan lanjutan"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Buka pautan yang membawa anda ke luar Modrinth dalam tab baharu. Tidak kira tetapan ini, pautan pada domain yang sama dan dalam keterangan berformat Markdown akan dibuka dalam tab yang sama dan pautan pada iklan dan laman sunting akan dibuka dalam tab baharu."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Buka pautan luaran dalam tab baharu"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Menyembunyikan butang \"Dapatkan Modrinth App\" daripada navigasi utama. Laman Modrinth App masih boleh dijumpai pada halaman pendaratan atau dalam pengaki."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Sembunyikan promosi Modrinth App"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Bar sisi carian dijajar kiri pada laman kandungan"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Menjajarkan bar sisi butiran projek ke sebelah kiri kandungan laman."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Menjajarkan bar sisi penapis ke sebelah kanan hasil carian."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Bar sisi penapis dijajar kanan pada laman carian"
-  },
-  "settings.display.theme.description": {
-    "message": "Pilih tema warna pilihan anda untuk Modrinth pada peranti ini."
-  },
-  "settings.display.theme.title": {
-    "message": "Tema warna"
   },
   "settings.head-title": {
     "message": "Tetapan paparan"

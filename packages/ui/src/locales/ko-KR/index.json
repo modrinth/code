@@ -5198,9 +5198,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "친구 요청"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "곧 제공할 예정입니다!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "모든 사람"
   },
